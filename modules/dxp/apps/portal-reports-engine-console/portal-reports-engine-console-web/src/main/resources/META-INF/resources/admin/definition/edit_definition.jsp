@@ -54,7 +54,7 @@ else {
 
 <div class="report-message"></div>
 
-<portlet:actionURL name="editDefinition" var="actionURL">
+<portlet:actionURL name="/reports_admin/edit_definition" var="actionURL">
 	<portlet:param name="mvcPath" value="/admin/definition/edit_definition.jsp" />
 </portlet:actionURL>
 
@@ -112,19 +112,23 @@ else {
 					<aui:input name="reportName" type="hidden" value="<%= reportName %>" />
 				</span>
 
-				<aui:button cssClass="cancel-update-template-report" style="display:none;" value="cancel" />
+				<aui:button cssClass="cancel-update-template-report" style="display: none;" value="cancel" />
 			</aui:field-wrapper>
 		</aui:fieldset>
 
 		<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="report-parameters">
 			<aui:input cssClass="report-parameters" name="reportParameters" type="hidden" />
 
-			<aui:row>
-				<aui:col width="<%= 35 %>">
+			<clay:row>
+				<clay:col
+					md="4"
+				>
 					<aui:input cssClass="parameters-key" name="key" size="20" type="text" />
-				</aui:col>
+				</clay:col>
 
-				<aui:col width="<%= 35 %>">
+				<clay:col
+					md="4"
+				>
 
 					<%
 					Calendar calendar = CalendarFactoryUtil.getCalendar(timeZone, locale);
@@ -145,26 +149,30 @@ else {
 							yearValue="<%= calendar.get(Calendar.YEAR) %>"
 						/>
 					</aui:field-wrapper>
-				</aui:col>
+				</clay:col>
 
-				<aui:col width="<%= 15 %>">
+				<clay:col
+					md="2"
+				>
 					<aui:select cssClass="parameters-input-type" label="type" name="type">
 						<aui:option label="text" value="text" />
 						<aui:option label="date" value="date" />
 					</aui:select>
-				</aui:col>
+				</clay:col>
 
-				<aui:col width="<%= 15 %>">
+				<clay:col
+					md="2"
+				>
 					<aui:button-row cssClass="add-parameter">
 						<aui:button value="add-parameter" />
 					</aui:button-row>
-				</aui:col>
-			</aui:row>
+				</clay:col>
+			</clay:row>
 
 			<aui:field-wrapper>
-				<aui:col>
+				<clay:col>
 					<div class="report-tags"></div>
-				</aui:col>
+				</clay:col>
 			</aui:field-wrapper>
 		</aui:fieldset>
 
@@ -187,12 +195,12 @@ else {
 
 		<c:if test="<%= definition != null %>">
 			<c:if test="<%= DefinitionPermissionChecker.contains(permissionChecker, definition, ReportsActionKeys.ADD_REPORT) %>">
-				<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "addReport();" %>' value="add-report" />
+				<aui:button cssClass="btn-lg" onClick='<%= liferayPortletResponse.getNamespace() + "addReport();" %>' value="add-report" />
 
-				<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "addScheduler();" %>' value="add-schedule" />
+				<aui:button cssClass="btn-lg" onClick='<%= liferayPortletResponse.getNamespace() + "addScheduler();" %>' value="add-schedule" />
 			</c:if>
 
-			<aui:button cssClass="btn-lg" onClick='<%= renderResponse.getNamespace() + "deleteDefinition();" %>' value="delete" />
+			<aui:button cssClass="btn-lg" onClick='<%= liferayPortletResponse.getNamespace() + "deleteDefinition();" %>' value="delete" />
 		</c:if>
 
 		<aui:button cssClass="btn-lg" href="<%= viewURL %>" type="cancel" />
@@ -200,11 +208,11 @@ else {
 </aui:form>
 
 <script type="text/javascript">
-	AUI().ready(function(A) {
+	AUI().ready(function (A) {
 		Liferay.Report.initialize({
 			namespace: '<portlet:namespace />',
 			parameters:
-				'<%= HtmlUtil.escapeJS(BeanParamUtil.getString(definition, request, "reportParameters")) %>'
+				'<%= HtmlUtil.escapeJS(BeanParamUtil.getString(definition, request, "reportParameters")) %>',
 		});
 	});
 
@@ -230,7 +238,7 @@ else {
 		) {
 			submitForm(
 				document.<portlet:namespace />fm,
-				'<portlet:actionURL name="deleteDefinition"><portlet:param name="redirect" value="<%= definitionsURL %>" /></portlet:actionURL>'
+				'<portlet:actionURL name="/reports_admin/delete_definition"><portlet:param name="redirect" value="<%= definitionsURL %>" /></portlet:actionURL>'
 			);
 		}
 	}

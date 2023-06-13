@@ -15,11 +15,13 @@
 package com.liferay.company.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.model.adapter.StagedAssetLink;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.exportimport.kernel.service.StagingLocalServiceUtil;
+import com.liferay.layout.set.model.adapter.StagedLayoutSet;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
@@ -27,23 +29,32 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.AccountNameException;
 import com.liferay.portal.kernel.exception.CompanyMxException;
 import com.liferay.portal.kernel.exception.CompanyVirtualHostException;
+import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.NoSuchAccountException;
 import com.liferay.portal.kernel.exception.NoSuchPasswordPolicyException;
 import com.liferay.portal.kernel.exception.NoSuchVirtualHostException;
 import com.liferay.portal.kernel.exception.RequiredCompanyException;
 import com.liferay.portal.kernel.model.Account;
+import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
+import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.model.PortalPreferences;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.model.UserGroupRole;
+import com.liferay.portal.kernel.model.adapter.StagedTheme;
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.AccountLocalServiceUtil;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalServiceUtil;
@@ -55,10 +66,12 @@ import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
 import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserGroupTestUtil;
@@ -67,14 +80,24 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.repository.liferayrepository.LiferayRepository;
+import com.liferay.portal.repository.temporaryrepository.TemporaryFileEntryRepository;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.test.rule.SybaseDump;
 import com.liferay.portal.test.rule.SybaseDumpTransactionLog;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.site.model.adapter.StagedGroup;
 import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.io.File;
@@ -82,11 +105,12 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -96,6 +120,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
+
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.mock.web.MockServletContext;
 
@@ -103,6 +132,7 @@ import org.springframework.mock.web.MockServletContext;
  * @author Mika Koivisto
  * @author Dale Shan
  */
+@DataGuard(autoDelete = false, scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 @SybaseDumpTransactionLog(dumpBefore = {SybaseDump.CLASS, SybaseDump.METHOD})
 public class CompanyLocalServiceTest {
@@ -147,6 +177,14 @@ public class CompanyLocalServiceTest {
 		CompanyThreadLocal.setCompanyId(_companyId);
 
 		resetBackgroundTaskThreadLocal();
+
+		for (ServiceRegistration<?> serviceRegistration :
+				_serviceRegistrations) {
+
+			serviceRegistration.unregister();
+		}
+
+		_serviceRegistrations.clear();
 	}
 
 	@Test
@@ -160,6 +198,8 @@ public class CompanyLocalServiceTest {
 		for (String webId : PortalInstances.getWebIds()) {
 			Assert.assertNotEquals(companyWebId, webId);
 		}
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -172,24 +212,24 @@ public class CompanyLocalServiceTest {
 
 		long userId = UserLocalServiceUtil.getDefaultUserId(companyId);
 
-		Organization companyOrganzation =
+		Organization companyOrganization =
 			OrganizationLocalServiceUtil.addOrganization(
 				userId, OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
 				RandomTestUtil.randomString(), true);
 
-		Group companyOrganizationGroup = companyOrganzation.getGroup();
+		Group companyOrganizationGroup = companyOrganization.getGroup();
 
 		Group group = GroupTestUtil.addGroup(
 			companyId, userId, companyOrganizationGroup.getGroupId());
 
 		CompanyLocalServiceUtil.deleteCompany(company);
 
-		companyOrganzation = OrganizationLocalServiceUtil.fetchOrganization(
-			companyOrganzation.getOrganizationId());
+		companyOrganization = OrganizationLocalServiceUtil.fetchOrganization(
+			companyOrganization.getOrganizationId());
 
 		Assert.assertNull(
 			"The company organization should delete with the company",
-			companyOrganzation);
+			companyOrganization);
 
 		companyOrganizationGroup = GroupLocalServiceUtil.fetchGroup(
 			companyOrganizationGroup.getGroupId());
@@ -204,6 +244,8 @@ public class CompanyLocalServiceTest {
 			"The company organization child group should delete with the " +
 				"company",
 			group);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -212,9 +254,8 @@ public class CompanyLocalServiceTest {
 
 		Company company = addCompany();
 
-		long companyId = company.getCompanyId();
-
-		long userId = UserLocalServiceUtil.getDefaultUserId(companyId);
+		long userId = UserLocalServiceUtil.getDefaultUserId(
+			company.getCompanyId());
 
 		Group companyGroup = company.getGroup();
 
@@ -234,6 +275,8 @@ public class CompanyLocalServiceTest {
 			companyStagingGroup.getGroupId());
 
 		Assert.assertNull(companyStagingGroup);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -263,6 +306,8 @@ public class CompanyLocalServiceTest {
 			"test.xml", "", "", "test".getBytes(), serviceContext);
 
 		CompanyLocalServiceUtil.deleteCompany(companyId);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -309,6 +354,8 @@ public class CompanyLocalServiceTest {
 				layoutSetPrototype.getLayoutSetPrototypeId());
 
 		Assert.assertNull(layoutSetPrototype);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -347,6 +394,8 @@ public class CompanyLocalServiceTest {
 			});
 
 		CompanyLocalServiceUtil.deleteCompany(companyId);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -377,6 +426,8 @@ public class CompanyLocalServiceTest {
 		group = GroupLocalServiceUtil.fetchGroup(group.getGroupId());
 
 		Assert.assertNull(group);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -387,28 +438,30 @@ public class CompanyLocalServiceTest {
 
 		User companyAdminUser = UserTestUtil.addCompanyAdminUser(company);
 
-		Organization companyOrganzation =
+		Organization companyOrganization =
 			OrganizationLocalServiceUtil.addOrganization(
 				companyAdminUser.getUserId(),
 				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
 				RandomTestUtil.randomString(), true);
 
-		Group companyOrganizationGroup = companyOrganzation.getGroup();
+		Group companyOrganizationGroup = companyOrganization.getGroup();
 
 		GroupTestUtil.enableLocalStaging(
 			companyOrganizationGroup, companyAdminUser.getUserId());
 
 		CompanyLocalServiceUtil.deleteCompany(company);
 
-		companyOrganzation = OrganizationLocalServiceUtil.fetchOrganization(
-			companyOrganzation.getOrganizationId());
+		companyOrganization = OrganizationLocalServiceUtil.fetchOrganization(
+			companyOrganization.getOrganizationId());
 
-		Assert.assertNull(companyOrganzation);
+		Assert.assertNull(companyOrganization);
 
 		companyOrganizationGroup = GroupLocalServiceUtil.fetchGroup(
 			companyOrganizationGroup.getGroupId());
 
 		Assert.assertNull(companyOrganizationGroup);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -441,6 +494,58 @@ public class CompanyLocalServiceTest {
 		user = UserLocalServiceUtil.fetchUser(user.getUserId());
 
 		Assert.assertNull(user);
+
+		deleteStagingClassNameEntries();
+	}
+
+	@Test
+	public void testAddAndDeleteCompanyWithUserGroupAndUserGroupRole()
+		throws Exception {
+
+		Company company = addCompany();
+
+		long userId = UserLocalServiceUtil.getDefaultUserId(
+			company.getCompanyId());
+
+		Group group = GroupTestUtil.addGroup(
+			company.getCompanyId(), userId,
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
+		UserGroup userGroup = UserGroupTestUtil.addUserGroup(
+			group.getGroupId());
+
+		User user = addUser(
+			company.getCompanyId(), userId, group.getGroupId(),
+			getServiceContext(company.getCompanyId()));
+
+		UserGroupLocalServiceUtil.addUserUserGroup(user.getUserId(), userGroup);
+
+		Role role = RoleLocalServiceUtil.addRole(
+			userId, Group.class.getName(), group.getClassPK(),
+			StringUtil.randomString(),
+			Collections.singletonMap(
+				LocaleUtil.getDefault(), StringUtil.randomString()),
+			Collections.emptyMap(), RoleConstants.TYPE_SITE, StringPool.BLANK,
+			getServiceContext(company.getCompanyId()));
+
+		UserGroupRoleLocalServiceUtil.addUserGroupRole(
+			user.getUserId(), group.getGroupId(), role.getRoleId());
+
+		CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
+
+		Assert.assertNull(RoleLocalServiceUtil.fetchRole(role.getRoleId()));
+
+		Assert.assertNull(
+			UserGroupLocalServiceUtil.fetchUserGroup(
+				userGroup.getUserGroupId()));
+
+		Assert.assertNull(
+			UserGroupRoleLocalServiceUtil.fetchUserGroupRole(
+				user.getUserId(), group.getGroupId(), role.getRoleId()));
+
+		Assert.assertNull(UserLocalServiceUtil.fetchUser(user.getUserId()));
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test(expected = NoSuchAccountException.class)
@@ -448,6 +553,8 @@ public class CompanyLocalServiceTest {
 		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
+
+		deleteStagingClassNameEntries();
 
 		AccountLocalServiceUtil.getAccount(company.getAccountId());
 	}
@@ -459,6 +566,8 @@ public class CompanyLocalServiceTest {
 		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
+
+		deleteStagingClassNameEntries();
 
 		PasswordPolicyLocalServiceUtil.getDefaultPasswordPolicy(
 			company.getCompanyId());
@@ -479,6 +588,8 @@ public class CompanyLocalServiceTest {
 			company.getCompanyId(), GroupConstants.ANY_PARENT_GROUP_ID, false);
 
 		Assert.assertEquals(0, count);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -496,6 +607,8 @@ public class CompanyLocalServiceTest {
 			company.getCompanyId(), false);
 
 		Assert.assertEquals(0, count);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -510,6 +623,8 @@ public class CompanyLocalServiceTest {
 
 		Assert.assertEquals(
 			layoutSetPrototypes.toString(), 0, layoutSetPrototypes.size());
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test(expected = NoSuchPasswordPolicyException.class)
@@ -519,6 +634,8 @@ public class CompanyLocalServiceTest {
 		final Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
+
+		deleteStagingClassNameEntries();
 
 		TransactionInvokerUtil.invoke(
 			_transactionConfig,
@@ -546,6 +663,8 @@ public class CompanyLocalServiceTest {
 			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
 
 		Assert.assertEquals(0, count);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -559,6 +678,8 @@ public class CompanyLocalServiceTest {
 				"Company instance was not deleted", company.getCompanyId(),
 				companyId);
 		}
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -585,6 +706,8 @@ public class CompanyLocalServiceTest {
 				}
 
 			});
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -608,6 +731,8 @@ public class CompanyLocalServiceTest {
 				}
 
 			});
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -620,6 +745,51 @@ public class CompanyLocalServiceTest {
 			company.getCompanyId());
 
 		Assert.assertEquals(roles.toString(), 0, roles.size());
+
+		deleteStagingClassNameEntries();
+	}
+
+	@Test
+	public void testDeleteCompanyDeletesUserGroupRoleBeforeRole()
+		throws Exception {
+
+		List<String> list = _registerModelListeners();
+
+		Company company = addCompany();
+
+		long userId = UserLocalServiceUtil.getDefaultUserId(
+			company.getCompanyId());
+
+		Group group = GroupTestUtil.addGroup(
+			company.getCompanyId(), userId,
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
+		UserGroup userGroup = UserGroupTestUtil.addUserGroup(
+			group.getGroupId());
+
+		User user = addUser(
+			company.getCompanyId(), userId, group.getGroupId(),
+			getServiceContext(company.getCompanyId()));
+
+		UserGroupLocalServiceUtil.addUserUserGroup(user.getUserId(), userGroup);
+
+		Role role = RoleLocalServiceUtil.addRole(
+			userId, Group.class.getName(), group.getClassPK(),
+			StringUtil.randomString(),
+			Collections.singletonMap(
+				LocaleUtil.getDefault(), StringUtil.randomString()),
+			Collections.emptyMap(), RoleConstants.TYPE_SITE, StringPool.BLANK,
+			getServiceContext(company.getCompanyId()));
+
+		UserGroupRoleLocalServiceUtil.addUserGroupRole(
+			user.getUserId(), group.getGroupId(), role.getRoleId());
+
+		CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
+
+		Assert.assertEquals(UserGroupRole.class.getName(), list.get(0));
+		Assert.assertEquals(Role.class.getName(), list.get(1));
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -632,6 +802,8 @@ public class CompanyLocalServiceTest {
 			company.getCompanyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(users.toString(), 0, users.size());
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test(expected = NoSuchVirtualHostException.class)
@@ -639,6 +811,8 @@ public class CompanyLocalServiceTest {
 		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
+
+		deleteStagingClassNameEntries();
 
 		VirtualHostLocalServiceUtil.getVirtualHost(company.getWebId());
 	}
@@ -650,6 +824,8 @@ public class CompanyLocalServiceTest {
 		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test(expected = RequiredCompanyException.class)
@@ -657,6 +833,79 @@ public class CompanyLocalServiceTest {
 		long companyId = PortalInstances.getDefaultCompanyId();
 
 		CompanyLocalServiceUtil.deleteCompany(companyId);
+
+		deleteStagingClassNameEntries();
+	}
+
+	@Test
+	public void testGetCompanyByVirtualHost() throws Exception {
+		String virtualHostName = "::1";
+
+		Company company = addCompany(virtualHostName);
+
+		Assert.assertEquals(
+			company,
+			CompanyLocalServiceUtil.getCompanyByVirtualHost(virtualHostName));
+		Assert.assertEquals(
+			company,
+			CompanyLocalServiceUtil.getCompanyByVirtualHost("0:0:0:0:0:0:0:1"));
+
+		CompanyLocalServiceUtil.deleteCompany(company);
+
+		deleteStagingClassNameEntries();
+	}
+
+	@Test
+	public void testUpdateCompanyLocalesUpdateGroupLocales() throws Exception {
+		Company company = addCompany();
+
+		String[] companyLanguageIds = PrefsPropsUtil.getStringArray(
+			company.getCompanyId(), PropsKeys.LOCALES, StringPool.COMMA,
+			PropsValues.LOCALES_ENABLED);
+
+		User user = UserTestUtil.getAdminUser(company.getCompanyId());
+
+		Group group = GroupTestUtil.addGroup(
+			company.getCompanyId(), user.getUserId(),
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
+		group = GroupTestUtil.updateDisplaySettings(
+			group.getGroupId(),
+			ListUtil.fromArray(LocaleUtil.fromLanguageIds(companyLanguageIds)),
+			LocaleUtil.getDefault());
+
+		UnicodeProperties groupTypeSettingsUnicodeProperties =
+			group.getTypeSettingsProperties();
+
+		Assert.assertEquals(
+			StringUtil.merge(companyLanguageIds),
+			groupTypeSettingsUnicodeProperties.getProperty(PropsKeys.LOCALES));
+
+		UnicodeProperties unicodeProperties = new UnicodeProperties();
+
+		String languageIds = "ca_ES,en_US";
+
+		unicodeProperties.put(PropsKeys.LOCALES, languageIds);
+
+		CompanyLocalServiceUtil.updatePreferences(
+			company.getCompanyId(), unicodeProperties);
+
+		Assert.assertEquals(
+			languageIds,
+			PrefsPropsUtil.getString(
+				company.getCompanyId(), PropsKeys.LOCALES));
+
+		group = GroupLocalServiceUtil.getGroup(group.getGroupId());
+
+		groupTypeSettingsUnicodeProperties = group.getTypeSettingsProperties();
+
+		Assert.assertEquals(
+			languageIds,
+			groupTypeSettingsUnicodeProperties.getProperty(PropsKeys.LOCALES));
+
+		CompanyLocalServiceUtil.deleteCompany(company);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -674,39 +923,48 @@ public class CompanyLocalServiceTest {
 
 		user = UserLocalServiceUtil.getDefaultUser(company.getCompanyId());
 
+		CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
+
 		Assert.assertEquals(languageId, user.getLanguageId());
 		Assert.assertEquals("CET", user.getTimeZoneId());
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
 	public void testUpdateInvalidAccountNames() throws Exception {
 		Company company = addCompany();
 
-		Group group = GroupTestUtil.addGroup();
+		long companyId = company.getCompanyId();
 
-		group.setCompanyId(company.getCompanyId());
+		long userId = UserLocalServiceUtil.getDefaultUserId(companyId);
 
-		GroupLocalServiceUtil.updateGroup(group);
+		Group group = GroupTestUtil.addGroup(
+			companyId, userId, GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
 		testUpdateAccountNames(
 			company,
 			new String[] {StringPool.BLANK, group.getDescriptiveName()}, true);
 
-		GroupLocalServiceUtil.deleteGroup(group);
-
 		CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
 	public void testUpdateInvalidMx() throws Exception {
 		testUpdateMx("abc", false, true);
 		testUpdateMx(StringPool.BLANK, false, true);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
 	public void testUpdateInvalidVirtualHostnames() throws Exception {
 		testUpdateVirtualHostnames(
 			new String[] {StringPool.BLANK, "localhost", ".abc"}, true);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -715,6 +973,8 @@ public class CompanyLocalServiceTest {
 		testUpdateMx("abc.com", true, false);
 		testUpdateMx(StringPool.BLANK, false, true);
 		testUpdateMx(StringPool.BLANK, false, false);
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -725,20 +985,33 @@ public class CompanyLocalServiceTest {
 			company, new String[] {RandomTestUtil.randomString()}, false);
 
 		CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
+
+		deleteStagingClassNameEntries();
 	}
 
 	@Test
 	public void testUpdateValidVirtualHostnames() throws Exception {
-		testUpdateVirtualHostnames(new String[] {"abc.com"}, false);
+		testUpdateVirtualHostnames(
+			new String[] {
+				"abc.com", "255.0.0.0", "0:0:0:0:0:0:0:1", "::1",
+				"0000:0000:0000:0000:0000:0000:0000:0001"
+			},
+			false);
+
+		deleteStagingClassNameEntries();
 	}
 
 	protected Company addCompany() throws Exception {
-		String webId = RandomTestUtil.randomString() + "test.com";
+		return addCompany(RandomTestUtil.randomString() + "test.com");
+	}
 
+	protected Company addCompany(String webId) throws Exception {
 		Company company = CompanyLocalServiceUtil.addCompany(
-			webId, webId, "test.com", false, 0, true);
+			null, webId, webId, "test.com", false, 0, true);
 
 		PortalInstances.initCompany(_mockServletContext, webId);
+
+		CompanyThreadLocal.setCompanyId(company.getCompanyId());
 
 		return company;
 	}
@@ -747,13 +1020,13 @@ public class CompanyLocalServiceTest {
 			long companyId, long userId, String name)
 		throws Exception {
 
-		Map<Locale, String> nameMap = HashMapBuilder.put(
-			LocaleUtil.getDefault(), name
-		).build();
-
 		return LayoutSetPrototypeLocalServiceUtil.addLayoutSetPrototype(
-			userId, companyId, nameMap, new HashMap<Locale, String>(), true,
-			true, getServiceContext(companyId));
+			userId, companyId,
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), name
+			).build(),
+			new HashMap<Locale, String>(), true, true,
+			getServiceContext(companyId));
 	}
 
 	protected User addUser(
@@ -767,6 +1040,26 @@ public class CompanyLocalServiceTest {
 			LocaleUtil.getDefault(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), new long[] {groupId},
 			serviceContext);
+	}
+
+	protected void deleteClassName(String value) {
+		ClassName className = _classNameLocalService.fetchClassName(value);
+
+		if (className == null) {
+			return;
+		}
+
+		_classNameLocalService.deleteClassName(className);
+	}
+
+	protected void deleteStagingClassNameEntries() {
+		deleteClassName(TemporaryFileEntryRepository.class.getName());
+		deleteClassName(LiferayRepository.class.getName());
+		deleteClassName(Folder.class.getName());
+		deleteClassName(StagedAssetLink.class.getName());
+		deleteClassName(StagedLayoutSet.class.getName());
+		deleteClassName(StagedGroup.class.getName());
+		deleteClassName(StagedTheme.class.getName());
 	}
 
 	protected ServiceContext getServiceContext(long companyId) {
@@ -873,6 +1166,45 @@ public class CompanyLocalServiceTest {
 		CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
 	}
 
+	private List<String> _registerModelListeners() {
+		List<String> list = new CopyOnWriteArrayList<>();
+
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		_serviceRegistrations.add(
+			bundleContext.registerService(
+				ModelListener.class,
+				new BaseModelListener<Role>() {
+
+					@Override
+					public void onBeforeRemove(Role role)
+						throws ModelListenerException {
+
+						list.add(Role.class.getName());
+					}
+
+				},
+				new HashMapDictionary<>()));
+		_serviceRegistrations.add(
+			bundleContext.registerService(
+				ModelListener.class,
+				new BaseModelListener<UserGroupRole>() {
+
+					@Override
+					public void onBeforeRemove(UserGroupRole userGroupRole)
+						throws ModelListenerException {
+
+						list.add(UserGroupRole.class.getName());
+					}
+
+				},
+				new HashMapDictionary<>()));
+
+		return list;
+	}
+
 	private static final TransactionConfig _transactionConfig;
 
 	static {
@@ -885,7 +1217,12 @@ public class CompanyLocalServiceTest {
 		_transactionConfig = builder.build();
 	}
 
+	@Inject
+	private ClassNameLocalService _classNameLocalService;
+
 	private long _companyId;
 	private MockServletContext _mockServletContext;
+	private final List<ServiceRegistration<?>> _serviceRegistrations =
+		new CopyOnWriteArrayList<>();
 
 }

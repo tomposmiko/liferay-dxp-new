@@ -12,16 +12,21 @@
  * details.
  */
 
-import {RulesVisitor} from 'dynamic-data-mapping-form-renderer/js/util/visitors.es';
+import {RulesVisitor} from 'dynamic-data-mapping-form-renderer';
 
 import Token from '../../../expressions/Token.es';
 import Tokenizer from '../../../expressions/Tokenizer.es';
 
 export const isEqualLengthOptions = (options1, options2) => {
-	return options1.length === options2.length;
+	if (!!options1 && !!options2) {
+		return options1.length === options2.length;
+	}
+	else {
+		return false;
+	}
 };
 
-export const isFieldValueOperand = operands => {
+export const isFieldValueOperand = (operands) => {
 	return (
 		operands.length == 2 &&
 		operands[0].type === 'field' &&
@@ -30,7 +35,7 @@ export const isFieldValueOperand = operands => {
 };
 
 export const isOptionReferencedByOperand = (options, operandValue) => {
-	return options.some(({value}) => operandValue === value);
+	return options.some(({label}) => operandValue === label);
 };
 
 export const renameFieldInsideExpression = (
@@ -41,7 +46,7 @@ export const renameFieldInsideExpression = (
 	const tokens = Tokenizer.tokenize(expression);
 
 	return Tokenizer.stringifyTokens(
-		tokens.map(token => {
+		tokens.map((token) => {
 			if (token.type === Token.VARIABLE && token.value === fieldName) {
 				token = new Token(Token.VARIABLE, newFieldName);
 			}
@@ -51,16 +56,30 @@ export const renameFieldInsideExpression = (
 	);
 };
 
+export const renameFieldInsideAutofill = (
+	object,
+	oldFieldName,
+	newFieldName
+) => {
+	Object.keys(object).map((key) => {
+		if (object[key] === oldFieldName) {
+			object[key] = newFieldName;
+		}
+	});
+
+	return object;
+};
+
 export const updateRulesReferences = (rules, oldProperties, newProperties) => {
 	const oldFieldName = oldProperties.fieldName;
 	const newFieldName = newProperties.fieldName;
 	const visitor = new RulesVisitor(rules);
 
-	rules = visitor.mapActions(action => {
+	rules = visitor.mapActions((action) => {
 		if (action.target === oldFieldName) {
 			action = {
 				...action,
-				target: newFieldName
+				target: newFieldName,
 			};
 		}
 
@@ -71,7 +90,22 @@ export const updateRulesReferences = (rules, oldProperties, newProperties) => {
 					action.expression,
 					oldFieldName,
 					newFieldName
-				)
+				),
+			};
+		}
+		else if (action.action === 'auto-fill') {
+			action = {
+				...action,
+				inputs: renameFieldInsideAutofill(
+					action.inputs,
+					oldFieldName,
+					newFieldName
+				),
+				outputs: renameFieldInsideAutofill(
+					action.outputs,
+					oldFieldName,
+					newFieldName
+				),
 			};
 		}
 
@@ -80,7 +114,7 @@ export const updateRulesReferences = (rules, oldProperties, newProperties) => {
 
 	visitor.setRules(rules);
 
-	return visitor.mapConditions(condition => {
+	return visitor.mapConditions((condition) => {
 		return {
 			...condition,
 			operands: condition.operands.map((operand, index) => {
@@ -93,30 +127,33 @@ export const updateRulesReferences = (rules, oldProperties, newProperties) => {
 				) {
 					return {
 						...operand,
-						value: newFieldName
+						value: newFieldName,
 					};
-				} else if (
+				}
+				else if (
 					index === 1 &&
 					isFieldValueOperand(condition.operands) &&
 					isEqualLengthOptions(oldOptions, newOptions) &&
 					isOptionReferencedByOperand(oldOptions, operand.value)
 				) {
-					const changedOption = newOptions.find(({value}) => {
-						return !oldOptions.some(
-							option => option.value == value
-						);
-					});
+					const changedOption = newOptions.find(
+						({value}) =>
+							value ===
+							oldOptions.find(
+								({label}) => label === operand.value
+							).value
+					);
 
 					if (changedOption) {
 						return {
 							...operand,
-							value: changedOption.value
+							value: changedOption.label,
 						};
 					}
 				}
 
 				return operand;
-			})
+			}),
 		};
 	});
 };

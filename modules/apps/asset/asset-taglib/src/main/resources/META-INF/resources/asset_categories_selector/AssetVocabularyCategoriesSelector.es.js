@@ -23,6 +23,8 @@ import {ItemSelectorDialog} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
+import Lang from '../utils/lang.es';
+
 function AssetVocabulariesCategoriesSelector({
 	eventName,
 	id,
@@ -36,7 +38,7 @@ function AssetVocabulariesCategoriesSelector({
 	selectedItems = [],
 	singleSelect,
 	sourceItemsVocabularyIds = [],
-	useFallbackInput
+	useFallbackInput,
 }) {
 	const [inputValue, setInputValue] = useState('');
 
@@ -52,17 +54,17 @@ function AssetVocabulariesCategoriesSelector({
 						groupIds,
 						name: `%${inputValue.toLowerCase()}%`,
 						start: 0,
-						vocabularyIds: sourceItemsVocabularyIds
-					}
+						vocabularyIds: sourceItemsVocabularyIds,
+					},
 				}),
-				p_auth: Liferay.authToken
+				p_auth: Liferay.authToken,
 			}),
 			credentials: 'include',
 			method: 'POST',
-			'x-csrf-token': Liferay.authToken
+			'x-csrf-token': Liferay.authToken,
 		},
 		link: `${window.location.origin}${themeDisplay.getPathContext()}
-				/api/jsonws/invoke`
+				/api/jsonws/invoke`,
 	});
 
 	const previousInputValue = usePrevious(inputValue);
@@ -75,21 +77,21 @@ function AssetVocabulariesCategoriesSelector({
 
 	const getUnique = (arr, property) => {
 		return arr
-			.map(element => element[property])
+			.map((element) => element[property])
 			.map(
 				(element, index, array) =>
 					array.indexOf(element) === index && index
 			)
-			.filter(element => arr[element])
-			.map(element => arr[element]);
+			.filter((element) => arr[element])
+			.map((element) => arr[element]);
 	};
 
-	const handleItemsChange = items => {
+	const handleItemsChange = (items) => {
 		const addedItems = getUnique(
 			items.filter(
-				item =>
+				(item) =>
 					!selectedItems.find(
-						selectedItem => selectedItem.value === item.value
+						(selectedItem) => selectedItem.value === item.value
 					)
 			),
 			'label'
@@ -99,27 +101,28 @@ function AssetVocabulariesCategoriesSelector({
 
 		const validAddedItems = [];
 
-		addedItems.map(item => {
+		addedItems.map((item) => {
 			if (
 				resource.find(
-					sourceItem => sourceItem.titleCurrentValue === item.label
+					(sourceItem) => sourceItem.titleCurrentValue === item.label
 				)
 			) {
 				validAddedItems.push(item);
-			} else {
+			}
+			else {
 				invalidAddedItems.push(item);
 			}
 		});
 
 		const removedItems = selectedItems.filter(
-			selectedItem =>
-				!items.find(item => item.value === selectedItem.value)
+			(selectedItem) =>
+				!items.find((item) => item.value === selectedItem.value)
 		);
 
 		const current = [...selectedItems, ...validAddedItems].filter(
-			item =>
+			(item) =>
 				!removedItems.find(
-					removedItem => removedItem.value === item.value
+					(removedItem) => removedItem.value === item.value
 				)
 		);
 
@@ -132,20 +135,24 @@ function AssetVocabulariesCategoriesSelector({
 		const sub = (str, obj) => str.replace(/\{([^}]+)\}/g, (_, m) => obj[m]);
 
 		const url = sub(decodeURIComponent(portletURL), {
-			selectedCategories: selectedItems.map(item => item.value).join(),
+			selectedCategories: selectedItems.map((item) => item.value).join(),
 			singleSelect,
-			vocabularyIds: sourceItemsVocabularyIds.concat()
+			vocabularyIds: sourceItemsVocabularyIds.concat(),
 		});
 
 		const itemSelectorDialog = new ItemSelectorDialog({
+			buttonAddLabel: Liferay.Language.get('done'),
+			dialogClasses: 'modal-lg',
 			eventName,
-			title: Liferay.Language.get('select-categories'),
-			url
+			title: label
+				? Liferay.Util.sub(Liferay.Language.get('select-x'), label)
+				: Liferay.Language.get('select-categories'),
+			url,
 		});
 
 		itemSelectorDialog.open();
 
-		itemSelectorDialog.on('selectedItemChange', event => {
+		itemSelectorDialog.on('selectedItemChange', (event) => {
 			const dialogSelectedItems = event.selectedItem;
 
 			if (dialogSelectedItems) {
@@ -155,9 +162,10 @@ function AssetVocabulariesCategoriesSelector({
 						if (!item.unchecked) {
 							acc.push({
 								label: item.value,
-								value: item.categoryId
+								value: item.categoryId,
 							});
 						}
+
 						return acc;
 					},
 					[]
@@ -173,7 +181,7 @@ function AssetVocabulariesCategoriesSelector({
 			<ClayForm.Group
 				className={classNames({
 					'has-error':
-						(invalidItems && invalidItems.length > 0) || !isValid
+						(invalidItems && invalidItems.length > 0) || !isValid,
 				})}
 				id={id}
 			>
@@ -181,7 +189,7 @@ function AssetVocabulariesCategoriesSelector({
 					<input
 						name={inputName}
 						type="hidden"
-						value={selectedItems.map(item => item.value).join()}
+						value={selectedItems.map((item) => item.value).join()}
 					/>
 				)}
 
@@ -211,11 +219,11 @@ function AssetVocabulariesCategoriesSelector({
 							onItemsChange={handleItemsChange}
 							sourceItems={
 								resource
-									? resource.map(category => {
+									? resource.map((category) => {
 											return {
 												label:
 													category.titleCurrentValue,
-												value: category.categoryId
+												value: category.categoryId,
 											};
 									  })
 									: []
@@ -227,10 +235,15 @@ function AssetVocabulariesCategoriesSelector({
 								<ClayForm.FeedbackItem>
 									<ClayForm.FeedbackIndicator symbol="info-circle" />
 
-									{Liferay.Language.get(
-										`category-${invalidItems
-											.map(item => item.label)
-											.join(',')}-does-not-exist`
+									{Lang.sub(
+										Liferay.Language.get(
+											`category-x-does-not-exist`
+										),
+										[
+											invalidItems
+												.map((item) => item.label)
+												.join(','),
+										]
 									)}
 								</ClayForm.FeedbackItem>
 							</ClayForm.FeedbackGroup>
@@ -276,7 +289,7 @@ AssetVocabulariesCategoriesSelector.propTypes = {
 	selectedItems: PropTypes.array,
 	singleSelect: PropTypes.bool,
 	sourceItemsVocabularyIds: PropTypes.array,
-	useFallbackInput: PropTypes.bool
+	useFallbackInput: PropTypes.bool,
 };
 
 export default AssetVocabulariesCategoriesSelector;

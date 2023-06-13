@@ -12,12 +12,45 @@
  * details.
  */
 
+AUI = () => ({
+	use: (key, callback) => callback(key),
+});
+
 window.themeDisplay = {
-	getBCP47LanguageId: () => 'en-US',
-	getPathContext: () => '/'
+	...window.themeDisplay,
+	getDefaultLanguageId: () => 'en_US',
+	getLanguageId: () => 'en_US',
+	getUserId: () => 0,
 };
 
 window.Liferay = {
 	...(window.Liferay || {}),
-	ThemeDisplay: window.themeDisplay
+	Language: {
+		...(window.Liferay.Language || {}),
+		available: {
+			ar_SA: 'Arabic (Saudi Arabia)',
+			ca_ES: 'Catalan (Spain)',
+			de_DE: 'German (Germany)',
+			en_US: 'English (United States)',
+			es_ES: 'Spanish (Spain)',
+			fi_FI: 'Finnish (Finland)',
+			fr_FR: 'French (France)',
+			hu_HU: 'Hungarian (Hungary)',
+			ja_JP: 'Japanese (Japan)',
+			nl_NL: 'Dutch (Netherlands)',
+			pt_BR: 'Portuguese (Brazil)',
+			sv_SE: 'Swedish (Sweden)',
+			zh_CN: 'Chinese (China)',
+		},
+	},
+	ThemeDisplay: {
+		...(window.Liferay.ThemeDisplay || {}),
+		getDefaultLanguageId: () => 'en_US',
+		getLanguageId: () => 'en_US',
+	},
+	Util: {
+		...window.Liferay.Util,
+		getLexiconIconTpl: (icon) => icon,
+	},
+	component: () => {},
 };

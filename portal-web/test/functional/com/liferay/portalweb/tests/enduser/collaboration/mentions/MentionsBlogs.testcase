@@ -1,9 +1,9 @@
 @component-name = "portal-collaboration"
 definition {
 
+	property custom.properties = "default.layout.template.id=1_column${line.separator}jsonws.web.service.paths.excludes=";
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property custom.properties = "default.layout.template.id=1_column${line.separator}jsonws.web.service.paths.excludes=";
 	property testray.component.names = "Mentions";
 	property testray.main.component.name = "Mentions";
 
@@ -25,13 +25,13 @@ definition {
 
 		User.logoutPG();
 
-		User.firstLoginPG(
+		User.loginPG(
 			password = "test",
 			userEmailAddress = "userea@liferay.com");
 
 		User.logoutPG();
 
-		User.firstLoginPG();
+		User.loginPG();
 	}
 
 	tearDown {
@@ -53,7 +53,6 @@ definition {
 	test ViewMentionViaBlogsEntry {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(
@@ -84,7 +83,6 @@ definition {
 	test ViewMentionViaBlogsEntryComment {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(
@@ -95,9 +93,7 @@ definition {
 
 		Portlet.addPG(portletName = "Blogs");
 
-		Navigator.gotoPage(pageName = "Blogs Page");
-
-		Blogs.addEntry(
+		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
 

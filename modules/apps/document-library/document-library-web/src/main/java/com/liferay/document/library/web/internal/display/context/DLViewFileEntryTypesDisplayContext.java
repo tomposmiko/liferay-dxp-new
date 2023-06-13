@@ -14,9 +14,12 @@
 
 package com.liferay.document.library.web.internal.display.context;
 
+import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeServiceUtil;
+import com.liferay.document.library.web.internal.configuration.FFDocumentLibraryDDMEditorConfigurationUtil;
 import com.liferay.document.library.web.internal.security.permission.resource.DLPermission;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -60,20 +63,32 @@ public class DLViewFileEntryTypesDisplayContext {
 				themeDisplay.getPermissionChecker(),
 				themeDisplay.getScopeGroupId(), ActionKeys.ADD_DOCUMENT_TYPE)) {
 
-			CreationMenu creationMenu = new CreationMenu();
+			return CreationMenuBuilder.addPrimaryDropdownItem(
+				dropdownItem -> {
+					PortletURL creationURL = renderResponse.createRenderURL();
 
-			PortletURL creationURL = renderResponse.createRenderURL();
+					String mvcRenderCommandName =
+						"/document_library/edit_file_entry_type";
 
-			creationURL.setParameter(
-				"mvcRenderCommandName",
-				"/document_library/edit_file_entry_type");
-			creationURL.setParameter(
-				"redirect", PortalUtil.getCurrentURL(_httpServletRequest));
+					if (useDataEngineEditor()) {
+						mvcRenderCommandName =
+							"/document_library" +
+								"/edit_file_entry_type_data_definition";
+					}
 
-			creationMenu.addPrimaryDropdownItem(
-				dropdownItem -> dropdownItem.setHref(creationURL.toString()));
+					creationURL.setParameter(
+						"mvcRenderCommandName", mvcRenderCommandName);
 
-			return creationMenu;
+					creationURL.setParameter(
+						"redirect",
+						PortalUtil.getCurrentURL(_httpServletRequest));
+
+					dropdownItem.setHref(creationURL.toString());
+
+					dropdownItem.setLabel(
+						LanguageUtil.get(_httpServletRequest, "new"));
+				}
+			).build();
 		}
 
 		return null;
@@ -83,7 +98,9 @@ public class DLViewFileEntryTypesDisplayContext {
 		return String.valueOf(getPortletURL());
 	}
 
-	public SearchContainer getSearchContainer() throws PortalException {
+	public SearchContainer<DLFileEntryType> getSearchContainer()
+		throws PortalException {
+
 		if (_searchContainer != null) {
 			return _searchContainer;
 		}
@@ -92,7 +109,7 @@ public class DLViewFileEntryTypesDisplayContext {
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		SearchContainer searchContainer = new SearchContainer(
+		SearchContainer<DLFileEntryType> searchContainer = new SearchContainer(
 			_renderRequest, new DisplayTerms(_httpServletRequest),
 			new DisplayTerms(_httpServletRequest),
 			SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA,
@@ -127,9 +144,14 @@ public class DLViewFileEntryTypesDisplayContext {
 	}
 
 	public int getTotalItems() throws PortalException {
-		SearchContainer searchContainer = getSearchContainer();
+		SearchContainer<DLFileEntryType> searchContainer = getSearchContainer();
 
 		return searchContainer.getTotal();
+	}
+
+	public boolean useDataEngineEditor() {
+		return FFDocumentLibraryDDMEditorConfigurationUtil.
+			useDataEngineEditor();
 	}
 
 	protected PortletURL getPortletURL() {
@@ -144,6 +166,6 @@ public class DLViewFileEntryTypesDisplayContext {
 
 	private final HttpServletRequest _httpServletRequest;
 	private final RenderRequest _renderRequest;
-	private SearchContainer _searchContainer;
+	private SearchContainer<DLFileEntryType> _searchContainer;
 
 }

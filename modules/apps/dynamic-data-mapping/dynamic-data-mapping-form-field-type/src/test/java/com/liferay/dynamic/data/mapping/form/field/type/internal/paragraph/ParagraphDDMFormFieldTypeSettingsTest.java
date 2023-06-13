@@ -86,7 +86,7 @@ public class ParagraphDDMFormFieldTypeSettingsTest
 
 		Assert.assertTrue(properties.containsKey("placeholder"));
 
-		Assert.assertEquals("editor", textDDMFormField.getType());
+		Assert.assertEquals("rich_text", textDDMFormField.getType());
 
 		DDMFormField validationDDMFormField = ddmFormFieldsMap.get(
 			"validation");
@@ -141,9 +141,7 @@ public class ParagraphDDMFormFieldTypeSettingsTest
 	protected void setUpLanguageUtil() {
 		LanguageUtil languageUtil = new LanguageUtil();
 
-		Language language = PowerMockito.mock(Language.class);
-
-		languageUtil.setLanguage(language);
+		languageUtil.setLanguage(PowerMockito.mock(Language.class));
 	}
 
 	protected void setUpPortalUtil() {

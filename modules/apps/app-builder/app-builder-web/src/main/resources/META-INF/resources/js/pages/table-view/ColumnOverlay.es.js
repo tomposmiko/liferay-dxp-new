@@ -21,19 +21,25 @@ import Button from '../../components/button/Button.es';
 import {useKeyDown} from '../../hooks/index.es';
 import isClickOutside from '../../utils/clickOutside.es';
 import EditTableViewContext, {
-	UPDATE_FOCUSED_COLUMN
+	UPDATE_FOCUSED_COLUMN,
 } from './EditTableViewContext.es';
 import {getColumnIndex, getColumnNode, getFieldTypeLabel} from './utils.es';
+
+const getTableResponsiveNode = (container) => {
+	return container.querySelector('.table-responsive');
+};
 
 const getStyle = (container, index) => {
 	const columnNode = getColumnNode(container, index);
 
 	return {
 		height: container.offsetHeight,
-		left: columnNode.offsetLeft,
+		left:
+			columnNode.offsetLeft -
+			getTableResponsiveNode(container).scrollLeft,
 		position: 'absolute',
 		top: container.offsetTop,
-		width: columnNode.offsetWidth
+		width: columnNode.offsetWidth,
 	};
 };
 
@@ -44,7 +50,7 @@ const Overlay = ({
 	name,
 	onRemoveFieldName,
 	selected,
-	total
+	total,
 }) => {
 	const [{fieldTypes}] = useContext(EditTableViewContext);
 	const [style, setStyle] = useState({});
@@ -59,6 +65,15 @@ const Overlay = ({
 		window
 	);
 
+	useEventListener(
+		'scroll',
+		() => {
+			setStyle(getStyle(container, index));
+		},
+		true,
+		getTableResponsiveNode(container)
+	);
+
 	useLayoutEffect(() => {
 		setStyle(getStyle(container, index));
 	}, [container, index, total]);
@@ -66,13 +81,13 @@ const Overlay = ({
 	return (
 		<div className={classNames('column-overlay', {selected})} style={style}>
 			<header>
-				<label>{fieldTypeLabel}</label>
+				<label className="text-truncate">{fieldTypeLabel}</label>
 
 				<Button
 					borderless
 					displayType="secondary"
 					onClick={() => onRemoveFieldName(name)}
-					symbol="times-circle"
+					symbol="trash"
 					tooltip={Liferay.Language.get('remove')}
 				/>
 			</header>
@@ -96,7 +111,7 @@ export default ({container, fields, onRemoveFieldName}) => {
 
 				dispatch({
 					payload: {fieldName: name},
-					type: UPDATE_FOCUSED_COLUMN
+					type: UPDATE_FOCUSED_COLUMN,
 				});
 			}
 		},
@@ -117,7 +132,7 @@ export default ({container, fields, onRemoveFieldName}) => {
 			) {
 				dispatch({
 					payload: {fieldName: null},
-					type: UPDATE_FOCUSED_COLUMN
+					type: UPDATE_FOCUSED_COLUMN,
 				});
 			}
 		},
@@ -163,7 +178,7 @@ export default ({container, fields, onRemoveFieldName}) => {
 		if (focusedColumn) {
 			dispatch({
 				payload: {fieldName: null},
-				type: UPDATE_FOCUSED_COLUMN
+				type: UPDATE_FOCUSED_COLUMN,
 			});
 		}
 	}, 27);

@@ -14,12 +14,10 @@
 
 AUI.add(
 	'liferay-portlet-invite-members',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var Language = Liferay.Language;
-
-		var LString = Lang.String;
 
 		var Util = Liferay.Util;
 
@@ -56,20 +54,37 @@ AUI.add(
 			'<span class="email">{userEmailAddress}</span>' +
 			'</div>';
 
+		var InviteMembersList = A.Component.create({
+			AUGMENTS: [A.AutoCompleteBase],
+
+			EXTENDS: A.Base,
+
+			prototype: {
+				initializer(config) {
+					var instance = this;
+
+					instance._listNode = A.one(config.listNode);
+
+					instance._bindUIACBase();
+					instance._syncUIACBase();
+				},
+			},
+		});
+
 		var InviteMembers = A.Component.create({
 			ATTRS: {
 				availableUsersURL: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				form: {
-					validator: Lang.isObject
+					validator: Lang.isObject,
 				},
 
 				pageDelta: {
 					validator: Lang.isInteger,
-					value: 50
-				}
+					value: 50,
+				},
 			},
 
 			AUGMENTS: [Liferay.PortletBase],
@@ -88,7 +103,7 @@ AUI.add(
 
 					if (emailAddress) {
 						var emailRow = Lang.sub(TPL_EMAIL_ROW, {
-							emailAddress
+							emailAddress,
 						});
 
 						var invitedEmailList = instance.one(
@@ -144,7 +159,7 @@ AUI.add(
 							STR_KEYPRESS,
 							instance._onEmailKeypress,
 							instance
-						)
+						),
 					];
 				},
 
@@ -153,7 +168,7 @@ AUI.add(
 
 					return new A.DataSource.IO({
 						ioConfig: {
-							method: 'post'
+							method: 'post',
 						},
 						on: {
 							request(event) {
@@ -162,11 +177,11 @@ AUI.add(
 								event.cfg.data = instance.ns({
 									end: data.end || instance.get('pageDelta'),
 									keywords: data.keywords || STR_BLANK,
-									start: data.start || 0
+									start: data.start || 0,
 								});
-							}
+							},
 						},
-						source: url
+						source: url,
 					});
 				},
 
@@ -189,10 +204,12 @@ AUI.add(
 					if (userId) {
 						if (user.hasClass(CSS_INVITED)) {
 							instance._removeMemberInvite(user, userId);
-						} else {
+						}
+						else {
 							instance._addMemberInvite(user);
 						}
-					} else {
+					}
+					else {
 						instance._removeEmailInvite(user);
 					}
 				},
@@ -210,7 +227,7 @@ AUI.add(
 				_onInviteMembersListResults(event) {
 					var instance = this;
 
-					var responseData = A.JSON.parse(event.data.responseText);
+					var responseData = JSON.parse(event.data.responseText);
 
 					instance._membersList.html(
 						instance._renderResults(responseData).join(STR_BLANK)
@@ -232,18 +249,18 @@ AUI.add(
 						instance.ns({
 							end,
 							keywords: instance._inviteUserSearch.get('value'),
-							start
+							start,
 						})
 					);
 
 					Liferay.Util.fetch(instance.get(STR_AVAILABLE_USERS_URL), {
 						body,
-						method: 'POST'
+						method: 'POST',
 					})
-						.then(response => {
+						.then((response) => {
 							return response.json();
 						})
-						.then(responseData => {
+						.then((responseData) => {
 							var moreResults = instance._membersList.one(
 								'.more-results'
 							);
@@ -300,15 +317,16 @@ AUI.add(
 								{
 									message: Language.get(
 										'there-are-no-users-to-invite'
-									)
+									),
 								}
 							);
 
 							buffer.push(noUsersMessage);
 						}
-					} else {
+					}
+					else {
 						buffer.push(
-							A.Array.map(results, result => {
+							A.Array.map(results, (result) => {
 								var cssClass = 'user';
 
 								if (result.hasPendingMemberRequest) {
@@ -326,13 +344,13 @@ AUI.add(
 
 								return Lang.sub(TPL_USER, {
 									cssClass,
-									userEmailAddress: LString.escapeHTML(
+									userEmailAddress: Liferay.Util.escapeHTML(
 										result.userEmailAddress
 									),
-									userFullName: LString.escapeHTML(
+									userFullName: Liferay.Util.escapeHTML(
 										result.userFullName
 									),
-									userId: result.userId
+									userId: result.userId,
 								});
 							}).join(STR_BLANK)
 						);
@@ -340,7 +358,7 @@ AUI.add(
 						if (count > results.length) {
 							var moreResults = Lang.sub(TPL_MORE_RESULTS, {
 								end: options.end,
-								message: Language.get('view-more')
+								message: Language.get('view-more'),
 							});
 
 							buffer.push(moreResults);
@@ -402,7 +420,7 @@ AUI.add(
 
 					var invitedEmailList = instance.one('#invitedEmailList');
 
-					invitedEmailList.all('.user').each(item => {
+					invitedEmailList.all('.user').each((item) => {
 						emailAddresses.push(item.attr('data-emailAddress'));
 					});
 
@@ -419,7 +437,7 @@ AUI.add(
 
 					var userIds = [];
 
-					instance._invitedMembersList.all('.user').each(item => {
+					instance._invitedMembersList.all('.user').each((item) => {
 						userIds.push(item.attr('data-userId'));
 					});
 
@@ -459,7 +477,7 @@ AUI.add(
 							return {
 								end: instance.get('pageDelta'),
 								keywords: query,
-								start: 0
+								start: 0,
 							};
 						},
 						resultTextLocator(response) {
@@ -467,7 +485,8 @@ AUI.add(
 
 							if (typeof response.toString != 'undefined') {
 								result = response.toString();
-							} else if (
+							}
+							else if (
 								typeof response.responseText != 'undefined'
 							) {
 								result = response.responseText;
@@ -477,31 +496,14 @@ AUI.add(
 						},
 						source: instance._createDataSource(
 							instance.get(STR_AVAILABLE_USERS_URL)
-						)
+						),
 					});
 
 					instance._inviteMembersList.sendRequest();
 
 					instance._bindUI();
-				}
-			}
-		});
-
-		var InviteMembersList = A.Component.create({
-			AUGMENTS: [A.AutoCompleteBase],
-
-			EXTENDS: A.Base,
-
-			prototype: {
-				initializer(config) {
-					var instance = this;
-
-					instance._listNode = A.one(config.listNode);
-
-					instance._bindUIACBase();
-					instance._syncUIACBase();
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.Portlet.InviteMembers = InviteMembers;
@@ -515,7 +517,7 @@ AUI.add(
 			'datatype-number',
 			'liferay-portlet-base',
 			'liferay-util-window',
-			'node-core'
-		]
+			'node-core',
+		],
 	}
 );

@@ -12,10 +12,10 @@
  * details.
  */
 
-(function() {
+(function () {
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 
-	var isString = function(val) {
+	var isString = function (val) {
 		return typeof val == 'string';
 	};
 
@@ -33,11 +33,11 @@
 		table: 1,
 		td: 1,
 		th: 1,
-		tr: 1
+		tr: 1,
 	};
 
 	var ELEMENTS_CLOSE_SELF = {
-		'*': 1
+		'*': 1,
 	};
 
 	var ELEMENTS_INLINE = {
@@ -49,14 +49,14 @@
 		s: 1,
 		size: 1,
 		u: 1,
-		url: 1
+		url: 1,
 	};
 
 	var REGEX_TAG_NAME = /^\/?(?:b|center|code|colou?r|email|i|img|justify|left|pre|q|quote|right|\*|s|size|table|tr|th|td|li|list|font|u|url)$/i;
 
 	var STR_TAG_CODE = 'code';
 
-	var Parser = function(config) {
+	var Parser = function (config) {
 		var instance = this;
 
 		config = config || {};
@@ -89,7 +89,7 @@
 			if (length > instance._dataPointer) {
 				instance._result.push({
 					type: Parser.TOKEN_DATA,
-					value: data.substring(instance._dataPointer, length)
+					value: data.substring(instance._dataPointer, length),
 				});
 			}
 
@@ -108,7 +108,8 @@
 			if (token) {
 				if (isString(token)) {
 					tagName = token;
-				} else {
+				}
+				else {
 					tagName = token[3];
 				}
 
@@ -127,7 +128,7 @@
 				for (var i = stack.length - 1; i >= pos; i--) {
 					instance._result.push({
 						type: tokenTagEnd,
-						value: stack[i]
+						value: stack[i],
 					});
 				}
 
@@ -166,7 +167,7 @@
 				instance._result.push({
 					attribute: token[2],
 					type: Parser.TOKEN_TAG_START,
-					value: tagName
+					value: tagName,
 				});
 			}
 		},
@@ -199,7 +200,7 @@
 
 			stack.last =
 				stack.last ||
-				function() {
+				function () {
 					var instance = this;
 
 					return instance[instance.length - 1];
@@ -231,17 +232,23 @@
 						while (
 							(token = lexer.getNextToken()) &&
 							token[3] != STR_TAG_CODE
-						);
+						) {
+
+							// Continue.
+
+						}
 
 						instance._handleData(token, data);
 
 						if (token) {
 							instance._handleTagEnd(token);
-						} else {
+						}
+						else {
 							break;
 						}
 					}
-				} else {
+				}
+				else {
 					instance._handleTagEnd(token);
 				}
 			}
@@ -255,7 +262,7 @@
 			instance._reset();
 
 			return result;
-		}
+		},
 	};
 
 	Parser.TOKEN_DATA = 4;

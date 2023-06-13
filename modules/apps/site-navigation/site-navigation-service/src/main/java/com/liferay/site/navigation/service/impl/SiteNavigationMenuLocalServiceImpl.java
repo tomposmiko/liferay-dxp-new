@@ -137,7 +137,7 @@ public class SiteNavigationMenuLocalServiceImpl
 
 		resourceLocalService.deleteResource(
 			siteNavigationMenu.getCompanyId(),
-			SiteNavigationMenuItem.class.getName(),
+			SiteNavigationMenu.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			siteNavigationMenu.getSiteNavigationMenuId());
 
@@ -158,8 +158,12 @@ public class SiteNavigationMenuLocalServiceImpl
 	}
 
 	@Override
-	public void deleteSiteNavigationMenus(long groupId) {
-		siteNavigationMenuPersistence.removeByGroupId(groupId);
+	public void deleteSiteNavigationMenus(long groupId) throws PortalException {
+		for (SiteNavigationMenu siteNavigationMenu :
+				getSiteNavigationMenus(groupId)) {
+
+			deleteSiteNavigationMenu(siteNavigationMenu);
+		}
 	}
 
 	@Override
@@ -192,7 +196,8 @@ public class SiteNavigationMenuLocalServiceImpl
 
 	@Override
 	public List<SiteNavigationMenu> getSiteNavigationMenus(
-		long groupId, int start, int end, OrderByComparator orderByComparator) {
+		long groupId, int start, int end,
+		OrderByComparator<SiteNavigationMenu> orderByComparator) {
 
 		return siteNavigationMenuPersistence.findByGroupId(
 			groupId, start, end, orderByComparator);
@@ -201,7 +206,7 @@ public class SiteNavigationMenuLocalServiceImpl
 	@Override
 	public List<SiteNavigationMenu> getSiteNavigationMenus(
 		long groupId, String keywords, int start, int end,
-		OrderByComparator orderByComparator) {
+		OrderByComparator<SiteNavigationMenu> orderByComparator) {
 
 		return siteNavigationMenuPersistence.findByG_LikeN(
 			groupId,

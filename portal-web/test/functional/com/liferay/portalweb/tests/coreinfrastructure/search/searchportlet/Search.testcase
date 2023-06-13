@@ -2,7 +2,7 @@
 definition {
 
 	property portal.release = "true";
-	property portal.suite.search.engine = "elasticsearch6,elasticsearch7";
+	property portal.suite.search.engine = "elasticsearch7";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Web Search";
 
@@ -33,7 +33,7 @@ definition {
 
 			Vocabulary.tearDownCP();
 
-			Tag.tearDownCP();
+			Tag.tearDownCP(site = "Guest");
 
 			Page.tearDownCP();
 		}
@@ -49,8 +49,7 @@ definition {
 			title = "apple");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntry(
@@ -135,23 +134,62 @@ definition {
 
 		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-page");
 
-		SearchPortlets.addWidgets(searchPortletList = "Category Facet,Custom Facet,Folder Facet,Low Level Search Options,Modified Facet,Search Insights,Search Options,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet,Search Results,Search Bar");
+		SearchPortlets.addWidgets(searchPortletList = "Category Facet,Custom Facet,Custom Filter,Folder Facet,Low Level Search Options,Modified Facet,Search Insights,Search Options,Search Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet,Search Bar");
+
+		var testRunEnvironment = PropsUtil.get("test.run.environment");
+
+		if ("${testRunEnvironment}" == "EE") {
+			Portlet._clickAddPortlet(portletName = "Similar Results");
+
+			AssertElementPresent(
+				key_portletName = "Similar Results",
+				locator1 = "Portlet#LOADED");
+
+			AssertElementPresent(
+				key_portletName = "Similar Results",
+				locator1 = "Home#PORTLET");
+		}
 
 		User.logoutPG();
 
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
-
-		// Workaround: Removed assertions for Suggestions, Sort, Search Results, and Modified Facet portlets until LPS-92008 is fixed. See LRQA-47720.
-
-		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Low Level Search Options,Modified Facet,Search Insights,Search Options,Search Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet") {
-			Portlet.viewNoSpecificPG(portletName = "${portletName}");
-		}
-
 		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-page");
 
-		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Low Level Search Options,Search Insights,Search Options,Site Facet,Tag Facet,Type Facet,User Facet") {
+		for (var portletName : list "Category Facet,Custom Facet,Custom Filter,Folder Facet,Low Level Search Options,Modified Facet,Search Insights,Search Options,Search Results,Similar Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet") {
 			Portlet.viewNoSpecificPG(portletName = "${portletName}");
 		}
+
+		Search.openSearchPage();
+
+		for (var portletName : list "Category Facet,Custom Facet,Custom Filter,Folder Facet,Low Level Search Options,Modified Facet,Search Insights,Search Options,Search Results,Similar Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet") {
+			Portlet.viewNoSpecificPG(portletName = "${portletName}");
+		}
+	}
+
+	@description = "This is a use case for LPS-147397."
+	@priority = "4"
+	test AssertModifiedFacetNoXSS {
+		Search.openSearchPage();
+
+		Portlet.gotoPortletOptions(
+			portletName = "Modified Facet",
+			portletOption = "Configuration");
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		var script = '''test"><script>alert(123);</script>''';
+
+		Type(
+			fieldValue = "past-hour",
+			locator1 = "Search#MODIFIED_FACET_CONFIG_SPECIFIC_FIELD",
+			value1 = "${script}");
+
+		PortletEntry.save();
+
+		IFrame.closeFrame();
+
+		SearchPortlets.searchEmbedded(searchTerm = "test");
+
+		AssertAlertNotPresent();
 	}
 
 	test AssertNonAdminsCannotAddCertainWidgets {
@@ -215,13 +253,13 @@ definition {
 			searchAssetType = "Web Content Article",
 			searchTerm = "WC Title");
 
-		Pagination.changePagination(itemsPerPage = "5");
+		Pagination.changePagination(itemsPerPage = "4");
 
 		var currentURL = selenium.getCurrentUrl();
 
 		echo("Current URL: ${currentURL} ");
 
-		if ((!(contains("${currentURL}","delta=5"))) || (contains("${currentURL}", "start"))) {
+		if (!(contains("${currentURL}", "delta=4")) || contains("${currentURL}", "start")) {
 			fail("URL should preserve delta, but not contain start.");
 		}
 
@@ -233,7 +271,7 @@ definition {
 
 		echo("Current URL: ${currentURL} ");
 
-		if ((!(contains("${currentURL}", "delta=5"))) || (!(contains("${currentURL}", "start=2")))) {
+		if (!(contains("${currentURL}", "delta=4")) || !(contains("${currentURL}", "start=2"))) {
 			fail("URL should preserve delta and add start.");
 		}
 
@@ -245,19 +283,17 @@ definition {
 
 		echo("Current URL: ${currentURL} ");
 
-		if ((!(contains("${currentURL}", "delta=5"))) && (!(contains("${currentURL}", "start=3")))) {
+		if (!(contains("${currentURL}", "delta=4")) && !(contains("${currentURL}", "start=3"))) {
 			fail("URL should preserve delta and modify start.");
 		}
 
-		Pagination.changePagination(itemsPerPage = "10");
+		Pagination.changePagination(itemsPerPage = "8");
 
-		//Workaround LPS-98391
-
-		/*var currentURL = selenium.getCurrentUrl();
+		var currentURL = selenium.getCurrentUrl();
 
 		echo("Current URL: ${currentURL} ");
 
-		if ((!(contains("${currentURL}", "delta"))) && (!(contains("${currentURL}", "start")))) {
+		if (!(contains("${currentURL}", "delta")) && !(contains("${currentURL}", "start"))) {
 			fail("Delta and start should be removed from URL.");
 		}
 
@@ -269,7 +305,7 @@ definition {
 
 		echo("Current URL: ${currentURL} ");
 
-		if ((!(contains("${currentURL}", "delta"))) && (contains("${currentURL}", "start=2"))) {
+		if (!(contains("${currentURL}", "delta")) && contains("${currentURL}", "start=2")) {
 			fail("URL should preserve abscence of delta and start should be added.");
 		}
 
@@ -281,9 +317,9 @@ definition {
 
 		echo("Current URL: ${currentURL} ");
 
-		if ((!(contains("${currentURL}", "delta"))) && (contains("${currentURL}", "start=1"))) {
+		if (!(contains("${currentURL}", "delta")) && contains("${currentURL}", "start=1")) {
 			fail("URL should preserve abscence of delta and modify start.");
-		}*/
+		}
 	}
 
 	@description = "This is a use case for LPS-95670."
@@ -298,15 +334,11 @@ definition {
 			groupName = "Guest",
 			titleMap = "en_US:WC Title,de_DE:WC Titel");
 
-		var portalURL = PropsUtil.get("portal.url");
+		Search.openSearchPage();
 
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
+		SearchPortlets.addWidgets(searchPortletList = "Suggestions");
 
-		Portlet.addPG(portletName = "Suggestions");
-
-		Portlet.gotoPortletOptions(
-			portletName = "Suggestions",
-			portletOption = "Configuration");
+		SearchPortlets.gotoConfigureSuggestionsOptions();
 
 		SelectFrame(locator1 = "IFrame#CONFIGURATION");
 
@@ -316,7 +348,7 @@ definition {
 
 		IFrame.closeFrame();
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Search");
@@ -327,7 +359,13 @@ definition {
 
 		Navigator.openURL();
 
-		Portlet.addPG(portletName = "Language Selector");
+		ContentPages.clickPencil();
+
+		PageEditor.addWidget(
+			portletName = "Language Selector",
+			targetFragmentName = "Container");
+
+		PageEditor.clickPublish();
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "de-DE",
@@ -345,28 +383,126 @@ definition {
 		}
 	}
 
+	@description = "This is a use case for LPS-140643."
+	@priority = "4"
+	test FederatedSearchPopulatesWidgetsWithRespectiveKey {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Federated Search Page");
+
+		var portalURL = PropsUtil.get("portal.url");
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/guest/federated-search-page");
+
+		for (var column : list "1,2") {
+			JSONLayout.addWidgetToPublicLayout(
+				column = "${column}",
+				groupName = "Guest",
+				layoutName = "Federated Search Page",
+				widgetName = "Search Bar");
+
+			JSONLayout.addWidgetToPublicLayout(
+				column = "${column}",
+				groupName = "Guest",
+				layoutName = "Federated Search Page",
+				widgetName = "Search Results");
+
+			Refresh();
+
+			SearchPortlets.configureSearchBarWidget(
+				federatedSearchKey = "federatedSearchKey${column}",
+				index = "${column}",
+				keywordsParameterName = "keywordParameter${column}");
+
+			SearchResultPortlet.configureSearchResults(
+				federatedSearchKey = "federatedSearchKey${column}",
+				index = "${column}");
+		}
+
+		for (var count : list "1,2,3,4,5") {
+			SearchPortlets.searchWidget(searchTerm = "test");
+
+			SearchResultPortlet.viewSearchResults(
+				searchAssetTitle = "Test Test",
+				searchAssetType = "User");
+
+			AssertElementNotPresent(locator1 = "xpath=(//li[contains(@class,'list-group-item') and contains(.,'Test Test')][.//span[@class='subtext-item' and contains(.,'User')]])[2]");
+		}
+	}
+
+	@description = "This is a use case for LPS-115435."
+	@priority = "3"
+	test ModifyPaginationConfigurationProperties {
+		for (var count : list "1,2,3,4,5") {
+			JSONWebcontent.addWebContent(
+				content = "WC Content ${count}",
+				groupName = "Guest",
+				title = "Apple ${count}");
+		}
+
+		SearchPortlets.searchEmbedded(searchTerm = "Apple");
+
+		SearchPortlets.addWidgets(searchPortletList = "Sort");
+
+		Refresh();
+
+		SearchPortlets.chooseSortOption(sortOption = "Title");
+
+		SearchPortlets.searchEmbedded(searchTerm = "Apple");
+
+		SearchResultPortlet.viewMultipleSearchResults(
+			resultsList = "Apple 1/Web Content Article,Apple 2/Web Content Article,Apple 3/Web Content Article,Apple 4/Web Content Article,Apple 5/Web Content Article,",
+			searchTerm = "Apple");
+
+		SearchResultPortlet.configureSearchResults(paginationDelta = "3");
+
+		Refresh();
+
+		SearchResultPortlet.viewSearchResultNotPresent(
+			searchAssetTitle = "Apple 4",
+			searchAssetType = "Web Content Article");
+
+		Pagination.changePagination(itemsPerPage = "20");
+
+		SearchResultPortlet.viewMultipleSearchResults(
+			resultsList = "Apple 1/Web Content Article,Apple 2/Web Content Article,Apple 3/Web Content Article,Apple 4/Web Content Article,Apple 5/Web Content Article,",
+			searchTerm = "Apple");
+
+		Pagination.changePagination(itemsPerPage = "4");
+
+		SearchResultPortlet.viewMultipleSearchResults(
+			resultsList = "Apple 1/Web Content Article,Apple 2/Web Content Article,Apple 3/Web Content Article,Apple 4/Web Content Article",
+			searchTerm = "Apple");
+
+		SearchResultPortlet.viewSearchResultNotPresent(
+			searchAssetTitle = "Apple 5",
+			searchAssetType = "Web Content Article");
+
+		Pagination.changePagination(itemsPerPage = "20");
+
+		SearchResultPortlet.viewMultipleSearchResults(
+			resultsList = "Apple 1/Web Content Article,Apple 2/Web Content Article,Apple 3/Web Content Article,Apple 4/Web Content Article,Apple 5/Web Content Article",
+			searchTerm = "Apple");
+	}
+
 	@description = "This is a use case for LPS-90078."
 	@priority = "4"
 	test ModifyPaginationPortalProperties {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property custom.properties = "search.container.page.default.delta=2";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property portal.acceptance = "true";
 		property environment.acceptance = "true";
+		property portal.acceptance = "true";
 
-		Portlet.addPG(portletName = "Search Results");
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Search Result Widget Page");
 
-		Portlet.gotoPortletOptions(
-			portletName = "Search Results",
-			portletOption = "Configuration");
-
-		SelectFrame(locator1 = "IFrame#CONFIGURATION");
-
-		AssertTextEquals(
-			locator1 = "SearchResults#RESULTS_PORTLET_PAGINATION_CONFIG",
-			value1 = "2");
-
-		IFrame.closeFrame();
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Search Result Widget Page",
+			widgetName = "Search Results");
 
 		for (var count : list "1,2,3") {
 			JSONWebcontent.addWebContent(
@@ -375,11 +511,9 @@ definition {
 				title = "WC Title ${count}");
 		}
 
-		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+		var portalURL = PropsUtil.get("portal.url");
 
-		while (IsElementNotPresent(locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE", key_searchAssetTitle = "WC Title 1")) {
-			Pause(locator1 = "5000");
-		}
+		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-result-widget-page");
 
 		Portlet.gotoPortletOptions(
 			portletName = "Search Results",
@@ -393,10 +527,54 @@ definition {
 
 		IFrame.closeFrame();
 
+		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+
+		Portlet.gotoPortletOptions(
+			portletName = "Search Results",
+			portletOption = "Configuration");
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		AssertTextEquals(
+			locator1 = "SearchResults#RESULTS_PORTLET_PAGINATION_CONFIG",
+			value1 = "2");
+
+		IFrame.closeFrame();
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "WC Title 1",
+			searchAssetType = "Web Content Article");
+
+		SearchResultPortlet.viewSearchResultNotPresent(
+			searchAssetTitle = "WC Title 3",
+			searchAssetType = "Web Content Article");
+
 		SearchResultPortlet.paginateAndViewSearchResults(
 			searchAssetTitle = "WC Title 3",
 			searchAssetType = "Web Content Article",
 			searchTerm = "WC Title");
+	}
+
+	@description = "This is a use case for LPS-112599."
+	test NavigateToAssetEditPageViaSearchResults {
+		JSONWebcontent.addWebContent(
+			content = "WC Content",
+			groupName = "Guest",
+			title = "WC Title");
+
+		SearchPortlets.searchEmbedded(searchTerm = "WC");
+
+		SearchPortlets.gotoResultDetails(searchAssetTitle = "WC Title");
+
+		SearchPortlets.viewResultDetails(searchAssetTitle = "WC Title");
+
+		Click(locator1 = "SearchResults#ASSET_DETAILS_EDIT_BUTTON");
+
+		AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Portlet#HEADER",
+			value1 = "WC Title");
 	}
 
 	@priority = "4"
@@ -404,8 +582,7 @@ definition {
 		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntry(
@@ -414,7 +591,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Search Page");
@@ -423,13 +599,13 @@ definition {
 
 		SearchPortlets.addWidgets(searchPortletList = "Type Facet,Search Results,Search Bar");
 
-		SearchPortlets.configureWidgetParameterNames(
+		SearchPortlets.configureSearchBarWidget(
 			keywordsParameterName = "keywordparameter",
 			scopeParameterName = "scopeparameter");
 
-		SearchPortlets.configureWidgetScope(searchScope = "Let the User Choose");
+		SearchPortlets.configureSearchBarWidget(searchScope = "Let the User Choose");
 
-		SearchPortlets.selectWidgetScopeInput(searchScope = "Everything");
+		SearchPortlets.chooseWidgetScope(searchScope = "Everything");
 
 		SearchPortlets.searchWidget(searchTerm = "Potato");
 
@@ -456,6 +632,7 @@ definition {
 		FormFields.viewCheckboxChecked(fieldName = "Blogs Entry");
 	}
 
+	@description = "This is a use case for LPS-95798."
 	test SearchAfterViewingResultDetails {
 		JSONWebcontent.addWebContent(
 			content = "Web Content",
@@ -486,8 +663,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntry(
@@ -555,11 +731,12 @@ definition {
 
 	@priority = "4"
 	test SearchBlogsEntryCategory {
+		property test.name.skip.portal.instance = "Search#SearchBlogsEntryCategory";
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
 			category = "Categorization",
-			panel = "Site Administration",
 			portlet = "Categories");
 
 		Vocabulary.addCP(vocabularyName = "Vocabulary Name");
@@ -571,8 +748,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntryWithCategory(
@@ -589,6 +765,16 @@ definition {
 			searchAssetSummary = "Blogs Entry Content",
 			searchAssetTitle = "Blogs Entry Title",
 			searchAssetType = "Blogs Entry");
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Cloud Layout",
+			portletName = "Category Facet");
+
+		Refresh();
+
+		AssertElementPresent(
+			categoryName = "Category Name",
+			locator1 = "Search#CATEGORY_FACET_CLOUD_LAYOUT");
 
 		SearchPortlets.searchEmbedded(searchTerm = "Category");
 
@@ -619,7 +805,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Categorization",
-			panel = "Site Administration",
 			portlet = "Categories");
 
 		Vocabulary.addCP(vocabularyName = "Vocabulary Name");
@@ -631,8 +816,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntryWithCategory(
@@ -682,8 +866,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntry(
@@ -786,11 +969,12 @@ definition {
 
 	@priority = "4"
 	test SearchBlogsEntryTag {
+		property test.name.skip.portal.instance = "Search#SearchBlogsEntryTag";
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntryWithTag(
@@ -806,6 +990,16 @@ definition {
 			searchAssetSummary = "Blogs Entry Content",
 			searchAssetTitle = "Blogs Entry Title",
 			searchAssetType = "Blogs Entry");
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Cloud Layout",
+			portletName = "Tag Facet");
+
+		Refresh();
+
+		AssertElementPresent(
+			locator1 = "Search#TAG_FACET_CLOUD_LAYOUT",
+			tagName = "tag name");
 
 		SearchPortlets.searchEmbedded(searchTerm = "tag");
 
@@ -835,8 +1029,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntryWithTag(
@@ -893,11 +1086,9 @@ definition {
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
-		BlogsConfiguration.configureScopePG(
+		Portlet.selectScopePG(
 			portletName = "Blogs",
-			scopeSelection = "Blogs Page (Create New)");
-
-		IFrame.closeFrame();
+			scope = "Blogs Page");
 
 		Blogs.addEntry(
 			entryContent = "Entry Content",
@@ -919,9 +1110,19 @@ definition {
 
 		ContentPages.addPage(pageName = "Test Content Page Name");
 
-		for (var portletName : list "Search Bar,Search Results") {
-			PageEditor.addWidget(portletName = "${portletName}");
-		}
+		PageEditor.addWidget(portletName = "Search Bar");
+
+		Refresh();
+
+		// Workaround for LPS-120037
+
+		//PageEditor.addWidget(
+		//	portletName = "Search Results",
+		//	targetFragmentName = "Search Bar");
+
+		SearchResultPortlet.addToContentPage(
+			portletName = "Search Results",
+			targetFragmentName = "Search Bar");
 
 		PageEditor.clickPublish();
 
@@ -950,8 +1151,7 @@ definition {
 			title = "WC Title");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContent.moveToRecycleBinCP(
@@ -970,7 +1170,7 @@ definition {
 	@description = "This test will set up a search page and search on a newly added site. It will also use different scopes to assert search results for assets from multiple sites"
 	@priority = "4"
 	test SearchDifferentScopesViaNewSite {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
@@ -982,7 +1182,7 @@ definition {
 			groupName = "Guest",
 			title = "Apple");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
@@ -990,8 +1190,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name 2");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
@@ -999,7 +1198,7 @@ definition {
 			dmDocumentFile = "Document_1.doc",
 			dmDocumentTitle = "Apple");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
@@ -1007,8 +1206,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name 3");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntry(
@@ -1017,7 +1215,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Site 3 Home Page");
@@ -1037,11 +1234,11 @@ definition {
 			pageName = "Site 3 Home Page",
 			siteName = "Site Name 3");
 
-		SearchPortlets.configureDestination(destinationPage = "Search Page");
+		SearchPortlets.configureEmbeddedSearchBar(destinationPage = "Search Page");
 
-		SearchPortlets.configureEmbeddedScope(searchScope = "Let the User Choose");
+		SearchPortlets.configureEmbeddedSearchBar(searchScope = "Let the User Choose");
 
-		SearchPortlets.selectEmbeddedScopeInput(searchScope = "Everything");
+		SearchPortlets.chooseEmbeddedScope(searchScope = "Everything");
 
 		SearchPortlets.searchEmbedded(searchTerm = "Apple");
 
@@ -1049,7 +1246,25 @@ definition {
 			resultsList = "Apple/Web Content Article,Apple/Document,Apple/Blogs Entry",
 			searchTerm = "Apple");
 
-		SearchPortlets.selectEmbeddedScopeInput(searchScope = "This Site");
+		SearchFacetPortlet.updateFacetConfiguration(
+			maxTerms = "2",
+			portletName = "Site Facet");
+
+		Refresh();
+
+		AssertElementPresent(
+			key_fieldName = "liferay",
+			locator1 = "FormFields#CHECKBOX_LABEL");
+
+		AssertElementPresent(
+			key_fieldName = "Site Name 2",
+			locator1 = "FormFields#CHECKBOX_LABEL");
+
+		AssertElementNotPresent(
+			key_fieldName = "Site Name 3",
+			locator1 = "FormFields#CHECKBOX_LABEL");
+
+		SearchPortlets.chooseEmbeddedScope(searchScope = "This Site");
 
 		SearchPortlets.searchEmbedded(searchTerm = "Apple");
 
@@ -1068,15 +1283,14 @@ definition {
 		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
 			dmDocumentFile = "Document_1.doc",
 			dmDocumentTitle = "Potato Document");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
@@ -1086,20 +1300,18 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "Test Site");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntry(
 			entryContent = "This is a blog about Potatoes",
 			entryTitle = "Potato Blog");
 
-		var currentDate = DateUtil.getFormattedDate("0", "MMM d, YYYY");
-		var portalURL = PropsUtil.get("portal.url");
+		var currentDate = DateUtil.getFormattedCurrentDate("MMM d, yyyy");
 
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
+		Search.openSearchPage();
 
-		SearchPortlets.configureEmbeddedScope(searchScope = "Everything");
+		SearchPortlets.configureEmbeddedSearchBar(searchScope = "Everything");
 
 		SearchPortlets.searchWidget(searchTerm = "Potato");
 
@@ -1116,7 +1328,7 @@ definition {
 			searchAssetType = "Document",
 			searchTerm = "Potato");
 
-		SearchPortlets.configureEmbeddedScope(searchScope = "This Site");
+		SearchPortlets.configureEmbeddedSearchBar(searchScope = "This Site");
 
 		SearchPortlets.searchWidget(searchTerm = "Potato");
 
@@ -1135,14 +1347,12 @@ definition {
 	test SearchDocumentsAndMediaDocument {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property environment.acceptance = "true";
 		property testray.component.names = "Training";
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
@@ -1226,7 +1436,7 @@ definition {
 	test SearchGlobalTemplateSmoke {
 		property portal.acceptance = "true";
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
@@ -1234,8 +1444,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntry(
@@ -1244,7 +1453,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Home");
@@ -1258,7 +1466,7 @@ definition {
 			pageName = "Search Global Template Page",
 			siteName = "Site Name");
 
-		SearchPortlets.configureDestination(destinationPage = "Search Global Template Page");
+		SearchPortlets.configureEmbeddedSearchBar(destinationPage = "Search Global Template Page");
 
 		for (var portlet : list "Category Facet,Folder Facet,Modified Facet,Search Bar,Search Options,Search Results,Tag Facet,Type Facet,User Facet") {
 			AssertElementPresent(
@@ -1288,9 +1496,11 @@ definition {
 
 	@priority = "4"
 	test SearchUser {
+		property test.name.skip.portal.instance = "Search#SearchUser";
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -1301,7 +1511,7 @@ definition {
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -1310,6 +1520,22 @@ definition {
 			siteName = "${siteName}",
 			userScreenName = "usersn");
 
+		Navigator.gotoBack();
+
+		Search.searchCP(searchTerm = "userfn");
+
+		User.viewUserTableName(
+			key_userScreenName = "usersn",
+			userfn = "userfn",
+			userln = "userln");
+
+		Search.searchCP(searchTerm = "userln");
+
+		User.viewUserTableName(
+			key_userScreenName = "usersn",
+			userfn = "userfn",
+			userln = "userln");
+
 		Navigator.openURL();
 
 		SearchPortlets.searchEmbedded(searchTerm = "userfn userln");
@@ -1317,6 +1543,20 @@ definition {
 		SearchResultPortlet.viewSearchResults(
 			searchAssetTitle = "userfn userln",
 			searchAssetType = "User");
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			parameterName = "username",
+			portletName = "User Facet");
+
+		Refresh();
+
+		SearchFacetPortlet.checkFacet(facetValueName = "userfn userln");
+
+		var currentURL = selenium.getLocation();
+
+		if (!(contains("${currentURL}", "username"))) {
+			fail("User parameter name failed to change.");
+		}
 
 		SearchPortlets.searchEmbedded(searchTerm = "userfn");
 
@@ -1353,7 +1593,7 @@ definition {
 	test SearchUserWildcard {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -1364,7 +1604,7 @@ definition {
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -1398,19 +1638,16 @@ definition {
 			title = "WebContent Title 1");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContent.viewVersion(
 			version = "1.0",
 			webContentTitle = "WebContent Title 1");
 
-		var portalURL = PropsUtil.get("portal.url");
+		Search.openSearchPage();
 
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
-
-		Portlet.addPG(portletName = "Custom Facet");
+		SearchPortlets.addWidgets(searchPortletList = "Custom Facet");
 
 		SearchFacetPortlet.configureCustomFacet(aggregationField = "version");
 
@@ -1437,8 +1674,7 @@ definition {
 			searchTerm = "WebContent");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentNavigator.gotoEditCP(webContentTitle = "WebContent Title 1");
@@ -1477,15 +1713,77 @@ definition {
 	}
 
 	@priority = "4"
+	test SearchUsingCustomFacetWithUnlocalizedDDMField {
+		ProductMenu.gotoPortlet(
+			category = "Content & Data",
+			portlet = "Web Content");
+
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(
+			structureDescription = "Test Structure Description",
+			structureName = "Test Structure");
+
+		DynamicDataMapping.addField(
+			field = "Text",
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
+
+		DynamicDataMapping.editFieldLocalizable(fieldFieldLabel = "Text");
+
+		WebContentStructures.saveCP(structureName = "Test Structure");
+
+		ProductMenu.gotoPortlet(
+			category = "Content & Data",
+			portlet = "Web Content");
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "Test Structure");
+
+		WebContent.addWithStructureCP(
+			structureName = "Test Structure",
+			webContentText = "Unlocalized text field",
+			webContentTitle = "WC Title");
+
+		PortletEntry.publish();
+
+		WebContent.viewWithStructureCP(
+			webContentText = "Unlocalized text field",
+			webContentTitle = "WC Title");
+
+		var portalHostname = PropsUtil.get("portal.hostname");
+
+		var port = Elasticsearch.getServerPort();
+
+		var curl = "http://${portalHostname}:${port}/_search?q=entryClassName:com.liferay.journal.model.JournalArticle";
+		var journalArticleDocumentType = JSONCurlUtil.get("${curl}");
+		var classTypeId = RegexUtil.replace("${journalArticleDocumentType}", "ddm__keyword__(\d+)__Text", "1");
+		var aggregationField = "ddm__keyword__${classTypeId}__Text";
+
+		Search.openSearchPage();
+
+		SearchPortlets.addWidgets(searchPortletList = "Custom Facet");
+
+		SearchFacetPortlet.configureCustomFacet(aggregationField = "${aggregationField}");
+
+		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+
+		AssertElementPresent(
+			key_checkboxName = "Unlocalized text field",
+			key_facetClass = "Custom Facet",
+			locator1 = "SearchResults#FACET_PORTLET_CHECKBOX_LABEL_SPECIFIC");
+	}
+
+	@priority = "4"
 	test SearchWebContent {
+		property test.name.skip.portal.instance = "Search#SearchWebContent";
+
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			groupName = "Guest",
 			title = "WC WebContent Title");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContent.viewTitle(webContentTitle = "WC WebContent Title");
@@ -1555,7 +1853,6 @@ definition {
 	test SearchWikiPage {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Wiki Test Page");
@@ -1616,6 +1913,66 @@ definition {
 			searchAssetSummary = "Wiki Page Content",
 			searchAssetTitle = "Wiki Page Title",
 			searchAssetType = "Wiki Page");
+	}
+
+	@priority = "4"
+	test SearchWithFolderFacet {
+		for (var count : list "1,2") {
+			JSONDocument.addFolder(
+				dmFolderDescription = "DM Folder Description ${count}",
+				dmFolderName = "DM Folder Name ${count}",
+				groupName = "Guest");
+		}
+
+		for (var count : list "1,2") {
+			JSONDocument.addFile(
+				dmDocumentDescription = "DM Document Description ${count}",
+				dmDocumentTitle = "DM Document Title ${count}",
+				folderName = "DM Folder Name ${count}",
+				groupName = "Guest");
+		}
+
+		Navigator.openURL();
+
+		SearchPortlets.searchEmbedded(searchTerm = "DM");
+
+		SearchResultPortlet.viewMultipleSearchResults(
+			resultsList = "DM Document Title 1/Document,DM Document Title 2/Document",
+			searchTerm = "DM");
+
+		SearchFacetPortlet.checkFacet(facetValueName = "DM Folder Name 1");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "DM Document Title 1",
+			searchAssetType = "Document");
+
+		SearchResultPortlet.viewSearchResultNotPresent(
+			searchAssetTitle = "DM Document Title 2",
+			searchAssetType = "Document");
+
+		SearchFacetPortlet.clearFacet();
+
+		SearchFacetPortlet.checkFacet(facetValueName = "DM Folder Name 2");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "DM Document Title 2",
+			searchAssetType = "Document");
+
+		SearchResultPortlet.viewSearchResultNotPresent(
+			searchAssetTitle = "DM Document Title 1",
+			searchAssetType = "Document");
+
+		SearchFacetPortlet.clearFacet();
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayFrequencies = "disable",
+			portletName = "Folder Facet");
+
+		Refresh();
+
+		AssertElementNotPresent(
+			facetValueName = "DM Folder Name 1",
+			locator1 = "Search#FACET_DISPLAY_FREQUENCIES");
 	}
 
 	test SearchWithModifiedFacet {
@@ -1708,14 +2065,6 @@ definition {
 
 		AssertVisible(locator1 = "Button#SEARCH_DISABLED");
 
-		// Workaround for LPS-82584
-
-		SearchFacetPortlet.clearFacet();
-
-		Click(
-			locator1 = "Search#MODIFIED_FACET_SELECTION",
-			range = "Custom Range");
-
 		Click(locator1 = "Search#CUSTOM_RANGE_FROM");
 
 		Click(locator1 = "YUICalendarWidget#PREVIOUS_MONTH_ARROW");
@@ -1735,25 +2084,69 @@ definition {
 	}
 
 	@priority = "4"
+	test SearchWithTypeFacet {
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Guest",
+			title = "Apple");
+
+		JSONDocument.addFile(
+			dmDocumentDescription = "DM Document Description ${count}",
+			dmDocumentTitle = "Apple",
+			groupName = "Guest");
+
+		JSONBlog.addEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Apple");
+
+		Navigator.openURL();
+
+		SearchPortlets.searchEmbedded(searchTerm = "Apple");
+
+		SearchResultPortlet.viewMultipleSearchResults(
+			resultsList = "Apple/Web Content Article,Apple/Document,Apple/Blogs Entry",
+			searchTerm = "Apple");
+
+		SearchFacetPortlet.moveAssetTypesToAvailable(assetType = "Document");
+
+		Refresh();
+
+		AssertElementPresent(
+			key_fieldName = "Web Content Article",
+			locator1 = "FormFields#CHECKBOX_LABEL");
+
+		AssertElementPresent(
+			key_fieldName = "Blogs Entry",
+			locator1 = "FormFields#CHECKBOX_LABEL");
+
+		AssertElementNotPresent(
+			key_fieldName = "Document",
+			locator1 = "FormFields#CHECKBOX_LABEL");
+
+		SearchResultPortlet.viewMultipleSearchResults(
+			resultsList = "Apple/Web Content Article,Apple/Blogs Entry",
+			searchTerm = "Apple");
+
+		SearchResultPortlet.viewSearchResultNotPresent(
+			searchAssetTitle = "Apple",
+			searchAssetType = "Document");
+	}
+
+	@priority = "4"
 	test SearchXSSAsset {
 		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			panel = "Site Administration",
-			portlet = "Pages");
+			category = "Content & Data",
+			portlet = "Message Boards");
 
-		SitePages.addPublicPage(pageName = "Message Boards Page");
-
-		Navigator.gotoPage(pageName = "Message Boards Page");
-
-		Portlet.addPG(portletName = "Message Boards");
-
-		Navigator.gotoPage(pageName = "Message Boards Page");
-
-		MessageboardsThread.addPG(
+		MessageboardsThread.addCP(
 			threadBody = '''<script>alert(123);</script>''',
 			threadSubject = "Thread Subject");
 
-		SearchPortlets.searchEmbedded(searchTerm = "Liferay Alert");
+		Navigator.openURL();
+
+		SearchPortlets.searchEmbedded(searchTerm = "Subject");
+
+		AssertAlertNotPresent();
 
 		SearchResultPortlet.viewSearchResults(
 			searchAssetSummary = '''<script>alert(123);</script>''',
@@ -1762,7 +2155,7 @@ definition {
 
 		var actualScript = '''<script>alert(123);</script>''';
 
-		var escapedScript = '''&lt;script&gt;<span class="highlight">alert</span>(123);&lt;/script&gt;''';
+		var escapedScript = '''&lt;script&gt;alert(123);&lt;/script&gt;''';
 
 		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
 
@@ -1817,7 +2210,7 @@ definition {
 
 		IFrame.closeFrame();
 
-		SearchPortlets.configureDestination(destinationPage = "Search Page");
+		SearchPortlets.configureEmbeddedSearchBar(destinationPage = "Search Page");
 
 		User.logoutPG();
 
@@ -1830,7 +2223,7 @@ definition {
 
 		AssertElementNotPresent(locator1 = "Portlet#ERROR");
 
-		for (var portlet : list "Custom Filter,Sort,Suggestions,Search Results,Search Bar") {
+		for (var portlet : list "Custom Filter,Sort,Search Results,Search Bar") {
 			AssertElementPresent(
 				key_portletName = "${portlet}",
 				locator1 = "Portlet#BODY");
@@ -1849,7 +2242,7 @@ definition {
 
 		AssertElementNotPresent(locator1 = "Portlet#ERROR");
 
-		for (var portlet : list "Custom Filter,Sort,Suggestions,Search Results,Search Bar") {
+		for (var portlet : list "Custom Filter,Sort,Search Results,Search Bar") {
 			AssertElementPresent(
 				key_portletName = "${portlet}",
 				locator1 = "Portlet#BODY");
@@ -1946,7 +2339,7 @@ definition {
 
 		// Workaround for LPS-89026
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Search");
@@ -1957,7 +2350,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Search Page");
@@ -1966,7 +2358,7 @@ definition {
 
 		SearchPortlets.addWidgets(searchPortletList = "Site Facet,Search Results,Search Bar");
 
-		SearchPortlets.configureWidgetScope(searchScope = "Everything");
+		SearchPortlets.configureSearchBarWidget(searchScope = "Everything");
 
 		SearchPortlets.searchWidget(searchTerm = "*");
 
@@ -2009,8 +2401,7 @@ definition {
 		var organicCategoryId = JSONCategory.getCategoryId(
 			categoryName = "organic",
 			groupName = "Guest",
-			vocabularyName = "Fruit Vocabulary"
-		);
+			vocabularyName = "Fruit Vocabulary");
 
 		var webContentserviceContext1 = '''{"assetTagNames": ["ripe"], "assetCategoryIds": ["${organicCategoryId}"]}''';
 
@@ -2041,8 +2432,7 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "New Site");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		Blogs.addEntryWithTag(
@@ -2062,7 +2452,7 @@ definition {
 			roleTitle = "Administrator",
 			userEmailAddress = "userea@liferay.com");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -2078,8 +2468,7 @@ definition {
 			userEmailAddress = "userea@liferay.com");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
@@ -2097,16 +2486,23 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "${searchPage}");
 
 		Navigator.gotoPage(pageName = "${searchPage}");
 
-		SearchPortlets.addWidgets(searchPortletList = "Search Options,Category Facet,Folder Facet,Site Facet,Tag Facet,Type Facet,User Facet,Search Results,Search Bar");
+		SearchPortlets.addWidgets(searchPortletList = "Category Facet,Folder Facet,Site Facet,Tag Facet,Type Facet,User Facet,Search Results,Search Bar");
 
-		SearchPortlets.configureWidgetScope(searchScope = "Everything");
+		JSONLayout.addWidgetToPublicLayout(
+			column = "2",
+			groupName = "Guest",
+			layoutName = "Search Page",
+			widgetName = "Search Options");
+
+		Refresh();
+
+		SearchPortlets.configureSearchBarWidget(searchScope = "Everything");
 
 		SearchPortlets.configureSearchOptions(
 			allowEmptySearches = "true",
@@ -2124,8 +2520,7 @@ definition {
 			facetClass = "type",
 			facetValueName = "Web Content Article",
 			searchPage = "${searchPage}",
-			searchTerm = "apple"
-		);
+			searchTerm = "apple");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Web Content Article",
@@ -2136,8 +2531,7 @@ definition {
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "type",
 			facetValueName = "Blogs Entry",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Blogs Entry,apple/Web Content Article",
@@ -2148,8 +2542,7 @@ definition {
 		var testSearchURL = SearchFacetPortlet.uncheckFacetAndViewURL(
 			facetClass = "type",
 			facetValueName = "Web Content Article",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Blogs Entry",
@@ -2163,8 +2556,7 @@ definition {
 
 		var testSearchURL = SearchPortlets.getSearchTermURL(
 			searchPage = "${searchPage}",
-			searchTerm = "test"
-		);
+			searchTerm = "test");
 
 		AssertLocation(value1 = "${testSearchURL}");
 
@@ -2176,8 +2568,7 @@ definition {
 			facetClass = "category",
 			facetValue = "${organicCategoryId}",
 			facetValueName = "organic",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Web Content Article,banana/Document",
@@ -2188,8 +2579,7 @@ definition {
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "user",
 			facetValueName = "userfn userln",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "banana/Document",
@@ -2200,8 +2590,7 @@ definition {
 		var testSearchURL = SearchFacetPortlet.uncheckFacetAndViewURL(
 			facetClass = "user",
 			facetValueName = "userfn userln",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Web Content Article,banana/Document",
@@ -2215,20 +2604,17 @@ definition {
 
 		var testSearchURL = SearchPortlets.getSearchTermURL(
 			searchPage = "${searchPage}",
-			searchTerm = "test"
-		);
+			searchTerm = "test");
 
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "tag",
 			facetValueName = "sweet",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "tag",
 			facetValueName = "fresh",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Blogs Entry,banana/Document,orange/Web Content Article",
@@ -2236,7 +2622,9 @@ definition {
 
 		SearchResultPortlet.viewMultipleSearchResultsNotPresent(noResultsList = "apple/Web Content Article");
 
-		var liferaySiteId = JSONGroupAPI._getGroupIdByName(groupName = "Guest");
+		var liferaySiteId = JSONGroupAPI._getGroupIdByName(
+			groupName = "Guest",
+			site = "true");
 
 		var siteName = TestCase.getSiteName();
 
@@ -2244,17 +2632,17 @@ definition {
 			facetClass = "site",
 			facetValue = "${liferaySiteId}",
 			facetValueName = "${siteName}",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
-		var newSiteId = JSONGroupAPI._getGroupIdByName(groupName = "New Site");
+		var newSiteId = JSONGroupAPI._getGroupIdByName(
+			groupName = "New Site",
+			site = "true");
 
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "site",
 			facetValue = "${newSiteId}",
 			facetValueName = "New Site",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Blogs Entry,banana/Document,orange/Web Content Article",
@@ -2266,8 +2654,7 @@ definition {
 			facetClass = "site",
 			facetValue = "${newSiteId}",
 			facetValueName = "New Site",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "banana/Document,orange/Web Content Article",
@@ -2283,8 +2670,7 @@ definition {
 			facetClass = "folder",
 			facetValue = "${webContentFolderId2}",
 			facetValueName = "${webContentFolderName2}",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "orange/Web Content Article",
@@ -2295,8 +2681,7 @@ definition {
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "tag",
 			facetValueName = "ripe",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "orange/Web Content Article",
@@ -2308,14 +2693,12 @@ definition {
 			facetClass = "folder",
 			facetValue = "${webContentFolderId2}",
 			facetValueName = "${webContentFolderName2}",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		var testSearchURL = SearchFacetPortlet.uncheckFacetAndViewURL(
 			facetClass = "tag",
 			facetValueName = "fresh",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Web Content Article,banana/Document",
@@ -2329,15 +2712,13 @@ definition {
 
 		var testSearchURL = SearchPortlets.getSearchTermURL(
 			searchPage = "${searchPage}",
-			searchTerm = "organic"
-		);
+			searchTerm = "organic");
 
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "category",
 			facetValue = "${organicCategoryId}",
 			facetValueName = "organic",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		var webContentFolderId1 = JSONWebcontent.getFolderIdByFolderName(
 			folderName = "${webContentFolderName1}",
@@ -2347,33 +2728,28 @@ definition {
 			facetClass = "folder",
 			facetValue = "${webContentFolderId1}",
 			facetValueName = "${webContentFolderName1}",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "site",
 			facetValue = "${liferaySiteId}",
 			facetValueName = "${siteName}",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "tag",
 			facetValueName = "ripe",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "type",
 			facetValueName = "Web Content Article",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		var testSearchURL = SearchFacetPortlet.checkFacetAndViewURL(
 			facetClass = "user",
 			facetValueName = "test test",
-			searchURL = "${testSearchURL}"
-		);
+			searchURL = "${testSearchURL}");
 
 		SearchResultPortlet.viewMultipleSearchResults(
 			resultsList = "apple/Web Content Article",
@@ -2385,7 +2761,7 @@ definition {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "Search#ViewSearchResultDetails";
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Search");
@@ -2429,7 +2805,9 @@ definition {
 
 		SearchPortlets.searchEmbedded(searchTerm = "Content");
 
-		Portlet.addPG(portletName = "Sort");
+		SearchPortlets.addWidgets(searchPortletList = "Sort");
+
+		Refresh();
 
 		SearchPortlets.chooseSortOption(sortOption = "Title");
 
@@ -2446,75 +2824,52 @@ definition {
 
 	@priority = "4"
 	test ViewStagedAndLiveContentInSearchResults {
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites");
+		JSONGroup.addGroup(groupName = "Site Name");
 
-		Site.addBlankCP(siteName = "Site Name");
-
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			panel = "Site Administration",
-			portlet = "Pages");
+		SitePages.openPagesAdmin(siteURLKey = "Site Name");
 
 		SitePages.addPublicPage(
 			inheritChanges = "disable",
 			pageName = "search",
 			pageTemplateName = "Search");
 
-		ProductMenu.gotoPortlet(
-			category = "Publishing",
-			panel = "Site Administration",
-			portlet = "Staging");
+		Navigator.openSiteURL(siteName = "Site Name");
+
+		SearchPortlets.configureEmbeddedSearchBar(searchScope = "Let the User Choose");
+
+		Staging.openStagingAdmin(siteURLKey = "site-name");
 
 		Staging.activateStagingCP(siteName = "Site Name");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
 		WebContent.addArticleCP(
-			webContentContent = "WebContent Content",
-			webContentTitle = "WebContent Title");
+			webContentContent = "WC Content",
+			webContentTitle = "Apple");
 
-		Navigator.gotoStagedSitePage(
-			pageName = "search",
-			siteName = "Site Name");
+		Navigator.openStagingSiteURL(siteName = "Site Name");
 
-		SearchPortlets.searchEmbedded(searchTerm = "Web Content Article");
+		SearchPortlets.searchEmbedded(searchTerm = "Apple");
 
 		SearchResultPortlet.viewSearchResults(
-			searchAssetTitle = "WebContent Title",
+			searchAssetTitle = "Apple",
 			searchAssetType = "Web Content Article");
 
-		ProductMenu.gotoLiveSite();
+		ProductMenu.gotoLiveSite(site = "Site Name");
 
-		SearchPortlets.searchEmbedded(searchTerm = "Web Content Article");
+		SearchPortlets.searchEmbedded(searchTerm = "Apple");
 
 		SearchResultPortlet.viewSearchResultNotPresent(
-			searchAssetTitle = "WebContent Title",
+			searchAssetTitle = "Apple",
 			searchAssetType = "Web Content Article");
 
-		// LPS-83060
+		SearchPortlets.chooseEmbeddedScope(searchScope = "Everything");
 
-		/* <execute macro="SearchPortlets#configureEmbeddedScope">
-			<var name="searchScope" value="Everything" />
-		</execute>
+		SearchPortlets.searchEmbedded(searchTerm = "Apple");
 
-		<execute macro="SearchPortlets#searchEmbedded">
-			<var name="searchTerm" value="Web Content Article" />
-		</execute>
-
-		<execute macro="SearchResultPortlet#viewSearchResultNotPresent">
-			<var name="searchAssetTitle" value="WebContent Title" />
-			<var name="searchAssetType" value="Web Content Article" />
-		</execute>
-
-		<execute macro="SearchPortlets#configureEmbeddedScope">
-			<var name="searchScope" value="This Site" />
-		</execute> */
+		SearchResultPortlet.viewSearchResultNotPresent(
+			searchAssetTitle = "Apple",
+			searchAssetType = "Web Content Article");
 
 		Navigator.gotoStagedView();
 
@@ -2522,32 +2877,26 @@ definition {
 
 		Staging.publishToLive();
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
-		WebContent.deleteStagedCP(
-			pageName = "search",
-			siteName = "Site Name",
-			webContentTitle = "WebContent Title");
+		WebContent.deleteCP(
+			siteURLKey = "site-name-staging",
+			webContentTitle = "Apple");
 
-		Navigator.gotoStagedSitePage(
-			pageName = "search",
-			siteName = "Site Name");
+		Navigator.openStagingSiteURL(siteName = "Site Name");
 
-		SearchPortlets.searchEmbedded(searchTerm = "Web Content Article");
+		SearchPortlets.searchEmbedded(searchTerm = "Apple");
 
 		SearchResultPortlet.viewSearchResultNotPresent(
-			searchAssetTitle = "WebContent Title",
+			searchAssetTitle = "Apple",
 			searchAssetType = "Web Content Article");
 
-		ProductMenu.gotoLiveSite();
+		ProductMenu.gotoLiveSite(site = "Site Name");
 
-		SearchPortlets.searchEmbedded(searchTerm = "Web Content Article");
+		SearchPortlets.searchEmbedded(searchTerm = "Apple");
 
 		SearchResultPortlet.viewSearchResults(
-			searchAssetTitle = "WebContent Title",
+			searchAssetTitle = "Apple",
 			searchAssetType = "Web Content Article");
 	}
 

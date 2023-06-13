@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FileImpl;
 import com.liferay.portal.util.HttpImpl;
 import com.liferay.portal.util.PropsImpl;
@@ -29,19 +30,25 @@ import com.liferay.portal.xml.SAXReaderImpl;
 import java.io.IOException;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.net.UnknownServiceException;
 
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Gregory Amerson
  */
 public class WabURLConnectionTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() {
@@ -122,7 +129,7 @@ public class WabURLConnectionTest {
 		wabURLConnection.getInputStream();
 	}
 
-	private String _getURIString(String fileName) throws URISyntaxException {
+	private String _getURIString(String fileName) throws Exception {
 		URL url = WabURLConnectionTest.class.getResource(fileName);
 
 		URI uri = url.toURI();

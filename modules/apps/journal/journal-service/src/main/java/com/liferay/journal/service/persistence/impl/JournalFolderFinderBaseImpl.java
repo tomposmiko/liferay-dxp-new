@@ -59,7 +59,6 @@ public abstract class JournalFolderFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -85,14 +84,5 @@ public abstract class JournalFolderFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalFolderFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(JournalPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

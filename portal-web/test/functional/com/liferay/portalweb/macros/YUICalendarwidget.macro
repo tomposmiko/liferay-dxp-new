@@ -1,7 +1,6 @@
 definition {
 
 	macro addDate {
-
 		/*
 		To ensure the desired month will always be reached, click "Previous"
 		until it reaches our baseline of May 2016. Then click "Next" until
@@ -28,7 +27,7 @@ definition {
 			value1 = "${month} ${year}");
 
 		AssertClick(
-			locator1 = "YUICalendarWidget#DATEPICKER_SPECIFIC_DAY",
+			locator1 = "YUICalendarWidget#DATEPICKER_SPECIFIC_DAY_1",
 			value1 = "${day}");
 	}
 

@@ -18,9 +18,11 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.DownloadURLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
+import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
+import com.liferay.layout.item.selector.criterion.LayoutItemSelectorCriterion;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
@@ -30,9 +32,10 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.resource.bundle.AggregateResourceBundleLoader;
+import com.liferay.portal.kernel.resource.bundle.ClassResourceBundleLoader;
+import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -75,27 +78,31 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 		sb.append(getAllowedContentTable());
 		sb.append(" span[*](*){*}; ");
 
-		jsonObject.put(
-			"allowedContent", sb.toString()
-		).put(
-			"enterMode", 2
-		).put(
-			"extraPlugins", getExtraPluginsLists()
-		);
-
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, "_EDITOR_NAME_selectItem",
+			getFileItemSelectorCriterion(), getLayoutItemSelectorURL());
+		PortletURL imageSelectorURL = _itemSelector.getItemSelectorURL(
 			requestBackedPortletURLFactory, "_EDITOR_NAME_selectItem",
 			getImageItemSelectorCriterion(), getURLItemSelectorCriterion());
 
 		jsonObject.put(
-			"filebrowserImageBrowseLinkUrl", itemSelectorURL.toString()
+			"allowedContent", sb.toString()
 		).put(
-			"filebrowserImageBrowseUrl", itemSelectorURL.toString()
+			"documentBrowseLinkUrl", itemSelectorURL.toString()
+		).put(
+			"enterMode", 2
+		).put(
+			"extraPlugins", getExtraPluginsLists()
+		).put(
+			"filebrowserImageBrowseLinkUrl", imageSelectorURL.toString()
+		).put(
+			"filebrowserImageBrowseUrl", imageSelectorURL.toString()
 		).put(
 			"removePlugins", getRemovePluginsLists()
 		).put(
-			"spritemap",
-			themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
+			"skin", "moono-lisa"
+		).put(
+			"spritemap", themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
 			"toolbars", getToolbarsJSONObject(themeDisplay.getLocale())
 		);
@@ -120,6 +127,16 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 				"ae_tabletools,ae_uicore,itemselector,media,adaptivemedia";
 	}
 
+	protected ItemSelectorCriterion getFileItemSelectorCriterion() {
+		ItemSelectorCriterion fileItemSelectorCriterion =
+			new FileItemSelectorCriterion();
+
+		fileItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new DownloadURLItemSelectorReturnType());
+
+		return fileItemSelectorCriterion;
+	}
+
 	protected ItemSelectorCriterion getImageItemSelectorCriterion() {
 		ItemSelectorCriterion itemSelectorCriterion =
 			new ImageItemSelectorCriterion();
@@ -128,6 +145,17 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 			new DownloadURLItemSelectorReturnType());
 
 		return itemSelectorCriterion;
+	}
+
+	protected ItemSelectorCriterion getLayoutItemSelectorURL() {
+		LayoutItemSelectorCriterion layoutItemSelectorCriterion =
+			new LayoutItemSelectorCriterion();
+
+		layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new URLItemSelectorReturnType());
+		layoutItemSelectorCriterion.setShowHiddenPages(true);
+
+		return layoutItemSelectorCriterion;
 	}
 
 	protected String getRemovePluginsLists() {
@@ -152,10 +180,9 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 
 		ResourceBundleLoader resourceBundleLoader =
 			new AggregateResourceBundleLoader(
-				ResourceBundleUtil.getResourceBundleLoader(
+				new ClassResourceBundleLoader(
 					"content.Language", clazz.getClassLoader()),
-				_resourceBundleLoader,
-				LanguageUtil.getPortalResourceBundleLoader());
+				_resourceBundleLoader, LanguageUtil.getResourceBundleLoader());
 
 		try {
 			resourceBundle = resourceBundleLoader.loadResourceBundle(locale);
@@ -166,21 +193,23 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 
 		return JSONUtil.putAll(
 			getStyleFormatJSONObject(
-				LanguageUtil.get(resourceBundle, "small"), "p", "small", 1),
+				LanguageUtil.get(resourceBundle, "small"), "span", "small",
+				_CKEDITOR_STYLE_INLINE),
 			getStyleFormatJSONObject(
-				LanguageUtil.get(resourceBundle, "lead"), "p", "lead", 1),
+				LanguageUtil.get(resourceBundle, "lead"), "span", "lead",
+				_CKEDITOR_STYLE_INLINE),
 			getStyleFormatJSONObject(
 				LanguageUtil.format(resourceBundle, "heading-x", "1"), "h1",
-				null, 1),
+				null, _CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
 				LanguageUtil.format(resourceBundle, "heading-x", "2"), "h2",
-				null, 1),
+				null, _CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
 				LanguageUtil.format(resourceBundle, "heading-x", "3"), "h3",
-				null, 1),
+				null, _CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
 				LanguageUtil.format(resourceBundle, "heading-x", "4"), "h4",
-				null, 1));
+				null, _CKEDITOR_STYLE_BLOCK));
 	}
 
 	protected JSONObject getStyleFormatsJSONObject(Locale locale) {
@@ -210,14 +239,13 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 	}
 
 	protected JSONObject getToolbarsJSONObject(Locale locale) {
-		JSONObject toolbarJSONObject = JSONUtil.put(
-			"buttons", toJSONArray("['image', 'hline']")
-		).put(
-			"tabIndex", 1
-		);
-
 		return JSONUtil.put(
-			"add", toolbarJSONObject
+			"add",
+			JSONUtil.put(
+				"buttons", toJSONArray("['image', 'hline']")
+			).put(
+				"tabIndex", 1
+			)
 		).put(
 			"styles", getToolbarsStylesJSONObject(locale)
 		);
@@ -231,8 +259,19 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 		);
 	}
 
+	protected JSONObject getToolbarsStylesSelectionsImageJSONObject() {
+		return JSONUtil.put(
+			"buttons", JSONUtil.putAll("imageLeft", "imageCenter", "imageRight")
+		).put(
+			"name", "image"
+		).put(
+			"test", "AlloyEditor.SelectionTest.image"
+		);
+	}
+
 	protected JSONArray getToolbarsStylesSelectionsJSONArray(Locale locale) {
 		return JSONUtil.putAll(
+			getToolbarsStylesSelectionsImageJSONObject(),
 			getToolbarsStylesSelectionsLinkJSONObject(),
 			getToolbarsStylesSelectionsTextJSONObject(locale));
 	}
@@ -288,6 +327,10 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 
 		return itemSelectorCriterion;
 	}
+
+	private static final int _CKEDITOR_STYLE_BLOCK = 1;
+
+	private static final int _CKEDITOR_STYLE_INLINE = 2;
 
 	@Reference
 	private ItemSelector _itemSelector;

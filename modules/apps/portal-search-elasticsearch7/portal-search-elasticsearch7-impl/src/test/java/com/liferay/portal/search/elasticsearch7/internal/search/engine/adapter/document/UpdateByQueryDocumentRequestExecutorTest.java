@@ -14,19 +14,24 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.document;
 
-import com.liferay.portal.json.JSONObjectImpl;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
-import com.liferay.portal.search.elasticsearch7.internal.legacy.query.ElasticsearchQueryTranslatorFixture;
+import com.liferay.portal.search.elasticsearch7.internal.query.ElasticsearchQueryTranslatorFixture;
 import com.liferay.portal.search.engine.adapter.document.UpdateByQueryDocumentRequest;
+import com.liferay.portal.search.internal.script.ScriptsImpl;
+import com.liferay.portal.search.script.Scripts;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PropsImpl;
 
 import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -34,8 +39,15 @@ import org.junit.Test;
  */
 public class UpdateByQueryDocumentRequestExecutorTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
 	public void setUp() throws Exception {
+		PropsUtil.setProps(new PropsImpl());
+
 		_elasticsearchFixture = new ElasticsearchFixture(
 			UpdateByQueryDocumentRequestExecutorTest.class.getSimpleName());
 
@@ -62,11 +74,9 @@ public class UpdateByQueryDocumentRequestExecutorTest {
 
 		booleanQuery.addExactTerm(_FIELD_NAME, true);
 
-		JSONObject jsonObject = new JSONObjectImpl();
-
 		UpdateByQueryDocumentRequest updateByQueryDocumentRequest =
 			new UpdateByQueryDocumentRequest(
-				booleanQuery, jsonObject, new String[] {_INDEX_NAME});
+				booleanQuery, null, new String[] {_INDEX_NAME});
 
 		updateByQueryDocumentRequest.setRefresh(refresh);
 
@@ -76,6 +86,16 @@ public class UpdateByQueryDocumentRequestExecutorTest {
 					{
 						setElasticsearchClientResolver(_elasticsearchFixture);
 
+						com.liferay.portal.search.elasticsearch7.internal.
+							legacy.query.ElasticsearchQueryTranslatorFixture
+								lecacyElasticsearchQueryTranslatorFixture =
+									new com.liferay.portal.search.
+										elasticsearch7.internal.legacy.query.ElasticsearchQueryTranslatorFixture();
+
+						setLegacyQueryTranslator(
+							lecacyElasticsearchQueryTranslatorFixture.
+								getElasticsearchQueryTranslator());
+
 						ElasticsearchQueryTranslatorFixture
 							elasticsearchQueryTranslatorFixture =
 								new ElasticsearchQueryTranslatorFixture();
@@ -83,6 +103,8 @@ public class UpdateByQueryDocumentRequestExecutorTest {
 						setQueryTranslator(
 							elasticsearchQueryTranslatorFixture.
 								getElasticsearchQueryTranslator());
+
+						setScripts(_scripts);
 					}
 				};
 
@@ -107,6 +129,8 @@ public class UpdateByQueryDocumentRequestExecutorTest {
 	private static final String _FIELD_NAME = "testField";
 
 	private static final String _INDEX_NAME = "test_request_index";
+
+	private static final Scripts _scripts = new ScriptsImpl();
 
 	private ElasticsearchFixture _elasticsearchFixture;
 

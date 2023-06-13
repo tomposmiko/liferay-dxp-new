@@ -12,8 +12,7 @@
  * details.
  */
 
-import {DefaultEventHandler, ItemSelectorDialog} from 'frontend-js-web';
-import dom from 'metal-dom';
+import {DefaultEventHandler, openSelectionModal} from 'frontend-js-web';
 
 class UserDropdownDefaultEventHandler extends DefaultEventHandler {
 	deleteGroupUsers(itemData) {
@@ -26,29 +25,46 @@ class UserDropdownDefaultEventHandler extends DefaultEventHandler {
 		}
 	}
 
-	assignSiteRoles(itemData) {
-		const itemSelectorDialog = new ItemSelectorDialog({
+	assignRoles(itemData) {
+		openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('done'),
-			eventName: this.ns('selectUsersRoles'),
-			title: Liferay.Language.get('assign-site-roles'),
-			url: itemData.assignSiteRolesURL
+			getSelectedItemsOnly: false,
+			multiple: true,
+			onSelect: (items) => {
+				if (items.length) {
+					const editUserGroupRoleFm = this.one(
+						'#editUserGroupRoleFm'
+					);
+
+					if (!editUserGroupRoleFm) {
+						return;
+					}
+
+					const allInput = document.createElement('input');
+
+					allInput.name = this.ns('availableRowIds');
+					allInput.value = items.map((item) => item.value);
+
+					editUserGroupRoleFm.appendChild(allInput);
+
+					const checkedInput = document.createElement('input');
+
+					checkedInput.name = this.ns('rowIds');
+					checkedInput.value = items
+						.filter((item) => item.checked)
+						.map((item) => item.value);
+
+					editUserGroupRoleFm.appendChild(checkedInput);
+
+					submitForm(
+						editUserGroupRoleFm,
+						itemData.editUserGroupRoleURL
+					);
+				}
+			},
+			title: Liferay.Language.get('assign-roles'),
+			url: itemData.assignRolesURL,
 		});
-
-		itemSelectorDialog.on('selectedItemChange', event => {
-			const selectedItem = event.selectedItem;
-
-			if (selectedItem) {
-				const editUserGroupRoleFm = this.one('#editUserGroupRoleFm');
-
-				selectedItem.forEach(item => {
-					dom.append(editUserGroupRoleFm, item);
-				});
-
-				submitForm(editUserGroupRoleFm, itemData.editUserGroupRoleURL);
-			}
-		});
-
-		itemSelectorDialog.open();
 	}
 }
 

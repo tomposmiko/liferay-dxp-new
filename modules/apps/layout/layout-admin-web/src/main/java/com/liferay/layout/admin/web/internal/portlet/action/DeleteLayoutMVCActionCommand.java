@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
-		"mvc.command.name=/layout/delete_layout"
+		"mvc.command.name=/layout_admin/delete_layout"
 	},
 	service = MVCActionCommand.class
 )
@@ -142,13 +142,13 @@ public class DeleteLayoutMVCActionCommand extends BaseMVCActionCommand {
 			_layoutService.deleteLayout(selPlid, serviceContext);
 		}
 		catch (Exception exception) {
-			Throwable cause = exception.getCause();
+			Throwable throwable = exception.getCause();
 
-			if (cause instanceof
+			if (throwable instanceof
 					RequiredSegmentsExperienceException.
 						MustNotDeleteSegmentsExperienceReferencedBySegmentsExperiments) {
 
-				SessionErrors.add(actionRequest, cause.getClass());
+				SessionErrors.add(actionRequest, throwable.getClass());
 			}
 			else {
 				throw exception;

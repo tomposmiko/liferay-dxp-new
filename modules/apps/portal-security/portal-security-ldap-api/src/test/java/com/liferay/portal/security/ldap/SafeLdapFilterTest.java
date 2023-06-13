@@ -17,17 +17,25 @@ package com.liferay.portal.security.ldap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.security.ldap.validator.LDAPFilterException;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Tomas Polesovsky
  */
 public class SafeLdapFilterTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testAnd() {
@@ -108,14 +116,10 @@ public class SafeLdapFilterTest {
 
 	@Test
 	public void testGenerateFilter() {
+		StringBundler sb = new StringBundler("(key1=value1)(key2=value2)");
+
 		test(
-			new SafeLdapFilter(
-				new StringBundler(
-					"(key1=value1)"
-				).append(
-					"(key2=value2)"
-				),
-				Collections.emptyList()),
+			new SafeLdapFilter(sb, Collections.emptyList()),
 			"(key1=value1)(key2=value2)");
 	}
 
@@ -123,11 +127,10 @@ public class SafeLdapFilterTest {
 	public void testGetArguments() {
 		Object[] arguments = {new Object()};
 
-		Assert.assertArrayEquals(
-			arguments,
-			new SafeLdapFilter(
-				new StringBundler(), Arrays.asList(arguments)
-			).getArguments());
+		SafeLdapFilter safeLdapFilter = new SafeLdapFilter(
+			new StringBundler(), Arrays.asList(arguments));
+
+		Assert.assertArrayEquals(arguments, safeLdapFilter.getArguments());
 	}
 
 	@Test

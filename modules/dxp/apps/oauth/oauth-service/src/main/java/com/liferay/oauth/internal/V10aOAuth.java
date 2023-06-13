@@ -15,6 +15,7 @@
 package com.liferay.oauth.internal;
 
 import com.liferay.oauth.configuration.OAuthConfigurationValues;
+import com.liferay.oauth.constants.OAuthAccessorConstants;
 import com.liferay.oauth.model.OAuthApplication;
 import com.liferay.oauth.model.OAuthUser;
 import com.liferay.oauth.service.OAuthApplicationLocalService;
@@ -25,10 +26,10 @@ import com.liferay.oauth.util.DefaultOAuthMessage;
 import com.liferay.oauth.util.DefaultOAuthValidator;
 import com.liferay.oauth.util.OAuth;
 import com.liferay.oauth.util.OAuthAccessor;
-import com.liferay.oauth.util.OAuthAccessorConstants;
 import com.liferay.oauth.util.OAuthConsumer;
 import com.liferay.oauth.util.OAuthMessage;
 import com.liferay.oauth.util.OAuthValidator;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheException;
 import com.liferay.portal.kernel.cache.PortalCacheListener;
@@ -51,7 +52,6 @@ import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PwdGenerator;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
@@ -159,9 +159,7 @@ public class V10aOAuth implements IdentifiableOSGiService, OAuth {
 
 		oAuthAccessor.setRequestToken(null);
 
-		String tokenSecret = randomizeToken(consumerKey.concat(token));
-
-		oAuthAccessor.setTokenSecret(tokenSecret);
+		oAuthAccessor.setTokenSecret(randomizeToken(consumerKey.concat(token)));
 
 		OAuthUser oAuthUser = _oAuthUserLocalService.fetchOAuthUser(
 			userId, oAuthApplication.getOAuthApplicationId());
@@ -202,9 +200,7 @@ public class V10aOAuth implements IdentifiableOSGiService, OAuth {
 
 		oAuthAccessor.setRequestToken(token);
 
-		String tokenSecret = randomizeToken(consumerKey.concat(token));
-
-		oAuthAccessor.setTokenSecret(tokenSecret);
+		oAuthAccessor.setTokenSecret(randomizeToken(consumerKey.concat(token)));
 
 		_put(token, oAuthAccessor);
 	}
@@ -328,7 +324,7 @@ public class V10aOAuth implements IdentifiableOSGiService, OAuth {
 			return deserializer.readObject();
 		}
 		catch (ClassNotFoundException classNotFoundException) {
-			classNotFoundException.printStackTrace();
+			_log.error(classNotFoundException);
 		}
 
 		return null;
@@ -368,7 +364,7 @@ public class V10aOAuth implements IdentifiableOSGiService, OAuth {
 			(V10aOAuth)IdentifiableOSGiServiceUtil.getIdentifiableOSGiService(
 				osgiServiceIdentifier);
 
-		PortalCache portalCache = v10aOAuth._portalCache;
+		PortalCache<Serializable, Object> portalCache = v10aOAuth._portalCache;
 
 		portalCache.put(key, oAuthAccessor);
 	}

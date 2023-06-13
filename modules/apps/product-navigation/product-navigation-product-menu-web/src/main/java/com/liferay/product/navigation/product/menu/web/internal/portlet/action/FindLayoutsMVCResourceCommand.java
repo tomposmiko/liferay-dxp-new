@@ -14,7 +14,6 @@
 
 package com.liferay.product.navigation.product.menu.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -32,6 +31,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.product.navigation.product.menu.constants.ProductNavigationProductMenuPortletKeys;
 
 import java.util.Collections;
@@ -53,7 +53,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU,
-		"mvc.command.name=/product_menu/find_layouts"
+		"mvc.command.name=/product_navigation_product_menu/find_layouts"
 	},
 	service = MVCResourceCommand.class
 )
@@ -100,21 +100,20 @@ public class FindLayoutsMVCResourceCommand extends BaseMVCResourceCommand {
 				LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
 				LayoutConstants.TYPE_URL
 			},
-			0, 10, null);
+			new int[] {WorkflowConstants.STATUS_ANY}, 0, 10, null);
 
 		for (Layout layout : layouts) {
 			JSONArray layoutPathJSONArray = _getLayoutPathJSONArray(
 				layout, themeDisplay.getLocale());
 
-			JSONObject layoutJSONObject = JSONUtil.put(
-				"name", layout.getName(themeDisplay.getLocale())
-			).put(
-				"path", layoutPathJSONArray
-			).put(
-				"url", _portal.getLayoutFullURL(layout, themeDisplay)
-			);
-
-			jsonArray.put(layoutJSONObject);
+			jsonArray.put(
+				JSONUtil.put(
+					"name", layout.getName(themeDisplay.getLocale())
+				).put(
+					"path", layoutPathJSONArray
+				).put(
+					"url", _portal.getLayoutFullURL(layout, themeDisplay)
+				));
 		}
 
 		jsonObject.put("layouts", jsonArray);
@@ -127,7 +126,8 @@ public class FindLayoutsMVCResourceCommand extends BaseMVCResourceCommand {
 				LayoutConstants.TYPE_FULL_PAGE_APPLICATION,
 				LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
 				LayoutConstants.TYPE_URL
-			});
+			},
+			new int[] {WorkflowConstants.STATUS_ANY});
 
 		jsonObject.put("totalCount", totalCount);
 
@@ -135,7 +135,7 @@ public class FindLayoutsMVCResourceCommand extends BaseMVCResourceCommand {
 	}
 
 	private JSONArray _getLayoutPathJSONArray(Layout layout, Locale locale)
-		throws PortalException {
+		throws Exception {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 

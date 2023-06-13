@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-fullscreen-source-editor',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var CONTENT_TEMPLATE =
@@ -22,7 +22,7 @@ AUI.add(
 			'<div class="col-6">' +
 			'<button class="btn btn-secondary btn-sm float-right lfr-portal-tooltip" data-title="{iconMoonTooltip}" id="switchTheme" type="button">' +
 			'<svg class="lexicon-icon lexicon-icon-moon" focusable="false" role="img">' +
-			'<use data-href="{pathThemeImages}/lexicon/icons.svg#moon" />' +
+			'<use href="{pathThemeImages}/clay/icons.svg#moon" />' +
 			'</svg>' +
 			'</button>' +
 			'</div>' +
@@ -30,17 +30,17 @@ AUI.add(
 			'<div class="btn-group" role="group">' +
 			'<button class="btn btn-secondary btn-sm" data-layout="vertical">' +
 			'<svg class="lexicon-icon lexicon-icon-columns" focusable="false" role="img">' +
-			'<use data-href="{pathThemeImages}/lexicon/icons.svg#columns" />' +
+			'<use href="{pathThemeImages}/clay/icons.svg#columns" />' +
 			'</svg>' +
 			'</button>' +
 			'<button class="btn btn-secondary btn-sm" data-layout="horizontal">' +
 			'<svg class="lexicon-icon lexicon-icon-cards" focusable="false" role="img">' +
-			'<use data-href="{pathThemeImages}/lexicon/icons.svg#cards" />' +
+			'<use href="{pathThemeImages}/clay/icons.svg#cards" />' +
 			'</svg>' +
 			'</button>' +
 			'<button class="btn btn-secondary btn-sm" data-layout="simple">' +
 			'<svg class="lexicon-icon lexicon-icon-expand" focusable="false" role="img">' +
-			'<use data-href="{pathThemeImages}/lexicon/icons.svg#expand" />' +
+			'<use href="{pathThemeImages}/clay/icons.svg#expand" />' +
 			'</svg>' +
 			'</button>' +
 			'</div>' +
@@ -73,34 +73,34 @@ AUI.add(
 					value: {
 						fontSize: 13,
 						showInvisibles: false,
-						showPrintMargin: false
-					}
+						showPrintMargin: false,
+					},
 				},
 
 				dataProcessor: {
-					validator: Lang.isObject
+					validator: Lang.isObject,
 				},
 
 				layout: {
 					validator: Lang.isString,
-					value: 'vertical'
+					value: 'vertical',
 				},
 
 				previewCssClass: {
 					validator: Lang.isString,
-					value: ''
+					value: '',
 				},
 
 				previewDelay: {
 					validator: Lang.isNumber,
-					value: 100
+					value: 100,
 				},
 
 				value: {
 					getter: '_getValue',
 					validator: Lang.isString,
-					value: ''
-				}
+					value: '',
+				},
 			},
 
 			CSS_PREFIX: 'lfr-fullscreen-source-editor',
@@ -135,9 +135,11 @@ AUI.add(
 				_onEditorChange(event) {
 					var instance = this;
 
-					instance._previewPanel.html(
-						instance._getHtml(event.newVal)
-					);
+					if (event.newVal || event.newVal === '') {
+						instance._previewPanel.html(
+							instance._getHtml(event.newVal)
+						);
+					}
 				},
 
 				_onLayoutChange(event) {
@@ -178,7 +180,7 @@ AUI.add(
 
 				CONTENT_TEMPLATE: Lang.sub(CONTENT_TEMPLATE, {
 					iconMoonTooltip: Liferay.Language.get('dark-theme'),
-					pathThemeImages: themeDisplay.getPathThemeImages()
+					pathThemeImages: themeDisplay.getPathThemeImages(),
 				}),
 
 				bindUI() {
@@ -216,7 +218,7 @@ AUI.add(
 								instance._onPreviewLink,
 								'a',
 								instance
-							)
+							),
 					];
 				},
 
@@ -266,9 +268,9 @@ AUI.add(
 									'data-title',
 									nextTheme.tooltip
 								);
-							}
+							},
 						},
-						value: instance.get(STR_VALUE)
+						value: instance.get(STR_VALUE),
 					}).render();
 
 					instance._previewPanel = boundingBox.one(CSS_PREVIEW_PANEL);
@@ -285,14 +287,14 @@ AUI.add(
 					var instance = this;
 
 					instance._editor.getEditor().resize();
-				}
-			}
+				},
+			},
 		});
 
 		A.LiferayFullScreenSourceEditor = LiferayFullScreenSourceEditor;
 	},
 	'',
 	{
-		requires: ['liferay-source-editor']
+		requires: ['liferay-source-editor'],
 	}
 );

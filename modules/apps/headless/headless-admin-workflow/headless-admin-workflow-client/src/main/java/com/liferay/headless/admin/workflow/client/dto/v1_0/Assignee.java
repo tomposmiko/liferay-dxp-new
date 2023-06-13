@@ -17,6 +17,8 @@ package com.liferay.headless.admin.workflow.client.dto.v1_0;
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.AssigneeSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Assignee {
+public class Assignee implements Cloneable, Serializable {
+
+	public static Assignee toDTO(String json) {
+		return AssigneeSerDes.toDTO(json);
+	}
 
 	public Long getId() {
 		return id;
@@ -65,6 +71,11 @@ public class Assignee {
 	}
 
 	protected String name;
+
+	@Override
+	public Assignee clone() throws CloneNotSupportedException {
+		return (Assignee)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

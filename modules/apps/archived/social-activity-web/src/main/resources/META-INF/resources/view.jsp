@@ -45,13 +45,11 @@
 							String className = entry.getKey();
 
 							String localizedClassName = ResourceActionsUtil.getModelResource(locale, className);
-
-							boolean enabled = entry.getValue();
 						%>
 
 							<h4 class="social-activity-item" data-modelName="<%= className %>" title="<%= localizedClassName %>">
 								<div class="social-activity-item-content">
-									<aui:input disabled="<%= !SocialActivityPermissionUtil.contains(permissionChecker, themeDisplay.getSiteGroupId(), ActionKeys.CONFIGURATION) %>" inlineField="<%= true %>" label="" name='<%= className + ".enabled" %>' title="enabled" type="checkbox" value="<%= enabled %>" />
+									<aui:input disabled="<%= !SocialActivityPermissionUtil.contains(permissionChecker, themeDisplay.getSiteGroupId(), ActionKeys.CONFIGURATION) %>" inlineField="<%= true %>" label="" name='<%= className + ".enabled" %>' title="enabled" type="checkbox" value="<%= entry.getValue() %>" />
 
 									<a class="settings-label" href="javascript:;"><%= localizedClassName %></a>
 								</div>
@@ -81,7 +79,7 @@
 				<aui:script use="liferay-social-activity-admin">
 					new Liferay.Portlet.SocialActivity.Admin({
 						activityDefinitionLanguageKeys: {
-							<%= StringUtil.merge(activityDefinitionLanguageKeys) %>
+							<%= StringUtil.merge(activityDefinitionLanguageKeys) %>,
 						},
 						counterSettings: {
 
@@ -90,20 +88,20 @@
 							%>
 
 							contributionIncrements: [
-								<%= StringUtil.merge(socialActivityGroupServiceConfiguration.contributionIncrements()) %>
+								<%= StringUtil.merge(socialActivityGroupServiceConfiguration.contributionIncrements()) %>,
 							],
 							contributionLimitValues: [
-								<%= StringUtil.merge(socialActivityGroupServiceConfiguration.contributionLimitValues()) %>
+								<%= StringUtil.merge(socialActivityGroupServiceConfiguration.contributionLimitValues()) %>,
 							],
 							participationIncrements: [
-								<%= StringUtil.merge(socialActivityGroupServiceConfiguration.participationIncrements()) %>
+								<%= StringUtil.merge(socialActivityGroupServiceConfiguration.participationIncrements()) %>,
 							],
 							participationLimitValues: [
-								<%= StringUtil.merge(socialActivityGroupServiceConfiguration.participationLimitValues()) %>
-							]
+								<%= StringUtil.merge(socialActivityGroupServiceConfiguration.participationLimitValues()) %>,
+							],
 						},
 						namespace: '<portlet:namespace />',
-						portletId: '<%= portletDisplay.getId() %>'
+						portletId: '<%= portletDisplay.getId() %>',
 					});
 				</aui:script>
 			</aui:form>

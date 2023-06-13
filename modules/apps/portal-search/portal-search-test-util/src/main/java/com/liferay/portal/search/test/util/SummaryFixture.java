@@ -30,8 +30,8 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.spring.mock.web.portlet.MockPortletResponse;
-import com.liferay.spring.mock.web.portlet.MockRenderRequest;
+import com.liferay.portletmvc4spring.test.mock.web.portlet.MockPortletResponse;
+import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderRequest;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -55,11 +55,12 @@ public class SummaryFixture<T> {
 	public SummaryFixture(
 		Class<T> clazz, Group group, Locale defaultLocale, User user) {
 
-		_class = clazz;
-		_indexer = IndexerRegistryUtil.getIndexer(clazz);
+		_clazz = clazz;
 		_group = group;
 		_defaultLocale = defaultLocale;
 		_user = user;
+
+		_indexer = IndexerRegistryUtil.getIndexer(clazz);
 	}
 
 	public void assertSummary(String title, String content, Document document)
@@ -73,7 +74,7 @@ public class SummaryFixture<T> {
 		throws Exception {
 
 		Assert.assertEquals(
-			_class.getName(), document.get(Field.ENTRY_CLASS_NAME));
+			_clazz.getName(), document.get(Field.ENTRY_CLASS_NAME));
 
 		Summary summary = getSummary(document, locale);
 
@@ -164,7 +165,7 @@ public class SummaryFixture<T> {
 		return themeDisplay;
 	}
 
-	private final Class<T> _class;
+	private final Class<T> _clazz;
 	private final Locale _defaultLocale;
 	private final Group _group;
 	private final Indexer<T> _indexer;

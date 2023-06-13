@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -27,7 +28,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.portlet.ActionRequest;
 
@@ -41,7 +41,7 @@ public class TrashUndoUtil {
 			List<ObjectValuePair<String, Long>> entries)
 		throws Exception {
 
-		if ((entries == null) || entries.isEmpty()) {
+		if (ListUtil.isEmpty(entries)) {
 			return;
 		}
 
@@ -88,7 +88,10 @@ public class TrashUndoUtil {
 			restoreMessages.add(restoreMessage);
 		}
 
-		Map<String, List<String>> data =
+		SessionMessages.add(
+			actionRequest,
+			PortalUtil.getPortletId(actionRequest) +
+				SessionMessages.KEY_SUFFIX_DELETE_SUCCESS_DATA,
 			HashMapBuilder.<String, List<String>>put(
 				"restoreClassNames", restoreClassNames
 			).put(
@@ -99,13 +102,7 @@ public class TrashUndoUtil {
 				"restoreLinks", restoreLinks
 			).put(
 				"restoreMessages", restoreMessages
-			).build();
-
-		SessionMessages.add(
-			actionRequest,
-			PortalUtil.getPortletId(actionRequest) +
-				SessionMessages.KEY_SUFFIX_DELETE_SUCCESS_DATA,
-			data);
+			).build());
 	}
 
 	public static void addRestoreData(

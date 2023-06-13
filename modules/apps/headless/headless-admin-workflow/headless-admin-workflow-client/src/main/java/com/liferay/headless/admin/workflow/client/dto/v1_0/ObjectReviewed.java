@@ -17,6 +17,8 @@ package com.liferay.headless.admin.workflow.client.dto.v1_0;
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.ObjectReviewedSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,53 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ObjectReviewed {
+public class ObjectReviewed implements Cloneable, Serializable {
+
+	public static ObjectReviewed toDTO(String json) {
+		return ObjectReviewedSerDes.toDTO(json);
+	}
+
+	public String getAssetTitle() {
+		return assetTitle;
+	}
+
+	public void setAssetTitle(String assetTitle) {
+		this.assetTitle = assetTitle;
+	}
+
+	public void setAssetTitle(
+		UnsafeSupplier<String, Exception> assetTitleUnsafeSupplier) {
+
+		try {
+			assetTitle = assetTitleUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String assetTitle;
+
+	public String getAssetType() {
+		return assetType;
+	}
+
+	public void setAssetType(String assetType) {
+		this.assetType = assetType;
+	}
+
+	public void setAssetType(
+		UnsafeSupplier<String, Exception> assetTypeUnsafeSupplier) {
+
+		try {
+			assetType = assetTypeUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String assetType;
 
 	public Long getId() {
 		return id;
@@ -67,6 +115,11 @@ public class ObjectReviewed {
 	}
 
 	protected String resourceType;
+
+	@Override
+	public ObjectReviewed clone() throws CloneNotSupportedException {
+		return (ObjectReviewed)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

@@ -24,7 +24,7 @@ import {validateArguments, validatePortletId} from './portlet_util.es';
  * @review
  */
 
-const register = function(portletId) {
+const register = function (portletId) {
 	validateArguments(arguments, 1, 1, ['string']);
 
 	const pageRenderState = global.portlet.data.pageRenderState;
@@ -32,7 +32,8 @@ const register = function(portletId) {
 	return new Promise((resolve, reject) => {
 		if (validatePortletId(pageRenderState, portletId)) {
 			resolve(new PortletInit(portletId));
-		} else {
+		}
+		else {
 			reject(new Error('Invalid portlet ID'));
 		}
 	});

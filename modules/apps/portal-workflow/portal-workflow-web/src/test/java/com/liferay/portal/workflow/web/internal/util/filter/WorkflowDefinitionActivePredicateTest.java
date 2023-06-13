@@ -14,10 +14,13 @@
 
 package com.liferay.portal.workflow.web.internal.util.filter;
 
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
-import com.liferay.portal.workflow.web.internal.constants.WorkflowDefinitionConstants;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -25,11 +28,15 @@ import org.junit.Test;
  */
 public class WorkflowDefinitionActivePredicateTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Test
 	public void testFilterAllIncludeActive() {
 		WorkflowDefinitionActivePredicate predicate =
-			new WorkflowDefinitionActivePredicate(
-				WorkflowDefinitionConstants.STATUS_ALL);
+			new WorkflowDefinitionActivePredicate(WorkflowConstants.STATUS_ANY);
 
 		WorkflowDefinition workflowDefinition = new WorkflowDefinitionImpl(
 			true);
@@ -42,8 +49,7 @@ public class WorkflowDefinitionActivePredicateTest {
 	@Test
 	public void testFilterAllIncludeInactive() {
 		WorkflowDefinitionActivePredicate predicate =
-			new WorkflowDefinitionActivePredicate(
-				WorkflowDefinitionConstants.STATUS_ALL);
+			new WorkflowDefinitionActivePredicate(WorkflowConstants.STATUS_ANY);
 
 		WorkflowDefinition workflowDefinition = new WorkflowDefinitionImpl(
 			false);
@@ -57,7 +63,7 @@ public class WorkflowDefinitionActivePredicateTest {
 	public void testFilterNotPublishedExcludeActive() {
 		WorkflowDefinitionActivePredicate predicate =
 			new WorkflowDefinitionActivePredicate(
-				WorkflowDefinitionConstants.STATUS_NOT_PUBLISHED);
+				WorkflowConstants.STATUS_DRAFT);
 
 		WorkflowDefinition workflowDefinition = new WorkflowDefinitionImpl(
 			true);
@@ -71,7 +77,7 @@ public class WorkflowDefinitionActivePredicateTest {
 	public void testFilterNotPublishedIncludeInactive() {
 		WorkflowDefinitionActivePredicate predicate =
 			new WorkflowDefinitionActivePredicate(
-				WorkflowDefinitionConstants.STATUS_NOT_PUBLISHED);
+				WorkflowConstants.STATUS_DRAFT);
 
 		WorkflowDefinition workflowDefinition = new WorkflowDefinitionImpl(
 			false);
@@ -85,7 +91,7 @@ public class WorkflowDefinitionActivePredicateTest {
 	public void testFilterPublishedExcludeInactive() {
 		WorkflowDefinitionActivePredicate predicate =
 			new WorkflowDefinitionActivePredicate(
-				WorkflowDefinitionConstants.STATUS_PUBLISHED);
+				WorkflowConstants.STATUS_APPROVED);
 
 		WorkflowDefinition workflowDefinition = new WorkflowDefinitionImpl(
 			false);
@@ -99,7 +105,7 @@ public class WorkflowDefinitionActivePredicateTest {
 	public void testFilterPublishedIncludeActive() {
 		WorkflowDefinitionActivePredicate predicate =
 			new WorkflowDefinitionActivePredicate(
-				WorkflowDefinitionConstants.STATUS_PUBLISHED);
+				WorkflowConstants.STATUS_APPROVED);
 
 		WorkflowDefinition workflowDefinition = new WorkflowDefinitionImpl(
 			true);

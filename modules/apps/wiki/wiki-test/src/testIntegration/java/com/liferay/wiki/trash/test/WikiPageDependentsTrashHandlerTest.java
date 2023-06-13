@@ -315,12 +315,10 @@ public class WikiPageDependentsTrashHandlerTest {
 			TestPropsValues.getUserId(), _group.getGroupId(), _node.getNodeId(),
 			RandomTestUtil.randomString(), true);
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
-
 		WikiPageLocalServiceUtil.changeParent(
 			TestPropsValues.getUserId(), _node.getNodeId(), page.getTitle(),
-			newParentPage.getTitle(), serviceContext);
+			newParentPage.getTitle(),
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		movePageToTrash(parentPage);
 
@@ -955,7 +953,7 @@ public class WikiPageDependentsTrashHandlerTest {
 	public void testTrashVersionDeletionWhenRestoringFromTrash()
 		throws Exception {
 
-		int initialTrashVersionCount =
+		int initialTrashVersionsCount =
 			TrashVersionLocalServiceUtil.getTrashVersionsCount();
 
 		RelatedPages relatedPages = buildRelatedPages();
@@ -968,7 +966,7 @@ public class WikiPageDependentsTrashHandlerTest {
 		restoreFromTrash(page);
 
 		Assert.assertEquals(
-			initialTrashVersionCount,
+			initialTrashVersionsCount,
 			TrashVersionLocalServiceUtil.getTrashVersionsCount());
 	}
 
@@ -1028,12 +1026,10 @@ public class WikiPageDependentsTrashHandlerTest {
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
 			WikiPage.class.getName());
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
-
 		trashHandler.moveEntry(
 			TestPropsValues.getUserId(), trashedPage.getResourcePrimKey(),
-			newParentPage.getResourcePrimKey(), serviceContext);
+			newParentPage.getResourcePrimKey(),
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 	}
 
 	protected void movePageToTrash(WikiPage page) throws PortalException {
@@ -1047,12 +1043,9 @@ public class WikiPageDependentsTrashHandlerTest {
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
 			WikiPage.class.getName());
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
-
 		trashHandler.moveTrashEntry(
 			TestPropsValues.getUserId(), classPK, newContainerId,
-			serviceContext);
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 	}
 
 	protected void restoreFromTrash(WikiPage page) throws Exception {
@@ -1090,8 +1083,8 @@ public class WikiPageDependentsTrashHandlerTest {
 
 			_parentPage = parentPage;
 			_page = page;
-			_grandchildPage = grandchildPage;
 			_childPage = childPage;
+			_grandchildPage = grandchildPage;
 			_redirectorPage = redirectorPage;
 			_childRedirectorPage = childRedirectorPage;
 		}

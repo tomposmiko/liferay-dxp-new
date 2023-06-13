@@ -32,7 +32,7 @@ function SegmentsExperimentsModal({
 	onSave,
 	segmentsExperienceId,
 	segmentsExperimentId,
-	title
+	title,
 }) {
 	const [busy, setBusy] = useState(false);
 	const [inputDescription, setInputDescription] = useState(description);
@@ -85,7 +85,8 @@ function SegmentsExperimentsModal({
 							<label className="w100">
 								{Liferay.Language.get('select-goal')}
 								<ClayIcon
-									className="ml-1 reference-mark text-warning"
+									className="lexicon-icon-sm ml-1 reference-mark text-warning"
+									style={{verticalAlign: 'super'}}
 									symbol="asterisk"
 								/>
 								<ClaySelect
@@ -93,7 +94,7 @@ function SegmentsExperimentsModal({
 									defaultValue={inputGoal}
 									onChange={_handleGoalChange}
 								>
-									{goals.map(goal => (
+									{goals.map((goal) => (
 										<ClaySelect.Option
 											key={goal.value}
 											label={goal.label}
@@ -168,7 +169,7 @@ function SegmentsExperimentsModal({
 				goalTarget,
 				name: inputName,
 				segmentsExperienceId,
-				segmentsExperimentId
+				segmentsExperimentId,
 			}).finally(() => {
 				if (isMounted()) {
 					setBusy(false);
@@ -194,7 +195,7 @@ SegmentsExperimentsModal.propTypes = {
 	onSave: PropTypes.func.isRequired,
 	segmentsExperienceId: PropTypes.string,
 	segmentsExperimentId: PropTypes.string,
-	title: PropTypes.string.isRequired
+	title: PropTypes.string.isRequired,
 };
 
 export default SegmentsExperimentsModal;

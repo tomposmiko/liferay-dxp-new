@@ -48,11 +48,7 @@ JournalArticle article = journalDisplayContext.getArticle();
 			displayContext="<%= journalHistoryManagementToolbarDisplayContext %>"
 		/>
 
-		<%
-		PortletURL portletURL = journalHistoryDisplayContext.getPortletURL();
-		%>
-
-		<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="fm">
+		<aui:form action="<%= journalHistoryDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="post" name="fm">
 			<aui:input name="referringPortletResource" type="hidden" value="<%= journalHistoryDisplayContext.getReferringPortletResource() %>" />
 			<aui:input name="groupId" type="hidden" value="<%= String.valueOf(article.getGroupId()) %>" />
 
@@ -66,11 +62,10 @@ JournalArticle article = journalDisplayContext.getArticle();
 				>
 
 					<%
-					Map<String, Object> rowData = new HashMap<>();
-
-					rowData.put("actions", journalHistoryManagementToolbarDisplayContext.getAvailableActions(articleVersion));
-
-					row.setData(rowData);
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", journalHistoryManagementToolbarDisplayContext.getAvailableActions(articleVersion)
+						).build());
 
 					row.setPrimaryKey(articleVersion.getArticleId() + JournalPortlet.VERSION_SEPARATOR + articleVersion.getVersion());
 					%>

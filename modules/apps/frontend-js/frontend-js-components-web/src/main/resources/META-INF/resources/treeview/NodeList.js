@@ -22,13 +22,16 @@ export default function NodeList({
 	nodes,
 	onBlur,
 	onFocus,
+	onMouseDown,
 	role = 'group',
-	tabIndex = -1
+	tabIndex = -1,
 }) {
 	const rootNodeId = nodes[0] && nodes[0].id;
 
 	if (!rootNodeId) {
+
 		// All nodes have been filtered.
+
 		return null;
 	}
 
@@ -40,19 +43,24 @@ export default function NodeList({
 					onBlur();
 				}
 			}}
-			onFocus={event => {
+			onFocus={(event) => {
 				if (onFocus) {
 					onFocus(event);
+				}
+			}}
+			onMouseDown={(event) => {
+				if (onMouseDown) {
+					onMouseDown(event);
 				}
 			}}
 			role={role}
 			tabIndex={tabIndex}
 		>
-			{nodes.map(node => (
+			{nodes.map((node) => (
 				<NodeListItem
+					NodeComponent={NodeComponent}
 					key={node.id}
 					node={node}
-					NodeComponent={NodeComponent}
 				/>
 			))}
 		</div>
@@ -65,10 +73,11 @@ NodeList.propTypes = {
 		PropTypes.shape({
 			children: PropTypes.array,
 			id: PropTypes.string.isRequired,
-			name: PropTypes.string.isRequired
+			name: PropTypes.string.isRequired,
 		})
 	).isRequired,
 	onBlur: PropTypes.func,
 	onFocus: PropTypes.func,
-	tabIndex: PropTypes.number
+	onMouseDown: PropTypes.func,
+	tabIndex: PropTypes.number,
 };

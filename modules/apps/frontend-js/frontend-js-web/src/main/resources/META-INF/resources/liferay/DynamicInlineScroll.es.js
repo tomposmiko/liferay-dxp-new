@@ -25,6 +25,7 @@ import PortletBase from './PortletBase.es';
  * @extends {Component}
  */
 class DynamicInlineScroll extends PortletBase {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -69,10 +70,9 @@ class DynamicInlineScroll extends PortletBase {
 	addListItem_(listElement, pageIndex) {
 		const listItem = document.createElement('li');
 
-		dom.append(
-			listItem,
-			`<a href="${this.getHREF_(pageIndex)}">${pageIndex}</a>`
-		);
+		listItem.innerHTML = `<a class="dropdown-item" href="${this.getHREF_(
+			pageIndex
+		)}">${pageIndex}</a>`;
 
 		pageIndex++;
 
@@ -97,7 +97,7 @@ class DynamicInlineScroll extends PortletBase {
 		let href = `javascript:document.${formName}.${namespace}${curParam}.value = "${pageIndex}; ${jsCall}`;
 
 		if (this.url !== null) {
-			href = `${url}${namespace}${curParam}=${pageIndex}${urlAnchor}`;
+			href = `${url}&${namespace}${curParam}=${pageIndex}${urlAnchor}`;
 		}
 
 		return href;
@@ -163,7 +163,8 @@ class DynamicInlineScroll extends PortletBase {
 
 			if (pageIndexCurrent === 0) {
 				pageIndex = initialPages;
-			} else {
+			}
+			else {
 				pageIndex = pageIndexCurrent + initialPages;
 			}
 		}
@@ -191,6 +192,7 @@ class DynamicInlineScroll extends PortletBase {
  * @type {!Object}
  */
 DynamicInlineScroll.STATE = {
+
 	/**
 	 * Current page index.
 	 *
@@ -200,7 +202,7 @@ DynamicInlineScroll.STATE = {
 	 */
 	cur: {
 		setter: 'getNumber_',
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -211,7 +213,7 @@ DynamicInlineScroll.STATE = {
 	 * @type {string}
 	 */
 	curParam: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -222,7 +224,7 @@ DynamicInlineScroll.STATE = {
 	 * @type {boolean}
 	 */
 	forcePost: {
-		validator: core.isBoolean
+		validator: core.isBoolean,
 	},
 
 	/**
@@ -233,7 +235,7 @@ DynamicInlineScroll.STATE = {
 	 * @type {string}
 	 */
 	formName: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -246,7 +248,7 @@ DynamicInlineScroll.STATE = {
 	 */
 	initialPages: {
 		setter: 'getNumber_',
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -257,7 +259,7 @@ DynamicInlineScroll.STATE = {
 	 * @type {string}
 	 */
 	jsCall: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -268,7 +270,7 @@ DynamicInlineScroll.STATE = {
 	 * @type {string}
 	 */
 	namespace: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -280,7 +282,7 @@ DynamicInlineScroll.STATE = {
 	 */
 	pages: {
 		setter: 'getNumber_',
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -291,7 +293,7 @@ DynamicInlineScroll.STATE = {
 	 * @type {string}
 	 */
 	randomNamespace: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -302,7 +304,7 @@ DynamicInlineScroll.STATE = {
 	 * @type {string}
 	 */
 	url: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -313,8 +315,8 @@ DynamicInlineScroll.STATE = {
 	 * @type {string}
 	 */
 	urlAnchor: {
-		validator: core.isString
-	}
+		validator: core.isString,
+	},
 };
 
 export default DynamicInlineScroll;

@@ -18,8 +18,8 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.saml.constants.SamlPortletKeys;
 import com.liferay.saml.runtime.configuration.SamlProviderConfigurationHelper;
-import com.liferay.saml.web.internal.constants.SamlAdminPortletKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -33,8 +33,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + SamlAdminPortletKeys.SAML_ADMIN,
-		"mvc.command.name=/admin/updateServiceProvider"
+		"javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN,
+		"mvc.command.name=/admin/update_service_provider"
 	},
 	service = MVCActionCommand.class
 )
@@ -46,12 +46,13 @@ public class UpdateServiceProviderMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		UnicodeProperties properties = PropertiesParamUtil.getProperties(
+		UnicodeProperties unicodeProperties = PropertiesParamUtil.getProperties(
 			actionRequest, "settings--");
 
-		_samlProviderConfigurationHelper.updateProperties(properties);
+		_samlProviderConfigurationHelper.updateProperties(unicodeProperties);
 
-		actionResponse.setRenderParameter("mvcRenderCommandName", "/admin");
+		actionResponse.setRenderParameter(
+			"mvcRenderCommandName", "/admin/view");
 		actionResponse.setRenderParameter("tabs1", "service-provider");
 	}
 

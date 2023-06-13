@@ -64,6 +64,8 @@ definition {
 	@description = "This makes sure that the user can change the default image for OpenGraph at the site level."
 	@priority = "5"
 	test ChangeSiteImage {
+		property portal.acceptance = "true";
+
 		var portalURL = PropsUtil.get("portal.url");
 
 		for (var imageNumber : list "1,2") {
@@ -71,8 +73,7 @@ definition {
 
 			ProductMenu.gotoPortlet(
 				category = "Configuration",
-				panel = "Site Administration",
-				portlet = "Settings");
+				portlet = "Site Settings");
 
 			Panel.expandPanel(panel = "Open Graph");
 
@@ -109,15 +110,13 @@ definition {
 	@description = "This makes sure that the previously added image can be cleared at the page level."
 	@priority = "5"
 	test ClearImageAtPageLevel {
-		property portal.acceptance = "true";
 		var portalURL = PropsUtil.get("portal.url");
 
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
-			panel = "Site Administration",
-			portlet = "Settings");
+			portlet = "Site Settings");
 
 		Panel.expandPanel(panel = "Open Graph");
 
@@ -126,6 +125,8 @@ definition {
 		OpenGraph.configureOpenGraph(
 			customImage = "true",
 			uploadFileName = "Document_1.jpg");
+
+		ScrollWebElementIntoView(locator1 = "//label[contains(.,'Preview')]");
 
 		AssertVisible(
 			key_imageName = "Document_1.jpg",
@@ -149,6 +150,8 @@ definition {
 
 		Navigator.gotoNavTab(navTab = "Open Graph");
 
+		ScrollWebElementIntoView(locator1 = "//label[contains(.,'Preview')]");
+
 		AssertVisible(
 			key_imageName = "Document_1.jpg",
 			locator1 = "SitePagesEditPage#PREVIEW_IMAGE");
@@ -171,14 +174,15 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
-			panel = "Site Administration",
-			portlet = "Settings");
+			portlet = "Site Settings");
 
 		Panel.expandPanel(panel = "Open Graph");
 
 		OpenGraph.configureOpenGraph(
 			customImage = "true",
 			uploadFileName = "Document_1.jpg");
+
+		Pause(locator1 = "1000");
 
 		AssertVisible(
 			key_imageName = "Document_1.jpg",
@@ -200,8 +204,7 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
-			panel = "Site Administration",
-			portlet = "Settings");
+			portlet = "Site Settings");
 
 		Panel.expandPanel(panel = "Open Graph");
 
@@ -241,8 +244,7 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
-			panel = "Site Administration",
-			portlet = "Settings");
+			portlet = "Site Settings");
 
 		Panel.expandPanel(panel = "Open Graph");
 
@@ -288,8 +290,7 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
-			panel = "Site Administration",
-			portlet = "Settings");
+			portlet = "Site Settings");
 
 		Panel.expandPanel(panel = "Open Graph");
 
@@ -323,8 +324,7 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
-			panel = "Site Administration",
-			portlet = "Settings");
+			portlet = "Site Settings");
 
 		Panel.expandPanel(panel = "Open Graph");
 
@@ -364,7 +364,7 @@ definition {
 			pageName = "Test Page Name",
 			uploadFileName = "Document_1.jpg");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "System Settings");
@@ -388,6 +388,8 @@ definition {
 	@description = "This ensures that users can introduce an alternative text for the image."
 	@priority = "5"
 	test EditAltDescription {
+		property portal.acceptance = "true";
+
 		var portalURL = PropsUtil.get("portal.url");
 
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");

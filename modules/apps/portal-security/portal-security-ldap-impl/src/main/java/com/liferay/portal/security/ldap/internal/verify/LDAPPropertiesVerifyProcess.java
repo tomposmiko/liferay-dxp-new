@@ -39,13 +39,10 @@ import com.liferay.portal.security.ldap.exportimport.configuration.LDAPExportCon
 import com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration;
 import com.liferay.portal.verify.VerifyProcess;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
@@ -322,9 +319,9 @@ public class LDAPPropertiesVerifyProcess extends VerifyProcess {
 				_companyLocalService.removePreferences(
 					companyId, keys.toArray(new String[0]));
 
-				UnicodeProperties properties = new UnicodeProperties();
+				UnicodeProperties unicodeProperties = new UnicodeProperties();
 
-				properties.put("ldap.server.ids", StringPool.BLANK);
+				unicodeProperties.put("ldap.server.ids", StringPool.BLANK);
 
 				if (_log.isInfoEnabled()) {
 					_log.info(
@@ -334,7 +331,8 @@ public class LDAPPropertiesVerifyProcess extends VerifyProcess {
 							companyId));
 				}
 
-				_companyLocalService.updatePreferences(companyId, properties);
+				_companyLocalService.updatePreferences(
+					companyId, unicodeProperties);
 			}
 		}
 	}
@@ -466,22 +464,6 @@ public class LDAPPropertiesVerifyProcess extends VerifyProcess {
 	protected void verifySystemLDAPConfiguration(long companyId) {
 		Dictionary<String, Object> dictionary = new HashMapDictionary<>();
 
-		Properties connectionProperties = _props.getProperties(
-			LegacyLDAPPropsKeys.LDAP_CONNECTION_PROPERTY_PREFIX, true);
-
-		List<String> connectionPropertiesList = new ArrayList<>(
-			connectionProperties.size());
-
-		for (Map.Entry entry : connectionProperties.entrySet()) {
-			String connectionPropertyString =
-				entry.getKey() + StringPool.EQUAL + entry.getValue();
-
-			connectionPropertiesList.add(connectionPropertyString);
-		}
-
-		dictionary.put(
-			LDAPConstants.CONNECTION_PROPERTIES,
-			connectionPropertiesList.toArray(new String[0]));
 		dictionary.put(
 			LDAPConstants.ERROR_PASSWORD_AGE_KEYWORDS,
 			new String[] {

@@ -14,11 +14,13 @@
 
 package com.liferay.layout.seo.web.internal.portlet.action;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.seo.service.LayoutSEOEntryService;
+import com.liferay.layout.seo.web.internal.util.LayoutTypeSettingsUtil;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -29,7 +31,6 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -76,26 +77,29 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 		boolean privateLayout = ParamUtil.getBoolean(
 			actionRequest, "privateLayout");
 		long layoutId = ParamUtil.getLong(actionRequest, "layoutId");
+
+		Layout layout = _layoutLocalService.getLayout(
+			groupId, privateLayout, layoutId);
+
 		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "title");
 		Map<Locale, String> descriptionMap =
 			LocalizationUtil.getLocalizationMap(actionRequest, "description");
+
 		Map<Locale, String> keywordsMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "keywords");
 		Map<Locale, String> robotsMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "robots");
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			Layout.class.getName(), actionRequest);
-
-		Layout layout = _layoutLocalService.getLayout(
-			groupId, privateLayout, layoutId);
+		ServiceContext serviceContext = _getServiceContent(
+			actionRequest, layout);
 
 		layout = _layoutService.updateLayout(
 			groupId, privateLayout, layoutId, layout.getParentLayoutId(),
 			layout.getNameMap(), titleMap, descriptionMap, keywordsMap,
 			robotsMap, layout.getType(), layout.isHidden(),
 			layout.getFriendlyURLMap(), layout.isIconImage(), null,
+			layout.getMasterLayoutPlid(), layout.getStyleBookEntryId(),
 			serviceContext);
 
 		boolean canonicalURLEnabled = ParamUtil.getBoolean(
@@ -107,17 +111,24 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 			groupId, privateLayout, layoutId, canonicalURLEnabled,
 			canonicalURLMap, serviceContext);
 
-		Layout draftLayout = _layoutLocalService.fetchLayout(
-			_portal.getClassNameId(Layout.class), layout.getPlid());
+		UnicodeProperties formTypeSettingsUnicodeProperties =
+			PropertiesParamUtil.getProperties(
+				actionRequest, "TypeSettingsProperties--");
+
+		Layout draftLayout = layout.fetchDraftLayout();
 
 		if (draftLayout != null) {
-			_layoutService.updateLayout(
+			draftLayout = _layoutService.updateLayout(
 				groupId, privateLayout, draftLayout.getLayoutId(),
 				draftLayout.getParentLayoutId(), draftLayout.getNameMap(),
 				titleMap, descriptionMap, keywordsMap, robotsMap,
 				draftLayout.getType(), draftLayout.isHidden(),
 				draftLayout.getFriendlyURLMap(), draftLayout.isIconImage(),
-				null, serviceContext);
+				null, layout.getMasterLayoutPlid(),
+				layout.getStyleBookEntryId(), serviceContext);
+
+			draftLayout = LayoutTypeSettingsUtil.updateTypeSettings(
+				draftLayout, _layoutService, formTypeSettingsUnicodeProperties);
 
 			_layoutSEOEntryService.updateLayoutSEOEntry(
 				groupId, privateLayout, draftLayout.getLayoutId(),
@@ -126,44 +137,11 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 
 		themeDisplay.clearLayoutFriendlyURL(layout);
 
-		UnicodeProperties layoutTypeSettingsProperties =
-			layout.getTypeSettingsProperties();
-
-		UnicodeProperties formTypeSettingsProperties =
-			PropertiesParamUtil.getProperties(
-				actionRequest, "TypeSettingsProperties--");
+		layout = LayoutTypeSettingsUtil.updateTypeSettings(
+			layout, _layoutService, formTypeSettingsUnicodeProperties);
 
 		LayoutTypePortlet layoutTypePortlet =
 			(LayoutTypePortlet)layout.getLayoutType();
-
-		String type = layout.getType();
-
-		if (type.equals(LayoutConstants.TYPE_PORTLET)) {
-			layoutTypeSettingsProperties.putAll(formTypeSettingsProperties);
-
-			boolean layoutCustomizable = GetterUtil.getBoolean(
-				layoutTypeSettingsProperties.get(
-					LayoutConstants.CUSTOMIZABLE_LAYOUT));
-
-			if (!layoutCustomizable) {
-				layoutTypePortlet.removeCustomization(
-					layoutTypeSettingsProperties);
-			}
-
-			layout = _layoutService.updateLayout(
-				groupId, privateLayout, layoutId,
-				layoutTypeSettingsProperties.toString());
-		}
-		else {
-			layoutTypeSettingsProperties.putAll(formTypeSettingsProperties);
-
-			layoutTypeSettingsProperties.putAll(
-				layout.getTypeSettingsProperties());
-
-			layout = _layoutService.updateLayout(
-				groupId, privateLayout, layoutId,
-				layoutTypeSettingsProperties.toString());
-		}
 
 		EventsProcessorUtil.process(
 			PropsKeys.LAYOUT_CONFIGURATION_ACTION_UPDATE,
@@ -185,6 +163,30 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 
 		actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
 	}
+
+	private ServiceContext _getServiceContent(
+			ActionRequest actionRequest, Layout layout)
+		throws Exception {
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			Layout.class.getName(), actionRequest);
+
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+			Layout.class.getName(), layout.getPlid());
+
+		serviceContext.setAssetCategoryIds(assetEntry.getCategoryIds());
+		serviceContext.setAssetTagNames(assetEntry.getTagNames());
+
+		if (layout.isTypeAssetDisplay()) {
+			serviceContext.setAttribute(
+				"layout.instanceable.allowed", Boolean.TRUE);
+		}
+
+		return serviceContext;
+	}
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

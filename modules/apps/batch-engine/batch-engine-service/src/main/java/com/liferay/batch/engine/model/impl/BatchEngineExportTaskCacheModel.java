@@ -39,17 +39,17 @@ public class BatchEngineExportTaskCacheModel
 	implements CacheModel<BatchEngineExportTask>, Externalizable, MVCCModel {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof BatchEngineExportTaskCacheModel)) {
+		if (!(object instanceof BatchEngineExportTaskCacheModel)) {
 			return false;
 		}
 
 		BatchEngineExportTaskCacheModel batchEngineExportTaskCacheModel =
-			(BatchEngineExportTaskCacheModel)obj;
+			(BatchEngineExportTaskCacheModel)object;
 
 		if ((batchEngineExportTaskId ==
 				batchEngineExportTaskCacheModel.batchEngineExportTaskId) &&
@@ -114,8 +114,8 @@ public class BatchEngineExportTaskCacheModel
 		sb.append(parameters);
 		sb.append(", startTime=");
 		sb.append(startTime);
-		sb.append(", version=");
-		sb.append(version);
+		sb.append(", taskItemDelegateName=");
+		sb.append(taskItemDelegateName);
 		sb.append("}");
 
 		return sb.toString();
@@ -212,11 +212,12 @@ public class BatchEngineExportTaskCacheModel
 			batchEngineExportTaskImpl.setStartTime(new Date(startTime));
 		}
 
-		if (version == null) {
-			batchEngineExportTaskImpl.setVersion("");
+		if (taskItemDelegateName == null) {
+			batchEngineExportTaskImpl.setTaskItemDelegateName("");
 		}
 		else {
-			batchEngineExportTaskImpl.setVersion(version);
+			batchEngineExportTaskImpl.setTaskItemDelegateName(
+				taskItemDelegateName);
 		}
 
 		batchEngineExportTaskImpl.resetOriginalValues();
@@ -247,7 +248,7 @@ public class BatchEngineExportTaskCacheModel
 		executeStatus = objectInput.readUTF();
 		parameters = (Map<String, Serializable>)objectInput.readObject();
 		startTime = objectInput.readLong();
-		version = objectInput.readUTF();
+		taskItemDelegateName = objectInput.readUTF();
 	}
 
 	@Override
@@ -316,11 +317,11 @@ public class BatchEngineExportTaskCacheModel
 		objectOutput.writeObject(parameters);
 		objectOutput.writeLong(startTime);
 
-		if (version == null) {
+		if (taskItemDelegateName == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
-			objectOutput.writeUTF(version);
+			objectOutput.writeUTF(taskItemDelegateName);
 		}
 	}
 
@@ -340,6 +341,6 @@ public class BatchEngineExportTaskCacheModel
 	public String executeStatus;
 	public Map<String, Serializable> parameters;
 	public long startTime;
-	public String version;
+	public String taskItemDelegateName;
 
 }

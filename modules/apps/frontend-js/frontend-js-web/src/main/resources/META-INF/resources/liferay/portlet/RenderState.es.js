@@ -20,7 +20,8 @@ class RenderState {
 	constructor(state) {
 		if (isObject(state)) {
 			this.from(state);
-		} else {
+		}
+		else {
 			this.parameters = {};
 			this.portletMode = PortletConstants.VIEW;
 			this.windowState = PortletConstants.NORMAL;
@@ -47,7 +48,7 @@ class RenderState {
 	from(renderState) {
 		this.parameters = {};
 
-		Object.keys(renderState.parameters).forEach(name => {
+		Object.keys(renderState.parameters).forEach((name) => {
 			if (Array.isArray(renderState.parameters[name])) {
 				this.parameters[name] = renderState.parameters[name].slice(0);
 			}

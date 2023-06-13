@@ -16,7 +16,7 @@
 	}
 }
 
-.dialog-iframe-popup {
+.portal-popup {
 	.hsv-palette-modal.modal-dialog {
 		bottom: 0 !important;
 		left: 0 !important;
@@ -34,7 +34,6 @@
 			max-width: 650px;
 			right: auto !important;
 			top: 50% !important;
-			-webkit-transform: translate(-50%, -50%);
 			transform: translate(-50%, -50%);
 		}
 

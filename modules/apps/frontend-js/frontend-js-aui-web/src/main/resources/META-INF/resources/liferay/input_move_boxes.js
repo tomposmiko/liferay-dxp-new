@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-input-move-boxes',
-	A => {
+	(A) => {
 		var Util = Liferay.Util;
 
 		var CSS_LEFT_REORDER = 'left-reorder';
@@ -25,7 +25,11 @@ AUI.add(
 
 		var InputMoveBoxes = A.Component.create({
 			ATTRS: {
+				leftBoxMaxItems: Infinity,
+
 				leftReorder: {},
+
+				rightBoxMaxItems: Infinity,
 
 				rightReorder: {},
 
@@ -35,8 +39,8 @@ AUI.add(
 					MOVE_LEFT: '',
 					MOVE_RIGHT: '',
 					RIGHT_MOVE_DOWN: '',
-					RIGHT_MOVE_UP: ''
-				}
+					RIGHT_MOVE_UP: '',
+				},
 			},
 
 			HTML_PARSER: {
@@ -46,7 +50,7 @@ AUI.add(
 
 				rightReorder(contentBox) {
 					return contentBox.hasClass(CSS_RIGHT_REORDER);
-				}
+				},
 			},
 
 			NAME,
@@ -112,7 +116,7 @@ AUI.add(
 
 						selectedOption = options.item(selectedIndex);
 
-						options.each(item => {
+						options.each((item) => {
 							if (item.get('selected')) {
 								to.append(item);
 							}
@@ -129,8 +133,15 @@ AUI.add(
 
 					Liferay.fire(NAME + ':moveItem', {
 						fromBox: from,
-						toBox: to
+						toBox: to,
 					});
+				},
+
+				_onSelectChange(event) {
+					var instance = this;
+
+					instance._toggleBtnMove(event);
+					instance._toggleBtnSort(event);
 				},
 
 				_onSelectFocus(event, box) {
@@ -146,7 +157,7 @@ AUI.add(
 
 					Liferay.fire(NAME + ':orderItem', {
 						box,
-						direction
+						direction,
 					});
 				},
 
@@ -181,9 +192,9 @@ AUI.add(
 										on: {
 											click(event) {
 												event.domEvent.preventDefault();
-											}
+											},
 										},
-										title: strings.MOVE_RIGHT
+										title: strings.MOVE_RIGHT,
 									},
 									{
 										cssClass: 'move-left',
@@ -191,12 +202,12 @@ AUI.add(
 										on: {
 											click(event) {
 												event.domEvent.preventDefault();
-											}
+											},
 										},
-										title: strings.MOVE_LEFT
-									}
-								]
-							]
+										title: strings.MOVE_LEFT,
+									},
+								],
+							],
 						});
 
 						moveToolbar.get(
@@ -219,8 +230,8 @@ AUI.add(
 									on: {
 										click(event) {
 											event.domEvent.preventDefault();
-										}
-									}
+										},
+									},
 								},
 								{
 									cssClass: 'reorder-down',
@@ -228,11 +239,11 @@ AUI.add(
 									on: {
 										click(event) {
 											event.domEvent.preventDefault();
-										}
-									}
-								}
-							]
-						]
+										},
+									},
+								},
+							],
+						],
 					};
 
 					if (instance.get('leftReorder')) {
@@ -271,31 +282,28 @@ AUI.add(
 				_toggleBtnMove(event) {
 					var instance = this;
 
+					var sourceBox = event.target;
+
+					var selectedOptions = sourceBox
+						.get('options')
+						.getDOMNodes()
+						.filter((option) => option.selected);
+
+					var direction =
+						sourceBox === instance._rightBox ? 'left' : 'right';
+
+					var destinationBox = instance[`_${direction}Box`];
+					var destinationBoxMaxItems = instance.get(
+						`${direction}BoxMaxItems`
+					);
+
 					var contentBox = instance.get('contentBox');
 
-					var moveBtnLeft = contentBox.one('.move-left');
-					var moveBtnRight = contentBox.one('.move-right');
-
-					var target = event.target;
-
-					if (moveBtnLeft && moveBtnRight && target) {
-						var btnDisabledLeft = true;
-						var btnDisabledRight = true;
-
-						if (target.get('length') > 0) {
-							if (target == instance._rightBox) {
-								btnDisabledLeft = false;
-							} else if (target == instance._leftBox) {
-								btnDisabledRight = false;
-							}
-						}
-
-						instance._toggleBtnState(moveBtnLeft, btnDisabledLeft);
-						instance._toggleBtnState(
-							moveBtnRight,
-							btnDisabledRight
-						);
-					}
+					instance._toggleBtnState(
+						contentBox.one(`.move-${direction}`),
+						destinationBox.get('length') + selectedOptions.length >
+							destinationBoxMaxItems
+					);
 				},
 
 				_toggleBtnSort(event) {
@@ -317,9 +325,11 @@ AUI.add(
 
 						if (selectedIndex === length - 1) {
 							btnDisabledDown = true;
-						} else if (selectedIndex === 0) {
+						}
+						else if (selectedIndex === 0) {
 							btnDisabledUp = true;
-						} else if (selectedIndex === -1) {
+						}
+						else if (selectedIndex === -1) {
 							btnDisabledDown = true;
 							btnDisabledUp = true;
 						}
@@ -404,18 +414,20 @@ AUI.add(
 					);
 
 					instance._leftBox.after(
-						'valuechange',
-						A.bind('_toggleBtnSort', instance)
+						'change',
+						A.bind('_onSelectChange', instance)
 					);
+
 					instance._leftBox.on(
 						'focus',
 						A.rbind('_onSelectFocus', instance, instance._rightBox)
 					);
 
 					instance._rightBox.after(
-						'valuechange',
-						A.bind('_toggleBtnSort', instance)
+						'change',
+						A.bind('_onSelectChange', instance)
 					);
+
 					instance._rightBox.on(
 						'focus',
 						A.rbind('_onSelectFocus', instance, instance._leftBox)
@@ -437,17 +449,30 @@ AUI.add(
 					for (var i = 0; i < options.size(); i++) {
 						newBox[i] = [
 							options.item(i).val(),
-							options.item(i).text()
+							options.item(i).text(),
 						];
 					}
 
-					newBox.sort(Util.sortByAscending);
+					newBox.sort((a, b) => {
+						a = a[1].toLowerCase();
+						b = b[1].toLowerCase();
+
+						if (a > b) {
+							return 1;
+						}
+
+						if (a < b) {
+							return -1;
+						}
+
+						return 0;
+					});
 
 					var boxObj = A.one(box);
 
 					boxObj.all('option').remove(true);
 
-					newBox.forEach(item => {
+					newBox.forEach((item) => {
 						boxObj.append(
 							'<option value="' +
 								item[0] +
@@ -456,14 +481,14 @@ AUI.add(
 								'</option>'
 						);
 					});
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.InputMoveBoxes = InputMoveBoxes;
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-toolbar']
+		requires: ['aui-base', 'aui-toolbar'],
 	}
 );

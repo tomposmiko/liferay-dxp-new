@@ -20,13 +20,13 @@ import {
 	addVariant,
 	reviewVariants,
 	updateVariant,
-	updateVariants
+	updateVariants,
 } from '../../state/actions.es';
 import {DispatchContext, StateContext} from '../../state/context.es';
 import {navigateToExperience} from '../../util/navigation.es';
 import {
 	STATUS_FINISHED_NO_WINNER,
-	STATUS_FINISHED_WINNER
+	STATUS_FINISHED_WINNER,
 } from '../../util/statuses.es';
 import {openErrorToast, openSuccessToast} from '../../util/toasts.es';
 import VariantForm from './internal/VariantForm.es';
@@ -36,21 +36,23 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 	const dispatch = useContext(DispatchContext);
 	const {errors, experiment, variants} = useContext(StateContext);
 	const {APIService, page} = useContext(SegmentsExperimentsContext);
+	const [creatingVariant, setCreatingVariant] = useState(false);
 
 	const {
 		observer: creatingVariantObserver,
-		onClose: creatingVariantOnClose
+		onClose: creatingVariantOnClose,
 	} = useModal({
-		onClose: () => setCreatingVariant(false)
+		onClose: () => setCreatingVariant(false),
 	});
+
+	const [editingVariant, setEditingVariant] = useState({active: false});
+
 	const {
 		observer: editingVariantObserver,
-		onClose: editingVariantOnClose
+		onClose: editingVariantOnClose,
 	} = useModal({
-		onClose: () => setEditingVariant({active: false})
+		onClose: () => setEditingVariant({active: false}),
 	});
-	const [creatingVariant, setCreatingVariant] = useState(false);
-	const [editingVariant, setEditingVariant] = useState({active: false});
 
 	const publishable =
 		experiment.status.value === STATUS_FINISHED_WINNER ||
@@ -61,7 +63,8 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 			<h4 className="mb-3 mt-4 sheet-subtitle">
 				{Liferay.Language.get('variants')}
 				<ClayIcon
-					className="ml-1 reference-mark text-warning"
+					className="lexicon-icon-sm ml-1 reference-mark text-warning"
+					style={{verticalAlign: 'super'}}
 					symbol="asterisk"
 				/>
 			</h4>
@@ -147,7 +150,7 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 		const body = {
 			classNameId: page.classNameId,
 			classPK: page.classPK,
-			segmentsExperimentRelId: variantId
+			segmentsExperimentRelId: variantId,
 		};
 
 		return APIService.deleteVariant(body)
@@ -156,22 +159,25 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 
 				let variantExperienceId = null;
 
-				const newVariants = variants.filter(variant => {
-					if (variant.segmentsExperimentRelId !== variantId)
+				const newVariants = variants.filter((variant) => {
+					if (variant.segmentsExperimentRelId !== variantId) {
 						return true;
+					}
 
 					variantExperienceId = variant.segmentsExperienceId;
+
 					return false;
 				});
 
 				if (variantExperienceId === selectedSegmentsExperienceId) {
 					navigateToExperience(experiment.segmentsExperienceId);
-				} else {
+				}
+				else {
 					dispatch(updateVariants(newVariants));
 					dispatch(reviewVariants());
 				}
 			})
-			.catch(_error => {
+			.catch((_error) => {
 				openErrorToast();
 			});
 	}
@@ -180,7 +186,7 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 		setEditingVariant({
 			active: true,
 			name,
-			variantId
+			variantId,
 		});
 	}
 
@@ -189,7 +195,7 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 			classNameId: page.classNameId,
 			classPK: page.classPK,
 			name,
-			segmentsExperimentRelId: variantId
+			segmentsExperimentRelId: variantId,
 		};
 
 		return APIService.editVariant(body).then(({segmentsExperimentRel}) => {
@@ -198,9 +204,9 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 			dispatch(
 				updateVariant({
 					changes: {
-						name: segmentsExperimentRel.name
+						name: segmentsExperimentRel.name,
 					},
-					variantId
+					variantId,
 				})
 			);
 		});
@@ -211,7 +217,7 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 			classNameId: page.classNameId,
 			classPK: page.classPK,
 			name,
-			segmentsExperimentId: experiment.segmentsExperimentId
+			segmentsExperimentId: experiment.segmentsExperimentId,
 		};
 
 		return APIService.createVariant(body)
@@ -221,7 +227,7 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 					segmentsExperienceId,
 					segmentsExperimentId,
 					segmentsExperimentRelId,
-					split
+					split,
 				} = segmentsExperimentRel;
 
 				openSuccessToast();
@@ -233,11 +239,11 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 						segmentsExperienceId,
 						segmentsExperimentId,
 						segmentsExperimentRelId,
-						split
+						split,
 					})
 				);
 			})
-			.catch(_error => {
+			.catch((_error) => {
 				openErrorToast();
 			});
 	}
@@ -245,7 +251,7 @@ function Variants({onVariantPublish, selectedSegmentsExperienceId}) {
 
 Variants.propTypes = {
 	onVariantPublish: PropTypes.func.isRequired,
-	selectedSegmentsExperienceId: PropTypes.string.isRequired
+	selectedSegmentsExperienceId: PropTypes.string.isRequired,
 };
 
 export default Variants;

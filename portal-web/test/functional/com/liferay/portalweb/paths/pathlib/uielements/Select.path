@@ -2,15 +2,22 @@
 <head>
 <title>Select</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Select</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>ANY</td>
 	<td>//div[not(contains(@class,'hide'))]/div[contains(@class,'input-select-wrapper')][label[contains(.,'${key_selectFieldLabel}')]]/select</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_2</td>
+	<td>xpath=(//div[not(contains(@class,'hide'))]/div[contains(@class,'input-select-wrapper')][label[contains(.,'${key_selectFieldLabel}')]]/select)[2]</td>
 	<td></td>
 </tr>
 <tr>
@@ -19,8 +26,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ANY_DISABLED</td>
+	<td>//div[not(contains(@class,'hide'))]/div[contains(@class,'input-select-wrapper')][label[contains(.,'${key_selectFieldLabel}')]]/select[contains(@class,'disabled')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ASSIGNMENT_TYPE</td>
 	<td>//select[@name='assignmentType']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BORDER_BOTTOM_SELECT_FIELD</td>
+	<td>//div[contains(@class,'label')][normalize-space()='${key_borderBottom}']/following-sibling::div[1]//div[label[contains(.,'${key_fieldLabel}')]]/select</td>
 	<td></td>
 </tr>
 <tr>
@@ -36,6 +53,11 @@
 <tr>
 	<td>BLOGS_RATING</td>
 	<td>//select[contains(@id,'blogs')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>APPLICATIONS_RATING</td>
+	<td>//select[contains(@id,'${key_applications}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -79,6 +101,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EXPORT_FILE_FORMAT</td>
+	<td>//div[contains(.,'Export File Format')]//select</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FEED_ITEM_CONTENT</td>
 	<td>//select[contains(@id,'contentFieldSelector')]</td>
 	<td></td>
@@ -94,6 +121,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>GENERIC_SELECT_VALUE</td>
+	<td>//div[label[contains(.,'${key_fieldLabel}')]]/select//option[normalize-space(text())='${key_value}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GROUPED_SELECT_VALUE</td>
+	<td>//div[label[contains(.,'${key_fieldLabel}')]]/select/optgroup[@label='${key_groupLabel}']/option[normalize-space(text())='${key_value}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>KNOWLEDGE_BASE_RATING</td>
 	<td>//select[contains(@id,'knowledge-base')]</td>
 	<td></td>
@@ -101,6 +138,11 @@
 <tr>
 	<td>LOS_ANGELES_TIME_ZONE</td>
 	<td>//select[contains(@id,'timeZoneId')]/option[@value='America/Los_Angeles']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MINIMUM_AGE</td>
+	<td>//select[contains(@id,'maxAge')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -134,6 +176,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>REDIRECT_TYPE</td>
+	<td>//div[label[contains(.,'Type')]]/select</td>
+	<td></td>
+</tr>
+<tr>
 	<td>REGION</td>
 	<td>//div[label[contains(.,'Region')]]/select</td>
 	<td></td>
@@ -146,6 +193,16 @@
 <tr>
 	<td>SAML_NAME_IDENTIFIER_FORMAT_SELECT</td>
 	<td>//select[contains(@id,'SamlAdminPortlet_nameIdFormat')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_ID</td>
+	<td>//select[contains(@id,'${selectFieldId}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT</td>
+	<td>//select</td>
 	<td></td>
 </tr>
 <tr>
@@ -176,6 +233,16 @@
 <tr>
 	<td>TYPE</td>
 	<td>//div[label[contains(.,'Type')]]/select</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TYPE_SELECTED</td>
+	<td>//div[label[contains(.,'Type')]]//option[contains(.,'${key_typeName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WARNING_TIME</td>
+	<td>//select[contains(@id,'warningTime')]</td>
 	<td></td>
 </tr>
 <tr>

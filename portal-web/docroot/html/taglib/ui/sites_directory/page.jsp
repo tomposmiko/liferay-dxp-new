@@ -29,7 +29,7 @@
 
 	if (sites.equals(SitesDirectoryTag.SITES_TOP_LEVEL)) {
 	}
-	else if (sites.equals(SitesDirectoryTag.SITES_CHILDREN) && (branchGroups.size() > 0)) {
+	else if (sites.equals(SitesDirectoryTag.SITES_CHILDREN) && !branchGroups.isEmpty()) {
 		rootGroup = branchGroups.get(0);
 	}
 	else if (sites.equals(SitesDirectoryTag.SITES_SIBLINGS) && (branchGroups.size() > 1)) {
@@ -64,14 +64,9 @@
 								</div>
 							</c:when>
 							<c:otherwise>
-
-								<%
-								PortletURL portletURL = PortletURLFactoryUtil.create(request, portletDisplay.getId(), PortletRequest.RENDER_PHASE);
-								%>
-
 								<liferay-ui:search-container
 									emptyResultsMessage="no-sites-were-found"
-									iteratorURL="<%= portletURL %>"
+									iteratorURL="<%= PortletURLFactoryUtil.create(request, portletDisplay.getId(), PortletRequest.RENDER_PHASE) %>"
 								>
 
 									<%
@@ -174,11 +169,9 @@
 						StringBundler sb = new StringBundler();
 
 						_buildSitesList(rootGroup, group, branchGroups, themeDisplay, 1, displayStyle.equals("list-hierarchy"), true, sb);
-
-						String content = sb.toString();
 						%>
 
-						<%= content %>
+						<%= sb.toString() %>
 					</c:otherwise>
 				</c:choose>
 			</c:otherwise>

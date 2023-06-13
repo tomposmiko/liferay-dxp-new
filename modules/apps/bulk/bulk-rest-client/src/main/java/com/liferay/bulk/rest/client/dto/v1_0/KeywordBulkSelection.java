@@ -17,6 +17,8 @@ package com.liferay.bulk.rest.client.dto.v1_0;
 import com.liferay.bulk.rest.client.function.UnsafeSupplier;
 import com.liferay.bulk.rest.client.serdes.v1_0.KeywordBulkSelectionSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class KeywordBulkSelection {
+public class KeywordBulkSelection implements Cloneable, Serializable {
+
+	public static KeywordBulkSelection toDTO(String json) {
+		return KeywordBulkSelectionSerDes.toDTO(json);
+	}
 
 	public DocumentBulkSelection getDocumentBulkSelection() {
 		return documentBulkSelection;
@@ -93,6 +99,11 @@ public class KeywordBulkSelection {
 	}
 
 	protected String[] keywordsToRemove;
+
+	@Override
+	public KeywordBulkSelection clone() throws CloneNotSupportedException {
+		return (KeywordBulkSelection)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

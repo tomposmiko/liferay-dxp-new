@@ -15,18 +15,20 @@
 package com.liferay.fragment.web.internal.servlet.taglib.clay;
 
 import com.liferay.fragment.constants.FragmentActionKeys;
+import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.fragment.web.internal.security.permission.resource.FragmentPermission;
 import com.liferay.fragment.web.internal.servlet.taglib.util.BasicFragmentEntryActionDropdownItemsProvider;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Date;
 import java.util.List;
@@ -84,7 +86,8 @@ public class BasicFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 		if (!FragmentPermission.contains(
 				themeDisplay.getPermissionChecker(),
 				themeDisplay.getScopeGroupId(),
-				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
+				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES) ||
+			(fragmentEntry.getType() == FragmentConstants.TYPE_REACT)) {
 
 			return null;
 		}
@@ -107,25 +110,41 @@ public class BasicFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 
 	@Override
 	public List<LabelItem> getLabels() {
-		return new LabelItemList() {
-			{
-				add(
-					labelItem -> labelItem.setStatus(
-						fragmentEntry.getStatus()));
-			}
-		};
+		if (fragmentEntry.isApproved() &&
+			(fragmentEntry.fetchDraftFragmentEntry() != null)) {
+
+			return LabelItemListBuilder.add(
+				labelItem -> labelItem.setStatus(
+					WorkflowConstants.STATUS_APPROVED)
+			).add(
+				labelItem -> labelItem.setStatus(WorkflowConstants.STATUS_DRAFT)
+			).build();
+		}
+
+		return LabelItemListBuilder.add(
+			labelItem -> labelItem.setStatus(fragmentEntry.getStatus())
+		).build();
 	}
 
 	@Override
 	public String getSubtitle() {
-		Date statusDate = fragmentEntry.getStatusDate();
+		Date modifiedDate = fragmentEntry.getModifiedDate();
 
-		String statusDateDescription = LanguageUtil.getTimeDescription(
+		String modifiedDateDescription = LanguageUtil.getTimeDescription(
 			_httpServletRequest,
-			System.currentTimeMillis() - statusDate.getTime(), true);
+			System.currentTimeMillis() - modifiedDate.getTime(), true);
 
 		return LanguageUtil.format(
-			_httpServletRequest, "x-ago", statusDateDescription);
+			_httpServletRequest, "modified-x-ago", modifiedDateDescription);
+	}
+
+	@Override
+	public boolean isSelectable() {
+		if (fragmentEntry.getType() == FragmentConstants.TYPE_REACT) {
+			return false;
+		}
+
+		return super.isSelectable();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

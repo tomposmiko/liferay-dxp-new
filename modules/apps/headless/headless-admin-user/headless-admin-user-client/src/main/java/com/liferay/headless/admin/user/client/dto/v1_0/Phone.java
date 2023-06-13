@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.PhoneSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Phone {
+public class Phone implements Cloneable, Serializable {
+
+	public static Phone toDTO(String json) {
+		return PhoneSerDes.toDTO(json);
+	}
 
 	public String getExtension() {
 		return extension;
@@ -130,6 +136,11 @@ public class Phone {
 	}
 
 	protected Boolean primary;
+
+	@Override
+	public Phone clone() throws CloneNotSupportedException {
+		return (Phone)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

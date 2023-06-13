@@ -16,7 +16,7 @@ package com.liferay.asset.auto.tagger.google.cloud.natural.language.internal;
 
 import com.liferay.asset.auto.tagger.google.cloud.natural.language.GCloudNaturalLanguageDocumentAssetAutoTagger;
 import com.liferay.asset.auto.tagger.google.cloud.natural.language.internal.configuration.GCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration;
-import com.liferay.asset.auto.tagger.google.cloud.natural.language.internal.contants.GCloudNaturalLanguageDocumentAssetAutoTaggerConstants;
+import com.liferay.asset.auto.tagger.google.cloud.natural.language.internal.constants.GCloudNaturalLanguageDocumentAssetAutoTaggerConstants;
 import com.liferay.asset.auto.tagger.google.cloud.natural.language.internal.util.GCloudNaturalLanguageUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -120,10 +120,6 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 		);
 	}
 
-	private static <T> Predicate<T> _negate(Predicate<T> predicate) {
-		return predicate.negate();
-	}
-
 	private Collection<String> _getClassificationTagNames(
 			GCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration
 				gCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration,
@@ -185,7 +181,7 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 		}
 
 		if (Objects.nonNull(locale) &&
-			_supportedEntityLanguages.contains(locale.getLanguage())) {
+			!_supportedEntityLanguages.contains(locale.getLanguage())) {
 
 			return Collections.emptySet();
 		}
@@ -210,11 +206,15 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 			apiKey);
 	}
 
+	private <T> Predicate<T> _negate(Predicate<T> predicate) {
+		return predicate.negate();
+	}
+
 	private JSONObject _post(String serviceURL, String body) throws Exception {
 		Http.Options options = new Http.Options();
 
-		options.setBody(body, ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 		options.addHeader("Content-Type", ContentTypes.APPLICATION_JSON);
+		options.setBody(body, ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 		options.setLocation(serviceURL);
 		options.setPost(true);
 

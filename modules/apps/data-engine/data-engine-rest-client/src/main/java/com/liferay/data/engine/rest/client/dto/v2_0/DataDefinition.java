@@ -17,6 +17,8 @@ package com.liferay.data.engine.rest.client.dto.v2_0;
 import com.liferay.data.engine.rest.client.function.UnsafeSupplier;
 import com.liferay.data.engine.rest.client.serdes.v2_0.DataDefinitionSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -28,7 +30,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class DataDefinition {
+public class DataDefinition implements Cloneable, Serializable {
+
+	public static DataDefinition toDTO(String json) {
+		return DataDefinitionSerDes.toDTO(json);
+	}
 
 	public String[] getAvailableLanguageIds() {
 		return availableLanguageIds;
@@ -117,6 +123,27 @@ public class DataDefinition {
 	}
 
 	protected String dataDefinitionKey;
+
+	public DataRule[] getDataRules() {
+		return dataRules;
+	}
+
+	public void setDataRules(DataRule[] dataRules) {
+		this.dataRules = dataRules;
+	}
+
+	public void setDataRules(
+		UnsafeSupplier<DataRule[], Exception> dataRulesUnsafeSupplier) {
+
+		try {
+			dataRules = dataRulesUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected DataRule[] dataRules;
 
 	public Date getDateCreated() {
 		return dateCreated;
@@ -326,6 +353,11 @@ public class DataDefinition {
 	}
 
 	protected Long userId;
+
+	@Override
+	public DataDefinition clone() throws CloneNotSupportedException {
+		return (DataDefinition)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

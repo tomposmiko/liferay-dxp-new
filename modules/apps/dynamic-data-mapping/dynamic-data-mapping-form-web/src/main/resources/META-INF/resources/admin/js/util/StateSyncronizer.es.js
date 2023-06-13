@@ -12,9 +12,7 @@
  * details.
  */
 
-import * as FormSupport from 'dynamic-data-mapping-form-renderer/js/components/FormRenderer/FormSupport.es';
-import {PagesVisitor} from 'dynamic-data-mapping-form-renderer/js/util/visitors.es';
-import {EventHandler} from 'metal-events';
+import {FormSupport, PagesVisitor} from 'dynamic-data-mapping-form-renderer';
 import Component from 'metal-jsx';
 import {Config} from 'metal-state';
 
@@ -22,14 +20,14 @@ class StateSyncronizer extends Component {
 	created() {
 		const {descriptionEditor, nameEditor, translationManager} = this.props;
 
-		this._eventHandler = new EventHandler();
+		descriptionEditor.addEventListener(
+			'input',
+			this._handleDescriptionEditorChanged.bind(this)
+		);
 
-		this._eventHandler.add(
-			descriptionEditor.on(
-				'change',
-				this._handleDescriptionEditorChanged.bind(this)
-			),
-			nameEditor.on('change', this._handleNameEditorChanged.bind(this))
+		nameEditor.addEventListener(
+			'input',
+			this._handleNameEditorChanged.bind(this)
 		);
 
 		if (translationManager) {
@@ -40,7 +38,7 @@ class StateSyncronizer extends Component {
 				),
 				translationManager.on('editingLocale', ({newValue}) => {
 					this.syncEditors(newValue);
-				})
+				}),
 			];
 		}
 	}
@@ -55,10 +53,21 @@ class StateSyncronizer extends Component {
 	}
 
 	disposed() {
-		this._eventHandler.removeAllListeners();
+		const {descriptionEditor, nameEditor} = this.props;
+
+		nameEditor.removeEventListener(
+			'input',
+			this._handleNameEditorChanged.bind(this)
+		);
+		descriptionEditor.removeEventListener(
+			'input',
+			this._handleDescriptionEditorChanged.bind(this)
+		);
 
 		if (this._translationManagerHandles) {
-			this._translationManagerHandles.forEach(handle => handle.detach());
+			this._translationManagerHandles.forEach((handle) =>
+				handle.detach()
+			);
 		}
 	}
 
@@ -110,7 +119,7 @@ class StateSyncronizer extends Component {
 			pages: store.state.pages,
 			paginationMode: store.state.paginationMode,
 			rules: store.getRules(),
-			successPageSettings: store.state.successPageSettings
+			successPageSettings: store.state.successPageSettings,
 		};
 
 		return state;
@@ -141,7 +150,7 @@ class StateSyncronizer extends Component {
 			descriptionEditor,
 			localizedDescription,
 			localizedName,
-			nameEditor
+			nameEditor,
 		} = this.props;
 
 		let description = localizedDescription[editingLanguageId];
@@ -150,7 +159,7 @@ class StateSyncronizer extends Component {
 			description = localizedDescription[this.getDefaultLanguageId()];
 		}
 
-		window[descriptionEditor.name].setHTML(description);
+		descriptionEditor.value = description;
 
 		let name = localizedName[editingLanguageId];
 
@@ -158,7 +167,7 @@ class StateSyncronizer extends Component {
 			name = localizedName[this.getDefaultLanguageId()];
 		}
 
-		window[nameEditor.name].setHTML(name);
+		nameEditor.value = name;
 	}
 
 	syncInputs() {
@@ -166,21 +175,21 @@ class StateSyncronizer extends Component {
 		const state = this.getState();
 		const {description, name} = state;
 
-		Object.keys(state.name).forEach(key => {
+		Object.keys(state.name).forEach((key) => {
 			state.name[key] = Liferay.Util.unescape(state.name[key]);
 		});
 
-		Object.keys(state.description).forEach(key => {
+		Object.keys(state.description).forEach((key) => {
 			state.description[key] = Liferay.Util.unescape(
 				state.description[key]
 			);
 		});
 
-		if (settingsDDMForm) {
+		if (settingsDDMForm && settingsDDMForm.reactComponentRef.current) {
 			document.querySelector(
 				`#${namespace}serializedSettingsContext`
 			).value = JSON.stringify({
-				pages: settingsDDMForm.pages
+				pages: settingsDDMForm.reactComponentRef.current.get('pages'),
 			});
 		}
 
@@ -200,11 +209,11 @@ class StateSyncronizer extends Component {
 
 		const visitor = new PagesVisitor(state.pages);
 
-		const pages = visitor.mapPages(page => {
+		const pages = visitor.mapPages((page) => {
 			return {
 				...page,
 				description: page.localizedDescription,
-				title: page.localizedTitle
+				title: page.localizedTitle,
 			};
 		});
 
@@ -212,7 +221,7 @@ class StateSyncronizer extends Component {
 
 		return JSON.stringify({
 			...state,
-			pages: visitor.mapFields(field => {
+			pages: visitor.mapFields((field) => {
 				return {
 					...field,
 					settingsContext: {
@@ -221,10 +230,10 @@ class StateSyncronizer extends Component {
 						defaultLanguageId: this.getDefaultLanguageId(),
 						pages: this._getSerializedSettingsContextPages(
 							field.settingsContext.pages
-						)
-					}
+						),
+					},
 				};
-			})
+			}),
 		});
 	}
 
@@ -232,12 +241,12 @@ class StateSyncronizer extends Component {
 		const defaultLanguageId = this.getDefaultLanguageId();
 		const visitor = new PagesVisitor(pages);
 
-		return visitor.mapFields(field => {
+		return visitor.mapFields((field) => {
 			if (field.type === 'options') {
 				const {value} = field;
 				const newValue = {};
 
-				Object.keys(value).forEach(locale => {
+				Object.keys(value).forEach((locale) => {
 					newValue[locale] = value[locale].filter(
 						({value}) => value !== ''
 					);
@@ -249,7 +258,7 @@ class StateSyncronizer extends Component {
 
 				field = {
 					...field,
-					value: newValue
+					value: newValue,
 				};
 			}
 
@@ -259,16 +268,15 @@ class StateSyncronizer extends Component {
 
 	_handleDescriptionEditorChanged() {
 		const {descriptionEditor, localizedDescription} = this.props;
-		const editor = window[descriptionEditor.name];
 
-		localizedDescription[this.getEditingLanguageId()] = editor.getHTML();
+		localizedDescription[this.getEditingLanguageId()] =
+			descriptionEditor.value;
 	}
 
 	_handleNameEditorChanged() {
 		const {localizedName, nameEditor} = this.props;
-		const editor = window[nameEditor.name];
 
-		localizedName[this.getEditingLanguageId()] = editor.getHTML();
+		localizedName[this.getEditingLanguageId()] = nameEditor.value;
 	}
 }
 
@@ -281,7 +289,7 @@ StateSyncronizer.PROPS = {
 	published: Config.bool(),
 	settingsDDMForm: Config.any(),
 	store: Config.any(),
-	translationManager: Config.any()
+	translationManager: Config.any(),
 };
 
 export default StateSyncronizer;

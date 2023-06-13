@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributo
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -102,8 +103,21 @@ public class BaseMentionsEditorConfigContributor
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
-		return requestBackedPortletURLFactory.createResourceURL(
-			MentionsPortletKeys.MENTIONS);
+		PortletURL portletURL =
+			requestBackedPortletURLFactory.createResourceURL(
+				MentionsPortletKeys.MENTIONS);
+
+		String discussionPortletId = themeDisplay.getPpid();
+
+		if (Validator.isBlank(discussionPortletId)) {
+			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+			discussionPortletId = portletDisplay.getId();
+		}
+
+		portletURL.setParameter("discussionPortletId", discussionPortletId);
+
+		return portletURL;
 	}
 
 }

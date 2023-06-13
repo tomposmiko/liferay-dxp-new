@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-calendar-container',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var isObject = Lang.isObject;
@@ -29,28 +29,28 @@ AUI.add(
 			ATTRS: {
 				availableCalendars: {
 					validator: isObject,
-					value: {}
+					value: {},
 				},
 
 				defaultCalendar: {
 					validator: isObject,
-					value: null
+					value: null,
 				},
 
 				groupCalendarResourceId: {
 					setter: toInt,
-					value: 0
+					value: 0,
 				},
 
 				userCalendarResourceId: {
 					setter: toInt,
-					value: 0
+					value: 0,
 				},
 
 				visibleCalendars: {
 					validator: isObject,
-					value: {}
-				}
+					value: {},
+				},
 			},
 
 			AUGMENTS: [Liferay.PortletBase],
@@ -66,7 +66,7 @@ AUI.add(
 					input.plug(A.Plugin.AutoComplete, {
 						activateFirstItem: true,
 						after: {
-							select: afterSelectFn
+							select: afterSelectFn,
 						},
 						maxResults: 20,
 						requestTemplate:
@@ -74,14 +74,14 @@ AUI.add(
 							instance.get('namespace') +
 							'keywords={query}',
 						resultFilters(_query, results) {
-							return results.filter(item => {
+							return results.filter((item) => {
 								return !instance.getCalendar(
 									item.raw.calendarId
 								);
 							});
 						},
 						resultFormatter(query, results) {
-							return results.map(result => {
+							return results.map((result) => {
 								var calendar = result.raw;
 								var calendarResourceName =
 									calendar.calendarResourceName;
@@ -91,7 +91,7 @@ AUI.add(
 									name = [
 										calendarResourceName,
 										STR_DASH,
-										name
+										name,
 									].join(STR_SPACE);
 								}
 
@@ -101,7 +101,7 @@ AUI.add(
 						resultHighlighter: 'wordMatch',
 						resultTextLocator: 'calendarResourceName',
 						source: resourceURL,
-						width: 'auto'
+						width: 'auto',
 					});
 
 					input.ac
@@ -132,12 +132,12 @@ AUI.add(
 
 									activeView._fillHeight();
 								}
-							}
+							},
 						},
 						animated: true,
 						content: config.content,
 						expanded: false,
-						header: config.header
+						header: config.header,
 					});
 
 					var items = [
@@ -146,7 +146,7 @@ AUI.add(
 							fn() {
 								var instance = this;
 
-								A.each(availableCalendars, item => {
+								A.each(availableCalendars, (item) => {
 									item.set('visible', false);
 								});
 
@@ -159,12 +159,12 @@ AUI.add(
 
 								return false;
 							},
-							id: 'check-availability'
-						}
+							id: 'check-availability',
+						},
 					];
 
 					var calendarsMenu = {
-						items
+						items,
 					};
 
 					if (config.invitable) {
@@ -179,7 +179,7 @@ AUI.add(
 
 								instance.hide();
 							},
-							id: 'remove'
+							id: 'remove',
 						});
 
 						calendarsMenu.on = {
@@ -202,7 +202,7 @@ AUI.add(
 
 									instance.set('hiddenItems', hiddenItems);
 								}
-							}
+							},
 						};
 					}
 
@@ -218,10 +218,10 @@ AUI.add(
 
 					var visibleCalendars = {};
 
-					calendarLists.forEach(calendarList => {
+					calendarLists.forEach((calendarList) => {
 						var calendars = calendarList.get('calendars');
 
-						A.each(calendars, item => {
+						A.each(calendars, (item) => {
 							var calendarId = item.get('calendarId');
 
 							availableCalendars[calendarId] = item;
@@ -230,11 +230,11 @@ AUI.add(
 								visibleCalendars[calendarId] = item;
 							}
 
-							if (item.get('defaultCalendar')) {
-								var calendarResourceId = item.get(
-									'calendarResourceId'
-								);
+							var calendarResourceId = item.get(
+								'calendarResourceId'
+							);
 
+							if (item.get('defaultCalendar')) {
 								if (
 									calendarResourceId ==
 										instance.get(
@@ -246,15 +246,13 @@ AUI.add(
 								}
 
 								if (
-									defaultCalendar == null &&
 									calendarResourceId ==
-										instance.get('userCalendarResourceId')
+									instance.get('userCalendarResourceId')
 								) {
 									defaultCalendar = item;
 								}
 
 								if (
-									defaultCalendar == null &&
 									calendarResourceId ==
 										instance.get(
 											'groupCalendarResourceId'
@@ -264,6 +262,15 @@ AUI.add(
 									defaultCalendar = item;
 								}
 							}
+
+							if (
+								defaultCalendar == null &&
+								calendarResourceId ==
+									instance.get('groupCalendarResourceId') &&
+								item.get('permissions').VIEW_BOOKING_DETAILS
+							) {
+								defaultCalendar = item;
+							}
 						});
 					});
 
@@ -272,14 +279,14 @@ AUI.add(
 					instance.set('defaultCalendar', defaultCalendar);
 
 					return availableCalendars;
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.CalendarContainer = CalendarContainer;
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-component', 'liferay-portlet-base']
+		requires: ['aui-base', 'aui-component', 'liferay-portlet-base'],
 	}
 );

@@ -24,20 +24,21 @@
 	showWhenSingleIcon="<%= true %>"
 	triggerCssClass="btn btn-unstyled component-action text-secondary"
 >
-	<portlet:renderURL var="viewAssetListEntryVariationContentURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-		<portlet:param name="mvcPath" value="/view_content.jsp" />
+	<portlet:renderURL var="viewAssetListEntryVariationItemsURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+		<portlet:param name="mvcPath" value="/view_asset_list_items.jsp" />
+		<portlet:param name="redirect" value="<%= currentURL %>" />
 		<portlet:param name="assetListEntryId" value="<%= String.valueOf(editAssetListDisplayContext.getAssetListEntryId()) %>" />
 		<portlet:param name="segmentsEntryId" value="<%= String.valueOf(editAssetListDisplayContext.getSegmentsEntryId()) %>" />
 	</portlet:renderURL>
 
 	<liferay-ui:icon
-		message="view-content"
+		message="view-items"
 		method="get"
-		url="<%= viewAssetListEntryVariationContentURL %>"
+		url="<%= viewAssetListEntryVariationItemsURL %>"
 		useDialog="<%= true %>"
 	/>
 
-	<c:if test="<%= editAssetListDisplayContext.getSegmentsEntryId() != SegmentsEntryConstants.ID_DEFAULT %>">
+	<c:if test="<%= (editAssetListDisplayContext.getSegmentsEntryId() != SegmentsEntryConstants.ID_DEFAULT) && !editAssetListDisplayContext.isLiveGroup() %>">
 		<portlet:actionURL name="/asset_list/delete_asset_list_entry_variation" var="deleteAssetListEntryVariationURL">
 			<portlet:param name="assetListEntryId" value="<%= String.valueOf(editAssetListDisplayContext.getAssetListEntryId()) %>" />
 			<portlet:param name="segmentsEntryId" value="<%= String.valueOf(editAssetListDisplayContext.getSegmentsEntryId()) %>" />

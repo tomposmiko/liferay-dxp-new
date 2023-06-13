@@ -15,6 +15,7 @@
 /* eslint-disable sort-keys */
 
 const PortletConstants = {
+
 	// Portlet mode
 
 	EDIT: 'edit',
@@ -31,7 +32,7 @@ const PortletConstants = {
 
 	FULL: 'cacheLevelFull',
 	PAGE: 'cacheLevelPage',
-	PORTLET: 'cacheLevelPortlet'
+	PORTLET: 'cacheLevelPortlet',
 };
 
 export {PortletConstants};

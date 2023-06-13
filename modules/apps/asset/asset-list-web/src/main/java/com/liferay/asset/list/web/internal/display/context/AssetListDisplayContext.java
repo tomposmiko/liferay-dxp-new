@@ -14,25 +14,31 @@
 
 package com.liferay.asset.list.web.internal.display.context;
 
-import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
+import com.liferay.asset.kernel.model.ClassType;
+import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.list.constants.AssetListActionKeys;
 import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
-import com.liferay.asset.list.constants.AssetListWebKeys;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalServiceUtil;
 import com.liferay.asset.list.service.AssetListEntryServiceUtil;
 import com.liferay.asset.list.util.AssetListPortletUtil;
 import com.liferay.asset.list.web.internal.security.permission.resource.AssetListPermission;
+import com.liferay.asset.util.AssetRendererFactoryClassProvider;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -42,6 +48,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsEntryConstants;
+import com.liferay.staging.StagingGroupHelper;
+import com.liferay.staging.StagingGroupHelperUtil;
 
 import java.util.List;
 
@@ -58,16 +66,15 @@ import javax.servlet.http.HttpServletRequest;
 public class AssetListDisplayContext {
 
 	public AssetListDisplayContext(
+		AssetRendererFactoryClassProvider assetRendererFactoryClassProvider,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
+		_assetRendererFactoryClassProvider = assetRendererFactoryClassProvider;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
 		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 
-		_assetListAssetEntryProvider =
-			(AssetListAssetEntryProvider)_httpServletRequest.getAttribute(
-				AssetListWebKeys.ASSET_LIST_ASSET_ENTRY_PROVIDER);
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
 			_httpServletRequest);
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
@@ -75,46 +82,15 @@ public class AssetListDisplayContext {
 	}
 
 	public List<DropdownItem> getAddAssetListEntryDropdownItems() {
-		return new DropdownItemList() {
-			{
-				add(
-					_getAddAssetListEntryDropdownItemUnsafeConsumer(
-						AssetListEntryTypeConstants.TYPE_MANUAL_LABEL,
-						"manual-selection",
-						AssetListEntryTypeConstants.TYPE_MANUAL));
-				add(
-					_getAddAssetListEntryDropdownItemUnsafeConsumer(
-						AssetListEntryTypeConstants.TYPE_DYNAMIC_LABEL,
-						"dynamic-selection",
-						AssetListEntryTypeConstants.TYPE_DYNAMIC));
-			}
-		};
-	}
-
-	public SearchContainer<AssetEntry> getAssetListContentSearchContainer() {
-		if (_assetListContentSearchContainer != null) {
-			return _assetListContentSearchContainer;
-		}
-
-		SearchContainer searchContainer = new SearchContainer(
-			_renderRequest, _getAssetListContentURL(), null,
-			"there-are-no-asset-entries");
-
-		List<AssetEntry> assetEntries =
-			_assetListAssetEntryProvider.getAssetEntries(
-				getAssetListEntry(), getSegmentsEntryId(),
-				searchContainer.getStart(), searchContainer.getEnd());
-
-		searchContainer.setResults(assetEntries);
-
-		int totalCount = _assetListAssetEntryProvider.getAssetEntriesCount(
-			getAssetListEntry(), getSegmentsEntryId());
-
-		searchContainer.setTotal(totalCount);
-
-		_assetListContentSearchContainer = searchContainer;
-
-		return _assetListContentSearchContainer;
+		return DropdownItemListBuilder.add(
+			_getAddAssetListEntryDropdownItemUnsafeConsumer(
+				AssetListEntryTypeConstants.TYPE_MANUAL_LABEL,
+				"manual-collection", AssetListEntryTypeConstants.TYPE_MANUAL)
+		).add(
+			_getAddAssetListEntryDropdownItemUnsafeConsumer(
+				AssetListEntryTypeConstants.TYPE_DYNAMIC_LABEL,
+				"dynamic-collection", AssetListEntryTypeConstants.TYPE_DYNAMIC)
+		).build();
 	}
 
 	public int getAssetListEntriesCount() {
@@ -129,14 +105,17 @@ public class AssetListDisplayContext {
 		return _assetListEntriesCount;
 	}
 
-	public SearchContainer getAssetListEntriesSearchContainer() {
+	public SearchContainer<AssetListEntry>
+		getAssetListEntriesSearchContainer() {
+
 		if (_assetListEntriesSearchContainer != null) {
 			return _assetListEntriesSearchContainer;
 		}
 
-		SearchContainer assetListEntriesSearchContainer = new SearchContainer(
-			_renderRequest, _renderResponse.createRenderURL(), null,
-			"there-are-no-content-sets");
+		SearchContainer<AssetListEntry> assetListEntriesSearchContainer =
+			new SearchContainer(
+				_renderRequest, _renderResponse.createRenderURL(), null,
+				"there-are-no-collections");
 
 		assetListEntriesSearchContainer.setRowChecker(
 			new EmptyOnClickRowChecker(_renderResponse));
@@ -215,12 +194,12 @@ public class AssetListDisplayContext {
 		if (getAssetListEntryType() ==
 				AssetListEntryTypeConstants.TYPE_DYNAMIC) {
 
-			title = "new-dynamic-content-set";
+			title = "new-dynamic-collection";
 		}
 		else if (getAssetListEntryType() ==
 					AssetListEntryTypeConstants.TYPE_MANUAL) {
 
-			title = "new-manual-content-set";
+			title = "new-manual-collection";
 		}
 
 		return LanguageUtil.get(_httpServletRequest, title);
@@ -246,13 +225,30 @@ public class AssetListDisplayContext {
 	}
 
 	public String getClassName(AssetRendererFactory<?> assetRendererFactory) {
-		Class<?> clazz = assetRendererFactory.getClass();
+		Class<? extends AssetRendererFactory> clazz =
+			_assetRendererFactoryClassProvider.getClass(assetRendererFactory);
 
 		String className = clazz.getName();
 
 		int pos = className.lastIndexOf(StringPool.PERIOD);
 
 		return className.substring(pos + 1);
+	}
+
+	public ClassType getClassType(
+		ClassTypeReader classTypeReader, long classTypeId) {
+
+		try {
+			return classTypeReader.getClassType(
+				classTypeId, _themeDisplay.getLocale());
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to get class type", portalException);
+			}
+		}
+
+		return null;
 	}
 
 	public String getEmptyResultMessageDescription() {
@@ -263,6 +259,28 @@ public class AssetListDisplayContext {
 		}
 
 		return StringPool.BLANK;
+	}
+
+	public List<NavigationItem> getNavigationItems(String currentItem) {
+		return NavigationItemListBuilder.add(
+			navigationItem -> {
+				navigationItem.setActive(currentItem.equals("collections"));
+				navigationItem.setHref(_renderResponse.createRenderURL());
+				navigationItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "collections"));
+			}
+		).add(
+			navigationItem -> {
+				navigationItem.setActive(
+					currentItem.equals("collection-providers"));
+				navigationItem.setHref(
+					_renderResponse.createRenderURL(), "mvcPath",
+					"/view_info_list_providers.jsp");
+				navigationItem.setLabel(
+					LanguageUtil.get(
+						_httpServletRequest, "collection-providers"));
+			}
+		).build();
 	}
 
 	public String getOrderByCol() {
@@ -352,6 +370,22 @@ public class AssetListDisplayContext {
 	}
 
 	public boolean isShowAddAssetListEntryAction() {
+		Group group = _themeDisplay.getScopeGroup();
+
+		if (group.isLayout()) {
+			group = group.getParentGroup();
+		}
+
+		StagingGroupHelper stagingGroupHelper =
+			StagingGroupHelperUtil.getStagingGroupHelper();
+
+		if (stagingGroupHelper.isLiveGroup(group) &&
+			stagingGroupHelper.isStagedPortlet(
+				group, AssetListPortletKeys.ASSET_LIST)) {
+
+			return false;
+		}
+
 		return AssetListPermission.contains(
 			_themeDisplay.getPermissionChecker(),
 			_themeDisplay.getScopeGroupId(),
@@ -367,7 +401,6 @@ public class AssetListDisplayContext {
 			dropdownItem.putData(
 				"addAssetListEntryURL", _getAddAssetListEntryURL(type));
 			dropdownItem.putData("title", _getAddAssetListTitle(title));
-			dropdownItem.setHref("#");
 			dropdownItem.setLabel(LanguageUtil.get(_httpServletRequest, label));
 		};
 	}
@@ -384,19 +417,7 @@ public class AssetListDisplayContext {
 
 	private String _getAddAssetListTitle(String title) {
 		return LanguageUtil.format(
-			_httpServletRequest, "add-x-content-set", title, true);
-	}
-
-	private PortletURL _getAssetListContentURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/view_content.jsp");
-		portletURL.setParameter(
-			"assetListEntryId", String.valueOf(getAssetListEntryId()));
-		portletURL.setParameter(
-			"segmentsEntryId", String.valueOf(getSegmentsEntryId()));
-
-		return portletURL;
+			_httpServletRequest, "add-x-collection", title, true);
 	}
 
 	private String _getKeywords() {
@@ -428,13 +449,16 @@ public class AssetListDisplayContext {
 		return false;
 	}
 
-	private final AssetListAssetEntryProvider _assetListAssetEntryProvider;
-	private SearchContainer _assetListContentSearchContainer;
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetListDisplayContext.class);
+
 	private Integer _assetListEntriesCount;
-	private SearchContainer _assetListEntriesSearchContainer;
+	private SearchContainer<AssetListEntry> _assetListEntriesSearchContainer;
 	private AssetListEntry _assetListEntry;
 	private Long _assetListEntryId;
 	private Integer _assetListEntryType;
+	private final AssetRendererFactoryClassProvider
+		_assetRendererFactoryClassProvider;
 	private final HttpServletRequest _httpServletRequest;
 	private String _keywords;
 	private String _orderByCol;

@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-toggler-key-filter',
-	A => {
+	(A) => {
 		var KeyMap = A.Event.KeyMap;
 
 		var NAME = 'togglerkeyfilter';
@@ -29,9 +29,9 @@ AUI.add(
 						KeyMap.NUM_MINUS,
 						KeyMap.NUM_PLUS,
 						KeyMap.RIGHT,
-						KeyMap.SPACE
-					]
-				}
+						KeyMap.SPACE,
+					],
+				},
 			},
 
 			EXTENDS: A.Plugin.Base,
@@ -72,14 +72,14 @@ AUI.add(
 						instance._headerEventHandler,
 						instance
 					);
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.TogglerKeyFilter = TogglerKeyFilter;
 	},
 	'',
 	{
-		requires: ['aui-event-base']
+		requires: ['aui-event-base'],
 	}
 );

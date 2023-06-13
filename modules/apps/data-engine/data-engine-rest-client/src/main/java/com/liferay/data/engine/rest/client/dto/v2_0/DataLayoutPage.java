@@ -17,6 +17,8 @@ package com.liferay.data.engine.rest.client.dto.v2_0;
 import com.liferay.data.engine.rest.client.function.UnsafeSupplier;
 import com.liferay.data.engine.rest.client.serdes.v2_0.DataLayoutPageSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class DataLayoutPage {
+public class DataLayoutPage implements Cloneable, Serializable {
+
+	public static DataLayoutPage toDTO(String json) {
+		return DataLayoutPageSerDes.toDTO(json);
+	}
 
 	public DataLayoutRow[] getDataLayoutRows() {
 		return dataLayoutRows;
@@ -93,6 +99,11 @@ public class DataLayoutPage {
 	}
 
 	protected Map<String, Object> title;
+
+	@Override
+	public DataLayoutPage clone() throws CloneNotSupportedException {
+		return (DataLayoutPage)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

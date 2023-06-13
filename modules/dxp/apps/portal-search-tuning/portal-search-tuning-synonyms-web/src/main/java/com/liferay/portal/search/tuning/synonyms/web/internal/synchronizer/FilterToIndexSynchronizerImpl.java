@@ -14,12 +14,12 @@
 
 package com.liferay.portal.search.tuning.synonyms.web.internal.synchronizer;
 
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.filter.SynonymSetFilterReader;
 import com.liferay.portal.search.tuning.synonyms.web.internal.filter.name.SynonymSetFilterNameHolder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSet;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexWriter;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexName;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexNameBuilder;
 
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
@@ -36,10 +36,8 @@ public class FilterToIndexSynchronizerImpl
 	implements FilterToIndexSynchronizer {
 
 	@Override
-	public void copyToIndex(String companyIndexName) {
-		SynonymSetIndexName synonymSetIndexName =
-			_synonymSetIndexNameBuilder.getSynonymSetIndexName(
-				companyIndexName);
+	public void copyToIndex(
+		String companyIndexName, SynonymSetIndexName synonymSetIndexName) {
 
 		for (String synonyms : getSynonymsFromFilters(companyIndexName)) {
 			addSynonymSetToIndex(synonymSetIndexName, synonyms);

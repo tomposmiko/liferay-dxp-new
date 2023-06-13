@@ -22,20 +22,20 @@ SiteNavigationMenuItemItemSelectorViewDisplayContext siteNavigationMenuItemItemS
 
 <c:choose>
 	<c:when test="<%= siteNavigationMenuItemItemSelectorViewDisplayContext.isShowSelectSiteNavigationMenuItem() %>">
-
-		<%
-		Map<String, Object> data = new HashMap<>();
-
-		data.put("itemSelectorSaveEvent", siteNavigationMenuItemItemSelectorViewDisplayContext.getItemSelectedEventName());
-		data.put("namespace", liferayPortletResponse.getNamespace());
-		data.put("nodes", siteNavigationMenuItemItemSelectorViewDisplayContext.getSiteNavigationMenuItemsJSONArray());
-		data.put("pathThemeImages", themeDisplay.getPathThemeImages());
-		%>
-
 		<div class="select-site-navigation-menu-item">
 			<react:component
-				data="<%= data %>"
 				module="js/SelectSiteNavigationMenuItem.es"
+				props='<%=
+					HashMapBuilder.<String, Object>put(
+						"itemSelectorSaveEvent", siteNavigationMenuItemItemSelectorViewDisplayContext.getItemSelectedEventName()
+					).put(
+						"namespace", liferayPortletResponse.getNamespace()
+					).put(
+						"nodes", siteNavigationMenuItemItemSelectorViewDisplayContext.getSiteNavigationMenuItemsJSONArray()
+					).put(
+						"pathThemeImages", themeDisplay.getPathThemeImages()
+					).build()
+				%>'
 			/>
 		</div>
 	</c:when>

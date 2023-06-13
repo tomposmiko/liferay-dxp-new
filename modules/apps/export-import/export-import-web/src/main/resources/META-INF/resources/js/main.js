@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-export-import-export-import',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var ADate = A.Date;
@@ -34,7 +34,7 @@ AUI.add(
 		var STR_HIDE = 'hide';
 
 		var defaultConfig = {
-			setter: '_setNode'
+			setter: '_setNode',
 		};
 
 		var ExportImport = A.Component.create({
@@ -54,7 +54,7 @@ AUI.add(
 				ratingsNode: defaultConfig,
 				setupNode: defaultConfig,
 				timeZoneOffset: 0,
-				userPreferencesNode: defaultConfig
+				userPreferencesNode: defaultConfig,
 			},
 
 			AUGMENTS: [Liferay.PortletBase],
@@ -72,7 +72,7 @@ AUI.add(
 					if (form) {
 						form.delegate(
 							STR_CLICK,
-							event => {
+							(event) => {
 								var portletId = event.currentTarget.attr(
 									'data-portletid'
 								);
@@ -99,7 +99,7 @@ AUI.add(
 
 						form.delegate(
 							STR_CLICK,
-							event => {
+							(event) => {
 								var portletId = event.currentTarget.attr(
 									'data-portletid'
 								);
@@ -131,7 +131,7 @@ AUI.add(
 
 					Array.prototype.forEach.call(
 						portletConfigurationNodes,
-						portletConfigurationNode => {
+						(portletConfigurationNode) => {
 							portletConfigurationNode.addEventListener(
 								STR_CLICK,
 								() => {
@@ -148,7 +148,7 @@ AUI.add(
 
 										Array.prototype.forEach.call(
 											controlCheckboxes,
-											controlCheckbox => {
+											(controlCheckbox) => {
 												if (!controlCheckbox.checked) {
 													controlCheckbox.click();
 												}
@@ -175,7 +175,7 @@ AUI.add(
 
 					Array.prototype.forEach.call(
 						portletDataNodes,
-						portletDataNode => {
+						(portletDataNode) => {
 							portletDataNode.addEventListener(STR_CLICK, () => {
 								if (portletDataNode.checked) {
 									var id = portletDataNode.id;
@@ -190,7 +190,7 @@ AUI.add(
 
 									Array.prototype.forEach.call(
 										controlCheckboxes,
-										controlCheckbox => {
+										(controlCheckbox) => {
 											if (!controlCheckbox.checked) {
 												controlCheckbox.click();
 											}
@@ -335,9 +335,9 @@ AUI.add(
 													);
 
 													configurationDialog.hide();
-												}
+												},
 											},
-											primary: true
+											primary: true,
 										},
 										{
 											label: Liferay.Language.get(
@@ -348,14 +348,14 @@ AUI.add(
 													event.domEvent.preventDefault();
 
 													configurationDialog.hide();
-												}
-											}
-										}
-									]
+												},
+											},
+										},
+									],
 								},
-								width: 400
+								width: 400,
 							},
-							title: portletTitle
+							title: portletTitle,
 						});
 
 						configurationNode.setData(
@@ -400,9 +400,9 @@ AUI.add(
 													);
 
 													contentDialog.hide();
-												}
+												},
 											},
-											primary: true
+											primary: true,
 										},
 										{
 											label: Liferay.Language.get(
@@ -417,14 +417,14 @@ AUI.add(
 													);
 
 													contentDialog.hide();
-												}
-											}
-										}
-									]
+												},
+											},
+										},
+									],
 								},
-								width: 400
+								width: 400,
 							},
-							title: portletTitle
+							title: portletTitle,
 						});
 
 						instance._storeNodeInputStates(contentNode);
@@ -467,9 +467,9 @@ AUI.add(
 													);
 
 													contentOptionsDialog.hide();
-												}
+												},
 											},
-											primary: true
+											primary: true,
 										},
 										{
 											label: Liferay.Language.get(
@@ -484,14 +484,14 @@ AUI.add(
 													);
 
 													contentOptionsDialog.hide();
-												}
-											}
-										}
-									]
+												},
+											},
+										},
+									],
 								},
-								width: 400
+								width: 400,
 							},
-							title: Liferay.Language.get('comments-and-ratings')
+							title: Liferay.Language.get('comments-and-ratings'),
 						});
 
 						instance._storeNodeInputStates(contentOptionsNode);
@@ -536,9 +536,9 @@ AUI.add(
 														instance._setGlobalConfigurationLabels();
 
 														globalConfigurationDialog.hide();
-													}
+													},
 												},
-												primary: true
+												primary: true,
 											},
 											{
 												label: Liferay.Language.get(
@@ -549,16 +549,16 @@ AUI.add(
 														event.domEvent.preventDefault();
 
 														globalConfigurationDialog.hide();
-													}
-												}
-											}
-										]
+													},
+												},
+											},
+										],
 									},
-									width: 400
+									width: 400,
 								},
 								title: Liferay.Language.get(
 									'application-configuration'
-								)
+								),
 							}
 						);
 
@@ -577,7 +577,8 @@ AUI.add(
 						message = Liferay.Language.get(
 							'end-date-must-be-greater-than-start-date'
 						);
-					} else if (
+					}
+					else if (
 						!instance._rangeEndsInPast(dateChecker.todayUsed) ||
 						!instance._rangeStartsInPast(dateChecker.todayUsed)
 					) {
@@ -621,14 +622,14 @@ AUI.add(
 														event.domEvent.preventDefault();
 
 														scheduledPublishingEventsDialog.hide();
-													}
-												}
-											}
-										]
+													},
+												},
+											},
+										],
 									},
-									width: 400
+									width: 400,
 								},
-								title: Liferay.Language.get('scheduled-events')
+								title: Liferay.Language.get('scheduled-events'),
 							}
 						);
 
@@ -673,7 +674,7 @@ AUI.add(
 
 					return {
 						endDate,
-						startDate
+						startDate,
 					};
 				},
 
@@ -694,13 +695,13 @@ AUI.add(
 				_initLabels() {
 					var instance = this;
 
-					instance.all('.configuration-link').each(item => {
+					instance.all('.configuration-link').each((item) => {
 						instance._setConfigurationLabels(
 							item.attr('data-portletid')
 						);
 					});
 
-					instance.all('.content-link').each(item => {
+					instance.all('.content-link').each((item) => {
 						instance._setContentLabels(item.attr('data-portletid'));
 					});
 
@@ -748,9 +749,9 @@ AUI.add(
 
 					Liferay.Util.openWindow({
 						dialog: {
-							bodyContent: bodyNode
+							bodyContent: bodyNode,
 						},
-						title
+						title,
 					});
 				},
 
@@ -798,11 +799,12 @@ AUI.add(
 					var instance = this;
 
 					if (instance._isChecked('deletionsNode')) {
-						instance.all('.deletions').each(item => {
+						instance.all('.deletions').each((item) => {
 							item.show();
 						});
-					} else {
-						instance.all('.deletions').each(item => {
+					}
+					else {
+						instance.all('.deletions').each((item) => {
 							item.hide();
 						});
 					}
@@ -816,7 +818,7 @@ AUI.add(
 
 					if (cmdNode.val() === 'add' || cmdNode.val() === 'update') {
 						var params = {
-							cmd: cmdNode.val()
+							cmd: cmdNode.val(),
 						};
 
 						if (instance._exportLAR) {
@@ -824,7 +826,8 @@ AUI.add(
 								'editExportConfiguration';
 							params.tabs2 = 'new-export-process';
 							params.exportConfigurationButtons = 'custom';
-						} else {
+						}
+						else {
 							params.mvcRenderCommandName =
 								'editPublishConfiguration';
 							params.publishConfigurationButtons = 'custom';
@@ -900,8 +903,8 @@ AUI.add(
 
 					if (processesNode && instance._processesResourceURL) {
 						Liferay.Util.fetch(instance._processesResourceURL)
-							.then(response => response.text())
-							.then(response => {
+							.then((response) => response.text())
+							.then((response) => {
 								processesNode.plug(A.Plugin.ParseContent);
 
 								processesNode.setContent(response);
@@ -916,21 +919,15 @@ AUI.add(
 								instance._scheduleRenderProcess();
 							})
 							.catch(() => {
-								new Liferay.Notice({
-									closeText: false,
-									content:
-										Liferay.Language.get(
-											'your-request-failed-to-complete'
-										) +
-										'<button aria-label="' +
-										Liferay.Language.get('close') +
-										'" type="button" class="close">&times;</button>',
-									noticeClass: 'hide',
-									timeout: FAILURE_TIMEOUT,
-									toggleText: false,
+								Liferay.Util.openToast({
+									message: Liferay.Language.get(
+										'your-request-failed-to-complete'
+									),
+									toastProps: {
+										autoClose: FAILURE_TIMEOUT,
+									},
 									type: 'warning',
-									useAnimation: true
-								}).show();
+								});
 							});
 					}
 				},
@@ -946,14 +943,14 @@ AUI.add(
 				_restoreNodeHiddenState(node, state) {
 					var hiddenList = node.ancestorsByClassName(STR_HIDE);
 
-					hiddenList.each(hiddenNode => {
+					hiddenList.each((hiddenNode) => {
 						hiddenNode.removeClass(STR_HIDE);
 					});
 
 					hiddenList = state.hiddenList;
 
 					if (hiddenList !== null) {
-						hiddenList.each(node => {
+						hiddenList.each((node) => {
 							node.addClass(STR_HIDE);
 						});
 					}
@@ -970,7 +967,7 @@ AUI.add(
 						inputNodes = node.getElementsByTagName('input');
 					}
 
-					inputNodes.each(node => {
+					inputNodes.each((node) => {
 						var id = node.get('id');
 
 						var state = inputStates[id];
@@ -1009,7 +1006,7 @@ AUI.add(
 
 					var selectedConfiguration = [];
 
-					inputs.each(item => {
+					inputs.each((item) => {
 						var checked = item.attr(STR_CHECKED);
 
 						if (checked) {
@@ -1025,7 +1022,8 @@ AUI.add(
 						instance
 							.byId('showChangeConfiguration_' + portletId)
 							.hide();
-					} else {
+					}
+					else {
 						instance
 							.byId('showChangeConfiguration_' + portletId)
 							.show();
@@ -1047,7 +1045,7 @@ AUI.add(
 
 					var selectedContent = [];
 
-					inputs.each(item => {
+					inputs.each((item) => {
 						var checked = item.attr(STR_CHECKED);
 
 						if (checked) {
@@ -1066,7 +1064,8 @@ AUI.add(
 							.attr('checked', false);
 
 						instance.byId('showChangeContent_' + portletId).hide();
-					} else {
+					}
+					else {
 						instance.byId('showChangeContent_' + portletId).show();
 					}
 
@@ -1110,7 +1109,7 @@ AUI.add(
 
 					Array.prototype.forEach.call(
 						portletDataNodes,
-						portletDataNode => {
+						(portletDataNode) => {
 							if (portletDataNode.type === 'checkbox') {
 								var id = portletDataNode.id;
 
@@ -1124,12 +1123,12 @@ AUI.add(
 
 								Array.prototype.forEach.call(
 									controlCheckboxes,
-									controlCheckbox => {
+									(controlCheckbox) => {
 										if (
 											controlCheckbox.disabled &&
 											controlCheckbox.checked
 										) {
-											portletURL.setParameter(
+											portletURL.searchParams.set(
 												controlCheckbox.name.replace(
 													instance.NS,
 													''
@@ -1182,7 +1181,8 @@ AUI.add(
 					if (linkNode) {
 						if (label !== STR_EMPTY) {
 							linkNode.html(Liferay.Language.get('change'));
-						} else {
+						}
+						else {
 							linkNode.html(Liferay.Language.get('select'));
 						}
 					}
@@ -1199,7 +1199,8 @@ AUI.add(
 
 					if (Lang.isString(val)) {
 						val = instance.one(val);
-					} else {
+					}
+					else {
 						val = A.one(val);
 					}
 
@@ -1217,7 +1218,7 @@ AUI.add(
 						inputNodes = node.getElementsByTagName('input');
 					}
 
-					inputNodes.each(node => {
+					inputNodes.each((node) => {
 						var hiddenList = node.ancestorsByClassName(STR_HIDE);
 
 						var id = node.get('id');
@@ -1230,7 +1231,7 @@ AUI.add(
 
 						inputStates[id] = {
 							hiddenList,
-							value: val
+							value: val,
 						};
 					});
 				},
@@ -1246,7 +1247,8 @@ AUI.add(
 						A.all(
 							'.datepicker-popover, .timepicker-popover'
 						).hide();
-					} else {
+					}
+					else {
 						instance.showNotification(dateChecker);
 					}
 				},
@@ -1315,7 +1317,7 @@ AUI.add(
 
 					var dateRangeChecker = {
 						todayUsed: adjustedDate,
-						validRange: true
+						validRange: true,
 					};
 
 					if (instance._isChecked('rangeDateRangeNode')) {
@@ -1371,37 +1373,21 @@ AUI.add(
 				showNotification(dateChecker, rangeEndsLater) {
 					var instance = this;
 
-					if (instance._notice) {
-						instance._notice.remove();
-					}
-
 					var message = instance._getNotificationMessage(
 						dateChecker,
 						rangeEndsLater
 					);
 
-					instance._notice = new Liferay.Notice({
-						animationConfig: {
-							duration: 2,
-							left: '0px',
-							top: '0px'
+					Liferay.Util.openToast({
+						message,
+						toastProps: {
+							autoClose: 10000,
+							style: {left: 0, top: 0},
 						},
-						closeText: false,
-						content:
-							message +
-							'<button aria-label="' +
-							Liferay.Language.get('close') +
-							'" type="button" class="close">&times;</button>',
-						noticeClass: 'hide',
-						timeout: 10000,
-						toggleText: false,
 						type: 'warning',
-						useAnimation: true
 					});
-
-					instance._notice.show();
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.ExportImport = ExportImport;
@@ -1415,9 +1401,8 @@ AUI.add(
 			'aui-parse-content',
 			'aui-toggler',
 			'aui-tree-view',
-			'liferay-notice',
 			'liferay-portlet-base',
-			'liferay-util-window'
-		]
+			'liferay-util-window',
+		],
 	}
 );

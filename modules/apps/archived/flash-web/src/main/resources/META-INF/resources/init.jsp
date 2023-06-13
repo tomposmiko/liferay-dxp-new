@@ -24,7 +24,8 @@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ page import="com.liferay.petra.string.StringPool" %><%@
+<%@ page import="com.liferay.petra.string.StringBundler" %><%@
+page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
@@ -39,7 +40,7 @@ page import="com.liferay.portal.kernel.util.Validator" %>
 <portlet:defineObjects />
 
 <%
-String movie = portletPreferences.getValue("movie", StringPool.BLANK);
 String flashAttributes = portletPreferences.getValue("flashAttributes", StringPool.BLANK);
 String flashVariables = portletPreferences.getValue("flashVariables", StringPool.BLANK);
+String movie = portletPreferences.getValue("movie", StringPool.BLANK);
 %>

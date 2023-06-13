@@ -51,6 +51,10 @@ public class SharepointOAuth2TokenEntryLocalServiceWrapper
 	/**
 	 * Adds the sharepoint o auth2 token entry to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SharepointOAuth2TokenEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param sharepointOAuth2TokenEntry the sharepoint o auth2 token entry
 	 * @return the sharepoint o auth2 token entry that was added
 	 */
@@ -62,6 +66,18 @@ public class SharepointOAuth2TokenEntryLocalServiceWrapper
 
 		return _sharepointOAuth2TokenEntryLocalService.
 			addSharepointOAuth2TokenEntry(sharepointOAuth2TokenEntry);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _sharepointOAuth2TokenEntryLocalService.createPersistedModel(
+			primaryKeyObj);
 	}
 
 	/**
@@ -93,6 +109,10 @@ public class SharepointOAuth2TokenEntryLocalServiceWrapper
 	/**
 	 * Deletes the sharepoint o auth2 token entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SharepointOAuth2TokenEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param sharepointOAuth2TokenEntryId the primary key of the sharepoint o auth2 token entry
 	 * @return the sharepoint o auth2 token entry that was removed
 	 * @throws PortalException if a sharepoint o auth2 token entry with the primary key could not be found
@@ -118,6 +138,10 @@ public class SharepointOAuth2TokenEntryLocalServiceWrapper
 	/**
 	 * Deletes the sharepoint o auth2 token entry from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SharepointOAuth2TokenEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param sharepointOAuth2TokenEntry the sharepoint o auth2 token entry
 	 * @return the sharepoint o auth2 token entry that was removed
 	 */
@@ -135,6 +159,18 @@ public class SharepointOAuth2TokenEntryLocalServiceWrapper
 	public void deleteUserSharepointOAuth2TokenEntries(long userId) {
 		_sharepointOAuth2TokenEntryLocalService.
 			deleteUserSharepointOAuth2TokenEntries(userId);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _sharepointOAuth2TokenEntryLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _sharepointOAuth2TokenEntryLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -273,6 +309,9 @@ public class SharepointOAuth2TokenEntryLocalServiceWrapper
 			getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -346,6 +385,10 @@ public class SharepointOAuth2TokenEntryLocalServiceWrapper
 
 	/**
 	 * Updates the sharepoint o auth2 token entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SharepointOAuth2TokenEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param sharepointOAuth2TokenEntry the sharepoint o auth2 token entry
 	 * @return the sharepoint o auth2 token entry that was updated

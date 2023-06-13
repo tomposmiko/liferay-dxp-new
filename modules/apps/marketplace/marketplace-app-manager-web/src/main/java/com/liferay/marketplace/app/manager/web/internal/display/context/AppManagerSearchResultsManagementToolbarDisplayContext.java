@@ -46,7 +46,7 @@ public class AppManagerSearchResultsManagementToolbarDisplayContext
 	}
 
 	public String getKeywords() {
-		return ParamUtil.getString(request, "keywords");
+		return ParamUtil.getString(httpServletRequest, "keywords");
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class AppManagerSearchResultsManagementToolbarDisplayContext
 		}
 
 		String redirect = ParamUtil.getString(
-			request, "redirect",
+			httpServletRequest, "redirect",
 			String.valueOf(liferayPortletResponse.createRenderURL()));
 
 		portletURL.setParameter("redirect", redirect);
@@ -81,12 +81,12 @@ public class AppManagerSearchResultsManagementToolbarDisplayContext
 	}
 
 	@Override
-	public SearchContainer getSearchContainer() throws Exception {
+	public SearchContainer<Object> getSearchContainer() throws Exception {
 		if (_searchContainer != null) {
 			return _searchContainer;
 		}
 
-		SearchContainer searchContainer = new SearchContainer(
+		SearchContainer<Object> searchContainer = new SearchContainer(
 			liferayPortletRequest, getPortletURL(), null,
 			"no-results-were-found");
 
@@ -94,7 +94,8 @@ public class AppManagerSearchResultsManagementToolbarDisplayContext
 		searchContainer.setOrderByType(getOrderByType());
 
 		List<Object> results = MarketplaceAppManagerSearchUtil.getResults(
-			BundleManagerUtil.getBundles(), getKeywords(), request.getLocale());
+			BundleManagerUtil.getBundles(), getKeywords(),
+			httpServletRequest.getLocale());
 
 		results = ListUtil.sort(
 			results, new MarketplaceAppManagerComparator(getOrderByType()));
@@ -115,6 +116,6 @@ public class AppManagerSearchResultsManagementToolbarDisplayContext
 		return _searchContainer;
 	}
 
-	private SearchContainer _searchContainer;
+	private SearchContainer<Object> _searchContainer;
 
 }

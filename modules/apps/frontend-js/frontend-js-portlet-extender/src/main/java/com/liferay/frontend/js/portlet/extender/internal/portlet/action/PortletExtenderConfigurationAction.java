@@ -80,7 +80,7 @@ public class PortletExtenderConfigurationAction
 		_ddmFormValuesFactory = ddmFormValuesFactory;
 		_preferencesJSONObject = preferencesJSONObject;
 
-		_ddmForm = ddm.getDDMForm(preferencesJSONObject.toJSONString());
+		_ddmForm = ddm.getDDMForm(preferencesJSONObject.toString());
 
 		_ddmFormFieldsMap = _ddmForm.getDDMFormFieldsMap(true);
 
@@ -149,27 +149,27 @@ public class PortletExtenderConfigurationAction
 
 			String ddmFormFieldType = ddmFormField.getType();
 
-			String[] values = stream.map(
-				ddmFormFieldValue -> {
-					Value value = ddmFormFieldValue.getValue();
+			setPreference(
+				actionRequest, entry.getKey(),
+				stream.map(
+					ddmFormFieldValue -> {
+						Value value = ddmFormFieldValue.getValue();
 
-					String stringValue = value.getString(
-						value.getDefaultLocale());
+						String stringValue = value.getString(
+							value.getDefaultLocale());
 
-					if (ddmFormFieldType.equals(DDMFormFieldType.SELECT)) {
-						stringValue = StringUtil.replace(
-							stringValue, "[\"", StringPool.BLANK);
-						stringValue = StringUtil.replace(
-							stringValue, "\"]", StringPool.BLANK);
+						if (ddmFormFieldType.equals(DDMFormFieldType.SELECT)) {
+							stringValue = StringUtil.removeSubstring(
+								stringValue, "[\"");
+							stringValue = StringUtil.removeSubstring(
+								stringValue, "\"]");
+						}
+
+						return stringValue;
 					}
-
-					return stringValue;
-				}
-			).toArray(
-				String[]::new
-			);
-
-			setPreference(actionRequest, entry.getKey(), values);
+				).toArray(
+					String[]::new
+				));
 		}
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
@@ -192,7 +192,7 @@ public class PortletExtenderConfigurationAction
 	private DDMFormRenderingContext _createDDMFormRenderingContext(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
-		throws PortalException {
+		throws Exception {
 
 		DDMFormRenderingContext ddmFormRenderingContext =
 			new DDMFormRenderingContext();
@@ -284,7 +284,7 @@ public class PortletExtenderConfigurationAction
 	private void _setDDMFormValues(
 			DDMFormRenderingContext ddmFormRenderingContext,
 			ThemeDisplay themeDisplay)
-		throws PortalException {
+		throws Exception {
 
 		DDMFormValues ddmFormValues = new DDMFormValues(_ddmForm);
 

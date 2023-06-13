@@ -17,8 +17,10 @@ package com.liferay.portal.internal.increment;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.PropsUtil;
 
 import java.util.List;
@@ -30,6 +32,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -38,8 +41,10 @@ import org.junit.Test;
 public class BufferedIncrementConfigurationTest {
 
 	@ClassRule
-	public static final CodeCoverageAssertor codeCoverageAssertor =
-		CodeCoverageAssertor.INSTANCE;
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@Before
 	public void setUp() {
@@ -89,7 +94,6 @@ public class BufferedIncrementConfigurationTest {
 
 	@Test
 	public void testValidSetting() {
-		_properties.put(PropsKeys.BUFFERED_INCREMENT_ENABLED, "false");
 		_properties.put(
 			PropsKeys.BUFFERED_INCREMENT_STANDBY_QUEUE_THRESHOLD, "10");
 		_properties.put(
@@ -101,7 +105,6 @@ public class BufferedIncrementConfigurationTest {
 		BufferedIncrementConfiguration bufferedIncrementConfiguration =
 			new BufferedIncrementConfiguration(StringPool.BLANK);
 
-		Assert.assertFalse(bufferedIncrementConfiguration.isEnabled());
 		Assert.assertEquals(
 			10, bufferedIncrementConfiguration.getStandbyQueueThreshold());
 		Assert.assertEquals(
@@ -153,8 +156,6 @@ public class BufferedIncrementConfigurationTest {
 	}
 
 	private CaptureHandler _testInvalidSetting(Level level) {
-		_properties.put(PropsKeys.BUFFERED_INCREMENT_ENABLED, "false");
-
 		if (level == Level.OFF) {
 			_properties.put(
 				PropsKeys.BUFFERED_INCREMENT_STANDBY_QUEUE_THRESHOLD, "1");
@@ -177,8 +178,6 @@ public class BufferedIncrementConfigurationTest {
 
 		BufferedIncrementConfiguration bufferedIncrementConfiguration =
 			new BufferedIncrementConfiguration(StringPool.BLANK);
-
-		Assert.assertFalse(bufferedIncrementConfiguration.isEnabled());
 
 		if (level == Level.OFF) {
 			Assert.assertEquals(

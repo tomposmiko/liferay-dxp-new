@@ -31,10 +31,6 @@ if (distributionScopeArray.length == 2) {
 	classPK = GetterUtil.getLong(distributionScopeArray[1]);
 }
 
-if ((classNameId == 0) && (classPK == 0) && !PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_GENERAL_ANNOUNCEMENTS)) {
-	throw new PrincipalException.MustHavePermission(permissionChecker, ActionKeys.ADD_GENERAL_ANNOUNCEMENTS);
-}
-
 SearchContainer<AnnouncementsEntry> announcementsEntriesSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, currentURLObj, null, "no-entries-were-found");
 
 announcementsEntriesSearchContainer.setRowChecker(new AnnouncementsEntryChecker(liferayPortletRequest, liferayPortletResponse));
@@ -46,7 +42,6 @@ AnnouncementsAdminViewManagementToolbarDisplayContext announcementsAdminViewMana
 %>
 
 <clay:navigation-bar
-	inverted="<%= true %>"
 	navigationItems='<%=
 		new JSPNavigationItemList(pageContext) {
 			{
@@ -54,15 +49,14 @@ AnnouncementsAdminViewManagementToolbarDisplayContext announcementsAdminViewMana
 					navigationItem -> {
 						navigationItem.setActive(navigation.equals("announcements"));
 						navigationItem.setHref(renderResponse.createRenderURL());
-						navigationItem.setLabel(LanguageUtil.get(request, "announcements"));
+						navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "announcements"));
 					});
 				add(
 					navigationItem -> {
 						navigationItem.setActive(navigation.equals("alerts"));
 						navigationItem.setHref(renderResponse.createRenderURL(), "navigation", "alerts");
-						navigationItem.setLabel(LanguageUtil.get(request, "alerts"));
+						navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "alerts"));
 					});
-
 			}
 		}
 	%>'
@@ -79,10 +73,10 @@ AnnouncementsAdminViewManagementToolbarDisplayContext announcementsAdminViewMana
 	itemsTotal="<%= announcementsAdminViewManagementToolbarDisplayContext.getTotal() %>"
 	searchContainerId="announcementsEntries"
 	selectable="<%= true %>"
-	showSearch="false"
+	showSearch="<%= false %>"
 />
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<aui:form action="<%= currentURL %>" method="get" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
@@ -103,11 +97,10 @@ AnnouncementsAdminViewManagementToolbarDisplayContext announcementsAdminViewMana
 			>
 
 				<%
-				Map<String, Object> rowData = new HashMap<String, Object>();
-
-				rowData.put("actions", StringUtil.merge(announcementsAdminViewManagementToolbarDisplayContext.getAvailableActions(entry)));
-
-				row.setData(rowData);
+				row.setData(
+					HashMapBuilder.<String, Object>put(
+						"actions", StringUtil.merge(announcementsAdminViewManagementToolbarDisplayContext.getAvailableActions(entry))
+					).build());
 
 				PortletURL rowURL = renderResponse.createRenderURL();
 
@@ -125,7 +118,7 @@ AnnouncementsAdminViewManagementToolbarDisplayContext announcementsAdminViewMana
 
 				<liferay-ui:search-container-column-text
 					name="type"
-					value="<%= LanguageUtil.get(resourceBundle, entry.getType()) %>"
+					value="<%= HtmlUtil.escape(LanguageUtil.get(resourceBundle, entry.getType())) %>"
 				/>
 
 				<liferay-ui:search-container-column-date
@@ -154,10 +147,10 @@ AnnouncementsAdminViewManagementToolbarDisplayContext announcementsAdminViewMana
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <aui:script>
-	var deleteEntries = function() {
+	var deleteEntries = function () {
 		if (
 			confirm(
 				'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-entries" />'
@@ -185,18 +178,18 @@ AnnouncementsAdminViewManagementToolbarDisplayContext announcementsAdminViewMana
 	};
 
 	var ACTIONS = {
-		deleteEntries: deleteEntries
+		deleteEntries: deleteEntries,
 	};
 
-	Liferay.componentReady('announcementsAdminViewManagementToolbar').then(function(
-		managementToolbar
-	) {
-		managementToolbar.on('actionItemClicked', function(event) {
-			var itemData = event.data.item.data;
+	Liferay.componentReady('announcementsAdminViewManagementToolbar').then(
+		function (managementToolbar) {
+			managementToolbar.on('actionItemClicked', function (event) {
+				var itemData = event.data.item.data;
 
-			if (itemData && itemData.action && ACTIONS[itemData.action]) {
-				ACTIONS[itemData.action]();
-			}
-		});
-	});
+				if (itemData && itemData.action && ACTIONS[itemData.action]) {
+					ACTIONS[itemData.action]();
+				}
+			});
+		}
+	);
 </aui:script>

@@ -2,16 +2,18 @@
 <head>
 <title>Sites</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Sites</td></tr>
 </thead>
+
 <tbody>
 <!--SELECT_SITE_MODAL-->
 <tr>
 	<td>SELECT_SITE_MODAL</td>
-	<td>//div[@id='selectSite' and contains(@class,'iframe-modal')]</td>
+	<td>//div[@id='selectSite' and contains(@class,'liferay-modal')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -21,7 +23,7 @@
 </tr>
 <tr>
 	<td>SELECT_SITE_MODAL_HEADER</td>
-	<td>//h3[@class='modal-title']</td>
+	<td>//div[@class='modal-title']</td>
 	<td></td>
 </tr>
 <!--SITE_TABLE-->

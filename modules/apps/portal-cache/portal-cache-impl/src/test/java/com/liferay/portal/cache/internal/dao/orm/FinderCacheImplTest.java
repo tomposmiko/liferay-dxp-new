@@ -21,13 +21,15 @@ import com.liferay.portal.kernel.cache.key.CacheKeyGenerator;
 import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
-import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.RegistryUtil;
 
@@ -35,27 +37,34 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 
 /**
  * @author Preston Crary
  */
 public class FinderCacheImplTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@BeforeClass
 	public static void setUpClass() {
 		_properties = HashMapBuilder.<String, Object>put(
-			PropsKeys.VALUE_OBJECT_ENTITY_BLOCKING_CACHE, "true"
-		).put(
 			PropsKeys.VALUE_OBJECT_ENTITY_CACHE_ENABLED, "true"
 		).put(
 			PropsKeys.VALUE_OBJECT_FINDER_CACHE_ENABLED, "true"
@@ -83,22 +92,16 @@ public class FinderCacheImplTest {
 	@Before
 	public void setUp() {
 		_finderPath = new FinderPath(
-			true, true, FinderCacheImplTest.class,
-			FinderCacheImplTest.class.getName(), "test",
-			new String[] {String.class.getName()});
+			FinderCacheImplTest.class.getName(), "test", new String[0],
+			new String[0], true);
 	}
 
 	@Test
 	public void testNotifyPortalCacheRemovedPortalCacheName() {
-		FinderCacheImpl finderCacheImpl = new FinderCacheImpl();
-
-		finderCacheImpl.setMultiVMPool(
+		FinderCacheImpl finderCacheImpl = _activateFinderCache(
 			(MultiVMPool)ProxyUtil.newProxyInstance(
 				_classLoader, new Class<?>[] {MultiVMPool.class},
 				new MultiVMPoolInvocationHandler(_classLoader, true)));
-		finderCacheImpl.setProps(PropsTestUtil.setProps(_properties));
-
-		finderCacheImpl.activate();
 
 		PortalCache<Serializable, Serializable> portalCache =
 			ReflectionTestUtil.invoke(
@@ -132,6 +135,32 @@ public class FinderCacheImplTest {
 	}
 
 	@Test
+	public void testPutNonbaseModelList() {
+		FinderPath finderPath = new FinderPath(
+			FinderCacheImplTest.class.getName(), "test-nonbase-model",
+			new String[0], new String[0], false);
+
+		FinderCache finderCache = _activateFinderCache(
+			_notSerializedMultiVMPool);
+
+		// Empty list
+
+		finderCache.putResult(finderPath, _KEY1, Collections.emptyList(), true);
+
+		Assert.assertSame(
+			Collections.emptyList(),
+			finderCache.getResult(finderPath, _KEY1, null));
+
+		// Not empty list
+
+		List<Long> list = Collections.singletonList(1L);
+
+		finderCache.putResult(finderPath, _KEY1, list, true);
+
+		Assert.assertSame(list, finderCache.getResult(finderPath, _KEY1, null));
+	}
+
+	@Test
 	public void testTestKeysCollide() {
 		Assert.assertEquals(
 			_cacheKeyGenerator.getCacheKey(_KEY1),
@@ -146,21 +175,26 @@ public class FinderCacheImplTest {
 		FinderCache finderCache = _activateFinderCache(
 			_notSerializedMultiVMPool);
 
-		List<Serializable> values = new ArrayList<>();
+		Map<Serializable, TestBaseModel> map =
+			HashMapBuilder.<Serializable, TestBaseModel>put(
+				"a", new TestBaseModel("a")
+			).put(
+				"b", new TestBaseModel("b")
+			).build();
 
-		values.add("a");
-		values.add("b");
+		List<TestBaseModel> values = new ArrayList<>(map.values());
 
 		finderCache.putResult(_finderPath, _KEY1, values, true);
 
 		Object result = finderCache.getResult(
-			_finderPath, _KEY1, new TestBasePersistence(new HashSet<>(values)));
+			_finderPath, _KEY1, new TestBasePersistence(map));
 
 		Assert.assertEquals(values, result);
 
-		values.add("c");
+		map.put("c", new TestBaseModel("c"));
 
-		finderCache.putResult(_finderPath, _KEY1, values, true);
+		finderCache.putResult(
+			_finderPath, _KEY1, new ArrayList<>(map.values()), true);
 
 		result = finderCache.getResult(
 			_finderPath, _KEY1, new TestBasePersistence(null));
@@ -168,20 +202,25 @@ public class FinderCacheImplTest {
 		Assert.assertNull(result);
 	}
 
-	private FinderCache _activateFinderCache(MultiVMPool multiVMPool) {
+	private FinderCacheImpl _activateFinderCache(MultiVMPool multiVMPool) {
 		FinderCacheImpl finderCacheImpl = new FinderCacheImpl();
 
-		EntityCacheImpl entityCacheImpl = new EntityCacheImpl();
+		ReflectionTestUtil.setFieldValue(
+			finderCacheImpl, "_multiVMPool", multiVMPool);
+		ReflectionTestUtil.setFieldValue(
+			finderCacheImpl, "_props", PropsTestUtil.setProps(_properties));
 
-		entityCacheImpl.setMultiVMPool(multiVMPool);
+		finderCacheImpl.activate(
+			(BundleContext)ProxyUtil.newProxyInstance(
+				BundleContext.class.getClassLoader(),
+				new Class<?>[] {BundleContext.class},
+				(proxy, method, args) -> {
+					if (Objects.equals("createFilter", method.getName())) {
+						return ProxyFactory.newDummyInstance(Filter.class);
+					}
 
-		finderCacheImpl.setEntityCache(entityCacheImpl);
-
-		finderCacheImpl.setMultiVMPool(multiVMPool);
-
-		finderCacheImpl.setProps(PropsTestUtil.setProps(_properties));
-
-		finderCacheImpl.activate();
+					return null;
+				}));
 
 		return finderCacheImpl;
 	}
@@ -192,9 +231,7 @@ public class FinderCacheImplTest {
 		finderCache.putResult(
 			_finderPath, _KEY1, Collections.emptyList(), true);
 
-		Object result = finderCache.getResult(_finderPath, _KEY2, null);
-
-		Assert.assertNull(result);
+		Assert.assertNull(finderCache.getResult(_finderPath, _KEY2, null));
 	}
 
 	private void _assertPutEmptyListValid(MultiVMPool multiVMPool) {
@@ -203,9 +240,9 @@ public class FinderCacheImplTest {
 		finderCache.putResult(
 			_finderPath, _KEY1, Collections.emptyList(), true);
 
-		Object result = finderCache.getResult(_finderPath, _KEY1, null);
-
-		Assert.assertSame(Collections.emptyList(), result);
+		Assert.assertSame(
+			Collections.emptyList(),
+			finderCache.getResult(_finderPath, _KEY1, null));
 	}
 
 	private static final String[] _KEY1 = {"home"};
@@ -222,30 +259,84 @@ public class FinderCacheImplTest {
 
 	private FinderPath _finderPath;
 
-	private static class TestBasePersistence<T extends BaseModel<T>>
-		extends BasePersistenceImpl<T> {
+	private static class TestBaseModel extends BaseModelImpl<TestBaseModel> {
 
 		@Override
-		public Map<Serializable, T> fetchByPrimaryKeys(
+		public Object clone() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int compareTo(TestBaseModel testBaseModel) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Class<?> getModelClass() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getModelClassName() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Serializable getPrimaryKeyObj() {
+			return _primaryKey;
+		}
+
+		@Override
+		public boolean isEntityCacheEnabled() {
+			return true;
+		}
+
+		@Override
+		public boolean isFinderCacheEnabled() {
+			return true;
+		}
+
+		@Override
+		public void setPrimaryKeyObj(Serializable primaryKeyObj) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String toXmlString() {
+			throw new UnsupportedOperationException();
+		}
+
+		private TestBaseModel(Serializable primaryKey) {
+			_primaryKey = primaryKey;
+		}
+
+		private final Serializable _primaryKey;
+
+	}
+
+	private static class TestBasePersistence
+		extends BasePersistenceImpl<TestBaseModel> {
+
+		@Override
+		public TestBaseModel fetchByPrimaryKey(Serializable serializable) {
+			return _map.get(serializable);
+		}
+
+		@Override
+		public Map<Serializable, TestBaseModel> fetchByPrimaryKeys(
 			Set<Serializable> primaryKeys) {
 
-			Assert.assertNotNull(_keys);
-			Assert.assertEquals(_keys, primaryKeys);
+			Assert.assertNotNull(_map);
+			Assert.assertEquals(_map.keySet(), primaryKeys);
 
-			Map map = new HashMap();
-
-			for (Object key : _keys) {
-				map.put(key, key);
-			}
-
-			return map;
+			return _map;
 		}
 
-		private TestBasePersistence(Set<?> keys) {
-			_keys = keys;
+		private TestBasePersistence(Map<Serializable, TestBaseModel> map) {
+			_map = map;
 		}
 
-		private final Set<?> _keys;
+		private final Map<Serializable, TestBaseModel> _map;
 
 	}
 

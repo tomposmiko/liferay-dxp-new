@@ -30,9 +30,9 @@ RuleGroupSearch ruleGroupSearch = new RuleGroupSearch(liferayPortletRequest, Por
 
 RuleGroupSearchTerms searchTerms = (RuleGroupSearchTerms)ruleGroupSearch.getSearchTerms();
 
-LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
-
-params.put("includeGlobalScope", Boolean.TRUE);
+LinkedHashMap<String, Object> params = LinkedHashMapBuilder.<String, Object>put(
+	"includeGlobalScope", Boolean.TRUE
+).build();
 
 int mdrRuleGroupsCount = MDRRuleGroupLocalServiceUtil.searchByKeywordsCount(groupId, searchTerms.getKeywords(), params, searchTerms.isAndOperator());
 
@@ -48,15 +48,10 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 	includeCheckBox="<%= true %>"
 	searchContainerId="deviceFamilies"
 >
-
-	<%
-	PortletURL displayStyleURL = PortletURLUtil.clone(portletURL, renderResponse);
-	%>
-
 	<liferay-frontend:management-bar-buttons>
 		<liferay-frontend:management-bar-display-buttons
 			displayViews='<%= new String[] {"icon", "descriptive", "list"} %>'
-			portletURL="<%= displayStyleURL %>"
+			portletURL="<%= PortletURLUtil.clone(portletURL, renderResponse) %>"
 			selectedDisplayStyle="<%= displayStyle %>"
 		/>
 
@@ -107,7 +102,7 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 
 		<c:if test="<%= (mdrRuleGroupsCount > 0) || searchTerms.isSearch() %>">
 			<li>
-				<aui:form action="<%= portletURL.toString() %>" name="searchFm">
+				<aui:form action="<%= portletURL %>" name="searchFm">
 					<liferay-ui:input-search
 						markupView="lexicon"
 					/>
@@ -151,20 +146,20 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 			Group group = GroupLocalServiceUtil.getGroup(ruleGroup.getGroupId());
 
 			String rowHREF = null;
-
-			if (MDRRuleGroupPermission.contains(permissionChecker, ruleGroup.getRuleGroupId(), ActionKeys.VIEW) && MDRPermission.contains(permissionChecker, groupId, ActionKeys.ADD_RULE_GROUP)) {
 			%>
 
+			<c:if test="<%= MDRRuleGroupPermission.contains(permissionChecker, ruleGroup.getRuleGroupId(), ActionKeys.VIEW) && MDRPermission.contains(permissionChecker, groupId, ActionKeys.ADD_RULE_GROUP) %>">
 				<portlet:renderURL var="editRulesURL">
 					<portlet:param name="mvcPath" value="/view_rules.jsp" />
 					<portlet:param name="ruleGroupId" value="<%= String.valueOf(ruleGroup.getRuleGroupId()) %>" />
 					<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 				</portlet:renderURL>
 
-			<%
+				<%
 				rowHREF = editRulesURL;
-			}
-			%>
+				%>
+
+			</c:if>
 
 			<c:choose>
 				<c:when test='<%= displayStyle.equals("descriptive") %>'>
@@ -234,7 +229,7 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 </aui:form>
 
 <script>
-	(function() {
+	(function () {
 		var deleteSelectedDeviceFamiliesButton = document.getElementById(
 			'<portlet:namespace />deleteSelectedDeviceFamilies'
 		);
@@ -242,7 +237,7 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 		if (deleteSelectedDeviceFamiliesButton) {
 			deleteSelectedDeviceFamiliesButton.addEventListener(
 				'click',
-				function() {
+				function () {
 					if (
 						confirm(
 							'<%= UnicodeLanguageUtil.get(resourceBundle, "are-you-sure-you-want-to-delete-this") %>'

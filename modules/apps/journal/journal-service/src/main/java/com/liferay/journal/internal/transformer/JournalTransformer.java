@@ -21,9 +21,9 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
+import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
-import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.templateparser.TemplateNode;
@@ -236,45 +235,34 @@ public class JournalTransformer {
 			Template template = getTemplate(
 				templateId, tokens, languageId, document, script, langType);
 
+			PortletRequest originalPortletRequest = null;
+			PortletResponse originalPortletResponse = null;
+
+			HttpServletRequest httpServletRequest = null;
+
 			if ((themeDisplay != null) && (themeDisplay.getRequest() != null)) {
-				PortletRequest originalPortletRequest = null;
-				PortletResponse originalPortletResponse = null;
+				httpServletRequest = themeDisplay.getRequest();
 
-				HttpServletRequest httpServletRequest =
-					themeDisplay.getRequest();
+				if (portletRequestModel != null) {
+					originalPortletRequest =
+						(PortletRequest)httpServletRequest.getAttribute(
+							JavaConstants.JAVAX_PORTLET_REQUEST);
+					originalPortletResponse =
+						(PortletResponse)httpServletRequest.getAttribute(
+							JavaConstants.JAVAX_PORTLET_RESPONSE);
 
-				try {
-					if (portletRequestModel != null) {
-						originalPortletRequest =
-							(PortletRequest)httpServletRequest.getAttribute(
-								JavaConstants.JAVAX_PORTLET_REQUEST);
-						originalPortletResponse =
-							(PortletResponse)httpServletRequest.getAttribute(
-								JavaConstants.JAVAX_PORTLET_RESPONSE);
-
-						httpServletRequest.setAttribute(
-							JavaConstants.JAVAX_PORTLET_REQUEST,
-							portletRequestModel.getPortletRequest());
-						httpServletRequest.setAttribute(
-							JavaConstants.JAVAX_PORTLET_RESPONSE,
-							portletRequestModel.getPortletResponse());
-						httpServletRequest.setAttribute(
-							PortletRequest.LIFECYCLE_PHASE,
-							portletRequestModel.getLifecycle());
-					}
-
-					template.prepare(httpServletRequest);
+					httpServletRequest.setAttribute(
+						JavaConstants.JAVAX_PORTLET_REQUEST,
+						portletRequestModel.getPortletRequest());
+					httpServletRequest.setAttribute(
+						JavaConstants.JAVAX_PORTLET_RESPONSE,
+						portletRequestModel.getPortletResponse());
+					httpServletRequest.setAttribute(
+						PortletRequest.LIFECYCLE_PHASE,
+						portletRequestModel.getLifecycle());
 				}
-				finally {
-					if (portletRequestModel != null) {
-						httpServletRequest.setAttribute(
-							JavaConstants.JAVAX_PORTLET_REQUEST,
-							originalPortletRequest);
-						httpServletRequest.setAttribute(
-							JavaConstants.JAVAX_PORTLET_RESPONSE,
-							originalPortletResponse);
-					}
-				}
+
+				template.prepare(httpServletRequest);
 			}
 
 			if (contextObjects != null) {
@@ -326,10 +314,11 @@ public class JournalTransformer {
 				}
 
 				template.put("articleGroupId", articleGroupId);
+				template.put("articleLocale", locale);
 				template.put("company", getCompany(themeDisplay, companyId));
 				template.put("companyId", companyId);
 				template.put("device", getDevice(themeDisplay));
-				template.put("locale", locale);
+				template.put("locale", getLocale(themeDisplay, locale));
 				template.put(
 					"permissionChecker",
 					PermissionThreadLocal.getPermissionChecker());
@@ -347,17 +336,8 @@ public class JournalTransformer {
 				template.put("viewMode", viewMode);
 
 				if (themeDisplay != null) {
-					TemplateManager templateManager =
-						TemplateManagerUtil.getTemplateManager(langType);
-
-					HttpServletRequest httpServletRequest =
-						themeDisplay.getRequest();
-
-					templateManager.addTaglibSupport(
-						template, httpServletRequest,
-						themeDisplay.getResponse());
-					templateManager.addTaglibTheme(
-						template, "taglibLiferay", httpServletRequest,
+					template.prepareTaglib(
+						themeDisplay.getRequest(),
 						new PipingServletResponse(
 							themeDisplay.getResponse(), unsyncStringWriter));
 				}
@@ -391,6 +371,18 @@ public class JournalTransformer {
 				else {
 					throw new TransformException(
 						"Unhandled exception", exception);
+				}
+			}
+			finally {
+				if ((httpServletRequest != null) &&
+					(portletRequestModel != null)) {
+
+					httpServletRequest.setAttribute(
+						JavaConstants.JAVAX_PORTLET_REQUEST,
+						originalPortletRequest);
+					httpServletRequest.setAttribute(
+						JavaConstants.JAVAX_PORTLET_RESPONSE,
+						originalPortletResponse);
 				}
 			}
 
@@ -473,6 +465,16 @@ public class JournalTransformer {
 		}
 
 		return null;
+	}
+
+	protected Locale getLocale(ThemeDisplay themeDisplay, Locale locale)
+		throws Exception {
+
+		if (themeDisplay != null) {
+			return themeDisplay.getLocale();
+		}
+
+		return locale;
 	}
 
 	protected Template getTemplate(
@@ -578,10 +580,10 @@ public class JournalTransformer {
 				JSONObject dataJSONObject = JSONFactoryUtil.createJSONObject(
 					data);
 
-				Iterator<String> itr = dataJSONObject.keys();
+				Iterator<String> iterator = dataJSONObject.keys();
 
-				while (itr.hasNext()) {
-					String key = itr.next();
+				while (iterator.hasNext()) {
+					String key = iterator.next();
 
 					String value = dataJSONObject.getString(key);
 

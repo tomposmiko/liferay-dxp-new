@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.test.util.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFeed;
@@ -29,6 +30,7 @@ import com.liferay.journal.service.JournalFeedLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.StagedModel;
@@ -38,21 +40,19 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.test.log.CaptureAppender;
-import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -96,33 +96,32 @@ public class JournalFeedStagedModelDataHandlerTest
 
 		serviceContext.setCompanyId(TestPropsValues.getCompanyId());
 
-		PortalPreferences portalPreferenceces =
+		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(
 				TestPropsValues.getUserId(), true);
 
 		_originalPortalPreferencesXML = PortletPreferencesFactoryUtil.toXML(
-			portalPreferenceces);
+			portalPreferences);
 
-		portalPreferenceces.setValue(
-			"", "publishToLiveByDefaultEnabled", "true");
-		portalPreferenceces.setValue(
+		portalPreferences.setValue("", "publishToLiveByDefaultEnabled", "true");
+		portalPreferences.setValue(
 			"", "versionHistoryByDefaultEnabled", "true");
-		portalPreferenceces.setValue("", "articleCommentsEnabled", "true");
-		portalPreferenceces.setValue(
+		portalPreferences.setValue("", "articleCommentsEnabled", "true");
+		portalPreferences.setValue(
 			"", "expireAllArticleVersionsEnabled", "true");
-		portalPreferenceces.setValue("", "folderIconCheckCountEnabled", "true");
-		portalPreferenceces.setValue(
+		portalPreferences.setValue("", "folderIconCheckCountEnabled", "true");
+		portalPreferences.setValue(
 			"", "indexAllArticleVersionsEnabled", "true");
-		portalPreferenceces.setValue(
+		portalPreferences.setValue(
 			"", "databaseContentKeywordSearchEnabled", "true");
-		portalPreferenceces.setValue("", "journalArticleStorageType", "json");
-		portalPreferenceces.setValue(
+		portalPreferences.setValue("", "journalArticleStorageType", "json");
+		portalPreferences.setValue(
 			"", "journalArticlePageBreakToken", "@page_break@");
 
 		PortalPreferencesLocalServiceUtil.updatePreferences(
 			TestPropsValues.getCompanyId(),
 			PortletKeys.PREFS_OWNER_TYPE_COMPANY,
-			PortletPreferencesFactoryUtil.toXML(portalPreferenceces));
+			PortletPreferencesFactoryUtil.toXML(portalPreferences));
 	}
 
 	@After
@@ -139,30 +138,29 @@ public class JournalFeedStagedModelDataHandlerTest
 	@Override
 	@Test
 	public void testCleanStagedModelDataHandler() throws Exception {
-		try (CaptureAppender captureAppender =
-				Log4JLoggerTestUtil.configureLog4JLogger(
-					"com.liferay.journal.internal.exportimport.data.handler." +
-						"JournalFeedStagedModelDataHandler",
-					Level.WARN)) {
+		List<Object> warnMessages = new ArrayList<>();
 
-			super.testCleanStagedModelDataHandler();
+		Log newLog = _getMockWarnLog(warnMessages);
 
-			List<LoggingEvent> loggingEvents =
-				captureAppender.getLoggingEvents();
+		Object oldLog = ReflectionTestUtil.getFieldValue(
+			_journalFeedStagedModelDataHandler, "_log");
 
-			Assert.assertEquals(
-				loggingEvents.toString(), 1, loggingEvents.size());
+		ReflectionTestUtil.setFieldValue(
+			_journalFeedStagedModelDataHandler, "_log", newLog);
 
-			LoggingEvent loggingEvent = loggingEvents.get(0);
+		super.testCleanStagedModelDataHandler();
 
-			String message = (String)loggingEvent.getMessage();
+		Assert.assertEquals(warnMessages.toString(), 1, warnMessages.size());
 
-			Assert.assertTrue(
-				message, message.startsWith("A feed with the ID "));
-			Assert.assertTrue(
-				message,
-				message.contains(" already exists. The new generated ID is "));
-		}
+		String message = (String)warnMessages.get(0);
+
+		Assert.assertTrue(message, message.startsWith("A feed with the ID "));
+		Assert.assertTrue(
+			message,
+			message.contains(" already exists. The new generated ID is "));
+
+		ReflectionTestUtil.setFieldValue(
+			_journalFeedStagedModelDataHandler, "_log", oldLog);
 	}
 
 	@Test
@@ -204,30 +202,29 @@ public class JournalFeedStagedModelDataHandlerTest
 	@Override
 	@Test
 	public void testStagedModelDataHandler() throws Exception {
-		try (CaptureAppender captureAppender =
-				Log4JLoggerTestUtil.configureLog4JLogger(
-					"com.liferay.journal.internal.exportimport.data.handler." +
-						"JournalFeedStagedModelDataHandler",
-					Level.WARN)) {
+		List<Object> warnMessages = new ArrayList<>();
 
-			super.testStagedModelDataHandler();
+		Log newLog = _getMockWarnLog(warnMessages);
 
-			List<LoggingEvent> loggingEvents =
-				captureAppender.getLoggingEvents();
+		Object oldLog = ReflectionTestUtil.getFieldValue(
+			_journalFeedStagedModelDataHandler, "_log");
 
-			Assert.assertEquals(
-				loggingEvents.toString(), 1, loggingEvents.size());
+		ReflectionTestUtil.setFieldValue(
+			_journalFeedStagedModelDataHandler, "_log", newLog);
 
-			LoggingEvent loggingEvent = loggingEvents.get(0);
+		super.testStagedModelDataHandler();
 
-			String message = (String)loggingEvent.getMessage();
+		Assert.assertEquals(warnMessages.toString(), 1, warnMessages.size());
 
-			Assert.assertTrue(
-				message, message.startsWith("A feed with the ID "));
-			Assert.assertTrue(
-				message,
-				message.contains(" already exists. The new generated ID is "));
-		}
+		String message = (String)warnMessages.get(0);
+
+		Assert.assertTrue(message, message.startsWith("A feed with the ID "));
+		Assert.assertTrue(
+			message,
+			message.contains(" already exists. The new generated ID is "));
+
+		ReflectionTestUtil.setFieldValue(
+			_journalFeedStagedModelDataHandler, "_log", oldLog);
 	}
 
 	@Override
@@ -351,6 +348,124 @@ public class JournalFeedStagedModelDataHandlerTest
 		Assert.assertEquals(
 			feed.getContentField(), importedFeed.getContentField());
 	}
+
+	private Log _getMockWarnLog(List<Object> warnMessages) {
+		return new Log() {
+
+			@Override
+			public void debug(Object msg) {
+			}
+
+			@Override
+			public void debug(Object msg, Throwable throwable) {
+			}
+
+			@Override
+			public void debug(Throwable throwable) {
+			}
+
+			@Override
+			public void error(Object msg) {
+			}
+
+			@Override
+			public void error(Object msg, Throwable throwable) {
+			}
+
+			@Override
+			public void error(Throwable throwable) {
+			}
+
+			@Override
+			public void fatal(Object msg) {
+			}
+
+			@Override
+			public void fatal(Object msg, Throwable throwable) {
+			}
+
+			@Override
+			public void fatal(Throwable throwable) {
+			}
+
+			@Override
+			public void info(Object msg) {
+			}
+
+			@Override
+			public void info(Object msg, Throwable throwable) {
+			}
+
+			@Override
+			public void info(Throwable throwable) {
+			}
+
+			@Override
+			public boolean isDebugEnabled() {
+				return false;
+			}
+
+			@Override
+			public boolean isErrorEnabled() {
+				return false;
+			}
+
+			@Override
+			public boolean isFatalEnabled() {
+				return false;
+			}
+
+			@Override
+			public boolean isInfoEnabled() {
+				return false;
+			}
+
+			@Override
+			public boolean isTraceEnabled() {
+				return false;
+			}
+
+			@Override
+			public boolean isWarnEnabled() {
+				return true;
+			}
+
+			@Override
+			public void setLogWrapperClassName(String className) {
+			}
+
+			@Override
+			public void trace(Object msg) {
+			}
+
+			@Override
+			public void trace(Object msg, Throwable throwable) {
+			}
+
+			@Override
+			public void trace(Throwable throwable) {
+			}
+
+			@Override
+			public void warn(Object msg) {
+				warnMessages.add(msg);
+			}
+
+			@Override
+			public void warn(Object msg, Throwable throwable) {
+				warnMessages.add(msg);
+			}
+
+			@Override
+			public void warn(Throwable throwable) {
+			}
+
+		};
+	}
+
+	@Inject(filter = "component.name=*JournalFeedStagedModelDataHandler")
+	private StagedModelDataHandler<JournalFeed>
+		_journalFeedStagedModelDataHandler;
 
 	private Layout _layout;
 	private String _originalPortalPreferencesXML;

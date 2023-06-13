@@ -40,12 +40,14 @@ import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.model.PortletDecorator;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
@@ -102,12 +104,12 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 
 				convertedLayoutPlids.add(layout.getPlid());
 			}
-			catch (Throwable t) {
+			catch (Throwable throwable) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						String.format(
 							"Layout with PLID %s cannot be converted", plid),
-						t);
+						throwable);
 				}
 			}
 		}
@@ -188,11 +190,11 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 
 			actionableDynamicQuery.setPerformActionMethod(
 				(Layout layout) -> {
-					UnicodeProperties typeSettingsProperties =
+					UnicodeProperties typeSettingsUnicodeProperties =
 						layout.getTypeSettingsProperties();
 
 					String layoutTemplateId =
-						typeSettingsProperties.getProperty(
+						typeSettingsUnicodeProperties.getProperty(
 							LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID);
 
 					if (layoutTemplateId != null) {
@@ -255,7 +257,12 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 		);
 
 		serviceContext.setScopeGroupId(layout.getGroupId());
-		serviceContext.setUserId(layout.getUserId());
+
+		User user = _userLocalService.fetchUser(layout.getUserId());
+
+		if (user != null) {
+			serviceContext.setUserId(user.getUserId());
+		}
 
 		try {
 			ServiceContextThreadLocal.pushServiceContext(serviceContext);
@@ -313,10 +320,10 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 			Layout layout, Locale locale)
 		throws LayoutConvertException {
 
-		UnicodeProperties typeSettingsProperties =
+		UnicodeProperties typeSettingsUnicodeProperties =
 			layout.getTypeSettingsProperties();
 
-		String layoutTemplateId = typeSettingsProperties.getProperty(
+		String layoutTemplateId = typeSettingsUnicodeProperties.getProperty(
 			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID);
 
 		if (Validator.isNull(layoutTemplateId)) {
@@ -349,19 +356,26 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 			throw new PortalException(sb.toString());
 		}
 
-		Layout draftLayout = _layoutLocalService.fetchLayout(
-			_portal.getClassNameId(Layout.class), layout.getPlid());
+		Layout draftLayout = layout.fetchDraftLayout();
+
+		long userId = serviceContext.getUserId();
+
+		User user = _userLocalService.fetchUser(layout.getUserId());
+
+		if (user != null) {
+			userId = user.getUserId();
+		}
 
 		if (draftLayout == null) {
 			draftLayout = _layoutLocalService.addLayout(
-				layout.getUserId(), layout.getGroupId(),
-				layout.isPrivateLayout(), layout.getParentLayoutId(),
+				userId, layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getParentLayoutId(),
 				_classNameLocalService.getClassNameId(Layout.class),
 				layout.getPlid(), layout.getNameMap(), layout.getTitleMap(),
 				layout.getDescriptionMap(), layout.getKeywordsMap(),
 				layout.getRobotsMap(), layout.getType(),
 				layout.getTypeSettings(), true, true, Collections.emptyMap(),
-				serviceContext);
+				layout.getMasterLayoutPlid(), serviceContext);
 		}
 
 		try {
@@ -444,6 +458,9 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 
 	@Reference
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 	private class ConvertLayoutCallable implements Callable<Layout> {
 

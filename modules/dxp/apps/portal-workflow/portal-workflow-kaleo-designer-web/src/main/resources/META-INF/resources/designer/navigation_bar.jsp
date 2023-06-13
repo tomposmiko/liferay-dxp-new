@@ -26,7 +26,7 @@
 	</aui:nav>
 
 	<aui:nav-bar-search>
-		<aui:form action="<%= searchURL.toString() %>" name="searchFm">
+		<aui:form action="<%= searchURL %>" name="searchFm">
 			<liferay-util:include page="/designer/kaleo_definition_search.jsp" servletContext="<%= application %>" />
 		</aui:form>
 	</aui:nav-bar-search>

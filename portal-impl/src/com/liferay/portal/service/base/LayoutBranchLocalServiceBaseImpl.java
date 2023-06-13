@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service.base;
 
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -34,7 +35,9 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.LayoutBranchLocalService;
+import com.liferay.portal.kernel.service.LayoutBranchLocalServiceUtil;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutBranchPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutRevisionPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutSetBranchPersistence;
@@ -46,6 +49,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -69,11 +74,15 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>LayoutBranchLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.LayoutBranchLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>LayoutBranchLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>LayoutBranchLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the layout branch to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutBranchLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutBranch the layout branch
 	 * @return the layout branch that was added
@@ -101,6 +110,10 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 	/**
 	 * Deletes the layout branch with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutBranchLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutBranchId the primary key of the layout branch
 	 * @return the layout branch that was removed
 	 * @throws PortalException if a layout branch with the primary key could not be found
@@ -116,6 +129,10 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 	/**
 	 * Deletes the layout branch from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutBranchLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutBranch the layout branch
 	 * @return the layout branch that was removed
 	 */
@@ -123,6 +140,18 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 	@Override
 	public LayoutBranch deleteLayoutBranch(LayoutBranch layoutBranch) {
 		return layoutBranchPersistence.remove(layoutBranch);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return layoutBranchPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -276,6 +305,16 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return layoutBranchPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -284,6 +323,13 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 			(LayoutBranch)persistedModel);
 	}
 
+	public BasePersistence<LayoutBranch> getBasePersistence() {
+		return layoutBranchPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -292,15 +338,15 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns a range of all the layout branchs.
+	 * Returns a range of all the layout branches.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutBranchModelImpl</code>.
 	 * </p>
 	 *
-	 * @param start the lower bound of the range of layout branchs
-	 * @param end the upper bound of the range of layout branchs (not inclusive)
-	 * @return the range of layout branchs
+	 * @param start the lower bound of the range of layout branches
+	 * @param end the upper bound of the range of layout branches (not inclusive)
+	 * @return the range of layout branches
 	 */
 	@Override
 	public List<LayoutBranch> getLayoutBranchs(int start, int end) {
@@ -308,9 +354,9 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of layout branchs.
+	 * Returns the number of layout branches.
 	 *
-	 * @return the number of layout branchs
+	 * @return the number of layout branches
 	 */
 	@Override
 	public int getLayoutBranchsCount() {
@@ -319,6 +365,10 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 
 	/**
 	 * Updates the layout branch in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutBranchLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutBranch the layout branch
 	 * @return the layout branch that was updated
@@ -606,11 +656,15 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.LayoutBranch",
 			layoutBranchLocalService);
+
+		_setLocalServiceUtilService(layoutBranchLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.LayoutBranch");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -652,6 +706,22 @@ public abstract class LayoutBranchLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		LayoutBranchLocalService layoutBranchLocalService) {
+
+		try {
+			Field field = LayoutBranchLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutBranchLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

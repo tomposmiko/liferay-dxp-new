@@ -77,7 +77,7 @@ public interface AssetPublisherHelper {
 			PortletPreferences portletPreferences,
 			PermissionChecker permissionChecker, long[] groupIds,
 			boolean deleteMissingAssetEntries, boolean checkPermission,
-			boolean includeNonVisibleAssets)
+			boolean includeNonvisibleAssets)
 		throws Exception;
 
 	public List<AssetEntry> getAssetEntries(
@@ -85,7 +85,7 @@ public interface AssetPublisherHelper {
 			PortletPreferences portletPreferences,
 			PermissionChecker permissionChecker, long[] groupIds,
 			boolean deleteMissingAssetEntries, boolean checkPermission,
-			boolean includeNonVisibleAssets, int type)
+			boolean includeNonvisibleAssets, int type)
 		throws Exception;
 
 	public List<AssetEntry> getAssetEntries(
@@ -109,12 +109,17 @@ public interface AssetPublisherHelper {
 		throws PortalException;
 
 	public List<AssetEntryResult> getAssetEntryResults(
-			SearchContainer searchContainer, AssetEntryQuery assetEntryQuery,
-			Layout layout, PortletPreferences portletPreferences,
-			String portletName, Locale locale, TimeZone timeZone,
-			long companyId, long scopeGroupId, long userId, long[] classNameIds,
+			SearchContainer<AssetEntry> searchContainer,
+			AssetEntryQuery assetEntryQuery, Layout layout,
+			PortletPreferences portletPreferences, String portletName,
+			Locale locale, TimeZone timeZone, long companyId, long scopeGroupId,
+			long userId, long[] classNameIds,
 			Map<String, Serializable> attributes)
 		throws Exception;
+
+	public String getAssetSocialURL(
+		LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse, AssetEntry assetEntry);
 
 	public String[] getAssetTagNames(PortletPreferences portletPreferences);
 

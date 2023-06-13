@@ -16,7 +16,6 @@ package com.liferay.journal.internal.transformer;
 
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.templateparser.BaseTransformerListener;
@@ -69,13 +68,10 @@ public class ViewCounterTransformerListener extends BaseTransformerListener {
 		sb.append(articleResourcePK);
 		sb.append("});</script>");
 
-		s = StringUtil.replace(s, _COUNTER_TOKEN, sb.toString());
-
-		return s;
+		return StringUtil.replace(s, _COUNTER_TOKEN, sb.toString());
 	}
 
-	private static final String _COUNTER_TOKEN =
-		StringPool.AT + "view_counter" + StringPool.AT;
+	private static final String _COUNTER_TOKEN = "@view_counter@";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ViewCounterTransformerListener.class);

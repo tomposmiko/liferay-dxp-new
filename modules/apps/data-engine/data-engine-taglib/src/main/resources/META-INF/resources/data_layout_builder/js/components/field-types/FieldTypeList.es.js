@@ -12,21 +12,38 @@
  * details.
  */
 
+import classNames from 'classnames';
 import React from 'react';
 
+import CollapsablePanel from '../collapsable-panel/CollapsablePanel.es';
+import EmptyState from '../empty-state/EmptyState.es';
 import FieldType from './FieldType.es';
+
+const FieldTypeWrapper = ({expanded, fieldType, showArrows, ...otherProps}) => {
+	const getIcon = () => {
+		if (showArrows) {
+			return expanded ? 'angle-down' : 'angle-right';
+		}
+
+		return fieldType.icon;
+	};
+
+	return <FieldType {...otherProps} {...fieldType} icon={getIcon()} />;
+};
 
 export default ({
 	deleteLabel,
+	emptyState,
 	fieldTypes,
 	keywords,
 	onClick,
 	onDelete,
-	onDoubleClick
+	onDoubleClick,
+	showEmptyState = true,
 }) => {
 	const regex = new RegExp(keywords, 'ig');
 
-	return fieldTypes
+	const filteredFieldTypes = fieldTypes
 		.filter(({system}) => !system)
 		.filter(({description, label}) => {
 			if (!keywords) {
@@ -34,15 +51,81 @@ export default ({
 			}
 
 			return regex.test(description) || regex.test(label);
-		})
-		.map((fieldType, index) => (
-			<FieldType
-				{...fieldType}
+		});
+
+	if (showEmptyState && !filteredFieldTypes.length) {
+		return <EmptyState emptyState={emptyState} keywords={keywords} small />;
+	}
+
+	return filteredFieldTypes.map((fieldType, index) => {
+		const {isFieldSet, nestedDataDefinitionFields = []} = fieldType;
+
+		const handleOnClick = (props) => {
+			if (fieldType.disabled || !onClick) {
+				return;
+			}
+
+			onClick(props);
+		};
+
+		if (nestedDataDefinitionFields.length) {
+			const Header = ({expanded, setExpanded}) => (
+				<FieldTypeWrapper
+					deleteLabel={deleteLabel}
+					expanded={expanded}
+					fieldType={{
+						...fieldType,
+						className: `${fieldType.className} field-type-header`,
+					}}
+					onClick={(props) => {
+						setExpanded(!expanded);
+
+						handleOnClick(props);
+					}}
+					onDelete={onDelete}
+					onDoubleClick={onDoubleClick}
+					setExpanded={setExpanded}
+					showArrows
+				/>
+			);
+
+			return (
+				<div className="field-type-list" key={index}>
+					<CollapsablePanel
+						Header={Header}
+						className={classNames({
+							'field-type-fieldgroup': !isFieldSet,
+							'field-type-fieldset': isFieldSet,
+						})}
+					>
+						<div className="field-type-item position-relative">
+							{nestedDataDefinitionFields.map(
+								(nestedFieldType) => (
+									<FieldTypeWrapper
+										draggable={false}
+										fieldType={{
+											...nestedFieldType,
+											disabled: fieldType.disabled,
+										}}
+										key={`${nestedFieldType.name}_${index}`}
+									/>
+								)
+							)}
+						</div>
+					</CollapsablePanel>
+				</div>
+			);
+		}
+
+		return (
+			<FieldTypeWrapper
 				deleteLabel={deleteLabel}
-				key={`${fieldType.name}_${index}`}
-				onClick={onClick}
+				fieldType={fieldType}
+				key={index}
+				onClick={handleOnClick}
 				onDelete={onDelete}
 				onDoubleClick={onDoubleClick}
 			/>
-		));
+		);
+	});
 };

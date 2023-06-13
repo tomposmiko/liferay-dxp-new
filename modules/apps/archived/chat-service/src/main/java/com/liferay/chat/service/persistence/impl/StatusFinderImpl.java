@@ -64,18 +64,19 @@ public class StatusFinderImpl
 
 			String sql = _customSQL.get(getClass(), FIND_BY_MODIFIED_DATE);
 
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			addScalars(q);
+			addScalars(sqlQuery);
 
-			QueryPos qPos = QueryPos.getInstance(q);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(_classNameLocalService.getClassNameId(User.class));
-			qPos.add(companyId);
-			qPos.add(userId);
-			qPos.add(modifiedDate);
+			queryPos.add(_classNameLocalService.getClassNameId(User.class));
+			queryPos.add(companyId);
+			queryPos.add(userId);
+			queryPos.add(modifiedDate);
 
-			return toObjectArray(QueryUtil.list(q, getDialect(), start, end));
+			return toObjectArray(
+				QueryUtil.list(sqlQuery, getDialect(), start, end));
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -96,24 +97,25 @@ public class StatusFinderImpl
 
 			String sql = getFindBySocialRelationTypes_SQL(types);
 
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			addScalars(q);
+			addScalars(sqlQuery);
 
-			QueryPos qPos = QueryPos.getInstance(q);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(_classNameLocalService.getClassNameId(User.class));
-			qPos.add(userId);
+			queryPos.add(_classNameLocalService.getClassNameId(User.class));
+			queryPos.add(userId);
 
 			if (types.length > 0) {
-				qPos.add(types);
+				queryPos.add(types);
 			}
 
-			qPos.add(CompanyThreadLocal.getCompanyId());
-			qPos.add(userId);
-			qPos.add(modifiedDate);
+			queryPos.add(CompanyThreadLocal.getCompanyId());
+			queryPos.add(userId);
+			queryPos.add(modifiedDate);
 
-			return toObjectArray(QueryUtil.list(q, getDialect(), start, end));
+			return toObjectArray(
+				QueryUtil.list(sqlQuery, getDialect(), start, end));
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -135,24 +137,25 @@ public class StatusFinderImpl
 
 			String sql = getFindByUsersGroups_SQL(groupNames);
 
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			addScalars(q);
+			addScalars(sqlQuery);
 
-			QueryPos qPos = QueryPos.getInstance(q);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(_classNameLocalService.getClassNameId(User.class));
-			qPos.add(CompanyThreadLocal.getCompanyId());
-			qPos.add(userId);
-			qPos.add(userId);
+			queryPos.add(_classNameLocalService.getClassNameId(User.class));
+			queryPos.add(CompanyThreadLocal.getCompanyId());
+			queryPos.add(userId);
+			queryPos.add(userId);
 
 			if (groupNames.length > 0) {
-				qPos.add(groupNames);
+				queryPos.add(groupNames);
 			}
 
-			qPos.add(modifiedDate);
+			queryPos.add(modifiedDate);
 
-			return toObjectArray(QueryUtil.list(q, getDialect(), start, end));
+			return toObjectArray(
+				QueryUtil.list(sqlQuery, getDialect(), start, end));
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -179,11 +182,10 @@ public class StatusFinderImpl
 		String sql = _customSQL.get(getClass(), FIND_BY_SOCIAL_RELATION_TYPES);
 
 		if (types.length == 0) {
-			return StringUtil.replace(
-				sql, "[$SOCIAL_RELATION_TYPES$]", StringPool.BLANK);
+			return StringUtil.removeSubstring(sql, "[$SOCIAL_RELATION_TYPES$]");
 		}
 
-		StringBundler sb = new StringBundler(types.length * 2 - 1);
+		StringBundler sb = new StringBundler((types.length * 2) - 1);
 
 		for (int i = 0; i < types.length; i++) {
 			sb.append(StringPool.QUESTION);
@@ -210,7 +212,7 @@ public class StatusFinderImpl
 				new String[] {StringPool.BLANK, StringPool.BLANK});
 		}
 
-		StringBundler sb = new StringBundler(groupNames.length * 2 - 1);
+		StringBundler sb = new StringBundler((groupNames.length * 2) - 1);
 
 		for (int i = 0; i < groupNames.length; i++) {
 			sb.append(StringPool.QUESTION);

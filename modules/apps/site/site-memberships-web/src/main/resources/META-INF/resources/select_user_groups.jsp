@@ -57,14 +57,14 @@ SelectUserGroupsDisplayContext selectUserGroupsDisplayContext = new SelectUserGr
 		'<portlet:namespace />userGroups'
 	);
 
-	searchContainer.on('rowToggled', function(event) {
+	searchContainer.on('rowToggled', function (event) {
 		var result = {};
 
 		var data = event.elements.allSelectedElements.getDOMNodes();
 
 		if (data.length) {
 			result = {
-				data: data
+				data: data,
 			};
 		}
 

@@ -14,24 +14,25 @@
 
 package com.liferay.layout.taglib.servlet.taglib;
 
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil;
-import com.liferay.layout.page.template.util.LayoutDataConverter;
 import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.layout.util.structure.DropZoneLayoutStructureItem;
+import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.impl.VirtualLayout;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.constants.SegmentsWebKeys;
 import com.liferay.taglib.util.IncludeTag;
@@ -54,6 +55,10 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 		return _groupId;
 	}
 
+	public String getMainItemId() {
+		return _mainItemId;
+	}
+
 	public String getMode() {
 		return _mode;
 	}
@@ -72,6 +77,10 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 
 	public void setGroupId(long groupId) {
 		_groupId = groupId;
+	}
+
+	public void setMainItemId(String mainItemId) {
+		_mainItemId = mainItemId;
 	}
 
 	public void setMode(String mode) {
@@ -97,10 +106,11 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
-		_dataJSONObject = null;
 		_fieldValues = null;
 		_groupId = 0;
-		_mode = null;
+		_layoutStructure = null;
+		_mainItemId = null;
+		_mode = FragmentEntryLinkConstants.VIEW;
 		_plid = 0;
 		_showPreview = false;
 	}
@@ -115,98 +125,81 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 		super.setAttributes(httpServletRequest);
 
 		httpServletRequest.setAttribute(
-			"liferay-layout:render-fragment-layout:dataJSONObject",
-			_getDataJSONObject());
-		httpServletRequest.setAttribute(
 			"liferay-layout:render-fragment-layout:fieldValues", _fieldValues);
+		httpServletRequest.setAttribute(
+			"liferay-layout:render-fragment-layout:layoutStructure",
+			_getLayoutStructure(httpServletRequest));
+		httpServletRequest.setAttribute(
+			"liferay-layout:render-fragment-layout:mainItemId", _mainItemId);
 		httpServletRequest.setAttribute(
 			"liferay-layout:render-fragment-layout:mode", _mode);
 		httpServletRequest.setAttribute(
-			"liferay-layout:render-fragment-layout:previewClassNameId",
-			_getPreviewClassNameId());
-		httpServletRequest.setAttribute(
-			"liferay-layout:render-fragment-layout:previewClassPK",
-			_getPreviewClassPK());
-		httpServletRequest.setAttribute(
-			"liferay-layout:render-fragment-layout:previewType",
-			_getPreviewType());
-		httpServletRequest.setAttribute(
-			"liferay-layout:render-fragment-layout:segmentsExperienceIds",
-			_getSegmentsExperienceIds());
+			"liferay-layout:render-fragment-layout:showPreview", _showPreview);
 	}
 
-	private JSONObject _getDataJSONObject() {
-		if (_dataJSONObject != null) {
-			return _dataJSONObject;
+	private Layout _getLayout(HttpServletRequest httpServletRequest) {
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(
+			_getPlid(httpServletRequest));
+
+		if (layout instanceof VirtualLayout) {
+			VirtualLayout virtualLayout = (VirtualLayout)layout;
+
+			layout = virtualLayout.getSourceLayout();
+		}
+
+		return layout;
+	}
+
+	private LayoutStructure _getLayoutStructure(
+		HttpServletRequest httpServletRequest) {
+
+		if (_layoutStructure != null) {
+			return _layoutStructure;
+		}
+
+		_layoutStructure = (LayoutStructure)httpServletRequest.getAttribute(
+			RenderLayoutStructureTag.LAYOUT_STRUCTURE);
+
+		if (_layoutStructure != null) {
+			return _layoutStructure;
 		}
 
 		try {
+			Layout layout = _getLayout(httpServletRequest);
+
 			LayoutPageTemplateStructure layoutPageTemplateStructure =
 				LayoutPageTemplateStructureLocalServiceUtil.
 					fetchLayoutPageTemplateStructure(
-						getGroupId(),
-						PortalUtil.getClassNameId(Layout.class.getName()),
-						getPlid(), true);
+						layout.getGroupId(), layout.getPlid(), true);
 
 			String data = layoutPageTemplateStructure.getData(
 				_getSegmentsExperienceIds());
 
-			JSONObject dataJSONObject = JSONFactoryUtil.createJSONObject(data);
-
-			if (LayoutDataConverter.isLatestVersion(dataJSONObject)) {
-				String masterLayoutData = _getMasterLayoutData();
-
-				if (Validator.isNull(masterLayoutData)) {
-					_dataJSONObject = dataJSONObject;
-
-					return _dataJSONObject;
-				}
-
-				JSONObject masterLayoutDataJSONObject =
-					JSONFactoryUtil.createJSONObject(masterLayoutData);
-
-				_dataJSONObject = _mergeLayoutDataJSONObject(
-					dataJSONObject, masterLayoutDataJSONObject);
-
-				return _dataJSONObject;
+			if (Validator.isNull(data)) {
+				return _layoutStructure;
 			}
 
-			String masterLayoutData = _getMasterLayoutData();
+			String masterLayoutData = _getMasterLayoutData(httpServletRequest);
 
 			if (Validator.isNull(masterLayoutData)) {
-				_dataJSONObject = _getDefaultDataJSONObject();
+				_layoutStructure = LayoutStructure.of(data);
 
-				return _dataJSONObject;
+				return _layoutStructure;
 			}
 
-			_dataJSONObject = JSONFactoryUtil.createJSONObject(
-				masterLayoutData);
+			_layoutStructure = _mergeLayoutStructure(data, masterLayoutData);
 
-			return _dataJSONObject;
+			return _layoutStructure;
 		}
 		catch (Exception exception) {
-			_log.error("Unable to get data JSON object", exception);
+			_log.error("Unable to get layout structure", exception);
 
 			return null;
 		}
 	}
 
-	private JSONObject _getDefaultDataJSONObject() {
-		return JSONUtil.put(
-			"structure",
-			JSONUtil.putAll(
-				JSONUtil.put(
-					"columns",
-					JSONUtil.putAll(
-						JSONUtil.put(
-							"fragmentEntryLinkIds", JSONUtil.put("drop-zone")
-						).put(
-							"size", 12
-						)))));
-	}
-
-	private String _getMasterLayoutData() {
-		Layout layout = LayoutLocalServiceUtil.fetchLayout(_plid);
+	private String _getMasterLayoutData(HttpServletRequest httpServletRequest) {
+		Layout layout = _getLayout(httpServletRequest);
 
 		LayoutPageTemplateEntry masterLayoutPageTemplateEntry =
 			LayoutPageTemplateEntryLocalServiceUtil.
@@ -221,77 +214,68 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 			LayoutPageTemplateStructureLocalServiceUtil.
 				fetchLayoutPageTemplateStructure(
 					masterLayoutPageTemplateEntry.getGroupId(),
-					PortalUtil.getClassNameId(Layout.class),
 					masterLayoutPageTemplateEntry.getPlid());
 
 		return masterLayoutPageTemplateStructure.getData(
 			SegmentsExperienceConstants.ID_DEFAULT);
 	}
 
-	private long _getPreviewClassNameId() {
-		if (!_showPreview) {
-			return 0;
+	private long _getPlid(HttpServletRequest httpServletRequest) {
+		long plid = getPlid();
+
+		if (plid > 0) {
+			return plid;
 		}
 
-		return ParamUtil.getLong(request, "previewClassNameId");
-	}
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
-	private long _getPreviewClassPK() {
-		if (!_showPreview) {
-			return 0;
-		}
-
-		return ParamUtil.getLong(request, "previewClassPK");
-	}
-
-	private int _getPreviewType() {
-		if (!_showPreview) {
-			return 0;
-		}
-
-		return ParamUtil.getInteger(request, "previewType");
+		return themeDisplay.getPlid();
 	}
 
 	private long[] _getSegmentsExperienceIds() {
+		long[] selectedSegmentsExperienceIds = ParamUtil.getLongValues(
+			request, "segmentsExperienceId");
+
+		if (selectedSegmentsExperienceIds.length > 0) {
+			return selectedSegmentsExperienceIds;
+		}
+
 		return GetterUtil.getLongValues(
 			request.getAttribute(SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS),
 			new long[] {SegmentsExperienceConstants.ID_DEFAULT});
 	}
 
-	private JSONObject _mergeLayoutDataJSONObject(
-		JSONObject dataJSONObject, JSONObject masterLayoutDataJSONObject) {
+	private LayoutStructure _mergeLayoutStructure(
+		String data, String masterLayoutData) {
 
-		JSONObject masterLayoutItemsJSONObject =
-			masterLayoutDataJSONObject.getJSONObject("items");
+		LayoutStructure masterLayoutStructure = LayoutStructure.of(
+			masterLayoutData);
 
-		JSONObject itemsJSONObject = dataJSONObject.getJSONObject("items");
+		LayoutStructure layoutStructure = LayoutStructure.of(data);
 
-		for (String key : itemsJSONObject.keySet()) {
-			JSONObject itemJSONObject = itemsJSONObject.getJSONObject(key);
+		for (LayoutStructureItem layoutStructureItem :
+				layoutStructure.getLayoutStructureItems()) {
 
-			masterLayoutItemsJSONObject.put(key, itemJSONObject);
+			masterLayoutStructure.addLayoutStructureItem(layoutStructureItem);
 		}
 
-		JSONObject masterLayoutDataRootItemsJSONObject =
-			masterLayoutDataJSONObject.getJSONObject("rootItems");
+		DropZoneLayoutStructureItem dropZoneLayoutStructureItem =
+			(DropZoneLayoutStructureItem)
+				masterLayoutStructure.getDropZoneLayoutStructureItem();
 
-		String dropZoneItemId = masterLayoutDataRootItemsJSONObject.getString(
-			"dropZone");
+		dropZoneLayoutStructureItem.addChildrenItem(
+			layoutStructure.getMainItemId());
 
-		JSONObject dropZoneJSONObject =
-			masterLayoutItemsJSONObject.getJSONObject(dropZoneItemId);
+		LayoutStructureItem rootStructureItem =
+			masterLayoutStructure.getLayoutStructureItem(
+				layoutStructure.getMainItemId());
 
-		JSONArray dropZoneChildrenJSONArray = dropZoneJSONObject.getJSONArray(
-			"children");
+		rootStructureItem.setParentItemId(
+			dropZoneLayoutStructureItem.getItemId());
 
-		JSONObject rootItemsJSONObject = dataJSONObject.getJSONObject(
-			"rootItems");
-
-		String mainItemId = rootItemsJSONObject.getString("main");
-
-		dropZoneChildrenJSONArray.put(mainItemId);
-
-		return masterLayoutDataJSONObject;
+		return masterLayoutStructure;
 	}
 
 	private static final String _PAGE = "/render_fragment_layout/page.jsp";
@@ -299,10 +283,11 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 	private static final Log _log = LogFactoryUtil.getLog(
 		RenderFragmentLayoutTag.class);
 
-	private JSONObject _dataJSONObject;
 	private Map<String, Object> _fieldValues;
 	private long _groupId;
-	private String _mode;
+	private LayoutStructure _layoutStructure;
+	private String _mainItemId;
+	private String _mode = FragmentEntryLinkConstants.VIEW;
 	private long _plid;
 	private boolean _showPreview;
 

@@ -64,10 +64,11 @@ public class TransactionalTestRule implements TestRule {
 	public TransactionalTestRule(
 		Propagation propagation, String originBundleSymbolicName) {
 
+		_originBundleSymbolicName = originBundleSymbolicName;
+
 		_transactionConfig = TransactionConfig.Factory.create(
 			propagation,
 			new Class<?>[] {PortalException.class, SystemException.class});
-		_originBundleSymbolicName = originBundleSymbolicName;
 	}
 
 	@Override
@@ -126,8 +127,9 @@ public class TransactionalTestRule implements TestRule {
 									try {
 										statement.evaluate();
 									}
-									catch (Throwable t) {
-										ReflectionUtil.throwException(t);
+									catch (Throwable throwable) {
+										ReflectionUtil.throwException(
+											throwable);
 									}
 
 									return null;
@@ -201,8 +203,8 @@ public class TransactionalTestRule implements TestRule {
 								return TransactionalFrameworkMethod.super.
 									invokeExplosively(target, params);
 							}
-							catch (Throwable t) {
-								ReflectionUtil.throwException(t);
+							catch (Throwable throwable) {
+								ReflectionUtil.throwException(throwable);
 							}
 
 							return null;

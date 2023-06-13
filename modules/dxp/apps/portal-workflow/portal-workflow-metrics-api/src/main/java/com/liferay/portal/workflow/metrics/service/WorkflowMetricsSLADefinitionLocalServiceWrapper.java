@@ -55,6 +55,10 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 	/**
 	 * Adds the workflow metrics sla definition to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect WorkflowMetricsSLADefinitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param workflowMetricsSLADefinition the workflow metrics sla definition
 	 * @return the workflow metrics sla definition that was added
 	 */
@@ -67,6 +71,18 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 
 		return _workflowMetricsSLADefinitionLocalService.
 			addWorkflowMetricsSLADefinition(workflowMetricsSLADefinition);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _workflowMetricsSLADefinitionLocalService.createPersistedModel(
+			primaryKeyObj);
 	}
 
 	/**
@@ -111,6 +127,10 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 	/**
 	 * Deletes the workflow metrics sla definition with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect WorkflowMetricsSLADefinitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param workflowMetricsSLADefinitionId the primary key of the workflow metrics sla definition
 	 * @return the workflow metrics sla definition that was removed
 	 * @throws PortalException if a workflow metrics sla definition with the primary key could not be found
@@ -129,6 +149,10 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 	/**
 	 * Deletes the workflow metrics sla definition from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect WorkflowMetricsSLADefinitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param workflowMetricsSLADefinition the workflow metrics sla definition
 	 * @return the workflow metrics sla definition that was removed
 	 */
@@ -141,6 +165,19 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 
 		return _workflowMetricsSLADefinitionLocalService.
 			deleteWorkflowMetricsSLADefinition(workflowMetricsSLADefinition);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _workflowMetricsSLADefinitionLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _workflowMetricsSLADefinitionLocalService.dslQueryCount(
+			dslQuery);
 	}
 
 	@Override
@@ -300,6 +337,9 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 			getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -386,11 +426,12 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 				int start, int end,
 				com.liferay.portal.kernel.util.OrderByComparator
 					<com.liferay.portal.workflow.metrics.model.
-						WorkflowMetricsSLADefinition> obc) {
+						WorkflowMetricsSLADefinition> orderByComparator) {
 
 		return _workflowMetricsSLADefinitionLocalService.
 			getWorkflowMetricsSLADefinitions(
-				companyId, active, processId, status, start, end, obc);
+				companyId, active, processId, status, start, end,
+				orderByComparator);
 	}
 
 	@Override
@@ -412,6 +453,16 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 
 		return _workflowMetricsSLADefinitionLocalService.
 			getWorkflowMetricsSLADefinitions(companyId, status);
+	}
+
+	@Override
+	public java.util.List
+		<com.liferay.portal.workflow.metrics.model.WorkflowMetricsSLADefinition>
+			getWorkflowMetricsSLADefinitions(
+				long companyId, String name, long processId) {
+
+		return _workflowMetricsSLADefinitionLocalService.
+			getWorkflowMetricsSLADefinitions(companyId, name, processId);
 	}
 
 	/**
@@ -504,6 +555,10 @@ public class WorkflowMetricsSLADefinitionLocalServiceWrapper
 
 	/**
 	 * Updates the workflow metrics sla definition in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect WorkflowMetricsSLADefinitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param workflowMetricsSLADefinition the workflow metrics sla definition
 	 * @return the workflow metrics sla definition that was updated

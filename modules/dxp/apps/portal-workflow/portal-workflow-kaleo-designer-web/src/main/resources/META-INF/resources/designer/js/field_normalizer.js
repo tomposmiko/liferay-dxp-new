@@ -11,15 +11,22 @@
 
 AUI.add(
 	'liferay-kaleo-designer-field-normalizer',
-	A => {
+	(A) => {
 		var AArray = A.Array;
 		var AObject = A.Object;
 		var Lang = A.Lang;
 
 		var KaleoDesignerRemoteServices = Liferay.KaleoDesignerRemoteServices;
 
+		var isArray = Lang.isArray;
 		var isObject = Lang.isObject;
 		var isValue = Lang.isValue;
+
+		var STR_BLANK = '';
+
+		var isNotEmptyValue = function (item) {
+			return isValue(item) && item !== STR_BLANK;
+		};
 
 		var COL_TYPES_ASSIGNMENT = [
 			'address',
@@ -31,12 +38,12 @@ AUI.add(
 			'scriptedRecipient',
 			'taskAssignees',
 			'user',
-			'userId'
+			'userId',
 		];
 
-		var populateRole = function(assignments) {
-			KaleoDesignerRemoteServices.getRole(assignments.roleId, data => {
-				AArray.each(data, item => {
+		var populateRole = function (assignments) {
+			KaleoDesignerRemoteServices.getRole(assignments.roleId, (data) => {
+				AArray.each(data, (item) => {
 					if (item) {
 						var index = assignments.roleId.indexOf(item.roleId);
 
@@ -46,21 +53,65 @@ AUI.add(
 			});
 		};
 
-		var populateUser = function(assignments) {
-			if (isValue(assignments.userId)) {
+		var populateUser = function (assignments) {
+			if (
+				isArray(assignments.emailAddress) &&
+				assignments.emailAddress.filter(isNotEmptyValue).length !== 0
+			) {
 				KaleoDesignerRemoteServices.getUser(
+					assignments.emailAddress,
+					null,
+					null,
+					(data) => {
+						AArray.each(data, (item) => {
+							if (item) {
+								var index = assignments.emailAddress.indexOf(
+									item.emailAddress
+								);
+
+								assignments.fullName[index] = item.fullName;
+							}
+						});
+					}
+				);
+			}
+			else if (
+				isArray(assignments.screenName) &&
+				assignments.screenName.filter(isNotEmptyValue).length !== 0
+			) {
+				KaleoDesignerRemoteServices.getUser(
+					null,
+					assignments.screenName,
+					null,
+					(data) => {
+						AArray.each(data, (item) => {
+							if (item) {
+								var index = assignments.screenName.indexOf(
+									item.screenName
+								);
+
+								assignments.fullName[index] = item.fullName;
+							}
+						});
+					}
+				);
+			}
+			else if (
+				isArray(assignments.userId) &&
+				assignments.userId.filter(isNotEmptyValue).length !== 0
+			) {
+				KaleoDesignerRemoteServices.getUser(
+					null,
+					null,
 					assignments.userId,
-					data => {
-						AArray.each(data, item => {
+					(data) => {
+						AArray.each(data, (item) => {
 							if (item) {
 								var index = assignments.userId.indexOf(
 									item.userId
 								);
 
-								assignments.emailAddress[index] =
-									item.emailAddress;
 								assignments.fullName[index] = item.fullName;
-								assignments.screenName[index] = item.screenName;
 							}
 						});
 					}
@@ -68,12 +119,13 @@ AUI.add(
 			}
 		};
 
-		var _put = function(obj, key, value, index) {
+		var _put = function (obj, key, value, index) {
 			obj[key] = obj[key] || [];
 
 			if (index === undefined) {
 				obj[key].push(value);
-			} else {
+			}
+			else {
 				obj[key][index] = value;
 			}
 		};
@@ -86,11 +138,7 @@ AUI.add(
 
 				data.forEach((item1, index1) => {
 					A.each(item1, (item2, index2) => {
-						if (isValue(item2)) {
-							if (index2 === 'script') {
-								item2 = Lang.trim(item2);
-							}
-
+						if (index2 === 'name' || isNotEmptyValue(item2)) {
 							_put(actions, index2, item2, index1);
 						}
 					});
@@ -103,10 +151,14 @@ AUI.add(
 				var assignments = {};
 
 				if (data && data.length) {
-					COL_TYPES_ASSIGNMENT.forEach(item1 => {
+					COL_TYPES_ASSIGNMENT.forEach((item1) => {
 						var value = data[0][item1];
 
-						if (!isValue(value)) {
+						if (item1 === 'taskAssignees' && value === '') {
+							assignments.assignmentType = 'taskAssignees';
+						}
+
+						if (!isNotEmptyValue(value)) {
 							return;
 						}
 
@@ -117,7 +169,8 @@ AUI.add(
 								A.each(item2, (item3, index3) => {
 									_put(assignments, index3, item3, index2);
 								});
-							} else {
+							}
+							else {
 								_put(assignments, item1, item2);
 							}
 						});
@@ -126,8 +179,8 @@ AUI.add(
 
 						if (
 							item1 !== 'receptionType' &&
-							AArray.some(assignmentValue, item2 => {
-								var valid = isValue(item2);
+							AArray.some(assignmentValue, (item2) => {
+								var valid = isNotEmptyValue(item2);
 
 								if (
 									valid &&
@@ -137,7 +190,7 @@ AUI.add(
 								) {
 									valid = AArray.some(
 										AObject.values(item2),
-										isValue
+										isNotEmptyValue
 									);
 								}
 
@@ -150,7 +203,8 @@ AUI.add(
 
 					if (assignments.assignmentType == 'roleId') {
 						populateRole(assignments);
-					} else if (assignments.assignmentType == 'user') {
+					}
+					else if (assignments.assignmentType == 'user') {
 						populateUser(assignments);
 					}
 				}
@@ -165,7 +219,7 @@ AUI.add(
 
 				data.forEach((item1, index1) => {
 					A.each(item1, (item2, index2) => {
-						if (isValue(item2)) {
+						if (isNotEmptyValue(item2)) {
 							_put(delays, index2, item2, index1);
 						}
 					});
@@ -181,7 +235,7 @@ AUI.add(
 
 				data.forEach((item1, index1) => {
 					A.each(item1, (item2, index2) => {
-						if (isValue(item2)) {
+						if (isNotEmptyValue(item2)) {
 							if (index2 === 'recipients') {
 								if (item2[0] && item2[0].receptionType) {
 									_put(
@@ -211,18 +265,25 @@ AUI.add(
 
 				data.forEach((item1, index1) => {
 					A.each(item1, (item2, index2) => {
-						if (isValue(item2)) {
+						if (isNotEmptyValue(item2)) {
 							if (index2 === 'delay' || index2 === 'recurrence') {
 								return;
-							} else if (index2 === 'timerNotifications') {
+							}
+							else if (index2 === 'timerNotifications') {
 								item2 = FieldNormalizer.normalizeToNotifications(
 									item2
 								);
-							} else if (index2 === 'timerActions') {
+							}
+							else if (index2 === 'timerActions') {
 								item2 = FieldNormalizer.normalizeToActions(
 									item2
 								);
-							} else if (index2 === 'reassignments') {
+							}
+							else if (index2 === 'reassignments') {
+								if (item2[0]?.taskAssignees === '') {
+									item2[0].taskAssignees = null;
+								}
+
 								item2 = FieldNormalizer.normalizeToAssignments(
 									item2
 								);
@@ -242,13 +303,13 @@ AUI.add(
 				});
 
 				return taskTimers;
-			}
+			},
 		};
 
 		Liferay.KaleoDesignerFieldNormalizer = FieldNormalizer;
 	},
 	'',
 	{
-		requires: ['liferay-kaleo-designer-remote-services']
+		requires: ['liferay-kaleo-designer-remote-services'],
 	}
 );

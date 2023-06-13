@@ -18,9 +18,12 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateServiceUtil;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
+import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.web.internal.util.SiteConnectedGroupUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -77,8 +80,9 @@ public class JournalSelectDDMTemplateDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle", "icon");
+		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
+			_httpServletRequest, JournalPortletKeys.JOURNAL,
+			"ddm-template-display-style", "icon");
 
 		return _displayStyle;
 	}
@@ -112,12 +116,12 @@ public class JournalSelectDDMTemplateDisplayContext {
 		}
 
 		_orderByType = ParamUtil.getString(
-			_renderRequest, "orderByType", "asc");
+			_renderRequest, "orderByType", "desc");
 
 		return _orderByType;
 	}
 
-	public SearchContainer getTemplateSearch() throws Exception {
+	public SearchContainer<DDMTemplate> getTemplateSearch() throws Exception {
 		if (_templateSearch != null) {
 			return _templateSearch;
 		}
@@ -126,7 +130,7 @@ public class JournalSelectDDMTemplateDisplayContext {
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		SearchContainer templateSearch = new SearchContainer(
+		SearchContainer<DDMTemplate> templateSearch = new SearchContainer(
 			_renderRequest, _getPortletURL(), null, "there-are-no-templates");
 
 		if (templateSearch.isSearch()) {
@@ -144,8 +148,9 @@ public class JournalSelectDDMTemplateDisplayContext {
 		templateSearch.setOrderByComparator(orderByComparator);
 		templateSearch.setOrderByType(orderByType);
 
-		long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(
-			themeDisplay.getScopeGroupId());
+		long[] groupIds =
+			SiteConnectedGroupUtil.getCurrentAndAncestorSiteAndDepotGroupIds(
+				themeDisplay.getScopeGroupId(), true);
 
 		List<DDMTemplate> results = DDMTemplateServiceUtil.search(
 			themeDisplay.getCompanyId(), groupIds,
@@ -241,6 +246,6 @@ public class JournalSelectDDMTemplateDisplayContext {
 	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private SearchContainer _templateSearch;
+	private SearchContainer<DDMTemplate> _templateSearch;
 
 }

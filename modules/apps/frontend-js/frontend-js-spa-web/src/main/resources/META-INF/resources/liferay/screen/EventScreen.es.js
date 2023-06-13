@@ -24,6 +24,7 @@ import globals from 'senna/lib/globals/globals';
  */
 
 class EventScreen extends HtmlScreen {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -45,7 +46,7 @@ class EventScreen extends HtmlScreen {
 
 		Liferay.fire('screenDispose', {
 			app: Liferay.SPA.app,
-			screen: this
+			screen: this,
 		});
 	}
 
@@ -59,7 +60,7 @@ class EventScreen extends HtmlScreen {
 
 		Liferay.fire('screenActivate', {
 			app: Liferay.SPA.app,
-			screen: this
+			screen: this,
 		});
 	}
 
@@ -96,7 +97,7 @@ class EventScreen extends HtmlScreen {
 
 		Liferay.fire('screenDeactivate', {
 			app: Liferay.SPA.app,
-			screen: this
+			screen: this,
 		});
 	}
 
@@ -107,7 +108,7 @@ class EventScreen extends HtmlScreen {
 	beforeScreenFlip() {
 		Liferay.fire('beforeScreenFlip', {
 			app: Liferay.SPA.app,
-			screen: this
+			screen: this,
 		});
 	}
 
@@ -173,7 +174,7 @@ class EventScreen extends HtmlScreen {
 
 				Liferay.fire('screenFlip', {
 					app: Liferay.SPA.app,
-					screen: this
+					screen: this,
 				});
 			});
 	}
@@ -227,7 +228,7 @@ class EventScreen extends HtmlScreen {
 	 */
 
 	load(path) {
-		return super.load(path).then(content => {
+		return super.load(path).then((content) => {
 			const redirectPath = this.beforeUpdateHistoryPath(path);
 
 			this.checkRedirectPath(redirectPath);
@@ -235,7 +236,7 @@ class EventScreen extends HtmlScreen {
 			Liferay.fire('screenLoad', {
 				app: Liferay.SPA.app,
 				content,
-				screen: this
+				screen: this,
 			});
 
 			return content;
@@ -257,13 +258,13 @@ class EventScreen extends HtmlScreen {
 			.concat(
 				HtmlScreen.selectors.stylesPermanent
 					.split(',')
-					.map(item => `${item}[href*="${currentLanguageId}"]`)
+					.map((item) => `${item}[href*="${currentLanguageId}"]`)
 			)
 			.join();
 
 		HtmlScreen.selectors.stylesPermanent = HtmlScreen.selectors.stylesPermanent
 			.split(',')
-			.map(item => `${item}[href*="${languageId}"]`)
+			.map((item) => `${item}[href*="${languageId}"]`)
 			.join();
 	}
 
@@ -304,7 +305,7 @@ class EventScreen extends HtmlScreen {
 
 	runFaviconInElement_(elements) {
 		return super.runFaviconInElement_(elements).then(() => {
-			elements.forEach(element => {
+			elements.forEach((element) => {
 				if (!element.type && element.href.indexOf('.ico') !== -1) {
 					element.type = 'image/x-icon';
 				}

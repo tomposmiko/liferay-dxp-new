@@ -15,7 +15,9 @@
 package com.liferay.petra.concurrent;
 
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,6 +40,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -46,8 +49,10 @@ import org.junit.Test;
 public class ConcurrentMapperHashMapTest {
 
 	@ClassRule
-	public static final CodeCoverageAssertor codeCoverageAssertor =
-		CodeCoverageAssertor.INSTANCE;
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@After
 	public void tearDown() {
@@ -990,12 +995,12 @@ public class ConcurrentMapperHashMapTest {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof Key)) {
+		public boolean equals(Object object) {
+			if (!(object instanceof Key)) {
 				return false;
 			}
 
-			Key key = (Key)obj;
+			Key key = (Key)object;
 
 			return _id.equals(key._id);
 		}
@@ -1022,12 +1027,12 @@ public class ConcurrentMapperHashMapTest {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof KeyReference)) {
+		public boolean equals(Object object) {
+			if (!(object instanceof KeyReference)) {
 				return false;
 			}
 
-			KeyReference keyReference = (KeyReference)obj;
+			KeyReference keyReference = (KeyReference)object;
 
 			return _key.equals(keyReference._key);
 		}
@@ -1054,12 +1059,12 @@ public class ConcurrentMapperHashMapTest {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof Value)) {
+		public boolean equals(Object object) {
+			if (!(object instanceof Value)) {
 				return false;
 			}
 
-			Value value = (Value)obj;
+			Value value = (Value)object;
 
 			return _valueId.equals(value._valueId);
 		}
@@ -1086,12 +1091,12 @@ public class ConcurrentMapperHashMapTest {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof ValueReference)) {
+		public boolean equals(Object object) {
+			if (!(object instanceof ValueReference)) {
 				return false;
 			}
 
-			ValueReference valueReference = (ValueReference)obj;
+			ValueReference valueReference = (ValueReference)object;
 
 			return _value.equals(valueReference._value);
 		}

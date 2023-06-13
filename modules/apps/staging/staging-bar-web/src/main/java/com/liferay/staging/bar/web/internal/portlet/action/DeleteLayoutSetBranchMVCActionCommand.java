@@ -14,13 +14,16 @@
 
 package com.liferay.staging.bar.web.internal.portlet.action;
 
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutSetBranchService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.staging.bar.web.internal.portlet.constants.StagingBarPortletKeys;
 
 import javax.portlet.ActionRequest;
@@ -36,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + StagingBarPortletKeys.STAGING_BAR,
-		"mvc.command.name=deleteLayoutSetBranch"
+		"mvc.command.name=/staging_bar/delete_layout_set_branch"
 	},
 	service = MVCActionCommand.class
 )
@@ -62,7 +65,13 @@ public class DeleteLayoutSetBranchMVCActionCommand
 		}
 
 		try {
-			_layoutSetBranchService.deleteLayoutSetBranch(layoutSetBranchId);
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			Layout layout = themeDisplay.getLayout();
+
+			_layoutSetBranchService.deleteLayoutSetBranch(
+				layout.getPlid(), layoutSetBranchId);
 
 			SessionMessages.add(actionRequest, "sitePageVariationDeleted");
 

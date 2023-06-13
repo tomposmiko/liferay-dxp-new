@@ -60,7 +60,6 @@ public abstract class DDMFormInstanceFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -86,14 +85,5 @@ public abstract class DDMFormInstanceFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormInstanceFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(DDMPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

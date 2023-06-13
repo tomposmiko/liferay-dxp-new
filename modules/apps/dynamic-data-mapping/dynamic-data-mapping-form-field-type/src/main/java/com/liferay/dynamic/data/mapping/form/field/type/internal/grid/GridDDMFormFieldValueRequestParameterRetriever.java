@@ -15,8 +15,11 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.grid;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueRequestParameterRetriever;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.util.Map;
 
@@ -51,11 +54,26 @@ public class GridDDMFormFieldValueRequestParameterRetriever
 
 		String[] parameterValues = parameterMap.get(ddmFormFieldParameterName);
 
-		for (String value : parameterValues) {
-			if (!value.isEmpty()) {
-				String[] values = value.split(";");
+		if (parameterValues.length == 1) {
+			try {
+				jsonObject = jsonFactory.createJSONObject(parameterValues[0]);
 
-				jsonObject.put(values[0], values[1]);
+				return jsonObject.toString();
+			}
+			catch (JSONException jsonException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(jsonException, jsonException);
+				}
+
+				jsonObject = jsonFactory.createJSONObject();
+			}
+		}
+
+		for (String parameterValue : parameterValues) {
+			if (!parameterValue.isEmpty()) {
+				String[] parameterValueParts = parameterValue.split(";");
+
+				jsonObject.put(parameterValueParts[0], parameterValueParts[1]);
 			}
 		}
 
@@ -64,5 +82,8 @@ public class GridDDMFormFieldValueRequestParameterRetriever
 
 	@Reference
 	protected JSONFactory jsonFactory;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		GridDDMFormFieldValueRequestParameterRetriever.class);
 
 }

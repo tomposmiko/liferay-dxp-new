@@ -14,20 +14,19 @@
 
 import {openToast} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 
-import {ConfigContext} from '../../../app/config/index';
 import {useDispatch} from '../../../app/store/index';
 import addFragmentComment from '../../../app/thunks/addFragmentComment';
+import {useId} from '../../../app/utils/useId';
 import CommentForm from './CommentForm';
 
 export default function AddCommentForm({fragmentEntryLinkId}) {
 	const [addingComment, setAddingComment] = useState(false);
+	const dispatch = useDispatch();
+	const pageEditorCommentEditorId = useId();
 	const [showButtons, setShowButtons] = useState(false);
 	const [textareaContent, setTextareaContent] = useState('');
-	const dispatch = useDispatch();
-
-	const config = useContext(ConfigContext);
 
 	const _handleCancelButtonClick = () => {
 		setShowButtons(false);
@@ -44,8 +43,7 @@ export default function AddCommentForm({fragmentEntryLinkId}) {
 		dispatch(
 			addFragmentComment({
 				body: textareaContent,
-				config,
-				fragmentEntryLinkId
+				fragmentEntryLinkId,
 			})
 		)
 			.then(() => {
@@ -58,15 +56,14 @@ export default function AddCommentForm({fragmentEntryLinkId}) {
 					message: Liferay.Language.get(
 						'the-comment-could-not-be-saved'
 					),
-					title: Liferay.Language.get('error'),
-					type: 'danger'
+					type: 'danger',
 				});
 
 				setAddingComment(false);
 			});
 	};
 
-	const _handleTextareaChange = content => {
+	const _handleTextareaChange = (content) => {
 		if (content) {
 			setTextareaContent(content);
 		}
@@ -75,7 +72,7 @@ export default function AddCommentForm({fragmentEntryLinkId}) {
 	return (
 		<div className="px-3">
 			<CommentForm
-				id="pageEditorCommentEditor"
+				id={pageEditorCommentEditorId}
 				loading={addingComment}
 				onCancelButtonClick={_handleCancelButtonClick}
 				onFormFocus={_handleFormFocus}
@@ -90,5 +87,5 @@ export default function AddCommentForm({fragmentEntryLinkId}) {
 }
 
 AddCommentForm.propTypes = {
-	fragmentEntryLinkId: PropTypes.string.isRequired
+	fragmentEntryLinkId: PropTypes.string.isRequired,
 };

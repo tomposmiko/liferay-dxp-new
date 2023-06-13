@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.SegmentSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Segment {
+public class Segment implements Cloneable, Serializable {
+
+	public static Segment toDTO(String json) {
+		return SegmentSerDes.toDTO(json);
+	}
 
 	public Boolean getActive() {
 		return active;
@@ -192,6 +198,11 @@ public class Segment {
 	}
 
 	protected String source;
+
+	@Override
+	public Segment clone() throws CloneNotSupportedException {
+		return (Segment)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

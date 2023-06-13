@@ -32,11 +32,10 @@ definition {
 
 	@priority = "4"
 	test ChangeSocialBookmarkSitesForKBArticle {
-		property osgi.app.includes = "social-bookmarks, knowledge-base";
+		property osgi.app.includes = "social-bookmarks,knowledge-base";
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(
@@ -50,8 +49,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Knowledge Base");
 
 		KBArticle.addCP(
@@ -86,11 +84,9 @@ definition {
 	@priority = "3"
 	test ViewBlogsEntryWithSocialBookmarksSites {
 		property osgi.app.includes = "social-bookmarks";
-		property test.assert.warning.exceptions = "true";
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(
@@ -101,9 +97,7 @@ definition {
 
 		Portlet.addPG(portletName = "Blogs");
 
-		Navigator.gotoPage(pageName = "Blogs Page");
-
-		Blogs.addEntry(
+		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title");
@@ -113,6 +107,8 @@ definition {
 		BlogsNavigator.gotoEntryPG(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
+
+		Pause(locator1 = "3000");
 
 		SocialBookmarks.viewDefaultSharableBookmarks();
 
@@ -135,11 +131,10 @@ definition {
 
 	@priority = "3"
 	test ViewKBArticleWithAllSocialBookmarkSites {
-		property osgi.app.includes = "social-bookmarks, knowledge-base";
+		property osgi.app.includes = "social-bookmarks,knowledge-base";
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(
@@ -153,8 +148,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Knowledge Base");
 
 		KBArticle.addCP(

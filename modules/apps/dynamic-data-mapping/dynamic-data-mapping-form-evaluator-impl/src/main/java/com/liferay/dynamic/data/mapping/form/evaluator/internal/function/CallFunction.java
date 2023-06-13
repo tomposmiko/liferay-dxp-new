@@ -34,13 +34,17 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+
+import java.math.BigDecimal;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -81,6 +85,13 @@ public class CallFunction
 				paramsExpression);
 
 			for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
+				if (Objects.equals(entry.getKey(), "locale")) {
+					builder = builder.withLocale(
+						LocaleUtil.fromLanguageId(entry.getValue()));
+
+					continue;
+				}
+
 				builder = builder.withParameter(
 					entry.getKey(), entry.getValue());
 			}
@@ -232,7 +243,7 @@ public class CallFunction
 		_ddmExpressionObserver.updateFieldProperty(builder.build());
 	}
 
-	protected void setDDMFormFieldValue(String field, String value) {
+	protected void setDDMFormFieldValue(String field, Object value) {
 		UpdateFieldPropertyRequest.Builder builder =
 			UpdateFieldPropertyRequest.Builder.newBuilder(
 				field, "value", value);
@@ -261,9 +272,17 @@ public class CallFunction
 				setDDMFormFieldOptions(ddmFormFieldName, optionsOptional.get());
 			}
 			else {
-				Optional<String> valueOptional =
+				Optional<Object> valueOptional =
 					ddmDataProviderResponse.getOutputOptional(
 						outputName, String.class);
+
+				if (!valueOptional.isPresent()) {
+					valueOptional = ddmDataProviderResponse.getOutputOptional(
+						outputName, Number.class);
+
+					valueOptional = valueOptional.map(
+						value -> new BigDecimal(value.toString()));
+				}
 
 				setDDMFormFieldValue(ddmFormFieldName, valueOptional.get());
 			}

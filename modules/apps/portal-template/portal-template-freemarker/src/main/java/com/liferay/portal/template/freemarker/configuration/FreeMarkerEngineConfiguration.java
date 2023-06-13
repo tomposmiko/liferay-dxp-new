@@ -29,8 +29,31 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 )
 public interface FreeMarkerEngineConfiguration {
 
+	@Meta.AD(deflt = "0", name = "async-render-timeout", required = false)
+	public long asyncRenderTimeout();
+
+	@Meta.AD(
+		deflt = "10", name = "async-render-timeout-threshold", required = false
+	)
+	public int asyncRenderTimeoutThreshold();
+
+	@Meta.AD(
+		deflt = "2147483647", name = "async-render-thread-pool-max-size",
+		required = false
+	)
+	public int asyncRenderThreadPoolMaxSize();
+
+	@Meta.AD(
+		deflt = "2147483647", name = "async-render-thread-pool-max-queue-size",
+		required = false
+	)
+	public int asyncRenderThreadPoolMaxQueueSize();
+
 	@Meta.AD(deflt = "false", name = "localized-lookup", required = false)
 	public boolean localizedLookup();
+
+	@Meta.AD(deflt = "0", name = "loop-count-threshold", required = false)
+	public int loopCountThreshold();
 
 	@Meta.AD(
 		deflt = "60000", name = "resource-modification-check", required = false
@@ -41,7 +64,7 @@ public interface FreeMarkerEngineConfiguration {
 	public String[] allowedClasses();
 
 	@Meta.AD(
-		deflt = "com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist|java.lang.Class|java.lang.ClassLoader|java.lang.Compiler|java.lang.Package|java.lang.Process|java.lang.Runtime|java.lang.RuntimePermission|java.lang.SecurityManager|java.lang.System|java.lang.Thread|java.lang.ThreadGroup|java.lang.ThreadLocal",
+		deflt = "com.ibm.*|com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist|com.liferay.portal.spring.context.*|io.undertow.*|java.lang.Class|java.lang.ClassLoader|java.lang.Compiler|java.lang.Package|java.lang.Process|java.lang.Runtime|java.lang.RuntimePermission|java.lang.SecurityManager|java.lang.System|java.lang.Thread|java.lang.ThreadGroup|java.lang.ThreadLocal|org.apache.*|org.glassfish.*|org.jboss.*|org.springframework.*|org.wildfly.*|weblogic.*",
 		name = "restricted-classes", required = false
 	)
 	public String[] restrictedClasses();

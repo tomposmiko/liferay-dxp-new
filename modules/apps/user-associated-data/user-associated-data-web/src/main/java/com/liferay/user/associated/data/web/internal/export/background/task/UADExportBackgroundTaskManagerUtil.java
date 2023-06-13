@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +55,8 @@ public class UADExportBackgroundTaskManagerUtil {
 
 		backgroundTaskModels = backgroundTaskModelsStream.filter(
 			backgroundTaskModel -> {
-				Map taskContextMap = backgroundTaskModel.getTaskContextMap();
+				Map<String, Serializable> taskContextMap =
+					backgroundTaskModel.getTaskContextMap();
 
 				return applicationKey.equals(
 					taskContextMap.get("applicationKey"));
@@ -72,11 +75,9 @@ public class UADExportBackgroundTaskManagerUtil {
 	public static List<BackgroundTask> getBackgroundTasks(
 		long groupId, long userId) {
 
-		DynamicQuery dynamicQuery = _getDynamicQuery(groupId, userId);
-
 		List<com.liferay.portal.background.task.model.BackgroundTask>
 			backgroundTaskModels = BackgroundTaskLocalServiceUtil.dynamicQuery(
-				dynamicQuery);
+				_getDynamicQuery(groupId, userId));
 
 		return _translate(backgroundTaskModels);
 	}
@@ -97,10 +98,8 @@ public class UADExportBackgroundTaskManagerUtil {
 	}
 
 	public static int getBackgroundTasksCount(long groupId, long userId) {
-		DynamicQuery dynamicQuery = _getDynamicQuery(groupId, userId);
-
 		return (int)BackgroundTaskLocalServiceUtil.dynamicQueryCount(
-			dynamicQuery);
+			_getDynamicQuery(groupId, userId));
 	}
 
 	public static int getBackgroundTasksCount(

@@ -33,8 +33,11 @@ import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.comparator.LayoutRevisionCreateDateComparator;
 import com.liferay.portal.kernel.util.comparator.LayoutRevisionModifiedDateComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -45,6 +48,8 @@ import com.liferay.portal.util.LayoutTypeControllerTracker;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Raymond Augé
@@ -270,6 +275,15 @@ public class LayoutRevisionLocalServiceImpl
 
 		return layoutRevisionPersistence.fetchByL_P_First(
 			layoutSetBranchId, plid,
+			new LayoutRevisionCreateDateComparator(false));
+	}
+
+	@Override
+	public LayoutRevision fetchLatestLayoutRevision(
+		long layoutSetBranchId, long layoutBranchId, long plid) {
+
+		return layoutRevisionPersistence.fetchByL_L_P_First(
+			layoutSetBranchId, layoutBranchId, plid,
 			new LayoutRevisionCreateDateComparator(false));
 	}
 
@@ -501,6 +515,31 @@ public class LayoutRevisionLocalServiceImpl
 			copyPortletPreferences(
 				layoutRevision, layoutRevision.getParentLayoutRevisionId());
 
+			if (Objects.equals(serviceContext.getCommand(), Constants.DELETE)) {
+				String[] removePortletIdsArray =
+					(String[])serviceContext.getAttribute("removePortletIds");
+
+				if (!ArrayUtil.isEmpty(removePortletIdsArray)) {
+					Set<String> removePortletIds = SetUtil.fromArray(
+						removePortletIdsArray);
+
+					for (PortletPreferences portletPreferences :
+							portletPreferencesLocalService.
+								getPortletPreferencesByPlid(
+									layoutRevision.getLayoutRevisionId())) {
+
+						if (removePortletIds.contains(
+								portletPreferences.getPortletId())) {
+
+							portletPreferencesLocalService.
+								deletePortletPreferences(
+									portletPreferences.
+										getPortletPreferencesId());
+						}
+					}
+				}
+			}
+
 			StagingUtil.setRecentLayoutBranchId(
 				user, layoutRevision.getLayoutSetBranchId(),
 				layoutRevision.getPlid(), layoutRevision.getLayoutBranchId());
@@ -594,8 +633,7 @@ public class LayoutRevisionLocalServiceImpl
 
 					curLayoutRevision.setHead(false);
 
-					curLayoutRevision = layoutRevisionPersistence.update(
-						curLayoutRevision);
+					layoutRevisionPersistence.update(curLayoutRevision);
 				}
 			}
 		}

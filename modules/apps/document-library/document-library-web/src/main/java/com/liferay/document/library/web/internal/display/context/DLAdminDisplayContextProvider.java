@@ -16,6 +16,8 @@ package com.liferay.document.library.web.internal.display.context;
 
 import com.liferay.document.library.kernel.versioning.VersioningStrategy;
 import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
+import com.liferay.document.library.web.internal.helper.DLTrashHelper;
+import com.liferay.trash.TrashHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,23 +41,31 @@ public class DLAdminDisplayContextProvider {
 			httpServletRequest);
 
 		return new DLAdminDisplayContext(
-			dlRequestHelper.getLiferayPortletRequest(),
-			dlRequestHelper.getLiferayPortletResponse(), _versioningStrategy);
+			httpServletRequest, dlRequestHelper.getLiferayPortletRequest(),
+			dlRequestHelper.getLiferayPortletResponse(), _versioningStrategy,
+			_trashHelper);
 	}
 
 	public DLAdminManagementToolbarDisplayContext
 		getDLAdminManagementToolbarDisplayContext(
 			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse) {
+			HttpServletResponse httpServletResponse,
+			DLAdminDisplayContext dlAdminDisplayContext) {
 
 		DLRequestHelper dlRequestHelper = new DLRequestHelper(
 			httpServletRequest);
 
 		return new DLAdminManagementToolbarDisplayContext(
 			httpServletRequest, dlRequestHelper.getLiferayPortletRequest(),
-			dlRequestHelper.getLiferayPortletResponse(),
-			getDLAdminDisplayContext(httpServletRequest, httpServletResponse));
+			dlRequestHelper.getLiferayPortletResponse(), dlAdminDisplayContext,
+			_dlTrashHelper);
 	}
+
+	@Reference
+	private DLTrashHelper _dlTrashHelper;
+
+	@Reference
+	private TrashHelper _trashHelper;
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,

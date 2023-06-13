@@ -37,17 +37,17 @@ public class SiteNavigationMenuItemCacheModel
 	implements CacheModel<SiteNavigationMenuItem>, Externalizable, MVCCModel {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof SiteNavigationMenuItemCacheModel)) {
+		if (!(object instanceof SiteNavigationMenuItemCacheModel)) {
 			return false;
 		}
 
 		SiteNavigationMenuItemCacheModel siteNavigationMenuItemCacheModel =
-			(SiteNavigationMenuItemCacheModel)obj;
+			(SiteNavigationMenuItemCacheModel)object;
 
 		if ((siteNavigationMenuItemId ==
 				siteNavigationMenuItemCacheModel.siteNavigationMenuItemId) &&
@@ -78,10 +78,12 @@ public class SiteNavigationMenuItemCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(33);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", ctCollectionId=");
+		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", siteNavigationMenuItemId=");
@@ -123,6 +125,7 @@ public class SiteNavigationMenuItemCacheModel
 			new SiteNavigationMenuItemImpl();
 
 		siteNavigationMenuItemImpl.setMvccVersion(mvccVersion);
+		siteNavigationMenuItemImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			siteNavigationMenuItemImpl.setUuid("");
@@ -200,8 +203,12 @@ public class SiteNavigationMenuItemCacheModel
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
+
+		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		siteNavigationMenuItemId = objectInput.readLong();
@@ -220,7 +227,7 @@ public class SiteNavigationMenuItemCacheModel
 		parentSiteNavigationMenuItemId = objectInput.readLong();
 		name = objectInput.readUTF();
 		type = objectInput.readUTF();
-		typeSettings = objectInput.readUTF();
+		typeSettings = (String)objectInput.readObject();
 
 		order = objectInput.readInt();
 		lastPublishDate = objectInput.readLong();
@@ -229,6 +236,8 @@ public class SiteNavigationMenuItemCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
+
+		objectOutput.writeLong(ctCollectionId);
 
 		if (uuid == null) {
 			objectOutput.writeUTF("");
@@ -274,10 +283,10 @@ public class SiteNavigationMenuItemCacheModel
 		}
 
 		if (typeSettings == null) {
-			objectOutput.writeUTF("");
+			objectOutput.writeObject("");
 		}
 		else {
-			objectOutput.writeUTF(typeSettings);
+			objectOutput.writeObject(typeSettings);
 		}
 
 		objectOutput.writeInt(order);
@@ -285,6 +294,7 @@ public class SiteNavigationMenuItemCacheModel
 	}
 
 	public long mvccVersion;
+	public long ctCollectionId;
 	public String uuid;
 	public long siteNavigationMenuItemId;
 	public long groupId;

@@ -66,13 +66,13 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 	public long[] getSegmentsExperienceIds(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, long groupId, long classNameId,
-		long classPK, long[] segmentsEntryIds, long[] segmentsExperienceIds) {
+		long classPK, long[] segmentsExperienceIds) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		if (!SegmentsExperimentUtil.isAnalyticsEnabled(
+		if (!SegmentsExperimentUtil.isAnalyticsSynced(
 				themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId())) {
 
 			return segmentsExperienceIds;
@@ -131,9 +131,9 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 			httpServletRequest, httpServletResponse,
 			themeDisplay.getURLCurrent());
 
-		LongStream stream = Arrays.stream(segmentsExperienceIds);
+		LongStream longStream = Arrays.stream(segmentsExperienceIds);
 
-		segmentsExperienceId = stream.findFirst(
+		segmentsExperienceId = longStream.findFirst(
 		).orElse(
 			SegmentsExperienceConstants.ID_DEFAULT
 		);
@@ -185,6 +185,17 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 		}
 
 		return new long[] {segmentsExperienceId};
+	}
+
+	@Override
+	public long[] getSegmentsExperienceIds(
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, long groupId, long classNameId,
+		long classPK, long[] segmentsEntryIds, long[] segmentsExperienceIds) {
+
+		return getSegmentsExperienceIds(
+			httpServletRequest, httpServletResponse, groupId, classNameId,
+			classPK, segmentsExperienceIds);
 	}
 
 	protected long getSegmentsExperimentSegmentsExperienceId(

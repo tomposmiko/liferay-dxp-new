@@ -14,6 +14,7 @@
 
 package com.liferay.sync.service.base;
 
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -33,11 +34,13 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.sync.model.SyncDLFileVersionDiff;
 import com.liferay.sync.service.SyncDLFileVersionDiffLocalService;
+import com.liferay.sync.service.SyncDLFileVersionDiffLocalServiceUtil;
 import com.liferay.sync.service.persistence.SyncDLFileVersionDiffPersistence;
 import com.liferay.sync.service.persistence.SyncDLObjectFinder;
 import com.liferay.sync.service.persistence.SyncDLObjectPersistence;
@@ -45,10 +48,13 @@ import com.liferay.sync.service.persistence.SyncDevicePersistence;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -70,11 +76,15 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>SyncDLFileVersionDiffLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.sync.service.SyncDLFileVersionDiffLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>SyncDLFileVersionDiffLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>SyncDLFileVersionDiffLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the sync dl file version diff to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SyncDLFileVersionDiffLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param syncDLFileVersionDiff the sync dl file version diff
 	 * @return the sync dl file version diff that was added
@@ -106,6 +116,10 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 	/**
 	 * Deletes the sync dl file version diff with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SyncDLFileVersionDiffLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param syncDLFileVersionDiffId the primary key of the sync dl file version diff
 	 * @return the sync dl file version diff that was removed
 	 * @throws PortalException if a sync dl file version diff with the primary key could not be found
@@ -122,6 +136,10 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 	/**
 	 * Deletes the sync dl file version diff from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SyncDLFileVersionDiffLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param syncDLFileVersionDiff the sync dl file version diff
 	 * @return the sync dl file version diff that was removed
 	 * @throws PortalException
@@ -133,6 +151,18 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 		throws PortalException {
 
 		return syncDLFileVersionDiffPersistence.remove(syncDLFileVersionDiff);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return syncDLFileVersionDiffPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -298,6 +328,16 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return syncDLFileVersionDiffPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -306,6 +346,13 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 			(SyncDLFileVersionDiff)persistedModel);
 	}
 
+	public BasePersistence<SyncDLFileVersionDiff> getBasePersistence() {
+		return syncDLFileVersionDiffPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -344,6 +391,10 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 	/**
 	 * Updates the sync dl file version diff in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SyncDLFileVersionDiffLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param syncDLFileVersionDiff the sync dl file version diff
 	 * @return the sync dl file version diff that was updated
 	 */
@@ -353,6 +404,11 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 		SyncDLFileVersionDiff syncDLFileVersionDiff) {
 
 		return syncDLFileVersionDiffPersistence.update(syncDLFileVersionDiff);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -367,6 +423,8 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		syncDLFileVersionDiffLocalService =
 			(SyncDLFileVersionDiffLocalService)aopProxy;
+
+		_setLocalServiceUtilService(syncDLFileVersionDiffLocalService);
 	}
 
 	/**
@@ -409,6 +467,23 @@ public abstract class SyncDLFileVersionDiffLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		SyncDLFileVersionDiffLocalService syncDLFileVersionDiffLocalService) {
+
+		try {
+			Field field =
+				SyncDLFileVersionDiffLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, syncDLFileVersionDiffLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

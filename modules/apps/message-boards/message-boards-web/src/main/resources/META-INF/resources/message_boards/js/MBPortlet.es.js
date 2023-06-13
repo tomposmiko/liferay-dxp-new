@@ -16,6 +16,11 @@ import {PortletBase, fetch} from 'frontend-js-web';
 import core from 'metal';
 import {EventHandler} from 'metal-events';
 
+const RECENTLY_REMOVED_ATTACHMENTS = {
+	multiple: Liferay.Language.get('x-recently-removed-attachments'),
+	single: Liferay.Language.get('x-recently-removed-attachment'),
+};
+
 /**
  * MBPortlet handles the actions of replying or editing a
  * message board.
@@ -25,6 +30,7 @@ import {EventHandler} from 'metal-events';
  */
 
 class MBPortlet extends PortletBase {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -42,7 +48,7 @@ class MBPortlet extends PortletBase {
 
 		if (publishButton) {
 			this.eventHandler_.add(
-				publishButton.addEventListener('click', e => {
+				publishButton.addEventListener('click', (e) => {
 					this.publish_(e);
 				})
 			);
@@ -52,7 +58,7 @@ class MBPortlet extends PortletBase {
 
 		if (saveButton) {
 			this.eventHandler_.add(
-				saveButton.addEventListener('click', e => {
+				saveButton.addEventListener('click', (e) => {
 					this.saveDraft_(e);
 				})
 			);
@@ -62,7 +68,7 @@ class MBPortlet extends PortletBase {
 
 		if (advancedReplyLink) {
 			this.eventHandler_.add(
-				advancedReplyLink.addEventListener('click', e => {
+				advancedReplyLink.addEventListener('click', (e) => {
 					this.openAdvancedReply_(e);
 				})
 			);
@@ -70,7 +76,7 @@ class MBPortlet extends PortletBase {
 
 		const searchContainerId = this.ns('messageAttachments');
 
-		Liferay.componentReady(searchContainerId).then(searchContainer => {
+		Liferay.componentReady(searchContainerId).then((searchContainer) => {
 			this.eventHandler_.add(
 				searchContainer
 					.get('contentBox')
@@ -93,16 +99,16 @@ class MBPortlet extends PortletBase {
 				Liferay.Util.openWindow({
 					dialog: {
 						on: {
-							visibleChange: event => {
+							visibleChange: (event) => {
 								if (!event.newVal) {
 									this.updateRemovedAttachments_();
 								}
-							}
-						}
+							},
+						},
 					},
 					id: this.namespace + 'openRemovedPageAttachments',
 					title: Liferay.Language.get('removed-attachments'),
-					uri: this.viewTrashAttachmentsURL
+					uri: this.viewTrashAttachmentsURL,
 				});
 			});
 		}
@@ -167,13 +173,14 @@ class MBPortlet extends PortletBase {
 
 		if (tempImages.length > 0) {
 			if (confirm(this.strings.confirmDiscardImages)) {
-				tempImages.forEach(node => {
+				tempImages.forEach((node) => {
 					node.parentElement.remove();
 				});
 
 				this.submitForm_();
 			}
-		} else {
+		}
+		else {
 			this.submitForm_();
 		}
 	}
@@ -211,8 +218,8 @@ class MBPortlet extends PortletBase {
 
 	updateRemovedAttachments_() {
 		fetch(this.getAttachmentsURL)
-			.then(res => res.json())
-			.then(attachments => {
+			.then((res) => res.json())
+			.then((attachments) => {
 				if (attachments.active.length > 0) {
 					const searchContainer = this.searchContainer_;
 					const searchContainerData = searchContainer.getData();
@@ -221,7 +228,7 @@ class MBPortlet extends PortletBase {
 						.getElementById(this.namespace + 'fileAttachments')
 						.classList.remove('hide');
 
-					attachments.active.forEach(attachment => {
+					attachments.active.forEach((attachment) => {
 						if (searchContainerData.indexOf(attachment.id) == -1) {
 							searchContainer.addRow(
 								[
@@ -233,7 +240,7 @@ class MBPortlet extends PortletBase {
 										attachment.deleteURL
 									}" href="javascript:;">${Liferay.Language.get(
 										'move-to-recycle-bin'
-									)}</a>`
+									)}</a>`,
 								],
 								attachment.id.toString()
 							);
@@ -251,14 +258,13 @@ class MBPortlet extends PortletBase {
 					deletedAttachmentsElement.style.display = 'initial';
 					deletedAttachmentsElement.innerHTML =
 						Liferay.Util.sub(
-							Liferay.Language.get(
-								attachments.deleted.length > 1
-									? 'x-recently-removed-attachments'
-									: 'x-recently-removed-attachment'
-							),
+							attachments.deleted.length > 1
+								? RECENTLY_REMOVED_ATTACHMENTS.multiple
+								: RECENTLY_REMOVED_ATTACHMENTS.single,
 							attachments.deleted.length
 						) + ' &raquo';
-				} else {
+				}
+				else {
 					deletedAttachmentsElement.style.display = 'none';
 				}
 			});
@@ -288,7 +294,9 @@ class MBPortlet extends PortletBase {
 					const namespace = this.namespace;
 					const value = item.value;
 
-					return `<input id="${namespace}selectedFileName${id}" name="${namespace}selectedFileName" type="hidden" value="${value}" />`;
+					return `<input id="${namespace}selectedFileName${id}" name="${namespace}selectedFileName" type="hidden" value="${Liferay.Util.escapeHTML(
+						value
+					)}" />`;
 				})
 				.join('');
 
@@ -315,7 +323,8 @@ class MBPortlet extends PortletBase {
 			submitForm(
 				document[this.ns('addQuickReplyFm' + this.replyToMessageId)]
 			);
-		} else {
+		}
+		else {
 			this.one('#body').value = window[this.ns('bodyEditor')].getHTML();
 
 			submitForm(document[this.ns('fm')]);
@@ -342,6 +351,7 @@ class MBPortlet extends PortletBase {
  */
 
 MBPortlet.STATE = {
+
 	/**
 	 * Portlet's constants
 	 * @instance
@@ -350,7 +360,7 @@ MBPortlet.STATE = {
 	 */
 
 	constants: {
-		validator: core.isObject
+		validator: core.isObject,
 	},
 
 	/**
@@ -362,7 +372,7 @@ MBPortlet.STATE = {
 	 */
 
 	currentAction: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -373,7 +383,7 @@ MBPortlet.STATE = {
 	 */
 
 	getAttachmentsURL: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -385,7 +395,7 @@ MBPortlet.STATE = {
 	 */
 
 	replyToMessageId: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -400,8 +410,8 @@ MBPortlet.STATE = {
 		value: {
 			confirmDiscardImages: Liferay.Language.get(
 				'uploads-are-in-progress-confirmation'
-			)
-		}
+			),
+		},
 	},
 
 	/**
@@ -412,8 +422,8 @@ MBPortlet.STATE = {
 	 */
 
 	viewTrashAttachmentsURL: {
-		validator: core.isString
-	}
+		validator: core.isString,
+	},
 };
 
 export default MBPortlet;

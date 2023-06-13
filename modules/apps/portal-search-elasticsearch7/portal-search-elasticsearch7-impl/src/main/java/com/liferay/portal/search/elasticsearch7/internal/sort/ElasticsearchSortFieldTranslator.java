@@ -56,15 +56,16 @@ import org.osgi.service.component.annotations.Reference;
 	service = {SortFieldTranslator.class, SortVisitor.class}
 )
 public class ElasticsearchSortFieldTranslator
-	implements SortFieldTranslator<SortBuilder>, SortVisitor<SortBuilder> {
+	implements SortFieldTranslator<SortBuilder<?>>,
+			   SortVisitor<SortBuilder<?>> {
 
 	@Override
-	public SortBuilder translate(Sort sort) {
+	public SortBuilder<?> translate(Sort sort) {
 		return sort.accept(this);
 	}
 
 	@Override
-	public SortBuilder visit(FieldSort fieldSort) {
+	public SortBuilder<?> visit(FieldSort fieldSort) {
 		FieldSortBuilder fieldSortBuilder = SortBuilders.fieldSort(
 			fieldSort.getField());
 
@@ -80,29 +81,29 @@ public class ElasticsearchSortFieldTranslator
 		}
 
 		if (fieldSort.getSortMode() != null) {
-			SortMode sortMode = fieldSort.getSortMode();
-
-			fieldSortBuilder.sortMode(translate(sortMode));
+			fieldSortBuilder.sortMode(translate(fieldSort.getSortMode()));
 		}
 
-		return fieldSortBuilder;
+		return fieldSortBuilder.unmappedType("keyword");
 	}
 
 	@Override
-	public SortBuilder visit(GeoDistanceSort geoDistanceSort) {
+	public SortBuilder<?> visit(GeoDistanceSort geoDistanceSort) {
 		List<GeoLocationPoint> geoLocationPoints =
 			geoDistanceSort.getGeoLocationPoints();
 
 		Stream<GeoLocationPoint> stream = geoLocationPoints.stream();
 
-		GeoPoint[] geoPoints = stream.map(
-			GeoLocationPointTranslator::translate
-		).toArray(
-			GeoPoint[]::new
-		);
-
 		GeoDistanceSortBuilder geoDistanceSortBuilder =
-			SortBuilders.geoDistanceSort(geoDistanceSort.getField(), geoPoints);
+			SortBuilders.geoDistanceSort(
+				geoDistanceSort.getField(),
+				stream.map(
+					GeoLocationPointTranslator::translate
+				).toArray(
+					GeoPoint[]::new
+				));
+
+		geoDistanceSortBuilder.order(translate(geoDistanceSort.getSortOrder()));
 
 		if (geoDistanceSort.getDistanceUnit() != null) {
 			geoDistanceSortBuilder.unit(
@@ -123,21 +124,23 @@ public class ElasticsearchSortFieldTranslator
 		}
 
 		if (geoDistanceSort.getSortMode() != null) {
-			SortMode sortMode = geoDistanceSort.getSortMode();
-
-			geoDistanceSortBuilder.sortMode(translate(sortMode));
+			geoDistanceSortBuilder.sortMode(
+				translate(geoDistanceSort.getSortMode()));
 		}
 
 		return geoDistanceSortBuilder;
 	}
 
 	@Override
-	public SortBuilder visit(ScoreSort scoreSort) {
-		return SortBuilders.scoreSort();
+	public SortBuilder<?> visit(ScoreSort scoreSort) {
+		return SortBuilders.scoreSort(
+		).order(
+			translate(scoreSort.getSortOrder())
+		);
 	}
 
 	@Override
-	public SortBuilder visit(ScriptSort scriptSort) {
+	public SortBuilder<?> visit(ScriptSort scriptSort) {
 		Script script = _scriptTranslator.translate(scriptSort.getScript());
 
 		ScriptSortBuilder.ScriptSortType scriptSortType =
@@ -158,10 +161,10 @@ public class ElasticsearchSortFieldTranslator
 		}
 
 		if (scriptSort.getSortMode() != null) {
-			SortMode sortMode = scriptSort.getSortMode();
-
-			scriptSortBuilder.sortMode(translate(sortMode));
+			scriptSortBuilder.sortMode(translate(scriptSort.getSortMode()));
 		}
+
+		scriptSortBuilder.order(translate(scriptSort.getSortOrder()));
 
 		return scriptSortBuilder;
 	}

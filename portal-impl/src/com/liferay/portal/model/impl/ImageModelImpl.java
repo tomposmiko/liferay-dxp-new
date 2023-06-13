@@ -28,12 +28,13 @@ import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
+import java.sql.Blob;
 import java.sql.Types;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -68,10 +70,11 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	public static final String TABLE_NAME = "Image";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"imageId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"modifiedDate", Types.TIMESTAMP},
-		{"type_", Types.VARCHAR}, {"height", Types.INTEGER},
-		{"width", Types.INTEGER}, {"size_", Types.INTEGER}
+		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
+		{"imageId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"modifiedDate", Types.TIMESTAMP}, {"type_", Types.VARCHAR},
+		{"height", Types.INTEGER}, {"width", Types.INTEGER},
+		{"size_", Types.INTEGER}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -79,6 +82,7 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("imageId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
@@ -89,7 +93,7 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table Image (mvccVersion LONG default 0 not null,imageId LONG not null primary key,companyId LONG,modifiedDate DATE null,type_ VARCHAR(75) null,height INTEGER,width INTEGER,size_ INTEGER)";
+		"create table Image (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,imageId LONG not null,companyId LONG,modifiedDate DATE null,type_ VARCHAR(75) null,height INTEGER,width INTEGER,size_ INTEGER,primary key (imageId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table Image";
 
@@ -103,23 +107,35 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	public static final String TX_MANAGER = "liferayTransactionManager";
 
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(
-		com.liferay.portal.util.PropsUtil.get(
-			"value.object.entity.cache.enabled.com.liferay.portal.kernel.model.Image"),
-		true);
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean ENTITY_CACHE_ENABLED = true;
 
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(
-		com.liferay.portal.util.PropsUtil.get(
-			"value.object.finder.cache.enabled.com.liferay.portal.kernel.model.Image"),
-		true);
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean FINDER_CACHE_ENABLED = true;
 
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(
-		com.liferay.portal.util.PropsUtil.get(
-			"value.object.column.bitmask.enabled.com.liferay.portal.kernel.model.Image"),
-		true);
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean COLUMN_BITMASK_ENABLED = true;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long SIZE_COLUMN_BITMASK = 1L;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *		#getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long IMAGEID_COLUMN_BITMASK = 2L;
 
 	/**
@@ -127,7 +143,9 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	 *
 	 * @param soapModel the soap model instance to convert
 	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
+	@Deprecated
 	public static Image toModel(ImageSoap soapModel) {
 		if (soapModel == null) {
 			return null;
@@ -136,6 +154,7 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		Image model = new ImageImpl();
 
 		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setImageId(soapModel.getImageId());
 		model.setCompanyId(soapModel.getCompanyId());
 		model.setModifiedDate(soapModel.getModifiedDate());
@@ -152,7 +171,9 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	 *
 	 * @param soapModels the soap model instances to convert
 	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
+	@Deprecated
 	public static List<Image> toModels(ImageSoap[] soapModels) {
 		if (soapModels == null) {
 			return null;
@@ -221,9 +242,6 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 				attributeName, attributeGetterFunction.apply((Image)this));
 		}
 
-		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
-		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
-
 		return attributes;
 	}
 
@@ -254,33 +272,6 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static Function<InvocationHandler, Image>
-		_getProxyProviderFunction() {
-
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			Image.class.getClassLoader(), Image.class, ModelWrapper.class);
-
-		try {
-			Constructor<Image> constructor =
-				(Constructor<Image>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
-	}
-
 	private static final Map<String, Function<Image, Object>>
 		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Image, Object>>
@@ -295,6 +286,11 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		attributeGetterFunctions.put("mvccVersion", Image::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Image, Long>)Image::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", Image::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<Image, Long>)Image::setCtCollectionId);
 		attributeGetterFunctions.put("imageId", Image::getImageId);
 		attributeSetterBiConsumers.put(
 			"imageId", (BiConsumer<Image, Long>)Image::setImageId);
@@ -331,7 +327,26 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_mvccVersion = mvccVersion;
+	}
+
+	@JSON
+	@Override
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_ctCollectionId = ctCollectionId;
 	}
 
 	@JSON
@@ -342,7 +357,9 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void setImageId(long imageId) {
-		_columnBitmask = -1L;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
 
 		_imageId = imageId;
 	}
@@ -355,6 +372,10 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void setCompanyId(long companyId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_companyId = companyId;
 	}
 
@@ -364,8 +385,18 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		return _modifiedDate;
 	}
 
+	public boolean hasSetModifiedDate() {
+		return _setModifiedDate;
+	}
+
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
+		_setModifiedDate = true;
+
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_modifiedDate = modifiedDate;
 	}
 
@@ -382,6 +413,10 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void setType(String type) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_type = type;
 	}
 
@@ -393,6 +428,10 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void setHeight(int height) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_height = height;
 	}
 
@@ -404,6 +443,10 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void setWidth(int width) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_width = width;
 	}
 
@@ -415,22 +458,44 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void setSize(int size) {
-		_columnBitmask |= SIZE_COLUMN_BITMASK;
-
-		if (!_setOriginalSize) {
-			_setOriginalSize = true;
-
-			_originalSize = _size;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_size = size;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public int getOriginalSize() {
-		return _originalSize;
+		return GetterUtil.getInteger(
+			this.<Integer>getColumnOriginalValue("size_"));
 	}
 
 	public long getColumnBitmask() {
+		if (_columnBitmask > 0) {
+			return _columnBitmask;
+		}
+
+		if ((_columnOriginalValues == null) ||
+			(_columnOriginalValues == Collections.EMPTY_MAP)) {
+
+			return 0;
+		}
+
+		for (Map.Entry<String, Object> entry :
+				_columnOriginalValues.entrySet()) {
+
+			if (!Objects.equals(
+					entry.getValue(), getColumnValue(entry.getKey()))) {
+
+				_columnBitmask |= _columnBitmasks.get(entry.getKey());
+			}
+		}
+
 		return _columnBitmask;
 	}
 
@@ -467,6 +532,7 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		ImageImpl imageImpl = new ImageImpl();
 
 		imageImpl.setMvccVersion(getMvccVersion());
+		imageImpl.setCtCollectionId(getCtCollectionId());
 		imageImpl.setImageId(getImageId());
 		imageImpl.setCompanyId(getCompanyId());
 		imageImpl.setModifiedDate(getModifiedDate());
@@ -502,16 +568,16 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof Image)) {
+		if (!(object instanceof Image)) {
 			return false;
 		}
 
-		Image image = (Image)obj;
+		Image image = (Image)object;
 
 		long primaryKey = image.getPrimaryKey();
 
@@ -528,11 +594,19 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		return (int)getPrimaryKey();
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isEntityCacheEnabled() {
 		return ENTITY_CACHE_ENABLED;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isFinderCacheEnabled() {
 		return FINDER_CACHE_ENABLED;
@@ -540,13 +614,11 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 
 	@Override
 	public void resetOriginalValues() {
-		ImageModelImpl imageModelImpl = this;
+		_columnOriginalValues = Collections.emptyMap();
 
-		imageModelImpl._originalSize = imageModelImpl._size;
+		_setModifiedDate = false;
 
-		imageModelImpl._setOriginalSize = false;
-
-		imageModelImpl._columnBitmask = 0;
+		_columnBitmask = 0;
 	}
 
 	@Override
@@ -554,6 +626,8 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 		ImageCacheModel imageCacheModel = new ImageCacheModel();
 
 		imageCacheModel.mvccVersion = getMvccVersion();
+
+		imageCacheModel.ctCollectionId = getCtCollectionId();
 
 		imageCacheModel.imageId = getImageId();
 
@@ -591,7 +665,7 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 			getAttributeGetterFunctions();
 
 		StringBundler sb = new StringBundler(
-			4 * attributeGetterFunctions.size() + 2);
+			(5 * attributeGetterFunctions.size()) + 2);
 
 		sb.append("{");
 
@@ -601,9 +675,26 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 			String attributeName = entry.getKey();
 			Function<Image, Object> attributeGetterFunction = entry.getValue();
 
+			sb.append("\"");
 			sb.append(attributeName);
-			sb.append("=");
-			sb.append(attributeGetterFunction.apply((Image)this));
+			sb.append("\": ");
+
+			Object value = attributeGetterFunction.apply((Image)this);
+
+			if (value == null) {
+				sb.append("null");
+			}
+			else if (value instanceof Blob || value instanceof Date ||
+					 value instanceof Map || value instanceof String) {
+
+				sb.append(
+					"\"" + StringUtil.replace(value.toString(), "\"", "'") +
+						"\"");
+			}
+			else {
+				sb.append(value);
+			}
+
 			sb.append(", ");
 		}
 
@@ -622,7 +713,7 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 			getAttributeGetterFunctions();
 
 		StringBundler sb = new StringBundler(
-			5 * attributeGetterFunctions.size() + 4);
+			(5 * attributeGetterFunctions.size()) + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
@@ -649,20 +740,106 @@ public class ImageModelImpl extends BaseModelImpl<Image> implements ImageModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Image>
-			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
+			_escapedModelProxyProviderFunction =
+				ProxyUtil.getProxyProviderFunction(
+					Image.class, ModelWrapper.class);
 
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private long _imageId;
 	private long _companyId;
 	private Date _modifiedDate;
+	private boolean _setModifiedDate;
 	private String _type;
 	private int _height;
 	private int _width;
 	private int _size;
-	private int _originalSize;
-	private boolean _setOriginalSize;
+
+	public <T> T getColumnValue(String columnName) {
+		columnName = _attributeNames.getOrDefault(columnName, columnName);
+
+		Function<Image, Object> function = _attributeGetterFunctions.get(
+			columnName);
+
+		if (function == null) {
+			throw new IllegalArgumentException(
+				"No attribute getter function found for " + columnName);
+		}
+
+		return (T)function.apply((Image)this);
+	}
+
+	public <T> T getColumnOriginalValue(String columnName) {
+		if (_columnOriginalValues == null) {
+			return null;
+		}
+
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		return (T)_columnOriginalValues.get(columnName);
+	}
+
+	private void _setColumnOriginalValues() {
+		_columnOriginalValues = new HashMap<String, Object>();
+
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
+		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
+		_columnOriginalValues.put("imageId", _imageId);
+		_columnOriginalValues.put("companyId", _companyId);
+		_columnOriginalValues.put("modifiedDate", _modifiedDate);
+		_columnOriginalValues.put("type_", _type);
+		_columnOriginalValues.put("height", _height);
+		_columnOriginalValues.put("width", _width);
+		_columnOriginalValues.put("size_", _size);
+	}
+
+	private static final Map<String, String> _attributeNames;
+
+	static {
+		Map<String, String> attributeNames = new HashMap<>();
+
+		attributeNames.put("type_", "type");
+		attributeNames.put("size_", "size");
+
+		_attributeNames = Collections.unmodifiableMap(attributeNames);
+	}
+
+	private transient Map<String, Object> _columnOriginalValues;
+
+	public static long getColumnBitmask(String columnName) {
+		return _columnBitmasks.get(columnName);
+	}
+
+	private static final Map<String, Long> _columnBitmasks;
+
+	static {
+		Map<String, Long> columnBitmasks = new HashMap<>();
+
+		columnBitmasks.put("mvccVersion", 1L);
+
+		columnBitmasks.put("ctCollectionId", 2L);
+
+		columnBitmasks.put("imageId", 4L);
+
+		columnBitmasks.put("companyId", 8L);
+
+		columnBitmasks.put("modifiedDate", 16L);
+
+		columnBitmasks.put("type_", 32L);
+
+		columnBitmasks.put("height", 64L);
+
+		columnBitmasks.put("width", 128L);
+
+		columnBitmasks.put("size_", 256L);
+
+		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
+	}
+
 	private long _columnBitmask;
 	private Image _escapedModel;
 

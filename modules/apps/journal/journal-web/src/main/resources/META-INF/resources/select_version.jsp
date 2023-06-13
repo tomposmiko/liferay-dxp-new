@@ -20,7 +20,7 @@
 long groupId = ParamUtil.getLong(request, "groupId");
 String articleId = ParamUtil.getString(request, "articleId");
 double sourceVersion = ParamUtil.getDouble(request, "sourceVersion");
-String eventName = ParamUtil.getString(request, "eventName", renderResponse.getNamespace() + "selectVersionFm");
+String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectVersionFm");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -31,7 +31,7 @@ portletURL.setParameter("articleId", articleId);
 portletURL.setParameter("sourceVersion", String.valueOf(sourceVersion));
 %>
 
-<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="selectVersionFm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="selectVersionFm">
 	<liferay-ui:search-container
 		iteratorURL="<%= portletURL %>"
 		total="<%= JournalArticleLocalServiceUtil.getArticlesCount(groupId, articleId) %>"
@@ -58,14 +58,19 @@ portletURL.setParameter("sourceVersion", String.valueOf(sourceVersion));
 					curTargetVersion = curSourceVersion;
 					curSourceVersion = tempVersion;
 				}
-
-				Map<String, Object> data = new HashMap<String, Object>();
-
-				data.put("sourceversion", curSourceVersion);
-				data.put("targetversion", curTargetVersion);
 				%>
 
-				<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
+				<aui:a
+					cssClass="selector-button"
+					data='<%=
+						HashMapBuilder.<String, Object>put(
+							"sourceversion", curSourceVersion
+						).put(
+							"targetversion", curTargetVersion
+						).build()
+					%>'
+					href="javascript:;"
+				>
 					<%= String.valueOf(curArticle.getVersion()) %>
 				</aui:a>
 			</liferay-ui:search-container-column-text>

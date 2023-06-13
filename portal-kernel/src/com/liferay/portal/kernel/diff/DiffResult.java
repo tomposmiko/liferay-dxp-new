@@ -39,8 +39,9 @@ public class DiffResult {
 	public static final String TARGET = "TARGET";
 
 	public DiffResult(int linePos, List<String> changedLines) {
-		_lineNumber = linePos + 1;
 		_changedLines = changedLines;
+
+		_lineNumber = linePos + 1;
 	}
 
 	public DiffResult(int linePos, String changedLine) {
@@ -52,16 +53,16 @@ public class DiffResult {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof DiffResult)) {
+		if (!(object instanceof DiffResult)) {
 			return false;
 		}
 
-		DiffResult diffResult = (DiffResult)obj;
+		DiffResult diffResult = (DiffResult)object;
 
 		List<String> changedLines = diffResult.getChangedLines();
 
@@ -99,7 +100,7 @@ public class DiffResult {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(2 * _changedLines.size() + 3);
+		StringBundler sb = new StringBundler((2 * _changedLines.size()) + 3);
 
 		sb.append("Line: ");
 		sb.append(_lineNumber);

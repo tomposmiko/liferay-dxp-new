@@ -60,11 +60,12 @@ request.setAttribute("view.jsp-orderByType", orderByType);
 </portlet:actionURL>
 
 <%
-SearchContainer wikiNodesSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, null, "there-are-no-wikis");
+SearchContainer<WikiNode> wikiNodesSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, portletURL, null, "there-are-no-wikis");
 
 NodesChecker nodesChecker = new NodesChecker(liferayPortletRequest, liferayPortletResponse);
 
 wikiNodesSearchContainer.setRowChecker(nodesChecker);
+
 wikiNodesSearchContainer.setOrderByCol(orderByCol);
 wikiNodesSearchContainer.setOrderByComparator(WikiPortletUtil.getNodeOrderByComparator(orderByCol, orderByType));
 wikiNodesSearchContainer.setOrderByType(orderByType);
@@ -92,7 +93,10 @@ WikiNodesManagementToolbarDisplayContext wikiNodesManagementToolbarDisplayContex
 	viewTypeItems="<%= wikiNodesManagementToolbarDisplayContext.getViewTypes() %>"
 />
 
-<div class="closed container-fluid container-fluid-max-xl sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+<clay:container-fluid
+	cssClass="closed sidenav-container sidenav-right"
+	id='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
+>
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/wiki/node_info_panel" var="sidebarPanelURL" />
 
 	<liferay-frontend:sidebar-panel
@@ -142,11 +146,10 @@ WikiNodesManagementToolbarDisplayContext wikiNodesManagementToolbarDisplayContex
 				>
 
 					<%
-					Map<String, Object> rowData = new HashMap<>();
-
-					rowData.put("actions", StringUtil.merge(wikiNodesManagementToolbarDisplayContext.getAvailableActions(node)));
-
-					row.setData(rowData);
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", StringUtil.merge(wikiNodesManagementToolbarDisplayContext.getAvailableActions(node))
+						).build());
 
 					PortletURL rowURL = renderResponse.createRenderURL();
 
@@ -178,7 +181,7 @@ WikiNodesManagementToolbarDisplayContext wikiNodesManagementToolbarDisplayContex
 
 								<c:if test="<%= lastPostDate != null %>">
 									<span class="text-default">
-										<liferay-ui:message arguments="<%= new String[] {LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - lastPostDate.getTime(), true)} %>" key="last-post-x-ago" />
+										<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - lastPostDate.getTime(), true) %>" key="last-post-x-ago" />
 									</span>
 								</c:if>
 
@@ -225,10 +228,10 @@ WikiNodesManagementToolbarDisplayContext wikiNodesManagementToolbarDisplayContex
 			</liferay-ui:search-container>
 		</aui:form>
 	</div>
-</div>
+</clay:container-fluid>
 
 <script>
-	var deleteNodes = function() {
+	var deleteNodes = function () {
 		if (
 			<%= trashHelper.isTrashEnabled(scopeGroupId) %> ||
 			confirm(
@@ -240,21 +243,21 @@ WikiNodesManagementToolbarDisplayContext wikiNodesManagementToolbarDisplayContex
 			Liferay.Util.postForm(form, {
 				data: {
 					<%= Constants.CMD %>:
-						'<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>'
+						'<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>',
 				},
-				url: '<portlet:actionURL name="/wiki/edit_node" />'
+				url: '<portlet:actionURL name="/wiki/edit_node" />',
 			});
 		}
 	};
 
 	var ACTIONS = {
-		deleteNodes: deleteNodes
+		deleteNodes: deleteNodes,
 	};
 
-	Liferay.componentReady('wikiNodesManagementToolbar').then(function(
+	Liferay.componentReady('wikiNodesManagementToolbar').then(function (
 		managementToolbar
 	) {
-		managementToolbar.on('actionItemClicked', function(event) {
+		managementToolbar.on('actionItemClicked', function (event) {
 			var itemData = event.data.item.data;
 
 			if (itemData && itemData.action && ACTIONS[itemData.action]) {

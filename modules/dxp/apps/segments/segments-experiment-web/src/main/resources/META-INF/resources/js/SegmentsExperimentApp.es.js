@@ -15,7 +15,7 @@ import SegmentsExperimentsSidebar from './components/SegmentsExperimentsSidebar.
 import SegmentsExperimentsContext from './context.es';
 import APIService from './util/APIService.es';
 
-export default function({context, props}) {
+export default function ({context, props}) {
 	const {assetsPath, endpoints, page} = context;
 	const {
 		calculateSegmentsExperimentEstimatedDurationURL,
@@ -27,7 +27,7 @@ export default function({context, props}) {
 		editSegmentsExperimentURL,
 		editSegmentsVariantLayoutURL,
 		editSegmentsVariantURL,
-		runSegmentsExperimentURL
+		runSegmentsExperimentURL,
 	} = endpoints;
 
 	return (
@@ -45,26 +45,22 @@ export default function({context, props}) {
 						editSegmentsExperimentStatusURL,
 						editSegmentsExperimentURL,
 						editSegmentsVariantURL,
-						runSegmentsExperimentURL
+						runSegmentsExperimentURL,
 					},
-					namespace: context.namespace
+					namespace: context.namespace,
 				}),
 				assetsPath,
 				editVariantLayoutURL: editSegmentsVariantLayoutURL,
-				page
+				page,
 			}}
 		>
 			<SegmentsExperimentsSidebar
 				initialExperimentHistory={props.historySegmentsExperiments}
 				initialGoals={props.segmentsExperimentGoals}
-				initialSegmentsExperiences={props.segmentsExperiences}
 				initialSegmentsExperiment={props.segmentsExperiment}
 				initialSegmentsVariants={props.initialSegmentsVariants}
 				initialSelectedSegmentsExperienceId={
 					props.selectedSegmentsExperienceId
-				}
-				viewSegmentsExperimentDetailsURL={
-					props.viewSegmentsExperimentDetailsURL
 				}
 				winnerSegmentsVariantId={props.winnerSegmentsVariantId}
 			/>

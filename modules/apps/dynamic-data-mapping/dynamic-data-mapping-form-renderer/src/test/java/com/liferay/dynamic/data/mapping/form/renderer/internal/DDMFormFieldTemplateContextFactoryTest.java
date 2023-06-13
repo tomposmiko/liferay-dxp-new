@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.renderer.internal;
 
+import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorFieldContextKey;
 import com.liferay.dynamic.data.mapping.form.field.type.BaseDDMFormFieldRenderer;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldRenderer;
@@ -22,14 +23,18 @@ import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServices
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.language.LanguageConstants;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.language.constants.LanguageConstants;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -37,6 +42,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,15 +54,23 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
  * @author Marcellus Tavares
  */
 public class DDMFormFieldTemplateContextFactoryTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -111,8 +125,8 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			createDDMFormFieldTemplateContextFactory(
-				ddmForm, ddmFormFieldsPropertyChanges, ddmFormFieldValues, true,
-				getTextDDMFormFieldRenderer(),
+				ddmForm, ddmFormField.getName(), ddmFormFieldsPropertyChanges,
+				ddmFormFieldValues, true, getTextDDMFormFieldRenderer(),
 				getTextDDMFormFieldTemplateContextContributor());
 
 		List<Object> fields = ddmFormFieldTemplateContextFactory.create();
@@ -122,8 +136,7 @@ public class DDMFormFieldTemplateContextFactoryTest {
 		Map<String, Object> fieldTemplateContext =
 			(Map<String, Object>)fields.get(0);
 
-		Assert.assertEquals(
-			true, MapUtil.getBoolean(fieldTemplateContext, "readOnly"));
+		Assert.assertTrue(MapUtil.getBoolean(fieldTemplateContext, "readOnly"));
 	}
 
 	@Test
@@ -173,8 +186,8 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			createDDMFormFieldTemplateContextFactory(
-				ddmForm, ddmFormFieldsPropertyChanges, ddmFormFieldValues,
-				false, getTextDDMFormFieldRenderer(),
+				ddmForm, ddmFormField.getName(), ddmFormFieldsPropertyChanges,
+				ddmFormFieldValues, false, getTextDDMFormFieldRenderer(),
 				getTextDDMFormFieldTemplateContextContributor());
 
 		List<Object> fields = ddmFormFieldTemplateContextFactory.create();
@@ -184,8 +197,7 @@ public class DDMFormFieldTemplateContextFactoryTest {
 		Map<String, Object> fieldTemplateContext =
 			(Map<String, Object>)fields.get(0);
 
-		Assert.assertEquals(
-			true, MapUtil.getBoolean(fieldTemplateContext, "readOnly"));
+		Assert.assertTrue(MapUtil.getBoolean(fieldTemplateContext, "readOnly"));
 	}
 
 	@Test
@@ -244,8 +256,8 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			createDDMFormFieldTemplateContextFactory(
-				ddmForm, ddmFormFieldsPropertyChanges, ddmFormFieldValues,
-				false, getTextDDMFormFieldRenderer(),
+				ddmForm, ddmFormField.getName(), ddmFormFieldsPropertyChanges,
+				ddmFormFieldValues, false, getTextDDMFormFieldRenderer(),
 				getTextDDMFormFieldTemplateContextContributor());
 
 		List<Object> fields = ddmFormFieldTemplateContextFactory.create();
@@ -260,23 +272,20 @@ public class DDMFormFieldTemplateContextFactoryTest {
 			MapUtil.getString(fieldTemplateContext, "displayStyle"));
 		Assert.assertEquals(
 			"Field 1", MapUtil.getString(fieldTemplateContext, "label"));
-		Assert.assertEquals(
-			false, MapUtil.getBoolean(fieldTemplateContext, "readOnly"));
-		Assert.assertEquals(
-			false, MapUtil.getBoolean(fieldTemplateContext, "repeatable"));
-		Assert.assertEquals(
-			true, MapUtil.getBoolean(fieldTemplateContext, "required"));
+		Assert.assertFalse(
+			MapUtil.getBoolean(fieldTemplateContext, "readOnly"));
+		Assert.assertFalse(
+			MapUtil.getBoolean(fieldTemplateContext, "repeatable"));
+		Assert.assertTrue(MapUtil.getBoolean(fieldTemplateContext, "required"));
 		Assert.assertEquals(
 			"This is a tip.", MapUtil.getString(fieldTemplateContext, "tip"));
-		Assert.assertEquals(
-			true, MapUtil.getBoolean(fieldTemplateContext, "valid"));
+		Assert.assertTrue(MapUtil.getBoolean(fieldTemplateContext, "valid"));
 		Assert.assertEquals(
 			StringPool.BLANK,
 			MapUtil.getString(fieldTemplateContext, "validationErrorMessage"));
 		Assert.assertEquals(
 			"Value 1", MapUtil.getString(fieldTemplateContext, "value"));
-		Assert.assertEquals(
-			true, MapUtil.getBoolean(fieldTemplateContext, "visible"));
+		Assert.assertTrue(MapUtil.getBoolean(fieldTemplateContext, "visible"));
 
 		String expectedName = String.format(
 			_FIELD_NAME_FORMAT, "Field1", instanceId, 0, _LOCALE.toString());
@@ -287,7 +296,7 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 	protected DDMFormFieldTemplateContextFactory
 		createDDMFormFieldTemplateContextFactory(
-			DDMForm ddmForm,
+			DDMForm ddmForm, String ddmFormFieldName,
 			Map<DDMFormEvaluatorFieldContextKey, Map<String, Object>>
 				ddmFormFieldsPropertyChanges,
 			List<DDMFormFieldValue> ddmFormFieldValues, boolean ddmFormReadOnly,
@@ -305,8 +314,11 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			new DDMFormFieldTemplateContextFactory(
+				_ddmFormEvaluator, ddmFormFieldName,
 				ddmForm.getDDMFormFieldsMap(true), ddmFormFieldsPropertyChanges,
-				ddmFormFieldValues, ddmFormRenderingContext, true);
+				ddmFormFieldValues, ddmFormRenderingContext,
+				_ddmStructureLayoutLocalService, _ddmStructureLocalService,
+				new JSONFactoryImpl(), true, new DDMFormLayout());
 
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker =
 			mockDDMFormFieldTypeServicesTracker(
@@ -424,6 +436,15 @@ public class DDMFormFieldTemplateContextFactoryTest {
 	private static final Locale _LOCALE = LocaleUtil.US;
 
 	private static final String _PORTLET_NAMESPACE = "_PORTLET_NAMESPACE_";
+
+	@Mock
+	private DDMFormEvaluator _ddmFormEvaluator;
+
+	@Mock
+	private DDMStructureLayoutLocalService _ddmStructureLayoutLocalService;
+
+	@Mock
+	private DDMStructureLocalService _ddmStructureLocalService;
 
 	private HttpServletRequest _httpServletRequest;
 

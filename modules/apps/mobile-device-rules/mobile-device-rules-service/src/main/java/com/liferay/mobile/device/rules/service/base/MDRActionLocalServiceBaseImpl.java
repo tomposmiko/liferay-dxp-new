@@ -21,8 +21,10 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.mobile.device.rules.model.MDRAction;
 import com.liferay.mobile.device.rules.service.MDRActionLocalService;
+import com.liferay.mobile.device.rules.service.MDRActionLocalServiceUtil;
 import com.liferay.mobile.device.rules.service.persistence.MDRActionPersistence;
 import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupInstancePersistence;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -45,16 +47,20 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -75,11 +81,15 @@ public abstract class MDRActionLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>MDRActionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.mobile.device.rules.service.MDRActionLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>MDRActionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>MDRActionLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the mdr action to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRActionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param mdrAction the mdr action
 	 * @return the mdr action that was added
@@ -107,6 +117,10 @@ public abstract class MDRActionLocalServiceBaseImpl
 	/**
 	 * Deletes the mdr action with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRActionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param actionId the primary key of the mdr action
 	 * @return the mdr action that was removed
 	 * @throws PortalException if a mdr action with the primary key could not be found
@@ -120,6 +134,10 @@ public abstract class MDRActionLocalServiceBaseImpl
 	/**
 	 * Deletes the mdr action from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRActionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mdrAction the mdr action
 	 * @return the mdr action that was removed
 	 */
@@ -127,6 +145,18 @@ public abstract class MDRActionLocalServiceBaseImpl
 	@Override
 	public MDRAction deleteMDRAction(MDRAction mdrAction) {
 		return mdrActionPersistence.remove(mdrAction);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return mdrActionPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -383,6 +413,15 @@ public abstract class MDRActionLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return mdrActionPersistence.create(((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -390,6 +429,13 @@ public abstract class MDRActionLocalServiceBaseImpl
 		return mdrActionLocalService.deleteMDRAction((MDRAction)persistedModel);
 	}
 
+	public BasePersistence<MDRAction> getBasePersistence() {
+		return mdrActionPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -474,6 +520,10 @@ public abstract class MDRActionLocalServiceBaseImpl
 	/**
 	 * Updates the mdr action in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRActionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mdrAction the mdr action
 	 * @return the mdr action that was updated
 	 */
@@ -481,6 +531,11 @@ public abstract class MDRActionLocalServiceBaseImpl
 	@Override
 	public MDRAction updateMDRAction(MDRAction mdrAction) {
 		return mdrActionPersistence.update(mdrAction);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -494,6 +549,8 @@ public abstract class MDRActionLocalServiceBaseImpl
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		mdrActionLocalService = (MDRActionLocalService)aopProxy;
+
+		_setLocalServiceUtilService(mdrActionLocalService);
 	}
 
 	/**
@@ -535,6 +592,22 @@ public abstract class MDRActionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		MDRActionLocalService mdrActionLocalService) {
+
+		try {
+			Field field = MDRActionLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mdrActionLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

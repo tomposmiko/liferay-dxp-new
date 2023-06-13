@@ -21,6 +21,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.opensocial.model.Gadget;
 import com.liferay.opensocial.service.GadgetLocalService;
+import com.liferay.opensocial.service.GadgetLocalServiceUtil;
 import com.liferay.opensocial.service.persistence.GadgetPersistence;
 import com.liferay.opensocial.service.persistence.OAuthConsumerPersistence;
 import com.liferay.opensocial.service.persistence.OAuthTokenPersistence;
@@ -44,6 +45,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistryUtil;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.PortletPersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
@@ -52,6 +54,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -75,11 +79,15 @@ public abstract class GadgetLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>GadgetLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.opensocial.service.GadgetLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>GadgetLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>GadgetLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the gadget to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect GadgetLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param gadget the gadget
 	 * @return the gadget that was added
@@ -107,6 +115,10 @@ public abstract class GadgetLocalServiceBaseImpl
 	/**
 	 * Deletes the gadget with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect GadgetLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param gadgetId the primary key of the gadget
 	 * @return the gadget that was removed
 	 * @throws PortalException if a gadget with the primary key could not be found
@@ -119,6 +131,10 @@ public abstract class GadgetLocalServiceBaseImpl
 
 	/**
 	 * Deletes the gadget from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect GadgetLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param gadget the gadget
 	 * @return the gadget that was removed
@@ -354,6 +370,15 @@ public abstract class GadgetLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return gadgetPersistence.create(((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -361,6 +386,13 @@ public abstract class GadgetLocalServiceBaseImpl
 		return gadgetLocalService.deleteGadget((Gadget)persistedModel);
 	}
 
+	public BasePersistence<Gadget> getBasePersistence() {
+		return gadgetPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -411,6 +443,10 @@ public abstract class GadgetLocalServiceBaseImpl
 
 	/**
 	 * Updates the gadget in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect GadgetLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param gadget the gadget
 	 * @return the gadget that was updated
@@ -716,11 +752,15 @@ public abstract class GadgetLocalServiceBaseImpl
 	public void afterPropertiesSet() {
 		PersistedModelLocalServiceRegistryUtil.register(
 			"com.liferay.opensocial.model.Gadget", gadgetLocalService);
+
+		_setLocalServiceUtilService(gadgetLocalService);
 	}
 
 	public void destroy() {
 		PersistedModelLocalServiceRegistryUtil.unregister(
 			"com.liferay.opensocial.model.Gadget");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -762,6 +802,22 @@ public abstract class GadgetLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		GadgetLocalService gadgetLocalService) {
+
+		try {
+			Field field = GadgetLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, gadgetLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

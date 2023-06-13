@@ -14,6 +14,8 @@
 
 package com.liferay.view.count.service;
 
+import com.liferay.petra.sql.dsl.Table;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -64,17 +66,27 @@ public interface ViewCountEntryLocalService
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link ViewCountEntryLocalServiceUtil} to access the view count entry local service. Add custom service methods to <code>com.liferay.view.count.service.impl.ViewCountEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.view.count.service.impl.ViewCountEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the view count entry local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link ViewCountEntryLocalServiceUtil} if injection and service tracking are not available.
 	 */
 
 	/**
 	 * Adds the view count entry to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was added
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public ViewCountEntry addViewCountEntry(ViewCountEntry viewCountEntry);
+
+	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
 
 	/**
 	 * Creates a new view count entry with the primary key. Does not add the view count entry to the database.
@@ -98,6 +110,10 @@ public interface ViewCountEntryLocalService
 	/**
 	 * Deletes the view count entry from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was removed
 	 */
@@ -107,6 +123,10 @@ public interface ViewCountEntryLocalService
 	/**
 	 * Deletes the view count entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param viewCountEntryPK the primary key of the view count entry
 	 * @return the view count entry that was removed
 	 * @throws PortalException if a view count entry with the primary key could not be found
@@ -115,6 +135,12 @@ public interface ViewCountEntryLocalService
 	public ViewCountEntry deleteViewCountEntry(
 			ViewCountEntryPK viewCountEntryPK)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public <T> T dslQuery(DSLQuery dslQuery);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int dslQueryCount(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -199,6 +225,9 @@ public interface ViewCountEntryLocalService
 	 */
 	public String getOSGiServiceIdentifier();
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -240,6 +269,9 @@ public interface ViewCountEntryLocalService
 	public ViewCountEntry getViewCountEntry(ViewCountEntryPK viewCountEntryPK)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Table<?> getViewCountEntryTable();
+
 	@BufferedIncrement(incrementClass = NumberIncrement.class)
 	@Retry(
 		acceptor = SQLStateAcceptor.class,
@@ -254,8 +286,18 @@ public interface ViewCountEntryLocalService
 	public void incrementViewCount(
 		long companyId, long classNameId, long classPK, int increment);
 
+	@Transactional(enabled = false)
+	public boolean isViewCountEnabled();
+
+	@Transactional(enabled = false)
+	public boolean isViewCountEnabled(long classNameId);
+
 	/**
 	 * Updates the view count entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was updated

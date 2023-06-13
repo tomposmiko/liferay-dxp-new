@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,12 +35,19 @@ import java.util.logging.LogRecord;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Igor Spasic
  */
 public class JSONFactoryTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -82,11 +90,10 @@ public class JSONFactoryTest {
 
 	@Test
 	public void testDeserializeLongArrayToIntegerArray() {
-		Map<String, long[]> map = HashMapBuilder.<String, long[]>put(
-			"key", new long[] {1L, 2L, 3L, 4L, 5L}
-		).build();
-
-		String json = JSONFactoryUtil.serialize(map);
+		String json = JSONFactoryUtil.serialize(
+			HashMapBuilder.<String, long[]>put(
+				"key", new long[] {1L, 2L, 3L, 4L, 5L}
+			).build());
 
 		Object object = JSONFactoryUtil.deserialize(json);
 

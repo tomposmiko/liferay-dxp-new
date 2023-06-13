@@ -14,6 +14,7 @@
 
 package com.liferay.portal.url.builder.internal;
 
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilder;
 import com.liferay.portal.url.builder.ResourceAbsolutePortalURLBuilder;
 
@@ -24,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,6 +39,11 @@ import org.mockito.Mockito;
 @RunWith(Parameterized.class)
 public class ResourceAbsolutePortalURLBuilderTest
 	extends BaseAbsolutePortalURLBuilderTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Parameterized.Parameters(name = "{0}: context={1}, proxy={2}, cdnHost={3}")
 	public static Collection<Object[]> data() {
@@ -60,18 +68,17 @@ public class ResourceAbsolutePortalURLBuilderTest
 
 	@Test
 	public void test() {
-		String url = _resourceAbsolutePortalURLBuilder.build();
-
-		Assert.assertEquals(_RESULTS[index], url);
+		Assert.assertEquals(
+			_RESULTS[index], _resourceAbsolutePortalURLBuilder.build());
 	}
 
 	@Test
 	public void testIgnoreCDN() {
 		_absolutePortalURLBuilder.ignoreCDNHost();
 
-		String url = _resourceAbsolutePortalURLBuilder.build();
-
-		Assert.assertEquals(_RESULTS_IGNORE_CDN[index], url);
+		Assert.assertEquals(
+			_RESULTS_IGNORE_CDN[index],
+			_resourceAbsolutePortalURLBuilder.build());
 	}
 
 	@Test
@@ -79,18 +86,18 @@ public class ResourceAbsolutePortalURLBuilderTest
 		_absolutePortalURLBuilder.ignoreCDNHost();
 		_absolutePortalURLBuilder.ignorePathProxy();
 
-		String url = _resourceAbsolutePortalURLBuilder.build();
-
-		Assert.assertEquals(_RESULTS_IGNORE_CDN_AND_PROXY[index], url);
+		Assert.assertEquals(
+			_RESULTS_IGNORE_CDN_AND_PROXY[index],
+			_resourceAbsolutePortalURLBuilder.build());
 	}
 
 	@Test
 	public void testIgnoreProxy() {
 		_absolutePortalURLBuilder.ignorePathProxy();
 
-		String url = _resourceAbsolutePortalURLBuilder.build();
-
-		Assert.assertEquals(_RESULTS_IGNORE_PROXY[index], url);
+		Assert.assertEquals(
+			_RESULTS_IGNORE_PROXY[index],
+			_resourceAbsolutePortalURLBuilder.build());
 	}
 
 	@Parameterized.Parameter(3)

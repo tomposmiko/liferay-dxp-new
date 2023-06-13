@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.users.admin.test.util.search.GroupBlueprint;
@@ -189,6 +190,9 @@ public class JournalArticleMultiLanguageSearchGroupIdsTest {
 		Assert.assertEquals(documents.toString(), 2, documents.size());
 	}
 
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
+
 	protected Group addGroup(Locale locale) throws Exception, PortalException {
 		return _userSearchFixture.addGroup(
 			new GroupBlueprint() {
@@ -251,7 +255,7 @@ public class JournalArticleMultiLanguageSearchGroupIdsTest {
 		SearchContext searchContext) {
 
 		FieldValuesAssert.assertFieldValues(
-			Collections.singletonMap(fieldPrefix + "_" + locale, fieldValue),
+			Collections.singletonMap(fieldPrefix + locale, fieldValue),
 			fieldPrefix, document,
 			(String)searchContext.getAttribute("queryString"));
 	}
@@ -263,10 +267,10 @@ public class JournalArticleMultiLanguageSearchGroupIdsTest {
 		Document document = findDocument(locale, documents);
 
 		assertOnlyPrefixedFieldIsTranslation(
-			"content", locale, content, document, searchContext);
+			"content_", locale, content, document, searchContext);
 
 		assertOnlyPrefixedFieldIsTranslation(
-			"title", locale, title, document, searchContext);
+			"title_", locale, title, document, searchContext);
 	}
 
 	protected Document findDocument(Locale locale, List<Document> documents) {

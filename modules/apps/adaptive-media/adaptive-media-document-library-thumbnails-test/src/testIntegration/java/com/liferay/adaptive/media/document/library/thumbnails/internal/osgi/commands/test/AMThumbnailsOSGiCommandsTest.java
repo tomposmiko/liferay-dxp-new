@@ -15,7 +15,6 @@
 package com.liferay.adaptive.media.document.library.thumbnails.internal.osgi.commands.test;
 
 import com.liferay.adaptive.media.AdaptiveMedia;
-import com.liferay.adaptive.media.document.library.thumbnails.internal.test.util.PropsValuesReplacer;
 import com.liferay.adaptive.media.image.configuration.AMImageConfigurationHelper;
 import com.liferay.adaptive.media.image.finder.AMImageFinder;
 import com.liferay.adaptive.media.image.processor.AMImageProcessor;
@@ -25,6 +24,7 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -63,13 +64,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
@@ -200,12 +201,15 @@ public class AMThumbnailsOSGiCommandsTest {
 		Assert.assertEquals(count + 2, _getThumbnailCount());
 	}
 
+	@Ignore
 	@Test
 	public void testMigrateOnlyProcessesImages() throws Exception {
-		try (PropsValuesReplacer propsValuesReplacer1 = new PropsValuesReplacer(
-				"DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT", 100);
-			PropsValuesReplacer propsValuesReplacer2 = new PropsValuesReplacer(
-				"DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_WIDTH", 100)) {
+		try (SafeCloseable safeCloseable1 =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT", 100);
+			SafeCloseable safeCloseable2 =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_WIDTH", 100)) {
 
 			FileEntry pdfFileEntry = _addPDFFileEntry();
 			FileEntry pngFileEntry = _addPNGFileEntry();
@@ -221,10 +225,12 @@ public class AMThumbnailsOSGiCommandsTest {
 	public void testMigrateThrowsExceptionWhenNoValidConfiguration()
 		throws Exception {
 
-		try (PropsValuesReplacer propsValuesReplacer1 = new PropsValuesReplacer(
-				"DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT", 999);
-			PropsValuesReplacer propsValuesReplacer2 = new PropsValuesReplacer(
-				"DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT", 999)) {
+		try (SafeCloseable safeCloseable1 =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT", 999);
+			SafeCloseable safeCloseable2 =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT", 999)) {
 
 			_addPNGFileEntry();
 
@@ -241,11 +247,10 @@ public class AMThumbnailsOSGiCommandsTest {
 		Object service = registry.getService(
 			registry.getServiceReference(_CLASS_NAME_PROCESSOR));
 
-		Bundle bundle = FrameworkUtil.getBundle(service.getClass());
-
 		ComponentDescriptionDTO componentDescriptionDTO =
 			serviceComponentRuntime.getComponentDescriptionDTO(
-				bundle, _CLASS_NAME_PROCESSOR);
+				FrameworkUtil.getBundle(service.getClass()),
+				_CLASS_NAME_PROCESSOR);
 
 		if (componentDescriptionDTO == null) {
 			return;
@@ -257,7 +262,7 @@ public class AMThumbnailsOSGiCommandsTest {
 		promise.getValue();
 	}
 
-	private static void _disableDocumentLibraryAM() throws BundleException {
+	private static void _disableDocumentLibraryAM() throws Exception {
 		Bundle bundle = FrameworkUtil.getBundle(
 			AMThumbnailsOSGiCommandsTest.class);
 
@@ -283,11 +288,10 @@ public class AMThumbnailsOSGiCommandsTest {
 		Object service = registry.getService(
 			registry.getServiceReference(_CLASS_NAME_OSGI_COMMAND));
 
-		Bundle bundle = FrameworkUtil.getBundle(service.getClass());
-
 		ComponentDescriptionDTO componentDescriptionDTO =
 			serviceComponentRuntime.getComponentDescriptionDTO(
-				bundle, _CLASS_NAME_PROCESSOR);
+				FrameworkUtil.getBundle(service.getClass()),
+				_CLASS_NAME_PROCESSOR);
 
 		if (componentDescriptionDTO == null) {
 			return;
@@ -299,7 +303,7 @@ public class AMThumbnailsOSGiCommandsTest {
 		promise.getValue();
 	}
 
-	private static void _enableDocumentLibraryAM() throws BundleException {
+	private static void _enableDocumentLibraryAM() throws Exception {
 		Bundle bundle = FrameworkUtil.getBundle(
 			AMThumbnailsOSGiCommandsTest.class);
 

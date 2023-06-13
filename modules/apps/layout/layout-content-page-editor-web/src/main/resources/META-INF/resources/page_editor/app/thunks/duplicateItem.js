@@ -1,6 +1,3 @@
-import {updateLayoutData} from '../actions/index';
-import FragmentService from '../services/FragmentService';
-
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -15,35 +12,33 @@ import FragmentService from '../services/FragmentService';
  * details.
  */
 
-export default function duplicateItem({config, itemId, store}) {
-	const {segmentsExperienceId} = store;
+import duplicateItemAction from '../actions/duplicateItem';
+import FragmentService from '../services/FragmentService';
 
-	return dispatch => {
+export default function duplicateItem({
+	itemId,
+	segmentsExperienceId,
+	selectItem = () => {},
+}) {
+	return (dispatch) => {
 		FragmentService.duplicateItem({
-			config,
 			itemId,
 			onNetworkStatus: dispatch,
-			segmentsExperienceId
-		}).then(({duplicatedFragmentEntryLinks, layoutData}) => {
-			const addedFragmentEntryLinks = duplicatedFragmentEntryLinks.map(
-				fragmentEntryLink => {
-					// TODO: LPS-106738
-					fragmentEntryLink.content = {
-						value: {
-							content: fragmentEntryLink.content
-						}
-					};
+			segmentsExperienceId,
+		}).then(
+			({duplicatedFragmentEntryLinks, duplicatedItemId, layoutData}) => {
+				dispatch(
+					duplicateItemAction({
+						addedFragmentEntryLinks: duplicatedFragmentEntryLinks,
+						itemId: duplicatedItemId,
+						layoutData,
+					})
+				);
 
-					return fragmentEntryLink;
+				if (duplicatedItemId) {
+					selectItem(duplicatedItemId);
 				}
-			);
-
-			dispatch(
-				updateLayoutData({
-					addedFragmentEntryLinks,
-					layoutData
-				})
-			);
-		});
+			}
+		);
 	};
 }

@@ -61,8 +61,10 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see DDMTemplateServiceHttp
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class DDMTemplateServiceSoap {
 
 	/**
@@ -494,6 +496,31 @@ public class DDMTemplateServiceSoap {
 		}
 	}
 
+	public static com.liferay.dynamic.data.mapping.model.DDMTemplateSoap[]
+			getTemplates(
+				long companyId, long[] groupIds, long[] classNameIds,
+				long[] classPKs, long resourceClassNameId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.dynamic.data.mapping.model.DDMTemplate>
+						orderByComparator)
+		throws RemoteException {
+
+		try {
+			java.util.List<com.liferay.dynamic.data.mapping.model.DDMTemplate>
+				returnValue = DDMTemplateServiceUtil.getTemplates(
+					companyId, groupIds, classNameIds, classPKs,
+					resourceClassNameId, start, end, orderByComparator);
+
+			return com.liferay.dynamic.data.mapping.model.DDMTemplateSoap.
+				toSoapModels(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	/**
 	 * Returns all the templates matching the group, class PK, and resource
 	 * class name ID.
@@ -595,6 +622,25 @@ public class DDMTemplateServiceSoap {
 			int returnValue =
 				DDMTemplateServiceUtil.getTemplatesByStructureClassNameIdCount(
 					groupId, structureClassNameId, status);
+
+			return returnValue;
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static int getTemplatesCount(
+			long companyId, long[] groupIds, long[] classNameIds,
+			long[] classPKs, long resourceClassNameId)
+		throws RemoteException {
+
+		try {
+			int returnValue = DDMTemplateServiceUtil.getTemplatesCount(
+				companyId, groupIds, classNameIds, classPKs,
+				resourceClassNameId);
 
 			return returnValue;
 		}

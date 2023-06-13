@@ -43,7 +43,7 @@ Set<String> contextNames = JSONWebServiceActionsManagerUtil.getContextNames();
 	</aui:select>
 </c:if>
 
-<aui:input autoFocus="<%= true %>" cssClass="lfr-api-service-search" label="" name="serviceSearch" placeholder="search" />
+<aui:input cssClass="lfr-api-service-search" label="" name="serviceSearch" placeholder="search" />
 
 <div class="services" id="services">
 
@@ -91,6 +91,7 @@ Set<String> contextNames = JSONWebServiceActionsManagerUtil.getContextNames();
 			collapsible="<%= true %>"
 			extended="<%= true %>"
 			id='<%= "apiService" + HtmlUtil.getAUICompatibleId(jsonWebServiceClassName) + "Panel" %>'
+			markupView="lexicon"
 			persistState="<%= true %>"
 			title="<%= panelTitle %>"
 		>
@@ -107,13 +108,8 @@ Set<String> contextNames = JSONWebServiceActionsManagerUtil.getContextNames();
 					String serviceSignature = jsonWebServiceActionMapping.getSignature();
 				%>
 
-					<li class="lfr-api-signature <%= serviceSignature.equals(signature) ? "selected" : StringPool.BLANK %>">
-
-						<%
-						String methodURL = HttpUtil.addParameter(jsonWSContextPath, "signature", serviceSignature);
-						%>
-
-						<a class="lfr-api-service-result method-name" data-metaData="<%= jsonWebServiceClassName %>" href="<%= methodURL %>">
+					<li class="lfr-api-signature <%= serviceSignature.equals(signature) ? "border border-primary my-2 rounded selected" : StringPool.BLANK %>">
+						<a class="d-block lfr-api-service-result method-name px-2 py-1 rounded" data-metaData="<%= jsonWebServiceClassName %>" href="<%= HttpUtil.addParameter(jsonWSContextPath, "signature", serviceSignature) %>">
 							<%= path %>
 						</a>
 					</li>
@@ -135,7 +131,7 @@ Set<String> contextNames = JSONWebServiceActionsManagerUtil.getContextNames();
 	<liferay-ui:message key="there-are-no-services-matching-that-phrase" />
 </div>
 
-<aui:script use="aui-base,autocomplete-base,autocomplete-filters,autocomplete-highlighters">
+<aui:script use="aui-base,aui-component,autocomplete-base,autocomplete-filters,autocomplete-highlighters">
 	var Lang = A.Lang;
 
 	var AArray = A.Array;

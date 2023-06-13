@@ -12,7 +12,7 @@
  * details.
  */
 
-import {PagesVisitor} from 'dynamic-data-mapping-form-builder/js/util/visitors.es';
+import {PagesVisitor} from 'dynamic-data-mapping-form-builder';
 
 import FormRenderer from './FormRenderer.es';
 
@@ -20,11 +20,11 @@ class FormRendererWithProvider extends FormRenderer {
 	_handleFieldEdited(properties) {
 		const pageVisitor = new PagesVisitor(this.pages);
 
-		const pages = pageVisitor.mapFields(field => {
+		const pages = pageVisitor.mapFields((field) => {
 			if (field.fieldName === properties.fieldInstance.fieldName) {
 				return {
 					...field,
-					value: properties.value
+					value: properties.value,
 				};
 			}
 		});

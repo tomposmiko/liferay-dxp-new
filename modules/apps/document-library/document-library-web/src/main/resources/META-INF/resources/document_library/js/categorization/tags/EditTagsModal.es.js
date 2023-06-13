@@ -39,7 +39,7 @@ const EditTagsModal = ({
 	repositoryId,
 	selectAll = false,
 	observer,
-	onModalClose = noop
+	onModalClose = noop,
 }) => {
 	const {namespace} = useContext(EditTagsContext);
 
@@ -47,6 +47,7 @@ const EditTagsModal = ({
 
 	// Flag that indicates whether new selected items must be added to old ones
 	// or replace them.
+
 	const [append, setAppend] = useState(true);
 	const [description, setDescription] = useState('');
 	const [loading, setLoading] = useState(true);
@@ -54,10 +55,12 @@ const EditTagsModal = ({
 
 	// Selected items received from the server and saved to compare with new
 	// ones.
+
 	const [initialSelectedItems, setInitialSelectedItems] = useState([]);
 	const [inputValue, setInputValue] = useState();
 
 	// Current selected items.
+
 	const [selectedItems, setSelectedItems] = useState([]);
 	const [selectedRadioGroupValue, setSelectedRadioGroupValue] = useState(
 		'add'
@@ -65,27 +68,60 @@ const EditTagsModal = ({
 
 	const fileEntriesLength = fileEntries && fileEntries.length;
 
+	const fetchTags = useCallback(
+		(url, method, bodyData) => {
+			const init = {
+				body: JSON.stringify(bodyData),
+				headers: {'Content-Type': 'application/json'},
+				method,
+			};
+
+			return fetch(`${pathModule}${url}`, init)
+				.then((response) => response.json())
+				.catch(() => {
+					onModalClose();
+				});
+		},
+		[onModalClose, pathModule]
+	);
+
+	const getDescription = (size) => {
+		if (size === 1) {
+			return Liferay.Language.get(
+				'you-are-editing-the-tags-for-the-selected-item'
+			);
+		}
+
+		return Liferay.Util.sub(
+			Liferay.Language.get(
+				'you-are-editing-the-common-tags-for-x-items.-select-edit-or-replace-current-tags'
+			),
+			size
+		);
+	};
+
 	// This makes the component fetch selected items only after mounting it
 	// (a.k.a. first render).
+
 	useEffect(() => {
 		const selection = {
 			documentIds: fileEntries,
 			selectionScope: {
 				folderId,
 				repositoryId,
-				selectAll
-			}
+				selectAll,
+			},
 		};
 
 		Promise.all([
 			fetchTags(URL_TAGS, 'POST', selection),
-			fetchTags(URL_SELECTION, 'POST', selection)
+			fetchTags(URL_SELECTION, 'POST', selection),
 		]).then(([responseTags, responseSelection]) => {
 			if (responseTags && responseSelection) {
 				const selectedItems = (responseTags.items || []).map(
 					({name}) => ({
 						label: name,
-						value: name
+						value: name,
 					})
 				);
 
@@ -105,63 +141,31 @@ const EditTagsModal = ({
 		folderId,
 		isMounted,
 		repositoryId,
-		selectAll
+		selectAll,
 	]);
 
-	const fetchTags = useCallback(
-		(url, method, bodyData) => {
-			const init = {
-				body: JSON.stringify(bodyData),
-				headers: {'Content-Type': 'application/json'},
-				method
-			};
-
-			return fetch(`${pathModule}${url}`, init)
-				.then(response => response.json())
-				.catch(() => {
-					onModalClose();
-				});
-		},
-		[onModalClose, pathModule]
-	);
-
-	const getDescription = size => {
-		if (size === 1) {
-			return Liferay.Language.get(
-				'you-are-editing-the-tags-for-the-selected-item'
-			);
-		}
-
-		return Liferay.Util.sub(
-			Liferay.Language.get(
-				'you-are-editing-the-common-tags-for-x-items.-select-edit-or-replace-current-tags'
-			),
-			size
-		);
-	};
-
-	const handleMultipleSelectedOptionChange = value => {
+	const handleMultipleSelectedOptionChange = (value) => {
 		setAppend(value === 'add');
 		setSelectedRadioGroupValue(value);
 	};
 
-	const handleSubmit = event => {
+	const handleSubmit = (event) => {
 		event.preventDefault();
 
 		const addedLabels = !append
 			? selectedItems
 			: selectedItems.filter(
-					selectedItem =>
+					(selectedItem) =>
 						!initialSelectedItems.find(
-							initialSelectedItem =>
+							(initialSelectedItem) =>
 								initialSelectedItem.value === selectedItem.value
 						)
 			  );
 
 		const removedLabels = initialSelectedItems.filter(
-			initialSelectedItem =>
+			(initialSelectedItem) =>
 				!selectedItems.find(
-					selectedItem =>
+					(selectedItem) =>
 						selectedItem.value === initialSelectedItem.value
 				)
 		);
@@ -172,13 +176,13 @@ const EditTagsModal = ({
 				selectionScope: {
 					folderId,
 					repositoryId,
-					selectAll
-				}
+					selectAll,
+				},
 			},
-			keywordsToAdd: addedLabels.map(addedLabel => addedLabel.value),
+			keywordsToAdd: addedLabels.map((addedLabel) => addedLabel.value),
 			keywordsToRemove: removedLabels.map(
-				removedLabel => removedLabel.value
-			)
+				(removedLabel) => removedLabel.value
+			),
 		}).then(() => {
 			const bulkStatusComponent = Liferay.component(
 				`${namespace}BulkStatus`
@@ -281,7 +285,7 @@ EditTagsModal.propTypes = {
 	id: PropTypes.string,
 	pathModule: PropTypes.string,
 	repositoryId: PropTypes.string,
-	selectAll: PropTypes.bool
+	selectAll: PropTypes.bool,
 };
 
 export default EditTagsModal;

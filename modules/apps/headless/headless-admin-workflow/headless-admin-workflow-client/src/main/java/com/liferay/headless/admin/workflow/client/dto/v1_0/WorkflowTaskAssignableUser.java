@@ -17,6 +17,8 @@ package com.liferay.headless.admin.workflow.client.dto.v1_0;
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowTaskAssignableUserSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class WorkflowTaskAssignableUser {
+public class WorkflowTaskAssignableUser implements Cloneable, Serializable {
+
+	public static WorkflowTaskAssignableUser toDTO(String json) {
+		return WorkflowTaskAssignableUserSerDes.toDTO(json);
+	}
 
 	public Assignee[] getAssignableUsers() {
 		return assignableUsers;
@@ -69,6 +75,13 @@ public class WorkflowTaskAssignableUser {
 	}
 
 	protected Long workflowTaskId;
+
+	@Override
+	public WorkflowTaskAssignableUser clone()
+		throws CloneNotSupportedException {
+
+		return (WorkflowTaskAssignableUser)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

@@ -24,8 +24,8 @@ import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.info.display.field.ExpandoInfoDisplayFieldProvider;
 import com.liferay.info.display.field.InfoDisplayFieldProvider;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -67,22 +67,23 @@ public class BlogsEntryInfoDisplayContributor
 			BlogsEntry blogsEntry, Locale locale)
 		throws PortalException {
 
-		Map<String, Object> infoDisplayFieldValues = new HashMap<>();
-
-		infoDisplayFieldValues.putAll(
+		return HashMapBuilder.<String, Object>putAll(
 			_assetEntryInfoDisplayFieldProvider.
 				getAssetEntryInfoDisplayFieldsValues(
-					BlogsEntry.class.getName(), blogsEntry.getEntryId(),
-					locale));
-		infoDisplayFieldValues.putAll(
+					BlogsEntry.class.getName(), blogsEntry.getEntryId(), locale)
+		).putAll(
 			_expandoInfoDisplayFieldProvider.
 				getContributorExpandoInfoDisplayFieldsValues(
-					BlogsEntry.class.getName(), blogsEntry, locale));
-		infoDisplayFieldValues.putAll(
+					BlogsEntry.class.getName(), blogsEntry, locale)
+		).putAll(
 			_infoDisplayFieldProvider.getContributorInfoDisplayFieldsValues(
-				BlogsEntry.class.getName(), blogsEntry, locale));
+				BlogsEntry.class.getName(), blogsEntry, locale)
+		).build();
+	}
 
-		return infoDisplayFieldValues;
+	@Override
+	public long getInfoDisplayObjectClassPK(BlogsEntry blogsEntry) {
+		return blogsEntry.getEntryId();
 	}
 
 	@Override

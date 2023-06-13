@@ -26,7 +26,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
-import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
@@ -72,14 +71,21 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 			JSONObject jsonObject = _jsonFactory.createJSONObject(
 				ddmFormDeserializerDeserializeRequest.getContent());
 
+			if (Validator.isNotNull(
+					jsonObject.getString("definitionSchemaVersion"))) {
+
+				ddmForm.setDefinitionSchemaVersion(
+					jsonObject.getString("definitionSchemaVersion"));
+			}
+
 			setDDMFormAvailableLocales(
 				jsonObject.getJSONArray("availableLanguageIds"), ddmForm);
 			setDDMFormDefaultLocale(
 				jsonObject.getString("defaultLanguageId"), ddmForm);
 			setDDMFormFields(jsonObject.getJSONArray("fields"), ddmForm);
-			setDDMFormRules(jsonObject.getJSONArray("rules"), ddmForm);
 
 			setDDMFormLocalizedValuesDefaultLocale(ddmForm);
+			setDDMFormRules(jsonObject.getJSONArray("rules"), ddmForm);
 			setDDMFormSuccessPageSettings(
 				jsonObject.getJSONObject("successPage"), ddmForm);
 
@@ -89,6 +95,8 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 			if (_log.isWarnEnabled()) {
 				_log.warn(exception, exception);
 			}
+
+			builder = builder.exception(exception);
 		}
 
 		return builder.build();
@@ -106,10 +114,10 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 		JSONObject jsonObject, DDMFormFieldOptions ddmFormFieldOptions,
 		String optionValue) {
 
-		Iterator<String> itr = jsonObject.keys();
+		Iterator<String> iterator = jsonObject.keys();
 
-		while (itr.hasNext()) {
-			String languageId = itr.next();
+		while (iterator.hasNext()) {
+			String languageId = iterator.next();
 
 			ddmFormFieldOptions.addOptionLabel(
 				optionValue, LocaleUtil.fromLanguageId(languageId),
@@ -152,15 +160,17 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 		else if (Objects.equals(
 					ddmFormFieldTypeSetting.getType(), "validation")) {
 
+			DDMForm ddmForm = ddmFormFieldTypeSetting.getDDMForm();
+
 			return deserializeDDMFormFieldValidation(
-				serializedDDMFormFieldProperty);
+				ddmForm.getAvailableLocales(), serializedDDMFormFieldProperty);
 		}
 
 		return serializedDDMFormFieldProperty;
 	}
 
 	protected static DDMFormFieldValidation deserializeDDMFormFieldValidation(
-			String serializedDDMFormFieldProperty)
+			Set<Locale> availableLocales, String serializedDDMFormFieldProperty)
 		throws PortalException {
 
 		DDMFormFieldValidation ddmFormFieldValidation =
@@ -173,8 +183,25 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 		JSONObject jsonObject = _jsonFactory.createJSONObject(
 			serializedDDMFormFieldProperty);
 
-		ddmFormFieldValidation.setErrorMessageLocalizedValue(
-			deserializeLocalizedValue(jsonObject.getString("errorMessage")));
+		JSONObject errorMessageJSONObject = jsonObject.getJSONObject(
+			"errorMessage");
+
+		if (errorMessageJSONObject == null) {
+			LocalizedValue errorMessageLocalizedValue = new LocalizedValue();
+
+			for (Locale locale : availableLocales) {
+				errorMessageLocalizedValue.addString(
+					locale, jsonObject.getString("errorMessage"));
+			}
+
+			ddmFormFieldValidation.setErrorMessageLocalizedValue(
+				errorMessageLocalizedValue);
+		}
+		else {
+			ddmFormFieldValidation.setErrorMessageLocalizedValue(
+				deserializeLocalizedValue(
+					jsonObject.getString("errorMessage")));
+		}
 
 		JSONObject expressionJSONObject = jsonObject.getJSONObject(
 			"expression");
@@ -214,10 +241,10 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject(value);
 
-		Iterator<String> itr = jsonObject.keys();
+		Iterator<String> iterator = jsonObject.keys();
 
-		while (itr.hasNext()) {
-			String languageId = itr.next();
+		while (iterator.hasNext()) {
+			String languageId = iterator.next();
 
 			localizedValue.addString(
 				LocaleUtil.fromLanguageId(languageId),
@@ -267,6 +294,8 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 			String value = jsonObject.getString("value");
 
 			ddmFormFieldOptions.addOption(value);
+			ddmFormFieldOptions.addOptionReference(
+				value, jsonObject.getString("reference"));
 
 			addOptionValueLabels(
 				jsonObject.getJSONObject("label"), ddmFormFieldOptions, value);
@@ -305,44 +334,6 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 		return DDMFormFactory.create(ddmFormFieldTypeSettings);
 	}
 
-	protected static DDMFormRule getDDMFormRule(JSONObject jsonObject) {
-		String condition = jsonObject.getString("condition");
-
-		List<String> actions = getDDMFormRuleActions(
-			jsonObject.getJSONArray("actions"));
-
-		DDMFormRule ddmFormRule = new DDMFormRule(condition, actions);
-
-		boolean enabled = jsonObject.getBoolean("enabled", true);
-
-		ddmFormRule.setEnabled(enabled);
-
-		return ddmFormRule;
-	}
-
-	protected static List<String> getDDMFormRuleActions(JSONArray jsonArray) {
-		List<String> actions = new ArrayList<>();
-
-		for (int i = 0; i < jsonArray.length(); i++) {
-			actions.add(jsonArray.getString(i));
-		}
-
-		return actions;
-	}
-
-	protected static List<DDMFormRule> getDDMFormRules(JSONArray jsonArray) {
-		List<DDMFormRule> ddmFormRules = new ArrayList<>();
-
-		for (int i = 0; i < jsonArray.length(); i++) {
-			DDMFormRule ddmFormRule = getDDMFormRule(
-				jsonArray.getJSONObject(i));
-
-			ddmFormRules.add(ddmFormRule);
-		}
-
-		return ddmFormRules;
-	}
-
 	protected static void setDDMFormAvailableLocales(
 		JSONArray jsonArray, DDMForm ddmForm) {
 
@@ -352,9 +343,7 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 	protected static void setDDMFormDefaultLocale(
 		String defaultLanguageId, DDMForm ddmForm) {
 
-		Locale defaultLocale = LocaleUtil.fromLanguageId(defaultLanguageId);
-
-		ddmForm.setDefaultLocale(defaultLocale);
+		ddmForm.setDefaultLocale(LocaleUtil.fromLanguageId(defaultLanguageId));
 	}
 
 	protected static void setDDMFormFieldLocalizedValueDefaultLocale(
@@ -451,7 +440,8 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 			return;
 		}
 
-		ddmForm.setDDMFormRules(getDDMFormRules(jsonArray));
+		ddmForm.setDDMFormRules(
+			DDMFormRuleJSONDeserializer.deserialize(jsonArray));
 	}
 
 	protected static void setDDMFormSuccessPageSettings(
@@ -479,9 +469,7 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 			return;
 		}
 
-		List<DDMFormField> nestedDDMFormFields = getDDMFormFields(jsonArray);
-
-		ddmFormField.setNestedDDMFormFields(nestedDDMFormFields);
+		ddmFormField.setNestedDDMFormFields(getDDMFormFields(jsonArray));
 	}
 
 	@Reference(unbind = "-")

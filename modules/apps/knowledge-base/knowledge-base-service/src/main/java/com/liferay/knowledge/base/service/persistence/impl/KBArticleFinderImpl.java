@@ -54,20 +54,20 @@ public class KBArticleFinderImpl
 
 			sql = replaceWorkflowStatus(sql, status);
 
-			SQLQuery query = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			query.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+			sqlQuery.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
-			QueryPos qPos = QueryPos.getInstance(query);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(groupId);
-			qPos.add(kbArticleUrlTitle);
-			qPos.add(kbFolderUrlTitle);
+			queryPos.add(groupId);
+			queryPos.add(kbArticleUrlTitle);
+			queryPos.add(kbFolderUrlTitle);
 
-			Iterator<Long> itr = query.iterate();
+			Iterator<Long> iterator = sqlQuery.iterate();
 
-			if (itr.hasNext()) {
-				Long count = itr.next();
+			if (iterator.hasNext()) {
+				Long count = iterator.next();
 
 				if (count != null) {
 					return count.intValue();
@@ -96,17 +96,17 @@ public class KBArticleFinderImpl
 
 			sql = replaceWorkflowStatus(sql, status);
 
-			SQLQuery query = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			query.addEntity(KBArticleImpl.TABLE_NAME, KBArticleImpl.class);
+			sqlQuery.addEntity(KBArticleImpl.TABLE_NAME, KBArticleImpl.class);
 
-			QueryPos qPos = QueryPos.getInstance(query);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(groupId);
-			qPos.add(kbArticleUrlTitle);
-			qPos.add(kbFolderUrlTitle);
+			queryPos.add(groupId);
+			queryPos.add(kbArticleUrlTitle);
+			queryPos.add(kbFolderUrlTitle);
 
-			return (List)QueryUtil.list(query, getDialect(), start, end);
+			return (List)QueryUtil.list(sqlQuery, getDialect(), start, end);
 		}
 		finally {
 			closeSession(session);

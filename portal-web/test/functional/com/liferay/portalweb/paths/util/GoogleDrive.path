@@ -2,11 +2,13 @@
 <head>
 <title>GoogleDrive</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">GoogleDrive</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>HEADER</td>
@@ -19,8 +21,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SEARCH_BUTTON</td>
+	<td>//div[contains(@role,'button') and @aria-label='Search']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEARCH_TERMS</td>
+	<td>//input[@aria-label='Search terms']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SELECT_BUTTON</td>
-	<td>//div[contains(@role,'button') and contains(.,'Select')]</td>
+	<td>//div[contains(@class,'enabled') and contains(@role,'button') and contains(.,'Select')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -71,8 +83,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>LIST_VIEW_DOCUMENT_1</td>
-	<td>xpath=(//div[contains(@aria-label,'Files and folders list view.')]//span[contains(.,'${key_googleDocName}')])[1]</td>
+	<td>LIST_VIEW_DOCUMENT_SPECIFIC</td>
+	<td>//div[contains(@aria-label,'Files and folders list view.')]//span[contains(.,'${key_googleDocName}')]</td>
 	<td></td>
 </tr>
 </tbody>

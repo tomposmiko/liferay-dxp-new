@@ -14,19 +14,23 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.cluster;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
-import com.liferay.portal.search.elasticsearch7.internal.connection.EmbeddedElasticsearchConnection;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PropsImpl;
 
-import org.elasticsearch.cluster.service.ClusterService;
-import org.elasticsearch.cluster.service.MasterService;
-import org.elasticsearch.common.inject.Injector;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.node.Node;
+import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.elasticsearch.client.ClusterClient;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -34,38 +38,49 @@ import org.junit.Test;
  */
 public class ClusterSettingsTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
+	@BeforeClass
+	public static void setUpClass() {
+		PropsUtil.setProps(new PropsImpl());
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_testCluster.setUp();
+		_elasticsearchFixture.setUp();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_testCluster.tearDown();
+		_elasticsearchFixture.tearDown();
 	}
 
 	@Test
 	public void testClusterSettings() throws Exception {
-		ElasticsearchFixture elasticsearchFixture = _testCluster.getNode(0);
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchFixture.getRestHighLevelClient();
 
-		EmbeddedElasticsearchConnection embeddedElasticsearchConnection =
-			elasticsearchFixture.getEmbeddedElasticsearchConnection();
+		ClusterClient clusterClient = restHighLevelClient.cluster();
 
-		Node node = embeddedElasticsearchConnection.getNode();
+		ClusterGetSettingsResponse clusterGetSettingsResponse =
+			clusterClient.getSettings(
+				new ClusterGetSettingsRequest() {
+					{
+						includeDefaults(true);
+					}
+				},
+				RequestOptions.DEFAULT);
 
-		Injector injector = node.injector();
-
-		ClusterService clusterService = injector.getInstance(
-			ClusterService.class);
-
-		MasterService masterService = clusterService.getMasterService();
-
-		TimeValue slowTaskLoggingThreshold = ReflectionTestUtil.getFieldValue(
-			masterService, "slowTaskLoggingThreshold");
-
-		Assert.assertEquals("10m", slowTaskLoggingThreshold.toString());
+		Assert.assertEquals(
+			"600s",
+			clusterGetSettingsResponse.getSetting(
+				"cluster.service.slow_task_logging_threshold"));
 	}
 
-	private final TestCluster _testCluster = new TestCluster(1, this);
+	private final ElasticsearchFixture _elasticsearchFixture =
+		new ElasticsearchFixture(getClass());
 
 }

@@ -13,7 +13,7 @@
  */
 
 import {useModal} from '@clayui/modal';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 
 import EditTagsContext from './EditTagsContext.es';
 import EditTagsModal from './EditTagsModal.es';
@@ -23,28 +23,30 @@ function EditTags(props) {
 	const [selectAll, setSelectAll] = useState();
 	const [folderId, setFolderId] = useState();
 	const [showModal, setShowModal] = useState();
+	const {namespace} = useContext(EditTagsContext);
+	const bridgeComponentId = `${namespace}EditTagsComponent`;
 
 	const handleOnClose = () => {
 		setShowModal(false);
 	};
 
-	const {observer} = useModal({
-		onClose: handleOnClose
+	const {observer, onClose} = useModal({
+		onClose: handleOnClose,
 	});
 
-	if (!Liferay.component(props.componentId)) {
+	if (!Liferay.component(bridgeComponentId)) {
 		Liferay.component(
-			props.componentId,
+			bridgeComponentId,
 			{
 				open: (fileEntries, selectAll, folderId) => {
 					setFileEntries(fileEntries);
 					setSelectAll(selectAll);
 					setFolderId(folderId);
 					setShowModal(true);
-				}
+				},
 			},
 			{
-				destroyOnNavigate: true
+				destroyOnNavigate: true,
 			}
 		);
 	}
@@ -57,7 +59,7 @@ function EditTags(props) {
 					fileEntries={fileEntires}
 					folderId={folderId}
 					observer={observer}
-					onModalClose={handleOnClose}
+					onModalClose={onClose}
 					selectAll={selectAll}
 				/>
 			)}
@@ -65,7 +67,7 @@ function EditTags(props) {
 	);
 }
 
-export default function({context, props}) {
+export default function ({context, props}) {
 	return (
 		<EditTagsContext.Provider value={context}>
 			<EditTags {...props} />

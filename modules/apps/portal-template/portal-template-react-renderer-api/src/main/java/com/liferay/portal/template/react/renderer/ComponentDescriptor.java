@@ -41,6 +41,13 @@ public class ComponentDescriptor {
 		String module, String componentId, Collection<String> dependencies,
 		boolean positionInLine) {
 
+		this(module, componentId, dependencies, positionInLine, null);
+	}
+
+	public ComponentDescriptor(
+		String module, String componentId, Collection<String> dependencies,
+		boolean positionInLine, String propsTransformer) {
+
 		_module = module;
 		_componentId = componentId;
 
@@ -49,6 +56,7 @@ public class ComponentDescriptor {
 		}
 
 		_positionInLine = positionInLine;
+		_propsTransformer = propsTransformer;
 	}
 
 	public String getComponentId() {
@@ -63,13 +71,18 @@ public class ComponentDescriptor {
 		return _module;
 	}
 
+	public String getPropsTransformer() {
+		return _propsTransformer;
+	}
+
 	public boolean isPositionInLine() {
 		return _positionInLine;
 	}
 
-	private String _componentId;
+	private final String _componentId;
 	private final Set<String> _dependencies = new HashSet<>();
-	private String _module;
-	private boolean _positionInLine;
+	private final String _module;
+	private final boolean _positionInLine;
+	private final String _propsTransformer;
 
 }

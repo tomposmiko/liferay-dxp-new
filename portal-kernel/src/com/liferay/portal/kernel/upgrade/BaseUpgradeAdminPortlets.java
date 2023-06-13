@@ -18,6 +18,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 
 import java.sql.PreparedStatement;
@@ -35,17 +36,27 @@ public abstract class BaseUpgradeAdminPortlets extends UpgradeProcess {
 		throws Exception {
 
 		try (PreparedStatement ps = connection.prepareStatement(
-				"insert into ResourcePermission (resourcePermissionId, " +
-					"companyId, name, scope, primKey, roleId, actionIds) " +
-						"values (?, ?, ?, ?, ?, ?, ?)")) {
+				StringBundler.concat(
+					"insert into ResourcePermission (resourcePermissionId, ",
+					"companyId, name, scope, primKey, primKeyId, roleId, ",
+					"actionIds, viewActionId) values (?, ?, ?, ?, ?, ?, ?, ?, ",
+					"?)"))) {
+
+			boolean viewActionId = false;
+
+			if ((actionIds % 2) == 1) {
+				viewActionId = true;
+			}
 
 			ps.setLong(1, resourcePermissionId);
 			ps.setLong(2, companyId);
 			ps.setString(3, name);
 			ps.setInt(4, scope);
 			ps.setString(5, primKey);
-			ps.setLong(6, roleId);
-			ps.setLong(7, actionIds);
+			ps.setLong(6, GetterUtil.getLong(primKey));
+			ps.setLong(7, roleId);
+			ps.setLong(8, actionIds);
+			ps.setBoolean(9, viewActionId);
 
 			ps.executeUpdate();
 		}
@@ -102,35 +113,36 @@ public abstract class BaseUpgradeAdminPortlets extends UpgradeProcess {
 					while (rs.next()) {
 						long actionIds = rs.getLong("actionIds");
 
-						if ((actionIds & bitwiseValue) != 0) {
-							actionIds = actionIds & ~bitwiseValue;
-
-							long resourcePermissionId = rs.getLong(
-								"resourcePermissionId");
-
-							runSQL(
-								StringBundler.concat(
-									"update ResourcePermission set actionIds ",
-									"= ", actionIds,
-									" where resourcePermissionId = ",
-									resourcePermissionId));
-
-							resourcePermissionId = increment(
-								ResourcePermission.class.getName());
-
-							long companyId = rs.getLong("companyId");
-							int scope = rs.getInt("scope");
-							String primKey = rs.getString("primKey");
-							long roleId = rs.getLong("roleId");
-
-							actionIds = rs.getLong("actionIds");
-
-							actionIds |= bitwiseValue;
-
-							addResourcePermission(
-								resourcePermissionId, companyId, portletTo,
-								scope, primKey, roleId, actionIds);
+						if ((actionIds & bitwiseValue) == 0) {
+							continue;
 						}
+
+						actionIds = actionIds & ~bitwiseValue;
+
+						long resourcePermissionId = rs.getLong(
+							"resourcePermissionId");
+
+						runSQL(
+							StringBundler.concat(
+								"update ResourcePermission set actionIds = ",
+								actionIds, " where resourcePermissionId = ",
+								resourcePermissionId));
+
+						resourcePermissionId = increment(
+							ResourcePermission.class.getName());
+
+						long companyId = rs.getLong("companyId");
+						int scope = rs.getInt("scope");
+						String primKey = rs.getString("primKey");
+						long roleId = rs.getLong("roleId");
+
+						actionIds = rs.getLong("actionIds");
+
+						actionIds |= bitwiseValue;
+
+						addResourcePermission(
+							resourcePermissionId, companyId, portletTo, scope,
+							primKey, roleId, actionIds);
 					}
 				}
 			}

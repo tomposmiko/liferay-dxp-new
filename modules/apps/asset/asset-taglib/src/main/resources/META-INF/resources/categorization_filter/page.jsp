@@ -18,17 +18,16 @@
 
 <%
 String assetType = GetterUtil.getString((String)request.getAttribute("liferay-asset:categorization-filter:assetType"), "content");
-PortletURL portletURL = (PortletURL)request.getAttribute("liferay-asset:categorization-filter:portletURL");
-
-if (portletURL == null) {
-	portletURL = renderResponse.createRenderURL();
-}
 
 long assetCategoryId = ParamUtil.getLong(request, "categoryId");
 
 String assetTagName = ParamUtil.getString(request, "tag");
 
-if (Validator.isNotNull(assetTagName) && !AssetTagLocalServiceUtil.hasTag(layout.getGroupId(), assetTagName)) {
+long[] groupIds = GetterUtil.getLongValues(request.getAttribute("liferay-asset:categorization-filter:groupIds"), new long[] {layout.getGroupId()});
+
+long[] assetTagIds = AssetTagLocalServiceUtil.getTagIds(groupIds, assetTagName);
+
+if (Validator.isNotNull(assetTagName) && (assetTagIds.length == 0)) {
 	assetTagName = null;
 }
 
@@ -48,6 +47,12 @@ if (assetCategoryId != 0) {
 		assetVocabularyTitle = HtmlUtil.escape(assetVocabulary.getTitle(locale));
 	}
 }
+
+PortletURL portletURL = (PortletURL)request.getAttribute("liferay-asset:categorization-filter:portletURL");
+
+if (portletURL == null) {
+	portletURL = renderResponse.createRenderURL();
+}
 %>
 
 <liferay-util:buffer
@@ -58,15 +63,21 @@ if (assetCategoryId != 0) {
 			<portlet:param name="categoryId" value="0" />
 		</portlet:renderURL>
 
-		<span class="label label-dark label-dismissible label-lg text-uppercase">
-			<span class="label-item label-item-expand"><%= assetCategoryTitle %></span>
+		<clay:label
+			dismissible="<%= true %>"
+			displayType="dark"
+			large="<%= true %>"
+		>
+			<clay:label-item-expand><%= assetCategoryTitle %></clay:label-item-expand>
 
-			<span class="label-item label-item-after">
+			<clay:label-item-after>
 				<a href="<%= viewURLWithoutCategory %>" title="<liferay-ui:message key="remove" />">
-					<aui:icon image="times-circle" markupView="lexicon" />
+					<clay:icon
+						symbol="times-circle"
+					/>
 				</a>
-			</span>
-		</span>
+			</clay:label-item-after>
+		</clay:label>
 	</c:if>
 </liferay-util:buffer>
 
@@ -78,15 +89,21 @@ if (assetCategoryId != 0) {
 			<liferay-portlet:param name="tag" value="" />
 		</liferay-portlet:renderURL>
 
-		<span class="label label-dark label-dismissible label-lg text-uppercase">
-			<span class="label-item label-item-expand"><%= HtmlUtil.escape(assetTagName) %></span>
+		<clay:label
+			dismissible="<%= true %>"
+			displayType="dark"
+			large="<%= true %>"
+		>
+			<clay:label-item-expand><%= HtmlUtil.escape(assetTagName) %></clay:label-item-expand>
 
-			<span class="label-item label-item-after">
+			<clay:label-item-after>
 				<a href="<%= viewURLWithoutTag %>" title="<liferay-ui:message key="remove" />">
-					<aui:icon image="times-circle" markupView="lexicon" />
+					<clay:icon
+						symbol="times-circle"
+					/>
 				</a>
-			</span>
-		</span>
+			</clay:label-item-after>
+		</clay:label>
 	</c:if>
 </liferay-util:buffer>
 

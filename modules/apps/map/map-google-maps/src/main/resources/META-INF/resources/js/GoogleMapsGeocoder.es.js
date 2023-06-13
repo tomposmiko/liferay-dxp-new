@@ -19,6 +19,7 @@ import State from 'metal-state';
  * @review
  */
 class GoogleMapsGeocoder extends State {
+
 	/**
 	 * Creates a new geocoder using Google Map's API
 	 * @param  {Array} args List of arguments to be passed to State
@@ -42,7 +43,7 @@ class GoogleMapsGeocoder extends State {
 	_handleGeocoderResponse(callback, location, response, status) {
 		const result = {
 			data: {},
-			err: status === google.maps.GeocoderStatus.OK ? null : status
+			err: status === google.maps.GeocoderStatus.OK ? null : status,
 		};
 
 		if (!result.err) {
@@ -53,13 +54,14 @@ class GoogleMapsGeocoder extends State {
 				address: geocoderResult.formatted_address,
 				location: {
 					lat: geolocation.lat(),
-					lng: geolocation.lng()
-				}
+					lng: geolocation.lng(),
+				},
 			};
-		} else {
+		}
+		else {
 			result.data = {
 				address: '',
-				location
+				location,
 			};
 		}
 
@@ -74,7 +76,7 @@ class GoogleMapsGeocoder extends State {
 	 */
 	forward(query, callback) {
 		const payload = {
-			address: query
+			address: query,
 		};
 
 		this._geocoder.geocode(
@@ -91,7 +93,7 @@ class GoogleMapsGeocoder extends State {
 	 */
 	reverse(location, callback) {
 		const payload = {
-			location
+			location,
 		};
 
 		this._geocoder.geocode(

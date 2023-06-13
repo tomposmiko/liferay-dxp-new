@@ -14,20 +14,31 @@
 
 package com.liferay.asset.display.page.portlet;
 
+import com.liferay.asset.display.page.configuration.AssetDisplayPageConfiguration;
 import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
-import com.liferay.asset.display.page.constants.AssetDisplayPageWebKeys;
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.service.AssetEntryService;
 import com.liferay.asset.util.AssetHelper;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.constants.InfoDisplayWebKeys;
-import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
-import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
-import com.liferay.info.display.url.provider.InfoEditURLProvider;
 import com.liferay.info.display.url.provider.InfoEditURLProviderTracker;
+import com.liferay.info.exception.NoSuchInfoItemException;
+import com.liferay.info.field.InfoFieldValue;
+import com.liferay.info.item.ClassPKInfoItemIdentifier;
+import com.liferay.info.item.InfoItemIdentifier;
+import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.provider.InfoItemDetailsProvider;
+import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
+import com.liferay.info.item.provider.InfoItemObjectProvider;
+import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
+import com.liferay.layout.display.page.LayoutDisplayPageProvider;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
+import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.petra.string.CharPool;
@@ -37,19 +48,24 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutFriendlyURLComposite;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -69,54 +85,64 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 		HttpServletRequest httpServletRequest =
 			(HttpServletRequest)requestContext.get("request");
 
-		InfoDisplayContributor infoDisplayContributor =
-			_getInfoDisplayContributor(friendlyURL);
+		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
+			_getLayoutDisplayPageProvider(friendlyURL);
 
-		InfoDisplayObjectProvider infoDisplayObjectProvider =
-			_getInfoDisplayObjectProvider(
-				infoDisplayContributor, groupId, friendlyURL);
+		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
+			_getLayoutDisplayPageObjectProvider(
+				layoutDisplayPageProvider, groupId, friendlyURL);
 
-		if (infoDisplayObjectProvider != null) {
-			httpServletRequest.setAttribute(
-				AssetDisplayPageWebKeys.INFO_DISPLAY_OBJECT_PROVIDER,
-				infoDisplayObjectProvider);
+		Object infoItem = _getInfoItem(layoutDisplayPageObjectProvider, params);
 
-			InfoEditURLProvider infoEditURLProvider =
-				infoEditURLProviderTracker.getInfoEditURLProvider(
-					portal.getClassName(
-						infoDisplayObjectProvider.getClassNameId()));
+		httpServletRequest.setAttribute(InfoDisplayWebKeys.INFO_ITEM, infoItem);
 
-			httpServletRequest.setAttribute(
-				AssetDisplayPageWebKeys.INFO_EDIT_URL_PROVIDER,
-				infoEditURLProvider);
-		}
+		String infoItemClassName = portal.getClassName(
+			layoutDisplayPageObjectProvider.getClassNameId());
+
+		InfoItemDetailsProvider infoItemDetailsProvider =
+			infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemDetailsProvider.class, infoItemClassName);
 
 		httpServletRequest.setAttribute(
-			InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR,
-			infoDisplayContributor);
+			InfoDisplayWebKeys.INFO_ITEM_DETAILS,
+			infoItemDetailsProvider.getInfoItemDetails(infoItem));
 
 		httpServletRequest.setAttribute(
-			InfoDisplayWebKeys.VERSION_CLASS_PK,
-			_getVersionClassPK(friendlyURL));
+			InfoDisplayWebKeys.INFO_ITEM_FIELD_VALUES_PROVIDER,
+			infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFieldValuesProvider.class, infoItemClassName));
+		httpServletRequest.setAttribute(
+			LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_OBJECT_PROVIDER,
+			layoutDisplayPageObjectProvider);
+		httpServletRequest.setAttribute(
+			LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_PROVIDER,
+			layoutDisplayPageProvider);
+		httpServletRequest.setAttribute(
+			WebKeys.LAYOUT_ASSET_ENTRY,
+			_getAssetEntry(layoutDisplayPageObjectProvider));
 
 		Locale locale = portal.getLocale(httpServletRequest);
+		Layout layout = _getLayoutDisplayPageObjectProviderLayout(
+			layoutDisplayPageObjectProvider);
 
 		portal.setPageDescription(
 			HtmlUtil.unescape(
 				HtmlUtil.stripHtml(
-					infoDisplayObjectProvider.getDescription(locale))),
+					_getMappedField(
+						layoutDisplayPageObjectProvider, locale,
+						layout.getTypeSettingsProperty("mapped-description"),
+						layoutDisplayPageObjectProvider::getDescription))),
 			httpServletRequest);
+
 		portal.setPageKeywords(
-			infoDisplayObjectProvider.getKeywords(locale), httpServletRequest);
+			layoutDisplayPageObjectProvider.getKeywords(locale),
+			httpServletRequest);
 		portal.setPageTitle(
-			infoDisplayObjectProvider.getTitle(locale), httpServletRequest);
-
-		AssetEntry assetEntry = _getAssetEntry(infoDisplayObjectProvider);
-
-		httpServletRequest.setAttribute(WebKeys.LAYOUT_ASSET_ENTRY, assetEntry);
-
-		Layout layout = _getInfoDisplayObjectProviderLayout(
-			infoDisplayObjectProvider);
+			_getMappedField(
+				layoutDisplayPageObjectProvider, locale,
+				layout.getTypeSettingsProperty("mapped-title"),
+				layoutDisplayPageObjectProvider::getTitle),
+			httpServletRequest);
 
 		return portal.getLayoutActualURL(layout, mainPath);
 	}
@@ -128,19 +154,33 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 			Map<String, Object> requestContext)
 		throws PortalException {
 
-		InfoDisplayContributor infoDisplayContributor =
-			_getInfoDisplayContributor(friendlyURL);
+		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
+			_getLayoutDisplayPageObjectProvider(
+				_getLayoutDisplayPageProvider(friendlyURL), groupId,
+				friendlyURL);
 
-		InfoDisplayObjectProvider infoDisplayObjectProvider =
-			_getInfoDisplayObjectProvider(
-				infoDisplayContributor, groupId, friendlyURL);
-
-		if (infoDisplayObjectProvider == null) {
+		if (layoutDisplayPageObjectProvider == null) {
 			throw new PortalException();
 		}
 
-		Layout layout = _getInfoDisplayObjectProviderLayout(
-			infoDisplayObjectProvider);
+		Layout layout = _getLayoutDisplayPageObjectProviderLayout(
+			layoutDisplayPageObjectProvider);
+
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest)requestContext.get("request");
+
+		HttpSession httpSession = httpServletRequest.getSession();
+
+		Locale locale = (Locale)httpSession.getAttribute(WebKeys.LOCALE);
+
+		if (locale != null) {
+			String urlTitle = layoutDisplayPageObjectProvider.getURLTitle(
+				locale);
+
+			if (Validator.isNotNull(urlTitle)) {
+				friendlyURL = getURLSeparator() + urlTitle;
+			}
+		}
 
 		return new LayoutFriendlyURLComposite(layout, friendlyURL);
 	}
@@ -148,6 +188,9 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 	@Reference
 	protected AssetDisplayPageEntryLocalService
 		assetDisplayPageEntryLocalService;
+
+	@Reference
+	protected AssetEntryService assetEntryLocalService;
 
 	@Reference
 	protected AssetHelper assetHelper;
@@ -159,6 +202,12 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 	protected InfoEditURLProviderTracker infoEditURLProviderTracker;
 
 	@Reference
+	protected InfoItemServiceTracker infoItemServiceTracker;
+
+	@Reference
+	protected LayoutDisplayPageProviderTracker layoutDisplayPageProviderTracker;
+
+	@Reference
 	protected LayoutLocalService layoutLocalService;
 
 	@Reference
@@ -168,23 +217,39 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 	protected Portal portal;
 
 	private AssetEntry _getAssetEntry(
-		InfoDisplayObjectProvider infoDisplayObjectProvider) {
+		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider) {
 
-		String classNameId = PortalUtil.getClassName(
-			infoDisplayObjectProvider.getClassNameId());
+		long classNameId = layoutDisplayPageObjectProvider.getClassNameId();
 
-		AssetRendererFactory assetRendererFactory =
+		if (classNameId == portal.getClassNameId(FileEntry.class)) {
+			classNameId = portal.getClassNameId(DLFileEntry.class);
+		}
+
+		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				classNameId);
+				portal.getClassName(classNameId));
 
 		if (assetRendererFactory == null) {
 			return null;
 		}
 
-		long classPK = infoDisplayObjectProvider.getClassPK();
+		long classPK = layoutDisplayPageObjectProvider.getClassPK();
 
 		try {
-			return assetRendererFactory.getAssetEntry(classNameId, classPK);
+			AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+				portal.getClassName(classNameId), classPK);
+
+			AssetDisplayPageConfiguration assetDisplayPageConfiguration =
+				ConfigurationProviderUtil.getSystemConfiguration(
+					AssetDisplayPageConfiguration.class);
+
+			if ((assetEntry != null) &&
+				assetDisplayPageConfiguration.enableViewCountIncrement()) {
+
+				assetEntryLocalService.incrementViewCounter(assetEntry);
+			}
+
+			return assetEntry;
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
@@ -195,42 +260,49 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 		return null;
 	}
 
-	private InfoDisplayContributor _getInfoDisplayContributor(
-			String friendlyURL)
-		throws PortalException {
+	private Object _getInfoItem(
+			LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider,
+			Map<String, String[]> params)
+		throws NoSuchInfoItemException {
 
-		String infoURLSeparator = _getInfoURLSeparator(friendlyURL);
+		long classPK = _getVersionClassPK(params);
 
-		InfoDisplayContributor infoDisplayContributor =
-			infoDisplayContributorTracker.
-				getInfoDisplayContributorByURLSeparator(infoURLSeparator);
-
-		if (infoDisplayContributor == null) {
-			throw new PortalException(
-				"Info display contributor is not available for " +
-					infoURLSeparator);
+		if (classPK <= 0) {
+			return layoutDisplayPageObjectProvider.getDisplayObject();
 		}
 
-		return infoDisplayContributor;
+		InfoItemObjectProvider<Object> infoItemObjectProvider =
+			(InfoItemObjectProvider<Object>)
+				infoItemServiceTracker.getFirstInfoItemService(
+					InfoItemObjectProvider.class,
+					portal.getClassName(
+						layoutDisplayPageObjectProvider.getClassNameId()));
+
+		InfoItemIdentifier infoItemIdentifier = new ClassPKInfoItemIdentifier(
+			layoutDisplayPageObjectProvider.getClassPK());
+
+		infoItemIdentifier.setVersion(InfoItemIdentifier.VERSION_LATEST);
+
+		return infoItemObjectProvider.getInfoItem(infoItemIdentifier);
 	}
 
-	private InfoDisplayObjectProvider _getInfoDisplayObjectProvider(
-			InfoDisplayContributor infoDisplayContributor, long groupId,
-			String friendlyURL)
-		throws PortalException {
+	private LayoutDisplayPageObjectProvider<?>
+		_getLayoutDisplayPageObjectProvider(
+			LayoutDisplayPageProvider<?> layoutDisplayPageProvider,
+			long groupId, String friendlyURL) {
 
-		return infoDisplayContributor.getInfoDisplayObjectProvider(
+		return layoutDisplayPageProvider.getLayoutDisplayPageObjectProvider(
 			groupId, _getUrlTitle(friendlyURL));
 	}
 
-	private Layout _getInfoDisplayObjectProviderLayout(
-		InfoDisplayObjectProvider infoDisplayObjectProvider) {
+	private Layout _getLayoutDisplayPageObjectProviderLayout(
+		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider) {
 
 		AssetDisplayPageEntry assetDisplayPageEntry =
 			assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
-				infoDisplayObjectProvider.getGroupId(),
-				infoDisplayObjectProvider.getClassNameId(),
-				infoDisplayObjectProvider.getClassPK());
+				layoutDisplayPageObjectProvider.getGroupId(),
+				layoutDisplayPageObjectProvider.getClassNameId(),
+				layoutDisplayPageObjectProvider.getClassPK());
 
 		if (assetDisplayPageEntry == null) {
 			return null;
@@ -245,9 +317,9 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			layoutPageTemplateEntryService.fetchDefaultLayoutPageTemplateEntry(
-				infoDisplayObjectProvider.getGroupId(),
-				infoDisplayObjectProvider.getClassNameId(),
-				infoDisplayObjectProvider.getClassTypeId());
+				layoutDisplayPageObjectProvider.getGroupId(),
+				layoutDisplayPageObjectProvider.getClassNameId(),
+				layoutDisplayPageObjectProvider.getClassTypeId());
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutLocalService.fetchLayout(
@@ -257,38 +329,70 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 		return null;
 	}
 
-	private String _getInfoURLSeparator(String friendlyURL) {
+	private LayoutDisplayPageProvider<?> _getLayoutDisplayPageProvider(
+			String friendlyURL)
+		throws PortalException {
+
+		String urlSeparator = _getURLSeparator(friendlyURL);
+
+		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
+			layoutDisplayPageProviderTracker.
+				getLayoutDisplayPageProviderByURLSeparator(urlSeparator);
+
+		if (layoutDisplayPageProvider == null) {
+			throw new PortalException(
+				"Info display contributor is not available for " +
+					urlSeparator);
+		}
+
+		return layoutDisplayPageProvider;
+	}
+
+	private String _getMappedField(
+		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider,
+		Locale locale, String mappedFieldName,
+		Function<Locale, String> defaultValueFunction) {
+
+		if (layoutDisplayPageObjectProvider != null) {
+			InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
+				infoItemServiceTracker.getFirstInfoItemService(
+					InfoItemFieldValuesProvider.class,
+					portal.getClassName(
+						layoutDisplayPageObjectProvider.getClassNameId()));
+
+			InfoFieldValue<Object> infoFieldValue =
+				infoItemFieldValuesProvider.getInfoItemFieldValue(
+					layoutDisplayPageObjectProvider.getDisplayObject(),
+					mappedFieldName);
+
+			if (infoFieldValue != null) {
+				return String.valueOf(infoFieldValue.getValue(locale));
+			}
+		}
+
+		return defaultValueFunction.apply(locale);
+	}
+
+	private String _getURLSeparator(String friendlyURL) {
 		List<String> paths = StringUtil.split(friendlyURL, CharPool.SLASH);
 
 		return CharPool.SLASH + paths.get(0) + CharPool.SLASH;
 	}
 
 	private String _getUrlTitle(String friendlyURL) {
-		String infoURLSeparator = _getInfoURLSeparator(friendlyURL);
+		String urlSeparator = _getURLSeparator(friendlyURL);
 
-		String urlTitle = friendlyURL.substring(infoURLSeparator.length());
-
-		long versionClassPK = _getVersionClassPK(friendlyURL);
-
-		if (versionClassPK > 0) {
-			String versionClassPKValue = String.valueOf(versionClassPK);
-
-			urlTitle = friendlyURL.substring(
-				infoURLSeparator.length(),
-				friendlyURL.length() - versionClassPKValue.length() - 1);
-		}
-
-		return urlTitle;
+		return friendlyURL.substring(urlSeparator.length());
 	}
 
-	private long _getVersionClassPK(String friendlyURL) {
-		List<String> paths = StringUtil.split(friendlyURL, CharPool.SLASH);
+	private long _getVersionClassPK(Map<String, String[]> params) {
+		String[] versions = params.get("version");
 
-		if (paths.size() < 3) {
+		if (ArrayUtil.isEmpty(versions)) {
 			return 0;
 		}
 
-		return GetterUtil.getLong(paths.get(paths.size() - 1));
+		return GetterUtil.getLong(versions[0]);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

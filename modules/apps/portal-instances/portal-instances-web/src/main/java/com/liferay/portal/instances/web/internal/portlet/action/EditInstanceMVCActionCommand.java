@@ -87,6 +87,10 @@ public class EditInstanceMVCActionCommand extends BaseMVCActionCommand {
 		catch (Exception exception) {
 			String mvcPath = "/error.jsp";
 
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			if (exception instanceof NoSuchCompanyException ||
 				exception instanceof PrincipalException) {
 
@@ -139,7 +143,7 @@ public class EditInstanceMVCActionCommand extends BaseMVCActionCommand {
 		String virtualHostname = ParamUtil.getString(
 			actionRequest, "virtualHostname");
 		String mx = ParamUtil.getString(actionRequest, "mx");
-		int maxUsers = ParamUtil.getInteger(actionRequest, "maxUsers", 0);
+		int maxUsers = ParamUtil.getInteger(actionRequest, "maxUsers");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 
 		if (companyId <= 0) {
@@ -160,6 +164,12 @@ public class EditInstanceMVCActionCommand extends BaseMVCActionCommand {
 		else {
 
 			// Update instance
+
+			if (companyId ==
+					_portalInstancesLocalService.getDefaultCompanyId()) {
+
+				active = true;
+			}
 
 			_companyService.updateCompany(
 				companyId, virtualHostname, mx, maxUsers, active);

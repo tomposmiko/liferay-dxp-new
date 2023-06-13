@@ -38,9 +38,9 @@ else {
 }
 %>
 
-<div class="sheet-section">
+<clay:sheet-section>
 	<div class="text-muted"><liferay-ui:message key="select-the-delivery-options-for-alerts-and-announcements" /></div>
-</div>
+</clay:sheet-section>
 
 <liferay-ui:search-container>
 	<liferay-ui:search-container-results
@@ -61,7 +61,7 @@ else {
 		<liferay-ui:search-container-column-text
 			name="email"
 		>
-			<aui:input disabled="<%= false %>" label="" name="announcementsTypeEmail" title='<%= LanguageUtil.format(request, "receive-x-announcements-via-email", delivery.getType()) %>' type="checkbox" value="<%= delivery.isEmail() %>" />
+			<aui:input label="" name='<%= "announcementsType" + delivery.getType() + "Email" %>' title='<%= LanguageUtil.format(request, "receive-x-announcements-via-email", delivery.getType()) %>' type="checkbox" value="<%= delivery.isEmail() %>" />
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 

@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	var STR_DIV = 'div';
 
 	CKEDITOR.plugins.add('media', {
@@ -135,8 +135,8 @@
 							}
 
 							return fakeElement;
-						}
-					}
+						},
+					},
 				});
 			}
 			if (htmlFilter) {
@@ -164,8 +164,8 @@
 							}
 
 							return realElement;
-						}
-					}
+						},
+					},
 				});
 			}
 		},
@@ -174,7 +174,7 @@
 			var instance = this;
 
 			var dialogReplace = {
-				dialog
+				dialog,
 			};
 
 			var mediaAUI = 'Audio';
@@ -200,7 +200,7 @@
 			);
 
 			var textScriptRender = scriptRender.output({
-				mediaAUI
+				mediaAUI,
 			});
 
 			instance.replaceScriptContent(
@@ -276,13 +276,13 @@
 			editor.ui.addButton('Audio', {
 				command: 'Audio',
 				icon: instance.path + 'icons/icon_audio.png',
-				label: Liferay.Language.get('audio')
+				label: Liferay.Language.get('audio'),
 			});
 
 			editor.ui.addButton('Video', {
 				command: 'Video',
 				icon: instance.path + 'icons/icon_video.png',
-				label: Liferay.Language.get('video')
+				label: Liferay.Language.get('video'),
 			});
 
 			if (editor.addMenuItems) {
@@ -290,24 +290,25 @@
 					audio: {
 						command: 'Audio',
 						group: 'flash',
-						label: Liferay.Language.get('edit-audio')
+						label: Liferay.Language.get('edit-audio'),
 					},
 					video: {
 						command: 'Video',
 						group: 'flash',
-						label: Liferay.Language.get('edit-video')
-					}
+						label: Liferay.Language.get('edit-video'),
+					},
 				});
 			}
 
-			editor.on('doubleclick', event => {
+			editor.on('doubleclick', (event) => {
 				var element = event.data.element;
 
 				var type;
 
 				if (instance.isElementType(element, 'audio')) {
 					type = 'audio';
-				} else if (instance.isElementType(element, 'video')) {
+				}
+				else if (instance.isElementType(element, 'video')) {
 					type = 'video';
 				}
 
@@ -317,7 +318,7 @@
 			});
 
 			if (editor.contextMenu) {
-				editor.contextMenu.addListener(element => {
+				editor.contextMenu.addListener((element) => {
 					var value = {};
 
 					if (!element.isReadOnly()) {
@@ -325,7 +326,8 @@
 
 						if (instance.isElementType(element, 'audio')) {
 							type = 'audio';
-						} else if (instance.isElementType(element, 'video')) {
+						}
+						else if (instance.isElementType(element, 'video')) {
 							type = 'video';
 						}
 
@@ -379,7 +381,8 @@
 
 			if (video) {
 				callerInstance.commitContent(divNode, extraStyles);
-			} else {
+			}
+			else {
 				callerInstance.commitContent(divNode);
 			}
 
@@ -404,7 +407,8 @@
 				newFakeImage.replace(callerInstance.fakeImage);
 
 				editor.getSelection().selectElement(newFakeImage);
-			} else {
+			}
+			else {
 				editor.insertHtml(newFakeImage.getOuterHtml());
 			}
 		},
@@ -423,7 +427,7 @@
 
 				divNode.getChild(1).remove();
 
-				AUI().use('aui-node', A => {
+				AUI().use('aui-node', (A) => {
 					var scriptNode = A.Node.create(
 						'<script type="text/javascript">' +
 							scriptContent +
@@ -451,6 +455,6 @@
 			}
 
 			instance.setupContent(content);
-		}
+		},
 	});
 })();

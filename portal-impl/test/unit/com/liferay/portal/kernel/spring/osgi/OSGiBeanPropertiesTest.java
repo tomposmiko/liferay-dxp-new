@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.spring.osgi;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.PropsImpl;
 
 import java.io.Serializable;
@@ -27,12 +28,19 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Raymond Augé
  */
 public class OSGiBeanPropertiesTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -331,9 +339,9 @@ public class OSGiBeanPropertiesTest {
 
 		Boolean[] values = (Boolean[])value;
 
-		Assert.assertEquals(true, values[0]);
-		Assert.assertEquals(false, values[1]);
-		Assert.assertEquals(true, values[2]);
+		Assert.assertTrue(values[0]);
+		Assert.assertFalse(values[1]);
+		Assert.assertTrue(values[2]);
 		Assert.assertEquals(Arrays.toString(values), 3, values.length);
 	}
 

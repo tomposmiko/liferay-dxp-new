@@ -16,6 +16,7 @@ package com.liferay.frontend.taglib.clay.servlet.taglib.soy.base;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.BaseClayCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -80,8 +81,12 @@ public class BaseClayCardTag extends BaseClayTag {
 	private void _populateContext() {
 		Map<String, Object> context = getContext();
 
-		if (context.get("actionItems") == null) {
-			setActionDropdownItems(_baseClayCard.getActionDropdownItems());
+		List<DropdownItem> actionItems = _baseClayCard.getActionDropdownItems();
+
+		if ((context.get("actionItems") == null) &&
+			!ListUtil.isEmpty(actionItems)) {
+
+			setActionDropdownItems(actionItems);
 		}
 
 		if (context.get("componentId") == null) {

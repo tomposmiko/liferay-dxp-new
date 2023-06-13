@@ -162,20 +162,41 @@
 		}
 	}
 
+	h3.component-title {
+		font-size: $h3-font-size;
+
+		@include media-breakpoint-down(sm) {
+			font-size: $h3-font-size-mobile;
+		}
+	}
+
+	.message-user-display {
+		margin-bottom: 0.5rem;
+		margin-top: 0.5rem;
+	}
+
+	.social-interaction {
+		display: flex;
+		margin-left: -0.5rem;
+
+		> div {
+			margin-right: 0.5rem;
+		}
+	}
+
 	@include media-breakpoint-up(sm) {
 		.message-user-display {
-			width: 50%;
+			width: calc(100% - 198px);
 		}
 
 		.social-interaction {
+			margin-left: 0;
 			position: absolute;
 			right: 0;
-			top: 0;
-			width: 50%;
+			top: 0.25rem;
 
-			& > div {
-				float: right;
-				margin-right: 12px;
+			> div {
+				float: left;
 			}
 		}
 	}
@@ -209,6 +230,53 @@
 
 		.list-group-item-content span.h5 {
 			margin-right: 12px;
+		}
+	}
+
+	.statistics-panel {
+		background-color: #fff;
+		border: 1px solid #e7e7ed;
+		border-radius: 4px;
+		box-sizing: border-box;
+		margin-top: 1.5rem;
+		padding: 1.5rem;
+
+		&.overview-container {
+			padding: 1rem;
+		}
+
+		small {
+			font-weight: 600;
+		}
+
+		.statistics-number {
+			font-size: 2.5rem;
+			margin-bottom: 0;
+		}
+
+		.sticker {
+			margin-right: 0.5rem;
+		}
+
+		.sticker-categories {
+			background-color: $primary-l3;
+			border: 1px solid $primary-l3;
+			box-shadow: none;
+			color: $primary-l1;
+		}
+
+		.sticker-posts {
+			background-color: $success-l2;
+			border: 1px solid $success-l2;
+			box-shadow: none;
+			color: $success-l1;
+		}
+
+		.sticker-participants {
+			background-color: $danger-l2;
+			border: 1px solid $danger-l2;
+			box-shadow: none;
+			color: $danger-l1;
 		}
 	}
 
@@ -326,6 +394,24 @@
 	}
 }
 
+.col-md-4 {
+	.portlet-asset-publisher,
+	.portlet-message-boards,
+	.portlet-trash {
+		@include media-breakpoint-up(sm) {
+			.message-user-display {
+				width: 100%;
+			}
+
+			.social-interaction {
+				margin-left: -0.5rem;
+				position: static;
+				width: 100%;
+			}
+		}
+	}
+}
+
 .trash-restore-popup {
 	.form {
 		fieldset {
@@ -335,7 +421,7 @@
 	}
 }
 
-.dialog-iframe-popup .portlet-message-boards .lfr-dynamic-uploader {
+.portal-popup .portlet-message-boards .lfr-dynamic-uploader {
 	position: relative;
 	top: 0;
 }

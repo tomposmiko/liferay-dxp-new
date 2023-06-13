@@ -90,7 +90,9 @@ else {
 
 portletURL.setParameter("navigation", navigation);
 
-SearchContainer bookmarksSearchContainer = new SearchContainer(liferayPortletRequest, null, null, "curEntry", SearchContainer.DEFAULT_DELTA, portletURL, null, "there-are-no-bookmarks-in-this-folder");
+SearchContainer<Object> bookmarksSearchContainer = new SearchContainer(liferayPortletRequest, null, null, "curEntry", SearchContainer.DEFAULT_DELTA, portletURL, null, "there-are-no-bookmarks-in-this-folder");
+
+List<Object> results = new ArrayList<>();
 
 int total = 0;
 
@@ -102,6 +104,7 @@ if (Validator.isNotNull(keywords)) {
 	searchContext.setAttribute("paginationType", "more");
 	searchContext.setEnd(bookmarksSearchContainer.getEnd());
 	searchContext.setFolderIds(new long[] {folderId});
+	searchContext.setIncludeInternalAssetCategories(true);
 	searchContext.setKeywords(keywords);
 	searchContext.setStart(bookmarksSearchContainer.getStart());
 
@@ -110,7 +113,8 @@ if (Validator.isNotNull(keywords)) {
 	total = hits.getLength();
 
 	bookmarksSearchContainer.setTotal(total);
-	bookmarksSearchContainer.setResults(BookmarksUtil.getEntries(hits));
+
+	results.addAll(BookmarksUtil.getEntries(hits));
 }
 else if (navigation.equals("mine") || navigation.equals("recent")) {
 	long groupEntriesUserId = 0;
@@ -122,7 +126,8 @@ else if (navigation.equals("mine") || navigation.equals("recent")) {
 	total = BookmarksEntryServiceUtil.getGroupEntriesCount(scopeGroupId, groupEntriesUserId);
 
 	bookmarksSearchContainer.setTotal(total);
-	bookmarksSearchContainer.setResults(BookmarksEntryServiceUtil.getGroupEntries(scopeGroupId, groupEntriesUserId, bookmarksSearchContainer.getStart(), bookmarksSearchContainer.getEnd()));
+
+	results.addAll(BookmarksEntryServiceUtil.getGroupEntries(scopeGroupId, groupEntriesUserId, bookmarksSearchContainer.getStart(), bookmarksSearchContainer.getEnd()));
 }
 else if (useAssetEntryQuery) {
 	AssetEntryQuery assetEntryQuery = new AssetEntryQuery(BookmarksEntry.class.getName(), bookmarksSearchContainer);
@@ -139,14 +144,18 @@ else if (useAssetEntryQuery) {
 	total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
 
 	bookmarksSearchContainer.setTotal(total);
-	bookmarksSearchContainer.setResults(AssetEntryServiceUtil.getEntries(assetEntryQuery));
+
+	results.addAll(AssetEntryServiceUtil.getEntries(assetEntryQuery));
 }
 else {
 	total = BookmarksFolderServiceUtil.getFoldersAndEntriesCount(scopeGroupId, folderId);
 
 	bookmarksSearchContainer.setTotal(total);
-	bookmarksSearchContainer.setResults(BookmarksFolderServiceUtil.getFoldersAndEntries(scopeGroupId, folderId, WorkflowConstants.STATUS_APPROVED, bookmarksSearchContainer.getStart(), bookmarksSearchContainer.getEnd()));
+
+	results.addAll(BookmarksFolderServiceUtil.getFoldersAndEntries(scopeGroupId, folderId, WorkflowConstants.STATUS_APPROVED, bookmarksSearchContainer.getStart(), bookmarksSearchContainer.getEnd()));
 }
+
+bookmarksSearchContainer.setResults(results);
 
 request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 
@@ -171,7 +180,10 @@ BookmarksUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 	<liferay-util:param name="searchContainerId" value="entries" />
 </liferay-util:include>
 
-<div class="closed container-fluid container-fluid-max-xl sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+<clay:container-fluid
+	cssClass="closed sidenav-container sidenav-right"
+	id='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
+>
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/bookmarks/info_panel" var="sidebarPanelURL">
 		<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 	</liferay-portlet:resourceURL>
@@ -199,7 +211,7 @@ BookmarksUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 			<portlet:param name="mvcRenderCommandName" value="/bookmarks/edit_entry" />
 		</liferay-portlet:actionURL>
 
-		<aui:form action="<%= editEntryURL.toString() %>" method="get" name="fm">
+		<aui:form action="<%= editEntryURL %>" method="get" name="fm">
 			<aui:input name="<%= Constants.CMD %>" type="hidden" />
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="newFolderId" type="hidden" />
@@ -209,7 +221,7 @@ BookmarksUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 			</liferay-util:include>
 		</aui:form>
 	</div>
-</div>
+</clay:container-fluid>
 
 <%
 if (navigation.equals("all") && !defaultFolderView && (folder != null) && (portletName.equals(BookmarksPortletKeys.BOOKMARKS) || portletName.equals(BookmarksPortletKeys.BOOKMARKS_ADMIN))) {
@@ -230,11 +242,11 @@ else {
 		editEntryUrl: '<portlet:actionURL name="/bookmarks/edit_entry" />',
 		form: {
 			method: 'POST',
-			node: A.one(document.<portlet:namespace />fm)
+			node: A.one(document.<portlet:namespace />fm),
 		},
 		moveEntryUrl:
 			'<portlet:renderURL><portlet:param name="mvcRenderCommandName" value="/bookmarks/move_entry" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
 		namespace: '<portlet:namespace />',
-		searchContainerId: 'entries'
+		searchContainerId: 'entries',
 	});
 </aui:script>

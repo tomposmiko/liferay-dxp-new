@@ -17,6 +17,8 @@ package com.liferay.headless.form.client.dto.v1_0;
 import com.liferay.headless.form.client.function.UnsafeSupplier;
 import com.liferay.headless.form.client.serdes.v1_0.FormFieldContextSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class FormFieldContext {
+public class FormFieldContext implements Cloneable, Serializable {
+
+	public static FormFieldContext toDTO(String json) {
+		return FormFieldContextSerDes.toDTO(json);
+	}
 
 	public Boolean getEvaluable() {
 		return evaluable;
@@ -215,6 +221,11 @@ public class FormFieldContext {
 	}
 
 	protected Boolean visible;
+
+	@Override
+	public FormFieldContext clone() throws CloneNotSupportedException {
+		return (FormFieldContext)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

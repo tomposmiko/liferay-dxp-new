@@ -247,10 +247,10 @@ public class InvokerPortletImpl
 
 			_portlet.init(portletConfig);
 		}
-		catch (Throwable t) {
+		catch (Throwable throwable) {
 			cleanUp();
 
-			throw t;
+			throw throwable;
 		}
 		finally {
 			if (_portletClassLoader != null) {
@@ -372,17 +372,15 @@ public class InvokerPortletImpl
 
 				response = new InvokerPortletResponse(
 					title, bufferCacheServletResponse.getString(),
-					now + Time.SECOND * _expCache.intValue());
+					now + (Time.SECOND * _expCache.intValue()));
 
 				sessionResponses.put(sessionResponseId, response);
 			}
 			else if ((response.getTime() < now) && (_expCache.intValue() > 0)) {
-				String title = invokeRender(renderRequest, renderResponse);
-
-				response.setTitle(title);
+				response.setTitle(invokeRender(renderRequest, renderResponse));
 
 				response.setContent(bufferCacheServletResponse.getString());
-				response.setTime(now + Time.SECOND * _expCache.intValue());
+				response.setTime(now + (Time.SECOND * _expCache.intValue()));
 			}
 			else {
 				renderResponseImpl.setTitle(response.getTitle());
@@ -464,6 +462,7 @@ public class InvokerPortletImpl
 			}
 			else if ((response.getTime() < now) && (_expCache > 0)) {
 				invokeHeader(headerRequest, headerResponse);
+
 				response.setContent(bufferCacheServletResponse.getString());
 			}
 			else {
@@ -573,13 +572,13 @@ public class InvokerPortletImpl
 				}
 			}
 			catch (ServletException servletException) {
-				Throwable cause = servletException.getRootCause();
+				Throwable throwable = servletException.getRootCause();
 
-				if (cause instanceof PortletException) {
-					throw (PortletException)cause;
+				if (throwable instanceof PortletException) {
+					throw (PortletException)throwable;
 				}
 
-				throw new PortletException(cause);
+				throw new PortletException(throwable);
 			}
 		}
 		else {
@@ -754,12 +753,12 @@ public class InvokerPortletImpl
 		_errorKey = _portletId.concat(PortletException.class.getName());
 
 		if (_log.isDebugEnabled()) {
-			com.liferay.portal.kernel.model.Portlet portletContextPortet =
+			com.liferay.portal.kernel.model.Portlet portletContextPortlet =
 				_liferayPortletContext.getPortlet();
 
 			_log.debug(
 				"Create instance cache wrapper for " +
-					portletContextPortet.getPortletId());
+					portletContextPortlet.getPortletId());
 		}
 	}
 

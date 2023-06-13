@@ -22,10 +22,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
+import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.io.Serializable;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -48,59 +52,40 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("MessageBoardThread")
+@GraphQLName(
+	description = "Represents a discussion thread in a message board.",
+	value = "MessageBoardThread"
+)
 @JsonFilter("Liferay.Vulcan")
-@Schema(requiredProperties = {"headline"})
+@Schema(
+	description = "Represents a discussion thread in a message board.",
+	requiredProperties = {"headline"}
+)
 @XmlRootElement(name = "MessageBoardThread")
-public class MessageBoardThread {
+public class MessageBoardThread implements Serializable {
 
-	@GraphQLName("ViewableBy")
-	public static enum ViewableBy {
+	public static MessageBoardThread toDTO(String json) {
+		return ObjectMapperUtil.readValue(MessageBoardThread.class, json);
+	}
 
-		ANYONE("Anyone"), MEMBERS("Members"), OWNER("Owner");
-
-		@JsonCreator
-		public static ViewableBy create(String value) {
-			for (ViewableBy viewableBy : values()) {
-				if (Objects.equals(viewableBy.getValue(), value)) {
-					return viewableBy;
-				}
-			}
-
-			return null;
-		}
-
-		@JsonValue
-		public String getValue() {
-			return _value;
-		}
-
-		@Override
-		public String toString() {
-			return _value;
-		}
-
-		private ViewableBy(String value) {
-			_value = value;
-		}
-
-		private final String _value;
-
+	public static MessageBoardThread unsafeToDTO(String json) {
+		return ObjectMapperUtil.unsafeReadValue(MessageBoardThread.class, json);
 	}
 
 	@Schema
 	@Valid
-	public Map<String, Map> getActions() {
+	public Map<String, Map<String, String>> getActions() {
 		return actions;
 	}
 
-	public void setActions(Map<String, Map> actions) {
+	public void setActions(Map<String, Map<String, String>> actions) {
 		this.actions = actions;
 	}
 
 	@JsonIgnore
 	public void setActions(
-		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+		UnsafeSupplier<Map<String, Map<String, String>>, Exception>
+			actionsUnsafeSupplier) {
 
 		try {
 			actions = actionsUnsafeSupplier.get();
@@ -115,7 +100,7 @@ public class MessageBoardThread {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Map<String, Map> actions;
+	protected Map<String, Map<String, String>> actions;
 
 	@Schema(description = "The thread's average rating.")
 	@Valid
@@ -207,6 +192,36 @@ public class MessageBoardThread {
 	@GraphQLField(description = "The thread's creator.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
+
+	@Schema
+	@Valid
+	public CreatorStatistics getCreatorStatistics() {
+		return creatorStatistics;
+	}
+
+	public void setCreatorStatistics(CreatorStatistics creatorStatistics) {
+		this.creatorStatistics = creatorStatistics;
+	}
+
+	@JsonIgnore
+	public void setCreatorStatistics(
+		UnsafeSupplier<CreatorStatistics, Exception>
+			creatorStatisticsUnsafeSupplier) {
+
+		try {
+			creatorStatistics = creatorStatisticsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected CreatorStatistics creatorStatistics;
 
 	@Schema
 	@Valid
@@ -324,8 +339,68 @@ public class MessageBoardThread {
 	@GraphQLField(
 		description = "The media format of the thread's content (e.g., HTML, BBCode, etc.)."
 	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String encodingFormat;
+
+	@Schema
+	public String getFriendlyUrlPath() {
+		return friendlyUrlPath;
+	}
+
+	public void setFriendlyUrlPath(String friendlyUrlPath) {
+		this.friendlyUrlPath = friendlyUrlPath;
+	}
+
+	@JsonIgnore
+	public void setFriendlyUrlPath(
+		UnsafeSupplier<String, Exception> friendlyUrlPathUnsafeSupplier) {
+
+		try {
+			friendlyUrlPath = friendlyUrlPathUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String friendlyUrlPath;
+
+	@Schema(
+		description = "A flag that indicates whether this thread has a message considered as valid"
+	)
+	public Boolean getHasValidAnswer() {
+		return hasValidAnswer;
+	}
+
+	public void setHasValidAnswer(Boolean hasValidAnswer) {
+		this.hasValidAnswer = hasValidAnswer;
+	}
+
+	@JsonIgnore
+	public void setHasValidAnswer(
+		UnsafeSupplier<Boolean, Exception> hasValidAnswerUnsafeSupplier) {
+
+		try {
+			hasValidAnswer = hasValidAnswerUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(
+		description = "A flag that indicates whether this thread has a message considered as valid"
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean hasValidAnswer;
 
 	@Schema(description = "The thread's main title.")
 	public String getHeadline() {
@@ -409,6 +484,66 @@ public class MessageBoardThread {
 	@GraphQLField(description = "A list of keywords describing the thread.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
+
+	@Schema(
+		description = "A flag that indicates whether this thread is locked."
+	)
+	public Boolean getLocked() {
+		return locked;
+	}
+
+	public void setLocked(Boolean locked) {
+		this.locked = locked;
+	}
+
+	@JsonIgnore
+	public void setLocked(
+		UnsafeSupplier<Boolean, Exception> lockedUnsafeSupplier) {
+
+		try {
+			locked = lockedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(
+		description = "A flag that indicates whether this thread is locked."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Boolean locked;
+
+	@Schema
+	public Long getMessageBoardSectionId() {
+		return messageBoardSectionId;
+	}
+
+	public void setMessageBoardSectionId(Long messageBoardSectionId) {
+		this.messageBoardSectionId = messageBoardSectionId;
+	}
+
+	@JsonIgnore
+	public void setMessageBoardSectionId(
+		UnsafeSupplier<Long, Exception> messageBoardSectionIdUnsafeSupplier) {
+
+		try {
+			messageBoardSectionId = messageBoardSectionIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long messageBoardSectionId;
 
 	@Schema(description = "The number of the thread's attachments.")
 	public Integer getNumberOfMessageBoardAttachments() {
@@ -504,6 +639,32 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RelatedContent[] relatedContents;
 
+	@Schema
+	public Boolean getSeen() {
+		return seen;
+	}
+
+	public void setSeen(Boolean seen) {
+		this.seen = seen;
+	}
+
+	@JsonIgnore
+	public void setSeen(UnsafeSupplier<Boolean, Exception> seenUnsafeSupplier) {
+		try {
+			seen = seenUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean seen;
+
 	@Schema(
 		description = "A flag that indicates whether this thread was posted as a question that can receive approved answers."
 	)
@@ -591,8 +752,68 @@ public class MessageBoardThread {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean subscribed;
+
+	@Schema
+	@Valid
+	public TaxonomyCategoryBrief[] getTaxonomyCategoryBriefs() {
+		return taxonomyCategoryBriefs;
+	}
+
+	public void setTaxonomyCategoryBriefs(
+		TaxonomyCategoryBrief[] taxonomyCategoryBriefs) {
+
+		this.taxonomyCategoryBriefs = taxonomyCategoryBriefs;
+	}
+
+	@JsonIgnore
+	public void setTaxonomyCategoryBriefs(
+		UnsafeSupplier<TaxonomyCategoryBrief[], Exception>
+			taxonomyCategoryBriefsUnsafeSupplier) {
+
+		try {
+			taxonomyCategoryBriefs = taxonomyCategoryBriefsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected TaxonomyCategoryBrief[] taxonomyCategoryBriefs;
+
+	@Schema
+	public Long[] getTaxonomyCategoryIds() {
+		return taxonomyCategoryIds;
+	}
+
+	public void setTaxonomyCategoryIds(Long[] taxonomyCategoryIds) {
+		this.taxonomyCategoryIds = taxonomyCategoryIds;
+	}
+
+	@JsonIgnore
+	public void setTaxonomyCategoryIds(
+		UnsafeSupplier<Long[], Exception> taxonomyCategoryIdsUnsafeSupplier) {
+
+		try {
+			taxonomyCategoryIds = taxonomyCategoryIdsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	protected Long[] taxonomyCategoryIds;
 
 	@Schema(description = "The thread's type.")
 	public String getThreadType() {
@@ -766,6 +987,16 @@ public class MessageBoardThread {
 			sb.append(String.valueOf(creator));
 		}
 
+		if (creatorStatistics != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"creatorStatistics\": ");
+
+			sb.append(String.valueOf(creatorStatistics));
+		}
+
 		if (customFields != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -828,6 +1059,30 @@ public class MessageBoardThread {
 			sb.append("\"");
 		}
 
+		if (friendlyUrlPath != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"friendlyUrlPath\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(friendlyUrlPath));
+
+			sb.append("\"");
+		}
+
+		if (hasValidAnswer != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"hasValidAnswer\": ");
+
+			sb.append(hasValidAnswer);
+		}
+
 		if (headline != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -876,6 +1131,26 @@ public class MessageBoardThread {
 			sb.append("]");
 		}
 
+		if (locked != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"locked\": ");
+
+			sb.append(locked);
+		}
+
+		if (messageBoardSectionId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"messageBoardSectionId\": ");
+
+			sb.append(messageBoardSectionId);
+		}
+
 		if (numberOfMessageBoardAttachments != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -916,6 +1191,16 @@ public class MessageBoardThread {
 			sb.append("]");
 		}
 
+		if (seen != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"seen\": ");
+
+			sb.append(seen);
+		}
+
 		if (showAsQuestion != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -944,6 +1229,46 @@ public class MessageBoardThread {
 			sb.append("\"subscribed\": ");
 
 			sb.append(subscribed);
+		}
+
+		if (taxonomyCategoryBriefs != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"taxonomyCategoryBriefs\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < taxonomyCategoryBriefs.length; i++) {
+				sb.append(String.valueOf(taxonomyCategoryBriefs[i]));
+
+				if ((i + 1) < taxonomyCategoryBriefs.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (taxonomyCategoryIds != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"taxonomyCategoryIds\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < taxonomyCategoryIds.length; i++) {
+				sb.append(taxonomyCategoryIds[i]);
+
+				if ((i + 1) < taxonomyCategoryIds.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (threadType != null) {
@@ -990,15 +1315,64 @@ public class MessageBoardThread {
 	}
 
 	@Schema(
+		accessMode = Schema.AccessMode.READ_ONLY,
 		defaultValue = "com.liferay.headless.delivery.dto.v1_0.MessageBoardThread",
 		name = "x-class-name"
 	)
 	public String xClassName;
 
-	private static String _escape(Object object) {
-		String string = String.valueOf(object);
+	@GraphQLName("ViewableBy")
+	public static enum ViewableBy {
 
-		return string.replaceAll("\"", "\\\\\"");
+		ANYONE("Anyone"), MEMBERS("Members"), OWNER("Owner");
+
+		@JsonCreator
+		public static ViewableBy create(String value) {
+			if ((value == null) || value.equals("")) {
+				return null;
+			}
+
+			for (ViewableBy viewableBy : values()) {
+				if (Objects.equals(viewableBy.getValue(), value)) {
+					return viewableBy;
+				}
+			}
+
+			throw new IllegalArgumentException("Invalid enum value: " + value);
+		}
+
+		@JsonValue
+		public String getValue() {
+			return _value;
+		}
+
+		@Override
+		public String toString() {
+			return _value;
+		}
+
+		private ViewableBy(String value) {
+			_value = value;
+		}
+
+		private final String _value;
+
+	}
+
+	private static String _escape(Object object) {
+		return StringUtil.replace(
+			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
+			_JSON_ESCAPE_STRINGS[1]);
+	}
+
+	private static boolean _isArray(Object value) {
+		if (value == null) {
+			return false;
+		}
+
+		Class<?> clazz = value.getClass();
+
+		return clazz.isArray();
 	}
 
 	private static String _toJSON(Map<String, ?> map) {
@@ -1014,14 +1388,47 @@ public class MessageBoardThread {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(entry.getKey());
-			sb.append("\":");
-			sb.append("\"");
-			sb.append(entry.getValue());
-			sb.append("\"");
+			sb.append(_escape(entry.getKey()));
+			sb.append("\": ");
+
+			Object value = entry.getValue();
+
+			if (_isArray(value)) {
+				sb.append("[");
+
+				Object[] valueArray = (Object[])value;
+
+				for (int i = 0; i < valueArray.length; i++) {
+					if (valueArray[i] instanceof String) {
+						sb.append("\"");
+						sb.append(valueArray[i]);
+						sb.append("\"");
+					}
+					else {
+						sb.append(valueArray[i]);
+					}
+
+					if ((i + 1) < valueArray.length) {
+						sb.append(", ");
+					}
+				}
+
+				sb.append("]");
+			}
+			else if (value instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)value));
+			}
+			else if (value instanceof String) {
+				sb.append("\"");
+				sb.append(_escape(value));
+				sb.append("\"");
+			}
+			else {
+				sb.append(value);
+			}
 
 			if (iterator.hasNext()) {
-				sb.append(",");
+				sb.append(", ");
 			}
 		}
 
@@ -1029,5 +1436,10 @@ public class MessageBoardThread {
 
 		return sb.toString();
 	}
+
+	private static final String[][] _JSON_ESCAPE_STRINGS = {
+		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
+		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
+	};
 
 }

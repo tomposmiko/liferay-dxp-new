@@ -47,6 +47,8 @@ public interface SamlWebKeys {
 
 	public static final String SAML_KEEP_ALIVE_URLS = "SAML_KEEP_ALIVE_URLS";
 
+	public static final String SAML_KEYSTORE = "SAML_KEYSTORE";
+
 	public static final String SAML_SLO_CONTEXT = "SAML_SLO_CONTEXT";
 
 	public static final String SAML_SLO_REQUEST_INFO = "SAML_SLO_REQUEST_INFO";
@@ -69,6 +71,8 @@ public interface SamlWebKeys {
 
 	public static final String SAML_SP_SESSION_KEY = "SAML_SP_SESSION_KEY";
 
+	public static final String SAML_SSO_ERROR = "SAML_SSO_ERROR";
+
 	public static final String SAML_SSO_LOGIN_CONTEXT =
 		"SAML_SSO_LOGIN_CONTEXT";
 
@@ -76,6 +80,8 @@ public interface SamlWebKeys {
 		"SAML_SSO_REQUEST_CONTEXT";
 
 	public static final String SAML_SSO_SESSION_ID = "SAML_SSO_SESSION_ID";
+
+	public static final String SAML_SUBJECT_NAME_ID = "SAML_SUBJECT_NAME_ID";
 
 	public static final String SAML_X509_CERTIFICATE = "SAML_X509_CERTIFICATE";
 

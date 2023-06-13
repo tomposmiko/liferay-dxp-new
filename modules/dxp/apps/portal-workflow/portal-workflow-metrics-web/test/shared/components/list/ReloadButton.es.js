@@ -9,20 +9,23 @@
  * distribution rights of the Software.
  */
 
+import {fireEvent, render} from '@testing-library/react';
 import React from 'react';
 
 import ReloadButton from '../../../../src/main/resources/META-INF/resources/js/shared/components/list/ReloadButton.es';
 
-test('Should component reload page', () => {
-	const component = shallow(<ReloadButton />);
+describe('ReloadButton', () => {
+	test('should call "reload" function when clicked', () => {
+		Object.defineProperty(window, 'location', {
+			value: {reload: jest.fn()},
+			writable: true,
+		});
 
-	window.location.reload = jest.fn();
+		const {getByText} = render(<ReloadButton />);
+		const reloadButton = getByText('reload-page');
 
-	const instance = component.instance();
+		fireEvent.click(reloadButton);
 
-	instance.reloadPage();
-
-	expect(window.location.reload).toHaveBeenCalled();
-
-	window.location.reload.mockRestore();
+		expect(window.location.reload).toHaveBeenCalled();
+	});
 });

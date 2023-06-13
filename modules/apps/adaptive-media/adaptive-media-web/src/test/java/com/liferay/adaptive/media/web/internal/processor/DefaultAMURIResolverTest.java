@@ -21,11 +21,14 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.net.URI;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -34,6 +37,11 @@ import org.mockito.Mockito;
  * @author Adolfo Pérez
  */
 public class DefaultAMURIResolverTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -56,9 +64,8 @@ public class DefaultAMURIResolverTest {
 
 		URI relativeURI = URI.create(RandomTestUtil.randomString());
 
-		URI uri = _amURIResolver.resolveURI(relativeURI);
-
-		String uriString = uri.toString();
+		String uriString = String.valueOf(
+			_amURIResolver.resolveURI(relativeURI));
 
 		Assert.assertTrue(uriString, uriString.contains(pathModule));
 		Assert.assertTrue(
@@ -80,9 +87,8 @@ public class DefaultAMURIResolverTest {
 
 		URI relativeURI = URI.create(RandomTestUtil.randomString());
 
-		URI uri = _amURIResolver.resolveURI(relativeURI);
-
-		String uriString = uri.toString();
+		String uriString = String.valueOf(
+			_amURIResolver.resolveURI(relativeURI));
 
 		Assert.assertTrue(uriString, uriString.contains(pathModule));
 		Assert.assertTrue(

@@ -19,6 +19,7 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -39,19 +40,24 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.site.model.SiteFriendlyURL;
 import com.liferay.site.service.SiteFriendlyURLLocalService;
+import com.liferay.site.service.SiteFriendlyURLLocalServiceUtil;
 import com.liferay.site.service.persistence.SiteFriendlyURLPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -73,11 +79,15 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>SiteFriendlyURLLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.site.service.SiteFriendlyURLLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>SiteFriendlyURLLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>SiteFriendlyURLLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the site friendly url to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SiteFriendlyURLLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param siteFriendlyURL the site friendly url
 	 * @return the site friendly url that was added
@@ -105,6 +115,10 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	/**
 	 * Deletes the site friendly url with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SiteFriendlyURLLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param siteFriendlyURLId the primary key of the site friendly url
 	 * @return the site friendly url that was removed
 	 * @throws PortalException if a site friendly url with the primary key could not be found
@@ -120,6 +134,10 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	/**
 	 * Deletes the site friendly url from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SiteFriendlyURLLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param siteFriendlyURL the site friendly url
 	 * @return the site friendly url that was removed
 	 */
@@ -129,6 +147,18 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 		SiteFriendlyURL siteFriendlyURL) {
 
 		return siteFriendlyURLPersistence.remove(siteFriendlyURL);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return siteFriendlyURLPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -365,6 +395,16 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return siteFriendlyURLPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -373,6 +413,13 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 			(SiteFriendlyURL)persistedModel);
 	}
 
+	public BasePersistence<SiteFriendlyURL> getBasePersistence() {
+		return siteFriendlyURLPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -458,6 +505,10 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	/**
 	 * Updates the site friendly url in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SiteFriendlyURLLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param siteFriendlyURL the site friendly url
 	 * @return the site friendly url that was updated
 	 */
@@ -467,6 +518,11 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 		SiteFriendlyURL siteFriendlyURL) {
 
 		return siteFriendlyURLPersistence.update(siteFriendlyURL);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -480,6 +536,8 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		siteFriendlyURLLocalService = (SiteFriendlyURLLocalService)aopProxy;
+
+		_setLocalServiceUtilService(siteFriendlyURLLocalService);
 	}
 
 	/**
@@ -521,6 +579,23 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		SiteFriendlyURLLocalService siteFriendlyURLLocalService) {
+
+		try {
+			Field field =
+				SiteFriendlyURLLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, siteFriendlyURLLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

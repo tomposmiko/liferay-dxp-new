@@ -55,7 +55,9 @@ PortletURL portletURL = organizationItemSelectorViewDisplayContext.getPortletURL
 	</liferay-frontend:management-bar-filters>
 </liferay-frontend:management-bar>
 
-<div class="container-fluid-1280" id="<portlet:namespace />organizationSelectorWrapper">
+<clay:container-fluid
+	id='<%= liferayPortletResponse.getNamespace() + "organizationSelectorWrapper" %>'
+>
 	<liferay-ui:search-container
 		id="organizations"
 		searchContainer="<%= organizationItemSelectorViewDisplayContext.getSearchContainer() %>"
@@ -68,12 +70,12 @@ PortletURL portletURL = organizationItemSelectorViewDisplayContext.getPortletURL
 		>
 
 			<%
-			Map<String, Object> data = new HashMap<>();
-
-			data.put("id", organization.getOrganizationId());
-			data.put("name", organization.getName());
-
-			row.setData(data);
+			row.setData(
+				HashMapBuilder.<String, Object>put(
+					"id", organization.getOrganizationId()
+				).put(
+					"name", organization.getName()
+				).build());
 			%>
 
 			<liferay-ui:search-container-column-text
@@ -99,33 +101,33 @@ PortletURL portletURL = organizationItemSelectorViewDisplayContext.getPortletURL
 			searchContainer="<%= organizationItemSelectorViewDisplayContext.getSearchContainer() %>"
 		/>
 	</liferay-ui:search-container>
-</div>
+</clay:container-fluid>
 
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get(
 		'<portlet:namespace />organizations'
 	);
 
-	searchContainer.on('rowToggled', function(event) {
+	searchContainer.on('rowToggled', function (event) {
 		var allSelectedElements = event.elements.allSelectedElements;
 
 		var arr = [];
 
-		allSelectedElements.each(function() {
+		allSelectedElements.each(function () {
 			var row = this.ancestor('tr');
 
 			var data = row.getDOM().dataset;
 
 			arr.push({
 				id: data.id,
-				name: data.name
+				name: data.name,
 			});
 		});
 
 		Liferay.Util.getOpener().Liferay.fire(
 			'<%= HtmlUtil.escapeJS(itemSelectedEventName) %>',
 			{
-				data: arr
+				data: arr,
 			}
 		);
 	});

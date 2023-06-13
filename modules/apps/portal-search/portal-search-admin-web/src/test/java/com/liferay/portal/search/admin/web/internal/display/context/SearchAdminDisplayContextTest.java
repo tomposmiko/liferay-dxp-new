@@ -25,14 +25,17 @@ import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.language.LanguageImpl;
 import com.liferay.portal.search.index.IndexInformation;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.HttpImpl;
-import com.liferay.spring.mock.web.portlet.MockRenderRequest;
-import com.liferay.spring.mock.web.portlet.MockRenderResponse;
+import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderRequest;
+import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderResponse;
 
 import javax.portlet.RenderRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Matchers;
@@ -42,6 +45,11 @@ import org.mockito.Mockito;
  * @author Adam Brandizzi
  */
 public class SearchAdminDisplayContextTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -69,7 +77,7 @@ public class SearchAdminDisplayContextTest {
 			searchAdminDisplayContext.getNavigationItemList();
 
 		Assert.assertEquals(
-			navigationItemList.toString(), 2, navigationItemList.size());
+			navigationItemList.toString(), 3, navigationItemList.size());
 	}
 
 	@Test
@@ -88,7 +96,25 @@ public class SearchAdminDisplayContextTest {
 			searchAdminDisplayContext.getNavigationItemList();
 
 		Assert.assertEquals(
-			navigationItemList.toString(), 1, navigationItemList.size());
+			navigationItemList.toString(), 2, navigationItemList.size());
+	}
+
+	@Test
+	public void testGetTabConnections() {
+		SearchAdminDisplayBuilder searchAdminDisplayBuilder =
+			new SearchAdminDisplayBuilder(
+				_language, _portal,
+				getRenderRequestWithSelectedTab("connections"),
+				new MockRenderResponse());
+
+		searchAdminDisplayBuilder.setIndexInformation(
+			Mockito.mock(IndexInformation.class));
+
+		SearchAdminDisplayContext searchAdminDisplayContext =
+			searchAdminDisplayBuilder.build();
+
+		Assert.assertEquals(
+			"connections", searchAdminDisplayContext.getSelectedTab());
 	}
 
 	@Test
@@ -105,7 +131,7 @@ public class SearchAdminDisplayContextTest {
 			searchAdminDisplayBuilder.build();
 
 		Assert.assertEquals(
-			"index-actions", searchAdminDisplayContext.getSelectedTab());
+			"connections", searchAdminDisplayContext.getSelectedTab());
 	}
 
 	@Test
@@ -140,7 +166,7 @@ public class SearchAdminDisplayContextTest {
 			searchAdminDisplayBuilder.build();
 
 		Assert.assertEquals(
-			"index-actions", searchAdminDisplayContext.getSelectedTab());
+			"connections", searchAdminDisplayContext.getSelectedTab());
 	}
 
 	@Test
@@ -176,40 +202,7 @@ public class SearchAdminDisplayContextTest {
 			searchAdminDisplayBuilder.build();
 
 		Assert.assertEquals(
-			"index-actions", searchAdminDisplayContext.getSelectedTab());
-	}
-
-	@Test
-	public void testIsIndexInformationAvailable() {
-		SearchAdminDisplayBuilder searchAdminDisplayBuilder =
-			new SearchAdminDisplayBuilder(
-				_language, _portal, new MockRenderRequest(),
-				new MockRenderResponse());
-
-		searchAdminDisplayBuilder.setIndexInformation(
-			Mockito.mock(IndexInformation.class));
-
-		SearchAdminDisplayContext searchAdminDisplayContext =
-			searchAdminDisplayBuilder.build();
-
-		Assert.assertTrue(
-			searchAdminDisplayContext.isIndexInformationAvailable());
-	}
-
-	@Test
-	public void testIsIndexInformationAvailableFalse() {
-		SearchAdminDisplayBuilder searchAdminDisplayBuilder =
-			new SearchAdminDisplayBuilder(
-				_language, _portal, new MockRenderRequest(),
-				new MockRenderResponse());
-
-		searchAdminDisplayBuilder.setIndexInformation(null);
-
-		SearchAdminDisplayContext searchAdminDisplayContext =
-			searchAdminDisplayBuilder.build();
-
-		Assert.assertTrue(
-			!searchAdminDisplayContext.isIndexInformationAvailable());
+			"connections", searchAdminDisplayContext.getSelectedTab());
 	}
 
 	protected RenderRequest getRenderRequestWithSelectedTab(

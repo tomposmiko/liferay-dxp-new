@@ -36,7 +36,7 @@ import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.saml.opensaml.integration.metadata.MetadataManager;
+import com.liferay.saml.opensaml.integration.internal.metadata.MetadataManager;
 import com.liferay.saml.opensaml.integration.resolver.AttributeResolver;
 import com.liferay.saml.util.PortletPropsKeys;
 
@@ -633,11 +633,8 @@ public class DefaultAttributeResolver implements AttributeResolver {
 
 			if (values.length > 2) {
 				for (int i = 2; i < values.length; i++) {
-					attributeValue = attributeValue.concat(
-						"="
-					).concat(
-						values[i]
-					);
+					attributeValue = StringBundler.concat(
+						attributeValue, "=", values[i]);
 				}
 			}
 		}

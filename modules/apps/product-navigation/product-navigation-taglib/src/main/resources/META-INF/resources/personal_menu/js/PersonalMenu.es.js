@@ -18,7 +18,7 @@ import ClayIcon from '@clayui/icon';
 import ClaySticker from '@clayui/sticker';
 import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useState, useRef} from 'react';
+import React, {useRef, useState} from 'react';
 
 function PersonalMenu({
 	color,
@@ -26,7 +26,7 @@ function PersonalMenu({
 	itemsURL,
 	label,
 	size,
-	userPortraitURL
+	userPortraitURL,
 }) {
 	const [items, setItems] = useState([]);
 	const preloadPromise = useRef();
@@ -34,8 +34,8 @@ function PersonalMenu({
 	function preloadItems() {
 		if (!preloadPromise.current) {
 			preloadPromise.current = fetch(itemsURL)
-				.then(response => response.json())
-				.then(items => setItems(items));
+				.then((response) => response.json())
+				.then((items) => setItems(items));
 		}
 	}
 
@@ -52,6 +52,7 @@ function PersonalMenu({
 					/>
 				) : (
 					<ClayButton
+						aria-label={Liferay.Language.get('personal-menu')}
 						displayType="unstyled"
 						onFocus={preloadItems}
 						onMouseOver={preloadItems}
@@ -95,9 +96,7 @@ function PersonalMenu({
 }
 
 PersonalMenu.propTypes = {
-	itemsURL: PropTypes.string
+	itemsURL: PropTypes.string,
 };
 
-export default function(props) {
-	return <PersonalMenu {...props} />;
-}
+export default PersonalMenu;

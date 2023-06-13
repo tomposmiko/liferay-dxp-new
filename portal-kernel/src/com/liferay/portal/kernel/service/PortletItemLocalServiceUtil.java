@@ -14,7 +14,16 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.model.PortletItem;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for PortletItem. This utility wraps
@@ -35,10 +44,10 @@ public class PortletItemLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.PortletItemLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static com.liferay.portal.kernel.model.PortletItem addPortletItem(
+	public static PortletItem addPortletItem(
 			long userId, long groupId, String name, String portletId,
 			String className)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().addPortletItem(
 			userId, groupId, name, portletId, className);
@@ -47,13 +56,25 @@ public class PortletItemLocalServiceUtil {
 	/**
 	 * Adds the portlet item to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PortletItemLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param portletItem the portlet item
 	 * @return the portlet item that was added
 	 */
-	public static com.liferay.portal.kernel.model.PortletItem addPortletItem(
-		com.liferay.portal.kernel.model.PortletItem portletItem) {
-
+	public static PortletItem addPortletItem(PortletItem portletItem) {
 		return getService().addPortletItem(portletItem);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -62,19 +83,16 @@ public class PortletItemLocalServiceUtil {
 	 * @param portletItemId the primary key for the new portlet item
 	 * @return the new portlet item
 	 */
-	public static com.liferay.portal.kernel.model.PortletItem createPortletItem(
-		long portletItemId) {
-
+	public static PortletItem createPortletItem(long portletItemId) {
 		return getService().createPortletItem(portletItemId);
 	}
 
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
@@ -82,13 +100,16 @@ public class PortletItemLocalServiceUtil {
 	/**
 	 * Deletes the portlet item with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PortletItemLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param portletItemId the primary key of the portlet item
 	 * @return the portlet item that was removed
 	 * @throws PortalException if a portlet item with the primary key could not be found
 	 */
-	public static com.liferay.portal.kernel.model.PortletItem deletePortletItem(
-			long portletItemId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PortletItem deletePortletItem(long portletItemId)
+		throws PortalException {
 
 		return getService().deletePortletItem(portletItemId);
 	}
@@ -96,18 +117,26 @@ public class PortletItemLocalServiceUtil {
 	/**
 	 * Deletes the portlet item from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PortletItemLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param portletItem the portlet item
 	 * @return the portlet item that was removed
 	 */
-	public static com.liferay.portal.kernel.model.PortletItem deletePortletItem(
-		com.liferay.portal.kernel.model.PortletItem portletItem) {
-
+	public static PortletItem deletePortletItem(PortletItem portletItem) {
 		return getService().deletePortletItem(portletItem);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -117,9 +146,7 @@ public class PortletItemLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -135,9 +162,8 @@ public class PortletItemLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -155,10 +181,9 @@ public class PortletItemLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -170,9 +195,7 @@ public class PortletItemLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -184,15 +207,13 @@ public class PortletItemLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.portal.kernel.model.PortletItem fetchPortletItem(
-		long portletItemId) {
-
+	public static PortletItem fetchPortletItem(long portletItemId) {
 		return getService().fetchPortletItem(portletItemId);
 	}
 
@@ -218,9 +239,11 @@ public class PortletItemLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -232,16 +255,15 @@ public class PortletItemLocalServiceUtil {
 	 * @return the portlet item
 	 * @throws PortalException if a portlet item with the primary key could not be found
 	 */
-	public static com.liferay.portal.kernel.model.PortletItem getPortletItem(
-			long portletItemId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PortletItem getPortletItem(long portletItemId)
+		throws PortalException {
 
 		return getService().getPortletItem(portletItemId);
 	}
 
-	public static com.liferay.portal.kernel.model.PortletItem getPortletItem(
+	public static PortletItem getPortletItem(
 			long groupId, String name, String portletId, String className)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().getPortletItem(groupId, name, portletId, className);
 	}
@@ -257,20 +279,18 @@ public class PortletItemLocalServiceUtil {
 	 * @param end the upper bound of the range of portlet items (not inclusive)
 	 * @return the range of portlet items
 	 */
-	public static java.util.List<com.liferay.portal.kernel.model.PortletItem>
-		getPortletItems(int start, int end) {
-
+	public static List<PortletItem> getPortletItems(int start, int end) {
 		return getService().getPortletItems(start, end);
 	}
 
-	public static java.util.List<com.liferay.portal.kernel.model.PortletItem>
-		getPortletItems(long groupId, String className) {
+	public static List<PortletItem> getPortletItems(
+		long groupId, String className) {
 
 		return getService().getPortletItems(groupId, className);
 	}
 
-	public static java.util.List<com.liferay.portal.kernel.model.PortletItem>
-		getPortletItems(long groupId, String portletId, String className) {
+	public static List<PortletItem> getPortletItems(
+		long groupId, String portletId, String className) {
 
 		return getService().getPortletItems(groupId, portletId, className);
 	}
@@ -284,10 +304,10 @@ public class PortletItemLocalServiceUtil {
 		return getService().getPortletItemsCount();
 	}
 
-	public static com.liferay.portal.kernel.model.PortletItem updatePortletItem(
+	public static PortletItem updatePortletItem(
 			long userId, long groupId, String name, String portletId,
 			String className)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().updatePortletItem(
 			userId, groupId, name, portletId, className);
@@ -296,24 +316,21 @@ public class PortletItemLocalServiceUtil {
 	/**
 	 * Updates the portlet item in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PortletItemLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param portletItem the portlet item
 	 * @return the portlet item that was updated
 	 */
-	public static com.liferay.portal.kernel.model.PortletItem updatePortletItem(
-		com.liferay.portal.kernel.model.PortletItem portletItem) {
-
+	public static PortletItem updatePortletItem(PortletItem portletItem) {
 		return getService().updatePortletItem(portletItem);
 	}
 
 	public static PortletItemLocalService getService() {
-		if (_service == null) {
-			_service = (PortletItemLocalService)PortalBeanLocatorUtil.locate(
-				PortletItemLocalService.class.getName());
-		}
-
 		return _service;
 	}
 
-	private static PortletItemLocalService _service;
+	private static volatile PortletItemLocalService _service;
 
 }

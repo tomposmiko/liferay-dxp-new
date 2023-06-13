@@ -16,8 +16,11 @@ package com.liferay.portal.dao.sql.transformer;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.db.DBType;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -25,6 +28,11 @@ import org.junit.Test;
  */
 public class DB2SQLTransformerLogicTest
 	extends BaseSQLTransformerLogicTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	public DB2SQLTransformerLogicTest() {
 		super(new TestDB(DBType.DB2, 1, 0));
@@ -41,13 +49,6 @@ public class DB2SQLTransformerLogicTest
 		sb.append("END");
 
 		return sb.toString();
-	}
-
-	@Test
-	public void testReplaceAlterColumnType() {
-		Assert.assertEquals(
-			"ALTER TABLE T ALTER COLUMN C SET DATA TYPE VARCHAR(256)",
-			sqlTransformer.transform("ALTER_COLUMN_TYPE T C VARCHAR(256)"));
 	}
 
 	@Override
@@ -81,7 +82,7 @@ public class DB2SQLTransformerLogicTest
 
 	@Override
 	protected String getCastClobTextTransformedSQL() {
-		return "select CAST(foo AS VARCHAR(254)) from Foo";
+		return "select CAST(foo AS VARCHAR(32672)) from Foo";
 	}
 
 	@Override

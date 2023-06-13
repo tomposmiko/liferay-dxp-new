@@ -21,7 +21,10 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil;
 import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructurePersistence;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -44,16 +47,22 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -75,11 +84,15 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>LayoutPageTemplateStructureLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>LayoutPageTemplateStructureLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>LayoutPageTemplateStructureLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the layout page template structure to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutPageTemplateStructureLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutPageTemplateStructure the layout page template structure
 	 * @return the layout page template structure that was added
@@ -113,6 +126,10 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 	/**
 	 * Deletes the layout page template structure with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutPageTemplateStructureLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutPageTemplateStructureId the primary key of the layout page template structure
 	 * @return the layout page template structure that was removed
 	 * @throws PortalException if a layout page template structure with the primary key could not be found
@@ -130,6 +147,10 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 	/**
 	 * Deletes the layout page template structure from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutPageTemplateStructureLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutPageTemplateStructure the layout page template structure
 	 * @return the layout page template structure that was removed
 	 */
@@ -140,6 +161,18 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 
 		return layoutPageTemplateStructurePersistence.remove(
 			layoutPageTemplateStructure);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return layoutPageTemplateStructurePersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -415,6 +448,16 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return layoutPageTemplateStructurePersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -424,6 +467,13 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 				(LayoutPageTemplateStructure)persistedModel);
 	}
 
+	public BasePersistence<LayoutPageTemplateStructure> getBasePersistence() {
+		return layoutPageTemplateStructurePersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -517,6 +567,10 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 	/**
 	 * Updates the layout page template structure in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutPageTemplateStructureLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutPageTemplateStructure the layout page template structure
 	 * @return the layout page template structure that was updated
 	 */
@@ -529,11 +583,17 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 			layoutPageTemplateStructure);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			LayoutPageTemplateStructureLocalService.class,
-			IdentifiableOSGiService.class, PersistedModelLocalService.class
+			IdentifiableOSGiService.class, CTService.class,
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -541,6 +601,8 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		layoutPageTemplateStructureLocalService =
 			(LayoutPageTemplateStructureLocalService)aopProxy;
+
+		_setLocalServiceUtilService(layoutPageTemplateStructureLocalService);
 	}
 
 	/**
@@ -553,8 +615,24 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 		return LayoutPageTemplateStructureLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<LayoutPageTemplateStructure> getCTPersistence() {
+		return layoutPageTemplateStructurePersistence;
+	}
+
+	@Override
+	public Class<LayoutPageTemplateStructure> getModelClass() {
 		return LayoutPageTemplateStructure.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<LayoutPageTemplateStructure>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(
+			layoutPageTemplateStructurePersistence);
 	}
 
 	protected String getModelClassName() {
@@ -583,6 +661,24 @@ public abstract class LayoutPageTemplateStructureLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		LayoutPageTemplateStructureLocalService
+			layoutPageTemplateStructureLocalService) {
+
+		try {
+			Field field =
+				LayoutPageTemplateStructureLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutPageTemplateStructureLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

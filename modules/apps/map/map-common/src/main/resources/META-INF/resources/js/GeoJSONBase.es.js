@@ -23,6 +23,7 @@ import State, {Config} from 'metal-state';
  * @review
  */
 class GeoJSONBase extends State {
+
 	/**
 	 * Receives an object with native features data and tries
 	 * to parse it with the implemented method _getNativeFeatures.
@@ -36,7 +37,7 @@ class GeoJSONBase extends State {
 
 		if (nativeFeatures.length > 0) {
 			this.emit('featuresAdded', {
-				features: nativeFeatures.map(this._wrapNativeFeature)
+				features: nativeFeatures.map(this._wrapNativeFeature),
 			});
 		}
 	}
@@ -51,7 +52,7 @@ class GeoJSONBase extends State {
 	 */
 	_handleFeatureClicked(nativeFeature) {
 		this.emit('featureClick', {
-			feature: this._wrapNativeFeature(nativeFeature)
+			feature: this._wrapNativeFeature(nativeFeature),
 		});
 	}
 
@@ -97,12 +98,13 @@ class GeoJSONBase extends State {
  * @type {!Object}
  */
 GeoJSONBase.STATE = {
+
 	/**
 	 * Map to be used
 	 * @review
 	 * @type {Object}
 	 */
-	map: Config.object()
+	map: Config.object(),
 };
 
 window.Liferay = window.Liferay || {};

@@ -21,7 +21,7 @@ WikiNode node = (WikiNode)request.getAttribute(WikiWebKeys.WIKI_NODE);
 
 List<WikiNode> nodes = wikiPortletInstanceSettingsHelper.getAllPermittedNodes();
 
-boolean print = ParamUtil.getString(request, "viewMode").equals(Constants.PRINT);
+boolean print = Objects.equals(ParamUtil.getString(request, "viewMode"), Constants.PRINT);
 
 WikiURLHelper wikiURLHelper = new WikiURLHelper(wikiRequestHelper, renderResponse, wikiGroupServiceConfiguration);
 WikiVisualizationHelper wikiVisualizationHelper = new WikiVisualizationHelper(wikiRequestHelper, wikiPortletInstanceSettingsHelper, wikiGroupServiceConfiguration);
@@ -90,28 +90,28 @@ if (portletTitleBasedNavigation) {
 						navigationItem -> {
 							navigationItem.setActive(wikiVisualizationHelper.isViewRecentChangesNavItemSelected());
 							navigationItem.setHref(wikiURLHelper.getViewRecentChangesURL(node));
-							navigationItem.setLabel(LanguageUtil.get(request, "recent-changes"));
+							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "recent-changes"));
 						});
 
 					add(
 						navigationItem -> {
 							navigationItem.setActive(wikiVisualizationHelper.isViewAllPagesNavItemSelected());
 							navigationItem.setHref(wikiURLHelper.getViewPagesURL(node));
-							navigationItem.setLabel(LanguageUtil.get(request, "all-pages"));
+							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "all-pages"));
 						});
 
 					add(
 						navigationItem -> {
 							navigationItem.setActive(wikiVisualizationHelper.isViewOrphanPagesNavItemSelected());
 							navigationItem.setHref(wikiURLHelper.getViewOrphanPagesURL(node));
-							navigationItem.setLabel(LanguageUtil.get(request, "orphan-pages"));
+							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "orphan-pages"));
 						});
 
 					add(
 						navigationItem -> {
 							navigationItem.setActive(wikiVisualizationHelper.isViewDraftPagesNavItemSelected());
 							navigationItem.setHref(wikiURLHelper.getViewDraftPagesURL(node));
-							navigationItem.setLabel(LanguageUtil.get(request, "draft-pages"));
+							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "draft-pages"));
 						});
 				}
 			}

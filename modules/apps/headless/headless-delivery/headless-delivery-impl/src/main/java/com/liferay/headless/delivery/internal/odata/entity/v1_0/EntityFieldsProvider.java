@@ -17,7 +17,7 @@ package com.liferay.headless.delivery.internal.odata.entity.v1_0;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.storage.FieldConstants;
+import com.liferay.dynamic.data.mapping.storage.constants.FieldConstants;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -125,9 +125,11 @@ public class EntityFieldsProvider {
 		}
 		else if (Objects.equals(
 					ddmFormField.getDataType(), DDMFormFieldType.RADIO) ||
-				 (Objects.equals(
-					 ddmFormField.getType(), DDMFormFieldType.TEXT) &&
-				  Objects.equals(ddmFormField.getIndexType(), "keyword"))) {
+				 (Objects.equals(ddmFormField.getIndexType(), "keyword") &&
+				  (Objects.equals(
+					  ddmFormField.getType(), DDMFormFieldType.SELECT) ||
+				   Objects.equals(
+					   ddmFormField.getType(), DDMFormFieldType.TEXT)))) {
 
 			return new StringEntityField(
 				ddmFormField.getName(),

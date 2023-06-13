@@ -16,6 +16,7 @@ package com.liferay.analytics.settings.internal.security.auth.verifier;
 
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -31,7 +32,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.nio.charset.Charset;
 
@@ -49,14 +49,16 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Shinn Lok
  */
 @Component(
-	enabled = false,
-	property = "auth.verifier.AnalyticsSecurityAuthVerifier.urls.includes=/v1.0/experiments/*",
+	configurationPid = "com.liferay.analytics.settings.configuration.AnalyticsConfiguration.scoped",
+	configurationPolicy = ConfigurationPolicy.REQUIRE,
+	property = "auth.verifier.AnalyticsSecurityAuthVerifier.urls.includes=/o/segments-asah/v1.0/experiments/*,/v1.0/experiments/*",
 	service = AuthVerifier.class
 )
 public class AnalyticsSecurityAuthVerifier implements AuthVerifier {

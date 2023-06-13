@@ -15,8 +15,10 @@
 package com.liferay.calendar.internal.upgrade.v1_0_4;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeKernelPackage;
 
@@ -33,9 +35,10 @@ public class UpgradeClassNames extends UpgradeKernelPackage {
 	public void doUpgrade() throws UpgradeException {
 		updateCalEventClassName();
 
+		deleteRelatedAssetEntries();
+
 		deleteCalEventClassName();
 		deleteDuplicateResourcePermissions();
-		deleteDuplicateResources();
 
 		super.doUpgrade();
 	}
@@ -51,6 +54,14 @@ public class UpgradeClassNames extends UpgradeKernelPackage {
 					_CLASS_NAME_CAL_EVENT + "%'");
 
 			runSQL(
+				"delete from MBDiscussion where classNameId = " +
+					PortalUtil.getClassNameId(_CLASS_NAME_CAL_EVENT));
+
+			runSQL(
+				"delete from MBMessage where classNameId = " +
+					PortalUtil.getClassNameId(_CLASS_NAME_CAL_EVENT));
+
+			runSQL(
 				"delete from ResourceAction where name like '" +
 					_CLASS_NAME_CAL_EVENT + "%'");
 
@@ -61,6 +72,10 @@ public class UpgradeClassNames extends UpgradeKernelPackage {
 			runSQL(
 				"delete from ResourcePermission where name like '" +
 					_CLASS_NAME_CAL_EVENT + "%'");
+
+			runSQL(
+				"delete from Subscription where classNameId = " +
+					PortalUtil.getClassNameId(_CLASS_NAME_CAL_EVENT));
 		}
 		catch (Exception exception) {
 			throw new UpgradeException(exception);
@@ -102,29 +117,40 @@ public class UpgradeClassNames extends UpgradeKernelPackage {
 		}
 	}
 
-	protected void deleteDuplicateResources() throws UpgradeException {
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			String newName = _RESOURCE_NAMES[0][1];
+	protected void deleteRelatedAssetEntries() throws UpgradeException {
+		try (LoggingTimer loggingTimer = new LoggingTimer();
+			PreparedStatement ps1 = connection.prepareStatement(
+				"select entryId from AssetEntry where classNameId = ?");
+			PreparedStatement ps2 = AutoBatchPreparedStatementUtil.autoBatch(
+				connection.prepareStatement(
+					"delete from AssetLink where entryId1 = ? or entryId2 = " +
+						"?"));
+			PreparedStatement ps3 = AutoBatchPreparedStatementUtil.autoBatch(
+				connection.prepareStatement(
+					"delete from AssetEntry where entryId = ? "))) {
 
-			String selectSQL =
-				"select actionId from ResourceAction where name = '" + newName +
-					"'";
+			ps1.setLong(1, PortalUtil.getClassNameId(_CLASS_NAME_CAL_EVENT));
 
-			try (PreparedStatement ps = connection.prepareStatement(selectSQL);
-				ResultSet rs = ps.executeQuery()) {
+			ResultSet rs = ps1.executeQuery();
 
-				String oldName = _RESOURCE_NAMES[0][0];
+			while (rs.next()) {
+				long entryId = rs.getLong("entryId");
 
-				while (rs.next()) {
-					runSQL(
-						StringBundler.concat(
-							"delete from ResourceAction where actionId = '",
-							rs.getString(1), "' and name= '", oldName, "'"));
-				}
+				ps2.setLong(1, entryId);
+				ps2.setLong(2, entryId);
+
+				ps2.addBatch();
+
+				ps3.setLong(1, entryId);
+				ps3.addBatch();
 			}
-			catch (Exception exception) {
-				throw new UpgradeException(exception);
-			}
+
+			ps2.executeBatch();
+
+			ps3.executeBatch();
+		}
+		catch (SQLException sqlException) {
+			throw new UpgradeException(sqlException);
 		}
 	}
 

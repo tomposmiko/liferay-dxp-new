@@ -12,18 +12,21 @@
  * details.
  */
 
-import {TYPES} from '../actions/index';
+import {UPDATE_NETWORK} from '../actions/types';
 
-export default function networkReducer(state, action) {
+export const INITIAL_STATE = {
+	error: null,
+	status: null,
+};
+
+export default function networkReducer(networkStatus = INITIAL_STATE, action) {
 	switch (action.type) {
-		case TYPES.UPDATE_NETWORK:
+		case UPDATE_NETWORK:
 			return {
-				...state,
-				...action.network
+				...networkStatus,
+				...action.network,
 			};
 		default:
-			break;
+			return networkStatus;
 	}
-
-	return state;
 }

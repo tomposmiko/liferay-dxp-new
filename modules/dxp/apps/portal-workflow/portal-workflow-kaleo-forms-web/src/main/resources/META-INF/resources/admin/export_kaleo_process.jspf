@@ -27,7 +27,7 @@
 	Liferay.provide(
 		window,
 		'<portlet:namespace />exportKaleoProcess',
-		function(url) {
+		function (url) {
 			var A = AUI();
 
 			var form = A.Node.create('<form method="post" />');
@@ -53,39 +53,39 @@
 								label:
 									'<%= UnicodeLanguageUtil.get(request, "ok") %>',
 								on: {
-									click: function() {
+									click: function () {
 										submitForm(form, url, false);
 
 										dialog.hide();
-									}
+									},
 								},
-								primary: true
+								primary: true,
 							},
 							{
 								label:
 									'<%= UnicodeLanguageUtil.get(request, "cancel") %>',
 								on: {
-									click: function() {
+									click: function () {
 										dialog.hide();
-									}
-								}
-							}
+									},
+								},
+							},
 						],
 						header: [
 							{
 								cssClass: 'close',
 								label: '\u00D7',
 								on: {
-									click: function(event) {
+									click: function (event) {
 										dialog.hide();
-									}
-								}
-							}
-						]
+									},
+								},
+							},
+						],
 					},
-					width: 350
+					width: 350,
 				},
-				title: '<%= UnicodeLanguageUtil.get(request, "export") %>'
+				title: '<%= UnicodeLanguageUtil.get(request, "export") %>',
 			});
 		},
 		['liferay-util-window']

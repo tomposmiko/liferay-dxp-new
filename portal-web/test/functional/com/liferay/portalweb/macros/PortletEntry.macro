@@ -8,13 +8,21 @@ definition {
 				key_fieldName = "${fieldName}",
 				locator1 = "Button#LOCALIZATION");
 		}
+		else if (isSet(friendlyURLHistory)) {
+			Click.clickNoMouseOver(locator1 = "Icon#FRIENDLY_URL_HISTORY_LOCALIZATION");
+		}
 		else {
 			Click.clickNoMouseOver(locator1 = "Button#LOCALIZATION_GENERIC");
 		}
 
-		Click(
-			key_locale = StringUtil.replace("${locale}", "-", "_"),
-			locator1 = "Translation#LOCALIZATION_NAME");
+		if (isSet(localizedFriendlyURL)) {
+			Click.clickNoMouseOver(locator1 = "Icon#FRIENDLY_URL_HISTORY_SPANISH_LOCALIZATION");
+		}
+		else {
+			Click(
+				key_locale = StringUtil.replace("${locale}", "-", "_"),
+				locator1 = "Translation#LOCALIZATION_NAME");
+		}
 	}
 
 	macro clickEditFromEllipsis {
@@ -141,6 +149,8 @@ definition {
 		Button.clickSave();
 
 		Alert.viewSuccessMessage();
+
+		WaitForLiferayEvent.initializeLiferayEventLog();
 	}
 
 	macro saveAsDraft {
@@ -158,6 +168,18 @@ definition {
 		}
 
 		AssertChecked.assertCheckedNotVisible(locator1 = "Checkbox#LEXICON_SELECT_ALL_INPUT");
+	}
+
+	macro SelectAllOnSpecificWidget {
+		if (IsNotChecked.isNotCheckedNotVisible(key_position = "${widgetPosition}", locator1 = "Checkbox#LEXICON_SELECT_ALL_INPUT_SPECIFIC")) {
+			Click(
+				key_position = "${widgetPosition}",
+				locator1 = "Checkbox#LEXICON_SELECT_ALL_CONTAINER_SPECIFIC");
+		}
+
+		AssertChecked.assertCheckedNotVisible(
+			key_position = "${widgetPosition}",
+			locator1 = "Checkbox#LEXICON_SELECT_ALL_INPUT_SPECIFIC");
 	}
 
 	macro submitForPublication {
@@ -203,13 +225,6 @@ definition {
 
 	macro viewNoNavItemLink {
 		AssertElementNotPresent(locator1 = "NavBar#NAV_ITEM_LINK");
-	}
-
-	macro viewWorkflowStatus {
-		AssertTextEquals(
-			key_rowEntry = "${rowEntry}",
-			locator1 = "Card#GENERIC_SMALL_TEXT",
-			value1 = "${workflowStatus}");
 	}
 
 }

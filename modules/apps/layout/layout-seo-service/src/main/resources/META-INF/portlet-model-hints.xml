@@ -3,6 +3,7 @@
 <model-hints>
 	<model name="com.liferay.layout.seo.model.LayoutSEOEntry">
 		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="layoutSEOEntryId" type="long" />
 		<field name="groupId" type="long" />
@@ -13,7 +14,9 @@
 		<field name="modifiedDate" type="Date" />
 		<field name="privateLayout" type="boolean" />
 		<field name="layoutId" type="long" />
-		<field localized="true" name="canonicalURL" type="String" />
+		<field localized="true" name="canonicalURL" type="String">
+			<hint-collection name="URL" />
+		</field>
 		<field name="canonicalURLEnabled" type="boolean" />
 		<field name="DDMStorageId" type="long" />
 		<field localized="true" name="openGraphDescription" type="String">
@@ -29,6 +32,7 @@
 	</model>
 	<model name="com.liferay.layout.seo.model.LayoutSEOSite">
 		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="layoutSEOSiteId" type="long" />
 		<field name="groupId" type="long" />

@@ -16,6 +16,7 @@ package com.liferay.portal.template.soy.internal;
 
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.template.soy.constants.SoyTemplateConstants;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,12 +24,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Iván Zaera Avellón
  */
 public class SoyContextImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testClear() {
@@ -128,11 +136,11 @@ public class SoyContextImplTest {
 
 		soyContextImpl.putInjectedData("injectedKey", "injectedValue");
 
-		Map<String, Object> injectedData = HashMapBuilder.<String, Object>put(
-			"injectedKey", "overrideValue"
-		).build();
-
-		soyContextImpl.put(SoyTemplateConstants.INJECTED_DATA, injectedData);
+		soyContextImpl.put(
+			SoyTemplateConstants.INJECTED_DATA,
+			HashMapBuilder.<String, Object>put(
+				"injectedKey", "overrideValue"
+			).build());
 
 		Assert.assertEquals(
 			"overrideValue", soyContextImpl.getInjectedData("injectedKey"));
@@ -142,11 +150,10 @@ public class SoyContextImplTest {
 	public void testPutAllThrowsWithInvalidInjectedData() {
 		SoyContextImpl soyContextImpl = new SoyContextImpl();
 
-		Map<String, Object> data = HashMapBuilder.<String, Object>put(
-			SoyTemplateConstants.INJECTED_DATA, new Object()
-		).build();
-
-		soyContextImpl.putAll(data);
+		soyContextImpl.putAll(
+			HashMapBuilder.<String, Object>put(
+				SoyTemplateConstants.INJECTED_DATA, new Object()
+			).build());
 	}
 
 	@Test

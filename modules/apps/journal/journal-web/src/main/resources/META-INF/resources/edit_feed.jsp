@@ -24,6 +24,7 @@ JournalFeed feed = ActionUtil.getFeed(request);
 long groupId = BeanParamUtil.getLong(feed, request, "groupId", scopeGroupId);
 
 String feedId = BeanParamUtil.getString(feed, request, "feedId");
+
 String newFeedId = ParamUtil.getString(request, "newFeedId");
 
 String ddmStructureKey = ParamUtil.getString(request, "ddmStructureKey");
@@ -116,7 +117,7 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 	enctype="multipart/form-data"
 	method="post"
 	name="fm"
-	onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFeed();" %>'
+	onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveFeed();" %>'
 >
 	<aui:input name="<%= ActionRequest.ACTION_NAME %>" type="hidden" value="" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
@@ -197,9 +198,9 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 
 					<aui:input name="structure" required="<%= true %>" type="resource" value="<%= ddmStructureName %>" />
 
-					<aui:button name="selectDDMStructureButton" onClick='<%= renderResponse.getNamespace() + "openDDMStructureSelector();" %>' value="select" />
+					<aui:button name="selectDDMStructureButton" onClick='<%= liferayPortletResponse.getNamespace() + "openDDMStructureSelector();" %>' value="select" />
 
-					<aui:button disabled="<%= Validator.isNull(ddmStructureKey) %>" name="removeDDMStructureButton" onClick='<%= renderResponse.getNamespace() + "removeDDMStructure();" %>' value="remove" />
+					<aui:button disabled="<%= Validator.isNull(ddmStructureKey) %>" name="removeDDMStructureButton" onClick='<%= liferayPortletResponse.getNamespace() + "removeDDMStructure();" %>' value="remove" />
 				</div>
 
 				<c:choose>
@@ -260,28 +261,33 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 
 							for (DDMFormField ddmFormField : ddmFormFieldsMap.values()) {
 								String ddmFormFieldType = ddmFormField.getType();
-
-								if (ddmFormFieldType.equals("radio") || ddmFormFieldType.equals("select")) {
-									DDMFormFieldOptions ddmFormFieldOptions = ddmFormField.getDDMFormFieldOptions();
-
-									for (String optionValue : ddmFormFieldOptions.getOptionsValues()) {
-										LocalizedValue optionLabels = ddmFormFieldOptions.getOptionLabels(optionValue);
-
-										optionValue = ddmFormField.getName() + StringPool.UNDERLINE + optionValue;
 							%>
 
-										<aui:option label='<%= TextFormatter.format(optionLabels.getString(locale), TextFormatter.J) + "(" + LanguageUtil.get(request, ddmFormFieldType) + ")" %>' selected="<%= contentField.equals(optionValue) %>" value="<%= optionValue %>" />
+								<c:choose>
+									<c:when test='<%= ddmFormFieldType.equals("radio") || ddmFormFieldType.equals("select") %>'>
 
-								<%
-									}
-								}
-								else if (!ddmFormFieldType.equals("checkbox")) {
-								%>
+										<%
+										DDMFormFieldOptions ddmFormFieldOptions = ddmFormField.getDDMFormFieldOptions();
 
-									<aui:option label='<%= TextFormatter.format(ddmFormField.getName(), TextFormatter.J) + "(" + LanguageUtil.get(request, ddmFormFieldType) + ")" %>' selected="<%= contentField.equals(ddmFormField.getName()) %>" value="<%= ddmFormField.getName() %>" />
+										for (String optionValue : ddmFormFieldOptions.getOptionsValues()) {
+											LocalizedValue optionLabels = ddmFormFieldOptions.getOptionLabels(optionValue);
+
+											optionValue = ddmFormField.getName() + StringPool.UNDERLINE + optionValue;
+										%>
+
+											<aui:option label='<%= TextFormatter.format(optionLabels.getString(locale), TextFormatter.J) + "(" + LanguageUtil.get(request, ddmFormFieldType) + ")" %>' selected="<%= contentField.equals(optionValue) %>" value="<%= optionValue %>" />
+
+										<%
+										}
+										%>
+
+									</c:when>
+									<c:when test='<%= !ddmFormFieldType.equals("checkbox") %>'>
+										<aui:option label='<%= TextFormatter.format(ddmFormField.getName(), TextFormatter.J) + "(" + LanguageUtil.get(request, ddmFormFieldType) + ")" %>' selected="<%= contentField.equals(ddmFormField.getName()) %>" value="<%= ddmFormField.getName() %>" />
+									</c:when>
+								</c:choose>
 
 							<%
-								}
 							}
 							%>
 
@@ -341,22 +347,12 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 
 <aui:script>
 	function <portlet:namespace />openDDMStructureSelector() {
-		Liferay.Util.selectEntity(
-			{
-				dialog: {
-					constrain: true,
-					modal: true
-				},
-				eventName: '<portlet:namespace />selectDDMStructure',
-				title: '<%= UnicodeLanguageUtil.get(request, "structures") %>',
-				uri:
-					'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_ddm_structure.jsp" /></portlet:renderURL>'
-			},
-			function(event) {
+		Liferay.Util.openSelectionModal({
+			onSelect: function (selectedItem) {
 				if (
 					document.<portlet:namespace />fm
 						.<portlet:namespace />ddmStructureKey.value !=
-					event.ddmstructurekey
+					selectedItem.ddmstructurekey
 				) {
 					if (
 						confirm(
@@ -364,7 +360,7 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 						)
 					) {
 						document.<portlet:namespace />fm.<portlet:namespace />ddmStructureKey.value =
-							event.ddmstructurekey;
+							selectedItem.ddmstructurekey;
 						document.<portlet:namespace />fm.<portlet:namespace />ddmTemplateKey.value =
 							'';
 						document.<portlet:namespace />fm.<portlet:namespace />ddmRendererTemplateKey.value =
@@ -380,8 +376,12 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 						);
 					}
 				}
-			}
-		);
+			},
+			selectEventName: '<portlet:namespace />selectDDMStructure',
+			title: '<%= UnicodeLanguageUtil.get(request, "structures") %>',
+			url:
+				'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_ddm_structure.jsp" /></portlet:renderURL>',
+		});
 	}
 
 	function <portlet:namespace />removeDDMStructure() {
@@ -429,7 +429,7 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 	);
 
 	if (contentFieldSelector) {
-		contentFieldSelector.addEventListener('change', function() {
+		contentFieldSelector.addEventListener('change', function () {
 			var contentFieldValue = '';
 			var ddmRendererTemplateKeyValue = '';
 
@@ -451,7 +451,7 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 
 			Liferay.Util.setFormValues(form, {
 				contentField: contentFieldValue,
-				ddmRendererTemplateKey: ddmRendererTemplateKeyValue
+				ddmRendererTemplateKey: ddmRendererTemplateKeyValue,
 			});
 		});
 	}

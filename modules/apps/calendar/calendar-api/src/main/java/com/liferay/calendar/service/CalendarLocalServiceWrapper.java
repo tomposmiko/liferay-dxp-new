@@ -35,6 +35,10 @@ public class CalendarLocalServiceWrapper
 	/**
 	 * Adds the calendar to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CalendarLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param calendar the calendar
 	 * @return the calendar that was added
 	 */
@@ -73,7 +77,22 @@ public class CalendarLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _calendarLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the calendar from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CalendarLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param calendar the calendar
 	 * @return the calendar that was removed
@@ -89,6 +108,10 @@ public class CalendarLocalServiceWrapper
 
 	/**
 	 * Deletes the calendar with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CalendarLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param calendarId the primary key of the calendar
 	 * @return the calendar that was removed
@@ -110,6 +133,18 @@ public class CalendarLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _calendarLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _calendarLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _calendarLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -382,6 +417,9 @@ public class CalendarLocalServiceWrapper
 		return _calendarLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -458,6 +496,10 @@ public class CalendarLocalServiceWrapper
 
 	/**
 	 * Updates the calendar in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CalendarLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param calendar the calendar
 	 * @return the calendar that was updated

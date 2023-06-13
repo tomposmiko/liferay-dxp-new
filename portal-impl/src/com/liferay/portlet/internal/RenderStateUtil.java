@@ -70,11 +70,11 @@ public class RenderStateUtil {
 			themeDisplay.getLayoutTypePortlet();
 
 		if (layoutTypePortlet != null) {
-			JSONObject pageState = _getPageStateJSONObject(
+			JSONObject pageStateJSONObject = _getPageStateJSONObject(
 				httpServletRequest, themeDisplay, layoutTypePortlet,
 				renderDataMap);
 
-			return pageState.toString();
+			return pageStateJSONObject.toString();
 		}
 
 		return StringPool.BLANK;
@@ -121,9 +121,8 @@ public class RenderStateUtil {
 
 		liferayPortletURL.setCacheability(ResourceURL.FULL);
 
-		return StringUtil.replace(
-			liferayPortletURL.toString(), "&p_p_cacheability=cacheLevelFull",
-			StringPool.BLANK);
+		return StringUtil.removeSubstring(
+			liferayPortletURL.toString(), "&p_p_cacheability=cacheLevelFull");
 	}
 
 	private static JSONArray _getAllowedPortletModesJSONArray(Portlet portlet) {

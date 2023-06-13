@@ -2,11 +2,13 @@
 <head>
 <title>FormPortlet</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">FormPortlet</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>FORM_CONTAINER</td>
@@ -26,6 +28,11 @@
 <tr>
 	<td>SELECT_FORM</td>
 	<td>//span[contains(@class,'taglib-text') and contains(.,'Select Form')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUBMIT_BUTTON</td>
+	<td>//button[@type='submit' and @id='ddm-form-submit']</td>
 	<td></td>
 </tr>
 <tr>
@@ -55,7 +62,7 @@
 </tr>
 <tr>
 	<td>SUCCESS_PAGE_DESCRIPTION</td>
-	<td>//div[contains(@class,'basic-info')]//h5[contains(.,'${key_successPageDescription}')]</td>
+	<td>//div[contains(@class,'basic-info')]//p[contains(.,'${key_successPageDescription}')]</td>
 	<td></td>
 </tr>
 </tbody>

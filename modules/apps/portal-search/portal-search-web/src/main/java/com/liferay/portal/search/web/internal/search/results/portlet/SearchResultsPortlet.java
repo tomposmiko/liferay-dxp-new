@@ -15,6 +15,7 @@
 package com.liferay.portal.search.web.internal.search.results.portlet;
 
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.util.AssetRendererFactoryLookup;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -25,9 +26,12 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.legacy.document.DocumentBuilderFactory;
@@ -41,7 +45,6 @@ import com.liferay.portal.search.web.internal.document.DocumentFormPermissionChe
 import com.liferay.portal.search.web.internal.document.DocumentFormPermissionCheckerImpl;
 import com.liferay.portal.search.web.internal.portlet.shared.search.NullPortletURL;
 import com.liferay.portal.search.web.internal.portlet.shared.task.PortletSharedRequestHelper;
-import com.liferay.portal.search.web.internal.result.display.builder.AssetRendererFactoryLookup;
 import com.liferay.portal.search.web.internal.result.display.builder.SearchResultSummaryDisplayBuilder;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext;
 import com.liferay.portal.search.web.internal.search.results.constants.SearchResultsPortletKeys;
@@ -112,6 +115,11 @@ public class SearchResultsPortlet extends MVCPortlet {
 			buildDisplayContext(
 				portletSharedSearchResponse, renderRequest, renderResponse);
 
+		if (searchResultsPortletDisplayContext.isRenderNothing()) {
+			renderRequest.setAttribute(
+				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
+		}
+
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
 			searchResultsPortletDisplayContext);
@@ -146,12 +154,6 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 		searchResultsPortletDisplayContext.setDocuments(documents);
 
-		Optional<String> keywordsOptional =
-			portletSharedSearchResponse.getKeywordsOptional();
-
-		searchResultsPortletDisplayContext.setKeywords(
-			keywordsOptional.orElse(StringPool.BLANK));
-
 		SearchResultsPortletPreferences searchResultsPortletPreferences =
 			new SearchResultsPortletPreferencesImpl(
 				portletSharedSearchResponse.getPortletPreferences(
@@ -160,16 +162,40 @@ public class SearchResultsPortlet extends MVCPortlet {
 		SearchResponse searchResponse = getSearchResponse(
 			portletSharedSearchResponse, searchResultsPortletPreferences);
 
+		SearchRequest searchRequest = searchResponse.getRequest();
+
+		Optional<String> keywordsOptional = Optional.ofNullable(
+			searchRequest.getQueryString());
+
+		searchResultsPortletDisplayContext.setKeywords(
+			keywordsOptional.orElse(StringPool.BLANK));
+
 		searchResultsPortletDisplayContext.setRenderNothing(
-			isRenderNothing(portletSharedSearchResponse, searchResponse));
+			isRenderNothing(renderRequest, searchRequest));
+
+		int paginationDelta = Optional.ofNullable(
+			searchRequest.getSize()
+		).orElse(
+			SearchContainer.DEFAULT_DELTA
+		);
+		int paginationStart = 0;
+
+		int from = Optional.ofNullable(
+			searchRequest.getFrom()
+		).orElse(
+			0
+		);
+
+		if (from > 0) {
+			paginationStart = (from / paginationDelta) + 1;
+		}
 
 		searchResultsPortletDisplayContext.setSearchContainer(
 			buildSearchContainer(
-				documents, searchResponse.getTotalHits(),
-				portletSharedSearchResponse.getPaginationStart(),
+				documents, searchResponse.getTotalHits(), paginationStart,
 				searchResultsPortletPreferences.
 					getPaginationStartParameterName(),
-				portletSharedSearchResponse.getPaginationDelta(),
+				paginationDelta,
 				searchResultsPortletPreferences.
 					getPaginationDeltaParameterName(),
 				renderRequest));
@@ -317,6 +343,8 @@ public class SearchResultsPortlet extends MVCPortlet {
 			documentBuilderFactory
 		).setFastDateFormatFactory(
 			fastDateFormatFactory
+		).setGroupLocalService(
+			groupLocalService
 		).setHighlightEnabled(
 			searchResultsPortletPreferences.isHighlightEnabled()
 		).setImageRequested(
@@ -345,6 +373,8 @@ public class SearchResultsPortlet extends MVCPortlet {
 			summaryBuilderFactory
 		).setThemeDisplay(
 			themeDisplay
+		).setUserLocalService(
+			userLocalService
 		);
 
 		return searchResultSummaryDisplayBuilder.build();
@@ -399,30 +429,25 @@ public class SearchResultsPortlet extends MVCPortlet {
 		String urlString = portletSharedRequestHelper.getCompleteURL(
 			renderRequest);
 
-		urlString = http.removeParameter(
-			urlString, paginationStartParameterName);
-
-		return urlString;
+		return http.removeParameter(urlString, paginationStartParameterName);
 	}
 
 	protected boolean isRenderNothing(
-		PortletSharedSearchResponse portletSharedSearchResponse,
-		SearchResponse searchResponse) {
+		RenderRequest renderRequest, SearchRequest searchRequest) {
 
-		Optional<String> keywordsOptional =
-			portletSharedSearchResponse.getKeywordsOptional();
+		long assetEntryId = ParamUtil.getLong(renderRequest, "assetEntryId");
 
-		if (keywordsOptional.isPresent()) {
+		if (assetEntryId != 0) {
 			return false;
 		}
 
-		SearchRequest searchRequest = searchResponse.getRequest();
+		if ((searchRequest.getQueryString() == null) &&
+			!searchRequest.isEmptySearchEnabled()) {
 
-		if (searchRequest.isEmptySearchEnabled()) {
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	protected void removeSearchResultImageContributor(
@@ -441,6 +466,9 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 	@Reference
 	protected FastDateFormatFactory fastDateFormatFactory;
+
+	@Reference
+	protected GroupLocalService groupLocalService;
 
 	@Reference
 	protected Http http;
@@ -462,6 +490,9 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 	@Reference
 	protected SummaryBuilderFactory summaryBuilderFactory;
+
+	@Reference
+	protected UserLocalService userLocalService;
 
 	@Reference
 	private Portal _portal;

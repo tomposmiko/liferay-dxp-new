@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	var LiferayAUI = Liferay.AUI;
 
 	AUI().applyConfig({
@@ -38,14 +38,13 @@
 							'liferay-layouts-tree-radio',
 							'liferay-layouts-tree-selectable',
 							'liferay-map-base',
-							'liferay-notice',
 							'liferay-translation-manager',
-							'liferay-util-window'
-						]
+							'liferay-util-window',
+						],
 					},
 					'liferay-portlet-dynamic-data-mapping': {
 						condition: {
-							trigger: 'liferay-document-library'
+							trigger: 'liferay-document-library',
 						},
 						path: 'main.js',
 						requires: [
@@ -58,19 +57,19 @@
 							'liferay-menu',
 							'liferay-translation-manager',
 							'liferay-util-window',
-							'text'
-						]
+							'text',
+						],
 					},
 					'liferay-portlet-dynamic-data-mapping-custom-fields': {
 						condition: {
-							trigger: 'liferay-document-library'
+							trigger: 'liferay-document-library',
 						},
 						path: 'custom_fields.js',
-						requires: ['liferay-portlet-dynamic-data-mapping']
-					}
+						requires: ['liferay-portlet-dynamic-data-mapping'],
+					},
 				},
-				root: MODULE_PATH + '/js/'
-			}
-		}
+				root: MODULE_PATH + '/js/',
+			},
+		},
 	});
 })();

@@ -22,10 +22,13 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.lang.reflect.Field;
 
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -34,6 +37,11 @@ import org.skyscreamer.jsonassert.JSONAssert;
  * @author Marcellus Tavares
  */
 public class DDMFormLayoutJSONSerializerTest extends BaseDDMTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
@@ -49,6 +57,23 @@ public class DDMFormLayoutJSONSerializerTest extends BaseDDMTestCase {
 			"ddm-form-layout-json-serializer-test-data.json");
 
 		DDMFormLayout ddmFormLayout = createDDMFormLayout();
+
+		String actualJSON = serialize(ddmFormLayout);
+
+		JSONAssert.assertEquals(expectedJSON, actualJSON, false);
+	}
+
+	@Test
+	public void testDDMFormLayoutSerializationWithSchemaVersion()
+		throws Exception {
+
+		String expectedJSON = read(
+			"ddm-form-layout-json-serializer-with-definition-schema-" +
+				"version.json");
+
+		DDMFormLayout ddmFormLayout = createDDMFormLayout();
+
+		ddmFormLayout.setDefinitionSchemaVersion("2.0");
 
 		String actualJSON = serialize(ddmFormLayout);
 

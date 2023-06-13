@@ -24,7 +24,16 @@ if (liveGroup == null) {
 	liveGroupId = groupId;
 }
 
-String displayStyle = ParamUtil.getString(request, "displayStyle", "descriptive");
+String displayStyle = ParamUtil.getString(request, "displayStyle");
+
+if (Validator.isNotNull(displayStyle) && Validator.isNotNull(displayStyle)) {
+	portalPreferences.setValue(ExportImportPortletKeys.EXPORT, "displayStyle", displayStyle);
+	portalPreferences.setValue(ExportImportPortletKeys.EXPORT, "displayStyle", displayStyle);
+}
+else {
+	displayStyle = portalPreferences.getValue(ExportImportPortletKeys.EXPORT, "displayStyle", "descriptive");
+}
+
 String navigation = ParamUtil.getString(request, "navigation", "all");
 
 String orderByCol = ParamUtil.getString(request, "orderByCol");
@@ -96,10 +105,10 @@ String searchContainerId = "exportLayoutProcesses";
 		namespace: '<portlet:namespace />',
 		processesNode: '#exportProcessesSearchContainer',
 		processesResourceURL:
-			'<%= HtmlUtil.escapeJS(exportProcessesURL.toString()) %>'
+			'<%= HtmlUtil.escapeJS(exportProcessesURL.toString()) %>',
 	});
 
-	var destroyInstance = function(event) {
+	var destroyInstance = function (event) {
 		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
 			exportImport.destroy();
 

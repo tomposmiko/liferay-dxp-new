@@ -17,6 +17,8 @@ package com.liferay.data.engine.rest.client.dto.v2_0;
 import com.liferay.data.engine.rest.client.function.UnsafeSupplier;
 import com.liferay.data.engine.rest.client.serdes.v2_0.DataLayoutColumnSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class DataLayoutColumn {
+public class DataLayoutColumn implements Cloneable, Serializable {
+
+	public static DataLayoutColumn toDTO(String json) {
+		return DataLayoutColumnSerDes.toDTO(json);
+	}
 
 	public Integer getColumnSize() {
 		return columnSize;
@@ -69,6 +75,11 @@ public class DataLayoutColumn {
 	}
 
 	protected String[] fieldNames;
+
+	@Override
+	public DataLayoutColumn clone() throws CloneNotSupportedException {
+		return (DataLayoutColumn)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

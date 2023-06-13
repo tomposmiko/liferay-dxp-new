@@ -47,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.restore-current-view=false",
+		"com.liferay.portlet.show-portlet-access-denied=false",
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Low Level Search Options",
 		"javax.portlet.expiration-cache=0",
@@ -66,7 +67,7 @@ public class LowLevelSearchOptionsPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		if (!SearchPortletPermissionUtil.containsConfiguration(
-				portletPermission, renderRequest, portal)) {
+				_portletPermission, renderRequest, _portal)) {
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
@@ -76,9 +77,9 @@ public class LowLevelSearchOptionsPortlet extends MVCPortlet {
 	}
 
 	@Reference
-	protected Portal portal;
+	private Portal _portal;
 
 	@Reference
-	protected PortletPermission portletPermission;
+	private PortletPermission _portletPermission;
 
 }

@@ -14,6 +14,7 @@
 
 package com.liferay.view.count.service.base;
 
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -33,21 +34,26 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.view.count.model.ViewCountEntry;
 import com.liferay.view.count.service.ViewCountEntryLocalService;
+import com.liferay.view.count.service.ViewCountEntryLocalServiceUtil;
 import com.liferay.view.count.service.persistence.ViewCountEntryFinder;
 import com.liferay.view.count.service.persistence.ViewCountEntryPK;
 import com.liferay.view.count.service.persistence.ViewCountEntryPersistence;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -68,11 +74,15 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>ViewCountEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.view.count.service.ViewCountEntryLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>ViewCountEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>ViewCountEntryLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the view count entry to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was added
@@ -102,6 +112,10 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	/**
 	 * Deletes the view count entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param viewCountEntryPK the primary key of the view count entry
 	 * @return the view count entry that was removed
 	 * @throws PortalException if a view count entry with the primary key could not be found
@@ -118,6 +132,10 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	/**
 	 * Deletes the view count entry from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was removed
 	 */
@@ -125,6 +143,18 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	@Override
 	public ViewCountEntry deleteViewCountEntry(ViewCountEntry viewCountEntry) {
 		return viewCountEntryPersistence.remove(viewCountEntry);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return viewCountEntryPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -282,6 +312,16 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return viewCountEntryPersistence.create(
+			(ViewCountEntryPK)primaryKeyObj);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -290,6 +330,13 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 			(ViewCountEntry)persistedModel);
 	}
 
+	public BasePersistence<ViewCountEntry> getBasePersistence() {
+		return viewCountEntryPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -326,6 +373,10 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	/**
 	 * Updates the view count entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was updated
 	 */
@@ -333,6 +384,11 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	@Override
 	public ViewCountEntry updateViewCountEntry(ViewCountEntry viewCountEntry) {
 		return viewCountEntryPersistence.update(viewCountEntry);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -346,6 +402,8 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		viewCountEntryLocalService = (ViewCountEntryLocalService)aopProxy;
+
+		_setLocalServiceUtilService(viewCountEntryLocalService);
 	}
 
 	/**
@@ -387,6 +445,22 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		ViewCountEntryLocalService viewCountEntryLocalService) {
+
+		try {
+			Field field = ViewCountEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, viewCountEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

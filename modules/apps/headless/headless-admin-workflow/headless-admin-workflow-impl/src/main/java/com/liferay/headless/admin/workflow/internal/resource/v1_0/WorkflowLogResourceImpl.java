@@ -19,7 +19,6 @@ import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowLog;
 import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.CreatorUtil;
 import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.RoleUtil;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowLogResource;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Portal;
@@ -128,7 +127,7 @@ public class WorkflowLogResourceImpl extends BaseWorkflowLogResourceImpl {
 		);
 	}
 
-	private Role _toRole(long roleId) throws PortalException {
+	private Role _toRole(long roleId) throws Exception {
 		com.liferay.portal.kernel.model.Role role = _roleLocalService.getRole(
 			roleId);
 
@@ -139,7 +138,7 @@ public class WorkflowLogResourceImpl extends BaseWorkflowLogResourceImpl {
 		return RoleUtil.toRole(
 			contextAcceptLanguage.isAcceptAllLanguages(),
 			contextAcceptLanguage.getPreferredLocale(), _portal, role,
-			_userLocalService.getUserById(role.getUserId()));
+			_userLocalService.fetchUser(role.getUserId()));
 	}
 
 	private WorkflowLog _toWorkflowLog(
@@ -150,7 +149,7 @@ public class WorkflowLogResourceImpl extends BaseWorkflowLogResourceImpl {
 			{
 				auditPerson = CreatorUtil.toCreator(
 					_portal,
-					_userLocalService.getUser(workflowLog.getAuditUserId()));
+					_userLocalService.fetchUser(workflowLog.getAuditUserId()));
 				commentLog = workflowLog.getComment();
 				dateCreated = workflowLog.getCreateDate();
 				id = workflowLog.getWorkflowLogId();

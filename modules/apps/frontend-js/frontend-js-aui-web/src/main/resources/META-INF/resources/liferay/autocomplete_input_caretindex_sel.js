@@ -15,13 +15,13 @@
 /**
  * The Autocomplete Input Caretindex Sel Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-autocomplete-input-caretindex-sel
  */
 
 AUI.add(
 	'liferay-autocomplete-input-caretindex-sel',
-	A => {
+	(A) => {
 		var DOC = A.config.doc;
 
 		var REGEX_NEW_LINE = /\r\n/g;
@@ -34,7 +34,7 @@ AUI.add(
 
 		var STR_NEW_LINE = '\n';
 
-		var AutcompleteInputCaretIndex = function() {};
+		var AutcompleteInputCaretIndex = function () {};
 
 		AutcompleteInputCaretIndex.prototype = {
 			_getCaretIndex(node) {
@@ -74,7 +74,8 @@ AUI.add(
 						) > -1
 					) {
 						start = end = length;
-					} else {
+					}
+					else {
 						start = -textInputRange.moveStart(
 							STR_CHARACTER,
 							-length
@@ -90,7 +91,8 @@ AUI.add(
 							) > -1
 						) {
 							end = length;
-						} else {
+						}
+						else {
 							end = -textInputRange.moveEnd(
 								STR_CHARACTER,
 								-length
@@ -105,7 +107,7 @@ AUI.add(
 
 				return {
 					end,
-					start
+					start,
 				};
 			},
 
@@ -133,13 +135,13 @@ AUI.add(
 
 					range.select();
 				}
-			}
+			},
 		};
 
 		A.Base.mix(Liferay.AutoCompleteTextarea, [AutcompleteInputCaretIndex]);
 	},
 	'',
 	{
-		requires: ['liferay-autocomplete-textarea']
+		requires: ['liferay-autocomplete-textarea'],
 	}
 );

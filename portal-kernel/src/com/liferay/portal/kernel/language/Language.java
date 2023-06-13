@@ -15,7 +15,7 @@
 package com.liferay.portal.kernel.language;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 
 import java.util.List;
 import java.util.Locale;
@@ -95,6 +95,8 @@ public interface Language {
 		ResourceBundle resourceBundle, String pattern, Object[] arguments,
 		boolean translateArguments);
 
+	public String formatStorageSize(double size, Locale locale);
+
 	public String get(
 		HttpServletRequest httpServletRequest, ResourceBundle resourceBundle,
 		String key);
@@ -143,7 +145,15 @@ public interface Language {
 
 	public Locale getLocale(String languageCode);
 
-	public ResourceBundleLoader getPortalResourceBundleLoader();
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getResourceBundleLoader}
+	 */
+	@Deprecated
+	public com.liferay.portal.kernel.util.ResourceBundleLoader
+		getPortalResourceBundleLoader();
+
+	public ResourceBundleLoader getResourceBundleLoader();
 
 	public Set<Locale> getSupportedLocales();
 

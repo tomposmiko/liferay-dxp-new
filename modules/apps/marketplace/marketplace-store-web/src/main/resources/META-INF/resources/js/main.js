@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-marketplace-messenger',
-	A => {
+	(A) => {
 		var NATIVE_MSG = !!window.postMessage;
 
 		var MarketplaceMessenger = {
@@ -27,7 +27,8 @@ AUI.add(
 
 				if (A.Lang.isString(options)) {
 					instance._targetURI = options;
-				} else if (A.Lang.isObject(options)) {
+				}
+				else if (A.Lang.isObject(options)) {
 					var targetFrame = options.targetFrame;
 
 					instance._targetFrame = A.one(targetFrame);
@@ -49,7 +50,8 @@ AUI.add(
 						instance._targetURI,
 						instance._targetFrame
 					);
-				} else {
+				}
+				else {
 					instance._messages.push(message);
 
 					if (instance._messages.length == 1) {
@@ -69,8 +71,9 @@ AUI.add(
 
 				if (NATIVE_MSG) {
 					A.receiveMessage(callback, validator);
-				} else {
-					var wrappedCallback = function(event) {
+				}
+				else {
+					var wrappedCallback = function (event) {
 						var response = event.responseData;
 
 						callback(event);
@@ -81,9 +84,10 @@ AUI.add(
 
 						if (instance._messages.length > 0) {
 							message = instance._messages[0];
-						} else if (!response.empty) {
+						}
+						else if (!response.empty) {
 							message = {
-								empty: true
+								empty: true,
 							};
 						}
 
@@ -106,38 +110,38 @@ AUI.add(
 
 			setTargetURI(targetURI) {
 				this._targetURI = targetURI;
-			}
+			},
 		};
 
 		Liferay.MarketplaceMessenger = MarketplaceMessenger;
 	},
 	'',
 	{
-		requires: ['aui-messaging']
+		requires: ['aui-messaging'],
 	}
 );
 
 AUI.add(
 	'liferay-marketplace-util',
-	A => {
+	(A) => {
 		var MarketplaceUtil = {
 			namespaceObject(namespace, object) {
 				var returnObject = {};
 
 				var keys = A.Object.keys(object);
 
-				A.Array.each(keys, key => {
+				A.Array.each(keys, (key) => {
 					returnObject[namespace + key] = object[key];
 				});
 
 				return returnObject;
-			}
+			},
 		};
 
 		Liferay.MarketplaceUtil = MarketplaceUtil;
 	},
 	'',
 	{
-		requires: ['aui-base']
+		requires: ['aui-base'],
 	}
 );

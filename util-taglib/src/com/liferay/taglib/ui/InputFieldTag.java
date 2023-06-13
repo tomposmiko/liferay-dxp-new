@@ -26,6 +26,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class InputFieldTag extends IncludeTag {
 
+	public String getAutoComplete() {
+		return _autoComplete;
+	}
+
 	public Object getBean() {
 		return _bean;
 	}
@@ -78,8 +82,12 @@ public class InputFieldTag extends IncludeTag {
 		return _placeholder;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getAutoComplete()}
+	 */
+	@Deprecated
 	public boolean isAutoComplete() {
-		return _autoComplete;
+		return Boolean.valueOf(_autoComplete);
 	}
 
 	public boolean isAutoFocus() {
@@ -98,7 +106,15 @@ public class InputFieldTag extends IncludeTag {
 		return _ignoreRequestValue;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #setAutoComplete(String)}
+	 */
+	@Deprecated
 	public void setAutoComplete(boolean autoComplete) {
+		_autoComplete = String.valueOf(autoComplete);
+	}
+
+	public void setAutoComplete(String autoComplete) {
 		_autoComplete = autoComplete;
 	}
 
@@ -174,7 +190,7 @@ public class InputFieldTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
-		_autoComplete = true;
+		_autoComplete = null;
 		_autoFocus = false;
 		_autoSize = false;
 		_bean = null;
@@ -214,8 +230,7 @@ public class InputFieldTag extends IncludeTag {
 		}
 
 		httpServletRequest.setAttribute(
-			"liferay-ui:input-field:autoComplete",
-			String.valueOf(_autoComplete));
+			"liferay-ui:input-field:autoComplete", _autoComplete);
 		httpServletRequest.setAttribute(
 			"liferay-ui:input-field:autoFocus", String.valueOf(_autoFocus));
 		httpServletRequest.setAttribute(
@@ -255,7 +270,7 @@ public class InputFieldTag extends IncludeTag {
 
 	private static final String _PAGE = "/html/taglib/ui/input_field/page.jsp";
 
-	private boolean _autoComplete = true;
+	private String _autoComplete;
 	private boolean _autoFocus;
 	private boolean _autoSize;
 	private Object _bean;

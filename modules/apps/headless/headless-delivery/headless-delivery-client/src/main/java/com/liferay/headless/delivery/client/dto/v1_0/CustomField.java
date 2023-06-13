@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.CustomFieldSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class CustomField {
+public class CustomField implements Cloneable, Serializable {
+
+	public static CustomField toDTO(String json) {
+		return CustomFieldSerDes.toDTO(json);
+	}
 
 	public CustomValue getCustomValue() {
 		return customValue;
@@ -88,6 +94,11 @@ public class CustomField {
 	}
 
 	protected String name;
+
+	@Override
+	public CustomField clone() throws CloneNotSupportedException {
+		return (CustomField)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

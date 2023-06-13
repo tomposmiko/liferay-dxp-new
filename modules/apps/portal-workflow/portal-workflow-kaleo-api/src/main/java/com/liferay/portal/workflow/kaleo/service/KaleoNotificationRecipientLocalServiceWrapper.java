@@ -38,6 +38,10 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 	/**
 	 * Adds the kaleo notification recipient to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoNotificationRecipientLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoNotificationRecipient the kaleo notification recipient
 	 * @return the kaleo notification recipient that was added
 	 */
@@ -54,7 +58,8 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoNotificationRecipient
 			addKaleoNotificationRecipient(
-				long kaleoDefinitionVersionId, long kaleoNotificationId,
+				long kaleoDefinitionId, long kaleoDefinitionVersionId,
+				long kaleoNotificationId,
 				com.liferay.portal.workflow.kaleo.definition.Recipient
 					recipient,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -62,8 +67,8 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 
 		return _kaleoNotificationRecipientLocalService.
 			addKaleoNotificationRecipient(
-				kaleoDefinitionVersionId, kaleoNotificationId, recipient,
-				serviceContext);
+				kaleoDefinitionId, kaleoDefinitionVersionId,
+				kaleoNotificationId, recipient, serviceContext);
 	}
 
 	/**
@@ -78,6 +83,18 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 
 		return _kaleoNotificationRecipientLocalService.
 			createKaleoNotificationRecipient(kaleoNotificationRecipientId);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoNotificationRecipientLocalService.createPersistedModel(
+			primaryKeyObj);
 	}
 
 	@Override
@@ -98,6 +115,10 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 	/**
 	 * Deletes the kaleo notification recipient from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoNotificationRecipientLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoNotificationRecipient the kaleo notification recipient
 	 * @return the kaleo notification recipient that was removed
 	 */
@@ -113,6 +134,10 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 
 	/**
 	 * Deletes the kaleo notification recipient with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoNotificationRecipientLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoNotificationRecipientId the primary key of the kaleo notification recipient
 	 * @return the kaleo notification recipient that was removed
@@ -137,6 +162,18 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 
 		return _kaleoNotificationRecipientLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _kaleoNotificationRecipientLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _kaleoNotificationRecipientLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -323,6 +360,9 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 			getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -334,6 +374,10 @@ public class KaleoNotificationRecipientLocalServiceWrapper
 
 	/**
 	 * Updates the kaleo notification recipient in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoNotificationRecipientLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoNotificationRecipient the kaleo notification recipient
 	 * @return the kaleo notification recipient that was updated

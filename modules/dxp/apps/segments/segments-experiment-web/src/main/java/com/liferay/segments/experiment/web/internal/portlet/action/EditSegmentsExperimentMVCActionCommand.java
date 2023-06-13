@@ -14,7 +14,6 @@
 
 package com.liferay.segments.experiment.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -52,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS_EXPERIMENT,
-		"mvc.command.name=/edit_segments_experiment"
+		"mvc.command.name=/segments_experiment/edit_segments_experiment"
 	},
 	service = MVCActionCommand.class
 )
@@ -76,8 +75,8 @@ public class EditSegmentsExperimentMVCActionCommand
 			jsonObject = TransactionInvokerUtil.invoke(
 				_transactionConfig, callable);
 		}
-		catch (Throwable t) {
-			_log.error(t, t);
+		catch (Throwable throwable) {
+			_log.error(throwable, throwable);
 
 			HttpServletResponse httpServletResponse =
 				_portal.getHttpServletResponse(actionResponse);
@@ -97,7 +96,7 @@ public class EditSegmentsExperimentMVCActionCommand
 	}
 
 	private JSONObject _editSegmentsExperiment(ActionRequest actionRequest)
-		throws PortalException {
+		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);

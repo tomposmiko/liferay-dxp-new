@@ -19,8 +19,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.segments.asah.connector.internal.cache.AsahSegmentsEntryCache;
 import com.liferay.segments.asah.connector.internal.context.contributor.SegmentsAsahRequestContextContributor;
 import com.liferay.segments.context.Context;
@@ -34,6 +37,8 @@ import java.util.stream.LongStream;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,15 +52,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class AsahSegmentsEntryProviderTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
 	public void setUp() throws PortalException {
 		ReflectionTestUtil.setFieldValue(
 			_asahSegmentsEntryProvider, "_asahSegmentsEntryCache",
 			_asahSegmentsEntryCache);
-
+		ReflectionTestUtil.setFieldValue(
+			_asahSegmentsEntryProvider, "_groupLocalService",
+			_groupLocalService);
 		ReflectionTestUtil.setFieldValue(
 			_asahSegmentsEntryProvider, "_messageBus", _messageBus);
-
 		ReflectionTestUtil.setFieldValue(
 			_asahSegmentsEntryProvider, "_segmentsEntryRelLocalService",
 			_segmentsEntryRelLocalService);
@@ -70,9 +81,9 @@ public class AsahSegmentsEntryProviderTest {
 
 		List<SegmentsEntryRel> segmentsEntryRels = new ArrayList<>();
 
-		LongStream stream = Arrays.stream(segmentsEntryRelIds);
+		LongStream longStream = Arrays.stream(segmentsEntryRelIds);
 
-		stream.forEach(
+		longStream.forEach(
 			segmentsEntryRelId -> segmentsEntryRels.add(
 				_createSegmentsEntryRel(segmentsEntryRelId)));
 
@@ -181,6 +192,14 @@ public class AsahSegmentsEntryProviderTest {
 
 	@Test
 	public void testGetSegmentsEntryIdsWithUncachedUserSegments() {
+		long groupId = RandomTestUtil.randomLong();
+
+		Mockito.when(
+			_groupLocalService.fetchGroup(groupId)
+		).thenReturn(
+			Mockito.mock(Group.class)
+		);
+
 		String userId = RandomTestUtil.randomString();
 
 		Mockito.when(
@@ -199,7 +218,7 @@ public class AsahSegmentsEntryProviderTest {
 		Assert.assertArrayEquals(
 			new long[0],
 			_asahSegmentsEntryProvider.getSegmentsEntryIds(
-				RandomTestUtil.randomLong(), RandomTestUtil.randomString(),
+				groupId, RandomTestUtil.randomString(),
 				RandomTestUtil.randomLong(), context));
 
 		Mockito.verify(
@@ -227,6 +246,9 @@ public class AsahSegmentsEntryProviderTest {
 
 	private final AsahSegmentsEntryProvider _asahSegmentsEntryProvider =
 		new AsahSegmentsEntryProvider();
+
+	@Mock
+	private GroupLocalService _groupLocalService;
 
 	@Mock
 	private MessageBus _messageBus;

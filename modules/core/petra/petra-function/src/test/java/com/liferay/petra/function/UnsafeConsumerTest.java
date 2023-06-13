@@ -14,7 +14,9 @@
 
 package com.liferay.petra.function;
 
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.IOException;
 
@@ -23,6 +25,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -31,17 +34,20 @@ import org.junit.Test;
 public class UnsafeConsumerTest {
 
 	@ClassRule
-	public static final CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor() {
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new CodeCoverageAssertor() {
 
-			@Override
-			public void appendAssertClasses(List<Class<?>> assertClasses) {
-				assertClasses.add(UnsafeFunction.class);
-				assertClasses.add(UnsafeRunnable.class);
-				assertClasses.add(UnsafeSupplier.class);
-			}
+				@Override
+				public void appendAssertClasses(List<Class<?>> assertClasses) {
+					assertClasses.add(UnsafeFunction.class);
+					assertClasses.add(UnsafeRunnable.class);
+					assertClasses.add(UnsafeSupplier.class);
+				}
 
-		};
+			},
+			LiferayUnitTestRule.INSTANCE);
 
 	@Test
 	public void testAccept1() throws IOException {
@@ -131,10 +137,10 @@ public class UnsafeConsumerTest {
 					throw exception;
 				});
 		}
-		catch (Throwable t) {
-			Assert.assertSame(_exceptions.get(0), t);
+		catch (Throwable throwable) {
+			Assert.assertSame(_exceptions.get(0), throwable);
 
-			Throwable[] throwables = t.getSuppressed();
+			Throwable[] throwables = throwable.getSuppressed();
 
 			Assert.assertEquals(
 				Arrays.toString(throwables), 2, throwables.length);

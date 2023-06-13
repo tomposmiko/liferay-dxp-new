@@ -2,11 +2,13 @@
 <head>
 <title>SitePagesEditPage</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">SitePagesEditPage</td></tr>
 </thead>
+
 <tbody>
 <!--DETAILS-->
 <tr>
@@ -22,6 +24,11 @@
 <tr>
 	<td>LAYOUT_PAGE_TEMPLATE_SELECT</td>
 	<td>//select[contains(@name,'layoutPageTemplate')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LINK_TO_PAGE_SELECT_BUTTON</td>
+	<td>//button[contains(@id,'selectLayoutButton')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -42,11 +49,6 @@
 <tr>
 	<td>PAGE_TYPE_PANEL_CHECKBOX_INPUT</td>
 	<td>//input[@type="hidden"][contains(@id,'panelSelectedPortlets')][contains(@value,'${key_componentOrPortletName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PAGE_TYPE_EMBEDDED_URL_FIELD</td>
-	<td>//input[contains(@id,'urlEmbedded')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -112,8 +114,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MASTER_LAYOUT_NAME</td>
+	<td>//div[@class='sheet-section']//span[contains(@id,'masterLayoutName')][contains(.,'${key_masterLayoutName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>REGULAR_UNIQUE_LOOK_AND_FEEL</td>
 	<td>//input[contains(@id,'regularUniqueLookAndFeel')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SECTION_TITLE</td>
+	<td>//div[@class='sheet-section']/h3[contains(.,'${key_sectionTitle}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>STYLE_BOOK_NAME</td>
+	<td>//div[@class='sheet-section']//span[contains(@id,'styleBookName')][contains(.,'${key_styleBookName}')]</td>
 	<td></td>
 </tr>
 <tr>

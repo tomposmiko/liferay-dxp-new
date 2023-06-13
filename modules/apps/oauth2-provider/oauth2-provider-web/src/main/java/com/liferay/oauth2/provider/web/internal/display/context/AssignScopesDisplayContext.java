@@ -63,23 +63,25 @@ public class AssignScopesDisplayContext
 	extends OAuth2AdminPortletDisplayContext {
 
 	public AssignScopesDisplayContext(
-			OAuth2ApplicationService oAuth2ApplicationService,
+			ApplicationDescriptorLocator applicationDescriptorLocator,
+			DLURLHelper dlURLHelper,
 			OAuth2ApplicationScopeAliasesLocalService
 				oAuth2ApplicationScopeAliasesLocalService,
-			OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService,
+			OAuth2ApplicationService oAuth2ApplicationService,
 			OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
-			PortletRequest portletRequest, ThemeDisplay themeDisplay,
-			ApplicationDescriptorLocator applicationDescriptorLocator,
+			OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService,
+			PortletRequest portletRequest,
 			ScopeDescriptorLocator scopeDescriptorLocator,
-			ScopeLocator scopeLocator, DLURLHelper dlURLHelper)
+			ScopeLocator scopeLocator, ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		super(
-			oAuth2ApplicationService, oAuth2ApplicationScopeAliasesLocalService,
-			oAuth2ProviderConfiguration, portletRequest, themeDisplay,
-			dlURLHelper);
+			dlURLHelper, oAuth2ApplicationScopeAliasesLocalService,
+			oAuth2ApplicationService, oAuth2ProviderConfiguration,
+			portletRequest, themeDisplay);
 
 		_applicationDescriptorLocator = applicationDescriptorLocator;
+
 		_companyId = themeDisplay.getCompanyId();
 		_locale = themeDisplay.getLocale();
 
@@ -337,16 +339,16 @@ public class AssignScopesDisplayContext
 		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (this == o) {
+		public boolean equals(Object object) {
+			if (this == object) {
 				return true;
 			}
 
-			if ((o == null) || (getClass() != o.getClass())) {
+			if ((object == null) || (getClass() != object.getClass())) {
 				return false;
 			}
 
-			Relations relations = (Relations)o;
+			Relations relations = (Relations)object;
 
 			if (Objects.equals(
 					_globalAssignableScopes,
@@ -481,16 +483,6 @@ public class AssignScopesDisplayContext
 			});
 	}
 
-	private static <K, V> Map<V, K> _invertMap(Map<K, V> map) {
-		Map<V, K> ret = new HashMap<>();
-
-		for (Map.Entry<K, V> entry : map.entrySet()) {
-			ret.put(entry.getValue(), entry.getKey());
-		}
-
-		return ret;
-	}
-
 	private void _indexAssignableScopes(
 		AssignableScopes assignableScopes, Set<String> assignedApplicationNames,
 		boolean indexAsGlobalAssignableScopes) {
@@ -523,6 +515,16 @@ public class AssignScopesDisplayContext
 
 			assignableScopesSet.add(assignableScopes);
 		}
+	}
+
+	private <K, V> Map<V, K> _invertMap(Map<K, V> map) {
+		Map<V, K> ret = new HashMap<>();
+
+		for (Map.Entry<K, V> entry : map.entrySet()) {
+			ret.put(entry.getValue(), entry.getKey());
+		}
+
+		return ret;
 	}
 
 	private Map<AssignableScopes, Relations> _normalize(
@@ -594,12 +596,12 @@ public class AssignScopesDisplayContext
 	}
 
 	private final ApplicationDescriptorLocator _applicationDescriptorLocator;
-	private Map<AssignableScopes, Relations> _assignableScopesRelations =
+	private final Map<AssignableScopes, Relations> _assignableScopesRelations =
 		new HashMap<>();
 	private final long _companyId;
-	private Map<String, Set<AssignableScopes>>
+	private final Map<String, Set<AssignableScopes>>
 		_globalAssignableScopesByApplicationName = new HashMap<>();
-	private Map<String, Set<AssignableScopes>>
+	private final Map<String, Set<AssignableScopes>>
 		_localAssignableScopesByApplicationName = new HashMap<>();
 	private final Locale _locale;
 

@@ -2,6 +2,26 @@
 	margin: 0 !important;
 }
 
+.assignments-cell-editor {
+	max-height: 500px;
+	overflow: auto;
+
+	.checkbox {
+		align-items: center;
+		display: flex;
+
+		.assignments-cell-editor-input {
+			position: absolute;
+		}
+
+		.celleditor-label-checkbox {
+			margin-left: 15px;
+			margin-top: 4px;
+			min-height: 16px;
+		}
+	}
+}
+
 .actions-cell-editor-hidden,
 .assignments-cell-editor-hidden,
 .forms-cell-editor-hidden,
@@ -174,8 +194,14 @@
 		}
 	}
 
-	.property-builder-tabs-content .property-builder-fields-container {
-		padding: 0;
+	.property-builder-tabs-content {
+		.property-builder-fields-container {
+			padding: 0;
+		}
+
+		.tab-content .tab-pane.active {
+			max-height: 544px;
+		}
 	}
 
 	.property-builder-content-container .btn-toolbar-button {
@@ -241,7 +267,7 @@
 	}
 }
 
-.dialog-iframe-popup,
+.portal-popup,
 .info-bar-container {
 	background: #fff;
 }
@@ -272,6 +298,17 @@
 	font-weight: 600;
 }
 
+.lfr-alert-container {
+	display: flex;
+	justify-content: center;
+	position: relative;
+
+	> div {
+		position: absolute;
+		width: 100%;
+	}
+}
+
 .lfr-portlet-workflowdesigner-draft-version {
 	display: inline;
 }
@@ -279,6 +316,20 @@
 .lfr-template-editor-wrapper {
 	margin-top: 20px;
 	width: 100% !important;
+}
+
+.modal-footer .btn-toolbar .btn-secondary {
+	margin-right: 10px;
+}
+
+.modal-open .modal {
+	min-height: 325px;
+	min-width: 500px;
+	overflow-y: hidden !important;
+}
+
+.portal-popup .basecelleditor {
+	top: 200px !important;
 }
 
 .property-builder-disabled {
@@ -427,4 +478,16 @@
 
 #workflowTasksPanelContainer {
 	border-width: 0;
+}
+
+@media only screen and (min-height: 600px) and (max-height: 800px) {
+	.portal-popup .basecelleditor {
+		top: 60px !important;
+	}
+}
+
+@media only screen and (max-height: 599px) {
+	.portal-popup .basecelleditor {
+		top: 35px !important;
+	}
 }

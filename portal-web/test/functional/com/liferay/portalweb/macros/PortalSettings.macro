@@ -113,14 +113,6 @@ definition {
 	}
 
 	macro configureCurrentLanguagesCP {
-		if (isSet(defaultPortalLanguage)) {
-			var defaultPortalLanguage = "${defaultPortalLanguage}";
-
-			Select(
-				locator1 = "Select#DEFAULT_LANGUAGE",
-				value1 = "${defaultPortalLanguage}");
-		}
-
 		if (isSet(currentPortalLanguages)) {
 			while (IsElementPresent(locator1 = "LanguageConfiguration#LANGUAGES_CURRENT_SELECT")) {
 				AddSelection(
@@ -143,6 +135,14 @@ definition {
 					locator1 = "LanguageConfiguration#LANGUAGES_CURRENT",
 					value1 = "${currentPortalLanguage}");
 			}
+		}
+
+		if (isSet(defaultPortalLanguage)) {
+			var defaultPortalLanguage = "${defaultPortalLanguage}";
+
+			Select(
+				locator1 = "Select#DEFAULT_LANGUAGE",
+				value1 = "${defaultPortalLanguage}");
 		}
 
 		if ("${failExpected}" == "true") {
@@ -189,12 +189,11 @@ definition {
 			locator1 = "Button#SAVE",
 			value1 = "Save");
 
-		AssertElementPresent(locator1 = "Message#SUCCESS");
+		VerifyElementPresent(locator1 = "Message#SUCCESS");
 	}
 
 	macro configureLDAPSetting {
 		for (var enableSetting : list "${enableSettingList}") {
-
 			if ("${enableSetting}" == "enabled") {
 				PortalSettings.gotoConfiguration(
 					configurationCategory = "LDAP",
@@ -254,6 +253,36 @@ definition {
 		Type(
 			locator1 = "TextArea#CONFIGURATION",
 			value1 = "${editor}");
+	}
+
+	macro disableApplicationsMenu {
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Navigation",
+			configurationName = "Applications Menu",
+			configurationScope = "Virtual Instance Scope");
+
+		AssertElementNotPresent(locator1 = "ProductMenu#TOGGLE");
+
+		AssertElementPresent(locator1 = "ApplicationsMenu#TOGGLE");
+
+		FormFields.disableCheckbox(fieldName = "enableApplicationsMenu");
+
+		if (IsElementPresent(locator1 = "Button#SAVE")) {
+			AssertClick(
+				locator1 = "Button#SAVE",
+				value1 = "Save");
+		}
+		else if (IsElementPresent(locator1 = "Button#UPDATE")) {
+			AssertClick(
+				locator1 = "Button#UPDATE",
+				value1 = "Update");
+		}
+
+		Alert.viewSuccessMessage();
+
+		AssertElementPresent(locator1 = "ProductMenu#TOGGLE");
+
+		AssertElementNotPresent(locator1 = "ApplicationsMenu#TOGGLE");
 	}
 
 	macro editConfigurationAuthenticationCAS {
@@ -480,7 +509,6 @@ definition {
 		if (IsElementPresent(locator1 = "Button#UPDATE")) {
 			PortletEntry.update();
 		}
-
 		else if (IsElementPresent(locator1 = "Button#SAVE")) {
 			PortletEntry.save();
 		}
@@ -494,7 +522,6 @@ definition {
 		if (IsElementPresent(locator1 = "Button#UPDATE")) {
 			PortletEntry.update();
 		}
-
 		else if (IsElementPresent(locator1 = "Button#SAVE")) {
 			PortletEntry.save();
 		}
@@ -531,6 +558,41 @@ definition {
 			value1 = "${virtualHostName}");
 	}
 
+	macro enableApplicationsMenu {
+		ProductMenu.gotoPortletWhenDisableApplicationsMenu(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Instance Settings");
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Navigation",
+			configurationName = "Applications Menu",
+			configurationScope = "Virtual Instance Scope");
+
+		AssertElementPresent(locator1 = "ProductMenu#TOGGLE");
+
+		AssertElementNotPresent(locator1 = "ApplicationsMenu#TOGGLE");
+
+		FormFields.enableCheckbox(fieldName = "enableApplicationsMenu");
+
+		if (IsElementPresent(locator1 = "Button#SAVE")) {
+			AssertClick(
+				locator1 = "Button#SAVE",
+				value1 = "Save");
+		}
+		else if (IsElementPresent(locator1 = "Button#UPDATE")) {
+			AssertClick(
+				locator1 = "Button#UPDATE",
+				value1 = "Update");
+		}
+
+		Alert.viewSuccessMessage();
+
+		AssertElementNotPresent(locator1 = "ProductMenu#TOGGLE");
+
+		AssertElementPresent(locator1 = "ApplicationsMenu#TOGGLE");
+	}
+
 	macro enableGoogleSSOCP {
 		Check(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_GOOGLE_ENABLED_CHECKBOX");
 
@@ -546,19 +608,20 @@ definition {
 	}
 
 	macro enableOpenIDConnectCP {
-		Check(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX");
+		if (isSet(systemLevel)) {
+			Click.clickAtNotVisible(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX_SYSTEM_LEVEL");
 
-		PortletEntry.save();
+			PortletEntry.save();
 
-		AssertChecked(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX");
-	}
+			AssertChecked.assertCheckedNotVisible(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX_SYSTEM_LEVEL");
+		}
+		else {
+			Click.clickAtNotVisible(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX");
 
-	macro enableOpenIDCP {
-		Check(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_ENABLED_CHECKBOX");
+			PortletEntry.save();
 
-		PortletEntry.save();
-
-		AssertChecked(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_ENABLED_CHECKBOX");
+			AssertChecked.assertCheckedNotVisible(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX");
+		}
 	}
 
 	macro enterReservedEmailAddressCP {
@@ -614,7 +677,7 @@ definition {
 	}
 
 	macro gotoConfiguration {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Instance Settings");
@@ -626,7 +689,7 @@ definition {
 	}
 
 	macro gotoPortalSettings {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Instance Settings");
@@ -635,6 +698,21 @@ definition {
 			configurationCategory = "Portal Settings",
 			configurationName = "Portal Settings",
 			configurationScope = "Virtual Instance Scope");
+	}
+
+	macro openInstanceSettingsAdmin {
+		Navigator.openWithAppendToBaseURL(
+			baseURL = "${baseURL}",
+			urlAppend = "group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_InstanceSettingsPortlet");
+	}
+
+	macro setCurrentInstanceLanguageCP {
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Language",
+			configurationScope = "Virtual Instance Scope");
+
+		PortalSettings.configureCurrentLanguagesCP(defaultPortalLanguage = "${newLanguage}");
 	}
 
 	macro tearDownAuthenticationCP {
@@ -972,15 +1050,6 @@ definition {
 			value1 = "TEMP_OBFUSCATION_VALUE");
 	}
 
-	macro viewAuthenticationOpenIDCP {
-		PortalSettings.gotoConfiguration(
-			configurationCategory = "SSO",
-			configurationName = "OpenID",
-			configurationScope = "Virtual Instance Scope");
-
-		AssertElementPresent(locator1 = "PortalSettingsAuthentication#AUTHENTICATION_OPEN_ID_ENABLED_CHECKBOX");
-	}
-
 	macro viewAuthenticationOpenSSOCP {
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "SSO",
@@ -1230,7 +1299,6 @@ definition {
 
 	macro viewEnabledLDAPSetting {
 		for (var enableSetting : list "${enableSettingList}") {
-
 			if ("${enableSetting}" == "enabled") {
 				PortalSettings.gotoConfiguration(
 					configurationCategory = "LDAP",
@@ -1277,6 +1345,18 @@ definition {
 		AssertTextEquals(
 			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_EMAIL_ADDRESSES_FIELD",
 			value1 = "");
+	}
+
+	macro viewToggleSwitchChecked {
+		AssertChecked.assertCheckedNotVisible(
+			key_toggleSwitchLabel = "${portalSetting}",
+			locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+	}
+
+	macro viewToggleSwitchNotChecked {
+		AssertNotChecked.assertNotCheckedNotVisible(
+			key_toggleSwitchLabel = "${portalSetting}",
+			locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 	}
 
 }

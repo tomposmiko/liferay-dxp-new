@@ -2,11 +2,13 @@
 <head>
 <title>Radio</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Radio</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>APPEND</td>
@@ -45,7 +47,7 @@
 </tr>
 <tr>
 	<td>DEPOT_LANGUAGES_OPTION</td>
-	<td>//div[@class='radio']/label[contains(.,'${key_languagesOption}')]/input[@type='radio']</td>
+	<td>//div[contains(@class,'custom-radio') and contains(.,'${key_languagesOption}')]//input</td>
 	<td></td>
 </tr>
 <tr>
@@ -60,17 +62,17 @@
 </tr>
 <tr>
 	<td>CURRENT_VERSION</td>
-	<td>//label[contains(.,'Current Version')]/input</td>
+	<td>//label[contains(.,'Current Version')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>MAJOR_VERSION</td>
-	<td>//label[contains(.,'Major Version')]/input</td>
+	<td>//label[contains(.,'Major Version')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>MINOR_VERSION</td>
-	<td>//label[contains(.,'Minor Version')]/input</td>
+	<td>//label[contains(.,'Minor Version')]</td>
 	<td></td>
 </tr>
 <tr>

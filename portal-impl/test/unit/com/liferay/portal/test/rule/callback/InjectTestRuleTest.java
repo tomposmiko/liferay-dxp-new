@@ -20,16 +20,18 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.InjectTestBag;
 import com.liferay.portal.test.rule.InjectTestRule;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.Description;
 
@@ -37,6 +39,11 @@ import org.junit.runner.Description;
  * @author Preston Crary
  */
 public class InjectTestRuleTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -98,13 +105,14 @@ public class InjectTestRuleTest {
 
 		InjectTestBag injectTestBag = null;
 
-		UnsyncByteArrayOutputStream ubaos = ConsoleTestUtil.hijackStdOut();
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			ConsoleTestUtil.hijackStdOut();
 
 		try {
 			Thread registerThread = new Thread(
 				() -> {
 					while (true) {
-						String stdOut = ubaos.toString();
+						String stdOut = unsyncByteArrayOutputStream.toString();
 
 						if (!stdOut.contains(
 								"Waiting for service " +
@@ -131,7 +139,7 @@ public class InjectTestRuleTest {
 			registerThread.join();
 		}
 		finally {
-			ConsoleTestUtil.restoreStdOut(ubaos);
+			ConsoleTestUtil.restoreStdOut(unsyncByteArrayOutputStream);
 		}
 
 		Assert.assertSame(service1, TestCase2._service1);
@@ -190,11 +198,11 @@ public class InjectTestRuleTest {
 
 		Service3 service3b = new Service3();
 
-		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
-			"inject.test.rule.test", true
-		).build();
-
-		registry.registerService(Service3.class, service3b, properties);
+		registry.registerService(
+			Service3.class, service3b,
+			HashMapBuilder.<String, Object>put(
+				"inject.test.rule.test", true
+			).build());
 
 		injectTestBag.injectFields();
 

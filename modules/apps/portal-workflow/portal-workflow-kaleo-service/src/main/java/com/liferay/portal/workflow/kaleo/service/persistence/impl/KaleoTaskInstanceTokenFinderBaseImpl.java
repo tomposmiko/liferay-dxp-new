@@ -42,7 +42,6 @@ public abstract class KaleoTaskInstanceTokenFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -66,14 +65,5 @@ public abstract class KaleoTaskInstanceTokenFinderBaseImpl
 	@Reference
 	protected KaleoTaskInstanceTokenPersistence
 		kaleoTaskInstanceTokenPersistence;
-
-	static {
-		try {
-			Class.forName(KaleoPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

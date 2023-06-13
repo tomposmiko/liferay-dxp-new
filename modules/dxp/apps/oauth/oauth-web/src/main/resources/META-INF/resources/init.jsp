@@ -19,14 +19,15 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ page import="com.liferay.oauth.model.OAuthApplication" %><%@
-page import="com.liferay.oauth.model.OAuthApplicationConstants" %><%@
+<%@ page import="com.liferay.oauth.constants.OAuthApplicationConstants" %><%@
+page import="com.liferay.oauth.model.OAuthApplication" %><%@
 page import="com.liferay.oauth.service.OAuthApplicationLocalServiceUtil" %><%@
 page import="com.liferay.oauth.service.OAuthUserLocalServiceUtil" %><%@
 page import="com.liferay.oauth.service.permission.OAuthApplicationPermission" %><%@
@@ -35,11 +36,11 @@ page import="com.liferay.oauth.service.permission.OAuthUserPermission" %><%@
 page import="com.liferay.oauth.util.OAuthAccessor" %><%@
 page import="com.liferay.oauth.util.OAuthActionKeys" %><%@
 page import="com.liferay.oauth.util.OAuthConsumer" %><%@
-page import="com.liferay.oauth.util.OAuthMessage" %><%@
 page import="com.liferay.oauth.util.OAuthWebKeys" %><%@
 page import="com.liferay.oauth.web.internal.search.OAuthApplicationDisplayTerms" %><%@
 page import="com.liferay.oauth.web.internal.search.OAuthApplicationSearch" %><%@
 page import="com.liferay.oauth.web.internal.util.OAuthUtil" %><%@
+page import="com.liferay.petra.string.StringBundler" %><%@
 page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.exception.ImageTypeException" %><%@
 page import="com.liferay.portal.kernel.exception.RequiredFieldException" %><%@

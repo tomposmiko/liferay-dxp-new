@@ -12,46 +12,34 @@
  * details.
  */
 
-import {ItemSelectorDialog} from 'frontend-js-web';
+import {openSelectionModal} from 'frontend-js-web';
 
-export function openImageSelector(config, callback, destroyedCallback = null) {
-	const {imageSelectorURL, portletNamespace} = config;
+import {config} from '../app/config/index';
 
-	const itemSelectorDialog = new ItemSelectorDialog({
-		eventName: `${portletNamespace}selectImage`,
-		singleSelect: true,
-		title: Liferay.Language.get('select'),
-		url: imageSelectorURL
-	});
+export function openImageSelector(callback, destroyedCallback = null) {
+	openSelectionModal({
+		onClose: destroyedCallback,
+		onSelect: (selectedItem) => {
+			const {returnType, value} = selectedItem;
 
-	itemSelectorDialog.on('selectedItemChange', event => {
-		const selectedItem = event.selectedItem || {};
+			const selectedImage = {};
 
-		const {returnType, value} = selectedItem;
-		const selectedImage = {};
+			if (returnType === 'URL') {
+				selectedImage.title = '';
+				selectedImage.url = value;
+			}
+			else {
+				const fileEntry = JSON.parse(value);
 
-		if (returnType === 'URL') {
-			selectedImage.title = value;
-			selectedImage.url = value;
-		}
+				selectedImage.fileEntryId = fileEntry.fileEntryId;
+				selectedImage.title = fileEntry.title;
+				selectedImage.url = fileEntry.url;
+			}
 
-		if (returnType) {
-			const fileEntry = JSON.parse(value);
-
-			selectedImage.title = fileEntry.title;
-			selectedImage.url = fileEntry.url;
-		}
-
-		if (selectedImage.url) {
 			callback(selectedImage);
-		}
+		},
+		selectEventName: `${config.portletNamespace}selectImage`,
+		title: Liferay.Language.get('select'),
+		url: config.imageSelectorURL,
 	});
-
-	itemSelectorDialog.on('visibleChange', () => {
-		if (destroyedCallback) {
-			destroyedCallback();
-		}
-	});
-
-	itemSelectorDialog.open();
 }

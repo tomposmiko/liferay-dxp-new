@@ -102,7 +102,7 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 
 <liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + Organization.class.getName() + ListTypeConstants.ORGANIZATION_SERVICE %>" message="please-select-a-type" />
 
-<aui:fieldset id='<%= renderResponse.getNamespace() + "services" %>'>
+<aui:fieldset id='<%= liferayPortletResponse.getNamespace() + "services" %>'>
 
 	<%
 	Calendar cal = CalendarFactoryUtil.getCalendar();
@@ -138,13 +138,12 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 				<%
 				for (int j = 0; j < days.length; j++) {
 					int close = closeArray[j];
-					String day = days[j];
 					int open = openArray[j];
 					String paramPrefix = paramPrefixes[j];
 				%>
 
 					<div class="org-labor-entry">
-						<h5 class="org-labor-entry-title"><%= day %></h5>
+						<h5 class="org-labor-entry-title"><%= days[j] %></h5>
 
 						<aui:select label="Open" name='<%= paramPrefix + "Open" + orgLaborsIndex %>'>
 							<aui:option value="-1" />
@@ -219,6 +218,6 @@ Format timeFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("HH:mm", local
 	new Liferay.AutoFields({
 		contentBox: '#<portlet:namespace />services',
 		fieldIndexes: '<portlet:namespace />orgLaborsIndexes',
-		namespace: '<portlet:namespace />'
+		namespace: '<portlet:namespace />',
 	}).render();
 </aui:script>

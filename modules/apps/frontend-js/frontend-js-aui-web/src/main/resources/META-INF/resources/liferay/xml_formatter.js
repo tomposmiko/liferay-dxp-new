@@ -15,26 +15,26 @@
 /**
  * The XML Formatter Utility
  *
- * @deprecated As of Athanasius(7.3.x), replaced by Liferay.Util.formatXML
+ * @deprecated As of Athanasius (7.3.x), replaced by Liferay.Util.formatXML
  * @module liferay-xml-formatter
  */
 
 AUI.add(
 	'liferay-xml-formatter',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var XMLFormatter = A.Component.create({
 			ATTRS: {
 				lineIndent: {
 					validator: Lang.isString,
-					value: '\r\n'
+					value: '\r\n',
 				},
 
 				tagIndent: {
 					validator: Lang.isString,
-					value: '\t'
-				}
+					value: '\t',
+				},
 			},
 
 			EXTENDS: A.Base,
@@ -51,16 +51,16 @@ AUI.add(
 
 					return Liferay.Util.formatXML(content, {
 						lineIndent,
-						tagIndent
+						tagIndent,
 					});
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.XMLFormatter = XMLFormatter;
 	},
 	'',
 	{
-		requires: ['aui-base']
+		requires: ['aui-base'],
 	}
 );

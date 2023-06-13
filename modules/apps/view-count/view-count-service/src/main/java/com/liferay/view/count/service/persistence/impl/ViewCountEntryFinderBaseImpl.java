@@ -42,7 +42,6 @@ public abstract class ViewCountEntryFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -65,14 +64,5 @@ public abstract class ViewCountEntryFinderBaseImpl
 
 	@Reference
 	protected ViewCountEntryPersistence viewCountEntryPersistence;
-
-	static {
-		try {
-			Class.forName(ViewCountPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

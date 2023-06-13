@@ -11,6 +11,8 @@
 @import 'portlet/portlet_decorators';
 @import 'portlet/portlet_hello_world';
 
+@import 'custom_properties';
+
 body {
 	header {
 		.field-wrapper {
@@ -82,18 +84,6 @@ body {
 					display: none;
 				}
 			}
-		}
-	}
-}
-
-#content.container-fluid {
-	padding: 0;
-
-	.row {
-		margin: 0;
-
-		.col-md-12 {
-			padding: 0;
 		}
 	}
 }

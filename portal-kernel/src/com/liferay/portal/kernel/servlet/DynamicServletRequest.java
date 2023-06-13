@@ -134,8 +134,9 @@ public class DynamicServletRequest extends HttpServletRequestWrapper {
 
 		super(httpServletRequest);
 
-		_params = new HashMap<>();
 		_inherit = inherit;
+
+		_params = new HashMap<>();
 
 		if (params != null) {
 			_params.putAll(params);
@@ -231,14 +232,14 @@ public class DynamicServletRequest extends HttpServletRequestWrapper {
 		Set<String> names = null;
 
 		if (_inherit) {
-			Enumeration<String> enu = super.getParameterNames();
+			Enumeration<String> enumeration = super.getParameterNames();
 
-			while (enu.hasMoreElements()) {
+			while (enumeration.hasMoreElements()) {
 				if (names == null) {
 					names = new LinkedHashSet<>();
 				}
 
-				names.add(enu.nextElement());
+				names.add(enumeration.nextElement());
 			}
 		}
 

@@ -60,7 +60,7 @@ if (fixedHeader) {
 				List entries = Collections.emptyList();
 
 				if (!firstResultRows.isEmpty()) {
-					com.liferay.portal.kernel.dao.search.ResultRow row = (com.liferay.portal.kernel.dao.search.ResultRow)firstResultRows.get(0);
+					com.liferay.portal.kernel.dao.search.ResultRow row = firstResultRows.get(0);
 
 					entries = row.getEntries();
 				}
@@ -77,7 +77,7 @@ if (fixedHeader) {
 					}
 
 					if (Validator.isNotNull(normalizedHeaderName)) {
-						cssClass = (normalizedHeaderName.equals("rowChecker")) ? "lfr-checkbox-column" : "lfr-" + normalizedHeaderName + "-column";
+						cssClass = normalizedHeaderName.equals("rowChecker") ? "lfr-checkbox-column" : "lfr-" + normalizedHeaderName + "-column";
 					}
 					else {
 						normalizedHeaderName = String.valueOf(i + 1);
@@ -223,7 +223,7 @@ if (fixedHeader) {
 				boolean allRowsIsChecked = true;
 
 				for (int i = 0; i < curResultRows.size(); i++) {
-					com.liferay.portal.kernel.dao.search.ResultRow row = (com.liferay.portal.kernel.dao.search.ResultRow)curResultRows.get(i);
+					com.liferay.portal.kernel.dao.search.ResultRow row = curResultRows.get(i);
 
 					primaryKeysJSONArray.put(row.getPrimaryKey());
 
@@ -276,7 +276,14 @@ if (fixedHeader) {
 					}
 				%>
 
-					<tr class="<%= GetterUtil.getString(row.getClassName()) %> <%= row.getCssClass() %> <%= row.getState() %> <%= rowIsChecked ? "active" : StringPool.BLANK %>" data-qa-id="row" <%= AUIUtil.buildData(data) %>>
+					<c:choose>
+						<c:when test="<%= Validator.isNotNull(rowIdProperty) %>">
+							<tr class="<%= GetterUtil.getString(row.getClassName()) %> <%= row.getCssClass() %> <%= row.getState() %> <%= rowIsChecked ? "active" : StringPool.BLANK %>" data-qa-id="row" id="<portlet:namespace /><%= id %>_<%= row.getRowId() %>" <%= AUIUtil.buildData(data) %>>
+						</c:when>
+						<c:otherwise>
+							<tr class="<%= GetterUtil.getString(row.getClassName()) %> <%= row.getCssClass() %> <%= row.getState() %> <%= rowIsChecked ? "active" : StringPool.BLANK %>" data-qa-id="row" <%= AUIUtil.buildData(data) %>>
+						</c:otherwise>
+					</c:choose>
 
 						<%
 						for (int j = 0; j < entries.size(); j++) {
@@ -310,7 +317,7 @@ if (fixedHeader) {
 								normalizedColumnName = normalizedHeaderNames.get(j);
 
 								if (!Validator.isBlank(normalizedColumnName)) {
-									columnClassName += (normalizedColumnName.equals("rowChecker")) ? " lfr-checkbox-column" : " lfr-" + normalizedColumnName + "-column";
+									columnClassName += normalizedColumnName.equals("rowChecker") ? " lfr-checkbox-column" : " lfr-" + normalizedColumnName + "-column";
 								}
 							}
 
@@ -338,7 +345,6 @@ if (fixedHeader) {
 
 									</c:otherwise>
 								</c:choose>
-
 							</td>
 
 						<%
@@ -357,7 +363,7 @@ if (fixedHeader) {
 			%>
 
 			<c:if test="<%= headerNames != null %>">
-				<tr class="lfr-template">
+				<tr class="lfr-template <%= searchContainerRowCssClass %>" data-qa-id="row">
 
 					<%
 					for (int i = 0; i < headerNames.size(); i++) {

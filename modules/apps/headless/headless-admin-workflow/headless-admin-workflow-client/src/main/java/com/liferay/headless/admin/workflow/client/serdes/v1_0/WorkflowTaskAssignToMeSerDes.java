@@ -59,7 +59,7 @@ public class WorkflowTaskAssignToMeSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+			"yyyy-MM-dd'T'HH:mm:ssXX");
 
 		if (workflowTaskAssignToMe.getComment() != null) {
 			if (sb.length() > 1) {
@@ -91,6 +91,16 @@ public class WorkflowTaskAssignToMeSerDes {
 			sb.append("\"");
 		}
 
+		if (workflowTaskAssignToMe.getWorkflowTaskId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"workflowTaskId\": ");
+
+			sb.append(workflowTaskAssignToMe.getWorkflowTaskId());
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -113,7 +123,7 @@ public class WorkflowTaskAssignToMeSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+			"yyyy-MM-dd'T'HH:mm:ssXX");
 
 		if (workflowTaskAssignToMe.getComment() == null) {
 			map.put("comment", null);
@@ -123,10 +133,24 @@ public class WorkflowTaskAssignToMeSerDes {
 				"comment", String.valueOf(workflowTaskAssignToMe.getComment()));
 		}
 
-		map.put(
-			"dueDate",
-			liferayToJSONDateFormat.format(
-				workflowTaskAssignToMe.getDueDate()));
+		if (workflowTaskAssignToMe.getDueDate() == null) {
+			map.put("dueDate", null);
+		}
+		else {
+			map.put(
+				"dueDate",
+				liferayToJSONDateFormat.format(
+					workflowTaskAssignToMe.getDueDate()));
+		}
+
+		if (workflowTaskAssignToMe.getWorkflowTaskId() == null) {
+			map.put("workflowTaskId", null);
+		}
+		else {
+			map.put(
+				"workflowTaskId",
+				String.valueOf(workflowTaskAssignToMe.getWorkflowTaskId()));
+		}
 
 		return map;
 	}
@@ -161,9 +185,11 @@ public class WorkflowTaskAssignToMeSerDes {
 						toDate((String)jsonParserFieldValue));
 				}
 			}
-			else {
-				throw new IllegalArgumentException(
-					"Unsupported field name " + jsonParserFieldName);
+			else if (Objects.equals(jsonParserFieldName, "workflowTaskId")) {
+				if (jsonParserFieldValue != null) {
+					workflowTaskAssignToMe.setWorkflowTaskId(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
 			}
 		}
 
@@ -193,7 +219,7 @@ public class WorkflowTaskAssignToMeSerDes {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
-			sb.append("\":");
+			sb.append("\": ");
 
 			Object value = entry.getValue();
 
@@ -219,14 +245,17 @@ public class WorkflowTaskAssignToMeSerDes {
 
 				sb.append("]");
 			}
-			else {
+			else if (value instanceof String) {
 				sb.append("\"");
 				sb.append(_escape(entry.getValue()));
 				sb.append("\"");
 			}
+			else {
+				sb.append(String.valueOf(entry.getValue()));
+			}
 
 			if (iterator.hasNext()) {
-				sb.append(",");
+				sb.append(", ");
 			}
 		}
 

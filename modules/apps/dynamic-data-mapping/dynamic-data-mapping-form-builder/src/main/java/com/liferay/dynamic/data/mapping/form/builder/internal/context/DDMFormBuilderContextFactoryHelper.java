@@ -73,7 +73,7 @@ public class DDMFormBuilderContextFactoryHelper {
 		DDMFormTemplateContextFactory ddmFormTemplateContextFactory,
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, JSONFactory jsonFactory,
-		Locale locale, boolean readOnly) {
+		Locale locale, String portletNamespace, boolean readOnly) {
 
 		_ddmStructureOptional = ddmStructureOptional;
 		_ddmStructureVersionOptional = ddmStructureVersionOptional;
@@ -83,6 +83,7 @@ public class DDMFormBuilderContextFactoryHelper {
 		_httpServletResponse = httpServletResponse;
 		_jsonFactory = jsonFactory;
 		_locale = locale;
+		_portletNamespace = portletNamespace;
 		_readOnly = readOnly;
 	}
 
@@ -129,7 +130,7 @@ public class DDMFormBuilderContextFactoryHelper {
 		ddmFormRenderingContext.setHttpServletRequest(_httpServletRequest);
 		ddmFormRenderingContext.setHttpServletResponse(_httpServletResponse);
 		ddmFormRenderingContext.setLocale(_locale);
-		ddmFormRenderingContext.setPortletNamespace(StringPool.BLANK);
+		ddmFormRenderingContext.setPortletNamespace(_portletNamespace);
 		ddmFormRenderingContext.setReadOnly(_readOnly);
 
 		Map<String, Object> ddmFormTemplateContext =
@@ -180,6 +181,8 @@ public class DDMFormBuilderContextFactoryHelper {
 			jsonObject.put(
 				"label", label.getString(locale)
 			).put(
+				"reference", ddmFormFieldOptions.getOptionReference(optionValue)
+			).put(
 				"value", optionValue
 			);
 
@@ -210,7 +213,7 @@ public class DDMFormBuilderContextFactoryHelper {
 		ddmFormRenderingContext.setHttpServletRequest(_httpServletRequest);
 		ddmFormRenderingContext.setHttpServletResponse(_httpServletResponse);
 		ddmFormRenderingContext.setLocale(_locale);
-		ddmFormRenderingContext.setPortletNamespace(StringPool.BLANK);
+		ddmFormRenderingContext.setPortletNamespace(_portletNamespace);
 
 		DDMFormValues ddmFormValues =
 			doCreateDDMFormFieldSettingContextDDMFormValues(
@@ -235,6 +238,9 @@ public class DDMFormBuilderContextFactoryHelper {
 				ddmFormFieldTypeSettingsDDMForm.getDDMFormFields()) {
 
 			DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
+
+			ddmFormFieldValue.setFieldReference(
+				ddmFormFieldTypeSetting.getFieldReference());
 
 			String propertyName = ddmFormFieldTypeSetting.getName();
 
@@ -269,9 +275,15 @@ public class DDMFormBuilderContextFactoryHelper {
 			return doCreateDDMFormFieldValue(
 				(DDMFormFieldOptions)propertyValue, availableLocales);
 		}
-		else if (Objects.equals(
-					ddmFormFieldTypeSetting.getType(), "validation")) {
 
+		if (Objects.equals(
+				ddmFormFieldTypeSetting.getName(), "requiredDescription") &&
+			(propertyValue == null)) {
+
+			return new UnlocalizedValue(Boolean.TRUE.toString());
+		}
+
+		if (Objects.equals(ddmFormFieldTypeSetting.getType(), "validation")) {
 			return doCreateDDMFormFieldValue(
 				availableLocales, (DDMFormFieldValidation)propertyValue);
 		}
@@ -449,6 +461,7 @@ public class DDMFormBuilderContextFactoryHelper {
 	private final HttpServletResponse _httpServletResponse;
 	private final JSONFactory _jsonFactory;
 	private final Locale _locale;
+	private final String _portletNamespace;
 	private final boolean _readOnly;
 
 	private static class DDMFormBuilderContextFieldVisitor {
@@ -475,6 +488,11 @@ public class DDMFormBuilderContextFactoryHelper {
 		protected void traverseFields(List<Map<String, Object>> fields) {
 			for (Map<String, Object> field : fields) {
 				_fieldConsumer.accept(field);
+
+				if (field.containsKey("nestedFields")) {
+					traverseFields(
+						(List<Map<String, Object>>)field.get("nestedFields"));
+				}
 			}
 		}
 

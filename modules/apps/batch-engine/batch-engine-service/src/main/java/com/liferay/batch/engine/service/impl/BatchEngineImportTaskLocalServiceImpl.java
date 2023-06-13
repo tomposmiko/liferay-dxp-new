@@ -46,7 +46,7 @@ public class BatchEngineImportTaskLocalServiceImpl
 		String className, byte[] content, String contentType,
 		String executeStatus, Map<String, String> fieldNameMappingMap,
 		String operation, Map<String, Serializable> parameters,
-		String version) {
+		String taskItemDelegateName) {
 
 		BatchEngineImportTask batchEngineImportTask =
 			batchEngineImportTaskPersistence.create(
@@ -74,7 +74,7 @@ public class BatchEngineImportTaskLocalServiceImpl
 			batchEngineImportTask.setParameters(parameters);
 		}
 
-		batchEngineImportTask.setVersion(version);
+		batchEngineImportTask.setTaskItemDelegateName(taskItemDelegateName);
 
 		return batchEngineImportTaskPersistence.update(batchEngineImportTask);
 	}

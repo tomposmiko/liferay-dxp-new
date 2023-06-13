@@ -21,7 +21,10 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.message.boards.model.MBThreadFlag;
 import com.liferay.message.boards.service.MBThreadFlagLocalService;
+import com.liferay.message.boards.service.MBThreadFlagLocalServiceUtil;
 import com.liferay.message.boards.service.persistence.MBThreadFlagPersistence;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -42,16 +45,22 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -72,11 +81,15 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>MBThreadFlagLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.message.boards.service.MBThreadFlagLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>MBThreadFlagLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>MBThreadFlagLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the message boards thread flag to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MBThreadFlagLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param mbThreadFlag the message boards thread flag
 	 * @return the message boards thread flag that was added
@@ -104,6 +117,10 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	/**
 	 * Deletes the message boards thread flag with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MBThreadFlagLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param threadFlagId the primary key of the message boards thread flag
 	 * @return the message boards thread flag that was removed
 	 * @throws PortalException if a message boards thread flag with the primary key could not be found
@@ -119,6 +136,10 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	/**
 	 * Deletes the message boards thread flag from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MBThreadFlagLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mbThreadFlag the message boards thread flag
 	 * @return the message boards thread flag that was removed
 	 */
@@ -126,6 +147,18 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	@Override
 	public MBThreadFlag deleteMBThreadFlag(MBThreadFlag mbThreadFlag) {
 		return mbThreadFlagPersistence.remove(mbThreadFlag);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return mbThreadFlagPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -362,6 +395,16 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return mbThreadFlagPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -370,6 +413,13 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 			(MBThreadFlag)persistedModel);
 	}
 
+	public BasePersistence<MBThreadFlag> getBasePersistence() {
+		return mbThreadFlagPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -455,6 +505,10 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 	/**
 	 * Updates the message boards thread flag in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MBThreadFlagLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mbThreadFlag the message boards thread flag
 	 * @return the message boards thread flag that was updated
 	 */
@@ -464,17 +518,24 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 		return mbThreadFlagPersistence.update(mbThreadFlag);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			MBThreadFlagLocalService.class, IdentifiableOSGiService.class,
-			PersistedModelLocalService.class
+			CTService.class, PersistedModelLocalService.class
 		};
 	}
 
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		mbThreadFlagLocalService = (MBThreadFlagLocalService)aopProxy;
+
+		_setLocalServiceUtilService(mbThreadFlagLocalService);
 	}
 
 	/**
@@ -487,8 +548,23 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 		return MBThreadFlagLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<MBThreadFlag> getCTPersistence() {
+		return mbThreadFlagPersistence;
+	}
+
+	@Override
+	public Class<MBThreadFlag> getModelClass() {
 		return MBThreadFlag.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<MBThreadFlag>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(mbThreadFlagPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -516,6 +592,22 @@ public abstract class MBThreadFlagLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		MBThreadFlagLocalService mbThreadFlagLocalService) {
+
+		try {
+			Field field = MBThreadFlagLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mbThreadFlagLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

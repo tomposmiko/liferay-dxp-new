@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FileImpl;
 
 import java.io.ByteArrayInputStream;
@@ -31,6 +32,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mock;
@@ -41,6 +44,11 @@ import org.mockito.MockitoAnnotations;
  * @author Alicia García
  */
 public class GCloudNaturalLanguageUtilTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -164,13 +172,13 @@ public class GCloudNaturalLanguageUtilTest {
 		int size = _randomSize();
 
 		String text =
-			RandomTestUtil.randomString(size - 1) + StringPool.SPACE +
-				RandomTestUtil.randomString(size - 1);
+			RandomTestUtil.randomString(size) + StringPool.SPACE +
+				RandomTestUtil.randomString(size);
 
 		Assert.assertEquals(
 			text,
 			GCloudNaturalLanguageUtil.truncateToSize(
-				text + StringPool.SPACE + RandomTestUtil.randomString(size - 1),
+				text + StringPool.SPACE + RandomTestUtil.randomString(size),
 				text.length() + 1));
 	}
 
@@ -178,12 +186,12 @@ public class GCloudNaturalLanguageUtilTest {
 	public void testTruncateToSizeTextGreaterThanMaxWithWordSmallerThanSize() {
 		int size = _randomSize();
 
-		String text = RandomTestUtil.randomString(size - 1);
+		String text = RandomTestUtil.randomString(size);
 
 		Assert.assertEquals(
 			text,
 			GCloudNaturalLanguageUtil.truncateToSize(
-				text + StringPool.SPACE + text, size));
+				text + StringPool.SPACE + text, size + 1));
 	}
 
 	@Test
@@ -191,11 +199,11 @@ public class GCloudNaturalLanguageUtilTest {
 		int size = _randomSize();
 
 		String text =
-			RandomTestUtil.randomString((size / 2) - 1) + StringPool.SPACE +
-				RandomTestUtil.randomString((size / 2) - 1);
+			RandomTestUtil.randomString(size / 2) + StringPool.SPACE +
+				RandomTestUtil.randomString(size / 2);
 
 		Assert.assertEquals(
-			text, GCloudNaturalLanguageUtil.truncateToSize(text, size));
+			text, GCloudNaturalLanguageUtil.truncateToSize(text, size + 1));
 	}
 
 	@Test

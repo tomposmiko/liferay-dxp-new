@@ -16,6 +16,8 @@ package com.liferay.portal.tools;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.xml.Dom4jUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CSVUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -138,7 +140,7 @@ public class SPDXBuilder {
 				new StreamResult(new FileOutputStream(versionHtmlFile)));
 		}
 		catch (Exception exception) {
-			exception.printStackTrace();
+			_log.error(exception);
 		}
 	}
 
@@ -249,9 +251,8 @@ public class SPDXBuilder {
 			for (Node fileNameNode : fileNameNodes) {
 				Element libraryElement = fileNameNode.getParent();
 
-				String key = _getKey("portal", libraryElement);
-
-				libraryElementMap.put(key, libraryElement);
+				libraryElementMap.put(
+					_getKey("portal", libraryElement), libraryElement);
 			}
 		}
 
@@ -279,21 +280,20 @@ public class SPDXBuilder {
 				packageElement, licenseOverrideProperties);
 
 			for (Element libraryElement : libraryElements) {
-				String key = _getKey("spdx", libraryElement);
-
-				libraryElementMap.put(key, libraryElement);
+				libraryElementMap.put(
+					_getKey("spdx", libraryElement), libraryElement);
 			}
 		}
 
 		Document document = DocumentHelper.createDocument();
 
-		Map<String, String> args = HashMapBuilder.put(
-			"href", "versions.xsl"
-		).put(
-			"type", "text/xsl"
-		).build();
-
-		document.addProcessingInstruction("xml-stylesheet", args);
+		document.addProcessingInstruction(
+			"xml-stylesheet",
+			HashMapBuilder.put(
+				"href", "versions.xsl"
+			).put(
+				"type", "text/xsl"
+			).build());
 
 		Element versionsElement = document.addElement("versions");
 
@@ -449,6 +449,8 @@ public class SPDXBuilder {
 
 	private static final Namespace _NAMESPACE_SPDX = new Namespace(
 		"spdx", "http://spdx.org/rdf/terms#");
+
+	private static final Log _log = LogFactoryUtil.getLog(SPDXBuilder.class);
 
 	private static final Map<String, QName> _qNameMap = new HashMap<>();
 

@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +50,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.osgi.framework.Version;
@@ -57,6 +60,11 @@ import org.osgi.framework.Version;
  * @author Matthew Tambara
  */
 public class LPKGOverrideTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testOverrideLPKG() throws IOException {
@@ -81,11 +89,11 @@ public class LPKGOverrideTest {
 
 			for (Path lpkgPath : directoryStream) {
 				try (ZipFile zipFile = new ZipFile(lpkgPath.toFile())) {
-					Enumeration<? extends ZipEntry> zipEntries =
+					Enumeration<? extends ZipEntry> enumeration =
 						zipFile.entries();
 
-					while (zipEntries.hasMoreElements()) {
-						ZipEntry zipEntry = zipEntries.nextElement();
+					while (enumeration.hasMoreElements()) {
+						ZipEntry zipEntry = enumeration.nextElement();
 
 						String name = zipEntry.getName();
 
@@ -133,8 +141,8 @@ public class LPKGOverrideTest {
 							if (name.endsWith(".war")) {
 								String fileName = matcher.group(1);
 
-								fileName = StringUtil.replace(
-									fileName, "-dxp", StringPool.BLANK);
+								fileName = StringUtil.removeSubstring(
+									fileName, "-dxp");
 
 								overrides.put("war.".concat(fileName), null);
 
@@ -199,7 +207,7 @@ public class LPKGOverrideTest {
 			Path manifestPath = fileSystem.getPath("META-INF/MANIFEST.MF");
 
 			try (InputStream inputStream = Files.newInputStream(manifestPath);
-				UnsyncByteArrayOutputStream outputStream =
+				UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 					new UnsyncByteArrayOutputStream()) {
 
 				Manifest manifest = new Manifest(inputStream);
@@ -224,10 +232,10 @@ public class LPKGOverrideTest {
 						versionString);
 				}
 
-				manifest.write(outputStream);
+				manifest.write(unsyncByteArrayOutputStream);
 
 				Files.write(
-					manifestPath, outputStream.toByteArray(),
+					manifestPath, unsyncByteArrayOutputStream.toByteArray(),
 					StandardOpenOption.TRUNCATE_EXISTING,
 					StandardOpenOption.WRITE);
 			}

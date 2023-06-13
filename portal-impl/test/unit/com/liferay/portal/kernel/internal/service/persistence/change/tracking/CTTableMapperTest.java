@@ -15,7 +15,7 @@
 package com.liferay.portal.kernel.internal.service.persistence.change.tracking;
 
 import com.liferay.petra.lang.HashUtil;
-import com.liferay.petra.lang.SafeClosable;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
@@ -39,10 +39,12 @@ import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListenerRegistrationUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.tools.ToolDependencies;
 import com.liferay.portal.util.PropsImpl;
 
@@ -68,6 +70,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -76,8 +79,10 @@ import org.junit.Test;
 public class CTTableMapperTest {
 
 	@ClassRule
-	public static final CodeCoverageAssertor codeCoverageAssertor =
-		CodeCoverageAssertor.INSTANCE;
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@BeforeClass
 	public static void setUpClass() {
@@ -144,8 +149,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey, 0L, null);
 
-		try (SafeClosable safeClosable1 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable1 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertFalse(
 				_ctTableMapper.addTableMapping(
@@ -156,8 +162,9 @@ public class CTTableMapperTest {
 
 		// Success
 
-		try (SafeClosable safeClosable2 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable2 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertTrue(
 				_ctTableMapper.addTableMapping(
@@ -175,8 +182,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey, rightPrimaryKey, 0L, null);
 		_put(leftPrimaryKey, rightPrimaryKey, ctCollectionId, false);
 
-		try (SafeClosable safeClosable3 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable3 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertTrue(
 				_ctTableMapper.addTableMapping(
@@ -198,8 +206,9 @@ public class CTTableMapperTest {
 
 		ModelListenerRegistrationUtil.register(rightModelListener);
 
-		try (SafeClosable safeClosable4 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable4 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertTrue(
 				_ctTableMapper.addTableMapping(
@@ -231,18 +240,19 @@ public class CTTableMapperTest {
 
 		mockAddCTTableMappingSqlUpdate.setDatabaseError(true);
 
-		try (SafeClosable safeClosable5 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable5 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			_ctTableMapper.addTableMapping(
 				companyId, leftPrimaryKey, rightPrimaryKey);
 		}
 		catch (SystemException systemException) {
-			Throwable cause = systemException.getCause();
+			Throwable throwable = systemException.getCause();
 
-			Assert.assertSame(RuntimeException.class, cause.getClass());
+			Assert.assertSame(RuntimeException.class, throwable.getClass());
 
-			Assert.assertEquals("Database error", cause.getMessage());
+			Assert.assertEquals("Database error", throwable.getMessage());
 		}
 		finally {
 			mockAddCTTableMappingSqlUpdate.setDatabaseError(false);
@@ -293,8 +303,9 @@ public class CTTableMapperTest {
 
 		long ctCollectionId = 5;
 
-		try (SafeClosable safeClosable1 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable1 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertArrayEquals(
 				new long[] {rightPrimaryKey1},
@@ -397,11 +408,11 @@ public class CTTableMapperTest {
 			Assert.fail();
 		}
 		catch (SystemException systemException) {
-			Throwable cause = systemException.getCause();
+			Throwable throwable = systemException.getCause();
 
-			Assert.assertSame(RuntimeException.class, cause.getClass());
+			Assert.assertSame(RuntimeException.class, throwable.getClass());
 
-			Assert.assertEquals("Database error", cause.getMessage());
+			Assert.assertEquals("Database error", throwable.getMessage());
 		}
 		finally {
 			mockContainsTableMappingSQLQuery.setDatabaseError(false);
@@ -430,18 +441,19 @@ public class CTTableMapperTest {
 
 		mockContainsCTTableMappingSQLQuery.setDatabaseError(true);
 
-		try (SafeClosable safeClosable1 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable1 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			_ctTableMapper.addTableMapping(
 				companyId, leftPrimaryKey, rightPrimaryKey);
 		}
 		catch (SystemException systemException) {
-			Throwable cause = systemException.getCause();
+			Throwable throwable = systemException.getCause();
 
-			Assert.assertSame(RuntimeException.class, cause.getClass());
+			Assert.assertSame(RuntimeException.class, throwable.getClass());
 
-			Assert.assertEquals("Database error", cause.getMessage());
+			Assert.assertEquals("Database error", throwable.getMessage());
 		}
 		finally {
 			mockContainsCTTableMappingSQLQuery.setDatabaseError(false);
@@ -451,8 +463,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable2 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable2 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertFalse(
 				_ctTableMapper.addTableMapping(
@@ -461,24 +474,25 @@ public class CTTableMapperTest {
 
 		mockContainsCTTableMappingSQLQuery.setEmptyResultSet(true);
 
-		try (SafeClosable safeClosable3 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable3 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertFalse(
 				_ctTableMapper.addTableMapping(
 					companyId, leftPrimaryKey, rightPrimaryKey));
 		}
 		catch (SystemException systemException) {
-			Throwable cause = systemException.getCause();
+			Throwable throwable = systemException.getCause();
 
-			Assert.assertSame(RuntimeException.class, cause.getClass());
+			Assert.assertSame(RuntimeException.class, throwable.getClass());
 
 			Assert.assertEquals(
 				StringBundler.concat(
 					"Unique key violation for left primary key ",
 					leftPrimaryKey, " and right primary key ", rightPrimaryKey,
 					" and ctcollectionId ", ctCollectionId),
-				cause.getMessage());
+				throwable.getMessage());
 		}
 		finally {
 			mockContainsCTTableMappingSQLQuery.setEmptyResultSet(false);
@@ -539,8 +553,9 @@ public class CTTableMapperTest {
 
 		long ctCollectionId = 4;
 
-		try (SafeClosable safeClosable1 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable1 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				0,
@@ -552,8 +567,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 
-		try (SafeClosable safeClosable2 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable2 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				1,
@@ -568,8 +584,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 		_put(leftPrimaryKey, rightPrimaryKey2, ctCollectionId, true);
 
-		try (SafeClosable safeClosable3 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable3 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				2,
@@ -584,8 +601,9 @@ public class CTTableMapperTest {
 
 		ModelListenerRegistrationUtil.register(leftModelListener);
 
-		try (SafeClosable safeClosable4 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable4 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				0,
@@ -608,8 +626,9 @@ public class CTTableMapperTest {
 
 		ModelListenerRegistrationUtil.register(rightModelListener);
 
-		try (SafeClosable safeClosable5 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable5 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				0,
@@ -633,8 +652,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 
-		try (SafeClosable safeClosable6 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable6 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				1,
@@ -658,8 +678,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 
-		try (SafeClosable safeClosable7 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable7 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				1,
@@ -703,8 +724,9 @@ public class CTTableMapperTest {
 
 		long ctCollectionId = 4;
 
-		try (SafeClosable safeClosable1 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable1 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				0,
@@ -716,8 +738,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey1, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable2 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable2 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				1,
@@ -732,8 +755,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey1, rightPrimaryKey, ctCollectionId, true);
 		_put(leftPrimaryKey2, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable3 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable3 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				2,
@@ -748,8 +772,9 @@ public class CTTableMapperTest {
 
 		ModelListenerRegistrationUtil.register(leftModelListener);
 
-		try (SafeClosable safeClosable4 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable4 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				0,
@@ -772,8 +797,9 @@ public class CTTableMapperTest {
 
 		ModelListenerRegistrationUtil.register(rightModelListener);
 
-		try (SafeClosable safeClosable5 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable5 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				0,
@@ -797,8 +823,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey1, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable6 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable6 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				1,
@@ -822,8 +849,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey1, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable7 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable7 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertEquals(
 				1,
@@ -867,8 +895,9 @@ public class CTTableMapperTest {
 
 		long ctCollectionId = 3;
 
-		try (SafeClosable safeClosable1 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable1 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertFalse(
 				_ctTableMapper.deleteTableMapping(
@@ -879,8 +908,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable2 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable2 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertTrue(
 				_ctTableMapper.deleteTableMapping(
@@ -893,8 +923,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey, 0L, null);
 
-		try (SafeClosable safeClosable2 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable2 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertTrue(
 				_ctTableMapper.deleteTableMapping(
@@ -903,8 +934,9 @@ public class CTTableMapperTest {
 
 		// Fail, already deleted
 
-		try (SafeClosable safeClosable3 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable3 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertFalse(
 				_ctTableMapper.deleteTableMapping(
@@ -927,8 +959,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable4 =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable4 =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertTrue(
 				_ctTableMapper.deleteTableMapping(
@@ -988,8 +1021,9 @@ public class CTTableMapperTest {
 				new long[] {leftPrimaryKey1, leftPrimaryKey2},
 				rightPrimaryKey1));
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			Assert.assertArrayEquals(
 				new long[0],
@@ -1081,8 +1115,9 @@ public class CTTableMapperTest {
 
 		long ctCollectionId = 5;
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			lefts = _ctTableMapper.getLeftBaseModels(
 				rightPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
@@ -1094,8 +1129,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey1, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			lefts = _ctTableMapper.getLeftBaseModels(
 				rightPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
@@ -1114,8 +1150,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey1, rightPrimaryKey, ctCollectionId, true);
 		_put(leftPrimaryKey2, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			lefts = _ctTableMapper.getLeftBaseModels(
 				rightPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
@@ -1134,8 +1171,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey1, rightPrimaryKey, ctCollectionId, true);
 		_put(leftPrimaryKey2, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			lefts = _ctTableMapper.getLeftBaseModels(
 				rightPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
@@ -1168,8 +1206,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey2, rightPrimaryKey, ctCollectionId, true);
 		_put(leftPrimaryKey3, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			lefts = _ctTableMapper.getLeftBaseModels(
 				rightPrimaryKey, 1, 2, null);
@@ -1177,27 +1216,28 @@ public class CTTableMapperTest {
 
 		Assert.assertEquals(lefts.toString(), 1, lefts.size());
 
-		Left left = lefts.get(0);
+		Left left3 = lefts.get(0);
 
-		Assert.assertEquals(leftPrimaryKey2, left.getPrimaryKeyObj());
+		Assert.assertEquals(leftPrimaryKey2, left3.getPrimaryKeyObj());
 
 		// No such model exception
 
 		_leftBasePersistence.setNoSuchModelException(true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			_ctTableMapper.getLeftBaseModels(
 				rightPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 		}
 		catch (SystemException systemException) {
-			Throwable cause = systemException.getCause();
+			Throwable throwable = systemException.getCause();
 
-			Assert.assertSame(NoSuchModelException.class, cause.getClass());
+			Assert.assertSame(NoSuchModelException.class, throwable.getClass());
 
 			Assert.assertEquals(
-				String.valueOf(leftPrimaryKey1), cause.getMessage());
+				String.valueOf(leftPrimaryKey1), throwable.getMessage());
 		}
 		finally {
 			_leftBasePersistence.setNoSuchModelException(false);
@@ -1249,8 +1289,9 @@ public class CTTableMapperTest {
 
 		long ctCollectionId = 5;
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			leftPrimaryKeys = _ctTableMapper.getLeftPrimaryKeys(
 				rightPrimaryKey);
@@ -1264,8 +1305,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey1, rightPrimaryKey, ctCollectionId, true);
 		_put(leftPrimaryKey2, rightPrimaryKey, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			leftPrimaryKeys = _ctTableMapper.getLeftPrimaryKeys(
 				rightPrimaryKey);
@@ -1284,17 +1326,18 @@ public class CTTableMapperTest {
 		mockGetLeftPrimaryKeysByRightPrimaryKeyMappingSqlQuery.setDatabaseError(
 			true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			_ctTableMapper.getLeftPrimaryKeys(rightPrimaryKey);
 		}
 		catch (SystemException systemException) {
-			Throwable cause = systemException.getCause();
+			Throwable throwable = systemException.getCause();
 
-			Assert.assertSame(RuntimeException.class, cause.getClass());
+			Assert.assertSame(RuntimeException.class, throwable.getClass());
 
-			Assert.assertEquals("Database error", cause.getMessage());
+			Assert.assertEquals("Database error", throwable.getMessage());
 		}
 		finally {
 			mockGetLeftPrimaryKeysByRightPrimaryKeyMappingSqlQuery.
@@ -1343,8 +1386,9 @@ public class CTTableMapperTest {
 
 		long ctCollectionId = 5;
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			rights = _ctTableMapper.getRightBaseModels(
 				leftPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
@@ -1356,8 +1400,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			rights = _ctTableMapper.getRightBaseModels(
 				leftPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
@@ -1377,8 +1422,9 @@ public class CTTableMapperTest {
 
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			rights = _ctTableMapper.getRightBaseModels(
 				leftPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
@@ -1397,8 +1443,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey, rightPrimaryKey2, ctCollectionId, true);
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			rights = _ctTableMapper.getRightBaseModels(
 				leftPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
@@ -1432,8 +1479,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey, rightPrimaryKey2, ctCollectionId, true);
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			rights = _ctTableMapper.getRightBaseModels(
 				leftPrimaryKey, 1, 2, null);
@@ -1441,27 +1489,28 @@ public class CTTableMapperTest {
 
 		Assert.assertEquals(rights.toString(), 1, rights.size());
 
-		Right right = rights.get(0);
+		Right right3 = rights.get(0);
 
-		Assert.assertEquals(rightPrimaryKey2, right.getPrimaryKeyObj());
+		Assert.assertEquals(rightPrimaryKey2, right3.getPrimaryKeyObj());
 
 		// No such model exception
 
 		_rightBasePersistence.setNoSuchModelException(true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			_ctTableMapper.getRightBaseModels(
 				leftPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 		}
 		catch (SystemException systemException) {
-			Throwable cause = systemException.getCause();
+			Throwable throwable = systemException.getCause();
 
-			Assert.assertSame(NoSuchModelException.class, cause.getClass());
+			Assert.assertSame(NoSuchModelException.class, throwable.getClass());
 
 			Assert.assertEquals(
-				String.valueOf(rightPrimaryKey1), cause.getMessage());
+				String.valueOf(rightPrimaryKey1), throwable.getMessage());
 		}
 		finally {
 			_rightBasePersistence.setNoSuchModelException(false);
@@ -1513,8 +1562,9 @@ public class CTTableMapperTest {
 
 		long ctCollectionId = 5;
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			rightPrimaryKeys = _ctTableMapper.getRightPrimaryKeys(
 				leftPrimaryKey);
@@ -1528,8 +1578,9 @@ public class CTTableMapperTest {
 		_put(leftPrimaryKey, rightPrimaryKey1, ctCollectionId, true);
 		_put(leftPrimaryKey, rightPrimaryKey2, ctCollectionId, true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			rightPrimaryKeys = _ctTableMapper.getRightPrimaryKeys(
 				leftPrimaryKey);
@@ -1548,17 +1599,18 @@ public class CTTableMapperTest {
 		mockGetRightPrimaryKeysByLeftPrimaryKeyMappingSqlQuery.setDatabaseError(
 			true);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(ctCollectionId)) {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					ctCollectionId)) {
 
 			_ctTableMapper.getRightPrimaryKeys(leftPrimaryKey);
 		}
 		catch (SystemException systemException) {
-			Throwable cause = systemException.getCause();
+			Throwable throwable = systemException.getCause();
 
-			Assert.assertSame(RuntimeException.class, cause.getClass());
+			Assert.assertSame(RuntimeException.class, throwable.getClass());
 
-			Assert.assertEquals("Database error", cause.getMessage());
+			Assert.assertEquals("Database error", throwable.getMessage());
 		}
 		finally {
 			mockGetRightPrimaryKeysByLeftPrimaryKeyMappingSqlQuery.
@@ -1625,8 +1677,8 @@ public class CTTableMapperTest {
 	private static class MappingKey {
 
 		@Override
-		public boolean equals(Object obj) {
-			MappingKey mappingKey = (MappingKey)obj;
+		public boolean equals(Object object) {
+			MappingKey mappingKey = (MappingKey)object;
 
 			if ((_leftPrimaryKey == mappingKey._leftPrimaryKey) &&
 				(_rightPrimaryKey == mappingKey._rightPrimaryKey) &&
@@ -2219,12 +2271,12 @@ public class CTTableMapperTest {
 			if (sql.equals(
 					StringBundler.concat(
 						"SELECT DISTINCT (", _LEFT_COLUMN_NAME, ") FROM ",
-						_TABLE_NAME, " WHERE (", _RIGHT_COLUMN_NAME,
-						" = ? AND ", _LEFT_COLUMN_NAME, " NOT IN (SELECT ",
+						_TABLE_NAME, " WHERE ", _RIGHT_COLUMN_NAME,
+						" = ? AND ((", _LEFT_COLUMN_NAME, " NOT IN (SELECT ",
 						_LEFT_COLUMN_NAME, " FROM ", _TABLE_NAME, " WHERE ",
 						_RIGHT_COLUMN_NAME, " = ? AND ctCollectionId = ? AND ",
 						"ctChangeType = false) AND ctCollectionId = 0) OR ",
-						"(ctCollectionId = ? AND ctChangeType = true)"))) {
+						"(ctCollectionId = ? AND ctChangeType = true))"))) {
 
 				return (MappingSqlQuery<T>)new MockGetCTLeftPrimaryKeysSqlQuery(
 					dataSource, RowMapper.PRIMARY_KEY, paramSetters);
@@ -2233,12 +2285,12 @@ public class CTTableMapperTest {
 			if (sql.equals(
 					StringBundler.concat(
 						"SELECT DISTINCT (", _RIGHT_COLUMN_NAME, ") FROM ",
-						_TABLE_NAME, " WHERE (", _LEFT_COLUMN_NAME, " = ? AND ",
-						_RIGHT_COLUMN_NAME, " NOT IN (SELECT ",
+						_TABLE_NAME, " WHERE ", _LEFT_COLUMN_NAME,
+						" = ? AND ((", _RIGHT_COLUMN_NAME, " NOT IN (SELECT ",
 						_RIGHT_COLUMN_NAME, " FROM ", _TABLE_NAME, " WHERE ",
 						_LEFT_COLUMN_NAME, " = ? AND ctCollectionId = ? AND ",
 						"ctChangeType = false) AND ctCollectionId = 0) OR ",
-						"(ctCollectionId = ? AND ctChangeType = true)"))) {
+						"(ctCollectionId = ? AND ctChangeType = true))"))) {
 
 				return (MappingSqlQuery<T>)
 					new MockGetCTRightPrimaryKeysSqlQuery(
@@ -2330,12 +2382,13 @@ public class CTTableMapperTest {
 			Assert.assertSame(Long.class, params[2].getClass());
 			Assert.assertSame(Long.class, params[3].getClass());
 
-			Boolean ctChangeType = (Boolean)params[0];
 			Long leftPrimaryKey = (Long)params[1];
 			Long rightPrimaryKey = (Long)params[2];
 			Long ctCollectionId = (Long)params[3];
 
 			if (_containsKey(leftPrimaryKey, rightPrimaryKey, ctCollectionId)) {
+				Boolean ctChangeType = (Boolean)params[0];
+
 				Boolean currentChangeType = _get(
 					leftPrimaryKey, rightPrimaryKey, ctCollectionId);
 

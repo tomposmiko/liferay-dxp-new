@@ -16,9 +16,9 @@ package com.liferay.journal.internal.security.permission.resource;
 
 import com.liferay.exportimport.kernel.staging.permission.StagingPermission;
 import com.liferay.journal.constants.JournalConstants;
+import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalFolder;
-import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.StagedModelPermissionLogic;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.Dictionary;
 
@@ -53,7 +54,8 @@ public class JournalFolderModelResourcePermissionRegistrar {
 		properties.put("model.class.name", JournalFolder.class.getName());
 
 		_serviceRegistration = bundleContext.registerService(
-			ModelResourcePermission.class,
+			(Class<ModelResourcePermission<JournalFolder>>)
+				(Class<?>)ModelResourcePermission.class,
 			ModelResourcePermissionFactory.create(
 				JournalFolder.class, JournalFolder::getFolderId,
 				_journalFolderLocalService::getFolder,
@@ -80,10 +82,13 @@ public class JournalFolderModelResourcePermissionRegistrar {
 							}
 
 						});
-					consumer.accept(
-						new DynamicInheritancePermissionLogic<>(
-							modelResourcePermission, _getFetchParentFunction(),
-							false));
+
+					if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
+						consumer.accept(
+							new DynamicInheritancePermissionLogic<>(
+								modelResourcePermission,
+								_getFetchParentFunction(), false));
+					}
 				},
 				actionId -> {
 					if (ActionKeys.ADD_FOLDER.equals(actionId)) {
@@ -126,7 +131,8 @@ public class JournalFolderModelResourcePermissionRegistrar {
 	)
 	private PortletResourcePermission _portletResourcePermission;
 
-	private ServiceRegistration<ModelResourcePermission> _serviceRegistration;
+	private ServiceRegistration<ModelResourcePermission<JournalFolder>>
+		_serviceRegistration;
 
 	@Reference
 	private StagingPermission _stagingPermission;

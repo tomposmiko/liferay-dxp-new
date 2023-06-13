@@ -1,7 +1,7 @@
 @component-name = "portal-document-management"
 definition {
 
-	property portal.release = "false";
+	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Depot";
 
@@ -24,13 +24,15 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
+			Site.tearDownCP();
+
+			Depot.tearDownCP();
+
 			DMDocument.tearDownCP();
 
 			DMFolder.tearDownCP();
 
 			User.logoutPG();
-
-			Site.tearDownCP();
 		}
 	}
 
@@ -55,6 +57,10 @@ definition {
 
 		DepotNavigator.openDepotAdmin();
 
+		Depot.viewConnectedSiteNumber(
+			connectedSiteNumber = "0",
+			depotName = "Test Depot Name");
+
 		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
 
 		DepotNavigator.gotoSites(depotName = "Test Depot Name");
@@ -62,6 +68,10 @@ definition {
 		Depot.connectSite(siteList = "Site Name,Private Site Name,Restricted Site Name");
 
 		DepotNavigator.openDepotAdmin();
+
+		Depot.viewConnectedSiteNumber(
+			connectedSiteNumber = "3",
+			depotName = "Test Depot Name");
 
 		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
 
@@ -85,6 +95,8 @@ definition {
 
 		DepotNavigator.gotoSites(depotName = "Test Depot Name");
 
+		Pause(locator1 = "3000");
+
 		Depot.connectSite(siteList = "Site Name");
 
 		DepotNavigator.openDepotAdmin();
@@ -97,7 +109,7 @@ definition {
 			depotName = "Test Depot Name",
 			siteList = "Site Name");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
@@ -112,13 +124,13 @@ definition {
 
 		DepotNavigator.gotoSites(depotName = "Test Depot Name");
 
-		// we need to add an assertion for the label that will later be developed and update the test description
+		// We need to add an assertion for the label that will later be developed and update the test description
 
 		Depot.viewConnectedSite(
 			depotName = "Test Depot Name",
 			siteList = "Site Name");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
@@ -149,9 +161,11 @@ definition {
 
 		Depot.connectSite(siteList = "Site Name");
 
-		Navigator.openSiteURL(siteName = "Site Name");
-
 		DepotNavigator.openDepotAdmin();
+
+		Depot.viewConnectedSiteNumber(
+			connectedSiteNumber = "1",
+			depotName = "Test Depot Name");
 
 		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
 
@@ -179,19 +193,11 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
-
-		PortletEntry.publish();
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Test Depot Name",
+			site = "false",
+			title = "WC WebContent Title");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -249,22 +255,18 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "DM Document Title");
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name");
 
 		DepotNavigator.openDepotAdmin();
 
 		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
 
 		DepotNavigator.gotoSites(depotName = "Test Depot Name");
+
+		Pause(locator1 = "3000");
 
 		Depot.connectSite(siteList = "Site Name");
 
@@ -300,16 +302,10 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "DM Document Title");
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name");
 
 		Navigator.gotoSitePage(
 			pageName = "Page Name",
@@ -337,11 +333,7 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
 		DMDocument.addCP(
 			dmDocumentDescription = "DM Document Description",
@@ -389,16 +381,10 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "DM Document Title");
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -425,6 +411,56 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "DM Document Title");
 	}
 
+	@description = "This ensures that a depot document associated with a tag cannot be searched on a connected site when searching is disabled."
+	@priority = "5"
+	test SearchForUnsearchableTag {
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Page Name",
+			widgetName = "Search Bar");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Page Name",
+			widgetName = "Search Results");
+
+		JSONDepot.addDepot(
+			depotDescription = "This is the description of a depot",
+			depotName = "Test Depot Name");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.doc",
+			dmDocumentTitle = "Document_1.doc",
+			tagNameList = "depot");
+
+		DepotNavigator.openDepotAdmin();
+
+		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
+
+		DepotNavigator.gotoSites(depotName = "Test Depot Name");
+
+		Depot.connectSite(siteList = "Site Name");
+
+		DepotNavigator.openDepotAdmin();
+
+		Depot.configureSearch(
+			depotName = "Test Depot Name",
+			item = "Make Unsearchable",
+			siteList = "Site Name",
+			tableEntryText = "No");
+
+		Navigator.gotoSitePage(
+			pageName = "Page Name",
+			siteName = "Site Name");
+
+		Search.searchCP(searchTerm = "depot");
+
+		SearchResultPortlet.viewNoSearchResults(searchTerm = "depot");
+	}
+
 	@description = "This ensures that a depot content associated with the user cannot be searched on a connected site when searching is disabled."
 	@priority = "5"
 	test SearchForUnsearchableUser {
@@ -442,30 +478,16 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "DM Document Title");
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
-
-		PortletEntry.publish();
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Test Depot Name",
+			site = "false",
+			title = "WC WebContent Title");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -517,19 +539,11 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
-
-		PortletEntry.publish();
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Test Depot Name",
+			site = "false",
+			title = "WC WebContent Title");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -573,30 +587,16 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "DM Document Title");
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
-
-		PortletEntry.publish();
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Test Depot Name",
+			site = "false",
+			title = "WC WebContent Title");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -624,6 +624,8 @@ definition {
 	@description = "This ensures that a depot web content can be searched from the connected site."
 	@priority = "5"
 	test SearchForWebContent {
+		property portal.acceptance = "true";
+
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
 			layoutName = "Page Name",
@@ -638,25 +640,19 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
-
-		PortletEntry.publish();
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Test Depot Name",
+			site = "false",
+			title = "WC WebContent Title");
 
 		DepotNavigator.openDepotAdmin();
 
 		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
 
 		DepotNavigator.gotoSites(depotName = "Test Depot Name");
+
+		Pause(locator1 = "3000");
 
 		Depot.connectSite(siteList = "Site Name");
 
@@ -710,16 +706,10 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.doc",
-			dmDocumentTitle = "DM Document Title");
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -729,13 +719,7 @@ definition {
 
 		Depot.connectSite(siteList = "Site Name");
 
-		ProductMenu.gotoSite(site = "Site Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
@@ -753,16 +737,10 @@ definition {
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "Document_1.jpg");
+			dmDocumentTitle = "Document_1.jpg",
+			groupName = "Test Depot Name");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -772,13 +750,7 @@ definition {
 
 		Depot.connectSite(siteList = "Child Site Name");
 
-		ProductMenu.gotoSite(site = "Child Site Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			portlet = "Documents and Media");
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.jpg");
 

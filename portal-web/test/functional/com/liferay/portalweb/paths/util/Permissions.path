@@ -2,11 +2,13 @@
 <head>
 <title>Permissions</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Permissions</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>ASSET_TITLE</td>
@@ -30,8 +32,8 @@
 </tr>
 <!--CONFIGURATION_PERMISSIONS-->
 <tr>
-	<td>CONFIGURATION_PERMISSIONS_TEAM_ROLE_NAME</td>
-	<td>//tr[contains(.,'${key_teamName}')]/td[1]</td>
+	<td>CONFIGURATION_PERMISSIONS_ROLE_NAME</td>
+	<td>//tr[contains(.,'${key_roleName}')]/td[1]</td>
 	<td></td>
 </tr>
 <tr>
@@ -55,8 +57,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONFIGURATION_PERMISSIONS_SUBSCRIBE_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_SUBSCRIBE']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX</td>
 	<td>//input[@id='${key_roleTitle}_ACTION_VIEW']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONFIGURATION_PERMISSIONS_ACCESS_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_ACCESS']</td>
 	<td></td>
 </tr>
 <tr>
@@ -128,6 +140,11 @@
 <tr>
 	<td>INLINE_PERMISSIONS_VIEW_CHECKBOX</td>
 	<td>//input[@id='${key_roleTitle}_ACTION_VIEW']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INLINE_PERMISSIONS_ADD_WEB_CONTENT_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_ADD_ARTICLE']</td>
 	<td></td>
 </tr>
 <tr>

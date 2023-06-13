@@ -51,22 +51,17 @@ if (kbArticle != null) {
 			%>
 
 				<div id="<portlet:namespace />fileEntryIdWrapper<%= fileEntry.getFileEntryId() %>">
-
-					<%
-					String rowURL = PortletFileRepositoryUtil.getDownloadPortletFileEntryURL(themeDisplay, fileEntry, "status=" + WorkflowConstants.STATUS_APPROVED);
-					%>
-
 					<liferay-ui:icon
 						icon="paperclip"
 						label="<%= true %>"
 						markupView="lexicon"
-						message='<%= HtmlUtil.escape(fileEntry.getTitle()) + " (" + TextFormatter.formatStorageSize(fileEntry.getSize(), locale) + ")" %>'
+						message='<%= HtmlUtil.escape(fileEntry.getTitle()) + " (" + LanguageUtil.formatStorageSize(fileEntry.getSize(), locale) + ")" %>'
 						method="get"
-						url="<%= rowURL %>"
+						url='<%= PortletFileRepositoryUtil.getDownloadPortletFileEntryURL(themeDisplay, fileEntry, "status=" + WorkflowConstants.STATUS_APPROVED) %>'
 					/>
 
 					<%
-					String taglibURL = "javascript:" + renderResponse.getNamespace() + "deleteFileEntry('" + fileEntry.getFileEntryId() + "');";
+					String taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "deleteFileEntry('" + fileEntry.getFileEntryId() + "');";
 					%>
 
 					<liferay-ui:icon-delete
@@ -105,18 +100,16 @@ if (kbArticle != null) {
 			method: Liferay.Service.bind('/kb.kbarticle/get-temp-attachment-names'),
 			params: {
 				groupId: <%= scopeGroupId %>,
-				tempFolderName: '<%= KBWebKeys.TEMP_FOLDER_NAME %>'
-			}
+				tempFolderName: '<%= KBWebKeys.TEMP_FOLDER_NAME %>',
+			},
 		},
 		uploadFile:
-			'<liferay-portlet:actionURL name="addTempAttachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>'
+			'<liferay-portlet:actionURL name="addTempAttachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>',
 	});
 </aui:script>
 
-<aui:script>
-	Liferay.provide(window, '<portlet:namespace />deleteFileEntry', function(
-		fileEntryId
-	) {
+<script>
+	window['<portlet:namespace />deleteFileEntry'] = function (fileEntryId) {
 		var removeFileEntryIdsInput = document.getElementById(
 			'<portlet:namespace />removeFileEntryIds'
 		);
@@ -136,7 +129,7 @@ if (kbArticle != null) {
 		);
 
 		if (fileEntryIdWrapper) {
-			fileEntryIdWrapper.hide();
+			fileEntryIdWrapper.style.display = 'none';
 		}
-	});
-</aui:script>
+	};
+</script>

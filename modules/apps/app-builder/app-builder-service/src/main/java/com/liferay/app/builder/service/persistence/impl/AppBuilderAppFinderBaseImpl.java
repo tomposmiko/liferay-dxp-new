@@ -44,6 +44,7 @@ public abstract class AppBuilderAppFinderBaseImpl
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("active", "active_");
 
 		setDBColumnNames(dbColumnNames);
 	}
@@ -59,7 +60,6 @@ public abstract class AppBuilderAppFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -85,14 +85,5 @@ public abstract class AppBuilderAppFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AppBuilderAppFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(AppBuilderPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

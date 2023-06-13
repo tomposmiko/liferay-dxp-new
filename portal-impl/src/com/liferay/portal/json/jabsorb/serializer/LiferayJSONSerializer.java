@@ -88,10 +88,20 @@ public class LiferayJSONSerializer extends JSONSerializer {
 						contextName);
 
 					if (classLoader != null) {
-						return Class.forName(className, true, classLoader);
+						try {
+							return Class.forName(className, true, classLoader);
+						}
+						catch (ClassNotFoundException classNotFoundException) {
+							if (_log.isWarnEnabled()) {
+								_log.warn(
+									StringBundler.concat(
+										"Unable to load class ", className,
+										" in context ", contextName),
+									classNotFoundException);
+							}
+						}
 					}
-
-					if (_log.isWarnEnabled()) {
+					else if (_log.isWarnEnabled()) {
 						_log.warn(
 							StringBundler.concat(
 								"Unable to get class loader for class ",
@@ -108,7 +118,7 @@ public class LiferayJSONSerializer extends JSONSerializer {
 		return super.getClassFromHint(object);
 	}
 
-	private static String[] _toClassNames(Class<?>[] classes) {
+	private String[] _toClassNames(Class<?>[] classes) {
 		String[] classNames = new String[classes.length];
 
 		for (int i = 0; i < classes.length; i++) {

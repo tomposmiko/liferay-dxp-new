@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
@@ -74,11 +75,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -177,6 +176,21 @@ public class GroupServiceTest {
 		Assert.assertEquals(
 			parentGroup.getGroupId(),
 			childGroupStagingGroup.getParentGroupId());
+	}
+
+	@Test
+	public void testChangeLocaleFromCurrentToAvailableAndBackAgain()
+		throws Exception {
+
+		_group = GroupTestUtil.addGroup(GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
+		_testUpdateDisplaySettings(
+			_group.getGroupId(), Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US),
+			Arrays.asList(LocaleUtil.US), LocaleUtil.US, false);
+		_testUpdateDisplaySettings(
+			_group.getGroupId(), Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US),
+			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US), LocaleUtil.US,
+			false);
 	}
 
 	@Test
@@ -511,6 +525,23 @@ public class GroupServiceTest {
 
 		_groupService.updateFriendlyURL(
 			_group.getGroupId(), "/" + _group.getGroupId());
+	}
+
+	@Test(expected = GroupFriendlyURLException.class)
+	public void testFriendlyURLSetToLanguageKey() throws Exception {
+		_group = GroupTestUtil.addGroup();
+
+		Locale locale = LocaleUtil.US;
+
+		String languageId = StringUtil.toLowerCase(
+			LocaleUtil.toLanguageId(locale));
+
+		String i18nPathLanguageId =
+			StringPool.SLASH +
+				PortalUtil.getI18nPathLanguageId(locale, languageId);
+
+		_groupService.updateFriendlyURL(
+			_group.getGroupId(), i18nPathLanguageId);
 	}
 
 	@Test(expected = GroupFriendlyURLException.class)
@@ -880,6 +911,33 @@ public class GroupServiceTest {
 	}
 
 	@Test
+	public void testGroupValidSiteFriendlyURLI18nPath() throws Exception {
+		_group = GroupTestUtil.addGroup();
+
+		GroupTestUtil.updateDisplaySettings(
+			_group.getGroupId(), Arrays.asList(LocaleUtil.SPAIN),
+			LocaleUtil.SPAIN);
+
+		ThemeDisplay themeDisplay = new ThemeDisplay();
+
+		String languageId = _language.getLanguageId(LocaleUtil.ENGLISH);
+
+		themeDisplay.setI18nLanguageId(languageId);
+		themeDisplay.setI18nPath(
+			StringPool.SLASH.concat(LocaleUtil.toW3cLanguageId(languageId)));
+
+		themeDisplay.setSiteGroupId(_group.getGroupId());
+
+		String groupFriendlyURL = _portal.getGroupFriendlyURL(
+			_group.getPublicLayoutSet(), themeDisplay);
+
+		Assert.assertFalse(
+			groupFriendlyURL + " should not contain " +
+				themeDisplay.getI18nPath(),
+			groupFriendlyURL.contains(themeDisplay.getI18nPath()));
+	}
+
+	@Test
 	public void testIndividualResourcePermission() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
@@ -903,15 +961,19 @@ public class GroupServiceTest {
 
 	@Test
 	public void testInvalidChangeAvailableLanguageIds() throws Exception {
+		_group = GroupTestUtil.addGroup(GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
 		_testUpdateDisplaySettings(
-			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US),
+			_group.getGroupId(), Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US),
 			Arrays.asList(LocaleUtil.GERMANY, LocaleUtil.US), null, true);
 	}
 
 	@Test
 	public void testInvalidChangeDefaultLanguageId() throws Exception {
+		_group = GroupTestUtil.addGroup(GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
 		_testUpdateDisplaySettings(
-			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US),
+			_group.getGroupId(), Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US),
 			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US), LocaleUtil.GERMANY,
 			true);
 	}
@@ -994,16 +1056,15 @@ public class GroupServiceTest {
 
 		Assert.assertFalse(layout.hasScopeGroup());
 
-		Map<Locale, String> nameMap = HashMapBuilder.put(
-			LocaleUtil.getDefault(), layout.getName(LocaleUtil.getDefault())
-		).build();
-
 		Group scopeGroup = _groupLocalService.addGroup(
 			TestPropsValues.getUserId(), GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			Layout.class.getName(), layout.getPlid(),
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0, true,
-			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false, true,
-			null);
+			GroupConstants.DEFAULT_LIVE_GROUP_ID,
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), layout.getName(LocaleUtil.getDefault())
+			).build(),
+			null, 0, true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null,
+			false, true, null);
 
 		_groups.addFirst(scopeGroup);
 
@@ -1202,14 +1263,20 @@ public class GroupServiceTest {
 
 	@Test
 	public void testValidChangeAvailableLanguageIds() throws Exception {
+		_group = GroupTestUtil.addGroup(GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
 		_testUpdateDisplaySettings(
+			_group.getGroupId(),
 			Arrays.asList(LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
 			Arrays.asList(LocaleUtil.SPAIN, LocaleUtil.US), null, false);
 	}
 
 	@Test
 	public void testValidChangeDefaultLanguageId() throws Exception {
+		_group = GroupTestUtil.addGroup(GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
 		_testUpdateDisplaySettings(
+			_group.getGroupId(),
 			Arrays.asList(LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
 			Arrays.asList(LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US),
 			LocaleUtil.GERMANY, false);
@@ -1218,16 +1285,15 @@ public class GroupServiceTest {
 	private Group _addScopeGroup(Group group) throws Exception {
 		Layout scopeLayout = LayoutTestUtil.addLayout(group);
 
-		Map<Locale, String> nameMap = HashMapBuilder.put(
-			LocaleUtil.getDefault(), RandomTestUtil.randomString()
-		).build();
-
 		return _groupLocalService.addGroup(
 			TestPropsValues.getUserId(), GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			Layout.class.getName(), scopeLayout.getPlid(),
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0, true,
-			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false, true,
-			null);
+			GroupConstants.DEFAULT_LIVE_GROUP_ID,
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			null, 0, true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null,
+			false, true, null);
 	}
 
 	private void _assertExpectedGroups(
@@ -1276,15 +1342,13 @@ public class GroupServiceTest {
 			excludedGroupIds.add(stagingGroup.getGroupId());
 		}
 
-		LinkedHashMap<String, Object> params =
+		List<Group> selectableGroups = _groupService.search(
+			_group.getCompanyId(), null, StringPool.BLANK,
 			LinkedHashMapBuilder.<String, Object>put(
 				"site", Boolean.TRUE
 			).put(
 				"excludedGroupIds", excludedGroupIds
-			).build();
-
-		List<Group> selectableGroups = _groupService.search(
-			_group.getCompanyId(), null, StringPool.BLANK, params,
+			).build(),
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		for (Group selectableGroup : selectableGroups) {
@@ -1303,7 +1367,7 @@ public class GroupServiceTest {
 	}
 
 	private void _testUpdateDisplaySettings(
-			Collection<Locale> portalAvailableLocales,
+			long groupId, Collection<Locale> portalAvailableLocales,
 			Collection<Locale> groupAvailableLocales, Locale groupDefaultLocale,
 			boolean expectFailure)
 		throws Exception {
@@ -1314,11 +1378,9 @@ public class GroupServiceTest {
 			TestPropsValues.getCompanyId(), portalAvailableLocales,
 			LocaleUtil.getDefault());
 
-		_group = GroupTestUtil.addGroup(GroupConstants.DEFAULT_PARENT_GROUP_ID);
-
 		try {
 			GroupTestUtil.updateDisplaySettings(
-				_group.getGroupId(), groupAvailableLocales, groupDefaultLocale);
+				groupId, groupAvailableLocales, groupDefaultLocale);
 
 			Assert.assertFalse(expectFailure);
 		}

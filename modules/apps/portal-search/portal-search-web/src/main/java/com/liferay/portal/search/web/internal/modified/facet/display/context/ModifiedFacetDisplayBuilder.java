@@ -17,15 +17,20 @@ package com.liferay.portal.search.web.internal.modified.facet.display.context;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
+import com.liferay.portal.kernel.theme.PortletDisplay;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.CalendarFactory;
 import com.liferay.portal.kernel.util.DateFormatFactory;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.modified.facet.builder.DateRangeFactory;
+import com.liferay.portal.search.web.internal.modified.facet.configuration.ModifiedFacetPortletInstanceConfiguration;
 
 import java.io.Serializable;
 
@@ -41,6 +46,8 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
+import javax.portlet.RenderRequest;
+
 /**
  * @author Lino Alves
  * @author Adam Brandizzi
@@ -48,30 +55,54 @@ import java.util.stream.Stream;
 public class ModifiedFacetDisplayBuilder implements Serializable {
 
 	public ModifiedFacetDisplayBuilder(
-		CalendarFactory calendarFactory, DateFormatFactory dateFormatFactory,
-		Http http) {
+			CalendarFactory calendarFactory,
+			DateFormatFactory dateFormatFactory, Http http,
+			RenderRequest renderRequest)
+		throws ConfigurationException {
 
 		_calendarFactory = calendarFactory;
 		_dateFormatFactory = dateFormatFactory;
 		_http = http;
 
 		_dateRangeFactory = new DateRangeFactory(dateFormatFactory);
+
+		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+
+		_modifiedFacetPortletInstanceConfiguration =
+			portletDisplay.getPortletInstanceConfiguration(
+				ModifiedFacetPortletInstanceConfiguration.class);
 	}
 
 	public ModifiedFacetDisplayContext build() {
 		ModifiedFacetDisplayContext modifiedFacetDisplayContext =
 			new ModifiedFacetDisplayContext();
 
-		modifiedFacetDisplayContext.setCalendarDisplayContext(
-			buildCalendarDisplayContext());
-		modifiedFacetDisplayContext.
-			setCustomRangeModifiedFacetTermDisplayContext(
-				buildCustomRangeModifiedTermDisplayContext());
+		if (_calendarFactory != null) {
+			modifiedFacetDisplayContext.setCalendarDisplayContext(
+				buildCalendarDisplayContext());
+		}
+
+		if ((_dateFormatFactory != null) && (_dateRangeFactory != null)) {
+			modifiedFacetDisplayContext.
+				setCustomRangeModifiedFacetTermDisplayContext(
+					buildCustomRangeModifiedTermDisplayContext());
+		}
+
 		modifiedFacetDisplayContext.setDefaultModifiedFacetTermDisplayContext(
 			buildDefaultModifiedFacetTermDisplayContext());
+		modifiedFacetDisplayContext.setDisplayStyleGroupId(
+			getDisplayStyleGroupId());
+		modifiedFacetDisplayContext.
+			setModifiedFacetPortletInstanceConfiguration(
+				_modifiedFacetPortletInstanceConfiguration);
 		modifiedFacetDisplayContext.setModifiedFacetTermDisplayContexts(
 			buildTermDisplayContexts());
 		modifiedFacetDisplayContext.setNothingSelected(isNothingSelected());
+		modifiedFacetDisplayContext.setPaginationStartParameterName(
+			_paginationStartParameterName);
 		modifiedFacetDisplayContext.setParameterName(_parameterName);
 		modifiedFacetDisplayContext.setRenderNothing(isRenderNothing());
 
@@ -92,6 +123,12 @@ public class ModifiedFacetDisplayBuilder implements Serializable {
 
 	public void setLocale(Locale locale) {
 		_locale = locale;
+	}
+
+	public void setPaginationStartParameterName(
+		String paginationStartParameterName) {
+
+		_paginationStartParameterName = paginationStartParameterName;
 	}
 
 	public void setParameterName(String parameterName) {
@@ -160,6 +197,10 @@ public class ModifiedFacetDisplayBuilder implements Serializable {
 	protected ModifiedFacetTermDisplayContext
 		buildDefaultModifiedFacetTermDisplayContext() {
 
+		if (_facet == null) {
+			return null;
+		}
+
 		FacetConfiguration facetConfiguration = _facet.getFacetConfiguration();
 
 		String label = facetConfiguration.getLabel();
@@ -192,10 +233,14 @@ public class ModifiedFacetDisplayBuilder implements Serializable {
 	}
 
 	protected List<ModifiedFacetTermDisplayContext> buildTermDisplayContexts() {
+		JSONArray rangesJSONArray = getRangesJSONArray();
+
+		if (rangesJSONArray == null) {
+			return null;
+		}
+
 		List<ModifiedFacetTermDisplayContext> modifiedFacetTermDisplayContexts =
 			new ArrayList<>();
-
-		JSONArray rangesJSONArray = getRangesJSONArray();
 
 		for (int i = 0; i < rangesJSONArray.length(); i++) {
 			JSONObject jsonObject = rangesJSONArray.getJSONObject(i);
@@ -232,9 +277,25 @@ public class ModifiedFacetDisplayBuilder implements Serializable {
 
 		String from = format.format(calendar.getTime());
 
-		String rangeURL = _http.setParameter(_currentURL, "modifiedFrom", from);
+		String rangeURL = _http.removeParameter(_currentURL, "modified");
+
+		rangeURL = _http.removeParameter(
+			rangeURL, _paginationStartParameterName);
+
+		rangeURL = _http.setParameter(rangeURL, "modifiedFrom", from);
 
 		return _http.setParameter(rangeURL, "modifiedTo", to);
+	}
+
+	protected long getDisplayStyleGroupId() {
+		long displayStyleGroupId =
+			_modifiedFacetPortletInstanceConfiguration.displayStyleGroupId();
+
+		if (displayStyleGroupId <= 0) {
+			displayStyleGroupId = _themeDisplay.getScopeGroupId();
+		}
+
+		return displayStyleGroupId;
 	}
 
 	protected int getFrequency(TermCollector termCollector) {
@@ -250,10 +311,17 @@ public class ModifiedFacetDisplayBuilder implements Serializable {
 
 		rangeURL = _http.removeParameter(rangeURL, "modifiedTo");
 
+		rangeURL = _http.removeParameter(
+			rangeURL, _paginationStartParameterName);
+
 		return _http.setParameter(rangeURL, "modified", label);
 	}
 
 	protected JSONArray getRangesJSONArray() {
+		if (_facet == null) {
+			return null;
+		}
+
 		FacetConfiguration facetConfiguration = _facet.getFacetConfiguration();
 
 		JSONObject dataJSONObject = facetConfiguration.getData();
@@ -262,6 +330,10 @@ public class ModifiedFacetDisplayBuilder implements Serializable {
 	}
 
 	protected TermCollector getTermCollector(String range) {
+		if (_facet == null) {
+			return null;
+		}
+
 		FacetCollector facetCollector = _facet.getFacetCollector();
 
 		if (facetCollector == null) {
@@ -307,8 +379,12 @@ public class ModifiedFacetDisplayBuilder implements Serializable {
 	private String _from;
 	private final Http _http;
 	private Locale _locale;
+	private final ModifiedFacetPortletInstanceConfiguration
+		_modifiedFacetPortletInstanceConfiguration;
+	private String _paginationStartParameterName;
 	private String _parameterName;
 	private List<String> _selectedRanges = Collections.emptyList();
+	private final ThemeDisplay _themeDisplay;
 	private TimeZone _timeZone;
 	private String _to;
 	private int _totalHits;

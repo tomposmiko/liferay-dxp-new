@@ -17,15 +17,13 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String command = (String)SessionMessages.get(renderRequest, "command");
 String commandOutput = (String)SessionMessages.get(renderRequest, "commandOutput");
-String prompt = (String)SessionMessages.get(renderRequest, "prompt");
 %>
 
 <portlet:actionURL name="executeCommand" var="executeCommandURL" />
 
-<div class="container-fluid-1280">
-	<aui:form action="<%= executeCommandURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "executeCommand();" %>'>
+<clay:container-fluid>
+	<aui:form action="<%= executeCommandURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "executeCommand();" %>'>
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 		<liferay-ui:error key="gogo">
@@ -39,7 +37,7 @@ String prompt = (String)SessionMessages.get(renderRequest, "prompt");
 
 		<aui:fieldset-group markupView="lexicon">
 			<aui:fieldset>
-				<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) || windowState.equals(LiferayWindowState.POP_UP) %>" name="command" prefix="<%= prompt %>" value="<%= command %>" />
+				<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) || windowState.equals(LiferayWindowState.POP_UP) %>" name="command" prefix='<%= (String)SessionMessages.get(renderRequest, "prompt") %>' value='<%= (String)SessionMessages.get(renderRequest, "command") %>' />
 			</aui:fieldset>
 		</aui:fieldset-group>
 
@@ -50,10 +48,10 @@ String prompt = (String)SessionMessages.get(renderRequest, "prompt");
 		<c:if test="<%= Validator.isNotNull(commandOutput) %>">
 			<b><liferay-ui:message key="output" /></b>
 
-			<pre><%= commandOutput %></pre>
+			<pre><%= HtmlUtil.escape(commandOutput) %></pre>
 		</c:if>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <aui:script>
 	function <portlet:namespace />executeCommand() {

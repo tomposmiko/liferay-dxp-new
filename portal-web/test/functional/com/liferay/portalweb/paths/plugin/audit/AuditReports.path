@@ -2,11 +2,13 @@
 <head>
 <title>AuditReports</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">AuditReports</td></tr>
 </thead>
+
 <tbody>
 <!--REPORTS_TABLE -->
 <tr>
@@ -42,6 +44,37 @@
 <tr>
 	<td>REPORTS_TABLE_RESOURCE_ACTION_1</td>
 	<td>xpath=(//tr/td[5])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--REPORTS_DETAIL -->
+<tr>
+	<td>REPORTS_DETAIL_RESOURCE_NAME</td>
+	<td>//span[(@class='control-label') and contains (.,'Resource Name')]/..</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORTS_DETAIL_RESOURCE_ACTION</td>
+	<td>//span[(@class='control-label') and contains (.,'Resource Action')]/..</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORTS_DETAIL_USER_NAME</td>
+	<td>//span[(@class='control-label') and contains (.,'User Name')]/..</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORTS_DETAIL_CLIENT_IP</td>
+	<td>//span[(@class='control-label') and contains (.,'Client IP')]/..</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORTS_DETAIL_ADDITIONAL_INFORMATION</td>
+	<td>//span[(@class='control-label') and contains (.,'Additional Information')]/..</td>
 	<td></td>
 </tr>
 <tr>

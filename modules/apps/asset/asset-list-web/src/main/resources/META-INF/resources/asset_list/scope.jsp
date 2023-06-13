@@ -18,8 +18,6 @@
 
 <%
 List<Group> selectedGroups = editAssetListDisplayContext.getSelectedGroups();
-
-PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 %>
 
 <aui:input name="TypeSettingsProperties--groupIds--" type="hidden" value="<%= StringUtil.merge(editAssetListDisplayContext.getSelectedGroupIds()) %>" />
@@ -38,7 +36,7 @@ PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 	compactEmptyResultsMessage="<%= true %>"
 	emptyResultsMessage="none"
 	headerNames="name,type,null"
-	iteratorURL="<%= portletURL %>"
+	iteratorURL="<%= editAssetListDisplayContext.getPortletURL() %>"
 	total="<%= selectedGroups.size() %>"
 >
 	<liferay-ui:search-container-results
@@ -61,9 +59,11 @@ PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 			value="<%= LanguageUtil.get(request, group.getScopeLabel(themeDisplay)) %>"
 		/>
 
-		<liferay-ui:search-container-column-text>
-			<a class="modify-link" data-rowId="<%= group.getGroupId() %>" href="javascript:;"><%= removeLinkIcon %></a>
-		</liferay-ui:search-container-column-text>
+		<c:if test="<%= !editAssetListDisplayContext.isLiveGroup() %>">
+			<liferay-ui:search-container-column-text>
+				<a class="modify-link" data-rowId="<%= group.getGroupId() %>" href="javascript:;"><%= removeLinkIcon %></a>
+			</liferay-ui:search-container-column-text>
+		</c:if>
 	</liferay-ui:search-container-row>
 
 	<liferay-ui:search-iterator
@@ -72,41 +72,43 @@ PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 	/>
 </liferay-ui:search-container>
 
-<liferay-ui:icon-menu
-	cssClass="select-existing-selector"
-	direction="right"
-	message="select"
-	showArrow="<%= false %>"
-	showWhenSingleIcon="<%= true %>"
->
+<c:if test="<%= !editAssetListDisplayContext.isLiveGroup() %>">
+	<liferay-ui:icon-menu
+		cssClass="select-existing-selector"
+		direction="right"
+		message="select"
+		showArrow="<%= false %>"
+		showWhenSingleIcon="<%= true %>"
+	>
 
-	<%
-	for (Group group : editAssetListDisplayContext.getAvailableGroups()) {
-		if (selectedGroups.contains(group)) {
-			continue;
+		<%
+		for (Group group : editAssetListDisplayContext.getAvailableGroups()) {
+			if (selectedGroups.contains(group)) {
+				continue;
+			}
+
+			String taglibOnClick = liferayPortletResponse.getNamespace() + "addRow('" + group.getGroupId() + "', '" + HtmlUtil.escapeJS(HtmlUtil.escape(group.getDescriptiveName(themeDisplay.getLocale()))) + "', '" + LanguageUtil.get(request, group.getScopeLabel(themeDisplay)) + "');";
+		%>
+
+			<liferay-ui:icon
+				message="<%= group.getScopeDescriptiveName(themeDisplay) %>"
+				onClick="<%= taglibOnClick %>"
+				url="javascript:;"
+			/>
+
+		<%
 		}
-
-		String onClick = "addRow('" + group.getGroupId() + "', '" + HtmlUtil.escapeJS(HtmlUtil.escape(group.getDescriptiveName(themeDisplay.getLocale()))) + "', '" + group.getScopeLabel(themeDisplay) + "');";
-	%>
+		%>
 
 		<liferay-ui:icon
-			message="<%= group.getScopeDescriptiveName(themeDisplay) %>"
-			onClick="<%= onClick %>"
+			cssClass="highlited scope-selector"
+			id="selectManageableGroup"
+			message='<%= LanguageUtil.get(request, "other-site-or-asset-library") + StringPool.TRIPLE_PERIOD %>'
+			method="get"
 			url="javascript:;"
 		/>
-
-	<%
-	}
-	%>
-
-	<liferay-ui:icon
-		cssClass="highlited scope-selector"
-		id="selectManageableGroup"
-		message='<%= LanguageUtil.get(request, "other-site") + StringPool.TRIPLE_PERIOD %>'
-		method="get"
-		url="javascript:;"
-	/>
-</liferay-ui:icon-menu>
+	</liferay-ui:icon-menu>
+</c:if>
 
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get(
@@ -115,7 +117,7 @@ PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 
 	searchContainer.get('contentBox').delegate(
 		'click',
-		function(event) {
+		function (event) {
 			var link = event.currentTarget;
 
 			var tr = link.ancestor('tr');
@@ -134,40 +136,38 @@ PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 	);
 
 	if (selectManageableGroupIcon) {
-		selectManageableGroupIcon.addEventListener('click', function(event) {
+		selectManageableGroupIcon.addEventListener('click', function (event) {
 			event.preventDefault();
 
-			Liferay.Util.selectEntity(
-				{
-					dialog: {
-						destroyOnHide: true
-					},
-					eventName:
-						'<%= editAssetListDisplayContext.getSelectGroupEventName() %>',
-					id:
-						'<%= editAssetListDisplayContext.getSelectGroupEventName() %>',
-					title: '<liferay-ui:message key="scopes" />',
-					uri:
-						'<%= editAssetListDisplayContext.getGroupItemSelectorURL() %>'
-				},
-				function(event) {
-					var entityId = event.groupid;
+			Liferay.Util.openSelectionModal({
+				id: '<%= editAssetListDisplayContext.getSelectGroupEventName() %>',
+				onSelect: function (selectedItem) {
+					var entityId = selectedItem.groupid;
 
 					var searchContainerData = searchContainer.getData();
 
 					if (searchContainerData.indexOf(entityId) == -1) {
-						addRow(
+						<portlet:namespace />addRow(
 							entityId,
-							event.groupdescriptivename,
-							event.groupscopelabel
+							selectedItem.groupdescriptivename,
+							selectedItem.groupscopelabel
 						);
 					}
-				}
-			);
+				},
+				selectEventName:
+					'<%= editAssetListDisplayContext.getSelectGroupEventName() %>',
+				title: '<liferay-ui:message key="scopes" />',
+				url: '<%= editAssetListDisplayContext.getGroupItemSelectorURL() %>',
+			});
 		});
 	}
 
-	Liferay.provide(window, 'addRow', function(groupId, name, scopeLabel) {
+	window['<portlet:namespace />addRow'] = function (groupId, name, scopeLabel) {
+		var data = searchContainer.getData(true);
+		if (data.includes(groupId)) {
+			return;
+		}
+
 		var rowColumns = [];
 
 		rowColumns.push('<span class="text-truncate">' + name + '</span>');
@@ -183,9 +183,9 @@ PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 		searchContainer.updateDataStore();
 
 		updateGroupIds();
-	});
+	};
 
-	Liferay.provide(window, 'updateGroupIds', function() {
+	function updateGroupIds() {
 		var groupIds = document.getElementById('<portlet:namespace />groupIds');
 
 		if (groupIds) {
@@ -193,5 +193,5 @@ PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 
 			groupIds.setAttribute('value', searchContainerData.split(','));
 		}
-	});
+	}
 </aui:script>

@@ -12,63 +12,73 @@
  * details.
  */
 
+import ClayIcon from '@clayui/icon';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {useEventListener} from 'frontend-js-react-web';
 import {openToast} from 'frontend-js-web';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {SERVICE_NETWORK_STATUS_TYPES} from '../config/constants/serviceNetworkStatusTypes';
 
-const getStatus = (isOnline, status, lastSaveDate) => {
+const LoadingText = ({children}) => (
+	<>
+		<span className="m-0 navbar-text page-editor__status-bar text-info">
+			{children}
+		</span>
+		<ClayLoadingIndicator className={'mr-3 my-0'} small />
+	</>
+);
+
+const SuccessText = ({children}) => (
+	<>
+		<span className="m-0 navbar-text page-editor__status-bar text-success">
+			{children}
+		</span>
+		<ClayIcon className={'mr-3 text-success'} symbol={'check-circle'} />
+	</>
+);
+
+const getContent = (isOnline, status) => {
 	if (!isOnline) {
-		return `${Liferay.Language.get('trying-to-reconnect')}...`;
-	} else if (status === SERVICE_NETWORK_STATUS_TYPES.Fetching) {
-		return Liferay.Language.get('saving-changes');
-	} else if (lastSaveDate) {
-		return lastSaveDate;
+		return (
+			<LoadingText>
+				{Liferay.Language.get('trying-to-reconnect')}
+			</LoadingText>
+		);
+	}
+
+	if (status === SERVICE_NETWORK_STATUS_TYPES.draftSaved) {
+		return <SuccessText>{Liferay.Language.get('saved')}</SuccessText>;
+	}
+
+	if (status === SERVICE_NETWORK_STATUS_TYPES.savingDraft) {
+		return <LoadingText>{Liferay.Language.get('saving')}</LoadingText>;
 	}
 
 	return null;
 };
 
-const NetworkStatusBar = ({lastFetch, status}) => {
+const NetworkStatusBar = ({error, status}) => {
 	const [isOnline, setIsOnline] = useState(true);
 
-	const lastSaveDate = useMemo(() => {
-		if (!lastFetch) return null;
-
-		const lastSaveDateText = Liferay.Language.get('draft-saved-at-x');
-
-		return lastSaveDateText.replace(
-			'{0}',
-			lastFetch.toLocaleTimeString(
-				Liferay.ThemeDisplay.getBCP47LanguageId()
-			)
-		);
-	}, [lastFetch]);
-
 	useEffect(() => {
-		if (status === SERVICE_NETWORK_STATUS_TYPES.Error) {
+		if (status === SERVICE_NETWORK_STATUS_TYPES.error) {
 			openToast({
-				message: Liferay.Language.get('an-unexpected-error-occurred'),
-				title: Liferay.Language.get('error'),
-				type: 'danger'
+				message: error,
+				type: 'danger',
 			});
 		}
-	}, [status]);
+	}, [error, status]);
 
 	useEventListener('online', () => setIsOnline(true), true, window);
 
 	useEventListener('offline', () => setIsOnline(false), true, window);
 
-	const statusText = getStatus(isOnline, status, lastSaveDate);
-
-	if (!statusText) {
-		return null;
-	}
+	const content = getContent(isOnline, status);
 
 	return (
-		<li className="d-inline nav-item text-truncate">
-			<span className="lfr-portal-tooltip navbar-text">{statusText}</span>
+		<li className="d-flex flex-direction-row nav-item text-truncate">
+			{content}
 		</li>
 	);
 };

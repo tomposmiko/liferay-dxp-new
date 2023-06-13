@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.numeric;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
+import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
@@ -55,7 +56,7 @@ public class NumericDDMFormFieldTemplateContextContributor
 
 		Locale locale = ddmFormFieldRenderingContext.getLocale();
 
-		Map<String, Object> parameters = HashMapBuilder.<String, Object>put(
+		return HashMapBuilder.<String, Object>put(
 			"dataType", getDataType(ddmFormField, ddmFormFieldRenderingContext)
 		).put(
 			"placeholder",
@@ -66,9 +67,8 @@ public class NumericDDMFormFieldTemplateContextContributor
 			"predefinedValue",
 			getFormattedValue(
 				ddmFormFieldRenderingContext, locale,
-				getValueString(
-					ddmFormField.getPredefinedValue(), locale,
-					ddmFormFieldRenderingContext))
+				DDMFormFieldTypeUtil.getPredefinedValue(
+					ddmFormField, ddmFormFieldRenderingContext))
 		).put(
 			"symbols", getSymbolsMap(locale)
 		).put(
@@ -76,21 +76,20 @@ public class NumericDDMFormFieldTemplateContextContributor
 			getValueString(
 				(LocalizedValue)ddmFormField.getProperty("tooltip"), locale,
 				ddmFormFieldRenderingContext)
+		).put(
+			"value",
+			() -> {
+				String value = HtmlUtil.extractText(
+					ddmFormFieldRenderingContext.getValue());
+
+				if (Objects.equals(value, "NaN")) {
+					return StringPool.BLANK;
+				}
+
+				return getFormattedValue(
+					ddmFormFieldRenderingContext, locale, value);
+			}
 		).build();
-
-		String value = HtmlUtil.extractText(
-			ddmFormFieldRenderingContext.getValue());
-
-		if (Objects.equals(value, "NaN")) {
-			parameters.put("value", "");
-		}
-		else {
-			parameters.put(
-				"value",
-				getFormattedValue(ddmFormFieldRenderingContext, locale, value));
-		}
-
-		return parameters;
 	}
 
 	protected String getDataType(

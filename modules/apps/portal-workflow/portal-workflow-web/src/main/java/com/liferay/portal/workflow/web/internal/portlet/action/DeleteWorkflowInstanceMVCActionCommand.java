@@ -56,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.name=" + WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW_INSTANCE,
 		"javax.portlet.name=" + WorkflowPortletKeys.SITE_ADMINISTRATION_WORKFLOW,
 		"javax.portlet.name=" + WorkflowPortletKeys.USER_WORKFLOW,
-		"mvc.command.name=deleteWorkflowInstance"
+		"mvc.command.name=/portal_workflow/delete_workflow_instance"
 	},
 	service = MVCActionCommand.class
 )
@@ -111,7 +111,7 @@ public class DeleteWorkflowInstanceMVCActionCommand
 					portletSession.getPortletContext();
 
 				PortletRequestDispatcher portletRequestDispatcher =
-					portletContext.getRequestDispatcher("/error.jsp");
+					portletContext.getRequestDispatcher("/instance/error.jsp");
 
 				portletRequestDispatcher.include(actionRequest, actionResponse);
 			}
@@ -155,10 +155,9 @@ public class DeleteWorkflowInstanceMVCActionCommand
 		long userId = GetterUtil.getLong(
 			workflowContext.get(WorkflowConstants.CONTEXT_USER_ID));
 
-		long validUserId = _portal.getValidUserId(companyId, userId);
-
 		workflowContext.put(
-			WorkflowConstants.CONTEXT_USER_ID, String.valueOf(validUserId));
+			WorkflowConstants.CONTEXT_USER_ID,
+			String.valueOf(_portal.getValidUserId(companyId, userId)));
 	}
 
 	@Reference

@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = ReleasePublisher.class)
 public final class ReleasePublisher {
 
-	public void publish(Release release) {
+	public void publish(Release release, boolean initialRelease) {
 		ServiceRegistration<Release> oldServiceRegistration =
 			_serviceConfiguratorRegistrations.get(
 				release.getServletContextName());
@@ -56,6 +56,7 @@ public final class ReleasePublisher {
 
 		properties.put(
 			"release.bundle.symbolic.name", release.getBundleSymbolicName());
+		properties.put("release.initial", initialRelease);
 		properties.put("release.state", release.getState());
 
 		try {
@@ -83,7 +84,7 @@ public final class ReleasePublisher {
 	public void publishInProgress(Release release) {
 		release.setState(_STATE_IN_PROGRESS);
 
-		publish(release);
+		publish(release, false);
 	}
 
 	@Activate
@@ -94,7 +95,7 @@ public final class ReleasePublisher {
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		for (Release release : releases) {
-			publish(release);
+			publish(release, false);
 		}
 	}
 

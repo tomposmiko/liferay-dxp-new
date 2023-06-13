@@ -17,6 +17,8 @@ package com.liferay.headless.admin.workflow.client.dto.v1_0;
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.ChangeTransitionSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ChangeTransition {
+public class ChangeTransition implements Cloneable, Serializable {
+
+	public static ChangeTransition toDTO(String json) {
+		return ChangeTransitionSerDes.toDTO(json);
+	}
 
 	public String getComment() {
 		return comment;
@@ -69,6 +75,32 @@ public class ChangeTransition {
 	}
 
 	protected String transitionName;
+
+	public Long getWorkflowTaskId() {
+		return workflowTaskId;
+	}
+
+	public void setWorkflowTaskId(Long workflowTaskId) {
+		this.workflowTaskId = workflowTaskId;
+	}
+
+	public void setWorkflowTaskId(
+		UnsafeSupplier<Long, Exception> workflowTaskIdUnsafeSupplier) {
+
+		try {
+			workflowTaskId = workflowTaskIdUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Long workflowTaskId;
+
+	@Override
+	public ChangeTransition clone() throws CloneNotSupportedException {
+		return (ChangeTransition)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

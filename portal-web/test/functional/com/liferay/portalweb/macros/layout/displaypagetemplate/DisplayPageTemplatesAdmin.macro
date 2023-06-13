@@ -2,21 +2,21 @@ definition {
 
 	@summary = "Select a content type and subtype when adding a display page. These locators should not be needed to be reused."
 	macro _selectMappingTypes {
-		if (!(isSet(contentType))) {
-			var contentType = "Web Content Article";
+		if (isSet(contentType)) {
+			Select(
+				locator1 = "//div[contains(.,'Content Type')]/select",
+				value1 = "${contentType}");
 		}
 
-		if (!(isSet(subType))) {
-			var subType = "Basic Web Content";
+		if (isSet(subType)) {
+			WaitForElementPresent(
+				locator1 = "//div[contains(.,'Subtype')]/select",
+				value1 = "${subType}");
+
+			Select(
+				locator1 = "//div[contains(.,'Subtype')]/select",
+				value1 = "${subType}");
 		}
-
-		Select(
-			locator1 = "//div[contains(.,'Content Type')]/select",
-			value1 = "${contentType}");
-
-		Select(
-			locator1 = "//div[contains(.,'Subtype')]/select",
-			value1 = "${subType}");
 	}
 
 	macro addDisplayPage {
@@ -48,6 +48,8 @@ definition {
 
 	macro gotoDisplayPage {
 		LexiconCard.clickCardTitle(card = "${displayPageName}");
+
+		PageEditor.assertFragmentSidebarLoaded();
 	}
 
 	macro gotoDisplayPageEllipsisItem {
@@ -58,6 +60,26 @@ definition {
 			item = "${item}");
 	}
 
+	macro importDisplayPageTemplateFromTempFolder {
+		Click.waitForMenuToggleJSClick(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
+
+		MenuItem.click(menuItem = "Import");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		var displayPageTemplateZipFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "display-page-template-*.zip");
+
+		UploadTempFile(
+			locator1 = "TextInput#FILE",
+			value1 = "${displayPageTemplateZipFileName}");
+
+		Button.clickImport();
+
+		Alert.viewSuccessMessage();
+
+		IFrame.closeFrame();
+	}
+
 	macro markDisplayPageAsDefault {
 		DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
 			displayPageName = "${displayPageName}",
@@ -65,11 +87,11 @@ definition {
 
 		AssertVisible(
 			key_card = "${displayPageName}",
-			locator1 = "LexiconCard#CARD_STICKER");
+			locator1 = "Card#CARD_STICKER");
 	}
 
 	macro openDisplayPagesAdmin {
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_layout_page_template_admin_web_portlet_LayoutPageTemplatesPortlet&amp;_com_liferay_layout_page_template_admin_web_portlet_LayoutPageTemplatesPortlet_tabs1=display-page-templates");
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_layout_page_template_admin_web_portlet_LayoutPageTemplatesPortlet&_com_liferay_layout_page_template_admin_web_portlet_LayoutPageTemplatesPortlet_tabs1=display-page-templates");
 	}
 
 	macro renameDisplayPage {

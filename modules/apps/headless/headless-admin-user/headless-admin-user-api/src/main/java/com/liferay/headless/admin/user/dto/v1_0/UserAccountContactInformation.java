@@ -20,10 +20,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
+import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.io.Serializable;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -41,10 +45,23 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("UserAccountContactInformation")
+@GraphQLName(
+	description = "The user's contact information.",
+	value = "UserAccountContactInformation"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "UserAccountContactInformation")
-public class UserAccountContactInformation {
+public class UserAccountContactInformation implements Serializable {
+
+	public static UserAccountContactInformation toDTO(String json) {
+		return ObjectMapperUtil.readValue(
+			UserAccountContactInformation.class, json);
+	}
+
+	public static UserAccountContactInformation unsafeToDTO(String json) {
+		return ObjectMapperUtil.unsafeReadValue(
+			UserAccountContactInformation.class, json);
+	}
 
 	@Schema(
 		description = "A list of the user's email addresses, with one optionally marked as primary."
@@ -77,7 +94,7 @@ public class UserAccountContactInformation {
 	@GraphQLField(
 		description = "A list of the user's email addresses, with one optionally marked as primary."
 	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected EmailAddress[] emailAddresses;
 
 	@Schema(description = "The user's Facebook account.")
@@ -105,7 +122,7 @@ public class UserAccountContactInformation {
 	}
 
 	@GraphQLField(description = "The user's Facebook account.")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String facebook;
 
 	@Schema(description = "The ID of the `contactInformation`.")
@@ -159,7 +176,7 @@ public class UserAccountContactInformation {
 	}
 
 	@GraphQLField(description = "The user's Jabber handle.")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String jabber;
 
 	@Schema(
@@ -193,7 +210,7 @@ public class UserAccountContactInformation {
 	@GraphQLField(
 		description = "A list of user's postal addresses, with one optionally marked as primary."
 	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected PostalAddress[] postalAddresses;
 
 	@Schema(description = "The user's Skype handle.")
@@ -221,7 +238,7 @@ public class UserAccountContactInformation {
 	}
 
 	@GraphQLField(description = "The user's Skype handle.")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String skype;
 
 	@Schema(description = "The user's SMS number.")
@@ -247,7 +264,7 @@ public class UserAccountContactInformation {
 	}
 
 	@GraphQLField(description = "The user's SMS number.")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String sms;
 
 	@Schema(
@@ -280,7 +297,7 @@ public class UserAccountContactInformation {
 	@GraphQLField(
 		description = "A list of the user's phone numbers, with one optionally marked as primary."
 	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Phone[] telephones;
 
 	@Schema(description = "The user's Twitter handle.")
@@ -308,7 +325,7 @@ public class UserAccountContactInformation {
 	}
 
 	@GraphQLField(description = "The user's Twitter handle.")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String twitter;
 
 	@Schema(
@@ -341,7 +358,7 @@ public class UserAccountContactInformation {
 	@GraphQLField(
 		description = "A list of the user's web URLs, with one optionally marked as primary."
 	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected WebUrl[] webUrls;
 
 	@Override
@@ -539,15 +556,26 @@ public class UserAccountContactInformation {
 	}
 
 	@Schema(
+		accessMode = Schema.AccessMode.READ_ONLY,
 		defaultValue = "com.liferay.headless.admin.user.dto.v1_0.UserAccountContactInformation",
 		name = "x-class-name"
 	)
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		String string = String.valueOf(object);
+		return StringUtil.replace(
+			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
+			_JSON_ESCAPE_STRINGS[1]);
+	}
 
-		return string.replaceAll("\"", "\\\\\"");
+	private static boolean _isArray(Object value) {
+		if (value == null) {
+			return false;
+		}
+
+		Class<?> clazz = value.getClass();
+
+		return clazz.isArray();
 	}
 
 	private static String _toJSON(Map<String, ?> map) {
@@ -563,14 +591,47 @@ public class UserAccountContactInformation {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(entry.getKey());
-			sb.append("\":");
-			sb.append("\"");
-			sb.append(entry.getValue());
-			sb.append("\"");
+			sb.append(_escape(entry.getKey()));
+			sb.append("\": ");
+
+			Object value = entry.getValue();
+
+			if (_isArray(value)) {
+				sb.append("[");
+
+				Object[] valueArray = (Object[])value;
+
+				for (int i = 0; i < valueArray.length; i++) {
+					if (valueArray[i] instanceof String) {
+						sb.append("\"");
+						sb.append(valueArray[i]);
+						sb.append("\"");
+					}
+					else {
+						sb.append(valueArray[i]);
+					}
+
+					if ((i + 1) < valueArray.length) {
+						sb.append(", ");
+					}
+				}
+
+				sb.append("]");
+			}
+			else if (value instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)value));
+			}
+			else if (value instanceof String) {
+				sb.append("\"");
+				sb.append(_escape(value));
+				sb.append("\"");
+			}
+			else {
+				sb.append(value);
+			}
 
 			if (iterator.hasNext()) {
-				sb.append(",");
+				sb.append(", ");
 			}
 		}
 
@@ -578,5 +639,10 @@ public class UserAccountContactInformation {
 
 		return sb.toString();
 	}
+
+	private static final String[][] _JSON_ESCAPE_STRINGS = {
+		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
+		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
+	};
 
 }

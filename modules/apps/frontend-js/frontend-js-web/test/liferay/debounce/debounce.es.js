@@ -14,7 +14,7 @@
 
 import {
 	cancelDebounce,
-	debounce
+	debounce,
 } from '../../../src/main/resources/META-INF/resources/liferay/debounce/debounce.es';
 
 describe('debounce', () => {
@@ -47,7 +47,7 @@ describe('debounce', () => {
 		const expectedContext = {};
 		let context;
 
-		const fn = function() {
+		const fn = function () {
 			context = this;
 		};
 

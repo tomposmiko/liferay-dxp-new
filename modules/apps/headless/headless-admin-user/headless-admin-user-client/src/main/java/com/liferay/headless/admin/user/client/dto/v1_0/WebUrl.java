@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.WebUrlSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class WebUrl {
+public class WebUrl implements Cloneable, Serializable {
+
+	public static WebUrl toDTO(String json) {
+		return WebUrlSerDes.toDTO(json);
+	}
 
 	public Long getId() {
 		return id;
@@ -107,6 +113,11 @@ public class WebUrl {
 	}
 
 	protected String urlType;
+
+	@Override
+	public WebUrl clone() throws CloneNotSupportedException {
+		return (WebUrl)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

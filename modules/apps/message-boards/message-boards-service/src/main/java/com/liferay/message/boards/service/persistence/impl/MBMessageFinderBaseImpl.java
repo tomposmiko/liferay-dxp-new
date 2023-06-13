@@ -59,7 +59,6 @@ public abstract class MBMessageFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -85,14 +84,5 @@ public abstract class MBMessageFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		MBMessageFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(MBPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

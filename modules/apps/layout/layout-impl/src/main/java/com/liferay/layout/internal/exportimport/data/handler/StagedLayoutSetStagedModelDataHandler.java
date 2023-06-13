@@ -14,6 +14,7 @@
 
 package com.liferay.layout.internal.exportimport.data.handler;
 
+import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
@@ -30,6 +31,7 @@ import com.liferay.exportimport.lar.ThemeExporter;
 import com.liferay.exportimport.lar.ThemeImporter;
 import com.liferay.layout.internal.exportimport.staged.model.repository.StagedLayoutSetStagedModelRepository;
 import com.liferay.layout.set.model.adapter.StagedLayoutSet;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -41,6 +43,8 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.model.StagedModel;
+import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.model.ThemeSetting;
 import com.liferay.portal.kernel.model.adapter.ModelAdapterUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ImageLocalService;
@@ -60,6 +64,7 @@ import com.liferay.portal.kernel.util.ThemeFactoryUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.model.impl.ThemeSettingImpl;
 import com.liferay.portal.service.impl.LayoutLocalServiceHelper;
 import com.liferay.sites.kernel.util.Sites;
 import com.liferay.sites.kernel.util.SitesUtil;
@@ -72,6 +77,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -234,9 +240,11 @@ public class StagedLayoutSetStagedModelDataHandler
 			portletDataContext.getParameterMap(),
 			PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_SETTINGS);
 
+		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
+
 		if (!layoutSetPrototypeSettings) {
-			stagedLayoutSet.setLayoutSetPrototypeUuid(StringPool.BLANK);
-			stagedLayoutSet.setLayoutSetPrototypeLinkEnabled(false);
+			layoutSet.setLayoutSetPrototypeUuid(StringPool.BLANK);
+			layoutSet.setLayoutSetPrototypeLinkEnabled(false);
 		}
 
 		// Layout set settings
@@ -246,7 +254,7 @@ public class StagedLayoutSetStagedModelDataHandler
 			PortletDataHandlerKeys.LAYOUT_SET_SETTINGS);
 
 		if (!layoutSetSettings) {
-			stagedLayoutSet.setSettings(StringPool.BLANK);
+			layoutSet.setSettings(StringPool.BLANK);
 		}
 
 		// Serialization
@@ -256,10 +264,10 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		// Last publish date must not be exported
 
-		UnicodeProperties settingsProperties =
-			stagedLayoutSet.getSettingsProperties();
+		UnicodeProperties settingsUnicodeProperties =
+			layoutSet.getSettingsProperties();
 
-		settingsProperties.remove("last-publish-date");
+		settingsUnicodeProperties.remove("last-publish-date");
 
 		// Page versioning
 
@@ -293,12 +301,14 @@ public class StagedLayoutSetStagedModelDataHandler
 			StagedLayoutSet stagedLayoutSet)
 		throws Exception {
 
+		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
+
 		Optional<StagedLayoutSet> existingLayoutSetOptional =
 			_stagedLayoutSetStagedModelRepository.fetchExistingLayoutSet(
 				portletDataContext.getScopeGroupId(),
-				stagedLayoutSet.isPrivateLayout());
+				layoutSet.isPrivateLayout());
 
-		stagedLayoutSet.setPrivateLayout(portletDataContext.isPrivateLayout());
+		layoutSet.setPrivateLayout(portletDataContext.isPrivateLayout());
 
 		StagedLayoutSet importedStagedLayoutSet =
 			(StagedLayoutSet)stagedLayoutSet.clone();
@@ -316,9 +326,16 @@ public class StagedLayoutSetStagedModelDataHandler
 				PortletDataHandlerKeys.
 					LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
 
-			StagedLayoutSet existingLayoutSet = existingLayoutSetOptional.get();
+			StagedLayoutSet existingStagedLayoutSet =
+				existingLayoutSetOptional.get();
 
-			importedStagedLayoutSet.setLayoutSetId(
+			LayoutSet existingLayoutSet =
+				existingStagedLayoutSet.getLayoutSet();
+
+			LayoutSet importedLayoutSet =
+				importedStagedLayoutSet.getLayoutSet();
+
+			importedLayoutSet.setLayoutSetId(
 				existingLayoutSet.getLayoutSetId());
 
 			importedStagedLayoutSet =
@@ -347,17 +364,18 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		checkLayoutSetPrototypeLayouts(portletDataContext, modifiedLayouts);
 
-		// Show site name
-
-		updateShowSiteName(portletDataContext, importedStagedLayoutSet);
-
-		// Show search header
-
-		updateShowSearchHeader(portletDataContext, importedStagedLayoutSet);
+		updateLayoutSetSettingsProperties(
+			portletDataContext, importedStagedLayoutSet);
 
 		// Last merge time
 
-		updateLastMergeTime(portletDataContext, modifiedLayouts);
+		LayoutSet importedLayoutSet = importedStagedLayoutSet.getLayoutSet();
+
+		Group group = importedLayoutSet.getGroup();
+
+		if (!group.isLayoutSetPrototype()) {
+			updateLastMergeTime(portletDataContext, modifiedLayouts);
+		}
 
 		// Page priorities
 
@@ -382,7 +400,9 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		long[] layoutIds = portletDataContext.getLayoutIds();
 
-		Group group = stagedLayoutSet.getGroup();
+		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
+
+		Group group = layoutSet.getGroup();
 
 		if (group.isLayoutPrototype()) {
 			layoutIds = _exportImportHelper.getAllLayoutIds(
@@ -438,8 +458,10 @@ public class StagedLayoutSetStagedModelDataHandler
 		boolean logo = MapUtil.getBoolean(
 			portletDataContext.getParameterMap(), PortletDataHandlerKeys.LOGO);
 
+		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
+
 		if (!logo) {
-			stagedLayoutSet.setLogoId(0);
+			layoutSet.setLogoId(0);
 
 			return;
 		}
@@ -469,14 +491,13 @@ public class StagedLayoutSetStagedModelDataHandler
 		}
 		else {
 			try {
-				image = _imageLocalService.getImage(
-					stagedLayoutSet.getLogoId());
+				image = _imageLocalService.getImage(layoutSet.getLogoId());
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Unable to get logo for layout set " +
-							stagedLayoutSet.getLayoutSetId(),
+							layoutSet.getLayoutSetId(),
 						portalException);
 				}
 			}
@@ -498,23 +519,34 @@ public class StagedLayoutSetStagedModelDataHandler
 	}
 
 	protected void exportTheme(
-		PortletDataContext portletDataContext,
-		StagedLayoutSet stagedLayoutSet) {
+			PortletDataContext portletDataContext,
+			StagedLayoutSet stagedLayoutSet)
+		throws Exception {
 
 		boolean exportThemeSettings = MapUtil.getBoolean(
 			portletDataContext.getParameterMap(),
 			PortletDataHandlerKeys.THEME_REFERENCE);
 
+		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
+
 		if (!exportThemeSettings) {
-			stagedLayoutSet.setColorSchemeId(
-				ColorSchemeFactoryUtil.getDefaultRegularColorSchemeId());
-			stagedLayoutSet.setCss(StringPool.BLANK);
-			stagedLayoutSet.setThemeId(
+			layoutSet.setThemeId(
 				ThemeFactoryUtil.getDefaultRegularThemeId(
 					stagedLayoutSet.getCompanyId()));
+			layoutSet.setColorSchemeId(
+				ColorSchemeFactoryUtil.getDefaultRegularColorSchemeId());
+			layoutSet.setCss(StringPool.BLANK);
 
 			return;
 		}
+
+		String css =
+			_dlReferencesExportImportContentProcessor.
+				replaceExportContentReferences(
+					portletDataContext, stagedLayoutSet, layoutSet.getCss(),
+					true, false);
+
+		layoutSet.setCss(css);
 
 		long layoutSetBranchId = MapUtil.getLong(
 			portletDataContext.getParameterMap(), "layoutSetBranchId");
@@ -538,13 +570,13 @@ public class StagedLayoutSetStagedModelDataHandler
 		}
 		else {
 			try {
-				_themeExporter.exportTheme(portletDataContext, stagedLayoutSet);
+				_themeExporter.exportTheme(portletDataContext, layoutSet);
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Unable to export theme reference for layout set " +
-							stagedLayoutSet.getLayoutSetId(),
+							layoutSet.getLayoutSetId(),
 						exception);
 				}
 			}
@@ -619,14 +651,24 @@ public class StagedLayoutSetStagedModelDataHandler
 		PortletDataContext portletDataContext,
 		StagedLayoutSet stagedLayoutSet) {
 
+		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
+
 		try {
-			_themeImporter.importTheme(portletDataContext, stagedLayoutSet);
+			String css =
+				_dlReferencesExportImportContentProcessor.
+					replaceImportContentReferences(
+						portletDataContext, stagedLayoutSet,
+						layoutSet.getCss());
+
+			layoutSet.setCss(css);
+
+			_themeImporter.importTheme(portletDataContext, layoutSet);
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to import theme reference " +
-						stagedLayoutSet.getThemeId(),
+						layoutSet.getThemeId(),
 					exception);
 			}
 		}
@@ -677,10 +719,10 @@ public class StagedLayoutSetStagedModelDataHandler
 				continue;
 			}
 
-			UnicodeProperties typeSettingsProperties =
+			UnicodeProperties typeSettingsUnicodeProperties =
 				layout.getTypeSettingsProperties();
 
-			typeSettingsProperties.setProperty(
+			typeSettingsUnicodeProperties.setProperty(
 				Sites.LAST_MERGE_TIME, String.valueOf(lastMergeTime));
 
 			_layoutLocalService.updateLayout(layout);
@@ -694,18 +736,19 @@ public class StagedLayoutSetStagedModelDataHandler
 			portletDataContext.getGroupId(),
 			portletDataContext.isPrivateLayout());
 
-		UnicodeProperties settingsProperties =
+		UnicodeProperties settingsUnicodeProperties =
 			layoutSet.getSettingsProperties();
 
-		String mergeFailFriendlyURLLayouts = settingsProperties.getProperty(
-			Sites.MERGE_FAIL_FRIENDLY_URL_LAYOUTS);
+		settingsUnicodeProperties.setProperty(
+			Sites.LAST_MERGE_TIME, String.valueOf(lastMergeTime));
 
-		if (Validator.isNull(mergeFailFriendlyURLLayouts)) {
-			settingsProperties.setProperty(
-				Sites.LAST_MERGE_TIME, String.valueOf(lastMergeTime));
+		long lastMergeVersion = MapUtil.getLong(
+			portletDataContext.getParameterMap(), "lastMergeVersion");
 
-			_layoutSetLocalService.updateLayoutSet(layoutSet);
-		}
+		settingsUnicodeProperties.setProperty(
+			Sites.LAST_MERGE_VERSION, String.valueOf(lastMergeVersion));
+
+		_layoutSetLocalService.updateLayoutSet(layoutSet);
 	}
 
 	protected void updateLayoutPriorities(
@@ -749,8 +792,14 @@ public class StagedLayoutSetStagedModelDataHandler
 			if (action.equals(Constants.SKIP) ||
 				hasSkippedSiblingLayout(layoutElement, siblingActionsMap)) {
 
-				// We do not want to update priorities if there are elements at
-				// the same level of the page hierarchy with the SKIP action
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						StringBundler.concat(
+							"Do not update priority for layout ",
+							layoutElement.attributeValue("uuid"),
+							" because there are elements at the same level of ",
+							"the page hierarchy with the SKIP action"));
+				}
 
 				continue;
 			}
@@ -761,10 +810,16 @@ public class StagedLayoutSetStagedModelDataHandler
 
 				Layout layout = layouts.get(layoutId);
 
-				// Layout might not have been imported due to a controlled
-				// error. See SitesImpl#addMergeFailFriendlyURLLayout.
-
 				if (layout == null) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							StringBundler.concat(
+								"Layout ", layoutElement.attributeValue("uuid"),
+								" might not have been imported due to a ",
+								"controlled error. See ",
+								"SitesImpl#addMergeFailFriendlyURLLayout."));
+					}
+
 					continue;
 				}
 
@@ -787,7 +842,21 @@ public class StagedLayoutSetStagedModelDataHandler
 		for (long plid : updatedPlids) {
 			Layout layout = _layoutLocalService.fetchLayout(plid);
 
-			layout.setPriority(layoutPriorities.get(plid));
+			int newLayoutPriority = layoutPriorities.get(plid);
+
+			if (layout.getPriority() == newLayoutPriority) {
+				continue;
+			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Updated priority for layout ", layout.getUuid(),
+						" from ", layout.getPriority(), " to ",
+						newLayoutPriority));
+			}
+
+			layout.setPriority(newLayoutPriority);
 
 			_layoutLocalService.updateLayout(layout);
 
@@ -816,7 +885,7 @@ public class StagedLayoutSetStagedModelDataHandler
 		}
 	}
 
-	protected void updateShowSearchHeader(
+	protected void updateLayoutSetSettingsProperties(
 			PortletDataContext portletDataContext,
 			StagedLayoutSet importedLayoutSet)
 		throws PortalException {
@@ -825,67 +894,71 @@ public class StagedLayoutSetStagedModelDataHandler
 			portletDataContext.getGroupId(),
 			portletDataContext.isPrivateLayout());
 
-		UnicodeProperties settingsProperties =
+		UnicodeProperties settingsUnicodeProperties =
 			layoutSet.getSettingsProperties();
 
-		String mergeFailFriendlyURLLayouts = settingsProperties.getProperty(
-			Sites.MERGE_FAIL_FRIENDLY_URL_LAYOUTS);
+		String mergeFailFriendlyURLLayouts =
+			settingsUnicodeProperties.getProperty(
+				Sites.MERGE_FAIL_FRIENDLY_URL_LAYOUTS);
 
 		if (Validator.isNull(mergeFailFriendlyURLLayouts)) {
-			UnicodeProperties importedSettingsProperties =
-				importedLayoutSet.getSettingsProperties();
+			boolean changed = false;
 
-			boolean showSearchHeader = GetterUtil.getBoolean(
-				settingsProperties.getProperty(
-					"lfr-theme:regular:show-header-search"),
-				true);
+			LayoutSet stagedLayoutSet = importedLayoutSet.getLayoutSet();
 
-			boolean importedShowSearchHeader = GetterUtil.getBoolean(
-				importedSettingsProperties.getProperty(
-					"lfr-theme:regular:show-header-search"),
-				true);
+			UnicodeProperties importedSettingsUnicodeProperties =
+				stagedLayoutSet.getSettingsProperties();
 
-			if (showSearchHeader != importedShowSearchHeader) {
-				settingsProperties.setProperty(
-					"lfr-theme:regular:show-header-search",
-					String.valueOf(importedShowSearchHeader));
+			Theme importedTheme = stagedLayoutSet.getTheme();
 
-				_layoutSetLocalService.updateLayoutSet(layoutSet);
+			Map<String, ThemeSetting> themeSettings =
+				importedTheme.getConfigurableSettings();
+
+			Set<Map.Entry<String, ThemeSetting>> themeSettingsEntries =
+				themeSettings.entrySet();
+
+			Stream<Map.Entry<String, ThemeSetting>> themeSettingsEntriesStream =
+				themeSettingsEntries.stream();
+
+			Map<String, String> defaultsMap =
+				themeSettingsEntriesStream.collect(
+					Collectors.toMap(
+						entry -> ThemeSettingImpl.namespaceProperty(
+							"regular", entry.getKey()),
+						entry -> {
+							ThemeSetting themeSetting = entry.getValue();
+
+							return themeSetting.getValue();
+						}));
+
+			defaultsMap.put(Sites.SHOW_SITE_NAME, Boolean.TRUE.toString());
+			defaultsMap.put("javascript", null);
+
+			for (Map.Entry<String, String> entry : defaultsMap.entrySet()) {
+				String propertyKey = entry.getKey();
+				String defaultValue = entry.getValue();
+
+				String currentValue = settingsUnicodeProperties.getProperty(
+					propertyKey, defaultValue);
+
+				String importedValue =
+					importedSettingsUnicodeProperties.getProperty(
+						propertyKey, defaultValue);
+
+				if (!Objects.equals(currentValue, importedValue)) {
+					if (Objects.equals(defaultValue, importedValue)) {
+						settingsUnicodeProperties.remove(propertyKey);
+					}
+					else {
+						settingsUnicodeProperties.setProperty(
+							propertyKey, importedValue);
+					}
+
+					changed = true;
+				}
 			}
-		}
-	}
 
-	protected void updateShowSiteName(
-			PortletDataContext portletDataContext,
-			StagedLayoutSet importedLayoutSet)
-		throws PortalException {
-
-		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
-			portletDataContext.getGroupId(),
-			portletDataContext.isPrivateLayout());
-
-		UnicodeProperties settingsProperties =
-			layoutSet.getSettingsProperties();
-
-		String mergeFailFriendlyURLLayouts = settingsProperties.getProperty(
-			Sites.MERGE_FAIL_FRIENDLY_URL_LAYOUTS);
-
-		if (Validator.isNull(mergeFailFriendlyURLLayouts)) {
-			UnicodeProperties importedSettingsProperties =
-				importedLayoutSet.getSettingsProperties();
-
-			boolean showSiteName = GetterUtil.getBoolean(
-				settingsProperties.getProperty(
-					Sites.SHOW_SITE_NAME, Boolean.TRUE.toString()));
-
-			boolean importedShowSiteName = GetterUtil.getBoolean(
-				importedSettingsProperties.getProperty(
-					Sites.SHOW_SITE_NAME, Boolean.TRUE.toString()));
-
-			if (showSiteName != importedShowSiteName) {
-				settingsProperties.setProperty(
-					Sites.SHOW_SITE_NAME, String.valueOf(importedShowSiteName));
-
+			if (changed) {
 				_layoutSetLocalService.updateLayoutSet(layoutSet);
 			}
 		}
@@ -893,6 +966,10 @@ public class StagedLayoutSetStagedModelDataHandler
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagedLayoutSetStagedModelDataHandler.class);
+
+	@Reference(target = "(content.processor.type=DLReferences)")
+	private ExportImportContentProcessor<String>
+		_dlReferencesExportImportContentProcessor;
 
 	@Reference
 	private ExportImportHelper _exportImportHelper;

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
@@ -105,13 +106,13 @@ public class ListUtil {
 
 		Set<E> set = new HashSet<>();
 
-		Iterator<? extends E> itr = list.iterator();
+		Iterator<? extends E> iterator = list.iterator();
 
-		while (itr.hasNext()) {
-			E obj = itr.next();
+		while (iterator.hasNext()) {
+			E object = iterator.next();
 
-			if (!set.add(obj)) {
-				itr.remove();
+			if (!set.add(object)) {
+				iterator.remove();
 			}
 		}
 
@@ -282,13 +283,15 @@ public class ListUtil {
 		return list;
 	}
 
-	public static <E> List<E> fromEnumeration(Enumeration<? extends E> enu) {
+	public static <E> List<E> fromEnumeration(
+		Enumeration<? extends E> enumeration) {
+
 		List<E> list = new ArrayList<>();
 
-		while (enu.hasMoreElements()) {
-			E obj = enu.nextElement();
+		while (enumeration.hasMoreElements()) {
+			E object = enumeration.nextElement();
 
-			list.add(obj);
+			list.add(object);
 		}
 
 		return list;
@@ -695,7 +698,7 @@ public class ListUtil {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(2 * list.size() - 1);
+		StringBundler sb = new StringBundler((2 * list.size()) - 1);
 
 		for (int i = 0; i < list.size(); i++) {
 			T bean = list.get(i);
@@ -731,7 +734,7 @@ public class ListUtil {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(2 * list.size() - 1);
+		StringBundler sb = new StringBundler((2 * list.size()) - 1);
 
 		for (int i = 0; i < list.size(); i++) {
 			Object bean = list.get(i);

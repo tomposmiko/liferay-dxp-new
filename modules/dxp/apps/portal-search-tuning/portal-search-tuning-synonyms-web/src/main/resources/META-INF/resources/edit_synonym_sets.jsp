@@ -35,7 +35,7 @@ portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(editSynonymSetsDisplayContext.getBackURL());
 %>
 
-<portlet:actionURL name="editSynonymSet" var="editSynonymSetURL">
+<portlet:actionURL name="/synonyms/edit_synonym_sets" var="editSynonymSetURL">
 	<portlet:param name="mvcPath" value="/view_synonym_sets.jsp" />
 </portlet:actionURL>
 
@@ -51,8 +51,8 @@ portletDisplay.setURLBack(editSynonymSetsDisplayContext.getBackURL());
 		<span aria-hidden="true" class="loading-animation"></span>
 
 		<react:component
-			data="<%= editSynonymSetsDisplayContext.getData() %>"
 			module="js/SynonymSetsApp.es"
+			props="<%= editSynonymSetsDisplayContext.getData() %>"
 		/>
 	</liferay-frontend:edit-form-body>
 </liferay-frontend:edit-form>

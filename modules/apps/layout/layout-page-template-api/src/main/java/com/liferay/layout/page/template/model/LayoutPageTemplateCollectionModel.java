@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedGroupedModel;
+import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -37,7 +38,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface LayoutPageTemplateCollectionModel
-	extends BaseModel<LayoutPageTemplateCollection>, MVCCModel, ShardedModel,
+	extends BaseModel<LayoutPageTemplateCollection>,
+			CTModel<LayoutPageTemplateCollection>, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
 	/*
@@ -51,6 +53,7 @@ public interface LayoutPageTemplateCollectionModel
 	 *
 	 * @return the primary key of this layout page template collection
 	 */
+	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -58,6 +61,7 @@ public interface LayoutPageTemplateCollectionModel
 	 *
 	 * @param primaryKey the primary key of this layout page template collection
 	 */
+	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -75,6 +79,22 @@ public interface LayoutPageTemplateCollectionModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
+
+	/**
+	 * Returns the ct collection ID of this layout page template collection.
+	 *
+	 * @return the ct collection ID of this layout page template collection
+	 */
+	@Override
+	public long getCtCollectionId();
+
+	/**
+	 * Sets the ct collection ID of this layout page template collection.
+	 *
+	 * @param ctCollectionId the ct collection ID of this layout page template collection
+	 */
+	@Override
+	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this layout page template collection.
@@ -220,6 +240,22 @@ public interface LayoutPageTemplateCollectionModel
 	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate);
+
+	/**
+	 * Returns the layout page template collection key of this layout page template collection.
+	 *
+	 * @return the layout page template collection key of this layout page template collection
+	 */
+	@AutoEscape
+	public String getLayoutPageTemplateCollectionKey();
+
+	/**
+	 * Sets the layout page template collection key of this layout page template collection.
+	 *
+	 * @param layoutPageTemplateCollectionKey the layout page template collection key of this layout page template collection
+	 */
+	public void setLayoutPageTemplateCollectionKey(
+		String layoutPageTemplateCollectionKey);
 
 	/**
 	 * Returns the name of this layout page template collection.

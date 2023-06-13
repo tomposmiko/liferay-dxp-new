@@ -6,6 +6,7 @@
 /development/appium.jar
 /development/catalina.jar
 /development/com.liferay.jenkins.results.parser.jar
+/development/com.liferay.poshi.core.jar
 /development/db2jcc.jar
 /development/db2jcc_license_cu.jar
 /development/deployment.jar
@@ -73,6 +74,7 @@
 /development/tlddoc.jar
 /development/tomcat-api.jar
 /development/tomcat-coyote.jar
+/development/tomcat-util-scan.jar
 /development/tomcat-util.jar
 /development/velocity.jar
 /development/velocity-tools.jar
@@ -118,8 +120,8 @@
 /portal/commons-discovery.jar
 /portal/commons-exec.jar
 /portal/commons-fileupload.jar
-/portal/commons-httpclient.jar
 /portal/commons-io.jar
+/portal/commons-lang3.jar
 /portal/commons-lang.jar
 /portal/commons-logging.jar
 /portal/commons-math3.jar
@@ -128,6 +130,7 @@
 /portal/commons-validator.jar
 /portal/concurrent.jar
 /portal/crypt.jar
+/portal/curvesapi.jar
 /portal/daisydiff.jar
 /portal/displaytag.jar
 /portal/dom4j.jar
@@ -173,6 +176,7 @@
 /portal/jcl-over-slf4j.jar
 /portal/jcommon.jar
 /portal/jdom.jar
+/portal/jdom2.jar
 /portal/jempbox.jar
 /portal/jena.jar
 /portal/jericho-html.jar
@@ -201,7 +205,6 @@
 /portal/jws-api.jar
 /portal/kxml2.jar
 /portal/liferay-icu4j.jar
-/portal/log4j.jar
 /portal/log4j-extras.jar
 /portal/mchange-commons-java.jar
 /portal/metadata-extractor.jar
@@ -209,9 +212,17 @@
 /portal/mime4j-dom.jar
 /portal/mimepull.jar
 /portal/monte-cc.jar
+/portal/mp4parser.jar
 /portal/nekohtml.jar
 /portal/netcdf.jar
 /portal/netty-all.jar
+/portal/netty-buffer.jar
+/portal/netty-codec.jar
+/portal/netty-codec-http.jar
+/portal/netty-common.jar
+/portal/netty-handler.jar
+/portal/netty-resolver.jar
+/portal/netty-transport.jar
 /portal/ridl.jar
 /portal/odmg.jar
 /portal/oro.jar
@@ -222,9 +233,11 @@
 /portal/poi.jar
 /portal/portletmvc4spring-framework.jar
 /portal/rdffilter.jar
+/portal/reload4j.jar
 /portal/rhino.jar
 /portal/rmi-api.jar
 /portal/rome.jar
+/portal/rometools-utils.jar
 /portal/rometools.jar
 /portal/saaj-api.jar
 /portal/saaj-impl.jar
@@ -234,6 +247,7 @@
 /portal/slf4j-api.jar
 /portal/soap.jar
 /portal/soap-api.jar
+/portal/sparse-bit-set.jar
 /portal/spring-aop.jar
 /portal/spring-aspects.jar
 /portal/spring-beans.jar
@@ -258,7 +272,6 @@
 /portal/tomcat-jdbc.jar
 /portal/tomcat-juli.jar
 /portal/transaction.jar
-/portal/truezip.jar
 /portal/unoil.jar
 /portal/urlrewritefilter.jar
 /portal/vorbis-java-core.jar

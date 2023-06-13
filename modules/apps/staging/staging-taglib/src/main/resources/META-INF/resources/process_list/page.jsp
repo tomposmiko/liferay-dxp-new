@@ -16,7 +16,7 @@
 
 <%@ include file="/process_list/init.jsp" %>
 
-<portlet:actionURL name="deleteBackgroundTasks" var="deleteBackgroundTasksURL">
+<portlet:actionURL name="/staging_processes/delete_background_tasks" var="deleteBackgroundTasksURL">
 	<portlet:param name="redirect" value="<%= currentURL.toString() %>" />
 </portlet:actionURL>
 
@@ -164,7 +164,7 @@
 					deleteMenu="<%= deleteMenu %>"
 					localPublishing="<%= localPublishing %>"
 					relaunchMenu="<%= relaunchMenu %>"
-					summaryMenu="<%= summaryMenu %>"
+					summaryMenu="<%= summaryMenu && !(backgroundTask.getStatus() == BackgroundTaskConstants.STATUS_FAILED) %>"
 				/>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
@@ -185,7 +185,7 @@
 	function <portlet:namespace />deleteEntries() {
 		if (
 			confirm(
-				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries") %>'
+				'<%= UnicodeLanguageUtil.get(request, "staging-are-you-sure-you-want-to-delete-the-selected-entries") %>'
 			)
 		) {
 			var form = document.<portlet:namespace />fm;
@@ -196,8 +196,8 @@
 					deleteBackgroundTaskIds: Liferay.Util.listCheckedExcept(
 						form,
 						'<portlet:namespace />allRowIds'
-					)
-				}
+					),
+				},
 			});
 		}
 	}

@@ -54,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
-		"mvc.command.name=publishFormInstance"
+		"mvc.command.name=/dynamic_data_mapping_form/publish_form_instance"
 	},
 	service = MVCActionCommand.class
 )
@@ -150,10 +150,24 @@ public class PublishFormInstanceMVCActionCommand
 			_portal.getCompanyId(actionRequest), RoleConstants.GUEST);
 
 		ResourcePermission resourcePermission =
-			_resourcePermissionLocalService.getResourcePermission(
+			_resourcePermissionLocalService.fetchResourcePermission(
 				role.getCompanyId(), DDMFormInstance.class.getName(),
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(formInstanceId), role.getRoleId());
+
+		if (resourcePermission == null) {
+			_resourcePermissionLocalService.setResourcePermissions(
+				role.getCompanyId(), DDMFormInstance.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				String.valueOf(formInstanceId), role.getRoleId(),
+				new String[] {DDMActionKeys.ADD_FORM_INSTANCE_RECORD});
+
+			resourcePermission =
+				_resourcePermissionLocalService.fetchResourcePermission(
+					role.getCompanyId(), DDMFormInstance.class.getName(),
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(formInstanceId), role.getRoleId());
+		}
 
 		if (published) {
 			resourcePermission.addResourceAction(
@@ -185,7 +199,7 @@ public class PublishFormInstanceMVCActionCommand
 	}
 
 	private boolean _isFormInstancePublished(DDMFormInstance formInstance)
-		throws PortalException {
+		throws Exception {
 
 		DDMFormInstanceSettings ddmFormInstanceSettings =
 			formInstance.getSettingsModel();

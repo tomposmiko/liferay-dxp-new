@@ -14,6 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.service.base;
 
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -33,11 +34,13 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskFormInstanceLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoTaskFormInstanceLocalServiceUtil;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoActionPersistence;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoConditionPersistence;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoDefinitionPersistence;
@@ -61,10 +64,13 @@ import com.liferay.portal.workflow.kaleo.service.persistence.KaleoTransitionPers
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -86,11 +92,15 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>KaleoTaskFormInstanceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoTaskFormInstanceLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>KaleoTaskFormInstanceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>KaleoTaskFormInstanceLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the kaleo task form instance to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTaskFormInstanceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTaskFormInstance the kaleo task form instance
 	 * @return the kaleo task form instance that was added
@@ -122,6 +132,10 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 	/**
 	 * Deletes the kaleo task form instance with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTaskFormInstanceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTaskFormInstanceId the primary key of the kaleo task form instance
 	 * @return the kaleo task form instance that was removed
 	 * @throws PortalException if a kaleo task form instance with the primary key could not be found
@@ -138,6 +152,10 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 	/**
 	 * Deletes the kaleo task form instance from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTaskFormInstanceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTaskFormInstance the kaleo task form instance
 	 * @return the kaleo task form instance that was removed
 	 */
@@ -147,6 +165,18 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 		KaleoTaskFormInstance kaleoTaskFormInstance) {
 
 		return kaleoTaskFormInstancePersistence.remove(kaleoTaskFormInstance);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return kaleoTaskFormInstancePersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -312,6 +342,16 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return kaleoTaskFormInstancePersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -320,6 +360,13 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 			(KaleoTaskFormInstance)persistedModel);
 	}
 
+	public BasePersistence<KaleoTaskFormInstance> getBasePersistence() {
+		return kaleoTaskFormInstancePersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -358,6 +405,10 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 	/**
 	 * Updates the kaleo task form instance in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTaskFormInstanceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTaskFormInstance the kaleo task form instance
 	 * @return the kaleo task form instance that was updated
 	 */
@@ -367,6 +418,11 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 		KaleoTaskFormInstance kaleoTaskFormInstance) {
 
 		return kaleoTaskFormInstancePersistence.update(kaleoTaskFormInstance);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -381,6 +437,8 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		kaleoTaskFormInstanceLocalService =
 			(KaleoTaskFormInstanceLocalService)aopProxy;
+
+		_setLocalServiceUtilService(kaleoTaskFormInstanceLocalService);
 	}
 
 	/**
@@ -423,6 +481,23 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		KaleoTaskFormInstanceLocalService kaleoTaskFormInstanceLocalService) {
+
+		try {
+			Field field =
+				KaleoTaskFormInstanceLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, kaleoTaskFormInstanceLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

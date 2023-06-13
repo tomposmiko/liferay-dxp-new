@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -72,12 +73,11 @@ public class PortletPermissionsPortletConfigurationIcon
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		try {
-			StringBundler sb = new StringBundler(6);
+			StringBundler sb = new StringBundler(5);
 
-			sb.append("Liferay.Util.openWindow({dialogIframe: {bodyCssClass: ");
-			sb.append("'dialog-with-footer'}, title: '");
-			sb.append(getMessage(portletRequest));
-			sb.append("', uri: '");
+			sb.append("Liferay.Util.openModal({title: '");
+			sb.append(HtmlUtil.escapeJS(getMessage(portletRequest)));
+			sb.append("', url: '");
 			sb.append(_generatePermissionURL(portletRequest));
 			sb.append("'});");
 

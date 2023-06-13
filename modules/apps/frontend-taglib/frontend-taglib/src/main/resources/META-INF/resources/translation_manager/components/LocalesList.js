@@ -36,11 +36,11 @@ export default function LocalesList({
 	defaultLocale,
 	editingLocale,
 	onLocaleClicked,
-	onLocaleRemoved
+	onLocaleRemoved,
 }) {
 	return (
 		<>
-			{Array.from(availableLocales.values()).map(locale => (
+			{Array.from(availableLocales.values()).map((locale) => (
 				<Locale
 					editingLocale={editingLocale}
 					key={locale.id}

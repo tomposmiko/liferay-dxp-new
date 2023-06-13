@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.net.URI;
 
@@ -48,6 +49,8 @@ import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -60,6 +63,11 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class MediaQueryProviderImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws PortalException {
@@ -639,20 +647,20 @@ public class MediaQueryProviderImplTest {
 	private void _addAdaptiveMedias(
 			FileEntry fileEntry,
 			AdaptiveMedia<AMImageProcessor>... adaptiveMedias)
-		throws PortalException {
+		throws Exception {
 
 		Mockito.when(
 			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenAnswer(
 			invocation -> {
-				Function<AMImageQueryBuilder, AMQuery>
+				Function<AMImageQueryBuilder, AMQuery<?, ?>>
 					amImageQueryBuilderFunction = invocation.getArgumentAt(
 						0, Function.class);
 
 				AMImageQueryBuilderImpl amImageQueryBuilderImpl =
 					new AMImageQueryBuilderImpl();
 
-				AMQuery amQuery = amImageQueryBuilderFunction.apply(
+				AMQuery<?, ?> amQuery = amImageQueryBuilderFunction.apply(
 					amImageQueryBuilderImpl);
 
 				if (!AMImageQueryBuilderImpl.AM_QUERY.equals(amQuery)) {
@@ -739,7 +747,7 @@ public class MediaQueryProviderImplTest {
 			String.valueOf(width)
 		).put(
 			() -> {
-				AMAttribute amAttribute =
+				AMAttribute<?, ?> amAttribute =
 					AMAttribute.getConfigurationUuidAMAttribute();
 
 				return amAttribute.getName();

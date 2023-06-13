@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -283,10 +284,10 @@ public class ConfigurationImpl
 			List<Configuration> configurations =
 				(List<Configuration>)field2.get(compositeConfiguration);
 
-			Iterator<Configuration> itr = configurations.iterator();
+			Iterator<Configuration> iterator = configurations.iterator();
 
-			while (itr.hasNext()) {
-				Configuration configuration = itr.next();
+			while (iterator.hasNext()) {
+				Configuration configuration = iterator.next();
 
 				if (!(configuration instanceof MapConfiguration)) {
 					break;
@@ -296,7 +297,7 @@ public class ConfigurationImpl
 					(MapConfiguration)configuration;
 
 				if (mapConfiguration.getMap() == (Map<?, ?>)properties) {
-					itr.remove();
+					iterator.remove();
 
 					_classLoaderAggregateProperties.removeConfiguration(
 						configuration);
@@ -320,6 +321,12 @@ public class ConfigurationImpl
 	}
 
 	protected void printSources(long companyId, String webId) {
+		if (GetterUtil.getBoolean(
+				System.getProperty("configuration.impl.quiet"))) {
+
+			return;
+		}
+
 		List<String> sources = _classLoaderAggregateProperties.loadedSources();
 
 		for (int i = sources.size() - 1; i >= 0; i--) {
@@ -347,9 +354,7 @@ public class ConfigurationImpl
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Map<String, Object> _castPropertiesToMap(
-		Properties properties) {
-
+	private Map<String, Object> _castPropertiesToMap(Properties properties) {
 		return (Map)properties;
 	}
 

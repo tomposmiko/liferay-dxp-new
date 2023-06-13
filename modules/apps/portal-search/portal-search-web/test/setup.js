@@ -26,12 +26,13 @@ function filter(name) {
 }
 
 function walk(dir, callback) {
-	fs.readdirSync(dir, {withFileTypes: true}).forEach(entry => {
+	fs.readdirSync(dir, {withFileTypes: true}).forEach((entry) => {
 		const entryPath = path.join(dir, entry.name);
 
 		if (entry.isDirectory()) {
 			walk(entryPath, callback);
-		} else if (filter(entryPath)) {
+		}
+		else if (filter(entryPath)) {
 			callback(entryPath);
 		}
 	});
@@ -44,7 +45,7 @@ beforeEach(() => {
 
 	const _YUI = YUI();
 
-	global.AUI = function() {
+	global.AUI = function () {
 		return _YUI;
 	};
 
@@ -57,14 +58,14 @@ beforeEach(() => {
 		'..'
 	);
 
-	// eslint-disable-next-line liferay/no-dynamic-require
-	walk(build, source => require(source));
+	// eslint-disable-next-line @liferay/liferay/no-dynamic-require
+	walk(build, (source) => require(source));
 
 	global.Liferay = {
 		namespace(name) {
 			Liferay[name] = {};
 
 			return Liferay[name];
-		}
+		},
 	};
 });

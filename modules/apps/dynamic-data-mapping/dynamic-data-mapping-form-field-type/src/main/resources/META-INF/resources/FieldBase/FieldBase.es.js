@@ -15,14 +15,14 @@
 import '../components/Tooltip/Tooltip.es';
 
 import 'clay-icon';
-import compose from 'dynamic-data-mapping-form-renderer/js/util/compose.es';
-import {getRepeatedIndex} from 'dynamic-data-mapping-form-renderer/js/util/repeatable.es';
+import {compose, getRepeatedIndex} from 'dynamic-data-mapping-form-renderer';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 
 import withDispatch from '../util/withDispatch.es';
-import templates from './FieldBase.soy.js';
+import templates from './FieldBase.soy';
+import withLocale from './withLocale.es';
 import withRepetitionControls from './withRepetitionControls.es';
 
 class FieldBase extends Component {
@@ -32,12 +32,13 @@ class FieldBase extends Component {
 		return {
 			...state,
 			showRepeatableAddButton: this.repeatable,
-			showRepeatableRemoveButton: this.repeatable && repeatedIndex > 0
+			showRepeatableRemoveButton: this.repeatable && repeatedIndex > 0,
 		};
 	}
 }
 
 FieldBase.STATE = {
+
 	/**
 	 * @default input
 	 * @memberof FieldBase
@@ -124,10 +125,14 @@ FieldBase.STATE = {
 	 * @type {?(string|undefined)}
 	 */
 
-	tooltip: Config.string()
+	tooltip: Config.string(),
 };
 
-const composed = compose(withDispatch, withRepetitionControls)(FieldBase);
+const composed = compose(
+	withDispatch,
+	withRepetitionControls,
+	withLocale
+)(FieldBase);
 
 Soy.register(composed, templates);
 

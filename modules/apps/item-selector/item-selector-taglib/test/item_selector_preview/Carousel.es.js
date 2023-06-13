@@ -26,16 +26,16 @@ const basicMetadata = {
 			data: [
 				{
 					key: Liferay.Language.get('format'),
-					value: 'jpg'
+					value: 'jpg',
 				},
 				{
 					key: Liferay.Language.get('name'),
-					value: 'test image.jpg'
-				}
+					value: 'test image.jpg',
+				},
 			],
-			title: 'file-info'
-		}
-	]
+			title: 'file-info',
+		},
+	],
 };
 
 const carouselProps = {
@@ -44,13 +44,14 @@ const carouselProps = {
 		returntype: 'returntype',
 		title: itemTitle,
 		url: itemUrl,
-		value: itemUrl
+		value: itemUrl,
 	},
 	handleClickNext: jest.fn(),
-	handleClickPrevious: jest.fn()
+	handleClickPrevious: jest.fn(),
+	isImage: true,
 };
 
-const renderCarouselComponent = props => render(<Carousel {...props} />);
+const renderCarouselComponent = (props) => render(<Carousel {...props} />);
 
 describe('Carousel', () => {
 	afterEach(cleanup);
@@ -92,7 +93,7 @@ describe('Arrow elements', () => {
 	it('does not render arrows if prop "showArrows" is false', () => {
 		const {container} = renderCarouselComponent({
 			...carouselProps,
-			showArrows: false
+			showArrows: false,
 		});
 
 		expect(container.querySelector('.icon-arrow')).toBeNull();

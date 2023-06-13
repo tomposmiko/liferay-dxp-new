@@ -69,7 +69,7 @@ else {
 				</portlet:actionURL>
 
 				<c:choose>
-					<c:when test="<%= !workflowEnabled && !layoutRevision.isIncomplete() %>">
+					<c:when test="<%= !layout.isTypeContent() && !layoutRevision.isIncomplete() && !workflowEnabled %>">
 						<span class="staging-bar-control-toggle">
 							<aui:input id="readyToggle" label="<%= StringPool.BLANK %>" labelOff="ready-for-publication" labelOn="ready-for-publication" name="readyToggle" onChange='<%= liferayPortletResponse.getNamespace() + "submitLayoutRevision('" + publishURL + "')" %>' type="toggle-switch" value="<%= false %>" />
 						</span>
@@ -100,7 +100,7 @@ else {
 
 	<c:if test="<%= !layoutRevision.isIncomplete() %>">
 		<li class="control-menu-nav-item">
-			<c:if test="<%= layoutRevision.isHead() %>">
+			<c:if test="<%= !layout.isTypeContent() && layoutRevision.isHead() %>">
 				<span class="staging-bar-control-toggle">
 					<aui:input disabled="<%= true %>" id="readyToggle" label="<%= StringPool.BLANK %>" labelOn="ready-for-publication" name="readyToggle" type="toggle-switch" value="<%= true %>" />
 				</span>
@@ -155,7 +155,7 @@ else {
 
 	<li class="control-menu-nav-item">
 		<div class="d-none d-sm-block dropdown">
-			<a class="dropdown-toggle taglib-icon" data-toggle="dropdown" href="javascript:;">
+			<a class="dropdown-toggle taglib-icon" data-toggle="liferay-dropdown" href="javascript:;">
 				<aui:icon cssClass="icon-monospaced" image="ellipsis-v" markupView="lexicon" />
 
 				<span class="sr-only">
@@ -165,14 +165,14 @@ else {
 
 			<ul class="dropdown-menu dropdown-menu-right" role="menu">
 				<li>
-					<a class="dropdown-item" href="javascript:;" id="manageLayoutSetRevisions" onclick="<%= renderResponse.getNamespace() + "openSitePagesVariationsDialog();" %>">
+					<a class="dropdown-item" href="javascript:;" id="manageLayoutSetRevisions" onclick="<%= liferayPortletResponse.getNamespace() + "openSitePagesVariationsDialog();" %>">
 						<liferay-ui:message key="site-pages-variation" />
 					</a>
 				</li>
 
-				<c:if test="<%= !layoutRevision.isIncomplete() %>">
+				<c:if test="<%= !layoutRevision.isIncomplete() && !layout.isTypeContent() %>">
 					<li>
-						<a class="dropdown-item" href="javascript:;" id="manageLayoutRevisions" onclick="<%= renderResponse.getNamespace() + "openPageVariationsDialog();" %>">
+						<a class="dropdown-item" href="javascript:;" id="manageLayoutRevisions" onclick="<%= liferayPortletResponse.getNamespace() + "openPageVariationsDialog();" %>">
 							<liferay-ui:message key="page-variations" />
 						</a>
 					</li>
@@ -183,7 +183,7 @@ else {
 					</li>
 				</c:if>
 
-				<c:if test="<%= !hasWorkflowTask %>">
+				<c:if test="<%= !hasWorkflowTask && !layout.isTypeContent() %>">
 					<c:if test="<%= !layoutRevision.isMajor() && (layoutRevision.getParentLayoutRevisionId() != LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID) %>">
 						<li>
 							<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>undo', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="undoLink">
@@ -198,9 +198,9 @@ else {
 						List<LayoutRevision> childLayoutRevisions = layoutRevision.getChildren();
 
 						LayoutRevision firstChildLayoutRevision = childLayoutRevisions.get(0);
-
-						if (firstChildLayoutRevision.isInactive()) {
 						%>
+
+						<c:if test="<%= firstChildLayoutRevision.isInactive() %>">
 
 						<li>
 							<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>redo', {layoutRevisionId: '<%= firstChildLayoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= firstChildLayoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="redoLink">
@@ -208,10 +208,7 @@ else {
 							</a>
 						</li>
 
-						<%
-						}
-						%>
-
+						</c:if>
 					</c:if>
 				</c:if>
 			</ul>
@@ -240,43 +237,30 @@ else {
 		markAsReadyForPublicationURL: '<%= markAsReadyForPublicationURL %>',
 		namespace: '<portlet:namespace />',
 		portletId: '<%= portletDisplay.getId() %>',
-		viewHistoryURL: '<%= viewHistoryURL %>'
+		viewHistoryURL: '<%= viewHistoryURL %>',
 	});
 </aui:script>
-
-<liferay-util:buffer
-	var="pageVariationsHelpIcon"
->
-	<liferay-ui:icon-help message="page-variations-help" />
-</liferay-util:buffer>
-
-<liferay-util:buffer
-	var="sitePagesVariationsHelpIcon"
->
-	<liferay-ui:icon-help message="pages-variations-help" />
-</liferay-util:buffer>
 
 <aui:script>
 	function <portlet:namespace />openPageVariationsDialog() {
 		Liferay.Util.openWindow({
 			dialog: {
 				after: {
-					destroy: function(event) {
+					destroy: function (event) {
 						window.location.reload();
-					}
+					},
 				},
-				destroyOnHide: true
+				destroyOnHide: true,
 			},
 			id: 'pagesVariationsDialog',
-			title:
-				'<liferay-ui:message arguments="<%= pageVariationsHelpIcon %>" key="page-variations-x" />',
+			title: '<liferay-ui:message key="page-variations" />',
 
 			<liferay-portlet:renderURL var="layoutBranchesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-				<portlet:param name="mvcRenderCommandName" value="viewLayoutBranches" />
+				<portlet:param name="mvcRenderCommandName" value="/staging_bar/view_layout_branches" />
 				<portlet:param name="layoutSetBranchId" value="<%= String.valueOf(layoutSetBranch.getLayoutSetBranchId()) %>" />
 			</liferay-portlet:renderURL>
 
-			uri: '<%= HtmlUtil.escapeJS(layoutBranchesURL) %>'
+			uri: '<%= HtmlUtil.escapeJS(layoutBranchesURL) %>',
 		});
 	}
 
@@ -284,21 +268,20 @@ else {
 		Liferay.Util.openWindow({
 			dialog: {
 				after: {
-					destroy: function(event) {
+					destroy: function (event) {
 						window.location.reload();
-					}
+					},
 				},
-				destroyOnHide: true
+				destroyOnHide: true,
 			},
 			id: 'sitePagesVariationDialog',
-			title:
-				'<liferay-ui:message arguments="<%= sitePagesVariationsHelpIcon %>" key="site-pages-variation-x" />',
+			title: '<liferay-ui:message key="site-pages-variation" />',
 
 			<liferay-portlet:renderURL var="layoutSetBranchesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-				<portlet:param name="mvcRenderCommandName" value="viewLayoutSetBranches" />
+				<portlet:param name="mvcRenderCommandName" value="/staging_bar/view_layout_set_branches" />
 			</liferay-portlet:renderURL>
 
-			uri: '<%= HtmlUtil.escapeJS(layoutSetBranchesURL) %>'
+			uri: '<%= HtmlUtil.escapeJS(layoutSetBranchesURL) %>',
 		});
 	}
 
@@ -306,7 +289,7 @@ else {
 		Liferay.fire('<portlet:namespace />submit', {
 			currentURL: '<%= currentURL %>',
 			incomplete: <%= layoutRevision.isIncomplete() %>,
-			publishURL: publishURL
+			publishURL: publishURL,
 		});
 
 		Liferay.Util.toggleDisabled('#<portlet:namespace />readyToggle', true);

@@ -32,17 +32,17 @@ PortletURL portletURL = renderResponse.createRenderURL();
 			List<MenuItem> menuItems = MenuItem.fromWikiPage(wikiPage, portletURL);
 
 			for (MenuItem menuItem : menuItems) {
-				String label = menuItem.getLabel();
+				String name = menuItem.getName();
 			%>
 
 				<c:choose>
-					<c:when test="<%= Validator.isNotNull(label) %>">
+					<c:when test="<%= Validator.isNotNull(name) %>">
 						<liferay-ui:panel
 							collapsible="<%= true %>"
 							extended="<%= true %>"
-							id='<%= "pageMenu_" + label %>'
+							id='<%= "pageMenu_" + name %>'
 							persistState="<%= true %>"
-							title="<%= label %>"
+							title="<%= name %>"
 						>
 							<%= _buildPageMenuLinksHTML(menuItem.getChildren()) %>
 						</liferay-ui:panel>
@@ -88,12 +88,11 @@ private String _buildPageMenuLinksHTML(List<MenuItem> menuItems) {
 	sb.append("<ul class=\"page-menu\">");
 
 	for (MenuItem menuItem : menuItems) {
-		String label = menuItem.getLabel();
-		String url = menuItem.getURL();
+		String name = menuItem.getName();
 
 		sb.append("<li>");
 		sb.append("<a href=\"");
-		sb.append(url);
+		sb.append(menuItem.getURL());
 		sb.append("\"");
 
 		if (menuItem.getExternalURL()) {
@@ -101,7 +100,7 @@ private String _buildPageMenuLinksHTML(List<MenuItem> menuItems) {
 		}
 
 		sb.append(">");
-		sb.append(label);
+		sb.append(name);
 		sb.append("</a>");
 		sb.append("</li>");
 	}

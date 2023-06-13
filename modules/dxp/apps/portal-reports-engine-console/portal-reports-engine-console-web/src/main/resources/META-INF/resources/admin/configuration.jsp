@@ -18,6 +18,7 @@
 
 <%
 boolean enabled = true;
+
 String emailFromName = ParamUtil.getString(request, "preferences--emailFromName--", reportsGroupServiceEmailConfiguration.emailFromName());
 String emailFromAddress = ParamUtil.getString(request, "preferences--emailFromAddress--", reportsGroupServiceEmailConfiguration.emailFromAddress());
 
@@ -35,13 +36,9 @@ Map<String, String> emailDefinitionTerms = EmailConfigurationUtil.getEmailDefini
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
-	<%
-	String tabs1Names = "email-from,delivery-email,notifications-email";
-	%>
-
 	<div class="portlet-configuration-body-content">
 		<liferay-ui:tabs
-			names="<%= tabs1Names %>"
+			names="email-from,delivery-email,notifications-email"
 			refresh="<%= false %>"
 		>
 			<liferay-ui:error key="emailDeliveryBody" message="please-enter-a-valid-body" />
@@ -52,7 +49,7 @@ Map<String, String> emailDefinitionTerms = EmailConfigurationUtil.getEmailDefini
 			<liferay-ui:error key="emailNotificationsSubject" message="please-enter-a-valid-subject" />
 
 			<liferay-ui:section>
-				<div class="container-fluid-1280">
+				<clay:container-fluid>
 					<aui:fieldset-group markupView="lexicon">
 						<aui:fieldset>
 							<aui:input cssClass="lfr-input-text-container" label="name" name="preferences--emailFromName--" type="text" value="<%= emailFromName %>" />
@@ -60,11 +57,11 @@ Map<String, String> emailDefinitionTerms = EmailConfigurationUtil.getEmailDefini
 							<aui:input cssClass="lfr-input-text-container" label="address" name="preferences--emailFromAddress--" type="text" value="<%= emailFromAddress %>" />
 						</aui:fieldset>
 					</aui:fieldset-group>
-				</div>
+				</clay:container-fluid>
 			</liferay-ui:section>
 
 			<liferay-ui:section>
-				<div class="container-fluid-1280">
+				<clay:container-fluid>
 					<aui:fieldset-group markupView="lexicon">
 						<liferay-frontend:email-notification-settings
 							emailBodyLocalizedValuesMap="<%= reportsGroupServiceEmailConfiguration.emailDeliveryBody() %>"
@@ -74,11 +71,11 @@ Map<String, String> emailDefinitionTerms = EmailConfigurationUtil.getEmailDefini
 							emailSubjectLocalizedValuesMap="<%= reportsGroupServiceEmailConfiguration.emailDeliverySubject() %>"
 						/>
 					</aui:fieldset-group>
-				</div>
+				</clay:container-fluid>
 			</liferay-ui:section>
 
 			<liferay-ui:section>
-				<div class="container-fluid-1280">
+				<clay:container-fluid>
 					<aui:fieldset-group markupView="lexicon">
 						<liferay-frontend:email-notification-settings
 							emailBodyLocalizedValuesMap="<%= reportsGroupServiceEmailConfiguration.emailNotificationsBody() %>"
@@ -88,7 +85,7 @@ Map<String, String> emailDefinitionTerms = EmailConfigurationUtil.getEmailDefini
 							emailSubjectLocalizedValuesMap="<%= reportsGroupServiceEmailConfiguration.emailNotificationsSubject() %>"
 						/>
 					</aui:fieldset-group>
-				</div>
+				</clay:container-fluid>
 			</liferay-ui:section>
 		</liferay-ui:tabs>
 	</div>

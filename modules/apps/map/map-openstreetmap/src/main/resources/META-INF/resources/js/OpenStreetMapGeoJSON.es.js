@@ -19,6 +19,7 @@ import GeoJSONBase from 'map-common/js/GeoJSONBase.es';
  * @review
  */
 class OpenStreetMapGeoJSONBase extends GeoJSONBase {
+
 	/**
 	 * Creates a new map geojson parser using OpenStreetMap's API
 	 * @param {Array} args List of arguments to be passed to State
@@ -42,7 +43,7 @@ class OpenStreetMapGeoJSONBase extends GeoJSONBase {
 				layer.on('click', this._handleFeatureClicked);
 
 				features.push(feature);
-			}
+			},
 		}).addTo(this.map);
 
 		return features;
@@ -66,7 +67,7 @@ class OpenStreetMapGeoJSONBase extends GeoJSONBase {
 							geometry.coordinates[1],
 							geometry.coordinates[0]
 						);
-					}
+					},
 				};
 			},
 
@@ -76,7 +77,7 @@ class OpenStreetMapGeoJSONBase extends GeoJSONBase {
 
 			getProperty(prop) {
 				return feature.properties[prop];
-			}
+			},
 		};
 	}
 }

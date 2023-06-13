@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-search-facet-util',
-	A => {
+	(A) => {
 		const FACET_TERM_CLASS = 'facet-term';
 
 		const FACET_TERM_SELECTED_CLASS = 'facet-term-selected';
@@ -39,7 +39,7 @@ AUI.add(
 		function _transformNodeListToArray(nodeList) {
 			const nodeArray = [];
 
-			nodeList.forEach(node => nodeArray.push(node));
+			nodeList.forEach((node) => nodeArray.push(node));
 
 			return nodeArray;
 		}
@@ -70,7 +70,7 @@ AUI.add(
 				);
 
 				const selectedTerms = _transformNodeListToArray(facetTerms)
-					.filter(term => {
+					.filter((term) => {
 						if (term.type === 'checkbox') {
 							return term.checked;
 						}
@@ -85,7 +85,7 @@ AUI.add(
 
 						return isCurrentTarget ? !isSelected : isSelected;
 					})
-					.map(term => _getTermId(term));
+					.map((term) => _getTermId(term));
 
 				FacetUtil.selectTerms(form, selectedTerms);
 			},
@@ -103,37 +103,73 @@ AUI.add(
 			},
 
 			enableInputs(inputs) {
-				inputs.forEach(term => {
+				inputs.forEach((term) => {
 					Liferay.Util.toggleDisabled(term, false);
 				});
+			},
+
+			removeStartParameter(startParameterName, queryString) {
+				var search = queryString;
+
+				var hasQuestionMark = search[0] === '?';
+
+				if (hasQuestionMark) {
+					search = search.substr(1);
+				}
+
+				var parameterArray = search.split('&').filter((item) => {
+					return item.trim() !== '';
+				});
+
+				var newParameters = FacetUtil.removeURLParameters(
+					startParameterName,
+					parameterArray
+				);
+
+				search = newParameters.join('&');
+
+				if (hasQuestionMark) {
+					search = '?' + search;
+				}
+
+				return search;
 			},
 
 			removeURLParameters(key, parameterArray) {
 				key = encodeURIComponent(key);
 
-				var newParameters = parameterArray.filter(item => {
+				return parameterArray.filter((item) => {
 					var itemSplit = item.split('=');
 
-					if (itemSplit && itemSplit[0] === key) {
-						return false;
-					}
-
-					return true;
+					return !(itemSplit && itemSplit[0] === key);
 				});
-
-				return newParameters;
 			},
 
 			selectTerms(form, selections) {
-				var formParameterName = document.querySelector(
+				var formParameterNameElement = document.querySelector(
 					'#' + form.id + ' input.facet-parameter-name'
 				);
 
-				document.location.search = FacetUtil.updateQueryString(
-					formParameterName.value,
-					selections,
-					document.location.search
+				var startParameterNameElement = document.querySelector(
+					'#' + form.id + ' input.start-parameter-name'
 				);
+
+				var search = document.location.search;
+
+				if (startParameterNameElement) {
+					search = FacetUtil.removeStartParameter(
+						startParameterNameElement.value,
+						search
+					);
+				}
+
+				search = FacetUtil.updateQueryString(
+					formParameterNameElement.value,
+					selections,
+					search
+				);
+
+				document.location.search = search;
 			},
 
 			setURLParameter(url, name, value) {
@@ -156,13 +192,23 @@ AUI.add(
 				return address + '?' + queryString;
 			},
 
-			setURLParameters(key, values, parameterArray) {
+			setURLParameters(key, selections, parameterArray) {
 				var newParameters = FacetUtil.removeURLParameters(
 					key,
 					parameterArray
 				);
 
-				values.forEach(item => {
+				newParameters = FacetUtil.removeURLParameters(
+					key + 'From',
+					newParameters
+				);
+
+				newParameters = FacetUtil.removeURLParameters(
+					key + 'To',
+					newParameters
+				);
+
+				selections.forEach((item) => {
 					newParameters = FacetUtil.addURLParameter(
 						key,
 						item,
@@ -176,17 +222,13 @@ AUI.add(
 			updateQueryString(key, selections, queryString) {
 				var search = queryString;
 
-				var hasQuestionMark = false;
-
-				if (search[0] === '?') {
-					hasQuestionMark = true;
-				}
+				var hasQuestionMark = search[0] === '?';
 
 				if (hasQuestionMark) {
 					search = search.substr(1);
 				}
 
-				var parameterArray = search.split('&').filter(item => {
+				var parameterArray = search.split('&').filter((item) => {
 					return item.trim() !== '';
 				});
 
@@ -203,13 +245,13 @@ AUI.add(
 				}
 
 				return search;
-			}
+			},
 		};
 
 		Liferay.namespace('Search').FacetUtil = FacetUtil;
 	},
 	'',
 	{
-		requires: []
+		requires: [],
 	}
 );

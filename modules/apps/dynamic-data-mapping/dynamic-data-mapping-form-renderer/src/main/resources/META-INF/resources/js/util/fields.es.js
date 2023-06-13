@@ -12,7 +12,7 @@
  * details.
  */
 
-export const checkInvalidFieldNameCharacter = character => {
+export const checkInvalidFieldNameCharacter = (character) => {
 	return /[\\~`!@#$%^&*(){}[\];:"'<,.>?/\-+=|]/g.test(character);
 };
 
@@ -29,7 +29,8 @@ export function normalizeFieldName(fieldName) {
 			nextUpperCase = true;
 
 			continue;
-		} else if (checkInvalidFieldNameCharacter(item)) {
+		}
+		else if (checkInvalidFieldNameCharacter(item)) {
 			continue;
 		}
 

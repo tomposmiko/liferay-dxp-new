@@ -15,7 +15,6 @@
 package com.liferay.opensocial.service.persistence;
 
 import com.liferay.opensocial.model.OAuthToken;
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -550,16 +549,9 @@ public class OAuthTokenUtil {
 	}
 
 	public static OAuthTokenPersistence getPersistence() {
-		if (_persistence == null) {
-			_persistence = (OAuthTokenPersistence)PortletBeanLocatorUtil.locate(
-				com.liferay.opensocial.service.ServletContextUtil.
-					getServletContextName(),
-				OAuthTokenPersistence.class.getName());
-		}
-
 		return _persistence;
 	}
 
-	private static OAuthTokenPersistence _persistence;
+	private static volatile OAuthTokenPersistence _persistence;
 
 }

@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.EmailAddressSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class EmailAddress {
+public class EmailAddress implements Cloneable, Serializable {
+
+	public static EmailAddress toDTO(String json) {
+		return EmailAddressSerDes.toDTO(json);
+	}
 
 	public String getEmailAddress() {
 		return emailAddress;
@@ -107,6 +113,11 @@ public class EmailAddress {
 	}
 
 	protected String type;
+
+	@Override
+	public EmailAddress clone() throws CloneNotSupportedException {
+		return (EmailAddress)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

@@ -22,14 +22,14 @@ describe('The QuickActionKebab component should', () => {
 			{
 				action: jest.fn(),
 				icon: 'change',
-				title: Liferay.Language.get('reassign-task')
-			}
+				title: Liferay.Language.get('reassign-task'),
+			},
 		];
-		const {getByTestId} = render(
+		const {container} = render(
 			<QuickActionKebab iconItems={kebabIconItems} />
 		);
 
-		const iconItemButton = getByTestId('iconItemButton');
+		const iconItemButton = container.querySelector('.quick-action-item');
 
 		expect(iconItemButton).not.toBeUndefined();
 	});

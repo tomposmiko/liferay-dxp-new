@@ -114,49 +114,43 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 
 	var availableFields;
 
-	var displayWarning = function(message) {
-		new Liferay.Notification({
-			closeable: true,
-			delay: {
-				hide: 5000,
-				show: 0
-			},
-			duration: 500,
+	var displayWarning = function (message) {
+		Liferay.Util.openToast({
 			message: message,
-			title: Liferay.Language.get('warning'),
-			type: 'warning'
-		}).render('body');
+			type: 'warning',
+		});
 	};
 
 	var formEditor;
 
-	var getContentValue = function() {
+	var getContentValue = function () {
 		var content;
 
 		if (formEditor && !isViewTabActive()) {
 			content = formEditor.get(STR_VALUE);
-		} else {
+		}
+		else {
 			content = formBuilder.getContent();
 		}
 
 		return content;
 	};
 
-	var getFormEditor = function() {
+	var getFormEditor = function () {
 		if (!formEditor) {
 			formEditor = new A.AceEditor({
 				boundingBox: '#<portlet:namespace />formBuilderEditor',
 				height: 600,
 				mode: 'xml',
 				tabSize: 4,
-				width: 600
+				width: 600,
 			}).render();
 		}
 
 		return formEditor;
 	};
 
-	var isViewTabActive = function() {
+	var isViewTabActive = function () {
 		var formBuilderTab = A.one('#<portlet:namespace />formBuilderTab');
 
 		if (!formBuilderTab) {
@@ -168,7 +162,7 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 		return !ancestor.hasClass('hide');
 	};
 
-	var reloadFormBuilderData = function(content) {
+	var reloadFormBuilderData = function (content) {
 		if (!Lang.isValue(content)) {
 			content = window.<portlet:namespace />getContentDefinition();
 		}
@@ -183,10 +177,12 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 			displayWarning(
 				'<%= UnicodeLanguageUtil.get(resourceBundle, "you-cannot-remove-default-attributes") %>'
 			);
-		} else {
+		}
+		else {
 			try {
 				content = JSON.parse(content);
-			} catch (e) {
+			}
+			catch (e) {
 				displayWarning(
 					'<%= UnicodeLanguageUtil.get(resourceBundle, "you-have-entered-invalid-json") %>'
 				);
@@ -205,7 +201,7 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 		}
 	};
 
-	var setEditorSize = function() {
+	var setEditorSize = function () {
 		if (!isViewTabActive()) {
 			getFormEditor().set(
 				'width',
@@ -216,7 +212,7 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 		}
 	};
 
-	var switchToSource = function() {
+	var switchToSource = function () {
 		setEditorSize();
 
 		var content = formBuilder.getContent();
@@ -224,10 +220,11 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 		getFormEditor().set(STR_VALUE, content);
 	};
 
-	var switchToView = function() {
+	var switchToView = function () {
 		if (formEditor) {
 			reloadFormBuilderData(formEditor.get(STR_VALUE));
-		} else if (formBuilder) {
+		}
+		else if (formBuilder) {
 			reloadFormBuilderData(formBuilder.getContent());
 		}
 	};
@@ -269,8 +266,8 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 			defaultLocale: '<%= HtmlUtil.escapeJS(defaultLanguageId) %>',
 			localesMap: <%= localesMapJSONObject.toString() %>,
 			srcNode:
-				'#<portlet:namespace />translationManager .lfr-translation-manager-content'
-		}
+				'#<portlet:namespace />translationManager .lfr-translation-manager-content',
+		},
 	}).render();
 
 	var dialog = Liferay.Util.getWindow();
@@ -279,17 +276,18 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 		dialog.after('widthChange', setEditorSize);
 	}
 
-	var afterShowTab = function(event) {
+	var afterShowTab = function (event) {
 		if (isViewTabActive()) {
 			switchToView();
-		} else {
+		}
+		else {
 			switchToSource();
 		}
 	};
 
 	Liferay.after('showTab', afterShowTab);
 
-	var onDestroyPortlet = function(event) {
+	var onDestroyPortlet = function (event) {
 		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
 			Liferay.detach('showTab', afterShowTab);
 			Liferay.detach('destroyPortlet', onDestroyPortlet);
@@ -298,7 +296,7 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 			var propertyList = formBuilder.propertyList;
 
 			if (propertyList) {
-				propertyList.get('data').each(function(model) {
+				propertyList.get('data').each(function (model) {
 					var editor = model.get('editor');
 
 					if (editor) {
@@ -321,11 +319,11 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 		'<%= HtmlUtil.escapeJS(portletResourceNamespace) %>getContentValue'
 	] = getContentValue;
 
-	Liferay.on('<portlet:namespace />saveTemplate', function(event) {
+	Liferay.on('<portlet:namespace />saveTemplate', function (event) {
 		A.one('#<portlet:namespace />scriptContent').val(getContentValue());
 	});
 
 	Liferay.fire('<portlet:namespace />formBuilderLoaded', {
-		formBuilder: formBuilder
+		formBuilder: formBuilder,
 	});
 </aui:script>

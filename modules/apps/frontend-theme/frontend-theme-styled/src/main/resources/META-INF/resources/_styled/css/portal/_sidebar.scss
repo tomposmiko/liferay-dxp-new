@@ -38,8 +38,12 @@
 		}
 	}
 
-	select.form-control:not([size]) {
-		height: 2rem;
+	select.form-control {
+		padding-right: 1.6rem;
+
+		&:not([size]) {
+			height: 2rem;
+		}
 	}
 
 	.article-content-description
@@ -68,6 +72,10 @@
 			height: 2rem;
 			padding: 0.1875rem 0;
 			width: 2rem;
+
+			&.input-localized-trigger {
+				padding: 0;
+			}
 		}
 	}
 

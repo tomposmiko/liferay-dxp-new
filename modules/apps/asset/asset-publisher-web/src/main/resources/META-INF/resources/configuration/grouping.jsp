@@ -16,8 +16,12 @@
 
 <%@ include file="/init.jsp" %>
 
-<aui:row id="grouping">
-	<aui:col width="<%= 30 %>">
+<clay:row
+	id='<%= liferayPortletResponse.getNamespace() + "grouping" %>'
+>
+	<clay:col
+		md="4"
+	>
 
 		<%
 		long assetVocabularyId = GetterUtil.getLong(portletPreferences.getValue("assetVocabularyId", null));
@@ -29,13 +33,15 @@
 
 			<%
 			Group companyGroup = company.getGroup();
-
-			if (scopeGroupId != companyGroup.getGroupId()) {
-				List<AssetVocabulary> assetVocabularies = AssetVocabularyLocalServiceUtil.getGroupVocabularies(scopeGroupId, false);
-
-				if (!assetVocabularies.isEmpty()) {
 			%>
 
+			<c:if test="<%= scopeGroupId != companyGroup.getGroupId() %>">
+
+				<%
+				List<AssetVocabulary> assetVocabularies = AssetVocabularyLocalServiceUtil.getGroupVocabularies(scopeGroupId, false);
+				%>
+
+				<c:if test="<%= !assetVocabularies.isEmpty() %>">
 					<optgroup label="<liferay-ui:message key="vocabularies" />">
 
 						<%
@@ -49,18 +55,14 @@
 						%>
 
 					</optgroup>
-
-			<%
-				}
-			}
-			%>
+				</c:if>
+			</c:if>
 
 			<%
 			List<AssetVocabulary> assetVocabularies = AssetVocabularyLocalServiceUtil.getGroupVocabularies(companyGroup.getGroupId(), false);
-
-			if (!assetVocabularies.isEmpty()) {
 			%>
 
+			<c:if test="<%= !assetVocabularies.isEmpty() %>">
 				<optgroup label="<liferay-ui:message key="vocabularies" /> (<liferay-ui:message key="global" />)">
 
 					<%
@@ -74,11 +76,7 @@
 					%>
 
 				</optgroup>
-
-			<%
-			}
-			%>
-
+			</c:if>
 		</aui:select>
-	</aui:col>
-</aui:row>
+	</clay:col>
+</clay:row>

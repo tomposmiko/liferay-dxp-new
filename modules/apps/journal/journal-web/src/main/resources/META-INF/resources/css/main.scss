@@ -1,9 +1,13 @@
-$toolbarDesktopHeight: 64px;
-$toolbarHeight: 110px;
+@import 'atlas-variables';
+
+$toolbarDesktopHeight: 4rem;
+$toolbarHeight: 6.875rem;
 $toolbarZIndex: 971;
 
-$controlMenuDesktopHeight: 56px;
-$controlMenuHeight: 49px;
+$controlMenuHeight: 56px;
+$sidebarHeaderHeight: 104px;
+
+$portletLayoutMargin: 35px;
 
 $productMenuTransitionDuration: 0.5s;
 $productMenuWidth: 320px;
@@ -43,6 +47,10 @@ $productMenuWidth: 320px;
 			margin-top: -40px;
 		}
 
+		.CodeMirror {
+			height: 100%;
+		}
+
 		.form-builder-field {
 			box-shadow: none;
 			margin: 0;
@@ -61,23 +69,24 @@ $productMenuWidth: 320px;
 		}
 
 		.lfr-ddm-field-group {
-			margin-bottom: 10px;
-			margin-top: 10px;
-			padding: 28px 24px;
-		}
-
-		.lfr-ddm-container > .lfr-ddm-field-group {
-			padding: 0;
+			background: #fff;
+			border-radius: 3px;
+			border-top: 5px solid transparent;
+			box-shadow: 0 1px 2px #c4c4c4;
+			margin: 8px 6px 0;
+			outline: 0;
+			padding: 10px;
+			position: relative;
+			-webkit-box-shadow: 0 1px 2px #c4c4c4;
 		}
 	}
 
 	.edit-article-form {
-		.component-tbar {
+		.component-tbar.tbar-article {
 			height: auto;
 			left: 0;
 			min-height: 3.5rem;
 			position: fixed;
-			top: $controlMenuHeight;
 			transition: left ease $productMenuTransitionDuration,
 				width ease $productMenuTransitionDuration;
 			width: 100%;
@@ -98,6 +107,10 @@ $productMenuWidth: 320px;
 
 				> .tbar-nav {
 					flex-wrap: wrap;
+
+					@include media-breakpoint-up(lg) {
+						flex-wrap: nowrap;
+					}
 
 					> .tbar-item {
 						padding: 0.5em;
@@ -146,9 +159,8 @@ $productMenuWidth: 320px;
 				border: 0;
 			}
 
-			@media (min-width: 768px) {
+			@include media-breakpoint-up(lg) {
 				min-height: $toolbarDesktopHeight;
-				top: $controlMenuDesktopHeight;
 
 				> .container-fluid > .tbar-nav {
 					> .tbar-item:first-child {
@@ -171,47 +183,45 @@ $productMenuWidth: 320px;
 		.contextual-sidebar-content {
 			margin-top: $toolbarHeight;
 
-			@media (min-width: 768px) {
+			@include media-breakpoint-up(lg) {
 				margin-top: $toolbarDesktopHeight;
 			}
 
-			@media (max-width: 769px) {
+			@include media-breakpoint-down(md) {
 				> .container-fluid {
-					margin: 0;
+					margin: 0 auto;
 					padding: 0;
 
 					> .sheet {
 						border: none;
 						border-radius: 0;
-						min-height: calc(
-							100vh - #{$controlMenuHeight + $toolbarHeight}
-						);
 					}
 				}
 			}
-		}
 
-		.data-layout-builder-sidebar {
-			top: 7.5rem;
+			.sidebar-body {
+				@include media-breakpoint-down(lg) {
+					height: calc(
+						100vh - #{$controlMenuHeight +$sidebarHeaderHeight} - #{$toolbarHeight}
+					);
+				}
+			}
 		}
 
 		.edit-article-sidebar {
 			border-left: 1px #e7e7ed solid;
 			box-shadow: none;
-			height: calc(
-				100vh - #{$controlMenuHeight + $toolbarHeight}
-			) !important;
+			margin-top: $toolbarHeight;
+			max-width: 90vw;
 			overflow-y: scroll;
-			top: $controlMenuHeight + $toolbarHeight !important;
-			width: 100%;
+			padding-top: 0;
+			position: fixed;
+			top: auto;
+			width: $productMenuWidth;
 			z-index: 1;
 
-			@media (min-width: 768px) {
-				height: calc(
-					100vh - #{$controlMenuDesktopHeight + $toolbarDesktopHeight}
-				) !important;
-				top: $controlMenuDesktopHeight + $toolbarDesktopHeight !important;
-				width: $productMenuWidth;
+			@include media-breakpoint-up(lg) {
+				margin-top: $toolbarDesktopHeight;
 			}
 
 			.article-content-description {
@@ -242,6 +252,10 @@ $productMenuWidth: 320px;
 		}
 
 		.sidebar-body {
+			.panel {
+				margin-bottom: 0;
+			}
+
 			.panel-body {
 				margin-bottom: 16px;
 				padding: 0;
@@ -256,6 +270,120 @@ $productMenuWidth: 320px;
 	.check-circle-center {
 		.green {
 			color: #008000;
+		}
+	}
+
+	.import-translation,
+	.translate-article {
+		nav {
+			height: auto;
+			left: 0;
+			position: fixed;
+			transition: left ease $productMenuTransitionDuration,
+				width ease $productMenuTransitionDuration;
+			width: 100%;
+			z-index: $toolbarZIndex;
+
+			body.open & {
+				left: $productMenuWidth;
+				width: calc(100% - #{$productMenuWidth});
+
+				@media (max-width: 768px) {
+					left: 0;
+					width: 100%;
+				}
+			}
+
+			> .container-fluid {
+				padding: 0;
+
+				> .tbar-nav {
+					flex-wrap: wrap;
+
+					> .tbar-item {
+						padding: 0.5em 0.75em;
+					}
+
+					> .tbar-item:first-child {
+						border-top: solid thin #e7e7ed;
+						order: 1;
+						width: 100%;
+					}
+
+					> .tbar-item:last-child {
+						flex-grow: 1;
+
+						> .tbar-section {
+							display: flex;
+							justify-content: flex-end;
+						}
+					}
+				}
+			}
+
+			@include media-breakpoint-up(lg) {
+				> .container-fluid > .tbar-nav {
+					> .tbar-item:first-child {
+						border-top: none;
+						order: 0;
+						width: auto;
+					}
+
+					> .tbar-item:last-child {
+						flex-grow: 0;
+					}
+				}
+			}
+		}
+
+		.import-body-form,
+		.translate-body-form {
+			margin-top: $toolbarHeight;
+
+			@include media-breakpoint-up(lg) {
+				margin-top: $toolbarDesktopHeight;
+			}
+		}
+	}
+
+	.translate-article {
+		.languages-selector .autofit-col {
+			margin-right: 1em;
+		}
+
+		.translate-body-form {
+			background-color: #fff;
+			padding: 1.5rem;
+
+			.translate-editor-preview {
+				border: 1px solid $gray-300;
+				border-radius: 4px;
+				box-sizing: border-box;
+				height: 22.375rem;
+				overflow: auto;
+				padding: 0.75rem 1rem 0.5rem;
+
+				img {
+					max-width: 100%;
+				}
+			}
+
+			.fieldset-title {
+				font-size: 0.875rem;
+				font-weight: 700;
+				margin: 1.5em 0;
+				text-transform: uppercase;
+			}
+
+			.form-control[readonly] {
+				background-color: #fff;
+			}
+
+			.separator {
+				border-color: $secondary;
+				margin-bottom: 2rem;
+				margin-top: 0.25rem;
+			}
 		}
 	}
 }

@@ -127,7 +127,7 @@ public class OAuth2AuthorizationException extends AuthorizationException {
 		public UnsupportedResponseType(String description) {
 			super(
 				String.format(
-					"The authorization server does not support obtaining an" +
+					"The authorization server does not support obtaining an " +
 						"authorization code using this method: %s",
 					description));
 		}
@@ -141,12 +141,12 @@ public class OAuth2AuthorizationException extends AuthorizationException {
 		super(msg);
 	}
 
-	protected OAuth2AuthorizationException(String msg, Throwable cause) {
-		super(msg, cause);
+	protected OAuth2AuthorizationException(String msg, Throwable throwable) {
+		super(msg, throwable);
 	}
 
-	protected OAuth2AuthorizationException(Throwable cause) {
-		super(cause);
+	protected OAuth2AuthorizationException(Throwable throwable) {
+		super(throwable);
 	}
 
 	private static final Map

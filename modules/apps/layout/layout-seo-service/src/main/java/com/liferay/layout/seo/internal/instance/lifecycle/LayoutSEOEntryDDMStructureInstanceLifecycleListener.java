@@ -16,6 +16,7 @@ package com.liferay.layout.seo.internal.instance.lifecycle;
 
 import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
 import com.liferay.layout.seo.model.LayoutSEOEntry;
+import com.liferay.layout.seo.service.LayoutSEOEntryLocalService;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.model.Company;
@@ -39,8 +40,8 @@ public class LayoutSEOEntryDDMStructureInstanceLifecycleListener
 	public void portalInstanceRegistered(Company company) throws Exception {
 		ServiceContext serviceContext = new ServiceContext();
 
-		serviceContext.setAddGuestPermissions(true);
 		serviceContext.setAddGroupPermissions(true);
+		serviceContext.setAddGuestPermissions(true);
 
 		Group group = _groupLocalService.getCompanyGroup(
 			company.getCompanyId());
@@ -71,6 +72,9 @@ public class LayoutSEOEntryDDMStructureInstanceLifecycleListener
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private LayoutSEOEntryLocalService _layoutSEOEntryLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

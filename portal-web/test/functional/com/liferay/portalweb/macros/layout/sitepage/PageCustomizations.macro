@@ -11,15 +11,24 @@ definition {
 
 		Check.checkToggleSwitch(locator1 = "SitePagesEditPage#CUSTOMIZATION_SETTINGS_SHOW_CUSTOMIZABLE_SECTIONS");
 
-		Check.toggleSwitch(
-			key_columnId = "${columnId}",
-			locator1 = "SitePagesEditPage#CUSTOMIZATION_SETTINGS_CUSTOMIZABLE_COLUMN_CHECKBOX");
+		if (isSet(columnIdList)) {
+			for (var columnId : list "${columnIdList}") {
+				Check.toggleSwitch(
+					key_columnId = "${columnId}",
+					locator1 = "SitePagesEditPage#CUSTOMIZATION_SETTINGS_CUSTOMIZABLE_COLUMN_CHECKBOX");
+			}
+		}
+		else {
+			Check.toggleSwitch(
+				key_columnId = "${columnId}",
+				locator1 = "SitePagesEditPage#CUSTOMIZATION_SETTINGS_CUSTOMIZABLE_COLUMN_CHECKBOX");
+		}
 
 		Button.clickSave();
 	}
 
 	macro gotoCustomizedPageInfo {
-		Click(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
+		Click(locator1 = "Icon#PAGE_CUSTOMIZATION_ELLIPSIS");
 
 		if (isSet(viewDefaultPage)) {
 			var key_menuItem = "View Page without my customizations";

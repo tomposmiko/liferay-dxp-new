@@ -36,6 +36,10 @@ public class BatchEngineImportTaskLocalServiceWrapper
 	/**
 	 * Adds the batch engine import task to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BatchEngineImportTaskLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param batchEngineImportTask the batch engine import task
 	 * @return the batch engine import task that was added
 	 */
@@ -57,12 +61,12 @@ public class BatchEngineImportTaskLocalServiceWrapper
 			String executeStatus,
 			java.util.Map<String, String> fieldNameMappingMap, String operation,
 			java.util.Map<String, java.io.Serializable> parameters,
-			String version) {
+			String taskItemDelegateName) {
 
 		return _batchEngineImportTaskLocalService.addBatchEngineImportTask(
 			companyId, userId, batchSize, callbackURL, className, content,
 			contentType, executeStatus, fieldNameMappingMap, operation,
-			parameters, version);
+			parameters, taskItemDelegateName);
 	}
 
 	/**
@@ -80,7 +84,23 @@ public class BatchEngineImportTaskLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _batchEngineImportTaskLocalService.createPersistedModel(
+			primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the batch engine import task from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BatchEngineImportTaskLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param batchEngineImportTask the batch engine import task
 	 * @return the batch engine import task that was removed
@@ -97,6 +117,10 @@ public class BatchEngineImportTaskLocalServiceWrapper
 
 	/**
 	 * Deletes the batch engine import task with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BatchEngineImportTaskLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param batchEngineImportTaskId the primary key of the batch engine import task
 	 * @return the batch engine import task that was removed
@@ -121,6 +145,18 @@ public class BatchEngineImportTaskLocalServiceWrapper
 
 		return _batchEngineImportTaskLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _batchEngineImportTaskLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _batchEngineImportTaskLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -354,6 +390,9 @@ public class BatchEngineImportTaskLocalServiceWrapper
 		return _batchEngineImportTaskLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -373,6 +412,10 @@ public class BatchEngineImportTaskLocalServiceWrapper
 
 	/**
 	 * Updates the batch engine import task in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BatchEngineImportTaskLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param batchEngineImportTask the batch engine import task
 	 * @return the batch engine import task that was updated

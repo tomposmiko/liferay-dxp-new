@@ -35,6 +35,10 @@ public class KBFolderLocalServiceWrapper
 	/**
 	 * Adds the kb folder to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBFolderLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kbFolder the kb folder
 	 * @return the kb folder that was added
 	 */
@@ -71,7 +75,22 @@ public class KBFolderLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kbFolderLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the kb folder from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBFolderLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbFolder the kb folder
 	 * @return the kb folder that was removed
@@ -85,6 +104,10 @@ public class KBFolderLocalServiceWrapper
 
 	/**
 	 * Deletes the kb folder with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBFolderLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbFolderId the primary key of the kb folder
 	 * @return the kb folder that was removed
@@ -114,6 +137,18 @@ public class KBFolderLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kbFolderLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _kbFolderLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _kbFolderLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -219,11 +254,11 @@ public class KBFolderLocalServiceWrapper
 	public com.liferay.knowledge.base.model.KBFolder fetchFirstChildKBFolder(
 			long groupId, long kbFolderId,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.knowledge.base.model.KBFolder> obc)
+				<com.liferay.knowledge.base.model.KBFolder> orderByComparator)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kbFolderLocalService.fetchFirstChildKBFolder(
-			groupId, kbFolderId, obc);
+			groupId, kbFolderId, orderByComparator);
 	}
 
 	@Override
@@ -439,6 +474,9 @@ public class KBFolderLocalServiceWrapper
 		return _kbFolderLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -456,6 +494,10 @@ public class KBFolderLocalServiceWrapper
 
 	/**
 	 * Updates the kb folder in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBFolderLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbFolder the kb folder
 	 * @return the kb folder that was updated

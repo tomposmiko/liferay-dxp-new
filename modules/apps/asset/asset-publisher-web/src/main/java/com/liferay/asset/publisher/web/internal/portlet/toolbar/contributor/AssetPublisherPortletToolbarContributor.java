@@ -17,10 +17,9 @@ package com.liferay.asset.publisher.web.internal.portlet.toolbar.contributor;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.constants.AssetPublisherWebKeys;
 import com.liferay.asset.publisher.web.internal.display.context.AssetPublisherDisplayContext;
-import com.liferay.asset.publisher.web.internal.util.AssetPublisherWebUtil;
+import com.liferay.asset.publisher.web.internal.helper.AssetPublisherWebHelper;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.asset.util.AssetPublisherAddItemHolder;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -136,20 +135,19 @@ public class AssetPublisherPortletToolbarContributor
 		String title = LanguageUtil.get(
 			resourceBundle, "add-content-select-scope-and-type");
 
-		Map<String, Object> data = HashMapBuilder.<String, Object>put(
-			"id",
-			() -> {
-				PortletDisplay portletDisplay =
-					themeDisplay.getPortletDisplay();
+		urlMenuItem.setData(
+			HashMapBuilder.<String, Object>put(
+				"id",
+				() -> {
+					PortletDisplay portletDisplay =
+						themeDisplay.getPortletDisplay();
 
-				return HtmlUtil.escape(portletDisplay.getNamespace()) +
-					"editAsset";
-			}
-		).put(
-			"title", title
-		).build();
-
-		urlMenuItem.setData(data);
+					return HtmlUtil.escape(portletDisplay.getNamespace()) +
+						"editAsset";
+				}
+			).put(
+				"title", title
+			).build());
 
 		urlMenuItem.setLabel(title);
 
@@ -194,15 +192,15 @@ public class AssetPublisherPortletToolbarContributor
 
 		String message = assetPublisherAddItemHolder.getModelResource();
 
-		Map<String, Object> data = HashMapBuilder.<String, Object>put(
-			"id", HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset"
-		).put(
-			"title",
-			LanguageUtil.format(
-				themeDisplay.getLocale(), "new-x", message, false)
-		).build();
-
-		urlMenuItem.setData(data);
+		urlMenuItem.setData(
+			HashMapBuilder.<String, Object>put(
+				"id",
+				HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset"
+			).put(
+				"title",
+				LanguageUtil.format(
+					themeDisplay.getLocale(), "new-x", message, false)
+			).build());
 
 		urlMenuItem.setLabel(message);
 
@@ -223,7 +221,7 @@ public class AssetPublisherPortletToolbarContributor
 			"portletResource", AssetPublisherPortletKeys.ASSET_PUBLISHER);
 
 		boolean addDisplayPageParameter =
-			_assetPublisherWebUtil.isDefaultAssetPublisher(
+			_assetPublisherWebHelper.isDefaultAssetPublisher(
 				themeDisplay.getLayout(), portletDisplay.getId(),
 				assetPublisherDisplayContext.getPortletResource());
 
@@ -239,7 +237,7 @@ public class AssetPublisherPortletToolbarContributor
 	private boolean _isVisible(
 			AssetPublisherDisplayContext assetPublisherDisplayContext,
 			PortletRequest portletRequest)
-		throws PortalException {
+		throws Exception {
 
 		if (!assetPublisherDisplayContext.isShowAddContentButton()) {
 			return false;
@@ -292,7 +290,7 @@ public class AssetPublisherPortletToolbarContributor
 	private AssetHelper _assetHelper;
 
 	@Reference
-	private AssetPublisherWebUtil _assetPublisherWebUtil;
+	private AssetPublisherWebHelper _assetPublisherWebHelper;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

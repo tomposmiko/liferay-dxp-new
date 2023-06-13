@@ -16,11 +16,11 @@ package com.liferay.frontend.image.editor.integration.document.library.internal.
 
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -190,6 +190,8 @@ public class ImageEditorDLDisplayContextHelper {
 
 		template.put("namespace", liferayPortletResponse.getNamespace());
 
+		template.put("redirectURL", _themeDisplay.getURLCurrent());
+
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		template.processTemplate(unsyncStringWriter);
@@ -214,7 +216,7 @@ public class ImageEditorDLDisplayContextHelper {
 			PortletRequest.RENDER_PHASE);
 
 		imageEditorURL.setParameter(
-			"mvcRenderCommandName", "/image_editor/view");
+			"mvcRenderCommandName", "/frontend_image_editor/view");
 
 		try {
 			imageEditorURL.setWindowState(LiferayWindowState.POP_UP);

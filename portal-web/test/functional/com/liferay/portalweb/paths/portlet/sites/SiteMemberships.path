@@ -2,11 +2,13 @@
 <head>
 <title>SiteMemberships</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">SiteMemberships</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>MEMBERSHIP_TYPE</td>
@@ -47,7 +49,7 @@
 </tr>
 <tr>
 	<td>USER_GROUPS_TABLE_SITE_ROLES</td>
-	<td>//td[contains(@class,'lfr-site-roles-column') and contains(.,'${key_siteRoleName}')]</td>
+	<td>//td[contains(@class,'lfr-roles-column') and contains(.,'${key_siteRoleName}')]</td>
 	<td></td>
 </tr>
 </tbody>

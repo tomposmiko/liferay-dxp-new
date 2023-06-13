@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.uuid.PortalUUID;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.scheduler.quartz.internal.job.MessageSenderJob;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -59,6 +60,8 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -87,6 +90,11 @@ import org.quartz.spi.JobFactory;
 @NewEnv(type = NewEnv.Type.CLASSLOADER)
 public class QuartzSchedulerEngineTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
 	public void setUp() throws SchedulerException {
 		Thread currentThread = Thread.currentThread();
@@ -99,7 +107,7 @@ public class QuartzSchedulerEngineTest {
 
 		_quartzSchedulerEngine = new QuartzSchedulerEngine();
 
-		_quartzSchedulerEngine.setProps(setUpProps());
+		_quartzSchedulerEngine.setProps(setUpPropsUtil());
 
 		ReflectionTestUtil.setFieldValue(
 			_quartzSchedulerEngine, "_jsonFactory", setUpJSONFactory());
@@ -187,7 +195,7 @@ public class QuartzSchedulerEngineTest {
 		schedulerResponses = _quartzSchedulerEngine.getScheduledJobs();
 
 		Assert.assertEquals(
-			schedulerResponses.toString(), 2 * _DEFAULT_JOB_NUMBER + 1,
+			schedulerResponses.toString(), (2 * _DEFAULT_JOB_NUMBER) + 1,
 			schedulerResponses.size());
 
 		_quartzSchedulerEngine.delete(
@@ -588,9 +596,7 @@ public class QuartzSchedulerEngineTest {
 
 		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
 
-		TriggerState triggerState = jobState.getTriggerState();
-
-		Assert.assertEquals(expectedTriggerState, triggerState);
+		Assert.assertEquals(expectedTriggerState, jobState.getTriggerState());
 	}
 
 	protected JSONFactory setUpJSONFactory() {
@@ -609,11 +615,13 @@ public class QuartzSchedulerEngineTest {
 
 					byte[] bytes = Base64.decode(base64);
 
-					ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+					ByteArrayInputStream byteArrayInputStream =
+						new ByteArrayInputStream(bytes);
 
-					ObjectInputStream ois = new ObjectInputStream(bais);
+					ObjectInputStream objectInputStream = new ObjectInputStream(
+						byteArrayInputStream);
 
-					return ois.readObject();
+					return objectInputStream.readObject();
 				}
 
 			}
@@ -628,17 +636,19 @@ public class QuartzSchedulerEngineTest {
 				public String answer(InvocationOnMock invocationOnMock)
 					throws Throwable {
 
-					Object obj = invocationOnMock.getArguments()[0];
+					Object object = invocationOnMock.getArguments()[0];
 
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					ByteArrayOutputStream byteArrayOutputStream =
+						new ByteArrayOutputStream();
 
-					ObjectOutputStream oos = new ObjectOutputStream(baos);
+					ObjectOutputStream objectOutputStream =
+						new ObjectOutputStream(byteArrayOutputStream);
 
-					oos.writeObject(obj);
+					objectOutputStream.writeObject(object);
 
-					byte[] bytes = baos.toByteArray();
+					byte[] bytes = byteArrayOutputStream.toByteArray();
 
-					oos.close();
+					objectOutputStream.close();
 
 					return Base64.encode(bytes);
 				}
@@ -676,7 +686,7 @@ public class QuartzSchedulerEngineTest {
 		portalUUIDUtil.setPortalUUID(portalUUID);
 	}
 
-	protected Props setUpProps() {
+	protected Props setUpPropsUtil() {
 		return PropsTestUtil.setProps(PropsKeys.SCHEDULER_ENABLED, "true");
 	}
 

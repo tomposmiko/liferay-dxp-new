@@ -14,7 +14,6 @@
 
 package com.liferay.sharing.service.persistence.impl;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -58,22 +57,22 @@ public class SharingEntryFinderImpl
 
 			sql = _replaceClassNameIdWhere(sql, classNameId);
 
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+			sqlQuery.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
-			QueryPos qPos = QueryPos.getInstance(q);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(userId);
+			queryPos.add(userId);
 
 			if (classNameId > 0) {
-				qPos.add(classNameId);
+				queryPos.add(classNameId);
 			}
 
-			Iterator<Long> itr = q.iterate();
+			Iterator<Long> iterator = sqlQuery.iterate();
 
-			if (itr.hasNext()) {
-				Long count = itr.next();
+			if (iterator.hasNext()) {
+				Long count = iterator.next();
 
 				if (count != null) {
 					return count.intValue();
@@ -108,20 +107,20 @@ public class SharingEntryFinderImpl
 
 			sql = _replaceClassNameIdWhere(sql, classNameId);
 
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			q.addEntity("SharingEntry", SharingEntryImpl.class);
+			sqlQuery.addEntity("SharingEntry", SharingEntryImpl.class);
 
-			QueryPos qPos = QueryPos.getInstance(q);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(userId);
+			queryPos.add(userId);
 
 			if (classNameId > 0) {
-				qPos.add(classNameId);
+				queryPos.add(classNameId);
 			}
 
 			return (List<SharingEntry>)QueryUtil.list(
-				q, getDialect(), begin, end);
+				sqlQuery, getDialect(), begin, end);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -138,8 +137,7 @@ public class SharingEntryFinderImpl
 				"AND SharingEntry.classNameId = ?");
 		}
 		else {
-			sql = StringUtil.replace(
-				sql, "[$CLASS_NAME_ID_WHERE$]", StringPool.BLANK);
+			sql = StringUtil.removeSubstring(sql, "[$CLASS_NAME_ID_WHERE$]");
 		}
 
 		return sql;

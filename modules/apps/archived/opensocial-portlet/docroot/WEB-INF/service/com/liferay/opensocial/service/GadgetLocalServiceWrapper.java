@@ -33,6 +33,10 @@ public class GadgetLocalServiceWrapper
 	/**
 	 * Adds the gadget to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect GadgetLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param gadget the gadget
 	 * @return the gadget that was added
 	 */
@@ -65,7 +69,22 @@ public class GadgetLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _gadgetLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the gadget from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect GadgetLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param gadget the gadget
 	 * @return the gadget that was removed
@@ -81,6 +100,10 @@ public class GadgetLocalServiceWrapper
 
 	/**
 	 * Deletes the gadget with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect GadgetLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param gadgetId the primary key of the gadget
 	 * @return the gadget that was removed
@@ -357,6 +380,9 @@ public class GadgetLocalServiceWrapper
 		return _gadgetLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -384,6 +410,10 @@ public class GadgetLocalServiceWrapper
 
 	/**
 	 * Updates the gadget in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect GadgetLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param gadget the gadget
 	 * @return the gadget that was updated

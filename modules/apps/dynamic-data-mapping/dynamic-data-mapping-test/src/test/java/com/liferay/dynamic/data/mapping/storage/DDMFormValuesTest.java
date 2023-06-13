@@ -18,17 +18,25 @@ import com.liferay.dynamic.data.mapping.BaseDDMTestCase;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Marcellus Tavares
  */
 public class DDMFormValuesTest extends BaseDDMTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testDDMFormFieldValuesMap() {
@@ -48,6 +56,52 @@ public class DDMFormValuesTest extends BaseDDMTestCase {
 
 		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValuesMap.get(
 			fieldName);
+
+		Assert.assertEquals(
+			ddmFormFieldValues.toString(), 3, ddmFormFieldValues.size());
+	}
+
+	@Test
+	public void testDDMFormFieldValuesReferencesMap() {
+		DDMFormValues ddmFormValues = createDDMFormValues(null);
+
+		String fieldName = StringUtil.randomString();
+
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesReferencesMap =
+			ddmFormValues.getDDMFormFieldValuesReferencesMap(false);
+
+		List<DDMFormFieldValue> ddmFormFieldValues =
+			ddmFormFieldValuesReferencesMap.get(fieldName);
+
+		Assert.assertEquals(
+			ddmFormFieldValues.toString(), 3, ddmFormFieldValues.size());
+	}
+
+	@Test
+	public void testDDMFormFieldValuesReferencesMapIncludingNestedFields() {
+		DDMFormValues ddmFormValues = createDDMFormValues(null);
+
+		String fieldName = StringUtil.randomString();
+
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+		ddmFormValues.addDDMFormFieldValue(
+			createDDMFormFieldValue(fieldName, null));
+
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesReferencesMap =
+			ddmFormValues.getDDMFormFieldValuesReferencesMap(true);
+
+		List<DDMFormFieldValue> ddmFormFieldValues =
+			ddmFormFieldValuesReferencesMap.get(fieldName);
 
 		Assert.assertEquals(
 			ddmFormFieldValues.toString(), 3, ddmFormFieldValues.size());

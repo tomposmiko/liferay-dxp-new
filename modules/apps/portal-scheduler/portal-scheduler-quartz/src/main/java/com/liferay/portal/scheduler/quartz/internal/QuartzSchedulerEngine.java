@@ -640,9 +640,8 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 
 		JobDataMap jobDataMap = jobDetail.getJobDataMap();
 
-		String description = jobDataMap.getString(SchedulerEngine.DESCRIPTION);
-
-		schedulerResponse.setDescription(description);
+		schedulerResponse.setDescription(
+			jobDataMap.getString(SchedulerEngine.DESCRIPTION));
 
 		String destinationName = jobDataMap.getString(
 			SchedulerEngine.DESTINATION_NAME);
@@ -800,10 +799,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 					JobDetail jobDetail = _persistedScheduler.getJobDetail(
 						jobKey);
 
-					Message message = getMessage(jobDetail.getJobDataMap());
-
 					_schedulerEngineHelper.auditSchedulerJobs(
-						message, TriggerState.EXPIRED);
+						getMessage(jobDetail.getJobDataMap()),
+						TriggerState.EXPIRED);
 				}
 
 				_persistedScheduler.deleteJob(jobKey);

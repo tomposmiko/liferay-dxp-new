@@ -64,7 +64,7 @@ export default function createPortletURL(basePortletURL, parameters = {}) {
 		'refererGroupId',
 		'refererPlid',
 		'saveLastPath',
-		'scroll'
+		'scroll',
 	]);
 
 	if (
@@ -73,7 +73,8 @@ export default function createPortletURL(basePortletURL, parameters = {}) {
 	) {
 		if (basePortletURL.indexOf('/') !== 0) {
 			basePortletURL = `${Liferay.ThemeDisplay.getPortalURL()}/${basePortletURL}`;
-		} else {
+		}
+		else {
 			basePortletURL =
 				Liferay.ThemeDisplay.getPortalURL() + basePortletURL;
 		}
@@ -97,12 +98,13 @@ export default function createPortletURL(basePortletURL, parameters = {}) {
 		namespace = getPortletNamespace(portletID);
 	}
 
-	Object.keys(parameters).forEach(key => {
+	Object.keys(parameters).forEach((key) => {
 		let param;
 
 		if (reservedParameters.has(key)) {
 			param = key;
-		} else {
+		}
+		else {
 			param = `${namespace}${key}`;
 		}
 

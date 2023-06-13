@@ -15,10 +15,10 @@
 package com.liferay.portal.util;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Html;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
@@ -506,6 +506,8 @@ public class HtmlImpl implements Html {
 			return StringPool.BLANK;
 		}
 
+		link = StringUtil.trim(link);
+
 		if (link.indexOf(StringPool.COLON) == 10) {
 			String protocol = StringUtil.toLowerCase(link.substring(0, 10));
 
@@ -569,26 +571,17 @@ public class HtmlImpl implements Html {
 		if (hasQuote && hasApostrophe) {
 			String[] parts = xPathAttribute.split(StringPool.APOSTROPHE);
 
-			return "concat('".concat(
-				StringUtil.merge(parts, "', \"'\", '")
-			).concat(
-				"')"
-			);
+			return StringBundler.concat(
+				"concat('", StringUtil.merge(parts, "', \"'\", '"), "')");
 		}
 
 		if (hasQuote) {
-			return StringPool.APOSTROPHE.concat(
-				xPathAttribute
-			).concat(
-				StringPool.APOSTROPHE
-			);
+			return StringBundler.concat(
+				StringPool.APOSTROPHE, xPathAttribute, StringPool.APOSTROPHE);
 		}
 
-		return StringPool.QUOTE.concat(
-			xPathAttribute
-		).concat(
-			StringPool.QUOTE
-		);
+		return StringBundler.concat(
+			StringPool.QUOTE, xPathAttribute, StringPool.QUOTE);
 	}
 
 	/**
@@ -773,7 +766,10 @@ public class HtmlImpl implements Html {
 
 			// Look for text enclosed by <abc></abc>
 
-			if (isTag(_TAG_SCRIPT, text, y + 1)) {
+			if (isTag(_TAG_NOSCRIPT, text, y + 1)) {
+				y = stripTag(_TAG_NOSCRIPT, text, y);
+			}
+			else if (isTag(_TAG_SCRIPT, text, y + 1)) {
 				y = stripTag(_TAG_SCRIPT, text, y);
 			}
 			else if (isTag(_TAG_STYLE, text, y + 1)) {
@@ -970,9 +966,19 @@ public class HtmlImpl implements Html {
 		return pos;
 	}
 
-	private static void _appendHexChars(
-		StringBuilder sb, char[] buffer, char c) {
+	private static boolean _isValidXmlCharacter(char c) {
+		if (((c >= CharPool.SPACE) && (c <= '\ud7ff')) ||
+			((c >= '\ue000') && (c <= '\ufffd')) || Character.isSurrogate(c) ||
+			(c == CharPool.TAB) || (c == CharPool.NEW_LINE) ||
+			(c == CharPool.RETURN)) {
 
+			return true;
+		}
+
+		return false;
+	}
+
+	private void _appendHexChars(StringBuilder sb, char[] buffer, char c) {
 		int index = buffer.length;
 
 		do {
@@ -992,18 +998,6 @@ public class HtmlImpl implements Html {
 		sb.append(buffer, index, buffer.length - index);
 	}
 
-	private static boolean _isValidXmlCharacter(char c) {
-		if (((c >= CharPool.SPACE) && (c <= '\ud7ff')) ||
-			((c >= '\ue000') && (c <= '\ufffd')) || Character.isSurrogate(c) ||
-			(c == CharPool.TAB) || (c == CharPool.NEW_LINE) ||
-			(c == CharPool.RETURN)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	private boolean _isUnicodeCompatibilityCharacter(char c) {
 		if (((c >= '\u007f') && (c <= '\u0084')) ||
 			((c >= '\u0086') && (c <= '\u009f')) ||
@@ -1020,6 +1014,10 @@ public class HtmlImpl implements Html {
 	private static final char[] _HEX_DIGITS = {
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
 		'e', 'f'
+	};
+
+	private static final char[] _TAG_NOSCRIPT = {
+		'n', 'o', 's', 'c', 'r', 'i', 'p', 't'
 	};
 
 	private static final char[] _TAG_SCRIPT = {'s', 'c', 'r', 'i', 'p', 't'};
@@ -1064,6 +1062,8 @@ public class HtmlImpl implements Html {
 		"gt", ">"
 	).put(
 		"lt", "<"
+	).put(
+		"nbsp", " "
 	).put(
 		"rsquo", "\u2019"
 	).build();

@@ -3,6 +3,12 @@ definition {
 	macro addContent {
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#GOOGLE_DOC");
 
+		if (IsElementPresent(locator1 = "GoogleDoc#DISMISS")) {
+			Click(locator1 = "GoogleDoc#DISMISS");
+
+			AssertElementPresent(locator1 = "GoogleDoc#INSERT_LINK_BUTTON");
+		}
+
 		if (isSet(insertLink)) {
 			Click(locator1 = "GoogleDoc#INSERT_LINK_BUTTON");
 
@@ -19,10 +25,6 @@ definition {
 				value1 = "${linkText}");
 
 			Click(locator1 = "GoogleDoc#INSERT_LINK_APPLY_BUTTON");
-
-			var key_googleDocContent = "${googleDocContent}";
-
-			AssertElementPresent(locator1 = "GoogleDoc#INSERT_LINK_DOCUMENT_CONTENT");
 		}
 
 		SelectFrameTop();
@@ -52,6 +54,8 @@ definition {
 			value1 = "\RETURN");
 
 		SelectFrameTop();
+
+		Refresh();
 	}
 
 	macro gotoEdit {
@@ -62,6 +66,16 @@ definition {
 		MenuItem.click(menuItem = "Edit in ${dmDocumentTypeName}");
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		Pause(locator1 = "5000");
+
+		if (IsElementNotPresent(key_text = "Save and Return to ${siteName}", locator1 = "Button#ANY")) {
+			Refresh();
+
+			Click(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
+
+			MenuItem.click(menuItem = "Edit in ${dmDocumentTypeName}");
+		}
 
 		AssertElementPresent(
 			key_text = "Save and Return to ${siteName}",

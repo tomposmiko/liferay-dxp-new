@@ -12,65 +12,61 @@
  * details.
  */
 
-import {FREEMARKER_FRAGMENT_ENTRY_PROCESSOR} from '../../../js/utils/constants';
-import updateEditableValues from '../actions/updateEditableValues';
-import updateFragmentEntryLinkContent from '../actions/updateFragmentEntryLinkContent';
+import {addMappedInfoItems} from '../actions/index';
+import updateFragmentEntryLinkConfiguration from '../actions/updateFragmentEntryLinkConfiguration';
+import updatePageContents from '../actions/updatePageContents';
+import {FREEMARKER_FRAGMENT_ENTRY_PROCESSOR} from '../config/constants/freemarkerFragmentEntryProcessor';
+import {config} from '../config/index';
 import FragmentService from '../services/FragmentService';
+import InfoItemService from '../services/InfoItemService';
 
 export default function updateFragmentConfiguration({
-	config,
 	configurationValues,
 	fragmentEntryLink,
-	segmentsExperienceId
 }) {
 	const {editableValues, fragmentEntryLinkId} = fragmentEntryLink;
 
 	const nextEditableValues = {
 		...editableValues,
-		[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR]: {
-			...editableValues[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR],
-			[segmentsExperienceId]: configurationValues
-		}
+		[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR]: configurationValues,
 	};
 
-	return dispatch => {
-		return FragmentService.updateEditableValues({
-			config,
-			editableValues: nextEditableValues,
+	return (dispatch) => {
+		return FragmentService.updateConfigurationValues({
+			configurationValues: nextEditableValues,
 			fragmentEntryLinkId,
-			onNetworkStatus: dispatch
+			onNetworkStatus: dispatch,
 		})
-			.then(() => {
-				return FragmentService.renderFragmentEntryLinkContent({
-					config,
-					fragmentEntryLinkId,
-					onNetworkStatus: dispatch,
-					segmentsExperienceId
-				});
+			.then(({fragmentEntryLink, layoutData}) => {
+				dispatch(
+					updateFragmentEntryLinkConfiguration({
+						fragmentEntryLink,
+						fragmentEntryLinkId,
+						layoutData,
+					})
+				);
 			})
-			.then(({content}) => {
-				// TODO: This is a temporary "hack"
-				//       until the backend is consitent
-				//       between both "metal+soy" and "react" versions
-				const nextContent = {
-					value: {
-						content
-					}
-				};
+			.then(() => {
+				InfoItemService.getPageContents({
+					onNetworkStatus: dispatch,
+				}).then((pageContents) => {
+					dispatch(
+						updatePageContents({
+							pageContents,
+							segmentsExperienceId:
+								config.defaultSegmentsExperienceId,
+						})
+					);
 
-				dispatch(
-					updateEditableValues({
-						editableValues: nextEditableValues,
-						fragmentEntryLinkId
-					})
-				);
-
-				dispatch(
-					updateFragmentEntryLinkContent({
-						content: nextContent,
-						fragmentEntryLinkId
-					})
-				);
+					dispatch(
+						addMappedInfoItems(
+							pageContents.filter(
+								(element) =>
+									element.classNameId && element.classPK
+							)
+						)
+					);
+				});
 			});
 	};
 }

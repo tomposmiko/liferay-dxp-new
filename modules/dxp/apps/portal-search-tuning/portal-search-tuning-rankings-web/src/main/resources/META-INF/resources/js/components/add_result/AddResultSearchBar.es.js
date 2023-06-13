@@ -11,6 +11,7 @@
 
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
+import ClayLayout from '@clayui/layout';
 import {PropTypes} from 'prop-types';
 import React from 'react';
 
@@ -22,9 +23,9 @@ const AddResultSearchBar = ({
 	onSearchKeyDown,
 	onSearchQueryChange,
 	onSearchSubmit,
-	searchQuery
+	searchQuery,
 }) => (
-	<div className="add-result-container container-fluid">
+	<ClayLayout.ContainerFluid className="add-result-container">
 		<div className="management-bar navbar-expand-md">
 			<div className="navbar-form navbar-form-autofit">
 				<div className="input-group">
@@ -56,18 +57,18 @@ const AddResultSearchBar = ({
 				</div>
 			</div>
 		</div>
-	</div>
+	</ClayLayout.ContainerFluid>
 );
 
 AddResultSearchBar.propTypes = {
 	onSearchKeyDown: PropTypes.func.isRequired,
 	onSearchQueryChange: PropTypes.func.isRequired,
 	onSearchSubmit: PropTypes.func.isRequired,
-	searchQuery: PropTypes.string
+	searchQuery: PropTypes.string,
 };
 
 AddResultSearchBar.defaultProps = {
-	searchQuery: ''
+	searchQuery: '',
 };
 
 export default AddResultSearchBar;

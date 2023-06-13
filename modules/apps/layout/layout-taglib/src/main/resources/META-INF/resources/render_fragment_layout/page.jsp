@@ -17,58 +17,41 @@
 <%@ include file="/render_fragment_layout/init.jsp" %>
 
 <%
-JSONObject dataJSONObject = (JSONObject)request.getAttribute("liferay-layout:render-fragment-layout:dataJSONObject");
+Map<String, Object> fieldValues = (Map<String, Object>)request.getAttribute("liferay-layout:render-fragment-layout:fieldValues");
+LayoutStructure layoutStructure = (LayoutStructure)request.getAttribute("liferay-layout:render-fragment-layout:layoutStructure");
+String mainItemId = (String)request.getAttribute("liferay-layout:render-fragment-layout:mainItemId");
+String mode = (String)request.getAttribute("liferay-layout:render-fragment-layout:mode");
+boolean showPreview = GetterUtil.getBoolean(request.getAttribute("liferay-layout:render-fragment-layout:showPreview"));
+
+RenderFragmentLayoutDisplayContext renderFragmentLayoutDisplayContext = new RenderFragmentLayoutDisplayContext(request, response);
 %>
 
-<c:if test="<%= dataJSONObject != null %>">
-	<div class="layout-content portlet-layout" id="main-content" role="main">
+<c:if test="<%= layoutStructure != null %>">
 
-		<%
-		try {
-			request.setAttribute(WebKeys.SHOW_PORTLET_TOPPER, Boolean.TRUE);
+	<%
+	try {
+		request.setAttribute(WebKeys.SHOW_PORTLET_TOPPER, Boolean.TRUE);
+	%>
 
-			RenderFragmentLayoutDisplayContext renderFragmentLayoutDisplayContext = new RenderFragmentLayoutDisplayContext(request, response);
+		<liferay-util:buffer
+			var="content"
+		>
+			<liferay-layout:render-layout-structure
+				fieldValues="<%= fieldValues %>"
+				layoutStructure="<%= layoutStructure %>"
+				mainItemId="<%= mainItemId %>"
+				mode="<%= mode %>"
+				showPreview="<%= showPreview %>"
+			/>
+		</liferay-util:buffer>
 
-			request.setAttribute("render_layout_data_structure.jsp-renderFragmentLayoutDisplayContext", renderFragmentLayoutDisplayContext);
-		%>
+		<%= renderFragmentLayoutDisplayContext.processAMImages(content) %>
 
-			<%= renderFragmentLayoutDisplayContext.getPortletPaths() %>
+	<%
+	}
+	finally {
+		request.removeAttribute(WebKeys.SHOW_PORTLET_TOPPER);
+	}
+	%>
 
-			<c:choose>
-				<c:when test="<%= LayoutDataConverter.isLatestVersion(dataJSONObject) %>">
-
-					<%
-					JSONObject rootItemsJSONObject = dataJSONObject.getJSONObject("rootItems");
-
-					String mainItemId = rootItemsJSONObject.getString("main");
-
-					JSONObject itemsJSONObject = dataJSONObject.getJSONObject("items");
-
-					request.setAttribute("render_react_editor_layout_data_structure.jsp-itemsJSONObject", itemsJSONObject);
-
-					JSONObject mainJSONObject = itemsJSONObject.getJSONObject(mainItemId);
-
-					request.setAttribute("render_react_editor_layout_data_structure.jsp-childrenJSONArray", mainJSONObject.getJSONArray("children"));
-					%>
-
-					<liferay-util:include page="/render_fragment_layout/render_react_editor_layout_data_structure.jsp" servletContext="<%= application %>" />
-				</c:when>
-				<c:otherwise>
-
-					<%
-					request.setAttribute("render_layout_data_structure.jsp-dataJSONObject", dataJSONObject);
-					%>
-
-					<liferay-util:include page="/render_fragment_layout/render_layout_data_structure.jsp" servletContext="<%= application %>" />
-				</c:otherwise>
-			</c:choose>
-
-		<%
-		}
-		finally {
-			request.removeAttribute(WebKeys.SHOW_PORTLET_TOPPER);
-		}
-		%>
-
-	</div>
 </c:if>

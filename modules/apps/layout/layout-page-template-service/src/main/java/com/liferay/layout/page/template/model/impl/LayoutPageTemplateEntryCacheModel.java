@@ -37,17 +37,17 @@ public class LayoutPageTemplateEntryCacheModel
 	implements CacheModel<LayoutPageTemplateEntry>, Externalizable, MVCCModel {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof LayoutPageTemplateEntryCacheModel)) {
+		if (!(object instanceof LayoutPageTemplateEntryCacheModel)) {
 			return false;
 		}
 
 		LayoutPageTemplateEntryCacheModel layoutPageTemplateEntryCacheModel =
-			(LayoutPageTemplateEntryCacheModel)obj;
+			(LayoutPageTemplateEntryCacheModel)object;
 
 		if ((layoutPageTemplateEntryId ==
 				layoutPageTemplateEntryCacheModel.layoutPageTemplateEntryId) &&
@@ -78,10 +78,12 @@ public class LayoutPageTemplateEntryCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(47);
+		StringBundler sb = new StringBundler(51);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", ctCollectionId=");
+		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", layoutPageTemplateEntryId=");
@@ -100,6 +102,8 @@ public class LayoutPageTemplateEntryCacheModel
 		sb.append(modifiedDate);
 		sb.append(", layoutPageTemplateCollectionId=");
 		sb.append(layoutPageTemplateCollectionId);
+		sb.append(", layoutPageTemplateEntryKey=");
+		sb.append(layoutPageTemplateEntryKey);
 		sb.append(", classNameId=");
 		sb.append(classNameId);
 		sb.append(", classTypeId=");
@@ -137,6 +141,7 @@ public class LayoutPageTemplateEntryCacheModel
 			new LayoutPageTemplateEntryImpl();
 
 		layoutPageTemplateEntryImpl.setMvccVersion(mvccVersion);
+		layoutPageTemplateEntryImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			layoutPageTemplateEntryImpl.setUuid("");
@@ -174,6 +179,15 @@ public class LayoutPageTemplateEntryCacheModel
 
 		layoutPageTemplateEntryImpl.setLayoutPageTemplateCollectionId(
 			layoutPageTemplateCollectionId);
+
+		if (layoutPageTemplateEntryKey == null) {
+			layoutPageTemplateEntryImpl.setLayoutPageTemplateEntryKey("");
+		}
+		else {
+			layoutPageTemplateEntryImpl.setLayoutPageTemplateEntryKey(
+				layoutPageTemplateEntryKey);
+		}
+
 		layoutPageTemplateEntryImpl.setClassNameId(classNameId);
 		layoutPageTemplateEntryImpl.setClassTypeId(classTypeId);
 
@@ -223,6 +237,8 @@ public class LayoutPageTemplateEntryCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
+
+		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		layoutPageTemplateEntryId = objectInput.readLong();
@@ -237,6 +253,7 @@ public class LayoutPageTemplateEntryCacheModel
 		modifiedDate = objectInput.readLong();
 
 		layoutPageTemplateCollectionId = objectInput.readLong();
+		layoutPageTemplateEntryKey = objectInput.readUTF();
 
 		classNameId = objectInput.readLong();
 
@@ -265,6 +282,8 @@ public class LayoutPageTemplateEntryCacheModel
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
+		objectOutput.writeLong(ctCollectionId);
+
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -291,6 +310,13 @@ public class LayoutPageTemplateEntryCacheModel
 		objectOutput.writeLong(modifiedDate);
 
 		objectOutput.writeLong(layoutPageTemplateCollectionId);
+
+		if (layoutPageTemplateEntryKey == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(layoutPageTemplateEntryKey);
+		}
 
 		objectOutput.writeLong(classNameId);
 
@@ -329,6 +355,7 @@ public class LayoutPageTemplateEntryCacheModel
 	}
 
 	public long mvccVersion;
+	public long ctCollectionId;
 	public String uuid;
 	public long layoutPageTemplateEntryId;
 	public long groupId;
@@ -338,6 +365,7 @@ public class LayoutPageTemplateEntryCacheModel
 	public long createDate;
 	public long modifiedDate;
 	public long layoutPageTemplateCollectionId;
+	public String layoutPageTemplateEntryKey;
 	public long classNameId;
 	public long classTypeId;
 	public String name;

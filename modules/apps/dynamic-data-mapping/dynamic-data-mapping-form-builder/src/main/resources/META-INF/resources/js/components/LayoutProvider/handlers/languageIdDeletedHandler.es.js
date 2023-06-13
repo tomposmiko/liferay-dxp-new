@@ -12,12 +12,12 @@
  * details.
  */
 
-import {PagesVisitor} from 'dynamic-data-mapping-form-renderer/js/util/visitors.es';
+import {PagesVisitor} from 'dynamic-data-mapping-form-renderer';
 
 const deleteLanguageId = (languageId, pages) => {
 	const visitor = new PagesVisitor(pages);
 
-	return visitor.mapFields(field => {
+	return visitor.mapFields((field) => {
 		const {localizedValue} = field;
 		const newLocalizedValue = {...localizedValue};
 
@@ -25,7 +25,7 @@ const deleteLanguageId = (languageId, pages) => {
 
 		return {
 			...field,
-			localizedValue: newLocalizedValue
+			localizedValue: newLocalizedValue,
 		};
 	});
 };
@@ -39,14 +39,14 @@ export const handleLanguageIdDeleted = (focusedField, pages, languageId) => {
 				pages: deleteLanguageId(
 					languageId,
 					focusedField.settingsContext.pages
-				)
-			}
+				),
+			},
 		};
 	}
 
 	const visitor = new PagesVisitor(pages);
 
-	pages = visitor.mapPages(page => {
+	pages = visitor.mapPages((page) => {
 		const {localizedDescription, localizedTitle} = page;
 
 		delete localizedDescription[languageId];
@@ -55,27 +55,27 @@ export const handleLanguageIdDeleted = (focusedField, pages, languageId) => {
 		return {
 			...page,
 			localizedDescription,
-			localizedTitle
+			localizedTitle,
 		};
 	});
 
 	visitor.setPages(pages);
 
-	pages = visitor.mapFields(field => {
+	pages = visitor.mapFields((field) => {
 		const {settingsContext} = field;
 
 		return {
 			...field,
 			settingsContext: {
 				...settingsContext,
-				pages: deleteLanguageId(languageId, settingsContext.pages)
-			}
+				pages: deleteLanguageId(languageId, settingsContext.pages),
+			},
 		};
 	});
 
 	return {
 		focusedField,
-		pages
+		pages,
 	};
 };
 

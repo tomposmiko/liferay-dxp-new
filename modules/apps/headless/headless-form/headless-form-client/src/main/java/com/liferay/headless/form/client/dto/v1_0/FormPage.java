@@ -17,6 +17,8 @@ package com.liferay.headless.form.client.dto.v1_0;
 import com.liferay.headless.form.client.function.UnsafeSupplier;
 import com.liferay.headless.form.client.serdes.v1_0.FormPageSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class FormPage {
+public class FormPage implements Cloneable, Serializable {
+
+	public static FormPage toDTO(String json) {
+		return FormPageSerDes.toDTO(json);
+	}
 
 	public FormField[] getFormFields() {
 		return formFields;
@@ -152,6 +158,11 @@ public class FormPage {
 	}
 
 	protected Map<String, String> text_i18n;
+
+	@Override
+	public FormPage clone() throws CloneNotSupportedException {
+		return (FormPage)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

@@ -16,8 +16,11 @@ package com.liferay.account.internal.search.searcher;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.searcher.SearchRequest;
@@ -136,13 +139,13 @@ public class UserSearchRequestBuilder {
 
 		searchContext.setAndSearch(andSearch);
 
-		Map<String, Serializable> attributes =
+		searchContext.setAttributes(
 			HashMapBuilder.<String, Serializable>put(
+				Field.STATUS, _status
+			).put(
 				"city", _keywords
 			).put(
 				"country", _keywords
-			).put(
-				"emailAddress", _keywords
 			).put(
 				"firstName", _keywords
 			).put(
@@ -158,18 +161,21 @@ public class UserSearchRequestBuilder {
 			).put(
 				"screenName", _keywords
 			).put(
-				"status", _status
-			).put(
 				"street", _keywords
 			).put(
 				"zip", _keywords
-			).build();
-
-		attributes.putAll(_attributes);
-
-		searchContext.setAttributes(attributes);
+			).putAll(
+				_attributes
+			).build());
 
 		searchContext.setCompanyId(CompanyThreadLocal.getCompanyId());
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (permissionChecker != null) {
+			searchContext.setUserId(permissionChecker.getUserId());
+		}
 	}
 
 	private Map<String, Serializable> _attributes = new HashMap<>();

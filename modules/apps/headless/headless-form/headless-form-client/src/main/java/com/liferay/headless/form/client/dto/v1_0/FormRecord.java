@@ -17,6 +17,8 @@ package com.liferay.headless.form.client.dto.v1_0;
 import com.liferay.headless.form.client.function.UnsafeSupplier;
 import com.liferay.headless.form.client.serdes.v1_0.FormRecordSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class FormRecord {
+public class FormRecord implements Cloneable, Serializable {
+
+	public static FormRecord toDTO(String json) {
+		return FormRecordSerDes.toDTO(json);
+	}
 
 	public Creator getCreator() {
 		return creator;
@@ -195,6 +201,11 @@ public class FormRecord {
 	}
 
 	protected Long id;
+
+	@Override
+	public FormRecord clone() throws CloneNotSupportedException {
+		return (FormRecord)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

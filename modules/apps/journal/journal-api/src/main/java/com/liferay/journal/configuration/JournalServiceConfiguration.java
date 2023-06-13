@@ -145,10 +145,22 @@ public interface JournalServiceConfiguration {
 	public String journalArticleStorageType();
 
 	@Meta.AD(
+		deflt = "0", name = "journal-article-max-version-count",
+		required = false
+	)
+	public int journalArticleMaxVersionCount();
+
+	@Meta.AD(
 		deflt = "false",
 		description = "single-asset-publish-includes-version-history-help",
 		name = "single-asset-publish-includes-version-history", required = false
 	)
 	public boolean singleAssetPublishIncludeVersionHistory();
+
+	@Meta.AD(
+		deflt = "false", name = "enable-content-transformer-listener",
+		required = false
+	)
+	public boolean enableContentTransformerListener();
 
 }

@@ -91,10 +91,10 @@ public class TranslatorUtil {
 			String fromLanguageId, String toLanguageId, String fromText)
 		throws WebCacheException {
 
-		WebCacheItem wci = new TranslatorWebCacheItem(
+		WebCacheItem webCacheItem = new TranslatorWebCacheItem(
 			fromLanguageId, toLanguageId, fromText);
 
-		return (Translation)wci.convert("");
+		return (Translation)webCacheItem.convert("");
 	}
 
 	private static class ValueComparator implements Comparator<Object> {
@@ -104,9 +104,9 @@ public class TranslatorUtil {
 		}
 
 		@Override
-		public int compare(Object obj1, Object obj2) {
-			String value1 = _map.get(obj1);
-			String value2 = _map.get(obj2);
+		public int compare(Object object1, Object object2) {
+			String value1 = _map.get(object1);
+			String value2 = _map.get(object2);
 
 			return value1.compareTo(value2);
 		}

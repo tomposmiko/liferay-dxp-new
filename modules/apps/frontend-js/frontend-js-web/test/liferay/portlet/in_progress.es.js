@@ -45,8 +45,8 @@ describe('PortletHub', () => {
 				register(portletA),
 				register(portletB),
 				register(portletC),
-				register(portletD)
-			]).then(values => {
+				register(portletD),
+			]).then((values) => {
 				hubA = values[0];
 
 				handleA = hubA.addEventListener(
@@ -136,7 +136,7 @@ describe('PortletHub', () => {
 
 			return hubB
 				.startPartialAction(parameters)
-				.then(partialActionInitObject => {
+				.then((partialActionInitObject) => {
 					expect(hubB.isInProgress()).toBeTruthy();
 
 					partialActionInitObject.setPageState(JSON.stringify({}));
@@ -152,7 +152,7 @@ describe('PortletHub', () => {
 
 			return hubB
 				.startPartialAction(parameters)
-				.then(partialActionInitObject => {
+				.then((partialActionInitObject) => {
 					expect(hubB.isInProgress()).toBeTruthy();
 					expect(hubD.isInProgress()).toBeTruthy();
 
@@ -168,7 +168,7 @@ describe('PortletHub', () => {
 			const parameters = {};
 
 			hubB.startPartialAction(parameters).then(
-				partialActionInitObject => {
+				(partialActionInitObject) => {
 					partialActionInitObject.setPageState(JSON.stringify({}));
 
 					expect(hubB.isInProgress()).toBeTruthy();
@@ -185,7 +185,7 @@ describe('PortletHub', () => {
 
 			return hubB
 				.startPartialAction(parameters)
-				.then(partialActionInitObject => {
+				.then((partialActionInitObject) => {
 					partialActionInitObject.setPageState(JSON.stringify({}));
 					expect(hubD.isInProgress()).toBeTruthy();
 
@@ -200,7 +200,7 @@ describe('PortletHub', () => {
 			const parameters = {ap1: ['actionVal']};
 
 			hubB.startPartialAction(parameters).then(
-				partialActionInitObject => {
+				(partialActionInitObject) => {
 					partialActionInitObject.setPageState(JSON.stringify({}));
 
 					expect(hubB.isInProgress()).toBeTruthy();
@@ -214,7 +214,9 @@ describe('PortletHub', () => {
 		});
 
 		it('returns true when action has been called but the updates have not been dispatched', () => {
-			global.fetchMock([portletA, portletB, portletC, portletD]);
+			global.fetch.mockResponse(
+				JSON.stringify([portletA, portletB, portletC, portletD])
+			);
 
 			const element = document.createElement('form');
 			const parameters = {};
@@ -226,7 +228,9 @@ describe('PortletHub', () => {
 		});
 
 		it('returns true through a different hub when action has been called but the updates have not been dispatched', () => {
-			global.fetchMock([portletA, portletB, portletC, portletD]);
+			global.fetch.mockResponse(
+				JSON.stringify([portletA, portletB, portletC, portletD])
+			);
 
 			const element = document.createElement('form');
 			const parameters = {};
@@ -242,7 +246,9 @@ describe('PortletHub', () => {
 		});
 
 		it('returns false after action updates have been dispatched', () => {
-			global.fetchMock([portletA, portletB, portletC, portletD]);
+			global.fetch.mockResponse(
+				JSON.stringify([portletA, portletB, portletC, portletD])
+			);
 
 			const element = document.createElement('form');
 			const parameters = {};

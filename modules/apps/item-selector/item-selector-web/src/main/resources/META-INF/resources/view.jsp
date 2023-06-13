@@ -40,18 +40,14 @@ List<NavigationItem> navigationItems = localizedItemSelectorRendering.getNavigat
 	<c:otherwise>
 		<c:if test="<%= navigationItems.size() > 1 %>">
 			<clay:navigation-bar
-				elementClasses="border-bottom"
+				cssClass="border-bottom"
 				inverted="<%= false %>"
 				navigationItems="<%= navigationItems %>"
 			/>
 		</c:if>
 
-		<%
-		boolean showGroupSelector = ParamUtil.getBoolean(request, "showGroupSelector");
-		%>
-
 		<c:choose>
-			<c:when test="<%= showGroupSelector %>">
+			<c:when test='<%= ParamUtil.getBoolean(request, "showGroupSelector") %>'>
 				<liferay-item-selector:group-selector />
 			</c:when>
 			<c:otherwise>

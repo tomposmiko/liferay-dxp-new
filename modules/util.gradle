@@ -26,6 +26,7 @@ task setUpPortalTools
 task setUpYarnOfflineCache
 task updateYarnBinariesCache
 task wrapperPortal(type: Wrapper)
+task wrapperProjectTemplates(type: Wrapper)
 task wrapperSubrepo(type: Wrapper)
 
 FileTree libDependenciesFileTree = fileTree(dir: "../lib", include: "*/dependencies.properties")
@@ -130,6 +131,18 @@ repositories {
 	maven {
 		url System.properties["repository.url"] ?: "https://repository-cdn.liferay.com/nexus/content/groups/public"
 	}
+
+	String repositoryPrivateURL = System.getProperty("repository.private.url")
+
+	if (repositoryPrivateURL) {
+		maven {
+			credentials {
+				password System.properties["repository.private.password"]
+				username System.properties["repository.private.username"]
+			}
+			url repositoryPrivateURL
+		}
+	}
 }
 
 setUpYarnOfflineCache {
@@ -147,7 +160,7 @@ updateYarnBinariesCache {
 wrapperPortal {
 	File wrapperDir = projectDir.parentFile
 
-	distributionUrl = "../../tools/gradle-${gradle.gradleVersion}.LIFERAY-PATCHED-2-bin.zip"
+	distributionUrl = "../../tools/gradle-${gradle.gradleVersion}.LIFERAY-PATCHED-1-bin.zip"
 	dependsOn wrapperSubrepo
 
 	doLast {
@@ -183,13 +196,26 @@ set DEFAULT_JVM_OPTS=%DEFAULT_JVM_OPTS% "-Dgradle.user.home=%APP_HOME%\\.gradle"
 		ant.replace(
 			failOnNoReplacements: true,
 			file: gradlewBatFile,
-			token: 'org.gradle.wrapper.GradleWrapperMain %CMD_LINE_ARGS%',
-			value: 'org.gradle.wrapper.GradleWrapperMain "--init-script=%APP_HOME%\\modules\\init.gradle" %CMD_LINE_ARGS%'
+			token: 'org.gradle.wrapper.GradleWrapperMain %*',
+			value: 'org.gradle.wrapper.GradleWrapperMain "--init-script=%APP_HOME%\\modules\\init.gradle" %*'
 		)
 	}
 
 	jarFile = new File(wrapperDir, "gradle/wrapper/gradle-wrapper.jar")
 	scriptFile = new File(wrapperDir, "gradlew")
+}
+
+wrapperProjectTemplates {
+	File wrapperDir = new File(projectDir.parentFile, "modules/sdk/project-templates/project-templates/src/main/resources/gradle-wrapper")
+
+	jarFile = new File(wrapperDir, "gradle/wrapper/gradle-wrapper.jar")
+	scriptFile = new File(wrapperDir, "gradlew")
+
+	doLast {
+		File gradleWrapperPropertiesFile = new File(wrapperDir, "gradle/wrapper/gradle-wrapper.properties")
+
+		gradleWrapperPropertiesFile.text = gradleWrapperPropertiesFile.text.trim()
+	}
 }
 
 wrapperSubrepo {
@@ -226,7 +252,6 @@ set DEFAULT_JVM_OPTS=%DEFAULT_JVM_OPTS% "-Dgradle.user.home=%APP_HOME%\\.gradle"
 tasks.withType(FormatSourceTask) {
 	baseDirName = "../"
 	group = "formatting"
-	showStatusUpdates = true
 }
 
 _createSetUpLibTasks(libDependenciesMap)
@@ -279,8 +304,6 @@ private void _createSetUpLibTasks(Map<File, Properties> libDependenciesMap) {
 
 private void _createSetUpPortalToolTasks() {
 	FileTree ivyXmlFileTree = fileTree(dir: "../tools/sdk", includes: ["ivy.xml", "dependencies/*/ivy.xml"])
-
-	XmlSlurper xmlSlurper = new XmlSlurper()
 
 	ivyXmlFileTree.each {
 		File ivyXmlFile ->

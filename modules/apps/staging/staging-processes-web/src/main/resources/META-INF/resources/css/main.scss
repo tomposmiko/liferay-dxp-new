@@ -96,6 +96,24 @@
 		display: inline;
 	}
 
+	.main-content-card {
+		> *:last-child,
+		.custom-control:last-of-type,
+		.form-group:last-of-type,
+		.tree-item:last-child,
+		ul:last-of-type {
+			margin-bottom: 0;
+		}
+
+		.panel-body {
+			padding-bottom: 0;
+		}
+
+		#pages-fieldset h5 {
+			margin-bottom: 3rem;
+		}
+	}
+
 	input.file-selector {
 		display: block;
 		margin: 0.5em 0 1.5em;

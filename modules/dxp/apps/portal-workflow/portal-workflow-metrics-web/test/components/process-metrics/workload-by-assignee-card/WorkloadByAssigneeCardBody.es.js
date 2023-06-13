@@ -9,7 +9,8 @@
  * distribution rights of the Software.
  */
 
-import {cleanup, render, waitForElement} from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
 import {AppContext} from '../../../../src/main/resources/META-INF/resources/js/components/AppContext.es';
@@ -18,17 +19,23 @@ import {MockRouter} from '../../../mock/MockRouter.es';
 
 const items = [
 	{
-		name: 'User 1',
+		assignee: {
+			id: 1,
+			name: 'User 1',
+		},
 		onTimeTaskCount: 10,
 		overdueTaskCount: 5,
-		taskCount: 15
+		taskCount: 15,
 	},
 	{
-		name: 'User 2',
+		assignee: {
+			id: 2,
+			name: 'User 2',
+		},
 		onTimeTaskCount: 3,
 		overdueTaskCount: 7,
-		taskCount: 10
-	}
+		taskCount: 10,
+	},
 ];
 const data = {items, totalCount: 2};
 
@@ -39,7 +46,7 @@ const wrapper = ({children}) => (
 );
 
 describe('The workload by assignee body should', () => {
-	let getAllByTestId, getByTestId;
+	let getByText;
 
 	afterEach(cleanup);
 
@@ -48,35 +55,37 @@ describe('The workload by assignee body should', () => {
 			const renderResult = render(
 				<WorkloadByAssigneeCard.Body
 					currentTab="onTime"
-					data={data}
+					{...data}
 					processId={12345}
-					processStepKey="allSteps"
 				/>,
 				{wrapper}
 			);
-			getAllByTestId = renderResult.getAllByTestId;
+
+			getByText = renderResult.getByText;
 		});
 
-		test('Be rendered with "User 1" and "User 2" items', async () => {
-			const assigneeNames = await waitForElement(() =>
-				getAllByTestId('assigneeName')
-			);
+		test('Be rendered with "User 1" and "User 2" items', () => {
+			const assigneeName1 = getByText('User 1');
+			const assigneeName2 = getByText('User 2');
 
-			expect(assigneeNames[0].innerHTML).toBe('User 1');
-			expect(assigneeNames[1].innerHTML).toBe('User 2');
+			expect(assigneeName1).toBeTruthy();
+			expect(assigneeName2).toBeTruthy();
+
+			expect(assigneeName1.parentNode.getAttribute('href')).toContain(
+				'&filters.assigneeIds%5B0%5D=1&filters.statuses%5B0%5D=Pending&filters.slaStatuses%5B0%5D=OnTime'
+			);
+			expect(assigneeName2.parentNode.getAttribute('href')).toContain(
+				'&filters.assigneeIds%5B0%5D=2&filters.statuses%5B0%5D=Pending&filters.slaStatuses%5B0%5D=OnTime'
+			);
 		});
 
-		test('Be rendered with "View All Steps" button and total "(2)"', async () => {
-			const viewAllAssignees = await waitForElement(() =>
-				getAllByTestId('viewAllAssignees')
-			);
+		test('Be rendered with "View All Steps" button and total "(2)"', () => {
+			const viewAllAssignees = getByText('view-all-assignees (2)');
 
-			expect(viewAllAssignees[0].innerHTML).toBe(
-				'view-all-assignees (2)'
-			);
+			expect(viewAllAssignees).toBeTruthy();
 			expect(
-				viewAllAssignees[0].parentNode.getAttribute('href')
-			).not.toContain('filters.taskKeys%5B0%5D=allSteps');
+				viewAllAssignees.parentNode.getAttribute('href')
+			).not.toContain('filters.taskNames%5B0%5D=allSteps');
 		});
 	});
 
@@ -85,31 +94,31 @@ describe('The workload by assignee body should', () => {
 			const renderResult = render(
 				<WorkloadByAssigneeCard.Body
 					currentTab="total"
-					data={{items: [items[0]], totalCount: 1}}
+					{...{items: [items[0]], totalCount: 1}}
 					processId={12345}
 					processStepKey="review"
 				/>,
 				{wrapper}
 			);
-			getByTestId = renderResult.getByTestId;
+
+			getByText = renderResult.getByText;
 		});
 
-		test('and with "User 1" item', async () => {
-			const assigneeName = await waitForElement(() =>
-				getByTestId('assigneeName')
-			);
+		test('and with "User 1" item', () => {
+			const assigneeName = getByText('User 1');
 
-			expect(assigneeName.innerHTML).toBe('User 1');
+			expect(assigneeName).toBeTruthy();
+			expect(assigneeName.parentNode.getAttribute('href')).toContain(
+				'&filters.assigneeIds%5B0%5D=1&filters.statuses%5B0%5D=Pending&filters.taskNames%5B0%5D=review'
+			);
 		});
 
-		test('and with "View All Steps" button and total "(1)"', async () => {
-			const viewAllAssignees = await waitForElement(() =>
-				getByTestId('viewAllAssignees')
-			);
+		test('and with "View All Steps" button and total "(1)"', () => {
+			const viewAllAssignees = getByText('view-all-assignees (1)');
 
-			expect(viewAllAssignees.innerHTML).toBe('view-all-assignees (1)');
+			expect(viewAllAssignees).toBeTruthy();
 			expect(viewAllAssignees.parentNode.getAttribute('href')).toContain(
-				'filters.taskKeys%5B0%5D=review'
+				'filters.taskNames%5B0%5D=review'
 			);
 		});
 	});
@@ -119,31 +128,31 @@ describe('The workload by assignee body should', () => {
 			const renderResult = render(
 				<WorkloadByAssigneeCard.Body
 					currentTab="onTime"
-					data={{items: [items[1]], totalCount: 1}}
+					{...{items: [items[1]], totalCount: 1}}
 					processId={12345}
 					processStepKey="update"
 				/>,
 				{wrapper}
 			);
-			getByTestId = renderResult.getByTestId;
+
+			getByText = renderResult.getByText;
 		});
 
-		test('and with "User 1" item', async () => {
-			const assigneeName = await waitForElement(() =>
-				getByTestId('assigneeName')
-			);
+		test('and with "User 2" item', () => {
+			const assigneeName = getByText('User 2');
 
-			expect(assigneeName.innerHTML).toBe('User 2');
+			expect(assigneeName).toBeTruthy();
+			expect(assigneeName.parentNode.getAttribute('href')).toContain(
+				'&filters.assigneeIds%5B0%5D=2&filters.statuses%5B0%5D=Pending&filters.taskNames%5B0%5D=update&filters.slaStatuses%5B0%5D=OnTime'
+			);
 		});
 
-		test('and with "View All Steps" button and total "(1)"', async () => {
-			const viewAllAssignees = await waitForElement(() =>
-				getByTestId('viewAllAssignees')
-			);
+		test('and with "View All Steps" button and total "(1)"', () => {
+			const viewAllAssignees = getByText('view-all-assignees (1)');
 
-			expect(viewAllAssignees.innerHTML).toBe('view-all-assignees (1)');
+			expect(viewAllAssignees).toBeTruthy();
 			expect(viewAllAssignees.parentNode.getAttribute('href')).toContain(
-				'filters.taskKeys%5B0%5D=update'
+				'filters.taskNames%5B0%5D=update'
 			);
 		});
 	});
@@ -155,20 +164,20 @@ describe('The workload by assignee body should', () => {
 			const renderResult = render(
 				<WorkloadByAssigneeCard.Body
 					currentTab="overdue"
-					data={{items: [], totalCount: 0}}
+					items={[]}
 					processId={12345}
+					totalCount={0}
 				/>,
 				{wrapper}
 			);
 
-			getByTestId = renderResult.getByTestId;
+			getByText = renderResult.getByText;
 		});
 
-		test('Be rendered with a empty state', async () => {
-			const emptyStateDiv = getByTestId('emptyState');
-			expect(emptyStateDiv.children[0].children[0].innerHTML).toBe(
-				'there-are-no-assigned-items-overdue-at-the-moment'
-			);
+		test('Be rendered with a empty state', () => {
+			expect(
+				getByText('there-are-no-assigned-items-overdue-at-the-moment')
+			).toBeTruthy();
 		});
 	});
 
@@ -178,21 +187,20 @@ describe('The workload by assignee body should', () => {
 		beforeAll(() => {
 			const renderResult = render(
 				<WorkloadByAssigneeCard.Body
-					currentTab="total"
-					data={{items: [], totalCount: 0}}
+					items={[]}
 					processId={12345}
+					totalCount={0}
 				/>,
 				{wrapper}
 			);
 
-			getByTestId = renderResult.getByTestId;
+			getByText = renderResult.getByText;
 		});
 
-		test('Be rendered with a empty state', async () => {
-			const emptyStateDiv = getByTestId('emptyState');
-			expect(emptyStateDiv.children[0].children[0].innerHTML).toBe(
-				'there-are-no-items-assigned-to-users-at-the-moment'
-			);
+		test('Be rendered with a empty state', () => {
+			expect(
+				getByText('there-are-no-items-assigned-to-users-at-the-moment')
+			).toBeTruthy();
 		});
 	});
 
@@ -203,20 +211,20 @@ describe('The workload by assignee body should', () => {
 			const renderResult = render(
 				<WorkloadByAssigneeCard.Body
 					currentTab="onTime"
-					data={{items: [], totalCount: 0}}
+					items={[]}
 					processId={12345}
+					totalCount={0}
 				/>,
 				{wrapper}
 			);
 
-			getByTestId = renderResult.getByTestId;
+			getByText = renderResult.getByText;
 		});
 
-		test('Be rendered with a empty state', async () => {
-			const emptyStateDiv = getByTestId('emptyState');
-			expect(emptyStateDiv.children[0].children[0].innerHTML).toBe(
-				'there-are-no-assigned-items-on-time-at-the-moment'
-			);
+		test('Be rendered with a empty state', () => {
+			expect(
+				getByText('there-are-no-assigned-items-on-time-at-the-moment')
+			).toBeTruthy();
 		});
 	});
 });

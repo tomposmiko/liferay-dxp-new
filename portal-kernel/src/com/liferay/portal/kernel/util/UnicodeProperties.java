@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
@@ -190,12 +191,12 @@ public class UnicodeProperties extends HashMap<String, String> {
 		return sb.toString();
 	}
 
-	private static String _decode(String value) {
+	private String _decode(String value) {
 		return StringUtil.replace(
 			value, _SAFE_NEWLINE_CHARACTER, StringPool.NEW_LINE);
 	}
 
-	private static String _encode(String value) {
+	private String _encode(String value) {
 		String encodedValue = StringUtil.replace(
 			value, StringPool.RETURN_NEW_LINE, _SAFE_NEWLINE_CHARACTER);
 

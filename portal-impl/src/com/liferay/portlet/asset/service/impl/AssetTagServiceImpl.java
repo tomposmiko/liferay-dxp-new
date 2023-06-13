@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Autocomplete;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.asset.service.base.AssetTagServiceBaseImpl;
 import com.liferay.portlet.asset.service.permission.AssetTagsPermission;
@@ -100,10 +101,12 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 
 	@Override
 	public List<AssetTag> getGroupTags(
-		long groupId, int start, int end, OrderByComparator<AssetTag> obc) {
+		long groupId, int start, int end,
+		OrderByComparator<AssetTag> orderByComparator) {
 
 		return sanitize(
-			assetTagPersistence.findByGroupId(groupId, start, end, obc));
+			assetTagPersistence.findByGroupId(
+				groupId, start, end, orderByComparator));
 	}
 
 	@Override
@@ -148,11 +151,11 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 	@Override
 	public List<AssetTag> getTags(
 		long groupId, long classNameId, String name, int start, int end,
-		OrderByComparator<AssetTag> obc) {
+		OrderByComparator<AssetTag> orderByComparator) {
 
 		return sanitize(
 			assetTagFinder.findByG_C_N(
-				groupId, classNameId, name, start, end, obc));
+				groupId, classNameId, name, start, end, orderByComparator));
 	}
 
 	@Override
@@ -165,9 +168,10 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 	@Override
 	public List<AssetTag> getTags(
 		long groupId, String name, int start, int end,
-		OrderByComparator<AssetTag> obc) {
+		OrderByComparator<AssetTag> orderByComparator) {
 
-		return getTags(new long[] {groupId}, name, start, end, obc);
+		return getTags(
+			new long[] {groupId}, name, start, end, orderByComparator);
 	}
 
 	@Override
@@ -181,15 +185,18 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 	@Override
 	public List<AssetTag> getTags(
 		long[] groupIds, String name, int start, int end,
-		OrderByComparator<AssetTag> obc) {
+		OrderByComparator<AssetTag> orderByComparator) {
 
 		if (Validator.isNull(name)) {
 			return sanitize(
-				assetTagPersistence.findByGroupId(groupIds, start, end, obc));
+				assetTagPersistence.findByGroupId(
+					groupIds, start, end, orderByComparator));
 		}
 
 		return sanitize(
-			assetTagPersistence.findByG_LikeN(groupIds, name, start, end, obc));
+			assetTagPersistence.findByG_LikeN(
+				groupIds, StringUtil.quote(name, StringPool.PERCENT), start,
+				end, orderByComparator));
 	}
 
 	@Override
@@ -203,7 +210,8 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 			return assetTagPersistence.countByGroupId(groupId);
 		}
 
-		return assetTagPersistence.countByG_LikeN(groupId, name);
+		return assetTagPersistence.countByG_LikeN(
+			groupId, StringUtil.quote(name, StringPool.PERCENT));
 	}
 
 	@Override
@@ -212,7 +220,8 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 			return assetTagPersistence.countByGroupId(groupIds);
 		}
 
-		return assetTagPersistence.countByG_LikeN(groupIds, name);
+		return assetTagPersistence.countByG_LikeN(
+			groupIds, StringUtil.quote(name, StringPool.PERCENT));
 	}
 
 	@Override
@@ -253,9 +262,8 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 
 	@Override
 	public JSONArray search(long[] groupIds, String name, int start, int end) {
-		List<AssetTag> tags = getTags(groupIds, name, start, end);
-
-		return Autocomplete.arrayToJSONArray(tags, "name", "name");
+		return Autocomplete.arrayToJSONArray(
+			getTags(groupIds, name, start, end), "name", "name");
 	}
 
 	@Override

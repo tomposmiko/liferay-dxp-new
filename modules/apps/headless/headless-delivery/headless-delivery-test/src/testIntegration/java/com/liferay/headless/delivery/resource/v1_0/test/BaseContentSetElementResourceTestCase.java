@@ -22,26 +22,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.ContentSetElement;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
 import com.liferay.headless.delivery.client.resource.v1_0.ContentSetElementResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.ContentSetElementSerDes;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -54,6 +59,7 @@ import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,12 +107,25 @@ public abstract class BaseContentSetElementResourceTestCase {
 		testCompany = CompanyLocalServiceUtil.getCompany(
 			testGroup.getCompanyId());
 
+		testDepotEntry = DepotEntryLocalServiceUtil.addDepotEntry(
+			Collections.singletonMap(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()),
+			null,
+			new ServiceContext() {
+				{
+					setCompanyId(testGroup.getCompanyId());
+					setUserId(TestPropsValues.getUserId());
+				}
+			});
+
 		_contentSetElementResource.setContextCompany(testCompany);
 
 		ContentSetElementResource.Builder builder =
 			ContentSetElementResource.builder();
 
-		contentSetElementResource = builder.locale(
+		contentSetElementResource = builder.authentication(
+			"test@liferay.com", "test"
+		).locale(
 			LocaleUtil.getDefault()
 		).build();
 	}
@@ -191,20 +210,331 @@ public abstract class BaseContentSetElementResourceTestCase {
 	}
 
 	@Test
-	public void testGetContentSetContentSetElementsPage() throws Exception {
+	public void testGetAssetLibraryContentSetByKeyContentSetElementsPage()
+		throws Exception {
+
+		Long assetLibraryId =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getAssetLibraryId();
+		Long irrelevantAssetLibraryId =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getIrrelevantAssetLibraryId();
+		String key =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getKey();
+		String irrelevantKey =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getIrrelevantKey();
+
 		Page<ContentSetElement> page =
-			contentSetElementResource.getContentSetContentSetElementsPage(
-				testGetContentSetContentSetElementsPage_getContentSetId(),
-				Pagination.of(1, 2));
+			contentSetElementResource.
+				getAssetLibraryContentSetByKeyContentSetElementsPage(
+					assetLibraryId, key, Pagination.of(1, 10));
 
 		Assert.assertEquals(0, page.getTotalCount());
 
+		if ((irrelevantAssetLibraryId != null) && (irrelevantKey != null)) {
+			ContentSetElement irrelevantContentSetElement =
+				testGetAssetLibraryContentSetByKeyContentSetElementsPage_addContentSetElement(
+					irrelevantAssetLibraryId, irrelevantKey,
+					randomIrrelevantContentSetElement());
+
+			page =
+				contentSetElementResource.
+					getAssetLibraryContentSetByKeyContentSetElementsPage(
+						irrelevantAssetLibraryId, irrelevantKey,
+						Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantContentSetElement),
+				(List<ContentSetElement>)page.getItems());
+			assertValid(page);
+		}
+
+		ContentSetElement contentSetElement1 =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_addContentSetElement(
+				assetLibraryId, key, randomContentSetElement());
+
+		ContentSetElement contentSetElement2 =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_addContentSetElement(
+				assetLibraryId, key, randomContentSetElement());
+
+		page =
+			contentSetElementResource.
+				getAssetLibraryContentSetByKeyContentSetElementsPage(
+					assetLibraryId, key, Pagination.of(1, 10));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(contentSetElement1, contentSetElement2),
+			(List<ContentSetElement>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetAssetLibraryContentSetByKeyContentSetElementsPageWithPagination()
+		throws Exception {
+
+		Long assetLibraryId =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getAssetLibraryId();
+		String key =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getKey();
+
+		ContentSetElement contentSetElement1 =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_addContentSetElement(
+				assetLibraryId, key, randomContentSetElement());
+
+		ContentSetElement contentSetElement2 =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_addContentSetElement(
+				assetLibraryId, key, randomContentSetElement());
+
+		ContentSetElement contentSetElement3 =
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_addContentSetElement(
+				assetLibraryId, key, randomContentSetElement());
+
+		Page<ContentSetElement> page1 =
+			contentSetElementResource.
+				getAssetLibraryContentSetByKeyContentSetElementsPage(
+					assetLibraryId, key, Pagination.of(1, 2));
+
+		List<ContentSetElement> contentSetElements1 =
+			(List<ContentSetElement>)page1.getItems();
+
+		Assert.assertEquals(
+			contentSetElements1.toString(), 2, contentSetElements1.size());
+
+		Page<ContentSetElement> page2 =
+			contentSetElementResource.
+				getAssetLibraryContentSetByKeyContentSetElementsPage(
+					assetLibraryId, key, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<ContentSetElement> contentSetElements2 =
+			(List<ContentSetElement>)page2.getItems();
+
+		Assert.assertEquals(
+			contentSetElements2.toString(), 1, contentSetElements2.size());
+
+		Page<ContentSetElement> page3 =
+			contentSetElementResource.
+				getAssetLibraryContentSetByKeyContentSetElementsPage(
+					assetLibraryId, key, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(
+				contentSetElement1, contentSetElement2, contentSetElement3),
+			(List<ContentSetElement>)page3.getItems());
+	}
+
+	protected ContentSetElement
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_addContentSetElement(
+				Long assetLibraryId, String key,
+				ContentSetElement contentSetElement)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getAssetLibraryId()
+		throws Exception {
+
+		return testDepotEntry.getDepotEntryId();
+	}
+
+	protected Long
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getIrrelevantAssetLibraryId()
+		throws Exception {
+
+		return null;
+	}
+
+	protected String
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getKey()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getIrrelevantKey()
+		throws Exception {
+
+		return null;
+	}
+
+	@Test
+	public void testGetAssetLibraryContentSetByUuidContentSetElementsPage()
+		throws Exception {
+
+		Long assetLibraryId =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getAssetLibraryId();
+		Long irrelevantAssetLibraryId =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getIrrelevantAssetLibraryId();
+		String uuid =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getUuid();
+		String irrelevantUuid =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getIrrelevantUuid();
+
+		Page<ContentSetElement> page =
+			contentSetElementResource.
+				getAssetLibraryContentSetByUuidContentSetElementsPage(
+					assetLibraryId, uuid, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if ((irrelevantAssetLibraryId != null) && (irrelevantUuid != null)) {
+			ContentSetElement irrelevantContentSetElement =
+				testGetAssetLibraryContentSetByUuidContentSetElementsPage_addContentSetElement(
+					irrelevantAssetLibraryId, irrelevantUuid,
+					randomIrrelevantContentSetElement());
+
+			page =
+				contentSetElementResource.
+					getAssetLibraryContentSetByUuidContentSetElementsPage(
+						irrelevantAssetLibraryId, irrelevantUuid,
+						Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantContentSetElement),
+				(List<ContentSetElement>)page.getItems());
+			assertValid(page);
+		}
+
+		ContentSetElement contentSetElement1 =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_addContentSetElement(
+				assetLibraryId, uuid, randomContentSetElement());
+
+		ContentSetElement contentSetElement2 =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_addContentSetElement(
+				assetLibraryId, uuid, randomContentSetElement());
+
+		page =
+			contentSetElementResource.
+				getAssetLibraryContentSetByUuidContentSetElementsPage(
+					assetLibraryId, uuid, Pagination.of(1, 10));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(contentSetElement1, contentSetElement2),
+			(List<ContentSetElement>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetAssetLibraryContentSetByUuidContentSetElementsPageWithPagination()
+		throws Exception {
+
+		Long assetLibraryId =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getAssetLibraryId();
+		String uuid =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getUuid();
+
+		ContentSetElement contentSetElement1 =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_addContentSetElement(
+				assetLibraryId, uuid, randomContentSetElement());
+
+		ContentSetElement contentSetElement2 =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_addContentSetElement(
+				assetLibraryId, uuid, randomContentSetElement());
+
+		ContentSetElement contentSetElement3 =
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_addContentSetElement(
+				assetLibraryId, uuid, randomContentSetElement());
+
+		Page<ContentSetElement> page1 =
+			contentSetElementResource.
+				getAssetLibraryContentSetByUuidContentSetElementsPage(
+					assetLibraryId, uuid, Pagination.of(1, 2));
+
+		List<ContentSetElement> contentSetElements1 =
+			(List<ContentSetElement>)page1.getItems();
+
+		Assert.assertEquals(
+			contentSetElements1.toString(), 2, contentSetElements1.size());
+
+		Page<ContentSetElement> page2 =
+			contentSetElementResource.
+				getAssetLibraryContentSetByUuidContentSetElementsPage(
+					assetLibraryId, uuid, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<ContentSetElement> contentSetElements2 =
+			(List<ContentSetElement>)page2.getItems();
+
+		Assert.assertEquals(
+			contentSetElements2.toString(), 1, contentSetElements2.size());
+
+		Page<ContentSetElement> page3 =
+			contentSetElementResource.
+				getAssetLibraryContentSetByUuidContentSetElementsPage(
+					assetLibraryId, uuid, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(
+				contentSetElement1, contentSetElement2, contentSetElement3),
+			(List<ContentSetElement>)page3.getItems());
+	}
+
+	protected ContentSetElement
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_addContentSetElement(
+				Long assetLibraryId, String uuid,
+				ContentSetElement contentSetElement)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getAssetLibraryId()
+		throws Exception {
+
+		return testDepotEntry.getDepotEntryId();
+	}
+
+	protected Long
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getIrrelevantAssetLibraryId()
+		throws Exception {
+
+		return null;
+	}
+
+	protected String
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getUuid()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getIrrelevantUuid()
+		throws Exception {
+
+		return null;
+	}
+
+	@Test
+	public void testGetContentSetContentSetElementsPage() throws Exception {
 		Long contentSetId =
 			testGetContentSetContentSetElementsPage_getContentSetId();
 		Long irrelevantContentSetId =
 			testGetContentSetContentSetElementsPage_getIrrelevantContentSetId();
 
-		if ((irrelevantContentSetId != null)) {
+		Page<ContentSetElement> page =
+			contentSetElementResource.getContentSetContentSetElementsPage(
+				contentSetId, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantContentSetId != null) {
 			ContentSetElement irrelevantContentSetElement =
 				testGetContentSetContentSetElementsPage_addContentSetElement(
 					irrelevantContentSetId,
@@ -231,7 +561,7 @@ public abstract class BaseContentSetElementResourceTestCase {
 				contentSetId, randomContentSetElement());
 
 		page = contentSetElementResource.getContentSetContentSetElementsPage(
-			contentSetId, Pagination.of(1, 2));
+			contentSetId, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -319,15 +649,6 @@ public abstract class BaseContentSetElementResourceTestCase {
 	public void testGetSiteContentSetByKeyContentSetElementsPage()
 		throws Exception {
 
-		Page<ContentSetElement> page =
-			contentSetElementResource.
-				getSiteContentSetByKeyContentSetElementsPage(
-					testGetSiteContentSetByKeyContentSetElementsPage_getSiteId(),
-					testGetSiteContentSetByKeyContentSetElementsPage_getKey(),
-					Pagination.of(1, 2));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
 		Long siteId =
 			testGetSiteContentSetByKeyContentSetElementsPage_getSiteId();
 		Long irrelevantSiteId =
@@ -335,6 +656,13 @@ public abstract class BaseContentSetElementResourceTestCase {
 		String key = testGetSiteContentSetByKeyContentSetElementsPage_getKey();
 		String irrelevantKey =
 			testGetSiteContentSetByKeyContentSetElementsPage_getIrrelevantKey();
+
+		Page<ContentSetElement> page =
+			contentSetElementResource.
+				getSiteContentSetByKeyContentSetElementsPage(
+					siteId, key, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
 
 		if ((irrelevantSiteId != null) && (irrelevantKey != null)) {
 			ContentSetElement irrelevantContentSetElement =
@@ -366,7 +694,7 @@ public abstract class BaseContentSetElementResourceTestCase {
 		page =
 			contentSetElementResource.
 				getSiteContentSetByKeyContentSetElementsPage(
-					siteId, key, Pagination.of(1, 2));
+					siteId, key, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -471,15 +799,6 @@ public abstract class BaseContentSetElementResourceTestCase {
 	public void testGetSiteContentSetByUuidContentSetElementsPage()
 		throws Exception {
 
-		Page<ContentSetElement> page =
-			contentSetElementResource.
-				getSiteContentSetByUuidContentSetElementsPage(
-					testGetSiteContentSetByUuidContentSetElementsPage_getSiteId(),
-					testGetSiteContentSetByUuidContentSetElementsPage_getUuid(),
-					Pagination.of(1, 2));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
 		Long siteId =
 			testGetSiteContentSetByUuidContentSetElementsPage_getSiteId();
 		Long irrelevantSiteId =
@@ -488,6 +807,13 @@ public abstract class BaseContentSetElementResourceTestCase {
 			testGetSiteContentSetByUuidContentSetElementsPage_getUuid();
 		String irrelevantUuid =
 			testGetSiteContentSetByUuidContentSetElementsPage_getIrrelevantUuid();
+
+		Page<ContentSetElement> page =
+			contentSetElementResource.
+				getSiteContentSetByUuidContentSetElementsPage(
+					siteId, uuid, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
 
 		if ((irrelevantSiteId != null) && (irrelevantUuid != null)) {
 			ContentSetElement irrelevantContentSetElement =
@@ -519,7 +845,7 @@ public abstract class BaseContentSetElementResourceTestCase {
 		page =
 			contentSetElementResource.
 				getSiteContentSetByUuidContentSetElementsPage(
-					siteId, uuid, Pagination.of(1, 2));
+					siteId, uuid, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -629,6 +955,25 @@ public abstract class BaseContentSetElementResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	protected void assertContains(
+		ContentSetElement contentSetElement,
+		List<ContentSetElement> contentSetElements) {
+
+		boolean contains = false;
+
+		for (ContentSetElement item : contentSetElements) {
+			if (equals(contentSetElement, item)) {
+				contains = true;
+
+				break;
+			}
+		}
+
+		Assert.assertTrue(
+			contentSetElements + " does not contain " + contentSetElement,
+			contains);
+	}
+
 	protected void assertHttpResponseStatusCode(
 		int expectedHttpResponseStatusCode,
 		HttpInvoker.HttpResponse actualHttpResponse) {
@@ -685,26 +1030,9 @@ public abstract class BaseContentSetElementResourceTestCase {
 		}
 	}
 
-	protected void assertEqualsJSONArray(
-		List<ContentSetElement> contentSetElements, JSONArray jsonArray) {
+	protected void assertValid(ContentSetElement contentSetElement)
+		throws Exception {
 
-		for (ContentSetElement contentSetElement : contentSetElements) {
-			boolean contains = false;
-
-			for (Object object : jsonArray) {
-				if (equalsJSONObject(contentSetElement, (JSONObject)object)) {
-					contains = true;
-
-					break;
-				}
-			}
-
-			Assert.assertTrue(
-				jsonArray + " does not contain " + contentSetElement, contains);
-		}
-	}
-
-	protected void assertValid(ContentSetElement contentSetElement) {
 		boolean valid = true;
 
 		if (contentSetElement.getId() == null) {
@@ -776,13 +1104,51 @@ public abstract class BaseContentSetElementResourceTestCase {
 		return new String[0];
 	}
 
-	protected List<GraphQLField> getGraphQLFields() {
+	protected List<GraphQLField> getGraphQLFields() throws Exception {
 		List<GraphQLField> graphQLFields = new ArrayList<>();
 
-		for (String additionalAssertFieldName :
-				getAdditionalAssertFieldNames()) {
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(
+					com.liferay.headless.delivery.dto.v1_0.ContentSetElement.
+						class)) {
 
-			graphQLFields.add(new GraphQLField(additionalAssertFieldName));
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			graphQLFields.addAll(getGraphQLFields(field));
+		}
+
+		return graphQLFields;
+	}
+
+	protected List<GraphQLField> getGraphQLFields(
+			java.lang.reflect.Field... fields)
+		throws Exception {
+
+		List<GraphQLField> graphQLFields = new ArrayList<>();
+
+		for (java.lang.reflect.Field field : fields) {
+			com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+				vulcanGraphQLField = field.getAnnotation(
+					com.liferay.portal.vulcan.graphql.annotation.GraphQLField.
+						class);
+
+			if (vulcanGraphQLField != null) {
+				Class<?> clazz = field.getType();
+
+				if (clazz.isArray()) {
+					clazz = clazz.getComponentType();
+				}
+
+				List<GraphQLField> childrenGraphQLFields = getGraphQLFields(
+					getDeclaredFields(clazz));
+
+				graphQLFields.add(
+					new GraphQLField(field.getName(), childrenGraphQLFields));
+			}
 		}
 
 		return graphQLFields;
@@ -848,9 +1214,9 @@ public abstract class BaseContentSetElementResourceTestCase {
 			}
 
 			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						contentSetElement1.getTitle_i18n(),
-						contentSetElement2.getTitle_i18n())) {
+				if (!equals(
+						(Map)contentSetElement1.getTitle_i18n(),
+						(Map)contentSetElement2.getTitle_i18n())) {
 
 					return false;
 				}
@@ -866,47 +1232,43 @@ public abstract class BaseContentSetElementResourceTestCase {
 		return true;
 	}
 
-	protected boolean equalsJSONObject(
-		ContentSetElement contentSetElement, JSONObject jsonObject) {
+	protected boolean equals(
+		Map<String, Object> map1, Map<String, Object> map2) {
 
-		for (String fieldName : getAdditionalAssertFieldNames()) {
-			if (Objects.equals("contentType", fieldName)) {
-				if (!Objects.deepEquals(
-						contentSetElement.getContentType(),
-						jsonObject.getString("contentType"))) {
+		if (Objects.equals(map1.keySet(), map2.keySet())) {
+			for (Map.Entry<String, Object> entry : map1.entrySet()) {
+				if (entry.getValue() instanceof Map) {
+					if (!equals(
+							(Map)entry.getValue(),
+							(Map)map2.get(entry.getKey()))) {
+
+						return false;
+					}
+				}
+				else if (!Objects.deepEquals(
+							entry.getValue(), map2.get(entry.getKey()))) {
 
 					return false;
 				}
-
-				continue;
 			}
 
-			if (Objects.equals("id", fieldName)) {
-				if (!Objects.deepEquals(
-						contentSetElement.getId(), jsonObject.getLong("id"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("title", fieldName)) {
-				if (!Objects.deepEquals(
-						contentSetElement.getTitle(),
-						jsonObject.getString("title"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			throw new IllegalArgumentException(
-				"Invalid field name " + fieldName);
+			return true;
 		}
 
-		return true;
+		return false;
+	}
+
+	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
+		throws Exception {
+
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
+
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1012,12 +1374,33 @@ public abstract class BaseContentSetElementResourceTestCase {
 		return httpResponse.getContent();
 	}
 
+	protected JSONObject invokeGraphQLMutation(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField mutationGraphQLField = new GraphQLField(
+			"mutation", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(mutationGraphQLField.toString()));
+	}
+
+	protected JSONObject invokeGraphQLQuery(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField queryGraphQLField = new GraphQLField(
+			"query", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(queryGraphQLField.toString()));
+	}
+
 	protected ContentSetElement randomContentSetElement() throws Exception {
 		return new ContentSetElement() {
 			{
-				contentType = RandomTestUtil.randomString();
+				contentType = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
-				title = RandomTestUtil.randomString();
+				title = StringUtil.toLowerCase(RandomTestUtil.randomString());
 			}
 		};
 	}
@@ -1040,6 +1423,7 @@ public abstract class BaseContentSetElementResourceTestCase {
 	protected ContentSetElementResource contentSetElementResource;
 	protected Group irrelevantGroup;
 	protected Company testCompany;
+	protected DepotEntry testDepotEntry;
 	protected Group testGroup;
 
 	protected class GraphQLField {
@@ -1048,9 +1432,22 @@ public abstract class BaseContentSetElementResourceTestCase {
 			this(key, new HashMap<>(), graphQLFields);
 		}
 
+		public GraphQLField(String key, List<GraphQLField> graphQLFields) {
+			this(key, new HashMap<>(), graphQLFields);
+		}
+
 		public GraphQLField(
 			String key, Map<String, Object> parameterMap,
 			GraphQLField... graphQLFields) {
+
+			_key = key;
+			_parameterMap = parameterMap;
+			_graphQLFields = Arrays.asList(graphQLFields);
+		}
+
+		public GraphQLField(
+			String key, Map<String, Object> parameterMap,
+			List<GraphQLField> graphQLFields) {
 
 			_key = key;
 			_parameterMap = parameterMap;
@@ -1068,25 +1465,25 @@ public abstract class BaseContentSetElementResourceTestCase {
 						_parameterMap.entrySet()) {
 
 					sb.append(entry.getKey());
-					sb.append(":");
+					sb.append(": ");
 					sb.append(entry.getValue());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append(")");
 			}
 
-			if (_graphQLFields.length > 0) {
+			if (!_graphQLFields.isEmpty()) {
 				sb.append("{");
 
 				for (GraphQLField graphQLField : _graphQLFields) {
 					sb.append(graphQLField.toString());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append("}");
 			}
@@ -1094,14 +1491,14 @@ public abstract class BaseContentSetElementResourceTestCase {
 			return sb.toString();
 		}
 
-		private final GraphQLField[] _graphQLFields;
+		private final List<GraphQLField> _graphQLFields;
 		private final String _key;
 		private final Map<String, Object> _parameterMap;
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseContentSetElementResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseContentSetElementResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

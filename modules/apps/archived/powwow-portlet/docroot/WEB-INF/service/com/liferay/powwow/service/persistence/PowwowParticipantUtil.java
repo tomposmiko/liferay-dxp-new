@@ -14,7 +14,6 @@
 
 package com.liferay.powwow.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -781,17 +780,9 @@ public class PowwowParticipantUtil {
 	}
 
 	public static PowwowParticipantPersistence getPersistence() {
-		if (_persistence == null) {
-			_persistence =
-				(PowwowParticipantPersistence)PortletBeanLocatorUtil.locate(
-					com.liferay.powwow.service.ServletContextUtil.
-						getServletContextName(),
-					PowwowParticipantPersistence.class.getName());
-		}
-
 		return _persistence;
 	}
 
-	private static PowwowParticipantPersistence _persistence;
+	private static volatile PowwowParticipantPersistence _persistence;
 
 }

@@ -23,12 +23,95 @@ const EVALUATOR_URL =
 
 let controller = null;
 
+export const mergeFieldOptions = (field, newField) => {
+	let newValue = {...newField.value};
+
+	Object.keys(newValue).forEach((languageId) => {
+		newValue = {
+			...newValue,
+			[languageId]: newValue[languageId].map((option) => {
+				const existingOption =
+					field.value &&
+					field.value[languageId] &&
+					field.value[languageId].find(
+						({value}) => value === option.value
+					);
+
+				return {
+					...option,
+					edited: existingOption && existingOption.edited,
+				};
+			}),
+		};
+	});
+
+	return newValue;
+};
+
+export const mergePages = (
+	defaultLanguageId,
+	editingLanguageId,
+	fieldName,
+	newPages,
+	sourcePages
+) => {
+	const newPagesVisitor = new PagesVisitor(newPages);
+	const sourcePagesVisitor = new PagesVisitor(sourcePages);
+
+	return newPagesVisitor.mapFields(
+		(field) => {
+			let sourceField =
+				sourcePagesVisitor.findField(({name}) => name === field.name) ||
+				{};
+
+			if (!sourceField || Object.keys(sourceField).length === 0) {
+				sourceField =
+					sourcePagesVisitor.findField(
+						({fieldName}) => fieldName === field.fieldName
+					) || {};
+			}
+
+			let newField = {
+				...sourceField,
+				...field,
+				defaultLanguageId,
+				displayErrors:
+					sourceField.displayErrors || field.fieldName === fieldName,
+				editingLanguageId,
+				valid: field.valid !== false,
+				value: field.valueChanged ? field.value : sourceField.value,
+			};
+
+			if (newField.type === 'options') {
+				newField = {
+					...newField,
+					value: mergeFieldOptions(sourceField, newField),
+				};
+			}
+
+			if (newField.localizable) {
+				newField = {
+					...newField,
+					localizedValue: {
+						...sourceField.localizedValue,
+					},
+				};
+			}
+
+			return newField;
+		},
+		false,
+		true
+	);
+};
+
 const doEvaluate = debounce((fieldName, evaluatorContext, callback) => {
 	const {
 		defaultLanguageId,
 		editingLanguageId,
+		groupId,
 		pages,
-		portletNamespace
+		portletNamespace,
 	} = evaluatorContext;
 
 	if (controller) {
@@ -46,15 +129,15 @@ const doEvaluate = debounce((fieldName, evaluatorContext, callback) => {
 			portletNamespace,
 			serializedFormContext: JSON.stringify({
 				...evaluatorContext,
-				groupId: themeDisplay.getScopeGroupId(),
-				portletNamespace
+				groupId: groupId ? groupId : themeDisplay.getScopeGroupId(),
+				portletNamespace,
 			}),
-			trigger: fieldName
+			trigger: fieldName,
 		}),
 		signal: controller && controller.signal,
-		url: EVALUATOR_URL
+		url: EVALUATOR_URL,
 	})
-		.then(newPages => {
+		.then((newPages) => {
 			const mergedPages = mergePages(
 				defaultLanguageId,
 				editingLanguageId,
@@ -65,8 +148,8 @@ const doEvaluate = debounce((fieldName, evaluatorContext, callback) => {
 
 			callback(null, mergedPages);
 		})
-		.catch(error => callback(error));
-}, 300);
+		.catch((error) => callback(error));
+}, 600);
 
 export const evaluate = (fieldName, evaluatorContext) => {
 	return new Promise((resolve, reject) => {
@@ -78,88 +161,4 @@ export const evaluate = (fieldName, evaluatorContext) => {
 			resolve(pages);
 		});
 	});
-};
-
-export const mergeFieldOptions = (field, newField) => {
-	let newValue = {...newField.value};
-
-	Object.keys(newValue).forEach(languageId => {
-		newValue = {
-			...newValue,
-			[languageId]: newValue[languageId].map(option => {
-				const existingOption = field.value[languageId].find(
-					({value}) => value === option.value
-				);
-
-				return {
-					...option,
-					edited: existingOption && existingOption.edited
-				};
-			})
-		};
-	});
-
-	return newValue;
-};
-
-export const mergePages = (
-	defaultLanguageId,
-	editingLanguageId,
-	fieldName,
-	newPages,
-	sourcePages
-) => {
-	const visitor = new PagesVisitor(newPages);
-
-	return visitor.mapFields(
-		(field, fieldIndex, columnIndex, rowIndex, pageIndex) => {
-			const sourceField =
-				sourcePages[pageIndex].rows[rowIndex].columns[columnIndex]
-					.fields[fieldIndex];
-
-			const displayErrors =
-				sourceField.displayErrors || field.fieldName === fieldName;
-
-			let newField = {
-				...sourceField,
-				...field,
-				defaultLanguageId,
-				displayErrors,
-				editingLanguageId,
-				valid: field.valid !== false
-			};
-
-			if (sourceField.nestedFields && newField.nestedFields) {
-				newField = {
-					...newField,
-					nestedFields: sourceField.nestedFields.map(nestedField => {
-						return {
-							...nestedField,
-							...(newField.nestedFields.find(({fieldName}) => {
-								return fieldName === nestedField.fieldName;
-							}) || {})
-						};
-					})
-				};
-			}
-
-			if (newField.type === 'options') {
-				newField = {
-					...newField,
-					value: mergeFieldOptions(sourceField, newField)
-				};
-			}
-
-			if (newField.localizable) {
-				newField = {
-					...newField,
-					localizedValue: {
-						...sourceField.localizedValue
-					}
-				};
-			}
-
-			return newField;
-		}
-	);
 };

@@ -33,7 +33,7 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(headerTitle);
 %>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<portlet:actionURL name="/document_library/edit_repository" var="editRepositoryURL">
 		<portlet:param name="mvcRenderCommandName" value="/document_library/edit_repository" />
 	</portlet:actionURL>
@@ -99,19 +99,18 @@ renderResponse.setTitle(headerTitle);
 
 							for (RepositoryConfiguration.Parameter repositoryConfigurationParameter : repositoryConfiguration.getParameters()) {
 								String parameterValue = typeSettingsProperties.getProperty(repositoryConfigurationParameter.getName());
-
-								if (Validator.isNotNull(parameterValue)) {
 							%>
 
+								<c:if test="<%= Validator.isNotNull(parameterValue) %>">
 									<dt>
 										<%= HtmlUtil.escape(repositoryConfigurationParameter.getLabel(locale)) %>
 									</dt>
 									<dd>
 										<%= HtmlUtil.escape(parameterValue) %>
 									</dd>
+								</c:if>
 
 							<%
-								}
 							}
 							%>
 
@@ -141,10 +140,9 @@ renderResponse.setTitle(headerTitle);
 		<%
 		for (RepositoryClassDefinition repositoryClassDefinition : RepositoryClassDefinitionCatalogUtil.getExternalRepositoryClassDefinitions()) {
 			try {
-				String repositoryClassDefinitionId = RepositoryClassDefinitionUtil.getRepositoryClassDefinitionId(repositoryClassDefinition);
 		%>
 
-				<div class="settings-parameters" id="<portlet:namespace />repository-<%= repositoryClassDefinitionId %>-configuration">
+				<div class="settings-parameters" id="<portlet:namespace />repository-<%= RepositoryClassDefinitionUtil.getRepositoryClassDefinitionId(repositoryClassDefinition) %>-configuration">
 
 					<%
 					RepositoryConfiguration repositoryConfiguration = repositoryClassDefinition.getRepositoryConfiguration();
@@ -169,7 +167,7 @@ renderResponse.setTitle(headerTitle);
 		%>
 
 	</div>
-</div>
+</clay:container-fluid>
 
 <aui:script require="metal-dom/src/dom as dom">
 	var settingsParametersContainer = document.getElementById(
@@ -210,7 +208,7 @@ renderResponse.setTitle(headerTitle);
 	);
 
 	if (repositoryTypesSelect) {
-		repositoryTypesSelect.addEventListener('change', function(event) {
+		repositoryTypesSelect.addEventListener('change', function (event) {
 			showConfiguration(repositoryTypesSelect);
 		});
 

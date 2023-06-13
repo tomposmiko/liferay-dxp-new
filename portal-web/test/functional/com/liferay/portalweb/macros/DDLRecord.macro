@@ -113,6 +113,16 @@ definition {
 		MenuItem.click(menuItem = "Edit");
 	}
 
+	macro editParagraphBody {
+		SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+
+		Type.clickAtType(
+			locator1 = "CKEditor#BODY",
+			value1 = "${content}");
+
+		SelectFrame(value1 = "relative=top");
+	}
+
 	macro editPG {
 		Click(locator1 = "DDL#RECORD_TABLE_ELLIPSIS_1");
 
@@ -428,7 +438,7 @@ definition {
 			locator1 = "Button#SELECT_CONTENT",
 			value1 = "Select");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		AssertClick.assertPartialTextClickAt(
 			locator1 = "LexiconList#LIST_ENTRY",
@@ -538,7 +548,6 @@ definition {
 				locator1 = "DDLRecord#FIELD_1",
 				value1 = "${fieldFieldLabel} ${ddlRecordFieldData_1}");
 		}
-
 		else {
 			DDLRecord.viewPopulatedField(
 				ddlRecordFieldData = "${ddlRecordFieldData}",
@@ -747,7 +756,6 @@ definition {
 					value1 = "${ddlRecordFieldData}");
 			}
 		}
-
 		else {
 			if ("${field}" == "Date") {
 				AssertTextEquals(
@@ -764,7 +772,7 @@ definition {
 
 	macro viewFirstRecordSearchResult {
 		AssertTextEquals(
-			locator1 = "Portlet#H3_HEADER",
+			locator1 = "Portlet#H4_COMPONENT_TITLE",
 			value1 = "New Data Definition Name for List: ${ddlListName}");
 
 		AssertTextEquals(
@@ -888,7 +896,7 @@ definition {
 
 	macro viewSecondRecordSearchResult {
 		AssertTextEquals(
-			locator1 = "Portlet#H3_HEADER",
+			locator1 = "Portlet#H4_COMPONENT_TITLE",
 			value1 = "New Data Definition Name for List: ${ddlListName}");
 
 		AssertTextEquals(

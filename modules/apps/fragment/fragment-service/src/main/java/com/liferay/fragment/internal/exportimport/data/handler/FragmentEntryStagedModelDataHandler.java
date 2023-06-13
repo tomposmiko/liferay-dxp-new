@@ -26,6 +26,8 @@ import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -79,6 +81,16 @@ public class FragmentEntryStagedModelDataHandler
 		FragmentCollection fragmentCollection =
 			_fragmentCollectionLocalService.fetchFragmentCollection(
 				fragmentEntry.getFragmentCollectionId());
+
+		if (fragmentCollection == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to export fragment entry with key " +
+						fragmentEntry.getFragmentEntryKey());
+			}
+
+			return;
+		}
 
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(
 			portletDataContext, fragmentEntry, fragmentCollection,
@@ -184,11 +196,10 @@ public class FragmentEntryStagedModelDataHandler
 			long previewFileEntryId = MapUtil.getLong(
 				fileEntryIds, fragmentEntry.getPreviewFileEntryId(), 0);
 
-			importedFragmentEntry.setPreviewFileEntryId(previewFileEntryId);
-
 			importedFragmentEntry =
 				_fragmentEntryLocalService.updateFragmentEntry(
-					importedFragmentEntry);
+					importedFragmentEntry.getFragmentEntryId(),
+					previewFileEntryId);
 		}
 
 		portletDataContext.importClassedModel(
@@ -199,6 +210,9 @@ public class FragmentEntryStagedModelDataHandler
 	protected StagedModelRepository<FragmentEntry> getStagedModelRepository() {
 		return _stagedModelRepository;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		FragmentEntryStagedModelDataHandler.class);
 
 	@Reference(target = "(content.processor.type=DLReferences)")
 	private ExportImportContentProcessor<String>

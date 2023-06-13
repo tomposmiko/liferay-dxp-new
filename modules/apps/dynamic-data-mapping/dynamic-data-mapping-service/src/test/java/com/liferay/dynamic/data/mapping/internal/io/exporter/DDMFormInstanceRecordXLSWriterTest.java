@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.mapping.internal.io.exporter;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterRequest;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterResponse;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ByteArrayOutputStream;
 
@@ -35,6 +36,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -50,6 +53,11 @@ import org.powermock.api.mockito.PowerMockito;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class DDMFormInstanceRecordXLSWriterTest extends PowerMockito {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testCreateCellStyle() {
@@ -200,17 +208,15 @@ public class DDMFormInstanceRecordXLSWriterTest extends PowerMockito {
 		List<Map<String, String>> ddmFormFieldValues =
 			new ArrayList<Map<String, String>>() {
 				{
-					Map<String, String> map1 = HashMapBuilder.put(
-						"field1", "2"
-					).build();
+					add(
+						HashMapBuilder.put(
+							"field1", "2"
+						).build());
 
-					add(map1);
-
-					Map<String, String> map2 = HashMapBuilder.put(
-						"field1", "1"
-					).build();
-
-					add(map2);
+					add(
+						HashMapBuilder.put(
+							"field1", "1"
+						).build());
 				}
 			};
 

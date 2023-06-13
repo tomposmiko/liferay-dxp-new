@@ -76,7 +76,7 @@ public class JournalViewMoreMenuItemsManagementToolbarDisplayContext
 
 	@Override
 	protected String[] getOrderByKeys() {
-		return new String[] {"modified-date"};
+		return new String[] {"name", "modified-date"};
 	}
 
 }

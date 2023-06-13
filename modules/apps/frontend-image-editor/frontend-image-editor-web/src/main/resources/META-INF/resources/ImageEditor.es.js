@@ -48,6 +48,7 @@ import ImageEditorHistoryEntry from './ImageEditorHistoryEntry.es';
  * </ul>
  */
 class ImageEditor extends PortletBase {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -72,20 +73,21 @@ class ImageEditor extends PortletBase {
 		 */
 		this.history_ = [
 			new ImageEditorHistoryEntry({
-				url: this.image
-			})
+				url: this.image,
+			}),
 		];
 
 		// Polyfill svg usage for lexicon icons
 
-		svg4everybody({
-			attributeName: 'data-href',
-			polyfill: true
-		});
+		if (window.svg4everybody) {
+			svg4everybody({
+				polyfill: true,
+			});
+		}
 
 		// Load the first entry imageData and render it on the app.
 
-		this.history_[0].getImageData().then(imageData => {
+		this.history_[0].getImageData().then((imageData) => {
 			async.nextTick(() => {
 				this.imageEditorReady = true;
 
@@ -105,8 +107,8 @@ class ImageEditor extends PortletBase {
 
 		this.history_[this.historyIndex_]
 			.getImageData()
-			.then(imageData => selectedControl.process(imageData))
-			.then(imageData => this.createHistoryEntry_(imageData))
+			.then((imageData) => selectedControl.process(imageData))
+			.then((imageData) => this.createHistoryEntry_(imageData))
 			.then(() => this.syncHistory_())
 			.then(() => {
 				this.selectedControl = null;
@@ -134,7 +136,7 @@ class ImageEditor extends PortletBase {
 		this.historyIndex_++;
 		this.history_.length = this.historyIndex_ + 1;
 		this.history_[this.historyIndex_] = new ImageEditorHistoryEntry({
-			data: imageData
+			data: imageData,
 		});
 
 		return Promise.resolve();
@@ -167,8 +169,8 @@ class ImageEditor extends PortletBase {
 	 * @return {Promise} A promise that resolves with the image blob.
 	 */
 	getImageEditorImageBlob() {
-		return new Promise(resolve => {
-			this.getImageEditorImageData().then(imageData => {
+		return new Promise((resolve) => {
+			this.getImageEditorImageData().then((imageData) => {
 				const canvas = document.createElement('canvas');
 				canvas.width = imageData.width;
 				canvas.height = imageData.height;
@@ -177,7 +179,8 @@ class ImageEditor extends PortletBase {
 
 				if (canvas.toBlob) {
 					canvas.toBlob(resolve, this.saveMimeType);
-				} else {
+				}
+				else {
 					const data = atob(
 						canvas.toDataURL(this.saveMimeType).split(',')[1]
 					);
@@ -240,11 +243,12 @@ class ImageEditor extends PortletBase {
 
 		if (result && result.success) {
 			Liferay.Util.getOpener().Liferay.fire(this.saveEventName, {
-				data: result
+				data: result,
 			});
 
 			Liferay.Util.getWindow().hide();
-		} else if (result.error) {
+		}
+		else if (result.error) {
 			this.showError_(result.error.message);
 		}
 	}
@@ -273,7 +277,7 @@ class ImageEditor extends PortletBase {
 
 		this.syncHistory_().then(() => {
 			this.selectedControl = controls.filter(
-				tool => tool.variant === targetControl
+				(tool) => tool.variant === targetControl
 			)[0];
 			this.selectedTool = targetTool;
 		});
@@ -293,7 +297,7 @@ class ImageEditor extends PortletBase {
 
 		this.syncHistory_().then(() => {
 			this.selectedControl = controls.filter(
-				tool => tool.variant === targetControl
+				(tool) => tool.variant === targetControl
 			)[0];
 			this.selectedTool = targetTool;
 		});
@@ -310,8 +314,8 @@ class ImageEditor extends PortletBase {
 
 		this.history_[this.historyIndex_]
 			.getImageData()
-			.then(imageData => selectedControl.preview(imageData))
-			.then(imageData => this.syncImageData_(imageData));
+			.then((imageData) => selectedControl.preview(imageData))
+			.then((imageData) => this.syncImageData_(imageData));
 
 		this.components.loading.show = true;
 	}
@@ -336,9 +340,9 @@ class ImageEditor extends PortletBase {
 	save_(event) {
 		if (!event.delegateTarget.disabled) {
 			this.getImageEditorImageBlob()
-				.then(imageBlob => this.submitBlob_(imageBlob))
-				.then(result => this.notifySaveResult_(result))
-				.catch(error => this.showError_(error));
+				.then((imageBlob) => this.submitBlob_(imageBlob))
+				.then((result) => this.notifySaveResult_(result))
+				.catch((error) => this.showError_(error));
 		}
 	}
 
@@ -350,7 +354,7 @@ class ImageEditor extends PortletBase {
 	 */
 	setterSaveMimeTypeFn_(saveMimeType) {
 		if (!saveMimeType) {
-			const imageExtensionRegex = /\.(\w+)\/[^?/]+/;
+			const imageExtensionRegex = /https?:\/\/(?:www\.)?(?:.+)\.(\w+)\/[^?/]+/;
 			const imageExtension = this.image.match(imageExtensionRegex)[1];
 
 			saveMimeType = `image/${imageExtension}`;
@@ -364,20 +368,13 @@ class ImageEditor extends PortletBase {
 	 * @param  {String} message The error message to display.
 	 * @protected
 	 */
-	showError_(message) {
+	showError_({message}) {
 		this.components.loading.show = false;
 
-		AUI().use('liferay-alert', () => {
-			new Liferay.Alert({
-				delay: {
-					hide: 2000,
-					show: 0
-				},
-				duration: 3000,
-				icon: 'exclamation-circle',
-				message: message.message,
-				type: 'danger'
-			}).render(this.element);
+		Liferay.Util.openToast({
+			container: this.element,
+			message,
+			type: 'danger',
 		});
 	}
 
@@ -391,16 +388,18 @@ class ImageEditor extends PortletBase {
 	submitBlob_(imageBlob) {
 		const saveFileName = this.saveFileName;
 		const saveParamName = this.saveParamName;
+		const saveFileEntryId = this.saveFileEntryId;
 
 		const promise = new Promise((resolve, reject) => {
 			const formData = new FormData();
 
 			formData.append(saveParamName, imageBlob, saveFileName);
+			formData.append('fileEntryId', saveFileEntryId);
 
 			this.fetch(this.saveURL, formData)
-				.then(response => response.json())
+				.then((response) => response.json())
 				.then(resolve)
-				.catch(error => reject(error));
+				.catch((error) => reject(error));
 		});
 
 		this.components.loading.show = true;
@@ -413,18 +412,20 @@ class ImageEditor extends PortletBase {
 	 * @protected
 	 */
 	syncHistory_() {
-		return new Promise(resolve => {
-			this.history_[this.historyIndex_].getImageData().then(imageData => {
-				this.syncImageData_(imageData);
+		return new Promise((resolve) => {
+			this.history_[this.historyIndex_]
+				.getImageData()
+				.then((imageData) => {
+					this.syncImageData_(imageData);
 
-				this.history = {
-					canRedo: this.historyIndex_ < this.history_.length - 1,
-					canReset: this.history_.length > 1,
-					canUndo: this.historyIndex_ > 0
-				};
+					this.history = {
+						canRedo: this.historyIndex_ < this.history_.length - 1,
+						canReset: this.history_.length > 1,
+						canUndo: this.historyIndex_ > 0,
+					};
 
-				resolve();
-			});
+					resolve();
+				});
 		});
 	}
 
@@ -467,7 +468,8 @@ class ImageEditor extends PortletBase {
 		if (availableAspectRatio > 1) {
 			canvas.height = availableHeight;
 			canvas.width = aspectRatio * availableHeight;
-		} else {
+		}
+		else {
 			canvas.width = availableWidth;
 			canvas.height = availableWidth / aspectRatio;
 		}
@@ -509,13 +511,14 @@ class ImageEditor extends PortletBase {
  * @type {!Object}
  */
 ImageEditor.STATE = {
+
 	/**
 	 * Whether the editor is ready for user interaction.
 	 * @type {Object}
 	 */
 	imageEditorReady: {
 		validator: core.isBoolean,
-		value: false
+		value: false,
 	},
 
 	/**
@@ -523,7 +526,15 @@ ImageEditor.STATE = {
 	 * @type {String}
 	 */
 	saveEventName: {
-		validator: core.isString
+		validator: core.isString,
+	},
+
+	/**
+	 * ID of the saved image to send to the server for the save action.
+	 * @type {String}
+	 */
+	saveFileEntryId: {
+		validator: core.isString,
 	},
 
 	/**
@@ -531,7 +542,7 @@ ImageEditor.STATE = {
 	 * @type {String}
 	 */
 	saveFileName: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -541,7 +552,7 @@ ImageEditor.STATE = {
 	 */
 	saveMimeType: {
 		setter: 'setterSaveMimeTypeFn_',
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -550,7 +561,7 @@ ImageEditor.STATE = {
 	 * @type {String}
 	 */
 	saveParamName: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -558,8 +569,8 @@ ImageEditor.STATE = {
 	 * @type {String}
 	 */
 	saveURL: {
-		validator: core.isString
-	}
+		validator: core.isString,
+	},
 };
 
 Soy.register(ImageEditor, templates);

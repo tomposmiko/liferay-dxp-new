@@ -27,8 +27,9 @@ public class RoleRecipient extends Recipient {
 		super(RecipientType.ROLE);
 
 		_roleId = roleId;
-		_roleName = null;
 		_roleType = roleType;
+
+		_roleName = null;
 	}
 
 	public RoleRecipient(String roleName, String roleType) {
@@ -39,16 +40,16 @@ public class RoleRecipient extends Recipient {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof RoleRecipient)) {
+		if (!(object instanceof RoleRecipient)) {
 			return false;
 		}
 
-		RoleRecipient roleRecipient = (RoleRecipient)obj;
+		RoleRecipient roleRecipient = (RoleRecipient)object;
 
 		if (Objects.equals(_roleName, roleRecipient._roleName) &&
 			(_roleId == roleRecipient._roleId)) {

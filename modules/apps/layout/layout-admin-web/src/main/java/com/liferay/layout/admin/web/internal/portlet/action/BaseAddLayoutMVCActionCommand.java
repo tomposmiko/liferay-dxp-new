@@ -49,8 +49,7 @@ public abstract class BaseAddLayoutMVCActionCommand
 
 		String layoutFullURL = portal.getLayoutFullURL(layout, themeDisplay);
 
-		Layout draftLayout = layoutLocalService.fetchLayout(
-			portal.getClassNameId(Layout.class), layout.getPlid());
+		Layout draftLayout = layout.fetchDraftLayout();
 
 		if (draftLayout != null) {
 			layoutFullURL = portal.getLayoutFullURL(draftLayout, themeDisplay);
@@ -80,7 +79,7 @@ public abstract class BaseAddLayoutMVCActionCommand
 			liferayPortletResponse.createRenderURL();
 
 		configureLayoutURL.setParameter(
-			"mvcRenderCommandName", "/layout/edit_layout");
+			"mvcRenderCommandName", "/layout_admin/edit_layout");
 
 		String backURL = ParamUtil.getString(actionRequest, "backURL");
 

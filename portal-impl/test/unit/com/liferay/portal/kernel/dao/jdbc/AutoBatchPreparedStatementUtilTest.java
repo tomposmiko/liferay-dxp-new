@@ -26,10 +26,10 @@ import com.liferay.portal.kernel.test.SwappableSecurityManager;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
-import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
@@ -76,7 +76,7 @@ public class AutoBatchPreparedStatementUtilTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@Before
 	public void setUp() {
@@ -229,18 +229,19 @@ public class AutoBatchPreparedStatementUtilTest {
 
 			preparedStatement.executeBatch();
 		}
-		catch (Throwable t) {
-			Assert.assertSame(CancellationException.class, t.getClass());
+		catch (Throwable throwable) {
+			Assert.assertSame(
+				CancellationException.class, throwable.getClass());
 
-			Throwable[] throwables = t.getSuppressed();
+			Throwable[] throwables = throwable.getSuppressed();
 
 			Assert.assertEquals(
 				Arrays.toString(throwables), 1, throwables.length);
 
-			Throwable throwable = throwables[0];
+			Throwable firstThrowable = throwables[0];
 
 			Assert.assertSame(
-				CancellationException.class, throwable.getClass());
+				CancellationException.class, firstThrowable.getClass());
 
 			return;
 		}
@@ -288,10 +289,11 @@ public class AutoBatchPreparedStatementUtilTest {
 
 			preparedStatement.executeBatch();
 		}
-		catch (Throwable t) {
-			Assert.assertTrue(throwables.toString(), throwables.contains(t));
+		catch (Throwable throwable) {
+			Assert.assertTrue(
+				throwables.toString(), throwables.contains(throwable));
 
-			Throwable[] suppressedThrowables = t.getSuppressed();
+			Throwable[] suppressedThrowables = throwable.getSuppressed();
 
 			Assert.assertEquals(
 				Arrays.toString(suppressedThrowables), 1,
@@ -323,11 +325,8 @@ public class AutoBatchPreparedStatementUtilTest {
 								supportBatchUpdates))),
 					StringPool.BLANK)) {
 
-			InvocationHandler invocationHandler =
-				ProxyUtil.getInvocationHandler(preparedStatement);
-
 			Set<Future<Void>> futures = ReflectionTestUtil.getFieldValue(
-				invocationHandler, "_futures");
+				ProxyUtil.getInvocationHandler(preparedStatement), "_futures");
 
 			futures.add(testNoticeableFuture);
 		}

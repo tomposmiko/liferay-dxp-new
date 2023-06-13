@@ -19,11 +19,15 @@ import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -57,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
-		"mvc.command.name=/analytics/edit_workspace_connection"
+		"mvc.command.name=/analytics_settings/edit_workspace_connection"
 	},
 	service = MVCActionCommand.class
 )
@@ -74,15 +78,30 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 		if (Objects.equals(cmd, "disconnect")) {
 			_disconnect(actionRequest, configurationProperties);
+
+			return;
 		}
-		else {
-			_connect(actionRequest, configurationProperties);
+
+		boolean upgrade = false;
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long companyId = themeDisplay.getCompanyId();
+
+		if (AnalyticsSettingsUtil.isAnalyticsEnabled(companyId) &&
+			Validator.isBlank(
+				AnalyticsSettingsUtil.getConnectionType(companyId))) {
+
+			upgrade = true;
 		}
+
+		_connect(actionRequest, configurationProperties, upgrade);
 	}
 
 	private void _connect(
 			ActionRequest actionRequest,
-			Dictionary<String, Object> configurationProperties)
+			Dictionary<String, Object> configurationProperties, boolean upgrade)
 		throws Exception {
 
 		String dataSourceConnectionJSON = _connectDataSource(
@@ -90,7 +109,8 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 		_updateCompanyPreferences(actionRequest, dataSourceConnectionJSON);
 		_updateConfigurationProperties(
-			actionRequest, configurationProperties, dataSourceConnectionJSON);
+			actionRequest, configurationProperties, dataSourceConnectionJSON,
+			upgrade);
 	}
 
 	private String _connectDataSource(
@@ -101,6 +121,8 @@ public class EditWorkspaceConnectionMVCActionCommand
 			WebKeys.THEME_DISPLAY);
 
 		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+
+		httpClientBuilder.useSystemProperties();
 
 		try (CloseableHttpClient closeableHttpClient =
 				httpClientBuilder.build()) {
@@ -124,6 +146,10 @@ public class EditWorkspaceConnectionMVCActionCommand
 			StatusLine statusLine = closeableHttpResponse.getStatusLine();
 
 			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+				_log.error(
+					"Unable to connect to Analytics Cloud at " +
+						tokenJSONObject.getString("url"));
+
 				throw new PortalException("Invalid token");
 			}
 
@@ -145,6 +171,8 @@ public class EditWorkspaceConnectionMVCActionCommand
 				new String(Base64.decode(token)));
 		}
 		catch (Exception exception) {
+			_log.error("Invalid token", exception);
+
 			throw new PortalException("Invalid token", exception);
 		}
 	}
@@ -157,45 +185,54 @@ public class EditWorkspaceConnectionMVCActionCommand
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		if (!_disconnectDataSource(
-				themeDisplay.getCompanyId(), configurationProperties)) {
+		long companyId = themeDisplay.getCompanyId();
 
-			removeCompanyPreferences(themeDisplay.getCompanyId());
-			removeConfigurationProperties(
-				themeDisplay.getCompanyId(), configurationProperties);
-		}
-	}
-
-	private boolean _disconnectDataSource(
-			long companyId, Dictionary<String, Object> configurationProperties)
-		throws Exception {
+		String dataSourceId = null;
+		String faroBackendURL = null;
+		String projectId = null;
 
 		if (!AnalyticsSettingsUtil.isAnalyticsEnabled(companyId)) {
-			return false;
+			if (Validator.isNotNull(
+					GetterUtil.getString(
+						configurationProperties.get("token"), null))) {
+
+				dataSourceId = GetterUtil.getString(
+					configurationProperties.get("osbAsahDataSourceId"), null);
+				faroBackendURL = GetterUtil.getString(
+					configurationProperties.get(
+						"liferayAnalyticsFaroBackendURL"),
+					null);
+				projectId = GetterUtil.getString(
+					configurationProperties.get("liferayAnalyticsProjectId"),
+					null);
+			}
+		}
+		else {
+			dataSourceId = AnalyticsSettingsUtil.getDataSourceId(companyId);
+			projectId = AnalyticsSettingsUtil.getProjectId(companyId);
 		}
 
-		HttpResponse httpResponse = AnalyticsSettingsUtil.doPost(
-			null, companyId,
-			String.format(
-				"api/1.0/data-sources/%s/disconnect",
-				AnalyticsSettingsUtil.getAsahFaroBackendDataSourceId(
-					companyId)));
+		try {
+			HttpResponse httpResponse = AnalyticsSettingsUtil.doPost(
+				null, companyId, faroBackendURL,
+				String.format(
+					"api/1.0/data-sources/%s/disconnect", dataSourceId),
+				projectId);
 
-		StatusLine statusLine = httpResponse.getStatusLine();
+			StatusLine statusLine = httpResponse.getStatusLine();
 
-		if (statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN) {
-			disconnectDataSource(companyId, httpResponse);
-
-			configurationProperties.remove("token");
-
-			return true;
+			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+				SessionErrors.add(
+					actionRequest, "unableToNotifyAnalyticsCloud");
+			}
+		}
+		catch (Exception exception) {
+			SessionErrors.add(actionRequest, "unableToNotifyAnalyticsCloud");
 		}
 
-		if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-			throw new PortalException("Unable to disconnect data source");
-		}
+		configurationProperties.remove("token");
 
-		return false;
+		clearConfiguration(companyId);
 	}
 
 	private void _updateCompanyPreferences(
@@ -210,10 +247,10 @@ public class EditWorkspaceConnectionMVCActionCommand
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			dataSourceConnectionJSON);
 
-		Iterator<String> keys = jsonObject.keys();
+		Iterator<String> iterator = jsonObject.keys();
 
-		while (keys.hasNext()) {
-			String key = keys.next();
+		while (iterator.hasNext()) {
+			String key = iterator.next();
 
 			unicodeProperties.setProperty(key, jsonObject.getString(key));
 		}
@@ -228,7 +265,7 @@ public class EditWorkspaceConnectionMVCActionCommand
 	private void _updateConfigurationProperties(
 			ActionRequest actionRequest,
 			Dictionary<String, Object> configurationProperties,
-			String dataSourceConnectionJSON)
+			String dataSourceConnectionJSON, boolean upgrade)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -239,17 +276,45 @@ public class EditWorkspaceConnectionMVCActionCommand
 		configurationProperties.put(
 			"token", ParamUtil.getString(actionRequest, "token"));
 
+		if (upgrade) {
+			configurationProperties.put(
+				"syncedContactFieldNames",
+				new String[] {
+					"accountId", "birthday", "classNameId", "classPK",
+					"companyId", "contactId", "createDate", "emailAddress",
+					"employeeNumber", "employeeStatusId", "facebookSn",
+					"firstName", "hoursOfOperation", "jabberSn", "jobClass",
+					"jobTitle", "lastName", "male", "middleName",
+					"modifiedDate", "parentContactId", "prefixId", "skypeSn",
+					"smsSn", "suffixId", "twitterSn", "userId", "userName"
+				});
+			configurationProperties.put(
+				"syncedUserFieldNames",
+				new String[] {
+					"agreedToTermsOfUse", "comments", "companyId", "contactId",
+					"createDate", "defaultUser", "emailAddress",
+					"emailAddressVerified", "externalReferenceCode",
+					"facebookId", "firstName", "googleUserId", "greeting",
+					"jobTitle", "languageId", "lastName", "ldapServerId",
+					"middleName", "modifiedDate", "openId", "portraitId",
+					"screenName", "status", "timeZoneId", "userId", "uuid"
+				});
+		}
+
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			dataSourceConnectionJSON);
 
-		Iterator<String> keys = jsonObject.keys();
+		Iterator<String> iterator = jsonObject.keys();
 
-		while (keys.hasNext()) {
-			String key = keys.next();
+		while (iterator.hasNext()) {
+			String key = iterator.next();
 
 			configurationProperties.put(key, jsonObject.getString(key));
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditWorkspaceConnectionMVCActionCommand.class);
 
 	@Reference
 	private Portal _portal;

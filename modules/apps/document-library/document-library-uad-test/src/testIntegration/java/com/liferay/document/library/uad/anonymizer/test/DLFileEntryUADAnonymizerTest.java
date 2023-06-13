@@ -121,10 +121,10 @@ public class DLFileEntryUADAnonymizerTest
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(dlFileEntry.getGroupId());
 
-		serviceContext.setAssetTagNames(new String[0]);
+		serviceContext.setAssetEntryVisible(true);
 		serviceContext.setAssetLinkEntryIds(
 			new long[] {dlFileEntryAssetEntry.getEntryId()});
-		serviceContext.setAssetEntryVisible(true);
+		serviceContext.setAssetTagNames(new String[0]);
 
 		MBMessage mbMessage = MBTestUtil.addMessageWithWorkflow(
 			dlFileEntry.getGroupId(),
@@ -194,7 +194,7 @@ public class DLFileEntryUADAnonymizerTest
 	}
 
 	@Override
-	protected UADAnonymizer getUADAnonymizer() {
+	protected UADAnonymizer<DLFileEntry> getUADAnonymizer() {
 		return _uadAnonymizer;
 	}
 
@@ -256,16 +256,13 @@ public class DLFileEntryUADAnonymizerTest
 		String description = RandomTestUtil.randomString();
 		String changeLog = RandomTestUtil.randomString();
 		boolean majorVersion = true;
-		InputStream is = dlFileEntry.getContentStream();
-		long size = dlFileEntry.getSize();
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext();
+		InputStream inputStream = dlFileEntry.getContentStream();
 
 		_dlAppLocalService.updateFileEntry(
 			userId, fileEntryId, sourceFileName, contentType, title,
 			description, changeLog,
-			DLVersionNumberIncrease.fromMajorVersion(majorVersion), is, size,
-			serviceContext);
+			DLVersionNumberIncrease.fromMajorVersion(majorVersion), inputStream,
+			dlFileEntry.getSize(), ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Inject
@@ -290,6 +287,6 @@ public class DLFileEntryUADAnonymizerTest
 	private MBThreadLocalService _mbThreadLocalService;
 
 	@Inject(filter = "component.name=*.DLFileEntryUADAnonymizer")
-	private UADAnonymizer _uadAnonymizer;
+	private UADAnonymizer<DLFileEntry> _uadAnonymizer;
 
 }

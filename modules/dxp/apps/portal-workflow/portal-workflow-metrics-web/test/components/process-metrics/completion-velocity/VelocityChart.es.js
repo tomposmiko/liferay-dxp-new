@@ -9,7 +9,6 @@
  * distribution rights of the Software.
  */
 
-import {waitForElement} from '@testing-library/dom';
 import {render} from '@testing-library/react';
 import React from 'react';
 
@@ -19,47 +18,47 @@ import VelocityChart from '../../../../src/main/resources/META-INF/resources/js/
 import '@testing-library/jest-dom/extend-expect';
 
 describe('The velocity chart should', () => {
-	test('Be rendered in document', async () => {
+	test('Be rendered in document', () => {
 		const velocityData = {
 			histograms: [
 				{
 					key: '2019-12-03T00:00',
-					value: 0.0
+					value: 0.0,
 				},
 				{
 					key: '2019-12-04T00:00',
-					value: 0.0
+					value: 0.0,
 				},
 				{
 					key: '2019-12-05T00:00',
-					value: 0.0
+					value: 0.0,
 				},
 				{
 					key: '2019-12-06T00:00',
-					value: 0.0
+					value: 0.0,
 				},
 				{
 					key: '2019-12-07T00:00',
-					value: 0.2
+					value: 0.2,
 				},
 				{
 					key: '2019-12-08T00:00',
-					value: 0.8
+					value: 0.8,
 				},
 				{
 					key: '2019-12-09T00:00',
-					value: 0.0
-				}
+					value: 0.0,
+				},
 			],
-			value: 0.0
+			value: 0.0,
 		};
 
-		const {getByTestId} = render(
+		const {container} = render(
 			<AppContext.Provider value={{isAmPm: true}}>
 				<VelocityChart
 					timeRange={{
 						dateEnd: '2019-12-09T00:00:00Z',
-						dateStart: '2019-12-03T00:00:00Z'
+						dateStart: '2019-12-03T00:00:00Z',
 					}}
 					velocityData={velocityData}
 					velocityUnit={{key: 'Days', name: 'Int / Day'}}
@@ -67,11 +66,9 @@ describe('The velocity chart should', () => {
 			</AppContext.Provider>
 		);
 
-		const velocityChat = await waitForElement(() =>
-			getByTestId('velocity-chart')
-		);
+		const velocityChart = container.querySelector('.velocity-chart');
 
-		expect(velocityChat).toBeInTheDocument();
+		expect(velocityChart).toBeInTheDocument();
 	});
 
 	describe('Be render tooltip', () => {
@@ -84,7 +81,7 @@ describe('The velocity chart should', () => {
 				description: 'Jun 28 - Sep 25',
 				id: 90,
 				key: '90',
-				name: 'Last 90 Days'
+				name: 'Last 90 Days',
 			};
 
 			const dataPoints = [
@@ -93,8 +90,8 @@ describe('The velocity chart should', () => {
 					index: 5,
 					name: 'data_1',
 					value: 0,
-					x: new Date('2019-09-24T05:00:00.000Z')
-				}
+					x: new Date('2019-09-24T05:00:00.000Z'),
+				},
 			];
 
 			const text = VelocityChart.Tooltip(
@@ -164,7 +161,7 @@ describe('The velocity chart should', () => {
 				description: 'Jun 28 - Sep 25',
 				id: 90,
 				key: '90',
-				name: 'Last 90 Days'
+				name: 'Last 90 Days',
 			};
 
 			const dataPoints = [
@@ -173,8 +170,8 @@ describe('The velocity chart should', () => {
 					index: 5,
 					name: 'data_1',
 					value: 0,
-					x: new Date('1936-09-25T17:06:52.000Z')
-				}
+					x: new Date('1936-09-25T17:06:52.000Z'),
+				},
 			];
 
 			const textHours = VelocityChart.Tooltip(

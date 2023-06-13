@@ -2,11 +2,13 @@
 <head>
 <title>UsersAndOrganizations</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">UsersAndOrganizations</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>ADD</td>
@@ -106,7 +108,7 @@
 </tr>
 <tr>
 	<td>USER_ADDRESS_PRIMARY_TABLE</td>
-	<td>//tr[contains(.,'${key_primaryValue}')]//span/span[contains(.,'PRIMARY')]</td>
+	<td>//tr[contains(.,'${key_primaryValue}')]//span/span[contains(.,'Primary')]</td>
 	<td></td>
 </tr>
 <!--USER_CONTACT_INFORMATION_TABLE-->
@@ -142,7 +144,7 @@
 </tr>
 <tr>
 	<td>USER_CONTACT_INFORMATION_PRIMARY_TABLE</td>
-	<td>//table[contains(@data-searchcontainerid,'${key_searchContainerType}')]//tr[contains(.,'${key_contactInfoPrimaryValue}')]/td/span/span[contains(.,'PRIMARY')]</td>
+	<td>//table[contains(@data-searchcontainerid,'${key_searchContainerType}')]//tr[contains(.,'${key_contactInfoPrimaryValue}')]/td/span/span[contains(.,'Primary')]</td>
 	<td></td>
 </tr>
 </tbody>

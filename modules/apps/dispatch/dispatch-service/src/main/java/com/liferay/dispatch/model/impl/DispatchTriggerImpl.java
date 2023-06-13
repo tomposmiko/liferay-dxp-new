@@ -14,10 +14,14 @@
 
 package com.liferay.dispatch.model.impl;
 
+import com.liferay.dispatch.executor.DispatchTaskStatus;
+import com.liferay.dispatch.model.DispatchLog;
+import com.liferay.dispatch.service.DispatchLogLocalServiceUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
 /**
  * @author Alessio Antonio Rendina
+ * @author Igor Beslic
  */
 public class DispatchTriggerImpl extends DispatchTriggerBaseImpl {
 
@@ -25,36 +29,61 @@ public class DispatchTriggerImpl extends DispatchTriggerBaseImpl {
 	}
 
 	@Override
-	public UnicodeProperties getTypeSettingsProperties() {
-		if (_typeSettingsProperties == null) {
-			_typeSettingsProperties = new UnicodeProperties(true);
+	public UnicodeProperties getDispatchTaskSettingsUnicodeProperties() {
+		if (_dispatchTaskSettingsUnicodeProperties == null) {
+			_dispatchTaskSettingsUnicodeProperties = new UnicodeProperties(
+				true);
 
-			_typeSettingsProperties.fastLoad(getTypeSettings());
+			_dispatchTaskSettingsUnicodeProperties.fastLoad(
+				getDispatchTaskSettings());
 		}
 
-		return _typeSettingsProperties;
+		return _dispatchTaskSettingsUnicodeProperties;
 	}
 
 	@Override
-	public void setTypeSettings(String typeSettings) {
-		super.setTypeSettings(typeSettings);
+	public DispatchTaskStatus getDispatchTaskStatus() {
+		if (_dispatchTaskStatus != null) {
+			return _dispatchTaskStatus;
+		}
 
-		_typeSettingsProperties = null;
+		DispatchLog dispatchLog =
+			DispatchLogLocalServiceUtil.fetchLatestDispatchLog(
+				getDispatchTriggerId());
+
+		if (dispatchLog == null) {
+			return DispatchTaskStatus.NEVER_RAN;
+		}
+
+		_dispatchTaskStatus = DispatchTaskStatus.valueOf(
+			dispatchLog.getStatus());
+
+		return _dispatchTaskStatus;
 	}
 
 	@Override
-	public void setTypeSettingsProperties(
-		UnicodeProperties typeSettingsProperties) {
+	public void setDispatchTaskSettings(String dispatchTaskSettings) {
+		super.setDispatchTaskSettings(dispatchTaskSettings);
 
-		_typeSettingsProperties = typeSettingsProperties;
-
-		if (_typeSettingsProperties == null) {
-			_typeSettingsProperties = new UnicodeProperties();
-		}
-
-		super.setTypeSettings(_typeSettingsProperties.toString());
+		_dispatchTaskSettingsUnicodeProperties = null;
 	}
 
-	private transient UnicodeProperties _typeSettingsProperties;
+	@Override
+	public void setDispatchTaskSettingsUnicodeProperties(
+		UnicodeProperties dispatchTaskSettingsUnicodeProperties) {
+
+		_dispatchTaskSettingsUnicodeProperties =
+			dispatchTaskSettingsUnicodeProperties;
+
+		if (_dispatchTaskSettingsUnicodeProperties == null) {
+			_dispatchTaskSettingsUnicodeProperties = new UnicodeProperties();
+		}
+
+		super.setDispatchTaskSettings(
+			_dispatchTaskSettingsUnicodeProperties.toString());
+	}
+
+	private transient UnicodeProperties _dispatchTaskSettingsUnicodeProperties;
+	private transient DispatchTaskStatus _dispatchTaskStatus;
 
 }

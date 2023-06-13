@@ -14,8 +14,7 @@
 
 package com.liferay.change.tracking.internal.conflict;
 
-import com.liferay.change.tracking.conflict.ConflictInfo;
-import com.liferay.change.tracking.resolver.ConstraintResolver;
+import com.liferay.change.tracking.spi.resolver.ConstraintResolver;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
@@ -24,22 +23,31 @@ import java.util.ResourceBundle;
 /**
  * @author Preston Crary
  */
-public class ConstraintResolverConflictInfo implements ConflictInfo {
+public class ConstraintResolverConflictInfo extends BaseConflictInfo {
 
 	public ConstraintResolverConflictInfo(
-		ConstraintResolver<?> constraintResolver, long sourcePrimaryKey,
-		long targetPrimaryKey, boolean resolved) {
+		ConstraintResolver<?> constraintResolver, boolean resolved,
+		long sourcePrimaryKey, long targetPrimaryKey) {
 
 		_constraintResolver = constraintResolver;
+		_resolved = resolved;
 		_sourcePrimaryKey = sourcePrimaryKey;
 		_targetPrimaryKey = targetPrimaryKey;
-		_resolved = resolved;
 	}
 
 	@Override
 	public String getConflictDescription(ResourceBundle resourceBundle) {
 		return ResourceBundleUtil.getString(
 			resourceBundle, _constraintResolver.getConflictDescriptionKey());
+	}
+
+	public ConstraintResolver<?> getConstraintResolver() {
+		return _constraintResolver;
+	}
+
+	@Override
+	public long getCTAutoResolutionInfoId() {
+		return _ctAutoResolutionInfoId;
 	}
 
 	@Override
@@ -68,7 +76,12 @@ public class ConstraintResolverConflictInfo implements ConflictInfo {
 		return _resolved;
 	}
 
+	public void setCtAutoResolutionInfoId(long ctAutoResolutionInfoId) {
+		_ctAutoResolutionInfoId = ctAutoResolutionInfoId;
+	}
+
 	private final ConstraintResolver<?> _constraintResolver;
+	private long _ctAutoResolutionInfoId;
 	private final boolean _resolved;
 	private final long _sourcePrimaryKey;
 	private final long _targetPrimaryKey;

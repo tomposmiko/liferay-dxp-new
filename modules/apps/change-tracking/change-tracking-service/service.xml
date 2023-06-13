@@ -3,7 +3,43 @@
 
 <service-builder auto-import-default-references="false" auto-namespace-tables="false" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.change.tracking">
 	<namespace>CT</namespace>
-	<entity local-service="true" name="CTCollection" remote-service="false" trash-enabled="false" uuid="false">
+	<entity local-service="false" name="CTAutoResolutionInfo" remote-service="false" trash-enabled="false" uuid="false">
+
+		<!-- PK fields -->
+
+		<column name="ctAutoResolutionInfoId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="createDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="ctCollectionId" type="long" />
+		<column name="modelClassNameId" type="long" />
+		<column name="sourceModelClassPK" type="long" />
+		<column name="targetModelClassPK" type="long" />
+		<column name="conflictIdentifier" type="String" />
+
+		<!-- Order -->
+
+		<order by="asc">
+			<order-column name="createDate" />
+		</order>
+
+		<!-- Finder methods -->
+
+		<finder name="CTCollectionId" return-type="Collection">
+			<finder-column name="ctCollectionId" />
+		</finder>
+		<finder name="C_MCNI_SMCPK" return-type="Collection">
+			<finder-column name="ctCollectionId" />
+			<finder-column name="modelClassNameId" />
+			<finder-column arrayable-operator="OR" name="sourceModelClassPK" />
+		</finder>
+	</entity>
+	<entity local-service="true" name="CTCollection" remote-service="true" trash-enabled="false" uuid="false">
 
 		<!-- PK fields -->
 
@@ -98,6 +134,10 @@
 
 		<column name="ctMessageId" primary="true" type="long" />
 
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+
 		<!-- Other fields -->
 
 		<column name="ctCollectionId" type="long" />
@@ -109,7 +149,7 @@
 			<finder-column name="ctCollectionId" />
 		</finder>
 	</entity>
-	<entity local-service="true" name="CTPreferences" remote-service="false" trash-enabled="false" uuid="false">
+	<entity local-service="true" name="CTPreferences" remote-service="true" trash-enabled="false" uuid="false">
 
 		<!-- PK fields -->
 
@@ -123,6 +163,7 @@
 		<!-- Other fields -->
 
 		<column name="ctCollectionId" type="long" />
+		<column name="previousCtCollectionId" type="long" />
 		<column name="confirmationEnabled" type="boolean" />
 
 		<!-- Finder methods -->
@@ -130,12 +171,15 @@
 		<finder name="CollectionId" return-type="Collection">
 			<finder-column name="ctCollectionId" />
 		</finder>
+		<finder name="PreviousCollectionId" return-type="Collection">
+			<finder-column name="previousCtCollectionId" />
+		</finder>
 		<finder name="C_U" return-type="CTPreferences" unique="true">
 			<finder-column name="companyId" />
 			<finder-column name="userId" />
 		</finder>
 	</entity>
-	<entity local-service="true" name="CTProcess" remote-service="false" trash-enabled="false" uuid="false">
+	<entity local-service="true" name="CTProcess" remote-service="true" trash-enabled="false" uuid="false">
 
 		<!-- PK fields -->
 
@@ -175,6 +219,7 @@
 	<exceptions>
 		<exception>CTCollectionDescription</exception>
 		<exception>CTCollectionName</exception>
+		<exception>CTEnclosure</exception>
 		<exception>DuplicateCTEntry</exception>
 	</exceptions>
 </service-builder>

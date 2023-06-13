@@ -47,6 +47,10 @@ public class OAuthTokenLocalServiceWrapper
 	/**
 	 * Adds the o auth token to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthTokenLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param oAuthToken the o auth token
 	 * @return the o auth token that was added
 	 */
@@ -71,7 +75,22 @@ public class OAuthTokenLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _oAuthTokenLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the o auth token with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthTokenLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthTokenId the primary key of the o auth token
 	 * @return the o auth token that was removed
@@ -97,6 +116,10 @@ public class OAuthTokenLocalServiceWrapper
 
 	/**
 	 * Deletes the o auth token from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthTokenLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthToken the o auth token
 	 * @return the o auth token that was removed
@@ -314,6 +337,9 @@ public class OAuthTokenLocalServiceWrapper
 		return _oAuthTokenLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -324,6 +350,10 @@ public class OAuthTokenLocalServiceWrapper
 
 	/**
 	 * Updates the o auth token in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthTokenLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthToken the o auth token
 	 * @return the o auth token that was updated

@@ -40,9 +40,8 @@ String[] tempFileNames = LayoutServiceUtil.getTempFileNames(scopeGroupId, Export
 					navigationItem -> {
 						navigationItem.setActive(tabs3.equals("new-import-process"));
 						navigationItem.setHref(portletURL.toString());
-						navigationItem.setLabel(LanguageUtil.get(request, "new-import-process"));
-					}
-				);
+						navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "new-import-process"));
+					});
 
 				portletURL.setParameter("tabs3", "current-and-previous");
 
@@ -50,9 +49,8 @@ String[] tempFileNames = LayoutServiceUtil.getTempFileNames(scopeGroupId, Export
 					navigationItem -> {
 						navigationItem.setActive(tabs3.equals("current-and-previous"));
 						navigationItem.setHref(portletURL.toString());
-						navigationItem.setLabel(LanguageUtil.get(request, "current-and-previous"));
-					}
-				);
+						navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "current-and-previous"));
+					});
 			}
 		}
 	%>'
@@ -108,6 +106,6 @@ String[] tempFileNames = LayoutServiceUtil.getTempFileNames(scopeGroupId, Export
 		processesNode: '#importProcesses',
 		processesResourceURL:
 			'<%= HtmlUtil.escapeJS(importProcessesURL.toString()) %>',
-		timeZoneOffset: <%= timeZoneOffset %>
+		timeZoneOffset: <%= timeZoneOffset %>,
 	});
 </aui:script>

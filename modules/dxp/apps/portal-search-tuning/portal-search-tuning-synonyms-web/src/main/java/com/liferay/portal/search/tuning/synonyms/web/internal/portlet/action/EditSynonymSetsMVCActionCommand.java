@@ -19,12 +19,12 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.index.IndexNameBuilder;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.constants.SynonymsPortletKeys;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSet;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexReader;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexWriter;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexName;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.synchronizer.IndexToFilterSynchronizer;
 
 import java.util.Optional;
@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + SynonymsPortletKeys.SYNONYMS,
-		"mvc.command.name=editSynonymSet"
+		"mvc.command.name=/synonyms/edit_synonym_sets"
 	},
 	service = MVCActionCommand.class
 )
@@ -53,19 +53,7 @@ public class EditSynonymSetsMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		String companyIndexName = _indexNameBuilder.getIndexName(
-			portal.getCompanyId(actionRequest));
-
-		SynonymSetIndexName synonymSetIndexName =
-			_synonymSetIndexNameBuilder.getSynonymSetIndexName(
-				companyIndexName);
-
-		updateSynonymSetIndex(
-			synonymSetIndexName,
-			ParamUtil.getString(actionRequest, "synonymSet"),
-			getSynonymSetOptional(synonymSetIndexName, actionRequest));
-
-		_indexToFilterSynchronizer.copyToFilter(companyIndexName);
+		updateSynonymSet(actionRequest);
 
 		sendRedirect(actionRequest, actionResponse);
 	}
@@ -78,6 +66,22 @@ public class EditSynonymSetsMVCActionCommand extends BaseMVCActionCommand {
 		).flatMap(
 			id -> _synonymSetIndexReader.fetchOptional(synonymSetIndexName, id)
 		);
+	}
+
+	protected void updateSynonymSet(ActionRequest actionRequest) {
+		long companyId = portal.getCompanyId(actionRequest);
+
+		SynonymSetIndexName synonymSetIndexName =
+			_synonymSetIndexNameBuilder.getSynonymSetIndexName(companyId);
+
+		updateSynonymSetIndex(
+			synonymSetIndexName,
+			ParamUtil.getString(actionRequest, "synonymSet"),
+			getSynonymSetOptional(synonymSetIndexName, actionRequest));
+
+		_indexToFilterSynchronizer.copyToFilter(
+			synonymSetIndexName, _indexNameBuilder.getIndexName(companyId),
+			false);
 	}
 
 	protected void updateSynonymSetIndex(

@@ -34,7 +34,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.rolesadmin.search.RoleSearch;
 import com.liferay.portlet.rolesadmin.search.RoleSearchTerms;
-import com.liferay.roles.admin.web.internal.role.type.contributor.RoleTypeContributor;
+import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
 import com.liferay.roles.admin.web.internal.role.type.contributor.util.RoleTypeContributorRetrieverUtil;
 import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
@@ -63,6 +63,8 @@ public class SelectRoleManagementToolbarDisplayContext {
 		_currentRoleTypeContributor =
 			RoleTypeContributorRetrieverUtil.getCurrentRoleTypeContributor(
 				renderRequest);
+		_groupId = ParamUtil.getLong(_httpServletRequest, "groupId");
+		_step = ParamUtil.getInteger(_httpServletRequest, "step", 1);
 	}
 
 	public String getClearResultsURL() {
@@ -96,10 +98,8 @@ public class SelectRoleManagementToolbarDisplayContext {
 			portletURL.setParameter("keywords", keywords[keywords.length - 1]);
 		}
 
-		long groupId = ParamUtil.getLong(_httpServletRequest, "groupId");
-
-		if (groupId != 0) {
-			portletURL.setParameter("groupId", String.valueOf(groupId));
+		if (_groupId != 0) {
+			portletURL.setParameter("groupId", String.valueOf(_groupId));
 		}
 
 		String organizationId = ParamUtil.getString(
@@ -116,20 +116,19 @@ public class SelectRoleManagementToolbarDisplayContext {
 			portletURL.setParameter("organizationIds", organizationIds);
 		}
 
-		int step = ParamUtil.getInteger(_httpServletRequest, "step", 1);
-
-		portletURL.setParameter("step", String.valueOf(step));
+		portletURL.setParameter("step", String.valueOf(_step));
 
 		return portletURL;
 	}
 
-	public SearchContainer getRoleSearchContainer(boolean filterManageableRoles)
+	public SearchContainer<Role> getRoleSearchContainer(
+			boolean filterManageableRoles)
 		throws Exception {
 
 		return getRoleSearchContainer(filterManageableRoles, 0);
 	}
 
-	public SearchContainer getRoleSearchContainer(
+	public SearchContainer<Role> getRoleSearchContainer(
 			boolean filterManageableRoles, long groupId)
 		throws Exception {
 
@@ -204,6 +203,14 @@ public class SelectRoleManagementToolbarDisplayContext {
 		};
 	}
 
+	public void setGroupId(long groupId) {
+		_groupId = groupId;
+	}
+
+	public void setStep(int step) {
+		_step = step;
+	}
+
 	private User _getSelectedUser() {
 		try {
 			return PortalUtil.getSelectedUser(_httpServletRequest);
@@ -220,9 +227,11 @@ public class SelectRoleManagementToolbarDisplayContext {
 
 	private final RoleTypeContributor _currentRoleTypeContributor;
 	private final String _eventName;
+	private long _groupId;
 	private final HttpServletRequest _httpServletRequest;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private RoleSearch _roleSearch;
+	private int _step;
 
 }

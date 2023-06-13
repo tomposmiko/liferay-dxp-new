@@ -15,6 +15,7 @@
 package com.liferay.site.navigation.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.site.navigation.model.SiteNavigationMenu;
 
 /**
  * Provides a wrapper for {@link SiteNavigationMenuService}.
@@ -34,10 +35,9 @@ public class SiteNavigationMenuServiceWrapper
 	}
 
 	@Override
-	public com.liferay.site.navigation.model.SiteNavigationMenu
-			addSiteNavigationMenu(
-				long groupId, String name, int type, boolean auto,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public SiteNavigationMenu addSiteNavigationMenu(
+			long groupId, String name, int type, boolean auto,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _siteNavigationMenuService.addSiteNavigationMenu(
@@ -45,10 +45,9 @@ public class SiteNavigationMenuServiceWrapper
 	}
 
 	@Override
-	public com.liferay.site.navigation.model.SiteNavigationMenu
-			addSiteNavigationMenu(
-				long groupId, String name, int type,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public SiteNavigationMenu addSiteNavigationMenu(
+			long groupId, String name, int type,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _siteNavigationMenuService.addSiteNavigationMenu(
@@ -56,10 +55,9 @@ public class SiteNavigationMenuServiceWrapper
 	}
 
 	@Override
-	public com.liferay.site.navigation.model.SiteNavigationMenu
-			addSiteNavigationMenu(
-				long groupId, String name,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public SiteNavigationMenu addSiteNavigationMenu(
+			long groupId, String name,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _siteNavigationMenuService.addSiteNavigationMenu(
@@ -67,8 +65,8 @@ public class SiteNavigationMenuServiceWrapper
 	}
 
 	@Override
-	public com.liferay.site.navigation.model.SiteNavigationMenu
-			deleteSiteNavigationMenu(long siteNavigationMenuId)
+	public SiteNavigationMenu deleteSiteNavigationMenu(
+			long siteNavigationMenuId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _siteNavigationMenuService.deleteSiteNavigationMenu(
@@ -76,8 +74,7 @@ public class SiteNavigationMenuServiceWrapper
 	}
 
 	@Override
-	public com.liferay.site.navigation.model.SiteNavigationMenu
-			fetchSiteNavigationMenu(long siteNavigationMenuId)
+	public SiteNavigationMenu fetchSiteNavigationMenu(long siteNavigationMenuId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _siteNavigationMenuService.fetchSiteNavigationMenu(
@@ -95,32 +92,50 @@ public class SiteNavigationMenuServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.site.navigation.model.SiteNavigationMenu>
-		getSiteNavigationMenus(long groupId) {
+	public java.util.List<SiteNavigationMenu> getSiteNavigationMenus(
+		long groupId) {
 
 		return _siteNavigationMenuService.getSiteNavigationMenus(groupId);
 	}
 
 	@Override
-	public java.util.List<com.liferay.site.navigation.model.SiteNavigationMenu>
-		getSiteNavigationMenus(
-			long groupId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				orderByComparator) {
+	public java.util.List<SiteNavigationMenu> getSiteNavigationMenus(
+		long groupId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<SiteNavigationMenu>
+			orderByComparator) {
 
 		return _siteNavigationMenuService.getSiteNavigationMenus(
 			groupId, start, end, orderByComparator);
 	}
 
 	@Override
-	public java.util.List<com.liferay.site.navigation.model.SiteNavigationMenu>
-		getSiteNavigationMenus(
-			long groupId, String keywords, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				orderByComparator) {
+	public java.util.List<SiteNavigationMenu> getSiteNavigationMenus(
+		long groupId, String keywords, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<SiteNavigationMenu>
+			orderByComparator) {
 
 		return _siteNavigationMenuService.getSiteNavigationMenus(
 			groupId, keywords, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<SiteNavigationMenu> getSiteNavigationMenus(
+		long[] groupIds, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<SiteNavigationMenu>
+			orderByComparator) {
+
+		return _siteNavigationMenuService.getSiteNavigationMenus(
+			groupIds, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<SiteNavigationMenu> getSiteNavigationMenus(
+		long[] groupIds, String keywords, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<SiteNavigationMenu>
+			orderByComparator) {
+
+		return _siteNavigationMenuService.getSiteNavigationMenus(
+			groupIds, keywords, start, end, orderByComparator);
 	}
 
 	@Override
@@ -135,10 +150,20 @@ public class SiteNavigationMenuServiceWrapper
 	}
 
 	@Override
-	public com.liferay.site.navigation.model.SiteNavigationMenu
-			updateSiteNavigationMenu(
-				long siteNavigationMenuId, int type, boolean auto,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public int getSiteNavigationMenusCount(long[] groupIds) {
+		return _siteNavigationMenuService.getSiteNavigationMenusCount(groupIds);
+	}
+
+	@Override
+	public int getSiteNavigationMenusCount(long[] groupIds, String keywords) {
+		return _siteNavigationMenuService.getSiteNavigationMenusCount(
+			groupIds, keywords);
+	}
+
+	@Override
+	public SiteNavigationMenu updateSiteNavigationMenu(
+			long siteNavigationMenuId, int type, boolean auto,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _siteNavigationMenuService.updateSiteNavigationMenu(
@@ -146,10 +171,9 @@ public class SiteNavigationMenuServiceWrapper
 	}
 
 	@Override
-	public com.liferay.site.navigation.model.SiteNavigationMenu
-			updateSiteNavigationMenu(
-				long siteNavigationMenuId, String name,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public SiteNavigationMenu updateSiteNavigationMenu(
+			long siteNavigationMenuId, String name,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _siteNavigationMenuService.updateSiteNavigationMenu(

@@ -26,7 +26,7 @@ export default function throttle(fn, interval) {
 	let timeout = null;
 	let last;
 
-	return function(...args) {
+	return function (...args) {
 		const context = this;
 		const now = Date.now();
 
@@ -40,7 +40,8 @@ export default function throttle(fn, interval) {
 
 		if (timeout === null) {
 			schedule();
-		} else {
+		}
+		else {
 			const remaining = Math.max(last + interval - now, 0);
 			clearTimeout(timeout);
 			timeout = setTimeout(schedule, remaining);

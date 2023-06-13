@@ -16,9 +16,9 @@ package com.liferay.portal.dao.init;
 
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.db.partition.DBPartitionUtil;
 import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBManager;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -39,6 +39,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import java.util.Properties;
+
 import javax.sql.DataSource;
 
 /**
@@ -50,63 +52,29 @@ public class DBInitUtil {
 		return _dataSource;
 	}
 
+	public static DataSource getReadDataSource() {
+		return _readDataSource;
+	}
+
+	public static DataSource getWriteDataSource() {
+		return _writeDataSource;
+	}
+
 	public static void init() throws Exception {
-		_dataSource = DataSourceFactoryUtil.initDataSource(
-			PropsUtil.getProperties("jdbc.default.", true));
+		_readDataSource = _initDataSource("jdbc.read.");
 
-		DB db = DBManagerUtil.getDB(
-			DBManagerUtil.getDBType(DialectDetector.getDialect(_dataSource)),
-			_dataSource);
+		_writeDataSource = _initDataSource("jdbc.write.");
 
-		DBManager dbManager = DBManagerUtil.getDBManager();
+		_dataSource = _writeDataSource;
 
-		dbManager.setDB(db);
+		if ((_readDataSource == null) && (_writeDataSource == null)) {
+			_dataSource = _initDataSource("jdbc.default.");
+		}
 
 		try (Connection connection = _dataSource.getConnection()) {
-			if (_checkDefaultRelease(connection)) {
-				_setSupportsStringCaseSensitiveQuery(db, connection);
+			_init(DBManagerUtil.getDB(), connection);
 
-				return;
-			}
-
-			try {
-				db.runSQL(
-					connection,
-					"alter table Release_ add mvccVersion LONG default 0 not " +
-						"null");
-			}
-			catch (Exception exception) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception.getMessage());
-				}
-			}
-
-			try {
-				db.runSQL(
-					connection,
-					"alter table Release_ add schemaVersion VARCHAR(75) null");
-			}
-			catch (Exception exception) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception.getMessage());
-				}
-			}
-
-			if (_checkDefaultRelease(connection)) {
-				_setSupportsStringCaseSensitiveQuery(db, connection);
-
-				return;
-			}
-
-			// Create tables and populate with default data
-
-			if (GetterUtil.getBoolean(
-					PropsUtil.get(PropsKeys.SCHEMA_RUN_ENABLED))) {
-
-				_createTablesAndPopulate(db, connection);
-
-				_setSupportsStringCaseSensitiveQuery(db, connection);
-			}
+			DBPartitionUtil.setDefaultCompanyId(connection);
 		}
 	}
 
@@ -205,6 +173,67 @@ public class DBInitUtil {
 		return false;
 	}
 
+	private static void _init(DB db, Connection connection) throws Exception {
+		if (_checkDefaultRelease(connection)) {
+			_setSupportsStringCaseSensitiveQuery(db, connection);
+
+			return;
+		}
+
+		try {
+			db.runSQL(
+				connection,
+				"alter table Release_ add mvccVersion LONG default 0 not null");
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception.getMessage());
+			}
+		}
+
+		try {
+			db.runSQL(
+				connection,
+				"alter table Release_ add schemaVersion VARCHAR(75) null");
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception.getMessage());
+			}
+		}
+
+		if (_checkDefaultRelease(connection)) {
+			_setSupportsStringCaseSensitiveQuery(db, connection);
+
+			return;
+		}
+
+		// Create tables and populate with default data
+
+		if (GetterUtil.getBoolean(
+				PropsUtil.get(PropsKeys.SCHEMA_RUN_ENABLED))) {
+
+			_createTablesAndPopulate(db, connection);
+
+			_setSupportsStringCaseSensitiveQuery(db, connection);
+		}
+	}
+
+	private static DataSource _initDataSource(String prefix) throws Exception {
+		Properties properties = PropsUtil.getProperties(prefix, true);
+
+		if ((properties == null) || properties.isEmpty()) {
+			return null;
+		}
+
+		DataSource dataSource = DBPartitionUtil.wrapDataSource(
+			DataSourceFactoryUtil.initDataSource(properties));
+
+		DBManagerUtil.setDB(DialectDetector.getDialect(dataSource), dataSource);
+
+		return dataSource;
+	}
+
 	private static void _runSQLTemplate(
 			DB db, Connection connection, ClassLoader classLoader, String path)
 		throws Exception {
@@ -214,7 +243,7 @@ public class DBInitUtil {
 			StreamUtil.toString(
 				classLoader.getResourceAsStream(
 					"com/liferay/portal/tools/sql/dependencies/".concat(path))),
-			false, false);
+			false);
 	}
 
 	private static void _setSupportsStringCaseSensitiveQuery(
@@ -245,5 +274,7 @@ public class DBInitUtil {
 	private static final Log _log = LogFactoryUtil.getLog(DBInitUtil.class);
 
 	private static DataSource _dataSource;
+	private static DataSource _readDataSource;
+	private static DataSource _writeDataSource;
 
 }

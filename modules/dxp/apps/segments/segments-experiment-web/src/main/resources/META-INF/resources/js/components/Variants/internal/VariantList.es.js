@@ -23,11 +23,11 @@ function VariantList({
 	onVariantPublish,
 	publishable,
 	selectedSegmentsExperienceId,
-	variants
+	variants,
 }) {
 	return (
 		<ClayList>
-			{variants.map(variant => {
+			{variants.map((variant) => {
 				const publishableVariant =
 					publishable && !!(!variant.control || variant.winner);
 
@@ -62,7 +62,7 @@ VariantList.propTypes = {
 	onVariantDeletion: PropTypes.func.isRequired,
 	onVariantEdition: PropTypes.func.isRequired,
 	publishable: PropTypes.bool.isRequired,
-	variants: PropTypes.arrayOf(SegmentsVariantType)
+	variants: PropTypes.arrayOf(SegmentsVariantType),
 };
 
 export default VariantList;

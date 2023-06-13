@@ -2,11 +2,13 @@
 <head>
 <title>MediaGallery</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">MediaGallery</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>BREADCRUMB</td>
@@ -31,7 +33,7 @@
 <!--ENTRY-->
 <tr>
 	<td>ENTRY_THUMBNAIL</td>
-	<td>//div[contains(@title,'${key_mgDocumentTitle}')]//div/img</td>
+	<td>//*[contains(@title,'${key_mgDocumentTitle}')]//div/img</td>
 	<td></td>
 </tr>
 <tr>

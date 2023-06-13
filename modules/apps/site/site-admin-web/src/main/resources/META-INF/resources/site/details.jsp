@@ -93,7 +93,7 @@ else {
 <aui:input name="description" placeholder="description" />
 
 <c:if test="<%= !group.isCompany() && !group.isGuest() %>">
-	<aui:input name="active" type="toggle-switch" value="<%= group.isActive() %>" />
+	<aui:input name="active" type="toggle-switch" value="<%= (liveGroup != null) ? liveGroup.isActive() : group.isActive() %>" />
 </c:if>
 
 <c:if test="<%= (parentGroupId != GroupConstants.DEFAULT_PARENT_GROUP_ID) && PropsValues.SITES_SHOW_INHERIT_CONTENT_SCOPE_FROM_PARENT_SITE %>">
@@ -207,30 +207,11 @@ else {
 	</div>
 
 	<aui:script use="liferay-search-container">
-		A.one('#<portlet:namespace />selectParentSiteLink').on('click', function(
+		A.one('#<portlet:namespace />selectParentSiteLink').on('click', function (
 			event
 		) {
-			Liferay.Util.selectEntity(
-				{
-					dialog: {
-						constrain: true,
-						modal: true
-					},
-					id: '<portlet:namespace />selectGroup',
-					title: '<liferay-ui:message arguments="site" key="select-x" />',
-
-					<%
-					PortletURL groupSelectorURL = PortletProviderUtil.getPortletURL(request, Group.class.getName(), PortletProvider.Action.BROWSE);
-
-					groupSelectorURL.setParameter("includeCurrentGroup", Boolean.FALSE.toString());
-					groupSelectorURL.setParameter("groupId", String.valueOf(group.getGroupId()));
-					groupSelectorURL.setParameter("eventName", liferayPortletResponse.getNamespace() + "selectGroup");
-					groupSelectorURL.setWindowState(LiferayWindowState.POP_UP);
-					%>
-
-					uri: '<%= groupSelectorURL.toString() %>'
-				},
-				function(event) {
+			Liferay.Util.openSelectionModal({
+				onSelect: function (event) {
 					var searchContainer = Liferay.SearchContainer.get(
 						'<portlet:namespace />parentGroupSearchContainer'
 					);
@@ -256,8 +237,21 @@ else {
 					A.one(
 						'#<portlet:namespace />membershipRestrictionContainer'
 					).show();
-				}
-			);
+				},
+				selectEventName: '<portlet:namespace />selectGroup',
+				title: '<liferay-ui:message arguments="site" key="select-x" />',
+
+				<%
+				PortletURL groupSelectorURL = PortletProviderUtil.getPortletURL(request, Group.class.getName(), PortletProvider.Action.BROWSE);
+
+				groupSelectorURL.setParameter("includeCurrentGroup", Boolean.FALSE.toString());
+				groupSelectorURL.setParameter("groupId", String.valueOf(group.getGroupId()));
+				groupSelectorURL.setParameter("eventName", liferayPortletResponse.getNamespace() + "selectGroup");
+				groupSelectorURL.setWindowState(LiferayWindowState.POP_UP);
+				%>
+
+				url: '<%= groupSelectorURL.toString() %>',
+			});
 		});
 
 		var searchContainer = Liferay.SearchContainer.get(
@@ -266,7 +260,7 @@ else {
 
 		searchContainer.get('contentBox').delegate(
 			'click',
-			function(event) {
+			function (event) {
 				var link = event.currentTarget;
 
 				var tr = link.ancestor('tr');

@@ -35,6 +35,10 @@ public class DDLRecordLocalServiceWrapper
 	/**
 	 * Adds the ddl record to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDLRecordLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ddlRecord the ddl record
 	 * @return the ddl record that was added
 	 */
@@ -74,6 +78,10 @@ public class DDLRecordLocalServiceWrapper
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.dynamic.data.lists.model.DDLRecord addRecord(
 			long userId, long groupId, long ddmStorageId, long ddlRecordSetId,
@@ -82,6 +90,18 @@ public class DDLRecordLocalServiceWrapper
 
 		return _ddlRecordLocalService.addRecord(
 			userId, groupId, ddmStorageId, ddlRecordSetId, serviceContext);
+	}
+
+	@Override
+	public com.liferay.dynamic.data.lists.model.DDLRecord addRecord(
+			long userId, long groupId, long ddmStorageId, long ddlRecordSetId,
+			String className, long classPK,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ddlRecordLocalService.addRecord(
+			userId, groupId, ddmStorageId, ddlRecordSetId, className, classPK,
+			serviceContext);
 	}
 
 	/**
@@ -98,7 +118,22 @@ public class DDLRecordLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ddlRecordLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the ddl record from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDLRecordLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ddlRecord the ddl record
 	 * @return the ddl record that was removed
@@ -112,6 +147,10 @@ public class DDLRecordLocalServiceWrapper
 
 	/**
 	 * Deletes the ddl record with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDLRecordLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param recordId the primary key of the ddl record
 	 * @return the ddl record that was removed
@@ -176,6 +215,18 @@ public class DDLRecordLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_ddlRecordLocalService.deleteRecords(recordSetId);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _ddlRecordLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _ddlRecordLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -288,6 +339,13 @@ public class DDLRecordLocalServiceWrapper
 
 		return _ddlRecordLocalService.fetchDDLRecordByUuidAndGroupId(
 			uuid, groupId);
+	}
+
+	@Override
+	public com.liferay.dynamic.data.lists.model.DDLRecord fetchFirstRecord(
+		String className, long classPK) {
+
+		return _ddlRecordLocalService.fetchFirstRecord(className, classPK);
 	}
 
 	/**
@@ -526,6 +584,9 @@ public class DDLRecordLocalServiceWrapper
 		return _ddlRecordLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -602,9 +663,11 @@ public class DDLRecordLocalServiceWrapper
 		getRecords(
 			long recordSetId, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.dynamic.data.lists.model.DDLRecord> obc) {
+				<com.liferay.dynamic.data.lists.model.DDLRecord>
+					orderByComparator) {
 
-		return _ddlRecordLocalService.getRecords(recordSetId, start, end, obc);
+		return _ddlRecordLocalService.getRecords(
+			recordSetId, start, end, orderByComparator);
 	}
 
 	/**
@@ -626,10 +689,11 @@ public class DDLRecordLocalServiceWrapper
 		getRecords(
 			long recordSetId, long userId, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.dynamic.data.lists.model.DDLRecord> obc) {
+				<com.liferay.dynamic.data.lists.model.DDLRecord>
+					orderByComparator) {
 
 		return _ddlRecordLocalService.getRecords(
-			recordSetId, userId, start, end, obc);
+			recordSetId, userId, start, end, orderByComparator);
 	}
 
 	@Override
@@ -738,6 +802,10 @@ public class DDLRecordLocalServiceWrapper
 
 	/**
 	 * Updates the ddl record in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDLRecordLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ddlRecord the ddl record
 	 * @return the ddl record that was updated

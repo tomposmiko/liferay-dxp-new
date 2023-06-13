@@ -30,8 +30,6 @@ if (calendarResource != null) {
 
 	calendars = CalendarServiceUtil.getCalendarResourceCalendars(themeDisplay.getScopeGroupId(), calendarResourceId);
 }
-
-String code = BeanParamUtil.getString(calendarResource, request, "code");
 %>
 
 <liferay-ui:header
@@ -42,7 +40,7 @@ String code = BeanParamUtil.getString(calendarResource, request, "code");
 
 <liferay-portlet:actionURL name="updateCalendarResource" var="updateCalendarResourceURL" />
 
-<aui:form action="<%= updateCalendarResourceURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "updateCalendarResource();" %>'>
+<aui:form action="<%= updateCalendarResourceURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "updateCalendarResource();" %>'>
 	<aui:input name="mvcPath" type="hidden" value="/edit_calendar_resource.jsp" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="calendarResourceId" type="hidden" value="<%= String.valueOf(calendarResourceId) %>" />
@@ -81,7 +79,7 @@ String code = BeanParamUtil.getString(calendarResource, request, "code");
 						</c:if>
 					</c:when>
 					<c:otherwise>
-						<aui:input name="code" type="resource" value="<%= code %>" />
+						<aui:input name="code" type="resource" value='<%= BeanParamUtil.getString(calendarResource, request, "code") %>' />
 					</c:otherwise>
 				</c:choose>
 
@@ -118,6 +116,7 @@ String code = BeanParamUtil.getString(calendarResource, request, "code");
 				<liferay-asset:asset-categories-selector
 					className="<%= CalendarResource.class.getName() %>"
 					classPK="<%= calendarResourceId %>"
+					visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
 				/>
 
 				<liferay-asset:asset-tags-selector

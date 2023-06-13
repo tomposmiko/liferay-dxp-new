@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * The persistence utility for the depot app customization service. This utility wraps <code>com.liferay.depot.service.persistence.impl.DepotAppCustomizationPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -302,6 +298,74 @@ public class DepotAppCustomizationUtil {
 	}
 
 	/**
+	 * Returns the depot app customization where depotEntryId = &#63; and enabled = &#63; or throws a <code>NoSuchAppCustomizationException</code> if it could not be found.
+	 *
+	 * @param depotEntryId the depot entry ID
+	 * @param enabled the enabled
+	 * @return the matching depot app customization
+	 * @throws NoSuchAppCustomizationException if a matching depot app customization could not be found
+	 */
+	public static DepotAppCustomization findByD_E(
+			long depotEntryId, boolean enabled)
+		throws com.liferay.depot.exception.NoSuchAppCustomizationException {
+
+		return getPersistence().findByD_E(depotEntryId, enabled);
+	}
+
+	/**
+	 * Returns the depot app customization where depotEntryId = &#63; and enabled = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param depotEntryId the depot entry ID
+	 * @param enabled the enabled
+	 * @return the matching depot app customization, or <code>null</code> if a matching depot app customization could not be found
+	 */
+	public static DepotAppCustomization fetchByD_E(
+		long depotEntryId, boolean enabled) {
+
+		return getPersistence().fetchByD_E(depotEntryId, enabled);
+	}
+
+	/**
+	 * Returns the depot app customization where depotEntryId = &#63; and enabled = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param depotEntryId the depot entry ID
+	 * @param enabled the enabled
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching depot app customization, or <code>null</code> if a matching depot app customization could not be found
+	 */
+	public static DepotAppCustomization fetchByD_E(
+		long depotEntryId, boolean enabled, boolean useFinderCache) {
+
+		return getPersistence().fetchByD_E(
+			depotEntryId, enabled, useFinderCache);
+	}
+
+	/**
+	 * Removes the depot app customization where depotEntryId = &#63; and enabled = &#63; from the database.
+	 *
+	 * @param depotEntryId the depot entry ID
+	 * @param enabled the enabled
+	 * @return the depot app customization that was removed
+	 */
+	public static DepotAppCustomization removeByD_E(
+			long depotEntryId, boolean enabled)
+		throws com.liferay.depot.exception.NoSuchAppCustomizationException {
+
+		return getPersistence().removeByD_E(depotEntryId, enabled);
+	}
+
+	/**
+	 * Returns the number of depot app customizations where depotEntryId = &#63; and enabled = &#63;.
+	 *
+	 * @param depotEntryId the depot entry ID
+	 * @param enabled the enabled
+	 * @return the number of matching depot app customizations
+	 */
+	public static int countByD_E(long depotEntryId, boolean enabled) {
+		return getPersistence().countByD_E(depotEntryId, enabled);
+	}
+
+	/**
 	 * Returns the depot app customization where depotEntryId = &#63; and portletId = &#63; or throws a <code>NoSuchAppCustomizationException</code> if it could not be found.
 	 *
 	 * @param depotEntryId the depot entry ID
@@ -528,29 +592,9 @@ public class DepotAppCustomizationUtil {
 	}
 
 	public static DepotAppCustomizationPersistence getPersistence() {
-		return _serviceTracker.getService();
+		return _persistence;
 	}
 
-	private static ServiceTracker
-		<DepotAppCustomizationPersistence, DepotAppCustomizationPersistence>
-			_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			DepotAppCustomizationPersistence.class);
-
-		ServiceTracker
-			<DepotAppCustomizationPersistence, DepotAppCustomizationPersistence>
-				serviceTracker =
-					new ServiceTracker
-						<DepotAppCustomizationPersistence,
-						 DepotAppCustomizationPersistence>(
-							 bundle.getBundleContext(),
-							 DepotAppCustomizationPersistence.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile DepotAppCustomizationPersistence _persistence;
 
 }

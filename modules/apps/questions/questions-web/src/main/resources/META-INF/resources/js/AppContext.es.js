@@ -12,15 +12,35 @@
  * details.
  */
 
-import React, {createContext} from 'react';
+import React, {createContext, useEffect, useState} from 'react';
 
-const AppContext = createContext();
+import {client, hasListPermissionsQuery} from './utils/client.es';
+
+const AppContext = createContext({});
 
 const AppContextProvider = ({children, ...context}) => {
+	const [canCreateThread, setCanCreateThread] = useState(false);
+
+	useEffect(() => {
+		client
+			.query({
+				query: hasListPermissionsQuery,
+				variables: {
+					siteKey: context.siteKey,
+				},
+			})
+			.then(({data: {messageBoardThreads}}) => {
+				setCanCreateThread(
+					Boolean(messageBoardThreads.actions['create'])
+				);
+			});
+	}, [context.siteKey]);
+
 	return (
 		<AppContext.Provider
 			value={{
-				...context
+				...context,
+				canCreateThread,
 			}}
 		>
 			{children}

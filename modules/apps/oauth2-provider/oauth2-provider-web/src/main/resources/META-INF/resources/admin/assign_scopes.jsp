@@ -24,7 +24,9 @@ OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2
 AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayContext)oAuth2AdminPortletDisplayContext;
 %>
 
-<div class="container-fluid container-fluid-max-xl container-view">
+<clay:container-fluid
+	cssClass="container-view"
+>
 	<liferay-ui:error exception="<%= OAuth2ApplicationClientCredentialUserIdException.class %>">
 
 		<%
@@ -41,11 +43,13 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 		</c:choose>
 	</liferay-ui:error>
 
-	<div class="row">
-		<div class="col-lg-12">
-			<portlet:actionURL name="/admin/assign_scopes" var="assignScopesURL">
-				<portlet:param name="mvcRenderCommandName" value="/admin/assign_scopes" />
-				<portlet:param name="appTab" value="assign_scopes" />
+	<clay:row>
+		<clay:col
+			lg="12"
+		>
+			<portlet:actionURL name="/oauth2_provider/assign_scopes" var="assignScopesURL">
+				<portlet:param name="mvcRenderCommandName" value="/oauth2_provider/assign_scopes" />
+				<portlet:param name="navigation" value="assign_scopes" />
 				<portlet:param name="backURL" value="<%= redirect %>" />
 				<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2Application.getOAuth2ApplicationId()) %>" />
 			</portlet:actionURL>
@@ -54,12 +58,12 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 				<div class="sheet">
 					<ul class="hidden nav nav-underline" id="<portlet:namespace />navScopeTypes" role="tablist">
 						<li class="nav-item">
-							<a aria-controls="<portlet:namespace />navResourceScopes" aria-expanded="true" class="active nav-link" data-toggle="tab" href="#<portlet:namespace />navResourceScopes" id="<portlet:namespace />navResourceScopesTab" role="tab">
+							<a aria-controls="<portlet:namespace />navResourceScopes" aria-expanded="true" class="active nav-link" data-toggle="liferay-tab" href="#<portlet:namespace />navResourceScopes" id="<portlet:namespace />navResourceScopesTab" role="tab">
 								<liferay-ui:message key="resource-scopes" />
 							</a>
 						</li>
 						<li class="nav-item">
-							<a aria-controls="<portlet:namespace />navGlobalScopes" class="nav-link" data-toggle="tab" href="#<portlet:namespace />navGlobalScopes" id="<portlet:namespace />navGlobalScopesTab" role="tab">
+							<a aria-controls="<portlet:namespace />navGlobalScopes" class="nav-link" data-toggle="liferay-tab" href="#<portlet:namespace />navGlobalScopes" id="<portlet:namespace />navGlobalScopesTab" role="tab">
 								<liferay-ui:message key="global-scopes" />
 							</a>
 						</li>
@@ -84,12 +88,12 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 
 				<aui:input id="impliedScopeAliases" name="scopeAliases" type="hidden" />
 			</aui:form>
-		</div>
-	</div>
-</div>
+		</clay:col>
+	</clay:row>
+</clay:container-fluid>
 
 <aui:script require="metal-dom/src/dom as dom">
-	AUI().use('node', 'aui-modal', function(A) {
+	AUI().use('node', 'aui-modal', function (A) {
 		if (A.all('#<portlet:namespace />navGlobalScopes .panel').size() > 0) {
 			A.one('#<portlet:namespace />navScopeTypes').toggleClass(
 				'hidden',
@@ -108,7 +112,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 
 		appsAccordion.delegate(
 			'click',
-			function(event) {
+			function (event) {
 				event.stopPropagation();
 
 				if (handle) {
@@ -131,10 +135,10 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 					modal: true,
 					bodyContent: '<div id="<portlet:namespace />modalBody"/>',
 					headerContent:
-						'<%= UnicodeLanguageUtil.get(request, "choose-one-of-the-following-global-scopes-that-include-this-resource-scope") %>'
+						'<%= UnicodeLanguageUtil.get(request, "choose-one-of-the-following-global-scopes-that-include-this-resource-scope") %>',
 				}).render();
 
-				modal.on('visibleChange', function(event) {
+				modal.on('visibleChange', function (event) {
 					if (event.newVal) {
 						return;
 					}
@@ -143,7 +147,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 						.querySelectorAll(
 							'#<portlet:namespace />globalAccordion .panel'
 						)
-						.forEach(function(globalAccordionPanel) {
+						.forEach(function (globalAccordionPanel) {
 							globalAccordionPanel.classList.remove('hide');
 						});
 
@@ -164,11 +168,11 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 						cssClass: 'btn-primary',
 						label: '<liferay-ui:message key="close" />',
 						on: {
-							click: function() {
+							click: function () {
 								modal.hide();
-							}
-						}
-					}
+							},
+						},
+					},
 				]);
 
 				var scopeAliases = currentTarget.attr('data-slave').split(' ');
@@ -177,7 +181,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 					.querySelectorAll(
 						'#<portlet:namespace />globalAccordion .panel'
 					)
-					.forEach(function(globalAccordionPanel) {
+					.forEach(function (globalAccordionPanel) {
 						globalAccordionPanel.classList.add('hide');
 					});
 
@@ -186,7 +190,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 						.querySelectorAll(
 							'#<portlet:namespace />globalAccordion .panel[data-master]'
 						)
-						.forEach(function(globalAccordionPanel) {
+						.forEach(function (globalAccordionPanel) {
 							var masterScopeAliases = globalAccordionPanel.getAttribute(
 								'data-master'
 							);
@@ -217,7 +221,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 			'input[data-slave], a[data-slave]'
 		);
 
-		<portlet:namespace />recalculateDependants = function(checkboxElement) {
+		<portlet:namespace />recalculateDependants = function (checkboxElement) {
 			var checkbox = A.one(checkboxElement);
 
 			var value = checkbox.val();
@@ -235,12 +239,12 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 			);
 
 			return A.all('input[data-slave]')
-				.filter(function() {
+				.filter(function () {
 					var array = this.attr('data-slave').split(' ');
 
 					return array.indexOf(scopeAlias) >= 0;
 				})
-				.each(function() {
+				.each(function () {
 					var slave = this;
 
 					var scopeAliases = slave.attr('data-slave').split(' ');
@@ -255,10 +259,10 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 						A.all(
 							'#<portlet:namespace />globalAccordion .panel[data-master]'
 						)
-							.filter(function() {
+							.filter(function () {
 								return this.one('input:checked');
 							})
-							.each(function() {
+							.each(function () {
 								var array = this.attr('data-master').split(' ');
 
 								if (array.indexOf(scopeAliases[i]) >= 0) {
@@ -287,9 +291,9 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 				});
 		};
 
-		<portlet:namespace />recalculateAll = function() {
+		<portlet:namespace />recalculateAll = function () {
 			A.all('input[name="<portlet:namespace />scopeAliases"]').each(
-				function() {
+				function () {
 					<portlet:namespace />recalculateDependants(this);
 				}
 			);
@@ -297,7 +301,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 
 		var <portlet:namespace />stickyScopeAliases = [];
 
-		<portlet:namespace />changeScopeAliasStickyStatus = function(
+		<portlet:namespace />changeScopeAliasStickyStatus = function (
 			scopeAlias,
 			sticky
 		) {
@@ -307,7 +311,8 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 				) {
 					<portlet:namespace />stickyScopeAliases.push(scopeAlias);
 				}
-			} else {
+			}
+			else {
 				var index = <portlet:namespace />getArrayIndexOfStickyScopeAlias(
 					scopeAlias
 				);
@@ -318,7 +323,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 			}
 		};
 
-		<portlet:namespace />getArrayIndexOfStickyScopeAlias = function(
+		<portlet:namespace />getArrayIndexOfStickyScopeAlias = function (
 			scopeAlias
 		) {
 			for (
@@ -335,14 +340,14 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 
 		<portlet:namespace />recalculateAll();
 
-		A.one('#<portlet:namespace />save').on('click', function(event) {
+		A.one('#<portlet:namespace />save').on('click', function (event) {
 			event.preventDefault();
 
 			var scopeAliases = [];
 
 			A.all(
 				'input[name="<portlet:namespace />scopeAliases"]:checked:disabled'
-			).each(function() {
+			).each(function () {
 				scopeAliases.push(this.val());
 			});
 
@@ -351,15 +356,17 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 				scopeAliases.join(' ')
 			);
 
-			document.<portlet:namespace/>fm.submit();
+			document.<portlet:namespace />fm.submit();
 		});
 
 		A.all('#<portlet:namespace />appsAccordion .panel')
-			.filter(function() {
+			.filter(function () {
 				return this.one('input:checked');
 			})
-			.each(function() {
-				var panelHeaderElement = this.one('*[data-toggle="collapse"]');
+			.each(function () {
+				var panelHeaderElement = this.one(
+					'*[data-toggle="liferay-collapse"]'
+				);
 
 				panelHeaderElement.attr('aria-expanded', 'true');
 				panelHeaderElement.removeClass('collapsed');

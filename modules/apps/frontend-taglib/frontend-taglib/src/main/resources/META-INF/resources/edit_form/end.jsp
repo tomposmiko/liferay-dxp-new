@@ -37,7 +37,7 @@ String fullName = namespace + HtmlUtil.escapeJS(name);
 <aui:script use="liferay-form">
 	var config = {
 		id: '<%= fullName %>',
-		validateOnBlur: <%= validateOnBlur %>
+		validateOnBlur: <%= validateOnBlur %>,
 	};
 
 	<c:if test="<%= validatorTagsMap != null %>">
@@ -48,6 +48,7 @@ String fullName = namespace + HtmlUtil.escapeJS(name);
 
 		for (Map.Entry<String, List<ValidatorTag>> entry : validatorTagsMap.entrySet()) {
 			String fieldName = entry.getKey();
+
 			List<ValidatorTag> validatorTags = entry.getValue();
 
 			for (ValidatorTag validatorTag : validatorTags) {
@@ -59,7 +60,7 @@ String fullName = namespace + HtmlUtil.escapeJS(name);
 					errorMessage:
 						'<%= UnicodeLanguageUtil.get(resourceBundle, validatorTag.getErrorMessage()) %>',
 					fieldName: '<%= namespace + HtmlUtil.escapeJS(fieldName) %>',
-					validatorName: '<%= validatorTag.getName() %>'
+					validatorName: '<%= validatorTag.getName() %>',
 				});
 
 		<%
@@ -71,14 +72,14 @@ String fullName = namespace + HtmlUtil.escapeJS(name);
 	</c:if>
 
 	<c:if test="<%= Validator.isNotNull(onSubmit) %>">
-		config.onSubmit = function(event) {
+		config.onSubmit = function (event) {
 			<%= onSubmit %>;
 		};
 	</c:if>
 
 	Liferay.Form.register(config);
 
-	var onDestroyPortlet = function(event) {
+	var onDestroyPortlet = function (event) {
 		if (event.portletId === '<%= portletDisplay.getId() %>') {
 			delete Liferay.Form._INSTANCES['<%= fullName %>'];
 		}
@@ -91,6 +92,6 @@ String fullName = namespace + HtmlUtil.escapeJS(name);
 	</c:if>
 
 	Liferay.fire('<portlet:namespace />formReady', {
-		formName: '<%= fullName %>'
+		formName: '<%= fullName %>',
 	});
 </aui:script>

@@ -24,14 +24,17 @@ public class QueryTypeEntriesHolder {
 
 	public QueryTypeEntriesHolder() {
 		add("bool", "Bool");
+		add("date_range", "Date Range");
 		add("exists", "Exists");
 		add("fuzzy", "Fuzzy");
 		add("match", "Match");
 		add("match_phrase", "Match Phrase");
 		add("match_phrase_prefix", "Match Phrase Prefix");
 		add("multi_match", "Multi Match");
+		add("nested", "Nested");
 		add("prefix", "Prefix");
 		add("query_string", "Query String");
+		add("range", "Range");
 		add("regexp", "Regexp");
 		add("script", "Script");
 		add("simple_query_string", "Simple Query String");

@@ -438,17 +438,22 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		// log4j*.jar
 
 		if (PropsValues.AUTO_DEPLOY_COPY_LOG4J) {
-			String[] log4jJars = pluginLibDir.list(
-				new GlobFilenameFilter("log4j*.jar"));
+			String[] reload4jJar = pluginLibDir.list(
+				new GlobFilenameFilter("reload4j.jar"));
 
-			if (ArrayUtil.isEmpty(log4jJars)) {
+			if (ArrayUtil.isEmpty(reload4jJar)) {
 				String portalJarPath =
-					PortalUtil.getPortalLibDir() + "log4j.jar";
+					PortalUtil.getPortalLibDir() + "reload4j.jar";
 
 				FileUtil.copyFile(
-					portalJarPath, srcFile + "/WEB-INF/lib/log4j.jar", true);
+					portalJarPath, srcFile + "/WEB-INF/lib/reload4j.jar", true);
+			}
 
-				portalJarPath =
+			String[] log4jExtrasJar = pluginLibDir.list(
+				new GlobFilenameFilter("log4j-extras.jar"));
+
+			if (ArrayUtil.isEmpty(log4jExtrasJar)) {
+				String portalJarPath =
 					PortalUtil.getPortalLibDir() + "log4j-extras.jar";
 
 				FileUtil.copyFile(
@@ -563,8 +568,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		String content = FileUtil.read(contextPath);
 
 		if (!PropsValues.AUTO_DEPLOY_UNPACK_WAR) {
-			content = StringUtil.replace(
-				content, "antiResourceLocking=\"true\"", StringPool.BLANK);
+			content = StringUtil.removeSubstring(
+				content, "antiResourceLocking=\"true\"");
 		}
 
 		FileUtil.write(targetFile, content);
@@ -703,7 +708,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		if (appServerType.equals(ServerDetector.JBOSS_ID) ||
 			appServerType.equals(ServerDetector.WILDFLY_ID)) {
 
-			excludes += "**/WEB-INF/lib/log4j.jar,";
+			excludes += "**/WEB-INF/lib/reload4j.jar,";
 		}
 		else if (appServerType.equals(ServerDetector.TOMCAT_ID)) {
 			String[] libs = FileUtil.listFiles(tomcatLibDir);
@@ -1370,7 +1375,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(5 * licenses.size() + 2);
+		StringBundler sb = new StringBundler((5 * licenses.size()) + 2);
 
 		for (int i = 0; i < licenses.size(); i++) {
 			License license = licenses.get(i);
@@ -1400,7 +1405,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(liferayVersions.size() * 3 + 2);
+		StringBundler sb = new StringBundler((liferayVersions.size() * 3) + 2);
 
 		for (int i = 0; i < liferayVersions.size(); i++) {
 			String liferayVersion = liferayVersions.get(i);
@@ -1444,7 +1449,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		}
 
 		StringBundler sb = new StringBundler(
-			requiredDeploymentContexts.size() * 3 + 2);
+			(requiredDeploymentContexts.size() * 3) + 2);
 
 		for (int i = 0; i < requiredDeploymentContexts.size(); i++) {
 			String requiredDeploymentContext = requiredDeploymentContexts.get(
@@ -1471,7 +1476,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(tags.size() * 3 + 2);
+		StringBundler sb = new StringBundler((tags.size() * 3) + 2);
 
 		for (int i = 0; i < tags.size(); i++) {
 			String tag = tags.get(i);
@@ -1687,7 +1692,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return null;
 		}
 
-		InputStream is = null;
+		InputStream inputStream = null;
 		ZipFile zipFile = null;
 
 		try {
@@ -1702,14 +1707,14 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 						"/WEB-INF/liferay-plugin-package.xml"));
 
 				if (pluginPackageXmlFile.exists()) {
-					is = new FileInputStream(pluginPackageXmlFile);
+					inputStream = new FileInputStream(pluginPackageXmlFile);
 				}
 				else {
 					pluginPackageXmlFile = new File(
 						path + "/WEB-INF/liferay-plugin-package.xml");
 
 					if (pluginPackageXmlFile.exists()) {
-						is = new FileInputStream(pluginPackageXmlFile);
+						inputStream = new FileInputStream(pluginPackageXmlFile);
 					}
 				}
 
@@ -1718,8 +1723,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 						file.getParent(), "/merge/", file.getName(),
 						"/WEB-INF/liferay-plugin-package.properties"));
 
-				if ((is == null) && pluginPackagePropertiesFile.exists()) {
-					is = new FileInputStream(pluginPackagePropertiesFile);
+				if ((inputStream == null) &&
+					pluginPackagePropertiesFile.exists()) {
+
+					inputStream = new FileInputStream(
+						pluginPackagePropertiesFile);
 
 					parseProps = true;
 				}
@@ -1727,8 +1735,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 					pluginPackagePropertiesFile = new File(
 						path + "/WEB-INF/liferay-plugin-package.properties");
 
-					if ((is == null) && pluginPackagePropertiesFile.exists()) {
-						is = new FileInputStream(pluginPackagePropertiesFile);
+					if ((inputStream == null) &&
+						pluginPackagePropertiesFile.exists()) {
+
+						inputStream = new FileInputStream(
+							pluginPackagePropertiesFile);
 
 						parseProps = true;
 					}
@@ -1743,14 +1754,14 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 						"/WEB-INF/liferay-plugin-package.xml"));
 
 				if (pluginPackageXmlFile.exists()) {
-					is = new FileInputStream(pluginPackageXmlFile);
+					inputStream = new FileInputStream(pluginPackageXmlFile);
 				}
 				else {
 					ZipEntry zipEntry = zipFile.getEntry(
 						"WEB-INF/liferay-plugin-package.xml");
 
 					if (zipEntry != null) {
-						is = zipFile.getInputStream(zipEntry);
+						inputStream = zipFile.getInputStream(zipEntry);
 					}
 				}
 
@@ -1759,8 +1770,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 						file.getParent(), "/merge/", file.getName(),
 						"/WEB-INF/liferay-plugin-package.properties"));
 
-				if ((is == null) && pluginPackagePropertiesFile.exists()) {
-					is = new FileInputStream(pluginPackagePropertiesFile);
+				if ((inputStream == null) &&
+					pluginPackagePropertiesFile.exists()) {
+
+					inputStream = new FileInputStream(
+						pluginPackagePropertiesFile);
 
 					parseProps = true;
 				}
@@ -1768,15 +1782,15 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 					ZipEntry zipEntry = zipFile.getEntry(
 						"WEB-INF/liferay-plugin-package.properties");
 
-					if ((is == null) && (zipEntry != null)) {
-						is = zipFile.getInputStream(zipEntry);
+					if ((inputStream == null) && (zipEntry != null)) {
+						inputStream = zipFile.getInputStream(zipEntry);
 
 						parseProps = true;
 					}
 				}
 			}
 
-			if (is == null) {
+			if (inputStream == null) {
 				if (_log.isInfoEnabled()) {
 					_log.info(
 						StringBundler.concat(
@@ -1791,7 +1805,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			if (parseProps) {
 				String displayName = getDisplayName(file);
 
-				String propertiesString = StringUtil.read(is);
+				String propertiesString = StringUtil.read(inputStream);
 
 				Properties properties = PropertiesUtil.load(propertiesString);
 
@@ -1799,7 +1813,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 					displayName, properties);
 			}
 
-			String xml = StringUtil.read(is);
+			String xml = StringUtil.read(inputStream);
 
 			xml = XMLUtil.fixProlog(xml);
 
@@ -1809,9 +1823,9 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			_log.error(file.getPath() + ": " + exception.toString(), exception);
 		}
 		finally {
-			if (is != null) {
+			if (inputStream != null) {
 				try {
-					is.close();
+					inputStream.close();
 				}
 				catch (IOException ioException) {
 				}
@@ -2068,12 +2082,9 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		}
 
 		if (webXmlVersion < 2.4) {
-			webXmlContent =
-				webXmlContent.substring(0, x) +
-					getExtraFiltersContent(webXmlVersion, srcFile) +
-						webXmlContent.substring(y);
-
-			return webXmlContent;
+			return webXmlContent.substring(0, x) +
+				getExtraFiltersContent(webXmlVersion, srcFile) +
+					webXmlContent.substring(y);
 		}
 
 		String filtersContent =
@@ -2095,11 +2106,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		FileUtil.write(
 			srcFile + "/WEB-INF/liferay-web.xml", liferayWebXmlContent);
 
-		webXmlContent =
-			webXmlContent.substring(0, x) + getInvokerFilterContent() +
-				webXmlContent.substring(y);
-
-		return webXmlContent;
+		return webXmlContent.substring(0, x) + getInvokerFilterContent() +
+			webXmlContent.substring(y);
 	}
 
 	@Override

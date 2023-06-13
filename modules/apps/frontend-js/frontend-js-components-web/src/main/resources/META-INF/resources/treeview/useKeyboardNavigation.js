@@ -29,7 +29,7 @@ const KEYS = {
 	RIGHT: 39,
 	SPACE: 32,
 	TAB: 9,
-	UP: 38
+	UP: 38,
 };
 
 const HANDLED_KEY_CODES = new Set(Object.values(KEYS));
@@ -51,7 +51,7 @@ const KEY_CODES_TO_ACTIONS = {
 	[KEYS.RIGHT]: 'EXPAND_AND_ENTER',
 	[KEYS.SPACE]: 'TOGGLE_SELECT',
 	[KEYS.TAB]: 'EXIT',
-	[KEYS.UP]: 'SELECT_PREVIOUS_VISIBLE'
+	[KEYS.UP]: 'SELECT_PREVIOUS_VISIBLE',
 };
 
 export default function useKeyboardNavigation(nodeId) {
@@ -59,21 +59,23 @@ export default function useKeyboardNavigation(nodeId) {
 	const {focusedNodeId} = state;
 
 	const handleKeyDown = useCallback(
-		event => {
+		(event) => {
 			const {keyCode} = event;
 
 			if (focusedNodeId === nodeId && HANDLED_KEY_CODES.has(keyCode)) {
 				if (keyCode !== KEYS.TAB) {
+
 					// We intercept and manage all key presses internally,
 					// except for TAB, which is used to navigate away from the
 					// component (requires a `tabindex` of -1 on all internal
 					// components).
+
 					event.preventDefault();
 				}
 
 				dispatch({
 					nodeId,
-					type: KEY_CODES_TO_ACTIONS[keyCode]
+					type: KEY_CODES_TO_ACTIONS[keyCode],
 				});
 			}
 		},

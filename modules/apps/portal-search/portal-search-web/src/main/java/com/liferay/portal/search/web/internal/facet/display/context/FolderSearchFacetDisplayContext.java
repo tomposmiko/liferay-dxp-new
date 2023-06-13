@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.web.internal.facet.display.context;
 
+import com.liferay.portal.search.web.internal.folder.facet.configuration.FolderFacetPortletInstanceConfiguration;
+
 import java.io.Serializable;
 
 import java.util.List;
@@ -23,10 +25,24 @@ import java.util.List;
  */
 public class FolderSearchFacetDisplayContext implements Serializable {
 
+	public long getDisplayStyleGroupId() {
+		return _displayStyleGroupId;
+	}
+
+	public FolderFacetPortletInstanceConfiguration
+		getFolderFacetPortletInstanceConfiguration() {
+
+		return _folderFacetPortletInstanceConfiguration;
+	}
+
 	public List<FolderSearchFacetTermDisplayContext>
 		getFolderSearchFacetTermDisplayContexts() {
 
 		return _folderSearchFacetTermDisplayContexts;
+	}
+
+	public String getPaginationStartParameterName() {
+		return _paginationStartParameterName;
 	}
 
 	public String getParameterName() {
@@ -49,6 +65,18 @@ public class FolderSearchFacetDisplayContext implements Serializable {
 		return _renderNothing;
 	}
 
+	public void setDisplayStyleGroupId(long displayStyleGroupId) {
+		_displayStyleGroupId = displayStyleGroupId;
+	}
+
+	public void setFolderFacetPortletInstanceConfiguration(
+		FolderFacetPortletInstanceConfiguration
+			folderFacetPortletInstanceConfiguration) {
+
+		_folderFacetPortletInstanceConfiguration =
+			folderFacetPortletInstanceConfiguration;
+	}
+
 	public void setFolderSearchFacetTermDisplayContexts(
 		List<FolderSearchFacetTermDisplayContext>
 			folderSearchFacetTermDisplayContexts) {
@@ -59,6 +87,12 @@ public class FolderSearchFacetDisplayContext implements Serializable {
 
 	public void setNothingSelected(boolean nothingSelected) {
 		_nothingSelected = nothingSelected;
+	}
+
+	public void setPaginationStartParameterName(
+		String paginationStartParameterName) {
+
+		_paginationStartParameterName = paginationStartParameterName;
 	}
 
 	public void setParameterName(String parameterName) {
@@ -77,9 +111,13 @@ public class FolderSearchFacetDisplayContext implements Serializable {
 		_renderNothing = renderNothing;
 	}
 
+	private long _displayStyleGroupId;
+	private FolderFacetPortletInstanceConfiguration
+		_folderFacetPortletInstanceConfiguration;
 	private List<FolderSearchFacetTermDisplayContext>
 		_folderSearchFacetTermDisplayContexts;
 	private boolean _nothingSelected;
+	private String _paginationStartParameterName;
 	private String _parameterName;
 	private String _parameterValue;
 	private List<String> _parameterValues;

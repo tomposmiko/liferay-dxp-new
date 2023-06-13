@@ -34,12 +34,12 @@ public class PrincipalException extends PortalException {
 		super(msg);
 	}
 
-	public PrincipalException(String msg, Throwable cause) {
-		super(msg, cause);
+	public PrincipalException(String msg, Throwable throwable) {
+		super(msg, throwable);
 	}
 
-	public PrincipalException(Throwable cause) {
-		super(cause);
+	public PrincipalException(Throwable throwable) {
+		super(throwable);
 	}
 
 	public static class MustBeAuthenticated extends PrincipalException {
@@ -48,16 +48,18 @@ public class PrincipalException extends PortalException {
 			this(String.valueOf(userId), null);
 		}
 
-		public MustBeAuthenticated(long userId, Throwable cause) {
-			this(String.valueOf(userId), cause);
+		public MustBeAuthenticated(long userId, Throwable throwable) {
+			this(String.valueOf(userId), throwable);
 		}
 
 		public MustBeAuthenticated(String login) {
 			this(login, null);
 		}
 
-		public MustBeAuthenticated(String login, Throwable cause) {
-			super(String.format("User %s must be authenticated", login), cause);
+		public MustBeAuthenticated(String login, Throwable throwable) {
+			super(
+				String.format("User %s must be authenticated", login),
+				throwable);
 
 			this.login = login;
 		}
@@ -166,15 +168,15 @@ public class PrincipalException extends PortalException {
 		}
 
 		public MustHavePermission(
-			long userId, String resourceName, long resourceId, Throwable cause,
-			String... actionIds) {
+			long userId, String resourceName, long resourceId,
+			Throwable throwable, String... actionIds) {
 
 			super(
 				String.format(
 					"User %s must have %s permission for %s %s", userId,
 					StringUtil.merge(actionIds, ","), resourceName,
 					(resourceId == 0) ? "" : resourceId),
-				cause);
+				throwable);
 
 			this.userId = userId;
 			this.resourceName = resourceName;
@@ -184,9 +186,9 @@ public class PrincipalException extends PortalException {
 		}
 
 		public MustHavePermission(
-			long userId, Throwable cause, String... actionIds) {
+			long userId, Throwable throwable, String... actionIds) {
 
-			this(userId, null, 0, cause, actionIds);
+			this(userId, null, 0, throwable, actionIds);
 		}
 
 		public MustHavePermission(
@@ -206,23 +208,47 @@ public class PrincipalException extends PortalException {
 
 		public MustHavePermission(
 			PermissionChecker permissionChecker, String resourceName,
-			long resourceId, Throwable cause, String... actionIds) {
+			long resourceId, Throwable throwable, String... actionIds) {
 
 			this(
-				permissionChecker.getUserId(), resourceName, resourceId, cause,
-				actionIds);
+				permissionChecker.getUserId(), resourceName, resourceId,
+				throwable, actionIds);
 		}
 
 		public MustHavePermission(
-			PermissionChecker permissionChecker, Throwable cause,
+			PermissionChecker permissionChecker, Throwable throwable,
 			String... actionIds) {
 
-			this(permissionChecker.getUserId(), null, 0, cause, actionIds);
+			this(permissionChecker.getUserId(), null, 0, throwable, actionIds);
 		}
 
 		public final String[] actionId;
 		public final long resourceId;
 		public final String resourceName;
+		public final long userId;
+
+	}
+
+	public static class MustHaveSessionCSRFToken extends PrincipalException {
+
+		public MustHaveSessionCSRFToken(long userId, String origin) {
+			this(userId, origin, null);
+		}
+
+		public MustHaveSessionCSRFToken(
+			long userId, String origin, Throwable throwable) {
+
+			super(
+				String.format(
+					"User %s session does not have a CSRF token for %s", userId,
+					origin),
+				throwable);
+
+			this.userId = userId;
+			this.origin = origin;
+		}
+
+		public final String origin;
 		public final long userId;
 
 	}
@@ -234,16 +260,16 @@ public class PrincipalException extends PortalException {
 		}
 
 		public MustHaveValidCSRFToken(
-			long userId, String origin, Throwable cause) {
+			long userId, String origin, Throwable throwable) {
 
 			super(
 				String.format(
 					"User %s did not provide a valid CSRF token for %s", userId,
 					origin),
-				cause);
+				throwable);
 
-			this.origin = origin;
 			this.userId = userId;
+			this.origin = origin;
 		}
 
 		public final String origin;
@@ -259,7 +285,8 @@ public class PrincipalException extends PortalException {
 		PrincipalException.MustBeOmniadmin.class,
 		PrincipalException.MustBePortletStrutsPath.class,
 		PrincipalException.MustHavePermission.class,
-		PrincipalException.MustHaveValidCSRFToken.class
+		PrincipalException.MustHaveValidCSRFToken.class,
+		PrincipalException.MustHaveSessionCSRFToken.class
 	};
 
 }

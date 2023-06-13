@@ -13,76 +13,76 @@
  */
 
 import classNames from 'classnames';
-import React, {useContext} from 'react';
+import React from 'react';
 
-import {LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS} from '../../config/constants/layoutDataFloatingToolbarButtons';
-import {LAYOUT_DATA_ITEM_TYPES} from '../../config/constants/layoutDataItemTypes';
-import {ConfigContext} from '../../config/index';
-import {useDispatch, useSelector} from '../../store/index';
-import duplicateItem from '../../thunks/duplicateItem';
-import FloatingToolbar from '../FloatingToolbar';
+import useSetRef from '../../../core/hooks/useSetRef';
+import {getLayoutDataItemPropTypes} from '../../../prop-types/index';
+import selectCanUpdateItemConfiguration from '../../selectors/selectCanUpdateItemConfiguration';
+import {useSelector} from '../../store/index';
+import {getFrontendTokenValue} from '../../utils/getFrontendTokenValue';
+import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
 import Topper from '../Topper';
 import Container from './Container';
 
-const ContainerWithControls = React.forwardRef(
-	({children, item, layoutData}, ref) => {
-		const config = useContext(ConfigContext);
-		const dispatch = useDispatch();
-		const segmentsExperienceId = useSelector(
-			state => state.segmentsExperienceId
-		);
+const ContainerWithControls = React.forwardRef(({children, item}, ref) => {
+	const canUpdateItemConfiguration = useSelector(
+		selectCanUpdateItemConfiguration
+	);
+	const selectedViewportSize = useSelector(
+		(state) => state.selectedViewportSize
+	);
 
-		const handleButtonClick = id => {
-			if (id === LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.duplicateItem.id) {
-				dispatch(
-					duplicateItem({
-						config,
-						itemId: item.itemId,
-						store: {segmentsExperienceId}
-					})
-				);
-			}
-		};
+	const [setRef, itemElement] = useSetRef(ref);
 
-		return (
-			<Topper
-				acceptDrop={[
-					LAYOUT_DATA_ITEM_TYPES.dropZone,
-					LAYOUT_DATA_ITEM_TYPES.fragment,
-					LAYOUT_DATA_ITEM_TYPES.row
-				]}
-				active
+	const itemConfig = getResponsiveConfig(item.config, selectedViewportSize);
+
+	const {widthType} = itemConfig;
+
+	const {
+		height,
+		marginLeft,
+		marginRight,
+		maxWidth,
+		minWidth,
+		shadow,
+		width,
+	} = itemConfig.styles;
+
+	const style = {};
+
+	style.boxShadow = getFrontendTokenValue(shadow);
+	style.maxWidth = maxWidth;
+	style.minWidth = minWidth;
+	style.width = width;
+
+	return (
+		<Topper
+			className={classNames({
+				container: widthType === 'fixed',
+				[`ml-${marginLeft}`]: widthType !== 'fixed',
+				[`mr-${marginRight}`]: widthType !== 'fixed',
+				'p-0': widthType === 'fixed',
+			})}
+			item={item}
+			itemElement={itemElement}
+			style={style}
+		>
+			<Container
+				className={classNames({
+					empty: !item.children.length && !height,
+					'page-editor__container': canUpdateItemConfiguration,
+				})}
 				item={item}
-				layoutData={layoutData}
-				name={Liferay.Language.get('container')}
+				ref={setRef}
 			>
-				{() => (
-					<Container
-						className={classNames(
-							'container-fluid page-editor__container',
-							{
-								empty: !item.children.length
-							}
-						)}
-						item={item}
-						ref={ref}
-					>
-						<FloatingToolbar
-							buttons={[
-								LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.duplicateItem,
-								LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.containerConfiguration
-							]}
-							item={item}
-							itemRef={ref}
-							onButtonClick={handleButtonClick}
-						/>
+				{children}
+			</Container>
+		</Topper>
+	);
+});
 
-						{children}
-					</Container>
-				)}
-			</Topper>
-		);
-	}
-);
+ContainerWithControls.propTypes = {
+	item: getLayoutDataItemPropTypes().isRequired,
+};
 
 export default ContainerWithControls;

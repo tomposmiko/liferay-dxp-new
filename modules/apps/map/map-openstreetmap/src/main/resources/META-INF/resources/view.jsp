@@ -32,9 +32,9 @@ name = namespace + name;
 <liferay-util:html-top
 	outputKey="js_maps_openstreet_skip_loading"
 >
-	<link href="https://npmcdn.com/leaflet@1.2.0/dist/leaflet.css" rel="stylesheet" />
+	<link href="https://npmcdn.com/leaflet@1.7.1/dist/leaflet.css" rel="stylesheet" />
 
-	<script src="https://npmcdn.com/leaflet@1.2.0/dist/leaflet.js" type="text/javascript"></script>
+	<script src="https://npmcdn.com/leaflet@1.7.1/dist/leaflet.js" type="text/javascript"></script>
 </liferay-util:html-top>
 
 <aui:script require="<%= bootstrapRequire %>">
@@ -54,7 +54,7 @@ name = namespace + name;
 						MapControls.PAN,
 						MapControls.SEARCH,
 						MapControls.TYPE,
-						MapControls.ZOOM
+						MapControls.ZOOM,
 					],
 				</c:otherwise>
 			</c:choose>
@@ -66,17 +66,17 @@ name = namespace + name;
 
 		geolocation: <%= geolocation %>,
 
-		<c:if test="<%= Validator.isNotNull(latitude) && Validator.isNotNull(longitude) %>">
+		<c:if test="<%= (latitude != 0) && (longitude != 0) %>">
 			position: {
 				location: {
 					lat: <%= latitude %>,
-					lng: <%= longitude %>
-				}
-			}
+					lng: <%= longitude %>,
+				},
+			},
 		</c:if>
 	};
 
-	var createMap = function() {
+	var createMap = function () {
 		var map = new MapOpenStreetMap.default(mapConfig);
 
 		Liferay.MapBase.register(

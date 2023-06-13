@@ -12,29 +12,32 @@
  * details.
  */
 
-import moment from 'moment';
 import React, {useContext} from 'react';
 
 import {AppContext} from '../../AppContext.es';
 import Button from '../../components/button/Button.es';
 import ListView from '../../components/list-view/ListView.es';
+import useDataDefinition from '../../hooks/useDataDefinition.es';
 import {confirmDelete} from '../../utils/client.es';
+import {getLocalizedValue} from '../../utils/lang.es';
+import {fromNow} from '../../utils/time.es';
 
 export default ({
 	match: {
-		params: {dataDefinitionId}
-	}
+		params: {dataDefinitionId},
+	},
 }) => {
 	const {basePortletURL} = useContext(AppContext);
+	const {defaultLanguageId} = useDataDefinition(dataDefinitionId);
 
-	const getItemURL = item =>
+	const getItemURL = (item) =>
 		Liferay.Util.PortletURL.createRenderURL(basePortletURL, {
 			dataDefinitionId,
 			dataLayoutId: item.id,
-			mvcRenderCommandName: '/edit_form_view'
+			mvcRenderCommandName: '/app_builder/edit_form_view',
 		});
 
-	const handleEditItem = item => {
+	const handleEditItem = (item) => {
 		const itemURL = getItemURL(item);
 
 		Liferay.Util.navigate(itemURL);
@@ -44,41 +47,45 @@ export default ({
 		{
 			key: 'name',
 			sortable: true,
-			value: Liferay.Language.get('name')
+			value: Liferay.Language.get('name'),
 		},
 		{
 			key: 'dateCreated',
 			sortable: true,
-			value: Liferay.Language.get('create-date')
+			value: Liferay.Language.get('create-date'),
 		},
 		{
 			asc: false,
 			key: 'dateModified',
 			sortable: true,
-			value: Liferay.Language.get('modified-date')
-		}
+			value: Liferay.Language.get('modified-date'),
+		},
+		{
+			key: 'id',
+			value: Liferay.Language.get('id'),
+		},
 	];
 
 	const addURL = Liferay.Util.PortletURL.createRenderURL(basePortletURL, {
 		dataDefinitionId,
-		mvcRenderCommandName: '/edit_form_view'
+		mvcRenderCommandName: '/app_builder/edit_form_view',
 	});
 
 	return (
 		<ListView
 			actions={[
 				{
-					action: item => Promise.resolve(handleEditItem(item)),
-					name: Liferay.Language.get('edit')
+					action: (item) => Promise.resolve(handleEditItem(item)),
+					name: Liferay.Language.get('edit'),
 				},
 				{
 					action: confirmDelete('/o/data-engine/v2.0/data-layouts/'),
-					name: Liferay.Language.get('delete')
-				}
+					name: Liferay.Language.get('delete'),
+				},
 			]}
 			addButton={() => (
 				<Button
-					className="nav-btn nav-btn-monospaced navbar-breakpoint-down-d-none"
+					className="nav-btn nav-btn-monospaced"
 					onClick={() => Liferay.Util.navigate(addURL)}
 					symbol="plus"
 					tooltip={Liferay.Language.get('new-form-view')}
@@ -97,17 +104,25 @@ export default ({
 				description: Liferay.Language.get(
 					'create-one-or-more-forms-to-display-the-data-held-in-your-data-object'
 				),
-				title: Liferay.Language.get('there-are-no-form-views-yet')
+				title: Liferay.Language.get('there-are-no-form-views-yet'),
 			}}
 			endpoint={`/o/data-engine/v2.0/data-definitions/${dataDefinitionId}/data-layouts`}
 		>
-			{item => ({
-				dataDefinitionId,
-				dateCreated: moment(item.dateCreated).fromNow(),
-				dateModified: moment(item.dateModified).fromNow(),
-				id: item.id,
-				name: <a href={getItemURL(item)}>{item.name.en_US}</a>
-			})}
+			{(item) => {
+				const {dateCreated, dateModified, id, name} = item;
+
+				return {
+					dataDefinitionId,
+					dateCreated: fromNow(dateCreated),
+					dateModified: fromNow(dateModified),
+					id,
+					name: (
+						<a href={getItemURL(item)}>
+							{getLocalizedValue(defaultLanguageId, name)}
+						</a>
+					),
+				};
+			}}
 		</ListView>
 	);
 };

@@ -14,7 +14,10 @@
 
 package com.liferay.segments.service;
 
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
+import com.liferay.segments.model.SegmentsExperimentRel;
 
 /**
  * Provides a wrapper for {@link SegmentsExperimentRelLocalService}.
@@ -34,10 +37,9 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			addSegmentsExperimentRel(
-				long segmentsExperimentId, long segmentsExperienceId,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public SegmentsExperimentRel addSegmentsExperimentRel(
+			long segmentsExperimentId, long segmentsExperienceId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.addSegmentsExperimentRel(
@@ -47,17 +49,31 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	/**
 	 * Adds the segments experiment rel to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SegmentsExperimentRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param segmentsExperimentRel the segments experiment rel
 	 * @return the segments experiment rel that was added
 	 */
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-		addSegmentsExperimentRel(
-			com.liferay.segments.model.SegmentsExperimentRel
-				segmentsExperimentRel) {
+	public SegmentsExperimentRel addSegmentsExperimentRel(
+		SegmentsExperimentRel segmentsExperimentRel) {
 
 		return _segmentsExperimentRelLocalService.addSegmentsExperimentRel(
 			segmentsExperimentRel);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _segmentsExperimentRelLocalService.createPersistedModel(
+			primaryKeyObj);
 	}
 
 	/**
@@ -67,8 +83,8 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	 * @return the new segments experiment rel
 	 */
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-		createSegmentsExperimentRel(long segmentsExperimentRelId) {
+	public SegmentsExperimentRel createSegmentsExperimentRel(
+		long segmentsExperimentRelId) {
 
 		return _segmentsExperimentRelLocalService.createSegmentsExperimentRel(
 			segmentsExperimentRelId);
@@ -89,13 +105,17 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	/**
 	 * Deletes the segments experiment rel with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SegmentsExperimentRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param segmentsExperimentRelId the primary key of the segments experiment rel
 	 * @return the segments experiment rel that was removed
 	 * @throws PortalException if a segments experiment rel with the primary key could not be found
 	 */
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			deleteSegmentsExperimentRel(long segmentsExperimentRelId)
+	public SegmentsExperimentRel deleteSegmentsExperimentRel(
+			long segmentsExperimentRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.deleteSegmentsExperimentRel(
@@ -105,15 +125,17 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	/**
 	 * Deletes the segments experiment rel from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SegmentsExperimentRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param segmentsExperimentRel the segments experiment rel
 	 * @return the segments experiment rel that was removed
 	 * @throws PortalException
 	 */
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			deleteSegmentsExperimentRel(
-				com.liferay.segments.model.SegmentsExperimentRel
-					segmentsExperimentRel)
+	public SegmentsExperimentRel deleteSegmentsExperimentRel(
+			SegmentsExperimentRel segmentsExperimentRel)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.deleteSegmentsExperimentRel(
@@ -121,11 +143,8 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			deleteSegmentsExperimentRel(
-				com.liferay.segments.model.SegmentsExperimentRel
-					segmentsExperimentRel,
-				boolean force)
+	public SegmentsExperimentRel deleteSegmentsExperimentRel(
+			SegmentsExperimentRel segmentsExperimentRel, boolean force)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.deleteSegmentsExperimentRel(
@@ -138,6 +157,18 @@ public class SegmentsExperimentRelLocalServiceWrapper
 
 		_segmentsExperimentRelLocalService.deleteSegmentsExperimentRels(
 			segmentsExperimentId);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _segmentsExperimentRelLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _segmentsExperimentRelLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -233,17 +264,16 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-		fetchSegmentsExperimentRel(long segmentsExperimentRelId) {
+	public SegmentsExperimentRel fetchSegmentsExperimentRel(
+		long segmentsExperimentRelId) {
 
 		return _segmentsExperimentRelLocalService.fetchSegmentsExperimentRel(
 			segmentsExperimentRelId);
 	}
 
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			fetchSegmentsExperimentRel(
-				long segmentsExperimentId, long segmentsExperienceId)
+	public SegmentsExperimentRel fetchSegmentsExperimentRel(
+			long segmentsExperimentId, long segmentsExperienceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.fetchSegmentsExperimentRel(
@@ -275,6 +305,9 @@ public class SegmentsExperimentRelLocalServiceWrapper
 		return _segmentsExperimentRelLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -292,8 +325,8 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	 * @throws PortalException if a segments experiment rel with the primary key could not be found
 	 */
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			getSegmentsExperimentRel(long segmentsExperimentRelId)
+	public SegmentsExperimentRel getSegmentsExperimentRel(
+			long segmentsExperimentRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.getSegmentsExperimentRel(
@@ -301,9 +334,8 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			getSegmentsExperimentRel(
-				long segmentsExperimentId, long segmentsExperienceId)
+	public SegmentsExperimentRel getSegmentsExperimentRel(
+			long segmentsExperimentId, long segmentsExperienceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.getSegmentsExperimentRel(
@@ -322,16 +354,16 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	 * @return the range of segments experiment rels
 	 */
 	@Override
-	public java.util.List<com.liferay.segments.model.SegmentsExperimentRel>
-		getSegmentsExperimentRels(int start, int end) {
+	public java.util.List<SegmentsExperimentRel> getSegmentsExperimentRels(
+		int start, int end) {
 
 		return _segmentsExperimentRelLocalService.getSegmentsExperimentRels(
 			start, end);
 	}
 
 	@Override
-	public java.util.List<com.liferay.segments.model.SegmentsExperimentRel>
-		getSegmentsExperimentRels(long segmentsExperimentId) {
+	public java.util.List<SegmentsExperimentRel> getSegmentsExperimentRels(
+		long segmentsExperimentId) {
 
 		return _segmentsExperimentRelLocalService.getSegmentsExperimentRels(
 			segmentsExperimentId);
@@ -349,9 +381,8 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			updateSegmentsExperimentRel(
-				long segmentsExperimentRelId, double split)
+	public SegmentsExperimentRel updateSegmentsExperimentRel(
+			long segmentsExperimentRelId, double split)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.updateSegmentsExperimentRel(
@@ -359,10 +390,8 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			updateSegmentsExperimentRel(
-				long segmentsExperimentId, long segmentsExperienceId,
-				double split)
+	public SegmentsExperimentRel updateSegmentsExperimentRel(
+			long segmentsExperimentId, long segmentsExperienceId, double split)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.updateSegmentsExperimentRel(
@@ -370,10 +399,9 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-			updateSegmentsExperimentRel(
-				long segmentsExperimentRelId, String name,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public SegmentsExperimentRel updateSegmentsExperimentRel(
+			long segmentsExperimentRelId, String name,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsExperimentRelLocalService.updateSegmentsExperimentRel(
@@ -383,17 +411,39 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	/**
 	 * Updates the segments experiment rel in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SegmentsExperimentRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param segmentsExperimentRel the segments experiment rel
 	 * @return the segments experiment rel that was updated
 	 */
 	@Override
-	public com.liferay.segments.model.SegmentsExperimentRel
-		updateSegmentsExperimentRel(
-			com.liferay.segments.model.SegmentsExperimentRel
-				segmentsExperimentRel) {
+	public SegmentsExperimentRel updateSegmentsExperimentRel(
+		SegmentsExperimentRel segmentsExperimentRel) {
 
 		return _segmentsExperimentRelLocalService.updateSegmentsExperimentRel(
 			segmentsExperimentRel);
+	}
+
+	@Override
+	public CTPersistence<SegmentsExperimentRel> getCTPersistence() {
+		return _segmentsExperimentRelLocalService.getCTPersistence();
+	}
+
+	@Override
+	public Class<SegmentsExperimentRel> getModelClass() {
+		return _segmentsExperimentRelLocalService.getModelClass();
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<SegmentsExperimentRel>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return _segmentsExperimentRelLocalService.updateWithUnsafeFunction(
+			updateUnsafeFunction);
 	}
 
 	@Override

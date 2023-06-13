@@ -12,23 +12,16 @@
  * details.
  */
 
+import {config} from '../config/index';
 import selectEditableValue from './selectEditableValue';
-import selectPrefixedDefaultSegmentsExperienceId from './selectPrefixedDefaultSegmentsExperienceId';
-import selectPrefixedSegmentsExperienceId from './selectPrefixedSegmentsExperienceId';
 
 export default function selectEditableValueContent(
 	state,
-	config,
 	fragmentEntryLinkId,
 	editableId,
 	processorType
 ) {
-	const {defaultLanguageId} = config;
-	const defaultSegmentsExperienceId = selectPrefixedDefaultSegmentsExperienceId(
-		config
-	);
 	const {languageId} = state;
-	const segmentsExperienceId = selectPrefixedSegmentsExperienceId(state);
 
 	const data = selectEditableValue(
 		state,
@@ -39,19 +32,14 @@ export default function selectEditableValueContent(
 
 	let content = data;
 
-	if (content[segmentsExperienceId]) {
-		content = content[segmentsExperienceId];
-	} else if (content[defaultSegmentsExperienceId]) {
-		content = content[defaultSegmentsExperienceId];
-	}
-
 	if (content[languageId]) {
 		content = content[languageId];
-	} else if (content[defaultLanguageId]) {
-		content = content[defaultLanguageId];
+	}
+	else if (content[config.defaultLanguageId]) {
+		content = content[config.defaultLanguageId];
 	}
 
-	if (typeof content !== 'string') {
+	if (content == null || content.defaultValue) {
 		content = data.defaultValue;
 	}
 

@@ -52,7 +52,7 @@ DecimalFormat decimalFormat = new DecimalFormat("##.00%");
 
 					<tr>
 						<td>
-							<div class="group-statistics-color-marker" style="background-color: <%= _BACKGROUND_COLORS[i % _BACKGROUND_COLORS.length] %>"></div>
+							<div class="group-statistics-color-marker" style="background-color: <%= _BACKGROUND_COLORS[i % _BACKGROUND_COLORS.length] %>;"></div>
 						</td>
 						<td>
 							<%= ResourceActionsUtil.getModelResource(locale, activityCounter.getClassName()) %>
@@ -92,12 +92,12 @@ DecimalFormat decimalFormat = new DecimalFormat("##.00%");
 	for (var i = 0; i < categories.length; i++) {
 		data.push({
 			category: categories[i],
-			values: values[i]
+			values: values[i],
 		});
 	}
 
 	var tooltip = {
-		markerLabelFunction: function(
+		markerLabelFunction: function (
 			categoryItem,
 			valueItem,
 			itemIndex,
@@ -113,15 +113,15 @@ DecimalFormat decimalFormat = new DecimalFormat("##.00%");
 			borderWidth: 1,
 			color: '#000',
 			textAlign: 'center',
-			width: 30
-		}
+			width: 30,
+		},
 	};
 
 	var chartContainer = A.one(
 		'#groupStatisticsChart<%= displayActivityCounterNameIndex %>'
 	);
 
-	var getContainerWidth = function(container) {
+	var getContainerWidth = function (container) {
 		return container.width() * 0.7;
 	};
 
@@ -139,23 +139,23 @@ DecimalFormat decimalFormat = new DecimalFormat("##.00%");
 					border: {
 						alpha: 0.8,
 						colors: new Array(9).join('#333,').split(','),
-						weight: 1
+						weight: 1,
 					},
 					fill: {
 						colors: [
-							'<%= StringUtil.merge(_BACKGROUND_COLORS, "', '") %>'
-						]
-					}
+							'<%= StringUtil.merge(_BACKGROUND_COLORS, "', '") %>',
+						],
+					},
 				},
-				valueKey: 'values'
-			}
+				valueKey: 'values',
+			},
 		],
 		tooltip: tooltip,
 		type: 'pie',
-		width: containerWidth
+		width: containerWidth,
 	}).render(chartContainer);
 
-	Liferay.after(['portletMoved', 'liferaypanel:collapse'], function(event) {
+	Liferay.after(['portletMoved', 'liferaypanel:collapse'], function (event) {
 		var width = getContainerWidth(chartContainer);
 
 		if (

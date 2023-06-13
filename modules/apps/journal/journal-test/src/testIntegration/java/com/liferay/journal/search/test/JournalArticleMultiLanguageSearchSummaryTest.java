@@ -33,6 +33,9 @@ import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.highlight.HighlightUtil;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -40,6 +43,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.search.test.util.SearchContextTestUtil;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.search.test.util.SummaryFixture;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -97,6 +101,11 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 
 		_summaryFixture = new SummaryFixture<>(
 			JournalArticle.class, _group, LocaleUtil.US, _user);
+
+		_permissionChecker = PermissionThreadLocal.getPermissionChecker();
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(_user));
 	}
 
 	@After
@@ -104,6 +113,8 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 		_journalArticleSearchFixture.tearDown();
 
 		_userSearchFixture.tearDown();
+
+		PermissionThreadLocal.setPermissionChecker(_permissionChecker);
 	}
 
 	@Test
@@ -142,9 +153,7 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 		_summaryFixture.assertSummary(
 			brTitle,
 			StringBundler.concat(
-				"Sobre ", HighlightUtil.HIGHLIGHT_TAG_OPEN,
-				HighlightUtil.HIGHLIGHT_TAG_OPEN, "times",
-				HighlightUtil.HIGHLIGHT_TAG_CLOSE,
+				"Sobre ", HighlightUtil.HIGHLIGHT_TAG_OPEN, "times",
 				HighlightUtil.HIGHLIGHT_TAG_CLOSE, " de futebol"),
 			LocaleUtil.BRAZIL, document2);
 
@@ -152,7 +161,7 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 	}
 
 	@Test
-	public void testBrDescriptionUntranslatedHighlightedTwiceTranslatedPlain()
+	public void testBrDescriptionUntranslatedHighlightedOnceTranslatedPlain()
 		throws Exception {
 
 		String title = "All About Clocks";
@@ -178,9 +187,7 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 		_summaryFixture.assertSummary(
 			title,
 			StringBundler.concat(
-				"On clocks and ", HighlightUtil.HIGHLIGHT_TAG_OPEN,
-				HighlightUtil.HIGHLIGHT_TAG_OPEN, "time",
-				HighlightUtil.HIGHLIGHT_TAG_CLOSE,
+				"On clocks and ", HighlightUtil.HIGHLIGHT_TAG_OPEN, "time",
 				HighlightUtil.HIGHLIGHT_TAG_CLOSE),
 			LocaleUtil.BRAZIL, document1);
 
@@ -189,9 +196,7 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 		_summaryFixture.assertSummary(
 			brTitle,
 			StringBundler.concat(
-				"Sobre ", HighlightUtil.HIGHLIGHT_TAG_OPEN,
-				HighlightUtil.HIGHLIGHT_TAG_OPEN, "times",
-				HighlightUtil.HIGHLIGHT_TAG_CLOSE,
+				"Sobre ", HighlightUtil.HIGHLIGHT_TAG_OPEN, "times",
 				HighlightUtil.HIGHLIGHT_TAG_CLOSE, " de futebol"),
 			LocaleUtil.BRAZIL, document2);
 
@@ -234,7 +239,7 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 	}
 
 	@Test
-	public void testUsDescriptionUntranslatedHighlightedTwiceTranslatedPlain()
+	public void testUsDescriptionUntranslatedHighlightedOnceTranslatedPlain()
 		throws Exception {
 
 		String content = "Clocks are great for telling time";
@@ -261,9 +266,7 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 		_summaryFixture.assertSummary(
 			title,
 			StringBundler.concat(
-				"On clocks and ", HighlightUtil.HIGHLIGHT_TAG_OPEN,
-				HighlightUtil.HIGHLIGHT_TAG_OPEN, "time",
-				HighlightUtil.HIGHLIGHT_TAG_CLOSE,
+				"On clocks and ", HighlightUtil.HIGHLIGHT_TAG_OPEN, "time",
 				HighlightUtil.HIGHLIGHT_TAG_CLOSE),
 			LocaleUtil.US, document1);
 
@@ -274,6 +277,9 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 
 		Assert.assertEquals(documents.toString(), 2, documents.size());
 	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected void addArticleTranslated(
 		String usTitle, String usContent, String brTitle, String brContent) {
@@ -443,6 +449,7 @@ public class JournalArticleMultiLanguageSearchSummaryTest {
 	private List<JournalArticle> _journalArticles;
 
 	private JournalArticleSearchFixture _journalArticleSearchFixture;
+	private PermissionChecker _permissionChecker;
 	private SummaryFixture<JournalArticle> _summaryFixture;
 	private User _user;
 

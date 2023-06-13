@@ -14,9 +14,16 @@
 
 package com.liferay.view.count.service;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.view.count.model.ViewCountEntry;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for ViewCountEntry. This utility wraps
@@ -41,13 +48,27 @@ public class ViewCountEntryLocalServiceUtil {
 	/**
 	 * Adds the view count entry to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was added
 	 */
-	public static com.liferay.view.count.model.ViewCountEntry addViewCountEntry(
-		com.liferay.view.count.model.ViewCountEntry viewCountEntry) {
+	public static ViewCountEntry addViewCountEntry(
+		ViewCountEntry viewCountEntry) {
 
 		return getService().addViewCountEntry(viewCountEntry);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -56,10 +77,9 @@ public class ViewCountEntryLocalServiceUtil {
 	 * @param viewCountEntryPK the primary key for the new view count entry
 	 * @return the new view count entry
 	 */
-	public static com.liferay.view.count.model.ViewCountEntry
-		createViewCountEntry(
-			com.liferay.view.count.service.persistence.ViewCountEntryPK
-				viewCountEntryPK) {
+	public static ViewCountEntry createViewCountEntry(
+		com.liferay.view.count.service.persistence.ViewCountEntryPK
+			viewCountEntryPK) {
 
 		return getService().createViewCountEntry(viewCountEntryPK);
 	}
@@ -67,10 +87,9 @@ public class ViewCountEntryLocalServiceUtil {
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
@@ -84,12 +103,15 @@ public class ViewCountEntryLocalServiceUtil {
 	/**
 	 * Deletes the view count entry from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was removed
 	 */
-	public static com.liferay.view.count.model.ViewCountEntry
-		deleteViewCountEntry(
-			com.liferay.view.count.model.ViewCountEntry viewCountEntry) {
+	public static ViewCountEntry deleteViewCountEntry(
+		ViewCountEntry viewCountEntry) {
 
 		return getService().deleteViewCountEntry(viewCountEntry);
 	}
@@ -97,22 +119,31 @@ public class ViewCountEntryLocalServiceUtil {
 	/**
 	 * Deletes the view count entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param viewCountEntryPK the primary key of the view count entry
 	 * @return the view count entry that was removed
 	 * @throws PortalException if a view count entry with the primary key could not be found
 	 */
-	public static com.liferay.view.count.model.ViewCountEntry
-			deleteViewCountEntry(
-				com.liferay.view.count.service.persistence.ViewCountEntryPK
-					viewCountEntryPK)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static ViewCountEntry deleteViewCountEntry(
+			com.liferay.view.count.service.persistence.ViewCountEntryPK
+				viewCountEntryPK)
+		throws PortalException {
 
 		return getService().deleteViewCountEntry(viewCountEntryPK);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -122,9 +153,7 @@ public class ViewCountEntryLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -140,9 +169,8 @@ public class ViewCountEntryLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -160,10 +188,9 @@ public class ViewCountEntryLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -175,9 +202,7 @@ public class ViewCountEntryLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -189,16 +214,15 @@ public class ViewCountEntryLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.view.count.model.ViewCountEntry
-		fetchViewCountEntry(
-			com.liferay.view.count.service.persistence.ViewCountEntryPK
-				viewCountEntryPK) {
+	public static ViewCountEntry fetchViewCountEntry(
+		com.liferay.view.count.service.persistence.ViewCountEntryPK
+			viewCountEntryPK) {
 
 		return getService().fetchViewCountEntry(viewCountEntryPK);
 	}
@@ -225,9 +249,11 @@ public class ViewCountEntryLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -249,9 +275,7 @@ public class ViewCountEntryLocalServiceUtil {
 	 * @param end the upper bound of the range of view count entries (not inclusive)
 	 * @return the range of view count entries
 	 */
-	public static java.util.List<com.liferay.view.count.model.ViewCountEntry>
-		getViewCountEntries(int start, int end) {
-
+	public static List<ViewCountEntry> getViewCountEntries(int start, int end) {
 		return getService().getViewCountEntries(start, end);
 	}
 
@@ -271,12 +295,16 @@ public class ViewCountEntryLocalServiceUtil {
 	 * @return the view count entry
 	 * @throws PortalException if a view count entry with the primary key could not be found
 	 */
-	public static com.liferay.view.count.model.ViewCountEntry getViewCountEntry(
+	public static ViewCountEntry getViewCountEntry(
 			com.liferay.view.count.service.persistence.ViewCountEntryPK
 				viewCountEntryPK)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().getViewCountEntry(viewCountEntryPK);
+	}
+
+	public static com.liferay.petra.sql.dsl.Table<?> getViewCountEntryTable() {
+		return getService().getViewCountEntryTable();
 	}
 
 	public static void incrementViewCount(
@@ -286,41 +314,34 @@ public class ViewCountEntryLocalServiceUtil {
 			companyId, classNameId, classPK, increment);
 	}
 
+	public static boolean isViewCountEnabled() {
+		return getService().isViewCountEnabled();
+	}
+
+	public static boolean isViewCountEnabled(long classNameId) {
+		return getService().isViewCountEnabled(classNameId);
+	}
+
 	/**
 	 * Updates the view count entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ViewCountEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param viewCountEntry the view count entry
 	 * @return the view count entry that was updated
 	 */
-	public static com.liferay.view.count.model.ViewCountEntry
-		updateViewCountEntry(
-			com.liferay.view.count.model.ViewCountEntry viewCountEntry) {
+	public static ViewCountEntry updateViewCountEntry(
+		ViewCountEntry viewCountEntry) {
 
 		return getService().updateViewCountEntry(viewCountEntry);
 	}
 
 	public static ViewCountEntryLocalService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	private static ServiceTracker
-		<ViewCountEntryLocalService, ViewCountEntryLocalService>
-			_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			ViewCountEntryLocalService.class);
-
-		ServiceTracker<ViewCountEntryLocalService, ViewCountEntryLocalService>
-			serviceTracker =
-				new ServiceTracker
-					<ViewCountEntryLocalService, ViewCountEntryLocalService>(
-						bundle.getBundleContext(),
-						ViewCountEntryLocalService.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile ViewCountEntryLocalService _service;
 
 }

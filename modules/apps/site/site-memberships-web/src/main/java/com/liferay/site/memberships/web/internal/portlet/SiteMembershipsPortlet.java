@@ -39,14 +39,17 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.liveusers.LiveUsers;
-import com.liferay.site.memberships.web.internal.constants.SiteMembershipsPortletKeys;
+import com.liferay.site.memberships.constants.SiteMembershipsPortletKeys;
 import com.liferay.site.memberships.web.internal.display.context.SiteMembershipsDisplayContext;
 import com.liferay.users.admin.kernel.util.UsersAdmin;
+import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.io.IOException;
 
@@ -248,13 +251,21 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 			return;
 		}
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		Group group = _getGroup(actionRequest, actionResponse);
 
+		long[] availableRoleIds = ParamUtil.getLongValues(
+			actionRequest, "availableRowIds");
 		long[] roleIds = ParamUtil.getLongValues(actionRequest, "rowIds");
 
 		List<UserGroupRole> userGroupRoles =
 			_userGroupRoleLocalService.getUserGroupRoles(
 				user.getUserId(), group.getGroupId());
+
+		userGroupRoles = UsersAdminUtil.filterUserGroupRoles(
+			themeDisplay.getPermissionChecker(), userGroupRoles);
 
 		List<Long> curRoleIds = ListUtil.toList(
 			userGroupRoles, UsersAdmin.USER_GROUP_ROLE_ID_ACCESSOR);
@@ -262,7 +273,9 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 		List<Long> removeRoleIds = new ArrayList<>();
 
 		for (long roleId : curRoleIds) {
-			if (!ArrayUtil.contains(roleIds, roleId)) {
+			if (!ArrayUtil.contains(roleIds, roleId) &&
+				ArrayUtil.contains(availableRoleIds, roleId)) {
+
 				removeRoleIds.add(roleId);
 			}
 		}
@@ -272,7 +285,7 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 			ArrayUtil.toLongArray(removeRoleIds));
 	}
 
-	public void editUserGroupsSiteRoles(
+	public void editUserGroupsRoles(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -288,7 +301,7 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 		}
 	}
 
-	public void editUsersSiteRoles(
+	public void editUsersRoles(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -304,7 +317,7 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 		}
 	}
 
-	public void removeUserGroupSiteRole(
+	public void removeUserGroupRole(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -316,7 +329,7 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 			userIds, group.getGroupId(), roleId);
 	}
 
-	public void removeUserSiteRole(
+	public void removeUserRole(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -395,14 +408,14 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 	}
 
 	@Override
-	protected boolean isSessionErrorException(Throwable cause) {
-		if (cause instanceof MembershipPolicyException ||
-			cause instanceof MembershipRequestCommentsException ||
-			cause instanceof NoSuchGroupException ||
-			cause instanceof NoSuchRoleException ||
-			cause instanceof PrincipalException ||
-			cause instanceof RequiredUserException ||
-			super.isSessionErrorException(cause)) {
+	protected boolean isSessionErrorException(Throwable throwable) {
+		if (throwable instanceof MembershipPolicyException ||
+			throwable instanceof MembershipRequestCommentsException ||
+			throwable instanceof NoSuchGroupException ||
+			throwable instanceof NoSuchRoleException ||
+			throwable instanceof PrincipalException ||
+			throwable instanceof RequiredUserException ||
+			super.isSessionErrorException(throwable)) {
 
 			return true;
 		}

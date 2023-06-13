@@ -30,10 +30,8 @@ portletURL.setParameter("mvcRenderCommandName", "/portal_instances/view");
 			{
 				addDropdownItem(
 					dropdownItem -> {
-						dropdownItem.setHref(
-							renderResponse.createRenderURL(), "mvcRenderCommandName", "/portal_instances/edit_instance", "redirect", PortalUtil.getCurrentURL(request));
-						dropdownItem.setLabel(
-							LanguageUtil.get(request, "add"));
+						dropdownItem.setHref(renderResponse.createRenderURL(), "mvcRenderCommandName", "/portal_instances/edit_instance", "redirect", PortalUtil.getCurrentURL(httpServletRequest));
+						dropdownItem.setLabel(LanguageUtil.get(httpServletRequest, "add"));
 					});
 			}
 		}
@@ -47,7 +45,7 @@ portletURL.setParameter("mvcRenderCommandName", "/portal_instances/view");
 	<portlet:param name="cur" value="<%= String.valueOf(cur) %>" />
 </portlet:renderURL>
 
-<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= redirectURL %>" />
 	<aui:input name="className" type="hidden" />

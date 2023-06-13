@@ -16,6 +16,7 @@ package com.liferay.item.selector.web.internal.servlet.taglib.clay;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.BaseVerticalCard;
 import com.liferay.item.selector.ItemSelectorViewDescriptor;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 
 import javax.portlet.RenderRequest;
 
@@ -26,9 +27,9 @@ public class ItemDescriptorVerticalCard extends BaseVerticalCard {
 
 	public ItemDescriptorVerticalCard(
 		ItemSelectorViewDescriptor.ItemDescriptor itemDescriptor,
-		RenderRequest renderRequest) {
+		RenderRequest renderRequest, RowChecker rowChecker) {
 
-		super(null, renderRequest, null);
+		super(null, renderRequest, rowChecker);
 
 		_itemDescriptor = itemDescriptor;
 	}
@@ -55,13 +56,18 @@ public class ItemDescriptorVerticalCard extends BaseVerticalCard {
 	}
 
 	@Override
+	public String getInputValue() {
+		return null;
+	}
+
+	@Override
 	public String getSubtitle() {
-		return _itemDescriptor.getSubtitle();
+		return _itemDescriptor.getSubtitle(themeDisplay.getLocale());
 	}
 
 	@Override
 	public String getTitle() {
-		return _itemDescriptor.getTitle();
+		return _itemDescriptor.getTitle(themeDisplay.getLocale());
 	}
 
 	private final ItemSelectorViewDescriptor.ItemDescriptor _itemDescriptor;

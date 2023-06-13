@@ -19,18 +19,24 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ProxyFactory;
-
-import java.util.Map;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Michael C. Han
  */
 public class ServiceContextTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testJSONSerialization() {
@@ -42,11 +48,10 @@ public class ServiceContextTest {
 
 		serviceContext.setAttribute("TestName", "TestValue");
 
-		Map<String, String> headers = HashMapBuilder.put(
-			"TestHeaderName", "TestHeaderValue"
-		).build();
-
-		serviceContext.setHeaders(headers);
+		serviceContext.setHeaders(
+			HashMapBuilder.put(
+				"TestHeaderName", "TestHeaderValue"
+			).build());
 
 		serviceContext.setRequest(
 			ProxyFactory.newDummyInstance(HttpServletRequest.class));

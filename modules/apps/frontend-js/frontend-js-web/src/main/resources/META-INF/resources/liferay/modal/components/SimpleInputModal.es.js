@@ -39,7 +39,7 @@ const SimpleInputModal = ({
 	mainFieldName,
 	namespace,
 	onFormSuccess,
-	placeholder
+	placeholder,
 }) => {
 	const isMounted = useIsMounted();
 	const [errorMessage, setErrorMessage] = useState();
@@ -48,11 +48,11 @@ const SimpleInputModal = ({
 	const [inputValue, setInputValue] = useState('');
 	const [isChecked, setChecked] = useState(checkboxFieldValue);
 
-	const handleFormError = responseContent => {
+	const handleFormError = (responseContent) => {
 		setErrorMessage(responseContent.error || '');
 	};
 
-	const _handleSubmit = event => {
+	const _handleSubmit = (event) => {
 		event.preventDefault();
 
 		const formData = new FormData(
@@ -61,35 +61,37 @@ const SimpleInputModal = ({
 
 		fetch(formSubmitURL, {
 			body: formData,
-			method: 'POST'
+			method: 'POST',
 		})
-			.then(response => response.json())
-			.then(responseContent => {
+			.then((response) => response.json())
+			.then((responseContent) => {
 				if (isMounted()) {
 					if (responseContent.error) {
 						setLoadingResponse(false);
 
 						handleFormError(responseContent);
-					} else {
+					}
+					else {
 						setVisible(false);
 
 						closeModal();
 
 						if (responseContent.redirectURL) {
 							navigate(responseContent.redirectURL);
-						} else {
+						}
+						else {
 							if (onFormSuccess) {
 								onFormSuccess({
 									...responseContent,
 									redirectURL:
-										responseContent.redirectURL || ''
+										responseContent.redirectURL || '',
 								});
 							}
 						}
 					}
 				}
 			})
-			.catch(response => {
+			.catch((response) => {
 				handleFormError(response);
 			});
 
@@ -101,7 +103,7 @@ const SimpleInputModal = ({
 			setVisible(false);
 
 			closeModal();
-		}
+		},
 	});
 
 	return (
@@ -148,7 +150,7 @@ const SimpleInputModal = ({
 								disabled={loadingResponse}
 								id={`${namespace}${mainFieldName}`}
 								name={`${namespace}${mainFieldName}`}
-								onChange={event =>
+								onChange={(event) =>
 									setInputValue(event.target.value)
 								}
 								placeholder={placeholder}
@@ -177,7 +179,7 @@ const SimpleInputModal = ({
 									label={checkboxFieldLabel}
 									name={`${namespace}${checkboxFieldName}`}
 									onChange={() =>
-										setChecked(isChecked => !isChecked)
+										setChecked((isChecked) => !isChecked)
 									}
 								/>
 							</div>

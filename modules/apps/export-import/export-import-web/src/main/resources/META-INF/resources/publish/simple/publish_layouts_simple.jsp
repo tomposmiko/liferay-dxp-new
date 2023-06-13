@@ -54,14 +54,17 @@ advancedPublishURL.setParameter("selPlid", String.valueOf(selPlid));
 advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 %>
 
-<div class="container-fluid-1280 mt-2 publish-navbar text-right">
+<clay:container-fluid
+	cssClass="mt-2 publish-navbar text-right"
+>
 	<clay:link
-		buttonStyle="link"
-		elementClasses="btn-sm"
+		displayType="link"
 		href="<%= advancedPublishURL.toString() %>"
-		label='<%= LanguageUtil.get(request, "switch-to-advanced-publication") %>'
+		label="switch-to-advanced-publication"
+		small="<%= true %>"
+		type="button"
 	/>
-</div>
+</clay:container-fluid>
 
 <portlet:actionURL name="editPublishConfiguration" var="confirmedActionURL">
 	<portlet:param name="mvcRenderCommandName" value="editPublishConfigurationSimple" />
@@ -92,7 +95,7 @@ advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 		}
 		%>
 
-		<div class="container-fluid-1280">
+		<clay:container-fluid>
 			<div class="<%= (incompleteBackgroundTaskCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
 				<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
 					<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
@@ -113,8 +116,11 @@ advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 								Set<String> portletDataHandlerClassNames = new HashSet<String>();
 
 								List<Portlet> dataSiteLevelPortlets = ExportImportHelperUtil.getDataSiteLevelPortlets(company.getCompanyId(), false);
+								%>
 
-								if (!dataSiteLevelPortlets.isEmpty()) {
+								<c:if test="<%= !dataSiteLevelPortlets.isEmpty() %>">
+
+									<%
 									boolean displayingChanges = false;
 
 									for (Portlet portlet : dataSiteLevelPortlets) {
@@ -144,10 +150,13 @@ advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 										long modelDeletionCount = manifestSummary.getModelDeletionCount(portletDataHandler.getDeletionSystemEventStagedModelTypes());
 
 										UnicodeProperties liveGroupTypeSettings = liveGroup.getTypeSettingsProperties();
+									%>
 
-										if (((exportModelCount > 0) || (modelDeletionCount > 0)) && GetterUtil.getBoolean(liveGroupTypeSettings.getProperty(StagingUtil.getStagedPortletId(portlet.getRootPortletId())), portletDataHandler.isPublishToLiveByDefault())) {
+										<c:if test="<%= ((exportModelCount > 0) || (modelDeletionCount > 0)) && GetterUtil.getBoolean(liveGroupTypeSettings.getProperty(StagingUtil.getStagedPortletId(portlet.getRootPortletId())), portletDataHandler.isPublishToLiveByDefault()) %>">
+
+											<%
 											displayingChanges = true;
-								%>
+											%>
 
 											<liferay-util:buffer
 												var="badgeHTML"
@@ -160,82 +169,81 @@ advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 											<li class="tree-item">
 												<liferay-ui:message key="<%= PortalUtil.getPortletTitle(portlet, application, locale) + StringPool.SPACE + badgeHTML %>" />
 											</li>
+										</c:if>
 
 									<%
-										}
 									}
 
-									if (!displayingChanges) {
+									settingsMap.remove("portletId");
 									%>
 
+									<c:if test="<%= !displayingChanges %>">
 										<liferay-ui:message key="none" />
+									</c:if>
+								</c:if>
+							</ul>
+						</li>
+					</aui:fieldset>
 
-								<%
+					<c:if test="<%= GroupCapabilityUtil.isSupportsPages(groupDisplayContextHelper.getGroup()) %>">
+						<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="pages-to-publish" markupView="lexicon">
+							<li class="options portlet-list-simple">
+								<ul class="portlet-list">
+
+									<%
+									int layoutsCount = 0;
+
+									long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
+
+									if (layoutSetBranchId > 0) {
+										List<LayoutRevision> approvedLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutSetBranchId, true, WorkflowConstants.STATUS_APPROVED);
+										List<LayoutRevision> pendingLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutSetBranchId, true, WorkflowConstants.STATUS_PENDING);
+
+										layoutsCount = approvedLayoutRevisions.size() + pendingLayoutRevisions.size();
 									}
-								}
-								%>
+									else {
+										LayoutSet selLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(groupDisplayContextHelper.getGroupId(), privateLayout);
 
-							</ul>
-						</li>
-					</aui:fieldset>
+										layoutsCount = selLayoutSet.getPageCount();
+									}
 
-					<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="pages-to-publish" markupView="lexicon">
-						<li class="options portlet-list-simple">
-							<ul class="portlet-list">
+									DateRange dateRange = ExportImportDateUtil.getDateRange(exportImportConfiguration);
 
-								<%
-								int layoutsCount = 0;
+									PortletDataContext portletDataContext = PortletDataContextFactoryUtil.createPreparePortletDataContext(company.getCompanyId(), groupDisplayContextHelper.getStagingGroupId(), ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE, dateRange.getStartDate(), dateRange.getEndDate());
 
-								long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
+									long layoutModelDeletionCount = ExportImportHelperUtil.getLayoutModelDeletionCount(portletDataContext, privateLayout);
+									%>
 
-								if (layoutSetBranchId > 0) {
-									List<LayoutRevision> approvedLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutSetBranchId, true, WorkflowConstants.STATUS_APPROVED);
-									List<LayoutRevision> pendingLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutSetBranchId, true, WorkflowConstants.STATUS_PENDING);
+									<liferay-util:buffer
+										var="badgeHTML"
+									>
+										<span class="badge badge-info">
+											<c:choose>
+												<c:when test="<%= layoutsCount == 0 %>">
+													<liferay-ui:message key="none" />
+												</c:when>
+												<c:otherwise>
+													<liferay-ui:message key='<%= "<strong>" + String.valueOf(layoutsCount) + "</strong>" %>' />
+												</c:otherwise>
+											</c:choose>
+										</span>
+										<span class="badge badge-warning deletions"><%= (layoutModelDeletionCount > 0) ? (layoutModelDeletionCount + StringPool.SPACE + LanguageUtil.get(request, "deletions")) : StringPool.BLANK %></span>
+									</liferay-util:buffer>
 
-									layoutsCount = approvedLayoutRevisions.size() + pendingLayoutRevisions.size();
-								}
-								else {
-									LayoutSet selLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(groupDisplayContextHelper.getGroupId(), privateLayout);
-
-									layoutsCount = selLayoutSet.getPageCount();
-								}
-
-								DateRange dateRange = ExportImportDateUtil.getDateRange(exportImportConfiguration);
-
-								PortletDataContext portletDataContext = PortletDataContextFactoryUtil.createPreparePortletDataContext(company.getCompanyId(), groupDisplayContextHelper.getStagingGroupId(), ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE, dateRange.getStartDate(), dateRange.getEndDate());
-
-								long layoutModelDeletionCount = ExportImportHelperUtil.getLayoutModelDeletionCount(portletDataContext, privateLayout);
-								%>
-
-								<liferay-util:buffer
-									var="badgeHTML"
-								>
-									<span class="badge badge-info">
-										<c:choose>
-											<c:when test="<%= layoutsCount == 0 %>">
-												<liferay-ui:message key="none" />
-											</c:when>
-											<c:otherwise>
-												<liferay-ui:message key='<%= "<strong>" + String.valueOf(layoutsCount) + "</strong>" %>' />
-											</c:otherwise>
-										</c:choose>
-									</span>
-									<span class="badge badge-warning deletions"><%= (layoutModelDeletionCount > 0) ? (layoutModelDeletionCount + StringPool.SPACE + LanguageUtil.get(request, "deletions")) : StringPool.BLANK %></span>
-								</liferay-util:buffer>
-
-								<li class="tree-item">
-									<liferay-ui:message arguments="<%= badgeHTML %>" key="pages-x" />
-								</li>
-							</ul>
-						</li>
-					</aui:fieldset>
+									<li class="tree-item">
+										<liferay-ui:message arguments="<%= badgeHTML %>" key="pages-x" />
+									</li>
+								</ul>
+							</li>
+						</aui:fieldset>
+					</c:if>
 				</aui:fieldset-group>
 
 				<span class="publish-simple-help-text">
 					<liferay-ui:message key="simple-publication-help" />
 				</span>
 			</ul>
-		</div>
+		</clay:container-fluid>
 	</div>
 
 	<aui:button-row>

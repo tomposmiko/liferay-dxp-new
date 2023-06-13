@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.CustomValueSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class CustomValue {
+public class CustomValue implements Cloneable, Serializable {
+
+	public static CustomValue toDTO(String json) {
+		return CustomValueSerDes.toDTO(json);
+	}
 
 	public Object getData() {
 		return data;
@@ -88,6 +94,11 @@ public class CustomValue {
 	}
 
 	protected Geo geo;
+
+	@Override
+	public CustomValue clone() throws CloneNotSupportedException {
+		return (CustomValue)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

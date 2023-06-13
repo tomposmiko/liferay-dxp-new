@@ -14,14 +14,10 @@
 
 package com.liferay.product.navigation.product.menu.web.internal.product.navigation.control.menu;
 
-import com.liferay.application.list.PanelCategory;
-import com.liferay.application.list.PanelCategoryRegistry;
-import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -36,13 +32,11 @@ import com.liferay.product.navigation.control.menu.BaseProductNavigationControlM
 import com.liferay.product.navigation.control.menu.ProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuCategoryKeys;
 import com.liferay.product.navigation.product.menu.constants.ProductNavigationProductMenuPortletKeys;
-import com.liferay.taglib.portletext.RuntimeTag;
-import com.liferay.taglib.servlet.PageContextFactoryUtil;
+import com.liferay.product.navigation.product.menu.helper.ProductNavigationProductMenuHelper;
 
 import java.io.IOException;
 import java.io.Writer;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -53,8 +47,6 @@ import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -81,19 +73,6 @@ public class ProductMenuProductNavigationControlMenuEntry
 	@Override
 	public String getURL(HttpServletRequest httpServletRequest) {
 		return null;
-	}
-
-	@Override
-	public boolean includeBody(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
-		throws IOException {
-
-		_processBodyBottomContent(
-			PageContextFactoryUtil.create(
-				httpServletRequest, httpServletResponse));
-
-		return true;
 	}
 
 	@Override
@@ -160,89 +139,23 @@ public class ProductMenuProductNavigationControlMenuEntry
 	public boolean isShow(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		if (_productNavigationProductMenuHelper.isShowProductMenu(
+				httpServletRequest)) {
 
-		if (!themeDisplay.isSignedIn()) {
-			return false;
+			return true;
 		}
 
-		User user = themeDisplay.getUser();
-
-		if (!themeDisplay.isImpersonated() && !user.isSetupComplete()) {
-			return false;
-		}
-
-		List<PanelCategory> childPanelCategories =
-			_panelCategoryRegistry.getChildPanelCategories(
-				PanelCategoryKeys.ROOT, themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroup());
-
-		if (childPanelCategories.isEmpty()) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private void _processBodyBottomContent(PageContext pageContext) {
-		try {
-			JspWriter jspWriter = pageContext.getOut();
-
-			jspWriter.write("<div class=\"");
-
-			HttpServletRequest httpServletRequest =
-				(HttpServletRequest)pageContext.getRequest();
-
-			String productMenuState = SessionClicks.get(
-				httpServletRequest,
-				"com.liferay.product.navigation.product.menu.web_" +
-					"productMenuState",
-				"closed");
-
-			if (Objects.equals(productMenuState, "open")) {
-				productMenuState += StringPool.SPACE + "product-menu-open";
-			}
-
-			jspWriter.write(productMenuState);
-
-			jspWriter.write(
-				" hidden-print lfr-product-menu-panel sidenav-fixed " +
-					"sidenav-menu-slider\" id=\"");
-
-			String portletNamespace = _portal.getPortletNamespace(
-				ProductNavigationProductMenuPortletKeys.
-					PRODUCT_NAVIGATION_PRODUCT_MENU);
-
-			jspWriter.write(portletNamespace);
-
-			jspWriter.write("sidenavSliderId\">");
-			jspWriter.write(
-				"<div class=\"product-menu sidebar sidenav-menu\">");
-
-			RuntimeTag runtimeTag = new RuntimeTag();
-
-			runtimeTag.setPortletName(
-				ProductNavigationProductMenuPortletKeys.
-					PRODUCT_NAVIGATION_PRODUCT_MENU);
-
-			runtimeTag.doTag(pageContext);
-
-			jspWriter.write("</div></div>");
-		}
-		catch (Exception exception) {
-			ReflectionUtil.throwException(exception);
-		}
+		return false;
 	}
 
 	private static final String _TMPL_CONTENT = StringUtil.read(
 		ProductMenuProductNavigationControlMenuEntry.class, "icon.tmpl");
 
 	@Reference
-	private PanelCategoryRegistry _panelCategoryRegistry;
+	private Portal _portal;
 
 	@Reference
-	private Portal _portal;
+	private ProductNavigationProductMenuHelper
+		_productNavigationProductMenuHelper;
 
 }

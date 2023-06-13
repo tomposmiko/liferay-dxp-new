@@ -43,7 +43,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-x", siteNavigationMenu
 	<liferay-ui:message arguments='<%= ModelHintsUtil.getMaxLength(SiteNavigationMenuItem.class.getName(), "name") %>' key="please-enter-a-name-with-fewer-than-x-characters" translateArguments="<%= false %>" />
 </liferay-ui:error>
 
-<aui:form action="<%= addURL.toString() %>" cssClass="container-fluid-1280" name="fm" onSubmit="event.preventDefault();">
+<aui:form action="<%= addURL %>" cssClass="container-fluid-1280" name="fm" onSubmit="event.preventDefault();">
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="siteNavigationMenuId" type="hidden" value="<%= siteNavigationMenuId %>" />
 	<aui:input name="type" type="hidden" value="<%= type %>" />
@@ -65,17 +65,17 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-x", siteNavigationMenu
 	</aui:button-row>
 </aui:form>
 
-<aui:script use="liferay-alert">
+<aui:script>
 	var addButton = document.getElementById('<portlet:namespace />addButton');
 
 	if (addButton) {
-		addButton.addEventListener('click', function() {
+		addButton.addEventListener('click', function () {
 			var form = document.getElementById('<portlet:namespace />fm');
 			var formData = new FormData();
 
 			Array.prototype.slice
 				.call(form.querySelectorAll('input'))
-				.forEach(function(input) {
+				.forEach(function (input) {
 					if (input.name && input.value) {
 						formData.append(input.name, input.value);
 					}
@@ -92,12 +92,12 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-x", siteNavigationMenu
 
 			Liferay.Util.fetch(form.action, {
 				body: formData,
-				method: 'POST'
+				method: 'POST',
 			})
-				.then(function(response) {
+				.then(function (response) {
 					return response.json();
 				})
-				.then(function(response) {
+				.then(function (response) {
 					if (response.siteNavigationMenuItemId) {
 						Liferay.fire('closeWindow', {
 
@@ -109,19 +109,14 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-x", siteNavigationMenu
 								'_<%= HtmlUtil.escapeJS(selPortlet.getPortletId()) %>_addMenuItem',
 							portletAjaxable: <%= selPortlet.isAjaxable() %>,
 							refresh:
-								'<%= HtmlUtil.escapeJS(selPortlet.getPortletId()) %>'
+								'<%= HtmlUtil.escapeJS(selPortlet.getPortletId()) %>',
 						});
-					} else {
-						new Liferay.Alert({
-							delay: {
-								hide: 500,
-								show: 0
-							},
-							duration: 500,
-							icon: 'exclamation-circle',
+					}
+					else {
+						Liferay.Util.openToast({
 							message: response.errorMessage,
-							type: 'danger'
-						}).render();
+							type: 'danger',
+						});
 					}
 				});
 		});

@@ -33,9 +33,9 @@ renderResponse.setTitle(editSegmentsEntryDisplayContext.getTitle(locale));
 <liferay-ui:error embed="<%= false %>" exception="<%= SegmentsEntryKeyException.class %>" message="key-is-already-used" />
 <liferay-ui:error embed="<%= false %>" exception="<%= SegmentsEntryNameException.class %>" message="please-enter-a-valid-name" />
 
-<portlet:actionURL name="updateSegmentsEntry" var="updateSegmentsEntryActionURL" />
+<portlet:actionURL name="/segments/update_segments_entry" var="updateSegmentsEntryActionURL" />
 
-<aui:form action="<%= updateSegmentsEntryActionURL %>" method="post" name="editSegmentFm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveSegmentsEntry();" %>'>
+<aui:form action="<%= updateSegmentsEntryActionURL %>" method="post" name="editSegmentFm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveSegmentsEntry();" %>'>
 	<aui:input name="redirect" type="hidden" value="<%= editSegmentsEntryDisplayContext.getRedirect() %>" />
 	<aui:input name="segmentsEntryId" type="hidden" value="<%= editSegmentsEntryDisplayContext.getSegmentsEntryId() %>" />
 	<aui:input name="groupId" type="hidden" value="<%= editSegmentsEntryDisplayContext.getGroupId() %>" />
@@ -43,18 +43,14 @@ renderResponse.setTitle(editSegmentsEntryDisplayContext.getTitle(locale));
 	<aui:input name="type" type="hidden" value="<%= editSegmentsEntryDisplayContext.getType() %>" />
 	<aui:input name="dynamic" type="hidden" value="<%= true %>" />
 
-	<%
-	String segmentEditRootElementId = renderResponse.getNamespace() + "-segment-edit-root";
-	%>
-
-	<div id="<%= segmentEditRootElementId %>">
+	<div id="<%= liferayPortletResponse.getNamespace() + "-segment-edit-root" %>">
 		<div class="inline-item my-5 p-5 w-100">
 			<span aria-hidden="true" class="loading-animation"></span>
 		</div>
 
 		<react:component
-			data="<%= editSegmentsEntryDisplayContext.getData() %>"
 			module="js/SegmentsApp.es"
+			props="<%= editSegmentsEntryDisplayContext.getData() %>"
 		/>
 	</div>
 </aui:form>

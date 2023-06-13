@@ -81,7 +81,7 @@ definition {
 	macro addDisplayTemplateTemplateViaDDLDisplayPG {
 		Click(locator1 = "DDL#PORTLET_ACTIONS_ADD_DISPLAY_TEMPLATE");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		PortletEntry.inputName(name = "${ddlDisplayTemplateName}");
 
@@ -147,7 +147,7 @@ definition {
 	macro addFormTemplateViaDDLDisplayPG {
 		Click(locator1 = "DDL#PORTLET_ACTIONS_ADD_FORM_TEMPLATE");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		PortletEntry.inputName(name = "${ddlFormTemplateName}");
 	}
@@ -174,8 +174,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLNavigator.gotoManageDataDefinitions();
@@ -313,8 +312,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Dynamic Data Lists");
 
 		DDLNavigator.gotoManageDataDefinitions();

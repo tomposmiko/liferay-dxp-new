@@ -21,7 +21,7 @@ BlogsGroupServiceOverriddenConfiguration blogsGroupServiceOverriddenConfiguratio
 %>
 
 <div class="btn-group">
-	<c:if test="<%= blogsGroupServiceOverriddenConfiguration.enableRss() %>">
+	<c:if test="<%= blogsGroupServiceOverriddenConfiguration.enableRss() && ((themeDisplay.getScopeGroupId() == 0) || GroupPermissionUtil.contains(themeDisplay.getPermissionChecker(), themeDisplay.getScopeGroupId(), ActionKeys.VIEW)) %>">
 
 		<%
 		String rssURL = RSSUtil.getURL(StringBundler.concat(themeDisplay.getPathMain(), "/blogs/rss?plid=", String.valueOf(themeDisplay.getPlid()), "&groupId=", String.valueOf(themeDisplay.getScopeGroupId())), GetterUtil.getInteger(blogsGroupServiceOverriddenConfiguration.rssDelta()), blogsGroupServiceOverriddenConfiguration.rssDisplayStyle(), blogsGroupServiceOverriddenConfiguration.rssFeedType(), null);
@@ -29,10 +29,13 @@ BlogsGroupServiceOverriddenConfiguration blogsGroupServiceOverriddenConfiguratio
 
 		<div class="btn-group-item">
 			<clay:link
-				elementClasses="btn btn-outline-borderless btn-outline-secondary btn-sm"
+				borderless="<%= true %>"
+				displayType="secondary"
 				href="<%= rssURL %>"
 				icon="rss-full"
-				label='<%= LanguageUtil.get(request, "rss") %>'
+				label="rss"
+				small="<%= true %>"
+				type="button"
 			/>
 		</div>
 
@@ -55,10 +58,11 @@ BlogsGroupServiceOverriddenConfiguration blogsGroupServiceOverriddenConfiguratio
 					</portlet:actionURL>
 
 					<clay:link
-						buttonStyle="secondary"
-						elementClasses="btn-sm"
+						displayType="secondary"
 						href="<%= unsubscribeURL %>"
-						label='<%= LanguageUtil.get(request, "unsubscribe") %>'
+						label="unsubscribe"
+						small="<%= true %>"
+						type="button"
 					/>
 				</c:when>
 				<c:otherwise>
@@ -68,10 +72,11 @@ BlogsGroupServiceOverriddenConfiguration blogsGroupServiceOverriddenConfiguratio
 					</portlet:actionURL>
 
 					<clay:link
-						buttonStyle="secondary"
-						elementClasses="btn-sm"
+						displayType="secondary"
 						href="<%= subscribeURL %>"
-						label='<%= LanguageUtil.get(request, "subscribe") %>'
+						label="subscribe"
+						small="<%= true %>"
+						type="button"
 					/>
 				</c:otherwise>
 			</c:choose>
@@ -90,10 +95,11 @@ BlogsGroupServiceOverriddenConfiguration blogsGroupServiceOverriddenConfiguratio
 
 		<div class="btn-group-item">
 			<clay:link
-				buttonStyle="primary"
-				elementClasses="btn-sm"
+				displayType="primary"
 				href="<%= editEntryURL.toString() %>"
-				label='<%= LanguageUtil.get(request, "new-entry") %>'
+				label="new-entry"
+				small="<%= true %>"
+				type="button"
 			/>
 		</div>
 	</c:if>

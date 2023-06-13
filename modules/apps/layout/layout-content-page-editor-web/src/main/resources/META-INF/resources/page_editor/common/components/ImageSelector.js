@@ -14,25 +14,32 @@
 
 import ClayButton from '@clayui/button';
 import ClayForm, {ClayInput} from '@clayui/form';
-import React, {useContext} from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 
-import {ConfigContext} from '../../app/config/index';
+import {useId} from '../../app/utils/useId';
 import {openImageSelector} from '../../core/openImageSelector';
 
 export function ImageSelector({
 	imageTitle = Liferay.Language.get('none'),
 	label,
 	onClearButtonPressed,
-	onImageSelected
+	onImageSelected,
 }) {
-	const {imageSelectorURL, portletNamespace} = useContext(ConfigContext);
+	const imageTitleId = useId();
 
 	return (
 		<>
-			<ClayForm.Group small>
-				<label htmlFor="imageTitle">{label}</label>
+			<ClayForm.Group>
+				<label htmlFor={imageTitleId}>{label}</label>
 				<ClayInput
-					id="imageTitle"
+					className="page-editor__item-selector__content-input"
+					id={imageTitleId}
+					onClick={() =>
+						openImageSelector((image) => {
+							onImageSelected(image);
+						})
+					}
 					placeholder={Liferay.Language.get('none')}
 					readOnly
 					sizing="sm"
@@ -44,12 +51,9 @@ export function ImageSelector({
 					<ClayButton
 						displayType="secondary"
 						onClick={() =>
-							openImageSelector(
-								{imageSelectorURL, portletNamespace},
-								image => {
-									onImageSelected(image);
-								}
-							)
+							openImageSelector((image) => {
+								onImageSelected(image);
+							})
 						}
 						small
 					>
@@ -70,3 +74,10 @@ export function ImageSelector({
 		</>
 	);
 }
+
+ImageSelector.propTypes = {
+	imageTitle: PropTypes.string,
+	label: PropTypes.string,
+	onClearButtonPressed: PropTypes.func.isRequired,
+	onImageSelected: PropTypes.func.isRequired,
+};

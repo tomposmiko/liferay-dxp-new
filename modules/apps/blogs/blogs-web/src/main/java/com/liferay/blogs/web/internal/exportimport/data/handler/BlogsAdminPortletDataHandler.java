@@ -71,6 +71,11 @@ public class BlogsAdminPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
+	public String getResourceName() {
+		return BlogsConstants.RESOURCE_NAME;
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
@@ -156,18 +161,6 @@ public class BlogsAdminPortletDataHandler extends BasePortletDataHandler {
 		portletDataContext.importPortletPermissions(
 			BlogsConstants.RESOURCE_NAME);
 
-		Element entriesElement = portletDataContext.getImportDataGroupElement(
-			BlogsEntry.class);
-
-		List<Element> entryElements = entriesElement.elements();
-
-		for (Element entryElement : entryElements) {
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, entryElement);
-		}
-
-		// Friendly URLs
-
 		Element friendlyURLEntriesElement =
 			portletDataContext.getImportDataGroupElement(
 				FriendlyURLEntry.class);
@@ -178,6 +171,16 @@ public class BlogsAdminPortletDataHandler extends BasePortletDataHandler {
 		for (Element friendlyURLEntryElement : friendlyURLEntryElements) {
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, friendlyURLEntryElement);
+		}
+
+		Element entriesElement = portletDataContext.getImportDataGroupElement(
+			BlogsEntry.class);
+
+		List<Element> entryElements = entriesElement.elements();
+
+		for (Element entryElement : entryElements) {
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, entryElement);
 		}
 
 		return null;

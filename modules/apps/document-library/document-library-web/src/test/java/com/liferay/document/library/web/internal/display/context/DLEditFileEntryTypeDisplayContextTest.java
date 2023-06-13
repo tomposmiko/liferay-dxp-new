@@ -15,8 +15,8 @@
 package com.liferay.document.library.web.internal.display.context;
 
 import com.liferay.document.library.web.internal.display.context.util.MockHttpServletRequestBuilder;
-import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStorageLinkLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.util.DDM;
@@ -34,14 +34,15 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.language.LanguageImpl;
 import com.liferay.portal.language.LanguageResources;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.PropsImpl;
 
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -50,6 +51,11 @@ import org.mockito.Mockito;
  * @author Cristina González
  */
 public class DLEditFileEntryTypeDisplayContextTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws PortalException {
@@ -98,7 +104,7 @@ public class DLEditFileEntryTypeDisplayContextTest {
 		DLEditFileEntryTypeDisplayContext dlEditFileEntryTypeDisplayContext =
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
-				_language, null);
+				_language, null, null);
 
 		Assert.assertEquals(
 			"Liferay.FormBuilder.AVAILABLE_FIELDS.DDM_STRUCTURE",
@@ -111,13 +117,14 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
 					).withParameter(
 						"definition", RandomTestUtil.randomString()
-					).build()));
+					).build()),
+				null);
 
 		Assert.assertEquals(
 			"[\"pt_BR\"]",
@@ -130,13 +137,14 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
 					).withParameter(
 						"definition", RandomTestUtil.randomString()
-					).build()));
+					).build()),
+				null);
 
 		Assert.assertEquals(
 			"pt_BR", dlEditFileEntryTypeDisplayContext.getDefaultLanguageId());
@@ -148,11 +156,12 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
-					).build()));
+					).build()),
+				null);
 
 		Assert.assertTrue(
 			dlEditFileEntryTypeDisplayContext.isFieldNameEditionDisabled());
@@ -164,11 +173,12 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
-					).build()));
+					).build()),
+				null);
 
 		Assert.assertEquals(
 			StringPool.BLANK,
@@ -181,16 +191,16 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
 					).withParameter(
 						"definition", RandomTestUtil.randomString()
-					).build()));
+					).build()),
+				null);
 
-		Assert.assertEquals(
-			true,
+		Assert.assertTrue(
 			dlEditFileEntryTypeDisplayContext.isChangeableDefaultLanguage());
 	}
 
@@ -236,31 +246,5 @@ public class DLEditFileEntryTypeDisplayContextTest {
 	private DDMStorageLinkLocalService _ddmStorageLinkLocalService;
 	private DDMStructureLocalService _ddmStructureLocalService;
 	private Language _language;
-
-	private class MockPortletRenderRequest
-		extends MockLiferayPortletRenderRequest {
-
-		public MockPortletRenderRequest(HttpServletRequest httpServletRequest) {
-			_httpServletRequest = httpServletRequest;
-		}
-
-		@Override
-		public Object getAttribute(String name) {
-			return _httpServletRequest.getAttribute(name);
-		}
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return _httpServletRequest;
-		}
-
-		@Override
-		public String getParameter(String name) {
-			return _httpServletRequest.getParameter(name);
-		}
-
-		private final HttpServletRequest _httpServletRequest;
-
-	}
 
 }

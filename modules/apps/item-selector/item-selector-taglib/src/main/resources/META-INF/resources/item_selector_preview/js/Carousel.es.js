@@ -17,6 +17,8 @@ import ClayIcon from '@clayui/icon';
 import ClayTabs from '@clayui/tabs';
 import React, {useState} from 'react';
 
+import NoPreview from './NoPreview.es';
+
 const Arrow = ({direction, handleClick}) => (
 	<div className={`pull-${direction}`}>
 		<ClayButton
@@ -49,7 +51,7 @@ const InfoPanel = ({metadata}) => {
 	});
 
 	const itemsContent = imageData.groups.map((group, index) => {
-		const itemContentTab = group.data.map(item => {
+		const itemContentTab = group.data.map((item) => {
 			return (
 				<React.Fragment key={item.key}>
 					<dt className="sidebar-dt">{item.key}</dt>
@@ -86,7 +88,8 @@ const Carousel = ({
 	currentItem,
 	handleClickNext,
 	handleClickPrevious,
-	showArrows = true
+	isImage,
+	showArrows = true,
 }) => (
 	<div className="carousel closed sidenav-container">
 		<InfoPanel metadata={currentItem.metadata} />
@@ -96,10 +99,14 @@ const Carousel = ({
 				<Arrow direction="left" handleClick={handleClickPrevious} />
 			)}
 
-			<img
-				alt={currentItem.title}
-				src={currentItem.url || currentItem.base64}
-			/>
+			{isImage ? (
+				<img
+					alt={currentItem.title}
+					src={currentItem.url || currentItem.base64}
+				/>
+			) : (
+				<NoPreview />
+			)}
 
 			{showArrows && (
 				<Arrow direction="right" handleClick={handleClickNext} />

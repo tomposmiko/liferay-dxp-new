@@ -60,6 +60,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.restore-current-view=false",
+		"com.liferay.portlet.show-portlet-access-denied=false",
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Search Insights",
 		"javax.portlet.expiration-cache=0",
@@ -79,7 +80,7 @@ public class SearchInsightsPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		PortletSharedSearchResponse portletSharedSearchResponse =
-			portletSharedSearchRequest.search(renderRequest);
+			_portletSharedSearchRequest.search(renderRequest);
 
 		SearchInsightsPortletPreferences searchInsightsPortletPreferences =
 			new SearchInsightsPortletPreferencesImpl(
@@ -93,7 +94,7 @@ public class SearchInsightsPortlet extends MVCPortlet {
 				renderRequest));
 
 		if (!SearchPortletPermissionUtil.containsConfiguration(
-				portletPermission, renderRequest, portal)) {
+				_portletPermission, renderRequest, _portal)) {
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
@@ -115,7 +116,10 @@ public class SearchInsightsPortlet extends MVCPortlet {
 				searchInsightsPortletPreferences.
 					getFederatedSearchKeyOptional());
 
-		if (isOmniadmin() && isRequestStringPresent(searchResponse)) {
+		if (isCompanyAdmin() &&
+			(isRequestStringPresent(searchResponse) ||
+			 isResponseStringPresent(searchResponse))) {
+
 			searchInsightsDisplayContext.setRequestString(
 				buildRequestString(searchResponse));
 
@@ -148,14 +152,14 @@ public class SearchInsightsPortlet extends MVCPortlet {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", renderRequest.getLocale(), getClass());
 
-		return language.get(resourceBundle, "search-insights-help");
+		return _language.get(resourceBundle, "search-insights-help");
 	}
 
-	protected boolean isOmniadmin() {
+	protected boolean isCompanyAdmin() {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
-		return permissionChecker.isOmniadmin();
+		return permissionChecker.isCompanyAdmin();
 	}
 
 	protected boolean isRequestStringPresent(SearchResponse searchResponse) {
@@ -165,16 +169,23 @@ public class SearchInsightsPortlet extends MVCPortlet {
 		return requestString.isPresent();
 	}
 
-	@Reference
-	protected Language language;
+	protected boolean isResponseStringPresent(SearchResponse searchResponse) {
+		Optional<String> responseString = SearchStringUtil.maybe(
+			searchResponse.getResponseString());
+
+		return responseString.isPresent();
+	}
 
 	@Reference
-	protected Portal portal;
+	private Language _language;
 
 	@Reference
-	protected PortletPermission portletPermission;
+	private Portal _portal;
 
 	@Reference
-	protected PortletSharedSearchRequest portletSharedSearchRequest;
+	private PortletPermission _portletPermission;
+
+	@Reference
+	private PortletSharedSearchRequest _portletSharedSearchRequest;
 
 }

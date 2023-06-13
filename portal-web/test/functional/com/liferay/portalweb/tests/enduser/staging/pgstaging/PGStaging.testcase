@@ -47,6 +47,8 @@ definition {
 			pageName = "Staging Test Page",
 			siteName = "Site Name");
 
+		DMDocument.enableActionsMenuOnPortlet();
+
 		DMDocument.addPG(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentFile = "Document_1.docx",
@@ -56,7 +58,7 @@ definition {
 
 		Staging.gotoPublishToLive();
 
-		Staging.publishToLive();
+		Staging.publishToLive(remoteStaging = "true");
 
 		Navigator.gotoSitePage(
 			pageName = "Staging Test Page",
@@ -72,7 +74,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.deactivateStagingCP(siteName = "Site Name");
@@ -93,15 +94,10 @@ definition {
 			layoutName = "Staging Test Page",
 			widgetName = "Documents and Media");
 
-		Portlet.addPG(
-			pageName = "Staging Test Page",
-			portletName = "Documents and Media");
-
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -109,6 +105,8 @@ definition {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
 			siteName = "Site Name");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		DMDocument.addPG(
 			dmDocumentFile = "Document_1.docx",
@@ -123,7 +121,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.deactivateStagingCP(siteName = "Site Name");
@@ -140,7 +137,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -166,11 +162,22 @@ definition {
 			remotePort = "9080",
 			remoteStaging = "true",
 			siteName = "Site Name");
+
+		User.loginPG(
+			nodePort = "9080",
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites");
+
+		Site.deleteAllCP();
 	}
 
 	@priority = "5"
 	test AddDMDocumentWCArticleStagingLocalLive {
-		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
 		JSONLayout.addWidgetToPublicLayout(
@@ -182,7 +189,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -190,6 +196,8 @@ definition {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
 			siteName = "Site Name");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		DMDocument.addPG(
 			dmDocumentFile = "Document_1.docx",
@@ -203,8 +211,7 @@ definition {
 			siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentNavigator.gotoAddCP();
@@ -263,7 +270,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(
@@ -279,8 +285,7 @@ definition {
 		WebContent.viewNoEditWCViaAP(assetTitle = "Web Content Title");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContent.viewNoEditWCCP(webContentTitle = "Web Content Title");
@@ -291,7 +296,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.deactivateStagingCP(siteName = "Site Name");
@@ -348,7 +352,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -367,7 +370,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.deactivateStagingCP(siteName = "Site Name");
@@ -381,13 +383,45 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
+	@description = "This will be ignored until LPS-125709 is fixed. This is a use case for LPS-125709."
+	@ignore = "true"
+	@priority = "3"
+	test AssertPublishPageDisplayInFullPage {
+		property portal.upstream = "quarantine";
+
+		Staging.openStagingAdmin(siteURLKey = "site-name");
+
+		Staging.activateStagingCP(siteName = "Site Name");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		ClickNoError(locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON");
+
+		Pause(locator1 = "3000");
+
+		AssertTextEquals(
+			locator1 = "Staging#PROCESS_SUCCESSFUL",
+			value1 = "Successful");
+
+		SelectFrameTop();
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		takeScreenshot();
+
+		AssertElementNotPresent(locator1 = "Staging#PROCESS_HALF_DISPLAY_PAGE");
+	}
+
 	@priority = "4"
 	test DeactivateStaging {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -398,7 +432,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.deactivateStagingCP(siteName = "Site Name");
@@ -412,7 +445,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.configurePage(
@@ -438,7 +470,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -504,17 +535,18 @@ definition {
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
 			layoutName = "Staging Test Page",
-			widgetName = "Message Boards");
+			widgetName = "Blogs");
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
-		MessageboardsPortlet.configureScopePG(scopeName = "Staging Test Page (Create New)");
+		Portlet.selectScopePG(
+			portletName = "Blogs",
+			scope = "Staging Test Page");
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -525,7 +557,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.deactivateStagingCP(siteName = "Site Name");
@@ -538,7 +569,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -561,7 +591,7 @@ definition {
 
 		Page.viewLayoutLogoPG(assertLayoutLogoPresent = "true");
 
-		ProductMenu.gotoStagingSite();
+		ProductMenu.gotoStagingSite(site = "Site Name");
 
 		Page.deleteLogoPG(page = "Staging Test Page");
 
@@ -580,19 +610,20 @@ definition {
 
 	@priority = "5"
 	test PublishPrivatePage {
+		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
-			portlet = "Staging");
+			portlet = "Staging",
+			site = "Site Name");
 
 		Staging.activateStagingCP(
 			pageVersioningEnabled = "true",
@@ -604,7 +635,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPrivatePage(pageName = "Private Staging Page");
@@ -634,8 +664,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
@@ -657,14 +686,15 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
 
-		DMDocument.linkImage(
-			dmDocumentURL = "${dmDocumentURL}",
+		ItemSelector.gotoItemSelectorViaCKEditor();
+
+		ItemSelector.addFromURL(
+			imageSourceURL = "${dmDocumentURL}",
 			navTab = "URL");
 
 		PortletEntry.publish();
@@ -673,7 +703,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(
@@ -690,7 +719,7 @@ definition {
 
 		Staging.publishToLive();
 
-		ProductMenu.gotoLiveSite();
+		ProductMenu.gotoLiveSite(site = "Site Name");
 
 		var key_portletTitleName = "Web Content Display";
 
@@ -750,7 +779,7 @@ definition {
 
 		Staging.gotoPublishToLive();
 
-		Staging.publishToLive();
+		Staging.publishToLive(remoteStaging = "true");
 
 		User.logoutPG(
 			password = "test",
@@ -767,6 +796,8 @@ definition {
 			siteName = "Remote Site");
 
 		WebContent.viewPGViaWCD(webContentContent = "Web Content Content");
+
+		WebContent.viewNoEditWCViaWCD(webContentContent = "Web Content Content");
 	}
 
 	@description = "This is a use case for LPS-80295."
@@ -779,7 +810,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "Site Name");
@@ -795,8 +825,7 @@ definition {
 		Navigator.openStagingSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentNavigator.gotoAddCP();
@@ -823,7 +852,8 @@ definition {
 		Navigator.openSpecificURL(url = "${baseURL}/web/site-name-staging/-/${friendlyUrl}");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "APAsset#ASSET_TITLE_HEADER",
+			key_assetTitle = "Web Content Title",
+			locator1 = "AP#ASSET_ABSTRACT_TITLE",
 			value1 = "Web Content Title");
 
 		AssertTextEquals.assertPartialText(
@@ -834,7 +864,8 @@ definition {
 		Navigator.openSpecificURL(url = "${baseURL}/web/site-name/-/${friendlyUrl}");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "APAsset#ASSET_TITLE_HEADER",
+			key_assetTitle = "Web Content Title",
+			locator1 = "AP#ASSET_ABSTRACT_TITLE",
 			value1 = "Web Content Title");
 
 		AssertTextEquals.assertPartialText(
@@ -892,7 +923,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Test Variation Page");
@@ -943,7 +973,7 @@ definition {
 
 		Staging.gotoPublishToLive();
 
-		Staging.publishToLive();
+		Staging.publishToLive(remoteStaging = "true");
 
 		User.logoutPG(
 			password = "test",

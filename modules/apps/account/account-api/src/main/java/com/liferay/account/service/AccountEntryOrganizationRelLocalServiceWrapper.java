@@ -38,6 +38,10 @@ public class AccountEntryOrganizationRelLocalServiceWrapper
 	/**
 	 * Adds the account entry organization rel to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AccountEntryOrganizationRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param accountEntryOrganizationRel the account entry organization rel
 	 * @return the account entry organization rel that was added
 	 */
@@ -85,7 +89,23 @@ public class AccountEntryOrganizationRelLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryOrganizationRelLocalService.createPersistedModel(
+			primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the account entry organization rel from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AccountEntryOrganizationRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param accountEntryOrganizationRel the account entry organization rel
 	 * @return the account entry organization rel that was removed
@@ -103,6 +123,10 @@ public class AccountEntryOrganizationRelLocalServiceWrapper
 	/**
 	 * Deletes the account entry organization rel with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AccountEntryOrganizationRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param accountEntryOrganizationRelId the primary key of the account entry organization rel
 	 * @return the account entry organization rel that was removed
 	 * @throws PortalException if a account entry organization rel with the primary key could not be found
@@ -117,6 +141,24 @@ public class AccountEntryOrganizationRelLocalServiceWrapper
 			deleteAccountEntryOrganizationRel(accountEntryOrganizationRelId);
 	}
 
+	@Override
+	public void deleteAccountEntryOrganizationRel(
+			long accountEntryId, long organizationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_accountEntryOrganizationRelLocalService.
+			deleteAccountEntryOrganizationRel(accountEntryId, organizationId);
+	}
+
+	@Override
+	public void deleteAccountEntryOrganizationRels(
+			long accountEntryId, long[] organizationIds)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_accountEntryOrganizationRelLocalService.
+			deleteAccountEntryOrganizationRels(accountEntryId, organizationIds);
+	}
+
 	/**
 	 * @throws PortalException
 	 */
@@ -127,6 +169,18 @@ public class AccountEntryOrganizationRelLocalServiceWrapper
 
 		return _accountEntryOrganizationRelLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _accountEntryOrganizationRelLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _accountEntryOrganizationRelLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -273,6 +327,14 @@ public class AccountEntryOrganizationRelLocalServiceWrapper
 			getAccountEntryOrganizationRels(accountEntryId);
 	}
 
+	@Override
+	public java.util.List<com.liferay.account.model.AccountEntryOrganizationRel>
+		getAccountEntryOrganizationRelsByOrganizationId(long organizationId) {
+
+		return _accountEntryOrganizationRelLocalService.
+			getAccountEntryOrganizationRelsByOrganizationId(organizationId);
+	}
+
 	/**
 	 * Returns the number of account entry organization rels.
 	 *
@@ -317,6 +379,9 @@ public class AccountEntryOrganizationRelLocalServiceWrapper
 			getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -335,7 +400,31 @@ public class AccountEntryOrganizationRelLocalServiceWrapper
 	}
 
 	/**
+	 * Creates an AccountEntryOrganizationRel for each given organizationId,
+	 * unless it already exists, and removes existing
+	 * AccountEntryOrganizationRels if their organizationId is not present in
+	 * the given organizationIds.
+	 *
+	 * @param accountEntryId
+	 * @param organizationIds
+	 * @throws PortalException
+	 * @review
+	 */
+	@Override
+	public void setAccountEntryOrganizationRels(
+			long accountEntryId, long[] organizationIds)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_accountEntryOrganizationRelLocalService.
+			setAccountEntryOrganizationRels(accountEntryId, organizationIds);
+	}
+
+	/**
 	 * Updates the account entry organization rel in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AccountEntryOrganizationRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param accountEntryOrganizationRel the account entry organization rel
 	 * @return the account entry organization rel that was updated

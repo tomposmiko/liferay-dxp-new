@@ -14,36 +14,37 @@
 
 package com.liferay.analytics.reports.web.internal.display.context;
 
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.analytics.reports.web.internal.util.AnalyticsReportsUtil;
+import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.util.Validator;
 
-import java.util.Locale;
+import java.util.Collections;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.portlet.ActionRequest;
+import javax.portlet.PortletURL;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.ResourceURL;
 
 /**
  * @author David Arques
  * @author Sarai Díaz
  */
-public class AnalyticsReportsDisplayContext {
+public class AnalyticsReportsDisplayContext<T> {
 
 	public AnalyticsReportsDisplayContext(
-		HttpServletRequest httpServletRequest,
-		UserLocalService userLocalService) {
+		LayoutDisplayPageObjectProvider<T> layoutDisplayPageObjectProvider,
+		RenderRequest renderRequest, RenderResponse renderResponse,
+		ThemeDisplay themeDisplay) {
 
-		_httpServletRequest = httpServletRequest;
-		_userLocalService = userLocalService;
-
-		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		_layoutDisplayPageObjectProvider = layoutDisplayPageObjectProvider;
+		_renderRequest = renderRequest;
+		_renderResponse = renderResponse;
+		_themeDisplay = themeDisplay;
 	}
 
 	public Map<String, Object> getData() {
@@ -51,49 +52,69 @@ public class AnalyticsReportsDisplayContext {
 			return _data;
 		}
 
-		_data = HashMapBuilder.<String, Object>put(
-			"context", StringPool.BLANK
-		).put(
-			"props", getProps()
-		).build();
+		_data = Collections.singletonMap(
+			"context",
+			Collections.singletonMap(
+				"analyticsReportsDataURL",
+				String.valueOf(
+					_getResourceURL("/analytics_reports/get_data"))));
 
 		return _data;
 	}
 
-	public String getLiferayAnalyticsURL(long companyId) {
-		return PrefsPropsUtil.getString(companyId, "liferayAnalyticsURL");
-	}
+	public String getHideAnalyticsReportsPanelURL() {
+		PortletURL portletURL = _renderResponse.createActionURL();
 
-	protected Map<String, Object> getProps() {
-		Layout layout = _themeDisplay.getLayout();
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME, "/analytics_reports/hide_panel");
 
-		User user = _userLocalService.fetchUser(layout.getUserId());
+		String redirect = ParamUtil.getString(_renderRequest, "redirect");
 
-		String authorName = StringPool.BLANK;
-
-		if (user != null) {
-			authorName = user.getFullName();
+		if (Validator.isNotNull(redirect)) {
+			portletURL.setParameter("redirect", redirect);
+		}
+		else {
+			portletURL.setParameter(
+				"redirect",
+				_themeDisplay.getLayoutFriendlyURL(_themeDisplay.getLayout()));
 		}
 
-		Locale locale = _themeDisplay.getLocale();
+		return String.valueOf(portletURL);
+	}
 
-		return HashMapBuilder.<String, Object>put(
-			"authorName", authorName
-		).put(
-			"publishDate",
-			FastDateFormatFactoryUtil.getSimpleDateFormat(
-				"MMMM dd, yyyy", locale
-			).format(
-				layout.getPublishDate()
-			)
-		).put(
-			"title", layout.getTitle(locale)
-		).build();
+	public String getLiferayAnalyticsURL() {
+		return PrefsPropsUtil.getString(
+			_themeDisplay.getCompanyId(), "liferayAnalyticsURL");
+	}
+
+	public boolean isAnalyticsSynced() {
+		long groupId = ParamUtil.getLong(
+			_renderRequest, "groupId", _themeDisplay.getScopeGroupId());
+
+		return AnalyticsReportsUtil.isAnalyticsSynced(
+			_themeDisplay.getCompanyId(), groupId);
+	}
+
+	private ResourceURL _getResourceURL(String resourceID) {
+		ResourceURL resourceURL = _renderResponse.createResourceURL();
+
+		resourceURL.setParameter(
+			"classNameId",
+			String.valueOf(_layoutDisplayPageObjectProvider.getClassNameId()));
+		resourceURL.setParameter(
+			"classPK",
+			String.valueOf(_layoutDisplayPageObjectProvider.getClassPK()));
+
+		resourceURL.setResourceID(resourceID);
+
+		return resourceURL;
 	}
 
 	private Map<String, Object> _data;
-	private final HttpServletRequest _httpServletRequest;
+	private final LayoutDisplayPageObjectProvider<T>
+		_layoutDisplayPageObjectProvider;
+	private final RenderRequest _renderRequest;
+	private final RenderResponse _renderResponse;
 	private final ThemeDisplay _themeDisplay;
-	private final UserLocalService _userLocalService;
 
 }

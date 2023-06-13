@@ -28,6 +28,7 @@ public class RatingsStatsTable {
 	public static final String TABLE_NAME = "RatingsStats";
 
 	public static final Object[][] TABLE_COLUMNS = {
+		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
 		{"statsId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
 		{"classNameId", Types.BIGINT}, {"classPK", Types.BIGINT},
@@ -39,6 +40,10 @@ public class RatingsStatsTable {
 new HashMap<String, Integer>();
 
 static {
+TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
+
+TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
+
 TABLE_COLUMNS_MAP.put("statsId", Types.BIGINT);
 
 TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -59,12 +64,12 @@ TABLE_COLUMNS_MAP.put("averageScore", Types.DOUBLE);
 
 }
 	public static final String TABLE_SQL_CREATE =
-"create table RatingsStats (statsId LONG not null primary key,companyId LONG,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,totalEntries INTEGER,totalScore DOUBLE,averageScore DOUBLE)";
+"create table RatingsStats (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,statsId LONG not null,companyId LONG,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,totalEntries INTEGER,totalScore DOUBLE,averageScore DOUBLE,primary key (statsId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table RatingsStats";
 
 	public static final String[] TABLE_SQL_ADD_INDEXES = {
-		"create unique index IX_A6E99284 on RatingsStats (classNameId, classPK)",
+		"create unique index IX_C286E0E2 on RatingsStats (classNameId, classPK, ctCollectionId)",
 		"create index IX_5EC6007D on RatingsStats (classNameId, createDate)",
 		"create index IX_11A5584A on RatingsStats (classNameId, modifiedDate)"
 	};

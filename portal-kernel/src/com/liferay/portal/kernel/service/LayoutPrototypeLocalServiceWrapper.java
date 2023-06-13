@@ -34,6 +34,10 @@ public class LayoutPrototypeLocalServiceWrapper
 	/**
 	 * Adds the layout prototype to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutPrototypeLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutPrototype the layout prototype
 	 * @return the layout prototype that was added
 	 */
@@ -71,7 +75,22 @@ public class LayoutPrototypeLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _layoutPrototypeLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the layout prototype from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutPrototypeLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutPrototype the layout prototype
 	 * @return the layout prototype that was removed
@@ -89,6 +108,10 @@ public class LayoutPrototypeLocalServiceWrapper
 
 	/**
 	 * Deletes the layout prototype with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutPrototypeLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutPrototypeId the primary key of the layout prototype
 	 * @return the layout prototype that was removed
@@ -121,6 +144,18 @@ public class LayoutPrototypeLocalServiceWrapper
 
 		return _layoutPrototypeLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _layoutPrototypeLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _layoutPrototypeLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -368,6 +403,9 @@ public class LayoutPrototypeLocalServiceWrapper
 		return _layoutPrototypeLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -381,10 +419,11 @@ public class LayoutPrototypeLocalServiceWrapper
 		search(
 			long companyId, java.lang.Boolean active, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.portal.kernel.model.LayoutPrototype> obc) {
+				<com.liferay.portal.kernel.model.LayoutPrototype>
+					orderByComparator) {
 
 		return _layoutPrototypeLocalService.search(
-			companyId, active, start, end, obc);
+			companyId, active, start, end, orderByComparator);
 	}
 
 	@Override
@@ -394,6 +433,10 @@ public class LayoutPrototypeLocalServiceWrapper
 
 	/**
 	 * Updates the layout prototype in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutPrototypeLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutPrototype the layout prototype
 	 * @return the layout prototype that was updated

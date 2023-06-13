@@ -13,99 +13,115 @@
  */
 
 import ClayButton from '@clayui/button';
-import {PagesVisitor} from 'dynamic-data-mapping-form-renderer/js/util/visitors.es';
-import openToast from 'frontend-js-web/liferay/toast/commands/OpenToast.es';
-import React, {useContext, useEffect, useCallback, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 
 import {AppContext} from '../../AppContext.es';
 import Button from '../../components/button/Button.es';
 import {ControlMenuBase} from '../../components/control-menu/ControlMenu.es';
+import useDataDefinition from '../../hooks/useDataDefinition.es';
+import withDDMForm, {
+	useDDMFormSubmit,
+	useDDMFormValidation,
+} from '../../hooks/withDDMForm.es';
 import {addItem, updateItem} from '../../utils/client.es';
+import {errorToast, successToast} from '../../utils/toast.es';
 
 export const EditEntry = ({
 	dataDefinitionId,
 	dataRecordId,
 	ddmForm,
-	redirect
+	redirect,
+	userLanguageId,
 }) => {
-	const {basePortletURL} = useContext(AppContext);
+	const {basePortletURL, portletId, showFormView, showTableView} = useContext(
+		AppContext
+	);
+	const {availableLanguageIds, defaultLanguageId} = useDataDefinition(
+		dataDefinitionId
+	);
+	const [submitting, setSubmitting] = useState(false);
+
+	const isFormViewOnly = showFormView && !showTableView;
+	const urlParams = new URLSearchParams(window.location.href);
+	const backURL = urlParams.get(`_${portletId}_backURL`) || basePortletURL;
 
 	const onCancel = useCallback(() => {
 		if (redirect) {
 			Liferay.Util.navigate(redirect);
-		} else {
-			Liferay.Util.navigate(basePortletURL);
 		}
-	}, [basePortletURL, redirect]);
+		else {
+			Liferay.Util.navigate(backURL);
+		}
+	}, [redirect, backURL]);
 
-	const onSave = useCallback(() => {
-		const {pages} = ddmForm;
-		const visitor = new PagesVisitor(pages);
+	const onError = () => {
+		errorToast();
+		setSubmitting(false);
+	};
 
-		ddmForm.validate().then(validForm => {
-			if (!validForm) {
-				return;
-			}
+	const validateForm = useDDMFormValidation(
+		ddmForm,
+		defaultLanguageId,
+		availableLanguageIds
+	);
 
-			const dataRecord = {
-				dataRecordValues: {}
-			};
+	const onSubmit = useCallback(
+		(event) => {
+			event.preventDefault();
+			setSubmitting(true);
 
-			visitor.mapFields(({fieldName, localizable, value}) => {
-				if (localizable) {
-					dataRecord.dataRecordValues[fieldName] = {
-						[themeDisplay.getLanguageId()]: value
-					};
-				} else {
-					dataRecord.dataRecordValues[fieldName] = value;
-				}
-			});
-
-			const openSuccessToast = isNew => {
-				const message = isNew
-					? Liferay.Language.get('an-entry-was-added')
-					: Liferay.Language.get('an-entry-was-updated');
-
-				openToast({
-					message,
-					title: Liferay.Language.get('success'),
-					type: 'success'
+			validateForm(event)
+				.then((dataRecord) => {
+					if (dataRecordId !== '0') {
+						updateItem({
+							endpoint: `/o/data-engine/v2.0/data-records/${dataRecordId}`,
+							item: dataRecord,
+							method: 'PATCH',
+						})
+							.then(() => {
+								successToast(
+									Liferay.Language.get('an-entry-was-updated')
+								);
+								onCancel();
+							})
+							.catch(onError);
+					}
+					else {
+						addItem(
+							`/o/data-engine/v2.0/data-definitions/${dataDefinitionId}/data-records`,
+							dataRecord
+						)
+							.then(() => {
+								successToast(
+									Liferay.Language.get('an-entry-was-added')
+								);
+								onCancel();
+							})
+							.catch(onError);
+					}
+				})
+				.catch(() => {
+					setSubmitting(false);
 				});
-			};
+		},
+		[dataDefinitionId, dataRecordId, onCancel, validateForm]
+	);
 
-			if (dataRecordId !== '0') {
-				updateItem(
-					`/o/data-engine/v2.0/data-records/${dataRecordId}`,
-					dataRecord
-				).then(() => {
-					openSuccessToast(false);
-					onCancel();
-				});
-			} else {
-				addItem(
-					`/o/data-engine/v2.0/data-definitions/${dataDefinitionId}/data-records`,
-					dataRecord
-				).then(() => {
-					openSuccessToast(true);
-					onCancel();
-				});
-			}
-		});
-	}, [dataDefinitionId, dataRecordId, ddmForm, onCancel]);
+	useDDMFormSubmit(ddmForm, onSubmit);
 
 	useEffect(() => {
-		const formNode = ddmForm.getFormNode();
-		const onSubmit = () => onSave();
+		const ddmReactForm = ddmForm.reactComponentRef.current;
 
-		formNode.addEventListener('submit', onSubmit);
-
-		return () => formNode.removeEventListener('submit', onSubmit);
-	}, [ddmForm, onSave]);
+		ddmReactForm.updateEditingLanguageId({
+			editingLanguageId: userLanguageId,
+			preserveValue: true,
+		});
+	}, [ddmForm, userLanguageId]);
 
 	return (
 		<>
 			<ControlMenuBase
-				backURL={redirect ? redirect : `${basePortletURL}/#/`}
+				backURL={isFormViewOnly ? null : redirect || backURL}
 				title={
 					dataRecordId !== '0'
 						? Liferay.Language.get('edit-entry')
@@ -115,21 +131,18 @@ export const EditEntry = ({
 			/>
 
 			<ClayButton.Group className="app-builder-form-buttons" spaced>
-				<Button onClick={onSave}>{Liferay.Language.get('save')}</Button>
-				<Button displayType="secondary" onClick={onCancel}>
-					{Liferay.Language.get('cancel')}
+				<Button disabled={submitting} onClick={onSubmit}>
+					{Liferay.Language.get('save')}
 				</Button>
+
+				{!isFormViewOnly && (
+					<Button displayType="secondary" onClick={onCancel}>
+						{Liferay.Language.get('cancel')}
+					</Button>
+				)}
 			</ClayButton.Group>
 		</>
 	);
 };
 
-export default ({editEntryContainerElementId, ...props}) => {
-	const [ddmForm, setDDMForm] = useState();
-
-	if (!ddmForm) {
-		Liferay.componentReady(editEntryContainerElementId).then(setDDMForm);
-	}
-
-	return ddmForm ? <EditEntry ddmForm={ddmForm} {...props} /> : null;
-};
+export default withDDMForm(EditEntry);

@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.SiteSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Site {
+public class Site implements Cloneable, Serializable {
+
+	public static Site toDTO(String json) {
+		return SiteSerDes.toDTO(json);
+	}
 
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
@@ -276,6 +282,11 @@ public class Site {
 	}
 
 	protected Site[] sites;
+
+	@Override
+	public Site clone() throws CloneNotSupportedException {
+		return (Site)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

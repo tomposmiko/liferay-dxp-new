@@ -16,8 +16,10 @@ package com.liferay.portlet.exportimport.service.base;
 
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
+import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalServiceUtil;
 import com.liferay.exportimport.kernel.service.persistence.ExportImportConfigurationFinder;
 import com.liferay.exportimport.kernel.service.persistence.ExportImportConfigurationPersistence;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -37,6 +39,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
@@ -46,6 +49,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.trash.kernel.service.persistence.TrashEntryPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -69,11 +74,15 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>ExportImportConfigurationLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>ExportImportConfigurationLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>ExportImportConfigurationLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the export import configuration to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ExportImportConfigurationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param exportImportConfiguration the export import configuration
 	 * @return the export import configuration that was added
@@ -107,6 +116,10 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 	/**
 	 * Deletes the export import configuration with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ExportImportConfigurationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param exportImportConfigurationId the primary key of the export import configuration
 	 * @return the export import configuration that was removed
 	 * @throws PortalException if a export import configuration with the primary key could not be found
@@ -124,6 +137,10 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 	/**
 	 * Deletes the export import configuration from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ExportImportConfigurationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param exportImportConfiguration the export import configuration
 	 * @return the export import configuration that was removed
 	 */
@@ -134,6 +151,18 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 
 		return exportImportConfigurationPersistence.remove(
 			exportImportConfiguration);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return exportImportConfigurationPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -299,6 +328,16 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return exportImportConfigurationPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -308,6 +347,13 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 				(ExportImportConfiguration)persistedModel);
 	}
 
+	public BasePersistence<ExportImportConfiguration> getBasePersistence() {
+		return exportImportConfigurationPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -346,6 +392,10 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 
 	/**
 	 * Updates the export import configuration in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ExportImportConfigurationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param exportImportConfiguration the export import configuration
 	 * @return the export import configuration that was updated
@@ -671,11 +721,15 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.exportimport.kernel.model.ExportImportConfiguration",
 			exportImportConfigurationLocalService);
+
+		_setLocalServiceUtilService(exportImportConfigurationLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.exportimport.kernel.model.ExportImportConfiguration");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -718,6 +772,24 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		ExportImportConfigurationLocalService
+			exportImportConfigurationLocalService) {
+
+		try {
+			Field field =
+				ExportImportConfigurationLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, exportImportConfigurationLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

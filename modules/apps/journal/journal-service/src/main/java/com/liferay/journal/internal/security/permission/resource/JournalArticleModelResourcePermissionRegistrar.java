@@ -17,10 +17,10 @@ package com.liferay.journal.internal.security.permission.resource;
 import com.liferay.exportimport.kernel.staging.permission.StagingPermission;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.journal.constants.JournalConstants;
+import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
-import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.petra.function.UnsafeFunction;
@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.security.permission.resource.WorkflowedModelPer
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermission;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.Dictionary;
 
@@ -64,7 +65,8 @@ public class JournalArticleModelResourcePermissionRegistrar {
 		properties.put("model.class.name", JournalArticle.class.getName());
 
 		_serviceRegistration = bundleContext.registerService(
-			ModelResourcePermission.class,
+			(Class<ModelResourcePermission<JournalArticle>>)
+				(Class<?>)ModelResourcePermission.class,
 			ModelResourcePermissionFactory.create(
 				JournalArticle.class, JournalArticle::getResourcePrimKey,
 				classPK -> {
@@ -106,10 +108,13 @@ public class JournalArticleModelResourcePermissionRegistrar {
 							_groupLocalService, JournalArticle::getId));
 					consumer.accept(
 						new JournalArticleConfigurationModelResourcePermissionLogic());
-					consumer.accept(
-						new DynamicInheritancePermissionLogic<>(
-							_journalFolderModelResourcePermission,
-							_getFetchParentFunction(), true));
+
+					if (PropsValues.PERMISSIONS_VIEW_DYNAMIC_INHERITANCE) {
+						consumer.accept(
+							new DynamicInheritancePermissionLogic<>(
+								_journalFolderModelResourcePermission,
+								_getFetchParentFunction(), true));
+					}
 				}),
 			properties);
 	}
@@ -163,7 +168,8 @@ public class JournalArticleModelResourcePermissionRegistrar {
 	)
 	private PortletResourcePermission _portletResourcePermission;
 
-	private ServiceRegistration<ModelResourcePermission> _serviceRegistration;
+	private ServiceRegistration<ModelResourcePermission<JournalArticle>>
+		_serviceRegistration;
 
 	@Reference
 	private StagingPermission _stagingPermission;

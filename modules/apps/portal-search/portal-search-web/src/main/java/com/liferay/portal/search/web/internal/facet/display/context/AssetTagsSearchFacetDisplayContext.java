@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.web.internal.facet.display.context;
 
+import com.liferay.portal.search.web.internal.tag.facet.configuration.TagFacetPortletInstanceConfiguration;
+
 import java.util.List;
 
 /**
@@ -21,8 +23,16 @@ import java.util.List;
  */
 public class AssetTagsSearchFacetDisplayContext {
 
+	public long getDisplayStyleGroupId() {
+		return _displayStyleGroupId;
+	}
+
 	public String getFacetLabel() {
 		return _facetLabel;
+	}
+
+	public String getPaginationStartParameterName() {
+		return _paginationStartParameterName;
 	}
 
 	public String getParameterName() {
@@ -35,6 +45,12 @@ public class AssetTagsSearchFacetDisplayContext {
 
 	public List<String> getParameterValues() {
 		return _parameterValues;
+	}
+
+	public TagFacetPortletInstanceConfiguration
+		getTagFacetPortletInstanceConfiguration() {
+
+		return _tagFacetPortletInstanceConfiguration;
 	}
 
 	public List<AssetTagsSearchFacetTermDisplayContext>
@@ -59,12 +75,22 @@ public class AssetTagsSearchFacetDisplayContext {
 		_cloudWithCount = cloudWithCount;
 	}
 
+	public void setDisplayStyleGroupId(long displayStyleGroupId) {
+		_displayStyleGroupId = displayStyleGroupId;
+	}
+
 	public void setFacetLabel(String facetLabel) {
 		_facetLabel = facetLabel;
 	}
 
 	public void setNothingSelected(boolean nothingSelected) {
 		_nothingSelected = nothingSelected;
+	}
+
+	public void setPaginationStartParameterName(
+		String paginationStartParameterName) {
+
+		_paginationStartParameterName = paginationStartParameterName;
 	}
 
 	public void setParameterName(String parameterName) {
@@ -83,6 +109,14 @@ public class AssetTagsSearchFacetDisplayContext {
 		_renderNothing = renderNothing;
 	}
 
+	public void setTagFacetPortletInstanceConfiguration(
+		TagFacetPortletInstanceConfiguration
+			tagFacetPortletInstanceConfiguration) {
+
+		_tagFacetPortletInstanceConfiguration =
+			tagFacetPortletInstanceConfiguration;
+	}
+
 	public void setTermDisplayContexts(
 		List<AssetTagsSearchFacetTermDisplayContext>
 			assetTagsSearchFacetTermDisplayContexts) {
@@ -94,11 +128,15 @@ public class AssetTagsSearchFacetDisplayContext {
 	private List<AssetTagsSearchFacetTermDisplayContext>
 		_assetTagsSearchFacetTermDisplayContexts;
 	private boolean _cloudWithCount;
+	private long _displayStyleGroupId;
 	private String _facetLabel;
 	private boolean _nothingSelected;
+	private String _paginationStartParameterName;
 	private String _parameterName;
 	private String _parameterValue;
 	private List<String> _parameterValues;
 	private boolean _renderNothing;
+	private TagFacetPortletInstanceConfiguration
+		_tagFacetPortletInstanceConfiguration;
 
 }

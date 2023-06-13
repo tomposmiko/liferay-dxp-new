@@ -37,17 +37,17 @@ public class DDMFormInstanceRecordCacheModel
 	implements CacheModel<DDMFormInstanceRecord>, Externalizable, MVCCModel {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof DDMFormInstanceRecordCacheModel)) {
+		if (!(object instanceof DDMFormInstanceRecordCacheModel)) {
 			return false;
 		}
 
 		DDMFormInstanceRecordCacheModel ddmFormInstanceRecordCacheModel =
-			(DDMFormInstanceRecordCacheModel)obj;
+			(DDMFormInstanceRecordCacheModel)object;
 
 		if ((formInstanceRecordId ==
 				ddmFormInstanceRecordCacheModel.formInstanceRecordId) &&
@@ -78,10 +78,12 @@ public class DDMFormInstanceRecordCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(33);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", ctCollectionId=");
+		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", formInstanceRecordId=");
@@ -110,6 +112,8 @@ public class DDMFormInstanceRecordCacheModel
 		sb.append(storageId);
 		sb.append(", version=");
 		sb.append(version);
+		sb.append(", ipAddress=");
+		sb.append(ipAddress);
 		sb.append(", lastPublishDate=");
 		sb.append(lastPublishDate);
 		sb.append("}");
@@ -123,6 +127,7 @@ public class DDMFormInstanceRecordCacheModel
 			new DDMFormInstanceRecordImpl();
 
 		ddmFormInstanceRecordImpl.setMvccVersion(mvccVersion);
+		ddmFormInstanceRecordImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			ddmFormInstanceRecordImpl.setUuid("");
@@ -185,6 +190,13 @@ public class DDMFormInstanceRecordCacheModel
 			ddmFormInstanceRecordImpl.setVersion(version);
 		}
 
+		if (ipAddress == null) {
+			ddmFormInstanceRecordImpl.setIpAddress("");
+		}
+		else {
+			ddmFormInstanceRecordImpl.setIpAddress(ipAddress);
+		}
+
 		if (lastPublishDate == Long.MIN_VALUE) {
 			ddmFormInstanceRecordImpl.setLastPublishDate(null);
 		}
@@ -201,6 +213,8 @@ public class DDMFormInstanceRecordCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
+
+		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		formInstanceRecordId = objectInput.readLong();
@@ -222,12 +236,15 @@ public class DDMFormInstanceRecordCacheModel
 
 		storageId = objectInput.readLong();
 		version = objectInput.readUTF();
+		ipAddress = objectInput.readUTF();
 		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
+
+		objectOutput.writeLong(ctCollectionId);
 
 		if (uuid == null) {
 			objectOutput.writeUTF("");
@@ -281,10 +298,18 @@ public class DDMFormInstanceRecordCacheModel
 			objectOutput.writeUTF(version);
 		}
 
+		if (ipAddress == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(ipAddress);
+		}
+
 		objectOutput.writeLong(lastPublishDate);
 	}
 
 	public long mvccVersion;
+	public long ctCollectionId;
 	public String uuid;
 	public long formInstanceRecordId;
 	public long groupId;
@@ -299,6 +324,7 @@ public class DDMFormInstanceRecordCacheModel
 	public String formInstanceVersion;
 	public long storageId;
 	public String version;
+	public String ipAddress;
 	public long lastPublishDate;
 
 }

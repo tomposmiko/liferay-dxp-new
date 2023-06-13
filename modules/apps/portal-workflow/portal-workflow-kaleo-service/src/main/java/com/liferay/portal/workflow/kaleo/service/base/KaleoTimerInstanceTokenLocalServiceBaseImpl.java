@@ -14,6 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.service.base;
 
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -33,11 +34,13 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.workflow.kaleo.model.KaleoTimerInstanceToken;
 import com.liferay.portal.workflow.kaleo.service.KaleoTimerInstanceTokenLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoTimerInstanceTokenLocalServiceUtil;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoActionPersistence;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoConditionPersistence;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoDefinitionPersistence;
@@ -61,10 +64,13 @@ import com.liferay.portal.workflow.kaleo.service.persistence.KaleoTransitionPers
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -86,11 +92,15 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>KaleoTimerInstanceTokenLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoTimerInstanceTokenLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>KaleoTimerInstanceTokenLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>KaleoTimerInstanceTokenLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the kaleo timer instance token to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTimerInstanceTokenLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTimerInstanceToken the kaleo timer instance token
 	 * @return the kaleo timer instance token that was added
@@ -124,6 +134,10 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 	/**
 	 * Deletes the kaleo timer instance token with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTimerInstanceTokenLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTimerInstanceTokenId the primary key of the kaleo timer instance token
 	 * @return the kaleo timer instance token that was removed
 	 * @throws PortalException if a kaleo timer instance token with the primary key could not be found
@@ -141,6 +155,10 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 	/**
 	 * Deletes the kaleo timer instance token from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTimerInstanceTokenLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTimerInstanceToken the kaleo timer instance token
 	 * @return the kaleo timer instance token that was removed
 	 */
@@ -151,6 +169,18 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 
 		return kaleoTimerInstanceTokenPersistence.remove(
 			kaleoTimerInstanceToken);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return kaleoTimerInstanceTokenPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -316,6 +346,16 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return kaleoTimerInstanceTokenPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -325,6 +365,13 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 				(KaleoTimerInstanceToken)persistedModel);
 	}
 
+	public BasePersistence<KaleoTimerInstanceToken> getBasePersistence() {
+		return kaleoTimerInstanceTokenPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -364,6 +411,10 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 	/**
 	 * Updates the kaleo timer instance token in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTimerInstanceTokenLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTimerInstanceToken the kaleo timer instance token
 	 * @return the kaleo timer instance token that was updated
 	 */
@@ -374,6 +425,11 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 
 		return kaleoTimerInstanceTokenPersistence.update(
 			kaleoTimerInstanceToken);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -388,6 +444,8 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		kaleoTimerInstanceTokenLocalService =
 			(KaleoTimerInstanceTokenLocalService)aopProxy;
+
+		_setLocalServiceUtilService(kaleoTimerInstanceTokenLocalService);
 	}
 
 	/**
@@ -430,6 +488,24 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		KaleoTimerInstanceTokenLocalService
+			kaleoTimerInstanceTokenLocalService) {
+
+		try {
+			Field field =
+				KaleoTimerInstanceTokenLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, kaleoTimerInstanceTokenLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

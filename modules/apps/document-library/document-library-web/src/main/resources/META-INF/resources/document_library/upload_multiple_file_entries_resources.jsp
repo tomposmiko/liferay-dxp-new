@@ -131,7 +131,12 @@ else {
 					title="document-type"
 				>
 					<aui:input name="fileEntryTypeId" type="hidden" value="<%= (fileEntryTypeId > 0) ? fileEntryTypeId : 0 %>" />
-					<aui:input name="defaultLanguageId" type="hidden" value="<%= themeDisplay.getLanguageId() %>" />
+
+					<%
+					String defaultLanguageId = LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault());
+					%>
+
+					<aui:input name="defaultLanguageId" type="hidden" value="<%= defaultLanguageId %>" />
 
 					<div class="document-type-selector" id="<portlet:namespace />documentTypeSelector">
 						<liferay-ui:icon-menu
@@ -166,8 +171,9 @@ else {
 						</liferay-ui:icon-menu>
 					</div>
 
-					<%
-					if (fileEntryTypeId > 0) {
+					<c:if test="<%= fileEntryTypeId > 0 %>">
+
+						<%
 						try {
 							List<DDMStructure> ddmStructures = fileEntryType.getDDMStructures();
 
@@ -185,7 +191,7 @@ else {
 								if (groupId <= 0) {
 									groupId = ddmStructure.getGroupId();
 								}
-					%>
+						%>
 
 								<aui:input name="ddmFormFieldNamespace" type="hidden" value="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>" />
 
@@ -194,36 +200,38 @@ else {
 										classNameId="<%= PortalUtil.getClassNameId(com.liferay.dynamic.data.mapping.model.DDMStructure.class) %>"
 										classPK="<%= ddmStructure.getPrimaryKey() %>"
 										ddmFormValues="<%= ddmFormValues %>"
+										defaultEditLocale="<%= LocaleUtil.fromLanguageId(defaultLanguageId) %>"
 										fieldsNamespace="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>"
 										groupId="<%= groupId %>"
-										localizable="<%= false %>"
+										localizable="<%= true %>"
 										requestedLocale="<%= locale %>"
 										synchronousFormSubmission="<%= false %>"
 									/>
 								</div>
 
-					<%
+						<%
 							}
 						}
 						catch (Exception e) {
 						}
-					}
-					%>
+						%>
+
+					</c:if>
 
 					<aui:script position="inline" require="metal-dom/src/all/dom as dom">
 						var documentTypeMenuList = document.querySelector(
-							'#<portlet:namespace/>documentTypeSelector .lfr-menu-list'
+							'#<portlet:namespace />documentTypeSelector .lfr-menu-list'
 						);
 
 						if (documentTypeMenuList) {
-							dom.delegate(documentTypeMenuList, 'click', 'li a', function(event) {
+							dom.delegate(documentTypeMenuList, 'click', 'li a', function (event) {
 								event.preventDefault();
 
 								Liferay.Util.fetch(event.delegateTarget.getAttribute('href'))
-									.then(function(response) {
+									.then(function (response) {
 										return response.text();
 									})
-									.then(function(response) {
+									.then(function (response) {
 										var commonFileMetadataContainer = document.getElementById(
 											'<portlet:namespace />commonFileMetadataContainer'
 										);
@@ -242,7 +250,7 @@ else {
 
 										var selectedFileNodes = Array.prototype.filter.call(
 											fileNodes,
-											function(fileNode) {
+											function (fileNode) {
 												return fileNode.checked;
 											}
 										);
@@ -259,7 +267,8 @@ else {
 											if (selectedFilesCount === fileNodes.length) {
 												selectedFilesText =
 													'<%= UnicodeLanguageUtil.get(request, "all-files-selected") %>';
-											} else {
+											}
+											else {
 												selectedFilesText = Liferay.Util.sub(
 													'<%= UnicodeLanguageUtil.get(request, "x-files-selected") %>',
 													selectedFilesCount
@@ -333,6 +342,7 @@ else {
 						className="<%= DLFileEntry.class.getName() %>"
 						classPK="<%= assetClassPK %>"
 						classTypePK="<%= fileEntryTypeId %>"
+						visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
 					/>
 
 					<liferay-asset:asset-tags-selector
@@ -342,13 +352,21 @@ else {
 				</aui:fieldset>
 			</liferay-ui:panel>
 		</c:if>
-	</liferay-ui:panel-container>
 
-	<aui:field-wrapper cssClass="upload-multiple-file-permissions" label="permissions">
-		<liferay-ui:input-permissions
-			modelName="<%= DLFileEntryConstants.getClassName() %>"
-		/>
-	</aui:field-wrapper>
+		<liferay-ui:panel
+			cssClass="mb-3"
+			defaultState="closed"
+			extended="<%= true %>"
+			id="dlFileEntryPermissionsPanel"
+			markupView="lexicon"
+			persistState="<%= true %>"
+			title="permissions"
+		>
+			<liferay-ui:input-permissions
+				modelName="<%= DLFileEntryConstants.getClassName() %>"
+			/>
+		</liferay-ui:panel>
+	</liferay-ui:panel-container>
 
 	<span id="<portlet:namespace />selectedFileNameContainer"></span>
 

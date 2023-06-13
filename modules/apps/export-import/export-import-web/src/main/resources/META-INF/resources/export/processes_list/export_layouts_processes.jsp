@@ -35,8 +35,6 @@ portletURL.setParameter("navigation", navigation);
 portletURL.setParameter("orderByCol", orderByCol);
 portletURL.setParameter("orderByType", orderByType);
 portletURL.setParameter("searchContainerId", searchContainerId);
-
-OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFactoryUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType);
 %>
 
 <portlet:actionURL name="deleteBackgroundTasks" var="deleteBackgroundTasksURL">
@@ -53,7 +51,7 @@ OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFa
 		id="<%= searchContainerId %>"
 		iteratorURL="<%= portletURL %>"
 		orderByCol="<%= orderByCol %>"
-		orderByComparator="<%= orderByComparator %>"
+		orderByComparator="<%= BackgroundTaskComparatorFactoryUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType) %>"
 		orderByType="<%= orderByType %>"
 		rowChecker="<%= new EmptyOnClickRowChecker(liferayPortletResponse) %>"
 	>
@@ -195,18 +193,18 @@ OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFa
 							</c:if>
 						</c:if>
 
-						<div class="row">
-							<div class="col">
+						<clay:row>
+							<clay:col>
 								<liferay-staging:process-status
 									backgroundTaskStatus="<%= backgroundTask.getStatus() %>"
 									backgroundTaskStatusLabel="<%= backgroundTask.getStatusLabel() %>"
 								/>
-							</div>
-						</div>
+							</clay:col>
+						</clay:row>
 
 						<c:if test="<%= Validator.isNotNull(backgroundTask.getStatusMessage()) %>">
 							<span class="background-task-status-row">
-								<a class="details-link" href="javascript:;" onclick="<portlet:namespace />viewBackgroundTaskDetails(<%= backgroundTask.getBackgroundTaskId() %>)">
+								<a class="details-link" href="javascript:;" onclick="<portlet:namespace />viewBackgroundTaskDetails(<%= backgroundTask.getBackgroundTaskId() %>);">
 									<liferay-ui:message key="see-more-details" />
 								</a>
 							</span>
@@ -273,16 +271,13 @@ OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFa
 						List<FileEntry> attachmentsFileEntries = backgroundTask.getAttachmentsFileEntries();
 
 						for (FileEntry fileEntry : attachmentsFileEntries) {
-						%>
-
-							<%
 							StringBundler sb = new StringBundler(4);
 
 							sb.append(fileEntry.getTitle());
 							sb.append(StringPool.OPEN_PARENTHESIS);
-							sb.append(TextFormatter.formatStorageSize(fileEntry.getSize(), locale));
+							sb.append(LanguageUtil.formatStorageSize(fileEntry.getSize(), locale));
 							sb.append(StringPool.CLOSE_PARENTHESIS);
-							%>
+						%>
 
 							<liferay-ui:icon
 								icon="download"
@@ -376,8 +371,8 @@ int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasks
 					deleteBackgroundTaskIds: Liferay.Util.listCheckedExcept(
 						form,
 						'<portlet:namespace />allRowIds'
-					)
-				}
+					),
+				},
 			});
 		}
 	}
@@ -395,7 +390,7 @@ int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasks
 
 		Liferay.fire('<portlet:namespace />viewBackgroundTaskDetails', {
 			nodeId: 'backgroundTaskStatusMessage' + backgroundTaskId,
-			title: title
+			title: title,
 		});
 	}
 </script>

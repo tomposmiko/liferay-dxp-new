@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.StructuredContentLinkSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class StructuredContentLink {
+public class StructuredContentLink implements Cloneable, Serializable {
+
+	public static StructuredContentLink toDTO(String json) {
+		return StructuredContentLinkSerDes.toDTO(json);
+	}
 
 	public String getContentType() {
 		return contentType;
@@ -48,6 +54,31 @@ public class StructuredContentLink {
 	}
 
 	protected String contentType;
+
+	public StructuredContent getEmbeddedStructuredContent() {
+		return embeddedStructuredContent;
+	}
+
+	public void setEmbeddedStructuredContent(
+		StructuredContent embeddedStructuredContent) {
+
+		this.embeddedStructuredContent = embeddedStructuredContent;
+	}
+
+	public void setEmbeddedStructuredContent(
+		UnsafeSupplier<StructuredContent, Exception>
+			embeddedStructuredContentUnsafeSupplier) {
+
+		try {
+			embeddedStructuredContent =
+				embeddedStructuredContentUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected StructuredContent embeddedStructuredContent;
 
 	public Long getId() {
 		return id;
@@ -88,6 +119,11 @@ public class StructuredContentLink {
 	}
 
 	protected String title;
+
+	@Override
+	public StructuredContentLink clone() throws CloneNotSupportedException {
+		return (StructuredContentLink)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

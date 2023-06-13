@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
-import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.lang.ref.Reference;
 import java.lang.reflect.Constructor;
@@ -44,7 +44,7 @@ public class FinalizeManagerTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@NewEnv(type = NewEnv.Type.NONE)
 	@Test
@@ -244,22 +244,6 @@ public class FinalizeManagerTest {
 		_checkThreadState();
 	}
 
-	private static Object _newIdentityKey(Reference<?> reference)
-		throws Exception {
-
-		ClassLoader classLoader = FinalizeManager.class.getClassLoader();
-
-		Class<?> identityKeyClass = classLoader.loadClass(
-			FinalizeManager.class.getName() + "$IdentityKey");
-
-		Constructor<?> constructor = identityKeyClass.getDeclaredConstructor(
-			Reference.class);
-
-		constructor.setAccessible(true);
-
-		return constructor.newInstance(reference);
-	}
-
 	private void _checkThreadState() {
 		Thread finalizeThread = null;
 
@@ -300,6 +284,20 @@ public class FinalizeManagerTest {
 
 	private <T> T _getReferent(Reference<T> reference) {
 		return ReflectionTestUtil.getFieldValue(reference, "referent");
+	}
+
+	private Object _newIdentityKey(Reference<?> reference) throws Exception {
+		ClassLoader classLoader = FinalizeManager.class.getClassLoader();
+
+		Class<?> identityKeyClass = classLoader.loadClass(
+			FinalizeManager.class.getName() + "$IdentityKey");
+
+		Constructor<?> constructor = identityKeyClass.getDeclaredConstructor(
+			Reference.class);
+
+		constructor.setAccessible(true);
+
+		return constructor.newInstance(reference);
 	}
 
 	private void _waitUntilMarked(MarkFinalizeAction markFinalizeAction)

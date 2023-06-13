@@ -13,7 +13,7 @@
  */
 
 import PropTypes from 'prop-types';
-import React, {useRef, useEffect, useState, useCallback} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import FormField from './FormField.es';
 
@@ -33,7 +33,7 @@ const DisplayPageModalForm = React.forwardRef((props, ref) => {
 	}, [props.error]);
 
 	const onChange = useCallback(
-		event => {
+		(event) => {
 			setError({...error, classNameId: null, classTypeId: null});
 
 			const select = event.target;
@@ -41,12 +41,13 @@ const DisplayPageModalForm = React.forwardRef((props, ref) => {
 				select.options[select.selectedIndex].value;
 
 			const mappingType = props.mappingTypes.find(
-				mappingType => mappingType.id === selectedMappingId
+				(mappingType) => mappingType.id === selectedMappingId
 			);
 
 			if (mappingType) {
 				setSubtypes(mappingType.subtypes);
-			} else {
+			}
+			else {
 				setSubtypes([]);
 			}
 		},
@@ -88,7 +89,7 @@ const DisplayPageModalForm = React.forwardRef((props, ref) => {
 										'not-selected'
 									)} --`}
 								</option>
-								{props.mappingTypes.map(mappingType => (
+								{props.mappingTypes.map((mappingType) => (
 									<option
 										key={mappingType.id}
 										value={mappingType.id}
@@ -117,7 +118,7 @@ const DisplayPageModalForm = React.forwardRef((props, ref) => {
 											'not-selected'
 										)} --`}
 									</option>
-									{subtypes.map(subtype => (
+									{subtypes.map((subtype) => (
 										<option
 											key={subtype.id}
 											value={subtype.id}
@@ -144,13 +145,13 @@ DisplayPageModalForm.propTypes = {
 			subtypes: PropTypes.arrayOf(
 				PropTypes.shape({
 					id: PropTypes.string,
-					label: PropTypes.string
+					label: PropTypes.string,
 				})
-			)
+			),
 		})
 	),
 	namespace: PropTypes.string.isRequired,
-	onSubmit: PropTypes.func.isRequire
+	onSubmit: PropTypes.func.isRequire,
 };
 
 export {DisplayPageModalForm};

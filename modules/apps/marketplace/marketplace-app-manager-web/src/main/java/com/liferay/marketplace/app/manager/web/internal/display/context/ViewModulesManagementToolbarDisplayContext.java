@@ -15,7 +15,7 @@
 package com.liferay.marketplace.app.manager.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.marketplace.app.manager.web.internal.constants.BundleStateConstants;
 import com.liferay.marketplace.app.manager.web.internal.util.AppDisplay;
 import com.liferay.marketplace.app.manager.web.internal.util.AppDisplayFactoryUtil;
@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.PortletURL;
@@ -55,11 +56,11 @@ public class ViewModulesManagementToolbarDisplayContext
 	}
 
 	public String getApp() {
-		return ParamUtil.getString(request, "app");
+		return ParamUtil.getString(httpServletRequest, "app");
 	}
 
 	public AppDisplay getAppDisplay() {
-		String app = ParamUtil.getString(request, "app");
+		String app = ParamUtil.getString(httpServletRequest, "app");
 
 		AppDisplay appDisplay = null;
 
@@ -72,7 +73,7 @@ public class ViewModulesManagementToolbarDisplayContext
 
 		if (appDisplay == null) {
 			appDisplay = AppDisplayFactoryUtil.getAppDisplay(
-				allBundles, app, request.getLocale());
+				allBundles, app, httpServletRequest.getLocale());
 		}
 
 		return appDisplay;
@@ -80,25 +81,19 @@ public class ViewModulesManagementToolbarDisplayContext
 
 	@Override
 	public List<DropdownItem> getFilterDropdownItems() {
-		return new DropdownItemList() {
-			{
-				addGroup(
-					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
-							getStatusDropdownItems());
-						dropdownGroupItem.setLabel(
-							LanguageUtil.get(request, "status"));
-					});
-
-				addGroup(
-					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
-							getOrderByDropdownItems());
-						dropdownGroupItem.setLabel(
-							LanguageUtil.get(request, "order-by"));
-					});
+		return DropdownItemListBuilder.addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(getStatusDropdownItems());
+				dropdownGroupItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "status"));
 			}
-		};
+		).addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(getOrderByDropdownItems());
+				dropdownGroupItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "order-by"));
+			}
+		).build();
 	}
 
 	@Override
@@ -123,23 +118,21 @@ public class ViewModulesManagementToolbarDisplayContext
 	}
 
 	@Override
-	public SearchContainer getSearchContainer() throws Exception {
+	public SearchContainer<Object> getSearchContainer() throws Exception {
 		if (_searchContainer != null) {
 			return _searchContainer;
 		}
 
-		SearchContainer searchContainer = new SearchContainer(
+		SearchContainer<Object> searchContainer = new SearchContainer(
 			liferayPortletRequest, getPortletURL(), null,
 			"no-modules-were-found");
 
 		searchContainer.setOrderByCol(getOrderByCol());
 		searchContainer.setOrderByType(getOrderByType());
 
-		List<Bundle> bundles = null;
-
 		AppDisplay appDisplay = getAppDisplay();
 
-		bundles = appDisplay.getBundles();
+		List<Bundle> bundles = appDisplay.getBundles();
 
 		BundleUtil.filterBundles(
 			bundles, BundleStateConstants.getState(getState()));
@@ -153,8 +146,10 @@ public class ViewModulesManagementToolbarDisplayContext
 			end = bundles.size();
 		}
 
+		List<Object> results = new ArrayList<>(bundles);
+
 		searchContainer.setResults(
-			bundles.subList(searchContainer.getStart(), end));
+			results.subList(searchContainer.getStart(), end));
 
 		searchContainer.setTotal(bundles.size());
 
@@ -163,6 +158,6 @@ public class ViewModulesManagementToolbarDisplayContext
 		return _searchContainer;
 	}
 
-	private SearchContainer _searchContainer;
+	private SearchContainer<Object> _searchContainer;
 
 }

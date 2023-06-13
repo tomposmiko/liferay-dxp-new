@@ -31,8 +31,8 @@ portletDisplay.setURLBack(stagingProcessesURL.toString());
 renderResponse.setTitle(LanguageUtil.get(request, "publish-templates"));
 %>
 
-<portlet:actionURL name="editPublishConfiguration" var="restoreTrashEntriesURL">
-	<portlet:param name="mvcRenderCommandName" value="viewPublishConfigurations" />
+<portlet:actionURL name="/staging_processes/edit_publish_configuration" var="restoreTrashEntriesURL">
+	<portlet:param name="mvcRenderCommandName" value="/staging_processes/view_publish_configurations" />
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
 </portlet:actionURL>
 
@@ -41,7 +41,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "publish-templates"));
 />
 
 <liferay-portlet:renderURL varImpl="portletURL">
-	<portlet:param name="mvcRenderCommandName" value="viewPublishConfigurations" />
+	<portlet:param name="mvcRenderCommandName" value="/staging_processes/view_publish_configurations" />
 	<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 	<portlet:param name="layoutSetBranchId" value="<%= String.valueOf(layoutSetBranchId) %>" />
 	<portlet:param name="layoutSetBranchName" value="<%= layoutSetBranchName %>" />
@@ -65,7 +65,14 @@ StagingProcessesWebPublishTemplatesToolbarDisplayContext stagingProcessesWebPubl
 	showSearch="<%= true %>"
 />
 
-<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+<clay:container-fluid
+	cssClass="closed sidenav-container sidenav-right"
+	id='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
+>
+	<liferay-ui:breadcrumb
+		showLayout="<%= false %>"
+	/>
+
 	<aui:form action="<%= portletURL %>">
 		<liferay-ui:search-container
 			searchContainer="<%= stagingProcessesWebPublishTemplatesToolbarDisplayContext.getSearchContainer() %>"
@@ -88,7 +95,7 @@ StagingProcessesWebPublishTemplatesToolbarDisplayContext stagingProcessesWebPubl
 				</liferay-ui:search-container-column-text>
 
 				<liferay-portlet:renderURL varImpl="rowURL">
-					<portlet:param name="mvcRenderCommandName" value="editPublishConfiguration" />
+					<portlet:param name="mvcRenderCommandName" value="/staging_processes/edit_publish_configuration" />
 					<portlet:param name="redirect" value="<%= searchContainer.getIteratorURL().toString() %>" />
 					<portlet:param name="exportImportConfigurationId" value="<%= String.valueOf(exportImportConfiguration.getExportImportConfigurationId()) %>" />
 					<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
@@ -130,4 +137,4 @@ StagingProcessesWebPublishTemplatesToolbarDisplayContext stagingProcessesWebPubl
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
-</div>
+</clay:container-fluid>

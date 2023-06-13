@@ -12,14 +12,14 @@
  * details.
  */
 
-import {DELETE_SEGMENTS_EXPERIENCE} from './types';
+import {DELETE_SEGMENTS_EXPERIENCE} from '../actions';
 
 export default function deleteExperience({portletIds, segmentsExperienceId}) {
 	return {
 		payload: {
 			portletIds,
-			segmentsExperienceId
+			segmentsExperienceId,
 		},
-		type: DELETE_SEGMENTS_EXPERIENCE
+		type: DELETE_SEGMENTS_EXPERIENCE,
 	};
 }

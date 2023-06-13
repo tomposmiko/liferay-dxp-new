@@ -36,7 +36,7 @@ portletURL.setParameter("tabs2", tabs2);
 	<portlet:param name="keywords" value="<%= keywords %>" />
 </portlet:renderURL>
 
-<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
+<aui:form action="<%= portletURL %>" method="post" name="fm">
 	<aui:input name="tabs1" type="hidden" value="<%= tabs1 %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirectURL %>" />
 
@@ -56,6 +56,6 @@ portletURL.setParameter("tabs2", tabs2);
 		namespace: '<portlet:namespace />',
 		redirectUrl: '<%= redirectURL %>',
 		submitButton: '.save-server-button',
-		url: '<portlet:actionURL name="/server_admin/edit_server" />'
+		url: '<portlet:actionURL name="/server_admin/edit_server" />',
 	});
 </aui:script>

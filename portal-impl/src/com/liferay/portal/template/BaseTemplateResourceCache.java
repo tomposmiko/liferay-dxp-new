@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.ProxyFactory;
 public abstract class BaseTemplateResourceCache
 	implements TemplateResourceCache {
 
+	@Override
 	public void clear() {
 		if (!isEnabled()) {
 			return;
@@ -42,6 +43,7 @@ public abstract class BaseTemplateResourceCache
 		_singleVMPortalCache.removeAll();
 	}
 
+	@Override
 	public TemplateResource getTemplateResource(String templateId) {
 		if (!isEnabled()) {
 			return null;
@@ -76,6 +78,7 @@ public abstract class BaseTemplateResourceCache
 		return templateResource;
 	}
 
+	@Override
 	public boolean isEnabled() {
 		if (_modificationCheckInterval == 0) {
 			return false;
@@ -84,6 +87,7 @@ public abstract class BaseTemplateResourceCache
 		return true;
 	}
 
+	@Override
 	public void put(String templateId, TemplateResource templateResource) {
 		if (!isEnabled()) {
 			return;
@@ -107,6 +111,7 @@ public abstract class BaseTemplateResourceCache
 		}
 	}
 
+	@Override
 	public void remove(String templateId) {
 		if (!isEnabled()) {
 			return;
@@ -116,6 +121,7 @@ public abstract class BaseTemplateResourceCache
 		_singleVMPortalCache.remove(templateId);
 	}
 
+	@Override
 	public void setSecondLevelPortalCache(
 		PortalCache<TemplateResource, ?> portalCache) {
 
@@ -145,7 +151,14 @@ public abstract class BaseTemplateResourceCache
 		}
 
 		_multiVMPool.removePortalCache(_portalCacheName);
+
+		_multiVMPortalCache = null;
+
 		_singleVMPool.removePortalCache(_portalCacheName);
+
+		_singleVMPortalCache = null;
+
+		_templateResourcePortalCacheListener = null;
 	}
 
 	protected void init(
@@ -173,13 +186,13 @@ public abstract class BaseTemplateResourceCache
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseTemplateResourceCache.class);
 
-	private long _modificationCheckInterval;
+	private volatile long _modificationCheckInterval;
 	private MultiVMPool _multiVMPool;
-	private PortalCache<String, TemplateResource> _multiVMPortalCache;
+	private volatile PortalCache<String, TemplateResource> _multiVMPortalCache;
 	private String _portalCacheName;
 	private SingleVMPool _singleVMPool;
-	private PortalCache<String, TemplateResource> _singleVMPortalCache;
-	private TemplateResourcePortalCacheListener
+	private volatile PortalCache<String, TemplateResource> _singleVMPortalCache;
+	private volatile TemplateResourcePortalCacheListener
 		_templateResourcePortalCacheListener;
 
 	private class TemplateResourcePortalCacheListener

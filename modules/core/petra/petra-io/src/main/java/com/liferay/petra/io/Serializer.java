@@ -14,6 +14,7 @@
 
 package com.liferay.petra.io;
 
+import com.liferay.petra.io.constants.SerializationConstants;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.lang.ClassLoaderPool;
 
@@ -285,7 +286,7 @@ public class Serializer {
 			}
 		}
 		else {
-			byte[] buffer = _getBuffer(length * 2 + 5);
+			byte[] buffer = _getBuffer((length * 2) + 5);
 
 			BigEndianCodec.putBoolean(buffer, _index++, asciiCode);
 
@@ -530,9 +531,7 @@ public class Serializer {
 
 		@Override
 		public void write(byte[] bytes, int offset, int length) {
-			byte[] buffer = _getBuffer(length);
-
-			System.arraycopy(bytes, offset, buffer, _index, length);
+			System.arraycopy(bytes, offset, _getBuffer(length), _index, length);
 
 			_index += length;
 		}

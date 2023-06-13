@@ -43,6 +43,10 @@ public class CTPreferencesLocalServiceWrapper
 	/**
 	 * Adds the ct preferences to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTPreferencesLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ctPreferences the ct preferences
 	 * @return the ct preferences that was added
 	 */
@@ -67,7 +71,22 @@ public class CTPreferencesLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ctPreferencesLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the ct preferences from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTPreferencesLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctPreferences the ct preferences
 	 * @return the ct preferences that was removed
@@ -81,6 +100,10 @@ public class CTPreferencesLocalServiceWrapper
 
 	/**
 	 * Deletes the ct preferences with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTPreferencesLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctPreferencesId the primary key of the ct preferences
 	 * @return the ct preferences that was removed
@@ -103,6 +126,18 @@ public class CTPreferencesLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ctPreferencesLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _ctPreferencesLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _ctPreferencesLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -284,6 +319,9 @@ public class CTPreferencesLocalServiceWrapper
 		return _ctPreferencesLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -292,8 +330,17 @@ public class CTPreferencesLocalServiceWrapper
 		return _ctPreferencesLocalService.getPersistedModel(primaryKeyObj);
 	}
 
+	@Override
+	public void resetCTPreferences(long ctCollectionId) {
+		_ctPreferencesLocalService.resetCTPreferences(ctCollectionId);
+	}
+
 	/**
 	 * Updates the ct preferences in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTPreferencesLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctPreferences the ct preferences
 	 * @return the ct preferences that was updated

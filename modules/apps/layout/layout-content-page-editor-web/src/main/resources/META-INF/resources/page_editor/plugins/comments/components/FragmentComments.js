@@ -19,7 +19,7 @@ import React from 'react';
 
 import editFragmentEntryComment from '../../../app/actions/editFragmentEntryLinkComment';
 import {useSelectItem} from '../../../app/components/Controls';
-import {useSelector, useDispatch} from '../../../app/store/index';
+import {useDispatch, useSelector} from '../../../app/store/index';
 import SidebarPanelContent from '../../../common/components/SidebarPanelContent';
 import SidebarPanelHeader from '../../../common/components/SidebarPanelHeader';
 import AddCommentForm from './AddCommentForm';
@@ -33,7 +33,7 @@ export default function FragmentComments({fragmentEntryLink}) {
 
 	const dispatch = useDispatch();
 	const showResolvedComments = useSelector(
-		state => state.showResolvedComments
+		(state) => state.showResolvedComments
 	);
 
 	const fragmentEntryLinkComments = showResolvedComments
@@ -48,7 +48,8 @@ export default function FragmentComments({fragmentEntryLink}) {
 			>
 				<ClayButton
 					borderless
-					className="text-dark"
+					className="mx-1 text-dark"
+					displayType="secondary"
 					onClick={() => selectItem(null)}
 					small
 				>
@@ -75,11 +76,11 @@ export default function FragmentComments({fragmentEntryLink}) {
 								comment={comment}
 								fragmentEntryLinkId={fragmentEntryLinkId}
 								key={comment.commentId}
-								onEdit={fragmentEntryLinkComment =>
+								onEdit={(fragmentEntryLinkComment) =>
 									dispatch(
 										editFragmentEntryComment({
 											fragmentEntryLinkComment,
-											fragmentEntryLinkId
+											fragmentEntryLinkId,
 										})
 									)
 								}
@@ -93,5 +94,5 @@ export default function FragmentComments({fragmentEntryLink}) {
 }
 
 FragmentComments.propTypes = {
-	fragmentEntryLink: PropTypes.object.isRequired
+	fragmentEntryLink: PropTypes.object.isRequired,
 };

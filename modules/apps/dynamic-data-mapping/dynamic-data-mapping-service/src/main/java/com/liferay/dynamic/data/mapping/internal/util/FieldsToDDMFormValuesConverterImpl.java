@@ -26,11 +26,14 @@ import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.util.DDMFieldsCounter;
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
+
+import java.math.BigDecimal;
 
 import java.text.NumberFormat;
 
@@ -73,6 +76,13 @@ public class FieldsToDDMFormValuesConverterImpl
 			for (int i = 0; i < repetitions; i++) {
 				DDMFormFieldValue ddmFormFieldValue = createDDMFormFieldValue(
 					fieldName);
+
+				DDMFormField ddmFormField = ddmFormFieldsMap.get(fieldName);
+
+				if (ddmFormField != null) {
+					ddmFormFieldValue.setFieldReference(
+						ddmFormField.getFieldReference());
+				}
 
 				setDDMFormFieldValueProperties(
 					ddmFormFieldValue, ddmFormFieldsMap, fields,
@@ -211,16 +221,24 @@ public class FieldsToDDMFormValuesConverterImpl
 
 			fieldValue = valueDate.getTime();
 		}
-		else if (fieldValue instanceof Number) {
+		else if ((fieldValue instanceof Number) &&
+				 !(fieldValue instanceof Integer)) {
+
 			NumberFormat numberFormat = NumberFormat.getInstance(locale);
 
 			Number number = (Number)fieldValue;
 
-			if (number instanceof Double || number instanceof Float) {
+			if (!_isBigDecimalAndInteger(number) ||
+				(number instanceof Double) || (number instanceof Float)) {
+
+				numberFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
 				numberFormat.setMinimumFractionDigits(1);
 			}
 
-			return numberFormat.format(number.doubleValue());
+			String valueString = numberFormat.format(number.doubleValue());
+
+			return StringUtil.removeChars(
+				valueString, CharPool.NO_BREAK_SPACE, CharPool.SPACE);
 		}
 
 		return String.valueOf(fieldValue);
@@ -342,6 +360,14 @@ public class FieldsToDDMFormValuesConverterImpl
 				DDMFormFieldValue nestedDDMFormFieldValue =
 					createDDMFormFieldValue(nestedFieldName);
 
+				DDMFormField nestedDDMFormField = ddmFormFieldsMap.get(
+					nestedFieldName);
+
+				if (nestedDDMFormField != null) {
+					nestedDDMFormFieldValue.setFieldReference(
+						nestedDDMFormField.getFieldReference());
+				}
+
 				setDDMFormFieldValueProperties(
 					nestedDDMFormFieldValue, ddmFormFieldsMap, ddmFields,
 					ddmFieldsCounter);
@@ -356,6 +382,23 @@ public class FieldsToDDMFormValuesConverterImpl
 		String value = (String)fieldsDisplayField.getValue();
 
 		return StringUtil.split(value);
+	}
+
+	private boolean _isBigDecimalAndInteger(Object number) {
+		if ((number == null) || !(number instanceof BigDecimal)) {
+			return false;
+		}
+
+		try {
+			BigDecimal bigDecimalValue = (BigDecimal)number;
+
+			bigDecimalValue.toBigIntegerExact();
+		}
+		catch (ArithmeticException arithmeticException) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

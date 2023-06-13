@@ -23,16 +23,16 @@ const basicMetadata = {
 			data: [
 				{
 					key: Liferay.Language.get('format'),
-					value: 'jpg'
+					value: 'jpg',
 				},
 				{
 					key: Liferay.Language.get('name'),
-					value: 'test image.jpg'
-				}
+					value: 'test image.jpg',
+				},
 			],
-			title: 'file-info'
-		}
-	]
+			title: 'file-info',
+		},
+	],
 };
 const item1Title = 'item1.jpg';
 const item2Title = 'item2.jpg';
@@ -42,43 +42,50 @@ const headerTitle = 'Images';
 const items = [
 	{
 		metadata: JSON.stringify(basicMetadata),
+		mimeType: 'image/jpeg',
 		returntype: 'returntype',
 		title: item1Title,
 		url: itemUrl,
-		value: itemUrl
+		value: itemUrl,
 	},
 	{
 		metadata: JSON.stringify(basicMetadata),
+		mimeType: 'image/jpeg',
 		returntype: 'returntype',
 		title: item2Title,
 		url: itemUrl,
-		value: itemUrl
-	}
+		value: itemUrl,
+	},
 ];
 
 const previewProps = {
 	container: document.createElement('div'),
 	handleSelectedItem: jest.fn(),
 	headerTitle,
-	items
+	items,
 };
 
-const renderPreviewComponent = props =>
+const renderPreviewComponent = (props) =>
 	render(<ItemSelectorPreview {...props} />);
 
 describe('ItemSelectorPreview', () => {
 	beforeAll(() => {
 		Liferay.component = jest.fn();
-		Liferay.SideNavigation = jest.fn();
-		Liferay.SideNavigation.initialize = jest.fn();
+		Liferay.SideNavigation = {
+			destroy: jest.fn(),
+			initialize: jest.fn(),
+		};
 	});
 
 	afterEach(cleanup);
 
-	it('initialize the sidebar only once', () => {
+	it('initialize/destroy the sidebar properly', () => {
 		renderPreviewComponent(previewProps);
 
-		expect(Liferay.SideNavigation.initialize).toHaveBeenCalledTimes(1);
+		expect(
+			Liferay.SideNavigation.initialize.mock.calls.length -
+				Liferay.SideNavigation.destroy.mock.calls.length
+		).toBe(1);
 	});
 
 	it('renders the ItemSelectorPreview component with the fullscreen class', () => {
@@ -102,7 +109,7 @@ describe('ItemSelectorPreview', () => {
 	it('renders a specific item', () => {
 		const {getByText} = renderPreviewComponent({
 			...previewProps,
-			currentIndex: 1
+			currentIndex: 1,
 		});
 
 		expect(getByText(item2Title));
@@ -110,7 +117,7 @@ describe('ItemSelectorPreview', () => {
 
 	it('shows the next item when requested', () => {
 		const {container, getByText} = renderPreviewComponent({
-			...previewProps
+			...previewProps,
 		});
 
 		expect(getByText(item1Title));
@@ -125,7 +132,7 @@ describe('ItemSelectorPreview', () => {
 	it('returns to the first item when requested the next item for the last one', () => {
 		const {container, getByText} = renderPreviewComponent({
 			...previewProps,
-			currentIndex: 1
+			currentIndex: 1,
 		});
 
 		const rigthArrowButton = container.querySelectorAll('.icon-arrow')[1];
@@ -136,13 +143,13 @@ describe('ItemSelectorPreview', () => {
 
 	it('shows the previous item when pressed the left key event', () => {
 		const {getByText} = renderPreviewComponent({
-			...previewProps
+			...previewProps,
 		});
 
 		fireEvent.keyDown(document.documentElement, {
 			key: 'ArrowLeft',
 			keyCode: 37,
-			which: 37
+			which: 37,
 		});
 
 		expect(getByText(item2Title));

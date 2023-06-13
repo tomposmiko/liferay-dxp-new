@@ -17,6 +17,8 @@ package com.liferay.headless.form.client.dto.v1_0;
 import com.liferay.headless.form.client.function.UnsafeSupplier;
 import com.liferay.headless.form.client.serdes.v1_0.FormSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -28,7 +30,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Form {
+public class Form implements Cloneable, Serializable {
+
+	public static Form toDTO(String json) {
+		return FormSerDes.toDTO(json);
+	}
 
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
@@ -363,6 +369,11 @@ public class Form {
 	}
 
 	protected Long structureId;
+
+	@Override
+	public Form clone() throws CloneNotSupportedException {
+		return (Form)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

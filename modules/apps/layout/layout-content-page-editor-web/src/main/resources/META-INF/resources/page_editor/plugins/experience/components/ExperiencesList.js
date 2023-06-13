@@ -12,10 +12,10 @@
  * details.
  */
 
+import ClayList from '@clayui/list';
 import PropTypes from 'prop-types';
-import React, {useContext} from 'react';
+import React from 'react';
 
-import {ConfigContext} from '../../../app/config/index';
 import {useDispatch} from '../../../app/store/index';
 import selectExperience from '../thunks/selectExperience';
 import {ExperienceType} from '../types';
@@ -23,30 +23,29 @@ import ExperienceItem from './ExperienceItem';
 
 const ExperiencesList = ({
 	activeExperienceId,
+	canUpdateExperiences,
 	defaultExperienceId,
 	experiences,
-	hasUpdatePermissions,
 	onDeleteExperience,
+	onDuplicateExperience,
 	onEditExperience,
 	onPriorityDecrease,
-	onPriorityIncrease
+	onPriorityIncrease,
 }) => {
-	const config = useContext(ConfigContext);
 	const dispatch = useDispatch();
 
-	const handleExperienceSelection = id =>
-		dispatch(selectExperience(id, config));
+	const handleExperienceSelection = (id) => dispatch(selectExperience({id}));
 
 	return (
-		<ul className="list-unstyled mt-4" role="list">
+		<ClayList className="mt-3">
 			{experiences.map((experience, i) => {
 				const active =
 					experience.segmentsExperienceId === activeExperienceId;
-				const lockedDecreasePriority = experiences.length - 2 === i;
+				const lockedDecreasePriority = experiences.length - 1 === i;
 				const lockedIncreasePriority = i === 0;
 
 				const editable =
-					hasUpdatePermissions &&
+					canUpdateExperiences &&
 					experience.segmentsExperienceId !== defaultExperienceId &&
 					!experience.hasLockedSegmentsExperiment;
 
@@ -59,6 +58,7 @@ const ExperiencesList = ({
 						lockedDecreasePriority={lockedDecreasePriority}
 						lockedIncreasePriority={lockedIncreasePriority}
 						onDeleteExperience={onDeleteExperience}
+						onDuplicateExperience={onDuplicateExperience}
 						onEditExperience={onEditExperience}
 						onPriorityDecrease={onPriorityDecrease}
 						onPriorityIncrease={onPriorityIncrease}
@@ -66,19 +66,20 @@ const ExperiencesList = ({
 					/>
 				);
 			})}
-		</ul>
+		</ClayList>
 	);
 };
 
 ExperiencesList.propTypes = {
 	activeExperienceId: PropTypes.string.isRequired,
+	canUpdateExperiences: PropTypes.bool.isRequired,
 	defaultExperienceId: PropTypes.string.isRequired,
 	experiences: PropTypes.arrayOf(PropTypes.shape(ExperienceType)).isRequired,
-	hasUpdatePermissions: PropTypes.bool.isRequired,
 	onDeleteExperience: PropTypes.func.isRequired,
+	onDuplicateExperience: PropTypes.func.isRequired,
 	onEditExperience: PropTypes.func.isRequired,
 	onPriorityDecrease: PropTypes.func.isRequired,
-	onPriorityIncrease: PropTypes.func.isRequired
+	onPriorityIncrease: PropTypes.func.isRequired,
 };
 
 export default ExperiencesList;

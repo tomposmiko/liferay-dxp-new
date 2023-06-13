@@ -2,11 +2,13 @@
 <head>
 <title>Message</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Message</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>ALERT_DISMISSIBLE</td>
@@ -20,7 +22,12 @@
 </tr>
 <tr>
 	<td>CHECKOUT_SUCCESS</td>
-	<td>//div[contains(@class,'content')]/div[contains(@class,'alert-success')]</td>
+	<td>//div[contains(@class,'content')]//div[contains(@class,'alert-info') and not(contains(@class,'center'))]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONVERSION_ALERT_MESSAGE</td>
+	<td>//div[contains(@class,'conversion-messages')]/div[contains(@class,'alert-${key_type}')][contains(.,'${key_alertMessage}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -29,8 +36,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DANGER_INFO</td>
+	<td>//*[contains(@class,'danger-info')][contains(.,'${key_dangerInfo}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DRAFT_AUTO_SAVE</td>
 	<td>//div/small[contains(@id,'saveStatus') and contains(.,'Draft Saved at')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EMPTY_DEPOT_ROLE</td>
+	<td>//div[contains(@id,'depotRoles')]/p[contains(@class,'text-muted')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -49,13 +66,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EMPTY_INFO_DEPOT_HIDE</td>
+	<td>//div[not(contains(@class,'hide'))]//p[contains(@class,'text-muted')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EMPTY_INFO_TAGLIB</td>
 	<td>//div[contains(@class,'taglib-empty-result-message')]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>EMPTY_INFO_TAGLIB_TITLE</td>
+	<td>//div/h1[contains(@class,'taglib-empty-result-message-title')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EMPTY_INFO_TAGLIB_DESCRIPTION</td>
+	<td>//div/p[contains(@class,'taglib-empty-result-message-description')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ERROR</td>
-	<td>//div[contains(@class,'alert') and (contains(@class,'alert-error') or contains(@class,'alert-danger'))]</td>
+	<td>//div[contains(@class,'alert') and (contains(@class,'alert-error') or contains(@class,'alert-danger'))][not(contains(@style,'display: none'))]</td>
 	<td></td>
 </tr>
 <tr>
@@ -134,6 +166,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ERROR_ENTER_A_VALID_VALUE</td>
+	<td>//div[@role='alert' and contains(.,'${key_alertMessage}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ERROR_ENTER_A_UNIQUE_FOLDER</td>
 	<td>//div[contains(@class,'alert-danger') and contains(.,'Please enter a unique folder name')]</td>
 	<td></td>
@@ -165,7 +202,7 @@
 </tr>
 <tr>
 	<td>ERROR_REQUEST_FAILED</td>
-	<td>//div[contains(@class,'alert-danger')][contains(@class,'alert-dismissible')][contains(@class,'show')]</td>
+	<td>//div[contains(@class,'alert-danger')][contains(@class,'alert-dismissible')][contains(.,'Your request failed to complete.')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -239,6 +276,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>INFO_MAIN_CONTENT</td>
+	<td>//*[@id="main-content"]//div[contains(@class,'alert alert-info') and not(contains(@class,'hide'))]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>LOGIN_URL_SUCCESS</td>
 	<td>//tr[contains(.,'Login URL')]/td//span[contains(@class,'lfr-status-success')]</td>
 	<td></td>
@@ -261,11 +303,6 @@
 <tr>
 	<td>NO_ENTRIES</td>
 	<td>//div[contains(@id,'Empty') and contains(.,'No entries were found')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NO_PAGES</td>
-	<td>//h1[contains(.,'No Pages yet')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -341,6 +378,11 @@
 <tr>
 	<td>USER_BLOCKED</td>
 	<td>//div[contains(@class,'alert-block')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WARNING_INFO</td>
+	<td>//*[contains(@class,'warning-info')][contains(.,'${key_warningInfo}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -24,8 +24,7 @@ import java.util.List;
  * This class is used by SOAP remote services.
  *
  * @author Brian Wing Shun Chan
- * @deprecated As of Mueller (7.2.x), replaced by {@link
- com.liferay.layout.model.impl.LayoutClassedModelUsageImpl}
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
 @Deprecated
@@ -35,6 +34,7 @@ public class AssetEntryUsageSoap implements Serializable {
 		AssetEntryUsageSoap soapModel = new AssetEntryUsageSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setCtCollectionId(model.getCtCollectionId());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setAssetEntryUsageId(model.getAssetEntryUsageId());
 		soapModel.setGroupId(model.getGroupId());
@@ -112,6 +112,14 @@ public class AssetEntryUsageSoap implements Serializable {
 
 	public void setMvccVersion(long mvccVersion) {
 		_mvccVersion = mvccVersion;
+	}
+
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	public void setCtCollectionId(long ctCollectionId) {
+		_ctCollectionId = ctCollectionId;
 	}
 
 	public String getUuid() {
@@ -211,6 +219,7 @@ public class AssetEntryUsageSoap implements Serializable {
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
 	private long _assetEntryUsageId;
 	private long _groupId;

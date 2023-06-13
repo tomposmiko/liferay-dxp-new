@@ -17,6 +17,8 @@ package com.liferay.segments.asah.rest.client.dto.v1_0;
 import com.liferay.segments.asah.rest.client.function.UnsafeSupplier;
 import com.liferay.segments.asah.rest.client.serdes.v1_0.StatusSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Status {
+public class Status implements Cloneable, Serializable {
+
+	public static Status toDTO(String json) {
+		return StatusSerDes.toDTO(json);
+	}
 
 	public String getStatus() {
 		return status;
@@ -69,6 +75,11 @@ public class Status {
 	}
 
 	protected String winnerVariantId;
+
+	@Override
+	public Status clone() throws CloneNotSupportedException {
+		return (Status)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

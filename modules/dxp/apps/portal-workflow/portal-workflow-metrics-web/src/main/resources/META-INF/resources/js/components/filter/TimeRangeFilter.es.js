@@ -9,13 +9,20 @@
  * distribution rights of the Software.
  */
 
-import React, {useMemo, useContext} from 'react';
+import React, {useContext, useMemo} from 'react';
 
 import Filter from '../../shared/components/filter/Filter.es';
 import {useFilterName} from '../../shared/components/filter/hooks/useFilterName.es';
 import {useFilterStatic} from '../../shared/components/filter/hooks/useFilterStatic.es';
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
-import {mergeItemsArray} from '../../shared/components/filter/util/filterUtil.es';
+import {
+	getCapitalizedFilterKey,
+	mergeItemsArray,
+	replaceHistory,
+} from '../../shared/components/filter/util/filterUtil.es';
+import {parse, stringify} from '../../shared/components/router/queryString.es';
+import {useFilter} from '../../shared/hooks/useFilter.es';
+import {useRouter} from '../../shared/hooks/useRouter.es';
 import {useRouterParams} from '../../shared/hooks/useRouterParams.es';
 import {useSessionStorage} from '../../shared/hooks/useStorage.es';
 import {AppContext} from '../AppContext.es';
@@ -27,62 +34,62 @@ const TimeRangeFilter = ({
 	buttonClassName,
 	className,
 	disabled,
-	dispatch,
 	filterKey = filterConstants.timeRange.key,
 	options = {},
 	prefixKey = '',
-	style
 }) => {
-	const defaultOptions = {
+	options = {
 		hideControl: true,
 		multiple: false,
 		position: 'left',
-		withSelectionTitle: true
+		withSelectionTitle: true,
+		withoutRouteParams: false,
+		...options,
 	};
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	options = useMemo(() => ({...defaultOptions, ...options}), [options]);
 
 	const {isAmPm} = useContext(AppContext);
 	const {filters} = useRouterParams();
-	const {
-		formVisible,
-		onChangeFilter,
-		onClickFilter,
-		setFormVisible
-	} = useCustomFormState();
+	const {formVisible, onClickFilter, setFormVisible} = useCustomFormState();
+
 	const [storedTimeRanges = {}] = useSessionStorage('timeRanges');
 
-	const dateEnd = filters[`${prefixKey}dateEnd`];
-	const dateStart = filters[`${prefixKey}dateStart`];
+	const {dispatch} = useFilter(options);
 
-	const {items: timeRanges} = useMemo(() => storedTimeRanges, [
-		storedTimeRanges
-	]);
+	const dateEndKey = getCapitalizedFilterKey(prefixKey, 'dateEnd');
+	const dateStartKey = getCapitalizedFilterKey(prefixKey, 'dateStart');
+	const prefixedFilterKey = getCapitalizedFilterKey(prefixKey, filterKey);
+	const routerProps = useRouter();
+
+	const dateEnd = filters[dateEndKey];
+	const dateStart = filters[dateStartKey];
 
 	const customRange = useMemo(() => getCustomTimeRange(dateEnd, dateStart), [
 		dateEnd,
-		dateStart
+		dateStart,
 	]);
 
 	const staticItems = useMemo(
 		() =>
-			parseDateItems(isAmPm)(mergeItemsArray([customRange], timeRanges)),
-		[customRange, timeRanges, isAmPm]
+			parseDateItems(isAmPm)(
+				mergeItemsArray([customRange], storedTimeRanges.items)
+			),
+		[customRange, storedTimeRanges.items, isAmPm]
 	);
 
-	const {items, selectedItems} = useFilterStatic(
-		dispatch,
+	const {items, selectedItems} = useFilterStatic({
 		filterKey,
 		prefixKey,
-		staticItems
-	);
+		propertyKey: 'id',
+		staticItems,
+		withoutRouteParams: options.withoutRouteParams,
+	});
 
 	const defaultItem = useMemo(
-		() => items.find(timeRange => timeRange.defaultTimeRange),
+		() => items.find((timeRange) => timeRange.defaultTimeRange),
 		[items]
 	);
 
-	if (defaultItem && !selectedItems.length) {
+	if (defaultItem && options.withSelectionTitle && !selectedItems.length) {
 		selectedItems[0] = defaultItem;
 	}
 
@@ -93,28 +100,46 @@ const TimeRangeFilter = ({
 		options.withSelectionTitle
 	);
 
+	const handleSelectFilter = (filter) => {
+		const filterValue = {[prefixedFilterKey]: [filter.key]};
+		const query = parse(routerProps.location.search);
+
+		if (!options.withoutRouteParams) {
+			query.filters = {
+				...query.filters,
+				[dateEndKey]: filter.dateEnd,
+				[dateStartKey]: filter.dateStart,
+				...filterValue,
+			};
+
+			replaceHistory(stringify(query), routerProps);
+		}
+		else {
+			dispatch(filterValue);
+		}
+	};
+
 	return (
 		<Filter
 			buttonClassName={buttonClassName}
-			dataTestId="timeRangeFilter"
 			defaultItem={defaultItem}
 			disabled={disabled}
 			elementClasses={className}
 			filterKey={filterKey}
 			items={items}
 			name={filterName}
-			onChangeFilter={onChangeFilter}
-			onClickFilter={onClickFilter}
+			onClickFilter={onClickFilter(handleSelectFilter)}
 			prefixKey={prefixKey}
+			preventClick
 			{...options}
-			style={style}
 		>
 			{formVisible && (
 				<CustomTimeRangeForm
-					filterKey={filterKey}
+					handleSelectFilter={handleSelectFilter}
 					items={items}
 					prefixKey={prefixKey}
 					setFormVisible={setFormVisible}
+					withoutRouteParams={options.withoutRouteParams}
 				/>
 			)}
 		</Filter>

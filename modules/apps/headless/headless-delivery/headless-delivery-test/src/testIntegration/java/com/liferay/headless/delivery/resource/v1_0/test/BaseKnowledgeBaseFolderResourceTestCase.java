@@ -28,13 +28,13 @@ import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
 import com.liferay.headless.delivery.client.resource.v1_0.KnowledgeBaseFolderResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.KnowledgeBaseFolderSerDes;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -44,10 +44,9 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.test.log.CaptureAppender;
-import com.liferay.portal.test.log.Log4JLoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
@@ -69,10 +68,8 @@ import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Level;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -113,7 +110,9 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		KnowledgeBaseFolderResource.Builder builder =
 			KnowledgeBaseFolderResource.builder();
 
-		knowledgeBaseFolderResource = builder.locale(
+		knowledgeBaseFolderResource = builder.authentication(
+			"test@liferay.com", "test"
+		).locale(
 			LocaleUtil.getDefault()
 		).build();
 	}
@@ -199,6 +198,7 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 
 	@Test
 	public void testDeleteKnowledgeBaseFolder() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		KnowledgeBaseFolder knowledgeBaseFolder =
 			testDeleteKnowledgeBaseFolder_addKnowledgeBaseFolder();
 
@@ -228,35 +228,23 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 	@Test
 	public void testGraphQLDeleteKnowledgeBaseFolder() throws Exception {
 		KnowledgeBaseFolder knowledgeBaseFolder =
-			testGraphQLKnowledgeBaseFolder_addKnowledgeBaseFolder();
-
-		GraphQLField graphQLField = new GraphQLField(
-			"mutation",
-			new GraphQLField(
-				"deleteKnowledgeBaseFolder",
-				new HashMap<String, Object>() {
-					{
-						put(
-							"knowledgeBaseFolderId",
-							knowledgeBaseFolder.getId());
-					}
-				}));
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
+			testGraphQLDeleteKnowledgeBaseFolder_addKnowledgeBaseFolder();
 
 		Assert.assertTrue(
-			dataJSONObject.getBoolean("deleteKnowledgeBaseFolder"));
-
-		try (CaptureAppender captureAppender =
-				Log4JLoggerTestUtil.configureLog4JLogger(
-					"graphql.execution.SimpleDataFetcherExceptionHandler",
-					Level.WARN)) {
-
-			graphQLField = new GraphQLField(
-				"query",
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteKnowledgeBaseFolder",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"knowledgeBaseFolderId",
+									knowledgeBaseFolder.getId());
+							}
+						})),
+				"JSONObject/data", "Object/deleteKnowledgeBaseFolder"));
+		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
 				new GraphQLField(
 					"knowledgeBaseFolder",
 					new HashMap<String, Object>() {
@@ -266,15 +254,17 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 								knowledgeBaseFolder.getId());
 						}
 					},
-					new GraphQLField("id")));
+					new GraphQLField("id"))),
+			"JSONArray/errors");
 
-			jsonObject = JSONFactoryUtil.createJSONObject(
-				invoke(graphQLField.toString()));
+		Assert.assertTrue(errorsJSONArray.length() > 0);
+	}
 
-			JSONArray errorsJSONArray = jsonObject.getJSONArray("errors");
+	protected KnowledgeBaseFolder
+			testGraphQLDeleteKnowledgeBaseFolder_addKnowledgeBaseFolder()
+		throws Exception {
 
-			Assert.assertTrue(errorsJSONArray.length() > 0);
-		}
+		return testGraphQLKnowledgeBaseFolder_addKnowledgeBaseFolder();
 	}
 
 	@Test
@@ -301,32 +291,54 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 	@Test
 	public void testGraphQLGetKnowledgeBaseFolder() throws Exception {
 		KnowledgeBaseFolder knowledgeBaseFolder =
-			testGraphQLKnowledgeBaseFolder_addKnowledgeBaseFolder();
-
-		List<GraphQLField> graphQLFields = getGraphQLFields();
-
-		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"knowledgeBaseFolder",
-				new HashMap<String, Object>() {
-					{
-						put(
-							"knowledgeBaseFolderId",
-							knowledgeBaseFolder.getId());
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
+			testGraphQLGetKnowledgeBaseFolder_addKnowledgeBaseFolder();
 
 		Assert.assertTrue(
-			equalsJSONObject(
+			equals(
 				knowledgeBaseFolder,
-				dataJSONObject.getJSONObject("knowledgeBaseFolder")));
+				KnowledgeBaseFolderSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"knowledgeBaseFolder",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"knowledgeBaseFolderId",
+											knowledgeBaseFolder.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/knowledgeBaseFolder"))));
+	}
+
+	@Test
+	public void testGraphQLGetKnowledgeBaseFolderNotFound() throws Exception {
+		Long irrelevantKnowledgeBaseFolderId = RandomTestUtil.randomLong();
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"knowledgeBaseFolder",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"knowledgeBaseFolderId",
+									irrelevantKnowledgeBaseFolderId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected KnowledgeBaseFolder
+			testGraphQLGetKnowledgeBaseFolder_addKnowledgeBaseFolder()
+		throws Exception {
+
+		return testGraphQLKnowledgeBaseFolder_addKnowledgeBaseFolder();
 	}
 
 	@Test
@@ -337,13 +349,14 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		KnowledgeBaseFolder randomPatchKnowledgeBaseFolder =
 			randomPatchKnowledgeBaseFolder();
 
+		@SuppressWarnings("PMD.UnusedLocalVariable")
 		KnowledgeBaseFolder patchKnowledgeBaseFolder =
 			knowledgeBaseFolderResource.patchKnowledgeBaseFolder(
 				postKnowledgeBaseFolder.getId(),
 				randomPatchKnowledgeBaseFolder);
 
 		KnowledgeBaseFolder expectedPatchKnowledgeBaseFolder =
-			(KnowledgeBaseFolder)BeanUtils.cloneBean(postKnowledgeBaseFolder);
+			postKnowledgeBaseFolder.clone();
 
 		_beanUtilsBean.copyProperties(
 			expectedPatchKnowledgeBaseFolder, randomPatchKnowledgeBaseFolder);
@@ -399,20 +412,19 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 	public void testGetKnowledgeBaseFolderKnowledgeBaseFoldersPage()
 		throws Exception {
 
-		Page<KnowledgeBaseFolder> page =
-			knowledgeBaseFolderResource.
-				getKnowledgeBaseFolderKnowledgeBaseFoldersPage(
-					testGetKnowledgeBaseFolderKnowledgeBaseFoldersPage_getParentKnowledgeBaseFolderId(),
-					Pagination.of(1, 2));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
 		Long parentKnowledgeBaseFolderId =
 			testGetKnowledgeBaseFolderKnowledgeBaseFoldersPage_getParentKnowledgeBaseFolderId();
 		Long irrelevantParentKnowledgeBaseFolderId =
 			testGetKnowledgeBaseFolderKnowledgeBaseFoldersPage_getIrrelevantParentKnowledgeBaseFolderId();
 
-		if ((irrelevantParentKnowledgeBaseFolderId != null)) {
+		Page<KnowledgeBaseFolder> page =
+			knowledgeBaseFolderResource.
+				getKnowledgeBaseFolderKnowledgeBaseFoldersPage(
+					parentKnowledgeBaseFolderId, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantParentKnowledgeBaseFolderId != null) {
 			KnowledgeBaseFolder irrelevantKnowledgeBaseFolder =
 				testGetKnowledgeBaseFolderKnowledgeBaseFoldersPage_addKnowledgeBaseFolder(
 					irrelevantParentKnowledgeBaseFolderId,
@@ -443,7 +455,7 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		page =
 			knowledgeBaseFolderResource.
 				getKnowledgeBaseFolderKnowledgeBaseFoldersPage(
-					parentKnowledgeBaseFolderId, Pagination.of(1, 2));
+					parentKnowledgeBaseFolderId, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -568,18 +580,17 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 
 	@Test
 	public void testGetSiteKnowledgeBaseFoldersPage() throws Exception {
-		Page<KnowledgeBaseFolder> page =
-			knowledgeBaseFolderResource.getSiteKnowledgeBaseFoldersPage(
-				testGetSiteKnowledgeBaseFoldersPage_getSiteId(),
-				Pagination.of(1, 2));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
 		Long siteId = testGetSiteKnowledgeBaseFoldersPage_getSiteId();
 		Long irrelevantSiteId =
 			testGetSiteKnowledgeBaseFoldersPage_getIrrelevantSiteId();
 
-		if ((irrelevantSiteId != null)) {
+		Page<KnowledgeBaseFolder> page =
+			knowledgeBaseFolderResource.getSiteKnowledgeBaseFoldersPage(
+				siteId, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantSiteId != null) {
 			KnowledgeBaseFolder irrelevantKnowledgeBaseFolder =
 				testGetSiteKnowledgeBaseFoldersPage_addKnowledgeBaseFolder(
 					irrelevantSiteId, randomIrrelevantKnowledgeBaseFolder());
@@ -604,7 +615,7 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 				siteId, randomKnowledgeBaseFolder());
 
 		page = knowledgeBaseFolderResource.getSiteKnowledgeBaseFoldersPage(
-			siteId, Pagination.of(1, 2));
+			siteId, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -694,60 +705,53 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 
 	@Test
 	public void testGraphQLGetSiteKnowledgeBaseFoldersPage() throws Exception {
-		List<GraphQLField> graphQLFields = new ArrayList<>();
-
-		List<GraphQLField> itemsGraphQLFields = getGraphQLFields();
-
-		graphQLFields.add(
-			new GraphQLField(
-				"items", itemsGraphQLFields.toArray(new GraphQLField[0])));
-
-		graphQLFields.add(new GraphQLField("page"));
-		graphQLFields.add(new GraphQLField("totalCount"));
+		Long siteId = testGetSiteKnowledgeBaseFoldersPage_getSiteId();
 
 		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"knowledgeBaseFolders",
-				new HashMap<String, Object>() {
-					{
-						put("page", 1);
-						put("pageSize", 2);
-						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
+			"knowledgeBaseFolders",
+			new HashMap<String, Object>() {
+				{
+					put("page", 1);
+					put("pageSize", 10);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
+					put("siteKey", "\"" + siteId + "\"");
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
 
 		JSONObject knowledgeBaseFoldersJSONObject =
-			dataJSONObject.getJSONObject("knowledgeBaseFolders");
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/knowledgeBaseFolders");
 
 		Assert.assertEquals(
 			0, knowledgeBaseFoldersJSONObject.get("totalCount"));
 
 		KnowledgeBaseFolder knowledgeBaseFolder1 =
-			testGraphQLKnowledgeBaseFolder_addKnowledgeBaseFolder();
+			testGraphQLGetSiteKnowledgeBaseFoldersPage_addKnowledgeBaseFolder();
 		KnowledgeBaseFolder knowledgeBaseFolder2 =
-			testGraphQLKnowledgeBaseFolder_addKnowledgeBaseFolder();
+			testGraphQLGetSiteKnowledgeBaseFoldersPage_addKnowledgeBaseFolder();
 
-		jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		dataJSONObject = jsonObject.getJSONObject("data");
-
-		knowledgeBaseFoldersJSONObject = dataJSONObject.getJSONObject(
-			"knowledgeBaseFolders");
+		knowledgeBaseFoldersJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/knowledgeBaseFolders");
 
 		Assert.assertEquals(
-			2, knowledgeBaseFoldersJSONObject.get("totalCount"));
+			2, knowledgeBaseFoldersJSONObject.getLong("totalCount"));
 
-		assertEqualsJSONArray(
+		assertEqualsIgnoringOrder(
 			Arrays.asList(knowledgeBaseFolder1, knowledgeBaseFolder2),
-			knowledgeBaseFoldersJSONObject.getJSONArray("items"));
+			Arrays.asList(
+				KnowledgeBaseFolderSerDes.toDTOs(
+					knowledgeBaseFoldersJSONObject.getString("items"))));
+	}
+
+	protected KnowledgeBaseFolder
+			testGraphQLGetSiteKnowledgeBaseFoldersPage_addKnowledgeBaseFolder()
+		throws Exception {
+
+		return testGraphQLKnowledgeBaseFolder_addKnowledgeBaseFolder();
 	}
 
 	@Test
@@ -783,10 +787,52 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 				randomKnowledgeBaseFolder);
 
 		Assert.assertTrue(
-			equalsJSONObject(
-				randomKnowledgeBaseFolder,
-				JSONFactoryUtil.createJSONObject(
-					JSONFactoryUtil.serialize(knowledgeBaseFolder))));
+			equals(randomKnowledgeBaseFolder, knowledgeBaseFolder));
+	}
+
+	protected void appendGraphQLFieldValue(StringBuilder sb, Object value)
+		throws Exception {
+
+		if (value instanceof Object[]) {
+			StringBuilder arraySB = new StringBuilder("[");
+
+			for (Object object : (Object[])value) {
+				if (arraySB.length() > 1) {
+					arraySB.append(", ");
+				}
+
+				arraySB.append("{");
+
+				Class<?> clazz = object.getClass();
+
+				for (java.lang.reflect.Field field :
+						getDeclaredFields(clazz.getSuperclass())) {
+
+					arraySB.append(field.getName());
+					arraySB.append(": ");
+
+					appendGraphQLFieldValue(arraySB, field.get(object));
+
+					arraySB.append(", ");
+				}
+
+				arraySB.setLength(arraySB.length() - 2);
+
+				arraySB.append("}");
+			}
+
+			arraySB.append("]");
+
+			sb.append(arraySB.toString());
+		}
+		else if (value instanceof String) {
+			sb.append("\"");
+			sb.append(value);
+			sb.append("\"");
+		}
+		else {
+			sb.append(value);
+		}
 	}
 
 	protected KnowledgeBaseFolder
@@ -802,147 +848,28 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 				KnowledgeBaseFolder knowledgeBaseFolder)
 		throws Exception {
 
+		JSONDeserializer<KnowledgeBaseFolder> jsonDeserializer =
+			JSONFactoryUtil.createJSONDeserializer();
+
 		StringBuilder sb = new StringBuilder("{");
 
-		for (String additionalAssertFieldName :
-				getAdditionalAssertFieldNames()) {
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(KnowledgeBaseFolder.class)) {
 
-			if (Objects.equals("description", additionalAssertFieldName)) {
-				sb.append(additionalAssertFieldName);
-				sb.append(": ");
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
 
-				Object value = knowledgeBaseFolder.getDescription();
+				continue;
+			}
 
-				if (value instanceof String) {
-					sb.append("\"");
-					sb.append(value);
-					sb.append("\"");
-				}
-				else {
-					sb.append(value);
-				}
-
+			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			if (Objects.equals("id", additionalAssertFieldName)) {
-				sb.append(additionalAssertFieldName);
-				sb.append(": ");
+			sb.append(field.getName());
+			sb.append(": ");
 
-				Object value = knowledgeBaseFolder.getId();
-
-				if (value instanceof String) {
-					sb.append("\"");
-					sb.append(value);
-					sb.append("\"");
-				}
-				else {
-					sb.append(value);
-				}
-
-				sb.append(", ");
-			}
-
-			if (Objects.equals("name", additionalAssertFieldName)) {
-				sb.append(additionalAssertFieldName);
-				sb.append(": ");
-
-				Object value = knowledgeBaseFolder.getName();
-
-				if (value instanceof String) {
-					sb.append("\"");
-					sb.append(value);
-					sb.append("\"");
-				}
-				else {
-					sb.append(value);
-				}
-
-				sb.append(", ");
-			}
-
-			if (Objects.equals(
-					"numberOfKnowledgeBaseArticles",
-					additionalAssertFieldName)) {
-
-				sb.append(additionalAssertFieldName);
-				sb.append(": ");
-
-				Object value =
-					knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles();
-
-				if (value instanceof String) {
-					sb.append("\"");
-					sb.append(value);
-					sb.append("\"");
-				}
-				else {
-					sb.append(value);
-				}
-
-				sb.append(", ");
-			}
-
-			if (Objects.equals(
-					"numberOfKnowledgeBaseFolders",
-					additionalAssertFieldName)) {
-
-				sb.append(additionalAssertFieldName);
-				sb.append(": ");
-
-				Object value =
-					knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders();
-
-				if (value instanceof String) {
-					sb.append("\"");
-					sb.append(value);
-					sb.append("\"");
-				}
-				else {
-					sb.append(value);
-				}
-
-				sb.append(", ");
-			}
-
-			if (Objects.equals(
-					"parentKnowledgeBaseFolderId", additionalAssertFieldName)) {
-
-				sb.append(additionalAssertFieldName);
-				sb.append(": ");
-
-				Object value =
-					knowledgeBaseFolder.getParentKnowledgeBaseFolderId();
-
-				if (value instanceof String) {
-					sb.append("\"");
-					sb.append(value);
-					sb.append("\"");
-				}
-				else {
-					sb.append(value);
-				}
-
-				sb.append(", ");
-			}
-
-			if (Objects.equals("siteId", additionalAssertFieldName)) {
-				sb.append(additionalAssertFieldName);
-				sb.append(": ");
-
-				Object value = knowledgeBaseFolder.getSiteId();
-
-				if (value instanceof String) {
-					sb.append("\"");
-					sb.append(value);
-					sb.append("\"");
-				}
-				else {
-					sb.append(value);
-				}
-
-				sb.append(", ");
-			}
+			appendGraphQLFieldValue(sb, field.get(knowledgeBaseFolder));
 		}
 
 		sb.append("}");
@@ -951,31 +878,41 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 
 		graphQLFields.add(new GraphQLField("id"));
 
-		GraphQLField graphQLField = new GraphQLField(
-			"mutation",
-			new GraphQLField(
-				"createSiteKnowledgeBaseFolder",
-				new HashMap<String, Object>() {
-					{
-						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
-						put("knowledgeBaseFolder", sb.toString());
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
-
-		JSONDeserializer<KnowledgeBaseFolder> jsonDeserializer =
-			JSONFactoryUtil.createJSONDeserializer();
-
-		String object = invoke(graphQLField.toString());
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(object);
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
-
 		return jsonDeserializer.deserialize(
-			String.valueOf(
-				dataJSONObject.getJSONObject("createSiteKnowledgeBaseFolder")),
+			JSONUtil.getValueAsString(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"createSiteKnowledgeBaseFolder",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"siteKey",
+									"\"" + testGroup.getGroupId() + "\"");
+								put("knowledgeBaseFolder", sb.toString());
+							}
+						},
+						graphQLFields)),
+				"JSONObject/data", "JSONObject/createSiteKnowledgeBaseFolder"),
 			KnowledgeBaseFolder.class);
+	}
+
+	protected void assertContains(
+		KnowledgeBaseFolder knowledgeBaseFolder,
+		List<KnowledgeBaseFolder> knowledgeBaseFolders) {
+
+		boolean contains = false;
+
+		for (KnowledgeBaseFolder item : knowledgeBaseFolders) {
+			if (equals(knowledgeBaseFolder, item)) {
+				contains = true;
+
+				break;
+			}
+		}
+
+		Assert.assertTrue(
+			knowledgeBaseFolders + " does not contain " + knowledgeBaseFolder,
+			contains);
 	}
 
 	protected void assertHttpResponseStatusCode(
@@ -1039,27 +976,9 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		}
 	}
 
-	protected void assertEqualsJSONArray(
-		List<KnowledgeBaseFolder> knowledgeBaseFolders, JSONArray jsonArray) {
+	protected void assertValid(KnowledgeBaseFolder knowledgeBaseFolder)
+		throws Exception {
 
-		for (KnowledgeBaseFolder knowledgeBaseFolder : knowledgeBaseFolders) {
-			boolean contains = false;
-
-			for (Object object : jsonArray) {
-				if (equalsJSONObject(knowledgeBaseFolder, (JSONObject)object)) {
-					contains = true;
-
-					break;
-				}
-			}
-
-			Assert.assertTrue(
-				jsonArray + " does not contain " + knowledgeBaseFolder,
-				contains);
-		}
-	}
-
-	protected void assertValid(KnowledgeBaseFolder knowledgeBaseFolder) {
 		boolean valid = true;
 
 		if (knowledgeBaseFolder.getDateCreated() == null) {
@@ -1211,13 +1130,53 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		return new String[0];
 	}
 
-	protected List<GraphQLField> getGraphQLFields() {
+	protected List<GraphQLField> getGraphQLFields() throws Exception {
 		List<GraphQLField> graphQLFields = new ArrayList<>();
 
-		for (String additionalAssertFieldName :
-				getAdditionalAssertFieldNames()) {
+		graphQLFields.add(new GraphQLField("siteId"));
 
-			graphQLFields.add(new GraphQLField(additionalAssertFieldName));
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(
+					com.liferay.headless.delivery.dto.v1_0.KnowledgeBaseFolder.
+						class)) {
+
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			graphQLFields.addAll(getGraphQLFields(field));
+		}
+
+		return graphQLFields;
+	}
+
+	protected List<GraphQLField> getGraphQLFields(
+			java.lang.reflect.Field... fields)
+		throws Exception {
+
+		List<GraphQLField> graphQLFields = new ArrayList<>();
+
+		for (java.lang.reflect.Field field : fields) {
+			com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+				vulcanGraphQLField = field.getAnnotation(
+					com.liferay.portal.vulcan.graphql.annotation.GraphQLField.
+						class);
+
+			if (vulcanGraphQLField != null) {
+				Class<?> clazz = field.getType();
+
+				if (clazz.isArray()) {
+					clazz = clazz.getComponentType();
+				}
+
+				List<GraphQLField> childrenGraphQLFields = getGraphQLFields(
+					getDeclaredFields(clazz));
+
+				graphQLFields.add(
+					new GraphQLField(field.getName(), childrenGraphQLFields));
+			}
 		}
 
 		return graphQLFields;
@@ -1246,9 +1205,9 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 				getAdditionalAssertFieldNames()) {
 
 			if (Objects.equals("actions", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						knowledgeBaseFolder1.getActions(),
-						knowledgeBaseFolder2.getActions())) {
+				if (!equals(
+						(Map)knowledgeBaseFolder1.getActions(),
+						(Map)knowledgeBaseFolder2.getActions())) {
 
 					return false;
 				}
@@ -1409,81 +1368,43 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		return true;
 	}
 
-	protected boolean equalsJSONObject(
-		KnowledgeBaseFolder knowledgeBaseFolder, JSONObject jsonObject) {
+	protected boolean equals(
+		Map<String, Object> map1, Map<String, Object> map2) {
 
-		for (String fieldName : getAdditionalAssertFieldNames()) {
-			if (Objects.equals("description", fieldName)) {
-				if (!Objects.deepEquals(
-						knowledgeBaseFolder.getDescription(),
-						jsonObject.getString("description"))) {
+		if (Objects.equals(map1.keySet(), map2.keySet())) {
+			for (Map.Entry<String, Object> entry : map1.entrySet()) {
+				if (entry.getValue() instanceof Map) {
+					if (!equals(
+							(Map)entry.getValue(),
+							(Map)map2.get(entry.getKey()))) {
+
+						return false;
+					}
+				}
+				else if (!Objects.deepEquals(
+							entry.getValue(), map2.get(entry.getKey()))) {
 
 					return false;
 				}
-
-				continue;
 			}
 
-			if (Objects.equals("id", fieldName)) {
-				if (!Objects.deepEquals(
-						knowledgeBaseFolder.getId(),
-						jsonObject.getLong("id"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("name", fieldName)) {
-				if (!Objects.deepEquals(
-						knowledgeBaseFolder.getName(),
-						jsonObject.getString("name"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("numberOfKnowledgeBaseArticles", fieldName)) {
-				if (!Objects.deepEquals(
-						knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles(),
-						jsonObject.getInt("numberOfKnowledgeBaseArticles"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("numberOfKnowledgeBaseFolders", fieldName)) {
-				if (!Objects.deepEquals(
-						knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders(),
-						jsonObject.getInt("numberOfKnowledgeBaseFolders"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("parentKnowledgeBaseFolderId", fieldName)) {
-				if (!Objects.deepEquals(
-						knowledgeBaseFolder.getParentKnowledgeBaseFolderId(),
-						jsonObject.getLong("parentKnowledgeBaseFolderId"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			throw new IllegalArgumentException(
-				"Invalid field name " + fieldName);
+			return true;
 		}
 
-		return true;
+		return false;
+	}
+
+	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
+		throws Exception {
+
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
+
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1642,13 +1563,19 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("numberOfKnowledgeBaseArticles")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
+			sb.append(
+				String.valueOf(
+					knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles()));
+
+			return sb.toString();
 		}
 
 		if (entityFieldName.equals("numberOfKnowledgeBaseFolders")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
+			sb.append(
+				String.valueOf(
+					knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders()));
+
+			return sb.toString();
 		}
 
 		if (entityFieldName.equals("parentKnowledgeBaseFolder")) {
@@ -1692,14 +1619,35 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		return httpResponse.getContent();
 	}
 
+	protected JSONObject invokeGraphQLMutation(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField mutationGraphQLField = new GraphQLField(
+			"mutation", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(mutationGraphQLField.toString()));
+	}
+
+	protected JSONObject invokeGraphQLQuery(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField queryGraphQLField = new GraphQLField(
+			"query", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(queryGraphQLField.toString()));
+	}
+
 	protected KnowledgeBaseFolder randomKnowledgeBaseFolder() throws Exception {
 		return new KnowledgeBaseFolder() {
 			{
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
-				description = RandomTestUtil.randomString();
+				description = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
-				name = RandomTestUtil.randomString();
+				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				numberOfKnowledgeBaseArticles = RandomTestUtil.randomInt();
 				numberOfKnowledgeBaseFolders = RandomTestUtil.randomInt();
 				parentKnowledgeBaseFolderId = RandomTestUtil.randomLong();
@@ -1737,9 +1685,22 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 			this(key, new HashMap<>(), graphQLFields);
 		}
 
+		public GraphQLField(String key, List<GraphQLField> graphQLFields) {
+			this(key, new HashMap<>(), graphQLFields);
+		}
+
 		public GraphQLField(
 			String key, Map<String, Object> parameterMap,
 			GraphQLField... graphQLFields) {
+
+			_key = key;
+			_parameterMap = parameterMap;
+			_graphQLFields = Arrays.asList(graphQLFields);
+		}
+
+		public GraphQLField(
+			String key, Map<String, Object> parameterMap,
+			List<GraphQLField> graphQLFields) {
 
 			_key = key;
 			_parameterMap = parameterMap;
@@ -1757,25 +1718,25 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 						_parameterMap.entrySet()) {
 
 					sb.append(entry.getKey());
-					sb.append(":");
+					sb.append(": ");
 					sb.append(entry.getValue());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append(")");
 			}
 
-			if (_graphQLFields.length > 0) {
+			if (!_graphQLFields.isEmpty()) {
 				sb.append("{");
 
 				for (GraphQLField graphQLField : _graphQLFields) {
 					sb.append(graphQLField.toString());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append("}");
 			}
@@ -1783,14 +1744,14 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 			return sb.toString();
 		}
 
-		private final GraphQLField[] _graphQLFields;
+		private final List<GraphQLField> _graphQLFields;
 		private final String _key;
 		private final Map<String, Object> _parameterMap;
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseKnowledgeBaseFolderResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseKnowledgeBaseFolderResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

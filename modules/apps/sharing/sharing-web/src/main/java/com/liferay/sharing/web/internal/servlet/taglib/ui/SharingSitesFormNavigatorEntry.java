@@ -14,17 +14,13 @@
 
 package com.liferay.sharing.web.internal.servlet.taglib.ui;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.servlet.taglib.ui.BaseJSPFormNavigatorEntry;
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorConstants;
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntry;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.sharing.configuration.SharingConfiguration;
 import com.liferay.sharing.configuration.SharingConfigurationFactory;
 import com.liferay.sharing.web.internal.constants.SharingWebKeys;
@@ -91,22 +87,10 @@ public class SharingSitesFormNavigatorEntry
 
 	@Override
 	public boolean isVisible(User user, Group group) {
-		try {
-			if (group.isStagingGroup()) {
-				return false;
-			}
+		SharingConfiguration groupSharingConfiguration =
+			_sharingConfigurationFactory.getGroupSharingConfiguration(group);
 
-			SharingConfiguration companySharingConfiguration =
-				_sharingConfigurationFactory.getCompanySharingConfiguration(
-					_companyLocalService.getCompany(group.getCompanyId()));
-
-			return companySharingConfiguration.isEnabled();
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException, portalException);
-
-			return false;
-		}
+		return groupSharingConfiguration.isAvailable();
 	}
 
 	@Override
@@ -121,12 +105,6 @@ public class SharingSitesFormNavigatorEntry
 	protected String getJspPath() {
 		return "/sites_admin/sharing.jsp";
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SharingSitesFormNavigatorEntry.class);
-
-	@Reference
-	private CompanyLocalService _companyLocalService;
 
 	@Reference(target = "(bundle.symbolic.name=com.liferay.sharing.web)")
 	private ResourceBundleLoader _resourceBundleLoader;

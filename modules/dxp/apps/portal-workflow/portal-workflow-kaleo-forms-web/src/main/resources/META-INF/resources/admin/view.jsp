@@ -18,15 +18,15 @@
 
 <%
 String displayStyle = kaleoFormsAdminDisplayContext.getDisplayStyle();
-
-KaleoProcessSearch kaleoProcessSearch = kaleoFormsAdminDisplayContext.getKaleoProcessSearch();
 %>
 
 <liferay-util:include page="/admin/navigation_bar.jsp" servletContext="<%= application %>" />
 
 <liferay-util:include page="/admin/management_bar.jsp" servletContext="<%= application %>" />
 
-<div class="container-fluid-1280" id="<portlet:namespace />formContainer">
+<clay:container-fluid
+	id='<%= liferayPortletResponse.getNamespace() + "formContainer" %>'
+>
 	<aui:form action="<%= kaleoFormsAdminDisplayContext.getSearchActionURL() %>" method="post" name="fm">
 		<aui:input name="redirect" type="hidden" value="<%= kaleoFormsAdminDisplayContext.getSearchActionURL() %>" />
 		<aui:input name="kaleoProcessIds" type="hidden" />
@@ -34,7 +34,7 @@ KaleoProcessSearch kaleoProcessSearch = kaleoFormsAdminDisplayContext.getKaleoPr
 		<liferay-ui:search-container
 			id="kaleoProcess"
 			rowChecker="<%= new EmptyOnClickRowChecker(renderResponse) %>"
-			searchContainer="<%= kaleoProcessSearch %>"
+			searchContainer="<%= kaleoFormsAdminDisplayContext.getKaleoProcessSearch() %>"
 			total="<%= kaleoFormsAdminDisplayContext.getTotalItems() %>"
 		>
 			<liferay-ui:search-container-row
@@ -43,7 +43,7 @@ KaleoProcessSearch kaleoProcessSearch = kaleoFormsAdminDisplayContext.getKaleoPr
 				modelVar="process"
 			>
 				<portlet:renderURL var="rowURL">
-					<portlet:param name="mvcPath" value='<%= "/admin/view_kaleo_process.jsp" %>' />
+					<portlet:param name="mvcPath" value="/admin/view_kaleo_process.jsp" />
 					<portlet:param name="redirect" value="<%= searchContainer.getIteratorURL().toString() %>" />
 					<portlet:param name="kaleoProcessId" value="<%= String.valueOf(process.getKaleoProcessId()) %>" />
 					<portlet:param name="displayStyle" value="<%= displayStyle %>" />
@@ -90,7 +90,7 @@ KaleoProcessSearch kaleoProcessSearch = kaleoFormsAdminDisplayContext.getKaleoPr
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <%@ include file="/admin/export_kaleo_process.jspf" %>
 

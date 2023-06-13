@@ -14,13 +14,15 @@
 
 package com.liferay.blogs.web.internal.display.context;
 
+import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.web.internal.security.permission.resource.BlogsPermission;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -57,7 +59,7 @@ public class BlogEntriesManagementToolbarDisplayContext
 		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		SearchContainer searchContainer, TrashHelper trashHelper,
+		SearchContainer<BlogsEntry> searchContainer, TrashHelper trashHelper,
 		String displayStyle) {
 
 		super(
@@ -73,30 +75,27 @@ public class BlogEntriesManagementToolbarDisplayContext
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		return new DropdownItemList() {
-			{
-				add(
-					dropdownItem -> {
-						dropdownItem.putData("action", "deleteEntries");
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.putData("action", "deleteEntries");
 
-						boolean trashEnabled = _trashHelper.isTrashEnabled(
-							_themeDisplay.getScopeGroupId());
+				boolean trashEnabled = _trashHelper.isTrashEnabled(
+					_themeDisplay.getScopeGroupId());
 
-						dropdownItem.setIcon(
-							trashEnabled ? "trash" : "times-circle");
+				dropdownItem.setIcon(trashEnabled ? "trash" : "times-circle");
 
-						String label = "delete";
+				String label = "delete";
 
-						if (trashEnabled) {
-							label = "move-to-recycle-bin";
-						}
+				if (trashEnabled) {
+					label = "move-to-recycle-bin";
+				}
 
-						dropdownItem.setLabel(LanguageUtil.get(request, label));
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, label));
 
-						dropdownItem.setQuickAction(true);
-					});
+				dropdownItem.setQuickAction(true);
 			}
-		};
+		).build();
 	}
 
 	@Override
@@ -105,14 +104,17 @@ public class BlogEntriesManagementToolbarDisplayContext
 	}
 
 	public Map<String, Object> getComponentContext() throws PortalException {
-		String cmd = Constants.DELETE;
-
-		if (_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroup())) {
-			cmd = Constants.MOVE_TO_TRASH;
-		}
-
 		return HashMapBuilder.<String, Object>put(
-			"deleteEntriesCmd", cmd
+			"deleteEntriesCmd",
+			() -> {
+				if (_trashHelper.isTrashEnabled(
+						_themeDisplay.getScopeGroup())) {
+
+					return Constants.MOVE_TO_TRASH;
+				}
+
+				return Constants.DELETE;
+			}
 		).put(
 			"deleteEntriesURL",
 			() -> {
@@ -139,19 +141,16 @@ public class BlogEntriesManagementToolbarDisplayContext
 			return null;
 		}
 
-		return new CreationMenu() {
-			{
-				addDropdownItem(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							liferayPortletResponse.createRenderURL(),
-							"mvcRenderCommandName", "/blogs/edit_entry",
-							"redirect", currentURLObj.toString());
-						dropdownItem.setLabel(
-							LanguageUtil.get(request, "add-blog-entry"));
-					});
+		return CreationMenuBuilder.addDropdownItem(
+			dropdownItem -> {
+				dropdownItem.setHref(
+					liferayPortletResponse.createRenderURL(),
+					"mvcRenderCommandName", "/blogs/edit_entry", "redirect",
+					currentURLObj.toString());
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "add-blog-entry"));
 			}
-		};
+		).build();
 	}
 
 	@Override
@@ -165,30 +164,25 @@ public class BlogEntriesManagementToolbarDisplayContext
 			return null;
 		}
 
-		return new LabelItemList() {
-			{
-				add(
-					labelItem -> {
-						PortletURL removeLabelURL = getPortletURL();
+		return LabelItemListBuilder.add(
+			labelItem -> {
+				PortletURL removeLabelURL = getPortletURL();
 
-						removeLabelURL.setParameter(
-							"entriesNavigation", (String)null);
+				removeLabelURL.setParameter("entriesNavigation", (String)null);
 
-						labelItem.putData(
-							"removeLabelURL", removeLabelURL.toString());
+				labelItem.putData("removeLabelURL", removeLabelURL.toString());
 
-						labelItem.setCloseable(true);
+				labelItem.setCloseable(true);
 
-						User user = _themeDisplay.getUser();
+				User user = _themeDisplay.getUser();
 
-						String label = String.format(
-							"%s: %s", LanguageUtil.get(request, "owner"),
-							user.getFullName());
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(httpServletRequest, "owner"),
+					user.getFullName());
 
-						labelItem.setLabel(label);
-					});
+				labelItem.setLabel(label);
 			}
-		};
+		).build();
 	}
 
 	@Override
@@ -198,7 +192,7 @@ public class BlogEntriesManagementToolbarDisplayContext
 		searchURL.setParameter("mvcRenderCommandName", "/blogs/view");
 
 		String navigation = ParamUtil.getString(
-			request, "navigation", "entries");
+			httpServletRequest, "navigation", "entries");
 
 		searchURL.setParameter("navigation", navigation);
 
@@ -253,30 +247,25 @@ public class BlogEntriesManagementToolbarDisplayContext
 
 	@Override
 	protected List<DropdownItem> getOrderByDropdownItems() {
-		return new DropdownItemList() {
-			{
-				add(
-					dropdownItem -> {
-						dropdownItem.setActive(
-							Objects.equals(getOrderByCol(), "title"));
-						dropdownItem.setHref(
-							_getCurrentSortingURL(), "orderByCol", "title");
-						dropdownItem.setLabel(
-							LanguageUtil.get(request, "title"));
-					});
-
-				add(
-					dropdownItem -> {
-						dropdownItem.setActive(
-							Objects.equals(getOrderByCol(), "display-date"));
-						dropdownItem.setHref(
-							_getCurrentSortingURL(), "orderByCol",
-							"display-date");
-						dropdownItem.setLabel(
-							LanguageUtil.get(request, "display-date"));
-					});
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.setActive(
+					Objects.equals(getOrderByCol(), "title"));
+				dropdownItem.setHref(
+					_getCurrentSortingURL(), "orderByCol", "title");
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "title"));
 			}
-		};
+		).add(
+			dropdownItem -> {
+				dropdownItem.setActive(
+					Objects.equals(getOrderByCol(), "display-date"));
+				dropdownItem.setHref(
+					_getCurrentSortingURL(), "orderByCol", "display-date");
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "display-date"));
+			}
+		).build();
 	}
 
 	private PortletURL _getCurrentSortingURL() {
@@ -286,7 +275,7 @@ public class BlogEntriesManagementToolbarDisplayContext
 
 		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
 
-		String keywords = ParamUtil.getString(request, "keywords");
+		String keywords = ParamUtil.getString(httpServletRequest, "keywords");
 
 		if (Validator.isNotNull(keywords)) {
 			sortingURL.setParameter("keywords", keywords);

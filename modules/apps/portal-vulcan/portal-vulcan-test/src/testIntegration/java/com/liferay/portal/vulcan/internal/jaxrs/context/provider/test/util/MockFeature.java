@@ -35,7 +35,7 @@ public class MockFeature {
 			}
 
 			@Override
-			public FeatureContext property(String s, Object o) {
+			public FeatureContext property(String s, Object object) {
 				return null;
 			}
 
@@ -98,6 +98,6 @@ public class MockFeature {
 		return _objects.get(className);
 	}
 
-	private Map<String, Object> _objects = new HashMap<>();
+	private final Map<String, Object> _objects = new HashMap<>();
 
 }

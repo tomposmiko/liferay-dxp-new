@@ -42,7 +42,6 @@ public abstract class BlogsStatsUserFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -65,14 +64,5 @@ public abstract class BlogsStatsUserFinderBaseImpl
 
 	@Reference
 	protected BlogsStatsUserPersistence blogsStatsUserPersistence;
-
-	static {
-		try {
-			Class.forName(BlogsPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

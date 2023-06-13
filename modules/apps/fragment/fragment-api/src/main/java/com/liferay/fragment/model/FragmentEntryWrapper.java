@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -44,7 +46,9 @@ public class FragmentEntryWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
+		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
+		attributes.put("headId", getHeadId());
 		attributes.put("fragmentEntryId", getFragmentEntryId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -58,6 +62,7 @@ public class FragmentEntryWrapper
 		attributes.put("css", getCss());
 		attributes.put("html", getHtml());
 		attributes.put("js", getJs());
+		attributes.put("cacheable", isCacheable());
 		attributes.put("configuration", getConfiguration());
 		attributes.put("previewFileEntryId", getPreviewFileEntryId());
 		attributes.put("readOnly", isReadOnly());
@@ -79,10 +84,22 @@ public class FragmentEntryWrapper
 			setMvccVersion(mvccVersion);
 		}
 
+		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
+
+		if (ctCollectionId != null) {
+			setCtCollectionId(ctCollectionId);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
 			setUuid(uuid);
+		}
+
+		Long headId = (Long)attributes.get("headId");
+
+		if (headId != null) {
+			setHeadId(headId);
 		}
 
 		Long fragmentEntryId = (Long)attributes.get("fragmentEntryId");
@@ -164,6 +181,12 @@ public class FragmentEntryWrapper
 			setJs(js);
 		}
 
+		Boolean cacheable = (Boolean)attributes.get("cacheable");
+
+		if (cacheable != null) {
+			setCacheable(cacheable);
+		}
+
 		String configuration = (String)attributes.get("configuration");
 
 		if (configuration != null) {
@@ -219,6 +242,21 @@ public class FragmentEntryWrapper
 		}
 	}
 
+	@Override
+	public FragmentEntry fetchDraftFragmentEntry() {
+		return model.fetchDraftFragmentEntry();
+	}
+
+	/**
+	 * Returns the cacheable of this fragment entry.
+	 *
+	 * @return the cacheable of this fragment entry
+	 */
+	@Override
+	public boolean getCacheable() {
+		return model.getCacheable();
+	}
+
 	/**
 	 * Returns the company ID of this fragment entry.
 	 *
@@ -262,6 +300,16 @@ public class FragmentEntryWrapper
 	@Override
 	public String getCss() {
 		return model.getCss();
+	}
+
+	/**
+	 * Returns the ct collection ID of this fragment entry.
+	 *
+	 * @return the ct collection ID of this fragment entry
+	 */
+	@Override
+	public long getCtCollectionId() {
+		return model.getCtCollectionId();
 	}
 
 	/**
@@ -310,6 +358,16 @@ public class FragmentEntryWrapper
 	}
 
 	/**
+	 * Returns the head ID of this fragment entry.
+	 *
+	 * @return the head ID of this fragment entry
+	 */
+	@Override
+	public long getHeadId() {
+		return model.getHeadId();
+	}
+
+	/**
 	 * Returns the html of this fragment entry.
 	 *
 	 * @return the html of this fragment entry
@@ -317,6 +375,11 @@ public class FragmentEntryWrapper
 	@Override
 	public String getHtml() {
 		return model.getHtml();
+	}
+
+	@Override
+	public String getIcon() {
+		return model.getIcon();
 	}
 
 	@Override
@@ -527,6 +590,16 @@ public class FragmentEntryWrapper
 	}
 
 	/**
+	 * Returns <code>true</code> if this fragment entry is cacheable.
+	 *
+	 * @return <code>true</code> if this fragment entry is cacheable; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isCacheable() {
+		return model.isCacheable();
+	}
+
+	/**
 	 * Returns <code>true</code> if this fragment entry is denied.
 	 *
 	 * @return <code>true</code> if this fragment entry is denied; <code>false</code> otherwise
@@ -620,6 +693,16 @@ public class FragmentEntryWrapper
 	}
 
 	/**
+	 * Sets whether this fragment entry is cacheable.
+	 *
+	 * @param cacheable the cacheable of this fragment entry
+	 */
+	@Override
+	public void setCacheable(boolean cacheable) {
+		model.setCacheable(cacheable);
+	}
+
+	/**
 	 * Sets the company ID of this fragment entry.
 	 *
 	 * @param companyId the company ID of this fragment entry
@@ -657,6 +740,16 @@ public class FragmentEntryWrapper
 	@Override
 	public void setCss(String css) {
 		model.setCss(css);
+	}
+
+	/**
+	 * Sets the ct collection ID of this fragment entry.
+	 *
+	 * @param ctCollectionId the ct collection ID of this fragment entry
+	 */
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		model.setCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -700,6 +793,16 @@ public class FragmentEntryWrapper
 	}
 
 	/**
+	 * Sets the head ID of this fragment entry.
+	 *
+	 * @param headId the head ID of this fragment entry
+	 */
+	@Override
+	public void setHeadId(long headId) {
+		model.setHeadId(headId);
+	}
+
+	/**
 	 * Sets the html of this fragment entry.
 	 *
 	 * @param html the html of this fragment entry
@@ -707,6 +810,11 @@ public class FragmentEntryWrapper
 	@Override
 	public void setHtml(String html) {
 		model.setHtml(html);
+	}
+
+	@Override
+	public void setIcon(String icon) {
+		model.setIcon(icon);
 	}
 
 	@Override
@@ -895,8 +1003,34 @@ public class FragmentEntryWrapper
 	}
 
 	@Override
+	public Map<String, Function<FragmentEntry, Object>>
+		getAttributeGetterFunctions() {
+
+		return model.getAttributeGetterFunctions();
+	}
+
+	@Override
+	public Map<String, BiConsumer<FragmentEntry, Object>>
+		getAttributeSetterBiConsumers() {
+
+		return model.getAttributeSetterBiConsumers();
+	}
+
+	@Override
 	public StagedModelType getStagedModelType() {
 		return model.getStagedModelType();
+	}
+
+	@Override
+	public boolean isHead() {
+		return model.isHead();
+	}
+
+	@Override
+	public void populateVersionModel(
+		FragmentEntryVersion fragmentEntryVersion) {
+
+		model.populateVersionModel(fragmentEntryVersion);
 	}
 
 	@Override

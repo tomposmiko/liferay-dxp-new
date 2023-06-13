@@ -22,7 +22,7 @@ export default function useRegistry({componentId, states}) {
 	const detach = (stateName, callback) => {
 		if (eventsRef.current) {
 			const refIndex = eventsRef.current.findIndex(
-				event =>
+				(event) =>
 					stateName === event.stateName && callback === event.callback
 			);
 
@@ -32,7 +32,7 @@ export default function useRegistry({componentId, states}) {
 		}
 	};
 
-	const get = stateName => {
+	const get = (stateName) => {
 		const stateValue = currentState.current[stateName];
 
 		if (stateValue) {
@@ -44,7 +44,7 @@ export default function useRegistry({componentId, states}) {
 		eventsRef.current.push({callback, stateName});
 
 		return {
-			detach: () => detach(stateName, callback)
+			detach: () => detach(stateName, callback),
 		};
 	};
 
@@ -54,10 +54,10 @@ export default function useRegistry({componentId, states}) {
 			{
 				detach,
 				get,
-				on
+				on,
 			},
 			{
-				destroyOnNavigate: true
+				destroyOnNavigate: true,
 			}
 		);
 	}
@@ -79,7 +79,7 @@ export default function useRegistry({componentId, states}) {
 			if (stateChanged.includes(stateName)) {
 				callback({
 					newValue: states[stateName],
-					previousValue: previousState.current[stateName]
+					previousValue: previousState.current[stateName],
 				});
 			}
 		});

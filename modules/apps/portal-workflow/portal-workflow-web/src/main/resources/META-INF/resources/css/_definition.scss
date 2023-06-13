@@ -6,7 +6,7 @@
 	margin: 0 !important;
 }
 
-.dialog-iframe-popup {
+.portal.popup {
 	background: #fff;
 }
 
@@ -85,6 +85,16 @@
 			border-top: 0;
 		}
 	}
+}
+
+.modal-footer .btn-toolbar .btn-secondary {
+	margin-right: 10px;
+}
+
+.modal-open .modal {
+	min-height: 325px;
+	min-width: 500px;
+	overflow-y: hidden !important;
 }
 
 .workflow-definition-container {

@@ -36,7 +36,7 @@ public abstract class FragmentManagementToolbarDisplayContext
 		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		SearchContainer searchContainer,
+		SearchContainer<Object> searchContainer,
 		FragmentDisplayContext fragmentDisplayContext) {
 
 		super(
@@ -81,7 +81,7 @@ public abstract class FragmentManagementToolbarDisplayContext
 
 	@Override
 	protected String[] getOrderByKeys() {
-		return new String[] {"name", "create-date"};
+		return new String[] {"name", "modified-date"};
 	}
 
 	protected final FragmentDisplayContext fragmentDisplayContext;

@@ -27,6 +27,7 @@ const KEY_CODE_ESC = 27;
  */
 
 class Modal extends Component {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -93,7 +94,8 @@ class Modal extends Component {
 			this._eventHandler.add(
 				dom.on(document, 'keyup', this._handleKeyup.bind(this))
 			);
-		} else {
+		}
+		else {
 			this._eventHandler.removeAllListeners();
 		}
 	}
@@ -124,7 +126,8 @@ class Modal extends Component {
 
 			this._autoFocus(this.autoFocus);
 			this._restrictFocus();
-		} else {
+		}
+		else {
 			this._unrestrictFocus();
 			this._shiftFocusBack();
 		}
@@ -234,6 +237,7 @@ class Modal extends Component {
 }
 
 Modal.STATE = {
+
 	/**
 	 * A selector for the element that should be automatically focused when the modal
 	 * becomes visible, or `false` if no auto focus should happen. Defaults to the
@@ -242,8 +246,8 @@ Modal.STATE = {
 	 */
 
 	autoFocus: {
-		validator: val => val === false || core.isString(val),
-		value: '.close'
+		validator: (val) => val === false || core.isString(val),
+		value: '.close',
 	},
 
 	/**
@@ -260,7 +264,7 @@ Modal.STATE = {
 	 */
 
 	bodyId: {
-		valueFn: () => 'modal-body-' + core.getUid()
+		valueFn: () => 'modal-body-' + core.getUid(),
 	},
 
 	/**
@@ -269,7 +273,7 @@ Modal.STATE = {
 	 */
 
 	dialogClasses: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -294,7 +298,7 @@ Modal.STATE = {
 	 */
 
 	headerId: {
-		valueFn: () => 'modal-header-' + core.getUid()
+		valueFn: () => 'modal-header-' + core.getUid(),
 	},
 
 	/**
@@ -305,7 +309,7 @@ Modal.STATE = {
 
 	hideOnEscape: {
 		validator: core.isBoolean,
-		value: true
+		value: true,
 	},
 
 	/**
@@ -316,7 +320,7 @@ Modal.STATE = {
 	 */
 
 	noCloseButton: {
-		value: false
+		value: false,
 	},
 
 	/**
@@ -327,7 +331,7 @@ Modal.STATE = {
 
 	overlay: {
 		validator: core.isBoolean,
-		value: true
+		value: true,
 	},
 
 	/**
@@ -337,7 +341,7 @@ Modal.STATE = {
 
 	overlayElement: {
 		valueFn: '_valueOverlayElementFn',
-		writeOnce: true
+		writeOnce: true,
 	},
 
 	/**
@@ -348,8 +352,8 @@ Modal.STATE = {
 
 	role: {
 		validator: core.isString,
-		value: 'dialog'
-	}
+		value: 'dialog',
+	},
 };
 
 Soy.register(Modal, templates);

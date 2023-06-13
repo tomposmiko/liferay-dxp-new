@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import java.sql.Connection;
@@ -68,7 +69,9 @@ public class UpgradeAssetDisplayPageEntryTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -380,6 +383,11 @@ public class UpgradeAssetDisplayPageEntryTest {
 					}
 				}
 
+				@Override
+				public void registerInitialUpgradeSteps(
+					UpgradeStep... upgradeSteps) {
+				}
+
 			});
 	}
 
@@ -390,6 +398,7 @@ public class UpgradeAssetDisplayPageEntryTest {
 		Group liveGroup = createGroup();
 
 		GroupTestUtil.enableLocalStaging(liveGroup);
+
 		Group stagingGroup = liveGroup.getStagingGroup();
 
 		String layoutUuid = PortalUUIDUtil.generate();

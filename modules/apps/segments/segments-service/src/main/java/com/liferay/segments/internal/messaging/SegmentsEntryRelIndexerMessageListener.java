@@ -14,16 +14,14 @@
 
 package com.liferay.segments.internal.messaging;
 
-import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
-import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
@@ -32,14 +30,10 @@ import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.segments.internal.background.task.SegmentsEntryRelIndexerBackgroundTaskExecutor;
-import com.liferay.segments.internal.configuration.SegmentsServiceConfiguration;
+import com.liferay.segments.configuration.SegmentsConfiguration;
+import com.liferay.segments.internal.constants.SegmentsDestinationNames;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.service.SegmentsEntryLocalService;
-
-import java.io.Serializable;
 
 import java.util.Map;
 
@@ -53,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
-	configurationPid = "com.liferay.segments.internal.configuration.SegmentsServiceConfiguration",
+	configurationPid = "com.liferay.segments.configuration.SegmentsConfiguration",
 	immediate = true,
 	service = {
 		MessageListener.class, SegmentsEntryRelIndexerMessageListener.class
@@ -65,8 +59,8 @@ public class SegmentsEntryRelIndexerMessageListener
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_segmentsServiceConfiguration = ConfigurableUtil.createConfigurable(
-			SegmentsServiceConfiguration.class, properties);
+		_segmentsConfiguration = ConfigurableUtil.createConfigurable(
+			SegmentsConfiguration.class, properties);
 
 		Class<?> clazz = getClass();
 
@@ -74,7 +68,7 @@ public class SegmentsEntryRelIndexerMessageListener
 
 		Trigger trigger = _triggerFactory.createTrigger(
 			className, className, null, null,
-			_segmentsServiceConfiguration.segmentsPreviewCheckInterval(),
+			_segmentsConfiguration.segmentsPreviewCheckInterval(),
 			TimeUnit.MINUTE);
 
 		SchedulerEntry schedulerEntry = new SchedulerEntryImpl(
@@ -101,39 +95,8 @@ public class SegmentsEntryRelIndexerMessageListener
 				dynamicQuery.add(activeProperty.eq(true));
 			});
 		actionableDynamicQuery.setPerformActionMethod(
-			(SegmentsEntry segmentsEntry) -> {
-				String backgroundTaskName =
-					SegmentsEntryRelIndexerBackgroundTaskExecutor.
-						getBackgroundTaskName(
-							segmentsEntry.getSegmentsEntryId());
-
-				int count = _backgroundTaskLocalService.getBackgroundTasksCount(
-					segmentsEntry.getGroupId(), backgroundTaskName,
-					SegmentsEntryRelIndexerBackgroundTaskExecutor.class.
-						getName(),
-					false);
-
-				if (count > 0) {
-					return;
-				}
-
-				Map<String, Serializable> taskContextMap =
-					HashMapBuilder.<String, Serializable>put(
-						BackgroundTaskContextMapConstants.DELETE_ON_SUCCESS,
-						true
-					).put(
-						"segmentsEntryId", segmentsEntry.getSegmentsEntryId()
-					).put(
-						"type", segmentsEntry.getType()
-					).build();
-
-				_backgroundTaskManager.addBackgroundTask(
-					segmentsEntry.getUserId(), segmentsEntry.getGroupId(),
-					backgroundTaskName,
-					SegmentsEntryRelIndexerBackgroundTaskExecutor.class.
-						getName(),
-					taskContextMap, new ServiceContext());
-			});
+			(ActionableDynamicQuery.PerformActionMethod<SegmentsEntry>)
+				this::_reindex);
 
 		actionableDynamicQuery.performActions();
 	}
@@ -143,19 +106,27 @@ public class SegmentsEntryRelIndexerMessageListener
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference
-	private BackgroundTaskLocalService _backgroundTaskLocalService;
+	private void _reindex(SegmentsEntry segmentsEntry) {
+		Message message = new Message();
+
+		message.put("companyId", segmentsEntry.getCompanyId());
+		message.put("segmentsEntryId", segmentsEntry.getSegmentsEntryId());
+		message.put("type", segmentsEntry.getType());
+
+		_messageBus.sendMessage(
+			SegmentsDestinationNames.SEGMENTS_ENTRY_REINDEX, message);
+	}
 
 	@Reference
-	private BackgroundTaskManager _backgroundTaskManager;
+	private MessageBus _messageBus;
 
 	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
 
+	private volatile SegmentsConfiguration _segmentsConfiguration;
+
 	@Reference
 	private SegmentsEntryLocalService _segmentsEntryLocalService;
-
-	private volatile SegmentsServiceConfiguration _segmentsServiceConfiguration;
 
 	@Reference
 	private TriggerFactory _triggerFactory;

@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.ParentKnowledgeBaseFolderSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ParentKnowledgeBaseFolder {
+public class ParentKnowledgeBaseFolder implements Cloneable, Serializable {
+
+	public static ParentKnowledgeBaseFolder toDTO(String json) {
+		return ParentKnowledgeBaseFolderSerDes.toDTO(json);
+	}
 
 	public Long getFolderId() {
 		return folderId;
@@ -69,6 +75,11 @@ public class ParentKnowledgeBaseFolder {
 	}
 
 	protected String folderName;
+
+	@Override
+	public ParentKnowledgeBaseFolder clone() throws CloneNotSupportedException {
+		return (ParentKnowledgeBaseFolder)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

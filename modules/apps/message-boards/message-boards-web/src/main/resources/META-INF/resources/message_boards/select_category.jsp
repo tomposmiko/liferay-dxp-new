@@ -38,7 +38,7 @@ else {
 }
 %>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<aui:form method="post" name="selectCategoryFm">
 		<liferay-ui:breadcrumb
 			showGuestGroup="<%= false %>"
@@ -109,28 +109,32 @@ else {
 				/>
 
 				<liferay-ui:search-container-column-text>
-
-					<%
-					Map<String, Object> data = new HashMap<>();
-
-					data.put("categoryId", curCategory.getCategoryId());
-					data.put("name", curCategory.getName());
-					%>
-
-					<aui:button cssClass="selector-button" data="<%= data %>" value="select" />
+					<aui:button
+						cssClass="selector-button"
+						data='<%=
+							HashMapBuilder.<String, Object>put(
+								"categoryId", curCategory.getCategoryId()
+							).put(
+								"name", curCategory.getName()
+							).build()
+						%>'
+						value="select"
+					/>
 				</liferay-ui:search-container-column-text>
 			</liferay-ui:search-container-row>
 
 			<aui:button-row>
-
-				<%
-				Map<String, Object> data = new HashMap<>();
-
-				data.put("categoryId", categoryId);
-				data.put("name", categoryName);
-				%>
-
-				<aui:button cssClass="selector-button" data="<%= data %>" value="select-this-category" />
+				<aui:button
+					cssClass="selector-button"
+					data='<%=
+						HashMapBuilder.<String, Object>put(
+							"categoryId", categoryId
+						).put(
+							"name", categoryName
+						).build()
+					%>'
+					value="select-this-category"
+				/>
 			</aui:button-row>
 
 			<liferay-ui:search-iterator
@@ -138,7 +142,7 @@ else {
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <aui:script>
 	Liferay.Util.selectEntityHandler(

@@ -17,7 +17,7 @@ package com.liferay.fragment.web.internal.display.context;
 import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.web.internal.security.permission.resource.FragmentPermission;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -56,38 +56,32 @@ public class InheritedFragmentManagementToolbarDisplayContext
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
-		return new DropdownItemList() {
-			{
-				add(
-					dropdownItem -> {
-						dropdownItem.putData(
-							"action", "exportSelectedFragmentEntries");
-						dropdownItem.setIcon("import-export");
-						dropdownItem.setLabel(
-							LanguageUtil.get(request, "export"));
-						dropdownItem.setQuickAction(true);
-					});
-
-				if (FragmentPermission.contains(
-						themeDisplay.getPermissionChecker(),
-						themeDisplay.getScopeGroupId(),
-						FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
-
-					add(
-						dropdownItem -> {
-							dropdownItem.putData(
-								"action", "copyToSelectedFragmentEntries");
-							dropdownItem.setIcon("paste");
-							dropdownItem.setLabel(
-								LanguageUtil.get(request, "copy-to"));
-							dropdownItem.setQuickAction(true);
-						});
-				}
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.putData(
+					"action", "exportFragmentCompositionsAndFragmentEntries");
+				dropdownItem.setIcon("import-export");
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "export"));
+				dropdownItem.setQuickAction(true);
 			}
-		};
+		).add(
+			() -> FragmentPermission.contains(
+				themeDisplay.getPermissionChecker(),
+				themeDisplay.getScopeGroupId(),
+				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES),
+			dropdownItem -> {
+				dropdownItem.putData("action", "copyToSelectedFragmentEntries");
+				dropdownItem.setIcon("paste");
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "copy-to"));
+				dropdownItem.setQuickAction(true);
+			}
+		).build();
 	}
 
 	@Override
@@ -95,8 +89,9 @@ public class InheritedFragmentManagementToolbarDisplayContext
 		return HashMapBuilder.<String, Object>put(
 			"copyFragmentEntryURL",
 			() -> {
-				ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-					WebKeys.THEME_DISPLAY);
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
 				PortletURL copyFragmentEntryURL =
 					liferayPortletResponse.createActionURL();
@@ -115,7 +110,8 @@ public class InheritedFragmentManagementToolbarDisplayContext
 					liferayPortletResponse.createResourceURL();
 
 				exportFragmentEntriesURL.setResourceID(
-					"/fragment/export_fragment_entries");
+					"/fragment" +
+						"/export_fragment_compositions_and_fragment_entries");
 
 				return exportFragmentEntriesURL.toString();
 			}

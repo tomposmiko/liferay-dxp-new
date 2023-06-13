@@ -3,6 +3,13 @@
 exports[`PagesVisitor is able to change columns 1`] = `
 Array [
   Object {
+    "description": "Add a short description for this page.",
+    "localizedDescription": Object {
+      "en_US": "Add a short description for this page.",
+    },
+    "localizedTitle": Object {
+      "en_US": "Page title",
+    },
     "rows": Array [
       Object {
         "columns": Array [
@@ -10,6 +17,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "liferay",
+                "instanceId": "123njndk1",
                 "label": "Radio Field",
                 "options": Array [
                   Object {
@@ -79,6 +87,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "text1",
+                "instanceId": "1fnjndk1",
                 "label": "Text Field 1",
                 "required": true,
                 "settingsContext": Object {
@@ -88,6 +97,7 @@ Array [
               },
               Object {
                 "fieldName": "text2",
+                "instanceId": "193jndk1",
                 "label": "Text Field 2",
                 "required": true,
                 "settingsContext": Object {
@@ -102,6 +112,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "select",
+                "instanceId": "1fnjfqk1",
                 "label": "Select Field",
                 "options": Array [
                   Object {
@@ -134,6 +145,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "date",
+                "instanceId": "1ffqwjndk1",
                 "label": "Date Field",
                 "required": true,
                 "settingsContext": Object {
@@ -152,6 +164,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "numeric",
+                "instanceId": "1ljqjndk1",
                 "label": "Numeric Field",
                 "required": true,
                 "settingsContext": Object {
@@ -165,7 +178,7 @@ Array [
         ],
       },
     ],
-    "title": "Untitled name",
+    "title": "Page title",
   },
 ]
 `;
@@ -173,6 +186,13 @@ Array [
 exports[`PagesVisitor is able to change fields 1`] = `
 Array [
   Object {
+    "description": "Add a short description for this page.",
+    "localizedDescription": Object {
+      "en_US": "Add a short description for this page.",
+    },
+    "localizedTitle": Object {
+      "en_US": "Page title",
+    },
     "rows": Array [
       Object {
         "columns": Array [
@@ -180,6 +200,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "liferay",
+                "instanceId": "123njndk1",
                 "label": "New label 0",
                 "options": Array [
                   Object {
@@ -249,6 +270,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "text1",
+                "instanceId": "1fnjndk1",
                 "label": "New label 0",
                 "required": true,
                 "settingsContext": Object {
@@ -258,6 +280,7 @@ Array [
               },
               Object {
                 "fieldName": "text2",
+                "instanceId": "193jndk1",
                 "label": "New label 1",
                 "required": true,
                 "settingsContext": Object {
@@ -272,6 +295,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "select",
+                "instanceId": "1fnjfqk1",
                 "label": "New label 0",
                 "options": Array [
                   Object {
@@ -304,6 +328,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "date",
+                "instanceId": "1ffqwjndk1",
                 "label": "New label 0",
                 "required": true,
                 "settingsContext": Object {
@@ -322,6 +347,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "numeric",
+                "instanceId": "1ljqjndk1",
                 "label": "New label 0",
                 "required": true,
                 "settingsContext": Object {
@@ -335,7 +361,7 @@ Array [
         ],
       },
     ],
-    "title": "Untitled name",
+    "title": "Page title",
   },
 ]
 `;
@@ -343,6 +369,13 @@ Array [
 exports[`PagesVisitor is able to change pages 1`] = `
 Array [
   Object {
+    "description": "Add a short description for this page.",
+    "localizedDescription": Object {
+      "en_US": "Add a short description for this page.",
+    },
+    "localizedTitle": Object {
+      "en_US": "Page title",
+    },
     "rows": Array [
       Object {
         "columns": Array [
@@ -350,6 +383,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "liferay",
+                "instanceId": "123njndk1",
                 "label": "Radio Field",
                 "options": Array [
                   Object {
@@ -419,6 +453,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "text1",
+                "instanceId": "1fnjndk1",
                 "label": "Text Field 1",
                 "required": true,
                 "settingsContext": Object {
@@ -428,6 +463,7 @@ Array [
               },
               Object {
                 "fieldName": "text2",
+                "instanceId": "193jndk1",
                 "label": "Text Field 2",
                 "required": true,
                 "settingsContext": Object {
@@ -442,6 +478,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "select",
+                "instanceId": "1fnjfqk1",
                 "label": "Select Field",
                 "options": Array [
                   Object {
@@ -474,6 +511,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "date",
+                "instanceId": "1ffqwjndk1",
                 "label": "Date Field",
                 "required": true,
                 "settingsContext": Object {
@@ -492,6 +530,7 @@ Array [
             "fields": Array [
               Object {
                 "fieldName": "numeric",
+                "instanceId": "1ljqjndk1",
                 "label": "Numeric Field",
                 "required": true,
                 "settingsContext": Object {
@@ -513,6 +552,13 @@ Array [
 exports[`PagesVisitor is able to change rows 1`] = `
 Array [
   Object {
+    "description": "Add a short description for this page.",
+    "localizedDescription": Object {
+      "en_US": "Add a short description for this page.",
+    },
+    "localizedTitle": Object {
+      "en_US": "Page title",
+    },
     "rows": Array [
       Object {
         "columns": Array [],
@@ -527,7 +573,7 @@ Array [
         "columns": Array [],
       },
     ],
-    "title": "Untitled name",
+    "title": "Page title",
   },
 ]
 `;

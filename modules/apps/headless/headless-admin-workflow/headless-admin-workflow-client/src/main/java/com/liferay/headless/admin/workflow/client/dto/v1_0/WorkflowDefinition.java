@@ -17,6 +17,8 @@ package com.liferay.headless.admin.workflow.client.dto.v1_0;
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowDefinitionSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class WorkflowDefinition {
+public class WorkflowDefinition implements Cloneable, Serializable {
+
+	public static WorkflowDefinition toDTO(String json) {
+		return WorkflowDefinitionSerDes.toDTO(json);
+	}
 
 	public Boolean getActive() {
 		return active;
@@ -173,6 +179,11 @@ public class WorkflowDefinition {
 	}
 
 	protected String version;
+
+	@Override
+	public WorkflowDefinition clone() throws CloneNotSupportedException {
+		return (WorkflowDefinition)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

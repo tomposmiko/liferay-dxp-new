@@ -19,6 +19,7 @@ import GeoJSONBase from 'map-common/js/GeoJSONBase.es';
  * @review
  */
 class GoogleMapsGeoJSON extends GeoJSONBase {
+
 	/**
 	 * Creates a new geojson parser using Google Map's API
 	 * @param  {Array} args List of arguments to be passed to State
@@ -42,7 +43,7 @@ class GoogleMapsGeoJSON extends GeoJSONBase {
 	 * @review
 	 */
 	destructor() {
-		this._eventHandlers.forEach(item => {
+		this._eventHandlers.forEach((item) => {
 			google.maps.event.removeListener(item);
 		});
 	}
@@ -60,7 +61,7 @@ class GoogleMapsGeoJSON extends GeoJSONBase {
 				this.map.data,
 				'click',
 				this._handleFeatureClicked
-			)
+			),
 		];
 	}
 
@@ -74,7 +75,7 @@ class GoogleMapsGeoJSON extends GeoJSONBase {
 	 */
 	_getFeatureStyle(feature) {
 		return {
-			icon: feature.getProperty('icon')
+			icon: feature.getProperty('icon'),
 		};
 	}
 
@@ -102,7 +103,7 @@ class GoogleMapsGeoJSON extends GeoJSONBase {
 					map: this.map,
 					opacity: 0,
 					position: feature.getGeometry().get('location'),
-					zIndex: -1
+					zIndex: -1,
 				});
 
 				feature._marker = marker;

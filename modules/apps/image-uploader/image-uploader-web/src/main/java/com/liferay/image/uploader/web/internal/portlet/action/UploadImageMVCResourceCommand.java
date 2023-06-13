@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Component;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ImageUploaderPortletKeys.IMAGE_UPLOADER,
-		"mvc.command.name=/image_uploader/view"
+		"mvc.command.name=/image_uploader/upload_image"
 	},
 	service = MVCResourceCommand.class
 )
@@ -89,10 +89,10 @@ public class UploadImageMVCResourceCommand extends BaseMVCResourceCommand {
 	}
 
 	protected void serveTempImageFile(
-			MimeResponse mimeResponse, InputStream tempImageStream)
+			MimeResponse mimeResponse, InputStream tempImageInputStream)
 		throws Exception {
 
-		ImageBag imageBag = ImageToolUtil.read(tempImageStream);
+		ImageBag imageBag = ImageToolUtil.read(tempImageInputStream);
 
 		byte[] bytes = ImageToolUtil.getBytes(
 			imageBag.getRenderedImage(), imageBag.getType());

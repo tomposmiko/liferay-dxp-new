@@ -15,16 +15,17 @@
 const path = require('path');
 
 /**
- * We use liferay-npm-scripts to perform linting in a controlled way, but we
+ * We use @liferay/npm-scripts to perform linting in a controlled way, but we
  * also try to expose its configuration here so it can be picked up by editors.
  */
 let config = {};
 
 try {
-	config = require('liferay-npm-scripts/src/config/eslint.config');
-} catch (error) {
+	config = require('@liferay/npm-scripts/src/config/eslint.config');
+}
+catch (error) {
 	throw new Error(
-		'liferay-npm-scripts is not installed; please run "ant setup-sdk"'
+		'@liferay/npm-scripts is not installed; please run "ant setup-sdk"'
 	);
 }
 
@@ -32,17 +33,27 @@ config = {
 	...config,
 	globals: {
 		...config.globals,
-		MODULE_PATH: true
+		MODULE_PATH: true,
 	},
 	rules: {
+		'@liferay/portal/no-metal-plugins': 'off',
 		'no-empty': ['error', {allowEmptyCatch: true}],
+		'no-for-of-loops/no-for-of-loops': 'error',
+		'no-use-before-define': [
+			'error',
+			{
+				classes: true,
+				functions: false,
+				variables: true,
+			},
+		],
 		'notice/notice': [
 			'error',
 			{
-				templateFile: path.join(__dirname, 'copyright.js')
-			}
-		]
-	}
+				templateFile: path.join(__dirname, 'copyright.js'),
+			},
+		],
+	},
 };
 
 module.exports = config;

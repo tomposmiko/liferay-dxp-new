@@ -28,7 +28,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 	action="<%= configurationActionURL %>"
 	method="post"
 	name="fm"
-	onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'
+	onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveConfiguration();" %>'
 >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
@@ -78,10 +78,18 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 					<div class="form-group">
 						<aui:input label="root-folder" name="rootFolderName" type="resource" value="<%= rootFolderName %>" />
 
+						<div class="alert alert-warning <%= rootFolderInTrash ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />rootFolderInTrash">
+							<liferay-ui:message key="the-selected-root-folder-is-in-the-recycle-bin-please-remove-it-or-select-another-one" />
+						</div>
+
+						<div class="alert alert-warning <%= rootFolderNotFound ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />rootFolderNotFound">
+							<liferay-ui:message key="the-selected-root-folder-cannot-be-found-please-select-another-one" />
+						</div>
+
 						<aui:button name="openFolderSelectorButton" value="select" />
 
 						<%
-						String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('rootFolderId', 'rootFolderName', this, '" + renderResponse.getNamespace() + "');";
+						String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('rootFolderId', 'rootFolderName', this, '" + liferayPortletResponse.getNamespace() + "');";
 						%>
 
 						<aui:button disabled="<%= rootFolderId <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
@@ -104,39 +112,45 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 	);
 
 	if (openFolderSelectorButton) {
-		openFolderSelectorButton.addEventListener('click', function(event) {
-			Liferay.Util.selectEntity(
-				{
-					dialog: {
-						constrain: true,
-						destroyOnHide: true,
-						modal: true,
-						width: 680
-					},
-					id:
-						'_<%= HtmlUtil.escapeJS(igRequestHelper.getPortletResource()) %>_selectFolder',
-					title:
-						'<liferay-ui:message arguments="folder" key="select-x" />',
-
-					<liferay-portlet:renderURL portletName="<%= igRequestHelper.getPortletResource() %>" var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-						<portlet:param name="mvcRenderCommandName" value="/document_library/select_folder" />
-						<portlet:param name="folderId" value="<%= String.valueOf(rootFolderId) %>" />
-						<portlet:param name="ignoreRootFolder" value="<%= Boolean.TRUE.toString() %>" />
-					</liferay-portlet:renderURL>
-
-					uri: '<%= HtmlUtil.escapeJS(selectFolderURL.toString()) %>'
-				},
-				function(event) {
+		openFolderSelectorButton.addEventListener('click', function (event) {
+			Liferay.Util.getOpener().Liferay.Util.openSelectionModal({
+				id:
+					'_<%= HtmlUtil.escapeJS(igRequestHelper.getPortletResource()) %>_selectFolder',
+				onSelect: function (selectedItem) {
 					var folderData = {
 						idString: 'rootFolderId',
-						idValue: event.folderid,
+						idValue: selectedItem.folderid,
 						nameString: 'rootFolderName',
-						nameValue: event.foldername
+						nameValue: selectedItem.foldername,
 					};
 
 					Liferay.Util.selectFolder(folderData, '<portlet:namespace />');
-				}
-			);
+
+					var rootFolderInTrashWarning = document.querySelector(
+						'#<portlet:namespace />rootFolderInTrash'
+					);
+
+					rootFolderInTrashWarning.classList.add('hide');
+
+					var rootFolderNotFoundWarning = document.querySelector(
+						'#<portlet:namespace />rootFolderNotFound'
+					);
+
+					rootFolderNotFoundWarning.classList.add('hide');
+				},
+				selectEventName:
+					'_<%= HtmlUtil.escapeJS(igRequestHelper.getPortletResource()) %>_selectFolder',
+				title: '<liferay-ui:message arguments="folder" key="select-x" />',
+
+				<liferay-portlet:renderURL portletName="<%= igRequestHelper.getPortletResource() %>" var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+					<portlet:param name="mvcRenderCommandName" value="/document_library/select_folder" />
+					<portlet:param name="folderId" value="<%= (rootFolderInTrash || rootFolderNotFound) ? String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID): String.valueOf(rootFolderId) %>" />
+					<portlet:param name="ignoreRootFolder" value="<%= Boolean.TRUE.toString() %>" />
+					<portlet:param name="selectedFolderId" value="<%= String.valueOf(rootFolderId) %>" />
+				</liferay-portlet:renderURL>
+
+				url: '<%= HtmlUtil.escapeJS(selectFolderURL.toString()) %>',
+			});
 		});
 	}
 
@@ -147,8 +161,8 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 			data: {
 				mimeTypes: Liferay.Util.listSelect(
 					Liferay.Util.getFormElement(form, 'currentMimeTypes')
-				)
-			}
+				),
+			},
 		});
 	}
 </script>

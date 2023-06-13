@@ -35,6 +35,10 @@ public class KBTemplateLocalServiceWrapper
 	/**
 	 * Adds the kb template to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBTemplateLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kbTemplate the kb template
 	 * @return the kb template that was added
 	 */
@@ -68,6 +72,17 @@ public class KBTemplateLocalServiceWrapper
 		return _kbTemplateLocalService.createKBTemplate(kbTemplateId);
 	}
 
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kbTemplateLocalService.createPersistedModel(primaryKeyObj);
+	}
+
 	@Override
 	public void deleteGroupKBTemplates(long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -77,6 +92,10 @@ public class KBTemplateLocalServiceWrapper
 
 	/**
 	 * Deletes the kb template from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBTemplateLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbTemplate the kb template
 	 * @return the kb template that was removed
@@ -92,6 +111,10 @@ public class KBTemplateLocalServiceWrapper
 
 	/**
 	 * Deletes the kb template with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBTemplateLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbTemplateId the primary key of the kb template
 	 * @return the kb template that was removed
@@ -121,6 +144,18 @@ public class KBTemplateLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kbTemplateLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _kbTemplateLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _kbTemplateLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -383,6 +418,9 @@ public class KBTemplateLocalServiceWrapper
 		return _kbTemplateLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -405,6 +443,10 @@ public class KBTemplateLocalServiceWrapper
 
 	/**
 	 * Updates the kb template in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBTemplateLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbTemplate the kb template
 	 * @return the kb template that was updated

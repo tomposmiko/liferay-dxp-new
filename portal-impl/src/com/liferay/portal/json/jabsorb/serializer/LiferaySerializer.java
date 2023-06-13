@@ -204,27 +204,28 @@ public class LiferaySerializer extends AbstractSerializer {
 		}
 
 		try {
-			ClassLoader classLoader = null;
+			boolean loadedClassFromContext = false;
 
 			if (jsonObject.has("contextName")) {
 				String contextName = jsonObject.getString("contextName");
 
-				classLoader = ClassLoaderPool.getClassLoader(contextName);
+				ClassLoader classLoader = ClassLoaderPool.getClassLoader(
+					contextName);
 
-				if (classLoader == null) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							StringBundler.concat(
-								"Unable to get class loader for class ",
-								javaClassName, " in context ", contextName));
-					}
+				if (classLoader != null) {
+					Class.forName(javaClassName, true, classLoader);
+
+					loadedClassFromContext = true;
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn(
+						StringBundler.concat(
+							"Unable to get class loader for class ",
+							javaClassName, " in context ", contextName));
 				}
 			}
 
-			if (classLoader != null) {
-				Class.forName(javaClassName, true, classLoader);
-			}
-			else {
+			if (!loadedClassFromContext) {
 				Class.forName(javaClassName);
 			}
 		}
@@ -303,27 +304,36 @@ public class LiferaySerializer extends AbstractSerializer {
 		Object javaClassInstance = null;
 
 		try {
-			ClassLoader classLoader = null;
-
 			if (jsonObject.has("contextName")) {
 				String contextName = jsonObject.getString("contextName");
 
-				classLoader = ClassLoaderPool.getClassLoader(contextName);
+				ClassLoader classLoader = ClassLoaderPool.getClassLoader(
+					contextName);
 
-				if (classLoader == null) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							StringBundler.concat(
-								"Unable to get class loader for class ",
-								javaClassName, " in context ", contextName));
+				if (classLoader != null) {
+					try {
+						javaClass = Class.forName(
+							javaClassName, true, classLoader);
 					}
+					catch (ClassNotFoundException classNotFoundException) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								StringBundler.concat(
+									"Unable to load class ", javaClassName,
+									" in context ", contextName),
+								classNotFoundException);
+						}
+					}
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn(
+						StringBundler.concat(
+							"Unable to get class loader for class ",
+							javaClassName, " in context ", contextName));
 				}
 			}
 
-			if (classLoader != null) {
-				javaClass = Class.forName(javaClassName, true, classLoader);
-			}
-			else {
+			if (javaClass == null) {
 				javaClass = Class.forName(javaClassName);
 			}
 
@@ -424,7 +434,7 @@ public class LiferaySerializer extends AbstractSerializer {
 		return javaClassInstance;
 	}
 
-	private static Object _getSafe(JSONObject jsonObject, String name) {
+	private Object _getSafe(JSONObject jsonObject, String name) {
 		Object object = jsonObject.get(name);
 
 		if (object instanceof Integer) {

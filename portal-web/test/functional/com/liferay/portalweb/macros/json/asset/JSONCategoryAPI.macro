@@ -16,10 +16,9 @@ definition {
 				-d vocabularyId=${vocabularyId} \
 				-d categoryProperties=
 		''';
-
 		var categoryId = JSONCurlUtil.post("${curl}", "$.categoryId");
-		var categoryId = StringUtil.replace("${categoryId}", "[&quot;", "");
-		var categoryId = StringUtil.replace("${categoryId}", "&quot;]", "");
+		var categoryId = StringUtil.replace("${categoryId}", "[\"", "");
+		var categoryId = StringUtil.replace("${categoryId}", "\"]", "");
 
 		return "${categoryId}";
 	}
@@ -53,18 +52,17 @@ definition {
 			${portalURL}/api/jsonws/assetcategory/get-vocabulary-categories \
 				-u test@liferay.com:test \
 				-d groupId=${groupId} \
-				-d name=${categoryName} \
+				-d <CURL_DATA[name=${categoryName}]CURL_DATA> \
 				-d vocabularyId=${vocabularyId} \
 				-d <CURL_DATA[start=-1]CURL_DATA> \
 				-d <CURL_DATA[end=-1]CURL_DATA> \
-				-d -obc=
+				-d -orderByComparator=
 		''';
-
 		var categoryId = JSONCurlUtil.post("${curl}", "$.[?(@['titleCurrentValue'] == '${categoryName}')]['categoryId']");
-		var categoryId = StringUtil.replace("${categoryId}", "[&quot;", "");
-		var categoryId = StringUtil.replace("${categoryId}", "&quot;]", "");
+		var categoryId = StringUtil.replace("${categoryId}", "[\"", "");
+		var categoryId = StringUtil.replace("${categoryId}", "\"]", "");
 
-		if ("${categoryId}" == "[]") {
+		if ("${categoryId}" == "") {
 			fail("FAIL. Cannot find category.");
 		}
 
@@ -82,12 +80,11 @@ definition {
 				-u test@liferay.com:test \
 				-d groupId=${groupId}
 		''';
-
 		var vocabularyId = JSONCurlUtil.post("${curl}", "$.[?(@['titleCurrentValue'] == '${vocabularyName}')]['vocabularyId']");
-		var vocabularyId = StringUtil.replace("${vocabularyId}", "[&quot;", "");
-		var vocabularyId = StringUtil.replace("${vocabularyId}", "&quot;]", "");
+		var vocabularyId = StringUtil.replace("${vocabularyId}", "[\"", "");
+		var vocabularyId = StringUtil.replace("${vocabularyId}", "\"]", "");
 
-		if ("${vocabularyId}" == "[]") {
+		if ("${vocabularyId}" == "") {
 			fail("FAIL. Cannot find vocabulary.");
 		}
 

@@ -23,9 +23,11 @@ import java.util.List;
 /**
  * This class is used by SOAP remote services, specifically {@link com.liferay.dispatch.service.http.DispatchTriggerServiceSoap}.
  *
- * @author Alessio Antonio Rendina
+ * @author Matija Petanjek
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class DispatchTriggerSoap implements Serializable {
 
 	public static DispatchTriggerSoap toSoapModel(DispatchTrigger model) {
@@ -40,12 +42,16 @@ public class DispatchTriggerSoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setActive(model.isActive());
 		soapModel.setCronExpression(model.getCronExpression());
+		soapModel.setDispatchTaskClusterMode(
+			model.getDispatchTaskClusterMode());
+		soapModel.setDispatchTaskExecutorType(
+			model.getDispatchTaskExecutorType());
+		soapModel.setDispatchTaskSettings(model.getDispatchTaskSettings());
 		soapModel.setEndDate(model.getEndDate());
 		soapModel.setName(model.getName());
+		soapModel.setOverlapAllowed(model.isOverlapAllowed());
 		soapModel.setStartDate(model.getStartDate());
 		soapModel.setSystem(model.isSystem());
-		soapModel.setType(model.getType());
-		soapModel.setTypeSettings(model.getTypeSettings());
 
 		return soapModel;
 	}
@@ -181,6 +187,30 @@ public class DispatchTriggerSoap implements Serializable {
 		_cronExpression = cronExpression;
 	}
 
+	public int getDispatchTaskClusterMode() {
+		return _dispatchTaskClusterMode;
+	}
+
+	public void setDispatchTaskClusterMode(int dispatchTaskClusterMode) {
+		_dispatchTaskClusterMode = dispatchTaskClusterMode;
+	}
+
+	public String getDispatchTaskExecutorType() {
+		return _dispatchTaskExecutorType;
+	}
+
+	public void setDispatchTaskExecutorType(String dispatchTaskExecutorType) {
+		_dispatchTaskExecutorType = dispatchTaskExecutorType;
+	}
+
+	public String getDispatchTaskSettings() {
+		return _dispatchTaskSettings;
+	}
+
+	public void setDispatchTaskSettings(String dispatchTaskSettings) {
+		_dispatchTaskSettings = dispatchTaskSettings;
+	}
+
 	public Date getEndDate() {
 		return _endDate;
 	}
@@ -195,6 +225,18 @@ public class DispatchTriggerSoap implements Serializable {
 
 	public void setName(String name) {
 		_name = name;
+	}
+
+	public boolean getOverlapAllowed() {
+		return _overlapAllowed;
+	}
+
+	public boolean isOverlapAllowed() {
+		return _overlapAllowed;
+	}
+
+	public void setOverlapAllowed(boolean overlapAllowed) {
+		_overlapAllowed = overlapAllowed;
 	}
 
 	public Date getStartDate() {
@@ -217,22 +259,6 @@ public class DispatchTriggerSoap implements Serializable {
 		_system = system;
 	}
 
-	public String getType() {
-		return _type;
-	}
-
-	public void setType(String type) {
-		_type = type;
-	}
-
-	public String getTypeSettings() {
-		return _typeSettings;
-	}
-
-	public void setTypeSettings(String typeSettings) {
-		_typeSettings = typeSettings;
-	}
-
 	private long _mvccVersion;
 	private long _dispatchTriggerId;
 	private long _companyId;
@@ -242,11 +268,13 @@ public class DispatchTriggerSoap implements Serializable {
 	private Date _modifiedDate;
 	private boolean _active;
 	private String _cronExpression;
+	private int _dispatchTaskClusterMode;
+	private String _dispatchTaskExecutorType;
+	private String _dispatchTaskSettings;
 	private Date _endDate;
 	private String _name;
+	private boolean _overlapAllowed;
 	private Date _startDate;
 	private boolean _system;
-	private String _type;
-	private String _typeSettings;
 
 }

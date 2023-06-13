@@ -14,7 +14,10 @@
 
 package com.liferay.layout.seo.service;
 
+import com.liferay.layout.seo.model.LayoutSEOSite;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link LayoutSEOSiteLocalService}.
@@ -36,13 +39,15 @@ public class LayoutSEOSiteLocalServiceWrapper
 	/**
 	 * Adds the layout seo site to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutSEOSiteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutSEOSite the layout seo site
 	 * @return the layout seo site that was added
 	 */
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite addLayoutSEOSite(
-		com.liferay.layout.seo.model.LayoutSEOSite layoutSEOSite) {
-
+	public LayoutSEOSite addLayoutSEOSite(LayoutSEOSite layoutSEOSite) {
 		return _layoutSEOSiteLocalService.addLayoutSEOSite(layoutSEOSite);
 	}
 
@@ -53,35 +58,49 @@ public class LayoutSEOSiteLocalServiceWrapper
 	 * @return the new layout seo site
 	 */
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite createLayoutSEOSite(
-		long layoutSEOSiteId) {
-
+	public LayoutSEOSite createLayoutSEOSite(long layoutSEOSiteId) {
 		return _layoutSEOSiteLocalService.createLayoutSEOSite(layoutSEOSiteId);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _layoutSEOSiteLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	/**
 	 * Deletes the layout seo site from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutSEOSiteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutSEOSite the layout seo site
 	 * @return the layout seo site that was removed
 	 */
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite deleteLayoutSEOSite(
-		com.liferay.layout.seo.model.LayoutSEOSite layoutSEOSite) {
-
+	public LayoutSEOSite deleteLayoutSEOSite(LayoutSEOSite layoutSEOSite) {
 		return _layoutSEOSiteLocalService.deleteLayoutSEOSite(layoutSEOSite);
 	}
 
 	/**
 	 * Deletes the layout seo site with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutSEOSiteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutSEOSiteId the primary key of the layout seo site
 	 * @return the layout seo site that was removed
 	 * @throws PortalException if a layout seo site with the primary key could not be found
 	 */
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite deleteLayoutSEOSite(
-			long layoutSEOSiteId)
+	public LayoutSEOSite deleteLayoutSEOSite(long layoutSEOSiteId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSEOSiteLocalService.deleteLayoutSEOSite(layoutSEOSiteId);
@@ -96,6 +115,18 @@ public class LayoutSEOSiteLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSEOSiteLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _layoutSEOSiteLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _layoutSEOSiteLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -190,16 +221,12 @@ public class LayoutSEOSiteLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite fetchLayoutSEOSite(
-		long layoutSEOSiteId) {
-
+	public LayoutSEOSite fetchLayoutSEOSite(long layoutSEOSiteId) {
 		return _layoutSEOSiteLocalService.fetchLayoutSEOSite(layoutSEOSiteId);
 	}
 
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite
-		fetchLayoutSEOSiteByGroupId(long groupId) {
-
+	public LayoutSEOSite fetchLayoutSEOSiteByGroupId(long groupId) {
 		return _layoutSEOSiteLocalService.fetchLayoutSEOSiteByGroupId(groupId);
 	}
 
@@ -211,8 +238,8 @@ public class LayoutSEOSiteLocalServiceWrapper
 	 * @return the matching layout seo site, or <code>null</code> if a matching layout seo site could not be found
 	 */
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite
-		fetchLayoutSEOSiteByUuidAndGroupId(String uuid, long groupId) {
+	public LayoutSEOSite fetchLayoutSEOSiteByUuidAndGroupId(
+		String uuid, long groupId) {
 
 		return _layoutSEOSiteLocalService.fetchLayoutSEOSiteByUuidAndGroupId(
 			uuid, groupId);
@@ -250,8 +277,7 @@ public class LayoutSEOSiteLocalServiceWrapper
 	 * @throws PortalException if a layout seo site with the primary key could not be found
 	 */
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite getLayoutSEOSite(
-			long layoutSEOSiteId)
+	public LayoutSEOSite getLayoutSEOSite(long layoutSEOSiteId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSEOSiteLocalService.getLayoutSEOSite(layoutSEOSiteId);
@@ -266,8 +292,8 @@ public class LayoutSEOSiteLocalServiceWrapper
 	 * @throws PortalException if a matching layout seo site could not be found
 	 */
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite
-			getLayoutSEOSiteByUuidAndGroupId(String uuid, long groupId)
+	public LayoutSEOSite getLayoutSEOSiteByUuidAndGroupId(
+			String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSEOSiteLocalService.getLayoutSEOSiteByUuidAndGroupId(
@@ -286,9 +312,7 @@ public class LayoutSEOSiteLocalServiceWrapper
 	 * @return the range of layout seo sites
 	 */
 	@Override
-	public java.util.List<com.liferay.layout.seo.model.LayoutSEOSite>
-		getLayoutSEOSites(int start, int end) {
-
+	public java.util.List<LayoutSEOSite> getLayoutSEOSites(int start, int end) {
 		return _layoutSEOSiteLocalService.getLayoutSEOSites(start, end);
 	}
 
@@ -300,8 +324,8 @@ public class LayoutSEOSiteLocalServiceWrapper
 	 * @return the matching layout seo sites, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<com.liferay.layout.seo.model.LayoutSEOSite>
-		getLayoutSEOSitesByUuidAndCompanyId(String uuid, long companyId) {
+	public java.util.List<LayoutSEOSite> getLayoutSEOSitesByUuidAndCompanyId(
+		String uuid, long companyId) {
 
 		return _layoutSEOSiteLocalService.getLayoutSEOSitesByUuidAndCompanyId(
 			uuid, companyId);
@@ -318,12 +342,10 @@ public class LayoutSEOSiteLocalServiceWrapper
 	 * @return the range of matching layout seo sites, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<com.liferay.layout.seo.model.LayoutSEOSite>
-		getLayoutSEOSitesByUuidAndCompanyId(
-			String uuid, long companyId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.layout.seo.model.LayoutSEOSite>
-					orderByComparator) {
+	public java.util.List<LayoutSEOSite> getLayoutSEOSitesByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<LayoutSEOSite>
+			orderByComparator) {
 
 		return _layoutSEOSiteLocalService.getLayoutSEOSitesByUuidAndCompanyId(
 			uuid, companyId, start, end, orderByComparator);
@@ -349,6 +371,9 @@ public class LayoutSEOSiteLocalServiceWrapper
 		return _layoutSEOSiteLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -360,18 +385,20 @@ public class LayoutSEOSiteLocalServiceWrapper
 	/**
 	 * Updates the layout seo site in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutSEOSiteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutSEOSite the layout seo site
 	 * @return the layout seo site that was updated
 	 */
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite updateLayoutSEOSite(
-		com.liferay.layout.seo.model.LayoutSEOSite layoutSEOSite) {
-
+	public LayoutSEOSite updateLayoutSEOSite(LayoutSEOSite layoutSEOSite) {
 		return _layoutSEOSiteLocalService.updateLayoutSEOSite(layoutSEOSite);
 	}
 
 	@Override
-	public com.liferay.layout.seo.model.LayoutSEOSite updateLayoutSEOSite(
+	public LayoutSEOSite updateLayoutSEOSite(
 			long userId, long groupId, boolean openGraphEnabled,
 			java.util.Map<java.util.Locale, String> openGraphImageAltMap,
 			long openGraphImageFileEntryId,
@@ -381,6 +408,26 @@ public class LayoutSEOSiteLocalServiceWrapper
 		return _layoutSEOSiteLocalService.updateLayoutSEOSite(
 			userId, groupId, openGraphEnabled, openGraphImageAltMap,
 			openGraphImageFileEntryId, serviceContext);
+	}
+
+	@Override
+	public CTPersistence<LayoutSEOSite> getCTPersistence() {
+		return _layoutSEOSiteLocalService.getCTPersistence();
+	}
+
+	@Override
+	public Class<LayoutSEOSite> getModelClass() {
+		return _layoutSEOSiteLocalService.getModelClass();
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<LayoutSEOSite>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return _layoutSEOSiteLocalService.updateWithUnsafeFunction(
+			updateUnsafeFunction);
 	}
 
 	@Override

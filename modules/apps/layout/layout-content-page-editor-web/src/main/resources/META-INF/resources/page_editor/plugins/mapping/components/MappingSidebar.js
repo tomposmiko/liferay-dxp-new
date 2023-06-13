@@ -12,15 +12,14 @@
  * details.
  */
 
-import React, {useContext} from 'react';
+import ClayLink from '@clayui/link';
+import React from 'react';
 
-import {ConfigContext} from '../../../app/config/index';
+import {config} from '../../../app/config/index';
 import SidebarPanelContent from '../../../common/components/SidebarPanelContent';
 import SidebarPanelHeader from '../../../common/components/SidebarPanelHeader';
 
 export default function MappingSidebar() {
-	const {selectedMappingTypes} = useContext(ConfigContext);
-
 	return (
 		<>
 			<SidebarPanelHeader>
@@ -29,30 +28,69 @@ export default function MappingSidebar() {
 
 			<SidebarPanelContent>
 				<p className="mb-4 small text-secondary">
-					{Liferay.Language.get(
-						'content-source-selected-for-this-display-page-template'
-					)}
+					{config.selectedMappingTypes.mappingDescription}
 				</p>
 
 				<div className="d-flex flex-column mb-4">
 					<p className="list-group-title">
-						{Liferay.Language.get('content-type')}:
+						{config.selectedMappingTypes.type.groupTypeTitle}:
 					</p>
 					<p className="mb-0 small">
-						{selectedMappingTypes.type.label}
+						{config.selectedMappingTypes.type.label}
 					</p>
 				</div>
 
-				{selectedMappingTypes.subtype && (
-					<div className="d-flex flex-column">
-						<p className="list-group-title">
-							{Liferay.Language.get('subtype')}:
-						</p>
-						<p className="small">
-							{selectedMappingTypes.subtype.label}
-						</p>
-					</div>
-				)}
+				{config.selectedMappingTypes.subtype &&
+					config.selectedMappingTypes.subtype.label && (
+						<div className="d-flex flex-column mb-4">
+							<p className="list-group-title">
+								{
+									config.selectedMappingTypes.subtype
+										.groupSubtypeTitle
+								}
+								:
+							</p>
+							<p className="mb-0 small">
+								{config.selectedMappingTypes.subtype.url ? (
+									<ClayLink
+										href={
+											config.selectedMappingTypes.subtype
+												.url
+										}
+										target="_parent"
+									>
+										{
+											config.selectedMappingTypes.subtype
+												.label
+										}
+									</ClayLink>
+								) : (
+									<>
+										{
+											config.selectedMappingTypes.subtype
+												.label
+										}
+									</>
+								)}
+							</p>
+						</div>
+					)}
+
+				{config.selectedMappingTypes.itemType &&
+					config.selectedMappingTypes.itemType.label && (
+						<div className="d-flex flex-column">
+							<p className="list-group-title">
+								{
+									config.selectedMappingTypes.itemType
+										.groupItemTypeTitle
+								}
+								:
+							</p>
+							<p className="small">
+								{config.selectedMappingTypes.itemType.label}
+							</p>
+						</div>
+					)}
 			</SidebarPanelContent>
 		</>
 	);

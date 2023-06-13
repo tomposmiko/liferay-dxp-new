@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-calendar-list',
-	A => {
+	(A) => {
 		var AArray = A.Array;
 		var Lang = A.Lang;
 
@@ -91,10 +91,12 @@ AUI.add(
 			"' ]}></div>",
 			'<span class="',
 			CSS_CALENDAR_LIST_ITEM_LABEL,
-			'">{[LString.escapeHTML(parent.calendars[$i].getDisplayName())]}</span>',
-			'<div class="',
+			'">{[Liferay.Util.escapeHTML(parent.calendars[$i].getDisplayName())]}</span>',
+			'<div aria-label="' +
+				Liferay.Language.get('show-calendar-actions') +
+				'" class="',
 			CSS_CALENDAR_LIST_ITEM_ARROW,
-			'">',
+			'" role="button" tabindex="0">',
 			CSS_ICON_CARET_DOWN,
 			'</div>',
 			'</div>',
@@ -106,21 +108,21 @@ AUI.add(
 				calendars: {
 					setter: '_setCalendars',
 					validator: isArray,
-					value: []
+					value: [],
 				},
 
 				scheduler: {},
 
 				showCalendarResourceName: {
-					value: true
+					value: true,
 				},
 
 				simpleMenu: {
 					setter: '_setSimpleMenu',
 					validator: isObject,
 					value: null,
-					zIndex: Liferay.zIndex.MENU
-				}
+					zIndex: Liferay.zIndex.MENU,
+				},
 			},
 
 			NAME: 'calendar-list',
@@ -157,7 +159,8 @@ AUI.add(
 
 					if (event.newVal) {
 						instance._setCalendarColor(target, target.get('color'));
-					} else {
+					}
+					else {
 						instance._clearCalendarColor(target);
 					}
 				},
@@ -197,9 +200,10 @@ AUI.add(
 							toggler: target,
 							visible:
 								simpleMenu.get('align.node') !== target ||
-								!simpleMenu.get('visible')
+								!simpleMenu.get('visible'),
 						});
-					} else {
+					}
+					else {
 						var calendar = instance.getCalendarByNode(
 							event.currentTarget
 						);
@@ -257,7 +261,7 @@ AUI.add(
 
 					instance.items = A.NodeList.create(
 						TPL_CALENDAR_LIST_ITEM.parse({
-							calendars
+							calendars,
 						})
 					);
 
@@ -275,7 +279,7 @@ AUI.add(
 
 					colorNode.setStyles({
 						backgroundColor: val,
-						borderColor: val
+						borderColor: val,
 					});
 				},
 
@@ -320,8 +324,8 @@ AUI.add(
 								align: {
 									points: [
 										A.WidgetPositionAlign.TL,
-										A.WidgetPositionAlign.BL
-									]
+										A.WidgetPositionAlign.BL,
+									],
 								},
 								bubbleTargets: [instance],
 								constrain: true,
@@ -330,7 +334,7 @@ AUI.add(
 								plugins: [A.Plugin.OverlayAutohide],
 								visible: false,
 								width: 290,
-								zIndex: Liferay.zIndex.MENU
+								zIndex: Liferay.zIndex.MENU,
 							},
 							val || {}
 						);
@@ -457,7 +461,7 @@ AUI.add(
 					}
 
 					instance.fire('calendarRemoved', {
-						calendar
+						calendar,
 					});
 
 					instance.set('calendars', calendars);
@@ -469,8 +473,8 @@ AUI.add(
 					instance._renderCalendars();
 
 					instance.simpleMenu.render();
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.CalendarList = CalendarList;
@@ -480,7 +484,7 @@ AUI.add(
 		requires: [
 			'aui-template-deprecated',
 			'liferay-calendar-simple-menu',
-			'liferay-scheduler'
-		]
+			'liferay-scheduler',
+		],
 	}
 );

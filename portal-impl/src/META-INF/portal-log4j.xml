@@ -269,7 +269,7 @@
 	</category>
 
 	<category name="com.liferay.portal.internal.servlet.MainServlet">
-		<priority value="WARN" />
+		<priority value="INFO" />
 	</category>
 
 	<category name="com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist">
@@ -332,11 +332,11 @@
 		<priority value="INFO" />
 	</category>
 
-	<category name="com.liferay.portal.kernel.resiliency">
-		<priority value="INFO" />
+	<category name="com.liferay.portal.kernel.search.HitsOpenSearchImpl">
+		<priority value="WARN" />
 	</category>
 
-	<category name="com.liferay.portal.kernel.search.HitsOpenSearchImpl">
+	<category name="com.liferay.portal.kernel.security.auth.CompanyThreadLocal">
 		<priority value="WARN" />
 	</category>
 
@@ -932,10 +932,6 @@
 		<priority value="INFO" />
 	</category>
 
-	<category name="com.liferay.util.resiliency">
-		<priority value="INFO" />
-	</category>
-
 	<category name="com.mchange">
 		<priority value="WARN" />
 	</category>
@@ -1041,6 +1037,10 @@
 	</category>
 
 	<category name="org.apache.xbean">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="org.elasticsearch.client.RestClient">
 		<priority value="ERROR" />
 	</category>
 

@@ -14,7 +14,16 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.MembershipRequest;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for MembershipRequest. This utility wraps
@@ -35,11 +44,10 @@ public class MembershipRequestLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.MembershipRequestLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static com.liferay.portal.kernel.model.MembershipRequest
-			addMembershipRequest(
-				long userId, long groupId, String comments,
-				ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static MembershipRequest addMembershipRequest(
+			long userId, long groupId, String comments,
+			ServiceContext serviceContext)
+		throws PortalException {
 
 		return getService().addMembershipRequest(
 			userId, groupId, comments, serviceContext);
@@ -48,13 +56,15 @@ public class MembershipRequestLocalServiceUtil {
 	/**
 	 * Adds the membership request to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MembershipRequestLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param membershipRequest the membership request
 	 * @return the membership request that was added
 	 */
-	public static com.liferay.portal.kernel.model.MembershipRequest
-		addMembershipRequest(
-			com.liferay.portal.kernel.model.MembershipRequest
-				membershipRequest) {
+	public static MembershipRequest addMembershipRequest(
+		MembershipRequest membershipRequest) {
 
 		return getService().addMembershipRequest(membershipRequest);
 	}
@@ -65,22 +75,36 @@ public class MembershipRequestLocalServiceUtil {
 	 * @param membershipRequestId the primary key for the new membership request
 	 * @return the new membership request
 	 */
-	public static com.liferay.portal.kernel.model.MembershipRequest
-		createMembershipRequest(long membershipRequestId) {
+	public static MembershipRequest createMembershipRequest(
+		long membershipRequestId) {
 
 		return getService().createMembershipRequest(membershipRequestId);
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the membership request with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MembershipRequestLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param membershipRequestId the primary key of the membership request
 	 * @return the membership request that was removed
 	 * @throws PortalException if a membership request with the primary key could not be found
 	 */
-	public static com.liferay.portal.kernel.model.MembershipRequest
-			deleteMembershipRequest(long membershipRequestId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static MembershipRequest deleteMembershipRequest(
+			long membershipRequestId)
+		throws PortalException {
 
 		return getService().deleteMembershipRequest(membershipRequestId);
 	}
@@ -88,13 +112,15 @@ public class MembershipRequestLocalServiceUtil {
 	/**
 	 * Deletes the membership request from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MembershipRequestLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param membershipRequest the membership request
 	 * @return the membership request that was removed
 	 */
-	public static com.liferay.portal.kernel.model.MembershipRequest
-		deleteMembershipRequest(
-			com.liferay.portal.kernel.model.MembershipRequest
-				membershipRequest) {
+	public static MembershipRequest deleteMembershipRequest(
+		MembershipRequest membershipRequest) {
 
 		return getService().deleteMembershipRequest(membershipRequest);
 	}
@@ -114,17 +140,22 @@ public class MembershipRequestLocalServiceUtil {
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -134,9 +165,7 @@ public class MembershipRequestLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -152,9 +181,8 @@ public class MembershipRequestLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -172,10 +200,9 @@ public class MembershipRequestLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -187,9 +214,7 @@ public class MembershipRequestLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -201,14 +226,14 @@ public class MembershipRequestLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.portal.kernel.model.MembershipRequest
-		fetchMembershipRequest(long membershipRequestId) {
+	public static MembershipRequest fetchMembershipRequest(
+		long membershipRequestId) {
 
 		return getService().fetchMembershipRequest(membershipRequestId);
 	}
@@ -233,9 +258,9 @@ public class MembershipRequestLocalServiceUtil {
 	 * @return the membership request
 	 * @throws PortalException if a membership request with the primary key could not be found
 	 */
-	public static com.liferay.portal.kernel.model.MembershipRequest
-			getMembershipRequest(long membershipRequestId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static MembershipRequest getMembershipRequest(
+			long membershipRequestId)
+		throws PortalException {
 
 		return getService().getMembershipRequest(membershipRequestId);
 	}
@@ -251,16 +276,14 @@ public class MembershipRequestLocalServiceUtil {
 	 * @param end the upper bound of the range of membership requests (not inclusive)
 	 * @return the range of membership requests
 	 */
-	public static java.util.List
-		<com.liferay.portal.kernel.model.MembershipRequest>
-			getMembershipRequests(int start, int end) {
+	public static List<MembershipRequest> getMembershipRequests(
+		int start, int end) {
 
 		return getService().getMembershipRequests(start, end);
 	}
 
-	public static java.util.List
-		<com.liferay.portal.kernel.model.MembershipRequest>
-			getMembershipRequests(long userId, long groupId, long statusId) {
+	public static List<MembershipRequest> getMembershipRequests(
+		long userId, long groupId, long statusId) {
 
 		return getService().getMembershipRequests(userId, groupId, statusId);
 	}
@@ -283,9 +306,11 @@ public class MembershipRequestLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -296,20 +321,18 @@ public class MembershipRequestLocalServiceUtil {
 		return getService().hasMembershipRequest(userId, groupId, statusId);
 	}
 
-	public static java.util.List
-		<com.liferay.portal.kernel.model.MembershipRequest> search(
-			long groupId, int status, int start, int end) {
+	public static List<MembershipRequest> search(
+		long groupId, int status, int start, int end) {
 
 		return getService().search(groupId, status, start, end);
 	}
 
-	public static java.util.List
-		<com.liferay.portal.kernel.model.MembershipRequest> search(
-			long groupId, int status, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.portal.kernel.model.MembershipRequest> obc) {
+	public static List<MembershipRequest> search(
+		long groupId, int status, int start, int end,
+		OrderByComparator<MembershipRequest> orderByComparator) {
 
-		return getService().search(groupId, status, start, end, obc);
+		return getService().search(
+			groupId, status, start, end, orderByComparator);
 	}
 
 	public static int searchCount(long groupId, int status) {
@@ -319,13 +342,15 @@ public class MembershipRequestLocalServiceUtil {
 	/**
 	 * Updates the membership request in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MembershipRequestLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param membershipRequest the membership request
 	 * @return the membership request that was updated
 	 */
-	public static com.liferay.portal.kernel.model.MembershipRequest
-		updateMembershipRequest(
-			com.liferay.portal.kernel.model.MembershipRequest
-				membershipRequest) {
+	public static MembershipRequest updateMembershipRequest(
+		MembershipRequest membershipRequest) {
 
 		return getService().updateMembershipRequest(membershipRequest);
 	}
@@ -334,7 +359,7 @@ public class MembershipRequestLocalServiceUtil {
 			long replierUserId, long membershipRequestId, String replyComments,
 			long statusId, boolean addUserToGroup,
 			ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		getService().updateStatus(
 			replierUserId, membershipRequestId, replyComments, statusId,
@@ -342,15 +367,9 @@ public class MembershipRequestLocalServiceUtil {
 	}
 
 	public static MembershipRequestLocalService getService() {
-		if (_service == null) {
-			_service =
-				(MembershipRequestLocalService)PortalBeanLocatorUtil.locate(
-					MembershipRequestLocalService.class.getName());
-		}
-
 		return _service;
 	}
 
-	private static MembershipRequestLocalService _service;
+	private static volatile MembershipRequestLocalService _service;
 
 }

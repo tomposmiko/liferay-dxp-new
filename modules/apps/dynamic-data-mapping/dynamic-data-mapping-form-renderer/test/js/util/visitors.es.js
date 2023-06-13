@@ -29,7 +29,7 @@ describe('PagesVisitor', () => {
 	});
 
 	it('does not multate the fields of the original array', () => {
-		const newPages = visitor.mapFields(field => {
+		const newPages = visitor.mapFields((field) => {
 			if (field.fieldName == 'radio') {
 				field.fieldName = 'liferay';
 			}
@@ -44,25 +44,25 @@ describe('PagesVisitor', () => {
 		expect(
 			visitor.mapPages((page, index) => ({
 				...page,
-				title: `New title ${index}`
+				title: `New title ${index}`,
 			}))
 		).toMatchSnapshot();
 	});
 
 	it('is able to change rows', () => {
 		expect(
-			visitor.mapRows(row => ({
+			visitor.mapRows((row) => ({
 				...row,
-				columns: []
+				columns: [],
 			}))
 		).toMatchSnapshot();
 	});
 
 	it('is able to change columns', () => {
 		expect(
-			visitor.mapColumns(column => ({
+			visitor.mapColumns((column) => ({
 				...column,
-				size: 6
+				size: 6,
 			}))
 		).toMatchSnapshot();
 	});
@@ -71,8 +71,79 @@ describe('PagesVisitor', () => {
 		expect(
 			visitor.mapFields((field, index) => ({
 				...field,
-				label: `New label ${index}`
+				label: `New label ${index}`,
 			}))
 		).toMatchSnapshot();
+	});
+
+	it('is able to visit fields and stop when required', () => {
+		const visitedFieldNames = [];
+
+		const visitor = new PagesVisitor([
+			{
+				rows: [
+					{
+						columns: [
+							{
+								fields: [
+									{
+										fieldName: 'fieldA',
+									},
+									{
+										fieldName: 'fieldB',
+										nestedFields: [{fieldName: 'fieldC'}],
+									},
+								],
+							},
+							{
+								fields: [
+									{
+										fieldName: 'fieldD',
+									},
+								],
+							},
+						],
+					},
+					{
+						columns: [
+							{
+								fields: [
+									{
+										fieldName: 'fieldE',
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				rows: [
+					{
+						columns: [
+							{
+								fields: [
+									{
+										fieldName: 'fieldF',
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		]);
+
+		visitor.visitFields(({fieldName}) => {
+			visitedFieldNames.push(fieldName);
+
+			if (fieldName.indexOf('C') > -1) {
+				return true; // stop
+			}
+
+			return false; // continue;
+		});
+
+		expect(visitedFieldNames).toEqual(['fieldA', 'fieldB', 'fieldC']);
 	});
 });

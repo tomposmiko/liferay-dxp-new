@@ -30,16 +30,16 @@ if (stageableGroup.isLayout()) {
 }
 %>
 
-<div class="sheet">
+<clay:sheet>
 	<c:if test="<%= Validator.isNotNull(assetEntryResult.getTitle()) %>">
-		<div class="sheet-header">
-			<h4 class="sheet-title">
+		<clay:sheet-header>
+			<p class="h4 sheet-title">
 				<%= assetEntryResult.getTitle() %>
-			</h4>
-		</div>
+			</p>
+		</clay:sheet-header>
 	</c:if>
 
-	<div class="sheet-section">
+	<clay:sheet-section>
 		<div class="table-responsive">
 			<table class="table table-autofit">
 				<thead>
@@ -106,6 +106,8 @@ if (stageableGroup.isLayout()) {
 						).put(
 							"fragments-editor-item-type", "fragments-editor-mapped-item"
 						).build();
+
+						String title = assetRenderer.getTitle(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(request)));
 					%>
 
 						<tr class="<%= ((previewClassNameId == assetEntry.getClassNameId()) && (previewClassPK == assetEntry.getClassPK())) ? "table-active" : StringPool.BLANK %>" <%= AUIUtil.buildData(fragmentsEditorData) %>>
@@ -115,12 +117,12 @@ if (stageableGroup.isLayout()) {
 								<c:choose>
 									<c:when test="<%= Validator.isNotNull(viewURL) %>">
 										<a class="text-truncate-inline" href="<%= viewURL %>">
-											<span class="text-truncate"><%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %></span>
+											<span class="text-truncate"><%= HtmlUtil.escape(title) %></span>
 										</a>
 									</c:when>
 									<c:otherwise>
 										<span class="text-truncate-inline">
-											<span class="text-truncate"><%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %></span>
+											<span class="text-truncate"><%= HtmlUtil.escape(title) %></span>
 										</span>
 									</c:otherwise>
 								</c:choose>
@@ -216,8 +218,8 @@ if (stageableGroup.isLayout()) {
 				</tbody>
 			</table>
 		</div>
-	</div>
-</div>
+	</clay:sheet-section>
+</clay:sheet>
 
 <%!
 private static Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entries_table_jsp");

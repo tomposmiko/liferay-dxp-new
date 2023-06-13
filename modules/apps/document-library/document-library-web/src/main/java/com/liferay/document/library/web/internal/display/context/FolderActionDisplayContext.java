@@ -20,14 +20,16 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
 import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
+import com.liferay.document.library.web.internal.helper.DLTrashHelper;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFolderPermission;
 import com.liferay.document.library.web.internal.security.permission.resource.DLPermission;
 import com.liferay.document.library.web.internal.util.DLFolderUtil;
-import com.liferay.document.library.web.internal.util.DLTrashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.ResultRow;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.capabilities.TemporaryFileEntriesCapability;
@@ -64,10 +66,10 @@ import javax.servlet.http.HttpServletRequest;
 public class FolderActionDisplayContext {
 
 	public FolderActionDisplayContext(
-		HttpServletRequest httpServletRequest, DLTrashUtil dlTrashUtil) {
+		DLTrashHelper dlTrashHelper, HttpServletRequest httpServletRequest) {
 
+		_dlTrashHelper = dlTrashHelper;
 		_httpServletRequest = httpServletRequest;
-		_dlTrashUtil = dlTrashUtil;
 
 		_dlRequestHelper = new DLRequestHelper(httpServletRequest);
 	}
@@ -452,20 +454,27 @@ public class FolderActionDisplayContext {
 	}
 
 	public boolean isDeleteExpiredTemporaryFileEntriesActionVisible() {
-		Folder folder = _getFolder();
+		try {
+			Folder folder = _getFolder();
 
-		if (folder == null) {
+			if (folder == null) {
+				return false;
+			}
+
+			if (DLFolderUtil.isRepositoryRoot(folder) &&
+				folder.isRepositoryCapabilityProvided(
+					TemporaryFileEntriesCapability.class)) {
+
+				return true;
+			}
+
 			return false;
 		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-		if (DLFolderUtil.isRepositoryRoot(folder) &&
-			folder.isRepositoryCapabilityProvided(
-				TemporaryFileEntriesCapability.class)) {
-
-			return true;
+			return false;
 		}
-
-		return false;
 	}
 
 	public boolean isDeleteFolderActionVisible() throws PortalException {
@@ -616,17 +625,25 @@ public class FolderActionDisplayContext {
 	}
 
 	public boolean isTrashEnabled() throws PortalException {
-		Folder folder = _getFolder();
+		try {
+			Folder folder = _getFolder();
 
-		if (((folder == null) ||
-			 folder.isRepositoryCapabilityProvided(TrashCapability.class)) &&
-			_dlTrashUtil.isTrashEnabled(
-				_dlRequestHelper.getScopeGroupId(), _getRepositoryId())) {
+			if (((folder == null) ||
+				 folder.isRepositoryCapabilityProvided(
+					 TrashCapability.class)) &&
+				_dlTrashHelper.isTrashEnabled(
+					_dlRequestHelper.getScopeGroupId(), _getRepositoryId())) {
 
-			return true;
+				return true;
+			}
+
+			return false;
 		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-		return false;
+			return false;
+		}
 	}
 
 	public boolean isViewSlideShowActionVisible() throws PortalException {
@@ -652,9 +669,7 @@ public class FolderActionDisplayContext {
 	}
 
 	private String _getDeleteFolderCommand() throws PortalException {
-		Folder folder = _getFolder();
-
-		if (DLFolderUtil.isRepositoryRoot(folder)) {
+		if (DLFolderUtil.isRepositoryRoot(_getFolder())) {
 			return Constants.DELETE;
 		}
 
@@ -852,8 +867,11 @@ public class FolderActionDisplayContext {
 		return true;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		FolderActionDisplayContext.class);
+
 	private final DLRequestHelper _dlRequestHelper;
-	private final DLTrashUtil _dlTrashUtil;
+	private final DLTrashHelper _dlTrashHelper;
 	private Folder _folder;
 	private final HttpServletRequest _httpServletRequest;
 	private String _randomNamespace;

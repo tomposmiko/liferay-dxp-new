@@ -17,25 +17,36 @@ package com.liferay.depot.model;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
  * This class is used by SOAP remote services, specifically {@link com.liferay.depot.service.http.DepotEntryGroupRelServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class DepotEntryGroupRelSoap implements Serializable {
 
 	public static DepotEntryGroupRelSoap toSoapModel(DepotEntryGroupRel model) {
 		DepotEntryGroupRelSoap soapModel = new DepotEntryGroupRelSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setUuid(model.getUuid());
 		soapModel.setDepotEntryGroupRelId(model.getDepotEntryGroupRelId());
+		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
+		soapModel.setUserId(model.getUserId());
+		soapModel.setUserName(model.getUserName());
+		soapModel.setCreateDate(model.getCreateDate());
+		soapModel.setModifiedDate(model.getModifiedDate());
+		soapModel.setDdmStructuresAvailable(model.isDdmStructuresAvailable());
 		soapModel.setDepotEntryId(model.getDepotEntryId());
 		soapModel.setSearchable(model.isSearchable());
 		soapModel.setToGroupId(model.getToGroupId());
+		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
 	}
@@ -106,6 +117,14 @@ public class DepotEntryGroupRelSoap implements Serializable {
 		_mvccVersion = mvccVersion;
 	}
 
+	public String getUuid() {
+		return _uuid;
+	}
+
+	public void setUuid(String uuid) {
+		_uuid = uuid;
+	}
+
 	public long getDepotEntryGroupRelId() {
 		return _depotEntryGroupRelId;
 	}
@@ -114,12 +133,64 @@ public class DepotEntryGroupRelSoap implements Serializable {
 		_depotEntryGroupRelId = depotEntryGroupRelId;
 	}
 
+	public long getGroupId() {
+		return _groupId;
+	}
+
+	public void setGroupId(long groupId) {
+		_groupId = groupId;
+	}
+
 	public long getCompanyId() {
 		return _companyId;
 	}
 
 	public void setCompanyId(long companyId) {
 		_companyId = companyId;
+	}
+
+	public long getUserId() {
+		return _userId;
+	}
+
+	public void setUserId(long userId) {
+		_userId = userId;
+	}
+
+	public String getUserName() {
+		return _userName;
+	}
+
+	public void setUserName(String userName) {
+		_userName = userName;
+	}
+
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		_createDate = createDate;
+	}
+
+	public Date getModifiedDate() {
+		return _modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		_modifiedDate = modifiedDate;
+	}
+
+	public boolean getDdmStructuresAvailable() {
+		return _ddmStructuresAvailable;
+	}
+
+	public boolean isDdmStructuresAvailable() {
+		return _ddmStructuresAvailable;
+	}
+
+	public void setDdmStructuresAvailable(boolean ddmStructuresAvailable) {
+		_ddmStructuresAvailable = ddmStructuresAvailable;
 	}
 
 	public long getDepotEntryId() {
@@ -150,11 +221,27 @@ public class DepotEntryGroupRelSoap implements Serializable {
 		_toGroupId = toGroupId;
 	}
 
+	public Date getLastPublishDate() {
+		return _lastPublishDate;
+	}
+
+	public void setLastPublishDate(Date lastPublishDate) {
+		_lastPublishDate = lastPublishDate;
+	}
+
 	private long _mvccVersion;
+	private String _uuid;
 	private long _depotEntryGroupRelId;
+	private long _groupId;
 	private long _companyId;
+	private long _userId;
+	private String _userName;
+	private Date _createDate;
+	private Date _modifiedDate;
+	private boolean _ddmStructuresAvailable;
 	private long _depotEntryId;
 	private boolean _searchable;
 	private long _toGroupId;
+	private Date _lastPublishDate;
 
 }

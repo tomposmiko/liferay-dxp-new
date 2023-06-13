@@ -38,7 +38,11 @@ $compat-utilities: true !default;
 
 // Map Bootstrap 4 Variables to Bootstrap 3 equivalent
 
+@import 'clay/atlas/variables';
+
 @import 'clay/variables/icons';
+
+$border-radius-base: 0.25rem !default;
 
 $icon-monospaced-size: 2rem !default;
 

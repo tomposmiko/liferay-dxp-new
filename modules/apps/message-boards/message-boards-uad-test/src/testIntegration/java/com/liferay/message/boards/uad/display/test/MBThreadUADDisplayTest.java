@@ -178,7 +178,7 @@ public class MBThreadUADDisplayTest extends BaseUADDisplayTestCase<MBThread> {
 	}
 
 	@Override
-	protected UADDisplay getUADDisplay() {
+	protected UADDisplay<MBThread> getUADDisplay() {
 		return _uadDisplay;
 	}
 
@@ -190,15 +190,6 @@ public class MBThreadUADDisplayTest extends BaseUADDisplayTestCase<MBThread> {
 		_mbCategories.add(mbCategory);
 
 		return mbCategory;
-	}
-
-	private MBMessage _addMessage(long mbCategoryId) throws Exception {
-		MBMessage mbMessage = MBMessageUADTestUtil.addMBMessage(
-			_mbMessageLocalService, TestPropsValues.getUserId(), mbCategoryId);
-
-		_mbMessages.add(mbMessage);
-
-		return mbMessage;
 	}
 
 	private MBMessage _addMessage(long mbCategoryId, long mbThreadId)

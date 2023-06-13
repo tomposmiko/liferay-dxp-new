@@ -14,15 +14,15 @@
 
 package com.liferay.portal.zip;
 
+import com.liferay.petra.io.StreamUtil;
 import com.liferay.portal.kernel.test.util.DependenciesTestUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
 import com.liferay.portal.util.FileImpl;
-
-import de.schlichtherle.io.FileInputStream;
 
 import java.io.InputStream;
 
@@ -32,12 +32,19 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Manuel de la Peña
  */
 public class ZipReaderImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -157,10 +164,10 @@ public class ZipReaderImplTest {
 
 	@Test
 	public void testGetEntryAsInputStream() throws Exception {
-		_testGetEntryAsInputStream(_FILE_PATH_0);
-		_testGetEntryAsInputStream(_FILE_PATH_1);
-		_testGetEntryAsInputStream(_FILE_PATH_2);
-		_testGetEntryAsInputStream(_FILE_PATH_3);
+		_testGetEntryAsInputStream(_expectedContent0, _FILE_PATH_0);
+		_testGetEntryAsInputStream(_expectedContent1, _FILE_PATH_1);
+		_testGetEntryAsInputStream(_expectedContent2, _FILE_PATH_2);
+		_testGetEntryAsInputStream(_expectedContent3, _FILE_PATH_3);
 	}
 
 	@Test
@@ -302,13 +309,19 @@ public class ZipReaderImplTest {
 		zipReader.close();
 	}
 
-	private void _testGetEntryAsInputStream(String filePath) throws Exception {
+	private void _testGetEntryAsInputStream(
+			String expectedContent, String filePath)
+		throws Exception {
+
 		ZipReader zipReader = new ZipReaderImpl(
 			DependenciesTestUtil.getDependencyAsInputStream(
 				getClass(), _ZIP_FILE_PATH));
 
-		try (InputStream is = zipReader.getEntryAsInputStream(filePath)) {
-			Assert.assertTrue(is instanceof FileInputStream);
+		try (InputStream inputStream = zipReader.getEntryAsInputStream(
+				filePath)) {
+
+			Assert.assertEquals(
+				expectedContent, StreamUtil.toString(inputStream));
 		}
 
 		zipReader.close();

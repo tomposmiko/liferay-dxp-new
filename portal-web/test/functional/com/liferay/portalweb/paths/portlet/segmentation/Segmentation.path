@@ -2,11 +2,13 @@
 <head>
 <title>Segmentation</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Segmentation</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>ADD_FIELD_POSITION</td>
@@ -16,6 +18,11 @@
 <tr>
 	<td>ADD_FIELD_TYPE</td>
 	<td>//*[contains(@class, 'criteria-sidebar-item-root') and contains(text(),'${key_propertyOption}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_TAG_BUTTON</td>
+	<td>//*[contains(@class,'btn btn-secondary') and contains(text(),'Select')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -40,7 +47,7 @@
 </tr>
 <tr>
 	<td>ORGANIZATION_MENU</td>
-	<td>//*[contains(@class, 'd-flex justify-content-between sidebar-collapse-header') and contains(text(),'Organization')]</td>
+	<td>//*[contains(@class, 'd-flex') and contains(@class, 'justify-content-between') and contains(@class, 'sidebar-collapse-header') and contains(text(),'Organization')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -49,13 +56,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SEARCH_TAG_FIELD</td>
+	<td>//*[contains(@class,'form-control') and contains(@class,'input-group-inset') and contains(@class,'input-group-inset-after') and contains(@aria-label,'Search')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SEGMENT_LIST</td>
 	<td>//*[@id='_com_liferay_segments_web_internal_portlet_SegmentsPortlet_segmentsEntriesSearchContainer']//td</td>
 	<td></td>
 </tr>
 <tr>
+	<td>SEGMENT_FIELDS_TYPE</td>
+	<td>//*[contains(@class, 'd-flex') and contains(@class, 'justify-content-between') and contains(@class, 'sidebar-collapse-header') and contains(text(),'${key_typeName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SESSION_MENU</td>
-	<td>//*[contains(@class, 'd-flex justify-content-between sidebar-collapse-header') and contains(text(),'Session')]</td>
+	<td>//*[contains(@class, 'd-flex') and contains(@class, 'justify-content-between') and contains(@class, 'sidebar-collapse-header') and contains(text(),'Session')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TAG_OPTION</td>
+	<td>//*[contains(@class,'selector-button')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -67,4 +89,3 @@
 </table>
 </body>
 </html>
-

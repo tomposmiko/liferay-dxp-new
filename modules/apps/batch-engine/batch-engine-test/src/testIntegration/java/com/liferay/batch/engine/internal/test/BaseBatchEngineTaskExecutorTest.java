@@ -14,28 +14,45 @@
 
 package com.liferay.batch.engine.internal.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.liferay.batch.engine.BatchEngineTaskFieldId;
-import com.liferay.batch.engine.BatchEngineTaskMethod;
-import com.liferay.batch.engine.BatchEngineTaskOperation;
+import com.liferay.batch.engine.BaseBatchEngineTaskItemDelegate;
+import com.liferay.batch.engine.BatchEngineTaskItemDelegate;
+import com.liferay.batch.engine.pagination.Page;
+import com.liferay.batch.engine.pagination.Pagination;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
-import com.liferay.headless.delivery.dto.v1_0.BlogPosting;
-import com.liferay.headless.delivery.dto.v1_0.Rating;
-import com.liferay.headless.delivery.resource.v1_0.BlogPostingResource;
-import com.liferay.portal.kernel.model.Company;
+import com.liferay.blogs.service.BlogsEntryService;
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.BooleanClause;
+import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
+import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.MatchAllQuery;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.DateTimeEntityField;
 import com.liferay.portal.odata.entity.EntityField;
@@ -44,31 +61,21 @@ import com.liferay.portal.odata.entity.IntegerEntityField;
 import com.liferay.portal.odata.entity.StringEntityField;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.pagination.Page;
-import com.liferay.portal.vulcan.pagination.Pagination;
-import com.liferay.portal.vulcan.resource.EntityModelResource;
+
+import java.io.Serializable;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -103,80 +110,21 @@ public class BaseBatchEngineTaskExecutorTest {
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		blogPostingResourceServiceRegistration = bundleContext.registerService(
-			BlogPostingResource.class, new TestBlogPostingResourceImpl(),
-			new HashMapDictionary<String, String>() {
-				{
-					put("api.version", "v1.0");
-					put("osgi.jaxrs.resource", "true");
-				}
-			});
+		_batchEngineTaskItemDelegateRegistration =
+			bundleContext.registerService(
+				BatchEngineTaskItemDelegate.class.getName(),
+				new TestBlogPostingBatchEngineTaskItemDelegate(),
+				new HashMapDictionary<String, String>());
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		blogsEntryLocalService.deleteEntries(group.getGroupId());
 
-		blogPostingResourceServiceRegistration.unregister();
+		_batchEngineTaskItemDelegateRegistration.unregister();
 	}
 
-	public abstract class BaseBlogPostingResourceImpl
-		implements BlogPostingResource {
-
-		@DELETE
-		@Override
-		@Path("/blog-postings/{blogPostingId}")
-		@Produces("application/json")
-		public void deleteBlogPosting(
-				@PathParam("blogPostingId") Long blogPostingId)
-			throws Exception {
-		}
-
-		@GET
-		@Override
-		@Path("/sites/{siteId}/blog-postings")
-		@Produces({"application/json", "application/xml"})
-		public Page<BlogPosting> getSiteBlogPostingsPage(
-				@PathParam("siteId") Long siteId,
-				@QueryParam("search") String search, @Context Filter filter,
-				@Context Pagination pagination, @Context Sort[] sorts)
-			throws Exception {
-
-			return Page.of(Collections.emptyList());
-		}
-
-		@Consumes({"application/json", "application/xml"})
-		@Override
-		@Path("/sites/{siteId}/blog-postings")
-		@POST
-		@Produces({"application/json", "application/xml"})
-		public BlogPosting postSiteBlogPosting(
-				@PathParam("siteId") Long siteId, BlogPosting blogPosting)
-			throws Exception {
-
-			return new BlogPosting();
-		}
-
-		@Consumes({"application/json", "application/xml"})
-		@Override
-		@Path("/blog-postings/{blogPostingId}")
-		@Produces({"application/json", "application/xml"})
-		@PUT
-		public BlogPosting putBlogPosting(
-				@PathParam("blogPostingId") Long blogPostingId,
-				BlogPosting blogPosting)
-			throws Exception {
-
-			return new BlogPosting();
-		}
-
-		protected AcceptLanguage contextAcceptLanguage;
-		protected Company contextCompany;
-		protected User contextUser;
-
-	}
-
-	public class BlogPostingEntityModel implements EntityModel {
+	public static class BlogPostingEntityModel implements EntityModel {
 
 		public BlogPostingEntityModel() {
 			_entityFieldsMap = EntityModel.toEntityFieldsMap(
@@ -215,136 +163,236 @@ public class BaseBatchEngineTaskExecutorTest {
 
 	}
 
-	public class TestBlogPostingResourceImpl
-		extends BaseBlogPostingResourceImpl implements EntityModelResource {
+	public class TestBlogPostingBatchEngineTaskItemDelegate
+		extends BaseBatchEngineTaskItemDelegate<BlogPosting> {
 
-		@BatchEngineTaskMethod(
-			batchEngineTaskOperation = BatchEngineTaskOperation.DELETE,
-			itemClass = BlogPosting.class
-		)
 		@Override
-		public void deleteBlogPosting(
-				@BatchEngineTaskFieldId("id") Long blogPostingId)
+		public void createItem(
+				BlogPosting blogPosting,
+				Map<String, Serializable> queryParameters)
 			throws Exception {
 
-			_initContextFields();
+			LocalDateTime localDateTime = _toLocalDateTime(
+				blogPosting.getDatePublished());
 
-			blogPostingResource.deleteBlogPosting(blogPostingId);
+			_blogsEntryService.addEntry(
+				blogPosting.getHeadline(), blogPosting.getAlternativeHeadline(),
+				blogPosting.getFriendlyUrlPath(), blogPosting.getDescription(),
+				blogPosting.getArticleBody(), localDateTime.getMonthValue() - 1,
+				localDateTime.getDayOfMonth(), localDateTime.getYear(),
+				localDateTime.getHour(), localDateTime.getMinute(), true, true,
+				new String[0], null, new ImageSelector(), null,
+				_createServiceContext(blogPosting.getSiteId()));
 		}
 
 		@Override
-		public void deleteBlogPostingMyRating(Long blogPostingId)
+		public void deleteItem(
+				BlogPosting blogPosting,
+				Map<String, Serializable> queryParameters)
 			throws Exception {
+
+			_blogsEntryService.deleteEntry(blogPosting.getId());
 		}
 
 		@Override
-		public BlogPosting getBlogPosting(Long blogPostingId) throws Exception {
-			return null;
-		}
-
-		@Override
-		public Rating getBlogPostingMyRating(Long blogPostingId)
-			throws Exception {
-
-			return null;
-		}
-
-		@Override
-		public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		public EntityModel getEntityModel(
+				Map<String, List<String>> multivaluedMap)
 			throws Exception {
 
 			return new BlogPostingEntityModel();
 		}
 
-		@BatchEngineTaskMethod(
-			batchEngineTaskOperation = BatchEngineTaskOperation.READ,
-			itemClass = BlogPosting.class
-		)
 		@Override
-		public Page<BlogPosting> getSiteBlogPostingsPage(
-				Long siteId, String search, Filter filter,
-				Pagination pagination, Sort[] sorts)
+		public Page<BlogPosting> read(
+				Filter filter, Pagination pagination, Sort[] sorts,
+				Map<String, Serializable> parameters, String search)
 			throws Exception {
 
-			_initContextFields();
+			long siteId = GetterUtil.getLong(parameters.get("siteId"));
 
-			return blogPostingResource.getSiteBlogPostingsPage(
-				siteId, search, filter, pagination, sorts);
+			return _search(
+				booleanQuery -> {
+				},
+				filter, search, pagination,
+				queryConfig -> queryConfig.setSelectedFieldNames(
+					Field.ENTRY_CLASS_PK),
+				searchContext -> {
+					searchContext.setAttribute(
+						Field.STATUS, WorkflowConstants.STATUS_APPROVED);
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+					searchContext.setGroupIds(new long[] {siteId});
+				},
+				sorts,
+				document -> _toBlogPosting(
+					_blogsEntryService.getEntry(
+						GetterUtil.getLong(
+							document.get(Field.ENTRY_CLASS_PK)))));
 		}
 
 		@Override
-		public BlogPosting patchBlogPosting(
-				Long blogPostingId, BlogPosting blogPosting)
+		public void updateItem(
+				BlogPosting blogPosting, Map<String, Serializable> parameters)
 			throws Exception {
 
-			return null;
+			LocalDateTime localDateTime = _toLocalDateTime(
+				blogPosting.getDatePublished());
+
+			BlogsEntry blogsEntry = _blogsEntryService.getEntry(
+				blogPosting.getId());
+
+			_blogsEntryService.updateEntry(
+				blogPosting.getId(), blogPosting.getHeadline(),
+				blogPosting.getAlternativeHeadline(),
+				blogPosting.getFriendlyUrlPath(), blogPosting.getDescription(),
+				blogPosting.getArticleBody(), localDateTime.getMonthValue() - 1,
+				localDateTime.getDayOfMonth(), localDateTime.getYear(),
+				localDateTime.getHour(), localDateTime.getMinute(), true, true,
+				new String[0], null, new ImageSelector(), null,
+				_createServiceContext(blogsEntry.getGroupId()));
 		}
 
-		@Override
-		public Rating postBlogPostingMyRating(Long blogPostingId, Rating rating)
+		private SearchContext _createSearchContext(
+				BooleanClause<?> booleanClause, String keywords,
+				Pagination pagination,
+				UnsafeConsumer<QueryConfig, Exception>
+					queryConfigUnsafeConsumer,
+				Sort[] sorts)
 			throws Exception {
 
-			return null;
+			SearchContext searchContext = new SearchContext();
+
+			QueryConfig queryConfig = searchContext.getQueryConfig();
+
+			queryConfig.setHighlightEnabled(false);
+			queryConfig.setScoreEnabled(false);
+
+			queryConfigUnsafeConsumer.accept(queryConfig);
+
+			searchContext.setBooleanClauses(
+				new BooleanClause[] {booleanClause});
+
+			if (pagination != null) {
+				searchContext.setEnd(pagination.getEndPosition());
+			}
+
+			searchContext.setKeywords(keywords);
+			searchContext.setSorts(sorts);
+
+			if (pagination != null) {
+				searchContext.setStart(pagination.getStartPosition());
+			}
+
+			PermissionChecker permissionChecker =
+				PermissionThreadLocal.getPermissionChecker();
+
+			searchContext.setUserId(permissionChecker.getUserId());
+
+			return searchContext;
 		}
 
-		@BatchEngineTaskMethod(
-			batchEngineTaskOperation = BatchEngineTaskOperation.CREATE,
-			itemClass = BlogPosting.class
-		)
-		@Override
-		public BlogPosting postSiteBlogPosting(
-				Long siteId, BlogPosting blogPosting)
+		private ServiceContext _createServiceContext(Long groupId) {
+			ServiceContext serviceContext = new ServiceContext();
+
+			if (groupId != null) {
+				serviceContext.setScopeGroupId(groupId);
+			}
+
+			return serviceContext;
+		}
+
+		private BooleanClause<?> _getBooleanClause(
+				UnsafeConsumer<BooleanQuery, Exception>
+					booleanQueryUnsafeConsumer,
+				Filter filter)
 			throws Exception {
 
-			_initContextFields();
+			BooleanQuery booleanQuery = new BooleanQueryImpl();
 
-			return blogPostingResource.postSiteBlogPosting(siteId, blogPosting);
+			booleanQuery.add(new MatchAllQuery(), BooleanClauseOccur.MUST);
+
+			BooleanFilter booleanFilter = new BooleanFilter();
+
+			if (filter != null) {
+				booleanFilter.add(filter, BooleanClauseOccur.MUST);
+			}
+
+			booleanQuery.setPreBooleanFilter(booleanFilter);
+
+			booleanQueryUnsafeConsumer.accept(booleanQuery);
+
+			return BooleanClauseFactoryUtil.create(
+				booleanQuery, BooleanClauseOccur.MUST.getName());
 		}
 
-		@BatchEngineTaskMethod(
-			batchEngineTaskOperation = BatchEngineTaskOperation.UPDATE,
-			itemClass = BlogPosting.class
-		)
-		@Override
-		public BlogPosting putBlogPosting(
-				@BatchEngineTaskFieldId("id") Long blogPostingId,
-				BlogPosting blogPosting)
+		private Page<BlogPosting> _search(
+				UnsafeConsumer<BooleanQuery, Exception>
+					booleanQueryUnsafeConsumer,
+				Filter filter, String keywords, Pagination pagination,
+				UnsafeConsumer<QueryConfig, Exception>
+					queryConfigUnsafeConsumer,
+				UnsafeConsumer<SearchContext, Exception>
+					searchContextUnsafeConsumer,
+				Sort[] sorts,
+				UnsafeFunction<Document, BlogPosting, Exception>
+					transformUnsafeFunction)
 			throws Exception {
 
-			_initContextFields();
+			if (sorts == null) {
+				sorts = new Sort[] {
+					new Sort(Field.ENTRY_CLASS_PK, Sort.LONG_TYPE, false)
+				};
+			}
 
-			return blogPostingResource.putBlogPosting(
-				blogPostingId, blogPosting);
+			List<BlogPosting> items = new ArrayList<>();
+
+			Indexer<?> indexer = IndexerRegistryUtil.getIndexer(
+				(Class<?>)BlogsEntry.class);
+
+			SearchContext searchContext = _createSearchContext(
+				_getBooleanClause(booleanQueryUnsafeConsumer, filter), keywords,
+				pagination, queryConfigUnsafeConsumer, sorts);
+
+			searchContextUnsafeConsumer.accept(searchContext);
+
+			Hits hits = indexer.search(searchContext);
+
+			for (Document document : hits.getDocs()) {
+				BlogPosting item = transformUnsafeFunction.apply(document);
+
+				if (item != null) {
+					items.add(item);
+				}
+			}
+
+			return Page.of(
+				items, pagination, indexer.searchCount(searchContext));
 		}
 
-		@Override
-		public Rating putBlogPostingMyRating(Long blogPostingId, Rating rating)
-			throws Exception {
+		private BlogPosting _toBlogPosting(BlogsEntry blogsEntry) {
+			BlogPosting blogPosting = new BlogPosting();
 
-			return null;
+			blogPosting.setAlternativeHeadline(blogsEntry.getSubtitle());
+			blogPosting.setArticleBody(blogsEntry.getContent());
+			blogPosting.setDateCreated(blogsEntry.getCreateDate());
+			blogPosting.setDateModified(blogsEntry.getModifiedDate());
+			blogPosting.setDatePublished(blogsEntry.getDisplayDate());
+			blogPosting.setDescription(blogsEntry.getDescription());
+			blogPosting.setEncodingFormat("text/html");
+			blogPosting.setFriendlyUrlPath(blogsEntry.getUrlTitle());
+			blogPosting.setHeadline(blogsEntry.getTitle());
+			blogPosting.setId(blogsEntry.getEntryId());
+			blogPosting.setSiteId(blogsEntry.getGroupId());
+
+			return blogPosting;
 		}
 
-		@Override
-		public void putSiteBlogPostingSubscribe(Long siteId) throws Exception {
-		}
+		private LocalDateTime _toLocalDateTime(Date date) {
+			Instant instant = date.toInstant();
 
-		@Override
-		public void putSiteBlogPostingUnsubscribe(Long siteId)
-			throws Exception {
-		}
+			ZonedDateTime zonedDateTime = instant.atZone(
+				ZoneId.systemDefault());
 
-		@Override
-		public void setContextCompany(Company contextCompany) {
-		}
-
-		@Override
-		public void setContextUser(User contextUser) {
-		}
-
-		private void _initContextFields() {
-			blogPostingResource.setContextAcceptLanguage(contextAcceptLanguage);
-			blogPostingResource.setContextCompany(contextCompany);
-			blogPostingResource.setContextUser(contextUser);
+			return zonedDateTime.toLocalDateTime();
 		}
 
 	}
@@ -373,26 +421,23 @@ public class BaseBatchEngineTaskExecutorTest {
 
 	protected static final int ROWS_COUNT = 18;
 
-	protected static final ObjectMapper objectMapper = new ObjectMapper();
-
 	protected Date baseDate;
-
-	@Inject
-	protected BlogPostingResource blogPostingResource;
-
-	protected ServiceRegistration<BlogPostingResource>
-		blogPostingResourceServiceRegistration;
 
 	@Inject
 	protected BlogsEntryLocalService blogsEntryLocalService;
 
 	protected final DateFormat dateFormat = new SimpleDateFormat(
-		"yyyy-MM-dd'T'HH:mm:00.000Z");
+		"yyyy-MM-dd'T'HH:mm:00.000XXX");
 
 	@DeleteAfterTestRun
 	protected Group group;
 
 	@DeleteAfterTestRun
 	protected User user;
+
+	private ServiceRegistration<?> _batchEngineTaskItemDelegateRegistration;
+
+	@Inject
+	private BlogsEntryService _blogsEntryService;
 
 }

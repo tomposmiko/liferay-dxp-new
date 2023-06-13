@@ -332,7 +332,7 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 		else {
 			roles.addAll(
 				roleLocalService.getRoles(
-					permissionChecker.getGuestUserRoleIds()));
+					permissionChecker.getRoleIds(userId, 0)));
 		}
 
 		int termsCount = roles.size();

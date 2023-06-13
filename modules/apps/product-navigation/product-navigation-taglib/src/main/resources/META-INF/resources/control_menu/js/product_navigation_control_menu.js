@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-product-navigation-control-menu',
-	A => {
+	(A) => {
 		var ControlMenu = {
 			init(containerId) {
 				var instance = this;
@@ -37,7 +37,7 @@ AUI.add(
 						}
 					);
 				}
-			}
+			},
 		};
 
 		Liferay.ControlMenu = ControlMenu;
@@ -49,7 +49,7 @@ AUI.add(
 			'aui-overlay-mask-deprecated',
 			'event-move',
 			'event-touch',
-			'liferay-menu-toggle'
-		]
+			'liferay-menu-toggle',
+		],
 	}
 );

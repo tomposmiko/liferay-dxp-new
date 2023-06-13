@@ -25,12 +25,14 @@ import com.liferay.expando.kernel.service.ExpandoTableLocalServiceUtil;
 import com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil;
 import com.liferay.expando.kernel.service.ExpandoValueServiceUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.util.PropsValues;
 
@@ -75,7 +77,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isImportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isImportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
@@ -94,7 +99,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isImportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isImportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
@@ -115,7 +123,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isImportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isImportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
@@ -149,12 +160,12 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof ExpandoBridgeImpl)) {
+	public boolean equals(Object object) {
+		if (!(object instanceof ExpandoBridgeImpl)) {
 			return false;
 		}
 
-		ExpandoBridgeImpl expandoBridgeImpl = (ExpandoBridgeImpl)obj;
+		ExpandoBridgeImpl expandoBridgeImpl = (ExpandoBridgeImpl)object;
 
 		try {
 			ExpandoTable table1 = getTable();
@@ -191,7 +202,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_READ_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isExportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isExportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
@@ -265,7 +279,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_READ_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isExportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isExportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
@@ -289,7 +306,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_READ_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isExportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isExportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
@@ -411,7 +431,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isImportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isImportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
@@ -462,21 +485,24 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 
 	@Override
 	public void setAttributeProperties(
-		String name, UnicodeProperties properties) {
+		String name, UnicodeProperties unicodeProperties) {
 
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isImportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isImportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
-		setAttributeProperties(name, properties, secure);
+		setAttributeProperties(name, unicodeProperties, secure);
 	}
 
 	@Override
 	public void setAttributeProperties(
-		String name, UnicodeProperties properties, boolean secure) {
+		String name, UnicodeProperties unicodeProperties, boolean secure) {
 
 		try {
 			ExpandoColumn column =
@@ -485,11 +511,11 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 
 			if (secure) {
 				ExpandoColumnServiceUtil.updateTypeSettings(
-					column.getColumnId(), properties.toString());
+					column.getColumnId(), unicodeProperties.toString());
 			}
 			else {
 				ExpandoColumnLocalServiceUtil.updateTypeSettings(
-					column.getColumnId(), properties.toString());
+					column.getColumnId(), unicodeProperties.toString());
 			}
 		}
 		catch (Exception exception) {
@@ -502,7 +528,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isImportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isImportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 
@@ -546,7 +575,10 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT;
 
-		if (ExportImportThreadLocal.isImportInProcess()) {
+		if (CopyLayoutThreadLocal.isCopyLayout() ||
+			ExportImportThreadLocal.isImportInProcess() ||
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
 			secure = false;
 		}
 

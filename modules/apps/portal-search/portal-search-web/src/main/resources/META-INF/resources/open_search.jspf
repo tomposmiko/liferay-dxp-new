@@ -15,7 +15,7 @@
 --%>
 
 <aui:button-row>
-	<aui:button onClick='<%= renderResponse.getNamespace() + "addSearchProvider();" %>' value='<%= LanguageUtil.format(request, "add-x-as-a-search-provider", HtmlUtil.escape(company.getName()), false) %>' />
+	<aui:button onClick='<%= liferayPortletResponse.getNamespace() + "addSearchProvider();" %>' value='<%= LanguageUtil.format(request, "add-x-as-a-search-provider", HtmlUtil.escape(company.getName()), false) %>' />
 </aui:button-row>
 
 <%
@@ -60,15 +60,15 @@ for (int i = 0; i < openSearchInstances.size(); i++) {
 		delta = ParamUtil.getInteger(request, SearchContainer.DEFAULT_DELTA_PARAM + i, SearchContainer.DEFAULT_DELTA);
 	}
 
-	SearchContainer openSearchSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM + i, delta, searchDisplayContext.getPortletURL(), null, LanguageUtil.format(request, "no-results-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(searchDisplayContext.getKeywords()) + "</strong>", false));
+	SearchContainer<?> openSearchSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM + i, delta, searchDisplayContext.getPortletURL(), null, LanguageUtil.format(request, "no-results-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(searchDisplayContext.getKeywords()) + "</strong>", false));
 
 	String xml = openSearch.search(request, groupId, themeDisplay.getUserId(), searchDisplayContext.getKeywords(), openSearchSearchContainer.getCur(), openSearchSearchContainer.getDelta(), format);
 
-	LinkedHashMap<String, Object> groupParams = new LinkedHashMap<String, Object>();
-
-	groupParams.put("active", Boolean.FALSE);
-
-	int inactiveGroupsCount = GroupLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), null, null, groupParams);
+	int inactiveGroupsCount = GroupLocalServiceUtil.searchCount(
+		themeDisplay.getCompanyId(), null, null,
+		LinkedHashMapBuilder.<String, Object>put(
+			"active", Boolean.FALSE
+		).build());
 
 	Tuple tuple = com.liferay.portal.search.web.internal.util.SearchUtil.getElements(xml, openSearch.getClassName(), inactiveGroupsCount);
 
@@ -98,7 +98,7 @@ for (int i = 0; i < openSearchInstances.size(); i++) {
 				if (openSearch instanceof HitsOpenSearchImpl) {
 					HitsOpenSearchImpl hitsOpenSearchImpl = (HitsOpenSearchImpl)openSearch;
 
-					Indexer hitsOpenSearchImplIndexer = hitsOpenSearchImpl.getIndexer();
+					Indexer<?> hitsOpenSearchImplIndexer = hitsOpenSearchImpl.getIndexer();
 
 					filterSearch = hitsOpenSearchImplIndexer.isFilterSearch();
 				}
@@ -126,11 +126,11 @@ for (int i = 0; i < openSearchInstances.size(); i++) {
 				<liferay-ui:search-container-column-text>
 
 					<%
-					String entryTitle = element.elementText("title");
-					String summary = element.elementText("summary");
 					String entryClassName = element.elementText("entryClassName");
 					long entryClassPK = GetterUtil.getLong(element.elementText("entryClassPK"));
+					String entryTitle = element.elementText("title");
 					String[] queryTerms = StringUtil.split(element.elementText("queryTerms"), StringPool.COMMA_AND_SPACE);
+					String summary = element.elementText("summary");
 					%>
 
 					<a class="entry-title" href="<%= com.liferay.portal.search.web.internal.util.SearchUtil.getSearchResultViewURL(renderRequest, renderResponse, entryClassName, entryClassPK, searchDisplayContext.isViewInContext(), currentURL) %>">

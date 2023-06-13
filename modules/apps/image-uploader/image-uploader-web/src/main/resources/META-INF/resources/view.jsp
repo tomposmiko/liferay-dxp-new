@@ -19,14 +19,14 @@
 <%
 int aspectRatio = ParamUtil.getInteger(request, "aspectRatio");
 String currentImageURL = ParamUtil.getString(request, "currentLogoURL");
-long maxFileSize = ParamUtil.getLong(request, "maxFileSize");
+long maxFileSize = UploadImageUtil.getMaxFileSize(renderRequest);
 boolean preserveRatio = ParamUtil.getBoolean(request, "preserveRatio");
-String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 String randomNamespace = ParamUtil.getString(request, "randomNamespace");
+String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 %>
 
-<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/image_uploader/view" var="previewURL">
-	<portlet:param name="mvcRenderCommandName" value="/image_uploader/view" />
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/image_uploader/upload_image" var="previewURL">
+	<portlet:param name="mvcRenderCommandName" value="/image_uploader/upload_image" />
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.GET_TEMP %>" />
 </liferay-portlet:resourceURL>
 
@@ -36,7 +36,7 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 		<%
 		FileEntry fileEntry = (FileEntry)SessionMessages.get(renderRequest, "imageUploaded");
 
-		previewURL = HttpUtil.addParameter(previewURL, renderResponse.getNamespace() + "tempImageFileName", tempImageFileName);
+		previewURL = HttpUtil.addParameter(previewURL, liferayPortletResponse.getNamespace() + "tempImageFileName", tempImageFileName);
 		%>
 
 		<aui:script>
@@ -51,9 +51,8 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 		</aui:script>
 	</c:when>
 	<c:otherwise>
-		<portlet:actionURL name="/image_uploader/view" var="uploadImageURL">
-			<portlet:param name="mvcRenderCommandName" value="/image_uploader/view" />
-			<portlet:param name="maxFileSize" value="<%= String.valueOf(maxFileSize) %>" />
+		<portlet:actionURL name="/image_uploader/upload_image" var="uploadImageURL">
+			<portlet:param name="mvcRenderCommandName" value="/image_uploader/upload_image" />
 		</portlet:actionURL>
 
 		<aui:form action="<%= uploadImageURL %>" enctype="multipart/form-data" method="post" name="fm">
@@ -66,7 +65,7 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 			<aui:input name="imageUploaded" type="hidden" value='<%= SessionMessages.contains(renderRequest, "imageUploaded") %>' />
 
 			<div class="dialog-body">
-				<div class="container-fluid-1280">
+				<clay:container-fluid>
 
 					<%
 					DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
@@ -77,24 +76,24 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 					</liferay-ui:error>
 
 					<liferay-ui:error exception="<%= FileSizeException.class %>">
-						<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(maxFileSize, locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
+						<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(maxFileSize, locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
 					</liferay-ui:error>
 
 					<liferay-ui:error exception="<%= NoSuchFileException.class %>" message="an-unexpected-error-occurred-while-uploading-your-file" />
 					<liferay-ui:error exception="<%= UploadException.class %>" message="an-unexpected-error-occurred-while-uploading-your-file" />
 
 					<liferay-ui:error exception="<%= UploadRequestSizeException.class %>">
-						<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(maxFileSize, locale) %>" key="request-is-larger-than-x-and-could-not-be-processed" translateArguments="<%= false %>" />
+						<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(maxFileSize, locale) %>" key="request-is-larger-than-x-and-could-not-be-processed" translateArguments="<%= false %>" />
 					</liferay-ui:error>
 
 					<aui:fieldset-group markupView="lexicon">
 						<aui:fieldset cssClass="lfr-portrait-editor">
 							<h4 class="text-default">
-								<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(maxFileSize, locale) %>" key="upload-images-no-larger-than-x" />
+								<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(maxFileSize, locale) %>" key="upload-images-no-larger-than-x" />
 							</h4>
 
 							<div class="lfr-change-logo lfr-portrait-preview" id="<portlet:namespace />portraitPreview">
-								<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" class="lfr-portrait-preview-img" id="<portlet:namespace />portraitPreviewImg" src="<%= HtmlUtil.escape(currentImageURL) %>" />
+								<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" class="img-fluid lfr-portrait-preview-img" id="<portlet:namespace />portraitPreviewImg" src="<%= HtmlUtil.escape(currentImageURL) %>" />
 							</div>
 
 							<c:if test='<%= Validator.isNull(currentImageURL) || currentImageURL.contains("/spacer.png") %>'>
@@ -104,17 +103,21 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 							</c:if>
 
 							<div class="button-holder">
-								<label class="btn btn-secondary" for="<portlet:namespace />fileName" id="<portlet:namespace />uploadImage" tabindex="0"><liferay-ui:message key="select" /></label>
+								<label class="btn btn-secondary mt-2" for="<portlet:namespace />fileName" id="<portlet:namespace />uploadImage" tabindex="0"><liferay-ui:message key="select" /></label>
 
 								<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) || windowState.equals(LiferayWindowState.POP_UP) %>" cssClass="hide" label="" name="fileName" type="file">
 									<aui:validator name="acceptFiles">
 										'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>'
 									</aui:validator>
+
+									<aui:validator name="maxFileSize">
+										'<%= String.valueOf(maxFileSize) %>'
+									</aui:validator>
 								</aui:input>
 							</div>
 						</aui:fieldset>
 					</aui:fieldset-group>
-				</div>
+				</clay:container-fluid>
 			</div>
 
 			<aui:button-row>
@@ -125,13 +128,13 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 		</aui:form>
 
 		<script>
-			(function() {
+			(function () {
 				var uploadImageButton = document.getElementById(
 					'<portlet:namespace />uploadImage'
 				);
 
 				if (uploadImageButton) {
-					uploadImageButton.addEventListener('keydown', function(event) {
+					uploadImageButton.addEventListener('keydown', function (event) {
 						event.preventDefault();
 
 						if (event.key == 'Enter' || event.key == ' ') {
@@ -143,11 +146,10 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 		</script>
 
 		<aui:script use="liferay-logo-editor">
-			<portlet:actionURL name="/image_uploader/view" var="addTempImageURL">
-				<portlet:param name="mvcRenderCommandName" value="/image_uploader/view" />
+			<portlet:actionURL name="/image_uploader/upload_image" var="addTempImageURL">
+				<portlet:param name="mvcRenderCommandName" value="/image_uploader/upload_image" />
 				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" />
 				<portlet:param name="aspectRatio" value="<%= String.valueOf(aspectRatio) %>" />
-				<portlet:param name="maxFileSize" value="<%= String.valueOf(maxFileSize) %>" />
 				<portlet:param name="preserveRatio" value="<%= String.valueOf(preserveRatio) %>" />
 			</portlet:actionURL>
 
@@ -165,11 +167,11 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 				maxFileSize: <%= maxFileSize %>,
 				namespace: '<portlet:namespace />',
 				on: {
-					uploadComplete: A.bind('val', imageUploadedInput, true)
+					uploadComplete: A.bind('val', imageUploadedInput, true),
 				},
 				preserveRatio: <%= preserveRatio %>,
 				previewURL: '<%= previewURL %>',
-				uploadURL: '<%= addTempImageURL %>'
+				uploadURL: '<%= addTempImageURL %>',
 			});
 
 			if (Liferay.Util.getTop() !== A.config.win) {

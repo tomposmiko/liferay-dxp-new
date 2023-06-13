@@ -18,20 +18,15 @@ import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.PortalRunMode;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.File;
 import java.io.InputStream;
 
 import java.lang.reflect.Method;
 
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.UnknownHostException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,44 +37,8 @@ import java.nio.file.StandardCopyOption;
  */
 public class JarUtil {
 
-	public static Path downloadAndInstallJar(
-			URL url, String libPath, String name)
+	public static void downloadAndInstallJar(URL url, Path path)
 		throws Exception {
-
-		String protocol = url.getProtocol();
-
-		if (PortalRunMode.isTestMode() &&
-			(protocol.equals(Http.HTTP) || protocol.equals(Http.HTTPS))) {
-
-			String urlString = url.toExternalForm();
-
-			if (!urlString.contains("mirrors")) {
-				try {
-					InetAddress.getAllByName("mirrors");
-
-					String newURLString = StringUtil.replace(
-						urlString, "://", "://mirrors/");
-
-					url = new URL(newURLString);
-
-					if (_log.isDebugEnabled()) {
-						_log.debug(
-							StringBundler.concat(
-								"Swapping URL from ", urlString, " to ",
-								newURLString));
-					}
-				}
-				catch (UnknownHostException unknownHostException) {
-					if (_log.isDebugEnabled()) {
-						_log.debug("Unable to resolve \"mirrors\"");
-					}
-				}
-			}
-		}
-
-		File file = new File(libPath, name);
-
-		Path path = file.toPath();
 
 		if (_log.isInfoEnabled()) {
 			_log.info(StringBundler.concat("Downloading ", url, " to ", path));
@@ -92,15 +51,13 @@ public class JarUtil {
 		if (_log.isInfoEnabled()) {
 			_log.info(StringBundler.concat("Downloaded ", url, " to ", path));
 		}
-
-		return path;
 	}
 
 	public static void downloadAndInstallJar(
-			URL url, String libPath, String name, URLClassLoader urlClassLoader)
+			URL url, Path path, URLClassLoader urlClassLoader)
 		throws Exception {
 
-		Path path = downloadAndInstallJar(url, libPath, name);
+		downloadAndInstallJar(url, path);
 
 		URI uri = path.toUri();
 
@@ -117,6 +74,40 @@ public class JarUtil {
 				StringBundler.concat(
 					"Installed ", path, " to ", urlClassLoader));
 		}
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #downloadAndInstallJar(URL, Path)}
+	 */
+	@Deprecated
+	public static Path downloadAndInstallJar(
+			URL url, String libPath, String name)
+		throws Exception {
+
+		File file = new File(libPath, name);
+
+		Path path = file.toPath();
+
+		downloadAndInstallJar(url, path);
+
+		return path;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #downloadAndInstallJar(URL, Path, URLClassLoader)}
+	 */
+	@Deprecated
+	public static void downloadAndInstallJar(
+			URL url, String libPath, String name, URLClassLoader urlClassLoader)
+		throws Exception {
+
+		File file = new File(libPath, name);
+
+		Path path = file.toPath();
+
+		downloadAndInstallJar(url, path, urlClassLoader);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(JarUtil.class);

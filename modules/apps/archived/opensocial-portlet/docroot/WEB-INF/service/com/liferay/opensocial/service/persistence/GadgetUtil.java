@@ -15,7 +15,6 @@
 package com.liferay.opensocial.service.persistence;
 
 import com.liferay.opensocial.model.Gadget;
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -1075,16 +1074,9 @@ public class GadgetUtil {
 	}
 
 	public static GadgetPersistence getPersistence() {
-		if (_persistence == null) {
-			_persistence = (GadgetPersistence)PortletBeanLocatorUtil.locate(
-				com.liferay.opensocial.service.ServletContextUtil.
-					getServletContextName(),
-				GadgetPersistence.class.getName());
-		}
-
 		return _persistence;
 	}
 
-	private static GadgetPersistence _persistence;
+	private static volatile GadgetPersistence _persistence;
 
 }

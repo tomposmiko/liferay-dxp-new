@@ -14,12 +14,12 @@
 
 AUI.add(
 	'liferay-staging-version',
-	A => {
+	(A) => {
 		var StagingBar = Liferay.StagingBar;
 
 		var MAP_CMD_REVISION = {
 			redo: 'redo_layout_revision',
-			undo: 'undo_layout_revision'
+			undo: 'undo_layout_revision',
 		};
 
 		var MAP_TEXT_REVISION = {
@@ -28,7 +28,7 @@ AUI.add(
 			),
 			undo: Liferay.Language.get(
 				'are-you-sure-you-want-to-undo-your-last-changes'
-			)
+			),
 		};
 
 		A.mix(StagingBar, {
@@ -38,30 +38,6 @@ AUI.add(
 				if (instance._eventHandles) {
 					A.Array.invoke(instance._eventHandles, 'detach');
 				}
-			},
-
-			_getNotification() {
-				var instance = this;
-
-				var notification = instance._notification;
-
-				if (!notification) {
-					notification = new Liferay.Notice({
-						closeText: false,
-						content: Liferay.Language.get(
-							'there-was-an-unexpected-error.-please-refresh-the-current-page'
-						),
-						noticeClass: 'hide',
-						timeout: 10000,
-						toggleText: false,
-						type: 'warning',
-						useAnimation: true
-					});
-
-					instance._notification = notification;
-				}
-
-				return notification;
 			},
 
 			_onInit() {
@@ -93,7 +69,7 @@ AUI.add(
 						namespace + 'viewHistory',
 						instance._onViewHistory,
 						instance
-					)
+					),
 				];
 
 				var layoutRevisionDetails = A.one(
@@ -109,8 +85,8 @@ AUI.add(
 							Liferay.Util.fetch(
 								instance.markAsReadyForPublicationURL
 							)
-								.then(response => response.text())
-								.then(response => {
+								.then((response) => response.text())
+								.then((response) => {
 									layoutRevisionDetails.plug(
 										A.Plugin.ParseContent
 									);
@@ -133,10 +109,10 @@ AUI.add(
 				if (layoutRevisionStatus) {
 					Liferay.after('updatedStatus', () => {
 						Liferay.Util.fetch(instance.layoutRevisionStatusURL)
-							.then(response => {
+							.then((response) => {
 								return response.text();
 							})
-							.then(response => {
+							.then((response) => {
 								layoutRevisionStatus.plug(
 									A.Plugin.ParseContent
 								);
@@ -197,7 +173,8 @@ AUI.add(
 					.then(() => {
 						if (event.incomplete) {
 							location.href = event.currentURL;
-						} else {
+						}
+						else {
 							Liferay.fire('updatedLayout');
 						}
 					})
@@ -218,18 +195,16 @@ AUI.add(
 						after: {
 							destroy() {
 								window.location.reload();
-							}
+							},
 						},
-						destroyOnHide: true
+						destroyOnHide: true,
 					},
 					title: Liferay.Language.get('history'),
-					uri: StagingBar.viewHistoryURL
+					uri: StagingBar.viewHistoryURL,
 				});
 			},
 
 			_updateRevision(cmd, layoutRevisionId, layoutSetBranchId) {
-				var instance = this;
-
 				var updateLayoutData = {
 					cmd,
 					doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
@@ -237,21 +212,29 @@ AUI.add(
 					layoutSetBranchId,
 					p_auth: Liferay.authToken,
 					p_l_id: themeDisplay.getPlid(),
-					p_v_l_s_g_id: themeDisplay.getSiteGroupId()
+					p_v_l_s_g_id: themeDisplay.getSiteGroupId(),
 				};
 
 				Liferay.Util.fetch(
 					themeDisplay.getPathMain() + '/portal/update_layout',
 					{
 						body: Liferay.Util.objectToFormData(updateLayoutData),
-						method: 'POST'
+						method: 'POST',
 					}
 				)
 					.then(() => {
 						window.location.reload();
 					})
 					.catch(() => {
-						instance._getNotification().show();
+						Liferay.Util.openToast({
+							message: Liferay.Language.get(
+								'there-was-an-unexpected-error.-please-refresh-the-current-page'
+							),
+							toastProps: {
+								autoClose: 10000,
+							},
+							type: 'warning',
+						});
 					});
 			},
 
@@ -259,13 +242,13 @@ AUI.add(
 				var instance = this;
 
 				instance._cleanup();
-			}
+			},
 		});
 
 		Liferay.on('initStagingBar', StagingBar._onInit, StagingBar);
 	},
 	'',
 	{
-		requires: ['aui-button', 'liferay-staging']
+		requires: ['aui-button', 'liferay-staging'],
 	}
 );

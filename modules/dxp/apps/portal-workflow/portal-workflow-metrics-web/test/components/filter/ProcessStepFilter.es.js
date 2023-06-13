@@ -9,21 +9,24 @@
  * distribution rights of the Software.
  */
 
-import {cleanup, render, findByTestId} from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
 import ProcessStepFilter from '../../../src/main/resources/META-INF/resources/js/components/filter/ProcessStepFilter.es';
 import {MockRouter} from '../../mock/MockRouter.es';
 
-const query = '?filters.taskKeys%5B0%5D=update';
+const query = '?filters.taskNames%5B0%5D=update';
 
 const items = [
-	{key: 'review', name: 'Review'},
-	{key: 'update', name: 'Update'}
+	{label: 'Review', name: 'review'},
+	{label: 'Update', name: 'update'},
 ];
 
 const clientMock = {
-	get: jest.fn().mockResolvedValue({data: {items, totalCount: items.length}})
+	request: jest
+		.fn()
+		.mockResolvedValue({data: {items, totalCount: items.length}}),
 };
 
 const wrapper = ({children}) => (
@@ -33,34 +36,28 @@ const wrapper = ({children}) => (
 );
 
 describe('The process step filter component should', () => {
-	let getAllByTestId;
+	let container;
 
 	afterEach(cleanup);
 
 	beforeEach(() => {
-		const renderResult = render(
-			<ProcessStepFilter dispatch={() => {}} processId={12345} />,
-			{wrapper}
-		);
+		const renderResult = render(<ProcessStepFilter processId={12345} />, {
+			wrapper,
+		});
 
-		getAllByTestId = renderResult.getAllByTestId;
+		container = renderResult.container;
 	});
 
-	test('Be rendered with filter item names', async () => {
-		const filterItems = await getAllByTestId('filterItem');
+	test('Be rendered with filter item names', () => {
+		const filterItems = container.querySelectorAll('.dropdown-item');
 
 		expect(filterItems[0].innerHTML).toContain('Review');
 		expect(filterItems[1].innerHTML).toContain('Update');
 	});
 
-	test('Be rendered with active option "Update"', async () => {
-		const filterItems = getAllByTestId('filterItem');
+	test('Be rendered with active option "Update"', () => {
+		const activeItem = container.querySelector('.active');
 
-		const activeItem = filterItems.find(item =>
-			item.className.includes('active')
-		);
-		const activeItemName = await findByTestId(activeItem, 'filterItemName');
-
-		expect(activeItemName.innerHTML).toBe('Update');
+		expect(activeItem).toHaveTextContent('Update');
 	});
 });

@@ -17,15 +17,12 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String domainNameValue = ParamUtil.getString(request, "domainName", domainName);
-String rulesValue = ParamUtil.getString(request, "rules", rules);
-String userCustomAttributeNamesValue = ParamUtil.getString(request, "userCustomAttributeNamesValue", userCustomAttributeNames);
 long[] classNameIdValues = StringUtil.split(ParamUtil.getString(request, "classNameIds", StringUtil.merge(classNameIds)), 0L);
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
 
-<aui:form action="<%= configurationActionURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'>
+<aui:form action="<%= configurationActionURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveConfiguration();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="classNameIds" type="hidden" />
 
@@ -34,11 +31,11 @@ long[] classNameIdValues = StringUtil.split(ParamUtil.getString(request, "classN
 	<liferay-ui:error key="rules" message="please-enter-valid-rules" />
 	<liferay-ui:error key="rulesEngineException" message="please-check-the-syntax-of-your-rules" />
 
-	<div class="container-fluid-1280">
+	<clay:container-fluid>
 		<aui:fieldset>
-			<aui:input name="domainName" value="<%= domainNameValue %>" wrapperCssClass="lfr-input-text-container" />
+			<aui:input name="domainName" value='<%= ParamUtil.getString(request, "domainName", domainName) %>' wrapperCssClass="lfr-input-text-container" />
 
-			<aui:input name="rules" style="height: 250px; width: 100%;" type="textarea" value="<%= rulesValue %>" wrap="off" wrapperCssClass="lfr-textarea-container" />
+			<aui:input name="rules" style="height: 250px; width: 100%;" type="textarea" value='<%= ParamUtil.getString(request, "rules", rules) %>' wrap="off" wrapperCssClass="lfr-textarea-container" />
 
 			<%
 
@@ -67,7 +64,7 @@ long[] classNameIdValues = StringUtil.split(ParamUtil.getString(request, "classN
 			}
 			%>
 
-			<aui:input name="userCustomAttributeNames" value="<%= userCustomAttributeNamesValue %>" wrapperCssClass="lfr-input-text-container" />
+			<aui:input name="userCustomAttributeNames" value='<%= ParamUtil.getString(request, "userCustomAttributeNamesValue", userCustomAttributeNames) %>' wrapperCssClass="lfr-input-text-container" />
 
 			<liferay-ui:input-move-boxes
 				leftBoxName="currentClassNameIds"
@@ -82,7 +79,7 @@ long[] classNameIdValues = StringUtil.split(ParamUtil.getString(request, "classN
 				<aui:button type="submit" />
 			</aui:button-row>
 		</aui:fieldset>
-	</div>
+	</clay:container-fluid>
 </aui:form>
 
 <aui:script>

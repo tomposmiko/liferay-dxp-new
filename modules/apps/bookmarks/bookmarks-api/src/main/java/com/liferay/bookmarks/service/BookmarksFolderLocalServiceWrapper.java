@@ -36,6 +36,10 @@ public class BookmarksFolderLocalServiceWrapper
 	/**
 	 * Adds the bookmarks folder to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BookmarksFolderLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param bookmarksFolder the bookmarks folder
 	 * @return the bookmarks folder that was added
 	 */
@@ -70,7 +74,22 @@ public class BookmarksFolderLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _bookmarksFolderLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the bookmarks folder from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BookmarksFolderLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param bookmarksFolder the bookmarks folder
 	 * @return the bookmarks folder that was removed
@@ -85,6 +104,10 @@ public class BookmarksFolderLocalServiceWrapper
 
 	/**
 	 * Deletes the bookmarks folder with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BookmarksFolderLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param folderId the primary key of the bookmarks folder
 	 * @return the bookmarks folder that was removed
@@ -150,6 +173,18 @@ public class BookmarksFolderLocalServiceWrapper
 
 		return _bookmarksFolderLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _bookmarksFolderLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _bookmarksFolderLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -458,10 +493,10 @@ public class BookmarksFolderLocalServiceWrapper
 	@Override
 	public java.util.List<Object> getFoldersAndEntries(
 		long groupId, long folderId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<?> orderByComparator) {
 
 		return _bookmarksFolderLocalService.getFoldersAndEntries(
-			groupId, folderId, status, start, end, obc);
+			groupId, folderId, status, start, end, orderByComparator);
 	}
 
 	@Override
@@ -509,6 +544,9 @@ public class BookmarksFolderLocalServiceWrapper
 		return _bookmarksFolderLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -613,6 +651,10 @@ public class BookmarksFolderLocalServiceWrapper
 
 	/**
 	 * Updates the bookmarks folder in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BookmarksFolderLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param bookmarksFolder the bookmarks folder
 	 * @return the bookmarks folder that was updated

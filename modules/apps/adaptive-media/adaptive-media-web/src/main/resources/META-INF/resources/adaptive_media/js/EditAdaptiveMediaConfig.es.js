@@ -12,9 +12,29 @@
  * details.
  */
 
-import {PortletBase} from 'frontend-js-web';
+import {PortletBase, normalizeFriendlyURL} from 'frontend-js-web';
 import core from 'metal';
 import dom from 'metal-dom';
+
+const VALID_INPUT_KEYS = new Set([
+	'0',
+	'1',
+	'2',
+	'3',
+	'4',
+	'5',
+	'6',
+	'7',
+	'8',
+	'9',
+	'ArrowDown',
+	'ArrowUp',
+	'Backspace',
+	'Down',
+	'Enter',
+	'Tab',
+	'Up',
+]);
 
 /**
  * EditAdaptiveMediaConfig
@@ -24,28 +44,6 @@ import dom from 'metal-dom';
  */
 
 class EditAdaptiveMediaConfig extends PortletBase {
-	/**
-	 * @inheritDoc
-	 */
-	created() {
-		this.validInputKeyCodes_ = [
-			8,
-			9,
-			13,
-			38,
-			40,
-			48,
-			49,
-			50,
-			51,
-			52,
-			53,
-			54,
-			55,
-			56,
-			57
-		];
-	}
 
 	/**
 	 * @inheritDoc
@@ -54,7 +52,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		const idOptions = this.one('#idOptions');
 
 		if (idOptions) {
-			dom.delegate(idOptions, 'change', 'input[type="radio"]', event =>
+			dom.delegate(idOptions, 'change', 'input[type="radio"]', (event) =>
 				this.onChangeUuidOptions_(event.delegateTarget)
 			);
 		}
@@ -71,7 +69,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		const maxWidthInput = this.one('#maxWidth');
 
 		if (maxWidthInput) {
-			maxWidthInput.addEventListener('keydown', event => {
+			maxWidthInput.addEventListener('keydown', (event) => {
 				this.handleKeyDown_(event);
 			});
 
@@ -81,7 +79,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		}
 
 		if (maxHeightInput) {
-			maxHeightInput.addEventListener('keydown', event =>
+			maxHeightInput.addEventListener('keydown', (event) =>
 				this.handleKeyDown_(event)
 			);
 
@@ -98,7 +96,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 
 		const saveButton = this.one('button[type=submit]');
 
-		saveButton.addEventListener('click', event =>
+		saveButton.addEventListener('click', (event) =>
 			this.onSubmitForm_(event)
 		);
 	}
@@ -116,9 +114,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 			this.isAutomaticUuid_() &&
 			(uuidEmpty || this._originalUuidChanged)
 		) {
-			newUuidInput.value = Liferay.Util.normalizeFriendlyURL(
-				this.nameInput.value
-			);
+			newUuidInput.value = normalizeFriendlyURL(this.nameInput.value);
 		}
 
 		this._originalUuidChanged = true;
@@ -130,9 +126,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 	 * @param {KeyboardEvent} event The keyboard event.
 	 */
 	handleKeyDown_(event) {
-		const code = event.keyCode || event.charCode;
-
-		if (this.validInputKeyCodes_.indexOf(code) == -1) {
+		if (!VALID_INPUT_KEYS.has(event.key)) {
 			event.preventDefault();
 		}
 	}
@@ -162,7 +156,8 @@ class EditAdaptiveMediaConfig extends PortletBase {
 
 			newUuidInput.setAttribute('disabled', true);
 			newUuidLabel.classList.add('disabled');
-		} else {
+		}
+		else {
 			newUuidInput.value = this._lastCustomUuuid || newUuidInput.value;
 
 			newUuidInput.removeAttribute('disabled');
@@ -187,7 +182,8 @@ class EditAdaptiveMediaConfig extends PortletBase {
 
 		if (form.formValidator.hasErrors()) {
 			event.preventDefault();
-		} else {
+		}
+		else {
 			submitForm(form.form);
 		}
 	}
@@ -211,7 +207,8 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		if (this.maxWidthInput.value || this.maxHeightInput.value) {
 			form.removeRule(nsMaxWidth, 'required');
 			form.removeRule(nsMaxHeight, 'required');
-		} else {
+		}
+		else {
 			form.addRule(nsMaxWidth, 'required', inputErrorMessage);
 			form.addRule(nsMaxHeight, 'required', STR_BLANK);
 
@@ -228,6 +225,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
  * @type {!Object}
  */
 EditAdaptiveMediaConfig.STATE = {
+
 	/**
 	 * Node where errors will be rendered.
 	 * @instance
@@ -236,8 +234,8 @@ EditAdaptiveMediaConfig.STATE = {
 	 */
 	errorNode: {
 		validator: core.isString,
-		value: '.error-wrapper'
-	}
+		value: '.error-wrapper',
+	},
 };
 
 export default EditAdaptiveMediaConfig;

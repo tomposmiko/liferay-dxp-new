@@ -12,7 +12,7 @@
  * details.
  */
 
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import DataLayoutBuilderInstanceProvider from './DataLayoutBuilderInstanceProvider.es';
 import FormViewContext from './FormViewContext.es';
@@ -32,7 +32,7 @@ export default ({children, dataLayoutBuilder}) => {
 	}, [dataLayoutBuilder]);
 
 	const dispatch = useCallback(
-		action => {
+		(action) => {
 			dataLayoutBuilder.dispatchAction(action);
 		},
 		[dataLayoutBuilder]

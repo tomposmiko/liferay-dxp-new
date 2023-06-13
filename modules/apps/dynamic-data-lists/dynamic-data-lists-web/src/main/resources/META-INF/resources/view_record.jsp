@@ -28,6 +28,7 @@ long recordSetId = BeanParamUtil.getLong(record, request, "recordSetId");
 DDLRecordSet recordSet = DDLRecordSetServiceUtil.getRecordSet(recordSetId);
 
 boolean editable = ParamUtil.getBoolean(request, "editable", true);
+
 long formDDMTemplateId = ParamUtil.getLong(request, "formDDMTemplateId");
 
 DDMStructure ddmStructure = recordSet.getDDMStructure(formDDMTemplateId);
@@ -49,7 +50,7 @@ else {
 }
 %>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<c:if test="<%= recordVersion != null %>">
 		<aui:model-context bean="<%= recordVersion %>" model="<%= DDLRecordVersion.class %>" />
 
@@ -100,7 +101,7 @@ else {
 			<aui:button href="<%= redirect %>" name="cancelButton" type="cancel" />
 		</aui:button-row>
 	</aui:fieldset>
-</div>
+</clay:container-fluid>
 
 <%
 PortletURL portletURL = renderResponse.createRenderURL();
@@ -109,6 +110,7 @@ portletURL.setParameter("mvcPath", "/view_record_set.jsp");
 portletURL.setParameter("recordSetId", String.valueOf(recordSetId));
 
 PortalUtil.addPortletBreadcrumbEntry(request, recordSet.getName(locale), portletURL.toString());
+
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.format(request, "view-x", ddmStructure.getName(locale), false), currentURL);
 %>
 

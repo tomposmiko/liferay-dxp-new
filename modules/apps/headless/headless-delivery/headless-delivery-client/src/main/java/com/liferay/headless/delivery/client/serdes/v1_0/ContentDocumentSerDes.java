@@ -93,6 +93,20 @@ public class ContentDocumentSerDes {
 			sb.append("\"");
 		}
 
+		if (contentDocument.getContentValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"contentValue\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(contentDocument.getContentValue()));
+
+			sb.append("\"");
+		}
+
 		if (contentDocument.getDescription() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -212,6 +226,15 @@ public class ContentDocumentSerDes {
 				"contentUrl", String.valueOf(contentDocument.getContentUrl()));
 		}
 
+		if (contentDocument.getContentValue() == null) {
+			map.put("contentValue", null);
+		}
+		else {
+			map.put(
+				"contentValue",
+				String.valueOf(contentDocument.getContentValue()));
+		}
+
 		if (contentDocument.getDescription() == null) {
 			map.put("description", null);
 		}
@@ -301,6 +324,12 @@ public class ContentDocumentSerDes {
 					contentDocument.setContentUrl((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "contentValue")) {
+				if (jsonParserFieldValue != null) {
+					contentDocument.setContentValue(
+						(String)jsonParserFieldValue);
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
 					contentDocument.setDescription(
@@ -336,10 +365,6 @@ public class ContentDocumentSerDes {
 					contentDocument.setTitle((String)jsonParserFieldValue);
 				}
 			}
-			else {
-				throw new IllegalArgumentException(
-					"Unsupported field name " + jsonParserFieldName);
-			}
 		}
 
 	}
@@ -368,7 +393,7 @@ public class ContentDocumentSerDes {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
-			sb.append("\":");
+			sb.append("\": ");
 
 			Object value = entry.getValue();
 
@@ -394,14 +419,17 @@ public class ContentDocumentSerDes {
 
 				sb.append("]");
 			}
-			else {
+			else if (value instanceof String) {
 				sb.append("\"");
 				sb.append(_escape(entry.getValue()));
 				sb.append("\"");
 			}
+			else {
+				sb.append(String.valueOf(entry.getValue()));
+			}
 
 			if (iterator.hasNext()) {
-				sb.append(",");
+				sb.append(", ");
 			}
 		}
 

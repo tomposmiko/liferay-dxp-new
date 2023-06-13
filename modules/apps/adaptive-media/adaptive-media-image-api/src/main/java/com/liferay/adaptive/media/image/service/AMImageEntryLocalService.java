@@ -16,6 +16,7 @@ package com.liferay.adaptive.media.image.service;
 
 import com.liferay.adaptive.media.image.configuration.AMImageConfigurationEntry;
 import com.liferay.adaptive.media.image.model.AMImageEntry;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -61,7 +62,7 @@ public interface AMImageEntryLocalService
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link AMImageEntryLocalServiceUtil} to access the am image entry local service. Add custom service methods to <code>com.liferay.adaptive.media.image.service.impl.AMImageEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.adaptive.media.image.service.impl.AMImageEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the am image entry local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link AMImageEntryLocalServiceUtil} if injection and service tracking are not available.
 	 */
 
 	/**
@@ -90,6 +91,10 @@ public interface AMImageEntryLocalService
 	/**
 	 * Adds the am image entry to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AMImageEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param amImageEntry the am image entry
 	 * @return the am image entry that was added
 	 */
@@ -106,6 +111,12 @@ public interface AMImageEntryLocalService
 	public AMImageEntry createAMImageEntry(long amImageEntryId);
 
 	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
+
+	/**
 	 * Deletes all the adaptive media images generated for the configuration in
 	 * the company. This method deletes both the adaptive media image entry from
 	 * the database and the bytes from the file store.
@@ -120,6 +131,10 @@ public interface AMImageEntryLocalService
 	/**
 	 * Deletes the am image entry from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AMImageEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param amImageEntry the am image entry
 	 * @return the am image entry that was removed
 	 */
@@ -128,6 +143,10 @@ public interface AMImageEntryLocalService
 
 	/**
 	 * Deletes the am image entry with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AMImageEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param amImageEntryId the primary key of the am image entry
 	 * @return the am image entry that was removed
@@ -167,6 +186,12 @@ public interface AMImageEntryLocalService
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public <T> T dslQuery(DSLQuery dslQuery);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int dslQueryCount(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -278,6 +303,16 @@ public interface AMImageEntryLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AMImageEntry> getAMImageEntries(int start, int end);
+
+	/**
+	 * Returns the list of adaptive media image entries generated for the
+	 * file version.
+	 *
+	 * @param fileVersionId the primary key of the file version
+	 * @return the list of adaptive media image entries in the file version
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AMImageEntry> getAMImageEntries(long fileVersionId);
 
 	/**
 	 * Returns all the am image entries matching the UUID and company.
@@ -402,6 +437,9 @@ public interface AMImageEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getPercentage(long companyId, String configurationUuid);
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -409,6 +447,10 @@ public interface AMImageEntryLocalService
 
 	/**
 	 * Updates the am image entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AMImageEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param amImageEntry the am image entry
 	 * @return the am image entry that was updated

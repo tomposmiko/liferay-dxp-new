@@ -12,28 +12,31 @@
  * details.
  */
 
-import updateLayoutData from '../actions/updateLayoutData';
+import addItemAction from '../actions/addItem';
 import LayoutService from '../services/LayoutService';
 
 export default function addItem({
-	config,
 	itemType,
 	parentItemId,
 	position,
-	store
+	selectItem = () => {},
+	store,
 }) {
-	return dispatch => {
+	return (dispatch) => {
 		const {segmentsExperienceId} = store;
 
-		LayoutService.addItem({
-			config,
+		return LayoutService.addItem({
 			itemType,
 			onNetworkStatus: dispatch,
 			parentItemId,
 			position,
-			segmentsExperienceId
-		}).then(layoutData => {
-			dispatch(updateLayoutData({layoutData}));
+			segmentsExperienceId,
+		}).then(({addedItemId, layoutData}) => {
+			dispatch(addItemAction({itemId: addedItemId, layoutData}));
+
+			if (addedItemId) {
+				selectItem(addedItemId);
+			}
 		});
 	};
 }

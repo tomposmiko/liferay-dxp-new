@@ -49,7 +49,7 @@
 	<c:if test="<%= fragmentDisplayContext.hasUpdatePermission() %>">
 		<liferay-ui:icon
 			message="import"
-			onClick='<%= "openImportCollectionView();" %>'
+			onClick="openImportCollectionView();"
 			url="javascript:;"
 		/>
 	</c:if>
@@ -72,23 +72,26 @@
 
 <c:if test="<%= fragmentDisplayContext.hasUpdatePermission() %>">
 	<aui:script>
-		var openImportCollectionView = function() {
-			Liferay.Util.openWindow({
-				dialog: {
-					after: {
-						destroy: function(event) {
-							window.location.reload();
-						}
+		var openImportCollectionView = function () {
+			Liferay.Util.openModal({
+				buttons: [
+					{
+						displayType: 'secondary',
+						label: '<liferay-ui:message key="cancel" />',
+						type: 'cancel',
 					},
-					destroyOnHide: true
-				},
-				dialogIframe: {
-					bodyCssClass: 'dialog-with-footer'
-				},
+					{
+						label: '<liferay-ui:message key="import" />',
+						type: 'submit',
+					},
+				],
 				id: '<portlet:namespace />openImportCollectionView',
+				onClose: function () {
+					window.location.reload();
+				},
 				title: '<liferay-ui:message key="import" />',
-				uri:
-					'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcRenderCommandName" value="/fragment/view_import" /><portlet:param name="fragmentCollectionId" value="<%= String.valueOf(fragmentDisplayContext.getFragmentCollectionId()) %>" /></portlet:renderURL>'
+				url:
+					'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcRenderCommandName" value="/fragment/view_import" /><portlet:param name="fragmentCollectionId" value="<%= String.valueOf(fragmentDisplayContext.getFragmentCollectionId()) %>" /></portlet:renderURL>',
 			});
 		};
 	</aui:script>

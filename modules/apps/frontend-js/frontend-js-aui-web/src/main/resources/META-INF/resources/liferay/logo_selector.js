@@ -14,24 +14,28 @@
 
 AUI.add(
 	'liferay-logo-selector',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var DELETE_LOGO = 'DELETE_LOGO';
 
 		var MAP_DELETE_LOGO = {
-			src: DELETE_LOGO
+			src: DELETE_LOGO,
 		};
 
 		var LogoSelector = A.Component.create({
 			ATTRS: {
+				defaultLogo: {
+					value: false,
+				},
+
 				defaultLogoURL: {
-					value: ''
+					value: '',
 				},
 
 				editLogoFn: {
 					setter(value) {
-						var fn = function() {};
+						var fn = function () {};
 
 						if (Lang.isFunction(window[value])) {
 							fn = window[value] || fn;
@@ -40,28 +44,28 @@ AUI.add(
 						return fn;
 					},
 					validator: A.Lang.isString,
-					value: ''
+					value: '',
 				},
 
 				editLogoURL: {
-					value: ''
+					value: '',
 				},
 
 				logoDisplaySelector: {
-					value: ''
+					value: '',
 				},
 
 				logoURL: {
-					value: ''
+					value: '',
 				},
 
 				portletNamespace: {
-					value: ''
+					value: '',
 				},
 
 				randomNamespace: {
-					value: ''
-				}
+					value: '',
+				},
 			},
 
 			BIND_UI_ATTRS: ['logoURL'],
@@ -71,6 +75,8 @@ AUI.add(
 			prototype: {
 				_changeLogo(url, fileEntryId) {
 					var instance = this;
+
+					url = Liferay.Util.addParams('t=' + Date.now(), url);
 
 					instance.set('logoURL', url);
 
@@ -101,14 +107,14 @@ AUI.add(
 					Liferay.Util.openWindow({
 						cache: false,
 						dialog: {
-							destroyOnHide: true
+							destroyOnHide: true,
 						},
 						dialogIframe: {
-							bodyCssClass: 'dialog-with-footer'
+							bodyCssClass: 'dialog-with-footer',
 						},
 						id: instance._portletNamespace + 'changeLogo',
 						title: Liferay.Language.get('upload-image'),
-						uri: editLogoURL
+						uri: editLogoURL,
 					});
 
 					event.preventDefault();
@@ -124,6 +130,8 @@ AUI.add(
 					);
 
 					var deleteLogo = src == DELETE_LOGO;
+
+					var defaultLogo = instance.get('defaultLogo');
 
 					instance._avatar.attr('src', logoURL);
 
@@ -142,7 +150,7 @@ AUI.add(
 					instance._deleteLogoInput.val(deleteLogo);
 					instance._deleteLogoButton.attr(
 						'disabled',
-						deleteLogo ? 'disabled' : ''
+						deleteLogo || defaultLogo ? 'disabled' : ''
 					);
 					instance._deleteLogoButton.toggleClass(
 						'disabled',
@@ -210,14 +218,14 @@ AUI.add(
 					instance._fileEntryIdInput = contentBox.one(
 						'#' + portletNamespace + 'fileEntryId'
 					);
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.LogoSelector = LogoSelector;
 	},
 	'',
 	{
-		requires: ['aui-base', 'liferay-util-window']
+		requires: ['aui-base', 'liferay-util-window'],
 	}
 );

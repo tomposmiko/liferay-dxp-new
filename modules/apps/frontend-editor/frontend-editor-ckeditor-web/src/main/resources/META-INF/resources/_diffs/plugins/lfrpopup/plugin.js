@@ -12,13 +12,13 @@
  * details.
  */
 
-(function() {
+(function () {
 	var pluginName = 'lfrpopup';
 
 	CKEDITOR.plugins.add(pluginName, {
 		init(editor) {
-			AUI().use('querystring-parse', A => {
-				editor.popup = function(url, width, height, options) {
+			AUI().use('querystring-parse', (A) => {
+				editor.popup = function (url, width, height, options) {
 					var params = A.QueryString.parse(url.split('?')[1]);
 
 					if (params.p_p_id) {
@@ -32,16 +32,16 @@
 
 					Liferay.Util.openWindow({
 						dialog: {
-							zIndex: CKEDITOR.getNextZIndex()
+							zIndex: CKEDITOR.getNextZIndex(),
 						},
 						height,
 						stack: false,
 						title: options.title || '',
 						uri: url,
-						width
+						width,
 					});
 				};
 			});
-		}
+		},
 	});
 })();

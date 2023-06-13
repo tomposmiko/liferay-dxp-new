@@ -89,12 +89,11 @@
 				String category = categoryLabels[i];
 				String[] sectionKeys = categorySectionKeys[i];
 				String[] sectionLabels = categorySectionLabels[i];
-
-				if (sectionKeys.length > 0) {
 			%>
 
+				<c:if test="<%= sectionKeys.length > 0 %>">
 					<c:if test="<%= Validator.isNotNull(category) %>">
-						<li class="list-group-item nav-header "><liferay-ui:message key="<%= category %>" /></li>
+						<li class="list-group-item nav-header"><liferay-ui:message key="<%= category %>" /></li>
 					</c:if>
 
 					<%
@@ -149,7 +148,7 @@
 
 							<div class="divider">
 								<svg aria-hidden="true" class="lexicon-icon lexicon-icon-<%= sectionIcon %>">
-									<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg#<%= sectionIcon %>"></use>
+									<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#<%= sectionIcon %>"></use>
 								</svg>
 							</div>
 
@@ -161,8 +160,9 @@
 					}
 					%>
 
+				</c:if>
+
 			<%
-				}
 			}
 			%>
 

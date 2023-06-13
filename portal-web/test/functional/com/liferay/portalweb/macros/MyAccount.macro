@@ -15,11 +15,15 @@ definition {
 
 		var key_saveButton = "${saveButton}";
 
+		ScrollWebElementIntoView(locator1 = "Button#SAVE_LOCALIZED");
+
+		Pause(locator1 = "2000");
+
 		AssertClick(
 			locator1 = "Button#SAVE_LOCALIZED",
 			value1 = "${saveButton}");
 
-		AssertElementPresent(locator1 = "Message#SUCCESS");
+		VerifyElementPresent(locator1 = "Message#SUCCESS");
 	}
 
 	macro configureDisplaySettingsLanguage {
@@ -35,7 +39,7 @@ definition {
 			locator1 = "Button#SAVE",
 			value1 = "Save");
 
-		AssertElementPresent(locator1 = "Message#SUCCESS");
+		VerifyElementPresent(locator1 = "Message#SUCCESS");
 	}
 
 	macro configureDisplaySettingsLanguageLocalized {
@@ -54,7 +58,7 @@ definition {
 			locator1 = "Button#SAVE_LOCALIZED",
 			value1 = "${saveButton}");
 
-		AssertElementPresent(locator1 = "Message#SUCCESS");
+		VerifyElementPresent(locator1 = "Message#SUCCESS");
 	}
 
 	macro editPasswordInvalidCP {
@@ -82,15 +86,11 @@ definition {
 		Button.clickSave();
 
 		if ("${changeable}" == "false") {
-			Alert.viewRequestFailedToComplete();
-
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR_1",
 				value1 = "Passwords may not be changed under the current password policy.");
 		}
 		else {
-			Alert.viewRequestFailedToComplete();
-
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR_1",
 				value1 = "That password is invalid. Please enter in a different password.");

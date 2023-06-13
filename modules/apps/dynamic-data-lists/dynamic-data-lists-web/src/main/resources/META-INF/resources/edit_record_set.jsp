@@ -28,6 +28,12 @@ long recordSetId = BeanParamUtil.getLong(recordSet, request, "recordSetId");
 
 long groupId = BeanParamUtil.getLong(recordSet, request, "groupId", scopeGroupId);
 
+Group scopeGroup = GroupLocalServiceUtil.getGroup(scopeGroupId);
+
+if (scopeGroup.isStagingGroup() && !scopeGroup.isInStagingPortlet(DDLPortletKeys.DYNAMIC_DATA_LISTS)) {
+	groupId = scopeGroup.getLiveGroupId();
+}
+
 long ddmStructureId = ParamUtil.getLong(request, "ddmStructureId");
 
 if (recordSet != null) {
@@ -54,15 +60,15 @@ if (ddlDisplayContext.isAdminPortlet()) {
 }
 %>
 
-<portlet:actionURL name="addRecordSet" var="addRecordSetURL">
+<portlet:actionURL name="/dynamic_data_lists/add_record_set" var="addRecordSetURL">
 	<portlet:param name="mvcPath" value="/edit_record_set.jsp" />
 </portlet:actionURL>
 
-<portlet:actionURL name="updateRecordSet" var="updateRecordSetURL">
+<portlet:actionURL name="/dynamic_data_lists/update_record_set" var="updateRecordSetURL">
 	<portlet:param name="mvcPath" value="/edit_record_set.jsp" />
 </portlet:actionURL>
 
-<aui:form action="<%= (recordSet == null) ? addRecordSetURL : updateRecordSetURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveRecordSet();" %>'>
+<aui:form action="<%= (recordSet == null) ? addRecordSetURL : updateRecordSetURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveRecordSet();" %>'>
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="closeRedirect" type="hidden" value="<%= closeRedirect %>" />
 	<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
@@ -99,13 +105,9 @@ if (ddlDisplayContext.isAdminPortlet()) {
 					label="<%= true %>"
 					linkCssClass="btn btn-secondary"
 					message="select"
-					url='<%= "javascript:" + renderResponse.getNamespace() + "openDDMStructureSelector();" %>'
+					url='<%= "javascript:" + liferayPortletResponse.getNamespace() + "openDDMStructureSelector();" %>'
 				/>
 			</div>
-
-			<%
-			Group scopeGroup = GroupLocalServiceUtil.getGroup(scopeGroupId);
-			%>
 
 			<c:if test="<%= WorkflowEngineManagerUtil.isDeployed() && (WorkflowHandlerRegistryUtil.getWorkflowHandler(DDLRecord.class.getName()) != null) && !scopeGroup.isLayoutSetPrototype() %>">
 				<aui:select label="workflow" name="workflowDefinition">
@@ -128,7 +130,7 @@ if (ddlDisplayContext.isAdminPortlet()) {
 					for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
 						boolean selected = false;
 
-						if ((workflowDefinitionLink != null) && workflowDefinitionLink.getWorkflowDefinitionName().equals(workflowDefinition.getName()) && (workflowDefinitionLink.getWorkflowDefinitionVersion() == workflowDefinition.getVersion())) {
+						if ((workflowDefinitionLink != null) && Objects.equals(workflowDefinitionLink.getWorkflowDefinitionName(), workflowDefinition.getName()) && (workflowDefinitionLink.getWorkflowDefinitionVersion() == workflowDefinition.getVersion())) {
 							selected = true;
 						}
 					%>
@@ -169,7 +171,7 @@ if (ddlDisplayContext.isAdminPortlet()) {
 					'<%= PortletURLFactoryUtil.create(request, PortletProviderUtil.getPortletId(DDMStructure.class.getName(), PortletProvider.Action.VIEW), PortletRequest.RENDER_PHASE) %>',
 				classPK: <%= ddmStructureId %>,
 				dialog: {
-					destroyOnHide: true
+					destroyOnHide: true,
 				},
 				eventName: '<portlet:namespace />selectDDMStructure',
 				groupId: <%= groupId %>,
@@ -183,12 +185,13 @@ if (ddlDisplayContext.isAdminPortlet()) {
 				refererPortletName: '<%= portlet.getPortletName() %>',
 				refererWebDAVToken: '<%= WebDAVUtil.getStorageToken(portlet) %>',
 				showAncestorScopes: true,
-				title: '<%= UnicodeLanguageUtil.get(request, "data-definitions") %>'
+				title:
+					'<%= UnicodeLanguageUtil.get(request, "data-definitions") %>',
 			},
-			function(event) {
+			function (event) {
 				Liferay.Util.setFormValues(form, {
 					ddmStructureId: event.ddmstructureid,
-					ddmStructureNameDisplay: Liferay.Util.unescape(event.name)
+					ddmStructureNameDisplay: Liferay.Util.unescape(event.name),
 				});
 			}
 		);
@@ -207,6 +210,7 @@ if (recordSet != null) {
 	portletURL.setParameter("recordSetId", String.valueOf(recordSet.getRecordSetId()));
 
 	PortalUtil.addPortletBreadcrumbEntry(request, recordSet.getName(locale), portletURL.toString());
+
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
 }
 else {

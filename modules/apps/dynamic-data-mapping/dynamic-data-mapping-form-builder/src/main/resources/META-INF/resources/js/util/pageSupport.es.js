@@ -12,9 +12,9 @@
  * details.
  */
 
-import {PagesVisitor} from 'dynamic-data-mapping-form-renderer/js/util/visitors.es';
+import {PagesVisitor} from 'dynamic-data-mapping-form-renderer';
 
-import {sub} from './strings.es.js';
+import {sub} from './strings.es';
 
 export function pageOptions(pages, maxPageIndex = 0) {
 	const pageOptions = [];
@@ -25,7 +25,7 @@ export function pageOptions(pages, maxPageIndex = 0) {
 		pageIndex++
 	) {
 		let pageTitle = `${pageIndex} ${sub(
-			Liferay.Language.get('untitled-page-x-of-x'),
+			Liferay.Language.get('page-title'),
 			[pageIndex, pages.length]
 		)}`;
 
@@ -36,7 +36,7 @@ export function pageOptions(pages, maxPageIndex = 0) {
 		pageOptions.push({
 			label: pageTitle,
 			name: pageIndex.toString(),
-			value: pageIndex.toString()
+			value: pageIndex.toString(),
 		});
 	}
 
@@ -48,7 +48,7 @@ export function maxPageIndex(conditions, pages) {
 	const visitor = new PagesVisitor(pages);
 
 	if (conditions.length && conditions[0].operands[0].value) {
-		conditions.forEach(condition => {
+		conditions.forEach((condition) => {
 			visitor.mapFields(
 				(field, fieldIndex, columnIndex, rowIndex, pageIndex) => {
 					if (field.fieldName === condition.operands[0].value) {

@@ -17,8 +17,8 @@ package com.liferay.saml.web.internal.portlet.action;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.saml.constants.SamlPortletKeys;
 import com.liferay.saml.persistence.service.SamlSpIdpConnectionLocalService;
-import com.liferay.saml.web.internal.constants.SamlAdminPortletKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -32,8 +32,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + SamlAdminPortletKeys.SAML_ADMIN,
-		"mvc.command.name=/admin/deleteSamlSpIdpConnection"
+		"javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN,
+		"mvc.command.name=/admin/delete_saml_sp_idp_connection"
 	},
 	service = MVCActionCommand.class
 )

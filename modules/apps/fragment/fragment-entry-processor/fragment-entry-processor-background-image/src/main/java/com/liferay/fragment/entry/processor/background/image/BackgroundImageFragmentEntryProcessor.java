@@ -20,22 +20,24 @@ import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
+import com.liferay.info.item.InfoItemFieldValues;
+import com.liferay.info.type.WebImage;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -87,7 +89,7 @@ public class BackgroundImageFragmentEntryProcessor
 
 		Document document = _getDocument(html);
 
-		Map<Long, Map<String, Object>> infoDisplaysFieldValues =
+		Map<Long, InfoItemFieldValues> infoDisplaysFieldValues =
 			new HashMap<>();
 
 		for (Element element :
@@ -111,57 +113,22 @@ public class BackgroundImageFragmentEntryProcessor
 
 			String value = StringPool.BLANK;
 
-			if (_fragmentEntryProcessorHelper.isAssetDisplayPage(
-					fragmentEntryProcessorContext.getMode())) {
+			Object fieldValue = _getFieldValue(
+				editableValueJSONObject, infoDisplaysFieldValues,
+				fragmentEntryProcessorContext);
 
-				String mappedField = editableValueJSONObject.getString(
-					"mappedField");
-
-				Optional<Map<String, Object>> fieldValuesOptional =
-					fragmentEntryProcessorContext.getFieldValuesOptional();
-
-				Map<String, Object> fieldValues = fieldValuesOptional.orElse(
-					new HashMap<>());
-
-				Object fieldValue = fieldValues.get(mappedField);
-
-				if (fieldValue instanceof JSONObject) {
-					JSONObject fieldValueJSONObject = (JSONObject)fieldValue;
-
-					value = fieldValueJSONObject.getString("url");
-				}
-			}
-
-			if (_fragmentEntryProcessorHelper.isMapped(
-					editableValueJSONObject)) {
-
-				Object fieldValue =
-					_fragmentEntryProcessorHelper.getMappedValue(
-						editableValueJSONObject, infoDisplaysFieldValues,
-						fragmentEntryProcessorContext);
-
-				if (fieldValue != null) {
-					if (fieldValue instanceof JSONObject) {
-						JSONObject fieldValueJSONObject =
-							(JSONObject)fieldValue;
-
-						value = fieldValueJSONObject.getString("url");
-					}
-					else {
-						value = String.valueOf(fieldValue);
-					}
-				}
+			if (fieldValue != null) {
+				value = _getImageURL(fieldValue);
 			}
 
 			if (Validator.isNull(value)) {
 				value = _fragmentEntryProcessorHelper.getEditableValue(
 					editableValueJSONObject,
-					fragmentEntryProcessorContext.getLocale(),
-					fragmentEntryProcessorContext.getSegmentsExperienceIds());
+					fragmentEntryProcessorContext.getLocale());
 			}
 
 			if (Validator.isNotNull(value)) {
-				if (value.startsWith(StringPool.OPEN_CURLY_BRACE)) {
+				if (JSONUtil.isValid(value)) {
 					JSONObject valueJSONObject =
 						JSONFactoryUtil.createJSONObject(value);
 
@@ -202,20 +169,13 @@ public class BackgroundImageFragmentEntryProcessor
 
 		Elements elements = document.select("[data-lfr-background-image-id]");
 
-		Stream<Element> uniqueElementsStream = elements.stream();
+		Set<String> ids = new HashSet<>();
 
-		Map<String, Long> idsMap = uniqueElementsStream.collect(
-			Collectors.groupingBy(
-				element -> element.attr("data-lfr-background-image-id"),
-				Collectors.counting()));
+		for (Element element : elements) {
+			if (ids.add(element.attr("data-lfr-background-image-id"))) {
+				continue;
+			}
 
-		Collection<String> ids = idsMap.keySet();
-
-		Stream<String> idsStream = ids.stream();
-
-		idsStream = idsStream.filter(id -> idsMap.get(id) > 1);
-
-		if (idsStream.count() > 0) {
 			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 				"content.Language", getClass());
 
@@ -237,6 +197,59 @@ public class BackgroundImageFragmentEntryProcessor
 		document.outputSettings(outputSettings);
 
 		return document;
+	}
+
+	private Object _getFieldValue(
+			JSONObject editableValueJSONObject,
+			Map<Long, InfoItemFieldValues> infoDisplaysFieldValues,
+			FragmentEntryProcessorContext fragmentEntryProcessorContext)
+		throws PortalException {
+
+		if (_fragmentEntryProcessorHelper.isAssetDisplayPage(
+				fragmentEntryProcessorContext.getMode())) {
+
+			String mappedField = editableValueJSONObject.getString(
+				"mappedField");
+
+			Optional<Map<String, Object>> fieldValuesOptional =
+				fragmentEntryProcessorContext.getFieldValuesOptional();
+
+			Map<String, Object> fieldValues = fieldValuesOptional.orElse(
+				new HashMap<>());
+
+			return fieldValues.get(mappedField);
+		}
+		else if (_fragmentEntryProcessorHelper.isMapped(
+					editableValueJSONObject)) {
+
+			return _fragmentEntryProcessorHelper.getMappedInfoItemFieldValue(
+				editableValueJSONObject, infoDisplaysFieldValues,
+				fragmentEntryProcessorContext);
+		}
+		else if (_fragmentEntryProcessorHelper.isMappedCollection(
+					editableValueJSONObject)) {
+
+			return _fragmentEntryProcessorHelper.getMappedCollectionValue(
+				editableValueJSONObject, fragmentEntryProcessorContext);
+		}
+
+		return null;
+	}
+
+	private String _getImageURL(Object fieldValue) {
+		if (fieldValue instanceof JSONObject) {
+			JSONObject fieldValueJSONObject = (JSONObject)fieldValue;
+
+			return fieldValueJSONObject.getString("url");
+		}
+
+		if (fieldValue instanceof WebImage) {
+			WebImage webImage = (WebImage)fieldValue;
+
+			return String.valueOf(webImage.toJSONObject());
+		}
+
+		return String.valueOf(fieldValue);
 	}
 
 	@Reference

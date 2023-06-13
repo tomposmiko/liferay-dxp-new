@@ -113,15 +113,19 @@ public class RatingsEntryModelListener extends BaseModelListener<RatingsEntry> {
 			int ratingsTotalEntries = blogsStatsUser.getRatingsTotalEntries();
 			double ratingsTotalScore = blogsStatsUser.getRatingsTotalScore();
 
-			RatingsEntryModelImpl ratingsEntryModelImpl =
-				(RatingsEntryModelImpl)ratingsEntry;
-
-			double originalScore = ratingsEntryModelImpl.getOriginalScore();
-
-			ratingsTotalScore += ratingsEntry.getScore() - originalScore;
-
 			if (ratingsEntry.isNew()) {
+				ratingsTotalScore += ratingsEntry.getScore();
+
 				ratingsTotalEntries++;
+			}
+			else {
+				RatingsEntryModelImpl ratingsEntryModelImpl =
+					(RatingsEntryModelImpl)ratingsEntry;
+
+				double originalScore =
+					ratingsEntryModelImpl.getColumnOriginalValue("score");
+
+				ratingsTotalScore += ratingsEntry.getScore() - originalScore;
 			}
 
 			double ratingsAverageScore =

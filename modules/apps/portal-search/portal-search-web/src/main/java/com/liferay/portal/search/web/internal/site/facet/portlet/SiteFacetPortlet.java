@@ -14,6 +14,9 @@
 
 package com.liferay.portal.search.web.internal.site.facet.portlet;
 
+import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
@@ -21,6 +24,8 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.search.searcher.SearchRequest;
+import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.web.internal.facet.display.builder.ScopeSearchFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.facet.display.context.ScopeSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.site.facet.constants.SiteFacetPortletKeys;
@@ -40,6 +45,8 @@ import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -112,7 +119,7 @@ public class SiteFacetPortlet extends MVCPortlet {
 					renderRequest));
 
 		ScopeSearchFacetDisplayBuilder scopeSearchFacetDisplayBuilder =
-			new ScopeSearchFacetDisplayBuilder();
+			createScopeSearchFacetDisplayBuilder(renderRequest);
 
 		scopeSearchFacetDisplayBuilder.setFacet(facet);
 
@@ -125,10 +132,13 @@ public class SiteFacetPortlet extends MVCPortlet {
 		scopeSearchFacetDisplayBuilder.setFrequenciesVisible(
 			siteFacetPortletPreferences.isFrequenciesVisible());
 		scopeSearchFacetDisplayBuilder.setGroupLocalService(groupLocalService);
+		scopeSearchFacetDisplayBuilder.setLanguage(language);
 		scopeSearchFacetDisplayBuilder.setLocale(
 			getLocale(portletSharedSearchResponse, renderRequest));
 		scopeSearchFacetDisplayBuilder.setMaxTerms(
 			siteFacetConfiguration.getMaxTerms());
+		scopeSearchFacetDisplayBuilder.setPaginationStartParameterName(
+			getPaginationStartParameterName(portletSharedSearchResponse));
 
 		String parameterName = siteFacetPortletPreferences.getParameterName();
 
@@ -139,7 +149,21 @@ public class SiteFacetPortlet extends MVCPortlet {
 				parameterName, portletSharedSearchResponse, renderRequest),
 			scopeSearchFacetDisplayBuilder::setParameterValues);
 
+		scopeSearchFacetDisplayBuilder.setRequest(
+			getHttpServletRequest(renderRequest));
+
 		return scopeSearchFacetDisplayBuilder.build();
+	}
+
+	protected ScopeSearchFacetDisplayBuilder
+		createScopeSearchFacetDisplayBuilder(RenderRequest renderRequest) {
+
+		try {
+			return new ScopeSearchFacetDisplayBuilder(renderRequest);
+		}
+		catch (ConfigurationException configurationException) {
+			throw new RuntimeException(configurationException);
+		}
 	}
 
 	protected String getAggregationName(RenderRequest renderRequest) {
@@ -157,6 +181,15 @@ public class SiteFacetPortlet extends MVCPortlet {
 		return Optional.ofNullable(searchContext.getGroupIds());
 	}
 
+	protected HttpServletRequest getHttpServletRequest(
+		RenderRequest renderRequest) {
+
+		LiferayPortletRequest liferayPortletRequest =
+			portal.getLiferayPortletRequest(renderRequest);
+
+		return liferayPortletRequest.getHttpServletRequest();
+	}
+
 	protected Locale getLocale(
 		PortletSharedSearchResponse portletSharedSearchResponse,
 		RenderRequest renderRequest) {
@@ -165,6 +198,17 @@ public class SiteFacetPortlet extends MVCPortlet {
 			renderRequest);
 
 		return themeDisplay.getLocale();
+	}
+
+	protected String getPaginationStartParameterName(
+		PortletSharedSearchResponse portletSharedSearchResponse) {
+
+		SearchResponse searchResponse =
+			portletSharedSearchResponse.getSearchResponse();
+
+		SearchRequest searchRequest = searchResponse.getRequest();
+
+		return searchRequest.getPaginationStartParameterName();
 	}
 
 	protected Optional<List<String>> getParameterValuesOptional(
@@ -181,6 +225,9 @@ public class SiteFacetPortlet extends MVCPortlet {
 
 	@Reference
 	protected GroupLocalService groupLocalService;
+
+	@Reference
+	protected Language language;
 
 	@Reference
 	protected Portal portal;

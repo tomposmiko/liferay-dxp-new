@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-navigation-interaction-touch',
-	A => {
+	(A) => {
 		var ANDROID = A.UA.android;
 
 		var ANDROID_LEGACY = ANDROID && ANDROID < 4.4;
@@ -48,14 +48,15 @@ AUI.add(
 
 						handle = menuNew.on(outsideEvents, () => {
 							Liferay.fire('hideNavigationMenu', {
-								menu: menuNew
+								menu: menuNew,
 							});
 
 							Liferay.Data[handleId] = null;
 
 							handle.detach();
 						});
-					} else {
+					}
+					else {
 						Liferay.fire('hideNavigationMenu', mapHover);
 
 						if (handle) {
@@ -84,7 +85,7 @@ AUI.add(
 						if (ANDROID_LEGACY) {
 							navigation.delegate(
 								'click',
-								event => {
+								(event) => {
 									event.preventDefault();
 								},
 								'.lfr-nav-child-toggle'
@@ -127,7 +128,7 @@ AUI.add(
 							event
 						);
 					}
-				}
+				},
 			},
 			true
 		);
@@ -138,7 +139,7 @@ AUI.add(
 			'event-outside',
 			'event-tap',
 			'event-touch',
-			'liferay-navigation-interaction'
-		]
+			'liferay-navigation-interaction',
+		],
 	}
 );

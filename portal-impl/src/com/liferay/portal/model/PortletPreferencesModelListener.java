@@ -14,6 +14,7 @@
 
 package com.liferay.portal.model;
 
+import com.liferay.asset.kernel.util.NotifiedAssetEntryThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
@@ -125,7 +126,10 @@ public class PortletPreferencesModelListener
 				Layout layout = LayoutLocalServiceUtil.fetchLayout(
 					portletPreferences.getPlid());
 
-				if (layout == null) {
+				if ((layout == null) ||
+					NotifiedAssetEntryThreadLocal.
+						isNotifiedAssetEntryIdsModified()) {
+
 					return;
 				}
 

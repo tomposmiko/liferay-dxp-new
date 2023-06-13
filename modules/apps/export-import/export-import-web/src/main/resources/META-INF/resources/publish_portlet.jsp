@@ -43,14 +43,16 @@ if (!layout.isTypeControlPanel()) {
 				targetLayout = LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(layout.getUuid(), liveGroup.getGroupId(), layout.isPrivateLayout());
 			}
 		}
-		catch (NoSuchLayoutException nsle) {
+		catch (PortalException portalException) {
 			errorMessageKey = "this-widget-is-placed-in-a-page-that-does-not-exist-in-the-live-site-publish-the-page-first";
 		}
 
 		if (targetLayout != null) {
 			LayoutType layoutType = targetLayout.getLayoutType();
 
-			if (!(layoutType instanceof LayoutTypePortlet) || !((LayoutTypePortlet)layoutType).hasPortletId(selPortlet.getPortletId())) {
+			LayoutTypePortlet targetLayoutTypePortlet = (LayoutTypePortlet)layoutType;
+
+			if (!(layoutType instanceof LayoutTypePortlet) || !targetLayoutTypePortlet.hasPortletId(selPortlet.getPortletId())) {
 				errorMessageKey = "this-widget-has-not-been-added-to-the-live-page-publish-the-page-first";
 			}
 		}
@@ -128,7 +130,7 @@ if (!GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(
 					rangeLastNode: '#rangeLast',
 					rangeLastPublishNode: '#rangeLastPublish',
 					ratingsNode: '#<%= PortletDataHandlerKeys.RATINGS %>',
-					timeZoneOffset: <%= timeZoneOffset %>
+					timeZoneOffset: <%= timeZoneOffset %>,
 				});
 
 				Liferay.component('<portlet:namespace />ExportImportComponent', exportImport);
@@ -152,7 +154,8 @@ if (!GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(
 							'copy_from_live';
 
 						submitForm(document.<portlet:namespace />fm1);
-					} else if (!dateChecker.validRange) {
+					}
+					else if (!dateChecker.validRange) {
 						exportImport.showNotification(dateChecker);
 					}
 				}
@@ -171,7 +174,8 @@ if (!GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(
 						)
 					) {
 						submitForm(document.<portlet:namespace />fm1);
-					} else if (!dateChecker.validRange) {
+					}
+					else if (!dateChecker.validRange) {
 						exportImport.showNotification(dateChecker);
 					}
 				}
@@ -181,12 +185,12 @@ if (!GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(
 					'<portlet:namespace />portletMetaDataList'
 				);
 				Liferay.Util.toggleRadio('<portlet:namespace />portletMetaDataAll', '', [
-					'<portlet:namespace />portletMetaDataList'
+					'<portlet:namespace />portletMetaDataList',
 				]);
 
 				Liferay.Util.toggleRadio('<portlet:namespace />rangeAll', '', [
 					'<portlet:namespace />startEndDate',
-					'<portlet:namespace />rangeLastInputs'
+					'<portlet:namespace />rangeLastInputs',
 				]);
 				Liferay.Util.toggleRadio(
 					'<portlet:namespace />rangeDateRange',
@@ -195,7 +199,7 @@ if (!GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(
 				);
 				Liferay.Util.toggleRadio('<portlet:namespace />rangeLastPublish', '', [
 					'<portlet:namespace />startEndDate',
-					'<portlet:namespace />rangeLastInputs'
+					'<portlet:namespace />rangeLastInputs',
 				]);
 				Liferay.Util.toggleRadio(
 					'<portlet:namespace />rangeLast',

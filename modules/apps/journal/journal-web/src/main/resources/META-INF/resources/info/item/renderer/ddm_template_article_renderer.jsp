@@ -16,14 +16,8 @@
 
 <%@ include file="/info/item/renderer/init.jsp" %>
 
-<%
-JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_ARTICLE);
-String ddmTemplateKey = (String)request.getAttribute(WebKeys.JOURNAL_TEMPLATE_ID);
-%>
-
 <liferay-journal:journal-article
-	articleId="<%= article.getArticleId() %>"
-	ddmTemplateKey="<%= ddmTemplateKey %>"
-	groupId="<%= article.getGroupId() %>"
+	article="<%= (JournalArticle)request.getAttribute(WebKeys.JOURNAL_ARTICLE) %>"
+	ddmTemplateKey="<%= (String)request.getAttribute(WebKeys.JOURNAL_TEMPLATE_ID) %>"
 	languageId="<%= themeDisplay.getLanguageId() %>"
 />

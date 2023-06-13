@@ -14,13 +14,16 @@
 
 package com.liferay.depot.web.internal.item.selector;
 
+import com.liferay.depot.web.internal.application.controller.DepotApplicationController;
+import com.liferay.depot.web.internal.application.list.DepotPanelAppController;
 import com.liferay.depot.web.internal.util.DepotAdminGroupSearchProvider;
-import com.liferay.depot.web.internal.util.DepotSupportChecker;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
+import com.liferay.item.selector.criteria.GroupItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
 import com.liferay.item.selector.criteria.group.criterion.GroupItemSelectorCriterion;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -29,6 +32,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
 import com.liferay.site.item.selector.display.context.SitesItemSelectorViewDisplayContext;
@@ -39,6 +43,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -74,13 +79,28 @@ public class DepotItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return ResourceBundleUtil.getString(
-			_portal.getResourceBundle(locale), "repositories");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			locale, getClass());
+
+		return ResourceBundleUtil.getString(resourceBundle, "asset-libraries");
 	}
 
 	@Override
-	public boolean isVisible(ThemeDisplay themeDisplay) {
-		return _depotSupportChecker.isEnabled();
+	public boolean isVisible(
+		GroupItemSelectorCriterion groupItemSelectorCriterion,
+		ThemeDisplay themeDisplay) {
+
+		if (groupItemSelectorCriterion == null) {
+			return true;
+		}
+
+		String portletId = groupItemSelectorCriterion.getPortletId();
+
+		if (Validator.isNull(portletId)) {
+			return true;
+		}
+
+		return _depotPanelAppController.isShow(portletId);
 	}
 
 	@Override
@@ -91,18 +111,19 @@ public class DepotItemSelectorView
 		throws IOException, ServletException {
 
 		SitesItemSelectorViewDisplayContext
-			depotSiteItemSelectorViewDisplayContext =
-				new DepotSiteItemSelectorViewDisplayContext(
+			depotSitesItemSelectorViewDisplayContext =
+				new DepotSitesItemSelectorViewDisplayContext(
 					(HttpServletRequest)servletRequest, itemSelectedEventName,
 					portletURL, groupItemSelectorCriterion);
 
 		_siteItemSelectorViewRenderer.renderHTML(
-			depotSiteItemSelectorViewDisplayContext);
+			depotSitesItemSelectorViewDisplayContext);
 	}
 
 	private static final List<ItemSelectorReturnType>
 		_supportedItemSelectorReturnTypes = Collections.unmodifiableList(
 			ListUtil.fromArray(
+				new GroupItemSelectorReturnType(),
 				new URLItemSelectorReturnType(),
 				new UUIDItemSelectorReturnType()));
 
@@ -110,7 +131,10 @@ public class DepotItemSelectorView
 	private DepotAdminGroupSearchProvider _depotAdminGroupSearchProvider;
 
 	@Reference
-	private DepotSupportChecker _depotSupportChecker;
+	private DepotApplicationController _depotApplicationController;
+
+	@Reference
+	private DepotPanelAppController _depotPanelAppController;
 
 	@Reference
 	private Portal _portal;
@@ -118,10 +142,10 @@ public class DepotItemSelectorView
 	@Reference
 	private SiteItemSelectorViewRenderer _siteItemSelectorViewRenderer;
 
-	private class DepotSiteItemSelectorViewDisplayContext
+	private class DepotSitesItemSelectorViewDisplayContext
 		implements SitesItemSelectorViewDisplayContext {
 
-		public DepotSiteItemSelectorViewDisplayContext(
+		public DepotSitesItemSelectorViewDisplayContext(
 			HttpServletRequest httpServletRequest, String itemSelectedEventName,
 			PortletURL portletURL,
 			GroupItemSelectorCriterion groupItemSelectorCriterion) {
@@ -154,8 +178,14 @@ public class DepotItemSelectorView
 
 		@Override
 		public GroupSearch getGroupSearch() {
-			return _depotAdminGroupSearchProvider.getGroupSearch(
-				getPortletRequest(), getPortletURL());
+			try {
+				return _depotAdminGroupSearchProvider.getGroupSearch(
+					_groupItemSelectorCriterion, getPortletRequest(),
+					getPortletURL());
+			}
+			catch (PortalException portalException) {
+				return ReflectionUtil.throwException(portalException);
+			}
 		}
 
 		@Override

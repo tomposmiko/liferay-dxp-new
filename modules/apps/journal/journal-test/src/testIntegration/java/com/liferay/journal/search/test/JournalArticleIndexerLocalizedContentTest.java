@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.IndexerFixture;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -160,10 +161,10 @@ public class JournalArticleIndexerLocalizedContentTest {
 			searchTerm, LocaleUtil.HUNGARY);
 
 		FieldValuesAssert.assertFieldValues(
-			titleStrings, "title", document, searchTerm);
+			titleStrings, "title_", document, searchTerm);
 
 		FieldValuesAssert.assertFieldValues(
-			contentStrings, "content", document, searchTerm);
+			contentStrings, "content_", document, searchTerm);
 
 		FieldValuesAssert.assertFieldValues(
 			localizedTitleStrings, "localized_title", document, searchTerm);
@@ -194,10 +195,10 @@ public class JournalArticleIndexerLocalizedContentTest {
 			});
 
 		assertSearchOneDocumentOneField(
-			"alpha", LocaleUtil.HUNGARY, "content", "content_en_US");
+			"alpha", LocaleUtil.HUNGARY, "content_", "content_en_US");
 
 		assertSearchOneDocumentOneField(
-			"gamma", LocaleUtil.HUNGARY, "title", "title_en_US");
+			"gamma", LocaleUtil.HUNGARY, "title_", "title_en_US");
 	}
 
 	@Test
@@ -222,7 +223,11 @@ public class JournalArticleIndexerLocalizedContentTest {
 
 		String articleId = journalArticle.getArticleId();
 
-		Map<String, String> titleStrings = Collections.emptyMap();
+		Map<String, String> titleStrings = HashMapBuilder.put(
+			"title_en_US", originalTitle
+		).put(
+			"title_pt_BR", translatedTitle
+		).build();
 
 		Map<String, String> contentStrings = Collections.emptyMap();
 
@@ -331,10 +336,10 @@ public class JournalArticleIndexerLocalizedContentTest {
 					searchTerm, LocaleUtil.JAPAN);
 
 				FieldValuesAssert.assertFieldValues(
-					titleStrings, "title", document, searchTerm);
+					titleStrings, "title_", document, searchTerm);
 
 				FieldValuesAssert.assertFieldValues(
-					contentStrings, "content", document, searchTerm);
+					contentStrings, "content_", document, searchTerm);
 
 				FieldValuesAssert.assertFieldValues(
 					localizedTitleStrings, "localized_title", document,
@@ -395,10 +400,13 @@ public class JournalArticleIndexerLocalizedContentTest {
 					searchTerm, LocaleUtil.JAPAN);
 
 				FieldValuesAssert.assertFieldValues(
-					titleStrings, "title", document, searchTerm);
+					titleStrings, "title_", document, searchTerm);
 			}
 		);
 	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected void assertSearchOneDocumentOneField(
 		String fieldValue, Locale locale, String fieldPrefix,
@@ -411,9 +419,7 @@ public class JournalArticleIndexerLocalizedContentTest {
 			document, document.toString());
 	}
 
-	private static Map<String, String> _withSortableValues(
-		Map<String, String> map) {
-
+	private Map<String, String> _withSortableValues(Map<String, String> map) {
 		Set<Map.Entry<String, String>> entrySet = map.entrySet();
 
 		Stream<Map.Entry<String, String>> entries = entrySet.stream();

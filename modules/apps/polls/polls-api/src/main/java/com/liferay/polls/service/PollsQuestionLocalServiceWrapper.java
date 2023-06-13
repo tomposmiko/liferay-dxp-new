@@ -36,6 +36,10 @@ public class PollsQuestionLocalServiceWrapper
 	/**
 	 * Adds the polls question to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsQuestionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param pollsQuestion the polls question
 	 * @return the polls question that was added
 	 */
@@ -106,6 +110,17 @@ public class PollsQuestionLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _pollsQuestionLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Creates a new polls question with the primary key. Does not add the polls question to the database.
 	 *
 	 * @param questionId the primary key for the new polls question
@@ -132,6 +147,10 @@ public class PollsQuestionLocalServiceWrapper
 	/**
 	 * Deletes the polls question with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsQuestionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param questionId the primary key of the polls question
 	 * @return the polls question that was removed
 	 * @throws PortalException if a polls question with the primary key could not be found
@@ -146,6 +165,10 @@ public class PollsQuestionLocalServiceWrapper
 
 	/**
 	 * Deletes the polls question from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsQuestionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param pollsQuestion the polls question
 	 * @return the polls question that was removed
@@ -176,6 +199,18 @@ public class PollsQuestionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_pollsQuestionLocalService.deleteQuestions(groupId);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _pollsQuestionLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _pollsQuestionLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -325,6 +360,9 @@ public class PollsQuestionLocalServiceWrapper
 		return _pollsQuestionLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -457,6 +495,16 @@ public class PollsQuestionLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.polls.model.PollsQuestion> search(
+		long groupId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator
+			<com.liferay.polls.model.PollsQuestion> orderByComparator) {
+
+		return _pollsQuestionLocalService.search(
+			groupId, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<com.liferay.polls.model.PollsQuestion> search(
 		long companyId, long[] groupIds, String keywords, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator
 			<com.liferay.polls.model.PollsQuestion> orderByComparator) {
@@ -478,6 +526,11 @@ public class PollsQuestionLocalServiceWrapper
 	}
 
 	@Override
+	public int searchCount(long groupId) {
+		return _pollsQuestionLocalService.searchCount(groupId);
+	}
+
+	@Override
 	public int searchCount(long companyId, long[] groupIds, String keywords) {
 		return _pollsQuestionLocalService.searchCount(
 			companyId, groupIds, keywords);
@@ -494,6 +547,10 @@ public class PollsQuestionLocalServiceWrapper
 
 	/**
 	 * Updates the polls question in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsQuestionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param pollsQuestion the polls question
 	 * @return the polls question that was updated

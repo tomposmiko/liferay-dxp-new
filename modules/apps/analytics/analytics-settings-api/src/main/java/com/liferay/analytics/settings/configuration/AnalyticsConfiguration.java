@@ -18,6 +18,8 @@ import aQute.bnd.annotation.metatype.Meta;
 
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * @author Marcellus Tavares
  */
@@ -28,6 +30,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 @Meta.OCD(
 	id = "com.liferay.analytics.settings.configuration.AnalyticsConfiguration"
 )
+@ProviderType
 public interface AnalyticsConfiguration {
 
 	@Meta.AD(required = false)
@@ -43,6 +46,9 @@ public interface AnalyticsConfiguration {
 	public String liferayAnalyticsFaroBackendSecuritySignature();
 
 	@Meta.AD(required = false)
+	public String liferayAnalyticsProjectId();
+
+	@Meta.AD(required = false)
 	public String liferayAnalyticsURL();
 
 	@Meta.AD(required = false)
@@ -55,10 +61,16 @@ public interface AnalyticsConfiguration {
 	public boolean syncAllContacts();
 
 	@Meta.AD(required = false)
+	public String[] syncedContactFieldNames();
+
+	@Meta.AD(required = false)
 	public String[] syncedGroupIds();
 
 	@Meta.AD(required = false)
 	public String[] syncedOrganizationIds();
+
+	@Meta.AD(required = false)
+	public String[] syncedUserFieldNames();
 
 	@Meta.AD(required = false)
 	public String[] syncedUserGroupIds();

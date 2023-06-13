@@ -16,17 +16,19 @@ package com.liferay.site.memberships.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
 import com.liferay.membership.requests.kernel.util.comparator.MembershipRequestCreateDateComparator;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.MembershipRequest;
 import com.liferay.portal.kernel.model.MembershipRequestConstants;
+import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
 import com.liferay.portal.kernel.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.site.memberships.constants.SiteMembershipsPortletKeys;
 import com.liferay.site.memberships.web.internal.servlet.taglib.util.ViewMembershipRequetsPendingActionDropdownItemsProvider;
 
 import java.util.List;
@@ -70,46 +72,37 @@ public class ViewMembershipRequestsDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle", "icon");
+		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
+			_httpServletRequest,
+			SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN, "icon");
 
 		return _displayStyle;
 	}
 
 	public List<NavigationItem> getNavigationItems() {
-		return new NavigationItemList() {
-			{
-				add(
-					navigationItem -> {
-						navigationItem.setActive(
-							Objects.equals(getTabs1(), "pending"));
-						navigationItem.setHref(
-							getPortletURL(), "tabs1", "pending");
-						navigationItem.setLabel(
-							LanguageUtil.get(_httpServletRequest, "pending"));
-					});
-
-				add(
-					navigationItem -> {
-						navigationItem.setActive(
-							Objects.equals(getTabs1(), "approved"));
-						navigationItem.setHref(
-							getPortletURL(), "tabs1", "approved");
-						navigationItem.setLabel(
-							LanguageUtil.get(_httpServletRequest, "approved"));
-					});
-
-				add(
-					navigationItem -> {
-						navigationItem.setActive(
-							Objects.equals(getTabs1(), "denied"));
-						navigationItem.setHref(
-							getPortletURL(), "tabs1", "denied");
-						navigationItem.setLabel(
-							LanguageUtil.get(_httpServletRequest, "denied"));
-					});
+		return NavigationItemListBuilder.add(
+			navigationItem -> {
+				navigationItem.setActive(Objects.equals(getTabs1(), "pending"));
+				navigationItem.setHref(getPortletURL(), "tabs1", "pending");
+				navigationItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "pending"));
 			}
-		};
+		).add(
+			navigationItem -> {
+				navigationItem.setActive(
+					Objects.equals(getTabs1(), "approved"));
+				navigationItem.setHref(getPortletURL(), "tabs1", "approved");
+				navigationItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "approved"));
+			}
+		).add(
+			navigationItem -> {
+				navigationItem.setActive(Objects.equals(getTabs1(), "denied"));
+				navigationItem.setHref(getPortletURL(), "tabs1", "denied");
+				navigationItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "denied"));
+			}
+		).build();
 	}
 
 	public String getOrderByCol() {
@@ -173,7 +166,9 @@ public class ViewMembershipRequestsDisplayContext {
 		return portletURL;
 	}
 
-	public SearchContainer getSiteMembershipSearchContainer() {
+	public SearchContainer<MembershipRequest>
+		getSiteMembershipSearchContainer() {
+
 		if (_siteMembershipSearch != null) {
 			return _siteMembershipSearch;
 		}
@@ -182,8 +177,10 @@ public class ViewMembershipRequestsDisplayContext {
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		SearchContainer siteMembershipSearch = new SearchContainer(
-			_renderRequest, getPortletURL(), null, "no-requests-were-found");
+		SearchContainer<MembershipRequest> siteMembershipSearch =
+			new SearchContainer(
+				_renderRequest, getPortletURL(), null,
+				"no-requests-were-found");
 
 		siteMembershipSearch.setOrderByCol(getOrderByCol());
 
@@ -206,10 +203,11 @@ public class ViewMembershipRequestsDisplayContext {
 
 		siteMembershipSearch.setTotal(membershipRequestCount);
 
-		List results = MembershipRequestLocalServiceUtil.search(
-			themeDisplay.getSiteGroupIdOrLiveGroupId(), getStatusId(),
-			siteMembershipSearch.getStart(), siteMembershipSearch.getEnd(),
-			siteMembershipSearch.getOrderByComparator());
+		List<MembershipRequest> results =
+			MembershipRequestLocalServiceUtil.search(
+				themeDisplay.getSiteGroupIdOrLiveGroupId(), getStatusId(),
+				siteMembershipSearch.getStart(), siteMembershipSearch.getEnd(),
+				siteMembershipSearch.getOrderByComparator());
 
 		siteMembershipSearch.setResults(results);
 
@@ -245,7 +243,7 @@ public class ViewMembershipRequestsDisplayContext {
 	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private SearchContainer _siteMembershipSearch;
+	private SearchContainer<MembershipRequest> _siteMembershipSearch;
 	private String _tabs1;
 
 }

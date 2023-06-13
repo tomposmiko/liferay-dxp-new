@@ -14,11 +14,13 @@
 
 package com.liferay.layout.admin.web.internal.display.context;
 
+import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.admin.web.internal.util.comparator.ThemeNameComparator;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
 import com.liferay.portal.kernel.service.ThemeLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -53,8 +55,9 @@ public class SelectThemeDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle", "icon");
+		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
+			_httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			"select-display-style", "icon");
 
 		return _displayStyle;
 	}
@@ -142,7 +145,7 @@ public class SelectThemeDisplayContext {
 		return _themeId;
 	}
 
-	public SearchContainer getThemesSearchContainer() {
+	public SearchContainer<Theme> getThemesSearchContainer() {
 		if (_themesSearchContainer != null) {
 			return _themesSearchContainer;
 		}
@@ -151,7 +154,7 @@ public class SelectThemeDisplayContext {
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		SearchContainer themesSearchContainer = new SearchContainer(
+		SearchContainer<Theme> themesSearchContainer = new SearchContainer(
 			_liferayPortletRequest, getPortletURL(), null, null);
 
 		themesSearchContainer.setOrderByCol(getOrderByCol());
@@ -193,6 +196,6 @@ public class SelectThemeDisplayContext {
 	private String _orderByType;
 	private String _redirect;
 	private String _themeId;
-	private SearchContainer _themesSearchContainer;
+	private SearchContainer<Theme> _themesSearchContainer;
 
 }

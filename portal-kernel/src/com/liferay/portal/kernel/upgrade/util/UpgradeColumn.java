@@ -30,8 +30,17 @@ public interface UpgradeColumn {
 
 	public Integer getOldColumnType(Integer defaultType);
 
+	public default String getOldName() {
+		return getName();
+	}
+
 	public Object getOldValue();
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             CounterLocalServiceUtil#increment()}
+	 */
+	@Deprecated
 	public long increment();
 
 	public boolean isApplicable(String name);

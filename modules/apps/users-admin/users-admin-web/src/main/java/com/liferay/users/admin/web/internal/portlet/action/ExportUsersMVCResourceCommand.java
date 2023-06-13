@@ -26,8 +26,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -48,6 +46,8 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.usersadmin.search.UserSearch;
 import com.liferay.portlet.usersadmin.search.UserSearchTerms;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
+
+import java.io.Serializable;
 
 import java.sql.Timestamp;
 
@@ -113,8 +113,15 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 
 				ExpandoBridge expandoBridge = user.getExpandoBridge();
 
-				sb.append(
-					CSVUtil.encode(expandoBridge.getAttribute(attributeName)));
+				Serializable attributeValue = expandoBridge.getAttribute(
+					attributeName);
+
+				if (attributeValue != null) {
+					sb.append(CSVUtil.encode(attributeValue));
+				}
+				else {
+					sb.append(StringPool.BLANK);
+				}
 			}
 			else if (field.contains("Date")) {
 				Date date = (Date)BeanPropertiesUtil.getObject(user, field);
@@ -205,12 +212,6 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 			params.put("usersUserGroups", Long.valueOf(userGroupId));
 		}
 
-		Indexer<?> indexer = IndexerRegistryUtil.nullSafeGetIndexer(User.class);
-
-		if (indexer.isIndexerEnabled() && PropsValues.USERS_SEARCH_WITH_INDEX) {
-			params.put("expandoAttributes", searchTerms.getKeywords());
-		}
-
 		if (searchTerms.isAdvancedSearch()) {
 			return _userLocalService.search(
 				themeDisplay.getCompanyId(), searchTerms.getFirstName(),
@@ -256,7 +257,7 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 
 			sb.append(getUserCSV(user));
 
-			percentage = Math.min(10 + (i * 90) / total, 99);
+			percentage = Math.min(10 + ((i * 90) / total), 99);
 
 			progressTracker.setPercent(percentage);
 		}

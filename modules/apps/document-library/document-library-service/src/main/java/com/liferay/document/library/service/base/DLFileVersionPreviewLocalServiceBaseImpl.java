@@ -16,7 +16,10 @@ package com.liferay.document.library.service.base;
 
 import com.liferay.document.library.model.DLFileVersionPreview;
 import com.liferay.document.library.service.DLFileVersionPreviewLocalService;
+import com.liferay.document.library.service.DLFileVersionPreviewLocalServiceUtil;
 import com.liferay.document.library.service.persistence.DLFileVersionPreviewPersistence;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -36,16 +39,22 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -67,11 +76,15 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>DLFileVersionPreviewLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.service.DLFileVersionPreviewLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>DLFileVersionPreviewLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>DLFileVersionPreviewLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the dl file version preview to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLFileVersionPreviewLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param dlFileVersionPreview the dl file version preview
 	 * @return the dl file version preview that was added
@@ -103,6 +116,10 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 	/**
 	 * Deletes the dl file version preview with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLFileVersionPreviewLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param dlFileVersionPreviewId the primary key of the dl file version preview
 	 * @return the dl file version preview that was removed
 	 * @throws PortalException if a dl file version preview with the primary key could not be found
@@ -119,6 +136,10 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 	/**
 	 * Deletes the dl file version preview from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLFileVersionPreviewLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param dlFileVersionPreview the dl file version preview
 	 * @return the dl file version preview that was removed
 	 */
@@ -128,6 +149,18 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 		DLFileVersionPreview dlFileVersionPreview) {
 
 		return dlFileVersionPreviewPersistence.remove(dlFileVersionPreview);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return dlFileVersionPreviewPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -293,6 +326,16 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return dlFileVersionPreviewPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -301,6 +344,13 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 			(DLFileVersionPreview)persistedModel);
 	}
 
+	public BasePersistence<DLFileVersionPreview> getBasePersistence() {
+		return dlFileVersionPreviewPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -339,6 +389,10 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 	/**
 	 * Updates the dl file version preview in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLFileVersionPreviewLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param dlFileVersionPreview the dl file version preview
 	 * @return the dl file version preview that was updated
 	 */
@@ -350,11 +404,17 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 		return dlFileVersionPreviewPersistence.update(dlFileVersionPreview);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			DLFileVersionPreviewLocalService.class,
-			IdentifiableOSGiService.class, PersistedModelLocalService.class
+			IdentifiableOSGiService.class, CTService.class,
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -362,6 +422,8 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		dlFileVersionPreviewLocalService =
 			(DLFileVersionPreviewLocalService)aopProxy;
+
+		_setLocalServiceUtilService(dlFileVersionPreviewLocalService);
 	}
 
 	/**
@@ -374,8 +436,23 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 		return DLFileVersionPreviewLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<DLFileVersionPreview> getCTPersistence() {
+		return dlFileVersionPreviewPersistence;
+	}
+
+	@Override
+	public Class<DLFileVersionPreview> getModelClass() {
 		return DLFileVersionPreview.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<DLFileVersionPreview>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(dlFileVersionPreviewPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -404,6 +481,23 @@ public abstract class DLFileVersionPreviewLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		DLFileVersionPreviewLocalService dlFileVersionPreviewLocalService) {
+
+		try {
+			Field field =
+				DLFileVersionPreviewLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileVersionPreviewLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

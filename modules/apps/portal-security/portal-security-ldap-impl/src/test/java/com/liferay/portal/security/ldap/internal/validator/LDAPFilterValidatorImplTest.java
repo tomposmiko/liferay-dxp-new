@@ -14,9 +14,14 @@
 
 package com.liferay.portal.security.ldap.internal.validator;
 
+import com.liferay.portal.security.ldap.SafeLdapFilterTemplate;
+import com.liferay.portal.security.ldap.validator.LDAPFilterException;
 import com.liferay.portal.security.ldap.validator.LDAPFilterValidator;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -24,6 +29,11 @@ import org.junit.Test;
  * @author Vilmos Papp
  */
 public class LDAPFilterValidatorImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testIsValidFilterBalancedParentheses() {
@@ -407,6 +417,27 @@ public class LDAPFilterValidatorImplTest {
 		Assert.assertFalse(isValidFilter("(:DN:2.4.6.8.10:=Dino)"));
 		Assert.assertFalse(
 			isValidFilter("(1.3.6.1.4.1.1466.0=\\04\\02\\48\\69)"));
+	}
+
+	@Test
+	public void testSafeLdapFilterTemplateValidations()
+		throws LDAPFilterException {
+
+		SafeLdapFilterTemplate safeLdapFilterTemplate =
+			new SafeLdapFilterTemplate(
+				"(mail=@email_address@)",
+				new String[] {
+					"@company_id@", "@email_address@", "@screen_name@",
+					"@user_id@"
+				},
+				_ldapFilterValidator);
+
+		safeLdapFilterTemplate = safeLdapFilterTemplate.replace(
+			new String[] {"@email_address@"},
+			new String[] {"test@liferay.com"});
+
+		Assert.assertTrue(
+			isValidFilter(safeLdapFilterTemplate.getFilterString()));
 	}
 
 	protected boolean isValidFilter(String filter) {

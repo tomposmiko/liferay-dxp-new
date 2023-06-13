@@ -66,7 +66,8 @@ public class SearchContainer<R> {
 
 	public static final String DEFAULT_VAR = "searchContainer";
 
-	public static final int MAX_DELTA = 200;
+	public static final int MAX_DELTA = GetterUtil.getInteger(
+		PropsUtil.get(PropsKeys.SEARCH_CONTAINER_PAGE_MAX_DELTA), 200);
 
 	public SearchContainer() {
 		_curParam = DEFAULT_CUR_PARAM;
@@ -95,7 +96,6 @@ public class SearchContainer<R> {
 		_portletRequest = portletRequest;
 		_displayTerms = displayTerms;
 		_searchTerms = searchTerms;
-
 		_curParam = curParam;
 
 		boolean resetCur = ParamUtil.getBoolean(portletRequest, "resetCur");
@@ -118,8 +118,7 @@ public class SearchContainer<R> {
 		}
 
 		if (!_curParam.equals(DEFAULT_CUR_PARAM)) {
-			String s = StringUtil.replace(
-				_curParam, DEFAULT_CUR_PARAM, StringPool.BLANK);
+			String s = StringUtil.removeSubstring(_curParam, DEFAULT_CUR_PARAM);
 
 			_deltaParam = DEFAULT_DELTA_PARAM + s;
 		}

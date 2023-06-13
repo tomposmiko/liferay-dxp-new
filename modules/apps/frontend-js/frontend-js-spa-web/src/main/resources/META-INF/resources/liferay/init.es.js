@@ -30,7 +30,7 @@ import RenderURLScreen from './screen/RenderURLScreen.es';
  * @return {!App} The Senna App initialized
  */
 
-const initSPA = function() {
+const initSPA = function () {
 	const app = new App();
 
 	app.addRoutes([
@@ -53,7 +53,7 @@ const initSPA = function() {
 				}
 
 				return match;
-			}
+			},
 		},
 		{
 			handler: RenderURLScreen,
@@ -64,7 +64,7 @@ const initSPA = function() {
 					(url + '/').indexOf(themeDisplay.getPathMain() + '/') !== 0
 				) {
 					const excluded = Liferay.SPA.excludedPaths.some(
-						excludedPath => url.indexOf(excludedPath) === 0
+						(excludedPath) => url.indexOf(excludedPath) === 0
 					);
 
 					if (!excluded) {
@@ -77,11 +77,11 @@ const initSPA = function() {
 				}
 
 				return match;
-			}
-		}
+			},
+		},
 	]);
 
-	Liferay.Util.submitForm = function(form) {
+	Liferay.Util.submitForm = function (form) {
 		async.nextTick(() => {
 			const formElement = Object.isPrototypeOf.call(
 				HTMLFormElement.prototype,
@@ -109,14 +109,16 @@ const initSPA = function() {
 				if (match(globals.document.activeElement, buttonSelector)) {
 					globals.capturedFormButtonElement =
 						globals.document.activeElement;
-				} else {
+				}
+				else {
 					globals.capturedFormButtonElement = formElement.querySelector(
 						buttonSelector
 					);
 				}
 
 				app.navigate(utils.getUrlPath(url));
-			} else {
+			}
+			else {
 				formElement.submit();
 			}
 		});
@@ -138,8 +140,9 @@ export default {
 			globals.document.addEventListener('DOMContentLoaded', () => {
 				callback.call(this, initSPA());
 			});
-		} else {
+		}
+		else {
 			callback.call(this, initSPA());
 		}
-	}
+	},
 };

@@ -32,11 +32,10 @@
 
 		String siteImageURL = curGroup.getLogoURL(themeDisplay, false);
 
-		Map<String, Object> rowData = new HashMap<>();
-
-		rowData.put("actions", siteAdminManagementToolbarDisplayContext.getAvailableActions(curGroup));
-
-		row.setData(rowData);
+		row.setData(
+			HashMapBuilder.<String, Object>put(
+				"actions", siteAdminManagementToolbarDisplayContext.getAvailableActions(curGroup)
+			).build());
 		%>
 
 		<portlet:renderURL var="viewSubsitesURL">
@@ -66,28 +65,21 @@
 						<aui:a href="<%= !curGroup.isCompany() ? viewSubsitesURL : StringPool.BLANK %>" label="<%= HtmlUtil.escape(curGroup.getDescriptiveName(locale)) %>" localizeLabel="<%= false %>" />
 					</h5>
 
-					<ul class="list-inline">
-						<li class="h6 text-default">
-							<c:choose>
-								<c:when test="<%= curGroup.isActive() %>">
-									<liferay-ui:message key="active" />
-								</c:when>
-								<c:otherwise>
-									<liferay-ui:message key="not-active" />
-								</c:otherwise>
-							</c:choose>
-						</li>
-						<li class="h6">
-							<c:choose>
-								<c:when test="<%= !curGroup.isCompany() %>">
-									<liferay-ui:message arguments="<%= String.valueOf(childSites.size()) %>" key="x-child-sites" />
-								</c:when>
-								<c:otherwise>
-									-
-								</c:otherwise>
-							</c:choose>
-						</li>
-					</ul>
+					<span class="text-secondary">
+						<c:choose>
+							<c:when test="<%= curGroup.isActive() %>">
+								<liferay-ui:message key="active" />
+							</c:when>
+							<c:otherwise>
+								<liferay-ui:message key="not-active" />
+							</c:otherwise>
+						</c:choose>
+					</span>
+					<span class="text-secondary">
+						<c:if test="<%= !curGroup.isCompany() %>">
+							<liferay-ui:message arguments="<%= String.valueOf(childSites.size()) %>" key="x-child-sites" />
+						</c:if>
+					</span>
 				</liferay-ui:search-container-column-text>
 
 				<liferay-ui:search-container-column-text>
@@ -130,24 +122,25 @@
 					List<String> names = SitesUtil.getOrganizationNames(curGroup, user);
 
 					names.addAll(SitesUtil.getUserGroupNames(curGroup, user));
+					%>
 
-					if (ListUtil.isNotEmpty(names)) {
+					<c:if test="<%= ListUtil.isNotEmpty(names) %>">
+
+						<%
 						String message = StringPool.BLANK;
 
 						if (names.size() == 1) {
 							message = LanguageUtil.format(request, "you-are-a-member-of-x-because-you-belong-to-x", new Object[] {HtmlUtil.escape(curGroup.getDescriptiveName(locale)), HtmlUtil.escape(names.get(0))}, false);
 						}
 						else {
-							message = LanguageUtil.format(request, "you-are-a-member-of-x-because-you-belong-to-x-and-x", new Object[] {HtmlUtil.escape(curGroup.getDescriptiveName(locale)), HtmlUtil.escape(StringUtil.merge(names.subList(0, names.size() - 1).toArray(new String[names.size() - 1]), ", ")), HtmlUtil.escape(names.get(names.size() - 1))}, false);
+							List<String> namesList = names.subList(0, names.size() - 1);
+
+							message = LanguageUtil.format(request, "you-are-a-member-of-x-because-you-belong-to-x-and-x", new Object[] {HtmlUtil.escape(curGroup.getDescriptiveName(locale)), HtmlUtil.escape(StringUtil.merge(namesList.toArray(new String[names.size() - 1]), ", ")), HtmlUtil.escape(names.get(names.size() - 1))}, false);
 						}
-					%>
+						%>
 
 						<liferay-ui:icon-help message="<%= message %>" />
-
-					<%
-					}
-					%>
-
+					</c:if>
 				</liferay-ui:search-container-column-text>
 
 				<liferay-ui:search-container-column-text
@@ -174,7 +167,7 @@
 					cssClass="table-cell-expand-smallest table-cell-minw-150"
 					name="members"
 				>
-					<span onmouseover="Liferay.Portal.ToolTip.show(this, '<liferay-ui:message key="inherited-memberships-are-not-included-in-members-count" unicode="<%= true %>" />');">
+					<span class="lfr-portal-tooltip" title="<liferay-ui:message key="inherited-memberships-are-not-included-in-members-count" />">
 
 						<%
 						int usersCount = UserLocalServiceUtil.getGroupUsersCount(curGroup.getGroupId(), WorkflowConstants.STATUS_APPROVED);

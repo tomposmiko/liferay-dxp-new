@@ -27,16 +27,18 @@ export default getAlloyEditorProcessor(
 
 			if (!anchor) {
 				anchor = document.createElement('a');
-
-				element.parentElement.replaceChild(anchor, element);
-
-				anchor.appendChild(element);
 			}
 
 			anchor.href = config.href;
 			anchor.target = config.target || '';
-		}
+			anchor.innerHTML = value;
 
-		element.innerHTML = value;
+			if (!element.contains(anchor)) {
+				element.innerHTML = anchor.outerHTML;
+			}
+		}
+		else if (value) {
+			element.innerHTML = value;
+		}
 	}
 );

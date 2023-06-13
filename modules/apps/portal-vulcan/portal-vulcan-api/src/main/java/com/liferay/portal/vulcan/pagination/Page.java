@@ -19,10 +19,16 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.vulcan.aggregation.Facet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Alejandro Hernández
@@ -33,25 +39,55 @@ import java.util.Map;
 public class Page<T> {
 
 	public static <T> Page<T> of(Collection<T> items) {
-		return new Page<>(items);
+		return new Page<>(new HashMap<>(), items);
 	}
 
 	public static <T> Page<T> of(
 		Collection<T> items, Pagination pagination, long totalCount) {
 
-		return new Page<>(items, pagination, totalCount);
+		return new Page<>(
+			new HashMap<>(), new ArrayList<>(), items, pagination, totalCount);
 	}
 
 	public static <T> Page<T> of(
-		Map<String, Map> actions, Collection<T> items, Pagination pagination,
-		long totalCount) {
+		Map<String, Map<String, String>> actions, Collection<T> items) {
 
-		return new Page<>(actions, items, pagination, totalCount);
+		return new Page<>(actions, items);
+	}
+
+	public static <T> Page<T> of(
+		Map<String, Map<String, String>> actions, Collection<T> items,
+		Pagination pagination, long totalCount) {
+
+		return new Page<>(
+			actions, new ArrayList<>(), items, pagination, totalCount);
+	}
+
+	public static <T> Page<T> of(
+		Map<String, Map<String, String>> actions, List<Facet> facets,
+		Collection<T> items, Pagination pagination, long totalCount) {
+
+		return new Page<>(actions, facets, items, pagination, totalCount);
+	}
+
+	public T fetchFirstItem() {
+		Iterator<T> iterator = _items.iterator();
+
+		if (iterator.hasNext()) {
+			return iterator.next();
+		}
+
+		return null;
 	}
 
 	@JsonProperty("actions")
-	public Map<String, Map> getActions() {
+	public Map<String, Map<String, String>> getActions() {
 		return _actions;
+	}
+
+	@JsonProperty("facets")
+	public List<Facet> getFacets() {
+		return _facets;
 	}
 
 	@JacksonXmlElementWrapper(localName = "items")
@@ -98,24 +134,51 @@ public class Page<T> {
 		return false;
 	}
 
-	private Page(Collection<T> items) {
+	@Override
+	public String toString() {
+		StringBundler sb = new StringBundler("{\"actions\": ");
+
+		sb.append(_toString((Map)_actions));
+		sb.append(", \"items\": [");
+
+		Iterator<T> iterator = _items.iterator();
+
+		while (iterator.hasNext()) {
+			sb.append(iterator.next());
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("], \"page\": ");
+		sb.append(_page);
+		sb.append(", \"pageSize\": ");
+		sb.append(_pageSize);
+		sb.append(", \"totalCount\": ");
+		sb.append(_totalCount);
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private Page(
+		Map<String, Map<String, String>> actions, Collection<T> items) {
+
+		_actions = actions;
 		_items = items;
 
-		_actions = new HashMap<>();
 		_page = 1;
 		_pageSize = items.size();
 		_totalCount = items.size();
 	}
 
-	private Page(Collection<T> items, Pagination pagination, long totalCount) {
-		this(new HashMap<>(), items, pagination, totalCount);
-	}
-
 	private Page(
-		Map<String, Map> actions, Collection<T> items, Pagination pagination,
-		long totalCount) {
+		Map<String, Map<String, String>> actions, List<Facet> facets,
+		Collection<T> items, Pagination pagination, long totalCount) {
 
 		_actions = actions;
+		_facets = facets;
 		_items = items;
 
 		if (pagination == null) {
@@ -130,7 +193,43 @@ public class Page<T> {
 		_totalCount = totalCount;
 	}
 
-	private final Map<String, Map> _actions;
+	private String _toString(Map<String, Object> map) {
+		StringBundler sb = new StringBundler("{");
+
+		Set<Map.Entry<String, Object>> entries = map.entrySet();
+
+		Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, Object> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\": ");
+
+			Object value = entry.getValue();
+
+			if (value instanceof Map) {
+				sb.append(_toString((Map)value));
+			}
+			else {
+				sb.append("\"");
+				sb.append(value);
+				sb.append("\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private final Map<String, Map<String, String>> _actions;
+	private List<Facet> _facets = new ArrayList<>();
 	private final Collection<T> _items;
 	private final long _page;
 	private final long _pageSize;

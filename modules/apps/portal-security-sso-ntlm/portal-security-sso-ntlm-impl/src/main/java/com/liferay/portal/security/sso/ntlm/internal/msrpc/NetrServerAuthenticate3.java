@@ -29,12 +29,11 @@ public class NetrServerAuthenticate3 extends DcerpcMessage {
 
 		_primaryName = primaryName;
 		_accountName = accountName;
+		_secureChannelType = (short)secureChannelType;
 		_computerName = computerName;
 		_clientCredential = clientCredential;
 		_serverCredential = serverCredential;
 		_negotiateFlags = negotiateFlags;
-
-		_secureChannelType = (short)secureChannelType;
 
 		ptype = 0;
 		flags = DCERPC_FIRST_FRAG | DCERPC_LAST_FRAG;
@@ -69,10 +68,10 @@ public class NetrServerAuthenticate3 extends DcerpcMessage {
 
 		ndrBuffer.advance(8);
 
-		NdrBuffer derivedNrdBuffer = ndrBuffer.derive(index);
+		NdrBuffer derivedNdrBuffer = ndrBuffer.derive(index);
 
 		for (int i = 0; i < 8; i++) {
-			derivedNrdBuffer.enc_ndr_small(_clientCredential[i]);
+			derivedNdrBuffer.enc_ndr_small(_clientCredential[i]);
 		}
 
 		ndrBuffer.enc_ndr_long(_negotiateFlags);

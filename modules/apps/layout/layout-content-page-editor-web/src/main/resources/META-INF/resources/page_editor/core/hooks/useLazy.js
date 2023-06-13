@@ -33,15 +33,16 @@ export default function useLazy(callback) {
 				const plugin = getInstance(pluginId);
 
 				const Component = lazy(() => {
-					return plugin.then(instance => {
+					return plugin.then((instance) => {
 						return {
 							default: () => {
 								if (instance) {
 									return callback({instance});
-								} else {
+								}
+								else {
 									return null;
 								}
-							}
+							},
 						};
 					});
 				});

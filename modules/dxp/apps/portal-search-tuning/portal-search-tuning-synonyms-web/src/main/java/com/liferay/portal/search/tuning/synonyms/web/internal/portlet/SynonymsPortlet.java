@@ -22,10 +22,10 @@ import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.sort.Sorts;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.constants.SynonymsPortletKeys;
 import com.liferay.portal.search.tuning.synonyms.web.internal.display.context.SynonymsDisplayBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.DocumentToSynonymSetTranslator;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexNameBuilder;
 
 import java.io.IOException;
 
@@ -36,9 +36,6 @@ import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Filipe Oshiro
@@ -73,8 +70,8 @@ public class SynonymsPortlet extends MVCPortlet {
 		SynonymsDisplayBuilder synonymsDisplayBuilder =
 			new SynonymsDisplayBuilder(
 				_documentToSynonymSetTranslator,
-				_portal.getHttpServletRequest(renderRequest), _indexNameBuilder,
-				_language, _portal, _queries, renderRequest, renderResponse,
+				_portal.getHttpServletRequest(renderRequest), _language,
+				_portal, _queries, renderRequest, renderResponse,
 				_searchEngineAdapter, _searchEngineInformation, _sorts,
 				_synonymSetIndexNameBuilder);
 
@@ -103,12 +100,8 @@ public class SynonymsPortlet extends MVCPortlet {
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile SearchEngineInformation _searchEngineInformation;
+	@Reference
+	private SearchEngineInformation _searchEngineInformation;
 
 	@Reference
 	private Sorts _sorts;

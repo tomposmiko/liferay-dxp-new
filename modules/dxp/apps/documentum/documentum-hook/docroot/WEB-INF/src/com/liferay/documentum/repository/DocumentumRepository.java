@@ -52,13 +52,14 @@ import com.liferay.document.library.repository.external.ExtRepositorySearchResul
 import com.liferay.document.library.repository.external.cache.ConnectionBuilder;
 import com.liferay.document.library.repository.external.cache.ConnectionCache;
 import com.liferay.document.library.repository.external.search.ExtRepositoryQueryMapper;
-import com.liferay.documentum.repository.model.Constants;
+import com.liferay.documentum.repository.constants.Constants;
 import com.liferay.documentum.repository.model.DocumentumFileEntry;
 import com.liferay.documentum.repository.model.DocumentumFileVersion;
 import com.liferay.documentum.repository.model.DocumentumFolder;
 import com.liferay.documentum.repository.model.DocumentumObject;
 import com.liferay.documentum.repository.model.DocumentumVersionNumber;
 import com.liferay.documentum.repository.search.DQLQueryBuilder;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.InvalidRepositoryException;
@@ -74,7 +75,6 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PwdGenerator;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -768,17 +768,17 @@ public class DocumentumRepository
 
 	@Override
 	public void initRepository(
-			UnicodeProperties typeSettingsProperties,
+			UnicodeProperties typeSettingsUnicodeProperties,
 			CredentialsProvider credentialsProvider)
 		throws InvalidRepositoryException, PrincipalException {
 
-		_cabinet = typeSettingsProperties.getProperty(_CABINET);
+		_cabinet = typeSettingsUnicodeProperties.getProperty(_CABINET);
 
 		if (Validator.isNull(_cabinet)) {
 			throw new InvalidRepositoryException();
 		}
 
-		_repository = typeSettingsProperties.getProperty(_REPOSITORY);
+		_repository = typeSettingsUnicodeProperties.getProperty(_REPOSITORY);
 
 		if (Validator.isNull(_repository)) {
 			throw new InvalidRepositoryException();
@@ -1275,9 +1275,8 @@ public class DocumentumRepository
 			String extRepositoryObjectKey)
 		throws DfException {
 
-		IDfId idfId = getIDfId(idfSession, extRepositoryObjectKey);
-
-		return (T)idfSession.getObject(idfId);
+		return (T)idfSession.getObject(
+			getIDfId(idfSession, extRepositoryObjectKey));
 	}
 
 	protected IDfDocument getLatestIDfDocument(

@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	AUI().applyConfig({
 		groups: {
 			'item-selector-taglib': {
@@ -26,12 +26,12 @@
 							'aui-base',
 							'liferay-item-selector-dialog',
 							'liferay-portlet-base',
-							'uploader'
-						]
-					}
+							'uploader',
+						],
+					},
 				},
-				root: MODULE_PATH + '/'
-			}
-		}
+				root: MODULE_PATH + '/',
+			},
+		},
 	});
 })();

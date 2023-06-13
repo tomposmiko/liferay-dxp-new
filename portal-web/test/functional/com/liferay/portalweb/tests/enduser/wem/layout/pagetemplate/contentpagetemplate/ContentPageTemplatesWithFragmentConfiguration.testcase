@@ -15,6 +15,17 @@ definition {
 		JSONFragment.addFragmentCollection(
 			groupName = "Test Site Name",
 			name = "Collection Name");
+
+		JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
+			groupName = "Test Site Name",
+			layoutPageTemplateCollectionName = "Page Template Collection");
+
+		JSONLayoutpagetemplate.addLayoutPageTemplateEntry(
+			groupName = "Test Site Name",
+			layoutPageTemplateCollectionName = "Page Template Collection",
+			layoutPageTemplateEntryName = "Page Template Name",
+			layoutPageTemplateStatus = "Draft",
+			layoutPageTemplateType = "Content Page Template");
 	}
 
 	tearDown {
@@ -35,11 +46,13 @@ definition {
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "checkbox_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "checkbox_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
 				html = "${htmlSnippet}",
 				name = "Checkbox Fragment Example");
@@ -47,11 +60,11 @@ definition {
 
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
-		PageTemplatesAdmin.addCollection(collectionName = "Page Template Collection");
-
 		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-		PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
+		PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
+
+		PageEditor.assertFragmentSidebarLoaded();
 
 		PageEditor.addFragment(
 			collectionName = "Collection Name",
@@ -87,11 +100,13 @@ definition {
 	test AddItemSelectorConfigurationFragmentToContentPageTemplate {
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
 				html = "${htmlSnippet}",
 				name = "itemSelector Fragment Example");
@@ -104,17 +119,18 @@ definition {
 
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
-		PageTemplatesAdmin.addCollection(collectionName = "Page Template Collection");
-
 		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-		PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
+		PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
+
+		PageEditor.assertFragmentSidebarLoaded();
 
 		PageEditor.addFragment(
 			collectionName = "Collection Name",
 			fragmentName = "itemSelector Fragment Example");
 
 		PageEditor.editContentDisplay(
+			fragmentName = "itemSelector Fragment Example",
 			webcontent = "true",
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WebContent Title");
@@ -131,7 +147,6 @@ definition {
 			AssertVisible(
 				key_content = "WC WebContent Content",
 				key_fragmentClass = "configuration",
-				key_position = "1",
 				locator1 = "Fragment#FRAGMENT");
 		}
 	}
@@ -142,11 +157,13 @@ definition {
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "select_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "select_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
 				html = "${htmlSnippet}",
 				name = "Text Fragment Example");
@@ -154,11 +171,11 @@ definition {
 
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
-		PageTemplatesAdmin.addCollection(collectionName = "Page Template Collection");
-
 		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-		PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
+		PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
+
+		PageEditor.assertFragmentSidebarLoaded();
 
 		PageEditor.addFragment(
 			collectionName = "Collection Name",
@@ -184,18 +201,17 @@ definition {
 	@description = "This is a test for LPS-99543. User can change text fragment configuration in a content page template."
 	@priority = "5"
 	test AddTextConfigurationFragmentToContentPageTemplate {
-
-		// Ignoring test from acceptance until LRQA-52644 is resolved
-
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "text_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "text_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
 				html = "${htmlSnippet}",
 				name = "Text Fragment Example");
@@ -203,11 +219,11 @@ definition {
 
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
-		PageTemplatesAdmin.addCollection(collectionName = "Page Template Collection");
-
 		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-		PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
+		PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
+
+		PageEditor.assertFragmentSidebarLoaded();
 
 		PageEditor.addFragment(
 			collectionName = "Collection Name",
@@ -230,7 +246,6 @@ definition {
 			AssertVisible(
 				key_content = "Updated fragment text",
 				key_fragmentClass = "configuration",
-				key_position = "1",
 				locator1 = "Fragment#FRAGMENT");
 		}
 	}

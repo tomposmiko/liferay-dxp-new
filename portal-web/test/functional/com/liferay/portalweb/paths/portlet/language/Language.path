@@ -2,11 +2,13 @@
 <head>
 <title>Language</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Language</td></tr>
 </thead>
+
 <tbody>
 <!--LANGUAGE_MENU-->
 <tr>
@@ -37,6 +39,12 @@
 <tr>
 	<td>SHORT_TEXT_LINK</td>
 	<td>//a[contains(@class,'short-text') and contains(.,'${key_languageKey}')]</td>
+	<td></td>
+</tr>
+<!--EXPORT_TRANSLATION-->
+<tr>
+	<td>EXPORT_TRANSLATION_ORIGIN_LANGUAGE</td>
+	<td>//div[contains(@class,'form-group')]//input[@readonly and @value='English (United States)']</td>
 	<td></td>
 </tr>
 </tbody>

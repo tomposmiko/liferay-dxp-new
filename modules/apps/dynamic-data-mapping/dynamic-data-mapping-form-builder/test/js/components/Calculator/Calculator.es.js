@@ -27,7 +27,7 @@ const fields = [
 		repeatable: true,
 		title: 'option1repeatablefieldName',
 		type: 'checkbox',
-		value: 'option1repeatablefieldName'
+		value: 'option1repeatablefieldName',
 	},
 	{
 		dataType: 'number',
@@ -37,8 +37,8 @@ const fields = [
 		repeatable: false,
 		title: 'option1nonrepeatablefieldName',
 		type: 'checkbox',
-		value: 'option1nonrepeatablefieldName'
-	}
+		value: 'option1nonrepeatablefieldName',
+	},
 ];
 
 const spritemap = 'icons.svg';
@@ -50,11 +50,11 @@ const getBaseConfig = () => ({
 		{
 			label: 'sum',
 			tooltip: '',
-			value: 'sum'
-		}
+			value: 'sum',
+		},
 	],
 	index: 0,
-	spritemap
+	spritemap,
 });
 
 describe('Calculator', () => {
@@ -65,6 +65,13 @@ describe('Calculator', () => {
 
 		beforeEach(() => {
 			jest.useFakeTimers();
+
+			window.Liferay = {
+				...(window.Liferay || {}),
+				Browser: {
+					isIe: () => false,
+				},
+			};
 
 			component = new Calculator(getBaseConfig());
 		});
@@ -84,6 +91,17 @@ describe('Calculator', () => {
 				component.addTokenToExpression(Token.VARIABLE, 'Field2');
 
 				expect(component.expression).toEqual('1+[Field1]*[Field2]');
+			});
+		});
+
+		describe('clicking the Sum function', () => {
+			it("don't disables functions, numbers and operators", () => {
+				const result = component.getStateBasedOnExpression('sum(');
+
+				expect(result.disableDot).toBe(true);
+				expect(result.disableFunctions).toBe(false);
+				expect(result.disableNumbers).toBe(false);
+				expect(result.disableOperators).toBe(false);
 			});
 		});
 
@@ -109,9 +127,10 @@ describe('Calculator', () => {
 			it('disables functions, numbers and operators when last token is a sum function', () => {
 				const result = component.getStateBasedOnExpression('4*sum(');
 
-				expect(result.disableFunctions).toBe(true);
-				expect(result.disableNumbers).toBe(true);
-				expect(result.disableOperators).toBe(true);
+				expect(result.disableDot).toBe(true);
+				expect(result.disableFunctions).toBe(false);
+				expect(result.disableNumbers).toBe(false);
+				expect(result.disableOperators).toBe(false);
 			});
 
 			it('does not disable functions, numbers and operators when last token is not a sum function', () => {

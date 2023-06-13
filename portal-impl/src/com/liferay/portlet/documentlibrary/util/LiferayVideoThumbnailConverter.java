@@ -24,7 +24,14 @@ import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IStreamCoder;
 import com.xuggle.xuggler.IVideoPicture;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
 import java.io.File;
+import java.io.FileOutputStream;
+
+import javax.imageio.ImageIO;
 
 /**
  * @author Juan González
@@ -74,6 +81,8 @@ public class LiferayVideoThumbnailConverter extends LiferayConverter {
 			throw new RuntimeException("Input URL does not have any streams");
 		}
 
+		boolean hasCodecTypeVideo = false;
+
 		IVideoPicture[] inputIVideoPictures =
 			new IVideoPicture[inputStreamsCount];
 
@@ -89,6 +98,8 @@ public class LiferayVideoThumbnailConverter extends LiferayConverter {
 			if (inputIStreamCoder.getCodecType() ==
 					ICodec.Type.CODEC_TYPE_VIDEO) {
 
+				hasCodecTypeVideo = true;
+
 				inputIVideoPictures[i] = IVideoPicture.make(
 					inputIStreamCoder.getPixelType(),
 					inputIStreamCoder.getWidth(),
@@ -98,31 +109,49 @@ public class LiferayVideoThumbnailConverter extends LiferayConverter {
 			openStreamCoder(inputIStreamCoder);
 		}
 
-		boolean thumbnailGenerated = false;
+		if (hasCodecTypeVideo) {
+			boolean thumbnailGenerated = false;
 
-		try {
-			if (seekTimeStamp != -1) {
+			try {
+				if (seekTimeStamp != -1) {
+					rewind();
+
+					seek(seekTimeStamp);
+				}
+
+				thumbnailGenerated = generateThumbnail(
+					inputIStreamCoders, inputIVideoPictures);
+			}
+			catch (Exception exception) {
+			}
+
+			if (!thumbnailGenerated) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to create thumbnail from specified frame. " +
+							"Will generate thumbnail from the beginning.");
+				}
+
 				rewind();
 
-				seek(seekTimeStamp);
+				generateThumbnail(inputIStreamCoders, inputIVideoPictures);
 			}
-
-			thumbnailGenerated = generateThumbnail(
-				inputIStreamCoders, inputIVideoPictures);
 		}
-		catch (Exception exception) {
-		}
+		else {
+			BufferedImage bufferedImage = new BufferedImage(
+				_width, _height, BufferedImage.TYPE_INT_RGB);
 
-		if (!thumbnailGenerated) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to create thumbnail from specified frame. Will " +
-						"generate thumbnail from the beginning.");
-			}
+			Graphics2D graphics2D = bufferedImage.createGraphics();
 
-			rewind();
+			graphics2D.setColor(Color.black);
 
-			generateThumbnail(inputIStreamCoders, inputIVideoPictures);
+			graphics2D.fillRect(
+				0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+
+			_outputFile.createNewFile();
+
+			ImageIO.write(
+				bufferedImage, _extension, new FileOutputStream(_outputFile));
 		}
 
 		cleanUp(inputIVideoPictures, null);
@@ -135,7 +164,7 @@ public class LiferayVideoThumbnailConverter extends LiferayConverter {
 		throws Exception {
 
 		boolean keyPacketFound = false;
-		int nonKeyAfterKeyCount = 0;
+		int nonkeyAfterKeyCount = 0;
 		boolean onlyDecodeKeyPackets = false;
 
 		IPacket inputIPacket = IPacket.make();
@@ -157,12 +186,12 @@ public class LiferayVideoThumbnailConverter extends LiferayConverter {
 
 			keyPacketFound = isKeyPacketFound(inputIPacket, keyPacketFound);
 
-			nonKeyAfterKeyCount = countNonKeyAfterKey(
-				inputIPacket, keyPacketFound, nonKeyAfterKeyCount);
+			nonkeyAfterKeyCount = countNonKeyAfterKey(
+				inputIPacket, keyPacketFound, nonkeyAfterKeyCount);
 
 			if (isStartDecoding(
 					inputIPacket, inputIStreamCoder, keyPacketFound,
-					nonKeyAfterKeyCount, onlyDecodeKeyPackets)) {
+					nonkeyAfterKeyCount, onlyDecodeKeyPackets)) {
 
 				IStream iStream = _inputIContainer.getStream(streamIndex);
 

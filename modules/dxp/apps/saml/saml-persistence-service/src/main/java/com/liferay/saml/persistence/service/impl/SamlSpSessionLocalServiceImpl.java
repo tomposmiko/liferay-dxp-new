@@ -17,6 +17,7 @@ package com.liferay.saml.persistence.service.impl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.saml.persistence.exception.NoSuchSpSessionException;
@@ -61,8 +62,8 @@ public class SamlSpSessionLocalServiceImpl
 		samlSpSession.setUserName(user.getFullName());
 		samlSpSession.setCreateDate(now);
 		samlSpSession.setModifiedDate(now);
-		samlSpSession.setSamlSpSessionKey(samlSpSessionKey);
 		samlSpSession.setSamlIdpEntityId(samlIdpEntityId);
+		samlSpSession.setSamlSpSessionKey(samlSpSessionKey);
 		samlSpSession.setAssertionXml(assertionXml);
 		samlSpSession.setJSessionId(jSessionId);
 		samlSpSession.setNameIdFormat(nameIdFormat);
@@ -89,12 +90,25 @@ public class SamlSpSessionLocalServiceImpl
 	}
 
 	@Override
-	public SamlSpSession fetchSamlSpSessionBySessionIndex(String sessionIndex) {
+	public SamlSpSession fetchSamlSpSessionBySessionIndex(
+		long companyId, String sessionIndex) {
+
 		if (Validator.isNull(sessionIndex)) {
 			return null;
 		}
 
-		return samlSpSessionPersistence.fetchBySessionIndex(sessionIndex);
+		return samlSpSessionPersistence.fetchByC_SI(companyId, sessionIndex);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #fetchSamlSpSessionBySessionIndex(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public SamlSpSession fetchSamlSpSessionBySessionIndex(String sessionIndex) {
+		return fetchSamlSpSessionBySessionIndex(
+			CompanyThreadLocal.getCompanyId(), sessionIndex);
 	}
 
 	@Override
@@ -161,8 +175,8 @@ public class SamlSpSessionLocalServiceImpl
 		samlSpSession.setUserId(user.getUserId());
 		samlSpSession.setUserName(user.getFullName());
 		samlSpSession.setModifiedDate(new Date());
-		samlSpSession.setSamlSpSessionKey(samlSpSessionKey);
 		samlSpSession.setSamlIdpEntityId(samlIdpEntityId);
+		samlSpSession.setSamlSpSessionKey(samlSpSessionKey);
 		samlSpSession.setAssertionXml(assertionXml);
 		samlSpSession.setJSessionId(jSessionId);
 		samlSpSession.setNameIdFormat(nameIdFormat);

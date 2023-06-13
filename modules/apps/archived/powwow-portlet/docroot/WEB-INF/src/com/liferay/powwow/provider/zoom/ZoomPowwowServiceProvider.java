@@ -245,20 +245,19 @@ public class ZoomPowwowServiceProvider extends BasePowwowServiceProvider {
 	}
 
 	protected String createZoomHost(User user, PowwowServer powwowServer) {
-		Map<String, String> parameterMap = HashMapBuilder.put(
-			"dept", _DEPT_API
-		).put(
-			"email", user.getEmailAddress()
-		).put(
-			"first_name", user.getFirstName()
-		).put(
-			"last_name", user.getLastName()
-		).put(
-			"type", String.valueOf(_USER_TYPE_PRO)
-		).build();
-
 		JSONObject responseJSONObject = execute(
-			powwowServer, "user", "custcreate", parameterMap);
+			powwowServer, "user", "custcreate",
+			HashMapBuilder.put(
+				"dept", _DEPT_API
+			).put(
+				"email", user.getEmailAddress()
+			).put(
+				"first_name", user.getFirstName()
+			).put(
+				"last_name", user.getLastName()
+			).put(
+				"type", String.valueOf(_USER_TYPE_PRO)
+			).build());
 
 		return responseJSONObject.getString("id");
 	}
@@ -340,9 +339,7 @@ public class ZoomPowwowServiceProvider extends BasePowwowServiceProvider {
 		sb.append(StringPool.SLASH);
 		sb.append(action);
 
-		String location = sb.toString();
-
-		options.setLocation(location);
+		options.setLocation(sb.toString());
 
 		Map<String, String> parts = new HashMap<>();
 

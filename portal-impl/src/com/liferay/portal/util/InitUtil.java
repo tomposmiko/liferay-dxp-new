@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
+import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.log.SanitizerLogWrapper;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
@@ -63,7 +64,6 @@ import com.sun.syndication.io.XmlReader;
 import java.lang.reflect.Field;
 
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -94,7 +94,9 @@ public class InitUtil {
 			}
 		}
 		catch (Exception exception) {
-			exception.printStackTrace();
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
 		}
 
 		StopWatch stopWatch = new StopWatch();
@@ -126,20 +128,14 @@ public class InitUtil {
 				currentThread.getContextClassLoader());
 		}
 		catch (Exception exception) {
-			exception.printStackTrace();
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
 		}
 
 		// Properties
 
 		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
-
-		// Log4J
-
-		if (GetterUtil.getBoolean(
-				SystemProperties.get("log4j.configure.on.startup"), true)) {
-
-			Log4JUtil.configureLog4J(InitUtil.class.getClassLoader());
-		}
 
 		// Shared log
 
@@ -147,7 +143,17 @@ public class InitUtil {
 			LogFactoryUtil.setLogFactory(new Log4jLogFactoryImpl());
 		}
 		catch (Exception exception) {
-			exception.printStackTrace();
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+		}
+
+		// Log4J
+
+		if (GetterUtil.getBoolean(
+				SystemProperties.get("log4j.configure.on.startup"), true)) {
+
+			Log4JUtil.configureLog4J(InitUtil.class.getClassLoader());
 		}
 
 		// Log sanitizer
@@ -299,21 +305,19 @@ public class InitUtil {
 	public static void registerSpringInitialized() {
 		Registry registry = RegistryUtil.getRegistry();
 
-		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
-			"module.service.lifecycle", "spring.initialized"
-		).put(
-			"service.vendor", ReleaseInfo.getVendor()
-		).put(
-			"service.version", ReleaseInfo.getVersion()
-		).build();
-
 		final ServiceRegistration<ModuleServiceLifecycle>
 			moduleServiceLifecycleServiceRegistration =
 				registry.registerService(
 					ModuleServiceLifecycle.class,
 					new ModuleServiceLifecycle() {
 					},
-					properties);
+					HashMapBuilder.<String, Object>put(
+						"module.service.lifecycle", "spring.initialized"
+					).put(
+						"service.vendor", ReleaseInfo.getVendor()
+					).put(
+						"service.version", ReleaseInfo.getVersion()
+					).build());
 
 		PortalLifecycleUtil.register(
 			new BasePortalLifecycle() {
@@ -350,6 +354,8 @@ public class InitUtil {
 	}
 
 	private static final boolean _PRINT_TIME = false;
+
+	private static final Log _log = LogFactoryUtil.getLog(InitUtil.class);
 
 	private static ApplicationContext _appApplicationContext;
 	private static boolean _initialized;

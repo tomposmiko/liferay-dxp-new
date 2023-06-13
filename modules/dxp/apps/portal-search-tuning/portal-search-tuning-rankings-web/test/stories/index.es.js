@@ -13,13 +13,14 @@ import {
 	STORYBOOK_CONSTANTS,
 	StorybookAddonActions,
 	StorybookAddonKnobs,
-	StorybookReact
-} from 'liferay-npm-scripts/src/storybook';
+	StorybookReact,
+} from '@liferay/npm-scripts/src/storybook';
 import React from 'react';
 
 import '../../src/main/resources/META-INF/resources/css/main.scss';
 
 import {ClayIconSpriteContext} from '@clayui/icon';
+import ClayLayout from '@clayui/layout';
 
 import ThemeContext from '../../src/main/resources/META-INF/resources/js/ThemeContext.es';
 import PageToolbar from '../../src/main/resources/META-INF/resources/js/components/PageToolbar.es';
@@ -43,15 +44,15 @@ const {array, boolean, select, text, withKnobs} = StorybookAddonKnobs;
 
 addDecorator(withKnobs);
 
-addDecorator(storyFn => {
+addDecorator((storyFn) => {
 	const context = {
 		constants: {
 			WORKFLOW_ACTION_PUBLISH: '1',
-			WORKFLOW_ACTION_SAVE_DRAFT: '2'
+			WORKFLOW_ACTION_SAVE_DRAFT: '2',
 		},
 		namespace:
 			'_com_liferay_portal_search_ranking_web_portlet_ResultRankingsPortlet_',
-		spritemap: STORYBOOK_CONSTANTS.SPRITEMAP_PATH
+		spritemap: STORYBOOK_CONSTANTS.SPRITEMAP_PATH,
 	};
 
 	return (
@@ -63,18 +64,16 @@ addDecorator(storyFn => {
 	);
 });
 
-const withSheet = storyFn => (
-	<div className="sheet sheet-lg" style={{marginTop: '24px'}}>
-		{storyFn()}
-	</div>
+const withSheet = (storyFn) => (
+	<ClayLayout.Sheet style={{marginTop: '24px'}}>{storyFn()}</ClayLayout.Sheet>
 );
 
 storiesOf('Pages|ResultRankingsForm', module).add('default', () => (
 	<ResultRankingsForm
 		cancelUrl=""
-		fetchDocumentsHiddenUrl="http://www.mocky.io/v2/5db38001300000620057b690"
-		fetchDocumentsSearchUrl="http://www.mocky.io/v2/5db37f913000005f0057b68e"
-		fetchDocumentsVisibleUrl="http://www.mocky.io/v2/5db37f913000005f0057b68e"
+		fetchDocumentsHiddenUrl="http://www.mocky.io/v2/5e8366a4300000580fcf3df1"
+		fetchDocumentsSearchUrl="http://www.mocky.io/v2/5e83720e3000007612cf3e32"
+		fetchDocumentsVisibleUrl="http://www.mocky.io/v2/5ea0e59d320000204394b198"
 		formName="testFm"
 		initialAliases={['one', 'two', 'three']}
 		saveActionUrl="#"
@@ -127,7 +126,7 @@ storiesOf('Components|ClayEmptyState', module)
 				{
 					Empty: 'empty',
 					Search: 'search',
-					Success: 'success'
+					Success: 'success',
 				},
 				'search'
 			)}

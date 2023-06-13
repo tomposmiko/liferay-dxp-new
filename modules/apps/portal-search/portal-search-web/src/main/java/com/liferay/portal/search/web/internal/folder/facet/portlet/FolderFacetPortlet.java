@@ -14,10 +14,13 @@
 
 package com.liferay.portal.search.web.internal.folder.facet.portlet;
 
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.search.searcher.SearchRequest;
+import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.web.internal.facet.display.builder.FolderSearchFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.facet.display.context.FolderSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.FolderSearcher;
@@ -109,7 +112,7 @@ public class FolderFacetPortlet extends MVCPortlet {
 					renderRequest));
 
 		FolderSearchFacetDisplayBuilder folderSearchFacetDisplayBuilder =
-			new FolderSearchFacetDisplayBuilder();
+			createFolderSearchFacetDisplayBuilder(renderRequest);
 
 		folderSearchFacetDisplayBuilder.setFacet(facet);
 		folderSearchFacetDisplayBuilder.setFolderTitleLookup(folderTitleLookup);
@@ -119,6 +122,8 @@ public class FolderFacetPortlet extends MVCPortlet {
 			folderFacetConfiguration.getFrequencyThreshold());
 		folderSearchFacetDisplayBuilder.setMaxTerms(
 			folderFacetConfiguration.getMaxTerms());
+		folderSearchFacetDisplayBuilder.setPaginationStartParameterName(
+			getPaginationStartParameterName(portletSharedSearchResponse));
 
 		String parameterName = folderFacetPortletPreferences.getParameterName();
 
@@ -132,8 +137,30 @@ public class FolderFacetPortlet extends MVCPortlet {
 		return folderSearchFacetDisplayBuilder.build();
 	}
 
+	protected FolderSearchFacetDisplayBuilder
+		createFolderSearchFacetDisplayBuilder(RenderRequest renderRequest) {
+
+		try {
+			return new FolderSearchFacetDisplayBuilder(renderRequest);
+		}
+		catch (ConfigurationException configurationException) {
+			throw new RuntimeException(configurationException);
+		}
+	}
+
 	protected String getAggregationName(RenderRequest renderRequest) {
 		return portal.getPortletId(renderRequest);
+	}
+
+	protected String getPaginationStartParameterName(
+		PortletSharedSearchResponse portletSharedSearchResponse) {
+
+		SearchResponse searchResponse =
+			portletSharedSearchResponse.getSearchResponse();
+
+		SearchRequest searchRequest = searchResponse.getRequest();
+
+		return searchRequest.getPaginationStartParameterName();
 	}
 
 	@Reference

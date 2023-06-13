@@ -35,7 +35,7 @@ definition {
 			locator1 = "Button#REPLY_AS",
 			value1 = "Reply as...");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		AssertClick(
 			locator1 = "Link#GUEST",
@@ -126,7 +126,40 @@ definition {
 			value1 = "${entryCommentEdit}");
 	}
 
+	macro getCommentId {
+		var currentURL = selenium.getCurrentUrl();
+		var commentId = StringUtil.extractLast("${currentURL}", "message_");
+
+		echo("commentId: ${commentId}");
+
+		return "${commentId}";
+	}
+
+	macro replyToComment {
+		AssertClick(
+			key_entryComment = "Reply",
+			key_text = "Reply",
+			locator1 = "Comments#ANY_BUTTON_IN_COMMENT",
+			value1 = "Reply");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME_2");
+
+		Type(
+			locator1 = "CKEditor#BODY",
+			value1 = "${commentReply}");
+
+		SelectFrame(value1 = "relative=top");
+
+		AssertClick(
+			locator1 = "Button#REPLY_LAST",
+			value1 = "Reply");
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro subscribePG {
+		AssertElementPresent.pauseAssertVisible(locator1 = "Comments#COMMENT_FIELD");
+
 		AssertClick(
 			locator1 = "Button#SUBSCRIBE",
 			value1 = "Subscribe");
@@ -142,6 +175,20 @@ definition {
 			value1 = "INFO:Comments are unavailable in staged sites.");
 	}
 
+	macro viewNoPG {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Comments#ENTRY_COUNT_PANEL",
+			value1 = "0 COMMENTS");
+
+		AssertElementNotPresent(
+			key_userFullName = "${userFullName}",
+			locator1 = "Comments#USER_NAME");
+
+		AssertElementNotPresent(
+			key_entryComment = "${entryComment}",
+			locator1 = "Comments#COMMENT_BODY_SPECIFIC");
+	}
+
 	macro viewPG {
 		var key_entryComment = "${entryComment}";
 
@@ -152,7 +199,6 @@ definition {
 				locator1 = "Comments#ENTRY_COUNT_PANEL",
 				value1 = "${commentCount} COMMENT");
 		}
-
 		else {
 			AssertTextEquals.assertPartialText(
 				locator1 = "Comments#ENTRY_COUNT_PANEL",
@@ -172,7 +218,8 @@ definition {
 
 	macro viewSubscribedPG {
 		AssertTextEquals(
-			locator1 = "Button#UNSUBSCRIBE",
+			key_text = "Unsubscribe",
+			locator1 = "Button#ANY",
 			value1 = "Unsubscribe");
 	}
 

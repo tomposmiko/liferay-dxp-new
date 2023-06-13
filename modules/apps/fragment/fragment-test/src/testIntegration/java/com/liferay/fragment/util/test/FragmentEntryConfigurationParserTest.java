@@ -56,8 +56,8 @@ public class FragmentEntryConfigurationParserTest {
 				_read("expected-configuration-default-values.json"));
 
 		Assert.assertEquals(
-			expectedConfigurationDefaultValuesJSONObject.toJSONString(),
-			configurationDefaultValuesJSONObject.toJSONString());
+			expectedConfigurationDefaultValuesJSONObject.toString(),
+			configurationDefaultValuesJSONObject.toString());
 	}
 
 	@Test
@@ -86,7 +86,7 @@ public class FragmentEntryConfigurationParserTest {
 	}
 
 	private void _testTranslateConfiguration(String language) throws Exception {
-		JSONObject configurationJSONOjbect = JSONFactoryUtil.createJSONObject(
+		JSONObject configurationJSONObject = JSONFactoryUtil.createJSONObject(
 			_read("configuration_untranslated.json"));
 
 		JSONObject expectedConfigurationTranslatedJSONObject =
@@ -97,9 +97,9 @@ public class FragmentEntryConfigurationParserTest {
 						language)));
 
 		Assert.assertEquals(
-			expectedConfigurationTranslatedJSONObject.toJSONString(),
+			expectedConfigurationTranslatedJSONObject.toString(),
 			_fragmentEntryConfigurationParser.translateConfiguration(
-				configurationJSONOjbect, _getResourceBundle(language)));
+				configurationJSONObject, _getResourceBundle(language)));
 	}
 
 	@Inject

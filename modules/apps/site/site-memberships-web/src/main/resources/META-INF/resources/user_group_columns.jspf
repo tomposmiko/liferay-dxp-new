@@ -15,15 +15,13 @@
 --%>
 
 <%
-LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+int usersCount = UserLocalServiceUtil.searchCount(
+	company.getCompanyId(), StringPool.BLANK, WorkflowConstants.STATUS_ANY,
+	LinkedHashMapBuilder.<String, Object>put(
+		"usersUserGroups", Long.valueOf(userGroup.getUserGroupId())
+	).build());
 
-userParams.put("usersUserGroups", Long.valueOf(userGroup.getUserGroupId()));
-
-int usersCount = UserLocalServiceUtil.searchCount(company.getCompanyId(), StringPool.BLANK, WorkflowConstants.STATUS_ANY, userParams);
-
-List<UserGroupGroupRole> userGroupGroupRoles = UserGroupGroupRoleLocalServiceUtil.getUserGroupGroupRoles(userGroup.getUserGroupId(), siteMembershipsDisplayContext.getGroupId());
-
-String userGroupGroupRolesString = ListUtil.toString(userGroupGroupRoles, UsersAdmin.USER_GROUP_GROUP_ROLE_TITLE_ACCESSOR, StringPool.COMMA_AND_SPACE);
+String userGroupGroupRolesString = ListUtil.toString(UserGroupGroupRoleLocalServiceUtil.getUserGroupGroupRoles(userGroup.getUserGroupId(), siteMembershipsDisplayContext.getGroupId()), UsersAdmin.USER_GROUP_GROUP_ROLE_TITLE_ACCESSOR, StringPool.COMMA_AND_SPACE);
 %>
 
 <c:choose>
@@ -75,7 +73,7 @@ String userGroupGroupRolesString = ListUtil.toString(userGroupGroupRoles, UsersA
 		<c:if test="<%= !selectUserGroup %>">
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-expand table-cell-minw-200"
-				name="site-roles"
+				name="roles"
 				value="<%= HtmlUtil.escape(userGroupGroupRolesString) %>"
 			/>
 

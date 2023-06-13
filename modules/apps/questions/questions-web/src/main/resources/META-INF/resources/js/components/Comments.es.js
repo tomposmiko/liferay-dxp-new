@@ -12,108 +12,107 @@
  * details.
  */
 
+import {useMutation} from '@apollo/client';
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import React, {useCallback, useState} from 'react';
+import {withRouter} from 'react-router-dom';
 
-import {createComment} from '../utils/client.es';
-import lang from '../utils/lang.es';
+import {createCommentQuery} from '../utils/client.es';
+import {getContextLink, stripHTML} from '../utils/utils.es';
 import Comment from './Comment.es';
+import QuestionsEditor from './QuestionsEditor';
+import TextLengthValidation from './TextLengthValidation.es';
 
-export default ({
-	comments,
-	commentsChange,
-	entityId,
-	showNewComment,
-	showNewCommentChange
-}) => {
-	const [comment, setComment] = useState('');
-
-	const postComment = () => {
-		return createComment(comment, entityId).then(data => {
-			setComment('');
-			showNewCommentChange(false);
-			commentsChange([...comments, data]);
-		});
-	};
-
-	const _commentChange = useCallback(
-		comment => {
-			if (commentsChange) {
-				return commentsChange([
-					...comments.filter(o => o.id !== comment.id)
-				]);
-			}
-			return null;
+export default withRouter(
+	({
+		comments,
+		commentsChange,
+		editable = true,
+		entityId,
+		match: {
+			params: {questionId, sectionTitle},
 		},
-		[commentsChange, comments]
-	);
+		showNewComment,
+		showNewCommentChange,
+	}) => {
+		const [comment, setComment] = useState('');
 
-	return (
-		<div>
-			{comments.map(comment => (
-				<Comment
-					comment={comment}
-					commentChange={_commentChange}
-					key={comment.id}
-				/>
-			))}
+		const [createComment] = useMutation(createCommentQuery, {
+			context: getContextLink(`${sectionTitle}/${questionId}`),
+			onCompleted(data) {
+				setComment('');
+				showNewCommentChange(false);
+				commentsChange([
+					...comments,
+					data.createMessageBoardMessageMessageBoardMessage,
+				]);
+			},
+		});
 
-			{showNewComment && (
-				<div
-					className="autofit-padded autofit-row"
-					style={{paddingLeft: '5em'}}
-				>
-					<div className="autofit-col autofit-col-expand">
-						<hr className="question-comment-separator" />
+		const _commentChange = useCallback(
+			(comment) => {
+				if (commentsChange) {
+					return commentsChange([
+						...comments.filter((o) => o.id !== comment.id),
+					]);
+				}
 
-						<div>
-							<ClayForm.Group className="form-group-sm">
-								<textarea
-									className="form-control"
-									onChange={event =>
-										setComment(event.target.value)
-									}
-									value={comment}
-								/>
-							</ClayForm.Group>
-						</div>
+				return null;
+			},
+			[commentsChange, comments]
+		);
 
-						<div className="autofit-row">
-							<ClayButton.Group spaced={true}>
+		return (
+			<div>
+				{comments.map((comment) => (
+					<Comment
+						comment={comment}
+						commentChange={_commentChange}
+						editable={editable}
+						key={comment.id}
+					/>
+				))}
+
+				{editable && showNewComment && (
+					<>
+						<ClayForm.Group small>
+							<QuestionsEditor
+								contents={comment}
+								onChange={(event) => {
+									setComment(event.editor.getData());
+								}}
+							/>
+
+							<TextLengthValidation text={comment} />
+
+							<ClayButton.Group className="c-mt-3" spaced>
 								<ClayButton
-									disabled={comment.length < 15}
+									disabled={stripHTML(comment).length < 15}
 									displayType="primary"
-									onClick={postComment}
-									small={true}
+									onClick={() => {
+										createComment({
+											variables: {
+												articleBody: comment,
+												parentMessageBoardMessageId: entityId,
+											},
+										});
+									}}
 								>
 									{Liferay.Language.get('reply')}
 								</ClayButton>
+
 								<ClayButton
 									displayType="secondary"
 									onClick={() => showNewCommentChange(false)}
-									small={true}
 								>
 									{Liferay.Language.get('cancel')}
 								</ClayButton>
 							</ClayButton.Group>
-
-							<div className="autofit-col autofit-col-expand question-comment-validation">
-								{comment.length < 15 && (
-									<span>
-										{lang.sub(
-											Liferay.Language.get(
-												'x-characters-left'
-											),
-											[15 - comment.length]
-										)}
-									</span>
-								)}
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
-		</div>
-	);
-};
+						</ClayForm.Group>
+					</>
+				)}
+			</div>
+		);
+	}
+);

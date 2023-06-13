@@ -24,7 +24,7 @@ JSONObject dataJSONObject = searchFacet.getData();
 JSONArray rangesJSONArray = dataJSONObject.getJSONArray("ranges");
 %>
 
-<aui:fieldset id='<%= renderResponse.getNamespace() + "rangesId" %>'>
+<aui:fieldset id='<%= liferayPortletResponse.getNamespace() + "rangesId" %>'>
 
 	<%
 	int[] rangesIndexes = new int[rangesJSONArray.length()];
@@ -55,6 +55,6 @@ JSONArray rangesJSONArray = dataJSONObject.getJSONArray("ranges");
 		contentBox: 'fieldset#<portlet:namespace />rangesId',
 		fieldIndexes:
 			'<portlet:namespace /><%= searchFacet.getClassName() %>rangesIndexes',
-		namespace: '<portlet:namespace />'
+		namespace: '<portlet:namespace />',
 	}).render();
 </aui:script>

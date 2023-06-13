@@ -15,6 +15,7 @@
 package com.liferay.oauth.service;
 
 import com.liferay.oauth.model.OAuthApplication;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -61,12 +62,12 @@ public interface OAuthApplicationLocalService
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link OAuthApplicationLocalServiceUtil} to access the o auth application local service. Add custom service methods to <code>com.liferay.oauth.service.impl.OAuthApplicationLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.oauth.service.impl.OAuthApplicationLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the o auth application local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link OAuthApplicationLocalServiceUtil} if injection and service tracking are not available.
 	 */
 
 	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by
-	 {@link #addOAuthApplication(long, String, String, String, int
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addOAuthApplication(long, String, String, String, int
 	 boolean, String, String, ServiceContext)}
 	 */
 	@Deprecated
@@ -85,6 +86,10 @@ public interface OAuthApplicationLocalService
 	/**
 	 * Adds the o auth application to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthApplicationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param oAuthApplication the o auth application
 	 * @return the o auth application that was added
 	 */
@@ -101,10 +106,20 @@ public interface OAuthApplicationLocalService
 	@Transactional(enabled = false)
 	public OAuthApplication createOAuthApplication(long oAuthApplicationId);
 
+	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
+
 	public void deleteLogo(long oAuthApplicationId) throws PortalException;
 
 	/**
 	 * Deletes the o auth application with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthApplicationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthApplicationId the primary key of the o auth application
 	 * @return the o auth application that was removed
@@ -116,6 +131,10 @@ public interface OAuthApplicationLocalService
 
 	/**
 	 * Deletes the o auth application from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthApplicationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthApplication the o auth application
 	 * @return the o auth application that was removed
@@ -132,6 +151,12 @@ public interface OAuthApplicationLocalService
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public <T> T dslQuery(DSLQuery dslQuery);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int dslQueryCount(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -243,7 +268,7 @@ public interface OAuthApplicationLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuthApplication> getOAuthApplications(
 		long companyId, int start, int end,
-		OrderByComparator orderByComparator);
+		OrderByComparator<OAuthApplication> orderByComparator);
 
 	/**
 	 * Returns the number of o auth applications.
@@ -263,6 +288,9 @@ public interface OAuthApplicationLocalService
 	 */
 	public String getOSGiServiceIdentifier();
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -271,7 +299,8 @@ public interface OAuthApplicationLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuthApplication> search(
 		long companyId, String keywords, LinkedHashMap<String, Object> params,
-		int start, int end, OrderByComparator orderByComparator);
+		int start, int end,
+		OrderByComparator<OAuthApplication> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int searchCount(
@@ -289,6 +318,10 @@ public interface OAuthApplicationLocalService
 
 	/**
 	 * Updates the o auth application in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthApplicationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthApplication the o auth application
 	 * @return the o auth application that was updated

@@ -49,20 +49,20 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 			<c:when test="<%= curArticle != null %>">
 
 				<%
-				Map<String, Object> rowData = new HashMap<String, Object>();
-
-				rowData.put("actions", journalDisplayContext.getAvailableActions(curArticle));
-				rowData.put("draggable", !BrowserSnifferUtil.isMobile(request) && (JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.UPDATE)));
-
 				String title = curArticle.getTitle(locale);
 
 				if (Validator.isNull(title)) {
 					title = curArticle.getTitle(LocaleUtil.fromLanguageId(curArticle.getDefaultLanguageId()));
 				}
 
-				rowData.put("title", HtmlUtil.escape(title));
-
-				row.setData(rowData);
+				row.setData(
+					HashMapBuilder.<String, Object>put(
+						"actions", journalDisplayContext.getAvailableActions(curArticle)
+					).put(
+						"draggable", !BrowserSnifferUtil.isMobile(request) && (JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.UPDATE))
+					).put(
+						"title", HtmlUtil.escape(title)
+					).build());
 
 				row.setPrimaryKey(HtmlUtil.escape(curArticle.getArticleId()));
 
@@ -85,9 +85,16 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 
 				<c:choose>
 					<c:when test='<%= Objects.equals(journalDisplayContext.getDisplayStyle(), "descriptive") %>'>
+
+						<%
+						List<JournalArticle> articles = JournalArticleLocalServiceUtil.getArticles(curArticle.getGroupId(), curArticle.getArticleId(), 0, 1, new ArticleVersionComparator(true));
+
+						JournalArticle article = articles.get(0);
+						%>
+
 						<liferay-ui:search-container-column-text>
 							<liferay-ui:user-portrait
-								userId="<%= curArticle.getUserId() %>"
+								userId="<%= article.getUserId() %>"
 							/>
 						</liferay-ui:search-container-column-text>
 
@@ -102,7 +109,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 							%>
 
 							<span class="text-default">
-								<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(curArticle.getUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
+								<liferay-ui:message arguments="<%= new String[] {modifiedDateDescription, HtmlUtil.escape(curArticle.getUserName())} %>" key="modified-x-ago-by-x" />
 							</span>
 
 							<p class="font-weight-bold h5">
@@ -119,14 +126,16 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 
 							<span class="text-default">
 								<c:if test="<%= !curArticle.isApproved() && curArticle.hasApprovedVersion() %>">
-									<span class="label label-success text-uppercase">
-										<liferay-ui:message key="approved" />
-									</span>
+									<clay:label
+										displayType="success"
+										label="approved"
+									/>
 								</c:if>
 
-								<span class="label label-<%= WorkflowConstants.getStatusStyle(curArticle.getStatus()) %> text-uppercase">
-									<liferay-ui:message key="<%= WorkflowConstants.getStatusLabel(curArticle.getStatus()) %>" />
-								</span>
+								<clay:label
+									displayType="<%= WorkflowConstants.getStatusStyle(curArticle.getStatus()) %>"
+									label="<%= WorkflowConstants.getStatusLabel(curArticle.getStatus()) %>"
+								/>
 							</span>
 						</liferay-ui:search-container-column-text>
 
@@ -165,7 +174,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 						/>
 
 						<liferay-ui:search-container-column-text
-							cssClass="table-cell-expand table-cell-minw-200"
+							cssClass="table-cell-expand table-cell-minw-200 text-truncate"
 							name="description"
 							value="<%= StringUtil.shorten(HtmlUtil.stripHtml(curArticle.getDescription(locale)), 200) %>"
 						/>
@@ -178,10 +187,14 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 							/>
 						</c:if>
 
+						<%
+						List<JournalArticle> articles = JournalArticleLocalServiceUtil.getArticles(curArticle.getGroupId(), curArticle.getArticleId(), 0, 1, new ArticleVersionComparator(true));
+						%>
+
 						<liferay-ui:search-container-column-text
 							cssClass="table-cell-expand-smallest table-cell-minw-100"
 							name="author"
-							value="<%= HtmlUtil.escape(PortalUtil.getUserName(curArticle)) %>"
+							value="<%= HtmlUtil.escape(PortalUtil.getUserName(articles.get(0))) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
@@ -189,21 +202,31 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 							name="status"
 						>
 							<c:if test="<%= !curArticle.isApproved() && curArticle.hasApprovedVersion() %>">
-								<span class="label label-success text-uppercase">
-									<liferay-ui:message key="approved" />
-								</span>
+								<clay:label
+									displayType="success"
+									label="approved"
+								/>
 							</c:if>
 
-							<span class="label label-<%= WorkflowConstants.getStatusStyle(curArticle.getStatus()) %> text-uppercase">
-								<liferay-ui:message key="<%= WorkflowConstants.getStatusLabel(curArticle.getStatus()) %>" />
-							</span>
+							<clay:label
+								displayType="<%= WorkflowConstants.getStatusStyle(curArticle.getStatus()) %>"
+								label="<%= WorkflowConstants.getStatusLabel(curArticle.getStatus()) %>"
+							/>
 						</liferay-ui:search-container-column-text>
 
-						<liferay-ui:search-container-column-date
-							cssClass="table-cell-expand-smallest table-cell-ws-nowrap"
-							name="modified-date"
-							value="<%= curArticle.getModifiedDate() %>"
-						/>
+						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand-smallest"
+							name="modified"
+						>
+
+							<%
+							Date createDate = curArticle.getModifiedDate();
+
+							String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - createDate.getTime(), true);
+							%>
+
+							<liferay-ui:message arguments="<%= new String[] {modifiedDateDescription, HtmlUtil.escape(curArticle.getUserName())} %>" key="modified-x-ago-by-x" />
+						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-date
 							cssClass="table-cell-expand-smallest table-cell-ws-nowrap"
@@ -233,15 +256,18 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 			<c:when test="<%= curFolder != null %>">
 
 				<%
-				Map<String, Object> rowData = new HashMap<String, Object>();
-
-				rowData.put("actions", journalDisplayContext.getAvailableActions(curFolder));
-				rowData.put("draggable", !BrowserSnifferUtil.isMobile(request) && (JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE)));
-				rowData.put("folder", true);
-				rowData.put("folder-id", curFolder.getFolderId());
-				rowData.put("title", HtmlUtil.escape(curFolder.getName()));
-
-				row.setData(rowData);
+				row.setData(
+					HashMapBuilder.<String, Object>put(
+						"actions", journalDisplayContext.getAvailableActions(curFolder)
+					).put(
+						"draggable", !BrowserSnifferUtil.isMobile(request) && (JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE))
+					).put(
+						"folder", true
+					).put(
+						"folder-id", curFolder.getFolderId()
+					).put(
+						"title", HtmlUtil.escape(curFolder.getName())
+					).build());
 				row.setPrimaryKey(String.valueOf(curFolder.getPrimaryKey()));
 
 				PortletURL rowURL = liferayPortletResponse.createRenderURL();
@@ -326,7 +352,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 						/>
 
 						<liferay-ui:search-container-column-text
-							cssClass="table-cell-expand table-cell-minw-200"
+							cssClass="table-cell-expand table-cell-minw-200 text-truncate"
 							name="description"
 							value="<%= HtmlUtil.escape(curFolder.getDescription()) %>"
 						/>
@@ -399,15 +425,15 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 		editEntryUrl: '<portlet:actionURL />',
 		form: {
 			method: 'POST',
-			node: A.one(document.<portlet:namespace />fm)
+			node: A.one(document.<portlet:namespace />fm),
 		},
 		moveEntryUrl:
-			'<portlet:renderURL><portlet:param name="mvcPath" value="/move_entries.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
+			'<portlet:renderURL><portlet:param name="mvcPath" value="/move_articles_and_folders.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
 		namespace: '<portlet:namespace />',
-		searchContainerId: 'articles'
+		searchContainerId: 'articles',
 	});
 
-	var clearJournalNavigationHandles = function(event) {
+	var clearJournalNavigationHandles = function (event) {
 		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
 			journalNavigation.destroy();
 

@@ -15,23 +15,43 @@
 package com.liferay.portal.search.web.internal.facet.display.builder;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
+import com.liferay.portal.kernel.theme.PortletDisplay;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetTermDisplayContext;
+import com.liferay.portal.search.web.internal.user.facet.configuration.UserFacetPortletInstanceConfiguration;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.portlet.RenderRequest;
+
 /**
  * @author André de Oliveira
  */
 public class UserSearchFacetDisplayBuilder {
+
+	public UserSearchFacetDisplayBuilder(RenderRequest renderRequest)
+		throws ConfigurationException {
+
+		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+
+		_userFacetPortletInstanceConfiguration =
+			portletDisplay.getPortletInstanceConfiguration(
+				UserFacetPortletInstanceConfiguration.class);
+	}
 
 	public UserSearchFacetDisplayContext build() {
 		boolean nothingSelected = isNothingSelected();
@@ -47,13 +67,19 @@ public class UserSearchFacetDisplayBuilder {
 		UserSearchFacetDisplayContext userSearchFacetDisplayContext =
 			new UserSearchFacetDisplayContext();
 
+		userSearchFacetDisplayContext.setDisplayStyleGroupId(
+			getDisplayStyleGroupId());
 		userSearchFacetDisplayContext.setNothingSelected(nothingSelected);
+		userSearchFacetDisplayContext.setPaginationStartParameterName(
+			_paginationStartParameterName);
 		userSearchFacetDisplayContext.setParamName(_paramName);
 		userSearchFacetDisplayContext.setParamValue(getFirstParamValue());
 		userSearchFacetDisplayContext.setParamValues(_paramValues);
 		userSearchFacetDisplayContext.setRenderNothing(renderNothing);
 		userSearchFacetDisplayContext.setTermDisplayContexts(
 			buildTermDisplayContexts(termCollectors));
+		userSearchFacetDisplayContext.setUserFacetPortletInstanceConfiguration(
+			_userFacetPortletInstanceConfiguration);
 
 		return userSearchFacetDisplayContext;
 	}
@@ -72,6 +98,12 @@ public class UserSearchFacetDisplayBuilder {
 
 	public void setMaxTerms(int maxTerms) {
 		_maxTerms = maxTerms;
+	}
+
+	public void setPaginationStartParameterName(
+		String paginationStartParameterName) {
+
+		_paginationStartParameterName = paginationStartParameterName;
 	}
 
 	public void setParamName(String paramName) {
@@ -138,6 +170,17 @@ public class UserSearchFacetDisplayBuilder {
 		return userSearchFacetTermDisplayContexts;
 	}
 
+	protected long getDisplayStyleGroupId() {
+		long displayStyleGroupId =
+			_userFacetPortletInstanceConfiguration.displayStyleGroupId();
+
+		if (displayStyleGroupId <= 0) {
+			displayStyleGroupId = _themeDisplay.getScopeGroupId();
+		}
+
+		return displayStyleGroupId;
+	}
+
 	protected List<UserSearchFacetTermDisplayContext>
 		getEmptyTermDisplayContexts() {
 
@@ -166,6 +209,10 @@ public class UserSearchFacetDisplayBuilder {
 	}
 
 	protected List<TermCollector> getTermCollectors() {
+		if (_facet == null) {
+			return Collections.emptyList();
+		}
+
 		FacetCollector facetCollector = _facet.getFacetCollector();
 
 		if (facetCollector != null) {
@@ -195,7 +242,11 @@ public class UserSearchFacetDisplayBuilder {
 	private boolean _frequenciesVisible;
 	private int _frequencyThreshold;
 	private int _maxTerms;
+	private String _paginationStartParameterName;
 	private String _paramName;
 	private List<String> _paramValues = Collections.emptyList();
+	private final ThemeDisplay _themeDisplay;
+	private final UserFacetPortletInstanceConfiguration
+		_userFacetPortletInstanceConfiguration;
 
 }

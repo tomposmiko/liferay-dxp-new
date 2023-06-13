@@ -21,7 +21,7 @@ Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 
 long folderId = BeanParamUtil.getLong(folder, request, "folderId", DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectFolder");
+long selectedFolderId = ParamUtil.getLong(request, "selectedFolderId", folderId);
 
 long repositoryId = scopeGroupId;
 String folderName = LanguageUtil.get(request, "home");
@@ -36,7 +36,7 @@ if (folder != null) {
 DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlRequestHelper);
 %>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<aui:form method="post" name="selectFolderFm">
 		<liferay-ui:breadcrumb
 			showCurrentGroup="<%= false %>"
@@ -58,16 +58,22 @@ DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlReques
 				<aui:button href="<%= editFolderURL %>" value="add-folder" />
 			</c:if>
 
-			<%
-			Map<String, Object> data = new HashMap<String, Object>();
-
-			data.put("folderid", folderId);
-			data.put("folderissupportsmetadata", (folder != null) ? folder.isSupportsMetadata() : Boolean.TRUE.toString());
-			data.put("folderissupportssocial", (folder != null) ? folder.isSupportsSocial() : Boolean.TRUE.toString());
-			data.put("foldername", folderName);
-			%>
-
-			<aui:button cssClass="selector-button" data="<%= data %>" value="select-this-folder" />
+			<aui:button
+				cssClass="selector-button"
+				data='<%=
+					HashMapBuilder.<String, Object>put(
+						"folderid", folderId
+					).put(
+						"folderissupportsmetadata", (folder != null) ? folder.isSupportsMetadata() : Boolean.TRUE.toString()
+					).put(
+						"folderissupportssocial", (folder != null) ? folder.isSupportsSocial() : Boolean.TRUE.toString()
+					).put(
+						"foldername", folderName
+					).build()
+				%>'
+				disabled="<%= folderId == selectedFolderId %>"
+				value="select-this-folder"
+			/>
 		</aui:button-row>
 
 		<%
@@ -76,10 +82,12 @@ DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlReques
 		portletURL.setParameter("mvcRenderCommandName", "/document_library/select_folder");
 		portletURL.setParameter("folderId", String.valueOf(folderId));
 		portletURL.setParameter("ignoreRootFolder", Boolean.TRUE.toString());
+		portletURL.setParameter("selectedFolderId", String.valueOf(selectedFolderId));
 		portletURL.setParameter("showMountFolder", String.valueOf(dlVisualizationHelper.isMountFolderVisible()));
 		%>
 
 		<liferay-ui:search-container
+			cssClass="pb-6"
 			iteratorURL="<%= portletURL %>"
 			total="<%= DLAppServiceUtil.getFoldersCount(repositoryId, folderId, dlVisualizationHelper.isMountFolderVisible()) %>"
 		>
@@ -97,6 +105,7 @@ DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlReques
 					<portlet:param name="mvcRenderCommandName" value="/document_library/select_folder" />
 					<portlet:param name="folderId" value="<%= String.valueOf(curFolder.getFolderId()) %>" />
 					<portlet:param name="ignoreRootFolder" value="<%= Boolean.TRUE.toString() %>" />
+					<portlet:param name="selectedFolderId" value="<%= String.valueOf(selectedFolderId) %>" />
 					<portlet:param name="showMountFolder" value="<%= String.valueOf(dlVisualizationHelper.isMountFolderVisible()) %>" />
 				</liferay-portlet:renderURL>
 
@@ -150,17 +159,22 @@ DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlReques
 
 				<liferay-ui:search-container-column-text>
 					<c:if test="<%= rowURL != null %>">
-
-						<%
-						Map<String, Object> data = new HashMap<String, Object>();
-
-						data.put("folderid", curFolder.getFolderId());
-						data.put("folderissupportsmetadata", curFolder.isSupportsMetadata());
-						data.put("folderissupportssocial", curFolder.isSupportsSocial());
-						data.put("foldername", curFolder.getName());
-						%>
-
-						<aui:button cssClass="selector-button" data="<%= data %>" value="select" />
+						<aui:button
+							cssClass="selector-button"
+							data='<%=
+								HashMapBuilder.<String, Object>put(
+									"folderid", curFolder.getFolderId()
+								).put(
+									"folderissupportsmetadata", curFolder.isSupportsMetadata()
+								).put(
+									"folderissupportssocial", curFolder.isSupportsSocial()
+								).put(
+									"foldername", curFolder.getName()
+								).build()
+							%>'
+							disabled="<%= curFolder.getFolderId() == selectedFolderId %>"
+							value="select"
+						/>
 					</c:if>
 				</liferay-ui:search-container-column-text>
 			</liferay-ui:search-container-row>
@@ -170,11 +184,4 @@ DLVisualizationHelper dlVisualizationHelper = new DLVisualizationHelper(dlReques
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
-</div>
-
-<aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectFolderFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
-	);
-</aui:script>
+</clay:container-fluid>

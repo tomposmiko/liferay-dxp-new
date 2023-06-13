@@ -13,7 +13,7 @@ import {
 	fetch,
 	navigate,
 	openSimpleInputModal,
-	openToast
+	openToast,
 } from 'frontend-js-web';
 
 const TIME_POLLING = 500;
@@ -44,29 +44,31 @@ class DocumentLibraryOpener {
 
 	_polling({statusURL}) {
 		return fetch(statusURL)
-			.then(response => {
+			.then((response) => {
 				if (!response.ok) {
 					throw DEFAULT_ERROR;
 				}
 
 				return response.json();
 			})
-			.then(response => {
+			.then((response) => {
 				if (response.complete) {
 					this._openExternal({
-						externalURL: response.office365EditURL
+						externalURL: response.office365EditURL,
 					});
-				} else if (response.error) {
+				}
+				else if (response.error) {
 					throw DEFAULT_ERROR;
-				} else {
-					return new Promise(resolve => {
+				}
+				else {
+					return new Promise((resolve) => {
 						setTimeout(() => {
 							this._polling({statusURL}).then(resolve);
 						}, TIME_POLLING);
 					});
 				}
 			})
-			.catch(error => {
+			.catch((error) => {
 				this._showError(error);
 			});
 	}
@@ -74,13 +76,12 @@ class DocumentLibraryOpener {
 	_showError(message) {
 		openToast({
 			message,
-			title: Liferay.Language.get('error'),
-			type: 'danger'
+			type: 'danger',
 		});
 	}
 
 	_showLoading({dialogMessage}) {
-		return new Promise(resolve => {
+		return new Promise((resolve) => {
 			Liferay.Util.openWindow(
 				{
 					dialog: {
@@ -90,9 +91,9 @@ class DocumentLibraryOpener {
 						modal: true,
 						resizable: false,
 						title: '',
-						width: 320
+						width: 320,
 					},
-					id: this._dialogLoadingId
+					id: this._dialogLoadingId,
 				},
 				() => {
 					setTimeout(resolve, TIME_SHOW_MSG);
@@ -108,25 +109,25 @@ class DocumentLibraryOpener {
 					'the-document-has-been-checked-out-please-on-finish-editing-check-in-the-document-to-save-changes-into-the-document-library'
 				),
 				style: 'info',
-				title: Liferay.Language.get('info')
+				title: Liferay.Language.get('info'),
 			},
 			dialogTitle,
 			formSubmitURL,
 			mainFieldLabel: Liferay.Language.get('title'),
 			mainFieldName: 'title',
 			namespace: this._namespace,
-			onFormSuccess: serverResponseContent => {
+			onFormSuccess: (serverResponseContent) => {
 				if (serverResponseContent.oneDriveBackgroundTaskStatusURL) {
 					this.open({
 						dialogMessage: serverResponseContent.dialogMessage,
 						refresh: true,
 						statusURL:
-							serverResponseContent.oneDriveBackgroundTaskStatusURL
+							serverResponseContent.oneDriveBackgroundTaskStatusURL,
 					});
 				}
 			},
 			spritemap:
-				Liferay.ThemeDisplay.getPathThemeImages() + '/lexicon/icons.svg'
+				Liferay.ThemeDisplay.getPathThemeImages() + '/clay/icons.svg',
 		});
 	}
 
@@ -136,29 +137,31 @@ class DocumentLibraryOpener {
 		const loadingPromise = this._showLoading({
 			dialogMessage: Liferay.Language.get(
 				'you-are-being-redirected-to-an-external-editor-to-edit-this-document'
-			)
+			),
 		});
 
 		const fetchPromise = fetch(formSubmitURL)
-			.then(response => {
+			.then((response) => {
 				if (!response.ok) {
 					throw DEFAULT_ERROR;
 				}
 
 				return response.json();
 			})
-			.then(response => {
+			.then((response) => {
 				if (response.redirectURL) {
 					navigate(response.redirectURL);
-				} else if (response.oneDriveBackgroundTaskStatusURL) {
+				}
+				else if (response.oneDriveBackgroundTaskStatusURL) {
 					return this._polling({
-						statusURL: response.oneDriveBackgroundTaskStatusURL
+						statusURL: response.oneDriveBackgroundTaskStatusURL,
 					});
-				} else if (response.error) {
+				}
+				else if (response.error) {
 					throw response.error.errorMessage || DEFAULT_ERROR;
 				}
 			})
-			.catch(error => {
+			.catch((error) => {
 				this._showError(error);
 			});
 
@@ -170,12 +173,12 @@ class DocumentLibraryOpener {
 			'you-are-being-redirected-to-an-external-editor-to-edit-this-document'
 		),
 		statusURL,
-		refresh = false
+		refresh = false,
 	}) {
 		this._refreshAfterNavigate = refresh;
 
 		const loadingPromise = this._showLoading({
-			dialogMessage
+			dialogMessage,
 		});
 		const pollingPromise = this._polling({statusURL});
 

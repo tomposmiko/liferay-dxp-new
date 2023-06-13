@@ -17,6 +17,8 @@ package com.liferay.portal.workflow.metrics.rest.client.dto.v1_0;
 import com.liferay.portal.workflow.metrics.rest.client.function.UnsafeSupplier;
 import com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0.CalendarSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Calendar {
+public class Calendar implements Cloneable, Serializable {
+
+	public static Calendar toDTO(String json) {
+		return CalendarSerDes.toDTO(json);
+	}
 
 	public Boolean getDefaultCalendar() {
 		return defaultCalendar;
@@ -88,6 +94,11 @@ public class Calendar {
 	}
 
 	protected String title;
+
+	@Override
+	public Calendar clone() throws CloneNotSupportedException {
+		return (Calendar)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

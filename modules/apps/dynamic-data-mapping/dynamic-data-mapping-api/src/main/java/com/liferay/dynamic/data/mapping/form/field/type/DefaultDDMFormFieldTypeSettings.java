@@ -92,6 +92,11 @@ public interface DefaultDDMFormFieldTypeSettings
 	)
 	public boolean localizable();
 
+	@DDMFormField(visibilityExpression = "FALSE")
+	public default boolean nativeField() {
+		return false;
+	}
+
 	@DDMFormField(
 		label = "%predefined-value",
 		properties = {
@@ -119,10 +124,7 @@ public interface DefaultDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		label = "%help-text",
-		properties = {
-			"placeholder=%enter-help-text",
-			"tooltip=%add-a-comment-to-help-users-understand-the-field-label"
-		},
+		properties = "tooltip=%add-a-comment-to-help-users-understand-the-field-label",
 		type = "text"
 	)
 	public LocalizedValue tip();

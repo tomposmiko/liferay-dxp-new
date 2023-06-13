@@ -162,7 +162,7 @@ if (WebFormUtil.getTableRowsCount(company.getCompanyId(), databaseTableName) > 0
 								</liferay-portlet:actionURL>
 
 								<%
-								String taglibDelete = "submitForm(document." + renderResponse.getNamespace() + "fm, '" + deleteURL + "');";
+								String taglibDelete = "submitForm(document." + liferayPortletResponse.getNamespace() + "fm, '" + deleteURL + "');";
 								%>
 
 								<aui:button onClick="<%= taglibDelete %>" value="delete-data" />
@@ -231,7 +231,7 @@ if (WebFormUtil.getTableRowsCount(company.getCompanyId(), databaseTableName) > 0
 
 <c:if test="<%= !fieldsEditingDisabled %>">
 	<aui:script use="aui-base,liferay-auto-fields">
-		var toggleOptions = function(event) {
+		var toggleOptions = function (event) {
 			var instance = this;
 
 			var formRow = instance.ancestor('.lfr-form-row');
@@ -242,7 +242,8 @@ if (WebFormUtil.getTableRowsCount(company.getCompanyId(), databaseTableName) > 0
 			if (value === 'options' || value === 'radio') {
 				optionsDiv.all('label').show();
 				optionsDiv.show();
-			} else {
+			}
+			else {
 				optionsDiv.hide();
 			}
 
@@ -275,7 +276,7 @@ if (WebFormUtil.getTableRowsCount(company.getCompanyId(), databaseTableName) > 0
 		webFields.delegate(['change', 'click', 'keydown'], toggleOptions, 'select');
 
 		<c:if test="<%= webFormServiceConfiguration.validationScriptEnable() %>">
-			var toggleValidationOptions = function(event) {
+			var toggleValidationOptions = function (event) {
 				this.next().toggle();
 			};
 
@@ -284,7 +285,7 @@ if (WebFormUtil.getTableRowsCount(company.getCompanyId(), databaseTableName) > 0
 
 		webFields.delegate(
 			'change',
-			function(event) {
+			function (event) {
 				var input = event.currentTarget;
 
 				var row = input.ancestor('.field-row');
@@ -309,7 +310,7 @@ if (WebFormUtil.getTableRowsCount(company.getCompanyId(), databaseTableName) > 0
 				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD %>" />
 			</liferay-portlet:renderURL>
 
-			url: '<%= editFieldURL %>'
+			url: '<%= editFieldURL %>',
 		}).render();
 	</aui:script>
 </c:if>

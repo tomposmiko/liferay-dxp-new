@@ -3,6 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
+	property testray.component.names = "Theme";
 	property testray.main.component.name = "Fragments";
 
 	setUp {
@@ -15,6 +16,12 @@ definition {
 		JSONFragment.addFragmentCollection(
 			groupName = "Test Site Name",
 			name = "Collection Name");
+
+		JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+			contentType = "Web Content Article",
+			displayPageTemplateEntryName = "Display Page Name",
+			groupName = "Test Site Name",
+			subType = "Basic Web Content");
 	}
 
 	tearDown {
@@ -32,14 +39,17 @@ definition {
 	@priority = "5"
 	test AddCheckboxConfigurationFragmentToDisplayPageTemplate {
 		property portal.acceptance = "true";
+		property portal.upstream = "true";
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "checkbox_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "checkbox_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
 				html = "${htmlSnippet}",
 				name = "Checkbox Fragment Example");
@@ -47,7 +57,7 @@ definition {
 
 		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-		DisplayPageTemplatesAdmin.addDisplayPage(displayPageName = "Display Page Name");
+		DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
 		PageEditor.addFragment(
 			collectionName = "Collection Name",
@@ -83,11 +93,13 @@ definition {
 	test AddItemSelectorConfigurationFragmentToDisplayPageTemplate {
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
 				html = "${htmlSnippet}",
 				name = "itemSelector Fragment Example");
@@ -100,13 +112,14 @@ definition {
 
 		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-		DisplayPageTemplatesAdmin.addDisplayPage(displayPageName = "Display Page Name");
+		DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
 		PageEditor.addFragment(
 			collectionName = "Collection Name",
 			fragmentName = "itemSelector Fragment Example");
 
 		PageEditor.editContentDisplay(
+			fragmentName = "itemSelector Fragment Example",
 			webcontent = "true",
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WebContent Title");
@@ -123,7 +136,6 @@ definition {
 			AssertVisible(
 				key_content = "WC WebContent Content",
 				key_fragmentClass = "configuration",
-				key_position = "1",
 				locator1 = "Fragment#FRAGMENT");
 		}
 	}
@@ -134,11 +146,13 @@ definition {
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "select_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "select_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
 				html = "${htmlSnippet}",
 				name = "Text Fragment Example");
@@ -146,7 +160,7 @@ definition {
 
 		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-		DisplayPageTemplatesAdmin.addDisplayPage(displayPageName = "Display Page Name");
+		DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
 		PageEditor.addFragment(
 			collectionName = "Collection Name",
@@ -176,11 +190,13 @@ definition {
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "text_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "text_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
 				html = "${htmlSnippet}",
 				name = "Text Fragment Example");
@@ -188,7 +204,7 @@ definition {
 
 		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-		DisplayPageTemplatesAdmin.addDisplayPage(displayPageName = "Display Page Name");
+		DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
 		PageEditor.addFragment(
 			collectionName = "Collection Name",
@@ -211,7 +227,6 @@ definition {
 			AssertVisible(
 				key_content = "Updated fragment text",
 				key_fragmentClass = "configuration",
-				key_position = "1",
 				locator1 = "Fragment#FRAGMENT");
 		}
 	}

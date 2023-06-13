@@ -14,16 +14,16 @@
 
 AUI.add(
 	'liferay-calendar-session-listener',
-	A => {
+	(A) => {
 		var CalendarSessionListener = A.Component.create({
 			ATTRS: {
 				calendars: {
-					value: []
+					value: [],
 				},
 
 				scheduler: {
-					value: null
-				}
+					value: null,
+				},
 			},
 
 			NAME: 'calendar-session-listener',
@@ -34,7 +34,7 @@ AUI.add(
 
 					var calendars = instance.get('calendars');
 
-					A.Object.each(calendars, calendar => {
+					A.Object.each(calendars, (calendar) => {
 						var permissions = calendar.get('permissions');
 
 						permissions.DELETE = false;
@@ -49,7 +49,7 @@ AUI.add(
 
 					var scheduler = instance.get('scheduler');
 
-					scheduler.getEvents().forEach(event => {
+					scheduler.getEvents().forEach((event) => {
 						event.set('disabled', true);
 					});
 				},
@@ -83,14 +83,14 @@ AUI.add(
 						'sessionExpired',
 						A.bind(instance._onSessionExpired, instance)
 					);
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.CalendarSessionListener = CalendarSessionListener;
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-component']
+		requires: ['aui-base', 'aui-component'],
 	}
 );

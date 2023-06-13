@@ -60,7 +60,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
-		"mvc.command.name=/anonymize_nonreviewable_uad_data"
+		"mvc.command.name=/user_associated_data/anonymize_nonreviewable_uad_data"
 	},
 	service = MVCRenderCommand.class
 )
@@ -195,13 +195,13 @@ public class AnonymizeNonreviewableUADDataMVCRenderCommand
 		UADApplicationSummaryDisplay uadApplicationSummaryDisplay =
 			new UADApplicationSummaryDisplay();
 
-		Collection<UADAnonymizer> nonreviewableApplicationUADAnonymizers =
+		Collection<UADAnonymizer<?>> nonreviewableApplicationUADAnonymizers =
 			_uadRegistry.getNonreviewableApplicationUADAnonymizers(
 				applicationKey);
 
 		int count = 0;
 
-		for (UADAnonymizer uadAnonymizer :
+		for (UADAnonymizer<?> uadAnonymizer :
 				nonreviewableApplicationUADAnonymizers) {
 
 			count += uadAnonymizer.count(userId);

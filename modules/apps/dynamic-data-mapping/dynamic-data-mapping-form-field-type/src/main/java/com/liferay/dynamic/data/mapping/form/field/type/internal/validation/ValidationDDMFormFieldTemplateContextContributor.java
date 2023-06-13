@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
@@ -49,11 +50,36 @@ public class ValidationDDMFormFieldTemplateContextContributor
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		return HashMapBuilder.<String, Object>put(
-			"value", getValue(ddmFormFieldRenderingContext)
+			"dataType", getDataType(ddmFormField, ddmFormFieldRenderingContext)
+		).put(
+			"value", _getValue(ddmFormFieldRenderingContext)
 		).build();
 	}
 
-	protected Map<String, Object> getValue(
+	protected String getDataType(
+		DDMFormField ddmFormField,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		Map<String, Object> changedProperties =
+			(Map<String, Object>)ddmFormFieldRenderingContext.getProperty(
+				"changedProperties");
+
+		if (MapUtil.isNotEmpty(changedProperties)) {
+			String validationDataType = (String)changedProperties.get(
+				"validationDataType");
+
+			if (Validator.isNotNull(validationDataType)) {
+				return validationDataType;
+			}
+		}
+
+		return ddmFormField.getDataType();
+	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
+
+	private Map<String, Object> _getValue(
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		String valueString = ddmFormFieldRenderingContext.getValue();
@@ -87,9 +113,6 @@ public class ValidationDDMFormFieldTemplateContextContributor
 			"parameter", jsonFactory.createJSONObject()
 		).build();
 	}
-
-	@Reference
-	protected JSONFactory jsonFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ValidationDDMFormFieldTemplateContextContributor.class);

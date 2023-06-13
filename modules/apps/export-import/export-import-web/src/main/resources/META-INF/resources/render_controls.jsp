@@ -45,8 +45,6 @@ for (int i = 0; i < controls.length; i++) {
 			<c:when test="<%= controls[i] instanceof PortletDataHandlerBoolean %>">
 
 				<%
-				Map<String, Object> data = new HashMap<String, Object>();
-
 				PortletDataHandlerBoolean control = (PortletDataHandlerBoolean)controls[i];
 
 				String controlLabel = LanguageUtil.get(request, resourceBundle, control.getControlLabel());
@@ -66,7 +64,9 @@ for (int i = 0; i < controls.length; i++) {
 					}
 				}
 
-				data.put("name", controlLabel);
+				Map<String, Object> data = HashMapBuilder.<String, Object>put(
+					"name", controlLabel
+				).build();
 
 				if (!childControl) {
 					data.put("root-control-id", liferayPortletResponse.getNamespace() + rootControlId);
@@ -114,14 +114,23 @@ for (int i = 0; i < controls.length; i++) {
 
 						String controlValue = MapUtil.getString(parameterMap, control.getNamespacedControlName(), defaultChoice);
 
-						Map<String, Object> data = new HashMap<String, Object>();
-
 						String controlName = LanguageUtil.get(request, resourceBundle, choice);
-
-						data.put("name", controlName);
 					%>
 
-						<aui:input checked="<%= controlValue.equals(choice) %>" data="<%= data %>" disabled="<%= disableInputs %>" helpMessage="<%= control.getHelpMessage(locale, action) %>" label="<%= controlName %>" name="<%= control.getNamespacedControlName() %>" type="radio" value="<%= choice %>" />
+						<aui:input
+							checked="<%= controlValue.equals(choice) %>"
+							data='<%=
+								HashMapBuilder.<String, Object>put(
+									"name", controlName
+								).build()
+							%>'
+							disabled="<%= disableInputs %>"
+							helpMessage="<%= control.getHelpMessage(locale, action) %>"
+							label="<%= controlName %>"
+							name="<%= control.getNamespacedControlName() %>"
+							type="radio"
+							value="<%= choice %>"
+						/>
 
 					<%
 					}

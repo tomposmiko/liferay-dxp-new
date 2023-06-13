@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.renderer.internal;
 
+import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorEvaluateRequest;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorEvaluateResponse;
@@ -26,8 +27,11 @@ import com.liferay.dynamic.data.mapping.model.DDMFormLayoutColumn;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -35,6 +39,8 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +50,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author Marcellus Tavares
  */
@@ -51,11 +59,17 @@ public class DDMFormPagesTemplateContextFactory {
 
 	public DDMFormPagesTemplateContextFactory(
 		DDMForm ddmForm, DDMFormLayout ddmFormLayout,
-		DDMFormRenderingContext ddmFormRenderingContext) {
+		DDMFormRenderingContext ddmFormRenderingContext,
+		DDMStructureLayoutLocalService ddmStructureLayoutLocalService,
+		DDMStructureLocalService ddmStructureLocalService,
+		JSONFactory jsonFactory) {
 
 		_ddmForm = ddmForm;
 		_ddmFormLayout = ddmFormLayout;
 		_ddmFormRenderingContext = ddmFormRenderingContext;
+		_ddmStructureLayoutLocalService = ddmStructureLayoutLocalService;
+		_ddmStructureLocalService = ddmStructureLocalService;
+		_jsonFactory = jsonFactory;
 
 		DDMFormValues ddmFormValues =
 			ddmFormRenderingContext.getDDMFormValues();
@@ -69,16 +83,11 @@ public class DDMFormPagesTemplateContextFactory {
 
 			ddmFormValues = defaultDDMFormValuesFactory.create();
 		}
-		else {
-			removeStaleDDMFormFieldValues(
-				ddmForm.getDDMFormFieldsMap(true),
-				ddmFormValues.getDDMFormFieldValues());
-		}
 
 		_ddmFormValues = ddmFormValues;
 
 		_ddmFormFieldsMap = ddmForm.getDDMFormFieldsMap(true);
-		_ddmFormFieldValuesMap = ddmFormValues.getDDMFormFieldValuesMap();
+		_ddmFormFieldValuesMap = ddmFormValues.getDDMFormFieldValuesMap(true);
 		_locale = ddmFormRenderingContext.getLocale();
 	}
 
@@ -156,11 +165,13 @@ public class DDMFormPagesTemplateContextFactory {
 	protected List<Object> createFieldTemplateContext(String ddmFormFieldName) {
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			new DDMFormFieldTemplateContextFactory(
-				_ddmFormFieldsMap,
+				_ddmFormEvaluator, ddmFormFieldName, _ddmFormFieldsMap,
 				_ddmFormEvaluatorEvaluateResponse.
 					getDDMFormFieldsPropertyChanges(),
 				_ddmFormFieldValuesMap.get(ddmFormFieldName),
-				_ddmFormRenderingContext, _pageEnabled);
+				_ddmFormRenderingContext, _ddmStructureLayoutLocalService,
+				_ddmStructureLocalService, _jsonFactory, _pageEnabled,
+				_ddmFormLayout);
 
 		ddmFormFieldTemplateContextFactory.setDDMFormFieldTypeServicesTracker(
 			_ddmFormFieldTypeServicesTracker);
@@ -333,14 +344,22 @@ public class DDMFormPagesTemplateContextFactory {
 					DDMFormEvaluatorEvaluateRequest.Builder.newBuilder(
 						_ddmForm, _ddmFormValues, _locale);
 
+			HttpServletRequest httpServletRequest =
+				_ddmFormRenderingContext.getHttpServletRequest();
+
 			formEvaluatorEvaluateRequestBuilder.withCompanyId(
-				PortalUtil.getCompanyId(
-					_ddmFormRenderingContext.getHttpServletRequest()));
+				PortalUtil.getCompanyId(httpServletRequest));
+
+			formEvaluatorEvaluateRequestBuilder.withDDMFormLayout(
+				_ddmFormLayout);
+			formEvaluatorEvaluateRequestBuilder.withEditingFieldValue(
+				Validator.isNotNull(
+					httpServletRequest.getParameter("trigger")));
 			formEvaluatorEvaluateRequestBuilder.withGroupId(
 				_ddmFormRenderingContext.getGroupId());
 			formEvaluatorEvaluateRequestBuilder.withUserId(
-				PortalUtil.getUserId(
-					_ddmFormRenderingContext.getHttpServletRequest()));
+				PortalUtil.getUserId(httpServletRequest));
+			formEvaluatorEvaluateRequestBuilder.withViewMode(_isViewMode());
 
 			_ddmFormEvaluatorEvaluateResponse = _ddmFormEvaluator.evaluate(
 				formEvaluatorEvaluateRequestBuilder.build());
@@ -351,6 +370,28 @@ public class DDMFormPagesTemplateContextFactory {
 			throw new IllegalStateException(
 				"Unexpected error occurred during form evaluation", exception);
 		}
+	}
+
+	private boolean _isViewMode() {
+		Boolean viewMode = _ddmFormRenderingContext.getProperty("viewMode");
+
+		if (viewMode != null) {
+			return viewMode;
+		}
+
+		String portletNamespace =
+			_ddmFormRenderingContext.getPortletNamespace();
+
+		if ((portletNamespace != null) &&
+			!StringUtil.equals(
+				portletNamespace,
+				PortalUtil.getPortletNamespace(
+					DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN))) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -365,6 +406,10 @@ public class DDMFormPagesTemplateContextFactory {
 	private final DDMFormLayout _ddmFormLayout;
 	private final DDMFormRenderingContext _ddmFormRenderingContext;
 	private final DDMFormValues _ddmFormValues;
+	private final DDMStructureLayoutLocalService
+		_ddmStructureLayoutLocalService;
+	private final DDMStructureLocalService _ddmStructureLocalService;
+	private final JSONFactory _jsonFactory;
 	private final Locale _locale;
 	private boolean _pageEnabled;
 

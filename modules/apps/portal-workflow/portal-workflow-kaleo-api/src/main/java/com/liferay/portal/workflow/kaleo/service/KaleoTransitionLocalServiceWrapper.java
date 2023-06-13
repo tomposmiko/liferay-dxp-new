@@ -36,6 +36,10 @@ public class KaleoTransitionLocalServiceWrapper
 	/**
 	 * Adds the kaleo transition to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTransitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTransition the kaleo transition
 	 * @return the kaleo transition that was added
 	 */
@@ -51,7 +55,8 @@ public class KaleoTransitionLocalServiceWrapper
 	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoTransition
 			addKaleoTransition(
-				long kaleoDefinitionVersionId, long kaleoNodeId,
+				long kaleoDefinitionId, long kaleoDefinitionVersionId,
+				long kaleoNodeId,
 				com.liferay.portal.workflow.kaleo.definition.Transition
 					transition,
 				com.liferay.portal.workflow.kaleo.model.KaleoNode
@@ -62,8 +67,8 @@ public class KaleoTransitionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTransitionLocalService.addKaleoTransition(
-			kaleoDefinitionVersionId, kaleoNodeId, transition, sourceKaleoNode,
-			targetKaleoNode, serviceContext);
+			kaleoDefinitionId, kaleoDefinitionVersionId, kaleoNodeId,
+			transition, sourceKaleoNode, targetKaleoNode, serviceContext);
 	}
 
 	/**
@@ -78,6 +83,17 @@ public class KaleoTransitionLocalServiceWrapper
 
 		return _kaleoTransitionLocalService.createKaleoTransition(
 			kaleoTransitionId);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTransitionLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	@Override
@@ -97,6 +113,10 @@ public class KaleoTransitionLocalServiceWrapper
 	/**
 	 * Deletes the kaleo transition from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTransitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTransition the kaleo transition
 	 * @return the kaleo transition that was removed
 	 */
@@ -112,6 +132,10 @@ public class KaleoTransitionLocalServiceWrapper
 
 	/**
 	 * Deletes the kaleo transition with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTransitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTransitionId the primary key of the kaleo transition
 	 * @return the kaleo transition that was removed
@@ -136,6 +160,18 @@ public class KaleoTransitionLocalServiceWrapper
 
 		return _kaleoTransitionLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _kaleoTransitionLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _kaleoTransitionLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -349,6 +385,9 @@ public class KaleoTransitionLocalServiceWrapper
 		return _kaleoTransitionLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -359,6 +398,10 @@ public class KaleoTransitionLocalServiceWrapper
 
 	/**
 	 * Updates the kaleo transition in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTransitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTransition the kaleo transition
 	 * @return the kaleo transition that was updated

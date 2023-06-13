@@ -35,6 +35,10 @@ public class TestEntityLocalServiceWrapper
 	/**
 	 * Adds the test entity to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TestEntityLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param testEntity the test entity
 	 * @return the test entity that was added
 	 */
@@ -43,6 +47,17 @@ public class TestEntityLocalServiceWrapper
 		com.liferay.external.data.source.test.model.TestEntity testEntity) {
 
 		return _testEntityLocalService.addTestEntity(testEntity);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _testEntityLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -72,6 +87,10 @@ public class TestEntityLocalServiceWrapper
 	/**
 	 * Deletes the test entity with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TestEntityLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param id the primary key of the test entity
 	 * @return the test entity that was removed
 	 * @throws PortalException if a test entity with the primary key could not be found
@@ -87,6 +106,10 @@ public class TestEntityLocalServiceWrapper
 	/**
 	 * Deletes the test entity from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TestEntityLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param testEntity the test entity
 	 * @return the test entity that was removed
 	 */
@@ -96,6 +119,18 @@ public class TestEntityLocalServiceWrapper
 			com.liferay.external.data.source.test.model.TestEntity testEntity) {
 
 		return _testEntityLocalService.deleteTestEntity(testEntity);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _testEntityLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _testEntityLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -219,6 +254,9 @@ public class TestEntityLocalServiceWrapper
 		return _testEntityLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -273,6 +311,10 @@ public class TestEntityLocalServiceWrapper
 
 	/**
 	 * Updates the test entity in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TestEntityLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param testEntity the test entity
 	 * @return the test entity that was updated

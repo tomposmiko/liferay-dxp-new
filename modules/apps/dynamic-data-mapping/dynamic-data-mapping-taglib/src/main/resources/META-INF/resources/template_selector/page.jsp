@@ -25,11 +25,16 @@ long ddmTemplateGroupId = PortletDisplayTemplateUtil.getDDMTemplateGroupId(theme
 Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 %>
 
-<div class="autofit-row autofit-row-center">
-	<div class="autofit-col inline-item-before">
+<clay:content-row
+	floatElements=""
+	verticalAlign="center"
+>
+	<clay:content-col
+		cssClass="inline-item-before"
+	>
 		<aui:input id="displayStyleGroupId" name="preferences--displayStyleGroupId--" type="hidden" value="<%= String.valueOf(displayStyleGroupId) %>" />
 
-		<aui:select id="displayStyle" inlineField="<%= true %>" label="<%= HtmlUtil.escape(label) %>" name="preferences--displayStyle--">
+		<aui:select id="displayStyle" label="<%= HtmlUtil.escape(label) %>" name="preferences--displayStyle--" wrapperCssClass="c-mb-4">
 			<c:if test="<%= showEmptyOption %>">
 				<aui:option label="default" selected="<%= Validator.isNull(displayStyle) %>" />
 			</c:if>
@@ -55,23 +60,28 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 				if (!DDMTemplatePermission.contains(permissionChecker, curDDMTemplate.getTemplateId(), ActionKeys.VIEW) || !DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY.equals(curDDMTemplate.getType())) {
 					continue;
 				}
-
-						Map<String, Object> data = new HashMap<String, Object>();
-
-						data.put("displaystylegroupid", curDDMTemplate.getGroupId());
 			%>
 
-				<aui:option data="<%= data %>" label="<%= HtmlUtil.escape(curDDMTemplate.getName(locale)) %>" selected="<%= (portletDisplayDDMTemplate != null) && (curDDMTemplate.getTemplateId() == portletDisplayDDMTemplate.getTemplateId()) %>" value="<%= PortletDisplayTemplate.DISPLAY_STYLE_PREFIX + HtmlUtil.escape(curDDMTemplate.getTemplateKey()) %>" />
+				<aui:option
+					data='<%=
+						HashMapBuilder.<String, Object>put(
+							"displaystylegroupid", curDDMTemplate.getGroupId()
+						).build()
+					%>'
+					label="<%= HtmlUtil.escape(curDDMTemplate.getName(locale)) %>"
+					selected="<%= (portletDisplayDDMTemplate != null) && (curDDMTemplate.getTemplateId() == portletDisplayDDMTemplate.getTemplateId()) %>"
+					value="<%= PortletDisplayTemplate.DISPLAY_STYLE_PREFIX + HtmlUtil.escape(curDDMTemplate.getTemplateKey()) %>"
+				/>
 
 			<%
 			}
 			%>
 
 		</aui:select>
-	</div>
+	</clay:content-col>
 
 	<c:if test="<%= !ddmTemplateGroup.isLayoutPrototype() %>">
-		<div class="autofit-col">
+		<clay:content-col>
 			<liferay-ui:icon
 				icon="<%= HtmlUtil.escapeCSS(icon) %>"
 				id="selectDDMTemplate"
@@ -80,9 +90,9 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 				message='<%= LanguageUtil.get(request, "manage-templates") %>'
 				url="javascript:;"
 			/>
-		</div>
+		</clay:content-col>
 	</c:if>
-</div>
+</clay:content-row>
 
 <liferay-portlet:renderURL plid="<%= themeDisplay.getPlid() %>" portletName="<%= PortletProviderUtil.getPortletId(DDMTemplate.class.getName(), PortletProvider.Action.VIEW) %>" var="basePortletURL">
 	<portlet:param name="showHeader" value="<%= Boolean.FALSE.toString() %>" />
@@ -94,13 +104,13 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 	);
 
 	if (selectDDMTemplateLink) {
-		selectDDMTemplateLink.addEventListener('click', function(event) {
+		selectDDMTemplateLink.addEventListener('click', function (event) {
 			Liferay.Util.openDDMPortlet(
 				{
 					basePortletURL: '<%= basePortletURL %>',
 					classNameId: '<%= classNameId %>',
 					dialog: {
-						width: 1024
+						width: 1024,
 					},
 					eventName: '<portlet:namespace />saveTemplate',
 					groupId: <%= ddmTemplateGroupId %>,
@@ -109,9 +119,9 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 					refererPortletName:
 						'<%= PortletKeys.PORTLET_DISPLAY_TEMPLATE %>',
 					title:
-						'<%= UnicodeLanguageUtil.get(request, "widget-templates") %>'
+						'<%= UnicodeLanguageUtil.get(request, "widget-templates") %>',
 				},
-				function(event) {
+				function (event) {
 					if (!event.newVal) {
 						submitForm(
 							document.<portlet:namespace />fm,
@@ -129,7 +139,7 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 	);
 
 	if (displayStyle && displayStyleGroupIdInput) {
-		displayStyle.addEventListener('change', function(event) {
+		displayStyle.addEventListener('change', function (event) {
 			var selectedDisplayStyle = displayStyle.querySelector('option:checked');
 
 			if (selectedDisplayStyle) {

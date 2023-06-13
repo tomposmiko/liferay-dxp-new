@@ -35,13 +35,22 @@ import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.exception.RequiredFileException;
 import com.liferay.document.library.kernel.exception.SourceFileNameException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.service.DLTrashService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.kernel.util.DLValidator;
+import com.liferay.document.library.web.internal.configuration.FFDocumentLibraryDDMEditorConfigurationUtil;
 import com.liferay.document.library.web.internal.settings.DLPortletInstanceSettings;
-import com.liferay.dynamic.data.mapping.kernel.StorageFieldRequiredException;
+import com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException;
+import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLinkLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.util.DDMBeanTranslator;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -49,6 +58,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -68,6 +78,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -87,7 +98,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
-import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -99,6 +109,7 @@ import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -167,10 +178,12 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					WebKeys.UPLOAD_EXCEPTION);
 
 			if (uploadException != null) {
-				Throwable cause = uploadException.getCause();
+				Throwable throwable = uploadException.getCause();
 
 				if (cmd.equals(Constants.ADD_TEMP)) {
-					if (cause instanceof FileUploadBase.IOFileUploadException) {
+					if (throwable instanceof
+							FileUploadBase.IOFileUploadException) {
+
 						if (_log.isInfoEnabled()) {
 							_log.info("Temporary upload was cancelled");
 						}
@@ -178,18 +191,18 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				}
 				else {
 					if (uploadException.isExceededFileSizeLimit()) {
-						throw new FileSizeException(cause);
+						throw new FileSizeException(throwable);
 					}
 
 					if (uploadException.isExceededLiferayFileItemSizeLimit()) {
-						throw new LiferayFileItemException(cause);
+						throw new LiferayFileItemException(throwable);
 					}
 
 					if (uploadException.isExceededUploadRequestSizeLimit()) {
-						throw new UploadRequestSizeException(cause);
+						throw new UploadRequestSizeException(throwable);
 					}
 
-					throw new PortalException(cause);
+					throw new PortalException(throwable);
 				}
 			}
 			else if (cmd.equals(Constants.ADD) ||
@@ -351,32 +364,30 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			String fileName = validFileNameKVP.getKey();
 			String originalFileName = validFileNameKVP.getValue();
 
-			JSONObject jsonObject = JSONUtil.put(
-				"added", Boolean.TRUE
-			).put(
-				"fileName", fileName
-			).put(
-				"originalFileName", originalFileName
-			);
-
-			jsonArray.put(jsonObject);
+			jsonArray.put(
+				JSONUtil.put(
+					"added", Boolean.TRUE
+				).put(
+					"fileName", fileName
+				).put(
+					"originalFileName", originalFileName
+				));
 		}
 
 		for (KeyValuePair invalidFileNameKVP : invalidFileNameKVPs) {
 			String fileName = invalidFileNameKVP.getKey();
 			String errorMessage = invalidFileNameKVP.getValue();
 
-			JSONObject jsonObject = JSONUtil.put(
-				"added", Boolean.FALSE
-			).put(
-				"errorMessage", errorMessage
-			).put(
-				"fileName", fileName
-			).put(
-				"originalFileName", fileName
-			);
-
-			jsonArray.put(jsonObject);
+			jsonArray.put(
+				JSONUtil.put(
+					"added", Boolean.FALSE
+				).put(
+					"errorMessage", errorMessage
+				).put(
+					"fileName", fileName
+				).put(
+					"originalFileName", fileName
+				));
 		}
 
 		JSONPortletResponseUtil.writeJSON(
@@ -623,12 +634,12 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 		fileEntry = _dlTrashService.moveFileEntryToTrash(fileEntryId);
 
-		Map<String, Object> data = HashMapBuilder.<String, Object>put(
-			"trashedModels",
-			ListUtil.fromArray((TrashedModel)fileEntry.getModel())
-		).build();
-
-		addDeleteSuccessData(actionRequest, data);
+		addDeleteSuccessData(
+			actionRequest,
+			HashMapBuilder.<String, Object>put(
+				"trashedModels",
+				ListUtil.fromArray((TrashedModel)fileEntry.getModel())
+			).build());
 	}
 
 	private void _deleteTempFileEntry(
@@ -729,7 +740,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		else if (exception instanceof FileSizeException) {
 			errorMessage = themeDisplay.translate(
 				"please-enter-a-file-with-a-valid-file-size-no-larger-than-x",
-				TextFormatter.formatStorageSize(
+				LanguageUtil.formatStorageSize(
 					_dlValidator.getMaxAllowableSize(),
 					themeDisplay.getLocale()));
 		}
@@ -775,6 +786,30 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		return extensions.toArray(new String[0]);
 	}
 
+	private HttpServletRequest _getDDMStructureHttpServletRequest(
+		HttpServletRequest httpServletRequest, long structureId) {
+
+		DynamicServletRequest dynamicServletRequest = new DynamicServletRequest(
+			httpServletRequest, new HashMap<>());
+
+		String namespace = String.valueOf(structureId);
+
+		Map<String, String[]> parameterMap =
+			httpServletRequest.getParameterMap();
+
+		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+			String parameterName = entry.getKey();
+
+			if (StringUtil.startsWith(parameterName, namespace)) {
+				dynamicServletRequest.setParameterValues(
+					parameterName.substring(namespace.length()),
+					entry.getValue());
+			}
+		}
+
+		return dynamicServletRequest;
+	}
+
 	private String _getSaveAndContinueRedirect(
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			FileEntry fileEntry, String redirect)
@@ -803,6 +838,10 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse,
 			String cmd, Exception exception)
 		throws Exception {
+
+		if (_log.isWarnEnabled()) {
+			_log.warn(exception);
+		}
 
 		if (exception instanceof AssetCategoryException ||
 			exception instanceof AssetTagException) {
@@ -885,9 +924,9 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				"mvcPath", "/document_library/error.jsp");
 		}
 		else {
-			Throwable cause = exception.getCause();
+			Throwable throwable = exception.getCause();
 
-			if (cause instanceof DuplicateFileEntryException) {
+			if (throwable instanceof DuplicateFileEntryException) {
 				SessionErrors.add(
 					actionRequest, DuplicateFileEntryException.class);
 			}
@@ -918,6 +957,43 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			DLFileEntry.class.getName(), actionRequest);
 
 		_dlAppService.revertFileEntry(fileEntryId, version, serviceContext);
+	}
+
+	private void _setUpDDMFormValues(ServiceContext serviceContext)
+		throws PortalException {
+
+		if (!FFDocumentLibraryDDMEditorConfigurationUtil.
+				useDataEngineEditor()) {
+
+			return;
+		}
+
+		long fileEntryTypeId = ParamUtil.getLong(
+			serviceContext, "fileEntryTypeId", -1);
+
+		if (fileEntryTypeId == -1) {
+			return;
+		}
+
+		DLFileEntryType dlFileEntryType =
+			_dlFileEntryTypeLocalService.getDLFileEntryType(fileEntryTypeId);
+
+		for (com.liferay.dynamic.data.mapping.kernel.DDMStructure ddmStructure :
+				dlFileEntryType.getDDMStructures()) {
+
+			String className =
+				com.liferay.dynamic.data.mapping.kernel.DDMFormValues.class.
+					getName();
+
+			DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
+				_getDDMStructureHttpServletRequest(
+					serviceContext.getRequest(), ddmStructure.getStructureId()),
+				_ddmBeanTranslator.translate(ddmStructure.getDDMForm()));
+
+			serviceContext.setAttribute(
+				className + StringPool.POUND + ddmStructure.getStructureId(),
+				_ddmBeanTranslator.translate(ddmFormValues));
+		}
 	}
 
 	private FileEntry _updateFileEntry(
@@ -998,24 +1074,35 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			ServiceContext serviceContext = _createServiceContext(
 				uploadPortletRequest);
 
+			_setUpDDMFormValues(serviceContext);
+
 			FileEntry fileEntry = null;
 
-			if (cmd.equals(Constants.ADD) ||
-				cmd.equals(Constants.ADD_DYNAMIC)) {
+			if (cmd.equals(Constants.ADD)) {
 
 				// Add file entry
 
 				fileEntry = _dlAppService.addFileEntry(
 					repositoryId, folderId, sourceFileName, contentType, title,
 					description, changeLog, inputStream, size, serviceContext);
+			}
+			else if (cmd.equals(Constants.ADD_DYNAMIC)) {
 
-				if (cmd.equals(Constants.ADD_DYNAMIC)) {
-					JSONObject jsonObject = JSONUtil.put(
-						"fileEntryId", fileEntry.getFileEntryId());
+				// Add file entry
 
-					JSONPortletResponseUtil.writeJSON(
-						actionRequest, actionResponse, jsonObject);
-				}
+				String uniqueFileName = DLUtil.getUniqueFileName(
+					themeDisplay.getScopeGroupId(), folderId, title);
+
+				fileEntry = _dlAppService.addFileEntry(
+					repositoryId, folderId, uniqueFileName, contentType,
+					uniqueFileName, description, changeLog, inputStream, size,
+					serviceContext);
+
+				JSONObject jsonObject = JSONUtil.put(
+					"fileEntryId", fileEntry.getFileEntryId());
+
+				JSONPortletResponseUtil.writeJSON(
+					actionRequest, actionResponse, jsonObject);
 			}
 			else if (cmd.equals(Constants.UPDATE_AND_CHECKIN)) {
 
@@ -1062,9 +1149,24 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		_assetDisplayPageEntryFormProcessor;
 
 	@Reference
+	private DDMBeanTranslator _ddmBeanTranslator;
+
+	@Reference
+	private DDMFormValuesFactory _ddmFormValuesFactory;
+
+	@Reference
+	private DDMStructureLinkLocalService _ddmStructureLinkLocalService;
+
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
 	private DLAppService _dlAppService;
 
 	private volatile DLConfiguration _dlConfiguration;
+
+	@Reference
+	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
 
 	@Reference
 	private DLTrashService _dlTrashService;

@@ -14,13 +14,14 @@ export function reducer(state, action) {
 		case 'ADD_EXPERIMENT':
 			return {
 				...state,
-				experiment: action.payload
+				experiment: action.payload,
+				viewExperimentDetailsURL: action.payload.detailsURL,
 			};
 
 		case 'ADD_VARIANT':
 			return {
 				...state,
-				variants: [...state.variants, action.payload]
+				variants: [...state.variants, action.payload],
 			};
 
 		case 'ARCHIVE_EXPERIMENT':
@@ -30,18 +31,18 @@ export function reducer(state, action) {
 				experiment: null,
 				experimentHistory: [
 					{...state.experiment, status: action.payload.status},
-					...state.experimentHistory
+					...state.experimentHistory,
 				],
 				variants: [],
-				viewExperimentURL: undefined
+				viewExperimentDetailsURL: undefined,
 			};
 
 		case 'CREATE_EXPERIMENT_FINISH':
 			return {
 				...state,
 				createExperimentModal: {
-					active: false
-				}
+					active: false,
+				},
 			};
 
 		case 'CREATE_EXPERIMENT_START':
@@ -51,13 +52,13 @@ export function reducer(state, action) {
 			return {
 				...state,
 				experimentHistory: state.experimentHistory.filter(
-					experiment => {
+					(experiment) => {
 						return (
 							experiment.segmentsExperimentId !==
 							action.payload.experimentId
 						);
 					}
-				)
+				),
 			};
 
 		case 'EDIT_EXPERIMENT':
@@ -67,8 +68,8 @@ export function reducer(state, action) {
 			return {
 				...state,
 				editExperimentModal: {
-					active: false
-				}
+					active: false,
+				},
 			};
 
 		case 'EDIT_EXPERIMENT_START':
@@ -81,8 +82,8 @@ export function reducer(state, action) {
 			return {
 				...state,
 				reviewExperimentModal: {
-					active: false
-				}
+					active: false,
+				},
 			};
 
 		case 'REVIEW_CLICK_TARGET_ELEMENT':
@@ -103,24 +104,25 @@ export function reducer(state, action) {
 		case 'UPDATE_VARIANT':
 			return {
 				...state,
-				variants: state.variants.map(variant => {
+				variants: state.variants.map((variant) => {
 					if (
 						action.payload.variantId ===
 						variant.segmentsExperimentRelId
 					) {
 						return {
 							...variant,
-							...action.payload.changes
+							...action.payload.changes,
 						};
 					}
+
 					return variant;
-				})
+				}),
 			};
 
 		case 'UPDATE_VARIANTS':
 			return {
 				...state,
-				variants: action.payload
+				variants: action.payload,
 			};
 
 		default:
@@ -134,7 +136,7 @@ function _createExperimentStart(state, experimentModalState = {}) {
 		description,
 		error,
 		name,
-		segmentsExperienceId
+		segmentsExperienceId,
 	} = experimentModalState;
 
 	return {
@@ -146,15 +148,15 @@ function _createExperimentStart(state, experimentModalState = {}) {
 			name,
 			segmentsExperienceId: segmentsExperienceId
 				? segmentsExperienceId
-				: selectedExperienceId
-		}
+				: selectedExperienceId,
+		},
 	};
 }
 
 function _editExperiment(state, updatedValues) {
 	return {
 		...state,
-		experiment: {...state.experiment, ...updatedValues}
+		experiment: {...state.experiment, ...updatedValues},
 	};
 }
 
@@ -170,7 +172,7 @@ function _editExperienceStart(state, experiementModalState = {}) {
 		segmentsEntryName,
 		segmentsExperienceId,
 		segmentsExperimentId,
-		status
+		status,
 	} = experiementModalState;
 
 	return {
@@ -191,8 +193,8 @@ function _editExperienceStart(state, experiementModalState = {}) {
 			segmentsExperimentId: segmentsExperimentId
 				? segmentsExperimentId
 				: experiment.segmentsExperimentId,
-			status: status ? status : experiment.status
-		}
+			status: status ? status : experiment.status,
+		},
 	};
 }
 
@@ -204,7 +206,7 @@ function _reviewAndRunExperiment(state) {
 		clickTargetError:
 			state.experiment.goal.value === 'click' &&
 			!state.experiment.goal.target,
-		variantsError: newState.variants.length <= 1
+		variantsError: newState.variants.length <= 1,
 	};
 
 	const errors = Object.entries(newState.errors);
@@ -216,8 +218,8 @@ function _reviewAndRunExperiment(state) {
 			return {
 				...newState,
 				reviewExperimentModal: {
-					active: false
-				}
+					active: false,
+				},
 			};
 		}
 	}
@@ -225,8 +227,8 @@ function _reviewAndRunExperiment(state) {
 	return {
 		...newState,
 		reviewExperimentModal: {
-			active: true
-		}
+			active: true,
+		},
 	};
 }
 
@@ -237,7 +239,7 @@ function _reviewClickTargetElement(state) {
 		...newState.errors,
 		clickTargetError:
 			state.experiment.goal.value === 'click' &&
-			!state.experiment.goal.target
+			!state.experiment.goal.target,
 	};
 
 	return newState;
@@ -248,16 +250,16 @@ function _reviewVariants(state) {
 
 	newState.errors = {
 		...newState.errors,
-		variantsError: state.variants.length <= 1
+		variantsError: state.variants.length <= 1,
 	};
 
 	return newState;
 }
 
 function _runExperiment(state, {experiment, splitVariantsMap}) {
-	const variants = state.variants.map(variant => ({
+	const variants = state.variants.map((variant) => ({
 		...variant,
-		split: splitVariantsMap[variant.segmentsExperimentRelId]
+		split: splitVariantsMap[variant.segmentsExperimentRelId],
 	}));
 
 	return {
@@ -265,9 +267,9 @@ function _runExperiment(state, {experiment, splitVariantsMap}) {
 		error: {},
 		experiment: {
 			...state.experiment,
-			...experiment
+			...experiment,
 		},
-		variants
+		variants,
 	};
 }
 
@@ -276,6 +278,6 @@ function _updateExperimentStatus(state, updatedValues) {
 		...state,
 		errors: {},
 		experiment: {...state.experiment, ...updatedValues},
-		variants: []
+		variants: [],
 	};
 }

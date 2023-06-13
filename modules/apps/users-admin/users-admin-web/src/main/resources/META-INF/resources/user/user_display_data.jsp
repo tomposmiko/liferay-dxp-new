@@ -22,8 +22,10 @@ User selUser = (User)request.getAttribute(UsersAdminWebKeys.SELECTED_USER);
 
 <aui:model-context bean="<%= selUser %>" model="<%= User.class %>" />
 
-<div class="row">
-	<div class="col-md-6">
+<clay:row>
+	<clay:col
+		md="6"
+	>
 		<liferay-ui:success key="verificationEmailSent" message="your-email-verification-code-has-been-sent-and-the-new-email-address-will-be-applied-to-your-account-once-it-has-been-verified" />
 
 		<liferay-ui:error exception="<%= CompanyMaxUsersException.class %>" message="unable-to-create-user-account-because-the-maximum-number-of-users-has-been-reached" />
@@ -46,7 +48,7 @@ User selUser = (User)request.getAttribute(UsersAdminWebKeys.SELECTED_USER);
 
 			List<String> fields = ufe.getFields();
 
-			StringBundler sb = new StringBundler(2 * fields.size() - 1);
+			StringBundler sb = new StringBundler((2 * fields.size()) - 1);
 
 			for (int i = 0; i < fields.size(); i++) {
 				String field = fields.get(i);
@@ -136,20 +138,17 @@ User selUser = (User)request.getAttribute(UsersAdminWebKeys.SELECTED_USER);
 			<liferay-ui:error exception="<%= UserIdException.MustNotBeNull.class %>" message="please-enter-a-user-id" />
 			<liferay-ui:error exception="<%= UserIdException.MustNotBeReserved.class %>" message="the-user-id-you-requested-is-reserved" />
 
-			<aui:input name="userId" type="resource" value="<%= String.valueOf(selUser.getUserId()) %>" />
+			<aui:input cssClass="disabled" name="userId" readonly="true" type="text" value="<%= String.valueOf(selUser.getUserId()) %>" />
 		</c:if>
-	</div>
+	</clay:col>
 
-	<div class="col-md-5">
+	<clay:col
+		md="5"
+	>
 		<div align="middle">
 			<c:if test="<%= selUser != null %>">
 				<c:choose>
 					<c:when test='<%= UsersAdminUtil.hasUpdateFieldPermission(permissionChecker, user, selUser, "portrait") %>'>
-
-						<%
-						UserFileUploadsConfiguration userFileUploadsConfiguration = ConfigurationProviderUtil.getSystemConfiguration(UserFileUploadsConfiguration.class);
-						%>
-
 						<label class="control-label"></label>
 
 						<liferay-ui:logo-selector
@@ -158,7 +157,6 @@ User selUser = (User)request.getAttribute(UsersAdminWebKeys.SELECTED_USER);
 							defaultLogo="<%= selUser.getPortraitId() == 0 %>"
 							defaultLogoURL="<%= UserConstants.getPortraitURL(themeDisplay.getPathImage(), selUser.isMale(), 0, null) %>"
 							logoDisplaySelector=".user-logo"
-							maxFileSize="<%= userFileUploadsConfiguration.imageMaxSize() %>"
 							preserveRatio="<%= true %>"
 							tempImageFileName="<%= String.valueOf(selUser.getUserId()) %>"
 						/>
@@ -169,5 +167,53 @@ User selUser = (User)request.getAttribute(UsersAdminWebKeys.SELECTED_USER);
 				</c:choose>
 			</c:if>
 		</div>
-	</div>
-</div>
+	</clay:col>
+</clay:row>
+
+<portlet:renderURL var="verifyPasswordURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+	<portlet:param name="mvcPath" value="/user/password_verification.jsp" />
+</portlet:renderURL>
+
+<c:if test="<%= (selUser != null) && PrefsPropsUtil.getBoolean(company.getCompanyId(), PropsKeys.COMPANY_SECURITY_UPDATE_PASSWORD_REQUIRED) %>">
+	<aui:script use="liferay-form">
+		Liferay.once('<portlet:namespace />formReady', function () {
+			var form = Liferay.Form.get('<portlet:namespace />fm');
+
+			form.set('onSubmit', function (event) {
+				event.preventDefault();
+
+				var emailAddressInput = document.getElementById(
+					'<portlet:namespace />emailAddress'
+				);
+				var screenNameInput = document.getElementById(
+					'<portlet:namespace />screenName'
+				);
+
+				if (
+					emailAddressInput.value != '<%= selUser.getEmailAddress() %>' ||
+					screenNameInput.value != '<%= selUser.getScreenName() %>'
+				) {
+					Liferay.Util.openModal({
+						customEvents: [
+							{
+								name:
+									'<%= liferayPortletResponse.getNamespace() + "verifyPassword" %>',
+								onEvent: function (event) {
+									submitForm(form.form);
+								},
+							},
+						],
+						height: '320px',
+						id: 'password-verification-dialog',
+						size: 'md',
+						title: '<%= LanguageUtil.get(request, "confirm-password") %>',
+						url: '<%= verifyPasswordURL %>',
+					});
+				}
+				else {
+					submitForm(form.form);
+				}
+			});
+		});
+	</aui:script>
+</c:if>

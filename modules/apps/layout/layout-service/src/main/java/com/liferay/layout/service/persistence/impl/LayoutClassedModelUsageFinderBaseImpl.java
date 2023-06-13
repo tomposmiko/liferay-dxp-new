@@ -60,7 +60,6 @@ public abstract class LayoutClassedModelUsageFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -87,14 +86,5 @@ public abstract class LayoutClassedModelUsageFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutClassedModelUsageFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(LayoutPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

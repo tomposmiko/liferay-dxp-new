@@ -16,31 +16,75 @@ import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
+import ClayLayout from '@clayui/layout';
+import classNames from 'classnames';
+import {openModal} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
+
+import {useHoverItem, useHoveredItemId} from '../../../app/components/Controls';
+import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../../../app/config/constants/editableFragmentEntryProcessor';
+import {ITEM_TYPES} from '../../../app/config/constants/itemTypes';
+import {useSelector} from '../../../app/store/index';
 
 export default function PageContent(props) {
 	const [active, setActive] = useState(false);
 	const {editURL, permissionsURL, viewUsagesURL} = props.actions;
+	const hoverItem = useHoverItem();
+	const hoveredItemId = useHoveredItemId();
+	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
+	const [isHovered, setIsHovered] = useState(false);
 
-	const openWindow = (uri, title) => {
-		Liferay.Util.openWindow({
-			dialog: {
-				destroyOnHide: true,
-				modal: true
-			},
-			dialogIframe: {
-				bodyCssClass: 'dialog-with-footer'
-			},
-			title,
-			uri
+	useEffect(() => {
+		if (hoveredItemId) {
+			const [fragmentEntryLinkId, ...editableId] = hoveredItemId.split(
+				'-'
+			);
+
+			if (fragmentEntryLinks[fragmentEntryLinkId]) {
+				const fragmentEntryLink =
+					fragmentEntryLinks[fragmentEntryLinkId];
+
+				const editableValue =
+					fragmentEntryLink.editableValues[
+						EDITABLE_FRAGMENT_ENTRY_PROCESSOR
+					];
+
+				const editable = editableValue[editableId.join('-')];
+
+				if (editable) {
+					setIsHovered(editable.classPK === props.classPK);
+				}
+			}
+		}
+		else {
+			setIsHovered(false);
+		}
+	}, [fragmentEntryLinks, hoveredItemId, props.classPK]);
+
+	const handleMouseOver = () => {
+		setIsHovered(true);
+
+		hoverItem(`${props.classNameId}-${props.classPK}`, {
+			itemType: ITEM_TYPES.mappedContent,
 		});
 	};
 
+	const handleMouseLeave = () => {
+		setIsHovered(false);
+		hoverItem(null);
+	};
+
 	return (
-		<li className="page-editor__contents__page-content">
+		<li
+			className={classNames('page-editor__contents__page-content', {
+				'page-editor__contents__page-content--mapped-item-hovered': isHovered,
+			})}
+			onMouseLeave={handleMouseLeave}
+			onMouseOver={handleMouseOver}
+		>
 			<div className="d-flex pl-3 pr-2 py-3">
-				<div className="autofit-col autofit-col-expand">
+				<ClayLayout.ContentCol expand>
 					<strong className="list-group-title text-truncate">
 						{props.title}
 					</strong>
@@ -66,7 +110,7 @@ export default function PageContent(props) {
 							{props.status.label}
 						</ClayLabel>
 					</div>
-				</div>
+				</ClayLayout.ContentCol>
 
 				{(editURL || permissionsURL || viewUsagesURL) && (
 					<ClayDropDown
@@ -94,12 +138,14 @@ export default function PageContent(props) {
 							{permissionsURL && (
 								<ClayDropDown.Item
 									key="permissionsURL"
-									onClick={() =>
-										openWindow(
-											permissionsURL,
-											Liferay.Language.get('permissions')
-										)
-									}
+									onClick={() => {
+										openModal({
+											title: Liferay.Language.get(
+												'permissions'
+											),
+											url: permissionsURL,
+										});
+									}}
 								>
 									{Liferay.Language.get('permissions')}
 								</ClayDropDown.Item>
@@ -108,12 +154,14 @@ export default function PageContent(props) {
 							{viewUsagesURL && (
 								<ClayDropDown.Item
 									key="viewUsagesURL"
-									onClick={() =>
-										openWindow(
-											viewUsagesURL,
-											Liferay.Language.get('view-usages')
-										)
-									}
+									onClick={() => {
+										openModal({
+											title: Liferay.Language.get(
+												'view-usages'
+											),
+											url: viewUsagesURL,
+										});
+									}}
 								>
 									{Liferay.Language.get('view-usages')}
 								</ClayDropDown.Item>
@@ -132,8 +180,8 @@ PageContent.propTypes = {
 	status: PropTypes.shape({
 		hasApprovedVersion: PropTypes.bool,
 		label: PropTypes.string,
-		style: PropTypes.string
+		style: PropTypes.string,
 	}),
 	title: PropTypes.string.isRequired,
-	usagesCount: PropTypes.number.isRequired
+	usagesCount: PropTypes.number.isRequired,
 };

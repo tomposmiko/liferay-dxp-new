@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * The persistence utility for the ddm template link service. This utility wraps <code>com.liferay.dynamic.data.mapping.service.persistence.impl.DDMTemplateLinkPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -121,182 +117,6 @@ public class DDMTemplateLinkUtil {
 		DDMTemplateLink ddmTemplateLink, ServiceContext serviceContext) {
 
 		return getPersistence().update(ddmTemplateLink, serviceContext);
-	}
-
-	/**
-	 * Returns all the ddm template links where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @return the matching ddm template links
-	 */
-	public static List<DDMTemplateLink> findByClassNameId(long classNameId) {
-		return getPersistence().findByClassNameId(classNameId);
-	}
-
-	/**
-	 * Returns a range of all the ddm template links where classNameId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMTemplateLinkModelImpl</code>.
-	 * </p>
-	 *
-	 * @param classNameId the class name ID
-	 * @param start the lower bound of the range of ddm template links
-	 * @param end the upper bound of the range of ddm template links (not inclusive)
-	 * @return the range of matching ddm template links
-	 */
-	public static List<DDMTemplateLink> findByClassNameId(
-		long classNameId, int start, int end) {
-
-		return getPersistence().findByClassNameId(classNameId, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the ddm template links where classNameId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMTemplateLinkModelImpl</code>.
-	 * </p>
-	 *
-	 * @param classNameId the class name ID
-	 * @param start the lower bound of the range of ddm template links
-	 * @param end the upper bound of the range of ddm template links (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching ddm template links
-	 */
-	public static List<DDMTemplateLink> findByClassNameId(
-		long classNameId, int start, int end,
-		OrderByComparator<DDMTemplateLink> orderByComparator) {
-
-		return getPersistence().findByClassNameId(
-			classNameId, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the ddm template links where classNameId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMTemplateLinkModelImpl</code>.
-	 * </p>
-	 *
-	 * @param classNameId the class name ID
-	 * @param start the lower bound of the range of ddm template links
-	 * @param end the upper bound of the range of ddm template links (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching ddm template links
-	 */
-	public static List<DDMTemplateLink> findByClassNameId(
-		long classNameId, int start, int end,
-		OrderByComparator<DDMTemplateLink> orderByComparator,
-		boolean useFinderCache) {
-
-		return getPersistence().findByClassNameId(
-			classNameId, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first ddm template link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching ddm template link
-	 * @throws NoSuchTemplateLinkException if a matching ddm template link could not be found
-	 */
-	public static DDMTemplateLink findByClassNameId_First(
-			long classNameId,
-			OrderByComparator<DDMTemplateLink> orderByComparator)
-		throws com.liferay.dynamic.data.mapping.exception.
-			NoSuchTemplateLinkException {
-
-		return getPersistence().findByClassNameId_First(
-			classNameId, orderByComparator);
-	}
-
-	/**
-	 * Returns the first ddm template link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching ddm template link, or <code>null</code> if a matching ddm template link could not be found
-	 */
-	public static DDMTemplateLink fetchByClassNameId_First(
-		long classNameId,
-		OrderByComparator<DDMTemplateLink> orderByComparator) {
-
-		return getPersistence().fetchByClassNameId_First(
-			classNameId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last ddm template link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching ddm template link
-	 * @throws NoSuchTemplateLinkException if a matching ddm template link could not be found
-	 */
-	public static DDMTemplateLink findByClassNameId_Last(
-			long classNameId,
-			OrderByComparator<DDMTemplateLink> orderByComparator)
-		throws com.liferay.dynamic.data.mapping.exception.
-			NoSuchTemplateLinkException {
-
-		return getPersistence().findByClassNameId_Last(
-			classNameId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last ddm template link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching ddm template link, or <code>null</code> if a matching ddm template link could not be found
-	 */
-	public static DDMTemplateLink fetchByClassNameId_Last(
-		long classNameId,
-		OrderByComparator<DDMTemplateLink> orderByComparator) {
-
-		return getPersistence().fetchByClassNameId_Last(
-			classNameId, orderByComparator);
-	}
-
-	/**
-	 * Returns the ddm template links before and after the current ddm template link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param templateLinkId the primary key of the current ddm template link
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next ddm template link
-	 * @throws NoSuchTemplateLinkException if a ddm template link with the primary key could not be found
-	 */
-	public static DDMTemplateLink[] findByClassNameId_PrevAndNext(
-			long templateLinkId, long classNameId,
-			OrderByComparator<DDMTemplateLink> orderByComparator)
-		throws com.liferay.dynamic.data.mapping.exception.
-			NoSuchTemplateLinkException {
-
-		return getPersistence().findByClassNameId_PrevAndNext(
-			templateLinkId, classNameId, orderByComparator);
-	}
-
-	/**
-	 * Removes all the ddm template links where classNameId = &#63; from the database.
-	 *
-	 * @param classNameId the class name ID
-	 */
-	public static void removeByClassNameId(long classNameId) {
-		getPersistence().removeByClassNameId(classNameId);
-	}
-
-	/**
-	 * Returns the number of ddm template links where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @return the number of matching ddm template links
-	 */
-	public static int countByClassNameId(long classNameId) {
-		return getPersistence().countByClassNameId(classNameId);
 	}
 
 	/**
@@ -691,27 +511,9 @@ public class DDMTemplateLinkUtil {
 	}
 
 	public static DDMTemplateLinkPersistence getPersistence() {
-		return _serviceTracker.getService();
+		return _persistence;
 	}
 
-	private static ServiceTracker
-		<DDMTemplateLinkPersistence, DDMTemplateLinkPersistence>
-			_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			DDMTemplateLinkPersistence.class);
-
-		ServiceTracker<DDMTemplateLinkPersistence, DDMTemplateLinkPersistence>
-			serviceTracker =
-				new ServiceTracker
-					<DDMTemplateLinkPersistence, DDMTemplateLinkPersistence>(
-						bundle.getBundleContext(),
-						DDMTemplateLinkPersistence.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile DDMTemplateLinkPersistence _persistence;
 
 }

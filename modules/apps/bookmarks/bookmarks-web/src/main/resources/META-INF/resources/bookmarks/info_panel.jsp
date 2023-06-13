@@ -72,7 +72,7 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(entries)) {
 						add(
 							navigationItem -> {
 								navigationItem.setActive(true);
-								navigationItem.setLabel(LanguageUtil.get(request, "details"));
+								navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "details"));
 							});
 					}
 				}
@@ -140,7 +140,7 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(entries)) {
 						add(
 							navigationItem -> {
 								navigationItem.setActive(true);
-								navigationItem.setLabel(LanguageUtil.get(request, "details"));
+								navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "details"));
 							});
 					}
 				}
@@ -194,7 +194,7 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(entries)) {
 				/>
 			</div>
 
-			<liferay-ui:ratings
+			<liferay-ratings:ratings
 				className="<%= BookmarksEntry.class.getName() %>"
 				classPK="<%= entry.getEntryId() %>"
 				inTrash="<%= entry.isInTrash() %>"
@@ -237,7 +237,7 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(entries)) {
 						add(
 							navigationItem -> {
 								navigationItem.setActive(true);
-								navigationItem.setLabel(LanguageUtil.get(request, "details"));
+								navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "details"));
 							});
 					}
 				}

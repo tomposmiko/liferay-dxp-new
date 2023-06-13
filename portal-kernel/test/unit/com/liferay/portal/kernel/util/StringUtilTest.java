@@ -114,7 +114,7 @@ public class StringUtilTest {
 				hexString.charAt(i * 2),
 				StringUtil.HEX_DIGITS[(data[i] & 0xFF) >> 4]);
 			Assert.assertEquals(
-				hexString.charAt(i * 2 + 1),
+				hexString.charAt((i * 2) + 1),
 				StringUtil.HEX_DIGITS[data[i] & 0x0F]);
 		}
 	}
@@ -543,6 +543,9 @@ public class StringUtilTest {
 			"Hello World",
 			StringUtil.replace(
 				"Hello World", StringPool.BLANK, StringPool.BLANK, map));
+		Assert.assertEquals(
+			"AB Hi CD AB Liferay CD",
+			StringUtil.replace("AB Hi CD AB Liferay CD", "AB ", " CD", map));
 	}
 
 	@Test
@@ -1090,6 +1093,14 @@ public class StringUtilTest {
 		Assert.assertEquals(
 			"Hello World", StringUtil.unquote("\"Hello World\""));
 		Assert.assertEquals("Hello World", StringUtil.unquote("Hello World"));
+	}
+
+	@Test
+	public void testUpperCaseFirstLetter() {
+		Assert.assertEquals("", StringUtil.upperCaseFirstLetter(""));
+		Assert.assertEquals(
+			"Hello World", StringUtil.upperCaseFirstLetter("hello World"));
+		Assert.assertNull(StringUtil.upperCaseFirstLetter(null));
 	}
 
 	@Test

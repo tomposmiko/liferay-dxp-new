@@ -21,17 +21,17 @@ const data = {
 	onTimeInstanceCount: 2,
 	overdueInstanceCount: 1,
 	title: 'Single Approver',
-	untrackedInstanceCount: 3
+	untrackedInstanceCount: 3,
 };
 
 describe('The pending items card component should', () => {
-	let getByTestId;
+	let container;
 
 	afterEach(cleanup);
 
 	beforeEach(() => {
 		const clientMock = {
-			get: jest.fn().mockResolvedValue({data})
+			get: jest.fn().mockResolvedValue({data}),
 		};
 
 		const wrapper = ({children}) => (
@@ -43,11 +43,11 @@ describe('The pending items card component should', () => {
 			{wrapper}
 		);
 
-		getByTestId = renderResult.getByTestId;
+		container = renderResult.container;
 	});
 
 	test('Be rendered with overdue count "1"', () => {
-		const panelBody = getByTestId('panelBody');
+		const panelBody = container.querySelector('.panel-body');
 
 		const overdueLink = panelBody.children[0].children[0];
 		const overdueHeader = overdueLink.children[0].children[0];
@@ -63,7 +63,7 @@ describe('The pending items card component should', () => {
 	});
 
 	test('Be rendered with ontime count "2"', () => {
-		const panelBody = getByTestId('panelBody');
+		const panelBody = container.querySelector('.panel-body');
 
 		const ontimeLink = panelBody.children[0].children[1];
 		const ontimeHeader = ontimeLink.children[0].children[0];
@@ -79,7 +79,7 @@ describe('The pending items card component should', () => {
 	});
 
 	test('Be rendered with untracked count "3"', () => {
-		const panelBody = getByTestId('panelBody');
+		const panelBody = container.querySelector('.panel-body');
 
 		const untrackedLink = panelBody.children[0].children[2];
 		const untrackedHeader = untrackedLink.children[0].children[0];
@@ -96,7 +96,7 @@ describe('The pending items card component should', () => {
 	});
 
 	test('Be rendered with total pending count "6"', () => {
-		const panelBody = getByTestId('panelBody');
+		const panelBody = container.querySelector('.panel-body');
 
 		const totalLink = panelBody.children[0].children[3];
 		const totalHeader = totalLink.children[0].children[0];

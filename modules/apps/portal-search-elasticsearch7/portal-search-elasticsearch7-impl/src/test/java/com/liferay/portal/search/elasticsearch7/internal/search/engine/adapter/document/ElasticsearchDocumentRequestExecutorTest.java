@@ -20,8 +20,12 @@ import com.liferay.portal.search.engine.adapter.document.DeleteDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.UpdateByQueryDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
+import com.liferay.portal.search.query.Query;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mock;
@@ -32,6 +36,11 @@ import org.mockito.MockitoAnnotations;
  * @author Dylan Rebelak
  */
 public class ElasticsearchDocumentRequestExecutorTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -57,7 +66,7 @@ public class ElasticsearchDocumentRequestExecutorTest {
 	@Test
 	public void testExecuteDeleteByQueryDocumentRequest() {
 		DeleteByQueryDocumentRequest deleteByQueryDocumentRequest =
-			new DeleteByQueryDocumentRequest(null);
+			new DeleteByQueryDocumentRequest((Query)null);
 
 		_elasticsearchDocumentRequestExecutor.executeDocumentRequest(
 			deleteByQueryDocumentRequest);
@@ -102,7 +111,7 @@ public class ElasticsearchDocumentRequestExecutorTest {
 	@Test
 	public void testExecuteUpdateByQueryDocumentRequest() {
 		UpdateByQueryDocumentRequest updateByQueryDocumentRequest =
-			new UpdateByQueryDocumentRequest(null, null);
+			new UpdateByQueryDocumentRequest((Query)null, null);
 
 		_elasticsearchDocumentRequestExecutor.executeDocumentRequest(
 			updateByQueryDocumentRequest);

@@ -35,6 +35,10 @@ public class PollsVoteLocalServiceWrapper
 	/**
 	 * Adds the polls vote to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsVoteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param pollsVote the polls vote
 	 * @return the polls vote that was added
 	 */
@@ -53,6 +57,17 @@ public class PollsVoteLocalServiceWrapper
 
 		return _pollsVoteLocalService.addVote(
 			userId, questionId, choiceId, serviceContext);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _pollsVoteLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -80,6 +95,10 @@ public class PollsVoteLocalServiceWrapper
 	/**
 	 * Deletes the polls vote with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsVoteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param voteId the primary key of the polls vote
 	 * @return the polls vote that was removed
 	 * @throws PortalException if a polls vote with the primary key could not be found
@@ -94,6 +113,10 @@ public class PollsVoteLocalServiceWrapper
 	/**
 	 * Deletes the polls vote from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsVoteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param pollsVote the polls vote
 	 * @return the polls vote that was removed
 	 */
@@ -102,6 +125,18 @@ public class PollsVoteLocalServiceWrapper
 		com.liferay.polls.model.PollsVote pollsVote) {
 
 		return _pollsVoteLocalService.deletePollsVote(pollsVote);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _pollsVoteLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _pollsVoteLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -267,6 +302,9 @@ public class PollsVoteLocalServiceWrapper
 		return _pollsVoteLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -384,6 +422,10 @@ public class PollsVoteLocalServiceWrapper
 
 	/**
 	 * Updates the polls vote in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsVoteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param pollsVote the polls vote
 	 * @return the polls vote that was updated

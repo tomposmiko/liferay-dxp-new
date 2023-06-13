@@ -15,6 +15,7 @@
 package com.liferay.oauth.service;
 
 import com.liferay.oauth.model.OAuthUser;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -59,7 +60,7 @@ public interface OAuthUserLocalService
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link OAuthUserLocalServiceUtil} to access the o auth user local service. Add custom service methods to <code>com.liferay.oauth.service.impl.OAuthUserLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.oauth.service.impl.OAuthUserLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the o auth user local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link OAuthUserLocalServiceUtil} if injection and service tracking are not available.
 	 */
 	public OAuthUser addOAuthUser(
 			long userId, long oAuthApplicationId, String accessToken,
@@ -68,6 +69,10 @@ public interface OAuthUserLocalService
 
 	/**
 	 * Adds the o auth user to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthUser the o auth user
 	 * @return the o auth user that was added
@@ -85,7 +90,17 @@ public interface OAuthUserLocalService
 	public OAuthUser createOAuthUser(long oAuthUserId);
 
 	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
+
+	/**
 	 * Deletes the o auth user with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthUserId the primary key of the o auth user
 	 * @return the o auth user that was removed
@@ -99,6 +114,10 @@ public interface OAuthUserLocalService
 
 	/**
 	 * Deletes the o auth user from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthUser the o auth user
 	 * @return the o auth user that was removed
@@ -114,6 +133,12 @@ public interface OAuthUserLocalService
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public <T> T dslQuery(DSLQuery dslQuery);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int dslQueryCount(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -199,7 +224,7 @@ public interface OAuthUserLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuthUser> getOAuthApplicationOAuthUsers(
 		long oAuthApplicationId, int start, int end,
-		OrderByComparator orderByComparator);
+		OrderByComparator<OAuthUser> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getOAuthApplicationOAuthUsersCount(long oAuthApplicationId);
@@ -250,6 +275,9 @@ public interface OAuthUserLocalService
 	 */
 	public String getOSGiServiceIdentifier();
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -257,7 +285,8 @@ public interface OAuthUserLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<OAuthUser> getUserOAuthUsers(
-		long userId, int start, int end, OrderByComparator orderByComparator);
+		long userId, int start, int end,
+		OrderByComparator<OAuthUser> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getUserOAuthUsersCount(long userId);
@@ -269,6 +298,10 @@ public interface OAuthUserLocalService
 
 	/**
 	 * Updates the o auth user in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect OAuthUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param oAuthUser the o auth user
 	 * @return the o auth user that was updated

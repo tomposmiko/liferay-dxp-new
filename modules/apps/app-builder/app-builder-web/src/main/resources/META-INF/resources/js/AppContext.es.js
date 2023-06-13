@@ -19,16 +19,18 @@ const AppContext = createContext();
 const AppContextProvider = ({
 	children,
 	pathFriendlyURLPublic,
+	portletNamespace,
 	...restProps
 }) => {
-	const getStandaloneURL = appId =>
+	const getStandaloneURL = (appId) =>
 		`${Liferay.ThemeDisplay.getPortalURL()}${pathFriendlyURLPublic}/App${appId}`;
 
 	return (
 		<AppContext.Provider
 			value={{
 				getStandaloneURL,
-				...restProps
+				namespace: portletNamespace,
+				...restProps,
 			}}
 		>
 			{children}

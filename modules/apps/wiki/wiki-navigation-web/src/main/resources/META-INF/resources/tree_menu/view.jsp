@@ -19,9 +19,7 @@
 <%
 String title = ParamUtil.getString(request, "title", wikiGroupServiceConfiguration.frontPageName());
 
-String portletId = PortletProviderUtil.getPortletId(WikiPage.class.getName(), PortletProvider.Action.VIEW);
-
-PortletURL viewURL = liferayPortletResponse.createRenderURL(portletId);
+PortletURL viewURL = liferayPortletResponse.createRenderURL(PortletProviderUtil.getPortletId(WikiPage.class.getName(), PortletProvider.Action.VIEW));
 
 viewURL.setParameter("mvcRenderCommandName", "/wiki/view_page");
 
@@ -36,7 +34,7 @@ List<MenuItem> menuItems = MenuItem.fromWikiNode(selNodeId, depth, viewURL);
 			var wikiPageList = A.one('.wiki-navigation-portlet-tree-menu .tree-menu');
 
 			var treeView = new A.TreeView({
-				contentBox: wikiPageList
+				contentBox: wikiPageList,
 			}).render();
 
 			var selected = wikiPageList.one('.tree-node .tag-selected');
@@ -46,7 +44,7 @@ List<MenuItem> menuItems = MenuItem.fromWikiNode(selNodeId, depth, viewURL);
 
 				selectedChild.expand();
 
-				selectedChild.eachParent(function(node) {
+				selectedChild.eachParent(function (node) {
 					if (node instanceof A.TreeNode) {
 						node.expand();
 					}
@@ -68,7 +66,7 @@ private String _buildTreeMenuHTML(List<MenuItem> menuItems, String curTitle, boo
 	}
 
 	for (MenuItem menuItem : menuItems) {
-		String label = menuItem.getLabel();
+		String name = menuItem.getName();
 		String url = menuItem.getURL();
 
 		sb.append("<li class=\"tree-node\">");
@@ -76,18 +74,18 @@ private String _buildTreeMenuHTML(List<MenuItem> menuItems, String curTitle, boo
 		if (Validator.isNotNull(url)) {
 			sb.append("<a ");
 
-			if (label.equals(curTitle)) {
+			if (name.equals(curTitle)) {
 				sb.append("class=\"tag-selected\" ");
 			}
 
 			sb.append("href=\"");
 			sb.append(url);
 			sb.append("\">");
-			sb.append(label);
+			sb.append(name);
 			sb.append("</a>");
 		}
 		else {
-			sb.append(label);
+			sb.append(name);
 		}
 
 		if (!menuItem.getChildren().isEmpty()) {

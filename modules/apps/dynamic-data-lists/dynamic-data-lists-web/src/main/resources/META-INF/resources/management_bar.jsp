@@ -28,7 +28,7 @@ PortletURL portletURL = renderResponse.createRenderURL();
 	disabled="<%= ddlDisplayContext.isDisabledManagementBar() %>"
 	filterDropdownItems="<%= ddlDisplayContext.getFilterItemsDropdownItems() %>"
 	itemsTotal="<%= ddlDisplayContext.getTotalItems() %>"
-	namespace="<%= renderResponse.getNamespace() %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	searchActionURL="<%= portletURL.toString() %>"
 	searchContainerId="<%= ddlDisplayContext.getSearchContainerId() %>"
 	searchFormName="fm1"
@@ -38,7 +38,7 @@ PortletURL portletURL = renderResponse.createRenderURL();
 />
 
 <aui:script sandbox="<%= true %>">
-	var deleteRecordSets = function() {
+	var deleteRecordSets = function () {
 		if (
 			confirm(
 				'<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />'
@@ -69,7 +69,7 @@ PortletURL portletURL = renderResponse.createRenderURL();
 
 						submitForm(
 							form,
-							'<portlet:actionURL name="deleteRecordSet"><portlet:param name="mvcPath" value="/view.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:actionURL>'
+							'<portlet:actionURL name="/dynamic_data_lists/delete_record_set"><portlet:param name="mvcPath" value="/view.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:actionURL>'
 						);
 					}
 				}
@@ -78,13 +78,13 @@ PortletURL portletURL = renderResponse.createRenderURL();
 	};
 
 	var ACTIONS = {
-		deleteRecordSets: deleteRecordSets
+		deleteRecordSets: deleteRecordSets,
 	};
 
-	Liferay.componentReady('ddlManagementToolbar').then(function(
+	Liferay.componentReady('ddlManagementToolbar').then(function (
 		managementToolbar
 	) {
-		managementToolbar.on('actionItemClicked', function(event) {
+		managementToolbar.on('actionItemClicked', function (event) {
 			var itemData = event.data.item.data;
 
 			if (itemData && itemData.action && ACTIONS[itemData.action]) {

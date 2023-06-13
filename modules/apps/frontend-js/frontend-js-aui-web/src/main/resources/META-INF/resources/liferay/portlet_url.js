@@ -15,16 +15,16 @@
 /**
  * The Portlet URL Utility
  *
- * @deprecated As of Athanasius(7.3.x), replaced by Liferay.Util.PortletURL
+ * @deprecated As of Athanasius (7.3.x), replaced by Liferay.Util.PortletURL
  * @module liferay-portlet-url
  */
 
 AUI.add(
 	'liferay-portlet-url',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
-		var PortletURL = function(lifecycle, params, basePortletURL) {
+		var PortletURL = function (lifecycle, params, basePortletURL) {
 			var instance = this;
 
 			instance.params = {};
@@ -57,7 +57,7 @@ AUI.add(
 				refererGroupId: null,
 				refererPlid: null,
 				saveLastPath: null,
-				scroll: null
+				scroll: null,
 			};
 
 			if (!basePortletURL) {
@@ -71,14 +71,15 @@ AUI.add(
 			instance.options = {
 				basePortletURL,
 				escapeXML: null,
-				secure: null
+				secure: null,
 			};
 
 			A.each(params, (item, index) => {
 				if (Lang.isValue(item)) {
 					if (instance._isReservedParam(index)) {
 						instance.reservedParams[index] = item;
-					} else {
+					}
+					else {
 						instance.params[index] = item;
 					}
 				}
@@ -105,7 +106,7 @@ AUI.add(
 			},
 
 			/*
-			 * @deprecated
+			 * @deprecated As of Wilberforce (7.0.x)
 			 */
 
 			setCopyCurrentRenderParameters() {
@@ -131,7 +132,7 @@ AUI.add(
 			},
 
 			/*
-			 * @deprecated
+			 * @deprecated As of Wilberforce (7.0.x)
 			 */
 
 			setEncrypt() {
@@ -156,9 +157,11 @@ AUI.add(
 				if (lifecycle === PortletURL.ACTION_PHASE) {
 					reservedParams.p_auth = Liferay.authToken;
 					reservedParams.p_p_lifecycle = PortletURL.ACTION_PHASE;
-				} else if (lifecycle === PortletURL.RENDER_PHASE) {
+				}
+				else if (lifecycle === PortletURL.RENDER_PHASE) {
 					reservedParams.p_p_lifecycle = PortletURL.RENDER_PHASE;
-				} else if (lifecycle === PortletURL.RESOURCE_PHASE) {
+				}
+				else if (lifecycle === PortletURL.RESOURCE_PHASE) {
 					reservedParams.p_p_lifecycle = PortletURL.RESOURCE_PHASE;
 					reservedParams.p_p_cacheability = 'cacheLevelPage';
 				}
@@ -179,7 +182,8 @@ AUI.add(
 
 				if (instance._isReservedParam(key)) {
 					instance.reservedParams[key] = value;
-				} else {
+				}
+				else {
 					instance.params[key] = value;
 				}
 
@@ -205,7 +209,7 @@ AUI.add(
 			},
 
 			/*
-			 * @deprecated
+			 * @deprecated As of Wilberforce (7.0.x)
 			 */
 
 			setPortletConfiguration() {
@@ -239,7 +243,7 @@ AUI.add(
 			},
 
 			/*
-			 * @deprecated since 7.2, unused
+			 * @deprecated As of Mueller (7.2.x), with no direct replacement
 			 */
 			setSecure(secure) {
 				var instance = this;
@@ -274,7 +278,7 @@ AUI.add(
 
 				var parameters = {
 					...instance.params,
-					...reservedParameters
+					...reservedParameters,
 				};
 
 				var portletURL = Liferay.Util.PortletURL.createPortletURL(
@@ -291,7 +295,7 @@ AUI.add(
 				}
 
 				return portletURL.toString();
-			}
+			},
 		};
 
 		A.mix(PortletURL, {
@@ -301,27 +305,30 @@ AUI.add(
 
 			RESOURCE_PHASE: '2',
 
-			createActionURL() {
+			// These are constructor functions and so must not use the concise
+			// method syntax. See COMMERCE-5035.
+
+			createActionURL: function createActionURL() {
 				return new PortletURL(PortletURL.ACTION_PHASE);
 			},
 
-			createRenderURL() {
+			createRenderURL: function createRenderURL() {
 				return new PortletURL(PortletURL.RENDER_PHASE);
 			},
 
-			createResourceURL() {
+			createResourceURL: function createResourceURL() {
 				return new PortletURL(PortletURL.RESOURCE_PHASE);
 			},
 
-			createURL(basePortletURL, params) {
+			createURL: function createURL(basePortletURL, params) {
 				return new PortletURL(null, params, basePortletURL);
-			}
+			},
 		});
 
 		Liferay.PortletURL = PortletURL;
 	},
 	'',
 	{
-		requires: ['aui-base']
+		requires: ['aui-base'],
 	}
 );

@@ -3,6 +3,7 @@ definition {
 
 	property app.server.bundles.size = "1";
 	property cluster.enabled = "true";
+	property minimum.slave.ram = "24";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property remote.elasticsearch.enabled = "true";
@@ -30,6 +31,7 @@ definition {
 
 	@priority = "4"
 	test AddAndDeleteBlogEntriesOnSeparateNodes {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "Clustering#AddAndDeleteBlogEntriesOnSeparateNodes";
 
 		Clustering.viewClusterStatusInConsole();
@@ -38,7 +40,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Test Page1");
@@ -72,7 +73,7 @@ definition {
 			entryContent = "Blogs Entry1 Content",
 			entryTitle = "Blogs Entry1 Title");
 
-		BlogsEntry.viewEntry(
+		BlogsEntry.viewEntryPG(
 			entryContent = "Blogs Entry1 Content",
 			entryTitle = "Blogs Entry1 Title");
 
@@ -80,7 +81,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Test Page2");
@@ -99,7 +99,7 @@ definition {
 			entryContent = "Blogs Entry1 Content",
 			entryTitle = "Blogs Entry1 Title");
 
-		BlogsEntry.viewEntry(
+		BlogsEntry.viewEntryPG(
 			entryContent = "Blogs Entry1 Content",
 			entryTitle = "Blogs Entry1 Title");
 
@@ -123,7 +123,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Recycle Bin",
-			panel = "Site Administration",
 			portlet = "Recycle Bin");
 
 		RecycleBin.emptyCP();
@@ -145,7 +144,7 @@ definition {
 			entryContent = "Blogs Entry1 Content",
 			entryTitle = "Blogs Entry1 Title");
 
-		BlogsEntry.viewEntry(
+		BlogsEntry.viewEntryPG(
 			entryContent = "Blogs Entry1 Content",
 			entryTitle = "Blogs Entry1 Title");
 
@@ -156,8 +155,78 @@ definition {
 			searchAssetType = "Blogs Entry");
 	}
 
+	@priority = "4"
+	test CanInvokeMethods {
+		property test.name.skip.portal.instance = "Clustering#CanInvokeMethods";
+
+		Clustering.runGroovyScript(
+			nodePort = "8080",
+			scriptFile = "groovy-script-invoke-method.groovy");
+
+		AssertTextEquals(
+			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
+			value1 = "Result of invoke-method-portal is :9080");
+
+		Clustering.runGroovyScript(
+			nodePort = "9080",
+			scriptFile = "groovy-script-invoke-method.groovy");
+
+		AssertTextEquals(
+			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
+			value1 = "Result of invoke-method-portal is :8080");
+
+		for (var serverPort : list "8080,9080") {
+			Clustering.runGroovyScript(
+				nodePort = "${serverPort}",
+				scriptFile = "groovy-script-invoke-method-on-master.groovy");
+
+			AssertTextEquals(
+				locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
+				value1 = "Result of invoke-method-portal-on-master is :8080");
+		}
+
+		for (var serverPort : list "8080,9080") {
+			Clustering.deployJarOnSpecificServer(
+				liferayDependencyJars = "com.liferay.cluster.test.module.jar",
+				nodePort = "${serverPort}");
+		}
+
+		for (var method : list "invoke-method-module,invoke-method-portal") {
+			AntCommand(
+				locator1 = "build-test.xml",
+				value1 = "cluster-invoke-method -Dcluster.invoke.method=${method}");
+
+			Pause(locator1 = "10000");
+
+			Clustering.viewTextPresentOnSpecificNode(
+				expectedText = "Result of ${method} is :9080",
+				nodePort = "8080");
+
+			Clustering.viewTextPresentOnSpecificNode(
+				expectedText = "Result of ${method} is :8080",
+				nodePort = "9080");
+		}
+
+		for (var method : list "invoke-method-module-on-master,invoke-method-portal-on-master") {
+			AntCommand(
+				locator1 = "build-test.xml",
+				value1 = "cluster-invoke-method -Dcluster.invoke.method=${method}");
+
+			Pause(locator1 = "10000");
+
+			Clustering.viewTextPresentOnSpecificNode(
+				expectedText = "Result of ${method} is :8080",
+				nodePort = "8080");
+
+			Clustering.viewTextPresentOnSpecificNode(
+				expectedText = "Result of ${method} is :8080",
+				nodePort = "9080");
+		}
+	}
+
 	@priority = "5"
 	test ShutdownAndStartupNodes {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "Clustering#ShutdownAndStartupNodes";
 
 		Clustering.viewClusterStatusInConsole();
@@ -219,6 +288,101 @@ definition {
 	}
 
 	@priority = "4"
+	test SlaveNodeCanBecomeMasterNode {
+		property test.name.skip.portal.instance = "Clustering#SlaveNodeCanBecomeMasterNode";
+
+		Clustering.runGroovyScript(
+			nodePort = "8080",
+			scriptFile = "groovy-script-master-slave.groovy");
+
+		AssertTextEquals(
+			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
+			value1 = "This node is master node");
+
+		Clustering.runGroovyScript(
+			nodePort = "9080",
+			scriptFile = "groovy-script-master-slave.groovy");
+
+		AssertTextEquals(
+			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
+			value1 = "This node is slave node");
+
+		Clustering.shutdownSpecificServer(nodePort = "8080");
+
+		Clustering.runGroovyScript(
+			nodePort = "9080",
+			scriptFile = "groovy-script-master-slave.groovy");
+
+		AssertTextEquals(
+			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
+			value1 = "This node is master node");
+
+		Clustering.startSpecificServer(
+			deleteLiferayHome = "true",
+			keepCachedAppServerData = "true",
+			nodePort = "8080");
+
+		User.logoutPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		User.loginPG(
+			nodePort = "8080",
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		Clustering.runGroovyScript(
+			nodePort = "8080",
+			scriptFile = "groovy-script-master-slave.groovy");
+
+		AssertTextEquals(
+			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
+			value1 = "This node is slave node");
+	}
+
+	@priority = "4"
+	test TCPControlChannelProperties {
+		property custom.properties = "cluster.link.channel.properties.control=tcp.xml";
+		property test.name.skip.portal.instance = "Clustering#TCPControlChannelProperties";
+
+		for (var serverPort : list "8080,9080") {
+			Clustering.viewTextPresentOnSpecificNode(
+				expectedText = "Create a new JGroups channel",
+				nodePort = "${serverPort}");
+
+			Clustering.viewTextPresentOnSpecificNode(
+				expectedText = "properties: TCP",
+				nodePort = "${serverPort}");
+		}
+
+		User.loginPG(
+			nodePort = "9080",
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+	}
+
+	@priority = "4"
+	test UDPControlChannelProperties {
+		property custom.properties = "cluster.link.channel.properties.control=udp.xml${line.separator}cluster.link.channel.properties.transport.0=udp.xml";
+		property test.name.skip.portal.instance = "Clustering#UDPControlChannelProperties";
+
+		for (var serverPort : list "8080,9080") {
+			Clustering.viewTextPresentOnSpecificNode(
+				expectedText = "Create a new JGroups channel",
+				nodePort = "${serverPort}");
+
+			Clustering.viewTextPresentOnSpecificNode(
+				expectedText = "properties: UDP",
+				nodePort = "${serverPort}");
+		}
+
+		User.loginPG(
+			nodePort = "9080",
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+	}
+
+	@priority = "4"
 	test ValidateDocumentOnSeparateNodes {
 		property test.name.skip.portal.instance = "Clustering#ValidateDocumentOnSeparateNodes";
 
@@ -228,7 +392,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Documents and Media Page");
@@ -281,7 +444,7 @@ definition {
 
 		Clustering.viewClusterStatusInConsole();
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Monitoring");
@@ -293,7 +456,7 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Monitoring");
@@ -305,7 +468,7 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Monitoring");
@@ -319,12 +482,107 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Monitoring");
 
 		Clustering.viewLiveSessionCount(count = "3");
+	}
+
+	@description = "This is a use case for LPS-142472."
+	@priority = "4"
+	test ValidatePublishOnTwoNodes {
+		property test.name.skip.portal.instance = "Clustering#ValidatePublishOnTwoNodes";
+
+		Clustering.viewClusterStatusInConsole();
+
+		Page.assertNodePortPG(nodePort = "8080");
+
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Staging Test Page");
+
+		Navigator.openSiteURL(siteName = "Site Name");
+
+		ProductMenu.gotoPortlet(
+			category = "Publishing",
+			portlet = "Staging");
+
+		Staging.activateStagingCP(siteName = "Site Name");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		Portlet.addPG(portletName = "Blogs");
+
+		Blogs.addEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title");
+
+		BlogsEntry.viewPG(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		User.logoutPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		User.loginPG(
+			nodePort = "9080",
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		Page.assertNodePortPG(nodePort = "9080");
+
+		Navigator.gotoSitePage(
+			baseURL = "http://localhost:9080",
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		BlogsEntry.viewPG(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title");
+
+		Navigator.gotoStagedView();
+
+		Portlet.addPG(portletName = "Web Content Display");
+
+		WebContent.addPGViaWCD(
+			webContentContent = "WebContent Content",
+			webContentTitle = "WebContent Title");
+
+		WebContent.viewPGViaWCD(webContentContent = "WebContent Content");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		User.logoutPG(
+			nodePort = "9080",
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		User.loginPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		BlogsEntry.viewPG(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title");
+
+		WebContent.viewPGViaWCD(webContentContent = "WebContent Content");
 	}
 
 	@priority = "4"
@@ -343,7 +601,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.activateStagingCP(siteName = "${siteName}");
@@ -354,7 +611,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "New Page Name");
@@ -406,7 +662,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
-			panel = "Site Administration",
 			portlet = "Staging");
 
 		Staging.deactivateStagingCP(siteName = "${siteName}");

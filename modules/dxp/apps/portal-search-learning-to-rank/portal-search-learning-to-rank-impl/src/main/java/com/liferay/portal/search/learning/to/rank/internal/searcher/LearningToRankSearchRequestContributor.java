@@ -20,7 +20,6 @@ import com.liferay.portal.search.learning.to.rank.configuration.LearningToRankCo
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.rescore.Rescore;
-import com.liferay.portal.search.rescore.RescoreBuilder;
 import com.liferay.portal.search.rescore.RescoreBuilderFactory;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
@@ -57,10 +56,7 @@ public class LearningToRankSearchRequestContributor
 		SearchRequestBuilder searchRequestBuilder =
 			searchRequestBuilderFactory.builder(searchRequest);
 
-		List<Rescore> rescores = getRescores(
-			searchRequest, rescoreBuilderFactory.getRescoreBuilder());
-
-		searchRequestBuilder.rescores(rescores);
+		searchRequestBuilder.rescores(getRescores(searchRequest));
 
 		return searchRequestBuilder.build();
 	}
@@ -77,28 +73,24 @@ public class LearningToRankSearchRequestContributor
 	}
 
 	protected Query getRescoreQuery(String model, String keywords) {
-		String query = JSONUtil.put(
-			"sltr",
+		return queries.wrapper(
 			JSONUtil.put(
-				"model", model
-			).put(
-				"params", JSONUtil.put("keywords", keywords)
-			)
-		).toString();
-
-		return queries.wrapper(query);
+				"sltr",
+				JSONUtil.put(
+					"model", model
+				).put(
+					"params", JSONUtil.put("keywords", keywords)
+				)
+			).toString());
 	}
 
-	protected List<Rescore> getRescores(
-		SearchRequest searchRequest, RescoreBuilder rescoreBuilder) {
-
-		Rescore rescore = rescoreBuilder.query(
-			getRescoreQuery(_model, searchRequest.getQueryString())
-		).windowSize(
-			1000
-		).build();
-
-		return Arrays.asList(rescore);
+	protected List<Rescore> getRescores(SearchRequest searchRequest) {
+		return Arrays.asList(
+			rescoreBuilderFactory.builder(
+				getRescoreQuery(_model, searchRequest.getQueryString())
+			).windowSize(
+				1000
+			).build());
 	}
 
 	@Reference

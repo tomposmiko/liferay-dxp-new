@@ -83,6 +83,16 @@ public class ChangeTransitionSerDes {
 			sb.append("\"");
 		}
 
+		if (changeTransition.getWorkflowTaskId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"workflowTaskId\": ");
+
+			sb.append(changeTransition.getWorkflowTaskId());
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -118,6 +128,15 @@ public class ChangeTransitionSerDes {
 				String.valueOf(changeTransition.getTransitionName()));
 		}
 
+		if (changeTransition.getWorkflowTaskId() == null) {
+			map.put("workflowTaskId", null);
+		}
+		else {
+			map.put(
+				"workflowTaskId",
+				String.valueOf(changeTransition.getWorkflowTaskId()));
+		}
+
 		return map;
 	}
 
@@ -150,9 +169,11 @@ public class ChangeTransitionSerDes {
 						(String)jsonParserFieldValue);
 				}
 			}
-			else {
-				throw new IllegalArgumentException(
-					"Unsupported field name " + jsonParserFieldName);
+			else if (Objects.equals(jsonParserFieldName, "workflowTaskId")) {
+				if (jsonParserFieldValue != null) {
+					changeTransition.setWorkflowTaskId(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
 			}
 		}
 
@@ -182,7 +203,7 @@ public class ChangeTransitionSerDes {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
-			sb.append("\":");
+			sb.append("\": ");
 
 			Object value = entry.getValue();
 
@@ -208,14 +229,17 @@ public class ChangeTransitionSerDes {
 
 				sb.append("]");
 			}
-			else {
+			else if (value instanceof String) {
 				sb.append("\"");
 				sb.append(_escape(entry.getValue()));
 				sb.append("\"");
 			}
+			else {
+				sb.append(String.valueOf(entry.getValue()));
+			}
 
 			if (iterator.hasNext()) {
-				sb.append(",");
+				sb.append(", ");
 			}
 		}
 

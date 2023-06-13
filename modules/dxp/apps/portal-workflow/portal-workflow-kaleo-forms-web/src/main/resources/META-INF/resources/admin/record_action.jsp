@@ -17,9 +17,9 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
-SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:search:searchContainer");
+SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("liferay-ui:search:searchContainer");
 
-String redirect = searchContainer.getIteratorURL().toString();
+String redirect = String.valueOf(searchContainer.getIteratorURL());
 
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
@@ -51,7 +51,7 @@ DDLRecordVersion ddlRecordVersion = ddlRecord.getLatestRecordVersion();
 	/>
 
 	<c:if test="<%= KaleoProcessPermission.contains(permissionChecker, kaleoProcessId, ActionKeys.UPDATE) %>">
-		<portlet:actionURL name="deleteDDLRecord" var="deleteDDLRecordURL">
+		<portlet:actionURL name="/kaleo_forms/delete_record" var="deleteDDLRecordURL">
 			<portlet:param name="redirect" value="<%= redirect %>" />
 			<portlet:param name="ddlRecordId" value="<%= String.valueOf(ddlRecord.getRecordId()) %>" />
 			<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcessId) %>" />

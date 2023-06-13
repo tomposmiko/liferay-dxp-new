@@ -16,6 +16,8 @@
 		<!-- Audit fields -->
 
 		<column name="companyId" type="long" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
 
 		<!-- Other fields -->
 
@@ -23,6 +25,7 @@
 		<column name="classPK" type="long" />
 		<column name="ddmStructureId" type="long" />
 		<column name="fieldName" type="String" />
+		<column name="lastPublishDate" type="Date" />
 
 		<!-- Finder methods -->
 
@@ -33,17 +36,29 @@
 			<finder-column name="classNameId" />
 			<finder-column name="classPK" />
 		</finder>
+		<finder name="C_DDMSI" return-type="Collection">
+			<finder-column name="classNameId" />
+			<finder-column name="ddmStructureId" />
+		</finder>
+		<finder name="DDMSI_F" return-type="Collection">
+			<finder-column name="ddmStructureId" />
+			<finder-column arrayable-operator="OR" name="fieldName" />
+		</finder>
 		<finder name="C_DDMSI_F" return-type="Collection">
 			<finder-column name="classNameId" />
 			<finder-column name="ddmStructureId" />
-			<finder-column name="fieldName" />
+			<finder-column arrayable-operator="OR" name="fieldName" />
 		</finder>
 		<finder name="C_C_DDMSI_F" return-type="DEDataDefinitionFieldLink" unique="true">
 			<finder-column name="classNameId" />
 			<finder-column name="classPK" />
 			<finder-column name="ddmStructureId" />
-			<finder-column name="fieldName" />
+			<finder-column arrayable-operator="OR" name="fieldName" />
 		</finder>
+
+		<!-- References -->
+
+		<reference entity="Group" package-path="com.liferay.portal" />
 	</entity>
 	<entity local-service="true" name="DEDataListView" remote-service="false" uuid="true">
 

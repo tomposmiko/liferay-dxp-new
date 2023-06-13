@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-calendar-date-picker-sanitizer',
-	A => {
+	(A) => {
 		var AArray = A.Array;
 
 		var DateMath = A.DataType.DateMath;
@@ -27,7 +27,7 @@ AUI.add(
 
 				maximumDate: {},
 
-				minimumDate: {}
+				minimumDate: {},
 			},
 
 			EXTENDS: A.Base,
@@ -67,7 +67,7 @@ AUI.add(
 
 					var datePickers = instance.get('datePickers');
 
-					instance.eventHandlers = A.map(datePickers, item => {
+					instance.eventHandlers = A.map(datePickers, (item) => {
 						return item.on(
 							'selectionChange',
 							A.bind(
@@ -98,14 +98,14 @@ AUI.add(
 					var instance = this;
 
 					AArray.invoke(instance.eventHandlers, 'detach');
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.DatePickerSanitizer = DatePickerSanitizer;
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-datatype']
+		requires: ['aui-base', 'aui-datatype'],
 	}
 );

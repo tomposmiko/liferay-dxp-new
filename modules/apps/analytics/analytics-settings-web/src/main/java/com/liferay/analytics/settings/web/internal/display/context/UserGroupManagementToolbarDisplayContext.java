@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -55,8 +56,6 @@ public class UserGroupManagementToolbarDisplayContext
 
 		_resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", themeDisplay.getLocale(), getClass());
-
-		_userGroupDisplayContext = userGroupDisplayContext;
 	}
 
 	@Override
@@ -100,7 +99,7 @@ public class UserGroupManagementToolbarDisplayContext
 		Map<String, String> entriesMap, PortletURL entryURL,
 		String parameterName, String parameterValue) {
 
-		if ((entriesMap == null) || entriesMap.isEmpty()) {
+		if (MapUtil.isEmpty(entriesMap)) {
 			return null;
 		}
 
@@ -127,7 +126,7 @@ public class UserGroupManagementToolbarDisplayContext
 
 	@Override
 	protected String getFilterNavigationDropdownItemsLabel() {
-		return LanguageUtil.get(request, "user-groups");
+		return LanguageUtil.get(httpServletRequest, "user-groups");
 	}
 
 	@Override
@@ -136,6 +135,5 @@ public class UserGroupManagementToolbarDisplayContext
 	}
 
 	private final ResourceBundle _resourceBundle;
-	private final UserGroupDisplayContext _userGroupDisplayContext;
 
 }

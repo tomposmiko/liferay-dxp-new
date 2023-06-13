@@ -19,8 +19,8 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Field;
-import com.liferay.dynamic.data.mapping.storage.FieldConstants;
 import com.liferay.dynamic.data.mapping.storage.Fields;
+import com.liferay.dynamic.data.mapping.storage.constants.FieldConstants;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.dynamic.data.mapping.util.DDMFieldsCounter;
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
@@ -38,12 +38,12 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -63,6 +63,7 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
+import com.liferay.trash.TrashHelper;
 
 import java.io.Serializable;
 
@@ -158,8 +159,21 @@ public class JournalConverterImpl implements JournalConverter {
 		).build();
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getContent(DDMStructure, Fields, long)}
+	 */
+	@Deprecated
 	@Override
 	public String getContent(DDMStructure ddmStructure, Fields ddmFields)
+		throws Exception {
+
+		return getContent(ddmStructure, ddmFields, ddmStructure.getGroupId());
+	}
+
+	@Override
+	public String getContent(
+			DDMStructure ddmStructure, Fields ddmFields, long groupId)
 		throws Exception {
 
 		Document document = SAXReaderUtil.createDocument();
@@ -169,9 +183,14 @@ public class JournalConverterImpl implements JournalConverter {
 		rootElement.addAttribute(
 			"available-locales", getAvailableLocales(ddmFields));
 
+		Locale defaultLocale = ddmFields.getDefaultLocale();
+
+		if (!LanguageUtil.isAvailableLocale(groupId, defaultLocale)) {
+			defaultLocale = LocaleUtil.getSiteDefault();
+		}
+
 		rootElement.addAttribute(
-			"default-locale",
-			LocaleUtil.toLanguageId(ddmFields.getDefaultLocale()));
+			"default-locale", LocaleUtil.toLanguageId(defaultLocale));
 
 		DDMFieldsCounter ddmFieldsCounter = new DDMFieldsCounter();
 
@@ -509,6 +528,12 @@ public class JournalConverterImpl implements JournalConverter {
 
 		String name = dynamicElementElement.attributeValue("name");
 
+		if (!GetterUtil.getBoolean(
+				ddmStructure.getFieldProperty(name, "localizable"))) {
+
+			availableLanguageIds = StringPool.EMPTY_ARRAY;
+		}
+
 		ddmField.setName(name);
 
 		String dataType = ddmStructure.getFieldDataType(name);
@@ -577,130 +602,27 @@ public class JournalConverterImpl implements JournalConverter {
 		String dataType, String type, Element dynamicContentElement,
 		Locale defaultLocale) {
 
-		Serializable serializable = null;
+		if (Objects.equals(DDMFormFieldType.DOCUMENT_LIBRARY, type) ||
+			Objects.equals(DDMFormFieldType.IMAGE, type)) {
 
-		if (Objects.equals(DDMFormFieldType.DOCUMENT_LIBRARY, type)) {
-			try {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-					dynamicContentElement.getText());
-
-				if (!ExportImportThreadLocal.isImportInProcess()) {
-					String uuid = jsonObject.getString("uuid");
-					long groupId = jsonObject.getLong("groupId");
-
-					_dlAppLocalService.getFileEntryByUuidAndGroupId(
-						uuid, groupId);
-				}
-
-				serializable = dynamicContentElement.getText();
-			}
-			catch (Exception exception) {
-				return StringPool.BLANK;
-			}
-		}
-		else if (Objects.equals(DDMFormFieldType.JOURNAL_ARTICLE, type)) {
-			try {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-					dynamicContentElement.getText());
-
-				Long classPK = jsonObject.getLong("classPK");
-
-				if (Validator.isNotNull(classPK)) {
-					JournalArticle article =
-						_journalArticleLocalService.fetchLatestArticle(classPK);
-
-					if (article != null) {
-						jsonObject.put("groupId", article.getGroupId());
-
-						String title = article.getTitle(defaultLocale);
-
-						if (article.isInTrash()) {
-							jsonObject.put(
-								"message",
-								LanguageUtil.get(
-									_getResourceBundle(defaultLocale),
-									"the-selected-web-content-was-moved-to-" +
-										"the-recycle-bin"));
-						}
-
-						jsonObject.put(
-							"title", title
-						).put(
-							"uuid", article.getUuid()
-						);
-					}
-					else {
-						jsonObject.put(
-							"message",
-							LanguageUtil.get(
-								_getResourceBundle(defaultLocale),
-								"the-selected-web-content-was-deleted"));
-					}
-				}
-
-				serializable = jsonObject.toString();
-			}
-			catch (JSONException jsonException) {
-				serializable = StringPool.BLANK;
-			}
-		}
-		else if (Objects.equals(DDMFormFieldType.LINK_TO_PAGE, type)) {
-			String[] values = StringUtil.split(
-				dynamicContentElement.getText(), CharPool.AT);
-
-			if (ArrayUtil.isEmpty(values)) {
-				return StringPool.BLANK;
-			}
-
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			long layoutId = GetterUtil.getLong(values[0]);
-			boolean privateLayout = !Objects.equals(values[1], "public");
-
-			if (values.length > 2) {
-				long groupId = GetterUtil.getLong(values[2]);
-
-				jsonObject.put("groupId", groupId);
-
-				Layout layout = _layoutLocalService.fetchLayout(
-					groupId, privateLayout, layoutId);
-
-				if (layout != null) {
-					jsonObject.put("label", layout.getName(defaultLocale));
-				}
-			}
-
-			jsonObject.put(
-				"layoutId", layoutId
-			).put(
-				"privateLayout", privateLayout
-			);
-
-			serializable = jsonObject.toString();
-		}
-		else if (Objects.equals(DDMFormFieldType.SELECT, type)) {
-			JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
-			List<Element> optionElements = dynamicContentElement.elements(
-				"option");
-
-			if (!optionElements.isEmpty()) {
-				for (Element optionElement : optionElements) {
-					jsonArray.put(optionElement.getText());
-				}
-			}
-			else {
-				jsonArray.put(dynamicContentElement.getText());
-			}
-
-			serializable = jsonArray.toString();
-		}
-		else {
-			serializable = FieldConstants.getSerializable(
-				dataType, dynamicContentElement.getText());
+			return _getFileEntryValue(defaultLocale, dynamicContentElement);
 		}
 
-		return serializable;
+		if (Objects.equals(DDMFormFieldType.JOURNAL_ARTICLE, type)) {
+			return _getJournalArticleValue(
+				defaultLocale, dynamicContentElement);
+		}
+
+		if (Objects.equals(DDMFormFieldType.LINK_TO_PAGE, type)) {
+			return _getLinkToLayoutValue(defaultLocale, dynamicContentElement);
+		}
+
+		if (Objects.equals(DDMFormFieldType.SELECT, type)) {
+			return _getSelectValue(dynamicContentElement);
+		}
+
+		return FieldConstants.getSerializable(
+			dataType, dynamicContentElement.getText());
 	}
 
 	protected void getJournalMetadataElement(Element metadataElement) {
@@ -820,12 +742,16 @@ public class JournalConverterImpl implements JournalConverter {
 
 				Serializable fieldValue = ddmField.getValue(locale, count);
 
-				if (fieldValue == null) {
+				if ((fieldValue == null) || fieldValue.equals(_EMPTY_VALUE)) {
 					fieldValue = ddmField.getValue(
 						ddmField.getDefaultLocale(), count);
 				}
 
-				String valueString = String.valueOf(fieldValue);
+				String valueString = StringPool.BLANK;
+
+				if (fieldValue != null) {
+					valueString = String.valueOf(fieldValue);
+				}
 
 				updateDynamicContentValue(
 					dynamicContentElement, fieldType, multiple,
@@ -932,9 +858,8 @@ public class JournalConverterImpl implements JournalConverter {
 	}
 
 	protected void updateDynamicContentValue(
-			Element dynamicContentElement, String fieldType, boolean multiple,
-			String fieldValue)
-		throws Exception {
+		Element dynamicContentElement, String fieldType, boolean multiple,
+		String fieldValue) {
 
 		if (DDMFormFieldType.CHECKBOX.equals(fieldType)) {
 			if (fieldValue.equals(Boolean.FALSE.toString())) {
@@ -942,47 +867,6 @@ public class JournalConverterImpl implements JournalConverter {
 			}
 
 			dynamicContentElement.addCDATA(fieldValue);
-		}
-		else if (DDMFormFieldType.LINK_TO_PAGE.equals(fieldType) &&
-				 Validator.isNotNull(fieldValue)) {
-
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-				fieldValue);
-
-			long groupId = jsonObject.getLong("groupId");
-
-			long layoutId = jsonObject.getLong("layoutId");
-
-			boolean privateLayout = jsonObject.getBoolean("privateLayout");
-
-			StringBundler sb = new StringBundler((groupId > 0) ? 5 : 3);
-
-			sb.append(layoutId);
-			sb.append(StringPool.AT);
-
-			if (privateLayout) {
-				Group group = _groupLocalService.fetchGroup(groupId);
-
-				if (group == null) {
-					sb.append("private");
-				}
-				else if (group.isUser()) {
-					sb.append("private-user");
-				}
-				else {
-					sb.append("private-group");
-				}
-			}
-			else {
-				sb.append("public");
-			}
-
-			if (groupId > 0) {
-				sb.append(StringPool.AT);
-				sb.append(groupId);
-			}
-
-			dynamicContentElement.addCDATA(sb.toString());
 		}
 		else if (DDMFormFieldType.SELECT.equals(fieldType) &&
 				 Validator.isNotNull(fieldValue)) {
@@ -1024,11 +908,8 @@ public class JournalConverterImpl implements JournalConverter {
 			instanceId = StringUtil.randomString();
 		}
 
-		String fieldsDisplayValue = fieldName.concat(
-			DDM.INSTANCE_SEPARATOR
-		).concat(
-			instanceId
-		);
+		String fieldsDisplayValue = StringBundler.concat(
+			fieldName, DDM.INSTANCE_SEPARATOR, instanceId);
 
 		Field fieldsDisplayField = ddmFields.get(DDM.FIELDS_DISPLAY_NAME);
 
@@ -1181,6 +1062,178 @@ public class JournalConverterImpl implements JournalConverter {
 		}
 	}
 
+	private String _getFileEntryValue(
+		Locale defaultLocale, Element dynamicContentElement) {
+
+		JSONObject jsonObject = null;
+
+		try {
+			jsonObject = JSONFactoryUtil.createJSONObject(
+				dynamicContentElement.getText());
+		}
+		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(jsonException);
+			}
+
+			return StringPool.BLANK;
+		}
+
+		if (jsonObject == null) {
+			return StringPool.BLANK;
+		}
+
+		String uuid = jsonObject.getString("uuid");
+		long groupId = jsonObject.getLong("groupId");
+
+		if (Validator.isNull(uuid) || (groupId <= 0)) {
+			return StringPool.BLANK;
+		}
+
+		try {
+			if (!ExportImportThreadLocal.isImportInProcess()) {
+				FileEntry fileEntry =
+					_dlAppLocalService.getFileEntryByUuidAndGroupId(
+						uuid, groupId);
+
+				String title = fileEntry.getTitle();
+
+				if (fileEntry.isInTrash()) {
+					title = _trashHelper.getOriginalTitle(fileEntry.getTitle());
+
+					jsonObject.put(
+						"message",
+						LanguageUtil.get(
+							_getResourceBundle(defaultLocale),
+							"the-selected-document-was-moved-to-the-recycle-" +
+								"bin"));
+				}
+
+				jsonObject.put("title", title);
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					StringBundler.concat(
+						"Unable to get file entry for UUID ", uuid,
+						" and group ID ", groupId));
+			}
+
+			jsonObject.put(
+				"message",
+				LanguageUtil.get(
+					_getResourceBundle(defaultLocale),
+					"the-selected-document-was-deleted"));
+		}
+
+		return jsonObject.toString();
+	}
+
+	private String _getJournalArticleValue(
+		Locale defaultLocale, Element dynamicContentElement) {
+
+		try {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				dynamicContentElement.getText());
+
+			long classPK = jsonObject.getLong("classPK");
+
+			if (classPK <= 0) {
+				return jsonObject.toString();
+			}
+
+			JournalArticle article =
+				_journalArticleLocalService.fetchLatestArticle(classPK);
+
+			if (article != null) {
+				jsonObject.put("groupId", article.getGroupId());
+
+				String title = article.getTitle(defaultLocale);
+
+				if (article.isInTrash()) {
+					jsonObject.put(
+						"message",
+						LanguageUtil.get(
+							_getResourceBundle(defaultLocale),
+							"the-selected-web-content-was-moved-to-the-" +
+								"recycle-bin"));
+				}
+
+				jsonObject.put(
+					"title", title
+				).put(
+					"titleMap", article.getTitleMap()
+				).put(
+					"uuid", article.getUuid()
+				);
+			}
+			else {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to get article for  " + classPK);
+				}
+
+				jsonObject.put(
+					"message",
+					LanguageUtil.get(
+						_getResourceBundle(defaultLocale),
+						"the-selected-web-content-was-deleted"));
+			}
+
+			return jsonObject.toString();
+		}
+		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(jsonException);
+			}
+
+			return StringPool.BLANK;
+		}
+	}
+
+	private String _getLinkToLayoutValue(
+		Locale defaultLocale, Element dynamicContentElement) {
+
+		String value = dynamicContentElement.getText();
+
+		if (JSONUtil.isValid(value)) {
+			return value;
+		}
+
+		String[] values = StringUtil.split(
+			dynamicContentElement.getText(), CharPool.AT);
+
+		if (ArrayUtil.isEmpty(values)) {
+			return StringPool.BLANK;
+		}
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		long layoutId = GetterUtil.getLong(values[0]);
+		boolean privateLayout = !Objects.equals(values[1], "public");
+
+		if (values.length > 2) {
+			long groupId = GetterUtil.getLong(values[2]);
+
+			jsonObject.put("groupId", groupId);
+
+			Layout layout = _layoutLocalService.fetchLayout(
+				groupId, privateLayout, layoutId);
+
+			if (layout != null) {
+				jsonObject.put("name", layout.getName(defaultLocale));
+			}
+		}
+
+		jsonObject.put(
+			"layoutId", layoutId
+		).put(
+			"privateLayout", privateLayout
+		);
+
+		return jsonObject.toString();
+	}
+
 	private ResourceBundle _getResourceBundle(Locale locale) {
 		ResourceBundle classResourceBundle = ResourceBundleUtil.getBundle(
 			locale, "com.liferay.journal.lang");
@@ -1188,6 +1241,25 @@ public class JournalConverterImpl implements JournalConverter {
 		return new AggregateResourceBundle(
 			classResourceBundle, _portal.getResourceBundle(locale));
 	}
+
+	private String _getSelectValue(Element dynamicContentElement) {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		List<Element> optionElements = dynamicContentElement.elements("option");
+
+		if (!optionElements.isEmpty()) {
+			for (Element optionElement : optionElements) {
+				jsonArray.put(optionElement.getText());
+			}
+		}
+		else {
+			jsonArray.put(dynamicContentElement.getText());
+		}
+
+		return jsonArray.toString();
+	}
+
+	private static final String _EMPTY_VALUE = "_EMPTY_VALUE_";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalConverterImpl.class);
@@ -1203,9 +1275,6 @@ public class JournalConverterImpl implements JournalConverter {
 	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
 
 	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
 	private Http _http;
 
 	@Reference
@@ -1218,5 +1287,8 @@ public class JournalConverterImpl implements JournalConverter {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private TrashHelper _trashHelper;
 
 }

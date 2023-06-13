@@ -32,7 +32,7 @@ if (layoutSetBranches.contains(layoutSetBranch)) {
 }
 %>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<div class="site-pages-variation taglib-header">
 		<a class="icon-monospaced list-unstyled portlet-icon-back text-default" href="<%= HtmlUtil.escapeAttribute(redirect) %>" title="<%= HtmlUtil.escapeAttribute(LanguageUtil.get(resourceBundle, "back")) %>">
 			<liferay-ui:icon
@@ -49,8 +49,8 @@ if (layoutSetBranches.contains(layoutSetBranch)) {
 	</div>
 
 	<div id="<portlet:namespace />mergeLayoutSetBranch">
-		<portlet:actionURL name="mergeLayoutSetBranch" var="mergeLayoutSetBranchURL">
-			<portlet:param name="mvcRenderCommandName" value="viewLayoutSetBranches" />
+		<portlet:actionURL name="/staging_bar/merge_layout_set_branch" var="mergeLayoutSetBranchURL">
+			<portlet:param name="mvcRenderCommandName" value="/staging_bar/view_layout_set_branches" />
 		</portlet:actionURL>
 
 		<aui:form action="<%= mergeLayoutSetBranchURL %>" enctype="multipart/form-data" method="post" name="fm4">
@@ -100,7 +100,7 @@ if (layoutSetBranches.contains(layoutSetBranch)) {
 			</liferay-ui:search-container>
 		</aui:form>
 	</div>
-</div>
+</clay:container-fluid>
 
 <script>
 	function <portlet:namespace />selectLayoutSetBranch(layoutSetBranchId) {
@@ -116,8 +116,8 @@ if (layoutSetBranches.contains(layoutSetBranch)) {
 				data: {
 					mergeLayoutSetBranchId: layoutSetBranch.getAttribute(
 						'data-layoutSetBranchId'
-					)
-				}
+					),
+				},
 			});
 		}
 	}

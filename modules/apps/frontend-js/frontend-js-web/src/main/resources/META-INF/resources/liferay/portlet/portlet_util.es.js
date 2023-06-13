@@ -43,6 +43,105 @@ const VALUE_NULL = '';
 const WINDOW_STATE_KEY = 'p_p_state';
 
 /**
+ * Compares two parameters and returns a boolean indicating if they're equal
+ * or not.
+ * @param {?Array.<string>} parameter1 The first parameter to compare.
+ * @param {?Array.<string>} parameter2 The second parameter to compare.
+ * @return {boolean}
+ * @review
+ */
+
+const isParameterEqual = function (parameter1, parameter2) {
+	let result = false;
+
+	// The values are either string arrays or undefined.
+
+	if (parameter1 === undefined && parameter2 === undefined) {
+		result = true;
+	}
+
+	if (parameter1 === undefined || parameter2 === undefined) {
+		result = false;
+	}
+
+	if (parameter1.length !== parameter2.length) {
+		result = false;
+	}
+
+	for (let i = parameter1.length - 1; i >= 0; i--) {
+		if (parameter1[i] !== parameter2[i]) {
+			result = false;
+		}
+	}
+
+	return result;
+};
+
+/**
+ * Returns true if input state differs from the current page state.
+ * Throws exception if input state is malformed.
+ * @param {Object} pageRenderState The (current) page render state.
+ * @param {RenderState} newState The new state to be set.
+ * @param {string} portletId The portlet ID.
+ * @return {boolean}  True if the two state are different.
+ * @review
+ */
+
+const stateChanged = function (pageRenderState, newState, portletId) {
+	let result = false;
+
+	if (pageRenderState && pageRenderState.portlets) {
+		const portletData = pageRenderState.portlets[portletId];
+
+		if (portletData) {
+			const oldState = pageRenderState.portlets[portletId].state;
+
+			if (
+				!newState.portletMode ||
+				!newState.windowState ||
+				!newState.parameters
+			) {
+				throw new Error(`Error decoding state: ${newState}`);
+			}
+
+			if (
+				newState.porletMode !== oldState.portletMode ||
+				newState.windowState !== oldState.windowState
+			) {
+				result = true;
+			}
+			else {
+
+				// Has a parameter changed or been added?
+
+				const newKeys = Object.keys(newState.parameters);
+
+				newKeys.forEach((key) => {
+					const newParameter = newState.parameters[key];
+					const oldParameter = oldState.parameters[key];
+
+					if (!isParameterEqual(newParameter, oldParameter)) {
+						result = true;
+					}
+				});
+
+				// Make sure no parameter was deleted
+
+				const oldKeys = Object.keys(oldState.parameters);
+
+				oldKeys.forEach((key) => {
+					if (!newState.parameters[key]) {
+						result = true;
+					}
+				});
+			}
+		}
+	}
+
+	return result;
+};
+
+/**
  * Decodes the update strings.
  * The update string is a JSON object containing the entire page state.
  * This decoder returns an object containing the portlet data for portlets whose
@@ -53,7 +152,7 @@ const WINDOW_STATE_KEY = 'p_p_state';
  * @review
  */
 
-const decodeUpdateString = function(pageRenderState, updateString) {
+const decodeUpdateString = function (pageRenderState, updateString) {
 	const portlets =
 		pageRenderState && pageRenderState.portlets
 			? pageRenderState.portlets
@@ -65,7 +164,7 @@ const decodeUpdateString = function(pageRenderState, updateString) {
 		if (newRenderState.portlets) {
 			const keys = Object.keys(portlets);
 
-			keys.forEach(key => {
+			keys.forEach((key) => {
 				const newState = newRenderState.portlets[key].state;
 				const oldState = portlets[key].state;
 
@@ -80,8 +179,11 @@ const decodeUpdateString = function(pageRenderState, updateString) {
 				}
 			});
 		}
-	} catch (e) {
+	}
+	catch (e) {
+
 		// Do nothing
+
 	}
 
 	return portlets;
@@ -95,7 +197,7 @@ const decodeUpdateString = function(pageRenderState, updateString) {
  * @review
  */
 
-const encodeFormAsString = function(portletId, form) {
+const encodeFormAsString = function (portletId, form) {
 	const parameters = [];
 
 	for (let i = 0; i < form.elements.length; i++) {
@@ -109,7 +211,7 @@ const encodeFormAsString = function(portletId, form) {
 			if (tag === 'SELECT' && element.multiple) {
 				const options = [...element.options];
 
-				options.forEach(opt => {
+				options.forEach((opt) => {
 					if (opt.checked) {
 						const value = opt.value;
 
@@ -121,7 +223,8 @@ const encodeFormAsString = function(portletId, form) {
 						parameters.push(parameter);
 					}
 				});
-			} else if (
+			}
+			else if (
 				(type !== 'CHECKBOX' && type !== 'RADIO') ||
 				element.checked
 			) {
@@ -145,7 +248,7 @@ const encodeFormAsString = function(portletId, form) {
  * @review
  */
 
-const encodeParameter = function(name, values) {
+const encodeParameter = function (name, values) {
 	let str = '';
 
 	if (Array.isArray(values)) {
@@ -155,13 +258,15 @@ const encodeParameter = function(name, values) {
 				encodeURIComponent(name) +
 				VALUE_DELIM +
 				VALUE_ARRAY_EMPTY;
-		} else {
-			values.forEach(value => {
+		}
+		else {
+			values.forEach((value) => {
 				str += TOKEN_DELIM + encodeURIComponent(name);
 
 				if (value === null) {
 					str += VALUE_DELIM + VALUE_NULL;
-				} else {
+				}
+				else {
 					str += VALUE_DELIM + encodeURIComponent(value);
 				}
 			});
@@ -182,11 +287,11 @@ const encodeParameter = function(name, values) {
  * @review
  */
 
-const generateActionUrl = function(portletId, url, form) {
+const generateActionUrl = function (portletId, url, form) {
 	const request = {
 		credentials: 'same-origin',
 		method: 'POST',
-		url
+		url,
 	};
 
 	if (form) {
@@ -196,22 +301,25 @@ const generateActionUrl = function(portletId, url, form) {
 			const formData = new FormData(form);
 
 			request.body = formData;
-		} else {
+		}
+		else {
 			const formAsString = encodeFormAsString(portletId, form);
 			const method = form.method ? form.method.toUpperCase() : 'GET';
 
 			if (method === 'GET') {
 				if (url.indexOf('?') >= 0) {
 					url += `&${formAsString}`;
-				} else {
+				}
+				else {
 					url += `?${formAsString}`;
 				}
 
 				request.url = url;
-			} else {
+			}
+			else {
 				request.body = formAsString;
 				request.headers = {
-					'Content-Type': 'application/x-www-form-urlencoded'
+					'Content-Type': 'application/x-www-form-urlencoded',
 				};
 			}
 		}
@@ -230,7 +338,7 @@ const generateActionUrl = function(portletId, url, form) {
  * @review
  */
 
-const generateParameterString = function(
+const generateParameterString = function (
 	pageRenderState,
 	portletId,
 	name,
@@ -246,16 +354,19 @@ const generateParameterString = function(
 			const values = portletData.state.parameters[name];
 
 			if (values !== undefined) {
+
 				// If values are present, encode the mutlivalued parameter string
 
 				if (type === PUBLIC_RENDER_PARAM_KEY) {
 					str += encodeParameter(group, values);
-				} else if (type === RENDER_PARAM_KEY) {
+				}
+				else if (type === RENDER_PARAM_KEY) {
 					str += encodeParameter(
 						portletId + RENDER_PARAM_KEY + name,
 						values
 					);
-				} else {
+				}
+				else {
 					str += encodeParameter(portletId + name, values);
 				}
 			}
@@ -273,7 +384,7 @@ const generateParameterString = function(
  * @review
  */
 
-const generatePortletModeAndWindowStateString = function(
+const generatePortletModeAndWindowStateString = function (
 	pageRenderState,
 	portletId
 ) {
@@ -302,6 +413,39 @@ const generatePortletModeAndWindowStateString = function(
 };
 
 /**
+ * Compares the values of the named parameter in the new render state
+ * with the values of that parameter in the current state.
+ * @param {Object} pageRenderState The page render state.
+ * @param {string} portletId The portlet ID.
+ * @param {RenderState} state The new render state.
+ * @param {string} name The name of the parameter to check.
+ * @return {boolean} True if the new parameter's value is different from the current value.
+ * @review
+ */
+
+const isParameterInStateEqual = function (
+	pageRenderState,
+	portletId,
+	state,
+	name
+) {
+	let result = false;
+
+	if (pageRenderState && pageRenderState.portlets) {
+		const portletData = pageRenderState.portlets[portletId];
+
+		if (state.parameters[name] && portletData.state.parameters[name]) {
+			const newParameter = state.parameters[name];
+			const oldParameter = portletData.state.parameters[name];
+
+			result = isParameterEqual(newParameter, oldParameter);
+		}
+	}
+
+	return result;
+};
+
+/**
  * Gets the updated public parameters for the given portlet ID and new render state.
  * Returns an object whose properties are the group indexes of the
  * updated public parameters. The values are the new public parameter values.
@@ -312,7 +456,7 @@ const generatePortletModeAndWindowStateString = function(
  * @review
  */
 
-const getUpdatedPublicRenderParameters = function(
+const getUpdatedPublicRenderParameters = function (
 	pageRenderState,
 	portletId,
 	state
@@ -327,7 +471,7 @@ const getUpdatedPublicRenderParameters = function(
 
 			const keys = Object.keys(portletPublicParameters);
 
-			keys.forEach(key => {
+			keys.forEach((key) => {
 				if (
 					!isParameterInStateEqual(
 						pageRenderState,
@@ -348,6 +492,31 @@ const getUpdatedPublicRenderParameters = function(
 };
 
 /**
+ * Function for checking if a parameter is public.
+ * @param {Object} pageRenderState The page render state.
+ * @param {string} portletId  The portlet ID.
+ * @param {string} name  The name of the parameter to check.
+ * @return {boolean}
+ * @review
+ */
+
+const isPublicParameter = function (pageRenderState, portletId, name) {
+	let result = false;
+
+	if (pageRenderState && pageRenderState.portlets) {
+		const portletData = pageRenderState.portlets[portletId];
+
+		if (portletData && portletData.pubParms) {
+			const keys = Object.keys(portletData.pubParms);
+
+			result = keys.includes(name);
+		}
+	}
+
+	return result;
+};
+
+/**
  * Returns a URL of the specified type.
  * @param {Object} pageRenderState The page render state.
  * @param {string} type The URL type.
@@ -359,7 +528,7 @@ const getUpdatedPublicRenderParameters = function(
  * @review
  */
 
-const getUrl = function(
+const getUrl = function (
 	pageRenderState,
 	type,
 	portletId,
@@ -372,6 +541,7 @@ const getUrl = function(
 	let url = '';
 
 	if (pageRenderState && pageRenderState.portlets) {
+
 		// If target portlet not defined for render URL, set it to null
 
 		if (type === 'RENDER' && portletId === undefined) {
@@ -401,18 +571,22 @@ const getUrl = function(
 						VALUE_DELIM +
 						encodeURIComponent(resourceId);
 				}
-			} else if (type === 'RENDER' && portletId !== null) {
+			}
+			else if (type === 'RENDER' && portletId !== null) {
 				url = decodeURIComponent(portletData.encodedRenderURL);
-			} else if (type === 'RENDER') {
+			}
+			else if (type === 'RENDER') {
 				url = decodeURIComponent(pageRenderState.encodedCurrentURL);
-			} else if (type === 'ACTION') {
+			}
+			else if (type === 'ACTION') {
 				url = decodeURIComponent(portletData.encodedActionURL);
 				url +=
 					TOKEN_DELIM +
 					HUB_ACTION_KEY +
 					VALUE_DELIM +
 					encodeURIComponent(AJAX_ACTION_VALUE);
-			} else if (type === 'PARTIAL_ACTION') {
+			}
+			else if (type === 'PARTIAL_ACTION') {
 				url = decodeURIComponent(portletData.encodedActionURL);
 				url +=
 					TOKEN_DELIM +
@@ -427,6 +601,7 @@ const getUrl = function(
 			// Put the private & public parameters on the URL if cacheability != FULL
 
 			if (type !== 'RESOURCE' || cacheability !== 'cacheLevelFull') {
+
 				// Add the state for the target portlet, if there is one.
 				// (for the render URL, pid can be null, and the state will have
 				// been added previously)
@@ -449,7 +624,7 @@ const getUrl = function(
 
 						const keys = Object.keys(stateParameters);
 
-						keys.forEach(key => {
+						keys.forEach((key) => {
 							if (
 								!isPublicParameter(
 									pageRenderState,
@@ -479,12 +654,12 @@ const getUrl = function(
 
 					const mapKeys = Object.keys(pageRenderState.prpMap);
 
-					mapKeys.forEach(mapKey => {
+					mapKeys.forEach((mapKey) => {
 						const groupKeys = Object.keys(
 							pageRenderState.prpMap[mapKey]
 						);
 
-						groupKeys.forEach(groupKey => {
+						groupKeys.forEach((groupKey) => {
 							const groupName =
 								pageRenderState.prpMap[mapKey][groupKey];
 
@@ -525,7 +700,7 @@ const getUrl = function(
 		str = '';
 		const parameterKeys = Object.keys(parameters);
 
-		parameterKeys.forEach(parameterKey => {
+		parameterKeys.forEach((parameterKey) => {
 			str += encodeParameter(
 				portletId + parameterKey,
 				parameters[parameterKey]
@@ -536,161 +711,6 @@ const getUrl = function(
 	}
 
 	return Promise.resolve(url);
-};
-
-/**
- * Compares two parameters and returns a boolean indicating if they're equal
- * or not.
- * @param {?Array.<string>} parameter1 The first parameter to compare.
- * @param {?Array.<string>} parameter2 The second parameter to compare.
- * @return {boolean}
- * @review
- */
-
-const isParameterEqual = function(parameter1, parameter2) {
-	let result = false;
-
-	// The values are either string arrays or undefined.
-
-	if (parameter1 === undefined && parameter2 === undefined) {
-		result = true;
-	}
-
-	if (parameter1 === undefined || parameter2 === undefined) {
-		result = false;
-	}
-
-	if (parameter1.length !== parameter2.length) {
-		result = false;
-	}
-
-	for (let i = parameter1.length - 1; i >= 0; i--) {
-		if (parameter1[i] !== parameter2[i]) {
-			result = false;
-		}
-	}
-
-	return result;
-};
-
-/**
- * Compares the values of the named parameter in the new render state
- * with the values of that parameter in the current state.
- * @param {Object} pageRenderState The page render state.
- * @param {string} portletId The portlet ID.
- * @param {RenderState} state The new render state.
- * @param {string} name The name of the parameter to check.
- * @return {boolean} True if the new parameter's value is different from the current value.
- * @review
- */
-
-const isParameterInStateEqual = function(
-	pageRenderState,
-	portletId,
-	state,
-	name
-) {
-	let result = false;
-
-	if (pageRenderState && pageRenderState.portlets) {
-		const portletData = pageRenderState.portlets[portletId];
-
-		if (state.parameters[name] && portletData.state.parameters[name]) {
-			const newParameter = state.parameters[name];
-			const oldParameter = portletData.state.parameters[name];
-
-			result = isParameterEqual(newParameter, oldParameter);
-		}
-	}
-
-	return result;
-};
-
-/**
- * Function for checking if a parameter is public.
- * @param {Object} pageRenderState The page render state.
- * @param {string} portletId  The portlet ID.
- * @param {string} name  The name of the parameter to check.
- * @return {boolean}
- * @review
- */
-
-const isPublicParameter = function(pageRenderState, portletId, name) {
-	let result = false;
-
-	if (pageRenderState && pageRenderState.portlets) {
-		const portletData = pageRenderState.portlets[portletId];
-
-		if (portletData && portletData.pubParms) {
-			const keys = Object.keys(portletData.pubParms);
-
-			result = keys.includes(name);
-		}
-	}
-
-	return result;
-};
-
-/**
- * Returns true if input state differs from the current page state.
- * Throws exception if input state is malformed.
- * @param {Object} pageRenderState The (current) page render state.
- * @param {RenderState} newState The new state to be set.
- * @param {string} portletId The portlet ID.
- * @return {boolean}  True if the two state are different.
- * @review
- */
-
-const stateChanged = function(pageRenderState, newState, portletId) {
-	let result = false;
-
-	if (pageRenderState && pageRenderState.portlets) {
-		const portletData = pageRenderState.portlets[portletId];
-
-		if (portletData) {
-			const oldState = pageRenderState.portlets[portletId].state;
-
-			if (
-				!newState.portletMode ||
-				!newState.windowState ||
-				!newState.parameters
-			) {
-				throw new Error(`Error decoding state: ${newState}`);
-			}
-
-			if (
-				newState.porletMode !== oldState.portletMode ||
-				newState.windowState !== oldState.windowState
-			) {
-				result = true;
-			} else {
-				// Has a parameter changed or been added?
-
-				const newKeys = Object.keys(newState.parameters);
-
-				newKeys.forEach(key => {
-					const newParameter = newState.parameters[key];
-					const oldParameter = oldState.parameters[key];
-
-					if (!isParameterEqual(newParameter, oldParameter)) {
-						result = true;
-					}
-				});
-
-				// Make sure no parameter was deleted
-
-				const oldKeys = Object.keys(oldState.parameters);
-
-				oldKeys.forEach(key => {
-					if (!newState.parameters[key]) {
-						result = true;
-					}
-				});
-			}
-		}
-	}
-
-	return result;
 };
 
 /**
@@ -708,16 +728,18 @@ const stateChanged = function(pageRenderState, newState, portletId) {
  * @review
  */
 
-const validateArguments = function(args = [], min = 0, max = 1, types = []) {
+const validateArguments = function (args = [], min = 0, max = 1, types = []) {
 	if (args.length < min) {
 		throw new TypeError(
 			`Too few arguments provided: Number of arguments: ${args.length}`
 		);
-	} else if (args.length > max) {
+	}
+	else if (args.length > max) {
 		throw new TypeError(
 			`Too many arguments provided: ${[].join.call(args, ', ')}`
 		);
-	} else if (Array.isArray(types)) {
+	}
+	else if (Array.isArray(types)) {
 		let i = Math.min(args.length, types.length) - 1;
 
 		for (i; i >= 0; i--) {
@@ -746,7 +768,7 @@ const validateArguments = function(args = [], min = 0, max = 1, types = []) {
  * @review
  */
 
-const validateForm = function(form) {
+const validateForm = function (form) {
 	if (!(form instanceof HTMLFormElement)) {
 		throw new TypeError('Element must be an HTMLFormElement');
 	}
@@ -811,14 +833,14 @@ const validateForm = function(form) {
  * @review
  */
 
-const validateParameters = function(parameters) {
+const validateParameters = function (parameters) {
 	if (!isDefAndNotNull(parameters)) {
 		throw new TypeError(`The parameter object is: ${typeof parameters}`);
 	}
 
 	const keys = Object.keys(parameters);
 
-	keys.forEach(key => {
+	keys.forEach((key) => {
 		if (!Array.isArray(parameters[key])) {
 			throw new TypeError(`${key} parameter is not an array`);
 		}
@@ -839,7 +861,7 @@ const validateParameters = function(parameters) {
  * @review
  */
 
-const validatePortletId = function(pageRenderState = {}, portletId = '') {
+const validatePortletId = function (pageRenderState = {}, portletId = '') {
 	return (
 		pageRenderState.portlets &&
 		Object.keys(pageRenderState.portlets).includes(portletId)
@@ -855,7 +877,7 @@ const validatePortletId = function(pageRenderState = {}, portletId = '') {
  * @review
  */
 
-const validateState = function(state = {}, portletData = {}) {
+const validateState = function (state = {}, portletData = {}) {
 	validateParameters(state.parameters);
 
 	const portletMode = state.portletMode;
@@ -864,7 +886,8 @@ const validateState = function(state = {}, portletData = {}) {
 		throw new TypeError(
 			`Invalid parameters. portletMode is ${typeof portletMode}`
 		);
-	} else {
+	}
+	else {
 		const allowedPortletModes = portletData.allowedPM;
 
 		if (!allowedPortletModes.includes(portletMode.toLowerCase())) {
@@ -880,7 +903,8 @@ const validateState = function(state = {}, portletData = {}) {
 		throw new TypeError(
 			`Invalid parameters. windowState is ${typeof windowState}`
 		);
-	} else {
+	}
+	else {
 		const allowedWindowStates = portletData.allowedWS;
 
 		if (!allowedWindowStates.includes(windowState.toLowerCase())) {
@@ -902,5 +926,5 @@ export {
 	validateForm,
 	validateParameters,
 	validatePortletId,
-	validateState
+	validateState,
 };

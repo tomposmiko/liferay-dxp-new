@@ -20,11 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class is used by SOAP remote services.
+ * This class is used by SOAP remote services, specifically {@link com.liferay.change.tracking.service.http.CTPreferencesServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class CTPreferencesSoap implements Serializable {
 
 	public static CTPreferencesSoap toSoapModel(CTPreferences model) {
@@ -35,6 +37,7 @@ public class CTPreferencesSoap implements Serializable {
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
 		soapModel.setCtCollectionId(model.getCtCollectionId());
+		soapModel.setPreviousCtCollectionId(model.getPreviousCtCollectionId());
 		soapModel.setConfirmationEnabled(model.isConfirmationEnabled());
 
 		return soapModel;
@@ -129,6 +132,14 @@ public class CTPreferencesSoap implements Serializable {
 		_ctCollectionId = ctCollectionId;
 	}
 
+	public long getPreviousCtCollectionId() {
+		return _previousCtCollectionId;
+	}
+
+	public void setPreviousCtCollectionId(long previousCtCollectionId) {
+		_previousCtCollectionId = previousCtCollectionId;
+	}
+
 	public boolean getConfirmationEnabled() {
 		return _confirmationEnabled;
 	}
@@ -146,6 +157,7 @@ public class CTPreferencesSoap implements Serializable {
 	private long _companyId;
 	private long _userId;
 	private long _ctCollectionId;
+	private long _previousCtCollectionId;
 	private boolean _confirmationEnabled;
 
 }

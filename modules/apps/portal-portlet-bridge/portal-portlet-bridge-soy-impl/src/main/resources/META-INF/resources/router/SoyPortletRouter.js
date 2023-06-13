@@ -30,6 +30,7 @@ import {RequestScreen, utils} from 'senna';
  *  - Global server error management
  */
 class SoyPortletRouter extends State {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -98,6 +99,7 @@ class SoyPortletRouter extends State {
 		 * way after retrieving the new renderState.
 		 */
 		class DeferredComponentScreen extends Router.defaultScreen {
+
 			/**
 			 * @inheritDoc
 			 */
@@ -121,6 +123,9 @@ class SoyPortletRouter extends State {
 				const uri = new URL(redirect, window.location.origin);
 				uri.searchParams.delete('p_p_lifecycle');
 				uri.searchParams.delete(`${instance.portletNamespace}pjax`);
+				uri.searchParams.delete(
+					`${instance.portletNamespace}soy_route`
+				);
 
 				if (
 					uri.searchParams.has(
@@ -151,7 +156,7 @@ class SoyPortletRouter extends State {
 				const deferred = new Promise((resolve, reject) => {
 					Liferay.Loader.require(
 						loadedState.javaScriptLoaderModule,
-						module => {
+						(module) => {
 							super.maybeRedirectRouter();
 							const component = module.default;
 
@@ -163,7 +168,7 @@ class SoyPortletRouter extends State {
 
 							resolve();
 						},
-						error => reject(error)
+						(error) => reject(error)
 					);
 				});
 
@@ -195,14 +200,15 @@ class SoyPortletRouter extends State {
 				pathFn ||
 				this.matchPath_.bind(this, route.mvcRenderCommandName),
 			portletNamespace: this.portletNamespace,
-			route
+			route,
 		};
 
 		try {
 			if (config.path(utils.getCurrentBrowserPath())) {
 				config.data = this.context;
 			}
-		} catch (e) {}
+		}
+		catch (e) {}
 
 		return new Router(config, this.portletWrapper);
 	}
@@ -227,10 +233,11 @@ class SoyPortletRouter extends State {
 
 		uri.searchParams.set('p_p_lifecycle', '2');
 		uri.searchParams.set(`${this.portletNamespace}pjax`, true);
+		uri.searchParams.set(`${this.portletNamespace}soy_route`, true);
 
 		if (!uri.searchParams.has('p_p_id')) {
-			uri.searchParams.add('p_p_id', this.portletId);
-			uri.searchParams.add(`${this.portletNamespace}no_p_p_id`, true);
+			uri.searchParams.append('p_p_id', this.portletId);
+			uri.searchParams.append(`${this.portletNamespace}no_p_p_id`, true);
 		}
 
 		return uri.toString();
@@ -244,7 +251,7 @@ class SoyPortletRouter extends State {
 	 * @return {Function} A matcher function
 	 */
 	getPathFunctionForFriendlyURLPattern_(pattern, mapping) {
-		return url => {
+		return (url) => {
 			let mappingPrefix = `/${mapping}`;
 
 			if (this.friendlyURLPrefix) {
@@ -331,7 +338,7 @@ class SoyPortletRouter extends State {
 	 * @protected
 	 */
 	initializeActionRouter_() {
-		const pathFn = url => {
+		const pathFn = (url) => {
 			const uri = new URL(url, window.location.origin);
 
 			const lifecycleParam = uri.searchParams.get('p_p_lifecycle');
@@ -352,7 +359,7 @@ class SoyPortletRouter extends State {
 
 		this.createRouter_(
 			{
-				mvcRenderCommandName: '/'
+				mvcRenderCommandName: '/',
 			},
 			pathFn
 		);
@@ -401,7 +408,7 @@ class SoyPortletRouter extends State {
 	 * @protected
 	 */
 	initializeRouters_() {
-		this.mvcRenderCommandNames.forEach(mvcRenderCommandName =>
+		this.mvcRenderCommandNames.forEach((mvcRenderCommandName) =>
 			this.createRouter_({mvcRenderCommandName})
 		);
 	}
@@ -456,7 +463,7 @@ class SoyPortletRouter extends State {
 	 */
 	isFriendlyURL_(url) {
 		const friendlyURLRoute = this.friendlyURLRoutes.find(
-			friendlyURLRoute => {
+			(friendlyURLRoute) => {
 				return this.getPathFunctionForFriendlyURLPattern_(
 					friendlyURLRoute.pattern,
 					this.friendlyURLMapping
@@ -507,7 +514,7 @@ class SoyPortletRouter extends State {
 			openToast({
 				message,
 				title,
-				type
+				type,
 			});
 		}
 	}
@@ -523,7 +530,8 @@ class SoyPortletRouter extends State {
 			(event.error.requestError || event.error.invalidStatus)
 		) {
 			window.location.href = event.path;
-		} else {
+		}
+		else {
 			const activeState = Router.getActiveState();
 
 			if (activeState) {
@@ -532,7 +540,7 @@ class SoyPortletRouter extends State {
 				const {sessionErrors, sessionMessages} = _INJECTED_DATA_;
 
 				if (sessionMessages) {
-					Object.keys(sessionMessages).forEach(key =>
+					Object.keys(sessionMessages).forEach((key) =>
 						this.maybeShowAlert_(
 							sessionMessages[key],
 							'success',
@@ -542,7 +550,7 @@ class SoyPortletRouter extends State {
 				}
 
 				if (sessionErrors) {
-					Object.keys(sessionErrors).forEach(key =>
+					Object.keys(sessionErrors).forEach((key) =>
 						this.maybeShowAlert_(sessionErrors[key])
 					);
 				}
@@ -558,6 +566,7 @@ class SoyPortletRouter extends State {
  * @static
  */
 SoyPortletRouter.STATE = {
+
 	/**
 	 * @instance
 	 * @memberof SoyPortletRouter
@@ -571,7 +580,7 @@ SoyPortletRouter.STATE = {
 	 * @type {string}
 	 */
 	element: {
-		setter: dom.toElement
+		setter: dom.toElement,
 	},
 
 	/**
@@ -622,8 +631,8 @@ SoyPortletRouter.STATE = {
 	 * @type {string}
 	 */
 	portletWrapper: {
-		setter: dom.toElement
-	}
+		setter: dom.toElement,
+	},
 };
 
 export default SoyPortletRouter;

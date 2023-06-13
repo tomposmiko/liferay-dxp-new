@@ -24,7 +24,7 @@ UserGroupRolesDisplayContext userGroupRolesDisplayContext = new UserGroupRolesDi
 	displayContext="<%= new UserGroupRolesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, userGroupRolesDisplayContext) %>"
 />
 
-<aui:form cssClass="container-fluid-1280 portlet-site-memberships-assign-site-roles" name="fm">
+<aui:form cssClass="container-fluid-1280 portlet-site-memberships-assign-roles" name="fm">
 	<liferay-ui:search-container
 		id="userGroupGroupRoleRole"
 		searchContainer="<%= userGroupRolesDisplayContext.getRoleSearchSearchContainer() %>"
@@ -54,11 +54,11 @@ UserGroupRolesDisplayContext userGroupRolesDisplayContext = new UserGroupRolesDi
 		'<portlet:namespace />userGroupGroupRoleRole'
 	);
 
-	searchContainer.on('rowToggled', function(event) {
+	searchContainer.on('rowToggled', function (event) {
 		Liferay.Util.getOpener().Liferay.fire(
 			'<%= HtmlUtil.escapeJS(userGroupRolesDisplayContext.getEventName()) %>',
 			{
-				data: event.elements.allSelectedElements.getDOMNodes()
+				data: event.elements.allSelectedElements.getDOMNodes(),
 			}
 		);
 	});

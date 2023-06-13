@@ -26,9 +26,9 @@ definition {
 
 		Click(locator1 = "Segmentation#CRITERION_INPUT");
 
-		Click(
-			locator1 = "Segmentation#CRITERION_INPUT_OPTION",
-			value1 = "${criterionInputOption}");
+		Click.clickNoMouseOver(
+			key_dropdownOption = "${criterionInputOption}",
+			locator1 = "AppBuilder#PRODUCT_MENU_PLACE_IT_DROPDOWN_OPTION");
 	}
 
 	macro deleteProperties {
@@ -57,12 +57,36 @@ definition {
 			value1 = "${titleField}");
 	}
 
+	macro openSegmentsAdmin {
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_segments_web_internal_portlet_SegmentsPortlet");
+	}
+
 	macro selectOrganization {
 		Click(locator1 = "Segmentation#ORGANIZATION_MENU");
 	}
 
 	macro selectSession {
 		Click(locator1 = "Segmentation#SESSION_MENU");
+	}
+
+	macro selectTag {
+		Click(locator1 = "Segmentation#ADD_TAG_BUTTON");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		Click(locator1 = "Segmentation#SEARCH_TAG_FIELD");
+
+		Type(
+			locator1 = "Segmentation#SEARCH_TAG_FIELD",
+			value1 = "${tagOption}");
+
+		KeyPress(
+			locator1 = "Segmentation#SEARCH_TAG_FIELD",
+			value1 = "\ENTER");
+
+		Click(locator1 = "Segmentation#TAG_OPTION");
+
+		SelectFrameTop();
 	}
 
 	macro tearDown {

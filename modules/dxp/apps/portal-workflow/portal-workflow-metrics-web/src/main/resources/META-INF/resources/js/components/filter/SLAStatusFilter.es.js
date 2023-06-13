@@ -16,28 +16,48 @@ import {useFilterName} from '../../shared/components/filter/hooks/useFilterName.
 import {useFilterStatic} from '../../shared/components/filter/hooks/useFilterStatic.es';
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
 
+const slaStatusConstants = {
+	onTime: 'OnTime',
+	overdue: 'Overdue',
+	untracked: 'Untracked',
+};
+
+const slaStatuses = [
+	{
+		key: slaStatusConstants.onTime,
+		name: Liferay.Language.get('on-time'),
+	},
+	{
+		key: slaStatusConstants.overdue,
+		name: Liferay.Language.get('overdue'),
+	},
+	{
+		key: slaStatusConstants.untracked,
+		name: Liferay.Language.get('untracked'),
+	},
+];
+
 const SLAStatusFilter = ({
 	className,
-	dispatch,
 	filterKey = filterConstants.slaStatus.key,
 	options = {},
-	prefixKey = ''
+	prefixKey = '',
 }) => {
-	const defaultOptions = {
+	options = {
 		hideControl: false,
 		multiple: true,
 		position: 'left',
-		withSelectionTitle: true
+		withSelectionTitle: true,
+		withoutRouteParams: false,
+		...options,
 	};
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	options = useMemo(() => ({...defaultOptions, ...options}), [options]);
 
-	const {items, selectedItems} = useFilterStatic(
-		dispatch,
+	const {items, selectedItems} = useFilterStatic({
 		filterKey,
 		prefixKey,
-		slaStatuses
-	);
+		staticItems: slaStatuses,
+		...options,
+	});
 
 	const defaultItem = useMemo(() => (items ? items[0] : undefined), [items]);
 
@@ -50,7 +70,6 @@ const SLAStatusFilter = ({
 
 	return (
 		<Filter
-			dataTestId="SLAStatusFilter"
 			defaultItem={defaultItem}
 			elementClasses={className}
 			filterKey={filterKey}
@@ -61,27 +80,6 @@ const SLAStatusFilter = ({
 		/>
 	);
 };
-
-const slaStatusConstants = {
-	onTime: 'OnTime',
-	overdue: 'Overdue',
-	untracked: 'Untracked'
-};
-
-const slaStatuses = [
-	{
-		key: slaStatusConstants.onTime,
-		name: Liferay.Language.get('on-time')
-	},
-	{
-		key: slaStatusConstants.overdue,
-		name: Liferay.Language.get('overdue')
-	},
-	{
-		key: slaStatusConstants.untracked,
-		name: Liferay.Language.get('untracked')
-	}
-];
 
 export default SLAStatusFilter;
 export {slaStatusConstants};

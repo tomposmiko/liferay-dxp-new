@@ -39,16 +39,18 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.trash.TrashHelper;
 import com.liferay.wiki.configuration.WikiGroupServiceOverriddenConfiguration;
 import com.liferay.wiki.constants.WikiConstants;
+import com.liferay.wiki.constants.WikiPageConstants;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.constants.WikiWebKeys;
 import com.liferay.wiki.engine.WikiEngineRenderer;
+import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
-import com.liferay.wiki.model.WikiPageConstants;
 import com.liferay.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.wiki.web.internal.security.permission.resource.WikiPagePermission;
 
 import java.util.Locale;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
@@ -217,13 +219,18 @@ public class WikiPageAssetRenderer
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			liferayPortletRequest, WikiPortletKeys.WIKI,
-			PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = liferayPortletResponse.createActionURL(
+			WikiPortletKeys.WIKI);
 
-		portletURL.setParameter("mvcRenderCommandName", "/wiki/export_page");
+		portletURL.setParameter(ActionRequest.ACTION_NAME, "/wiki/export_page");
 		portletURL.setParameter("nodeId", String.valueOf(_page.getNodeId()));
+
+		WikiNode node = _page.getNode();
+
+		portletURL.setParameter("nodeName", node.getName());
+
 		portletURL.setParameter("title", _page.getTitle());
+		portletURL.setParameter("version", String.valueOf(_page.getVersion()));
 
 		return portletURL;
 	}

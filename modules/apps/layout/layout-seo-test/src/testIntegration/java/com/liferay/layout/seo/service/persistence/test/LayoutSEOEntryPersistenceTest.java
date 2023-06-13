@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -45,7 +46,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.junit.After;
@@ -126,6 +126,8 @@ public class LayoutSEOEntryPersistenceTest {
 
 		newLayoutSEOEntry.setMvccVersion(RandomTestUtil.nextLong());
 
+		newLayoutSEOEntry.setCtCollectionId(RandomTestUtil.nextLong());
+
 		newLayoutSEOEntry.setUuid(RandomTestUtil.randomString());
 
 		newLayoutSEOEntry.setGroupId(RandomTestUtil.nextLong());
@@ -177,6 +179,9 @@ public class LayoutSEOEntryPersistenceTest {
 		Assert.assertEquals(
 			existingLayoutSEOEntry.getMvccVersion(),
 			newLayoutSEOEntry.getMvccVersion());
+		Assert.assertEquals(
+			existingLayoutSEOEntry.getCtCollectionId(),
+			newLayoutSEOEntry.getCtCollectionId());
 		Assert.assertEquals(
 			existingLayoutSEOEntry.getUuid(), newLayoutSEOEntry.getUuid());
 		Assert.assertEquals(
@@ -298,10 +303,10 @@ public class LayoutSEOEntryPersistenceTest {
 
 	protected OrderByComparator<LayoutSEOEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"LayoutSEOEntry", "mvccVersion", true, "uuid", true,
-			"layoutSEOEntryId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "privateLayout", true, "layoutId", true,
+			"LayoutSEOEntry", "mvccVersion", true, "ctCollectionId", true,
+			"uuid", true, "layoutSEOEntryId", true, "groupId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "privateLayout", true, "layoutId", true,
 			"canonicalURL", true, "canonicalURLEnabled", true, "DDMStorageId",
 			true, "openGraphDescription", true, "openGraphDescriptionEnabled",
 			true, "openGraphImageAlt", true, "openGraphImageFileEntryId", true,
@@ -529,34 +534,77 @@ public class LayoutSEOEntryPersistenceTest {
 
 		_persistence.clearCache();
 
-		LayoutSEOEntry existingLayoutSEOEntry = _persistence.findByPrimaryKey(
-			newLayoutSEOEntry.getPrimaryKey());
+		_assertOriginalValues(
+			_persistence.findByPrimaryKey(newLayoutSEOEntry.getPrimaryKey()));
+	}
 
-		Assert.assertTrue(
-			Objects.equals(
-				existingLayoutSEOEntry.getUuid(),
-				ReflectionTestUtil.invoke(
-					existingLayoutSEOEntry, "getOriginalUuid",
-					new Class<?>[0])));
+	@Test
+	public void testResetOriginalValuesWithDynamicQueryLoadFromDatabase()
+		throws Exception {
+
+		_testResetOriginalValuesWithDynamicQuery(true);
+	}
+
+	@Test
+	public void testResetOriginalValuesWithDynamicQueryLoadFromSession()
+		throws Exception {
+
+		_testResetOriginalValuesWithDynamicQuery(false);
+	}
+
+	private void _testResetOriginalValuesWithDynamicQuery(boolean clearSession)
+		throws Exception {
+
+		LayoutSEOEntry newLayoutSEOEntry = addLayoutSEOEntry();
+
+		if (clearSession) {
+			Session session = _persistence.openSession();
+
+			session.flush();
+
+			session.clear();
+		}
+
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LayoutSEOEntry.class, _dynamicQueryClassLoader);
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"layoutSEOEntryId", newLayoutSEOEntry.getLayoutSEOEntryId()));
+
+		List<LayoutSEOEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
+
+		_assertOriginalValues(result.get(0));
+	}
+
+	private void _assertOriginalValues(LayoutSEOEntry layoutSEOEntry) {
 		Assert.assertEquals(
-			Long.valueOf(existingLayoutSEOEntry.getGroupId()),
+			layoutSEOEntry.getUuid(),
+			ReflectionTestUtil.invoke(
+				layoutSEOEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "uuid_"));
+		Assert.assertEquals(
+			Long.valueOf(layoutSEOEntry.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
-				existingLayoutSEOEntry, "getOriginalGroupId", new Class<?>[0]));
+				layoutSEOEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "groupId"));
 
 		Assert.assertEquals(
-			Long.valueOf(existingLayoutSEOEntry.getGroupId()),
+			Long.valueOf(layoutSEOEntry.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
-				existingLayoutSEOEntry, "getOriginalGroupId", new Class<?>[0]));
+				layoutSEOEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "groupId"));
 		Assert.assertEquals(
-			Boolean.valueOf(existingLayoutSEOEntry.getPrivateLayout()),
+			Boolean.valueOf(layoutSEOEntry.getPrivateLayout()),
 			ReflectionTestUtil.<Boolean>invoke(
-				existingLayoutSEOEntry, "getOriginalPrivateLayout",
-				new Class<?>[0]));
+				layoutSEOEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "privateLayout"));
 		Assert.assertEquals(
-			Long.valueOf(existingLayoutSEOEntry.getLayoutId()),
+			Long.valueOf(layoutSEOEntry.getLayoutId()),
 			ReflectionTestUtil.<Long>invoke(
-				existingLayoutSEOEntry, "getOriginalLayoutId",
-				new Class<?>[0]));
+				layoutSEOEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "layoutId"));
 	}
 
 	protected LayoutSEOEntry addLayoutSEOEntry() throws Exception {
@@ -565,6 +613,8 @@ public class LayoutSEOEntryPersistenceTest {
 		LayoutSEOEntry layoutSEOEntry = _persistence.create(pk);
 
 		layoutSEOEntry.setMvccVersion(RandomTestUtil.nextLong());
+
+		layoutSEOEntry.setCtCollectionId(RandomTestUtil.nextLong());
 
 		layoutSEOEntry.setUuid(RandomTestUtil.randomString());
 

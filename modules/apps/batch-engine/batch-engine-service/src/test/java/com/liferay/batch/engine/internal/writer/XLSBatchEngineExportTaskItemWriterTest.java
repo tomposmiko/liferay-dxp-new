@@ -16,10 +16,10 @@ package com.liferay.batch.engine.internal.writer;
 
 import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.string.CharPool;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import java.lang.reflect.Field;
 
@@ -42,6 +42,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -49,6 +51,11 @@ import org.junit.Test;
  */
 public class XLSBatchEngineExportTaskItemWriterTest
 	extends BaseBatchEngineExportTaskItemWriterTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testWriteRowsWithDefinedFieldNames1() throws Exception {
@@ -87,7 +94,7 @@ public class XLSBatchEngineExportTaskItemWriterTest
 
 	private byte[] _getExpectedContent(
 			List<String> fieldNames, List<Item> items)
-		throws IllegalAccessException, IOException {
+		throws Exception {
 
 		try (Workbook workbook = new XSSFWorkbook()) {
 			Sheet sheet = workbook.createSheet();

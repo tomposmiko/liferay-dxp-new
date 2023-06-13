@@ -16,6 +16,7 @@ package com.liferay.portal.search.tuning.synonyms.web.internal.filter;
 
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.index.CloseIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.OpenIndexRequest;
@@ -32,7 +33,12 @@ public class SynonymSetFilterWriterImpl implements SynonymSetFilterWriter {
 
 	@Override
 	public void updateSynonymSets(
-		String companyIndexName, String filterName, String[] synonymSets) {
+		String companyIndexName, String filterName, String[] synonymSets,
+		boolean deletion) {
+
+		if (ArrayUtil.isEmpty(synonymSets) && !deletion) {
+			return;
+		}
 
 		closeIndex(companyIndexName);
 
@@ -40,9 +46,8 @@ public class SynonymSetFilterWriterImpl implements SynonymSetFilterWriter {
 			UpdateIndexSettingsIndexRequest updateIndexSettingsIndexRequest =
 				new UpdateIndexSettingsIndexRequest(companyIndexName);
 
-			String settings = buildSettings(filterName, synonymSets);
-
-			updateIndexSettingsIndexRequest.setSettings(settings);
+			updateIndexSettingsIndexRequest.setSettings(
+				buildSettings(filterName, synonymSets));
 
 			searchEngineAdapter.execute(updateIndexSettingsIndexRequest);
 		}
@@ -76,6 +81,8 @@ public class SynonymSetFilterWriterImpl implements SynonymSetFilterWriter {
 
 	protected void openIndex(String indexName) {
 		OpenIndexRequest openIndexRequest = new OpenIndexRequest(indexName);
+
+		openIndexRequest.setWaitForActiveShards(1);
 
 		searchEngineAdapter.execute(openIndexRequest);
 	}

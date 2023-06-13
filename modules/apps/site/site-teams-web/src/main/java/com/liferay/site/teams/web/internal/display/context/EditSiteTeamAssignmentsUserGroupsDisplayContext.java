@@ -17,6 +17,7 @@ package com.liferay.site.teams.web.internal.display.context;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
 import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.service.persistence.constants.UserGroupFinderConstants;
 import com.liferay.portlet.usergroupsadmin.search.UserGroupDisplayTerms;
 import com.liferay.portlet.usergroupsadmin.search.UserGroupSearch;
+import com.liferay.site.teams.web.internal.constants.SiteTeamsPortletKeys;
 import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.LinkedHashMap;
@@ -56,8 +58,9 @@ public class EditSiteTeamAssignmentsUserGroupsDisplayContext
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(
-			httpServletRequest, "displayStyle", "list");
+		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
+			httpServletRequest, SiteTeamsPortletKeys.SITE_TEAMS,
+			"usergroup-display-style", "list");
 
 		return _displayStyle;
 	}
@@ -119,7 +122,7 @@ public class EditSiteTeamAssignmentsUserGroupsDisplayContext
 		return _orderByType;
 	}
 
-	public SearchContainer getUserGroupSearchContainer() {
+	public SearchContainer<UserGroup> getUserGroupSearchContainer() {
 		if (_userGroupSearchContainer != null) {
 			return _userGroupSearchContainer;
 		}
@@ -128,8 +131,8 @@ public class EditSiteTeamAssignmentsUserGroupsDisplayContext
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		SearchContainer userGroupSearchContainer = new UserGroupSearch(
-			renderRequest, getEditTeamAssignmentsURL());
+		SearchContainer<UserGroup> userGroupSearchContainer =
+			new UserGroupSearch(renderRequest, getEditTeamAssignmentsURL());
 
 		OrderByComparator<UserGroup> orderByComparator =
 			UsersAdminUtil.getUserGroupOrderByComparator(
@@ -174,6 +177,6 @@ public class EditSiteTeamAssignmentsUserGroupsDisplayContext
 	private String _keywords;
 	private String _orderByCol;
 	private String _orderByType;
-	private SearchContainer _userGroupSearchContainer;
+	private SearchContainer<UserGroup> _userGroupSearchContainer;
 
 }

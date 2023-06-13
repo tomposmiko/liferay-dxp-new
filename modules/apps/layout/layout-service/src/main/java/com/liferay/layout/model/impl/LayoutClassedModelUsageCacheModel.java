@@ -37,17 +37,17 @@ public class LayoutClassedModelUsageCacheModel
 	implements CacheModel<LayoutClassedModelUsage>, Externalizable, MVCCModel {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof LayoutClassedModelUsageCacheModel)) {
+		if (!(object instanceof LayoutClassedModelUsageCacheModel)) {
 			return false;
 		}
 
 		LayoutClassedModelUsageCacheModel layoutClassedModelUsageCacheModel =
-			(LayoutClassedModelUsageCacheModel)obj;
+			(LayoutClassedModelUsageCacheModel)object;
 
 		if ((layoutClassedModelUsageId ==
 				layoutClassedModelUsageCacheModel.layoutClassedModelUsageId) &&
@@ -78,16 +78,20 @@ public class LayoutClassedModelUsageCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(31);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", ctCollectionId=");
+		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", layoutClassedModelUsageId=");
 		sb.append(layoutClassedModelUsageId);
 		sb.append(", groupId=");
 		sb.append(groupId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 		sb.append(", createDate=");
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
@@ -117,6 +121,7 @@ public class LayoutClassedModelUsageCacheModel
 			new LayoutClassedModelUsageImpl();
 
 		layoutClassedModelUsageImpl.setMvccVersion(mvccVersion);
+		layoutClassedModelUsageImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			layoutClassedModelUsageImpl.setUuid("");
@@ -128,6 +133,7 @@ public class LayoutClassedModelUsageCacheModel
 		layoutClassedModelUsageImpl.setLayoutClassedModelUsageId(
 			layoutClassedModelUsageId);
 		layoutClassedModelUsageImpl.setGroupId(groupId);
+		layoutClassedModelUsageImpl.setCompanyId(companyId);
 
 		if (createDate == Long.MIN_VALUE) {
 			layoutClassedModelUsageImpl.setCreateDate(null);
@@ -173,11 +179,15 @@ public class LayoutClassedModelUsageCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
+
+		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		layoutClassedModelUsageId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
+
+		companyId = objectInput.readLong();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
 
@@ -198,6 +208,8 @@ public class LayoutClassedModelUsageCacheModel
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
+		objectOutput.writeLong(ctCollectionId);
+
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -208,6 +220,8 @@ public class LayoutClassedModelUsageCacheModel
 		objectOutput.writeLong(layoutClassedModelUsageId);
 
 		objectOutput.writeLong(groupId);
+
+		objectOutput.writeLong(companyId);
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 
@@ -231,9 +245,11 @@ public class LayoutClassedModelUsageCacheModel
 	}
 
 	public long mvccVersion;
+	public long ctCollectionId;
 	public String uuid;
 	public long layoutClassedModelUsageId;
 	public long groupId;
+	public long companyId;
 	public long createDate;
 	public long modifiedDate;
 	public long classNameId;

@@ -66,7 +66,7 @@ if (Validator.isNotNull(scriptContent)) {
 							ResourceBundleLoader resourceBundleLoader = ResourceBundleLoaderUtil.getResourceBundleLoaderByBundleSymbolicName(bundle.getSymbolicName());
 
 							if (resourceBundleLoader == null) {
-								resourceBundleLoader = new AggregateResourceBundleLoader(ResourceBundleUtil.getResourceBundleLoader("content.Language", clazz.getClassLoader()), LanguageResources.RESOURCE_BUNDLE_LOADER);
+								resourceBundleLoader = new AggregateResourceBundleLoader(new ClassResourceBundleLoader("content.Language", clazz.getClassLoader()), LanguageResources.PORTAL_RESOURCE_BUNDLE_LOADER);
 							}
 
 							ResourceBundle templateHandlerResourceBundle = resourceBundleLoader.loadResourceBundle(locale);
@@ -176,29 +176,29 @@ if (Validator.isNotNull(scriptContent)) {
 				NAME: 'searchpalette',
 
 				prototype: {
-					initializer: function() {
+					initializer: function () {
 						var instance = this;
 
 						instance._bindUIACBase();
 						instance._syncUIACBase();
-					}
-				}
+					},
+				},
 			});
 
-			var getItems = function() {
+			var getItems = function () {
 				var results = [];
 
-				paletteItems.each(function(item, index) {
+				paletteItems.each(function (item, index) {
 					results.push({
 						data: item.text().trim(),
-						node: item.ancestor()
+						node: item.ancestor(),
 					});
 				});
 
 				return results;
 			};
 
-			var getNoResultsNode = function() {
+			var getNoResultsNode = function () {
 				if (!noResultsNode) {
 					noResultsNode = A.Node.create(
 						'<div class="alert"><%= UnicodeLanguageUtil.get(request, "there-are-no-results") %></div>'
@@ -219,21 +219,21 @@ if (Validator.isNotNull(scriptContent)) {
 				nodes: '.palette-item-container',
 				resultFilters: 'phraseMatch',
 				resultTextLocator: 'data',
-				source: getItems()
+				source: getItems(),
 			});
 
-			paletteSearch.on('results', function(event) {
-				paletteItems.each(function(item, index) {
+			paletteSearch.on('results', function (event) {
+				paletteItems.each(function (item, index) {
 					item.ancestor().addClass('hide');
 				});
 
-				event.results.forEach(function(item, index) {
+				event.results.forEach(function (item, index) {
 					item.raw.node.removeClass('hide');
 				});
 
 				var foundVisibleSection;
 
-				paletteSectionsNode.each(function(item, index) {
+				paletteSectionsNode.each(function (item, index) {
 					var visibleItem = item.one('.palette-item-container:not(.hide)');
 
 					if (visibleItem) {
@@ -247,7 +247,8 @@ if (Validator.isNotNull(scriptContent)) {
 
 				if (foundVisibleSection) {
 					noResultsNode.remove();
-				} else {
+				}
+				else {
 					paletteDataContainer.appendChild(noResultsNode);
 				}
 			});
@@ -269,7 +270,7 @@ if (Validator.isNotNull(scriptContent)) {
 			var cursorPos;
 			var processed;
 
-			AObject.each(fragments, function(item, index) {
+			AObject.each(fragments, function (item, index) {
 				if (processed) {
 					cursorPos = editor.getCursorPosition();
 				}
@@ -333,7 +334,7 @@ if (Validator.isNotNull(scriptContent)) {
 
 		if (AutoComplete) {
 			var processor = new AutoComplete({
-				variables: <%= ddmDisplayContext.getAutocompleteJSON(request, language) %>
+				variables: <%= ddmDisplayContext.getAutocompleteJSON(request, language) %>,
 			});
 
 			if (processor) {
@@ -343,9 +344,10 @@ if (Validator.isNotNull(scriptContent)) {
 					processor: processor,
 					render: true,
 					visible: false,
-					zIndex: 10000
+					zIndex: 10000,
 				});
-			} else {
+			}
+			else {
 				richEditor.unplug(ACPlugin);
 			}
 		}
@@ -361,31 +363,31 @@ if (Validator.isNotNull(scriptContent)) {
 
 	A.on(
 		'domready',
-		function(event) {
+		function (event) {
 			richEditor = new A.AceEditor({
 				boundingBox: editorNode,
 				height: 400,
 				mode: '<%= EditorModeUtil.getEditorMode(langType) %>',
-				width: '100%'
+				width: '100%',
 			}).render();
 
 			new A.Resize({
 				handles: ['br'],
 				node: editorNode,
 				on: {
-					resize: resizeEditor
-				}
+					resize: resizeEditor,
+				},
 			});
 
 			if (editorContentElement) {
 				setEditorContent(editorContentElement.val());
 			}
 
-			Liferay.on('<portlet:namespace />saveTemplate', function(event) {
+			Liferay.on('<portlet:namespace />saveTemplate', function (event) {
 				editorContentElement.val(getEditorContent());
 			});
 
-			selectLanguageNode.on('change', function(event) {
+			selectLanguageNode.on('change', function (event) {
 				Liferay.fire('<portlet:namespace />refreshEditor');
 			});
 
@@ -402,12 +404,12 @@ if (Validator.isNotNull(scriptContent)) {
 					animated: true,
 					container: paletteDataContainer,
 					content: '.palette-item-content',
-					header: '.palette-item-header'
+					header: '.palette-item-header',
 				});
 
 				new A.TooltipDelegate({
 					align: {
-						points: [A.WidgetPositionAlign.LC, A.WidgetPositionAlign.RC]
+						points: [A.WidgetPositionAlign.LC, A.WidgetPositionAlign.RC],
 					},
 					duration: 0.5,
 					html: true,
@@ -415,7 +417,7 @@ if (Validator.isNotNull(scriptContent)) {
 					trigger:
 						'#<portlet:namespace />templatePaletteContainer .palette-item',
 					visible: false,
-					zIndex: 6
+					zIndex: 6,
 				});
 
 				createLiveSearch();
@@ -424,7 +426,7 @@ if (Validator.isNotNull(scriptContent)) {
 		'#<portlet:namespace />richEditor'
 	);
 
-	Liferay.on('<portlet:namespace />refreshEditor', function(event) {
+	Liferay.on('<portlet:namespace />refreshEditor', function (event) {
 		var form = A.one('#<portlet:namespace />fm');
 
 		<portlet:renderURL var="refreshTemplateURL">
@@ -433,13 +435,7 @@ if (Validator.isNotNull(scriptContent)) {
 
 		form.attr('action', '<%= refreshTemplateURL %>');
 
-		if (
-			richEditor
-				.getEditor()
-				.getSession()
-				.getUndoManager()
-				.hasUndo()
-		) {
+		if (richEditor.getEditor().getSession().getUndoManager().hasUndo()) {
 			Liferay.fire('<portlet:namespace />saveTemplate');
 		}
 		<c:if test="<%= template == null %>">
@@ -661,8 +657,6 @@ private String _getVariableReferenceCode(String variableName, String accessor, S
 
 	return variableName;
 }
-%>
 
-<%!
 private static Log _log = LogFactoryUtil.getLog("com_liferay_dynamic_data_mapping_web.edit_template_display_jspf");
 %>

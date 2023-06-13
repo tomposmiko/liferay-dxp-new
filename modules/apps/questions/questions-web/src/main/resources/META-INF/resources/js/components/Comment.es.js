@@ -12,34 +12,53 @@
  * details.
  */
 
+import {useMutation} from '@apollo/client';
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import React from 'react';
 
-import {deleteMessage} from '../utils/client.es';
+import {deleteMessageQuery} from '../utils/client.es';
+import ArticleBodyRenderer from './ArticleBodyRenderer.es';
 
-export default ({comment, commentChange}) => {
-	const deleteComment = () => {
-		deleteMessage(comment);
-		commentChange(comment);
-	};
+export default ({comment, commentChange, editable = true}) => {
+	const [deleteMessage] = useMutation(deleteMessageQuery, {
+		onCompleted() {
+			if (commentChange) {
+				commentChange(comment);
+			}
+		},
+	});
 
 	return (
-		<div className="autofit-padded autofit-row question-comment">
-			<div className="autofit-col question-reply-icon-row">
-				<ClayIcon className="question-reply-icon" symbol="reply" />
+		<div className="c-my-3 questions-reply row">
+			<div className="align-items-md-center col-2 col-md-1 d-flex justify-content-end justify-content-md-center">
+				<ClayIcon
+					className="c-mt-3 c-mt-md-0 questions-reply-icon text-secondary"
+					symbol="reply"
+				/>
 			</div>
-			<div className="autofit-col autofit-col-expand">
-				<hr className="question-comment-separator" />
-				<p>
-					{comment.articleBody} -{' '}
-					<strong>{comment.creator.name}</strong>
-				</p>
-				<p>
-					<ClayButton displayType="unstyled" onClick={deleteComment}>
+
+			<div className="col-10 col-lg-11">
+				<div className="c-mb-0">
+					<ArticleBodyRenderer
+						{...comment}
+						signature={comment.creator.name}
+					/>
+				</div>
+
+				{editable && comment.actions.delete && (
+					<ClayButton
+						className="c-mt-3 font-weight-bold text-secondary"
+						displayType="unstyled"
+						onClick={() => {
+							deleteMessage({
+								variables: {messageBoardMessageId: comment.id},
+							});
+						}}
+					>
 						{Liferay.Language.get('delete')}
 					</ClayButton>
-				</p>
+				)}
 			</div>
 		</div>
 	);

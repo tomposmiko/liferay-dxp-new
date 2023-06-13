@@ -40,6 +40,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.webserver.WebServerServlet;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -167,8 +168,6 @@ public class VirtualHostFilter extends BasePortalFilter {
 			HttpServletResponse httpServletResponse, FilterChain filterChain)
 		throws Exception {
 
-		long companyId = PortalInstances.getCompanyId(httpServletRequest);
-
 		String originalFriendlyURL = HttpUtil.normalizePath(
 			httpServletRequest.getRequestURI());
 
@@ -268,6 +267,8 @@ public class VirtualHostFilter extends BasePortalFilter {
 			return;
 		}
 
+		long companyId = PortalInstances.getCompanyId(httpServletRequest);
+
 		try {
 			Map<String, String[]> parameterMap =
 				httpServletRequest.getParameterMap();
@@ -315,7 +316,10 @@ public class VirtualHostFilter extends BasePortalFilter {
 					return;
 				}
 
-				if (group.isGuest() && friendlyURL.equals(StringPool.SLASH) &&
+				if (Objects.equals(
+						group.getGroupKey(),
+						PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME) &&
+					friendlyURL.equals(StringPool.SLASH) &&
 					!layoutSet.isPrivateLayout()) {
 
 					String homeURL = PortalUtil.getRelativeHomeURL(
@@ -323,6 +327,22 @@ public class VirtualHostFilter extends BasePortalFilter {
 
 					if (Validator.isNotNull(homeURL)) {
 						friendlyURL = homeURL;
+					}
+
+					if (friendlyURL.equals(StringPool.SLASH)) {
+						if (layoutSet.isPrivateLayout()) {
+							if (group.isUser()) {
+								sb.append(_PRIVATE_USER_SERVLET_MAPPING);
+							}
+							else {
+								sb.append(_PRIVATE_GROUP_SERVLET_MAPPING);
+							}
+						}
+						else {
+							sb.append(_PUBLIC_GROUP_SERVLET_MAPPING);
+						}
+
+						sb.append(group.getFriendlyURL());
 					}
 				}
 				else {

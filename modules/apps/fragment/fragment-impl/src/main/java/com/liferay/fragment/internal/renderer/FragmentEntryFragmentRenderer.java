@@ -15,6 +15,8 @@
 package com.liferay.fragment.internal.renderer;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.DefaultFragmentEntryProcessorContext;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
@@ -23,10 +25,14 @@ import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.string.StringUtil;
+import com.liferay.portal.kernel.cache.MultiVMPool;
+import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.servlet.taglib.util.OutputData;
 import com.liferay.portal.kernel.util.Validator;
@@ -44,6 +50,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -99,12 +106,62 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		}
 	}
 
+	@Activate
+	protected void activate() {
+		_portalCache = (PortalCache<String, String>)_multiVMPool.getPortalCache(
+			FragmentEntryLink.class.getName());
+	}
+
+	private FragmentEntry _getContributedFragmentEntry(
+		FragmentEntryLink fragmentEntryLink) {
+
+		Map<String, FragmentEntry> fragmentCollectionContributorEntries =
+			_fragmentCollectionContributorTracker.getFragmentEntries();
+
+		return fragmentCollectionContributorEntries.get(
+			fragmentEntryLink.getRendererKey());
+	}
+
+	private FragmentEntryLink _getFragmentEntryLink(
+		FragmentRendererContext fragmentRendererContext) {
+
+		FragmentEntryLink fragmentEntryLink =
+			fragmentRendererContext.getFragmentEntryLink();
+
+		FragmentEntry fragmentEntry = _getContributedFragmentEntry(
+			fragmentEntryLink);
+
+		if (fragmentEntry != null) {
+			fragmentEntryLink.setCss(fragmentEntry.getCss());
+			fragmentEntryLink.setHtml(fragmentEntry.getHtml());
+			fragmentEntryLink.setJs(fragmentEntry.getJs());
+		}
+
+		return fragmentEntryLink;
+	}
+
+	private boolean _isCacheable(FragmentEntryLink fragmentEntryLink) {
+		if (Validator.isNull(fragmentEntryLink.getRendererKey())) {
+			return fragmentEntryLink.isCacheable();
+		}
+
+		FragmentEntry fragmentEntry =
+			_fragmentCollectionContributorTracker.getFragmentEntry(
+				fragmentEntryLink.getRendererKey());
+
+		if (fragmentEntry == null) {
+			return false;
+		}
+
+		return fragmentEntry.isCacheable();
+	}
+
 	private String _renderFragmentEntry(
 		long fragmentEntryId, String css, String html, String js,
-		String configuration, String namespace,
+		String configuration, String namespace, String mode,
 		HttpServletRequest httpServletRequest) {
 
-		StringBundler sb = new StringBundler(16);
+		StringBundler sb = new StringBundler(18);
 
 		sb.append("<div id=\"");
 
@@ -145,7 +202,9 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 				outputData = new OutputData();
 			}
 
-			if (!cssLoaded) {
+			if (!cssLoaded ||
+				Objects.equals(mode, FragmentEntryLinkConstants.EDIT)) {
+
 				sb.append("<style>");
 				sb.append(css);
 				sb.append("</style>");
@@ -162,11 +221,13 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 		if (Validator.isNotNull(js)) {
 			sb.append("<script>(function() {");
-			sb.append("var fragmentElement = document.querySelector('#");
-			sb.append(fragmentIdSB.toString());
-			sb.append("'); var configuration = ");
+			sb.append("var configuration = ");
 			sb.append(configuration);
-			sb.append(";");
+			sb.append("; var fragmentElement = document.querySelector('#");
+			sb.append(fragmentIdSB.toString());
+			sb.append("'); var fragmentNamespace = '");
+			sb.append(namespace);
+			sb.append("';");
 			sb.append(js);
 			sb.append(";}());</script>");
 		}
@@ -180,8 +241,35 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			HttpServletResponse httpServletResponse)
 		throws PortalException {
 
-		FragmentEntryLink fragmentEntryLink =
-			fragmentRendererContext.getFragmentEntryLink();
+		FragmentEntryLink fragmentEntryLink = _getFragmentEntryLink(
+			fragmentRendererContext);
+
+		StringBundler cacheKeySB = new StringBundler(5);
+
+		cacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
+		cacheKeySB.append(StringPool.DASH);
+		cacheKeySB.append(fragmentRendererContext.getLocale());
+		cacheKeySB.append(StringPool.DASH);
+		cacheKeySB.append(
+			StringUtil.merge(
+				fragmentRendererContext.getSegmentsExperienceIds(),
+				StringPool.SEMICOLON));
+
+		String content = StringPool.BLANK;
+
+		if (Objects.equals(
+				fragmentRendererContext.getMode(),
+				FragmentEntryLinkConstants.VIEW) &&
+			(fragmentRendererContext.getPreviewClassPK() <= 0) &&
+			fragmentRendererContext.isUseCachedContent() &&
+			_isCacheable(fragmentEntryLink)) {
+
+			content = _portalCache.get(cacheKeySB.toString());
+
+			if (Validator.isNotNull(content)) {
+				return content;
+			}
+		}
 
 		DefaultFragmentEntryProcessorContext
 			defaultFragmentEntryProcessorContext =
@@ -189,6 +277,12 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 					httpServletRequest, httpServletResponse,
 					fragmentRendererContext.getMode(),
 					fragmentRendererContext.getLocale());
+
+		Optional<Object> displayObjectOptional =
+			fragmentRendererContext.getDisplayObjectOptional();
+
+		defaultFragmentEntryProcessorContext.setDisplayObject(
+			displayObjectOptional.orElse(null));
 
 		Optional<Map<String, Object>> fieldValuesOptional =
 			fragmentRendererContext.getFieldValuesOptional();
@@ -202,6 +296,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentRendererContext.getPreviewClassPK());
 		defaultFragmentEntryProcessorContext.setPreviewType(
 			fragmentRendererContext.getPreviewType());
+		defaultFragmentEntryProcessorContext.setPreviewVersion(
+			fragmentRendererContext.getPreviewVersion());
 		defaultFragmentEntryProcessorContext.setSegmentsExperienceIds(
 			fragmentRendererContext.getSegmentsExperienceIds());
 
@@ -230,23 +326,30 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 				httpServletResponse);
 		}
 
-		String configuration =
-			StringPool.OPEN_CURLY_BRACE + StringPool.CLOSE_CURLY_BRACE;
+		JSONObject configurationJSONObject = JSONFactoryUtil.createJSONObject();
 
 		if (Validator.isNotNull(fragmentEntryLink.getConfiguration())) {
-			JSONObject configurationJSONObject =
+			configurationJSONObject =
 				_fragmentEntryConfigurationParser.getConfigurationJSONObject(
 					fragmentEntryLink.getConfiguration(),
-					fragmentEntryLink.getEditableValues(),
-					fragmentRendererContext.getSegmentsExperienceIds());
-
-			configuration = configurationJSONObject.toString();
+					fragmentEntryLink.getEditableValues());
 		}
 
-		return _renderFragmentEntry(
+		content = _renderFragmentEntry(
 			fragmentEntryLink.getFragmentEntryId(), css, html,
-			fragmentEntryLink.getJs(), configuration,
-			fragmentEntryLink.getNamespace(), httpServletRequest);
+			fragmentEntryLink.getJs(), configurationJSONObject.toString(),
+			fragmentEntryLink.getNamespace(), fragmentRendererContext.getMode(),
+			httpServletRequest);
+
+		if (Objects.equals(
+				fragmentRendererContext.getMode(),
+				FragmentEntryLinkConstants.VIEW) &&
+			_isCacheable(fragmentEntryLink)) {
+
+			_portalCache.put(cacheKeySB.toString(), content);
+		}
+
+		return content;
 	}
 
 	private String _writePortletPaths(
@@ -266,11 +369,20 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		return unsyncStringWriter.toString();
 	}
 
+	private static PortalCache<String, String> _portalCache;
+
+	@Reference
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
+
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
 	@Reference
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;
+
+	@Reference
+	private MultiVMPool _multiVMPool;
 
 	@Reference
 	private PortletRegistry _portletRegistry;

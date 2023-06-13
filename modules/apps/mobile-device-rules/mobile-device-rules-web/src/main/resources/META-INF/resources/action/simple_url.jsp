@@ -16,17 +16,11 @@
 
 <%@ include file="/action/init.jsp" %>
 
-<%
-boolean ajax = GetterUtil.getBoolean(request.getParameter("ajax"));
-
-String url = GetterUtil.getString(typeSettingsProperties.get("url"));
-%>
-
-<aui:input cssClass="lfr-input-text-container" name="url" type="text" value="<%= url %>">
+<aui:input cssClass="lfr-input-text-container" name="url" type="text" value='<%= GetterUtil.getString(typeSettingsProperties.get("url")) %>'>
 	<aui:validator name="required" />
 </aui:input>
 
-<c:if test="<%= ajax %>">
+<c:if test='<%= GetterUtil.getBoolean(request.getParameter("ajax")) %>'>
 	<aui:script use="liferay-form">
 		var form = Liferay.Form.get('<portlet:namespace />fm');
 
@@ -38,7 +32,7 @@ String url = GetterUtil.getString(typeSettingsProperties.get("url"));
 			if (!(fieldName in rules)) {
 				rules[fieldName] = {
 					custom: false,
-					required: true
+					required: true,
 				};
 			}
 		}

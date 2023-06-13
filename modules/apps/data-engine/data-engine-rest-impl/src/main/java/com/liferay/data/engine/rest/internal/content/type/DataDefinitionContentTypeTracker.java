@@ -15,10 +15,12 @@
 package com.liferay.data.engine.rest.internal.content.type;
 
 import com.liferay.data.engine.content.type.DataDefinitionContentType;
+import com.liferay.data.engine.rest.resource.exception.DataDefinitionValidationException;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -34,10 +36,30 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 @Component(immediate = true, service = DataDefinitionContentTypeTracker.class)
 public class DataDefinitionContentTypeTracker {
 
+	public Long getClassNameId(String contentType) {
+		return Optional.ofNullable(
+			_classNameIds.get(contentType)
+		).orElseThrow(
+			() -> new DataDefinitionValidationException.MustSetValidContentType(
+				contentType)
+		);
+	}
+
+	public DataDefinitionContentType getDataDefinitionContentType(
+		long classNameId) {
+
+		return _dataDefinitionContentTypesByClassNameId.get(classNameId);
+	}
+
 	public DataDefinitionContentType getDataDefinitionContentType(
 		String contentType) {
 
-		return _dataDefinitionContentTypes.get(contentType);
+		return Optional.ofNullable(
+			_dataDefinitionContentTypesByContentType.get(contentType)
+		).orElseThrow(
+			() -> new DataDefinitionValidationException.MustSetValidContentType(
+				contentType)
+		);
 	}
 
 	@Reference(
@@ -53,26 +75,42 @@ public class DataDefinitionContentTypeTracker {
 			return;
 		}
 
-		_dataDefinitionContentTypes.put(
-			MapUtil.getString(properties, "content.type"),
+		String contentType = MapUtil.getString(properties, "content.type");
+
+		_classNameIds.put(
+			contentType, dataDefinitionContentType.getClassNameId());
+
+		_dataDefinitionContentTypesByClassNameId.put(
+			dataDefinitionContentType.getClassNameId(),
 			dataDefinitionContentType);
+
+		_dataDefinitionContentTypesByContentType.put(
+			contentType, dataDefinitionContentType);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_dataDefinitionContentTypes.clear();
+		_dataDefinitionContentTypesByContentType.clear();
 	}
 
 	protected void removeDataDefinitionContentType(
 		DataDefinitionContentType dataDefinitionContentType,
 		Map<String, Object> properties) {
 
-		_dataDefinitionContentTypes.remove(
-			MapUtil.getString(properties, "content.type"));
+		String contentType = MapUtil.getString(properties, "content.type");
+
+		_dataDefinitionContentTypesByClassNameId.remove(
+			_classNameIds.get(contentType));
+
+		_classNameIds.remove(contentType);
+		_dataDefinitionContentTypesByContentType.remove(contentType);
 	}
 
+	private final Map<String, Long> _classNameIds = new TreeMap<>();
+	private final Map<Long, DataDefinitionContentType>
+		_dataDefinitionContentTypesByClassNameId = new TreeMap<>();
 	private final Map<String, DataDefinitionContentType>
-		_dataDefinitionContentTypes = new TreeMap<>();
+		_dataDefinitionContentTypesByContentType = new TreeMap<>();
 
 	@Reference
 	private Portal _portal;

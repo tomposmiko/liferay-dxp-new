@@ -11,7 +11,9 @@
 
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
+import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 import classNames from 'classnames';
 import {useEventListener} from 'frontend-js-react-web';
 import {throttle} from 'frontend-js-web';
@@ -20,13 +22,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {StateContext as GlobalStateContext} from './../../state/context.es';
-import {getInitialState, reducer, StateContext} from './reducer.es';
+import {StateContext, getInitialState, reducer} from './reducer.es';
 import {
 	GeometryType,
+	getElementGeometry,
+	getRootElementGeometry,
 	getTargetableElements,
 	stopImmediatePropagation,
-	getRootElementGeometry,
-	getElementGeometry
 } from './utils.es';
 
 const {
@@ -36,12 +38,12 @@ const {
 	useLayoutEffect,
 	useReducer,
 	useRef,
-	useState
+	useState,
 } = React;
 
 const ESCAPE_KEYS = [
 	'Escape', // Most browsers.
-	'Esc' // IE and Edge.
+	'Esc', // IE and Edge.
 ];
 
 const POPOVER_PADDING = 16;
@@ -92,16 +94,18 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 			'Cannot render <SegmentsExperimentsClickGoal /> without #content element',
 			document.querySelectorAll('section').length
 		);
+
 		return null;
 	}
 
-	const scrollIntoView = event => {
+	const scrollIntoView = (event) => {
 		const target = document.querySelector(state.selectedTarget);
 
 		if (target) {
 			target.scrollIntoView();
 
 			// Make sure nothing slides under the top nav.
+
 			window.scrollBy(0, -100);
 		}
 
@@ -116,18 +120,23 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 				<h4 className="mb-3 mt-4 sheet-subtitle">
 					{Liferay.Language.get('click-goal')}
 					<ClayIcon
-						className="ml-1 reference-mark text-warning"
+						className="lexicon-icon-sm ml-1 reference-mark text-warning"
+						style={{verticalAlign: 'super'}}
 						symbol="asterisk"
 					/>
 				</h4>
 
 				{state.selectedTarget && (
-					<dl className="autofit-row">
-						<dt className="autofit-col">
+					<ClayLayout.ContentRow containerElement="dl">
+						<ClayLayout.ContentCol containerElement="dt">
 							{Liferay.Language.get('element')}:
-						</dt>
+						</ClayLayout.ContentCol>
 
-						<dd className="autofit-col autofit-col-expand mb-0 ml-2 text-truncate-inline">
+						<ClayLayout.ContentCol
+							className="mb-0 ml-2 text-truncate-inline"
+							containerElement="dd"
+							expand
+						>
 							<ClayLink
 								className="text-truncate"
 								href={state.selectedTarget}
@@ -136,8 +145,8 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 							>
 								{state.selectedTarget}
 							</ClayLink>
-						</dd>
-					</dl>
+						</ClayLayout.ContentCol>
+					</ClayLayout.ContentRow>
 				)}
 
 				{!state.selectedTarget && (
@@ -190,7 +199,7 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 ClickGoalPicker.propTypes = {
 	allowEdit: PropTypes.bool,
 	onSelectClickGoalTarget: PropTypes.func,
-	target: PropTypes.string
+	target: PropTypes.string,
 };
 
 /**
@@ -205,25 +214,28 @@ function OverlayContainer({allowEdit, root}) {
 	const targetableElements = useRef();
 
 	// Before mount.
+
 	if (!targetableElements.current) {
+
 		// Apply CSS overrides.
+
 		const css = `
-			#banner {
+			#banner, #footer,
+			#banner .input-group .input-group-item .input-group-inset-after.form-control:hover {
 				cursor: not-allowed;
 			}
-			#banner a, #banner button {
+			#banner a, #banner button,
+			#footer a, #footer button {
 				cursor: not-allowed;
 				pointer-events: none;
+			}
+			#banner section.portlet:hover .portlet-content.portlet-content-editable {
+				border-color: transparent;
 			}
 			#content {
 				position: relative;
 				cursor: not-allowed;
 			}
-
-			.portlet-content-editable {
-				border-color: transparent;
-			}
-
 			.portlet-topper {
 				visibility: hidden;
 			}
@@ -238,13 +250,17 @@ function OverlayContainer({allowEdit, root}) {
 		head.appendChild(style);
 
 		// This must happen after hiding the toppers.
+
 		targetableElements.current = getTargetableElements(root);
 	}
 
 	// On unmount.
+
 	useEffect(() => {
 		return () => {
+
 			// Remove CSS overrides.
+
 			const style = document.getElementById(cssId);
 
 			if (style) {
@@ -254,7 +270,7 @@ function OverlayContainer({allowEdit, root}) {
 	}, []);
 
 	const handleKeydown = useCallback(
-		event => {
+		(event) => {
 			if (ESCAPE_KEYS.includes(event.key)) {
 				dispatch({type: 'deactivate'});
 				event.preventDefault();
@@ -265,8 +281,10 @@ function OverlayContainer({allowEdit, root}) {
 	);
 
 	const handleClick = useCallback(
-		event => {
+		(event) => {
+
 			// Clicking anywhere other than a target aborts target selection.
+
 			event.preventDefault();
 			stopImmediatePropagation(event);
 			dispatch({type: 'deactivate'});
@@ -290,7 +308,7 @@ function OverlayContainer({allowEdit, root}) {
 
 OverlayContainer.propTypes = {
 	allowEdit: PropTypes.bool,
-	root: PropTypes.instanceOf(Element).isRequired
+	root: PropTypes.instanceOf(Element).isRequired,
 };
 
 /**
@@ -302,6 +320,7 @@ function Overlay({allowEdit, root, targetableElements}) {
 
 	const [geometry, setGeometry] = useState(getRootElementGeometry(root));
 
+	/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	const handleResize = useCallback(
 		throttle(() => {
 			setGeometry(getRootElementGeometry(root));
@@ -310,22 +329,29 @@ function Overlay({allowEdit, root, targetableElements}) {
 	);
 
 	// For now, treat scrolling just like resizing.
+
 	const handleScroll = handleResize;
 
 	useEventListener('resize', handleResize, false, window);
 
 	// TODO: also consider scrolling of elements with "overflow: auto/scroll";
+
 	useEventListener('scroll', handleScroll, false, window);
 
 	return (
 		<div className="lfr-segments-experiment-click-goal-root">
 			{targetableElements
-				.filter(element => {
-					if (allowEdit === true) return true;
-					if ('#' + element.id === selectedTarget) return true;
+				.filter((element) => {
+					if (allowEdit === true) {
+						return true;
+					}
+					if ('#' + element.id === selectedTarget) {
+						return true;
+					}
+
 					return false;
 				})
-				.map(element => {
+				.map((element) => {
 					const selector = `#${element.id}`;
 
 					const mode =
@@ -354,7 +380,7 @@ Overlay.propTypes = {
 	allowEdit: PropTypes.bool,
 	root: PropTypes.instanceOf(Element).isRequired,
 	targetableElements: PropTypes.arrayOf(PropTypes.instanceOf(Element))
-		.isRequired
+		.isRequired,
 };
 
 /**
@@ -377,10 +403,10 @@ function Target({allowEdit, element, geometry, mode, selector}) {
 		return null;
 	}
 
-	const handleClick = event => {
+	const handleClick = (event) => {
 		dispatch({
 			selector,
-			type: 'editTarget'
+			type: 'editTarget',
 		});
 
 		stopImmediatePropagation(event);
@@ -389,43 +415,49 @@ function Target({allowEdit, element, geometry, mode, selector}) {
 	// At this point we don't know the dimensions of our children, but we do
 	// know whether we have more space on the left or right of our target, so we
 	// flip based on that.
+
 	const spaceOnLeft = left - geometry.left;
 	const spaceOnRight = geometry.right - right;
 	const spaceOnTop = top - geometry.top;
 	const align = spaceOnRight > spaceOnLeft ? 'left' : 'right';
 
+	// TODO: make tooltip match mock and switch to Clay v3 tooltips directly
+	// instead of using lfr-portal-tooltip.
+
 	return (
-		// TODO: make tooltip match mock and switch to Clay v3 tooltips directly
-		// instead of using lfr-portal-tooltip.
 		<div
 			className="lfr-segments-experiment-click-goal-target"
 			style={{
 				alignItems: align === 'left' ? 'flex-start' : 'flex-end',
 				left: align === 'left' ? spaceOnLeft : null,
 				right: align === 'right' ? spaceOnRight : null,
-				top: spaceOnTop
+				top: spaceOnTop,
 			}}
 		>
-			<div
-				className={classNames({
-					'lfr-portal-tooltip': mode === 'inactive',
-					'lfr-segments-experiment-click-goal-target-overlay': true,
-					'lfr-segments-experiment-click-goal-target-overlay-editing':
-						mode === 'editing',
-					'lfr-segments-experiment-click-goal-target-overlay-selected':
-						mode === 'selected'
-				})}
-				data-target-selector={selector}
-				data-title={
-					mode === 'inactive'
-						? Liferay.Language.get(
-								'click-element-to-set-as-click-target-for-your-goal'
-						  )
-						: ''
-				}
-				onClick={handleClick}
-				style={{height, width}}
-			></div>
+			<ClayTooltipProvider>
+				<div
+					className={classNames(
+						'lfr-segments-experiment-click-goal-target-overlay',
+						{
+							'lfr-segments-experiment-click-goal-target-overlay-editing':
+								mode === 'editing',
+							'lfr-segments-experiment-click-goal-target-overlay-selected':
+								mode === 'selected',
+						}
+					)}
+					data-target-selector={selector}
+					data-tooltip-align="bottom-left"
+					onClick={handleClick}
+					style={{height, width}}
+					title={
+						mode === 'inactive'
+							? Liferay.Language.get(
+									'click-element-to-set-as-click-target-for-your-goal'
+							  )
+							: ''
+					}
+				></div>
+			</ClayTooltipProvider>
 			{mode !== 'inactive' && (
 				<ClickGoalPicker.TargetTopper
 					allowEdit={allowEdit}
@@ -447,7 +479,7 @@ Target.propTypes = {
 	element: PropTypes.instanceOf(Element).isRequired,
 	geometry: GeometryType.isRequired,
 	mode: PropTypes.oneOf(['inactive', 'selected', 'editing']).isRequired,
-	selector: PropTypes.string.isRequired
+	selector: PropTypes.string.isRequired,
 };
 
 /**
@@ -468,7 +500,7 @@ function TargetTopper({allowEdit, geometry, isEditing, selector}) {
 			const {
 				height,
 				left,
-				width
+				width,
 			} = topperRef.current.getBoundingClientRect();
 
 			setTop(-height);
@@ -477,12 +509,12 @@ function TargetTopper({allowEdit, geometry, isEditing, selector}) {
 		}
 	}, [geometry.left, geometry.width]);
 
-	const handleClick = event => {
+	const handleClick = (event) => {
 		stopImmediatePropagation(event);
 
 		dispatch({
 			selector: '',
-			type: 'selectTarget'
+			type: 'selectTarget',
 		});
 	};
 
@@ -494,13 +526,13 @@ function TargetTopper({allowEdit, geometry, isEditing, selector}) {
 				'lfr-segments-experiment-click-goal-target-topper-editing': isEditing,
 				'px-2': true,
 				small: true,
-				'text-white': true
+				'text-white': true,
 			})}
 			onClick={stopImmediatePropagation}
 			ref={topperRef}
 			style={{
 				maxWidth: width !== null ? `${width}px` : null,
-				top: `${top}px`
+				top: `${top}px`,
 			}}
 		>
 			<span className="mr-2 text-truncate">
@@ -523,7 +555,7 @@ TargetTopper.propTypes = {
 	allowEdit: PropTypes.bool,
 	geometry: GeometryType.isRequired,
 	isEditing: PropTypes.bool.isRequired,
-	selector: PropTypes.string.isRequired
+	selector: PropTypes.string.isRequired,
 };
 
 /**
@@ -544,6 +576,7 @@ function TargetPopover({selector}) {
 	}, []);
 
 	// The +1 here is to avoid unwanted wrapping of the button.
+
 	const maxWidth = buttonWidth
 		? `${buttonWidth + POPOVER_PADDING * 2 + 1}px`
 		: 'none';
@@ -551,7 +584,7 @@ function TargetPopover({selector}) {
 	const handleClick = () => {
 		dispatch({
 			selector,
-			type: 'selectTarget'
+			type: 'selectTarget',
 		});
 	};
 
@@ -572,7 +605,7 @@ function TargetPopover({selector}) {
 }
 
 TargetPopover.propTypes = {
-	selector: PropTypes.string.isRequired
+	selector: PropTypes.string.isRequired,
 };
 
 ClickGoalPicker.Overlay = Overlay;

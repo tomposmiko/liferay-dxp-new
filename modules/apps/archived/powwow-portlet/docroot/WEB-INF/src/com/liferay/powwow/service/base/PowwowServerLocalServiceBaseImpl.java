@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistryUtil;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -40,12 +41,15 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.powwow.model.PowwowServer;
 import com.liferay.powwow.service.PowwowServerLocalService;
+import com.liferay.powwow.service.PowwowServerLocalServiceUtil;
 import com.liferay.powwow.service.persistence.PowwowMeetingFinder;
 import com.liferay.powwow.service.persistence.PowwowMeetingPersistence;
 import com.liferay.powwow.service.persistence.PowwowParticipantPersistence;
 import com.liferay.powwow.service.persistence.PowwowServerPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -69,11 +73,15 @@ public abstract class PowwowServerLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>PowwowServerLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.powwow.service.PowwowServerLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>PowwowServerLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>PowwowServerLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the powwow server to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowServerLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowServer the powwow server
 	 * @return the powwow server that was added
@@ -101,6 +109,10 @@ public abstract class PowwowServerLocalServiceBaseImpl
 	/**
 	 * Deletes the powwow server with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowServerLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param powwowServerId the primary key of the powwow server
 	 * @return the powwow server that was removed
 	 * @throws PortalException if a powwow server with the primary key could not be found
@@ -115,6 +127,10 @@ public abstract class PowwowServerLocalServiceBaseImpl
 
 	/**
 	 * Deletes the powwow server from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowServerLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowServer the powwow server
 	 * @return the powwow server that was removed
@@ -276,6 +292,16 @@ public abstract class PowwowServerLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return powwowServerPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -284,6 +310,13 @@ public abstract class PowwowServerLocalServiceBaseImpl
 			(PowwowServer)persistedModel);
 	}
 
+	public BasePersistence<PowwowServer> getBasePersistence() {
+		return powwowServerPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -319,6 +352,10 @@ public abstract class PowwowServerLocalServiceBaseImpl
 
 	/**
 	 * Updates the powwow server in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowServerLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowServer the powwow server
 	 * @return the powwow server that was updated
@@ -607,11 +644,15 @@ public abstract class PowwowServerLocalServiceBaseImpl
 	public void afterPropertiesSet() {
 		PersistedModelLocalServiceRegistryUtil.register(
 			"com.liferay.powwow.model.PowwowServer", powwowServerLocalService);
+
+		_setLocalServiceUtilService(powwowServerLocalService);
 	}
 
 	public void destroy() {
 		PersistedModelLocalServiceRegistryUtil.unregister(
 			"com.liferay.powwow.model.PowwowServer");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -653,6 +694,22 @@ public abstract class PowwowServerLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		PowwowServerLocalService powwowServerLocalService) {
+
+		try {
+			Field field = PowwowServerLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, powwowServerLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -16,6 +16,8 @@ package com.liferay.account.service.impl;
 
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.exception.AccountEntryDomainsException;
+import com.liferay.account.exception.AccountEntryNameException;
+import com.liferay.account.exception.AccountEntryTypeException;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.base.AccountEntryLocalServiceBaseImpl;
 import com.liferay.petra.string.StringPool;
@@ -24,13 +26,19 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -90,10 +98,48 @@ public class AccountEntryLocalServiceImpl
 		return activateAccountEntry(getAccountEntry(accountEntryId));
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #addAccountEntry(long, long, String, String, String[],
+	 *             byte[], String, String, int, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public AccountEntry addAccountEntry(
 			long userId, long parentAccountEntryId, String name,
 			String description, String[] domains, byte[] logoBytes, int status)
+		throws PortalException {
+
+		return addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			null, AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS, status, null);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #addAccountEntry(long, long, String, String, String[],
+	 *             byte[], String, String, int, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes, int status,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			null, AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS, status,
+			serviceContext);
+	}
+
+	@Override
+	public AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes,
+			String taxIdNumber, String type, int status,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		// Account entry
@@ -114,7 +160,11 @@ public class AccountEntryLocalServiceImpl
 		int nameMaxLength = ModelHintsUtil.getMaxLength(
 			AccountEntry.class.getName(), "name");
 
-		accountEntry.setName(StringUtil.shorten(name, nameMaxLength));
+		name = StringUtil.shorten(name, nameMaxLength);
+
+		_validateName(name);
+
+		accountEntry.setName(name);
 
 		accountEntry.setDescription(description);
 
@@ -127,6 +177,12 @@ public class AccountEntryLocalServiceImpl
 			_userFileUploadsSettings.getImageMaxSize(),
 			_userFileUploadsSettings.getImageMaxHeight(),
 			_userFileUploadsSettings.getImageMaxWidth());
+
+		accountEntry.setTaxIdNumber(taxIdNumber);
+
+		_validateType(type);
+
+		accountEntry.setType(type);
 
 		accountEntry.setStatus(status);
 
@@ -147,6 +203,12 @@ public class AccountEntryLocalServiceImpl
 		resourceLocalService.addResources(
 			user.getCompanyId(), 0, user.getUserId(),
 			AccountEntry.class.getName(), accountEntryId, false, false, false);
+
+		// Asset
+
+		if (serviceContext != null) {
+			_updateAsset(accountEntry, serviceContext);
+		}
 
 		return accountEntry;
 	}
@@ -179,6 +241,21 @@ public class AccountEntryLocalServiceImpl
 	}
 
 	@Override
+	public void deleteAccountEntriesByCompanyId(long companyId) {
+		if (!CompanyThreadLocal.isDeleteInProcess()) {
+			throw new UnsupportedOperationException(
+				"Deleting account entries by company must be called when " +
+					"deleting a company");
+		}
+
+		for (AccountEntry accountRole :
+				accountEntryPersistence.findByCompanyId(companyId)) {
+
+			accountEntryPersistence.remove(accountRole);
+		}
+	}
+
+	@Override
 	public AccountEntry deleteAccountEntry(AccountEntry accountEntry)
 		throws PortalException {
 
@@ -197,6 +274,11 @@ public class AccountEntryLocalServiceImpl
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			accountEntry.getAccountEntryId());
 
+		// Asset
+
+		assetEntryLocalService.deleteEntry(
+			AccountEntry.class.getName(), accountEntry.getAccountEntryId());
+
 		return accountEntry;
 	}
 
@@ -210,10 +292,10 @@ public class AccountEntryLocalServiceImpl
 	@Override
 	public List<AccountEntry> getAccountEntries(
 		long companyId, int status, int start, int end,
-		OrderByComparator<AccountEntry> obc) {
+		OrderByComparator<AccountEntry> orderByComparator) {
 
 		return accountEntryPersistence.findByC_S(
-			companyId, status, start, end, obc);
+			companyId, status, start, end, orderByComparator);
 	}
 
 	@Override
@@ -240,13 +322,30 @@ public class AccountEntryLocalServiceImpl
 
 				long accountEntryId = document.getLong(Field.ENTRY_CLASS_PK);
 
-				return getAccountEntry(accountEntryId);
+				AccountEntry accountEntry = fetchAccountEntry(accountEntryId);
+
+				if (accountEntry == null) {
+					Indexer<AccountEntry> indexer =
+						IndexerRegistryUtil.getIndexer(AccountEntry.class);
+
+					indexer.delete(
+						document.getLong(Field.COMPANY_ID),
+						document.getString(Field.UID));
+				}
+
+				return accountEntry;
 			});
 
 		return new BaseModelSearchResult<>(
 			accountEntries, searchResponse.getTotalHits());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #updateAccountEntry(Long, long, String, String, boolean,
+	 *             String[], byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public AccountEntry updateAccountEntry(
 			Long accountEntryId, long parentAccountEntryId, String name,
@@ -254,11 +353,46 @@ public class AccountEntryLocalServiceImpl
 			byte[] logoBytes, int status)
 		throws PortalException {
 
+		return updateAccountEntry(
+			accountEntryId, parentAccountEntryId, name, description, deleteLogo,
+			domains, logoBytes, null, status, null);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #updateAccountEntry(Long, long, String, String, boolean,
+	 *             String[], byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			byte[] logoBytes, int status, ServiceContext serviceContext)
+		throws PortalException {
+
+		return updateAccountEntry(
+			accountEntryId, parentAccountEntryId, name, description, deleteLogo,
+			domains, logoBytes, null, status, serviceContext);
+	}
+
+	@Override
+	public AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			byte[] logoBytes, String taxIdNumber, int status,
+			ServiceContext serviceContext)
+		throws PortalException {
+
 		AccountEntry accountEntry = accountEntryPersistence.fetchByPrimaryKey(
 			accountEntryId);
 
 		accountEntry.setParentAccountEntryId(parentAccountEntryId);
+
+		_validateName(name);
+
 		accountEntry.setName(name);
+
 		accountEntry.setDescription(description);
 
 		domains = _validateDomains(domains);
@@ -271,7 +405,14 @@ public class AccountEntryLocalServiceImpl
 			_userFileUploadsSettings.getImageMaxHeight(),
 			_userFileUploadsSettings.getImageMaxWidth());
 
+		accountEntry.setTaxIdNumber(taxIdNumber);
 		accountEntry.setStatus(status);
+
+		// Asset
+
+		if (serviceContext != null) {
+			_updateAsset(accountEntry, serviceContext);
+		}
 
 		return accountEntryPersistence.update(accountEntry);
 	}
@@ -352,33 +493,70 @@ public class AccountEntryLocalServiceImpl
 			searchContext.setKeywords(keywords);
 		}
 
-		if (MapUtil.isNotEmpty(params)) {
-			long[] accountUserIds = (long[])params.get("accountUserIds");
-
-			if (ArrayUtil.isNotEmpty(accountUserIds)) {
-				searchContext.setAttribute("accountUserIds", accountUserIds);
-			}
-
-			String[] domains = (String[])params.get("domains");
-
-			if (ArrayUtil.isNotEmpty(domains)) {
-				searchContext.setAttribute("domains", domains);
-			}
-
-			long parentAccountEntryId = GetterUtil.getLong(
-				params.get("parentAccountEntryId"),
-				AccountConstants.ACCOUNT_ENTRY_ID_ANY);
-
-			if (parentAccountEntryId != AccountConstants.ACCOUNT_ENTRY_ID_ANY) {
-				searchContext.setAttribute(
-					"parentAccountEntryId", parentAccountEntryId);
-			}
-
-			int status = GetterUtil.getInteger(
-				params.get("status"), WorkflowConstants.STATUS_APPROVED);
-
-			searchContext.setAttribute("status", status);
+		if (MapUtil.isEmpty(params)) {
+			return;
 		}
+
+		long[] accountGroupIds = (long[])params.get("accountGroupIds");
+
+		if (ArrayUtil.isNotEmpty(accountGroupIds)) {
+			searchContext.setAttribute("accountGroupIds", accountGroupIds);
+		}
+
+		long[] accountUserIds = (long[])params.get("accountUserIds");
+
+		if (ArrayUtil.isNotEmpty(accountUserIds)) {
+			searchContext.setAttribute("accountUserIds", accountUserIds);
+		}
+
+		String[] domains = (String[])params.get("domains");
+
+		if (ArrayUtil.isNotEmpty(domains)) {
+			searchContext.setAttribute("domains", domains);
+		}
+
+		long[] organizationIds = (long[])params.get("organizationIds");
+
+		if (ArrayUtil.isNotEmpty(organizationIds)) {
+			searchContext.setAttribute("organizationIds", organizationIds);
+		}
+
+		long parentAccountEntryId = GetterUtil.getLong(
+			params.get("parentAccountEntryId"),
+			AccountConstants.ACCOUNT_ENTRY_ID_ANY);
+
+		if (parentAccountEntryId != AccountConstants.ACCOUNT_ENTRY_ID_ANY) {
+			searchContext.setAttribute(
+				"parentAccountEntryId", parentAccountEntryId);
+		}
+
+		int status = GetterUtil.getInteger(
+			params.get("status"), WorkflowConstants.STATUS_APPROVED);
+
+		searchContext.setAttribute(Field.STATUS, status);
+
+		String type = (String)params.get("type");
+
+		if (Validator.isNotNull(type)) {
+			searchContext.setAttribute(Field.TYPE, type);
+		}
+	}
+
+	private void _updateAsset(
+			AccountEntry accountEntry, ServiceContext serviceContext)
+		throws PortalException {
+
+		Company company = _companyLocalService.getCompany(
+			serviceContext.getCompanyId());
+
+		assetEntryLocalService.updateEntry(
+			serviceContext.getUserId(), company.getGroupId(),
+			accountEntry.getCreateDate(), accountEntry.getModifiedDate(),
+			AccountEntry.class.getName(), accountEntry.getAccountEntryId(),
+			null, 0, serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(), true, true, null, null, null,
+			null, null, accountEntry.getName(), accountEntry.getDescription(),
+			null, null, null, 0, 0, null);
 	}
 
 	private String[] _validateDomains(String[] domains) throws PortalException {
@@ -396,6 +574,21 @@ public class AccountEntryLocalServiceImpl
 
 		return ArrayUtil.distinct(domains);
 	}
+
+	private void _validateName(String name) throws PortalException {
+		if (Validator.isNull(name)) {
+			throw new AccountEntryNameException();
+		}
+	}
+
+	private void _validateType(String type) throws PortalException {
+		if (!ArrayUtil.contains(AccountConstants.ACCOUNT_ENTRY_TYPES, type)) {
+			throw new AccountEntryTypeException();
+		}
+	}
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private Portal _portal;

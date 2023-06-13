@@ -37,19 +37,10 @@ public class SearchHttpUtil {
 	public static String getCompleteOriginalURL(
 		HttpServletRequest httpServletRequest) {
 
-		boolean forwarded = false;
-
-		Object requestURLObject = httpServletRequest.getAttribute(
-			JavaConstants.JAVAX_SERVLET_FORWARD_REQUEST_URI);
-
-		if (requestURLObject != null) {
-			forwarded = true;
-		}
-
 		String requestURL = null;
 		String queryString = null;
 
-		if (forwarded) {
+		if (_http.isForwarded(httpServletRequest)) {
 			requestURL = _portal.getAbsoluteURL(
 				httpServletRequest,
 				(String)httpServletRequest.getAttribute(
@@ -59,7 +50,10 @@ public class SearchHttpUtil {
 				JavaConstants.JAVAX_SERVLET_FORWARD_QUERY_STRING);
 		}
 		else {
-			requestURL = String.valueOf(httpServletRequest.getRequestURL());
+			requestURL = _portal.getAbsoluteURL(
+				httpServletRequest,
+				_http.getPath(
+					String.valueOf(httpServletRequest.getRequestURL())));
 
 			queryString = httpServletRequest.getQueryString();
 		}
@@ -103,12 +97,18 @@ public class SearchHttpUtil {
 	}
 
 	@Reference(unbind = "-")
+	protected void setHttp(Http http) {
+		_http = http;
+	}
+
+	@Reference(unbind = "-")
 	protected void setPortal(Portal portal) {
 		_portal = portal;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(SearchHttpUtil.class);
 
+	private static Http _http;
 	private static Portal _portal;
 
 }

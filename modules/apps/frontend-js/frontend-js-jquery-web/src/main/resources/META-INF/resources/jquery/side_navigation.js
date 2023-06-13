@@ -12,7 +12,7 @@
  * details.
  */
 
-+(function($) {
++(function ($) {
 	var doc = $(document);
 
 	var listenerAdded = false;
@@ -20,11 +20,11 @@
 	// Make sure we only add one resize listener to the page,
 	// no matter how many components we have
 
-	var addResizeListener = function() {
+	var addResizeListener = function () {
 		if (!listenerAdded) {
 			$(window).on(
 				'resize',
-				debounce(function() {
+				debounce(function () {
 					doc.trigger('screenChange.lexicon.sidenav');
 				}, 150)
 			);
@@ -33,15 +33,15 @@
 		}
 	};
 
-	var debounce = function(fn, delay) {
+	var debounce = function (fn, delay) {
 		var id;
 
-		return function() {
+		return function () {
 			var instance = this;
 
 			var args = arguments;
 
-			var later = function() {
+			var later = function () {
 				id = null;
 
 				fn.apply(instance, args);
@@ -53,7 +53,7 @@
 		};
 	};
 
-	var getBreakpointRegion = function() {
+	var getBreakpointRegion = function () {
 		var screenXs = 480;
 		var screenSm = 768;
 		var screenMd = 992;
@@ -64,23 +64,27 @@
 
 		if (windowWidth >= screenLg) {
 			region = 'lg';
-		} else if (windowWidth >= screenMd) {
+		}
+		else if (windowWidth >= screenMd) {
 			region = 'md';
-		} else if (windowWidth >= screenSm) {
+		}
+		else if (windowWidth >= screenSm) {
 			region = 'sm';
-		} else if (windowWidth >= screenXs) {
+		}
+		else if (windowWidth >= screenXs) {
 			region = 'xs';
-		} else {
+		}
+		else {
 			region = 'xxs';
 		}
 
 		return region;
 	};
 
-	var guid = (function() {
+	var guid = (function () {
 		var counter = 0;
 
-		return function(toggler, ns) {
+		return function (toggler, ns) {
 			var strId = toggler.attr('id');
 
 			if (!strId) {
@@ -93,11 +97,11 @@
 		};
 	})();
 
-	var toInt = function(str) {
+	var toInt = function (str) {
 		return parseInt(str, 10) || 0;
 	};
 
-	var SideNavigation = function(toggler, options) {
+	var SideNavigation = function (toggler, options) {
 		this.init(toggler, options);
 	};
 
@@ -114,7 +118,8 @@
 
 			if (instance.options.useDelegate) {
 				instance._onDelegateClickTrigger();
-			} else {
+			}
+			else {
 				instance._onClickTrigger();
 			}
 
@@ -122,6 +127,7 @@
 		},
 
 		_focusElement(el) {
+
 			// ios 8 fixed element disappears when trying to scroll
 
 			el.focus();
@@ -155,7 +161,8 @@
 
 			if (desktop && type === 'fixed-push') {
 				return 'desktop-fixed-push';
-			} else if (!desktop && typeMobile === 'fixed-push') {
+			}
+			else if (!desktop && typeMobile === 'fixed-push') {
 				return 'mobile-fixed-push';
 			}
 
@@ -209,7 +216,7 @@
 						'</div>'
 				);
 
-				urlLoaded = $.ajax(url).done(function(response) {
+				urlLoaded = $.ajax(url).done(function (response) {
 					sidebarBody.append(response);
 
 					eventTarget.trigger('urlLoaded.lexicon.sidenav');
@@ -243,7 +250,7 @@
 				doc.on(
 					'click.close.lexicon.sidenav',
 					closeButtonSelector,
-					function(event) {
+					function (event) {
 						event.preventDefault();
 
 						instance.toggle();
@@ -260,7 +267,7 @@
 
 			var el = instance.toggler;
 
-			el.on('click.lexicon.sidenav', function() {
+			el.on('click.lexicon.sidenav', function () {
 				instance.toggle();
 			});
 		},
@@ -278,7 +285,7 @@
 			if (!doc.data(dataTogglerSelector)) {
 				doc.data(dataTogglerSelector, 'true');
 
-				doc.on('click.lexicon.sidenav', togglerSelector, function(
+				doc.on('click.lexicon.sidenav', togglerSelector, function (
 					event
 				) {
 					instance.toggle();
@@ -300,7 +307,7 @@
 
 			var screenStartDesktop = instance._setScreenSize();
 
-			doc.on('screenChange.lexicon.sidenav', function() {
+			doc.on('screenChange.lexicon.sidenav', function () {
 				var desktop = instance._setScreenSize();
 				var sidenavRight = instance._isSidenavRight();
 				var type = desktop ? options.type : options.typeMobile;
@@ -376,7 +383,7 @@
 
 			var transitionEnd = 'bsTransitionEnd';
 
-			var complete = function() {
+			var complete = function () {
 				el.removeClass('sidenav-transition');
 
 				if (fn) {
@@ -386,8 +393,9 @@
 
 			if (!bootstrap.Util.supportsTransitionEnd()) {
 				complete.call(instance);
-			} else {
-				el.one(transitionEnd, function() {
+			}
+			else {
+				el.one(transitionEnd, function () {
 					complete();
 				}).emulateTransitionEnd(SideNavigation.TRANSITION_DURATION);
 			}
@@ -413,7 +421,8 @@
 
 					menu.css(positionDirection, width);
 				}
-			} else {
+			}
+			else {
 				instance.showSidenav();
 				instance.setHeight();
 			}
@@ -484,7 +493,8 @@
 				for (var i = 0; i < attribute.length; i++) {
 					els.css(attribute[i], '');
 				}
-			} else {
+			}
+			else {
 				els.css(attribute, '');
 			}
 		},
@@ -509,7 +519,8 @@
 			if (options.useDelegate) {
 				doc.off('click.lexicon.sidenav', instance.togglerSelector);
 				doc.data(instance.dataTogglerSelector, null);
-			} else {
+			}
+			else {
 				container.off('click.lexicon.sidenav');
 			}
 
@@ -523,7 +534,8 @@
 
 			if (instance.useDataAttribute) {
 				instance.hideSimpleSidenav();
-			} else {
+			}
+			else {
 				instance.toggleNavigation(false);
 			}
 		},
@@ -577,16 +589,16 @@
 
 				sidenav.trigger({
 					toggler: $(instance.togglerSelector),
-					type: 'closedStart.lexicon.sidenav'
+					type: 'closedStart.lexicon.sidenav',
 				});
 
-				instance._onSidenavTransitionEnd(content, function() {
+				instance._onSidenavTransitionEnd(content, function () {
 					sidenav.removeClass('sidenav-transition');
 					toggler.removeClass('sidenav-transition');
 
 					sidenav.trigger({
 						toggler: $(instance.togglerSelector),
-						type: 'closed.lexicon.sidenav'
+						type: 'closed.lexicon.sidenav',
 					});
 				});
 
@@ -686,12 +698,12 @@
 
 				navNode.css({
 					height: '100%',
-					'min-height': tallest
+					'min-height': tallest,
 				});
 
 				sideNavMenuNode.css({
 					height: '100%',
-					'min-height': tallest
+					'min-height': tallest,
 				});
 			}
 		},
@@ -721,12 +733,12 @@
 
 				navNode.css({
 					height: '100%',
-					'min-height': minHeight
+					'min-height': minHeight,
 				});
 
 				sidenavMenuNode.css({
 					height: '100%',
-					'min-height': minHeight
+					'min-height': minHeight,
 				});
 			}
 		},
@@ -738,7 +750,8 @@
 
 			if (options.heightType === 'equalHeight') {
 				instance.setEqualHeight();
-			} else if (options.heightType === 'fullHeight') {
+			}
+			else if (options.heightType === 'fullHeight') {
 				instance.setFullHeight();
 			}
 		},
@@ -748,7 +761,8 @@
 
 			if (instance.useDataAttribute) {
 				instance.showSimpleSidenav();
-			} else {
+			}
+			else {
 				instance.toggleNavigation(true);
 			}
 		},
@@ -771,7 +785,7 @@
 			var url = options.url;
 
 			if (url) {
-				container.one('urlLoaded.lexicon.sidenav', function() {
+				container.one('urlLoaded.lexicon.sidenav', function () {
 					instance.setHeight();
 				});
 
@@ -813,7 +827,8 @@
 					if (navigationStartX > contentStartX) {
 						padding = navigationStartX - contentStartX;
 					}
-				} else if (
+				}
+				else if (
 					(options.rtl && options.position === 'left') ||
 					(!options.rtl && sidenavRight)
 				) {
@@ -855,16 +870,16 @@
 
 				sidenav.trigger({
 					toggler: $(instance.togglerSelector),
-					type: 'openStart.lexicon.sidenav'
+					type: 'openStart.lexicon.sidenav',
 				});
 
-				instance._onSidenavTransitionEnd(content, function() {
+				instance._onSidenavTransitionEnd(content, function () {
 					sidenav.removeClass('sidenav-transition');
 					toggler.removeClass('sidenav-transition');
 
 					sidenav.trigger({
 						toggler: $(instance.togglerSelector),
-						type: 'open.lexicon.sidenav'
+						type: 'open.lexicon.sidenav',
 					});
 				});
 
@@ -885,7 +900,8 @@
 
 			if (instance.useDataAttribute) {
 				instance.toggleSimpleSidenav();
-			} else {
+			}
+			else {
 				instance.toggleNavigation();
 			}
 		},
@@ -911,16 +927,17 @@
 			if (closed) {
 				container.trigger({
 					toggler,
-					type: 'openStart.lexicon.sidenav'
+					type: 'openStart.lexicon.sidenav',
 				});
-			} else {
+			}
+			else {
 				container.trigger({
 					toggler,
-					type: 'closedStart.lexicon.sidenav'
+					type: 'closedStart.lexicon.sidenav',
 				});
 			}
 
-			instance._onSidenavTransitionEnd(container, function() {
+			instance._onSidenavTransitionEnd(container, function () {
 				var menu = container.find('.sidenav-menu').first();
 
 				if (container.hasClass('closed')) {
@@ -932,14 +949,15 @@
 
 					container.trigger({
 						toggler,
-						type: 'closed.lexicon.sidenav'
+						type: 'closed.lexicon.sidenav',
 					});
-				} else {
+				}
+				else {
 					toggler.addClass('open').removeClass('sidenav-transition');
 
 					container.trigger({
 						toggler,
-						type: 'open.lexicon.sidenav'
+						type: 'open.lexicon.sidenav',
 					});
 				}
 
@@ -978,7 +996,8 @@
 
 			if (simpleSidenavClosed) {
 				instance.showSimpleSidenav();
-			} else {
+			}
+			else {
 				instance.hideSimpleSidenav();
 			}
 		},
@@ -990,7 +1009,8 @@
 
 			if (instance.useDataAttribute) {
 				closed = instance._isSimpleSidenavClosed();
-			} else {
+			}
+			else {
 				var container = $(instance.options.container);
 
 				closed = container.hasClass('sidenav-transition')
@@ -999,12 +1019,12 @@
 			}
 
 			return !closed;
-		}
+		},
 	};
 
 	var old = $.fn.sideNavigation;
 
-	var initialize = function(toggler, options, selector) {
+	var initialize = function (toggler, options, selector) {
 		var data = toggler.data('lexicon.sidenav');
 
 		if (!data) {
@@ -1022,7 +1042,7 @@
 		return data;
 	};
 
-	var Plugin = function(options) {
+	var Plugin = function (options) {
 		var instance = this;
 
 		var selector = instance.selector;
@@ -1033,7 +1053,7 @@
 		var args = $.makeArray(arguments).slice(1);
 
 		if (methodCall) {
-			this.each(function() {
+			this.each(function () {
 				var $this = $(this);
 
 				var data = $this.data('lexicon.sidenav');
@@ -1057,20 +1077,23 @@
 					if (methodRetVal !== data && methodRetVal !== undefined) {
 						if (methodRetVal.jquery) {
 							retVal = retVal.pushStack(methodRetVal.get());
-						} else {
+						}
+						else {
 							retVal = methodRetVal;
 						}
 
 						return false;
 					}
-				} else if (returnInstance) {
+				}
+				else if (returnInstance) {
 					retVal = null;
 
 					return false;
 				}
 			});
-		} else {
-			this.each(function() {
+		}
+		else {
+			this.each(function () {
 				initialize($(this), options, selector);
 			});
 		}
@@ -1078,7 +1101,7 @@
 		return retVal;
 	};
 
-	Plugin.noConflict = function() {
+	Plugin.noConflict = function () {
 		$.fn.sideNavigation = old;
 
 		return this;
@@ -1105,7 +1128,7 @@
 		breakpoint: 768,
 		content: '.sidenav-content',
 		equalHeight: true, // equalHeight option is deprecated, use heightType instead
-		gutter: '15px',
+		gutter: '0px',
 		heightType: null,
 		loadingIndicatorTPL:
 			'<div class="loading-animation loading-animation-md"></div>',
@@ -1115,14 +1138,14 @@
 		typeMobile: 'relative',
 		url: null,
 		useDelegate: true,
-		width: '225px'
+		width: '225px',
 	};
 
 	Plugin.Constructor = SideNavigation;
 
 	$.fn.sideNavigation = Plugin;
 
-	$(function() {
+	$(function () {
 		var sidenav = $('[data-toggle="sidenav"]');
 
 		Plugin.call(sidenav);

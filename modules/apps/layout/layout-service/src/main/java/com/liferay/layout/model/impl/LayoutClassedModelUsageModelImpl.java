@@ -16,6 +16,7 @@ package com.liferay.layout.model.impl;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.model.LayoutClassedModelUsageModel;
 import com.liferay.petra.string.StringBundler;
@@ -27,13 +28,14 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
+import java.sql.Blob;
 import java.sql.Types;
 
 import java.util.Collections;
@@ -41,6 +43,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -67,8 +70,9 @@ public class LayoutClassedModelUsageModelImpl
 	public static final String TABLE_NAME = "LayoutClassedModelUsage";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
-		{"layoutClassedModelUsageId", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
+		{"uuid_", Types.VARCHAR}, {"layoutClassedModelUsageId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
 		{"classNameId", Types.BIGINT}, {"classPK", Types.BIGINT},
 		{"containerKey", Types.VARCHAR}, {"containerType", Types.BIGINT},
@@ -81,9 +85,11 @@ public class LayoutClassedModelUsageModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("layoutClassedModelUsageId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("classNameId", Types.BIGINT);
@@ -96,7 +102,7 @@ public class LayoutClassedModelUsageModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table LayoutClassedModelUsage (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,layoutClassedModelUsageId LONG not null primary key,groupId LONG,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,containerKey VARCHAR(200) null,containerType LONG,plid LONG,type_ INTEGER,lastPublishDate DATE null)";
+		"create table LayoutClassedModelUsage (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,layoutClassedModelUsageId LONG not null,groupId LONG,companyId LONG,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,containerKey VARCHAR(200) null,containerType LONG,plid LONG,type_ INTEGER,lastPublishDate DATE null,primary key (layoutClassedModelUsageId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table LayoutClassedModelUsage";
@@ -113,30 +119,79 @@ public class LayoutClassedModelUsageModelImpl
 
 	public static final String TX_MANAGER = "liferayTransactionManager";
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long CLASSNAMEID_COLUMN_BITMASK = 1L;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long CLASSPK_COLUMN_BITMASK = 2L;
 
-	public static final long CONTAINERKEY_COLUMN_BITMASK = 4L;
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long COMPANYID_COLUMN_BITMASK = 4L;
 
-	public static final long CONTAINERTYPE_COLUMN_BITMASK = 8L;
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long CONTAINERKEY_COLUMN_BITMASK = 8L;
 
-	public static final long GROUPID_COLUMN_BITMASK = 16L;
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long CONTAINERTYPE_COLUMN_BITMASK = 16L;
 
-	public static final long PLID_COLUMN_BITMASK = 32L;
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long GROUPID_COLUMN_BITMASK = 32L;
 
-	public static final long TYPE_COLUMN_BITMASK = 64L;
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long PLID_COLUMN_BITMASK = 64L;
 
-	public static final long UUID_COLUMN_BITMASK = 128L;
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long TYPE_COLUMN_BITMASK = 128L;
 
-	public static final long LAYOUTCLASSEDMODELUSAGEID_COLUMN_BITMASK = 256L;
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long UUID_COLUMN_BITMASK = 256L;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *		#getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long LAYOUTCLASSEDMODELUSAGEID_COLUMN_BITMASK = 512L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
-		_entityCacheEnabled = entityCacheEnabled;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
-		_finderCacheEnabled = finderCacheEnabled;
 	}
 
 	public LayoutClassedModelUsageModelImpl() {
@@ -191,9 +246,6 @@ public class LayoutClassedModelUsageModelImpl
 				attributeGetterFunction.apply((LayoutClassedModelUsage)this));
 		}
 
-		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
-		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
-
 		return attributes;
 	}
 
@@ -228,34 +280,6 @@ public class LayoutClassedModelUsageModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static Function<InvocationHandler, LayoutClassedModelUsage>
-		_getProxyProviderFunction() {
-
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			LayoutClassedModelUsage.class.getClassLoader(),
-			LayoutClassedModelUsage.class, ModelWrapper.class);
-
-		try {
-			Constructor<LayoutClassedModelUsage> constructor =
-				(Constructor<LayoutClassedModelUsage>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
-	}
-
 	private static final Map<String, Function<LayoutClassedModelUsage, Object>>
 		_attributeGetterFunctions;
 	private static final Map
@@ -278,6 +302,12 @@ public class LayoutClassedModelUsageModelImpl
 			"mvccVersion",
 			(BiConsumer<LayoutClassedModelUsage, Long>)
 				LayoutClassedModelUsage::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", LayoutClassedModelUsage::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setCtCollectionId);
 		attributeGetterFunctions.put("uuid", LayoutClassedModelUsage::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
@@ -296,6 +326,12 @@ public class LayoutClassedModelUsageModelImpl
 			"groupId",
 			(BiConsumer<LayoutClassedModelUsage, Long>)
 				LayoutClassedModelUsage::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", LayoutClassedModelUsage::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setCompanyId);
 		attributeGetterFunctions.put(
 			"createDate", LayoutClassedModelUsage::getCreateDate);
 		attributeSetterBiConsumers.put(
@@ -362,7 +398,25 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_mvccVersion = mvccVersion;
+	}
+
+	@Override
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_ctCollectionId = ctCollectionId;
 	}
 
 	@Override
@@ -377,17 +431,20 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setUuid(String uuid) {
-		_columnBitmask |= UUID_COLUMN_BITMASK;
-
-		if (_originalUuid == null) {
-			_originalUuid = _uuid;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_uuid = uuid;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public String getOriginalUuid() {
-		return GetterUtil.getString(_originalUuid);
+		return getColumnOriginalValue("uuid_");
 	}
 
 	@Override
@@ -397,6 +454,10 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setLayoutClassedModelUsageId(long layoutClassedModelUsageId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_layoutClassedModelUsageId = layoutClassedModelUsageId;
 	}
 
@@ -407,19 +468,44 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setGroupId(long groupId) {
-		_columnBitmask |= GROUPID_COLUMN_BITMASK;
-
-		if (!_setOriginalGroupId) {
-			_setOriginalGroupId = true;
-
-			_originalGroupId = _groupId;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_groupId = groupId;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public long getOriginalGroupId() {
-		return _originalGroupId;
+		return GetterUtil.getLong(this.<Long>getColumnOriginalValue("groupId"));
+	}
+
+	@Override
+	public long getCompanyId() {
+		return _companyId;
+	}
+
+	@Override
+	public void setCompanyId(long companyId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_companyId = companyId;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public long getOriginalCompanyId() {
+		return GetterUtil.getLong(
+			this.<Long>getColumnOriginalValue("companyId"));
 	}
 
 	@Override
@@ -429,6 +515,10 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setCreateDate(Date createDate) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_createDate = createDate;
 	}
 
@@ -444,6 +534,10 @@ public class LayoutClassedModelUsageModelImpl
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_setModifiedDate = true;
+
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
 
 		_modifiedDate = modifiedDate;
 	}
@@ -475,19 +569,21 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setClassNameId(long classNameId) {
-		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
-
-		if (!_setOriginalClassNameId) {
-			_setOriginalClassNameId = true;
-
-			_originalClassNameId = _classNameId;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_classNameId = classNameId;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public long getOriginalClassNameId() {
-		return _originalClassNameId;
+		return GetterUtil.getLong(
+			this.<Long>getColumnOriginalValue("classNameId"));
 	}
 
 	@Override
@@ -497,19 +593,20 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setClassPK(long classPK) {
-		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
-
-		if (!_setOriginalClassPK) {
-			_setOriginalClassPK = true;
-
-			_originalClassPK = _classPK;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_classPK = classPK;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public long getOriginalClassPK() {
-		return _originalClassPK;
+		return GetterUtil.getLong(this.<Long>getColumnOriginalValue("classPK"));
 	}
 
 	@Override
@@ -524,17 +621,20 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setContainerKey(String containerKey) {
-		_columnBitmask |= CONTAINERKEY_COLUMN_BITMASK;
-
-		if (_originalContainerKey == null) {
-			_originalContainerKey = _containerKey;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_containerKey = containerKey;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public String getOriginalContainerKey() {
-		return GetterUtil.getString(_originalContainerKey);
+		return getColumnOriginalValue("containerKey");
 	}
 
 	@Override
@@ -544,19 +644,21 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setContainerType(long containerType) {
-		_columnBitmask |= CONTAINERTYPE_COLUMN_BITMASK;
-
-		if (!_setOriginalContainerType) {
-			_setOriginalContainerType = true;
-
-			_originalContainerType = _containerType;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_containerType = containerType;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public long getOriginalContainerType() {
-		return _originalContainerType;
+		return GetterUtil.getLong(
+			this.<Long>getColumnOriginalValue("containerType"));
 	}
 
 	@Override
@@ -566,19 +668,20 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setPlid(long plid) {
-		_columnBitmask |= PLID_COLUMN_BITMASK;
-
-		if (!_setOriginalPlid) {
-			_setOriginalPlid = true;
-
-			_originalPlid = _plid;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_plid = plid;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public long getOriginalPlid() {
-		return _originalPlid;
+		return GetterUtil.getLong(this.<Long>getColumnOriginalValue("plid"));
 	}
 
 	@Override
@@ -588,19 +691,21 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setType(int type) {
-		_columnBitmask |= TYPE_COLUMN_BITMASK;
-
-		if (!_setOriginalType) {
-			_setOriginalType = true;
-
-			_originalType = _type;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_type = type;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public int getOriginalType() {
-		return _originalType;
+		return GetterUtil.getInteger(
+			this.<Integer>getColumnOriginalValue("type_"));
 	}
 
 	@Override
@@ -610,17 +715,49 @@ public class LayoutClassedModelUsageModelImpl
 
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_lastPublishDate = lastPublishDate;
 	}
 
+	@Override
+	public StagedModelType getStagedModelType() {
+		return new StagedModelType(
+			PortalUtil.getClassNameId(LayoutClassedModelUsage.class.getName()),
+			getClassNameId());
+	}
+
 	public long getColumnBitmask() {
+		if (_columnBitmask > 0) {
+			return _columnBitmask;
+		}
+
+		if ((_columnOriginalValues == null) ||
+			(_columnOriginalValues == Collections.EMPTY_MAP)) {
+
+			return 0;
+		}
+
+		for (Map.Entry<String, Object> entry :
+				_columnOriginalValues.entrySet()) {
+
+			if (!Objects.equals(
+					entry.getValue(), getColumnValue(entry.getKey()))) {
+
+				_columnBitmask |= _columnBitmasks.get(entry.getKey());
+			}
+		}
+
 		return _columnBitmask;
 	}
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
 		return ExpandoBridgeFactoryUtil.getExpandoBridge(
-			0, LayoutClassedModelUsage.class.getName(), getPrimaryKey());
+			getCompanyId(), LayoutClassedModelUsage.class.getName(),
+			getPrimaryKey());
 	}
 
 	@Override
@@ -651,10 +788,12 @@ public class LayoutClassedModelUsageModelImpl
 			new LayoutClassedModelUsageImpl();
 
 		layoutClassedModelUsageImpl.setMvccVersion(getMvccVersion());
+		layoutClassedModelUsageImpl.setCtCollectionId(getCtCollectionId());
 		layoutClassedModelUsageImpl.setUuid(getUuid());
 		layoutClassedModelUsageImpl.setLayoutClassedModelUsageId(
 			getLayoutClassedModelUsageId());
 		layoutClassedModelUsageImpl.setGroupId(getGroupId());
+		layoutClassedModelUsageImpl.setCompanyId(getCompanyId());
 		layoutClassedModelUsageImpl.setCreateDate(getCreateDate());
 		layoutClassedModelUsageImpl.setModifiedDate(getModifiedDate());
 		layoutClassedModelUsageImpl.setClassNameId(getClassNameId());
@@ -686,17 +825,17 @@ public class LayoutClassedModelUsageModelImpl
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof LayoutClassedModelUsage)) {
+		if (!(object instanceof LayoutClassedModelUsage)) {
 			return false;
 		}
 
 		LayoutClassedModelUsage layoutClassedModelUsage =
-			(LayoutClassedModelUsage)obj;
+			(LayoutClassedModelUsage)object;
 
 		long primaryKey = layoutClassedModelUsage.getPrimaryKey();
 
@@ -713,60 +852,31 @@ public class LayoutClassedModelUsageModelImpl
 		return (int)getPrimaryKey();
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return _entityCacheEnabled;
+		return true;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return _finderCacheEnabled;
+		return true;
 	}
 
 	@Override
 	public void resetOriginalValues() {
-		LayoutClassedModelUsageModelImpl layoutClassedModelUsageModelImpl =
-			this;
+		_columnOriginalValues = Collections.emptyMap();
 
-		layoutClassedModelUsageModelImpl._originalUuid =
-			layoutClassedModelUsageModelImpl._uuid;
+		_setModifiedDate = false;
 
-		layoutClassedModelUsageModelImpl._originalGroupId =
-			layoutClassedModelUsageModelImpl._groupId;
-
-		layoutClassedModelUsageModelImpl._setOriginalGroupId = false;
-
-		layoutClassedModelUsageModelImpl._setModifiedDate = false;
-
-		layoutClassedModelUsageModelImpl._originalClassNameId =
-			layoutClassedModelUsageModelImpl._classNameId;
-
-		layoutClassedModelUsageModelImpl._setOriginalClassNameId = false;
-
-		layoutClassedModelUsageModelImpl._originalClassPK =
-			layoutClassedModelUsageModelImpl._classPK;
-
-		layoutClassedModelUsageModelImpl._setOriginalClassPK = false;
-
-		layoutClassedModelUsageModelImpl._originalContainerKey =
-			layoutClassedModelUsageModelImpl._containerKey;
-
-		layoutClassedModelUsageModelImpl._originalContainerType =
-			layoutClassedModelUsageModelImpl._containerType;
-
-		layoutClassedModelUsageModelImpl._setOriginalContainerType = false;
-
-		layoutClassedModelUsageModelImpl._originalPlid =
-			layoutClassedModelUsageModelImpl._plid;
-
-		layoutClassedModelUsageModelImpl._setOriginalPlid = false;
-
-		layoutClassedModelUsageModelImpl._originalType =
-			layoutClassedModelUsageModelImpl._type;
-
-		layoutClassedModelUsageModelImpl._setOriginalType = false;
-
-		layoutClassedModelUsageModelImpl._columnBitmask = 0;
+		_columnBitmask = 0;
 	}
 
 	@Override
@@ -775,6 +885,8 @@ public class LayoutClassedModelUsageModelImpl
 			new LayoutClassedModelUsageCacheModel();
 
 		layoutClassedModelUsageCacheModel.mvccVersion = getMvccVersion();
+
+		layoutClassedModelUsageCacheModel.ctCollectionId = getCtCollectionId();
 
 		layoutClassedModelUsageCacheModel.uuid = getUuid();
 
@@ -788,6 +900,8 @@ public class LayoutClassedModelUsageModelImpl
 			getLayoutClassedModelUsageId();
 
 		layoutClassedModelUsageCacheModel.groupId = getGroupId();
+
+		layoutClassedModelUsageCacheModel.companyId = getCompanyId();
 
 		Date createDate = getCreateDate();
 
@@ -845,7 +959,7 @@ public class LayoutClassedModelUsageModelImpl
 			attributeGetterFunctions = getAttributeGetterFunctions();
 
 		StringBundler sb = new StringBundler(
-			4 * attributeGetterFunctions.size() + 2);
+			(5 * attributeGetterFunctions.size()) + 2);
 
 		sb.append("{");
 
@@ -856,10 +970,27 @@ public class LayoutClassedModelUsageModelImpl
 			Function<LayoutClassedModelUsage, Object> attributeGetterFunction =
 				entry.getValue();
 
+			sb.append("\"");
 			sb.append(attributeName);
-			sb.append("=");
-			sb.append(
-				attributeGetterFunction.apply((LayoutClassedModelUsage)this));
+			sb.append("\": ");
+
+			Object value = attributeGetterFunction.apply(
+				(LayoutClassedModelUsage)this);
+
+			if (value == null) {
+				sb.append("null");
+			}
+			else if (value instanceof Blob || value instanceof Date ||
+					 value instanceof Map || value instanceof String) {
+
+				sb.append(
+					"\"" + StringUtil.replace(value.toString(), "\"", "'") +
+						"\"");
+			}
+			else {
+				sb.append(value);
+			}
+
 			sb.append(", ");
 		}
 
@@ -878,7 +1009,7 @@ public class LayoutClassedModelUsageModelImpl
 			attributeGetterFunctions = getAttributeGetterFunctions();
 
 		StringBundler sb = new StringBundler(
-			5 * attributeGetterFunctions.size() + 4);
+			(5 * attributeGetterFunctions.size()) + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
@@ -909,41 +1040,130 @@ public class LayoutClassedModelUsageModelImpl
 		private static final Function
 			<InvocationHandler, LayoutClassedModelUsage>
 				_escapedModelProxyProviderFunction =
-					_getProxyProviderFunction();
+					ProxyUtil.getProxyProviderFunction(
+						LayoutClassedModelUsage.class, ModelWrapper.class);
 
 	}
 
-	private static boolean _entityCacheEnabled;
-	private static boolean _finderCacheEnabled;
-
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
-	private String _originalUuid;
 	private long _layoutClassedModelUsageId;
 	private long _groupId;
-	private long _originalGroupId;
-	private boolean _setOriginalGroupId;
+	private long _companyId;
 	private Date _createDate;
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
 	private long _classNameId;
-	private long _originalClassNameId;
-	private boolean _setOriginalClassNameId;
 	private long _classPK;
-	private long _originalClassPK;
-	private boolean _setOriginalClassPK;
 	private String _containerKey;
-	private String _originalContainerKey;
 	private long _containerType;
-	private long _originalContainerType;
-	private boolean _setOriginalContainerType;
 	private long _plid;
-	private long _originalPlid;
-	private boolean _setOriginalPlid;
 	private int _type;
-	private int _originalType;
-	private boolean _setOriginalType;
 	private Date _lastPublishDate;
+
+	public <T> T getColumnValue(String columnName) {
+		columnName = _attributeNames.getOrDefault(columnName, columnName);
+
+		Function<LayoutClassedModelUsage, Object> function =
+			_attributeGetterFunctions.get(columnName);
+
+		if (function == null) {
+			throw new IllegalArgumentException(
+				"No attribute getter function found for " + columnName);
+		}
+
+		return (T)function.apply((LayoutClassedModelUsage)this);
+	}
+
+	public <T> T getColumnOriginalValue(String columnName) {
+		if (_columnOriginalValues == null) {
+			return null;
+		}
+
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		return (T)_columnOriginalValues.get(columnName);
+	}
+
+	private void _setColumnOriginalValues() {
+		_columnOriginalValues = new HashMap<String, Object>();
+
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
+		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
+		_columnOriginalValues.put("uuid_", _uuid);
+		_columnOriginalValues.put(
+			"layoutClassedModelUsageId", _layoutClassedModelUsageId);
+		_columnOriginalValues.put("groupId", _groupId);
+		_columnOriginalValues.put("companyId", _companyId);
+		_columnOriginalValues.put("createDate", _createDate);
+		_columnOriginalValues.put("modifiedDate", _modifiedDate);
+		_columnOriginalValues.put("classNameId", _classNameId);
+		_columnOriginalValues.put("classPK", _classPK);
+		_columnOriginalValues.put("containerKey", _containerKey);
+		_columnOriginalValues.put("containerType", _containerType);
+		_columnOriginalValues.put("plid", _plid);
+		_columnOriginalValues.put("type_", _type);
+		_columnOriginalValues.put("lastPublishDate", _lastPublishDate);
+	}
+
+	private static final Map<String, String> _attributeNames;
+
+	static {
+		Map<String, String> attributeNames = new HashMap<>();
+
+		attributeNames.put("uuid_", "uuid");
+		attributeNames.put("type_", "type");
+
+		_attributeNames = Collections.unmodifiableMap(attributeNames);
+	}
+
+	private transient Map<String, Object> _columnOriginalValues;
+
+	public static long getColumnBitmask(String columnName) {
+		return _columnBitmasks.get(columnName);
+	}
+
+	private static final Map<String, Long> _columnBitmasks;
+
+	static {
+		Map<String, Long> columnBitmasks = new HashMap<>();
+
+		columnBitmasks.put("mvccVersion", 1L);
+
+		columnBitmasks.put("ctCollectionId", 2L);
+
+		columnBitmasks.put("uuid_", 4L);
+
+		columnBitmasks.put("layoutClassedModelUsageId", 8L);
+
+		columnBitmasks.put("groupId", 16L);
+
+		columnBitmasks.put("companyId", 32L);
+
+		columnBitmasks.put("createDate", 64L);
+
+		columnBitmasks.put("modifiedDate", 128L);
+
+		columnBitmasks.put("classNameId", 256L);
+
+		columnBitmasks.put("classPK", 512L);
+
+		columnBitmasks.put("containerKey", 1024L);
+
+		columnBitmasks.put("containerType", 2048L);
+
+		columnBitmasks.put("plid", 4096L);
+
+		columnBitmasks.put("type_", 8192L);
+
+		columnBitmasks.put("lastPublishDate", 16384L);
+
+		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
+	}
+
 	private long _columnBitmask;
 	private LayoutClassedModelUsage _escapedModel;
 

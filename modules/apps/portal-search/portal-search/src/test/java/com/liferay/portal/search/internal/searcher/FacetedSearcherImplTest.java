@@ -15,17 +15,22 @@
 package com.liferay.portal.search.internal.searcher;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.search.ExpandoQueryContributor;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.search.asset.SearchableAssetClassNamesProvider;
 import com.liferay.portal.search.constants.SearchContextAttributes;
+import com.liferay.portal.search.internal.expando.ExpandoQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.AddSearchKeywordsQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.PostProcessSearchQueryContributorHelper;
 import com.liferay.portal.search.internal.indexer.PreFilterContributorHelper;
+import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderFactoryImpl;
 import com.liferay.portal.search.internal.test.util.DocumentFixture;
+import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
@@ -35,6 +40,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mock;
@@ -45,6 +52,11 @@ import org.mockito.MockitoAnnotations;
  * @author André de Oliveira
  */
 public class FacetedSearcherImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -131,12 +143,30 @@ public class FacetedSearcherImplTest {
 
 	protected FacetedSearcherImpl createFacetedSearcher() {
 		return new FacetedSearcherImpl(
-			expandoQueryContributor, indexerRegistry, indexSearcherHelper,
-			preFilterContributorHelper, searchEngineHelper);
+			addSearchKeywordsQueryContributorHelper,
+			expandoQueryContributorHelper, indexerRegistry, indexSearcherHelper,
+			postProcessSearchQueryContributorHelper, preFilterContributorHelper,
+			searchableAssetClassNamesProvider,
+			createSearchRequestBuilderFactory());
+	}
+
+	protected SearchRequestBuilderFactory createSearchRequestBuilderFactory() {
+		SearchRequestBuilderFactoryImpl searchRequestBuilderFactoryImpl =
+			new SearchRequestBuilderFactoryImpl();
+
+		searchRequestBuilderFactoryImpl.setSearchRequestBuilderFactory(
+			new com.liferay.portal.search.internal.searcher.
+				SearchRequestBuilderFactoryImpl());
+
+		return searchRequestBuilderFactoryImpl;
 	}
 
 	@Mock
-	protected ExpandoQueryContributor expandoQueryContributor;
+	protected AddSearchKeywordsQueryContributorHelper
+		addSearchKeywordsQueryContributorHelper;
+
+	@Mock
+	protected ExpandoQueryContributorHelper expandoQueryContributorHelper;
 
 	protected FacetedSearcher facetedSearcher;
 
@@ -147,10 +177,15 @@ public class FacetedSearcherImplTest {
 	protected IndexSearcherHelper indexSearcherHelper;
 
 	@Mock
+	protected PostProcessSearchQueryContributorHelper
+		postProcessSearchQueryContributorHelper;
+
+	@Mock
 	protected PreFilterContributorHelper preFilterContributorHelper;
 
 	@Mock
-	protected SearchEngineHelper searchEngineHelper;
+	protected SearchableAssetClassNamesProvider
+		searchableAssetClassNamesProvider;
 
 	private DocumentFixture _documentFixture;
 

@@ -125,6 +125,13 @@ components:
                             format: uri
                             readOnly: true
                             type: string
+                        contentValue:
+                            # @review
+                            description:
+                                "optional field with the content of the image in Base64, can be embedded with
+                                nestedFields"
+                            readOnly: true
+                            type: string
                         imageId:
                             description:
                                 The image's ID. This can be used to retrieve more information in the `Document` API.
@@ -153,22 +160,11 @@ components:
                     format: int64
                     readOnly: true
                     type: integer
-                taxonomyCategories:
+                taxonomyCategoryBriefs:
                     description:
                         The categories associated with this blog post.
                     items:
-                        properties:
-                            taxonomyCategoryId:
-                                description:
-                                    The category's ID. This can be used to retrieve more information in the
-                                    `TaxonomyCategory` API.
-                                format: int64
-                                type: integer
-                            taxonomyCategoryName:
-                                description:
-                                    The category's name.
-                                type: string
-                        type: object
+                        $ref: "#/components/schemas/TaxonomyCategoryBrief"
                     readOnly: true
                     type: array
                 taxonomyCategoryIds:
@@ -196,6 +192,12 @@ components:
                 contentUrl:
                     description:
                         The image's relative URL.
+                    readOnly: true
+                    type: string
+                contentValue:
+                    # @review
+                    description:
+                        optional field with the content of the image in Base64, can be embedded with nestedFields
                     readOnly: true
                     type: string
                 encodingFormat:
@@ -230,6 +232,40 @@ components:
                     enum: [Anyone, Members, Owner]
                     type: string
                     writeOnly: true
+            type: object
+        ClassNameReference:
+            properties:
+                className:
+                    type: string
+            required:
+                - className
+        ClassPKReference:
+            properties:
+                className:
+                    type: string
+                classPK:
+                    format: int64
+                    type: integer
+            required:
+                - className
+                - classPK
+            type: object
+        ColumnViewport:
+            additionalProperties: false
+            properties:
+                columnViewportDefinition:
+                    additionalProperties: false
+                    properties:
+                        size:
+                            maximum: 12
+                            minimum: 1
+                            type: integer
+                    type: object
+                id:
+                    type: string
+            required:
+                - columnViewportDefinition
+                - id
             type: object
         Comment:
             description:
@@ -300,6 +336,12 @@ components:
                     format: uri
                     readOnly: true
                     type: string
+                contentValue:
+                    # @review
+                    description:
+                        optional field with the content of the document in Base64, can be embedded with nestedFields
+                    readOnly: true
+                    type: string
                 description:
                     description:
                         The document's description.
@@ -330,11 +372,46 @@ components:
                         The document's title.
                     type: string
             type: object
+        ContentElement:
+            # @review
+            properties:
+                content:
+                    description:
+                        The content's fields.
+                    readOnly: true
+                    type: object
+                contentType:
+                    description:
+                        The content set element's type.
+                    readOnly: true
+                    type: string
+                id:
+                    description:
+                        The content set element's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                title:
+                    description:
+                        The content's title.
+                    readOnly: true
+                    type: string
+                title_i18n:
+                    additionalProperties:
+                        type: string
+                    readOnly: true
+                    type: object
         ContentField:
             description:
                 Represents the value of each field in structured content. Fields can contain different information types
-                (e.g., geolocation, documents, etc.).
+                (e.g., documents, geolocation, etc.).
             properties:
+                contentFieldValue:
+                    $ref: "#/components/schemas/ContentFieldValue"
+                contentFieldValue_i18n:
+                    additionalProperties:
+                        $ref: "#/components/schemas/ContentFieldValue"
+                    type: object
                 dataType:
                     description:
                         The field type (e.g., image, text, etc.).
@@ -353,6 +430,7 @@ components:
                 label_i18n:
                     additionalProperties:
                         type: string
+                    readOnly: true
                     type: object
                 name:
                     description:
@@ -369,63 +447,69 @@ components:
                         A flag that indicates whether this field can be rendered multiple times.
                     readOnly: true
                     type: boolean
-                value:
+        ContentFieldValue:
+            description:
+                # @review
+                Represents the value of a content field. Can contain different information types (e.g., geolocation,
+                documents, etc.).
+            properties:
+                data:
+                    description:
+                        The field's content for simple types.
+                    type: string
+                document:
+                    allOf:
+                        - $ref: "#/components/schemas/ContentDocument"
+                    description:
+                        A content document element.
+                geo:
+                    description:
+                        A point determined by latitude and longitude.
                     properties:
-                        data:
+                        latitude:
                             description:
-                                The field's content for simple types.
-                            type: string
-                        document:
-                            allOf:
-                                - $ref: "#/components/schemas/ContentDocument"
+                                The latitude of a point in space.
+                            format: double
+                            type: number
+                        longitude:
                             description:
-                                A content document element.
-                        geo:
-                            description:
-                                A point determined by latitude and longitude.
-                            properties:
-                                latitude:
-                                    description:
-                                        The latitude of a point in space.
-                                    format: double
-                                    type: number
-                                longitude:
-                                    description:
-                                        The longitude of a point in space.
-                                    format: double
-                                    type: number
-                            type: object
-                        image:
-                            allOf:
-                                - $ref: "#/components/schemas/ContentDocument"
-                            description:
-                                A content document element that stores an image file.
-                        link:
-                            description:
-                                A link to a page on the server.
-                            format: uri
-                            type: string
-                        structuredContentLink:
-                            description:
-                                A link to structured content on the server.
-                            properties:
-                                contentType:
-                                    readOnly: true
-                                    type: string
-                                id:
-                                    description:
-                                        The resource's ID.
-                                    format: int64
-                                    type: integer
-                                title:
-                                    description:
-                                        The resource's title.
-                                    type: string
-                            type: object
+                                The longitude of a point in space.
+                            format: double
+                            type: number
                     type: object
-                value_i18n:
-                    additionalProperties:
-                        type: object
+                image:
+                    allOf:
+                        - $ref: "#/components/schemas/ContentDocument"
+                    description:
+                        A content document element that stores an image file.
+                link:
+                    description:
+                        A link to a page on the server.
+                    format: uri
+                    type: string
+                structuredContentLink:
+                    description:
+                        A link to structured content on the server.
+                    properties:
+                        contentType:
+                            readOnly: true
+                            type: string
+                        embeddedStructuredContent:
+                            allOf:
+                                - $ref: "#/components/schemas/StructuredContent"
+                            # @review
+                            description:
+                                optional field with the structured content, can be embedded with nestedFields
+                            readOnly: true
+                        id:
+                            description:
+                                The resource's ID.
+                            format: int64
+                            type: integer
+                        title:
+                            description:
+                                The resource's title.
+                            type: string
                     type: object
         ContentSetElement:
             description:
@@ -462,6 +546,9 @@ components:
                 Represents the content structure that backs structured content. This defines which form fields are
                 available and the possible types and values.
             properties:
+                assetLibraryKey:
+                    readOnly: true
+                    type: string
                 availableLanguages:
                     description:
                         The list of languages the structure has a translation for.
@@ -619,6 +706,74 @@ components:
                     readOnly: true
                     type: boolean
             type: object
+        ContentTemplate:
+            properties:
+                actions:
+                    additionalProperties:
+                        additionalProperties:
+                            type: string
+                        type: object
+                    readOnly: true
+                    type: object
+                assetLibraryKey:
+                    readOnly: true
+                    type: string
+                availableLanguages:
+                    items:
+                        type: string
+                    readOnly: true
+                    type: array
+                contentStructureId:
+                    format: int64
+                    type: integer
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    description:
+                        The content template's creator.
+                    readOnly: true
+                dateCreated:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                description:
+                    type: string
+                description_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+                id:
+                    readOnly: true
+                    type: string
+                name:
+                    type: string
+                name_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+                programmingLanguage:
+                    type: string
+                siteId:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                templateScript:
+                    type: string
+            required:
+                - contentStructureId
+                - name
+        ContextReference:
+            properties:
+                contextSource:
+                    enum: [CollectionItem, DisplayPageItem]
+                    type: string
+            required:
+                - contextSource
+            type: object
         Creator:
             description:
                 Represents the user account of the content's creator/author. Properties follow the
@@ -663,9 +818,38 @@ components:
                     readOnly: true
                     type: string
                 profileURL:
+                    # @review
                     description:
-                        A relative URL to the author's user profile.
+                        "A relative URL to the author's user profile. Optional field, can be embedded with nestedFields"
                     format: uri
+                    readOnly: true
+                    type: string
+            type: object
+        CreatorStatistics:
+            # @review
+            description:
+                Detailed info of the creator.
+            properties:
+                joinDate:
+                    description:
+                        Join date of the author
+                    format: date-time
+                    readOnly: true
+                    type: string
+                lastPostDate:
+                    description:
+                        Last post created by the author
+                    format: date-time
+                    readOnly: true
+                    type: string
+                postsNumber:
+                    description:
+                        Number of posts publicated by the author.
+                    readOnly: true
+                    type: integer
+                rank:
+                    description:
+                        The rank of the author.
                     readOnly: true
                     type: string
             type: object
@@ -710,6 +894,24 @@ components:
                     description:
                         The field's internal name. This is valid for comparisons and unique in the structured content.
                     type: string
+        DisplayPageTemplate:
+            properties:
+                contentSubtype:
+                    properties:
+                        subtypeId:
+                            format: int64
+                            type: integer
+                    type: object
+                contentType:
+                    properties:
+                        className:
+                            type: string
+                    type: object
+                key:
+                    type: string
+                name:
+                    type: string
+            type: object
         Document:
             description:
                 Represents a Document Library file, storing binary and metadata information. Properties follow the
@@ -731,6 +933,13 @@ components:
                                 description:
                                     The image's relative URL.
                                 format: uri
+                                type: string
+                            contentValue:
+                                # @review
+                                description:
+                                    "optional field with the content of the image in Base64, can be embedded with
+                                    nestedFields"
+                                readOnly: true
                                 type: string
                             height:
                                 description:
@@ -758,10 +967,19 @@ components:
                     description:
                         The document's average rating.
                     readOnly: true
+                assetLibraryKey:
+                    readOnly: true
+                    type: string
                 contentUrl:
                     description:
                         The document's relative URL.
                     format: binary
+                    readOnly: true
+                    type: string
+                contentValue:
+                    # @review
+                    description:
+                        optional field with the content of the document in Base64, can be embedded with nestedFields
                     readOnly: true
                     type: string
                 creator:
@@ -794,8 +1012,33 @@ components:
                     description:
                         The ID of the `DocumentFolder` where this document is stored.
                     format: int64
-                    readOnly: true
                     type: integer
+                documentType:
+                    properties:
+                        availableLanguages:
+                            items:
+                                type: string
+                            readOnly: true
+                            type: array
+                        contentFields:
+                            items:
+                                $ref: "#/components/schemas/ContentField"
+                            type: array
+                        description:
+                            type: string
+                        description_i18n:
+                            additionalProperties:
+                                type: string
+                            readOnly: true
+                            type: object
+                        name:
+                            type: string
+                        name_i18n:
+                            additionalProperties:
+                                type: string
+                            readOnly: true
+                            type: object
+                    type: object
                 encodingFormat:
                     description:
                         The document's content type (e.g., `application/pdf`, etc.).
@@ -828,28 +1071,24 @@ components:
                         $ref: "#/components/schemas/RelatedContent"
                     readOnly: true
                     type: array
+                siteId:
+                    # @review
+                    description:
+                        The ID of the site to which this document is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
                 sizeInBytes:
                     description:
                         The document's size in bytes.
                     format: int64
                     readOnly: true
                     type: integer
-                taxonomyCategories:
+                taxonomyCategoryBriefs:
                     description:
                         The categories associated with this document.
                     items:
-                        properties:
-                            taxonomyCategoryId:
-                                description:
-                                    The category's ID. This can be used to retrieve more information via the
-                                    `TaxonomyCategory` API.
-                                format: int64
-                                type: integer
-                            taxonomyCategoryName:
-                                description:
-                                    The category's name.
-                                type: string
-                        type: object
+                        $ref: "#/components/schemas/TaxonomyCategoryBrief"
                     readOnly: true
                     type: array
                 taxonomyCategoryIds:
@@ -882,6 +1121,9 @@ components:
                         type: object
                     readOnly: true
                     type: object
+                assetLibraryKey:
+                    readOnly: true
+                    type: string
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
@@ -948,6 +1190,227 @@ components:
                     writeOnly: true
             required:
                 - name
+            type: object
+        Fragment:
+            properties:
+                collectionName:
+                    type: string
+                key:
+                    type: string
+                name:
+                    type: string
+            type: object
+        FragmentField:
+            properties:
+                id:
+                    type: string
+                value:
+                    anyOf:
+                        - $ref: "#/components/schemas/FragmentFieldBackgroundImage"
+                        - $ref: "#/components/schemas/FragmentFieldHTML"
+                        - $ref: "#/components/schemas/FragmentFieldImage"
+                        - $ref: "#/components/schemas/FragmentFieldText"
+            type: object
+        FragmentFieldBackgroundImage:
+            properties:
+                backgroundFragmentImage:
+                    $ref: "#/components/schemas/FragmentImage"
+                backgroundImage:
+                    deprecated: true
+                    description:
+                        "Deprecated as of Athanasius (7.3.x), replaced by backgroundFragmentImage"
+                    properties:
+                        description:
+                            oneOf:
+                                - $ref: "#/components/schemas/FragmentInlineValue"
+                        title:
+                            oneOf:
+                                - $ref: "#/components/schemas/FragmentInlineValue"
+                        url:
+                            oneOf:
+                                - $ref: "#/components/schemas/FragmentInlineValue"
+                                - $ref: "#/components/schemas/FragmentMappedValue"
+                    type: object
+            type: object
+        FragmentFieldHTML:
+            properties:
+                html:
+                    oneOf:
+                        - $ref: "#/components/schemas/FragmentInlineValue"
+                        - $ref: "#/components/schemas/FragmentMappedValue"
+            type: object
+        FragmentFieldImage:
+            properties:
+                fragmentImage:
+                    $ref: "#/components/schemas/FragmentImage"
+                fragmentLink:
+                    $ref: "#/components/schemas/FragmentLink"
+            type: object
+        FragmentFieldText:
+            properties:
+                fragmentLink:
+                    $ref: "#/components/schemas/FragmentLink"
+                text:
+                    oneOf:
+                        - $ref: "#/components/schemas/FragmentInlineValue"
+                        - $ref: "#/components/schemas/FragmentMappedValue"
+            type: object
+        FragmentImage:
+            properties:
+                description:
+                    oneOf:
+                        - $ref: "#/components/schemas/FragmentInlineValue"
+                title:
+                    oneOf:
+                        - $ref: "#/components/schemas/FragmentInlineValue"
+                url:
+                    oneOf:
+                        - $ref: "#/components/schemas/FragmentInlineValue"
+                        - $ref: "#/components/schemas/FragmentMappedValue"
+            type: object
+        FragmentInlineValue:
+            properties:
+                value:
+                    type: string
+                value_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+            type: object
+        FragmentLink:
+            properties:
+                href:
+                    oneOf:
+                        - $ref: "#/components/schemas/FragmentInlineValue"
+                        - $ref: "#/components/schemas/FragmentMappedValue"
+                target:
+                    enum: [Blank, Parent, Self, Top]
+                    type: string
+        FragmentMappedValue:
+            properties:
+                defaultFragmentInlineValue:
+                    $ref: "#/components/schemas/FragmentInlineValue"
+                defaultValue:
+                    deprecated: true
+                    description:
+                        "Deprecated as of Athanasius (7.3.x), replaced by defaultFragmentInlineValue"
+                    properties:
+                        value:
+                            type: string
+                        value_i18n:
+                            additionalProperties:
+                                type: string
+                            type: object
+                    type: object
+                mapping:
+                    properties:
+                        fieldKey:
+                            type: string
+                        itemReference:
+                            oneOf:
+                                - $ref: "#/components/schemas/ClassPKReference"
+                                - $ref: "#/components/schemas/ContextReference"
+                    type: object
+            type: object
+        FragmentSettingsAllowed:
+            properties:
+                allowedFragments:
+                    items:
+                        $ref: "#/components/schemas/Fragment"
+                    type: array
+            type: object
+        FragmentSettingsUnallowed:
+            properties:
+                unallowedFragments:
+                    items:
+                        $ref: "#/components/schemas/Fragment"
+                    type: array
+            type: object
+        FragmentStyle:
+            properties:
+                backgroundColor:
+                    type: string
+                backgroundFragmentImage:
+                    $ref: "#/components/schemas/FragmentImage"
+                borderColor:
+                    type: string
+                borderRadius:
+                    type: string
+                borderWidth:
+                    type: string
+                fontFamily:
+                    type: string
+                fontSize:
+                    type: string
+                fontWeight:
+                    type: string
+                height:
+                    type: string
+                marginBottom:
+                    type: string
+                marginLeft:
+                    type: string
+                marginRight:
+                    type: string
+                marginTop:
+                    type: string
+                maxHeight:
+                    type: string
+                maxWidth:
+                    type: string
+                minHeight:
+                    type: string
+                minWidth:
+                    type: string
+                opacity:
+                    type: string
+                overflow:
+                    type: string
+                paddingBottom:
+                    type: string
+                paddingLeft:
+                    type: string
+                paddingRight:
+                    type: string
+                paddingTop:
+                    type: string
+                shadow:
+                    type: string
+                textAlign:
+                    type: string
+                textColor:
+                    type: string
+                width:
+                    type: string
+            type: object
+        FragmentViewport:
+            additionalProperties: false
+            properties:
+                fragmentViewportStyle:
+                    additionalProperties: false
+                    properties:
+                        marginBottom:
+                            type: string
+                        marginLeft:
+                            type: string
+                        marginRight:
+                            type: string
+                        marginTop:
+                            type: string
+                        paddingBottom:
+                            type: string
+                        paddingLeft:
+                            type: string
+                        paddingRight:
+                            type: string
+                        paddingTop:
+                            type: string
+                    type: object
+                id:
+                    type: string
+            required:
+                - fragmentViewportStyle
+                - id
             type: object
         KnowledgeBaseArticle:
             description:
@@ -1062,22 +1525,11 @@ components:
                 subscribed:
                     readOnly: true
                     type: boolean
-                taxonomyCategories:
+                taxonomyCategoryBriefs:
                     description:
                         The categories associated with this article.
                     items:
-                        properties:
-                            taxonomyCategoryId:
-                                description:
-                                    The category's ID, which can be used to retrieve more information in the
-                                    `TaxonomyCategory` API.
-                                format: int64
-                                type: integer
-                            taxonomyCategoryName:
-                                description:
-                                    The category's name.
-                                type: string
-                        type: object
+                        $ref: "#/components/schemas/TaxonomyCategoryBrief"
                     readOnly: true
                     type: array
                 taxonomyCategoryIds:
@@ -1109,6 +1561,12 @@ components:
                 contentUrl:
                     description:
                         The file's relative URL.
+                    readOnly: true
+                    type: string
+                contentValue:
+                    # @review
+                    description:
+                        optional field with the content of the document in Base64, can be embedded with nestedFields
                     readOnly: true
                     type: string
                 encodingFormat:
@@ -1231,6 +1689,35 @@ components:
             required:
                 - name
             type: object
+        Language:
+            # @review
+            description:
+                Describes a specific language in the platform
+            properties:
+                countryName:
+                    type: string
+                countryName_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+                id:
+                    type: string
+                markedAsDefault:
+                    type: boolean
+                name:
+                    type: string
+                name_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+            type: object
+        MasterPage:
+            properties:
+                key:
+                    type: string
+                name:
+                    type: string
+            type: object
         MessageBoardAttachment:
             description:
                 A binary file attached to a message on a message board (`MessageBoardMessage`).
@@ -1238,6 +1725,12 @@ components:
                 contentUrl:
                     description:
                         The file's relative URL.
+                    readOnly: true
+                    type: string
+                contentValue:
+                    # @review
+                    description:
+                        optional field with the content of the document in Base64, can be embedded with nestedFields
                     readOnly: true
                     type: string
                 encodingFormat:
@@ -1299,6 +1792,8 @@ components:
                     description:
                         The message's author.
                     readOnly: true
+                creatorStatistics:
+                    $ref: "#/components/schemas/CreatorStatistics"
                 customFields:
                     items:
                         $ref: "#/components/schemas/CustomField"
@@ -1318,7 +1813,8 @@ components:
                 encodingFormat:
                     description:
                         The message's media format (e.g., HTML, BBCode, etc.).
-                    readOnly: true
+                    type: string
+                friendlyUrlPath:
                     type: string
                 headline:
                     description:
@@ -1336,6 +1832,9 @@ components:
                     items:
                         type: string
                     type: array
+                messageBoardSectionId:
+                    format: int64
+                    type: integer
                 messageBoardThreadId:
                     # @review
                     description:
@@ -1487,6 +1986,8 @@ components:
                     description:
                         The thread's creator.
                     readOnly: true
+                creatorStatistics:
+                    $ref: "#/components/schemas/CreatorStatistics"
                 customFields:
                     items:
                         $ref: "#/components/schemas/CustomField"
@@ -1506,8 +2007,14 @@ components:
                 encodingFormat:
                     description:
                         The media format of the thread's content (e.g., HTML, BBCode, etc.).
-                    readOnly: true
                     type: string
+                friendlyUrlPath:
+                    type: string
+                hasValidAnswer:
+                    # @review
+                    description:
+                        A flag that indicates whether this thread has a message considered as valid
+                    type: boolean
                 headline:
                     description:
                         The thread's main title.
@@ -1524,6 +2031,15 @@ components:
                     items:
                         type: string
                     type: array
+                locked:
+                    # @review
+                    description:
+                        A flag that indicates whether this thread is locked.
+                    readOnly: true
+                    type: boolean
+                messageBoardSectionId:
+                    format: int64
+                    type: integer
                 numberOfMessageBoardAttachments:
                     description:
                         The number of the thread's attachments.
@@ -1539,6 +2055,8 @@ components:
                         $ref: "#/components/schemas/RelatedContent"
                     readOnly: true
                     type: array
+                seen:
+                    type: boolean
                 showAsQuestion:
                     description:
                         A flag that indicates whether this thread was posted as a question that can receive approved
@@ -1551,8 +2069,18 @@ components:
                     readOnly: true
                     type: integer
                 subscribed:
-                    readOnly: true
                     type: boolean
+                taxonomyCategoryBriefs:
+                    items:
+                        $ref: "#/components/schemas/TaxonomyCategoryBrief"
+                    readOnly: true
+                    type: array
+                taxonomyCategoryIds:
+                    items:
+                        format: int64
+                        type: integer
+                    type: array
+                    writeOnly: true
                 threadType:
                     description:
                         The thread's type.
@@ -1573,9 +2101,14 @@ components:
                 - headline
             type: object
         NavigationMenu:
-            description:
-                ""
             properties:
+                actions:
+                    additionalProperties:
+                        additionalProperties:
+                            type: string
+                        type: object
+                    readOnly: true
+                    type: object
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
@@ -1598,14 +2131,22 @@ components:
                     items:
                         $ref: "#/components/schemas/NavigationMenuItem"
                     type: array
+                navigationType:
+                    enum: [Primary, Secondary, Social]
+                    type: string
                 siteId:
                     format: int64
                     readOnly: true
                     type: integer
         NavigationMenuItem:
-            description:
-                ""
             properties:
+                availableLanguages:
+                    description:
+                        The list of languages the structure has a translation for.
+                    items:
+                        type: string
+                    readOnly: true
+                    type: array
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
@@ -1620,9 +2161,12 @@ components:
                     type: string
                 id:
                     format: int64
-                    readOnly: true
                     type: integer
                 link:
+                    # @review
+                    description:
+                        A link to a page on the server.
+                    format: uri
                     type: string
                 name:
                     type: string
@@ -1636,11 +2180,404 @@ components:
                     type: array
                 parentNavigationMenuId:
                     format: int64
+                    readOnly: true
                     type: integer
                 type:
+                    readOnly: true
                     type: string
                 url:
                     type: string
+                useCustomName:
+                    type: boolean
+        PageCollectionDefinition:
+            properties:
+                collectionConfig:
+                    properties:
+                        collectionReference:
+                            oneOf:
+                                - $ref: "#/components/schemas/ClassNameReference"
+                                - $ref: "#/components/schemas/ClassPKReference"
+                        collectionType:
+                            enum: [Collection, CollectionProvider]
+                            type: string
+                    required:
+                        - collectionReference
+                        - collectionType
+                    type: object
+                fragmentStyle:
+                    $ref: "#/components/schemas/FragmentStyle"
+                fragmentViewports:
+                    items:
+                        $ref: "#/components/schemas/FragmentViewport"
+                    type: array
+                listItemStyle:
+                    type: string
+                listStyle:
+                    type: string
+                numberOfColumns:
+                    type: integer
+                numberOfItems:
+                    type: integer
+                templateKey:
+                    type: string
+            type: object
+        PageCollectionItemDefinition:
+            properties:
+                collectionItemConfig:
+                    type: object
+            type: object
+        PageColumnDefinition:
+            properties:
+                columnViewportConfig:
+                    deprecated: true
+                    description:
+                        "Deprecated as of Athanasius (7.3.x), replaced by columnViewports"
+                    properties:
+                        landscapeMobile:
+                            properties:
+                                size:
+                                    maximum: 12
+                                    minimum: 1
+                                    type: integer
+                            type: object
+                        portraitMobile:
+                            properties:
+                                size:
+                                    maximum: 12
+                                    minimum: 1
+                                    type: integer
+                            type: object
+                        tablet:
+                            properties:
+                                size:
+                                    maximum: 12
+                                    minimum: 1
+                                    type: integer
+                            type: object
+                    type: object
+                columnViewports:
+                    items:
+                        $ref: "#/components/schemas/ColumnViewport"
+                    type: array
+                size:
+                    maximum: 12
+                    minimum: 1
+                    type: integer
+            type: object
+        PageDefinition:
+            properties:
+                pageElement:
+                    $ref: "#/components/schemas/PageElement"
+                settings:
+                    properties:
+                        colorSchemeName:
+                            type: string
+                        css:
+                            type: string
+                        javascript:
+                            type: string
+                        masterPage:
+                            $ref: "#/components/schemas/MasterPage"
+                        themeName:
+                            type: string
+                        themeSettings:
+                            type: object
+                    type: object
+            type: object
+        PageDropZoneDefinition:
+            properties:
+                fragmentSettings:
+                    oneOf:
+                        - $ref: "#/components/schemas/FragmentSettingsAllowed"
+                        - $ref: "#/components/schemas/FragmentSettingsUnallowed"
+            type: object
+        PageElement:
+            properties:
+                definition:
+                    oneOf:
+                        - $ref: "#/components/schemas/PageCollectionDefinition"
+                        - $ref: "#/components/schemas/PageCollectionItemDefinition"
+                        - $ref: "#/components/schemas/PageColumnDefinition"
+                        - $ref: "#/components/schemas/PageDropZoneDefinition"
+                        - $ref: "#/components/schemas/PageFragmentInstanceDefinition"
+                        - $ref: "#/components/schemas/PageRootDefinition"
+                        - $ref: "#/components/schemas/PageRowDefinition"
+                        - $ref: "#/components/schemas/PageSectionDefinition"
+                        - $ref: "#/components/schemas/PageWidgetInstanceDefinition"
+                pageElements:
+                    items:
+                        $ref: "#/components/schemas/PageElement"
+                    type: array
+                type:
+                    enum: [Collection, CollectionItem, Column, DropZone, Fragment, FragmentDropZone, Root, Row, Section,
+                        Widget]
+                    type: string
+        PageFragmentInstanceDefinition:
+            properties:
+                fragment:
+                    $ref: "#/components/schemas/Fragment"
+                fragmentConfig:
+                    additionalProperties:
+                        type: object
+                    type: object
+                fragmentFields:
+                    items:
+                        $ref: "#/components/schemas/FragmentField"
+                    type: array
+                fragmentStyle:
+                    $ref: "#/components/schemas/FragmentStyle"
+                fragmentViewports:
+                    items:
+                        $ref: "#/components/schemas/FragmentViewport"
+                    type: array
+                widgetInstances:
+                    items:
+                        $ref: "#/components/schemas/WidgetInstance"
+                    type: array
+            type: object
+        PageRootDefinition:
+            type: object
+        PageRowDefinition:
+            properties:
+                fragmentStyle:
+                    $ref: "#/components/schemas/FragmentStyle"
+                fragmentViewports:
+                    items:
+                        $ref: "#/components/schemas/FragmentViewport"
+                    type: array
+                gutters:
+                    type: boolean
+                modulesPerRow:
+                    type: integer
+                numberOfColumns:
+                    type: integer
+                reverseOrder:
+                    type: boolean
+                rowViewportConfig:
+                    deprecated: true
+                    description:
+                        "Deprecated as of Athanasius (7.3.x), replaced by rowViewports"
+                    properties:
+                        landscapeMobile:
+                            properties:
+                                modulesPerRow:
+                                    type: integer
+                                reverseOrder:
+                                    type: boolean
+                                verticalAlignment:
+                                    type: string
+                            type: object
+                        portraitMobile:
+                            properties:
+                                modulesPerRow:
+                                    type: integer
+                                reverseOrder:
+                                    type: boolean
+                                verticalAlignment:
+                                    type: string
+                            type: object
+                        tablet:
+                            properties:
+                                modulesPerRow:
+                                    type: integer
+                                reverseOrder:
+                                    type: boolean
+                                verticalAlignment:
+                                    type: string
+                            type: object
+                    type: object
+                rowViewports:
+                    items:
+                        $ref: "#/components/schemas/RowViewport"
+                    type: array
+                verticalAlignment:
+                    type: string
+            type: object
+        PageSectionDefinition:
+            properties:
+                backgroundColor:
+                    deprecated: true
+                    type: string
+                backgroundFragmentImage:
+                    $ref: "#/components/schemas/FragmentImage"
+                backgroundImage:
+                    deprecated: true
+                    description:
+                        "Deprecated as of Athanasius (7.3.x), replaced by backgroundFragmentImage"
+                    properties:
+                        description:
+                            oneOf:
+                                - $ref: "#/components/schemas/FragmentInlineValue"
+                        title:
+                            oneOf:
+                                - $ref: "#/components/schemas/FragmentInlineValue"
+                        url:
+                            oneOf:
+                                - $ref: "#/components/schemas/FragmentInlineValue"
+                                - $ref: "#/components/schemas/FragmentMappedValue"
+                    type: object
+                fragmentLink:
+                    $ref: "#/components/schemas/FragmentLink"
+                fragmentStyle:
+                    $ref: "#/components/schemas/FragmentStyle"
+                fragmentViewports:
+                    items:
+                        $ref: "#/components/schemas/FragmentViewport"
+                    type: array
+                layout:
+                    properties:
+                        align:
+                            deprecated: true
+                            enum: [Center, End, None, Start, Stretch]
+                            type: string
+                        borderColor:
+                            deprecated: true
+                            type: string
+                        borderRadius:
+                            deprecated: true
+                            enum: [Circle, Large, None, Pill, Regular]
+                            type: string
+                        borderWidth:
+                            deprecated: true
+                            type: integer
+                        containerType:
+                            enum: [Fixed, Fluid]
+                            type: string
+                        contentDisplay:
+                            deprecated: true
+                            enum: [Block, Flex]
+                            type: string
+                        justify:
+                            deprecated: true
+                            enum: [Center, End, None, SpaceAround, SpaceBetween, Start]
+                            type: string
+                        marginBottom:
+                            deprecated: true
+                            type: integer
+                        marginLeft:
+                            deprecated: true
+                            type: integer
+                        marginRight:
+                            deprecated: true
+                            type: integer
+                        marginTop:
+                            deprecated: true
+                            type: integer
+                        opacity:
+                            deprecated: true
+                            type: integer
+                        paddingBottom:
+                            deprecated: true
+                            type: integer
+                        paddingHorizontal:
+                            deprecated: true
+                            type: integer
+                        paddingLeft:
+                            deprecated: true
+                            type: integer
+                        paddingRight:
+                            deprecated: true
+                            type: integer
+                        paddingTop:
+                            deprecated: true
+                            type: integer
+                        shadow:
+                            deprecated: true
+                            enum: [Default, Large, None, Regular, Small]
+                            type: string
+                        widthType:
+                            enum: [Fixed, Fluid]
+                            type: string
+                    type: object
+            type: object
+        PageTemplate:
+            properties:
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    readOnly: true
+                dateCreated:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                keywords:
+                    items:
+                        type: string
+                    type: array
+                name:
+                    type: string
+                pageDefinition:
+                    $ref: "#/components/schemas/PageDefinition"
+                pageTemplateCollection:
+                    allOf:
+                        - $ref: "#/components/schemas/PageTemplateCollection"
+                    readOnly: true
+                taxonomyCategoryBriefs:
+                    description:
+                        The categories associated with this page template.
+                    items:
+                        $ref: "#/components/schemas/TaxonomyCategoryBrief"
+                    readOnly: true
+                    type: array
+                taxonomyCategoryIds:
+                    items:
+                        format: int64
+                        type: integer
+                    type: array
+                    writeOnly: true
+                uuid:
+                    description:
+                        A valid external identifier to reference this page template.
+                    readOnly: true
+                    type: string
+            type: object
+        PageTemplateCollection:
+            properties:
+                creator:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    readOnly: true
+                dateCreated:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                description:
+                    type: string
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                name:
+                    type: string
+                uuid:
+                    description:
+                        A valid external identifier to reference this page template collection.
+                    readOnly: true
+                    type: string
+            type: object
+        PageWidgetInstanceDefinition:
+            properties:
+                fragmentStyle:
+                    $ref: "#/components/schemas/FragmentStyle"
+                fragmentViewports:
+                    items:
+                        $ref: "#/components/schemas/FragmentViewport"
+                    type: array
+                widgetInstance:
+                    $ref: "#/components/schemas/WidgetInstance"
+            type: object
         Rating:
             description:
                 Represents a rating/score received by any kind of asset. Properties follow the
@@ -1716,6 +2653,25 @@ components:
                         The title of the content.
                     readOnly: true
                     type: string
+        RowViewport:
+            additionalProperties: false
+            properties:
+                id:
+                    type: string
+                rowViewportDefinition:
+                    additionalProperties: false
+                    properties:
+                        modulesPerRow:
+                            type: integer
+                        reverseOrder:
+                            type: boolean
+                        verticalAlignment:
+                            type: string
+                    type: object
+            required:
+                - id
+                - rowViewportDefinition
+            type: object
         StructuredContent:
             description:
                 Represents content that has fields and is rendered by a template backed by a `ContentStructure`. This is
@@ -1734,6 +2690,9 @@ components:
                     description:
                         The structured content's average rating.
                     readOnly: true
+                assetLibraryKey:
+                    readOnly: true
+                    type: string
                 availableLanguages:
                     description:
                         The list of languages the structured content has a translation for.
@@ -1829,19 +2788,27 @@ components:
                         content and return HTML.
                     items:
                         properties:
+                            contentTemplateId:
+                                readOnly: true
+                                type: string
+                            contentTemplateName:
+                                description:
+                                    The name of the template used to render the content.
+                                type: string
+                            contentTemplateName_i18n:
+                                additionalProperties:
+                                    type: string
+                                type: object
                             renderedContentURL:
                                 description:
                                     An absolute URL to the rendered content.
                                 format: uri
                                 type: string
-                            templateName:
+                            renderedContentValue:
+                                # @review
                                 description:
-                                    The name of the template used to render the content.
+                                    optional field with the rendered content, can be embedded with nestedFields
                                 type: string
-                            templateName_i18n:
-                                additionalProperties:
-                                    type: string
-                                type: object
                         type: object
                     readOnly: true
                     type: array
@@ -1854,22 +2821,11 @@ components:
                 subscribed:
                     readOnly: true
                     type: boolean
-                taxonomyCategories:
+                taxonomyCategoryBriefs:
                     description:
                         The categories associated with this structured content.
                     items:
-                        properties:
-                            taxonomyCategoryId:
-                                description:
-                                    The category's ID, which can be used to retrieve more information via the
-                                    `TaxonomyCategory` API.
-                                format: int64
-                                type: integer
-                            taxonomyCategoryName:
-                                description:
-                                    The category's name.
-                                type: string
-                        type: object
+                        $ref: "#/components/schemas/TaxonomyCategoryBrief"
                     readOnly: true
                     type: array
                 taxonomyCategoryIds:
@@ -1913,6 +2869,9 @@ components:
                         type: object
                     readOnly: true
                     type: object
+                assetLibraryKey:
+                    readOnly: true
+                    type: string
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"
@@ -1979,6 +2938,53 @@ components:
                     writeOnly: true
             required:
                 - name
+            type: object
+        TaxonomyCategoryBrief:
+            properties:
+                embeddedTaxonomyCategory:
+                    # @review
+                    description:
+                        Optional field with the embedded taxonomy category, can be embedded with nestedFields
+                    readOnly: true
+                    type: object
+                taxonomyCategoryId:
+                    description:
+                        The category's ID. This can be used to retrieve more information in the `TaxonomyCategory` API.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                taxonomyCategoryName:
+                    description:
+                        The category's name.
+                    readOnly: true
+                    type: string
+                taxonomyCategoryName_i18n:
+                    additionalProperties:
+                        type: string
+                    readOnly: true
+                    type: object
+            type: object
+        WidgetInstance:
+            properties:
+                widgetConfig:
+                    additionalProperties:
+                        type: object
+                    type: object
+                widgetInstanceId:
+                    type: string
+                widgetName:
+                    type: string
+                widgetPermissions:
+                    items:
+                        properties:
+                            actionKeys:
+                                items:
+                                    type: string
+                                type: array
+                            roleKey:
+                                type: string
+                        type: object
+                    type: array
             type: object
         WikiNode:
             # @review
@@ -2140,22 +3146,11 @@ components:
                 subscribed:
                     readOnly: true
                     type: boolean
-                taxonomyCategories:
+                taxonomyCategoryBriefs:
                     description:
                         The categories associated with this blog post.
                     items:
-                        properties:
-                            taxonomyCategoryId:
-                                description:
-                                    The category's ID. This can be used to retrieve more information in the
-                                    `TaxonomyCategory` API.
-                                format: int64
-                                type: integer
-                            taxonomyCategoryName:
-                                description:
-                                    The category's name.
-                                type: string
-                        type: object
+                        $ref: "#/components/schemas/TaxonomyCategoryBrief"
                     readOnly: true
                     type: array
                 taxonomyCategoryIds:
@@ -2184,6 +3179,12 @@ components:
                 contentUrl:
                     description:
                         The file's relative URL.
+                    readOnly: true
+                    type: string
+                contentValue:
+                    # @review
+                    description:
+                        optional field with the content of the document in Base64, can be embedded with nestedFields
                     readOnly: true
                     type: string
                 encodingFormat:
@@ -2215,7 +3216,8 @@ components:
             type: object
 info:
     description:
-        ""
+        "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
+        'com.liferay.headless.delivery.client', and version '3.0.24'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -2223,6 +3225,592 @@ info:
     version: v1.0
 openapi: 3.0.1
 paths:
+    "/asset-libraries/{assetLibraryId}/content-elements":
+        get:
+            operationId: getAssetLibraryContentElementsPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentElement"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentElement"
+                                type: array
+            tags: ["ContentElement"]
+    "/asset-libraries/{assetLibraryId}/content-sets/by-key/{key}/content-set-elements":
+        get:
+            operationId: getAssetLibraryContentSetByKeyContentSetElementsPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: key
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
+            tags: ["ContentSetElement"]
+    "/asset-libraries/{assetLibraryId}/content-sets/by-uuid/{uuid}/content-set-elements":
+        get:
+            operationId: getAssetLibraryContentSetByUuidContentSetElementsPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: uuid
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
+            tags: ["ContentSetElement"]
+    "/asset-libraries/{assetLibraryId}/content-structures":
+        get:
+            operationId: getAssetLibraryContentStructuresPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentStructure"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentStructure"
+                                type: array
+            tags: ["ContentStructure"]
+    "/asset-libraries/{assetLibraryId}/content-templates":
+        get:
+            operationId: getAssetLibraryContentTemplatesPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentTemplate"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentTemplate"
+                                type: array
+            tags: ["ContentTemplate"]
+    "/asset-libraries/{assetLibraryId}/document-folders":
+        get:
+            operationId: getAssetLibraryDocumentFoldersPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: flatten
+                  schema:
+                      type: boolean
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/DocumentFolder"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/DocumentFolder"
+                                type: array
+            tags: ["DocumentFolder"]
+        post:
+            operationId: postAssetLibraryDocumentFolder
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DocumentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/DocumentFolder"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/DocumentFolder"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/DocumentFolder"
+            tags: ["DocumentFolder"]
+    "/asset-libraries/{assetLibraryId}/documents":
+        get:
+            operationId: getAssetLibraryDocumentsPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: flatten
+                  schema:
+                      type: boolean
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Document"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Document"
+                                type: array
+            tags: ["Document"]
+        post:
+            operationId: postAssetLibraryDocument
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            properties:
+                                document:
+                                    $ref: "#/components/schemas/Document"
+                                file:
+                                    format: binary
+                                    type: string
+                            type: object
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Document"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Document"
+            tags: ["Document"]
+    "/asset-libraries/{assetLibraryId}/languages":
+        get:
+            # @review
+            description:
+                Retrieves the asset libraries languages.
+            operationId: getAssetLibraryLanguagesPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Language"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Language"
+                                type: array
+            tags: ["Language"]
+    "/asset-libraries/{assetLibraryId}/structured-content-folders":
+        get:
+            operationId: getAssetLibraryStructuredContentFoldersPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: flatten
+                  schema:
+                      type: boolean
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContentFolder"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContentFolder"
+                                type: array
+            tags: ["StructuredContentFolder"]
+        post:
+            operationId: postAssetLibraryStructuredContentFolder
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContentFolder"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+            tags: ["StructuredContentFolder"]
+    "/asset-libraries/{assetLibraryId}/structured-contents":
+        get:
+            operationId: getAssetLibraryStructuredContentsPage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: flatten
+                  schema:
+                      type: boolean
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContent"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StructuredContent"
+                                type: array
+            tags: ["StructuredContent"]
+        post:
+            operationId: postAssetLibraryStructuredContent
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContent"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContent"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContent"
+            tags: ["StructuredContent"]
     "/blog-posting-images/{blogPostingImageId}":
         delete:
             description:
@@ -2240,8 +3828,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["BlogPostingImage"]
         get:
             description:
@@ -2263,8 +3849,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPostingImage"
-                    description:
-                        ""
             tags: ["BlogPostingImage"]
     "/blog-postings/{blogPostingId}":
         delete:
@@ -2283,8 +3867,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["BlogPosting"]
         get:
             description:
@@ -2306,8 +3888,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
-                    description:
-                        ""
             tags: ["BlogPosting"]
         patch:
             description:
@@ -2338,8 +3918,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
-                    description:
-                        ""
             tags: ["BlogPosting"]
         put:
             description:
@@ -2370,8 +3948,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
-                    description:
-                        ""
             tags: ["BlogPosting"]
     "/blog-postings/{blogPostingId}/comments":
         get:
@@ -2385,6 +3961,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -2418,8 +4000,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Comment"
                                 type: array
-                    description:
-                        ""
             tags: ["Comment"]
         post:
             description:
@@ -2449,8 +4029,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
-                    description:
-                        ""
             tags: ["Comment"]
     "/blog-postings/{blogPostingId}/my-rating":
         delete:
@@ -2469,8 +4047,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["BlogPosting"]
         get:
             description:
@@ -2492,8 +4068,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["BlogPosting"]
         post:
             description:
@@ -2523,8 +4097,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["BlogPosting"]
         put:
             description:
@@ -2554,8 +4126,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["BlogPosting"]
     "/comments/{commentId}":
         delete:
@@ -2574,8 +4144,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["Comment"]
         get:
             description:
@@ -2597,8 +4165,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
-                    description:
-                        ""
             tags: ["Comment"]
         put:
             description:
@@ -2629,8 +4195,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
-                    description:
-                        ""
             tags: ["Comment"]
     "/comments/{parentCommentId}/comments":
         get:
@@ -2644,6 +4208,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -2677,8 +4247,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Comment"
                                 type: array
-                    description:
-                        ""
             tags: ["Comment"]
         post:
             description:
@@ -2708,8 +4276,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
-                    description:
-                        ""
             tags: ["Comment"]
     "/content-sets/{contentSetId}/content-set-elements":
         get:
@@ -2750,8 +4316,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/ContentSetElement"
                                 type: array
-                    description:
-                        ""
             tags: ["ContentSetElement"]
     "/content-structures/{contentStructureId}":
         get:
@@ -2774,8 +4338,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/ContentStructure"
-                    description:
-                        ""
             tags: ["ContentStructure"]
     "/content-structures/{contentStructureId}/structured-contents":
         get:
@@ -2790,6 +4352,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -2827,8 +4395,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContent"
                                 type: array
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/document-folders/{documentFolderId}":
         delete:
@@ -2847,8 +4413,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["DocumentFolder"]
         get:
             description:
@@ -2870,8 +4434,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
-                    description:
-                        ""
             tags: ["DocumentFolder"]
         patch:
             description:
@@ -2901,8 +4463,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
-                    description:
-                        ""
             tags: ["DocumentFolder"]
         put:
             description:
@@ -2933,8 +4493,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
-                    description:
-                        ""
             tags: ["DocumentFolder"]
     "/document-folders/{documentFolderId}/documents":
         get:
@@ -2948,6 +4506,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -2985,8 +4549,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Document"
                                 type: array
-                    description:
-                        ""
             tags: ["Document"]
         post:
             description:
@@ -3021,8 +4583,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Document"
-                    description:
-                        ""
             tags: ["Document"]
     "/document-folders/{documentFolderId}/subscribe":
         put:
@@ -3039,8 +4599,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["DocumentFolder"]
     "/document-folders/{documentFolderId}/unsubscribe":
         put:
@@ -3057,8 +4615,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["DocumentFolder"]
     "/document-folders/{parentDocumentFolderId}/document-folders":
         get:
@@ -3072,6 +4628,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -3109,8 +4671,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/DocumentFolder"
                                 type: array
-                    description:
-                        ""
             tags: ["DocumentFolder"]
         post:
             description:
@@ -3140,8 +4700,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
-                    description:
-                        ""
             tags: ["DocumentFolder"]
     "/documents/{documentId}":
         delete:
@@ -3160,8 +4718,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["Document"]
         get:
             description:
@@ -3183,8 +4739,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Document"
-                    description:
-                        ""
             tags: ["Document"]
         patch:
             description:
@@ -3219,8 +4773,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Document"
-                    description:
-                        ""
             tags: ["Document"]
         put:
             description:
@@ -3255,8 +4807,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Document"
-                    description:
-                        ""
             tags: ["Document"]
     "/documents/{documentId}/comments":
         get:
@@ -3270,6 +4820,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -3303,8 +4859,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Comment"
                                 type: array
-                    description:
-                        ""
             tags: ["Comment"]
         post:
             description:
@@ -3334,8 +4888,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
-                    description:
-                        ""
             tags: ["Comment"]
     "/documents/{documentId}/my-rating":
         delete:
@@ -3354,8 +4906,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["Document"]
         get:
             description:
@@ -3377,8 +4927,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["Document"]
         post:
             description:
@@ -3408,8 +4956,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["Document"]
         put:
             description:
@@ -3440,8 +4986,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["Document"]
     "/knowledge-base-articles/{knowledgeBaseArticleId}":
         delete:
@@ -3460,8 +5004,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         get:
             description:
@@ -3483,8 +5025,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         patch:
             description:
@@ -3514,8 +5054,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         put:
             description:
@@ -3546,8 +5084,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/knowledge-base-articles/{knowledgeBaseArticleId}/knowledge-base-attachments":
         get:
@@ -3574,8 +5110,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseAttachment"
                                 type: array
-                    description:
-                        ""
             tags: ["KnowledgeBaseAttachment"]
         post:
             description:
@@ -3610,8 +5144,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseAttachment"
-                    description:
-                        ""
             tags: ["KnowledgeBaseAttachment"]
     "/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating":
         delete:
@@ -3630,8 +5162,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         get:
             description:
@@ -3653,8 +5183,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         post:
             description:
@@ -3684,8 +5212,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         put:
             description:
@@ -3716,8 +5242,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/knowledge-base-articles/{knowledgeBaseArticleId}/subscribe":
         put:
@@ -3734,8 +5258,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/knowledge-base-articles/{knowledgeBaseArticleId}/unsubscribe":
         put:
@@ -3752,8 +5274,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles":
         get:
@@ -3768,6 +5288,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -3805,8 +5331,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseArticle"
                                 type: array
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         post:
             description:
@@ -3837,8 +5361,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/knowledge-base-attachments/{knowledgeBaseAttachmentId}":
         delete:
@@ -3857,8 +5379,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["KnowledgeBaseAttachment"]
         get:
             description:
@@ -3880,8 +5400,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseAttachment"
-                    description:
-                        ""
             tags: ["KnowledgeBaseAttachment"]
     "/knowledge-base-folders/{knowledgeBaseFolderId}":
         delete:
@@ -3900,8 +5418,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["KnowledgeBaseFolder"]
         get:
             description:
@@ -3923,8 +5439,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
-                    description:
-                        ""
             tags: ["KnowledgeBaseFolder"]
         patch:
             description:
@@ -3954,8 +5468,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
-                    description:
-                        ""
             tags: ["KnowledgeBaseFolder"]
         put:
             description:
@@ -3986,8 +5498,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
-                    description:
-                        ""
             tags: ["KnowledgeBaseFolder"]
     "/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles":
         get:
@@ -4002,6 +5512,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -4039,8 +5555,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseArticle"
                                 type: array
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         post:
             description:
@@ -4070,8 +5584,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/knowledge-base-folders/{parentKnowledgeBaseFolderId}/knowledge-base-folders":
         get:
@@ -4106,8 +5618,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseFolder"
                                 type: array
-                    description:
-                        ""
             tags: ["KnowledgeBaseFolder"]
         post:
             description:
@@ -4137,8 +5647,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
-                    description:
-                        ""
             tags: ["KnowledgeBaseFolder"]
     "/message-board-attachments/{messageBoardAttachmentId}":
         delete:
@@ -4157,8 +5665,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardAttachment"]
         get:
             description:
@@ -4180,8 +5686,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardAttachment"
-                    description:
-                        ""
             tags: ["MessageBoardAttachment"]
     "/message-board-messages/{messageBoardMessageId}":
         delete:
@@ -4200,8 +5704,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
         get:
             description:
@@ -4223,8 +5725,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
         patch:
             description:
@@ -4254,8 +5754,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
         put:
             description:
@@ -4286,8 +5784,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
     "/message-board-messages/{messageBoardMessageId}/message-board-attachments":
         get:
@@ -4314,8 +5810,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardAttachment"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardAttachment"]
         post:
             description:
@@ -4350,8 +5844,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardAttachment"
-                    description:
-                        ""
             tags: ["MessageBoardAttachment"]
     "/message-board-messages/{messageBoardMessageId}/my-rating":
         delete:
@@ -4370,8 +5862,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
         get:
             description:
@@ -4393,8 +5883,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
         post:
             description:
@@ -4424,8 +5912,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
         put:
             description:
@@ -4456,8 +5942,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
     "/message-board-messages/{messageBoardMessageId}/subscribe":
         put:
@@ -4474,8 +5958,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
     "/message-board-messages/{messageBoardMessageId}/unsubscribe":
         put:
@@ -4492,8 +5974,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
     "/message-board-messages/{parentMessageBoardMessageId}/message-board-messages":
         get:
@@ -4508,6 +5988,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -4545,8 +6031,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardMessage"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
         post:
             description:
@@ -4576,8 +6060,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
     "/message-board-sections/{messageBoardSectionId}":
         delete:
@@ -4596,8 +6078,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
         get:
             description:
@@ -4619,8 +6099,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
         patch:
             description:
@@ -4650,8 +6128,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
         put:
             description:
@@ -4682,8 +6158,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
     "/message-board-sections/{messageBoardSectionId}/message-board-threads":
         get:
@@ -4697,6 +6171,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -4730,8 +6210,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardThread"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
         post:
             description:
@@ -4761,8 +6239,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
     "/message-board-sections/{messageBoardSectionId}/subscribe":
         put:
@@ -4779,8 +6255,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
     "/message-board-sections/{messageBoardSectionId}/unsubscribe":
         put:
@@ -4797,8 +6271,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
     "/message-board-sections/{parentMessageBoardSectionId}/message-board-sections":
         get:
@@ -4813,6 +6285,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -4846,8 +6324,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardSection"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
         post:
             description:
@@ -4877,8 +6353,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
     "/message-board-threads/ranked":
         get:
@@ -4894,6 +6368,11 @@ paths:
                   schema:
                       format: date-time
                       type: string
+                - in: query
+                  name: messageBoardSectionId
+                  schema:
+                      format: int64
+                      type: integer
                 - in: query
                   name: page
                   schema:
@@ -4919,8 +6398,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardThread"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
     "/message-board-threads/{messageBoardThreadId}":
         delete:
@@ -4939,8 +6416,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
         get:
             description:
@@ -4962,8 +6437,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
         patch:
             description:
@@ -4993,8 +6466,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
         put:
             description:
@@ -5025,8 +6496,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
     "/message-board-threads/{messageBoardThreadId}/message-board-attachments":
         get:
@@ -5053,8 +6522,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardAttachment"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardAttachment"]
         post:
             description:
@@ -5089,8 +6556,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardAttachment"
-                    description:
-                        ""
             tags: ["MessageBoardAttachment"]
     "/message-board-threads/{messageBoardThreadId}/message-board-messages":
         get:
@@ -5104,6 +6569,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -5137,8 +6608,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardMessage"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
         post:
             description:
@@ -5168,8 +6637,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardMessage"
-                    description:
-                        ""
             tags: ["MessageBoardMessage"]
     "/message-board-threads/{messageBoardThreadId}/my-rating":
         delete:
@@ -5188,8 +6655,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
         get:
             description:
@@ -5211,8 +6676,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
         post:
             description:
@@ -5242,8 +6705,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
         put:
             description:
@@ -5274,8 +6735,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
     "/message-board-threads/{messageBoardThreadId}/subscribe":
         put:
@@ -5292,8 +6751,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
     "/message-board-threads/{messageBoardThreadId}/unsubscribe":
         put:
@@ -5310,13 +6767,27 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
     "/navigation-menus/{navigationMenuId}":
-        get:
+        delete:
+            # @review
             description:
-                ""
+                Deletes the navigation menu and returns a 204 if the operation succeeds
+            operationId: deleteNavigationMenu
+            parameters:
+                - in: path
+                  name: navigationMenuId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["NavigationMenu"]
+        get:
             operationId: getNavigationMenu
             parameters:
                 - in: path
@@ -5334,8 +6805,37 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/NavigationMenu"
-                    description:
-                        ""
+            tags: ["NavigationMenu"]
+        put:
+            # @review
+            description:
+                Replaces the navigation menu with the information sent in the request body. Any missing fields are
+                deleted, unless they are required.
+            operationId: putNavigationMenu
+            parameters:
+                - in: path
+                  name: navigationMenuId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/NavigationMenu"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/NavigationMenu"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NavigationMenu"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/NavigationMenu"
             tags: ["NavigationMenu"]
     "/sites/{siteId}/blog-posting-images":
         get:
@@ -5349,6 +6849,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -5382,8 +6888,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/BlogPostingImage"
                                 type: array
-                    description:
-                        ""
             tags: ["BlogPostingImage"]
         post:
             description:
@@ -5417,8 +6921,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPostingImage"
-                    description:
-                        ""
             tags: ["BlogPostingImage"]
     "/sites/{siteId}/blog-postings":
         get:
@@ -5432,6 +6934,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -5465,8 +6973,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/BlogPosting"
                                 type: array
-                    description:
-                        ""
             tags: ["BlogPosting"]
         post:
             description:
@@ -5496,8 +7002,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
-                    description:
-                        ""
             tags: ["BlogPosting"]
     "/sites/{siteId}/blog-postings/subscribe":
         put:
@@ -5514,8 +7018,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["BlogPosting"]
     "/sites/{siteId}/blog-postings/unsubscribe":
         put:
@@ -5532,9 +7034,57 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["BlogPosting"]
+    "/sites/{siteId}/content-elements":
+        get:
+            operationId: getSiteContentElementsPage
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentElement"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentElement"
+                                type: array
+            tags: ["ContentElement"]
     "/sites/{siteId}/content-sets/by-key/{key}/content-set-elements":
         get:
             description:
@@ -5573,8 +7123,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/ContentSetElement"
                                 type: array
-                    description:
-                        ""
             tags: ["ContentSetElement"]
     "/sites/{siteId}/content-sets/by-uuid/{uuid}/content-set-elements":
         get:
@@ -5614,8 +7162,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/ContentSetElement"
                                 type: array
-                    description:
-                        ""
             tags: ["ContentSetElement"]
     "/sites/{siteId}/content-structures":
         get:
@@ -5629,6 +7175,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -5662,9 +7214,82 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/ContentStructure"
                                 type: array
-                    description:
-                        ""
             tags: ["ContentStructure"]
+    "/sites/{siteId}/content-templates":
+        get:
+            operationId: getSiteContentTemplatesPage
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentTemplate"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentTemplate"
+                                type: array
+            tags: ["ContentTemplate"]
+    "/sites/{siteId}/content-templates/{contentTemplateId}":
+        get:
+            operationId: getSiteContentTemplate
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: contentTemplateId
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ContentTemplate"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ContentTemplate"
+            tags: ["ContentTemplate"]
     "/sites/{siteId}/document-folders":
         get:
             description:
@@ -5678,6 +7303,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -5715,8 +7346,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/DocumentFolder"
                                 type: array
-                    description:
-                        ""
             tags: ["DocumentFolder"]
         post:
             description:
@@ -5746,8 +7375,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/DocumentFolder"
-                    description:
-                        ""
             tags: ["DocumentFolder"]
     "/sites/{siteId}/documents":
         get:
@@ -5762,6 +7389,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -5799,8 +7432,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Document"
                                 type: array
-                    description:
-                        ""
             tags: ["Document"]
         post:
             description:
@@ -5834,8 +7465,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Document"
-                    description:
-                        ""
             tags: ["Document"]
     "/sites/{siteId}/knowledge-base-articles":
         get:
@@ -5850,6 +7479,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -5887,8 +7522,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseArticle"
                                 type: array
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
         post:
             description:
@@ -5918,8 +7551,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseArticle"
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/sites/{siteId}/knowledge-base-articles/subscribe":
         put:
@@ -5936,8 +7567,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/sites/{siteId}/knowledge-base-articles/unsubscribe":
         put:
@@ -5954,8 +7583,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["KnowledgeBaseArticle"]
     "/sites/{siteId}/knowledge-base-folders":
         get:
@@ -5990,8 +7617,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/KnowledgeBaseFolder"
                                 type: array
-                    description:
-                        ""
             tags: ["KnowledgeBaseFolder"]
         post:
             description:
@@ -6021,9 +7646,34 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/KnowledgeBaseFolder"
-                    description:
-                        ""
             tags: ["KnowledgeBaseFolder"]
+    "/sites/{siteId}/languages":
+        get:
+            # @review
+            description:
+                Retrieves the site's languages.
+            operationId: getSiteLanguagesPage
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Language"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Language"
+                                type: array
+            tags: ["Language"]
     "/sites/{siteId}/message-board-messages":
         # @review
         get:
@@ -6037,6 +7687,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -6074,8 +7730,35 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardMessage"
                                 type: array
-                    description:
-                        ""
+            tags: ["MessageBoardMessage"]
+    "/sites/{siteId}/message-board-messages/by-friendly-url-path/{friendlyUrlPath}":
+        get:
+            operationId: getSiteMessageBoardMessageByFriendlyUrlPath
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: friendlyUrlPath
+                  required: true
+                  schema:
+                      type: string
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardMessage"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardMessage"
             tags: ["MessageBoardMessage"]
     "/sites/{siteId}/message-board-sections":
         get:
@@ -6091,6 +7774,12 @@ paths:
                       format: int64
                       type: integer
                 - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                - in: query
                   name: flatten
                   schema:
                       type: boolean
@@ -6127,8 +7816,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardSection"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
         post:
             description:
@@ -6158,8 +7845,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardSection"
-                    description:
-                        ""
             tags: ["MessageBoardSection"]
     "/sites/{siteId}/message-board-threads":
         get:
@@ -6174,6 +7859,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -6211,8 +7902,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/MessageBoardThread"
                                 type: array
-                    description:
-                        ""
             tags: ["MessageBoardThread"]
         post:
             description:
@@ -6242,13 +7931,38 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/MessageBoardThread"
-                    description:
-                        ""
+            tags: ["MessageBoardThread"]
+    "/sites/{siteId}/message-board-threads/by-friendly-url-path/{friendlyUrlPath}":
+        get:
+            operationId: getSiteMessageBoardThreadByFriendlyUrlPath
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: friendlyUrlPath
+                  required: true
+                  schema:
+                      type: string
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardThread"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/MessageBoardThread"
             tags: ["MessageBoardThread"]
     "/sites/{siteId}/navigation-menus":
         get:
-            description:
-                ""
             operationId: getSiteNavigationMenusPage
             parameters:
                 - in: path
@@ -6278,8 +7992,36 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/NavigationMenu"
                                 type: array
-                    description:
-                        ""
+            tags: ["NavigationMenu"]
+        post:
+            # @review
+            description:
+                Creates a new navigation menu.
+            operationId: postSiteNavigationMenu
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/NavigationMenu"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/NavigationMenu"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NavigationMenu"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/NavigationMenu"
             tags: ["NavigationMenu"]
     "/sites/{siteId}/structured-content-folders":
         get:
@@ -6294,6 +8036,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -6331,8 +8079,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContentFolder"
                                 type: array
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
         post:
             description:
@@ -6362,8 +8108,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
     "/sites/{siteId}/structured-contents":
         get:
@@ -6378,6 +8122,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -6419,8 +8169,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContent"
                                 type: array
-                    description:
-                        ""
             tags: ["StructuredContent"]
         post:
             description:
@@ -6454,8 +8202,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/sites/{siteId}/structured-contents/by-key/{key}":
         get:
@@ -6487,8 +8233,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/sites/{siteId}/structured-contents/by-uuid/{uuid}":
         get:
@@ -6520,8 +8264,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/sites/{siteId}/structured-contents/permissions":
         get:
@@ -6542,11 +8284,9 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContent"]
         put:
-            operationId: putSiteStructuredContentPermission
+            operationId: putSiteStructuredContentPermissionsPage
             parameters:
                 - in: path
                   name: siteId
@@ -6559,8 +8299,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/sites/{siteId}/wiki-nodes":
         get:
@@ -6575,6 +8313,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -6606,8 +8350,6 @@ paths:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/WikiNode"
-                    description:
-                        ""
             tags: ["WikiNode"]
         post:
             description:
@@ -6637,8 +8379,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiNode"
-                    description:
-                        ""
             tags: ["WikiNode"]
     "/structured-content-folders/{parentStructuredContentFolderId}/structured-content-folders":
         get:
@@ -6653,6 +8393,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -6686,8 +8432,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContentFolder"
                                 type: array
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
         post:
             description:
@@ -6717,8 +8461,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
     "/structured-content-folders/{structuredContentFolderId}":
         delete:
@@ -6737,8 +8479,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
         get:
             description:
@@ -6760,8 +8500,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
         patch:
             description:
@@ -6791,8 +8529,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
         put:
             description:
@@ -6823,8 +8559,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContentFolder"
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
     "/structured-content-folders/{structuredContentFolderId}/structured-contents":
         get:
@@ -6838,6 +8572,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: flatten
                   schema:
@@ -6879,8 +8619,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/StructuredContent"
                                 type: array
-                    description:
-                        ""
             tags: ["StructuredContent"]
         post:
             description:
@@ -6914,8 +8652,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/structured-content-folders/{structuredContentFolderId}/subscribe":
         put:
@@ -6932,8 +8668,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
     "/structured-content-folders/{structuredContentFolderId}/unsubscribe":
         put:
@@ -6950,8 +8684,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContentFolder"]
     "/structured-contents/{structuredContentId}":
         delete:
@@ -6970,8 +8702,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContent"]
         get:
             description:
@@ -6997,8 +8727,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
-                    description:
-                        ""
             tags: ["StructuredContent"]
         patch:
             description:
@@ -7032,8 +8760,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
-                    description:
-                        ""
             tags: ["StructuredContent"]
         put:
             description:
@@ -7068,8 +8794,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/StructuredContent"
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/structured-contents/{structuredContentId}/comments":
         get:
@@ -7083,6 +8807,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -7116,8 +8846,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Comment"
                                 type: array
-                    description:
-                        ""
             tags: ["Comment"]
         post:
             description:
@@ -7147,8 +8875,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Comment"
-                    description:
-                        ""
             tags: ["Comment"]
     "/structured-contents/{structuredContentId}/my-rating":
         delete:
@@ -7167,8 +8893,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContent"]
         get:
             description:
@@ -7190,8 +8914,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["StructuredContent"]
         post:
             description:
@@ -7221,8 +8943,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["StructuredContent"]
         put:
             description:
@@ -7253,8 +8973,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Rating"
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/structured-contents/{structuredContentId}/permissions":
         get:
@@ -7275,11 +8993,9 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContent"]
         put:
-            operationId: putStructuredContentPermission
+            operationId: putStructuredContentPermissionsPage
             parameters:
                 - in: path
                   name: structuredContentId
@@ -7292,15 +9008,13 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContent"]
-    "/structured-contents/{structuredContentId}/rendered-content/{templateId}":
+    "/structured-contents/{structuredContentId}/rendered-content/{contentTemplateId}":
         get:
             description:
                 Retrieves the structured content's rendered template (the result of applying the structure's values to a
                 template).
-            operationId: getStructuredContentRenderedContentTemplate
+            operationId: getStructuredContentRenderedContentContentTemplate
             parameters:
                 - in: path
                   name: structuredContentId
@@ -7309,19 +9023,16 @@ paths:
                       format: int64
                       type: integer
                 - in: path
-                  name: templateId
+                  name: contentTemplateId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             responses:
                 200:
                     content:
                         text/html:
                             schema:
                                 type: string
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/structured-contents/{structuredContentId}/subscribe":
         put:
@@ -7338,8 +9049,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/structured-contents/{structuredContentId}/unsubscribe":
         put:
@@ -7356,8 +9065,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["StructuredContent"]
     "/wiki-nodes/{wikiNodeId}":
         # @review
@@ -7377,8 +9084,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["WikiNode"]
         get:
             description:
@@ -7400,8 +9105,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiNode"
-                    description:
-                        ""
             tags: ["WikiNode"]
         put:
             description:
@@ -7432,8 +9135,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiNode"
-                    description:
-                        ""
             tags: ["WikiNode"]
     "/wiki-nodes/{wikiNodeId}/subscribe":
         put:
@@ -7450,8 +9151,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["WikiNode"]
     "/wiki-nodes/{wikiNodeId}/unsubscribe":
         put:
@@ -7468,8 +9167,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["WikiNode"]
     "/wiki-nodes/{wikiNodeId}/wiki-pages":
         get:
@@ -7484,6 +9181,12 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: aggregationTerms
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - in: query
                   name: filter
                   schema:
@@ -7515,8 +9218,6 @@ paths:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/WikiPage"
-                    description:
-                        ""
             tags: ["WikiPage"]
         post:
             description:
@@ -7546,8 +9247,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiPage"
-                    description:
-                        ""
             tags: ["WikiPage"]
     "/wiki-page-attachments/{wikiPageAttachmentId}":
         delete:
@@ -7567,8 +9266,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["WikiPageAttachment"]
         get:
             description:
@@ -7590,8 +9287,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiPageAttachment"
-                    description:
-                        ""
             tags: ["WikiPageAttachment"]
     "/wiki-pages/{parentWikiPageId}/wiki-pages":
         get:
@@ -7617,8 +9312,6 @@ paths:
                             schema:
                                 items:
                                     $ref: "#/components/schemas/WikiPage"
-                    description:
-                        ""
             tags: ["WikiPage"]
         post:
             description:
@@ -7648,8 +9341,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiPage"
-                    description:
-                        ""
             tags: ["WikiPage"]
     "/wiki-pages/{wikiPageId}":
         # @review
@@ -7669,8 +9360,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["WikiPage"]
         get:
             description:
@@ -7692,8 +9381,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiPage"
-                    description:
-                        ""
             tags: ["WikiPage"]
         put:
             description:
@@ -7724,8 +9411,6 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiPage"
-                    description:
-                        ""
             tags: ["WikiPage"]
     "/wiki-pages/{wikiPageId}/subscribe":
         put:
@@ -7742,8 +9427,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["WikiPage"]
     "/wiki-pages/{wikiPageId}/unsubscribe":
         put:
@@ -7760,8 +9443,6 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
-                    description:
-                        ""
             tags: ["WikiPage"]
     "/wiki-pages/{wikiPageId}/wiki-page-attachments":
         get:
@@ -7789,8 +9470,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/WikiPageAttachment"
                                 type: array
-                    description:
-                        ""
             tags: ["WikiPageAttachment"]
         post:
             description:
@@ -7824,6 +9503,4 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/WikiPageAttachment"
-                    description:
-                        ""
             tags: ["WikiPageAttachment"]

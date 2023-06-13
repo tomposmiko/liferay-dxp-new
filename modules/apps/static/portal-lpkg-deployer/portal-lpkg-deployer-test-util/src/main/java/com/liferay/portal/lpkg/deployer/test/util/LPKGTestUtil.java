@@ -14,10 +14,10 @@
 
 package com.liferay.portal.lpkg.deployer.test.util;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.util.StreamUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -116,9 +116,7 @@ public class LPKGTestUtil {
 			sb.append("restart-required=false\n");
 			sb.append("title=");
 
-			Path namePath = path.getFileName();
-
-			String name = namePath.toString();
+			String name = String.valueOf(path.getFileName());
 
 			sb.append(name.substring(0, name.indexOf(".lpkg")));
 

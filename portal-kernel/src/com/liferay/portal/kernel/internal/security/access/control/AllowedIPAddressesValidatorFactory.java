@@ -122,10 +122,10 @@ public final class AllowedIPAddressesValidatorFactory {
 		}
 
 		private BaseAllowedIPAddressesValidator(
-				InetAddress inetAddress, String[] ipAddressAndNetmask)
+				InetAddress allowedIpAddress, String[] ipAddressAndNetmask)
 			throws UnknownHostException {
 
-			_allowedIpAddress = inetAddress;
+			_allowedIpAddress = allowedIpAddress;
 
 			_allowedIpAddressBytes = _allowedIpAddress.getAddress();
 
@@ -152,10 +152,8 @@ public final class AllowedIPAddressesValidatorFactory {
 				bytesNetmask[i] = (byte)_BYTE[8];
 			}
 
-			int byteOffset = cidr % 8;
-
 			if (netmaskBytes < bytesNetmask.length) {
-				bytesNetmask[netmaskBytes] = (byte)_BYTE[byteOffset];
+				bytesNetmask[netmaskBytes] = (byte)_BYTE[cidr % 8];
 			}
 
 			return bytesNetmask;

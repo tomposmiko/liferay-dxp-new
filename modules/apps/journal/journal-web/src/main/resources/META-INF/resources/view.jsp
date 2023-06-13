@@ -31,12 +31,6 @@ else if (journalDisplayContext.isCommentsTabSelected()) {
 else {
 	journalManagementToolbarDisplayContext = new JournalManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, journalDisplayContext, trashHelper);
 }
-
-String title = journalDisplayContext.getFolderTitle();
-
-if (Validator.isNotNull(title)) {
-	renderResponse.setTitle(journalDisplayContext.getFolderTitle());
-}
 %>
 
 <portlet:actionURL name="/journal/restore_trash_entries" var="restoreTrashEntriesURL" />
@@ -47,7 +41,7 @@ if (Validator.isNotNull(title)) {
 
 <clay:navigation-bar
 	inverted="<%= true %>"
-	navigationItems='<%= journalDisplayContext.getNavigationBarItems("web-content") %>'
+	navigationItems='<%= journalDisplayContext.getNavigationItems("web-content") %>'
 />
 
 <clay:management-toolbar
@@ -60,7 +54,10 @@ if (Validator.isNotNull(title)) {
 	module="js/ManagementToolbarDefaultEventHandler.es"
 />
 
-<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+<clay:container-fluid
+	cssClass="closed sidenav-container sidenav-right"
+	id='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
+>
 	<c:if test="<%= journalDisplayContext.isShowInfoButton() %>">
 		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/journal/info_panel" var="sidebarPanelURL">
 			<portlet:param name="folderId" value="<%= String.valueOf(journalDisplayContext.getFolderId()) %>" />
@@ -101,6 +98,7 @@ if (Validator.isNotNull(title)) {
 						String tabName = StringUtil.appendParentheticalSuffix(LanguageUtil.get(request, "web-content"), journalDisplayContext.getTotalItems());
 
 						tabsNames = ArrayUtil.append(tabsNames, tabName);
+
 						tabsValues = ArrayUtil.append(tabsValues, "web-content");
 					}
 
@@ -108,6 +106,7 @@ if (Validator.isNotNull(title)) {
 						String tabName = StringUtil.appendParentheticalSuffix(LanguageUtil.get(request, "versions"), journalDisplayContext.getVersionsTotal());
 
 						tabsNames = ArrayUtil.append(tabsNames, tabName);
+
 						tabsValues = ArrayUtil.append(tabsValues, "versions");
 					}
 
@@ -115,6 +114,7 @@ if (Validator.isNotNull(title)) {
 						String tabName = StringUtil.appendParentheticalSuffix(LanguageUtil.get(request, "comments"), journalDisplayContext.getCommentsTotal());
 
 						tabsNames = ArrayUtil.append(tabsNames, tabName);
+
 						tabsValues = ArrayUtil.append(tabsValues, "comments");
 					}
 					%>
@@ -143,4 +143,13 @@ if (Validator.isNotNull(title)) {
 			</c:choose>
 		</aui:form>
 	</div>
-</div>
+
+	<div>
+		<react:component
+			module="js/export_translation/ExportTranslation.es"
+			props="<%= journalDisplayContext.getExportTranslationData() %>"
+		/>
+	</div>
+</clay:container-fluid>
+
+<%@ include file="/friendly_url_changed_message.jspf" %>

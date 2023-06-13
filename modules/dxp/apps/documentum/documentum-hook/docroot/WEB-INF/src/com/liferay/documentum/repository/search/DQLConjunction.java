@@ -14,8 +14,8 @@
 
 package com.liferay.documentum.repository.search;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class DQLConjunction extends DQLJunction {
 
 		List<DQLCriterion> dqlCriterions = list();
 
-		StringBundler sb = new StringBundler(dqlCriterions.size() * 2 + 1);
+		StringBundler sb = new StringBundler((dqlCriterions.size() * 2) + 1);
 
 		if (dqlCriterions.size() > 1) {
 			sb.append(StringPool.OPEN_PARENTHESIS);

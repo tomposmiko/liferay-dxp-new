@@ -14,20 +14,17 @@
 
 package com.liferay.change.tracking.web.internal.portlet.action;
 
-import com.liferay.change.tracking.constants.CTConstants;
-import com.liferay.change.tracking.constants.CTPortletKeys;
-import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTPreferences;
-import com.liferay.change.tracking.service.CTCollectionLocalService;
-import com.liferay.change.tracking.service.CTPreferencesLocalService;
+import com.liferay.change.tracking.service.CTPreferencesService;
+import com.liferay.change.tracking.web.internal.constants.CTPortletKeys;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -41,8 +38,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + CTPortletKeys.CHANGE_LISTS,
-		"mvc.command.name=/change_lists/checkout_ct_collection"
+		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
+		"mvc.command.name=/change_tracking/checkout_ct_collection"
 	},
 	service = MVCActionCommand.class
 )
@@ -50,46 +47,39 @@ public class CheckoutCTCollectionMVCActionCommand extends BaseMVCActionCommand {
 
 	@Override
 	protected void doProcessAction(
-		ActionRequest actionRequest, ActionResponse actionResponse) {
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
 
 		long ctCollectionId = ParamUtil.getLong(
 			actionRequest, "ctCollectionId");
-
-		if (ctCollectionId != CTConstants.CT_COLLECTION_ID_PRODUCTION) {
-			CTCollection ctCollection =
-				_ctCollectionLocalService.fetchCTCollection(ctCollectionId);
-
-			if ((ctCollection == null) ||
-				(ctCollection.getStatus() != WorkflowConstants.STATUS_DRAFT)) {
-
-				return;
-			}
-		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		CTPreferences ctPreferences =
-			_ctPreferencesLocalService.getCTPreferences(
-				themeDisplay.getCompanyId(), themeDisplay.getUserId());
+			_ctPreferencesService.checkoutCTCollection(
+				themeDisplay.getCompanyId(), ctCollectionId,
+				themeDisplay.getUserId());
 
-		ctPreferences.setCtCollectionId(ctCollectionId);
+		if (ctPreferences == null) {
+			return;
+		}
 
-		_ctPreferencesLocalService.updateCTPreferences(ctPreferences);
+		hideDefaultSuccessMessage(actionRequest);
 
-		if (ctCollectionId == CTConstants.CT_COLLECTION_ID_PRODUCTION) {
-			SessionMessages.add(
-				actionRequest,
-				_portal.getPortletId(actionRequest) +
-					"checkoutProductionSuccess");
+		SessionMessages.add(
+			_portal.getHttpServletRequest(actionRequest), "requestProcessed",
+			ParamUtil.getString(actionRequest, "successMessage"));
+
+		String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+		if (Validator.isNotNull(redirect)) {
+			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 	}
 
 	@Reference
-	private CTCollectionLocalService _ctCollectionLocalService;
-
-	@Reference
-	private CTPreferencesLocalService _ctPreferencesLocalService;
+	private CTPreferencesService _ctPreferencesService;
 
 	@Reference
 	private Portal _portal;

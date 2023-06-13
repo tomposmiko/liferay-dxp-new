@@ -32,17 +32,19 @@ export default function objectToFormData(
 		const formKey = namespace ? `${namespace}[${key}]` : key;
 
 		if (Array.isArray(value)) {
-			value.forEach(item => {
+			value.forEach((item) => {
 				objectToFormData(
 					{
-						[formKey]: item
+						[formKey]: item,
 					},
 					formData
 				);
 			});
-		} else if (isObject(value) && !(value instanceof File)) {
+		}
+		else if (isObject(value) && !(value instanceof File)) {
 			objectToFormData(value, formData, formKey);
-		} else {
+		}
+		else {
 			formData.append(formKey, value);
 		}
 	});

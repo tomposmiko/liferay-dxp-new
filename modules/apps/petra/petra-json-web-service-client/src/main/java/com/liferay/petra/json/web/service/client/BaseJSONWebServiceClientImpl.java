@@ -75,7 +75,6 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
@@ -710,6 +709,13 @@ public abstract class BaseJSONWebServiceClientImpl
 		_proxyWorkstation = proxyWorkstation;
 	}
 
+	@Override
+	public void setTrustSelfSignedCertificates(
+		boolean trustSelfSignedCertificates) {
+
+		_trustSelfSignedCertificates = trustSelfSignedCertificates;
+	}
+
 	protected BaseJSONWebServiceClientImpl() {
 		_objectMapper.configure(
 			DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -898,25 +904,27 @@ public abstract class BaseJSONWebServiceClientImpl
 		SSLContext sslContext = null;
 
 		try {
-			sslContextBuilder.loadTrustMaterial(
-				_keyStore, new TrustSelfSignedStrategy());
-
 			sslContext = sslContextBuilder.build();
 
 			sslContext.init(
-				null, new TrustManager[] {new X509TrustManagerImpl()}, null);
+				null,
+				new TrustManager[] {
+					new X509TrustManagerImpl(
+						_keyStore, _trustSelfSignedCertificates)
+				},
+				null);
 		}
 		catch (Exception exception) {
 			throw new RuntimeException(exception);
 		}
 
-		String[] httpProtocols = _split(System.getProperty("https.protocols"));
+		String[] httpsProtocols = _split(System.getProperty("https.protocols"));
 
 		String[] cipherSuites = _split(
 			System.getProperty("https.cipherSuites"));
 
 		return new SSLIOSessionStrategy(
-			sslContext, httpProtocols, cipherSuites,
+			sslContext, httpsProtocols, cipherSuites,
 			SSLIOSessionStrategy.getDefaultHostnameVerifier());
 	}
 
@@ -1006,28 +1014,6 @@ public abstract class BaseJSONWebServiceClientImpl
 		}
 
 		return json;
-	}
-
-	private static boolean _isBlank(String s) {
-		if (s == null) {
-			return true;
-		}
-
-		for (int i = 0; i < s.length(); i++) {
-			if (!Character.isWhitespace(s.charAt(i))) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private static String[] _split(final String s) {
-		if (_isBlank(s)) {
-			return null;
-		}
-
-		return s.split(" *, *");
 	}
 
 	private CredentialsProvider _getCredentialsProvider() {
@@ -1124,6 +1110,20 @@ public abstract class BaseJSONWebServiceClientImpl
 		return false;
 	}
 
+	private boolean _isBlank(String s) {
+		if (s == null) {
+			return true;
+		}
+
+		for (int i = 0; i < s.length(); i++) {
+			if (!Character.isWhitespace(s.charAt(i))) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private boolean _isStatus2XX(int statusCode) {
 		if ((statusCode == 200) || (statusCode == 201) || (statusCode == 202) ||
 			(statusCode == 203) || (statusCode == 204)) {
@@ -1132,6 +1132,14 @@ public abstract class BaseJSONWebServiceClientImpl
 		}
 
 		return false;
+	}
+
+	private String[] _split(final String s) {
+		if (_isBlank(s)) {
+			return null;
+		}
+
+		return s.split(" *, *");
 	}
 
 	private List<NameValuePair> _toNameValuePairs(String... keyValuesArray) {
@@ -1203,7 +1211,7 @@ public abstract class BaseJSONWebServiceClientImpl
 	private String _oAuthAccessToken;
 	private String _oAuthConsumerKey;
 	private String _oAuthConsumerSecret;
-	private ObjectMapper _objectMapper = new ObjectMapper();
+	private final ObjectMapper _objectMapper = new ObjectMapper();
 	private String _password;
 	private String _protocol = "http";
 	private String _proxyAuthType;
@@ -1213,5 +1221,6 @@ public abstract class BaseJSONWebServiceClientImpl
 	private String _proxyLogin;
 	private String _proxyPassword;
 	private String _proxyWorkstation;
+	private boolean _trustSelfSignedCertificates = true;
 
 }

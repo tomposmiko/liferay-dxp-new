@@ -131,7 +131,7 @@ public interface PortletDataContext extends Serializable {
 
 	public void addZipEntry(String path, byte[] bytes);
 
-	public void addZipEntry(String path, InputStream is);
+	public void addZipEntry(String path, InputStream inputStream);
 
 	public void addZipEntry(String path, Object object);
 
@@ -409,6 +409,9 @@ public interface PortletDataContext extends Serializable {
 	public void setExportImportProcessId(String exportImportProcessId);
 
 	public void setGroupId(long groupId);
+
+	public void setImportDataElementCacheEnabled(
+		boolean importDataElementCacheEnabled);
 
 	public void setImportDataRootElement(Element importDataRootElement);
 

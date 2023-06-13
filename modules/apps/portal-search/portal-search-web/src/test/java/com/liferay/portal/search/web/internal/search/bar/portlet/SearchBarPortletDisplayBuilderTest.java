@@ -16,6 +16,8 @@ package com.liferay.portal.search.web.internal.search.bar.portlet;
 
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -30,6 +32,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.display.context.SearchScope;
 import com.liferay.portal.search.web.internal.display.context.SearchScopePreference;
+import com.liferay.portal.search.web.internal.search.bar.portlet.configuration.SearchBarPortletInstanceConfiguration;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Optional;
 
@@ -40,22 +44,32 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import org.powermock.api.mockito.PowerMockito;
+
 /**
  * @author Adam Brandizzi
  */
 public class SearchBarPortletDisplayBuilderTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 
 		setUpHttp();
+		setUpLanguageUtil();
 		setUpPortal();
 		setUpThemeDisplay();
 	}
@@ -268,6 +282,12 @@ public class SearchBarPortletDisplayBuilderTest {
 		);
 	}
 
+	protected void setUpLanguageUtil() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		languageUtil.setLanguage(PowerMockito.mock(Language.class));
+	}
+
 	protected void setUpPortal() {
 		Mockito.doReturn(
 			createLiferayPortletRequest()
@@ -285,11 +305,21 @@ public class SearchBarPortletDisplayBuilderTest {
 			_group
 		);
 
-		Mockito.doReturn(
-			Mockito.mock(PortletDisplay.class)
-		).when(
-			_themeDisplay
-		).getPortletDisplay();
+		try {
+			Mockito.when(
+				_portletDisplay.getPortletInstanceConfiguration(Mockito.any())
+			).thenReturn(
+				Mockito.mock(SearchBarPortletInstanceConfiguration.class)
+			);
+		}
+		catch (Exception exception) {
+		}
+
+		Mockito.when(
+			_themeDisplay.getPortletDisplay()
+		).thenReturn(
+			_portletDisplay
+		);
 	}
 
 	protected void whenLayoutLocalServiceFetchLayoutByFriendlyURL(
@@ -332,6 +362,9 @@ public class SearchBarPortletDisplayBuilderTest {
 
 	@Mock
 	private Portal _portal;
+
+	@Mock
+	private PortletDisplay _portletDisplay;
 
 	@Mock
 	private ThemeDisplay _themeDisplay;

@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.servlet;
 
 import com.liferay.petra.nio.CharsetEncoderUtil;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -47,7 +49,9 @@ import java.nio.channels.FileChannel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -182,7 +186,7 @@ public class ServletResponseUtil {
 			return;
 		}
 
-		if ((ranges == null) || ranges.isEmpty()) {
+		if (ListUtil.isEmpty(ranges)) {
 			sendFile(
 				httpServletRequest, httpServletResponse, fileName, inputStream,
 				contentLength, contentType);
@@ -340,9 +344,8 @@ public class ServletResponseUtil {
 			BufferCacheServletResponse bufferCacheServletResponse =
 				(BufferCacheServletResponse)httpServletResponse;
 
-			ByteBuffer byteBuffer = ByteBuffer.wrap(FileUtil.getBytes(file));
-
-			bufferCacheServletResponse.setByteBuffer(byteBuffer);
+			bufferCacheServletResponse.setByteBuffer(
+				ByteBuffer.wrap(FileUtil.getBytes(file)));
 		}
 		else {
 			FileInputStream fileInputStream = new FileInputStream(file);
@@ -488,6 +491,21 @@ public class ServletResponseUtil {
 			String extension = GetterUtil.getString(
 				FileUtil.getExtension(fileName));
 
+			if (extension.isEmpty() && Validator.isNotNull(contentType)) {
+				Set<String> extensions = MimeTypesUtil.getExtensions(
+					contentType);
+
+				Iterator<String> iterator = extensions.iterator();
+
+				if (iterator.hasNext()) {
+					extension = iterator.next();
+
+					int index = extension.lastIndexOf(CharPool.PERIOD);
+
+					extension = extension.substring(index + 1);
+				}
+			}
+
 			extension = StringUtil.toLowerCase(extension);
 
 			String[] mimeTypesContentDispositionInline = null;
@@ -555,7 +573,11 @@ public class ServletResponseUtil {
 			isClientAbortException(ioException)) {
 
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioException, ioException);
+				_log.warn(ioException.getMessage());
+			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
 			}
 		}
 		else {
@@ -849,6 +871,9 @@ public class ServletResponseUtil {
 				servletOutputStream.println(
 					StringPool.DOUBLE_DASH + boundary + StringPool.DOUBLE_DASH);
 			}
+		}
+		catch (IOException ioException) {
+			_checkSocketException(ioException);
 		}
 		finally {
 			StreamUtil.cleanUp(true, inputStream);

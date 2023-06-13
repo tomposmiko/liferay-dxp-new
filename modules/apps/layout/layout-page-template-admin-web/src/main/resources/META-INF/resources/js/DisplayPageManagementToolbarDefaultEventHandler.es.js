@@ -25,10 +25,14 @@ class DisplayPageManagementToolbarDefaultEventHandler extends DefaultEventHandle
 			submitForm(this.one('#fm'));
 		}
 	}
+
+	exportDisplayPages(itemData) {
+		submitForm(this.one('#fm'), itemData.exportDisplayPageURL);
+	}
 }
 
 DisplayPageManagementToolbarDefaultEventHandler.STATE = {
-	spritemap: Config.string()
+	spritemap: Config.string(),
 };
 
 export default DisplayPageManagementToolbarDefaultEventHandler;

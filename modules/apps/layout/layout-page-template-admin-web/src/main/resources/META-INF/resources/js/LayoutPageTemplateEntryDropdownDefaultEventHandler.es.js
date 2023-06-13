@@ -14,8 +14,9 @@
 
 import {
 	DefaultEventHandler,
-	ItemSelectorDialog,
-	openSimpleInputModal
+	openModal,
+	openSelectionModal,
+	openSimpleInputModal,
 } from 'frontend-js-web';
 import {Config} from 'metal-state';
 
@@ -34,17 +35,22 @@ class LayoutPageTemplateEntryDropdownDefaultEventHandler extends DefaultEventHan
 		this._send(itemData.deleteLayoutPageTemplateEntryPreviewURL);
 	}
 
+	discardDraft(itemData) {
+		if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
+				)
+			)
+		) {
+			this._send(itemData.discardDraftURL);
+		}
+	}
+
 	permissionsLayoutPageTemplateEntry(itemData) {
-		Liferay.Util.openWindow({
-			dialog: {
-				destroyOnHide: true,
-				modal: true
-			},
-			dialogIframe: {
-				bodyCssClass: 'dialog-with-footer'
-			},
+		openModal({
 			title: Liferay.Language.get('permissions'),
-			uri: itemData.permissionsLayoutPageTemplateEntryURL
+			url: itemData.permissionsLayoutPageTemplateEntryURL,
 		});
 	}
 
@@ -59,33 +65,27 @@ class LayoutPageTemplateEntryDropdownDefaultEventHandler extends DefaultEventHan
 			mainFieldPlaceholder: Liferay.Language.get('name'),
 			mainFieldValue: itemData.layoutPageTemplateEntryName,
 			namespace: this.namespace,
-			spritemap: this.spritemap
+			spritemap: this.spritemap,
 		});
 	}
 
 	updateLayoutPageTemplateEntryPreview(itemData) {
-		const itemSelectorDialog = new ItemSelectorDialog({
-			eventName: this.ns('changePreview'),
-			singleSelect: true,
+		openSelectionModal({
+			onSelect: (selectedItem) => {
+				if (selectedItem) {
+					const itemValue = JSON.parse(selectedItem.value);
+
+					this.one('#layoutPageTemplateEntryId').value =
+						itemData.layoutPageTemplateEntryId;
+					this.one('#fileEntryId').value = itemValue.fileEntryId;
+
+					submitForm(this.one('#layoutPageTemplateEntryPreviewFm'));
+				}
+			},
+			selectEventName: this.ns('changePreview'),
 			title: Liferay.Language.get('page-template-thumbnail'),
-			url: itemData.itemSelectorURL
+			url: itemData.itemSelectorURL,
 		});
-
-		itemSelectorDialog.on('selectedItemChange', event => {
-			const selectedItem = event.selectedItem;
-
-			if (selectedItem) {
-				const itemValue = JSON.parse(selectedItem.value);
-
-				this.one('#layoutPageTemplateEntryId').value =
-					itemData.layoutPageTemplateEntryId;
-				this.one('#fileEntryId').value = itemValue.fileEntryId;
-
-				submitForm(this.one('#layoutPageTemplateEntryPreviewFm'));
-			}
-		});
-
-		itemSelectorDialog.open();
 	}
 
 	_send(url) {
@@ -94,7 +94,7 @@ class LayoutPageTemplateEntryDropdownDefaultEventHandler extends DefaultEventHan
 }
 
 LayoutPageTemplateEntryDropdownDefaultEventHandler.STATE = {
-	spritemap: Config.string()
+	spritemap: Config.string(),
 };
 
 export default LayoutPageTemplateEntryDropdownDefaultEventHandler;

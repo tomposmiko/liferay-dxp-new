@@ -14,14 +14,19 @@
 
 package com.liferay.document.library.web.internal.portlet.toolbar.contributor.helper;
 
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.document.library.constants.DLPortletKeys;
+import com.liferay.document.library.display.context.DLUIItemKeys;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeServiceUtil;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFolderPermission;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -33,15 +38,21 @@ import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
+import javax.portlet.WindowStateException;
 
 /**
  * @author Adolfo Pérez
@@ -52,11 +63,9 @@ public class MenuItemProvider {
 		Folder folder, ThemeDisplay themeDisplay,
 		PortletRequest portletRequest) {
 
-		long folderId = _getFolderId(folder);
-
 		if (!_hasPermission(
 				themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroupId(), folderId,
+				themeDisplay.getScopeGroupId(), _getFolderId(folder),
 				ActionKeys.ADD_DOCUMENT)) {
 
 			return Collections.emptyList();
@@ -92,15 +101,13 @@ public class MenuItemProvider {
 		URLMenuItem urlMenuItem = new URLMenuItem();
 
 		urlMenuItem.setIcon("upload");
+		urlMenuItem.setKey(DLUIItemKeys.UPLOAD);
 		urlMenuItem.setLabel(
 			LanguageUtil.get(
 				PortalUtil.getHttpServletRequest(portletRequest),
 				"file-upload"));
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			portletRequest, themeDisplay.getScopeGroup(),
-			DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, 0, 0,
-			PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = _getPortletURL(themeDisplay, portletRequest);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/document_library/edit_file_entry");
@@ -116,6 +123,9 @@ public class MenuItemProvider {
 			"repositoryId",
 			String.valueOf(_getRepositoryId(folder, themeDisplay)));
 		portletURL.setParameter("folderId", String.valueOf(folderId));
+		portletURL.setParameter(
+			"fileEntryTypeId",
+			String.valueOf(_getDefaultFileEntryTypeId(folderId)));
 
 		urlMenuItem.setURL(portletURL.toString());
 
@@ -139,14 +149,12 @@ public class MenuItemProvider {
 		URLMenuItem urlMenuItem = new URLMenuItem();
 
 		urlMenuItem.setIcon("folder");
+		urlMenuItem.setKey(DLUIItemKeys.ADD_FOLDER);
 		urlMenuItem.setLabel(
 			LanguageUtil.get(
 				PortalUtil.getHttpServletRequest(portletRequest), "folder"));
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			portletRequest, themeDisplay.getScopeGroup(),
-			DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, 0, 0,
-			PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = _getPortletURL(themeDisplay, portletRequest);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/document_library/edit_folder");
@@ -189,15 +197,14 @@ public class MenuItemProvider {
 		URLMenuItem urlMenuItem = new URLMenuItem();
 
 		urlMenuItem.setIcon("upload-multiple");
-		urlMenuItem.setLabel(
-			LanguageUtil.get(
-				PortalUtil.getHttpServletRequest(portletRequest),
-				"multiple-files-upload"));
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			portletRequest, themeDisplay.getScopeGroup(),
-			DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, 0, 0,
-			PortletRequest.RENDER_PHASE);
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", themeDisplay.getLocale(), getClass());
+
+		urlMenuItem.setLabel(
+			LanguageUtil.get(resourceBundle, "multiple-files-upload"));
+
+		PortletURL portletURL = _getPortletURL(themeDisplay, portletRequest);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName",
@@ -244,10 +251,7 @@ public class MenuItemProvider {
 				PortalUtil.getHttpServletRequest(portletRequest),
 				"repository"));
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			portletRequest, themeDisplay.getScopeGroup(),
-			DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, 0, 0,
-			PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = _getPortletURL(themeDisplay, portletRequest);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/document_library/edit_repository");
@@ -284,10 +288,7 @@ public class MenuItemProvider {
 			LanguageUtil.get(
 				PortalUtil.getHttpServletRequest(portletRequest), "shortcut"));
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			portletRequest, themeDisplay.getScopeGroup(),
-			DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, 0, 0,
-			PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = _getPortletURL(themeDisplay, portletRequest);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/document_library/edit_file_shortcut");
@@ -303,6 +304,34 @@ public class MenuItemProvider {
 		return urlMenuItem;
 	}
 
+	private long[] _getCurrentAndAncestorSiteAndDepotGroupIds(long groupId)
+		throws PortalException {
+
+		return ArrayUtil.append(
+			PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId),
+			ListUtil.toLongArray(
+				DepotEntryLocalServiceUtil.getGroupConnectedDepotEntries(
+					groupId, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+				DepotEntry::getGroupId));
+	}
+
+	private long _getDefaultFileEntryTypeId(long folderId) {
+		try {
+			return DLFileEntryTypeLocalServiceUtil.getDefaultFileEntryTypeId(
+				folderId);
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to get default file entry type ID for folder " +
+						folderId,
+					portalException);
+			}
+
+			return DLFileEntryTypeConstants.COMPANY_ID_BASIC_DOCUMENT;
+		}
+	}
+
 	private MenuItem _getFileEntryTypeMenuItem(
 			Folder folder, List<DLFileEntryType> fileEntryTypes,
 			DLFileEntryType fileEntryType, ThemeDisplay themeDisplay,
@@ -311,18 +340,19 @@ public class MenuItemProvider {
 
 		URLMenuItem urlMenuItem = new URLMenuItem();
 
+		urlMenuItem.setKey(
+			DLFileEntryType.class.getSimpleName() +
+				fileEntryType.getFileEntryTypeKey());
+
 		String label = LanguageUtil.get(
 			PortalUtil.getHttpServletRequest(portletRequest),
 			fileEntryType.getUnambiguousName(
 				fileEntryTypes, themeDisplay.getScopeGroupId(),
 				themeDisplay.getLocale()));
 
-		urlMenuItem.setLabel(label);
+		urlMenuItem.setLabel(HtmlUtil.escape(label));
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			portletRequest, themeDisplay.getScopeGroup(),
-			DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, 0, 0,
-			PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = _getPortletURL(themeDisplay, portletRequest);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/document_library/edit_file_entry");
@@ -367,7 +397,7 @@ public class MenuItemProvider {
 
 		try {
 			return DLFileEntryTypeServiceUtil.getFolderFileEntryTypes(
-				PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId), folderId,
+				_getCurrentAndAncestorSiteAndDepotGroupIds(groupId), folderId,
 				inherited);
 		}
 		catch (PortalException portalException) {
@@ -419,6 +449,24 @@ public class MenuItemProvider {
 		}
 
 		return menuItems;
+	}
+
+	private PortletURL _getPortletURL(
+		ThemeDisplay themeDisplay, PortletRequest portletRequest) {
+
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			portletRequest, themeDisplay.getScopeGroup(),
+			DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, 0, 0,
+			PortletRequest.RENDER_PHASE);
+
+		try {
+			portletURL.setWindowState(portletRequest.getWindowState());
+		}
+		catch (WindowStateException windowStateException) {
+			_log.error(windowStateException, windowStateException);
+		}
+
+		return portletURL;
 	}
 
 	private long _getRepositoryId(Folder folder, ThemeDisplay themeDisplay) {

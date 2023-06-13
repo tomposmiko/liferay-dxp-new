@@ -227,39 +227,23 @@ public class GroupPermissionImpl
 
 		// Group id must be set so that users can modify their personal pages
 
-		if (permissionChecker.hasPermission(
-				originalGroup, Group.class.getName(), groupId, actionId)) {
-
-			return true;
-		}
-
-		while (!group.isRoot()) {
-			if (contains(
-					permissionChecker, group.getParentGroupId(),
-					ActionKeys.MANAGE_SUBGROUPS)) {
-
-				return true;
-			}
-
-			group = group.getParentGroup();
-		}
-
-		return false;
+		return permissionChecker.hasPermission(
+			originalGroup, Group.class.getName(), groupId, actionId);
 	}
 
 	private static class CacheKey {
 
 		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
+		public boolean equals(Object object) {
+			if (this == object) {
 				return true;
 			}
 
-			if (!(obj instanceof CacheKey)) {
+			if (!(object instanceof CacheKey)) {
 				return false;
 			}
 
-			CacheKey cacheKey = (CacheKey)obj;
+			CacheKey cacheKey = (CacheKey)object;
 
 			if ((_groupId == cacheKey._groupId) &&
 				(_mvccVersion == cacheKey._mvccVersion) &&

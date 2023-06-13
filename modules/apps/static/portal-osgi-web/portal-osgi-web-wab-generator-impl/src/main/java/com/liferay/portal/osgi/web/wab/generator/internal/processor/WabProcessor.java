@@ -35,12 +35,15 @@ import com.liferay.ant.bnd.jsp.JspAnalyzerPlugin;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.events.GlobalStartupAction;
+import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployListener;
 import com.liferay.portal.kernel.deploy.auto.context.AutoDeploymentContext;
 import com.liferay.portal.kernel.deploy.hot.DependencyManagementThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.servlet.PortalClassLoaderFilter;
 import com.liferay.portal.kernel.servlet.PortalClassLoaderServlet;
@@ -66,6 +69,7 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.util.JS;
 import com.liferay.whip.util.ReflectionUtil;
 
 import java.io.File;
@@ -73,6 +77,10 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -243,11 +251,9 @@ public class WabProcessor {
 		try {
 			DependencyManagementThreadLocal.setEnabled(false);
 
-			List<AutoDeployListener> autoDeployListeners =
-				GlobalStartupAction.getAutoDeployListeners(false);
-
 			AutoDeployListener autoDeployListener = getAutoDeployListener(
-				autoDeploymentContext, autoDeployListeners);
+				autoDeploymentContext,
+				GlobalStartupAction.getAutoDeployListeners(false));
 
 			autoDeployListener.deploy(autoDeploymentContext);
 		}
@@ -581,10 +587,10 @@ public class WabProcessor {
 		Properties properties = PropsUtil.getProperties(
 			PropsKeys.MODULE_FRAMEWORK_WEB_GENERATOR_HEADERS, true);
 
-		Enumeration<Object> keys = properties.keys();
+		Enumeration<Object> enumeration = properties.keys();
 
-		while (keys.hasMoreElements()) {
-			String key = (String)keys.nextElement();
+		while (enumeration.hasMoreElements()) {
+			String key = (String)enumeration.nextElement();
 
 			String value = properties.getProperty(key);
 
@@ -923,6 +929,91 @@ public class WabProcessor {
 		analyzer.setProperty(Constants.REQUIRE_BUNDLE, sb.toString());
 	}
 
+	protected void processResourceActionXML() throws IOException {
+		File dir = new File(_pluginDir, "WEB-INF/classes");
+
+		URI uri = dir.toURI();
+
+		ClassLoader classLoader = new URLClassLoader(new URL[] {uri.toURL()});
+
+		if (classLoader.getResource("portlet.properties") == null) {
+			return;
+		}
+
+		Configuration configuration = ConfigurationFactoryUtil.getConfiguration(
+			classLoader, "portlet");
+
+		Properties properties = configuration.getProperties();
+
+		for (String xmlFile :
+				StringUtil.split(
+					properties.getProperty(
+						PropsKeys.RESOURCE_ACTIONS_CONFIGS))) {
+
+			processResourceActionXML(dir, xmlFile);
+		}
+	}
+
+	protected void processResourceActionXML(File dir, String xmlFile)
+		throws IOException {
+
+		File file = new File(dir, xmlFile);
+
+		if (!file.exists()) {
+			return;
+		}
+
+		Document document = readDocument(file);
+
+		Element rootElement = document.getRootElement();
+
+		String servletContextName = _context.substring(1);
+
+		for (Element portletResourceElement :
+				rootElement.elements("portlet-resource")) {
+
+			Element portletNameElement = portletResourceElement.element(
+				"portlet-name");
+
+			portletNameElement.setText(
+				JS.getSafeName(
+					StringBundler.concat(
+						portletNameElement.getTextTrim(),
+						PortletConstants.WAR_SEPARATOR, servletContextName)));
+		}
+
+		for (Element modelResourceElement :
+				rootElement.elements("model-resource")) {
+
+			Element portletRefElement = modelResourceElement.element(
+				"portlet-ref");
+
+			for (Element portletNameElement :
+					portletRefElement.elements("portlet-name")) {
+
+				portletNameElement.setText(
+					JS.getSafeName(
+						StringBundler.concat(
+							portletNameElement.getTextTrim(),
+							PortletConstants.WAR_SEPARATOR,
+							servletContextName)));
+			}
+		}
+
+		formatDocument(file, document);
+
+		if (!xmlFile.endsWith("-ext.xml")) {
+			processResourceActionXML(
+				dir, StringUtil.replace(xmlFile, ".xml", "-ext.xml"));
+		}
+
+		for (Element resourceFileElement : rootElement.elements("resource")) {
+			processResourceActionXML(
+				dir,
+				StringUtil.trim(resourceFileElement.attributeValue("file")));
+		}
+	}
+
 	protected void processServicePackageName(Resource resource) {
 		try (InputStream inputStream = resource.openInputStream()) {
 			Document document = UnsecureSAXReaderUtil.read(inputStream);
@@ -1132,93 +1223,95 @@ public class WabProcessor {
 	}
 
 	protected File transformToOSGiBundle(Jar jar) throws IOException {
-		Builder analyzer = new Builder();
+		try (Builder analyzer = new Builder()) {
+			analyzer.setBase(_pluginDir);
+			analyzer.setJar(jar);
+			analyzer.setProperty("-jsp", "*.jsp,*.jspf");
+			analyzer.setProperty("Web-ContextPath", getWebContextPath());
 
-		analyzer.setBase(_pluginDir);
-		analyzer.setJar(jar);
-		analyzer.setProperty("-jsp", "*.jsp,*.jspf");
-		analyzer.setProperty("Web-ContextPath", getWebContextPath());
+			List<Object> disabledPlugins = new ArrayList<>();
+			Properties properties = PropsUtil.getProperties(
+				"module.framework.web.generator.bnd.plugin.enabled[", true);
 
-		List<Object> disabledPlugins = new ArrayList<>();
-		Properties properties = PropsUtil.getProperties(
-			"module.framework.web.generator.bnd.plugin.enabled[", true);
+			Set<Object> plugins = analyzer.getPlugins();
 
-		Set<Object> plugins = analyzer.getPlugins();
+			for (Object plugin : plugins) {
+				if (plugin instanceof DSAnnotations ||
+					plugin instanceof ServiceComponent) {
 
-		for (Object plugin : plugins) {
-			if (plugin instanceof DSAnnotations ||
-				plugin instanceof ServiceComponent) {
+					disabledPlugins.add(plugin);
 
-				disabledPlugins.add(plugin);
+					continue;
+				}
 
-				continue;
+				Class<?> clazz = plugin.getClass();
+
+				String name = clazz.getName() + "]";
+
+				if (!GetterUtil.getBoolean(
+						properties.getProperty(name), true)) {
+
+					disabledPlugins.add(plugin);
+				}
 			}
 
-			Class<?> clazz = plugin.getClass();
+			plugins.removeAll(disabledPlugins);
 
-			String name = clazz.getName() + "]";
+			plugins.add(new JspAnalyzerPlugin());
 
-			if (!GetterUtil.getBoolean(properties.getProperty(name), true)) {
-				disabledPlugins.add(plugin);
+			Properties pluginPackageProperties = getPluginPackageProperties();
+
+			if (pluginPackageProperties.containsKey("portal-dependency-jars") &&
+				_log.isWarnEnabled()) {
+
+				_log.warn(
+					"The property \"portal-dependency-jars\" is deprecated. " +
+						"Specified JARs may not be included in the class " +
+							"path.");
 			}
-		}
 
-		plugins.removeAll(disabledPlugins);
+			processBundleVersion(analyzer);
+			processBundleClasspath(analyzer, pluginPackageProperties);
+			processBundleSymbolicName(analyzer);
+			processExtraHeaders(analyzer);
+			processPluginPackagePropertiesExportImportPackages(
+				pluginPackageProperties);
 
-		plugins.add(new JspAnalyzerPlugin());
+			processBundleManifestVersion(analyzer);
 
-		Properties pluginPackageProperties = getPluginPackageProperties();
+			processLiferayPortletXML();
+			processWebXML("WEB-INF/web.xml");
+			processWebXML("WEB-INF/liferay-web.xml");
 
-		if (pluginPackageProperties.containsKey("portal-dependency-jars") &&
-			_log.isWarnEnabled()) {
+			processResourceActionXML();
 
-			_log.warn(
-				"The property \"portal-dependency-jars\" is deprecated. " +
-					"Specified JARs may not be included in the class path.");
-		}
+			processDeclarativeReferences(analyzer);
 
-		processBundleVersion(analyzer);
-		processBundleClasspath(analyzer, pluginPackageProperties);
-		processBundleSymbolicName(analyzer);
-		processExtraHeaders(analyzer);
-		processPluginPackagePropertiesExportImportPackages(
-			pluginPackageProperties);
+			processExtraRequirements();
 
-		processBundleManifestVersion(analyzer);
+			processPackageNames(analyzer);
 
-		processLiferayPortletXML();
-		processWebXML("WEB-INF/web.xml");
-		processWebXML("WEB-INF/liferay-web.xml");
+			processRequiredDeploymentContexts(analyzer);
 
-		processDeclarativeReferences(analyzer);
+			_processExcludedJSPs(analyzer);
 
-		processExtraRequirements();
+			analyzer.setProperties(pluginPackageProperties);
 
-		processPackageNames(analyzer);
+			processBeans(analyzer);
 
-		processRequiredDeploymentContexts(analyzer);
+			try {
+				jar = analyzer.build();
 
-		_processExcludedJSPs(analyzer);
+				File outputFile = analyzer.getOutputFile(null);
 
-		analyzer.setProperties(pluginPackageProperties);
+				jar.write(outputFile);
 
-		processBeans(analyzer);
-
-		try {
-			jar = analyzer.build();
-
-			File outputFile = analyzer.getOutputFile(null);
-
-			jar.write(outputFile);
-
-			return outputFile;
-		}
-		catch (Exception exception) {
-			throw new IOException(
-				"Unable to calculate the manifest", exception);
-		}
-		finally {
-			analyzer.close();
+				return outputFile;
+			}
+			catch (Exception exception) {
+				throw new IOException(
+					"Unable to calculate the manifest", exception);
+			}
 		}
 	}
 

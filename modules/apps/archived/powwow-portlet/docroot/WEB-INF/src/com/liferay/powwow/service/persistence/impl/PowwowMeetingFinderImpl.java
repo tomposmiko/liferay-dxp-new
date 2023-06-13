@@ -62,9 +62,9 @@ public class PowwowMeetingFinderImpl
 			sql = StringUtil.replace(
 				sql, "[$STATUSES$]", getStatusesSQL(statuses));
 
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+			sqlQuery.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 
 			User user = UserLocalServiceUtil.fetchUser(userId);
 
@@ -72,16 +72,16 @@ public class PowwowMeetingFinderImpl
 				return 0;
 			}
 
-			QueryPos qPos = QueryPos.getInstance(q);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(user.getUserId());
-			qPos.add(user.getUserId());
-			qPos.add(user.getEmailAddress());
+			queryPos.add(user.getUserId());
+			queryPos.add(user.getUserId());
+			queryPos.add(user.getEmailAddress());
 
-			Iterator<Long> itr = q.iterate();
+			Iterator<Long> iterator = sqlQuery.iterate();
 
-			if (itr.hasNext()) {
-				Long count = itr.next();
+			if (iterator.hasNext()) {
+				Long count = iterator.next();
 
 				if (count != null) {
 					return count.intValue();
@@ -101,7 +101,7 @@ public class PowwowMeetingFinderImpl
 	@Override
 	public List<PowwowMeeting> findByU_S(
 		long userId, int[] statuses, int start, int end,
-		OrderByComparator orderByComparator) {
+		OrderByComparator<PowwowMeeting> orderByComparator) {
 
 		Session session = null;
 
@@ -122,9 +122,9 @@ public class PowwowMeetingFinderImpl
 
 			sql = StringUtil.replace(sql, "[$ORDER_BY$]", sb.toString());
 
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			q.addEntity("PowwowMeeting", PowwowMeetingImpl.class);
+			sqlQuery.addEntity("PowwowMeeting", PowwowMeetingImpl.class);
 
 			User user = UserLocalServiceUtil.fetchUser(userId);
 
@@ -132,14 +132,14 @@ public class PowwowMeetingFinderImpl
 				return Collections.emptyList();
 			}
 
-			QueryPos qPos = QueryPos.getInstance(q);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(user.getUserId());
-			qPos.add(user.getUserId());
-			qPos.add(user.getEmailAddress());
+			queryPos.add(user.getUserId());
+			queryPos.add(user.getUserId());
+			queryPos.add(user.getEmailAddress());
 
 			return (List<PowwowMeeting>)QueryUtil.list(
-				q, getDialect(), start, end);
+				sqlQuery, getDialect(), start, end);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);

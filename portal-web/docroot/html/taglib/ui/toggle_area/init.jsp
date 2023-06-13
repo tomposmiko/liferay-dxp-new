@@ -17,12 +17,12 @@
 <%@ include file="/html/taglib/init.jsp" %>
 
 <%
+String align = (String)request.getAttribute("liferay-ui:toggle-area:align");
+boolean defaultShowContent = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:toggle-area:defaultShowContent"));
+String hideImage = (String)request.getAttribute("liferay-ui:toggle-area:hideImage");
+String hideMessage = (String)request.getAttribute("liferay-ui:toggle-area:hideMessage");
 String id = (String)request.getAttribute("liferay-ui:toggle-area:id");
 String showImage = (String)request.getAttribute("liferay-ui:toggle-area:showImage");
-String hideImage = (String)request.getAttribute("liferay-ui:toggle-area:hideImage");
 String showMessage = (String)request.getAttribute("liferay-ui:toggle-area:showMessage");
-String hideMessage = (String)request.getAttribute("liferay-ui:toggle-area:hideMessage");
-boolean defaultShowContent = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:toggle-area:defaultShowContent"));
 String stateVar = (String)request.getAttribute("liferay-ui:toggle-area:stateVar");
-String align = (String)request.getAttribute("liferay-ui:toggle-area:align");
 %>

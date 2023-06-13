@@ -79,16 +79,13 @@
 		<liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + className + ListTypeConstants.ADDRESS %>" message="please-select-a-type" />
 		<liferay-ui:error exception="<%= NoSuchRegionException.class %>" message="please-select-a-region" />
 
-		<aui:fieldset cssClass="addresses" id='<%= renderResponse.getNamespace() + "addresses" %>'>
+		<aui:fieldset cssClass="addresses" id='<%= liferayPortletResponse.getNamespace() + "addresses" %>'>
 
 			<%
 			for (int i = 0; i < addressesIndexes.length; i++) {
 				int addressesIndex = addressesIndexes[i];
 
 				Address address = addresses.get(i);
-
-				long countryId = ParamUtil.getLong(request, "addressCountryId" + addressesIndex, address.getCountryId());
-				long regionId = ParamUtil.getLong(request, "addressRegionId" + addressesIndex, address.getRegionId());
 			%>
 
 				<aui:model-context bean="<%= address %>" model="<%= Address.class %>" />
@@ -99,7 +96,7 @@
 					</div>
 				</div>
 
-				<aui:script use="liferay-dynamic-select">
+				<script>
 					new Liferay.DynamicSelect([
 						{
 							select: '<portlet:namespace />addressCountryId<%= addressesIndex %>',
@@ -107,17 +104,19 @@
 							selectDesc: 'nameCurrentValue',
 							selectId: 'countryId',
 							selectSort: '<%= true %>',
-							selectVal: '<%= countryId %>'
+							selectVal:
+								'<%= ParamUtil.getLong(request, "addressCountryId" + addressesIndex, address.getCountryId()) %>',
 						},
 						{
 							select: '<portlet:namespace />addressRegionId<%= addressesIndex %>',
 							selectData: Liferay.Address.getRegions,
 							selectDesc: 'name',
 							selectId: 'regionId',
-							selectVal: '<%= regionId %>'
-						}
+							selectVal:
+								'<%= ParamUtil.getLong(request, "addressRegionId" + addressesIndex, address.getRegionId()) %>',
+						},
 					]);
-				</aui:script>
+				</script>
 
 			<%
 			}
@@ -126,13 +125,13 @@
 			<aui:input name="addressesIndexes" type="hidden" value="<%= StringUtil.merge(addressesIndexes) %>" />
 		</aui:fieldset>
 
-		<aui:script use="liferay-auto-fields,liferay-dynamic-select">
+		<aui:script use="liferay-auto-fields">
 			new Liferay.AutoFields({
 				contentBox: '#<portlet:namespace />addresses',
 				fieldIndexes: '<portlet:namespace />addressesIndexes',
 				namespace: '<portlet:namespace />',
 				on: {
-					clone: function(event) {
+					clone: function (event) {
 						var guid = event.guid;
 						var row = event.row;
 
@@ -151,18 +150,18 @@
 								selectDesc: 'nameCurrentValue',
 								selectId: 'countryId',
 								selectSort: '<%= true %>',
-								selectVal: '0'
+								selectVal: '0',
 							},
 							{
 								select: '<portlet:namespace />addressRegionId' + guid,
 								selectData: Liferay.Address.getRegions,
 								selectDesc: 'name',
 								selectId: 'regionId',
-								selectVal: '0'
-							}
+								selectVal: '0',
+							},
 						]);
-					}
-				}
+					},
+				},
 			}).render();
 		</aui:script>
 	</c:when>

@@ -21,17 +21,24 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.ExistsFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
 import java.io.Serializable;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -65,6 +72,45 @@ public class DDMFormInstanceRecordModelPreFilterContributor
 
 		if (formInstanceId > 0) {
 			booleanFilter.addRequiredTerm("formInstanceId", formInstanceId);
+		}
+
+		String[] languageIds = GetterUtil.getStringValues(
+			searchContext.getAttribute("languageIds"));
+		String[] notEmptyFields = GetterUtil.getStringValues(
+			searchContext.getAttribute("notEmptyFields"));
+		long structureId = GetterUtil.getLong(
+			searchContext.getAttribute("structureId"));
+
+		if ((languageIds.length > 0) && (notEmptyFields.length > 0) &&
+			(structureId > 0)) {
+
+			List<Locale> locales = Stream.of(
+				languageIds
+			).map(
+				languageId -> LocaleUtil.fromLanguageId(languageId)
+			).collect(
+				Collectors.toList()
+			);
+
+			Stream.of(
+				notEmptyFields
+			).forEach(
+				notEmptyField -> {
+					BooleanFilter notEmptyFieldBooleanFilter =
+						new BooleanFilter();
+
+					locales.forEach(
+						locale -> notEmptyFieldBooleanFilter.add(
+							new ExistsFilter(
+								ddmIndexer.encodeName(
+									structureId, notEmptyField, locale)),
+							BooleanClauseOccur.MUST));
+
+					booleanFilter.add(
+						notEmptyFieldBooleanFilter,
+						BooleanClauseOccur.MUST_NOT);
+				}
+			);
 		}
 
 		addSearchClassTypeIds(booleanFilter, searchContext);

@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -41,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -106,22 +106,48 @@ public class CTSContentModelImpl
 
 	public static final String TX_MANAGER = "liferayTransactionManager";
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long COMPANYID_COLUMN_BITMASK = 1L;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long PATH_COLUMN_BITMASK = 2L;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long REPOSITORYID_COLUMN_BITMASK = 4L;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long STORETYPE_COLUMN_BITMASK = 8L;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
 	public static final long VERSION_COLUMN_BITMASK = 16L;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
-		_entityCacheEnabled = entityCacheEnabled;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
-		_finderCacheEnabled = finderCacheEnabled;
 	}
 
 	public CTSContentModelImpl() {
@@ -175,9 +201,6 @@ public class CTSContentModelImpl
 				attributeName, attributeGetterFunction.apply((CTSContent)this));
 		}
 
-		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
-		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
-
 		return attributes;
 	}
 
@@ -209,34 +232,6 @@ public class CTSContentModelImpl
 		getAttributeSetterBiConsumers() {
 
 		return _attributeSetterBiConsumers;
-	}
-
-	private static Function<InvocationHandler, CTSContent>
-		_getProxyProviderFunction() {
-
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			CTSContent.class.getClassLoader(), CTSContent.class,
-			ModelWrapper.class);
-
-		try {
-			Constructor<CTSContent> constructor =
-				(Constructor<CTSContent>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
 	}
 
 	private static final Map<String, Function<CTSContent, Object>>
@@ -303,6 +298,10 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_mvccVersion = mvccVersion;
 	}
 
@@ -313,6 +312,10 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setCtCollectionId(long ctCollectionId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_ctCollectionId = ctCollectionId;
 	}
 
@@ -323,6 +326,10 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setCtsContentId(long ctsContentId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_ctsContentId = ctsContentId;
 	}
 
@@ -333,19 +340,21 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setCompanyId(long companyId) {
-		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
-
-		if (!_setOriginalCompanyId) {
-			_setOriginalCompanyId = true;
-
-			_originalCompanyId = _companyId;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_companyId = companyId;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public long getOriginalCompanyId() {
-		return _originalCompanyId;
+		return GetterUtil.getLong(
+			this.<Long>getColumnOriginalValue("companyId"));
 	}
 
 	@Override
@@ -355,19 +364,21 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setRepositoryId(long repositoryId) {
-		_columnBitmask |= REPOSITORYID_COLUMN_BITMASK;
-
-		if (!_setOriginalRepositoryId) {
-			_setOriginalRepositoryId = true;
-
-			_originalRepositoryId = _repositoryId;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_repositoryId = repositoryId;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public long getOriginalRepositoryId() {
-		return _originalRepositoryId;
+		return GetterUtil.getLong(
+			this.<Long>getColumnOriginalValue("repositoryId"));
 	}
 
 	@Override
@@ -382,17 +393,20 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setPath(String path) {
-		_columnBitmask |= PATH_COLUMN_BITMASK;
-
-		if (_originalPath == null) {
-			_originalPath = _path;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_path = path;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public String getOriginalPath() {
-		return GetterUtil.getString(_originalPath);
+		return getColumnOriginalValue("path_");
 	}
 
 	@Override
@@ -407,17 +421,20 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setVersion(String version) {
-		_columnBitmask = -1L;
-
-		if (_originalVersion == null) {
-			_originalVersion = _version;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_version = version;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public String getOriginalVersion() {
-		return GetterUtil.getString(_originalVersion);
+		return getColumnOriginalValue("version");
 	}
 
 	@Override
@@ -442,6 +459,10 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setData(Blob data) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		if (_dataBlobModel == null) {
 			_dataBlobModel = new CTSContentDataBlobModel(getPrimaryKey(), data);
 		}
@@ -457,6 +478,10 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setSize(long size) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
 		_size = size;
 	}
 
@@ -472,20 +497,43 @@ public class CTSContentModelImpl
 
 	@Override
 	public void setStoreType(String storeType) {
-		_columnBitmask |= STORETYPE_COLUMN_BITMASK;
-
-		if (_originalStoreType == null) {
-			_originalStoreType = _storeType;
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
 		}
 
 		_storeType = storeType;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
 	public String getOriginalStoreType() {
-		return GetterUtil.getString(_originalStoreType);
+		return getColumnOriginalValue("storeType");
 	}
 
 	public long getColumnBitmask() {
+		if (_columnBitmask > 0) {
+			return _columnBitmask;
+		}
+
+		if ((_columnOriginalValues == null) ||
+			(_columnOriginalValues == Collections.EMPTY_MAP)) {
+
+			return 0;
+		}
+
+		for (Map.Entry<String, Object> entry :
+				_columnOriginalValues.entrySet()) {
+
+			if (!Objects.equals(
+					entry.getValue(), getColumnValue(entry.getKey()))) {
+
+				_columnBitmask |= _columnBitmasks.get(entry.getKey());
+			}
+		}
+
 		return _columnBitmask;
 	}
 
@@ -552,16 +600,16 @@ public class CTSContentModelImpl
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof CTSContent)) {
+		if (!(object instanceof CTSContent)) {
 			return false;
 		}
 
-		CTSContent ctsContent = (CTSContent)obj;
+		CTSContent ctsContent = (CTSContent)object;
 
 		long primaryKey = ctsContent.getPrimaryKey();
 
@@ -578,38 +626,31 @@ public class CTSContentModelImpl
 		return (int)getPrimaryKey();
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return _entityCacheEnabled;
+		return true;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return _finderCacheEnabled;
+		return true;
 	}
 
 	@Override
 	public void resetOriginalValues() {
-		CTSContentModelImpl ctsContentModelImpl = this;
+		_columnOriginalValues = Collections.emptyMap();
 
-		ctsContentModelImpl._originalCompanyId = ctsContentModelImpl._companyId;
+		_dataBlobModel = null;
 
-		ctsContentModelImpl._setOriginalCompanyId = false;
-
-		ctsContentModelImpl._originalRepositoryId =
-			ctsContentModelImpl._repositoryId;
-
-		ctsContentModelImpl._setOriginalRepositoryId = false;
-
-		ctsContentModelImpl._originalPath = ctsContentModelImpl._path;
-
-		ctsContentModelImpl._originalVersion = ctsContentModelImpl._version;
-
-		ctsContentModelImpl._dataBlobModel = null;
-
-		ctsContentModelImpl._originalStoreType = ctsContentModelImpl._storeType;
-
-		ctsContentModelImpl._columnBitmask = 0;
+		_columnBitmask = 0;
 	}
 
 	@Override
@@ -659,24 +700,42 @@ public class CTSContentModelImpl
 	public String toString() {
 		StringBundler sb = new StringBundler(21);
 
-		sb.append("{mvccVersion=");
+		sb.append("{\"mvccVersion\": ");
+
 		sb.append(getMvccVersion());
-		sb.append(", ctCollectionId=");
+
+		sb.append(", \"ctCollectionId\": ");
+
 		sb.append(getCtCollectionId());
-		sb.append(", ctsContentId=");
+
+		sb.append(", \"ctsContentId\": ");
+
 		sb.append(getCtsContentId());
-		sb.append(", companyId=");
+
+		sb.append(", \"companyId\": ");
+
 		sb.append(getCompanyId());
-		sb.append(", repositoryId=");
+
+		sb.append(", \"repositoryId\": ");
+
 		sb.append(getRepositoryId());
-		sb.append(", path=");
-		sb.append(getPath());
-		sb.append(", version=");
-		sb.append(getVersion());
-		sb.append(", size=");
+
+		sb.append(", \"path\": ");
+
+		sb.append("\"" + getPath() + "\"");
+
+		sb.append(", \"version\": ");
+
+		sb.append("\"" + getVersion() + "\"");
+
+		sb.append(", \"size\": ");
+
 		sb.append(getSize());
-		sb.append(", storeType=");
-		sb.append(getStoreType());
+
+		sb.append(", \"storeType\": ");
+
+		sb.append("\"" + getStoreType() + "\"");
+
 		sb.append("}");
 
 		return sb.toString();
@@ -692,39 +751,57 @@ public class CTSContentModelImpl
 
 		sb.append(
 			"<column><column-name>mvccVersion</column-name><column-value><![CDATA[");
+
 		sb.append(getMvccVersion());
+
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>ctCollectionId</column-name><column-value><![CDATA[");
+
 		sb.append(getCtCollectionId());
+
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>ctsContentId</column-name><column-value><![CDATA[");
+
 		sb.append(getCtsContentId());
+
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>companyId</column-name><column-value><![CDATA[");
+
 		sb.append(getCompanyId());
+
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>repositoryId</column-name><column-value><![CDATA[");
+
 		sb.append(getRepositoryId());
+
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>path</column-name><column-value><![CDATA[");
+
 		sb.append(getPath());
+
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>version</column-name><column-value><![CDATA[");
+
 		sb.append(getVersion());
+
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>size</column-name><column-value><![CDATA[");
+
 		sb.append(getSize());
+
 		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>storeType</column-name><column-value><![CDATA[");
+
 		sb.append(getStoreType());
+
 		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
@@ -735,30 +812,109 @@ public class CTSContentModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTSContent>
-			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
+			_escapedModelProxyProviderFunction =
+				ProxyUtil.getProxyProviderFunction(
+					CTSContent.class, ModelWrapper.class);
 
 	}
-
-	private static boolean _entityCacheEnabled;
-	private static boolean _finderCacheEnabled;
 
 	private long _mvccVersion;
 	private long _ctCollectionId;
 	private long _ctsContentId;
 	private long _companyId;
-	private long _originalCompanyId;
-	private boolean _setOriginalCompanyId;
 	private long _repositoryId;
-	private long _originalRepositoryId;
-	private boolean _setOriginalRepositoryId;
 	private String _path;
-	private String _originalPath;
 	private String _version;
-	private String _originalVersion;
 	private CTSContentDataBlobModel _dataBlobModel;
 	private long _size;
 	private String _storeType;
-	private String _originalStoreType;
+
+	public <T> T getColumnValue(String columnName) {
+		columnName = _attributeNames.getOrDefault(columnName, columnName);
+
+		Function<CTSContent, Object> function = _attributeGetterFunctions.get(
+			columnName);
+
+		if (function == null) {
+			throw new IllegalArgumentException(
+				"No attribute getter function found for " + columnName);
+		}
+
+		return (T)function.apply((CTSContent)this);
+	}
+
+	public <T> T getColumnOriginalValue(String columnName) {
+		if (_columnOriginalValues == null) {
+			return null;
+		}
+
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		return (T)_columnOriginalValues.get(columnName);
+	}
+
+	private void _setColumnOriginalValues() {
+		_columnOriginalValues = new HashMap<String, Object>();
+
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
+		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
+		_columnOriginalValues.put("ctsContentId", _ctsContentId);
+		_columnOriginalValues.put("companyId", _companyId);
+		_columnOriginalValues.put("repositoryId", _repositoryId);
+		_columnOriginalValues.put("path_", _path);
+		_columnOriginalValues.put("version", _version);
+		_columnOriginalValues.put("size_", _size);
+		_columnOriginalValues.put("storeType", _storeType);
+	}
+
+	private static final Map<String, String> _attributeNames;
+
+	static {
+		Map<String, String> attributeNames = new HashMap<>();
+
+		attributeNames.put("path_", "path");
+		attributeNames.put("data_", "data");
+		attributeNames.put("size_", "size");
+
+		_attributeNames = Collections.unmodifiableMap(attributeNames);
+	}
+
+	private transient Map<String, Object> _columnOriginalValues;
+
+	public static long getColumnBitmask(String columnName) {
+		return _columnBitmasks.get(columnName);
+	}
+
+	private static final Map<String, Long> _columnBitmasks;
+
+	static {
+		Map<String, Long> columnBitmasks = new HashMap<>();
+
+		columnBitmasks.put("mvccVersion", 1L);
+
+		columnBitmasks.put("ctCollectionId", 2L);
+
+		columnBitmasks.put("ctsContentId", 4L);
+
+		columnBitmasks.put("companyId", 8L);
+
+		columnBitmasks.put("repositoryId", 16L);
+
+		columnBitmasks.put("path_", 32L);
+
+		columnBitmasks.put("version", 64L);
+
+		columnBitmasks.put("data_", 128L);
+
+		columnBitmasks.put("size_", 256L);
+
+		columnBitmasks.put("storeType", 512L);
+
+		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
+	}
+
 	private long _columnBitmask;
 	private CTSContent _escapedModel;
 

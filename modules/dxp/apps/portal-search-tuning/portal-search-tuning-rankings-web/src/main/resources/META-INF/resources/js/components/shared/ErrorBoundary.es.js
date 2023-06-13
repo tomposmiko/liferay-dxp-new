@@ -18,7 +18,7 @@ import ClayEmptyState, {DISPLAY_STATES} from './ClayEmptyState.es';
 
 class ErrorBoundary extends Component {
 	static propTypes = {
-		component: PropTypes.string
+		component: PropTypes.string,
 	};
 
 	state = {
@@ -32,7 +32,7 @@ class ErrorBoundary extends Component {
 			  )
 			: Liferay.Language.get(
 					'an-error-has-occurred-and-we-were-unable-to-load-the-results'
-			  )
+			  ),
 	};
 
 	static getDerivedStateFromError() {
@@ -46,8 +46,7 @@ class ErrorBoundary extends Component {
 		if (this.props.toast) {
 			openToast({
 				message: this.state.message,
-				title: Liferay.Language.get('error'),
-				type: 'danger'
+				type: 'danger',
 			});
 		}
 	}

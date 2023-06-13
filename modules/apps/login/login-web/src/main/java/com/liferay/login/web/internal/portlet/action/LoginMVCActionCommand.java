@@ -14,7 +14,8 @@
 
 package com.liferay.login.web.internal.portlet.action;
 
-import com.liferay.login.web.internal.constants.LoginPortletKeys;
+import com.liferay.login.web.constants.LoginPortletKeys;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.CompanyMaxUsersException;
 import com.liferay.portal.kernel.exception.CookieNotSupportedException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
@@ -116,12 +117,13 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 		}
 		catch (Exception exception) {
 			if (exception instanceof AuthException) {
-				Throwable cause = exception.getCause();
+				Throwable throwable = exception.getCause();
 
-				if (cause instanceof PasswordExpiredException ||
-					cause instanceof UserLockoutException) {
+				if (throwable instanceof PasswordExpiredException ||
+					throwable instanceof UserLockoutException) {
 
-					SessionErrors.add(actionRequest, cause.getClass(), cause);
+					SessionErrors.add(
+						actionRequest, throwable.getClass(), throwable);
 				}
 				else {
 					if (_log.isInfoEnabled()) {
@@ -217,11 +219,9 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 
 		if (PropsValues.PORTAL_JAAS_ENABLE) {
 			if (Validator.isNotNull(redirect)) {
-				redirect = mainPath.concat(
-					"/portal/protected?redirect="
-				).concat(
-					URLCodec.encodeURL(redirect)
-				);
+				redirect = StringBundler.concat(
+					mainPath, "/portal/protected?redirect=",
+					URLCodec.encodeURL(redirect));
 			}
 			else {
 				redirect = mainPath.concat("/portal/protected");
@@ -237,20 +237,11 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 
 		if (Validator.isNotNull(redirect)) {
 			if (!themeDisplay.isSignedIn()) {
-				LiferayPortletResponse liferayPortletResponse =
-					_portal.getLiferayPortletResponse(actionResponse);
-
-				PortletURL actionURL = liferayPortletResponse.createActionURL(
-					_portal.getPortletId(actionRequest));
-
-				actionURL.setParameter(
-					ActionRequest.ACTION_NAME, "/login/login");
-				actionURL.setParameter(
-					"saveLastPath", Boolean.FALSE.toString());
-				actionURL.setParameter("redirect", redirect);
-
 				actionRequest.setAttribute(
-					WebKeys.REDIRECT, actionURL.toString());
+					WebKeys.REDIRECT,
+					_http.addParameter(
+						_portal.getPathMain() + "/portal/login", "redirect",
+						redirect));
 
 				return;
 			}
@@ -323,6 +314,9 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private AuthenticatedSessionManager _authenticatedSessionManager;
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private Portal _portal;

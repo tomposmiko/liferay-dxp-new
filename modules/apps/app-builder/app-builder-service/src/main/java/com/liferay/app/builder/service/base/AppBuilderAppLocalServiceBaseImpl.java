@@ -16,6 +16,7 @@ package com.liferay.app.builder.service.base;
 
 import com.liferay.app.builder.model.AppBuilderApp;
 import com.liferay.app.builder.service.AppBuilderAppLocalService;
+import com.liferay.app.builder.service.AppBuilderAppLocalServiceUtil;
 import com.liferay.app.builder.service.persistence.AppBuilderAppFinder;
 import com.liferay.app.builder.service.persistence.AppBuilderAppPersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
@@ -23,6 +24,7 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -43,16 +45,20 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -73,11 +79,15 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>AppBuilderAppLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.app.builder.service.AppBuilderAppLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>AppBuilderAppLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>AppBuilderAppLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the app builder app to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AppBuilderAppLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param appBuilderApp the app builder app
 	 * @return the app builder app that was added
@@ -105,6 +115,10 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 	/**
 	 * Deletes the app builder app with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AppBuilderAppLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param appBuilderAppId the primary key of the app builder app
 	 * @return the app builder app that was removed
 	 * @throws PortalException if a app builder app with the primary key could not be found
@@ -120,6 +134,10 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 	/**
 	 * Deletes the app builder app from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AppBuilderAppLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param appBuilderApp the app builder app
 	 * @return the app builder app that was removed
 	 */
@@ -127,6 +145,18 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 	@Override
 	public AppBuilderApp deleteAppBuilderApp(AppBuilderApp appBuilderApp) {
 		return appBuilderAppPersistence.remove(appBuilderApp);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return appBuilderAppPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -360,6 +390,16 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return appBuilderAppPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -368,6 +408,13 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 			(AppBuilderApp)persistedModel);
 	}
 
+	public BasePersistence<AppBuilderApp> getBasePersistence() {
+		return appBuilderAppPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -453,6 +500,10 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 	/**
 	 * Updates the app builder app in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AppBuilderAppLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param appBuilderApp the app builder app
 	 * @return the app builder app that was updated
 	 */
@@ -460,6 +511,11 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 	@Override
 	public AppBuilderApp updateAppBuilderApp(AppBuilderApp appBuilderApp) {
 		return appBuilderAppPersistence.update(appBuilderApp);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -473,6 +529,8 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		appBuilderAppLocalService = (AppBuilderAppLocalService)aopProxy;
+
+		_setLocalServiceUtilService(appBuilderAppLocalService);
 	}
 
 	/**
@@ -514,6 +572,22 @@ public abstract class AppBuilderAppLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		AppBuilderAppLocalService appBuilderAppLocalService) {
+
+		try {
+			Field field = AppBuilderAppLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, appBuilderAppLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

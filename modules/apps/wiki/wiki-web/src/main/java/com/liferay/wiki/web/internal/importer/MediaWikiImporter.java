@@ -49,12 +49,12 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.wiki.configuration.WikiGroupServiceConfiguration;
+import com.liferay.wiki.constants.WikiPageConstants;
 import com.liferay.wiki.exception.ImportFilesException;
 import com.liferay.wiki.exception.NoSuchPageException;
 import com.liferay.wiki.importer.WikiImporter;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
-import com.liferay.wiki.model.WikiPageConstants;
 import com.liferay.wiki.service.WikiPageLocalService;
 import com.liferay.wiki.validator.WikiPageTitleValidator;
 import com.liferay.wiki.web.internal.translator.MediaWikiToCreoleTranslator;
@@ -281,36 +281,38 @@ public class MediaWikiImporter implements WikiImporter {
 
 		String frontPageTitle = MapUtil.getString(options, OPTIONS_FRONT_PAGE);
 
-		if (Validator.isNotNull(frontPageTitle)) {
-			frontPageTitle = _wikiPageTitleValidator.normalize(frontPageTitle);
+		if (Validator.isNull(frontPageTitle)) {
+			return;
+		}
 
-			try {
-				int count = _wikiPageLocalService.getPagesCount(
-					node.getNodeId(), frontPageTitle, true);
+		frontPageTitle = _wikiPageTitleValidator.normalize(frontPageTitle);
 
-				if (count > 0) {
-					ServiceContext serviceContext = new ServiceContext();
+		try {
+			int count = _wikiPageLocalService.getPagesCount(
+				node.getNodeId(), frontPageTitle, true);
 
-					serviceContext.setAddGroupPermissions(true);
-					serviceContext.setAddGuestPermissions(true);
+			if (count > 0) {
+				ServiceContext serviceContext = new ServiceContext();
 
-					_wikiPageLocalService.renamePage(
-						userId, node.getNodeId(), frontPageTitle,
-						_wikiGroupServiceConfiguration.frontPageName(), false,
-						serviceContext);
-				}
+				serviceContext.setAddGroupPermissions(true);
+				serviceContext.setAddGuestPermissions(true);
+
+				_wikiPageLocalService.renamePage(
+					userId, node.getNodeId(), frontPageTitle,
+					_wikiGroupServiceConfiguration.frontPageName(), false,
+					serviceContext);
 			}
-			catch (Exception exception) {
-				if (_log.isWarnEnabled()) {
-					StringBundler sb = new StringBundler(4);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				StringBundler sb = new StringBundler(4);
 
-					sb.append("Could not move ");
-					sb.append(_wikiGroupServiceConfiguration.frontPageName());
-					sb.append(" to the title provided: ");
-					sb.append(frontPageTitle);
+				sb.append("Could not move ");
+				sb.append(_wikiGroupServiceConfiguration.frontPageName());
+				sb.append(" to the title provided: ");
+				sb.append(frontPageTitle);
 
-					_log.warn(sb.toString(), exception);
-				}
+				_log.warn(sb.toString(), exception);
 			}
 		}
 	}
@@ -403,7 +405,7 @@ public class MediaWikiImporter implements WikiImporter {
 
 					inputStreamOVPs.clear();
 
-					percentage = Math.min(50 + (i * 50) / total, 99);
+					percentage = Math.min(50 + ((i * 50) / total), 99);
 
 					if (progressTracker != null) {
 						progressTracker.setPercent(percentage);
@@ -477,7 +479,7 @@ public class MediaWikiImporter implements WikiImporter {
 			title = _wikiPageTitleValidator.normalize(title);
 
 			percentage = Math.min(
-				10 + (i * (maxPercentage - percentage)) / pageElements.size(),
+				10 + ((i * (maxPercentage - percentage)) / pageElements.size()),
 				maxPercentage);
 
 			progressTracker.setPercent(percentage);

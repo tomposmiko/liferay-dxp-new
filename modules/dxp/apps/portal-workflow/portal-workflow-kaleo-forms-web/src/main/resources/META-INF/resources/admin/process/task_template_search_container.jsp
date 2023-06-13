@@ -24,11 +24,10 @@ KaleoProcess kaleoProcess = (KaleoProcess)request.getAttribute(KaleoFormsWebKeys
 long kaleoProcessId = BeanParamUtil.getLong(kaleoProcess, request, "kaleoProcessId");
 
 long ddmStructureId = KaleoFormsUtil.getKaleoProcessDDMStructureId(kaleoProcessId, portletSession);
+
 String workflowDefinition = ParamUtil.getString(request, "workflowDefinition");
 
-String initialStateName = KaleoFormsUtil.getInitialStateName(company.getCompanyId(), workflowDefinition);
-
-KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialStateKaleoTaskFormPair(kaleoProcessId, ddmStructureId, workflowDefinition, initialStateName, portletSession);
+KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialStateKaleoTaskFormPair(kaleoProcessId, ddmStructureId, workflowDefinition, KaleoFormsUtil.getInitialStateName(company.getCompanyId(), workflowDefinition), portletSession);
 %>
 
 <div id="<portlet:namespace />formsSearchContainer">
@@ -113,7 +112,7 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 	Liferay.provide(
 		window,
 		'<portlet:namespace />selectFormTemplate',
-		function(classPK, mode, sessionParamName) {
+		function (classPK, mode, sessionParamName) {
 			Liferay.Util.openDDMPortlet(
 				{
 					basePortletURL:
@@ -121,7 +120,7 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 					classNameId: <%= PortalUtil.getClassNameId(DDMStructure.class) %>,
 					classPK: classPK,
 					dialog: {
-						destroyOnHide: true
+						destroyOnHide: true,
 					},
 					id: 'ddmDialog',
 					mode: mode,
@@ -129,16 +128,16 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 					navigationStartsOn:
 						'<%= DDMNavigationHelper.SELECT_TEMPLATE %>',
 					portletResourceNamespace:
-						'<%= renderResponse.getNamespace() %>',
+						'<%= liferayPortletResponse.getNamespace() %>',
 					refererPortletName: '<%= portletDisplay.getId() %>',
 					resourceClassNameId: <%= scopeClassNameId %>,
 					showBackURL: false,
 					showHeader: false,
 					structureAvailableFields:
-						'<%= renderResponse.getNamespace() + "getAvailableFields" %>',
-					title: '<liferay-ui:message key="form" />'
+						'<%= liferayPortletResponse.getNamespace() + "getAvailableFields" %>',
+					title: '<liferay-ui:message key="form" />',
 				},
-				function(event) {
+				function (event) {
 					var A = AUI();
 
 					var data = {};
@@ -149,13 +148,13 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 						'<portlet:resourceURL id="saveInPortletSession" />',
 						{
 							after: {
-								success: function() {
+								success: function () {
 									window.location = decodeURIComponent(
 										'<%= HtmlUtil.escapeURL(backURL) %>'
 									);
-								}
+								},
 							},
-							data: data
+							data: data,
 						}
 					);
 				}
@@ -167,7 +166,7 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 	Liferay.provide(
 		window,
 		'<portlet:namespace />editFormTemplate',
-		function(uri) {
+		function (uri) {
 			var A = AUI();
 
 			var WIN = A.config.win;
@@ -176,7 +175,7 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 				id: A.guid(),
 				refreshWindow: WIN,
 				title: '<liferay-ui:message key="forms" />',
-				uri: uri
+				uri: uri,
 			});
 		},
 		['liferay-util']
@@ -185,7 +184,7 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 	Liferay.provide(
 		window,
 		'<portlet:namespace />unassignForm',
-		function(event) {
+		function (event) {
 			var A = AUI();
 
 			var taskFormPairsParamName = event.taskFormPairsParamName;
@@ -196,13 +195,13 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 
 			A.io.request('<portlet:resourceURL id="saveInPortletSession" />', {
 				after: {
-					success: function() {
+					success: function () {
 						window.location = decodeURIComponent(
 							'<%= HtmlUtil.escapeURL(backURL) %>'
 						);
-					}
+					},
 				},
-				data: data
+				data: data,
 			});
 		},
 		['aui-base']

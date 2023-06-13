@@ -17,6 +17,8 @@ package com.liferay.headless.form.client.dto.v1_0;
 import com.liferay.headless.form.client.function.UnsafeSupplier;
 import com.liferay.headless.form.client.serdes.v1_0.FormDocumentSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class FormDocument {
+public class FormDocument implements Cloneable, Serializable {
+
+	public static FormDocument toDTO(String json) {
+		return FormDocumentSerDes.toDTO(json);
+	}
 
 	public String getContentUrl() {
 		return contentUrl;
@@ -214,6 +220,11 @@ public class FormDocument {
 	}
 
 	protected String title;
+
+	@Override
+	public FormDocument clone() throws CloneNotSupportedException {
+		return (FormDocument)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

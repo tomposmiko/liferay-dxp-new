@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistryUtil;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -40,12 +41,15 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.powwow.model.PowwowMeeting;
 import com.liferay.powwow.service.PowwowMeetingLocalService;
+import com.liferay.powwow.service.PowwowMeetingLocalServiceUtil;
 import com.liferay.powwow.service.persistence.PowwowMeetingFinder;
 import com.liferay.powwow.service.persistence.PowwowMeetingPersistence;
 import com.liferay.powwow.service.persistence.PowwowParticipantPersistence;
 import com.liferay.powwow.service.persistence.PowwowServerPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -69,11 +73,15 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>PowwowMeetingLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.powwow.service.PowwowMeetingLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>PowwowMeetingLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>PowwowMeetingLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the powwow meeting to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowMeetingLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowMeeting the powwow meeting
 	 * @return the powwow meeting that was added
@@ -101,6 +109,10 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 	/**
 	 * Deletes the powwow meeting with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowMeetingLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param powwowMeetingId the primary key of the powwow meeting
 	 * @return the powwow meeting that was removed
 	 * @throws PortalException if a powwow meeting with the primary key could not be found
@@ -115,6 +127,10 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 
 	/**
 	 * Deletes the powwow meeting from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowMeetingLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowMeeting the powwow meeting
 	 * @return the powwow meeting that was removed
@@ -279,6 +295,16 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return powwowMeetingPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -287,6 +313,13 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 			(PowwowMeeting)persistedModel);
 	}
 
+	public BasePersistence<PowwowMeeting> getBasePersistence() {
+		return powwowMeetingPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -322,6 +355,10 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 
 	/**
 	 * Updates the powwow meeting in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowMeetingLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowMeeting the powwow meeting
 	 * @return the powwow meeting that was updated
@@ -611,11 +648,15 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 		PersistedModelLocalServiceRegistryUtil.register(
 			"com.liferay.powwow.model.PowwowMeeting",
 			powwowMeetingLocalService);
+
+		_setLocalServiceUtilService(powwowMeetingLocalService);
 	}
 
 	public void destroy() {
 		PersistedModelLocalServiceRegistryUtil.unregister(
 			"com.liferay.powwow.model.PowwowMeeting");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -657,6 +698,22 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		PowwowMeetingLocalService powwowMeetingLocalService) {
+
+		try {
+			Field field = PowwowMeetingLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, powwowMeetingLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

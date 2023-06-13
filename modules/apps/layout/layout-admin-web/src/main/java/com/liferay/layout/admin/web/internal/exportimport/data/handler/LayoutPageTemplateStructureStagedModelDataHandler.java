@@ -17,18 +17,20 @@ package com.liferay.layout.admin.web.internal.exportimport.data.handler;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
+import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureRelLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -79,6 +81,8 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 
 		importedLayoutPageTemplateStructure.setGroupId(
 			portletDataContext.getScopeGroupId());
+		importedLayoutPageTemplateStructure.setCompanyId(
+			portletDataContext.getCompanyId());
 
 		Element element = portletDataContext.getImportDataElement(
 			importedLayoutPageTemplateStructure);
@@ -92,6 +96,14 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
 				layoutPageTemplateStructure.getUuid(),
 				portletDataContext.getScopeGroupId());
+
+		if (existingLayoutPageTemplateStructure == null) {
+			existingLayoutPageTemplateStructure =
+				_layoutPageTemplateStructureLocalService.
+					fetchLayoutPageTemplateStructure(
+						portletDataContext.getScopeGroupId(),
+						importedLayoutPageTemplateStructure.getClassPK());
+		}
 
 		if ((existingLayoutPageTemplateStructure == null) ||
 			!portletDataContext.isDataStrategyMirror()) {
@@ -116,13 +128,6 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 		portletDataContext.importClassedModel(
 			layoutPageTemplateStructure, importedLayoutPageTemplateStructure);
 
-		if (existingLayoutPageTemplateStructure != null) {
-			_layoutPageTemplateStructureRelLocalService.
-				deleteLayoutPageTemplateStructureRels(
-					existingLayoutPageTemplateStructure.
-						getLayoutPageTemplateStructureId());
-		}
-
 		_importLayoutPageTemplateStructureRels(
 			portletDataContext, layoutPageTemplateStructure);
 	}
@@ -142,7 +147,7 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 	private void _exportLayoutPageTemplateStructureRels(
 			PortletDataContext portletDataContext,
 			LayoutPageTemplateStructure layoutPageTemplateStructure)
-		throws PortletDataException {
+		throws Exception {
 
 		List<LayoutPageTemplateStructureRel> layoutPageTemplateStructureRels =
 			_layoutPageTemplateStructureRelLocalService.
@@ -163,7 +168,20 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 	private void _importLayoutPageTemplateStructureRels(
 			PortletDataContext portletDataContext,
 			LayoutPageTemplateStructure layoutPageTemplateStructure)
-		throws PortletDataException {
+		throws Exception {
+
+		Map<Long, Long> layoutPageTemplateStructureIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				LayoutPageTemplateStructure.class);
+
+		long layoutPageTemplateStructureId = MapUtil.getLong(
+			layoutPageTemplateStructureIds,
+			layoutPageTemplateStructure.getLayoutPageTemplateStructureId(),
+			layoutPageTemplateStructure.getLayoutPageTemplateStructureId());
+
+		_layoutPageTemplateStructureRelLocalService.
+			deleteLayoutPageTemplateStructureRels(
+				layoutPageTemplateStructureId);
 
 		List<Element> layoutPageTemplateStructureRelElements =
 			portletDataContext.getReferenceDataElements(
@@ -178,6 +196,10 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 				portletDataContext, layoutPageTemplateStructureRelElement);
 		}
 	}
+
+	@Reference
+	private LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureLocalService;
 
 	@Reference
 	private LayoutPageTemplateStructureRelLocalService

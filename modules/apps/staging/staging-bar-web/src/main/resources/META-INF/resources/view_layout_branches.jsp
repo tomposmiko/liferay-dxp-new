@@ -43,7 +43,7 @@ request.setAttribute("view_layout_branches.jsp-currenttLayoutBranchId", String.v
 	<liferay-util:param name="navigationName" value="page-variations" />
 </liferay-util:include>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<liferay-ui:success key="pageVariationAdded" message="page-variation-was-added" />
 	<liferay-ui:success key="pageVariationDeleted" message="page-variation-was-deleted" />
 	<liferay-ui:success key="pageVariationUpdated" message="page-variation-was-updated" />
@@ -52,7 +52,7 @@ request.setAttribute("view_layout_branches.jsp-currenttLayoutBranchId", String.v
 
 	<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, stagingGroup, ActionKeys.ADD_LAYOUT_BRANCH) %>">
 		<liferay-portlet:renderURL var="addLayoutBranchURL">
-			<portlet:param name="mvcRenderCommandName" value="editLayoutBranch" />
+			<portlet:param name="mvcRenderCommandName" value="/staging_bar/edit_layout_branch" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="layoutRevisionId" value="<%= String.valueOf(layoutRevisionId) %>" />
 		</liferay-portlet:renderURL>
@@ -118,11 +118,11 @@ request.setAttribute("view_layout_branches.jsp-currenttLayoutBranchId", String.v
 			/>
 		</liferay-ui:search-container>
 	</div>
-</div>
+</clay:container-fluid>
 
 <aui:script position="inline" use="liferay-staging-branch">
 	Liferay.StagingBar.init({
 		namespace: '<portlet:namespace />',
-		portletId: '<%= portletDisplay.getId() %>'
+		portletId: '<%= portletDisplay.getId() %>',
 	});
 </aui:script>

@@ -22,15 +22,13 @@ String redirect = ParamUtil.getString(request, "redirect", String.valueOf(render
 ConfigurationModel configurationModel = (ConfigurationModel)request.getAttribute(ConfigurationAdminWebKeys.FACTORY_CONFIGURATION_MODEL);
 ConfigurationModelIterator configurationModelIterator = (ConfigurationModelIterator)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MODEL_ITERATOR);
 
-ConfigurationScopeDisplayContext configurationScopeDisplayContext = ConfigurationScopeDisplayContextFactory.create(renderRequest);
-
 PortalUtil.addPortletBreadcrumbEntry(request, portletDisplay.getPortletDisplayName(), String.valueOf(renderResponse.createRenderURL()));
 
 ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay = (ConfigurationCategoryMenuDisplay)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_CATEGORY_MENU_DISPLAY);
 
 ConfigurationCategoryDisplay configurationCategoryDisplay = configurationCategoryMenuDisplay.getConfigurationCategoryDisplay();
 
-String categoryDisplayName = HtmlUtil.escape(configurationCategoryDisplay.getCategoryLabel(locale));
+String categoryDisplayName = configurationCategoryDisplay.getCategoryLabel(locale);
 
 String viewCategoryHREF = ConfigurationCategoryUtil.getHREF(configurationCategoryMenuDisplay, liferayPortletResponse, renderRequest, renderResponse);
 
@@ -52,39 +50,47 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(categoryDisplayName);
 %>
 
-<div class="container-fluid container-fluid-max-xl">
-	<div class="col-12">
+<clay:container-fluid>
+	<clay:col
+		size="12"
+	>
 		<liferay-ui:breadcrumb
 			showCurrentGroup="<%= false %>"
 			showGuestGroup="<%= false %>"
 			showLayout="<%= false %>"
 			showParentGroups="<%= false %>"
 		/>
-	</div>
-</div>
+	</clay:col>
+</clay:container-fluid>
 
-<div class="container-fluid container-fluid-max-xl">
-	<div class="row">
-		<div class="col-md-3">
+<clay:container-fluid>
+	<clay:row>
+		<clay:col
+			md="3"
+		>
 			<liferay-util:include page="/configuration_category_menu.jsp" servletContext="<%= application %>" />
-		</div>
+		</clay:col>
 
-		<div class="col-md-9">
-			<div class="sheet sheet-lg">
-				<div class="autofit-row">
-					<div class="autofit-col">
+		<clay:col
+			md="9"
+		>
+			<clay:sheet
+				size="full"
+			>
+				<clay:content-row>
+					<clay:content-col>
 						<h2><%= factoryConfigurationModelName %></h2>
-					</div>
+					</clay:content-col>
 
-					<c:if test="<%= (configurationModelIterator.getTotal() > 0) && ExtendedObjectClassDefinition.Scope.SYSTEM.equals(configurationScopeDisplayContext.getScope()) %>">
-						<div class="autofit-col">
+					<c:if test="<%= configurationModelIterator.getTotal() > 0 %>">
+						<clay:content-col>
 							<liferay-ui:icon-menu
 								cssClass="float-right"
 								direction="right"
 								markupView="lexicon"
 								showWhenSingleIcon="<%= true %>"
 							>
-								<portlet:resourceURL id="export" var="exportEntriesURL">
+								<portlet:resourceURL id="/configuration_admin/export_configuration" var="exportEntriesURL">
 									<portlet:param name="redirect" value="<%= currentURL %>" />
 									<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
 								</portlet:resourceURL>
@@ -95,33 +101,42 @@ renderResponse.setTitle(categoryDisplayName);
 									url="<%= exportEntriesURL %>"
 								/>
 							</liferay-ui:icon-menu>
-						</div>
+						</clay:content-col>
 					</c:if>
-				</div>
+				</clay:content-row>
 
-				<h3 class="autofit-row sheet-subtitle">
-					<span class="autofit-col autofit-col-expand">
+				<clay:content-row
+					containerElement="h3"
+					cssClass="sheet-subtitle"
+				>
+					<clay:content-col
+						containerElement="span"
+						expand="<%= true %>"
+					>
 						<span class="heading-text">
 							<liferay-ui:message key="configuration-entries" />
 						</span>
-					</span>
-					<span class="autofit-col">
+					</clay:content-col>
+
+					<clay:content-col
+						containerElement="span"
+					>
 						<span class="heading-end">
 							<portlet:renderURL var="createFactoryConfigURL">
-								<portlet:param name="mvcRenderCommandName" value="/edit_configuration" />
+								<portlet:param name="mvcRenderCommandName" value="/configuration_admin/edit_configuration" />
 								<portlet:param name="redirect" value="<%= currentURL %>" />
-								<portlet:param name="factoryPid" value="<%= configurationModel.getID() %>" />
+								<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
 							</portlet:renderURL>
 
 							<a class="btn btn-secondary btn-sm" href="<%= createFactoryConfigURL %>"><liferay-ui:message key="add" /></a>
 						</span>
-					</span>
-				</h3>
+					</clay:content-col>
+				</clay:content-row>
 
 				<%
 				PortletURL iteratorURL = renderResponse.createRenderURL();
 
-				iteratorURL.setParameter("mvcRenderCommandName", "/view_factory_instances");
+				iteratorURL.setParameter("mvcRenderCommandName", "/configuration_admin/view_factory_instances");
 				iteratorURL.setParameter("factoryPid", configurationModel.getFactoryPid());
 				%>
 
@@ -140,7 +155,7 @@ renderResponse.setTitle(categoryDisplayName);
 						modelVar="curConfigurationModel"
 					>
 						<portlet:renderURL var="editFactoryInstanceURL">
-							<portlet:param name="mvcRenderCommandName" value="/edit_configuration" />
+							<portlet:param name="mvcRenderCommandName" value="/configuration_admin/edit_configuration" />
 							<portlet:param name="redirect" value="<%= currentURL %>" />
 							<portlet:param name="factoryPid" value="<%= curConfigurationModel.getFactoryPid() %>" />
 							<portlet:param name="pid" value="<%= curConfigurationModel.getID() %>" />
@@ -157,6 +172,10 @@ renderResponse.setTitle(categoryDisplayName);
 							if (attributeDefinition != null) {
 								columnLabel = attributeDefinition.getName();
 							}
+						}
+
+						if (componentResourceBundle != null) {
+							columnLabel = LanguageUtil.get(componentResourceBundle, columnLabel);
 						}
 						%>
 
@@ -183,7 +202,7 @@ renderResponse.setTitle(categoryDisplayName);
 								/>
 
 								<c:if test="<%= curConfigurationModel.hasConfiguration() %>">
-									<portlet:actionURL name="deleteConfiguration" var="deleteConfigActionURL">
+									<portlet:actionURL name="/configuration_admin/delete_configuration" var="deleteConfigActionURL">
 										<portlet:param name="redirect" value="<%= currentURL %>" />
 										<portlet:param name="factoryPid" value="<%= curConfigurationModel.getFactoryPid() %>" />
 										<portlet:param name="pid" value="<%= curConfigurationModel.getID() %>" />
@@ -195,18 +214,16 @@ renderResponse.setTitle(categoryDisplayName);
 										url="<%= deleteConfigActionURL %>"
 									/>
 
-									<c:if test="<%= ExtendedObjectClassDefinition.Scope.SYSTEM.equals(configurationScopeDisplayContext.getScope()) %>">
-										<portlet:resourceURL id="export" var="exportURL">
-											<portlet:param name="factoryPid" value="<%= curConfigurationModel.getFactoryPid() %>" />
-											<portlet:param name="pid" value="<%= curConfigurationModel.getID() %>" />
-										</portlet:resourceURL>
+									<portlet:resourceURL id="/configuration_admin/export_configuration" var="exportURL">
+										<portlet:param name="factoryPid" value="<%= curConfigurationModel.getFactoryPid() %>" />
+										<portlet:param name="pid" value="<%= curConfigurationModel.getID() %>" />
+									</portlet:resourceURL>
 
-										<liferay-ui:icon
-											message="export"
-											method="get"
-											url="<%= exportURL %>"
-										/>
-									</c:if>
+									<liferay-ui:icon
+										message="export"
+										method="get"
+										url="<%= exportURL %>"
+									/>
 								</c:if>
 							</liferay-ui:icon-menu>
 						</liferay-ui:search-container-column-text>
@@ -217,7 +234,7 @@ renderResponse.setTitle(categoryDisplayName);
 						searchResultCssClass="show-quick-actions-on-hover table table-autofit"
 					/>
 				</liferay-ui:search-container>
-			</div>
-		</div>
-	</div>
-</div>
+			</clay:sheet>
+		</clay:col>
+	</clay:row>
+</clay:container-fluid>

@@ -14,6 +14,13 @@
 
 export default [
 	{
+		description: 'Add a short description for this page.',
+		localizedDescription: {
+			en_US: 'Add a short description for this page.',
+		},
+		localizedTitle: {
+			en_US: 'Page title',
+		},
 		rows: [
 			{
 				columns: [
@@ -21,16 +28,17 @@ export default [
 						fields: [
 							{
 								fieldName: 'radio',
+								instanceId: '123njndk1',
 								label: 'Radio Field',
 								options: [
 									{
 										label: 'Option 1',
-										value: 'option1'
+										value: 'option1',
 									},
 									{
 										label: 'Option 2',
-										value: 'option2'
-									}
+										value: 'option2',
+									},
 								],
 								settingsContext: {
 									pages: [
@@ -49,44 +57,44 @@ export default [
 																			{
 																				rows: [
 																					{
-																						columns: []
-																					}
-																				]
-																			}
-																		]
-																	}
+																						columns: [],
+																					},
+																				],
+																			},
+																		],
+																	},
 																},
 																{
 																	fieldName:
-																		'name'
+																		'name',
 																},
 																{
 																	fieldName:
-																		'required'
+																		'required',
 																},
 																{
 																	fieldName:
-																		'type'
-																}
+																		'type',
+																},
 															],
-															size: 12
-														}
-													]
-												}
-											]
-										}
-									]
+															size: 12,
+														},
+													],
+												},
+											],
+										},
+									],
 								},
-								type: 'radio'
-							}
+								type: 'radio',
+							},
 						],
-						size: 3
+						size: 3,
 					},
 					{
 						fields: [],
-						size: 9
-					}
-				]
+						size: 9,
+					},
+				],
 			},
 			{
 				columns: [
@@ -94,54 +102,57 @@ export default [
 						fields: [
 							{
 								fieldName: 'text1',
+								instanceId: '1fnjndk1',
 								label: 'Text Field 1',
 								required: true,
 								settingsContext: {
-									pages: []
+									pages: [],
 								},
-								type: 'text'
+								type: 'text',
 							},
 							{
 								fieldName: 'text2',
+								instanceId: '193jndk1',
 								label: 'Text Field 2',
 								required: true,
 								settingsContext: {
-									pages: []
+									pages: [],
 								},
-								type: 'text'
-							}
+								type: 'text',
+							},
 						],
-						size: 4
+						size: 4,
 					},
 					{
 						fields: [
 							{
 								fieldName: 'select',
+								instanceId: '1fnjfqk1',
 								label: 'Select Field',
 								options: [
 									{
 										label: 'Option 1',
-										value: 'option1'
+										value: 'option1',
 									},
 									{
 										label: 'Option 2',
-										value: 'option2'
-									}
+										value: 'option2',
+									},
 								],
 								required: true,
 								settingsContext: {
-									pages: []
+									pages: [],
 								},
-								type: 'select'
-							}
+								type: 'select',
+							},
 						],
-						size: 6
+						size: 6,
 					},
 					{
 						fields: [],
-						size: 2
-					}
-				]
+						size: 2,
+					},
+				],
 			},
 			{
 				columns: [
@@ -149,17 +160,18 @@ export default [
 						fields: [
 							{
 								fieldName: 'date',
+								instanceId: '1ffqwjndk1',
 								label: 'Date Field',
 								required: true,
 								settingsContext: {
-									pages: []
+									pages: [],
 								},
-								type: 'date'
-							}
+								type: 'date',
+							},
 						],
-						size: 12
-					}
-				]
+						size: 12,
+					},
+				],
 			},
 			{
 				columns: [
@@ -167,19 +179,20 @@ export default [
 						fields: [
 							{
 								fieldName: 'numeric',
+								instanceId: '1ljqjndk1',
 								label: 'Numeric Field',
 								required: true,
 								settingsContext: {
-									pages: []
+									pages: [],
 								},
-								type: 'numeric'
-							}
+								type: 'numeric',
+							},
 						],
-						size: 12
-					}
-				]
-			}
+						size: 12,
+					},
+				],
+			},
 		],
-		title: 'Untitled name'
-	}
+		title: 'Page title',
+	},
 ];

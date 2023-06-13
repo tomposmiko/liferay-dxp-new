@@ -29,8 +29,14 @@ String kbArticleDisplayStyle = kbSectionPortletInstanceConfiguration.kbArticleDi
 			<portlet:param name="mvcPath" value="/section/view.jsp" />
 		</liferay-portlet:renderURL>
 
+		<%
+		KBObjectsSearch kbObjectsSearch = new KBObjectsSearch(renderRequest, iteratorURL);
+
+		kbObjectsSearch.setOrderByComparator(new KBOrderByComparatorAdapter<>(KBUtil.getKBArticleOrderByComparator(kbObjectsSearch.getOrderByCol(), kbObjectsSearch.getOrderByType())));
+		%>
+
 		<liferay-ui:search-container
-			searchContainer="<%= new KBObjectsSearch(renderRequest, iteratorURL) %>"
+			searchContainer="<%= kbObjectsSearch %>"
 			total="<%= KBArticleServiceUtil.getSectionsKBArticlesCount(scopeGroupId, kbArticlesSections, WorkflowConstants.STATUS_APPROVED) %>"
 		>
 			<liferay-ui:search-container-results
@@ -116,7 +122,7 @@ String kbArticleDisplayStyle = kbSectionPortletInstanceConfiguration.kbArticleDi
 		%>
 
 		<div class="alert alert-info">
-			<%= LanguageUtil.get(resourceBundle, "please-configure-the-list-of-available-sections-in-system-settings-collaboration-knowledge-base-to-enable-this-widget") %>
+			<%= LanguageUtil.get(resourceBundle, "please-configure-the-list-of-available-sections-in-system-settings-knowledge-base-knowledge-base-section-to-enable-this-widget") %>
 		</div>
 	</c:otherwise>
 </c:choose>

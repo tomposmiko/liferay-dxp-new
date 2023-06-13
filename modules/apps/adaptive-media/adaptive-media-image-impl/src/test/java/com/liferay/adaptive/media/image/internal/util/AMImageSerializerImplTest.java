@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.InputStream;
 
@@ -40,6 +41,8 @@ import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -48,6 +51,11 @@ import org.mockito.Mockito;
  * @author Sergio González
  */
 public class AMImageSerializerImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -60,13 +68,13 @@ public class AMImageSerializerImplTest {
 	public void testDeserialize() throws Exception {
 		JSONObject jsonObject = JSONUtil.put("uri", "http://localhost");
 
-		JSONObject attributesJSONObject = JSONUtil.put(
-			AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT.getName(), "200"
-		).put(
-			AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH.getName(), "300"
-		);
-
-		jsonObject.put("attributes", attributesJSONObject);
+		jsonObject.put(
+			"attributes",
+			JSONUtil.put(
+				AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT.getName(), "200"
+			).put(
+				AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH.getName(), "300"
+			));
 
 		AMImageSerializer amImageSerializer = new AMImageSerializerImpl();
 
@@ -133,14 +141,14 @@ public class AMImageSerializerImplTest {
 
 	@Test
 	public void testSerialize() throws Exception {
-		Map<String, String> properties = HashMapBuilder.put(
-			AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT.getName(), "200"
-		).put(
-			AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH.getName(), "300"
-		).build();
-
 		AdaptiveMedia<AMImageProcessor> adaptiveMedia = new AMImage(
-			() -> null, AMImageAttributeMapping.fromProperties(properties),
+			() -> null,
+			AMImageAttributeMapping.fromProperties(
+				HashMapBuilder.put(
+					AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT.getName(), "200"
+				).put(
+					AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH.getName(), "300"
+				).build()),
 			new URI("http://localhost"));
 
 		AMImageSerializer amImageSerializer = new AMImageSerializerImpl();

@@ -45,9 +45,9 @@ catch (Exception e) {
 }
 %>
 
-<liferay-portlet:renderURL var="generatePasswordUrl" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>" />
+<liferay-portlet:renderURL var="generatePasswordURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>" />
 
-<aui:form action="<%= generatePasswordUrl %>" method="post" name="fm">
+<aui:form action="<%= generatePasswordURL %>" method="post" name="fm">
 	<aui:fieldset>
 		<aui:field-wrapper label="password-settings">
 			<aui:input name="numbers" type="checkbox" value="<%= numbers %>" />
@@ -84,15 +84,15 @@ catch (Exception e) {
 
 	parentNode.plug(A.Plugin.ParseContent);
 
-	form.on('submit', function(event) {
+	form.on('submit', function (event) {
 		Liferay.Util.fetch(form.getAttribute('action'), {
 			body: new FormData(form.getDOM()),
-			method: 'POST'
+			method: 'POST',
 		})
-			.then(function(response) {
+			.then(function (response) {
 				return response.text();
 			})
-			.then(function(response) {
+			.then(function (response) {
 				parentNode.setContent(response);
 			});
 

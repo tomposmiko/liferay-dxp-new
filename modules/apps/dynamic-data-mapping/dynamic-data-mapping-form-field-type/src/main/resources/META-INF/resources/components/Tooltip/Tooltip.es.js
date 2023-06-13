@@ -22,7 +22,7 @@ import {Align} from 'metal-position';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 
-import templates from './Tooltip.soy.js';
+import templates from './Tooltip.soy';
 
 const POSITIONS = ['top', 'left', 'right', 'bottom'];
 
@@ -56,6 +56,7 @@ class Tooltip extends Component {
 Soy.register(Tooltip, templates);
 
 Tooltip.STATE = {
+
 	/**
 	 * @default undefined
 	 * @instance
@@ -99,7 +100,7 @@ Tooltip.STATE = {
 	 * @type {?(string|undefined)}
 	 */
 
-	text: Config.string().required()
+	text: Config.string().required(),
 };
 
 export default Tooltip;

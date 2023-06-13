@@ -17,6 +17,8 @@ package com.liferay.data.engine.rest.client.dto.v2_0;
 import com.liferay.data.engine.rest.client.function.UnsafeSupplier;
 import com.liferay.data.engine.rest.client.serdes.v2_0.DataListViewSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -28,7 +30,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class DataListView {
+public class DataListView implements Cloneable, Serializable {
+
+	public static DataListView toDTO(String json) {
+		return DataListViewSerDes.toDTO(json);
+	}
 
 	public Map<String, Object> getAppliedFilters() {
 		return appliedFilters;
@@ -238,6 +244,11 @@ public class DataListView {
 	}
 
 	protected Long userId;
+
+	@Override
+	public DataListView clone() throws CloneNotSupportedException {
+		return (DataListView)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

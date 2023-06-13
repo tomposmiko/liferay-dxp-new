@@ -14,7 +14,8 @@
 
 package com.liferay.saml.opensaml.integration.internal.servlet.profile;
 
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.saml.constants.SamlWebKeys;
 import com.liferay.saml.opensaml.integration.internal.BaseSamlTestCase;
 import com.liferay.saml.opensaml.integration.internal.util.OpenSamlUtil;
@@ -36,6 +37,8 @@ import java.util.zip.DeflaterOutputStream;
 import org.apache.xml.security.algorithms.JCEMapper;
 
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -54,6 +57,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
  * @author Mika Koivisto
  */
 public class XMLSecurityTest extends BaseSamlTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
@@ -104,9 +112,8 @@ public class XMLSecurityTest extends BaseSamlTestCase {
 	public void testXMLBombBillionLaughs() throws Exception {
 		String redirectURL = getAuthnRequestRedirectURL();
 
-		AuthnRequest authnRequest = getAuthnRequest(redirectURL);
-
-		String authnRequestXML = OpenSamlUtil.marshall(authnRequest);
+		String authnRequestXML = OpenSamlUtil.marshall(
+			getAuthnRequest(redirectURL));
 
 		String samlMessageXML = authnRequestXML.substring(38);
 
@@ -121,8 +128,8 @@ public class XMLSecurityTest extends BaseSamlTestCase {
 				lol += "&lol" + (i - 1) + ";";
 			}
 
-			authnRequestXML =
-				authnRequestXML + " <!ENTITY lol" + i + " \"" + lol + "\">\n";
+			authnRequestXML = StringBundler.concat(
+				authnRequestXML, " <!ENTITY lol", i, " \"", lol, "\">\n");
 		}
 
 		authnRequestXML += "]>" + samlMessageXML;
@@ -138,9 +145,8 @@ public class XMLSecurityTest extends BaseSamlTestCase {
 	public void testXMLBombQuadraticBlowup() throws Exception {
 		String redirectURL = getAuthnRequestRedirectURL();
 
-		AuthnRequest authnRequest = getAuthnRequest(redirectURL);
-
-		String authnRequestXML = OpenSamlUtil.marshall(authnRequest);
+		String authnRequestXML = OpenSamlUtil.marshall(
+			getAuthnRequest(redirectURL));
 
 		String samlMessageXML = authnRequestXML.substring(38);
 
@@ -173,9 +179,8 @@ public class XMLSecurityTest extends BaseSamlTestCase {
 	public void testXXEGeneralEntities1() throws Exception {
 		String redirectURL = getAuthnRequestRedirectURL();
 
-		AuthnRequest authnRequest = getAuthnRequest(redirectURL);
-
-		String authnRequestXML = OpenSamlUtil.marshall(authnRequest);
+		String authnRequestXML = OpenSamlUtil.marshall(
+			getAuthnRequest(redirectURL));
 
 		StringBundler sb = new StringBundler(4);
 
@@ -197,9 +202,8 @@ public class XMLSecurityTest extends BaseSamlTestCase {
 	public void testXXEGeneralEntities2() throws Exception {
 		String redirectURL = getAuthnRequestRedirectURL();
 
-		AuthnRequest authnRequest = getAuthnRequest(redirectURL);
-
-		String authnRequestXML = OpenSamlUtil.marshall(authnRequest);
+		String authnRequestXML = OpenSamlUtil.marshall(
+			getAuthnRequest(redirectURL));
 
 		StringBundler sb = new StringBundler(5);
 
@@ -222,9 +226,8 @@ public class XMLSecurityTest extends BaseSamlTestCase {
 	public void testXXEParameterEntities() throws Exception {
 		String redirectURL = getAuthnRequestRedirectURL();
 
-		AuthnRequest authnRequest = getAuthnRequest(redirectURL);
-
-		String authnRequestXML = OpenSamlUtil.marshall(authnRequest);
+		String authnRequestXML = OpenSamlUtil.marshall(
+			getAuthnRequest(redirectURL));
 
 		StringBundler sb = new StringBundler(4);
 
@@ -311,7 +314,7 @@ public class XMLSecurityTest extends BaseSamlTestCase {
 			_webSsoProfileImpl.decodeAuthnRequest(
 				mockHttpServletRequest, mockHttpServletResponse);
 
-		MessageContext samlMessageContext =
+		MessageContext<?> samlMessageContext =
 			samlSsoRequestContext.getSAMLMessageContext();
 
 		InOutOperationContext<AuthnRequest, ?> inOutOperationContext =
@@ -355,7 +358,7 @@ public class XMLSecurityTest extends BaseSamlTestCase {
 		return mockHttpServletResponse.getRedirectedUrl();
 	}
 
-	private static Base64.Encoder _getEncoder() {
+	private Base64.Encoder _getEncoder() {
 		Base64.Encoder encoder = Base64.getEncoder();
 
 		return encoder.withoutPadding();

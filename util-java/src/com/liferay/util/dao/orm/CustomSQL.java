@@ -104,25 +104,15 @@ public class CustomSQL {
 		int pos = sql.indexOf(_GROUP_BY_CLAUSE);
 
 		if (pos != -1) {
-			return sql.substring(
-				0, pos + 1
-			).concat(
-				criteria
-			).concat(
-				sql.substring(pos + 1)
-			);
+			return StringBundler.concat(
+				sql.substring(0, pos + 1), criteria, sql.substring(pos + 1));
 		}
 
 		pos = sql.indexOf(_ORDER_BY_CLAUSE);
 
 		if (pos != -1) {
-			return sql.substring(
-				0, pos + 1
-			).concat(
-				criteria
-			).concat(
-				sql.substring(pos + 1)
-			);
+			return StringBundler.concat(
+				sql.substring(0, pos + 1), criteria, sql.substring(pos + 1));
 		}
 
 		return sql.concat(criteria);
@@ -376,12 +366,10 @@ public class CustomSQL {
 	public void reloadCustomSQL() throws SQLException {
 		PortalUtil.initCustomSQL();
 
-		Connection con = DataAccess.getConnection();
-
 		String functionIsNull = PortalUtil.getCustomSQLFunctionIsNull();
 		String functionIsNotNull = PortalUtil.getCustomSQLFunctionIsNotNull();
 
-		try {
+		try (Connection con = DataAccess.getConnection()) {
 			if (Validator.isNotNull(functionIsNull) &&
 				Validator.isNotNull(functionIsNotNull)) {
 
@@ -479,9 +467,6 @@ public class CustomSQL {
 		catch (Exception exception) {
 			_log.error(exception, exception);
 		}
-		finally {
-			DataAccess.cleanUp(con);
-		}
 
 		try {
 			Class<?> clazz = getClass();
@@ -559,9 +544,7 @@ public class CustomSQL {
 				});
 		}
 
-		sql = replaceIsNull(sql);
-
-		return sql;
+		return replaceIsNull(sql);
 	}
 
 	public String replaceGroupBy(String sql, String groupBy) {
@@ -580,24 +563,16 @@ public class CustomSQL {
 				sql = sql.concat(groupBy);
 			}
 			else {
-				sql = sql.substring(
-					0, x + _GROUP_BY_CLAUSE.length()
-				).concat(
-					groupBy
-				).concat(
-					sql.substring(y)
-				);
+				sql = StringBundler.concat(
+					sql.substring(0, x + _GROUP_BY_CLAUSE.length()), groupBy,
+					sql.substring(y));
 			}
 		}
 		else {
 			int y = sql.indexOf(_ORDER_BY_CLAUSE);
 
 			if (y == -1) {
-				sql = sql.concat(
-					_GROUP_BY_CLAUSE
-				).concat(
-					groupBy
-				);
+				sql = StringBundler.concat(sql, _GROUP_BY_CLAUSE, groupBy);
 			}
 			else {
 				StringBundler sb = new StringBundler(4);
@@ -642,11 +617,10 @@ public class CustomSQL {
 		}
 
 		if (ArrayUtil.isEmpty(values)) {
-			return StringUtil.replace(
-				sql, oldSqlSB.toString(), StringPool.BLANK);
+			return StringUtil.removeSubstring(sql, oldSqlSB.toString());
 		}
 
-		StringBundler newSqlSB = new StringBundler(values.length * 4 + 3);
+		StringBundler newSqlSB = new StringBundler((values.length * 4) + 3);
 
 		newSqlSB.append(StringPool.OPEN_PARENTHESIS);
 
@@ -688,11 +662,10 @@ public class CustomSQL {
 		}
 
 		if (ArrayUtil.isEmpty(values)) {
-			return StringUtil.replace(
-				sql, oldSqlSB.toString(), StringPool.BLANK);
+			return StringUtil.removeSubstring(sql, oldSqlSB.toString());
 		}
 
-		StringBundler newSqlSB = new StringBundler(values.length * 4 + 3);
+		StringBundler newSqlSB = new StringBundler((values.length * 4) + 3);
 
 		newSqlSB.append(StringPool.OPEN_PARENTHESIS);
 
@@ -736,7 +709,7 @@ public class CustomSQL {
 			oldSqlSB.append(" [$AND_OR_CONNECTOR$]");
 		}
 
-		StringBundler newSqlSB = new StringBundler(values.length * 6 + 2);
+		StringBundler newSqlSB = new StringBundler((values.length * 6) + 2);
 
 		newSqlSB.append(StringPool.OPEN_PARENTHESIS);
 
@@ -762,12 +735,14 @@ public class CustomSQL {
 			sql, oldSqlSB.toString(), newSqlSB.toString());
 	}
 
-	public String replaceOrderBy(String sql, OrderByComparator<?> obc) {
-		if (obc == null) {
+	public String replaceOrderBy(
+		String sql, OrderByComparator<?> orderByComparator) {
+
+		if (orderByComparator == null) {
 			return sql;
 		}
 
-		String orderBy = obc.getOrderBy();
+		String orderBy = orderByComparator.getOrderBy();
 
 		int pos = sql.indexOf(_ORDER_BY_CLAUSE);
 
@@ -777,11 +752,7 @@ public class CustomSQL {
 			sql = sql.concat(orderBy);
 		}
 		else {
-			sql = sql.concat(
-				_ORDER_BY_CLAUSE
-			).concat(
-				orderBy
-			);
+			sql = StringBundler.concat(sql, _ORDER_BY_CLAUSE, orderBy);
 		}
 
 		return sql;
@@ -891,8 +862,10 @@ public class CustomSQL {
 			ClassLoader classLoader, String source, Map<String, String> sqlPool)
 		throws Exception {
 
-		try (InputStream is = classLoader.getResourceAsStream(source)) {
-			if (is == null) {
+		try (InputStream inputStream = classLoader.getResourceAsStream(
+				source)) {
+
+			if (inputStream == null) {
 				return;
 			}
 
@@ -900,7 +873,7 @@ public class CustomSQL {
 				_log.debug("Loading " + source);
 			}
 
-			Document document = UnsecureSAXReaderUtil.read(is);
+			Document document = UnsecureSAXReaderUtil.read(inputStream);
 
 			Element rootElement = document.getRootElement();
 

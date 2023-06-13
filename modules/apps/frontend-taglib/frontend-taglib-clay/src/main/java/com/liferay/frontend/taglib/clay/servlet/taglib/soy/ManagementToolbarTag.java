@@ -27,12 +27,14 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +55,33 @@ public class ManagementToolbarTag extends BaseClayTag {
 		}
 
 		Map<String, Object> context = getContext();
+
+		List<DropdownItem> filterDropdownItems =
+			(List<DropdownItem>)context.get("filterItems");
+
+		if (filterDropdownItems != null) {
+			filterDropdownItems.forEach(
+				filterDropdownItem -> {
+					List<DropdownItem> items =
+						(List<DropdownItem>)filterDropdownItem.get("items");
+
+					if (items != null) {
+						items.forEach(
+							item -> item.setLabel(
+								HtmlUtil.escapeAttribute(
+									(String)item.get("label"))));
+					}
+				});
+		}
+
+		List<LabelItem> filterLabelItems = (List<LabelItem>)context.get(
+			"filterLabels");
+
+		if (filterLabelItems != null) {
+			filterLabelItems.forEach(
+				labelItem -> labelItem.setLabel(
+					HtmlUtil.escapeAttribute((String)labelItem.get("label"))));
+		}
 
 		String searchContainerId = (String)context.get("searchContainerId");
 
@@ -85,9 +114,7 @@ public class ManagementToolbarTag extends BaseClayTag {
 		if (searchFormMethod.equals("GET") &&
 			Validator.isNotNull(searchActionURL)) {
 
-			Map<String, Object> searchData = _getSearchData(searchActionURL);
-
-			putValue("searchData", searchData);
+			putValue("searchData", _getSearchData(searchActionURL));
 
 			String contentRenderer = GetterUtil.getString(
 				context.get("contentRenderer"),
@@ -134,7 +161,8 @@ public class ManagementToolbarTag extends BaseClayTag {
 			setShowResultsBar(true);
 		}
 		else {
-			List filterLabels = (List)context.get("filterLabels");
+			List<LabelItem> filterLabels = (List<LabelItem>)context.get(
+				"filterLabels");
 
 			if ((filterLabels != null) && !filterLabels.isEmpty()) {
 				setShowResultsBar(true);
@@ -438,8 +466,8 @@ public class ManagementToolbarTag extends BaseClayTag {
 		}
 	}
 
-	private Map<String, Object> _getSearchData(String searchActionURL) {
-		Map<String, Object> searchData = new HashMap<>();
+	private Map<String, List<Object>> _getSearchData(String searchActionURL) {
+		Map<String, List<Object>> searchData = new HashMap<>();
 
 		String[] parameters = StringUtil.split(
 			HttpUtil.getQueryString(searchActionURL), CharPool.AMPERSAND);
@@ -458,6 +486,10 @@ public class ManagementToolbarTag extends BaseClayTag {
 
 			String parameterName = parameterParts[0];
 
+			if (parameterName.contains(StringPool.PERIOD)) {
+				continue;
+			}
+
 			String parameterValue = StringPool.BLANK;
 
 			if (parameterParts.length > 1) {
@@ -466,7 +498,15 @@ public class ManagementToolbarTag extends BaseClayTag {
 
 			parameterValue = HttpUtil.decodeURL(parameterValue);
 
-			searchData.put(parameterName, parameterValue);
+			List<Object> parameterValues = searchData.get(parameterName);
+
+			if (parameterValues == null) {
+				parameterValues = new LinkedList<>();
+
+				searchData.put(parameterName, parameterValues);
+			}
+
+			parameterValues.add(parameterValue);
 		}
 
 		return searchData;

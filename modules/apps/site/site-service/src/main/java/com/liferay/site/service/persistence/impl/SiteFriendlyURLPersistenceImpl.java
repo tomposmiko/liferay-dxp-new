@@ -16,6 +16,7 @@ package com.liferay.site.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -26,36 +27,47 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.site.exception.NoSuchFriendlyURLException;
 import com.liferay.site.model.SiteFriendlyURL;
+import com.liferay.site.model.SiteFriendlyURLTable;
 import com.liferay.site.model.impl.SiteFriendlyURLImpl;
 import com.liferay.site.model.impl.SiteFriendlyURLModelImpl;
 import com.liferay.site.service.persistence.SiteFriendlyURLPersistence;
+import com.liferay.site.service.persistence.SiteFriendlyURLUtil;
 import com.liferay.site.service.persistence.impl.constants.SitePersistenceConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -202,54 +214,54 @@ public class SiteFriendlyURLPersistenceImpl
 		}
 
 		if (list == null) {
-			StringBundler query = null;
+			StringBundler sb = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
+				sb = new StringBundler(
 					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
-				query = new StringBundler(3);
+				sb = new StringBundler(3);
 			}
 
-			query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
 			boolean bindUuid = false;
 
 			if (uuid.isEmpty()) {
-				query.append(_FINDER_COLUMN_UUID_UUID_3);
+				sb.append(_FINDER_COLUMN_UUID_UUID_3);
 			}
 			else {
 				bindUuid = true;
 
-				query.append(_FINDER_COLUMN_UUID_UUID_2);
+				sb.append(_FINDER_COLUMN_UUID_UUID_2);
 			}
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
 			else {
-				query.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
+				sb.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindUuid) {
-					qPos.add(uuid);
+					queryPos.add(uuid);
 				}
 
 				list = (List<SiteFriendlyURL>)QueryUtil.list(
-					q, getDialect(), start, end);
+					query, getDialect(), start, end);
 
 				cacheResult(list);
 
@@ -258,10 +270,6 @@ public class SiteFriendlyURLPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(finderPath, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -292,16 +300,16 @@ public class SiteFriendlyURLPersistenceImpl
 			return siteFriendlyURL;
 		}
 
-		StringBundler msg = new StringBundler(4);
+		StringBundler sb = new StringBundler(4);
 
-		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("uuid=");
-		msg.append(uuid);
+		sb.append("uuid=");
+		sb.append(uuid);
 
-		msg.append("}");
+		sb.append("}");
 
-		throw new NoSuchFriendlyURLException(msg.toString());
+		throw new NoSuchFriendlyURLException(sb.toString());
 	}
 
 	/**
@@ -344,16 +352,16 @@ public class SiteFriendlyURLPersistenceImpl
 			return siteFriendlyURL;
 		}
 
-		StringBundler msg = new StringBundler(4);
+		StringBundler sb = new StringBundler(4);
 
-		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("uuid=");
-		msg.append(uuid);
+		sb.append("uuid=");
+		sb.append(uuid);
 
-		msg.append("}");
+		sb.append("}");
 
-		throw new NoSuchFriendlyURLException(msg.toString());
+		throw new NoSuchFriendlyURLException(sb.toString());
 	}
 
 	/**
@@ -432,28 +440,28 @@ public class SiteFriendlyURLPersistenceImpl
 		OrderByComparator<SiteFriendlyURL> orderByComparator,
 		boolean previous) {
 
-		StringBundler query = null;
+		StringBundler sb = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
+			sb = new StringBundler(
 				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			sb = new StringBundler(3);
 		}
 
-		query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+		sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
 		boolean bindUuid = false;
 
 		if (uuid.isEmpty()) {
-			query.append(_FINDER_COLUMN_UUID_UUID_3);
+			sb.append(_FINDER_COLUMN_UUID_UUID_3);
 		}
 		else {
 			bindUuid = true;
 
-			query.append(_FINDER_COLUMN_UUID_UUID_2);
+			sb.append(_FINDER_COLUMN_UUID_UUID_2);
 		}
 
 		if (orderByComparator != null) {
@@ -461,72 +469,72 @@ public class SiteFriendlyURLPersistenceImpl
 				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
-				query.append(WHERE_AND);
+				sb.append(WHERE_AND);
 			}
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
-				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByConditionFields[i]);
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
 					else {
-						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
 					}
 				}
 				else {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(WHERE_GREATER_THAN);
+						sb.append(WHERE_GREATER_THAN);
 					}
 					else {
-						query.append(WHERE_LESSER_THAN);
+						sb.append(WHERE_LESSER_THAN);
 					}
 				}
 			}
 
-			query.append(ORDER_BY_CLAUSE);
+			sb.append(ORDER_BY_CLAUSE);
 
 			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
-				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(ORDER_BY_ASC_HAS_NEXT);
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
 					}
 					else {
-						query.append(ORDER_BY_DESC_HAS_NEXT);
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
 					}
 				}
 				else {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(ORDER_BY_ASC);
+						sb.append(ORDER_BY_ASC);
 					}
 					else {
-						query.append(ORDER_BY_DESC);
+						sb.append(ORDER_BY_DESC);
 					}
 				}
 			}
 		}
 		else {
-			query.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
+			sb.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
 		}
 
-		String sql = query.toString();
+		String sql = sb.toString();
 
-		Query q = session.createQuery(sql);
+		Query query = session.createQuery(sql);
 
-		q.setFirstResult(0);
-		q.setMaxResults(2);
+		query.setFirstResult(0);
+		query.setMaxResults(2);
 
-		QueryPos qPos = QueryPos.getInstance(q);
+		QueryPos queryPos = QueryPos.getInstance(query);
 
 		if (bindUuid) {
-			qPos.add(uuid);
+			queryPos.add(uuid);
 		}
 
 		if (orderByComparator != null) {
@@ -534,11 +542,11 @@ public class SiteFriendlyURLPersistenceImpl
 					orderByComparator.getOrderByConditionValues(
 						siteFriendlyURL)) {
 
-				qPos.add(orderByConditionValue);
+				queryPos.add(orderByConditionValue);
 			}
 		}
 
-		List<SiteFriendlyURL> list = q.list();
+		List<SiteFriendlyURL> list = query.list();
 
 		if (list.size() == 2) {
 			return list.get(1);
@@ -579,43 +587,41 @@ public class SiteFriendlyURLPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(2);
+			StringBundler sb = new StringBundler(2);
 
-			query.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
 
 			boolean bindUuid = false;
 
 			if (uuid.isEmpty()) {
-				query.append(_FINDER_COLUMN_UUID_UUID_3);
+				sb.append(_FINDER_COLUMN_UUID_UUID_3);
 			}
 			else {
 				bindUuid = true;
 
-				query.append(_FINDER_COLUMN_UUID_UUID_2);
+				sb.append(_FINDER_COLUMN_UUID_UUID_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindUuid) {
-					qPos.add(uuid);
+					queryPos.add(uuid);
 				}
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -650,23 +656,23 @@ public class SiteFriendlyURLPersistenceImpl
 		SiteFriendlyURL siteFriendlyURL = fetchByUUID_G(uuid, groupId);
 
 		if (siteFriendlyURL == null) {
-			StringBundler msg = new StringBundler(6);
+			StringBundler sb = new StringBundler(6);
 
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			msg.append("uuid=");
-			msg.append(uuid);
+			sb.append("uuid=");
+			sb.append(uuid);
 
-			msg.append(", groupId=");
-			msg.append(groupId);
+			sb.append(", groupId=");
+			sb.append(groupId);
 
-			msg.append("}");
+			sb.append("}");
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(msg.toString());
+				_log.debug(sb.toString());
 			}
 
-			throw new NoSuchFriendlyURLException(msg.toString());
+			throw new NoSuchFriendlyURLException(sb.toString());
 		}
 
 		return siteFriendlyURL;
@@ -722,41 +728,41 @@ public class SiteFriendlyURLPersistenceImpl
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler sb = new StringBundler(4);
 
-			query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
 			boolean bindUuid = false;
 
 			if (uuid.isEmpty()) {
-				query.append(_FINDER_COLUMN_UUID_G_UUID_3);
+				sb.append(_FINDER_COLUMN_UUID_G_UUID_3);
 			}
 			else {
 				bindUuid = true;
 
-				query.append(_FINDER_COLUMN_UUID_G_UUID_2);
+				sb.append(_FINDER_COLUMN_UUID_G_UUID_2);
 			}
 
-			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
+			sb.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindUuid) {
-					qPos.add(uuid);
+					queryPos.add(uuid);
 				}
 
-				qPos.add(groupId);
+				queryPos.add(groupId);
 
-				List<SiteFriendlyURL> list = q.list();
+				List<SiteFriendlyURL> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
@@ -773,11 +779,6 @@ public class SiteFriendlyURLPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(
-						_finderPathFetchByUUID_G, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -827,47 +828,45 @@ public class SiteFriendlyURLPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler sb = new StringBundler(3);
 
-			query.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
 
 			boolean bindUuid = false;
 
 			if (uuid.isEmpty()) {
-				query.append(_FINDER_COLUMN_UUID_G_UUID_3);
+				sb.append(_FINDER_COLUMN_UUID_G_UUID_3);
 			}
 			else {
 				bindUuid = true;
 
-				query.append(_FINDER_COLUMN_UUID_G_UUID_2);
+				sb.append(_FINDER_COLUMN_UUID_G_UUID_2);
 			}
 
-			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
+			sb.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindUuid) {
-					qPos.add(uuid);
+					queryPos.add(uuid);
 				}
 
-				qPos.add(groupId);
+				queryPos.add(groupId);
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -1008,58 +1007,58 @@ public class SiteFriendlyURLPersistenceImpl
 		}
 
 		if (list == null) {
-			StringBundler query = null;
+			StringBundler sb = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
+				sb = new StringBundler(
 					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
-				query = new StringBundler(4);
+				sb = new StringBundler(4);
 			}
 
-			query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
 			boolean bindUuid = false;
 
 			if (uuid.isEmpty()) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+				sb.append(_FINDER_COLUMN_UUID_C_UUID_3);
 			}
 			else {
 				bindUuid = true;
 
-				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+				sb.append(_FINDER_COLUMN_UUID_C_UUID_2);
 			}
 
-			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
 			else {
-				query.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
+				sb.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindUuid) {
-					qPos.add(uuid);
+					queryPos.add(uuid);
 				}
 
-				qPos.add(companyId);
+				queryPos.add(companyId);
 
 				list = (List<SiteFriendlyURL>)QueryUtil.list(
-					q, getDialect(), start, end);
+					query, getDialect(), start, end);
 
 				cacheResult(list);
 
@@ -1068,10 +1067,6 @@ public class SiteFriendlyURLPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(finderPath, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -1104,19 +1099,19 @@ public class SiteFriendlyURLPersistenceImpl
 			return siteFriendlyURL;
 		}
 
-		StringBundler msg = new StringBundler(6);
+		StringBundler sb = new StringBundler(6);
 
-		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("uuid=");
-		msg.append(uuid);
+		sb.append("uuid=");
+		sb.append(uuid);
 
-		msg.append(", companyId=");
-		msg.append(companyId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 
-		msg.append("}");
+		sb.append("}");
 
-		throw new NoSuchFriendlyURLException(msg.toString());
+		throw new NoSuchFriendlyURLException(sb.toString());
 	}
 
 	/**
@@ -1164,19 +1159,19 @@ public class SiteFriendlyURLPersistenceImpl
 			return siteFriendlyURL;
 		}
 
-		StringBundler msg = new StringBundler(6);
+		StringBundler sb = new StringBundler(6);
 
-		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("uuid=");
-		msg.append(uuid);
+		sb.append("uuid=");
+		sb.append(uuid);
 
-		msg.append(", companyId=");
-		msg.append(companyId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 
-		msg.append("}");
+		sb.append("}");
 
-		throw new NoSuchFriendlyURLException(msg.toString());
+		throw new NoSuchFriendlyURLException(sb.toString());
 	}
 
 	/**
@@ -1260,117 +1255,117 @@ public class SiteFriendlyURLPersistenceImpl
 		long companyId, OrderByComparator<SiteFriendlyURL> orderByComparator,
 		boolean previous) {
 
-		StringBundler query = null;
+		StringBundler sb = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
+			sb = new StringBundler(
 				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(4);
+			sb = new StringBundler(4);
 		}
 
-		query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+		sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
 		boolean bindUuid = false;
 
 		if (uuid.isEmpty()) {
-			query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+			sb.append(_FINDER_COLUMN_UUID_C_UUID_3);
 		}
 		else {
 			bindUuid = true;
 
-			query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+			sb.append(_FINDER_COLUMN_UUID_C_UUID_2);
 		}
 
-		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+		sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
 			String[] orderByConditionFields =
 				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
-				query.append(WHERE_AND);
+				sb.append(WHERE_AND);
 			}
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
-				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByConditionFields[i]);
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
 					else {
-						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
 					}
 				}
 				else {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(WHERE_GREATER_THAN);
+						sb.append(WHERE_GREATER_THAN);
 					}
 					else {
-						query.append(WHERE_LESSER_THAN);
+						sb.append(WHERE_LESSER_THAN);
 					}
 				}
 			}
 
-			query.append(ORDER_BY_CLAUSE);
+			sb.append(ORDER_BY_CLAUSE);
 
 			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
-				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(ORDER_BY_ASC_HAS_NEXT);
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
 					}
 					else {
-						query.append(ORDER_BY_DESC_HAS_NEXT);
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
 					}
 				}
 				else {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(ORDER_BY_ASC);
+						sb.append(ORDER_BY_ASC);
 					}
 					else {
-						query.append(ORDER_BY_DESC);
+						sb.append(ORDER_BY_DESC);
 					}
 				}
 			}
 		}
 		else {
-			query.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
+			sb.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
 		}
 
-		String sql = query.toString();
+		String sql = sb.toString();
 
-		Query q = session.createQuery(sql);
+		Query query = session.createQuery(sql);
 
-		q.setFirstResult(0);
-		q.setMaxResults(2);
+		query.setFirstResult(0);
+		query.setMaxResults(2);
 
-		QueryPos qPos = QueryPos.getInstance(q);
+		QueryPos queryPos = QueryPos.getInstance(query);
 
 		if (bindUuid) {
-			qPos.add(uuid);
+			queryPos.add(uuid);
 		}
 
-		qPos.add(companyId);
+		queryPos.add(companyId);
 
 		if (orderByComparator != null) {
 			for (Object orderByConditionValue :
 					orderByComparator.getOrderByConditionValues(
 						siteFriendlyURL)) {
 
-				qPos.add(orderByConditionValue);
+				queryPos.add(orderByConditionValue);
 			}
 		}
 
-		List<SiteFriendlyURL> list = q.list();
+		List<SiteFriendlyURL> list = query.list();
 
 		if (list.size() == 2) {
 			return list.get(1);
@@ -1415,47 +1410,45 @@ public class SiteFriendlyURLPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler sb = new StringBundler(3);
 
-			query.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
 
 			boolean bindUuid = false;
 
 			if (uuid.isEmpty()) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+				sb.append(_FINDER_COLUMN_UUID_C_UUID_3);
 			}
 			else {
 				bindUuid = true;
 
-				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+				sb.append(_FINDER_COLUMN_UUID_C_UUID_2);
 			}
 
-			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindUuid) {
-					qPos.add(uuid);
+					queryPos.add(uuid);
 				}
 
-				qPos.add(companyId);
+				queryPos.add(companyId);
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -1480,47 +1473,47 @@ public class SiteFriendlyURLPersistenceImpl
 	private FinderPath _finderPathCountByC_G;
 
 	/**
-	 * Returns all the site friendly urls where companyId = &#63; and groupId = &#63;.
+	 * Returns all the site friendly urls where groupId = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @return the matching site friendly urls
 	 */
 	@Override
-	public List<SiteFriendlyURL> findByC_G(long companyId, long groupId) {
+	public List<SiteFriendlyURL> findByC_G(long groupId, long companyId) {
 		return findByC_G(
-			companyId, groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+			groupId, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
-	 * Returns a range of all the site friendly urls where companyId = &#63; and groupId = &#63;.
+	 * Returns a range of all the site friendly urls where groupId = &#63; and companyId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SiteFriendlyURLModelImpl</code>.
 	 * </p>
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param start the lower bound of the range of site friendly urls
 	 * @param end the upper bound of the range of site friendly urls (not inclusive)
 	 * @return the range of matching site friendly urls
 	 */
 	@Override
 	public List<SiteFriendlyURL> findByC_G(
-		long companyId, long groupId, int start, int end) {
+		long groupId, long companyId, int start, int end) {
 
-		return findByC_G(companyId, groupId, start, end, null);
+		return findByC_G(groupId, companyId, start, end, null);
 	}
 
 	/**
-	 * Returns an ordered range of all the site friendly urls where companyId = &#63; and groupId = &#63;.
+	 * Returns an ordered range of all the site friendly urls where groupId = &#63; and companyId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SiteFriendlyURLModelImpl</code>.
 	 * </p>
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param start the lower bound of the range of site friendly urls
 	 * @param end the upper bound of the range of site friendly urls (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1528,22 +1521,22 @@ public class SiteFriendlyURLPersistenceImpl
 	 */
 	@Override
 	public List<SiteFriendlyURL> findByC_G(
-		long companyId, long groupId, int start, int end,
+		long groupId, long companyId, int start, int end,
 		OrderByComparator<SiteFriendlyURL> orderByComparator) {
 
 		return findByC_G(
-			companyId, groupId, start, end, orderByComparator, true);
+			groupId, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
-	 * Returns an ordered range of all the site friendly urls where companyId = &#63; and groupId = &#63;.
+	 * Returns an ordered range of all the site friendly urls where groupId = &#63; and companyId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SiteFriendlyURLModelImpl</code>.
 	 * </p>
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param start the lower bound of the range of site friendly urls
 	 * @param end the upper bound of the range of site friendly urls (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1552,7 +1545,7 @@ public class SiteFriendlyURLPersistenceImpl
 	 */
 	@Override
 	public List<SiteFriendlyURL> findByC_G(
-		long companyId, long groupId, int start, int end,
+		long groupId, long companyId, int start, int end,
 		OrderByComparator<SiteFriendlyURL> orderByComparator,
 		boolean useFinderCache) {
 
@@ -1564,13 +1557,13 @@ public class SiteFriendlyURLPersistenceImpl
 
 			if (useFinderCache) {
 				finderPath = _finderPathWithoutPaginationFindByC_G;
-				finderArgs = new Object[] {companyId, groupId};
+				finderArgs = new Object[] {groupId, companyId};
 			}
 		}
 		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_G;
 			finderArgs = new Object[] {
-				companyId, groupId, start, end, orderByComparator
+				groupId, companyId, start, end, orderByComparator
 			};
 		}
 
@@ -1582,8 +1575,8 @@ public class SiteFriendlyURLPersistenceImpl
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SiteFriendlyURL siteFriendlyURL : list) {
-					if ((companyId != siteFriendlyURL.getCompanyId()) ||
-						(groupId != siteFriendlyURL.getGroupId())) {
+					if ((groupId != siteFriendlyURL.getGroupId()) ||
+						(companyId != siteFriendlyURL.getCompanyId())) {
 
 						list = null;
 
@@ -1594,47 +1587,47 @@ public class SiteFriendlyURLPersistenceImpl
 		}
 
 		if (list == null) {
-			StringBundler query = null;
+			StringBundler sb = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
+				sb = new StringBundler(
 					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
-				query = new StringBundler(4);
+				sb = new StringBundler(4);
 			}
 
-			query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
-			query.append(_FINDER_COLUMN_C_G_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_C_G_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_C_G_GROUPID_2);
+			sb.append(_FINDER_COLUMN_C_G_COMPANYID_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
 			else {
-				query.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
+				sb.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
-				qPos.add(companyId);
+				queryPos.add(groupId);
 
-				qPos.add(groupId);
+				queryPos.add(companyId);
 
 				list = (List<SiteFriendlyURL>)QueryUtil.list(
-					q, getDialect(), start, end);
+					query, getDialect(), start, end);
 
 				cacheResult(list);
 
@@ -1643,10 +1636,6 @@ public class SiteFriendlyURLPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(finderPath, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -1658,57 +1647,57 @@ public class SiteFriendlyURLPersistenceImpl
 	}
 
 	/**
-	 * Returns the first site friendly url in the ordered set where companyId = &#63; and groupId = &#63;.
+	 * Returns the first site friendly url in the ordered set where groupId = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
 	@Override
 	public SiteFriendlyURL findByC_G_First(
-			long companyId, long groupId,
+			long groupId, long companyId,
 			OrderByComparator<SiteFriendlyURL> orderByComparator)
 		throws NoSuchFriendlyURLException {
 
 		SiteFriendlyURL siteFriendlyURL = fetchByC_G_First(
-			companyId, groupId, orderByComparator);
+			groupId, companyId, orderByComparator);
 
 		if (siteFriendlyURL != null) {
 			return siteFriendlyURL;
 		}
 
-		StringBundler msg = new StringBundler(6);
+		StringBundler sb = new StringBundler(6);
 
-		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("companyId=");
-		msg.append(companyId);
+		sb.append("groupId=");
+		sb.append(groupId);
 
-		msg.append(", groupId=");
-		msg.append(groupId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 
-		msg.append("}");
+		sb.append("}");
 
-		throw new NoSuchFriendlyURLException(msg.toString());
+		throw new NoSuchFriendlyURLException(sb.toString());
 	}
 
 	/**
-	 * Returns the first site friendly url in the ordered set where companyId = &#63; and groupId = &#63;.
+	 * Returns the first site friendly url in the ordered set where groupId = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
 	@Override
 	public SiteFriendlyURL fetchByC_G_First(
-		long companyId, long groupId,
+		long groupId, long companyId,
 		OrderByComparator<SiteFriendlyURL> orderByComparator) {
 
 		List<SiteFriendlyURL> list = findByC_G(
-			companyId, groupId, 0, 1, orderByComparator);
+			groupId, companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1718,63 +1707,63 @@ public class SiteFriendlyURLPersistenceImpl
 	}
 
 	/**
-	 * Returns the last site friendly url in the ordered set where companyId = &#63; and groupId = &#63;.
+	 * Returns the last site friendly url in the ordered set where groupId = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
 	@Override
 	public SiteFriendlyURL findByC_G_Last(
-			long companyId, long groupId,
+			long groupId, long companyId,
 			OrderByComparator<SiteFriendlyURL> orderByComparator)
 		throws NoSuchFriendlyURLException {
 
 		SiteFriendlyURL siteFriendlyURL = fetchByC_G_Last(
-			companyId, groupId, orderByComparator);
+			groupId, companyId, orderByComparator);
 
 		if (siteFriendlyURL != null) {
 			return siteFriendlyURL;
 		}
 
-		StringBundler msg = new StringBundler(6);
+		StringBundler sb = new StringBundler(6);
 
-		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("companyId=");
-		msg.append(companyId);
+		sb.append("groupId=");
+		sb.append(groupId);
 
-		msg.append(", groupId=");
-		msg.append(groupId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 
-		msg.append("}");
+		sb.append("}");
 
-		throw new NoSuchFriendlyURLException(msg.toString());
+		throw new NoSuchFriendlyURLException(sb.toString());
 	}
 
 	/**
-	 * Returns the last site friendly url in the ordered set where companyId = &#63; and groupId = &#63;.
+	 * Returns the last site friendly url in the ordered set where groupId = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
 	@Override
 	public SiteFriendlyURL fetchByC_G_Last(
-		long companyId, long groupId,
+		long groupId, long companyId,
 		OrderByComparator<SiteFriendlyURL> orderByComparator) {
 
-		int count = countByC_G(companyId, groupId);
+		int count = countByC_G(groupId, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
 		List<SiteFriendlyURL> list = findByC_G(
-			companyId, groupId, count - 1, count, orderByComparator);
+			groupId, companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1784,18 +1773,18 @@ public class SiteFriendlyURLPersistenceImpl
 	}
 
 	/**
-	 * Returns the site friendly urls before and after the current site friendly url in the ordered set where companyId = &#63; and groupId = &#63;.
+	 * Returns the site friendly urls before and after the current site friendly url in the ordered set where groupId = &#63; and companyId = &#63;.
 	 *
 	 * @param siteFriendlyURLId the primary key of the current site friendly url
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next site friendly url
 	 * @throws NoSuchFriendlyURLException if a site friendly url with the primary key could not be found
 	 */
 	@Override
 	public SiteFriendlyURL[] findByC_G_PrevAndNext(
-			long siteFriendlyURLId, long companyId, long groupId,
+			long siteFriendlyURLId, long groupId, long companyId,
 			OrderByComparator<SiteFriendlyURL> orderByComparator)
 		throws NoSuchFriendlyURLException {
 
@@ -1809,13 +1798,13 @@ public class SiteFriendlyURLPersistenceImpl
 			SiteFriendlyURL[] array = new SiteFriendlyURLImpl[3];
 
 			array[0] = getByC_G_PrevAndNext(
-				session, siteFriendlyURL, companyId, groupId, orderByComparator,
+				session, siteFriendlyURL, groupId, companyId, orderByComparator,
 				true);
 
 			array[1] = siteFriendlyURL;
 
 			array[2] = getByC_G_PrevAndNext(
-				session, siteFriendlyURL, companyId, groupId, orderByComparator,
+				session, siteFriendlyURL, groupId, companyId, orderByComparator,
 				false);
 
 			return array;
@@ -1829,110 +1818,110 @@ public class SiteFriendlyURLPersistenceImpl
 	}
 
 	protected SiteFriendlyURL getByC_G_PrevAndNext(
-		Session session, SiteFriendlyURL siteFriendlyURL, long companyId,
-		long groupId, OrderByComparator<SiteFriendlyURL> orderByComparator,
+		Session session, SiteFriendlyURL siteFriendlyURL, long groupId,
+		long companyId, OrderByComparator<SiteFriendlyURL> orderByComparator,
 		boolean previous) {
 
-		StringBundler query = null;
+		StringBundler sb = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
+			sb = new StringBundler(
 				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(4);
+			sb = new StringBundler(4);
 		}
 
-		query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+		sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
-		query.append(_FINDER_COLUMN_C_G_COMPANYID_2);
+		sb.append(_FINDER_COLUMN_C_G_GROUPID_2);
 
-		query.append(_FINDER_COLUMN_C_G_GROUPID_2);
+		sb.append(_FINDER_COLUMN_C_G_COMPANYID_2);
 
 		if (orderByComparator != null) {
 			String[] orderByConditionFields =
 				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
-				query.append(WHERE_AND);
+				sb.append(WHERE_AND);
 			}
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
-				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByConditionFields[i]);
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
 					else {
-						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
 					}
 				}
 				else {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(WHERE_GREATER_THAN);
+						sb.append(WHERE_GREATER_THAN);
 					}
 					else {
-						query.append(WHERE_LESSER_THAN);
+						sb.append(WHERE_LESSER_THAN);
 					}
 				}
 			}
 
-			query.append(ORDER_BY_CLAUSE);
+			sb.append(ORDER_BY_CLAUSE);
 
 			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
-				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(ORDER_BY_ASC_HAS_NEXT);
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
 					}
 					else {
-						query.append(ORDER_BY_DESC_HAS_NEXT);
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
 					}
 				}
 				else {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(ORDER_BY_ASC);
+						sb.append(ORDER_BY_ASC);
 					}
 					else {
-						query.append(ORDER_BY_DESC);
+						sb.append(ORDER_BY_DESC);
 					}
 				}
 			}
 		}
 		else {
-			query.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
+			sb.append(SiteFriendlyURLModelImpl.ORDER_BY_JPQL);
 		}
 
-		String sql = query.toString();
+		String sql = sb.toString();
 
-		Query q = session.createQuery(sql);
+		Query query = session.createQuery(sql);
 
-		q.setFirstResult(0);
-		q.setMaxResults(2);
+		query.setFirstResult(0);
+		query.setMaxResults(2);
 
-		QueryPos qPos = QueryPos.getInstance(q);
+		QueryPos queryPos = QueryPos.getInstance(query);
 
-		qPos.add(companyId);
+		queryPos.add(groupId);
 
-		qPos.add(groupId);
+		queryPos.add(companyId);
 
 		if (orderByComparator != null) {
 			for (Object orderByConditionValue :
 					orderByComparator.getOrderByConditionValues(
 						siteFriendlyURL)) {
 
-				qPos.add(orderByConditionValue);
+				queryPos.add(orderByConditionValue);
 			}
 		}
 
-		List<SiteFriendlyURL> list = q.list();
+		List<SiteFriendlyURL> list = query.list();
 
 		if (list.size() == 2) {
 			return list.get(1);
@@ -1943,16 +1932,16 @@ public class SiteFriendlyURLPersistenceImpl
 	}
 
 	/**
-	 * Removes all the site friendly urls where companyId = &#63; and groupId = &#63; from the database.
+	 * Removes all the site friendly urls where groupId = &#63; and companyId = &#63; from the database.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 */
 	@Override
-	public void removeByC_G(long companyId, long groupId) {
+	public void removeByC_G(long groupId, long companyId) {
 		for (SiteFriendlyURL siteFriendlyURL :
 				findByC_G(
-					companyId, groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					groupId, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 					null)) {
 
 			remove(siteFriendlyURL);
@@ -1960,51 +1949,49 @@ public class SiteFriendlyURLPersistenceImpl
 	}
 
 	/**
-	 * Returns the number of site friendly urls where companyId = &#63; and groupId = &#63;.
+	 * Returns the number of site friendly urls where groupId = &#63; and companyId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @return the number of matching site friendly urls
 	 */
 	@Override
-	public int countByC_G(long companyId, long groupId) {
+	public int countByC_G(long groupId, long companyId) {
 		FinderPath finderPath = _finderPathCountByC_G;
 
-		Object[] finderArgs = new Object[] {companyId, groupId};
+		Object[] finderArgs = new Object[] {groupId, companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler sb = new StringBundler(3);
 
-			query.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
 
-			query.append(_FINDER_COLUMN_C_G_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_C_G_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_C_G_GROUPID_2);
+			sb.append(_FINDER_COLUMN_C_G_COMPANYID_2);
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
-				qPos.add(companyId);
+				queryPos.add(groupId);
 
-				qPos.add(groupId);
+				queryPos.add(companyId);
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -2015,11 +2002,11 @@ public class SiteFriendlyURLPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_G_COMPANYID_2 =
-		"siteFriendlyURL.companyId = ? AND ";
-
 	private static final String _FINDER_COLUMN_C_G_GROUPID_2 =
-		"siteFriendlyURL.groupId = ?";
+		"siteFriendlyURL.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_G_COMPANYID_2 =
+		"siteFriendlyURL.companyId = ?";
 
 	private FinderPath _finderPathFetchByC_F;
 	private FinderPath _finderPathCountByC_F;
@@ -2039,23 +2026,23 @@ public class SiteFriendlyURLPersistenceImpl
 		SiteFriendlyURL siteFriendlyURL = fetchByC_F(companyId, friendlyURL);
 
 		if (siteFriendlyURL == null) {
-			StringBundler msg = new StringBundler(6);
+			StringBundler sb = new StringBundler(6);
 
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			msg.append("companyId=");
-			msg.append(companyId);
+			sb.append("companyId=");
+			sb.append(companyId);
 
-			msg.append(", friendlyURL=");
-			msg.append(friendlyURL);
+			sb.append(", friendlyURL=");
+			sb.append(friendlyURL);
 
-			msg.append("}");
+			sb.append("}");
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(msg.toString());
+				_log.debug(sb.toString());
 			}
 
-			throw new NoSuchFriendlyURLException(msg.toString());
+			throw new NoSuchFriendlyURLException(sb.toString());
 		}
 
 		return siteFriendlyURL;
@@ -2112,41 +2099,41 @@ public class SiteFriendlyURLPersistenceImpl
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler sb = new StringBundler(4);
 
-			query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
-			query.append(_FINDER_COLUMN_C_F_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_C_F_COMPANYID_2);
 
 			boolean bindFriendlyURL = false;
 
 			if (friendlyURL.isEmpty()) {
-				query.append(_FINDER_COLUMN_C_F_FRIENDLYURL_3);
+				sb.append(_FINDER_COLUMN_C_F_FRIENDLYURL_3);
 			}
 			else {
 				bindFriendlyURL = true;
 
-				query.append(_FINDER_COLUMN_C_F_FRIENDLYURL_2);
+				sb.append(_FINDER_COLUMN_C_F_FRIENDLYURL_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
-				qPos.add(companyId);
+				queryPos.add(companyId);
 
 				if (bindFriendlyURL) {
-					qPos.add(friendlyURL);
+					queryPos.add(friendlyURL);
 				}
 
-				List<SiteFriendlyURL> list = q.list();
+				List<SiteFriendlyURL> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
@@ -2163,10 +2150,6 @@ public class SiteFriendlyURLPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(_finderPathFetchByC_F, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -2216,47 +2199,45 @@ public class SiteFriendlyURLPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler sb = new StringBundler(3);
 
-			query.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
 
-			query.append(_FINDER_COLUMN_C_F_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_C_F_COMPANYID_2);
 
 			boolean bindFriendlyURL = false;
 
 			if (friendlyURL.isEmpty()) {
-				query.append(_FINDER_COLUMN_C_F_FRIENDLYURL_3);
+				sb.append(_FINDER_COLUMN_C_F_FRIENDLYURL_3);
 			}
 			else {
 				bindFriendlyURL = true;
 
-				query.append(_FINDER_COLUMN_C_F_FRIENDLYURL_2);
+				sb.append(_FINDER_COLUMN_C_F_FRIENDLYURL_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
-				qPos.add(companyId);
+				queryPos.add(companyId);
 
 				if (bindFriendlyURL) {
-					qPos.add(friendlyURL);
+					queryPos.add(friendlyURL);
 				}
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -2280,75 +2261,75 @@ public class SiteFriendlyURLPersistenceImpl
 	private FinderPath _finderPathCountByC_G_L;
 
 	/**
-	 * Returns the site friendly url where companyId = &#63; and groupId = &#63; and languageId = &#63; or throws a <code>NoSuchFriendlyURLException</code> if it could not be found.
+	 * Returns the site friendly url where groupId = &#63; and companyId = &#63; and languageId = &#63; or throws a <code>NoSuchFriendlyURLException</code> if it could not be found.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param languageId the language ID
 	 * @return the matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
 	@Override
 	public SiteFriendlyURL findByC_G_L(
-			long companyId, long groupId, String languageId)
+			long groupId, long companyId, String languageId)
 		throws NoSuchFriendlyURLException {
 
 		SiteFriendlyURL siteFriendlyURL = fetchByC_G_L(
-			companyId, groupId, languageId);
+			groupId, companyId, languageId);
 
 		if (siteFriendlyURL == null) {
-			StringBundler msg = new StringBundler(8);
+			StringBundler sb = new StringBundler(8);
 
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			msg.append("companyId=");
-			msg.append(companyId);
+			sb.append("groupId=");
+			sb.append(groupId);
 
-			msg.append(", groupId=");
-			msg.append(groupId);
+			sb.append(", companyId=");
+			sb.append(companyId);
 
-			msg.append(", languageId=");
-			msg.append(languageId);
+			sb.append(", languageId=");
+			sb.append(languageId);
 
-			msg.append("}");
+			sb.append("}");
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(msg.toString());
+				_log.debug(sb.toString());
 			}
 
-			throw new NoSuchFriendlyURLException(msg.toString());
+			throw new NoSuchFriendlyURLException(sb.toString());
 		}
 
 		return siteFriendlyURL;
 	}
 
 	/**
-	 * Returns the site friendly url where companyId = &#63; and groupId = &#63; and languageId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the site friendly url where groupId = &#63; and companyId = &#63; and languageId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param languageId the language ID
 	 * @return the matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
 	@Override
 	public SiteFriendlyURL fetchByC_G_L(
-		long companyId, long groupId, String languageId) {
+		long groupId, long companyId, String languageId) {
 
-		return fetchByC_G_L(companyId, groupId, languageId, true);
+		return fetchByC_G_L(groupId, companyId, languageId, true);
 	}
 
 	/**
-	 * Returns the site friendly url where companyId = &#63; and groupId = &#63; and languageId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the site friendly url where groupId = &#63; and companyId = &#63; and languageId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param languageId the language ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
 	@Override
 	public SiteFriendlyURL fetchByC_G_L(
-		long companyId, long groupId, String languageId,
+		long groupId, long companyId, String languageId,
 		boolean useFinderCache) {
 
 		languageId = Objects.toString(languageId, "");
@@ -2356,7 +2337,7 @@ public class SiteFriendlyURLPersistenceImpl
 		Object[] finderArgs = null;
 
 		if (useFinderCache) {
-			finderArgs = new Object[] {companyId, groupId, languageId};
+			finderArgs = new Object[] {groupId, companyId, languageId};
 		}
 
 		Object result = null;
@@ -2369,8 +2350,8 @@ public class SiteFriendlyURLPersistenceImpl
 		if (result instanceof SiteFriendlyURL) {
 			SiteFriendlyURL siteFriendlyURL = (SiteFriendlyURL)result;
 
-			if ((companyId != siteFriendlyURL.getCompanyId()) ||
-				(groupId != siteFriendlyURL.getGroupId()) ||
+			if ((groupId != siteFriendlyURL.getGroupId()) ||
+				(companyId != siteFriendlyURL.getCompanyId()) ||
 				!Objects.equals(languageId, siteFriendlyURL.getLanguageId())) {
 
 				result = null;
@@ -2378,45 +2359,45 @@ public class SiteFriendlyURLPersistenceImpl
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(5);
+			StringBundler sb = new StringBundler(5);
 
-			query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
-			query.append(_FINDER_COLUMN_C_G_L_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_C_G_L_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_C_G_L_GROUPID_2);
+			sb.append(_FINDER_COLUMN_C_G_L_COMPANYID_2);
 
 			boolean bindLanguageId = false;
 
 			if (languageId.isEmpty()) {
-				query.append(_FINDER_COLUMN_C_G_L_LANGUAGEID_3);
+				sb.append(_FINDER_COLUMN_C_G_L_LANGUAGEID_3);
 			}
 			else {
 				bindLanguageId = true;
 
-				query.append(_FINDER_COLUMN_C_G_L_LANGUAGEID_2);
+				sb.append(_FINDER_COLUMN_C_G_L_LANGUAGEID_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
-				qPos.add(companyId);
+				queryPos.add(groupId);
 
-				qPos.add(groupId);
+				queryPos.add(companyId);
 
 				if (bindLanguageId) {
-					qPos.add(languageId);
+					queryPos.add(languageId);
 				}
 
-				List<SiteFriendlyURL> list = q.list();
+				List<SiteFriendlyURL> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
@@ -2433,11 +2414,6 @@ public class SiteFriendlyURLPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(
-						_finderPathFetchByC_G_L, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -2454,88 +2430,86 @@ public class SiteFriendlyURLPersistenceImpl
 	}
 
 	/**
-	 * Removes the site friendly url where companyId = &#63; and groupId = &#63; and languageId = &#63; from the database.
+	 * Removes the site friendly url where groupId = &#63; and companyId = &#63; and languageId = &#63; from the database.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param languageId the language ID
 	 * @return the site friendly url that was removed
 	 */
 	@Override
 	public SiteFriendlyURL removeByC_G_L(
-			long companyId, long groupId, String languageId)
+			long groupId, long companyId, String languageId)
 		throws NoSuchFriendlyURLException {
 
 		SiteFriendlyURL siteFriendlyURL = findByC_G_L(
-			companyId, groupId, languageId);
+			groupId, companyId, languageId);
 
 		return remove(siteFriendlyURL);
 	}
 
 	/**
-	 * Returns the number of site friendly urls where companyId = &#63; and groupId = &#63; and languageId = &#63;.
+	 * Returns the number of site friendly urls where groupId = &#63; and companyId = &#63; and languageId = &#63;.
 	 *
-	 * @param companyId the company ID
 	 * @param groupId the group ID
+	 * @param companyId the company ID
 	 * @param languageId the language ID
 	 * @return the number of matching site friendly urls
 	 */
 	@Override
-	public int countByC_G_L(long companyId, long groupId, String languageId) {
+	public int countByC_G_L(long groupId, long companyId, String languageId) {
 		languageId = Objects.toString(languageId, "");
 
 		FinderPath finderPath = _finderPathCountByC_G_L;
 
-		Object[] finderArgs = new Object[] {companyId, groupId, languageId};
+		Object[] finderArgs = new Object[] {groupId, companyId, languageId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler sb = new StringBundler(4);
 
-			query.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
 
-			query.append(_FINDER_COLUMN_C_G_L_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_C_G_L_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_C_G_L_GROUPID_2);
+			sb.append(_FINDER_COLUMN_C_G_L_COMPANYID_2);
 
 			boolean bindLanguageId = false;
 
 			if (languageId.isEmpty()) {
-				query.append(_FINDER_COLUMN_C_G_L_LANGUAGEID_3);
+				sb.append(_FINDER_COLUMN_C_G_L_LANGUAGEID_3);
 			}
 			else {
 				bindLanguageId = true;
 
-				query.append(_FINDER_COLUMN_C_G_L_LANGUAGEID_2);
+				sb.append(_FINDER_COLUMN_C_G_L_LANGUAGEID_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
-				qPos.add(companyId);
+				queryPos.add(groupId);
 
-				qPos.add(groupId);
+				queryPos.add(companyId);
 
 				if (bindLanguageId) {
-					qPos.add(languageId);
+					queryPos.add(languageId);
 				}
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -2546,11 +2520,11 @@ public class SiteFriendlyURLPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_G_L_COMPANYID_2 =
-		"siteFriendlyURL.companyId = ? AND ";
-
 	private static final String _FINDER_COLUMN_C_G_L_GROUPID_2 =
 		"siteFriendlyURL.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_G_L_COMPANYID_2 =
+		"siteFriendlyURL.companyId = ? AND ";
 
 	private static final String _FINDER_COLUMN_C_G_L_LANGUAGEID_2 =
 		"siteFriendlyURL.languageId = ?";
@@ -2579,26 +2553,26 @@ public class SiteFriendlyURLPersistenceImpl
 			companyId, friendlyURL, languageId);
 
 		if (siteFriendlyURL == null) {
-			StringBundler msg = new StringBundler(8);
+			StringBundler sb = new StringBundler(8);
 
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			msg.append("companyId=");
-			msg.append(companyId);
+			sb.append("companyId=");
+			sb.append(companyId);
 
-			msg.append(", friendlyURL=");
-			msg.append(friendlyURL);
+			sb.append(", friendlyURL=");
+			sb.append(friendlyURL);
 
-			msg.append(", languageId=");
-			msg.append(languageId);
+			sb.append(", languageId=");
+			sb.append(languageId);
 
-			msg.append("}");
+			sb.append("}");
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(msg.toString());
+				_log.debug(sb.toString());
 			}
 
-			throw new NoSuchFriendlyURLException(msg.toString());
+			throw new NoSuchFriendlyURLException(sb.toString());
 		}
 
 		return siteFriendlyURL;
@@ -2662,56 +2636,56 @@ public class SiteFriendlyURLPersistenceImpl
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(5);
+			StringBundler sb = new StringBundler(5);
 
-			query.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_SELECT_SITEFRIENDLYURL_WHERE);
 
-			query.append(_FINDER_COLUMN_C_F_L_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_C_F_L_COMPANYID_2);
 
 			boolean bindFriendlyURL = false;
 
 			if (friendlyURL.isEmpty()) {
-				query.append(_FINDER_COLUMN_C_F_L_FRIENDLYURL_3);
+				sb.append(_FINDER_COLUMN_C_F_L_FRIENDLYURL_3);
 			}
 			else {
 				bindFriendlyURL = true;
 
-				query.append(_FINDER_COLUMN_C_F_L_FRIENDLYURL_2);
+				sb.append(_FINDER_COLUMN_C_F_L_FRIENDLYURL_2);
 			}
 
 			boolean bindLanguageId = false;
 
 			if (languageId.isEmpty()) {
-				query.append(_FINDER_COLUMN_C_F_L_LANGUAGEID_3);
+				sb.append(_FINDER_COLUMN_C_F_L_LANGUAGEID_3);
 			}
 			else {
 				bindLanguageId = true;
 
-				query.append(_FINDER_COLUMN_C_F_L_LANGUAGEID_2);
+				sb.append(_FINDER_COLUMN_C_F_L_LANGUAGEID_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
-				qPos.add(companyId);
+				queryPos.add(companyId);
 
 				if (bindFriendlyURL) {
-					qPos.add(friendlyURL);
+					queryPos.add(friendlyURL);
 				}
 
 				if (bindLanguageId) {
-					qPos.add(languageId);
+					queryPos.add(languageId);
 				}
 
-				List<SiteFriendlyURL> list = q.list();
+				List<SiteFriendlyURL> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
@@ -2728,11 +2702,6 @@ public class SiteFriendlyURLPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(
-						_finderPathFetchByC_F_L, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -2789,62 +2758,60 @@ public class SiteFriendlyURLPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(4);
+			StringBundler sb = new StringBundler(4);
 
-			query.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
+			sb.append(_SQL_COUNT_SITEFRIENDLYURL_WHERE);
 
-			query.append(_FINDER_COLUMN_C_F_L_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_C_F_L_COMPANYID_2);
 
 			boolean bindFriendlyURL = false;
 
 			if (friendlyURL.isEmpty()) {
-				query.append(_FINDER_COLUMN_C_F_L_FRIENDLYURL_3);
+				sb.append(_FINDER_COLUMN_C_F_L_FRIENDLYURL_3);
 			}
 			else {
 				bindFriendlyURL = true;
 
-				query.append(_FINDER_COLUMN_C_F_L_FRIENDLYURL_2);
+				sb.append(_FINDER_COLUMN_C_F_L_FRIENDLYURL_2);
 			}
 
 			boolean bindLanguageId = false;
 
 			if (languageId.isEmpty()) {
-				query.append(_FINDER_COLUMN_C_F_L_LANGUAGEID_3);
+				sb.append(_FINDER_COLUMN_C_F_L_LANGUAGEID_3);
 			}
 			else {
 				bindLanguageId = true;
 
-				query.append(_FINDER_COLUMN_C_F_L_LANGUAGEID_2);
+				sb.append(_FINDER_COLUMN_C_F_L_LANGUAGEID_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
-				qPos.add(companyId);
+				queryPos.add(companyId);
 
 				if (bindFriendlyURL) {
-					qPos.add(friendlyURL);
+					queryPos.add(friendlyURL);
 				}
 
 				if (bindLanguageId) {
-					qPos.add(languageId);
+					queryPos.add(languageId);
 				}
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -2871,16 +2838,18 @@ public class SiteFriendlyURLPersistenceImpl
 		"(siteFriendlyURL.languageId IS NULL OR siteFriendlyURL.languageId = '')";
 
 	public SiteFriendlyURLPersistenceImpl() {
-		setModelClass(SiteFriendlyURL.class);
-
-		setModelImplClass(SiteFriendlyURLImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(SiteFriendlyURL.class);
+
+		setModelImplClass(SiteFriendlyURLImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(SiteFriendlyURLTable.INSTANCE);
 	}
 
 	/**
@@ -2891,8 +2860,8 @@ public class SiteFriendlyURLPersistenceImpl
 	@Override
 	public void cacheResult(SiteFriendlyURL siteFriendlyURL) {
 		entityCache.putResult(
-			entityCacheEnabled, SiteFriendlyURLImpl.class,
-			siteFriendlyURL.getPrimaryKey(), siteFriendlyURL);
+			SiteFriendlyURLImpl.class, siteFriendlyURL.getPrimaryKey(),
+			siteFriendlyURL);
 
 		finderCache.putResult(
 			_finderPathFetchByUUID_G,
@@ -2911,7 +2880,7 @@ public class SiteFriendlyURLPersistenceImpl
 		finderCache.putResult(
 			_finderPathFetchByC_G_L,
 			new Object[] {
-				siteFriendlyURL.getCompanyId(), siteFriendlyURL.getGroupId(),
+				siteFriendlyURL.getGroupId(), siteFriendlyURL.getCompanyId(),
 				siteFriendlyURL.getLanguageId()
 			},
 			siteFriendlyURL);
@@ -2924,9 +2893,9 @@ public class SiteFriendlyURLPersistenceImpl
 				siteFriendlyURL.getLanguageId()
 			},
 			siteFriendlyURL);
-
-		siteFriendlyURL.resetOriginalValues();
 	}
+
+	private int _valueObjectFinderCacheListThreshold;
 
 	/**
 	 * Caches the site friendly urls in the entity cache if it is enabled.
@@ -2935,15 +2904,20 @@ public class SiteFriendlyURLPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(List<SiteFriendlyURL> siteFriendlyURLs) {
+		if ((_valueObjectFinderCacheListThreshold == 0) ||
+			((_valueObjectFinderCacheListThreshold > 0) &&
+			 (siteFriendlyURLs.size() >
+				 _valueObjectFinderCacheListThreshold))) {
+
+			return;
+		}
+
 		for (SiteFriendlyURL siteFriendlyURL : siteFriendlyURLs) {
 			if (entityCache.getResult(
-					entityCacheEnabled, SiteFriendlyURLImpl.class,
+					SiteFriendlyURLImpl.class,
 					siteFriendlyURL.getPrimaryKey()) == null) {
 
 				cacheResult(siteFriendlyURL);
-			}
-			else {
-				siteFriendlyURL.resetOriginalValues();
 			}
 		}
 	}
@@ -2973,29 +2947,14 @@ public class SiteFriendlyURLPersistenceImpl
 	 */
 	@Override
 	public void clearCache(SiteFriendlyURL siteFriendlyURL) {
-		entityCache.removeResult(
-			entityCacheEnabled, SiteFriendlyURLImpl.class,
-			siteFriendlyURL.getPrimaryKey());
-
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-
-		clearUniqueFindersCache(
-			(SiteFriendlyURLModelImpl)siteFriendlyURL, true);
+		entityCache.removeResult(SiteFriendlyURLImpl.class, siteFriendlyURL);
 	}
 
 	@Override
 	public void clearCache(List<SiteFriendlyURL> siteFriendlyURLs) {
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-
 		for (SiteFriendlyURL siteFriendlyURL : siteFriendlyURLs) {
 			entityCache.removeResult(
-				entityCacheEnabled, SiteFriendlyURLImpl.class,
-				siteFriendlyURL.getPrimaryKey());
-
-			clearUniqueFindersCache(
-				(SiteFriendlyURLModelImpl)siteFriendlyURL, true);
+				SiteFriendlyURLImpl.class, siteFriendlyURL);
 		}
 	}
 
@@ -3006,8 +2965,7 @@ public class SiteFriendlyURLPersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Serializable primaryKey : primaryKeys) {
-			entityCache.removeResult(
-				entityCacheEnabled, SiteFriendlyURLImpl.class, primaryKey);
+			entityCache.removeResult(SiteFriendlyURLImpl.class, primaryKey);
 		}
 	}
 
@@ -3035,8 +2993,8 @@ public class SiteFriendlyURLPersistenceImpl
 			_finderPathFetchByC_F, args, siteFriendlyURLModelImpl, false);
 
 		args = new Object[] {
-			siteFriendlyURLModelImpl.getCompanyId(),
 			siteFriendlyURLModelImpl.getGroupId(),
+			siteFriendlyURLModelImpl.getCompanyId(),
 			siteFriendlyURLModelImpl.getLanguageId()
 		};
 
@@ -3055,103 +3013,6 @@ public class SiteFriendlyURLPersistenceImpl
 			_finderPathCountByC_F_L, args, Long.valueOf(1), false);
 		finderCache.putResult(
 			_finderPathFetchByC_F_L, args, siteFriendlyURLModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(
-		SiteFriendlyURLModelImpl siteFriendlyURLModelImpl,
-		boolean clearCurrent) {
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-				siteFriendlyURLModelImpl.getUuid(),
-				siteFriendlyURLModelImpl.getGroupId()
-			};
-
-			finderCache.removeResult(_finderPathCountByUUID_G, args);
-			finderCache.removeResult(_finderPathFetchByUUID_G, args);
-		}
-
-		if ((siteFriendlyURLModelImpl.getColumnBitmask() &
-			 _finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				siteFriendlyURLModelImpl.getOriginalUuid(),
-				siteFriendlyURLModelImpl.getOriginalGroupId()
-			};
-
-			finderCache.removeResult(_finderPathCountByUUID_G, args);
-			finderCache.removeResult(_finderPathFetchByUUID_G, args);
-		}
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-				siteFriendlyURLModelImpl.getCompanyId(),
-				siteFriendlyURLModelImpl.getFriendlyURL()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_F, args);
-			finderCache.removeResult(_finderPathFetchByC_F, args);
-		}
-
-		if ((siteFriendlyURLModelImpl.getColumnBitmask() &
-			 _finderPathFetchByC_F.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				siteFriendlyURLModelImpl.getOriginalCompanyId(),
-				siteFriendlyURLModelImpl.getOriginalFriendlyURL()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_F, args);
-			finderCache.removeResult(_finderPathFetchByC_F, args);
-		}
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-				siteFriendlyURLModelImpl.getCompanyId(),
-				siteFriendlyURLModelImpl.getGroupId(),
-				siteFriendlyURLModelImpl.getLanguageId()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_G_L, args);
-			finderCache.removeResult(_finderPathFetchByC_G_L, args);
-		}
-
-		if ((siteFriendlyURLModelImpl.getColumnBitmask() &
-			 _finderPathFetchByC_G_L.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				siteFriendlyURLModelImpl.getOriginalCompanyId(),
-				siteFriendlyURLModelImpl.getOriginalGroupId(),
-				siteFriendlyURLModelImpl.getOriginalLanguageId()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_G_L, args);
-			finderCache.removeResult(_finderPathFetchByC_G_L, args);
-		}
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-				siteFriendlyURLModelImpl.getCompanyId(),
-				siteFriendlyURLModelImpl.getFriendlyURL(),
-				siteFriendlyURLModelImpl.getLanguageId()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_F_L, args);
-			finderCache.removeResult(_finderPathFetchByC_F_L, args);
-		}
-
-		if ((siteFriendlyURLModelImpl.getColumnBitmask() &
-			 _finderPathFetchByC_F_L.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				siteFriendlyURLModelImpl.getOriginalCompanyId(),
-				siteFriendlyURLModelImpl.getOriginalFriendlyURL(),
-				siteFriendlyURLModelImpl.getOriginalLanguageId()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_F_L, args);
-			finderCache.removeResult(_finderPathFetchByC_F_L, args);
-		}
 	}
 
 	/**
@@ -3295,25 +3156,25 @@ public class SiteFriendlyURLPersistenceImpl
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		Date now = new Date();
+		Date date = new Date();
 
 		if (isNew && (siteFriendlyURL.getCreateDate() == null)) {
 			if (serviceContext == null) {
-				siteFriendlyURL.setCreateDate(now);
+				siteFriendlyURL.setCreateDate(date);
 			}
 			else {
 				siteFriendlyURL.setCreateDate(
-					serviceContext.getCreateDate(now));
+					serviceContext.getCreateDate(date));
 			}
 		}
 
 		if (!siteFriendlyURLModelImpl.hasSetModifiedDate()) {
 			if (serviceContext == null) {
-				siteFriendlyURL.setModifiedDate(now);
+				siteFriendlyURL.setModifiedDate(date);
 			}
 			else {
 				siteFriendlyURL.setModifiedDate(
-					serviceContext.getModifiedDate(now));
+					serviceContext.getModifiedDate(date));
 			}
 		}
 
@@ -3322,10 +3183,8 @@ public class SiteFriendlyURLPersistenceImpl
 		try {
 			session = openSession();
 
-			if (siteFriendlyURL.isNew()) {
+			if (isNew) {
 				session.save(siteFriendlyURL);
-
-				siteFriendlyURL.setNew(false);
 			}
 			else {
 				siteFriendlyURL = (SiteFriendlyURL)session.merge(
@@ -3339,113 +3198,14 @@ public class SiteFriendlyURLPersistenceImpl
 			closeSession(session);
 		}
 
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-
-		if (!_columnBitmaskEnabled) {
-			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-		}
-		else if (isNew) {
-			Object[] args = new Object[] {siteFriendlyURLModelImpl.getUuid()};
-
-			finderCache.removeResult(_finderPathCountByUuid, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUuid, args);
-
-			args = new Object[] {
-				siteFriendlyURLModelImpl.getUuid(),
-				siteFriendlyURLModelImpl.getCompanyId()
-			};
-
-			finderCache.removeResult(_finderPathCountByUuid_C, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByUuid_C, args);
-
-			args = new Object[] {
-				siteFriendlyURLModelImpl.getCompanyId(),
-				siteFriendlyURLModelImpl.getGroupId()
-			};
-
-			finderCache.removeResult(_finderPathCountByC_G, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByC_G, args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((siteFriendlyURLModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					siteFriendlyURLModelImpl.getOriginalUuid()
-				};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-
-				args = new Object[] {siteFriendlyURLModelImpl.getUuid()};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid, args);
-			}
-
-			if ((siteFriendlyURLModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					siteFriendlyURLModelImpl.getOriginalUuid(),
-					siteFriendlyURLModelImpl.getOriginalCompanyId()
-				};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
-
-				args = new Object[] {
-					siteFriendlyURLModelImpl.getUuid(),
-					siteFriendlyURLModelImpl.getCompanyId()
-				};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByUuid_C, args);
-			}
-
-			if ((siteFriendlyURLModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByC_G.getColumnBitmask()) !=
-					 0) {
-
-				Object[] args = new Object[] {
-					siteFriendlyURLModelImpl.getOriginalCompanyId(),
-					siteFriendlyURLModelImpl.getOriginalGroupId()
-				};
-
-				finderCache.removeResult(_finderPathCountByC_G, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_G, args);
-
-				args = new Object[] {
-					siteFriendlyURLModelImpl.getCompanyId(),
-					siteFriendlyURLModelImpl.getGroupId()
-				};
-
-				finderCache.removeResult(_finderPathCountByC_G, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByC_G, args);
-			}
-		}
-
 		entityCache.putResult(
-			entityCacheEnabled, SiteFriendlyURLImpl.class,
-			siteFriendlyURL.getPrimaryKey(), siteFriendlyURL, false);
+			SiteFriendlyURLImpl.class, siteFriendlyURLModelImpl, false, true);
 
-		clearUniqueFindersCache(siteFriendlyURLModelImpl, false);
 		cacheUniqueFindersCache(siteFriendlyURLModelImpl);
+
+		if (isNew) {
+			siteFriendlyURL.setNew(false);
+		}
 
 		siteFriendlyURL.resetOriginalValues();
 
@@ -3591,19 +3351,19 @@ public class SiteFriendlyURLPersistenceImpl
 		}
 
 		if (list == null) {
-			StringBundler query = null;
+			StringBundler sb = null;
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
+				sb = new StringBundler(
 					2 + (orderByComparator.getOrderByFields().length * 2));
 
-				query.append(_SQL_SELECT_SITEFRIENDLYURL);
+				sb.append(_SQL_SELECT_SITEFRIENDLYURL);
 
 				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
-				sql = query.toString();
+				sql = sb.toString();
 			}
 			else {
 				sql = _SQL_SELECT_SITEFRIENDLYURL;
@@ -3616,10 +3376,10 @@ public class SiteFriendlyURLPersistenceImpl
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
 				list = (List<SiteFriendlyURL>)QueryUtil.list(
-					q, getDialect(), start, end);
+					query, getDialect(), start, end);
 
 				cacheResult(list);
 
@@ -3628,10 +3388,6 @@ public class SiteFriendlyURLPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(finderPath, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -3669,17 +3425,14 @@ public class SiteFriendlyURLPersistenceImpl
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(_SQL_COUNT_SITEFRIENDLYURL);
+				Query query = session.createQuery(_SQL_COUNT_SITEFRIENDLYURL);
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(
 					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
-
 				throw processException(exception);
 			}
 			finally {
@@ -3719,154 +3472,170 @@ public class SiteFriendlyURLPersistenceImpl
 	 * Initializes the site friendly url persistence.
 	 */
 	@Activate
-	public void activate() {
-		SiteFriendlyURLModelImpl.setEntityCacheEnabled(entityCacheEnabled);
-		SiteFriendlyURLModelImpl.setFinderCacheEnabled(finderCacheEnabled);
+	public void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
 
-		_finderPathWithPaginationFindAll = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_argumentsResolverServiceRegistration = _bundleContext.registerService(
+			ArgumentsResolver.class,
+			new SiteFriendlyURLModelArgumentsResolver(),
+			MapUtil.singletonDictionary(
+				"model.class.name", SiteFriendlyURL.class.getName()));
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
+			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathCountAll = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathWithPaginationFindAll = _createFinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
+			new String[0], true);
+
+		_finderPathWithoutPaginationFindAll = _createFinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
+			new String[0], true);
+
+		_finderPathCountAll = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathWithPaginationFindByUuid = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+			},
+			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-			new String[] {String.class.getName()},
-			SiteFriendlyURLModelImpl.UUID_COLUMN_BITMASK);
+			new String[] {String.class.getName()}, new String[] {"uuid_"},
+			true);
 
-		_finderPathCountByUuid = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByUuid = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-			new String[] {String.class.getName()});
+			new String[] {String.class.getName()}, new String[] {"uuid_"},
+			false);
 
-		_finderPathFetchByUUID_G = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathFetchByUUID_G = _createFinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
-			SiteFriendlyURLModelImpl.UUID_COLUMN_BITMASK |
-			SiteFriendlyURLModelImpl.GROUPID_COLUMN_BITMASK);
+			new String[] {"uuid_", "groupId"}, true);
 
-		_finderPathCountByUUID_G = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByUUID_G = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
-			new String[] {String.class.getName(), Long.class.getName()});
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"uuid_", "groupId"}, false);
 
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
 				OrderByComparator.class.getName()
-			});
+			},
+			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
-			SiteFriendlyURLModelImpl.UUID_COLUMN_BITMASK |
-			SiteFriendlyURLModelImpl.COMPANYID_COLUMN_BITMASK);
+			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByUuid_C = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()});
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathWithPaginationFindByC_G = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathWithPaginationFindByC_G = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_G",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
 				OrderByComparator.class.getName()
-			});
+			},
+			new String[] {"groupId", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByC_G = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathWithoutPaginationFindByC_G = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_G",
 			new String[] {Long.class.getName(), Long.class.getName()},
-			SiteFriendlyURLModelImpl.COMPANYID_COLUMN_BITMASK |
-			SiteFriendlyURLModelImpl.GROUPID_COLUMN_BITMASK);
+			new String[] {"groupId", "companyId"}, true);
 
-		_finderPathCountByC_G = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByC_G = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_G",
-			new String[] {Long.class.getName(), Long.class.getName()});
+			new String[] {Long.class.getName(), Long.class.getName()},
+			new String[] {"groupId", "companyId"}, false);
 
-		_finderPathFetchByC_F = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathFetchByC_F = _createFinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_F",
 			new String[] {Long.class.getName(), String.class.getName()},
-			SiteFriendlyURLModelImpl.COMPANYID_COLUMN_BITMASK |
-			SiteFriendlyURLModelImpl.FRIENDLYURL_COLUMN_BITMASK);
+			new String[] {"companyId", "friendlyURL"}, true);
 
-		_finderPathCountByC_F = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByC_F = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_F",
-			new String[] {Long.class.getName(), String.class.getName()});
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "friendlyURL"}, false);
 
-		_finderPathFetchByC_G_L = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathFetchByC_G_L = _createFinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_G_L",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				String.class.getName()
 			},
-			SiteFriendlyURLModelImpl.COMPANYID_COLUMN_BITMASK |
-			SiteFriendlyURLModelImpl.GROUPID_COLUMN_BITMASK |
-			SiteFriendlyURLModelImpl.LANGUAGEID_COLUMN_BITMASK);
+			new String[] {"groupId", "companyId", "languageId"}, true);
 
-		_finderPathCountByC_G_L = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByC_G_L = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_G_L",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				String.class.getName()
-			});
+			},
+			new String[] {"groupId", "companyId", "languageId"}, false);
 
-		_finderPathFetchByC_F_L = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SiteFriendlyURLImpl.class,
+		_finderPathFetchByC_F_L = _createFinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_F_L",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
 				String.class.getName()
 			},
-			SiteFriendlyURLModelImpl.COMPANYID_COLUMN_BITMASK |
-			SiteFriendlyURLModelImpl.FRIENDLYURL_COLUMN_BITMASK |
-			SiteFriendlyURLModelImpl.LANGUAGEID_COLUMN_BITMASK);
+			new String[] {"companyId", "friendlyURL", "languageId"}, true);
 
-		_finderPathCountByC_F_L = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByC_F_L = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_F_L",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
 				String.class.getName()
-			});
+			},
+			new String[] {"companyId", "friendlyURL", "languageId"}, false);
+
+		_setSiteFriendlyURLUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
+		_setSiteFriendlyURLUtilPersistence(null);
+
 		entityCache.removeCache(SiteFriendlyURLImpl.class.getName());
-		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		_argumentsResolverServiceRegistration.unregister();
+
+		for (ServiceRegistration<FinderPath> serviceRegistration :
+				_serviceRegistrations) {
+
+			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSiteFriendlyURLUtilPersistence(
+		SiteFriendlyURLPersistence siteFriendlyURLPersistence) {
+
+		try {
+			Field field = SiteFriendlyURLUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, siteFriendlyURLPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@Override
@@ -3875,12 +3644,6 @@ public class SiteFriendlyURLPersistenceImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
-
-		_columnBitmaskEnabled = GetterUtil.getBoolean(
-			configuration.get(
-				"value.object.column.bitmask.enabled.com.liferay.site.model.SiteFriendlyURL"),
-			true);
 	}
 
 	@Override
@@ -3901,7 +3664,7 @@ public class SiteFriendlyURLPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private boolean _columnBitmaskEnabled;
+	private BundleContext _bundleContext;
 
 	@Reference
 	protected EntityCache entityCache;
@@ -3935,13 +3698,105 @@ public class SiteFriendlyURLPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
 
-	static {
-		try {
-			Class.forName(SitePersistenceConstants.class.getName());
+	private FinderPath _createFinderPath(
+		String cacheName, String methodName, String[] params,
+		String[] columnNames, boolean baseModelResult) {
+
+		FinderPath finderPath = new FinderPath(
+			cacheName, methodName, params, columnNames, baseModelResult);
+
+		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
+			_serviceRegistrations.add(
+				_bundleContext.registerService(
+					FinderPath.class, finderPath,
+					MapUtil.singletonDictionary("cache.name", cacheName)));
 		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
+
+		return finderPath;
+	}
+
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+	private ServiceRegistration<ArgumentsResolver>
+		_argumentsResolverServiceRegistration;
+
+	private static class SiteFriendlyURLModelArgumentsResolver
+		implements ArgumentsResolver {
+
+		@Override
+		public Object[] getArguments(
+			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
+			boolean original) {
+
+			String[] columnNames = finderPath.getColumnNames();
+
+			if ((columnNames == null) || (columnNames.length == 0)) {
+				if (baseModel.isNew()) {
+					return new Object[0];
+				}
+
+				return null;
+			}
+
+			SiteFriendlyURLModelImpl siteFriendlyURLModelImpl =
+				(SiteFriendlyURLModelImpl)baseModel;
+
+			long columnBitmask = siteFriendlyURLModelImpl.getColumnBitmask();
+
+			if (!checkColumn || (columnBitmask == 0)) {
+				return _getValue(
+					siteFriendlyURLModelImpl, columnNames, original);
+			}
+
+			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
+				finderPath);
+
+			if (finderPathColumnBitmask == null) {
+				finderPathColumnBitmask = 0L;
+
+				for (String columnName : columnNames) {
+					finderPathColumnBitmask |=
+						siteFriendlyURLModelImpl.getColumnBitmask(columnName);
+				}
+
+				_finderPathColumnBitmasksCache.put(
+					finderPath, finderPathColumnBitmask);
+			}
+
+			if ((columnBitmask & finderPathColumnBitmask) != 0) {
+				return _getValue(
+					siteFriendlyURLModelImpl, columnNames, original);
+			}
+
+			return null;
 		}
+
+		private static Object[] _getValue(
+			SiteFriendlyURLModelImpl siteFriendlyURLModelImpl,
+			String[] columnNames, boolean original) {
+
+			Object[] arguments = new Object[columnNames.length];
+
+			for (int i = 0; i < arguments.length; i++) {
+				String columnName = columnNames[i];
+
+				if (original) {
+					arguments[i] =
+						siteFriendlyURLModelImpl.getColumnOriginalValue(
+							columnName);
+				}
+				else {
+					arguments[i] = siteFriendlyURLModelImpl.getColumnValue(
+						columnName);
+				}
+			}
+
+			return arguments;
+		}
+
+		private static final Map<FinderPath, Long>
+			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
+
 	}
 
 }

@@ -14,6 +14,7 @@
 
 package com.liferay.document.library.web.internal.lar;
 
+import com.liferay.document.library.constants.DLPortletDataHandlerConstants;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
@@ -72,7 +73,8 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 		RepositoryEntry.class.getName()
 	};
 
-	public static final String NAMESPACE = "document_library";
+	public static final String NAMESPACE =
+		DLPortletDataHandlerConstants.NAMESPACE;
 
 	public static final String SCHEMA_VERSION = "1.0.0";
 
@@ -84,6 +86,11 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 	@Override
 	public String getNamespace() {
 		return NAMESPACE;
+	}
+
+	@Override
+	public String getResourceName() {
+		return DLConstants.RESOURCE_NAME;
 	}
 
 	@Override
@@ -150,7 +157,8 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 			return portletPreferences;
 		}
 
-		_dlAppLocalService.deleteAll(portletDataContext.getScopeGroupId());
+		_dlAppLocalService.deleteAllRepositories(
+			portletDataContext.getScopeGroupId());
 		_dlFileEntryTypeLocalService.deleteFileEntryTypes(
 			portletDataContext.getScopeGroupId());
 

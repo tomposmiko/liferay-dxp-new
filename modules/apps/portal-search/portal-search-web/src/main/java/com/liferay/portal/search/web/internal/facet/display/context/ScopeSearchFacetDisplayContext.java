@@ -14,12 +14,22 @@
 
 package com.liferay.portal.search.web.internal.facet.display.context;
 
+import com.liferay.portal.search.web.internal.site.facet.configuration.SiteFacetPortletInstanceConfiguration;
+
 import java.util.List;
 
 /**
  * @author André de Oliveira
  */
 public class ScopeSearchFacetDisplayContext {
+
+	public long getDisplayStyleGroupId() {
+		return _displayStyleGroupId;
+	}
+
+	public String getPaginationStartParameterName() {
+		return _paginationStartParameterName;
+	}
 
 	public String getParameterName() {
 		return _parameterName;
@@ -31,6 +41,12 @@ public class ScopeSearchFacetDisplayContext {
 
 	public List<String> getParameterValues() {
 		return _parameterValues;
+	}
+
+	public SiteFacetPortletInstanceConfiguration
+		getSiteFacetPortletInstanceConfiguration() {
+
+		return _siteFacetPortletInstanceConfiguration;
 	}
 
 	public List<ScopeSearchFacetTermDisplayContext> getTermDisplayContexts() {
@@ -45,8 +61,18 @@ public class ScopeSearchFacetDisplayContext {
 		return _renderNothing;
 	}
 
+	public void setDisplayStyleGroupId(long displayStyleGroupId) {
+		_displayStyleGroupId = displayStyleGroupId;
+	}
+
 	public void setNothingSelected(boolean nothingSelected) {
 		_nothingSelected = nothingSelected;
+	}
+
+	public void setPaginationStartParameterName(
+		String paginationStartParameterName) {
+
+		_paginationStartParameterName = paginationStartParameterName;
 	}
 
 	public void setParameterName(String parameterName) {
@@ -65,6 +91,14 @@ public class ScopeSearchFacetDisplayContext {
 		_renderNothing = renderNothing;
 	}
 
+	public void setSiteFacetPortletInstanceConfiguration(
+		SiteFacetPortletInstanceConfiguration
+			siteFacetPortletInstanceConfiguration) {
+
+		_siteFacetPortletInstanceConfiguration =
+			siteFacetPortletInstanceConfiguration;
+	}
+
 	public void setTermDisplayContexts(
 		List<ScopeSearchFacetTermDisplayContext>
 			scopeSearchFacetTermDisplayContexts) {
@@ -73,12 +107,16 @@ public class ScopeSearchFacetDisplayContext {
 			scopeSearchFacetTermDisplayContexts;
 	}
 
+	private long _displayStyleGroupId;
 	private boolean _nothingSelected;
+	private String _paginationStartParameterName;
 	private String _parameterName;
 	private String _parameterValue;
 	private List<String> _parameterValues;
 	private boolean _renderNothing;
 	private List<ScopeSearchFacetTermDisplayContext>
 		_scopeSearchFacetTermDisplayContexts;
+	private SiteFacetPortletInstanceConfiguration
+		_siteFacetPortletInstanceConfiguration;
 
 }

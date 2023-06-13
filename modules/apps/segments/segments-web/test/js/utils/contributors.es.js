@@ -18,11 +18,11 @@ describe('applyConjunctionChangeToContributor', () => {
 	it('changes contributors to selected conjunction', () => {
 		const mockContributors = [
 			{
-				conjunctionId: 'and'
+				conjunctionId: 'and',
 			},
 			{
-				conjunctionId: 'and'
-			}
+				conjunctionId: 'and',
+			},
 		];
 		const newConjunctionName = 'or';
 
@@ -31,7 +31,7 @@ describe('applyConjunctionChangeToContributor', () => {
 			newConjunctionName
 		);
 
-		updatedContributors.map(c =>
+		updatedContributors.map((c) =>
 			expect(c).toEqual(
 				expect.objectContaining({conjunctionId: newConjunctionName})
 			)
@@ -41,11 +41,11 @@ describe('applyConjunctionChangeToContributor', () => {
 	it('does not change contributors to selected conjunction when it is not supported', () => {
 		const mockContributors = [
 			{
-				conjunctionId: 'and'
+				conjunctionId: 'and',
 			},
 			{
-				conjunctionId: 'and'
-			}
+				conjunctionId: 'and',
+			},
 		];
 		const newConjunctionName = 'bad_conjunction';
 
@@ -54,7 +54,7 @@ describe('applyConjunctionChangeToContributor', () => {
 			newConjunctionName
 		);
 
-		updatedContributors.map(c =>
+		updatedContributors.map((c) =>
 			expect(c).toEqual(expect.objectContaining({conjunctionId: 'and'}))
 		);
 	});
@@ -62,11 +62,11 @@ describe('applyConjunctionChangeToContributor', () => {
 	it('does not change contributors to selected conjunction when it is already in the contributor', () => {
 		const mockContributors = [
 			{
-				conjunctionId: 'and'
+				conjunctionId: 'and',
 			},
 			{
-				conjunctionId: 'and'
-			}
+				conjunctionId: 'and',
+			},
 		];
 		const newConjunctionName = 'and';
 
@@ -75,7 +75,7 @@ describe('applyConjunctionChangeToContributor', () => {
 			newConjunctionName
 		);
 
-		updatedContributors.map(c =>
+		updatedContributors.map((c) =>
 			expect(c).toEqual(expect.objectContaining({conjunctionId: 'and'}))
 		);
 	});

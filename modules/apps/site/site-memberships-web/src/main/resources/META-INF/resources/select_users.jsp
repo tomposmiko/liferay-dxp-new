@@ -58,14 +58,14 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />users');
 
-	searchContainer.on('rowToggled', function(event) {
+	searchContainer.on('rowToggled', function (event) {
 		var result = {};
 
 		var data = event.elements.allSelectedElements.getDOMNodes();
 
 		if (data.length) {
 			result = {
-				data: data
+				data: data,
 			};
 		}
 

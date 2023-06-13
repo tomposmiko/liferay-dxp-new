@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
@@ -67,7 +68,7 @@ public class GroupSearchProvider {
 
 		Company company = themeDisplay.getCompany();
 
-		List results = null;
+		List<Group> results = null;
 
 		if (!searchTerms.hasSearchTerms() &&
 			isFilterManageableGroups(portletRequest) && (parentGroupId <= 0)) {
@@ -124,14 +125,12 @@ public class GroupSearchProvider {
 	protected List<Group> getAllGroups(PortletRequest portletRequest)
 		throws PortalException {
 
-		List<Group> groups = new ArrayList<>();
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		User user = themeDisplay.getUser();
 
-		groups = user.getMySiteGroups(
+		List<Group> groups = user.getMySiteGroups(
 			new String[] {
 				Company.class.getName(), Group.class.getName(),
 				Organization.class.getName()
@@ -157,6 +156,8 @@ public class GroupSearchProvider {
 
 		LinkedHashMap<String, Object> groupParams =
 			LinkedHashMapBuilder.<String, Object>put(
+				"actionId", ActionKeys.VIEW
+			).put(
 				"site", Boolean.TRUE
 			).build();
 
@@ -238,6 +239,15 @@ public class GroupSearchProvider {
 		_groupLocalService = groupLocalService;
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Reference(unbind = "-")
+	protected void setGroupService(GroupService groupService) {
+		_groupService = groupService;
+	}
+
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
@@ -251,5 +261,6 @@ public class GroupSearchProvider {
 
 	private long[] _classNameIds;
 	private GroupLocalService _groupLocalService;
+	private GroupService _groupService;
 
 }

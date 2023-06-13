@@ -12,43 +12,38 @@
 import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayInput} from '@clayui/form';
 import ClayManagementToolbar from '@clayui/management-toolbar';
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {useRouter} from '../../hooks/useRouter.es';
-import {pushToHistory} from '../filter/util/filterUtil.es';
+import {replaceHistory} from '../filter/util/filterUtil.es';
 import {parse, stringify} from '../router/queryString.es';
 
-const SearchField = props => {
+const SearchField = ({
+	disabled,
+	placeholder = Liferay.Language.get('search-for'),
+}) => {
 	const routerProps = useRouter();
 
 	const query = parse(routerProps.location.search);
 	const {search = null} = query;
 
-	const {disabled, placeholder = Liferay.Language.get('search-for')} = props;
-
 	const [searchValue, setSearchValue] = useState(null);
-	const [redirect, setRedirect] = useState(false);
 
 	useEffect(() => {
 		setSearchValue(search);
 	}, [search]);
 
-	const handleChange = event => {
+	const handleChange = (event) => {
 		setSearchValue(event.target.value);
 	};
 
-	const handleSubmit = event => {
+	const handleSubmit = (event) => {
 		event.preventDefault();
-		setRedirect(true);
-	};
-
-	if (redirect) {
-		setRedirect(false);
 
 		query.search = searchValue;
 
-		pushToHistory(stringify(query), routerProps);
-	}
+		replaceHistory(stringify(query), routerProps);
+	};
 
 	return (
 		<ClayManagementToolbar.Search

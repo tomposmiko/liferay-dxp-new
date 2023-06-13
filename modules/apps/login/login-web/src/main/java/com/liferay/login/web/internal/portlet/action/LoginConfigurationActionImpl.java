@@ -14,7 +14,7 @@
 
 package com.liferay.login.web.internal.portlet.action;
 
-import com.liferay.login.web.internal.constants.LoginPortletKeys;
+import com.liferay.login.web.constants.LoginPortletKeys;
 import com.liferay.petra.content.ContentUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
@@ -72,11 +72,11 @@ public class LoginConfigurationActionImpl extends DefaultConfigurationAction {
 		String[] discardLegacyKeys = ParamUtil.getStringValues(
 			portletRequest, "discardLegacyKey");
 
-		Enumeration<String> names = portletPreferences.getNames();
+		Enumeration<String> enumeration = portletPreferences.getNames();
 
 		try {
-			while (names.hasMoreElements()) {
-				String name = names.nextElement();
+			while (enumeration.hasMoreElements()) {
+				String name = enumeration.nextElement();
 
 				for (String discardLegacyKey : discardLegacyKeys) {
 					if (name.startsWith(discardLegacyKey + "_")) {

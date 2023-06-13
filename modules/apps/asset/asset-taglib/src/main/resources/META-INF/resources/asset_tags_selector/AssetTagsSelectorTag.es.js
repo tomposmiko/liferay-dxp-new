@@ -28,7 +28,7 @@ function AssetTagsSelectorTag({
 	label,
 	portletURL,
 	removeCallback,
-	showSelectButton
+	showSelectButton,
 }) {
 	const [selectedItems, setSelectedItems] = useState(initialSelectedItems);
 	const [inputValue, setInputValue] = useState(initialInputValue);
@@ -62,10 +62,10 @@ AssetTagsSelectorTag.propTypes = {
 	inputName: PropTypes.string,
 	label: PropTypes.string,
 	portletURL: PropTypes.string,
-	removeCallback: PropTypes.string
+	removeCallback: PropTypes.string,
 };
 
-export default function(props) {
+export default function (props) {
 	return (
 		<AssetTagsSelectorTag
 			{...props}

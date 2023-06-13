@@ -9,7 +9,7 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/user/add-user \
-				-u test@liferay.com:test \
+				-u ${creatorEmailAddress}:${creatorPassword} \
 				-d companyId=${companyId} \
 				-d autoPassword=false \
 				-d password1=initPassword \
@@ -26,10 +26,10 @@ definition {
 				-d prefixId=0 \
 				-d suffixId=0 \
 				-d male=true \
-				-d birthdayMonth=4 \
-				-d birthdayDay=31 \
-				-d birthdayYear=1986 \
-				-d jobTitle= \
+				-d birthdayMonth=${birthdayMonth} \
+				-d birthdayDay=${birthdayDay} \
+				-d birthdayYear=${birthdayYear} \
+				-d jobTitle=${jobTitle} \
 				-d groupIds= \
 				-d organizationIds= \
 				-d roleIds= \
@@ -47,6 +47,24 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/user/add-group-users/group-id/${groupId}/user-ids/${userId} \
+				-u test@liferay.com:test
+		''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	macro _addUserToUserGroup {
+		Variables.assertDefined(parameterList = "${userGroupId},${userId}");
+
+		if (isSet(specificURL)) {
+			var portalURL = "${specificURL}";
+		}
+		else {
+			var portalURL = JSONCompany.getPortalURL();
+		}
+
+		var curl = '''
+			${portalURL}/api/jsonws/user/add-user-group-users/user-group-id/${userGroupId}/user-ids/${userId} \
 				-u test@liferay.com:test
 		''';
 
@@ -95,13 +113,17 @@ definition {
 		var portalURL = JSONCompany.getPortalURL();
 
 		var curl = '''
-			${portalURL}/api/jsonws/passwordpolicy/search/company-id/${companyId}/name/default/start/0/end/1/-obc \
+			${portalURL}/api/jsonws/passwordpolicy/search \
 				-u test@liferay.com:test
+				-d companyId=${companyId} \
+				-d "name=Default%20Password%20Policy" \
+				-d "start=-1" \
+				-d "end=-1" \
+				-d -orderByComparator=
 		''';
-
 		var passwordPolicyId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == 'Default Password Policy')]['passwordPolicyId']");
-		var passwordPolicyId = StringUtil.replace("${passwordPolicyId}", "[&quot;", "");
-		var passwordPolicyId = StringUtil.replace("${passwordPolicyId}", "&quot;]", "");
+		var passwordPolicyId = StringUtil.replace("${passwordPolicyId}", "[\"", "");
+		var passwordPolicyId = StringUtil.replace("${passwordPolicyId}", "\"]", "");
 
 		var curl = '''
 			${portalURL}/api/jsonws/passwordpolicy/update-password-policy \
@@ -148,7 +170,6 @@ definition {
 			${portalURL}/api/jsonws/user/get-user-by-email-address/company-id/${companyId}/email-address/${userEmailAddress} \
 				-u test@liferay.com:test
 		''';
-
 		var userId = JSONCurlUtil.get("${curl}", "$['userId']");
 
 		return "${userId}";
@@ -166,11 +187,10 @@ definition {
 			-d <CURL_DATA[start=-1]CURL_DATA> \
 			-d <CURL_DATA[end=-1]CURL_DATA>
 		''';
-
 		var userIds = JSONCurlUtil.post("${curl}", "$..['userId']");
 		var userIds = StringUtil.replace("${userIds}", "[", "");
 		var userIds = StringUtil.replace("${userIds}", "]", "");
-		var userIds = StringUtil.replace("${userIds}", "&quot;", "");
+		var userIds = StringUtil.replace("${userIds}", "\"", "");
 
 		return "${userIds}";
 	}

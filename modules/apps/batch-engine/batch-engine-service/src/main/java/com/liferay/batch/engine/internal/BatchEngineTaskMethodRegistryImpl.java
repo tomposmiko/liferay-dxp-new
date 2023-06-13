@@ -14,34 +14,23 @@
 
 package com.liferay.batch.engine.internal;
 
-import com.liferay.batch.engine.BatchEngineTaskFieldId;
-import com.liferay.batch.engine.BatchEngineTaskMethod;
-import com.liferay.batch.engine.BatchEngineTaskOperation;
+import com.liferay.batch.engine.BatchEngineTaskItemDelegate;
 import com.liferay.batch.engine.ItemClassRegistry;
-import com.liferay.batch.engine.internal.item.BatchEngineTaskItemResourceDelegate;
-import com.liferay.batch.engine.internal.item.BatchEngineTaskItemResourceDelegateCreator;
-import com.liferay.batch.engine.internal.writer.ItemClassIndexUtil;
-import com.liferay.petra.lang.HashUtil;
-import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.filter.Filter;
-import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.batch.engine.internal.item.BatchEngineTaskItemDelegateExecutor;
+import com.liferay.batch.engine.internal.item.BatchEngineTaskItemDelegateExecutorCreator;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
@@ -60,38 +49,38 @@ public class BatchEngineTaskMethodRegistryImpl
 	implements BatchEngineTaskMethodRegistry {
 
 	@Override
-	public BatchEngineTaskItemResourceDelegateCreator
-		getBatchEngineTaskItemResourceDelegateCreator(
-			String apiVersion,
-			BatchEngineTaskOperation batchEngineTaskOperation,
-			String itemClassName) {
+	public BatchEngineTaskItemDelegateExecutorCreator
+		getBatchEngineTaskItemDelegateExecutorCreator(
+			String itemClassName, String taskItemDelegateName) {
 
-		return _batchEngineTaskItemResourceDelegateCreators.get(
-			new CreatorKey(
-				apiVersion, batchEngineTaskOperation, itemClassName));
+		if (Validator.isNull(taskItemDelegateName)) {
+			taskItemDelegateName = "DEFAULT";
+		}
+
+		Map<String, BatchEngineTaskItemDelegateExecutorCreator>
+			batchEngineTaskItemDelegateExecutorCreatorMap =
+				_batchEngineTaskItemDelegateExecutorCreators.get(
+					_itemClasses.get(itemClassName));
+
+		return batchEngineTaskItemDelegateExecutorCreatorMap.get(
+			taskItemDelegateName);
 	}
 
 	@Override
 	public Class<?> getItemClass(String itemClassName) {
-		Map.Entry<Class<?>, AtomicInteger> entry = _itemClasses.get(
-			itemClassName);
+		Class<?> itemClass = _itemClasses.get(itemClassName);
 
-		if (entry == null) {
+		if (itemClass == null) {
 			throw new IllegalStateException("Unknown class: " + itemClassName);
 		}
 
-		return entry.getKey();
+		return itemClass;
 	}
 
 	@Activate
-	protected void activate(BundleContext bundleContext)
-		throws InvalidSyntaxException {
-
+	protected void activate(BundleContext bundleContext) {
 		_serviceTracker = new ServiceTracker<>(
-			bundleContext,
-			bundleContext.createFilter(
-				"(&(api.version=*)(osgi.jaxrs.resource=true)" +
-					"(!(batch.engine=true)))"),
+			bundleContext, BatchEngineTaskItemDelegate.class.getName(),
 			new BatchEngineTaskMethodServiceTrackerCustomizer(bundleContext));
 
 		_serviceTracker.open();
@@ -102,167 +91,105 @@ public class BatchEngineTaskMethodRegistryImpl
 		_serviceTracker.close();
 	}
 
-	private final Map<CreatorKey, BatchEngineTaskItemResourceDelegateCreator>
-		_batchEngineTaskItemResourceDelegateCreators =
-			new ConcurrentHashMap<>();
-	private final Map<String, Map.Entry<Class<?>, AtomicInteger>> _itemClasses =
+	private static final Log _log = LogFactoryUtil.getLog(
+		BatchEngineTaskMethodRegistryImpl.class);
+
+	private final Map
+		<Class<?>, Map<String, BatchEngineTaskItemDelegateExecutorCreator>>
+			_batchEngineTaskItemDelegateExecutorCreators =
+				new ConcurrentHashMap<>();
+	private final Map<String, Class<?>> _itemClasses =
 		new ConcurrentHashMap<>();
-	private ServiceTracker<Object, List<CreatorKey>> _serviceTracker;
-
-	private static class CreatorKey {
-
-		@Override
-		public boolean equals(Object obj) {
-			CreatorKey creatorKey = (CreatorKey)obj;
-
-			if (Objects.equals(creatorKey._apiVersion, _apiVersion) &&
-				Objects.equals(
-					creatorKey._batchEngineTaskOperation,
-					_batchEngineTaskOperation) &&
-				Objects.equals(creatorKey._itemClassName, _itemClassName)) {
-
-				return true;
-			}
-
-			return false;
-		}
-
-		@Override
-		public int hashCode() {
-			int hashCode = HashUtil.hash(0, _apiVersion);
-
-			hashCode = HashUtil.hash(hashCode, _batchEngineTaskOperation);
-			hashCode = HashUtil.hash(hashCode, _itemClassName);
-
-			return hashCode;
-		}
-
-		private CreatorKey(
-			String apiVersion,
-			BatchEngineTaskOperation batchEngineTaskOperation,
-			String itemClassName) {
-
-			_apiVersion = apiVersion;
-			_batchEngineTaskOperation = batchEngineTaskOperation;
-			_itemClassName = itemClassName;
-		}
-
-		private final String _apiVersion;
-		private final BatchEngineTaskOperation _batchEngineTaskOperation;
-		private final String _itemClassName;
-
-	}
+	private ServiceTracker<BatchEngineTaskItemDelegate<Object>, Class<?>>
+		_serviceTracker;
 
 	private class BatchEngineTaskMethodServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer<Object, List<CreatorKey>> {
+		implements ServiceTrackerCustomizer
+			<BatchEngineTaskItemDelegate<Object>, Class<?>> {
 
 		@Override
-		public List<CreatorKey> addingService(
-			ServiceReference<Object> serviceReference) {
+		public Class<?> addingService(
+			ServiceReference<BatchEngineTaskItemDelegate<Object>>
+				serviceReference) {
 
-			Object resource = _bundleContext.getService(serviceReference);
+			BatchEngineTaskItemDelegate<Object> batchEngineTaskItemDelegate =
+				_bundleContext.getService(serviceReference);
 
-			Class<?> resourceClass = resource.getClass();
+			Class<?> itemClass = _getItemClass(batchEngineTaskItemDelegate);
 
-			List<CreatorKey> creatorKeys = null;
+			Map<String, BatchEngineTaskItemDelegateExecutorCreator>
+				batchEngineTaskItemDelegateExecutorCreatorMap =
+					_batchEngineTaskItemDelegateExecutorCreators.
+						computeIfAbsent(
+							itemClass, key -> new ConcurrentHashMap<>());
 
-			for (Method resourceMethod : resourceClass.getMethods()) {
-				BatchEngineTaskMethod batchEngineTaskMethod =
-					resourceMethod.getAnnotation(BatchEngineTaskMethod.class);
+			String batchEngineTaskItemDelegateName =
+				_getBatchEngineTaskItemDelegateName(serviceReference);
 
-				if (batchEngineTaskMethod == null) {
-					continue;
-				}
+			if (batchEngineTaskItemDelegateExecutorCreatorMap.containsKey(
+					batchEngineTaskItemDelegateName)) {
 
-				Class<?> itemClass = batchEngineTaskMethod.itemClass();
-
-				CreatorKey creatorKey = new CreatorKey(
-					String.valueOf(serviceReference.getProperty("api.version")),
-					batchEngineTaskMethod.batchEngineTaskOperation(),
-					itemClass.getName());
-
-				try {
-					Map.Entry<String, Class<?>>[]
-						resourceMethodArgNameTypeEntries =
-							_getResourceMethodArgNameTypeEntries(
-								resourceClass, resourceMethod);
-
-					ServiceObjects<Object> serviceObjects =
-						_bundleContext.getServiceObjects(serviceReference);
-
-					_batchEngineTaskItemResourceDelegateCreators.put(
-						creatorKey,
-						(company, expressionConvert, filterParserProvider,
-						 parameters, sortParserProvider, user) ->
-							new BatchEngineTaskItemResourceDelegate(
-								company, expressionConvert,
-								ItemClassIndexUtil.index(itemClass),
-								filterParserProvider, parameters,
-								resourceMethod,
-								resourceMethodArgNameTypeEntries,
-								serviceObjects, sortParserProvider, user));
-				}
-				catch (NoSuchMethodException noSuchMethodException) {
-					throw new IllegalStateException(noSuchMethodException);
-				}
-
-				if (creatorKeys == null) {
-					creatorKeys = new ArrayList<>();
-				}
-
-				creatorKeys.add(creatorKey);
-
-				_itemClasses.compute(
-					creatorKey._itemClassName,
-					(itemClassName, entry) -> {
-						if (entry == null) {
-							return new AbstractMap.SimpleImmutableEntry<>(
-								itemClass, new AtomicInteger(1));
-						}
-
-						AtomicInteger counter = entry.getValue();
-
-						counter.incrementAndGet();
-
-						return entry;
-					});
+				throw new IllegalStateException(
+					batchEngineTaskItemDelegateName + " is already registered");
 			}
 
-			return creatorKeys;
+			ServiceObjects<BatchEngineTaskItemDelegate<Object>> serviceObjects =
+				_bundleContext.getServiceObjects(serviceReference);
+
+			batchEngineTaskItemDelegateExecutorCreatorMap.put(
+				batchEngineTaskItemDelegateName,
+				(company, expressionConvert, filterParserProvider, parameters,
+				 sortParserProvider, user) ->
+					new BatchEngineTaskItemDelegateExecutor(
+						company, expressionConvert, filterParserProvider,
+						parameters, serviceObjects, sortParserProvider, user));
+
+			_itemClasses.put(itemClass.getName(), itemClass);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Batch engine task item delegate registered for item ",
+						"class ", itemClass, " and delegate name ",
+						batchEngineTaskItemDelegateName));
+			}
+
+			return itemClass;
 		}
 
 		@Override
 		public void modifiedService(
-			ServiceReference<Object> serviceReference,
-			List<CreatorKey> creatorKeys) {
+			ServiceReference<BatchEngineTaskItemDelegate<Object>>
+				serviceReference,
+			Class<?> itemClass) {
 		}
 
 		@Override
 		public void removedService(
-			ServiceReference<Object> serviceReference,
-			List<CreatorKey> creatorKeys) {
+			ServiceReference<BatchEngineTaskItemDelegate<Object>>
+				serviceReference,
+			Class<?> itemClass) {
 
-			for (CreatorKey creatorKey : creatorKeys) {
-				_batchEngineTaskItemResourceDelegateCreators.remove(creatorKey);
+			Map<String, BatchEngineTaskItemDelegateExecutorCreator>
+				batchEngineTaskItemDelegateExecutorCreatorMap =
+					_batchEngineTaskItemDelegateExecutorCreators.get(itemClass);
 
-				_itemClasses.compute(
-					creatorKey._itemClassName,
-					(itemClassName, entry) -> {
-						if (entry == null) {
-							return null;
-						}
+			batchEngineTaskItemDelegateExecutorCreatorMap.remove(
+				_getBatchEngineTaskItemDelegateName(serviceReference));
 
-						AtomicInteger counter = entry.getValue();
+			if (batchEngineTaskItemDelegateExecutorCreatorMap.isEmpty()) {
+				_batchEngineTaskItemDelegateExecutorCreators.remove(itemClass);
 
-						if (counter.decrementAndGet() == 0) {
-							return null;
-						}
-
-						return entry;
-					});
+				_itemClasses.remove(itemClass.getName());
 			}
 
 			_bundleContext.ungetService(serviceReference);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Batch engine task item delegate unregistered for item " +
+						"class " + itemClass);
+			}
 		}
 
 		private BatchEngineTaskMethodServiceTrackerCustomizer(
@@ -271,79 +198,81 @@ public class BatchEngineTaskMethodRegistryImpl
 			_bundleContext = bundleContext;
 		}
 
-		private Map.Entry<String, Class<?>>[]
-				_getResourceMethodArgNameTypeEntries(
-					Class<?> resourceClass, Method resourceMethod)
-			throws NoSuchMethodException {
+		private String _getBatchEngineTaskItemDelegateName(
+			ServiceReference<BatchEngineTaskItemDelegate<Object>>
+				serviceReference) {
 
-			Parameter[] resourceMethodParameters =
-				resourceMethod.getParameters();
+			return GetterUtil.getString(
+				serviceReference.getProperty(
+					"batch.engine.task.item.delegate.name"),
+				"DEFAULT");
+		}
 
-			Map.Entry<String, Class<?>>[] resourceMethodArgNameTypeEntries =
-				new Map.Entry[resourceMethodParameters.length];
+		private Class<?> _getItemClass(
+			BatchEngineTaskItemDelegate<?> batchEngineTaskItemDelegate) {
 
-			Class<?> parentResourceClass = resourceClass.getSuperclass();
+			Class<?> itemClass = batchEngineTaskItemDelegate.getItemClass();
 
-			Method parentResourceMethod = parentResourceClass.getMethod(
-				resourceMethod.getName(), resourceMethod.getParameterTypes());
+			if (itemClass != null) {
+				return itemClass;
+			}
 
-			Parameter[] parentResourceMethodParameters =
-				parentResourceMethod.getParameters();
+			Class<?> batchEngineTaskItemDelegateClass =
+				batchEngineTaskItemDelegate.getClass();
 
-			for (int i = 0; i < resourceMethodParameters.length; i++) {
-				Parameter parameter = resourceMethodParameters[i];
+			itemClass = _getItemClassFromGenericInterfaces(
+				batchEngineTaskItemDelegateClass.getGenericInterfaces());
 
-				BatchEngineTaskFieldId batchEngineTaskFieldId =
-					parameter.getAnnotation(BatchEngineTaskFieldId.class);
+			if (itemClass == null) {
+				itemClass = _getItemClassFromGenericSuperclass(
+					batchEngineTaskItemDelegateClass.getGenericSuperclass());
+			}
 
-				Class<?> parameterType = parameter.getType();
+			if (itemClass == null) {
+				throw new IllegalStateException(
+					BatchEngineTaskItemDelegate.class.getName() +
+						" is not implemented");
+			}
 
-				if (batchEngineTaskFieldId == null) {
-					if (parentResourceMethodParameters == null) {
+			return itemClass;
+		}
+
+		@SuppressWarnings("unchecked")
+		private Class<?> _getItemClass(ParameterizedType parameterizedType) {
+			Type[] genericTypes = parameterizedType.getActualTypeArguments();
+
+			return (Class<BatchEngineTaskItemDelegate<?>>)genericTypes[0];
+		}
+
+		private Class<?> _getItemClassFromGenericInterfaces(
+			Type[] genericInterfaceTypes) {
+
+			for (Type genericInterfaceType : genericInterfaceTypes) {
+				if (genericInterfaceType instanceof ParameterizedType) {
+					ParameterizedType parameterizedType =
+						(ParameterizedType)genericInterfaceType;
+
+					if (parameterizedType.getRawType() !=
+							BatchEngineTaskItemDelegate.class) {
+
 						continue;
 					}
 
-					parameter = parentResourceMethodParameters[i];
-
-					if ((parameterType == Filter.class) ||
-						(parameterType == Pagination.class) ||
-						(parameterType == Sort[].class)) {
-
-						resourceMethodArgNameTypeEntries[i] =
-							new AbstractMap.SimpleImmutableEntry<>(
-								parameter.getName(), parameterType);
-
-						continue;
-					}
-
-					PathParam pathParam = parameter.getAnnotation(
-						PathParam.class);
-
-					if (pathParam != null) {
-						resourceMethodArgNameTypeEntries[i] =
-							new AbstractMap.SimpleImmutableEntry<>(
-								pathParam.value(), parameterType);
-
-						continue;
-					}
-
-					QueryParam queryParam = parameter.getAnnotation(
-						QueryParam.class);
-
-					if (queryParam != null) {
-						resourceMethodArgNameTypeEntries[i] =
-							new AbstractMap.SimpleImmutableEntry<>(
-								queryParam.value(), parameterType);
-					}
-				}
-				else {
-					resourceMethodArgNameTypeEntries[i] =
-						new AbstractMap.SimpleImmutableEntry<>(
-							batchEngineTaskFieldId.value(), parameterType);
+					return _getItemClass(parameterizedType);
 				}
 			}
 
-			return resourceMethodArgNameTypeEntries;
+			return null;
+		}
+
+		private Class<?> _getItemClassFromGenericSuperclass(
+			Type genericSuperclassType) {
+
+			if (genericSuperclassType == null) {
+				return null;
+			}
+
+			return _getItemClass((ParameterizedType)genericSuperclassType);
 		}
 
 		private final BundleContext _bundleContext;

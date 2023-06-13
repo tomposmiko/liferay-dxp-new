@@ -14,22 +14,29 @@
 
 package com.liferay.portal.template.soy.internal;
 
-import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.template.soy.constants.SoyTemplateConstants;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Bruno Basto
  */
 public class SoyTemplateTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -64,11 +71,11 @@ public class SoyTemplateTest {
 
 		soyTemplate.put("namespace", "soy.test.ijdata");
 
-		Map<String, Object> injectedData = HashMapBuilder.<String, Object>put(
-			"hasData", true
-		).build();
-
-		soyTemplate.put(SoyTemplateConstants.INJECTED_DATA, injectedData);
+		soyTemplate.put(
+			SoyTemplateConstants.INJECTED_DATA,
+			HashMapBuilder.<String, Object>put(
+				"hasData", true
+			).build());
 
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 

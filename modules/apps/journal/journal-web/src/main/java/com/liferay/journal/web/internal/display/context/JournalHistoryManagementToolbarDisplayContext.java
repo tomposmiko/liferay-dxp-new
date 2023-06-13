@@ -55,12 +55,14 @@ public class JournalHistoryManagementToolbarDisplayContext
 			journalHistoryDisplayContext.getArticleSearchContainer());
 
 		_article = article;
+		_journalHistoryDisplayContext = journalHistoryDisplayContext;
 	}
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		return new DropdownItemList() {
 			{
@@ -85,9 +87,10 @@ public class JournalHistoryManagementToolbarDisplayContext
 								dropdownItem.putData(
 									"deleteArticlesURL",
 									deleteArticlesURL.toString());
-								dropdownItem.setIcon("trash");
+								dropdownItem.setIcon("times-circle");
 								dropdownItem.setLabel(
-									LanguageUtil.get(request, "delete"));
+									LanguageUtil.get(
+										httpServletRequest, "delete"));
 								dropdownItem.setQuickAction(true);
 							});
 					}
@@ -118,7 +121,8 @@ public class JournalHistoryManagementToolbarDisplayContext
 									expireArticlesURL.toString());
 								dropdownItem.setIcon("time");
 								dropdownItem.setLabel(
-									LanguageUtil.get(request, "expire"));
+									LanguageUtil.get(
+										httpServletRequest, "expire"));
 								dropdownItem.setQuickAction(true);
 							});
 					}
@@ -132,8 +136,9 @@ public class JournalHistoryManagementToolbarDisplayContext
 	public String getAvailableActions(JournalArticle article)
 		throws PortalException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		List<String> availableActions = new ArrayList<>();
 
@@ -171,6 +176,11 @@ public class JournalHistoryManagementToolbarDisplayContext
 	}
 
 	@Override
+	protected String getDisplayStyle() {
+		return _journalHistoryDisplayContext.getDisplayStyle();
+	}
+
+	@Override
 	protected String[] getDisplayViews() {
 		return new String[] {"list", "descriptive", "icon"};
 	}
@@ -186,5 +196,6 @@ public class JournalHistoryManagementToolbarDisplayContext
 	}
 
 	private final JournalArticle _article;
+	private final JournalHistoryDisplayContext _journalHistoryDisplayContext;
 
 }

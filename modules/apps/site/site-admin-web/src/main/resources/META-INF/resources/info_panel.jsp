@@ -35,16 +35,17 @@ if (ListUtil.isEmpty(groups)) {
 	}
 }
 
-List<NavigationItem> navigationItems = new JSPNavigationItemList(pageContext) {
-	{
-		add(
-			navigationItem -> {
-				navigationItem.setActive(true);
-				navigationItem.setHref(currentURL);
-				navigationItem.setLabel(LanguageUtil.get(request, "details"));
-			});
-	}
-};
+List<NavigationItem> navigationItems =
+	new JSPNavigationItemList(pageContext) {
+		{
+			add(
+				navigationItem -> {
+					navigationItem.setActive(true);
+					navigationItem.setHref(currentURL);
+					navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "details"));
+				});
+		}
+	};
 
 request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 %>
@@ -93,9 +94,16 @@ request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 				/>
 
 				<div class="sidebar-body">
-					<p>
-						<img alt="<%= HtmlUtil.escapeAttribute(group.getDescriptiveName()) %>" class="center-block img-responsive" src="<%= group.getLogoURL(themeDisplay, true) %>" />
-					</p>
+
+					<%
+					String logoURL = group.getLogoURL(themeDisplay, false);
+					%>
+
+					<c:if test="<%= Validator.isNotNull(logoURL) %>">
+						<p>
+							<img alt="<%= HtmlUtil.escapeAttribute(group.getDescriptiveName()) %>" class="center-block img-responsive" src="<%= logoURL %>" />
+						</p>
+					</c:if>
 
 					<c:if test="<%= group.isOrganization() %>">
 
@@ -119,7 +127,7 @@ request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 					<%
 					String portletId = PortletProviderUtil.getPortletId(MembershipRequest.class.getName(), PortletProvider.Action.VIEW);
 
-					PortletURL assignMembersURL = PortalUtil.getControlPanelPortletURL(request, portletId, PortletRequest.RENDER_PHASE);
+					PortletURL assignMembersURL = PortalUtil.getControlPanelPortletURL(request, group, portletId, 0, 0, PortletRequest.RENDER_PHASE);
 
 					assignMembersURL.setParameter("redirect", currentURL);
 					assignMembersURL.setParameter("groupId", String.valueOf(group.getGroupId()));
@@ -167,7 +175,7 @@ request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 						<h5><liferay-ui:message key="description" /></h5>
 
 						<p>
-							<%= HtmlUtil.escape(group.getDescription()) %>
+							<%= HtmlUtil.escape(group.getDescription(locale)) %>
 						</p>
 					</c:if>
 

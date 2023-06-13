@@ -14,23 +14,25 @@
 
 package com.liferay.dynamic.data.mapping.internal.upgrade.v1_1_2;
 
-import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
-
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.portal.json.JSONArrayImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
@@ -38,6 +40,11 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class UpgradeDynamicDataMappingTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testTransformRadioDDMFormFieldValues() throws Exception {
@@ -72,7 +79,7 @@ public class UpgradeDynamicDataMappingTest {
 		radioDDMFormFieldValueTransformer.transform(_ddmFormFieldValue);
 
 		Mockito.verify(
-			_value, atLeastOnce()
+			_value, VerificationModeFactory.atLeastOnce()
 		).addString(
 			Matchers.any(Locale.class), Matchers.anyString()
 		);
@@ -134,7 +141,7 @@ public class UpgradeDynamicDataMappingTest {
 		selectDDMFormFieldValueTransformer.transform(_ddmFormFieldValue);
 
 		Mockito.verify(
-			_value, atLeastOnce()
+			_value, VerificationModeFactory.atLeastOnce()
 		).addString(
 			Matchers.any(Locale.class), Matchers.anyString()
 		);

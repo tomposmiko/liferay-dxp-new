@@ -22,23 +22,16 @@
 	OAuthException oae = (OAuthException)errorException;
 
 	String exceptionMessage = oae.getMessage();
-
-	if (exceptionMessage.contains("token_expired")) {
 	%>
 
-		<liferay-ui:message key="the-temporary-oauth-token-expired.-please-go-back-to-your-client-application-and-repeat-the-oauth-authorization" />
-
-	<%
-	}
-	else {
-	%>
-
-		<liferay-ui:message key="an-unexpected-oauth-error-occured" />
-
-	<%
-	}
-	%>
-
+	<c:choose>
+		<c:when test='<%= exceptionMessage.contains("token_expired") %>'>
+			<liferay-ui:message key="the-temporary-oauth-token-expired.-please-go-back-to-your-client-application-and-repeat-the-oauth-authorization" />
+		</c:when>
+		<c:otherwise>
+			<liferay-ui:message key="an-unexpected-oauth-error-occured" />
+		</c:otherwise>
+	</c:choose>
 </liferay-ui:error>
 
 <c:if test="<%= !SessionErrors.contains(liferayPortletRequest, OAuthException.class) %>">
@@ -48,9 +41,7 @@
 
 	String oAuthCallback = ParamUtil.getString(request, net.oauth.OAuth.OAUTH_CALLBACK);
 
-	OAuthMessage oAuthMessage = OAuthUtil.getOAuthMessage(request, currentURL);
-
-	OAuthAccessor oAuthAccessor = OAuthUtil.getOAuthAccessor(oAuthMessage);
+	OAuthAccessor oAuthAccessor = OAuthUtil.getOAuthAccessor(OAuthUtil.getOAuthMessage(request, currentURL));
 
 	OAuthApplication oAuthApplication = null;
 
@@ -77,8 +68,10 @@
 						<aui:input name="<%= net.oauth.OAuth.OAUTH_CALLBACK %>" type="hidden" value="<%= oAuthCallback %>" />
 						<aui:input name="<%= net.oauth.OAuth.OAUTH_TOKEN %>" type="hidden" value="<%= oAuthAccessor.getRequestToken() %>" />
 
-						<aui:row>
-							<aui:col width="<%= (oAuthApplication.getLogoId() != 0) ? 50 : 100 %>">
+						<clay:row>
+							<clay:col
+								md="<%= (oAuthApplication.getLogoId() != 0) ? String.valueOf(6) : String.valueOf(12) %>"
+							>
 								<liferay-ui:message key="the-application-listed-below-is-requesting-access-to-your-account" />
 
 								<h3>
@@ -102,20 +95,22 @@
 										</li>
 									</c:if>
 								</ul>
-							</aui:col>
+							</clay:col>
 
 							<c:if test="<%= oAuthApplication.getLogoId() != 0 %>">
-								<aui:col width="<%= 50 %>">
+								<clay:col
+									md="6"
+								>
 									<img src="<%= HtmlUtil.escape(themeDisplay.getPathImage() + "/logo?img_id=" + oAuthApplication.getLogoId() + "&t=" + WebServerServletTokenUtil.getToken(oAuthApplication.getLogoId())) %>" />
-								</aui:col>
+								</clay:col>
 							</c:if>
-						</aui:row>
+						</clay:row>
 
 						<aui:button-row>
 							<aui:button type="submit" value="grant-access" />
 
 							<%
-							String taglibOnClick = "document.location = '".concat(HtmlUtil.escape(oAuthApplication.getWebsiteURL())).concat("'");
+							String taglibOnClick = StringBundler.concat("document.location = '", HtmlUtil.escape(oAuthApplication.getWebsiteURL()), "'");
 							%>
 
 							<aui:button onClick="<%= taglibOnClick %>" value="deny-access" />

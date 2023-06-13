@@ -17,10 +17,9 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String title = LocalizationUtil.getPreferencesValue(portletPreferences, "title", themeDisplay.getLanguageId());
 String description = LocalizationUtil.getPreferencesValue(portletPreferences, "description", themeDisplay.getLanguageId());
-boolean requireCaptcha = GetterUtil.getBoolean(portletPreferences.getValue("requireCaptcha", StringPool.BLANK));
 String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
+String title = LocalizationUtil.getPreferencesValue(portletPreferences, "title", themeDisplay.getLanguageId());
 %>
 
 <portlet:actionURL var="saveDataURL">
@@ -53,6 +52,7 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 		String fieldName = "field" + i;
 		String fieldLabel = LocalizationUtil.getPreferencesValue(portletPreferences, "fieldLabel" + i, themeDisplay.getLanguageId());
 		boolean fieldOptional = PrefsParamUtil.getBoolean(portletPreferences, request, "fieldOptional" + i, false);
+
 		String fieldValue = ParamUtil.getString(request, fieldName);
 
 		while ((i == 1) || Validator.isNotNull(fieldLabel)) {
@@ -134,14 +134,8 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 		}
 		%>
 
-		<c:if test="<%= requireCaptcha %>">
-			<portlet:resourceURL var="captchaURL">
-				<portlet:param name="<%= Constants.CMD %>" value="captcha" />
-			</portlet:resourceURL>
-
-			<liferay-captcha:captcha
-				url="<%= captchaURL %>"
-			/>
+		<c:if test='<%= GetterUtil.getBoolean(portletPreferences.getValue("requireCaptcha", StringPool.BLANK)) %>'>
+			<liferay-captcha:captcha />
 		</c:if>
 
 		<aui:button onClick="" type="submit" value="send" />
@@ -156,10 +150,10 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 	var fieldValidationErrorMessages = {};
 	var fieldValidationFunctions = {};
 
-	var getFieldsMap = function() {
+	var getFieldsMap = function () {
 		var fieldsMap = {};
 
-		keys.forEach(function(key) {
+		keys.forEach(function (key) {
 			var field = A.one('[name="<portlet:namespace />' + key + '"]');
 
 			if (
@@ -174,7 +168,8 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 				if (field) {
 					fieldsMap[key] = field.val();
 				}
-			} else {
+			}
+			else {
 				fieldsMap[key] = (field && field.val()) || '';
 			}
 		});
@@ -182,7 +177,7 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 		return fieldsMap;
 	};
 
-	var validateField = function(key) {
+	var validateField = function (key) {
 		var fieldsMap = getFieldsMap();
 
 		var field = A.one('[name="<portlet:namespace />' + key + '"]');
@@ -192,7 +187,7 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 				'[name="<portlet:namespace />' + key + '"]:not(:checked)'
 			);
 
-			uncheckedOptions.each(function(option) {
+			uncheckedOptions.each(function (option) {
 				option.removeAttribute('aria-invalid');
 			});
 
@@ -221,7 +216,8 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 			if (field) {
 				field.attr('aria-invalid', true);
 			}
-		} else if (!fieldValidationFunctions[key](currentFieldValue, fieldsMap)) {
+		}
+		else if (!fieldValidationFunctions[key](currentFieldValue, fieldsMap)) {
 			A.all('.alert-success').hide();
 
 			if (optionalFieldError) {
@@ -236,7 +232,8 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 			if (field) {
 				field.attr('aria-invalid', true);
 			}
-		} else {
+		}
+		else {
 			if (optionalFieldError) {
 				optionalFieldError.hide();
 			}
@@ -262,7 +259,6 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 	String fieldLabel = portletPreferences.getValue("fieldLabel" + i, StringPool.BLANK);
 
 	while ((i == 1) || Validator.isNotNull(fieldLabel)) {
-		boolean fieldOptional = PrefsParamUtil.getBoolean(portletPreferences, request, "fieldOptional" + i, false);
 		String fieldValidationScript = portletPreferences.getValue("fieldValidationScript" + i, StringPool.BLANK);
 		String fieldValidationErrorMessage = portletPreferences.getValue("fieldValidationErrorMessage" + i, StringPool.BLANK);
 	%>
@@ -286,7 +282,9 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 			</c:choose>
 		}
 
-		fieldOptional[fieldKey] = <%= fieldOptional %>;
+		fieldOptional[
+			fieldKey
+		] = <%= PrefsParamUtil.getBoolean(portletPreferences, request, "fieldOptional" + i, false) %>;
 		fieldValidationFunctions[fieldKey] = fieldValidationFunction<%= i %>;
 
 	<%
@@ -297,11 +295,11 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 	}
 	%>
 
-	keys.forEach(function(key) {
+	keys.forEach(function (key) {
 		var fields = A.all('[name="<portlet:namespace />' + key + '"]');
 
-		var addOnBlurFieldValidation = function(field) {
-			field.on('blur', function(event) {
+		var addOnBlurFieldValidation = function (field) {
+			field.on('blur', function (event) {
 				if (!validateField(key)) {
 					event.halt();
 					event.stopImmediatePropagation();
@@ -315,7 +313,7 @@ String successURL = portletPreferences.getValue("successURL", StringPool.BLANK);
 	var form = A.one('#<portlet:namespace />fm');
 
 	if (form) {
-		form.on('submit', function(event) {
+		form.on('submit', function (event) {
 			var validationErrors = false;
 
 			for (var i = 1; i < keys.length; i++) {

@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.SubscriptionSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Subscription {
+public class Subscription implements Cloneable, Serializable {
+
+	public static Subscription toDTO(String json) {
+		return SubscriptionSerDes.toDTO(json);
+	}
 
 	public Object getContentId() {
 		return contentId;
@@ -173,6 +179,11 @@ public class Subscription {
 	}
 
 	protected Long siteId;
+
+	@Override
+	public Subscription clone() throws CloneNotSupportedException {
+		return (Subscription)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

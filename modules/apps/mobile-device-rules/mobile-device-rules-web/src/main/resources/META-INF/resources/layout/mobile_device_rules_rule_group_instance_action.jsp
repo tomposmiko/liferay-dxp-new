@@ -73,23 +73,23 @@ MDRRuleGroup mdrRuleGroup = MDRRuleGroupLocalServiceUtil.getMDRRuleGroup(mdrRule
 
 		A.one('#<portlet:namespace /><%= row.getRowId() %>manageActions').on(
 			'click',
-			function(event) {
+			function (event) {
 				var currentTarget = event.currentTarget;
 
 				Liferay.Util.openWindow({
 					dialog: {
 						on: {
-							visibleChange: function(event) {
+							visibleChange: function (event) {
 								<portlet:namespace />updateRuleGroupInstances();
-							}
-						}
+							},
+						},
 					},
 					dialogIframe: {
-						bodyCssClass: 'dialog-with-footer'
+						bodyCssClass: 'dialog-with-footer',
 					},
 					title:
 						'<liferay-ui:message arguments="<%= HtmlUtil.escape(mdrRuleGroup.getName(locale)) %>" key="actions-for-x" translateArguments="<%= false %>" />',
-					uri: '<%= viewRuleGroupInstanceActionsURL.toString() %>'
+					uri: '<%= viewRuleGroupInstanceActionsURL.toString() %>',
 				});
 			}
 		);

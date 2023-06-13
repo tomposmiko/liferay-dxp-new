@@ -17,43 +17,51 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
+PortletURL portletURL = renderResponse.createRenderURL();
+
+portletURL.setParameter("mvcRenderCommandName", "/configuration_admin/view_configuration_screen");
+portletURL.setParameter("configurationScreenKey", "2-synced-contact-data");
+
+String redirect = ParamUtil.getString(request, "redirect", portletURL.toString());
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(ParamUtil.getString(request, "backURL", redirect));
 
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contact-data"), portletURL.toString());
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "select-contacts"), redirect);
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "sync-by-organizations"), currentURL);
 %>
 
-<portlet:actionURL name="/analytics/edit_synced_contacts" var="editSyncedContactsURL" />
+<portlet:renderURL var="editSyncedContactsFieldsURL">
+	<portlet:param name="mvcRenderCommandName" value="/analytics_settings/edit_synced_contacts_fields" />
+</portlet:renderURL>
 
-<div class="container-fluid container-fluid-max-xl">
-	<div class="col-12">
-		<div id="breadcrumb">
-			<liferay-ui:breadcrumb
-				showCurrentGroup="<%= false %>"
-				showGuestGroup="<%= false %>"
-				showLayout="<%= false %>"
-				showPortletBreadcrumb="<%= true %>"
-			/>
-		</div>
-	</div>
-</div>
+<clay:container-fluid>
+	<clay:row>
+		<clay:col
+			size="12"
+		>
+			<div id="breadcrumb">
+				<liferay-ui:breadcrumb
+					showCurrentGroup="<%= false %>"
+					showGuestGroup="<%= false %>"
+					showLayout="<%= false %>"
+					showPortletBreadcrumb="<%= true %>"
+				/>
+			</div>
+		</clay:col>
+	</clay:row>
+</clay:container-fluid>
 
-<div class="sheet sheet-lg">
-	<h2 class="autofit-row">
-		<span class="autofit-col autofit-col-expand">
-			<liferay-ui:message key="select-contacts-by-organizations" />
-		</span>
+<clay:sheet>
+	<h2>
+		<liferay-ui:message key="select-contacts-by-organizations" />
 	</h2>
 
 	<hr />
 
-	<div class="autofit-row form-text">
-		<span class="autofit-col autofit-col-expand pb-3">
-			<liferay-ui:message key="select-contacts-by-organizations-help" />
-		</span>
+	<div class="c-pb-3 form-text">
+		<liferay-ui:message key="select-contacts-by-organizations-help" />
 	</div>
 
 	<%
@@ -64,9 +72,9 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 		displayContext="<%= new OrganizationManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, organizationDisplayContext) %>"
 	/>
 
-	<aui:form action="<%= editSyncedContactsURL %>" method="post" name="fm">
+	<aui:form action="<%= editSyncedContactsFieldsURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="update_synced_organizations" />
-		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 		<liferay-ui:search-container
 			id="selectOrganizations"
@@ -92,9 +100,11 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 			/>
 		</liferay-ui:search-container>
 
-		<aui:button-row>
-			<aui:button type="submit" value="save" />
-			<aui:button href="<%= redirect %>" type="cancel" value="cancel" />
-		</aui:button-row>
+		<div class="text-right">
+			<aui:button-row>
+				<aui:button href="<%= redirect %>" type="cancel" value="cancel" />
+				<aui:button type="submit" value="save-and-next" />
+			</aui:button-row>
+		</div>
 	</aui:form>
-</div>
+</clay:sheet>

@@ -2,11 +2,13 @@
 <head>
 <title>Panel</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Panel</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>PANEL_TITLE</td>
@@ -25,17 +27,22 @@
 </tr>
 <tr>
 	<td>PANEL</td>
-	<td>//div[@class='panel-heading']//a[normalize-space(text())='${key_panel}']</td>
+	<td>//*[contains(@class,'panel')]//*[normalize-space()='${key_panel}'][contains(@class,'collapse')][not(contains(@data-qa-id,'app'))]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PANEL_COLLAPSED</td>
-	<td>//div[@class='panel-heading']//a[normalize-space(text())='${key_panel}'][@aria-expanded='false' or contains(@class,'collapsed')]</td>
+	<td>//*[contains(@class,'panel')]//*[normalize-space()='${key_panel}'][@aria-expanded='false'][contains(@class,'collapse')][not(contains(@data-qa-id,'app'))]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PANEL_EXPANDED</td>
-	<td>//div[@class='panel-heading']//a[normalize-space(text())='${key_panel}'][@aria-expanded='true' and not(contains(@class,'collapsed'))]</td>
+	<td>//*[contains(@class,'panel')]//*[normalize-space()='${key_panel}'][@aria-expanded='true'][contains(@class,'collapse')][not(contains(@data-qa-id,'app'))]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PANEL_RECYCLE_BIN</td>
+	<td>//div[contains(@class,'panel-heading')]//span[normalize-space()='Recycle Bin']</td>
 	<td></td>
 </tr>
 <tr>

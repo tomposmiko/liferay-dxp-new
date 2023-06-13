@@ -15,7 +15,8 @@ const getJsonItem = (storage, key) => {
 
 	try {
 		jsonItem = JSON.parse(item);
-	} catch {
+	}
+	catch {
 		jsonItem = item;
 	}
 
@@ -27,17 +28,19 @@ const setJsonItem = (storage, key, json = {}) => {
 
 	try {
 		jsonString = JSON.stringify(json);
-	} catch {
+	}
+	catch {
 		jsonString = json;
 	}
 
 	storage.setItem(key, jsonString);
 };
 
-const jsonStorage = storage => {
+const jsonStorage = (storage) => {
 	return {
-		get: key => getJsonItem(storage, key),
-		set: (key, value) => setJsonItem(storage, key, value)
+		get: (key) => getJsonItem(storage, key),
+		remove: (key) => storage.removeItem(key),
+		set: (key, value) => setJsonItem(storage, key, value),
 	};
 };
 

@@ -13,7 +13,7 @@
  */
 
 const DEFAULT_INIT = {
-	credentials: 'include'
+	credentials: 'include',
 };
 
 /**
@@ -34,11 +34,11 @@ export default function defaultFetch(resource, init = {}) {
 
 	const mergedInit = {
 		...DEFAULT_INIT,
-		...init
+		...init,
 	};
 
 	mergedInit.headers = headers;
 
-	// eslint-disable-next-line liferay-portal/no-global-fetch
+	// eslint-disable-next-line @liferay/portal/no-global-fetch
 	return fetch(resource, mergedInit);
 }

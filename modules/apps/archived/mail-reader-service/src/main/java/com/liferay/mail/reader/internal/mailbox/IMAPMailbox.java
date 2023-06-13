@@ -373,13 +373,13 @@ public class IMAPMailbox extends BaseMailbox {
 
 		updateFolders();
 
-		List<Folder> folders = FolderLocalServiceUtil.getFolders(
-			account.getAccountId());
-
 		String key = AccountLock.getKey(
 			user.getUserId(), account.getAccountId());
 
 		if (AccountLock.acquireLock(key)) {
+			List<Folder> folders = FolderLocalServiceUtil.getFolders(
+				account.getAccountId());
+
 			try {
 				for (Folder folder : folders) {
 					_imapAccessor.storeEnvelopes(folder.getFolderId(), true);
@@ -435,17 +435,17 @@ public class IMAPMailbox extends BaseMailbox {
 			long folderId, int pageNumber, int messagesPerPage)
 		throws PortalException {
 
-		long[] remoteMessageIds = _imapAccessor.getMessageUIDs(
+		long[] remoteMessageUIds = _imapAccessor.getMessageUIDs(
 			folderId, pageNumber, messagesPerPage);
 
 		List<Long> missingRemoteMessageIdsList = new ArrayList<>();
 
-		for (long remoteMessageId : remoteMessageIds) {
+		for (long remoteMessageUId : remoteMessageUIds) {
 			try {
-				MessageLocalServiceUtil.getMessage(folderId, remoteMessageId);
+				MessageLocalServiceUtil.getMessage(folderId, remoteMessageUId);
 			}
 			catch (NoSuchMessageException noSuchMessageException) {
-				missingRemoteMessageIdsList.add(remoteMessageId);
+				missingRemoteMessageIdsList.add(remoteMessageUId);
 			}
 		}
 

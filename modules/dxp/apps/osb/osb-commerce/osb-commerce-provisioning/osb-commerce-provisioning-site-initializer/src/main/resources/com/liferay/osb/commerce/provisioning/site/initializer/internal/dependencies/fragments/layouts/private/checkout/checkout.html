@@ -1,0 +1,17 @@
+<section class="container-fluid osb-commerce-checkout p-0">
+	<div class="row">
+		<div class="col-md-8">
+			[#if liferay_portlet??]
+				[@liferay_portlet.runtime
+					defaultPreferences=portlet_preferences
+					instanceId="osb_commerce_checkout_checkout"
+					portletName="com_liferay_commerce_checkout_web_internal_portlet_CommerceCheckoutPortlet"
+				/]
+			[/#if]
+		</div>
+
+		<div class="col-md-4">
+			<lfr-widget-osb-commerce-checkout></lfr-widget-osb-commerce-checkout>
+		</div>
+	</div>
+</section>

@@ -16,6 +16,7 @@ package com.liferay.layout.internal.util;
 
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
+import com.liferay.layout.security.permission.resource.LayoutContentModelResourcePermission;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -40,6 +41,7 @@ import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalService;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
+import com.liferay.portal.kernel.service.permission.LayoutPermission;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -47,6 +49,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SessionClicks;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.layoutsadmin.util.LayoutsTree;
 import com.liferay.sites.kernel.util.SitesUtil;
@@ -55,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -260,6 +264,22 @@ public class LayoutsTreeImpl implements LayoutsTree {
 			httpServletRequest, groupId, layoutTreeNodes, layoutSetBranch);
 	}
 
+	private Layout _getDraftLayout(Layout layout) {
+		if (!layout.isTypeContent()) {
+			return null;
+		}
+
+		Layout draftLayout = layout.fetchDraftLayout();
+
+		if ((draftLayout != null) &&
+			(draftLayout.getStatus() == WorkflowConstants.STATUS_DRAFT)) {
+
+			return draftLayout;
+		}
+
+		return null;
+	}
+
 	private LayoutTreeNodes _getLayoutTreeNodes(
 			HttpServletRequest httpServletRequest, long groupId,
 			boolean privateLayout, long parentLayoutId, boolean incomplete,
@@ -435,7 +455,7 @@ public class LayoutsTreeImpl implements LayoutsTree {
 	private boolean _isDeleteable(
 			Layout layout, ThemeDisplay themeDisplay,
 			LayoutSetBranch layoutSetBranch)
-		throws PortalException {
+		throws Exception {
 
 		if (!LayoutPermissionUtil.contains(
 				themeDisplay.getPermissionChecker(), layout,
@@ -543,9 +563,20 @@ public class LayoutsTreeImpl implements LayoutsTree {
 			).put(
 				"deleteable",
 				_isDeleteable(layout, themeDisplay, layoutSetBranch)
-			).put(
-				"friendlyURL", layout.getFriendlyURL()
 			);
+
+			Layout draftLayout = _getDraftLayout(layout);
+
+			if (draftLayout != null) {
+				jsonObject.put("draftStatus", "draft");
+
+				String draftLayoutURL = _portal.getLayoutFriendlyURL(
+					draftLayout, themeDisplay);
+
+				jsonObject.put("draftURL", draftLayoutURL);
+			}
+
+			jsonObject.put("friendlyURL", layout.getFriendlyURL());
 
 			if (layout instanceof VirtualLayout) {
 				VirtualLayout virtualLayout = (VirtualLayout)layout;
@@ -560,8 +591,31 @@ public class LayoutsTreeImpl implements LayoutsTree {
 				"hasChildren", layout.hasChildren()
 			).put(
 				"layoutId", layout.getLayoutId()
-			).put(
-				"name", layout.getName(themeDisplay.getLocale())
+			);
+
+			String layoutName = layout.getName(themeDisplay.getLocale());
+
+			try {
+				if ((draftLayout != null) &&
+					(_layoutContentModelResourcePermission.contains(
+						themeDisplay.getPermissionChecker(), layout.getPlid(),
+						ActionKeys.UPDATE) ||
+					 _layoutPermission.contains(
+						 themeDisplay.getPermissionChecker(), layout,
+						 ActionKeys.UPDATE) ||
+					 _layoutPermission.contains(
+						 themeDisplay.getPermissionChecker(), layout,
+						 ActionKeys.UPDATE_LAYOUT_CONTENT))) {
+
+					layoutName = layoutName + StringPool.STAR;
+				}
+			}
+			catch (PortalException portalException) {
+				_log.error(portalException);
+			}
+
+			jsonObject.put(
+				"name", layoutName
 			).put(
 				"parentable",
 				LayoutPermissionUtil.contains(
@@ -629,6 +683,18 @@ public class LayoutsTreeImpl implements LayoutsTree {
 				);
 			}
 
+			if (Objects.equals(
+					layout.getType(), LayoutConstants.TYPE_COLLECTION)) {
+
+				jsonObject.put(
+					"collectionPK",
+					layout.getTypeSettingsProperty("collectionPK")
+				).put(
+					"collectionType",
+					layout.getTypeSettingsProperty("collectionType")
+				);
+			}
+
 			jsonArray.put(jsonObject);
 		}
 
@@ -666,7 +732,14 @@ public class LayoutsTreeImpl implements LayoutsTree {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
+	private LayoutContentModelResourcePermission
+		_layoutContentModelResourcePermission;
+
+	@Reference
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutPermission _layoutPermission;
 
 	@Reference
 	private LayoutRevisionLocalService _layoutRevisionLocalService;

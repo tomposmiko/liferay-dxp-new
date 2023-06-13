@@ -20,6 +20,7 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.osgi.web.servlet.jsp.compiler.internal.util.ClassPathUtil;
 
@@ -85,6 +86,11 @@ public class JspJavaFileObjectResolver implements JavaFileObjectResolver {
 				_jspBundleWiring.listResources(
 					packagePath, "*.class", options)));
 
+		javaFileObjects.addAll(
+			toJavaFileObjects(
+				_bundleWiring.getBundle(),
+				_bundleWiring.listResources(packagePath, "*.class", options)));
+
 		String packageName = StringUtil.replace(
 			packagePath, CharPool.SLASH, CharPool.PERIOD);
 
@@ -97,12 +103,6 @@ public class JspJavaFileObjectResolver implements JavaFileObjectResolver {
 				javaFileObjects.addAll(
 					doResolveClasses(entry.getKey(), packagePath, options));
 			}
-		}
-
-		if (javaFileObjects.isEmpty()) {
-			return toJavaFileObjects(
-				_bundleWiring.getBundle(),
-				_bundleWiring.listResources(packagePath, "*.class", options));
 		}
 
 		return javaFileObjects;
@@ -180,7 +180,7 @@ public class JspJavaFileObjectResolver implements JavaFileObjectResolver {
 			urls = extraPackageMap.get(StringUtil.replace(path, '/', '.'));
 		}
 
-		if ((urls == null) || urls.isEmpty()) {
+		if (ListUtil.isEmpty(urls)) {
 			ClassLoader classLoader = bundleWiring.getClassLoader();
 
 			try {
@@ -205,7 +205,7 @@ public class JspJavaFileObjectResolver implements JavaFileObjectResolver {
 			}
 		}
 
-		if ((urls == null) || urls.isEmpty()) {
+		if (ListUtil.isEmpty(urls)) {
 			_javaFileObjects.put(path, Collections.<JavaFileObject>emptyList());
 
 			return Collections.emptyList();
@@ -254,7 +254,9 @@ public class JspJavaFileObjectResolver implements JavaFileObjectResolver {
 
 							String entryPathString = entryPath.toString();
 
-							entryPathString = entryPathString.substring(1);
+							if (entryPathString.charAt(0) == CharPool.SLASH) {
+								entryPathString = entryPathString.substring(1);
+							}
 
 							javaFileObjects.add(
 								new JarJavaFileObject(

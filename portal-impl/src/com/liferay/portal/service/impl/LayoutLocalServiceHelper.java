@@ -63,9 +63,11 @@ import com.liferay.portal.util.LayoutTypeControllerTracker;
 import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,6 +79,15 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 	public String getFriendlyURL(
 			long groupId, boolean privateLayout, long layoutId, String name,
 			String friendlyURL)
+		throws PortalException {
+
+		return getFriendlyURL(
+			groupId, privateLayout, layoutId, name, friendlyURL, null);
+	}
+
+	public String getFriendlyURL(
+			long groupId, boolean privateLayout, long layoutId, String name,
+			String friendlyURL, String languageId)
 		throws PortalException {
 
 		friendlyURL = getFriendlyURL(friendlyURL);
@@ -92,7 +103,7 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 		for (int i = 1;; i++) {
 			try {
 				validateFriendlyURL(
-					groupId, privateLayout, layoutId, friendlyURL);
+					groupId, privateLayout, layoutId, friendlyURL, languageId);
 
 				break;
 			}
@@ -129,7 +140,8 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 
 			if (Validator.isNotNull(friendlyURL)) {
 				friendlyURL = getFriendlyURL(
-					groupId, privateLayout, layoutId, name, friendlyURL);
+					groupId, privateLayout, layoutId, name, friendlyURL,
+					locale.toString());
 
 				newFriendlyURLMap.put(locale, friendlyURL);
 			}
@@ -339,6 +351,15 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 			String friendlyURL)
 		throws PortalException {
 
+		validateFriendlyURL(
+			groupId, privateLayout, layoutId, friendlyURL, null);
+	}
+
+	public void validateFriendlyURL(
+			long groupId, boolean privateLayout, long layoutId,
+			String friendlyURL, String languageId)
+		throws PortalException {
+
 		if (Validator.isNull(friendlyURL)) {
 			return;
 		}
@@ -357,7 +378,10 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 			Layout layout = layoutPersistence.findByPrimaryKey(
 				layoutFriendlyURL.getPlid());
 
-			if (layout.getLayoutId() != layoutId) {
+			if ((layout.getLayoutId() != layoutId) ||
+				(Validator.isNotNull(languageId) &&
+				 !languageId.equals(layoutFriendlyURL.getLanguageId()))) {
+
 				LayoutFriendlyURLException layoutFriendlyURLException =
 					new LayoutFriendlyURLException(
 						LayoutFriendlyURLException.DUPLICATE);
@@ -438,7 +462,7 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 		}
 
 		for (Locale locale : LanguageUtil.getAvailableLocales()) {
-			String languageId = StringUtil.toLowerCase(
+			languageId = StringUtil.toLowerCase(
 				LocaleUtil.toLanguageId(locale));
 
 			String i18nPathLanguageId =
@@ -490,12 +514,25 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 
 		LayoutFriendlyURLsException layoutFriendlyURLsException = null;
 
+		Set<String> friendlyURLs = new HashSet<>(friendlyURLMap.values());
+
+		if (friendlyURLs.size() != friendlyURLMap.size()) {
+			LayoutFriendlyURLException layoutFriendlyURLException =
+				new LayoutFriendlyURLException(
+					LayoutFriendlyURLException.DUPLICATE);
+
+			layoutFriendlyURLsException = new LayoutFriendlyURLsException(
+				layoutFriendlyURLException);
+		}
+
 		for (Map.Entry<Locale, String> entry : friendlyURLMap.entrySet()) {
 			try {
 				String friendlyURL = entry.getValue();
+				Locale locale = entry.getKey();
 
 				validateFriendlyURL(
-					groupId, privateLayout, layoutId, friendlyURL);
+					groupId, privateLayout, layoutId, friendlyURL,
+					locale.toString());
 			}
 			catch (LayoutFriendlyURLException layoutFriendlyURLException) {
 				Locale locale = entry.getKey();
@@ -593,31 +630,33 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 
 		// If layout is moved, the new first layout must be valid
 
-		if (layout.getParentLayoutId() ==
+		if (layout.getParentLayoutId() !=
 				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) {
 
-			List<Layout> layouts = layoutPersistence.findByG_P_P(
-				groupId, privateLayout,
-				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, 0, 2);
+			return;
+		}
 
-			// You can only reach this point if there are more than two layouts
-			// at the root level because of the descendant check
+		List<Layout> layouts = layoutPersistence.findByG_P_P(
+			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, 0,
+			2);
 
-			Layout firstLayout = layouts.get(0);
+		// You can only reach this point if there are more than two layouts
+		// at the root level because of the descendant check
 
-			long firstLayoutId = firstLayout.getLayoutId();
+		Layout firstLayout = layouts.get(0);
 
-			if (firstLayoutId == layoutId) {
-				Layout secondLayout = layouts.get(1);
+		long firstLayoutId = firstLayout.getLayoutId();
 
-				LayoutType layoutType = secondLayout.getLayoutType();
+		if (firstLayoutId == layoutId) {
+			Layout secondLayout = layouts.get(1);
 
-				if (Validator.isNull(secondLayout.getType()) ||
-					!layoutType.isFirstPageable()) {
+			LayoutType layoutType = secondLayout.getLayoutType();
 
-					throw new LayoutParentLayoutIdException(
-						LayoutParentLayoutIdException.FIRST_LAYOUT_TYPE);
-				}
+			if (Validator.isNull(secondLayout.getType()) ||
+				!layoutType.isFirstPageable()) {
+
+				throw new LayoutParentLayoutIdException(
+					LayoutParentLayoutIdException.FIRST_LAYOUT_TYPE);
 			}
 		}
 	}

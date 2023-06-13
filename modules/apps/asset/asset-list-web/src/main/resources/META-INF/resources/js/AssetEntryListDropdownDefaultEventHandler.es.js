@@ -12,7 +12,11 @@
  * details.
  */
 
-import {DefaultEventHandler, openSimpleInputModal} from 'frontend-js-web';
+import {
+	DefaultEventHandler,
+	openModal,
+	openSimpleInputModal,
+} from 'frontend-js-web';
 import {Config} from 'metal-state';
 
 class AssetEntryListDropdownDefaultEventHandler extends DefaultEventHandler {
@@ -27,15 +31,15 @@ class AssetEntryListDropdownDefaultEventHandler extends DefaultEventHandler {
 	}
 
 	permissionsAssetEntryList(itemData) {
-		this._openWindow(
-			Liferay.Language.get('permissions'),
-			itemData.permissionsAssetEntryListURL
-		);
+		openModal({
+			title: Liferay.Language.get('permissions'),
+			url: itemData.permissionsAssetEntryListURL,
+		});
 	}
 
 	renameAssetListEntry(itemData) {
 		openSimpleInputModal({
-			dialogTitle: Liferay.Language.get('rename-content-set'),
+			dialogTitle: Liferay.Language.get('rename-collection'),
 			formSubmitURL: itemData.renameAssetListEntryURL,
 			idFieldName: 'id',
 			idFieldValue: itemData.assetListEntryId,
@@ -44,21 +48,7 @@ class AssetEntryListDropdownDefaultEventHandler extends DefaultEventHandler {
 			mainFieldPlaceholder: Liferay.Language.get('title'),
 			mainFieldValue: itemData.assetListEntryTitle,
 			namespace: this.namespace,
-			spritemap: this.spritemap
-		});
-	}
-
-	_openWindow(label, url) {
-		Liferay.Util.openWindow({
-			dialog: {
-				destroyOnHide: true,
-				modal: true
-			},
-			dialogIframe: {
-				bodyCssClass: 'dialog-with-footer'
-			},
-			title: Liferay.Language.get(label),
-			uri: url
+			spritemap: this.spritemap,
 		});
 	}
 
@@ -68,7 +58,7 @@ class AssetEntryListDropdownDefaultEventHandler extends DefaultEventHandler {
 }
 
 AssetEntryListDropdownDefaultEventHandler.STATE = {
-	spritemap: Config.string()
+	spritemap: Config.string(),
 };
 
 export default AssetEntryListDropdownDefaultEventHandler;

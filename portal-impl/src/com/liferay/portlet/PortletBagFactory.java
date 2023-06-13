@@ -277,15 +277,15 @@ public class PortletBagFactory {
 	}
 
 	private javax.portlet.Portlet _getPortletInstance(Portlet portlet)
-		throws IllegalAccessException, InstantiationException {
+		throws Exception {
 
 		Class<?> portletClass = null;
 
 		try {
 			portletClass = _classLoader.loadClass(portlet.getPortletClass());
 		}
-		catch (Throwable t) {
-			_log.error(t, t);
+		catch (Throwable throwable) {
+			_log.error(throwable, throwable);
 
 			PortletLocalServiceUtil.destroyPortlet(portlet);
 
@@ -588,32 +588,33 @@ public class PortletBagFactory {
 			List<ServiceRegistration<?>> serviceRegistrations)
 		throws Exception {
 
-		if (Validator.isNotNull(portlet.getPreferencesValidator())) {
-			PreferencesValidator preferencesValidatorInstance = _newInstance(
-				PreferencesValidator.class, portlet.getPreferencesValidator());
-
-			try {
-				if (PropsValues.PREFERENCE_VALIDATE_ON_STARTUP) {
-					preferencesValidatorInstance.validate(
-						PortletPreferencesFactoryUtil.fromDefaultXML(
-							portlet.getDefaultPreferences()));
-				}
-			}
-			catch (Exception exception) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Portlet with the name " + portlet.getPortletId() +
-							" does not have valid default preferences");
-				}
-			}
-
-			ServiceRegistration<?> serviceRegistration =
-				registry.registerService(
-					PreferencesValidator.class, preferencesValidatorInstance,
-					properties);
-
-			serviceRegistrations.add(serviceRegistration);
+		if (Validator.isNull(portlet.getPreferencesValidator())) {
+			return;
 		}
+
+		PreferencesValidator preferencesValidatorInstance = _newInstance(
+			PreferencesValidator.class, portlet.getPreferencesValidator());
+
+		try {
+			if (PropsValues.PREFERENCE_VALIDATE_ON_STARTUP) {
+				preferencesValidatorInstance.validate(
+					PortletPreferencesFactoryUtil.fromDefaultXML(
+						portlet.getDefaultPreferences()));
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Portlet with the name " + portlet.getPortletId() +
+						" does not have valid default preferences");
+			}
+		}
+
+		ServiceRegistration<?> serviceRegistration = registry.registerService(
+			PreferencesValidator.class, preferencesValidatorInstance,
+			properties);
+
+		serviceRegistrations.add(serviceRegistration);
 	}
 
 	private void _registerSchedulerEventMessageListeners(
@@ -863,15 +864,13 @@ public class PortletBagFactory {
 			WebDAVStorage webDAVStorageInstance = _newInstance(
 				WebDAVStorage.class, portlet.getWebDAVStorageClass());
 
-			Map<String, Object> webDAVProperties =
+			registry.registerService(
+				WebDAVStorage.class, webDAVStorageInstance,
 				HashMapBuilder.<String, Object>put(
 					"javax.portlet.name", portlet.getPortletId()
 				).put(
 					"webdav.storage.token", portlet.getWebDAVStorageToken()
-				).build();
-
-			registry.registerService(
-				WebDAVStorage.class, webDAVStorageInstance, webDAVProperties);
+				).build());
 		}
 	}
 

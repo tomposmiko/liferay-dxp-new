@@ -14,6 +14,7 @@
 
 package com.liferay.headless.delivery.internal.odata.entity.v1_0;
 
+import com.liferay.headless.common.spi.odata.entity.EntityFieldsMapFactory;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.CollectionEntityField;
@@ -33,7 +34,7 @@ import java.util.Map;
 public class KnowledgeBaseArticleEntityModel implements EntityModel {
 
 	public KnowledgeBaseArticleEntityModel(List<EntityField> entityFields) {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+		_entityFieldsMap = EntityFieldsMapFactory.create(
 			new CollectionEntityField(
 				new IntegerEntityField(
 					"taxonomyCategoryIds", locale -> "assetCategoryIds")),
@@ -49,6 +50,9 @@ public class KnowledgeBaseArticleEntityModel implements EntityModel {
 				"dateModified",
 				locale -> Field.getSortableFieldName(Field.MODIFIED_DATE),
 				locale -> Field.MODIFIED_DATE),
+			new StringEntityField(
+				"friendlyUrlPath",
+				locale -> Field.getSortableFieldName("urlTitle_String")),
 			new StringEntityField(
 				"title",
 				locale -> Field.getSortableFieldName(

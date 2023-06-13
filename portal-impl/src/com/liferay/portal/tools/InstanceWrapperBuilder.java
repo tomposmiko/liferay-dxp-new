@@ -16,6 +16,8 @@ package com.liferay.portal.tools;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
@@ -75,7 +77,7 @@ public class InstanceWrapperBuilder {
 			}
 		}
 		catch (Exception exception) {
-			exception.printStackTrace();
+			_log.error(exception);
 		}
 	}
 
@@ -111,11 +113,11 @@ public class InstanceWrapperBuilder {
 		sb.append("_IW getInstance() {return _instance;}\n");
 
 		for (JavaMethod javaMethod : javaMethods) {
-			String methodName = javaMethod.getName();
-
 			if (!javaMethod.isPublic() || !javaMethod.isStatic()) {
 				continue;
 			}
+
+			String methodName = javaMethod.getName();
 
 			if (methodName.equals("getInstance")) {
 				methodName = "getWrappedInstance";
@@ -280,7 +282,7 @@ public class InstanceWrapperBuilder {
 		}
 
 		StringBundler sb = new StringBundler(
-			actualTypeArguments.length * 2 + 3);
+			(actualTypeArguments.length * 2) + 3);
 
 		sb.append(type.getValue());
 		sb.append("<");
@@ -299,5 +301,8 @@ public class InstanceWrapperBuilder {
 
 		return sb.toString();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		InstanceWrapperBuilder.class);
 
 }

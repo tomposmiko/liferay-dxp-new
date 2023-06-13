@@ -90,8 +90,6 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 				).put(
 					DBType.POSTGRESQL,
 					"ERROR: column \"unknown\" does not exist"
-				).put(
-					DBType.SYBASE, "Invalid column name 'Unknown'."
 				).build());
 		}
 	}
@@ -142,6 +140,8 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 					DBType.POSTGRESQL,
 					"ERROR: relation \"unknown\" does not exist"
 				).put(
+					DBType.SQLSERVER, "Invalid object name 'Unknown'"
+				).put(
 					DBType.SYBASE, "Unknown not found."
 				).build());
 		}
@@ -185,6 +185,8 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 					DBType.POSTGRESQL,
 					"ERROR: relation \"unknown\" does not exist"
 				).put(
+					DBType.SQLSERVER, "Invalid object name 'Unknown'"
+				).put(
 					DBType.SYBASE, "Unknown not found."
 				).build());
 		}
@@ -195,15 +197,20 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 		return _verifyUUID;
 	}
 
-	private static void _verifyException(
+	private void _testDoVerify(VerifiableUUIDModel... verifiableUUIDModels) {
+		ReflectionTestUtil.invoke(
+			_verifyUUID, "doVerify",
+			new Class<?>[] {VerifiableUUIDModel[].class},
+			new Object[] {verifiableUUIDModels});
+	}
+
+	private void _verifyException(
 			Exception exception, Map<DBType, String> expectedMessages)
 		throws Exception {
 
 		DB db = DBManagerUtil.getDB();
 
-		DBType dbType = db.getDBType();
-
-		String expectedMessagePrefix = expectedMessages.get(dbType);
+		String expectedMessagePrefix = expectedMessages.get(db.getDBType());
 
 		if (expectedMessagePrefix == null) {
 			throw exception;
@@ -214,13 +221,6 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 		Assert.assertTrue(
 			message + " does not start " + expectedMessagePrefix,
 			message.startsWith(expectedMessagePrefix));
-	}
-
-	private void _testDoVerify(VerifiableUUIDModel... verifiableUUIDModels) {
-		ReflectionTestUtil.invoke(
-			_verifyUUID, "doVerify",
-			new Class<?>[] {VerifiableUUIDModel[].class},
-			new Object[] {verifiableUUIDModels});
 	}
 
 	private static final String _UNKNOWN = "Unknown";
@@ -234,8 +234,8 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 			try {
 				UnsafeConsumer.accept(callables, Callable<Void>::call);
 			}
-			catch (Throwable t) {
-				ReflectionUtil.throwException(t);
+			catch (Throwable throwable) {
+				ReflectionUtil.throwException(throwable);
 			}
 		}
 

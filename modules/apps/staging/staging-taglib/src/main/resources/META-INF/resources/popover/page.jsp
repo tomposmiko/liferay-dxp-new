@@ -36,7 +36,7 @@
 	</span>
 
 	<aui:script use="aui-base">
-		A.ready('aui-base', function(A) {
+		A.ready('aui-base', function (A) {
 			var popoverNode = A.one('#<%= domId %>');
 
 			var popover = popoverNode.one('.popover');
@@ -52,7 +52,7 @@
 				if ('visible' !== popover.get('visibility')) {
 					popover.setXY([
 						iconHolderNode.getX() + iconHolderNode.width() + dx,
-						iconHolderNode.getY() - dy
+						iconHolderNode.getY() - dy,
 					]);
 				}
 			});

@@ -18,9 +18,9 @@
 
 <%
 boolean inline = GetterUtil.getBoolean(request.getAttribute("liferay-frontend:add-menu:inline"));
-int menuItemsCount = GetterUtil.getInteger(request.getAttribute("liferay-frontend:add-menu:menuItemsCount"));
 int maxItems = GetterUtil.getInteger(request.getAttribute("liferay-frontend:add-menu:maxItems"));
 List<MenuItemGroup> menuItemGroups = (List<MenuItemGroup>)request.getAttribute("liferay-frontend:add-menu:menuItemGroups");
+int menuItemsCount = GetterUtil.getInteger(request.getAttribute("liferay-frontend:add-menu:menuItemsCount"));
 int numMenuItems = GetterUtil.getInteger(request.getAttribute("liferay-frontend:add-menu:numMenuItems"));
 int total = GetterUtil.getInteger(request.getAttribute("liferay-frontend:add-menu:total"));
 String viewMoreURL = (String)request.getAttribute("liferay-frontend:add-menu:viewMoreURL");
@@ -55,7 +55,7 @@ String viewMoreURL = (String)request.getAttribute("liferay-frontend:add-menu:vie
 	</c:when>
 	<c:otherwise>
 		<div class="add-menu btn-action-secondary <%= inline ? StringPool.BLANK : "btn-bottom-right" %> dropdown">
-			<button aria-expanded="false" class="btn btn-primary" data-qa-id="addButton" data-toggle="dropdown" type="button">
+			<button aria-expanded="false" class="btn btn-primary" data-qa-id="addButton" data-toggle="liferay-dropdown" type="button">
 				<aui:icon image="plus" markupView="lexicon" />
 			</button>
 
@@ -136,7 +136,7 @@ String viewMoreURL = (String)request.getAttribute("liferay-frontend:add-menu:vie
 						<aui:script use="liferay-util-window">
 							var viewMoreAddMenuElements = A.one('#<%= namespace %>viewMoreButton');
 
-							viewMoreAddMenuElements.on('click', function(event) {
+							viewMoreAddMenuElements.on('click', function (event) {
 								Liferay.Util.Session.set(
 									'com.liferay.addmenu_customizeAddMenuAdviceMessage',
 									true
@@ -145,11 +145,11 @@ String viewMoreURL = (String)request.getAttribute("liferay-frontend:add-menu:vie
 								Liferay.Util.openWindow({
 									dialog: {
 										destroyOnHide: true,
-										modal: true
+										modal: true,
 									},
 									id: '<%= namespace %>selectAddMenuItem',
 									title: '<liferay-ui:message key="more" />',
-									uri: '<%= viewMoreURL %>'
+									uri: '<%= viewMoreURL %>',
 								});
 							});
 						</aui:script>

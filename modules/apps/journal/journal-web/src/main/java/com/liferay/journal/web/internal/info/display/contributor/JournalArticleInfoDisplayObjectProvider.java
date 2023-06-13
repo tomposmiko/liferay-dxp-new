@@ -38,6 +38,7 @@ public class JournalArticleInfoDisplayObjectProvider
 		throws PortalException {
 
 		_article = article;
+
 		_assetEntry = _getAssetEntry(article);
 	}
 
@@ -94,7 +95,7 @@ public class JournalArticleInfoDisplayObjectProvider
 
 	@Override
 	public String getURLTitle(Locale locale) {
-		AssetRenderer assetRenderer = _assetEntry.getAssetRenderer();
+		AssetRenderer<?> assetRenderer = _assetEntry.getAssetRenderer();
 
 		return assetRenderer.getUrlTitle(locale);
 	}
@@ -102,7 +103,7 @@ public class JournalArticleInfoDisplayObjectProvider
 	private AssetEntry _getAssetEntry(JournalArticle journalArticle)
 		throws PortalException {
 
-		AssetRendererFactory assetRendererFactory =
+		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 				JournalArticle.class.getName());
 

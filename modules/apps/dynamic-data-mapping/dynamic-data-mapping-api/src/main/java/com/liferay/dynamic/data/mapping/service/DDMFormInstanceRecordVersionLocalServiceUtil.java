@@ -14,9 +14,16 @@
 
 package com.liferay.dynamic.data.mapping.service;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for DDMFormInstanceRecordVersion. This utility wraps
@@ -41,14 +48,15 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	/**
 	 * Adds the ddm form instance record version to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMFormInstanceRecordVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ddmFormInstanceRecordVersion the ddm form instance record version
 	 * @return the ddm form instance record version that was added
 	 */
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-			addDDMFormInstanceRecordVersion(
-				com.liferay.dynamic.data.mapping.model.
-					DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion) {
+	public static DDMFormInstanceRecordVersion addDDMFormInstanceRecordVersion(
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion) {
 
 		return getService().addDDMFormInstanceRecordVersion(
 			ddmFormInstanceRecordVersion);
@@ -60,26 +68,36 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	 * @param formInstanceRecordVersionId the primary key for the new ddm form instance record version
 	 * @return the new ddm form instance record version
 	 */
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-			createDDMFormInstanceRecordVersion(
-				long formInstanceRecordVersionId) {
+	public static DDMFormInstanceRecordVersion
+		createDDMFormInstanceRecordVersion(long formInstanceRecordVersionId) {
 
 		return getService().createDDMFormInstanceRecordVersion(
 			formInstanceRecordVersionId);
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the ddm form instance record version from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMFormInstanceRecordVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ddmFormInstanceRecordVersion the ddm form instance record version
 	 * @return the ddm form instance record version that was removed
 	 */
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-			deleteDDMFormInstanceRecordVersion(
-				com.liferay.dynamic.data.mapping.model.
-					DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion) {
+	public static DDMFormInstanceRecordVersion
+		deleteDDMFormInstanceRecordVersion(
+			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion) {
 
 		return getService().deleteDDMFormInstanceRecordVersion(
 			ddmFormInstanceRecordVersion);
@@ -88,15 +106,17 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	/**
 	 * Deletes the ddm form instance record version with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMFormInstanceRecordVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param formInstanceRecordVersionId the primary key of the ddm form instance record version
 	 * @return the ddm form instance record version that was removed
 	 * @throws PortalException if a ddm form instance record version with the primary key could not be found
 	 */
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-				deleteDDMFormInstanceRecordVersion(
-					long formInstanceRecordVersionId)
-			throws com.liferay.portal.kernel.exception.PortalException {
+	public static DDMFormInstanceRecordVersion
+			deleteDDMFormInstanceRecordVersion(long formInstanceRecordVersionId)
+		throws PortalException {
 
 		return getService().deleteDDMFormInstanceRecordVersion(
 			formInstanceRecordVersionId);
@@ -105,17 +125,22 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -125,9 +150,7 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -143,9 +166,8 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -163,10 +185,9 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -178,9 +199,7 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -192,26 +211,23 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-			fetchDDMFormInstanceRecordVersion(
-				long formInstanceRecordVersionId) {
+	public static DDMFormInstanceRecordVersion
+		fetchDDMFormInstanceRecordVersion(long formInstanceRecordVersionId) {
 
 		return getService().fetchDDMFormInstanceRecordVersion(
 			formInstanceRecordVersionId);
 	}
 
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-			fetchLatestFormInstanceRecordVersion(
-				long userId, long formInstanceId, String formInstanceVersion,
-				int status) {
+	public static DDMFormInstanceRecordVersion
+		fetchLatestFormInstanceRecordVersion(
+			long userId, long formInstanceId, String formInstanceVersion,
+			int status) {
 
 		return getService().fetchLatestFormInstanceRecordVersion(
 			userId, formInstanceId, formInstanceVersion, status);
@@ -230,11 +246,9 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	 * @return the ddm form instance record version
 	 * @throws PortalException if a ddm form instance record version with the primary key could not be found
 	 */
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-				getDDMFormInstanceRecordVersion(
-					long formInstanceRecordVersionId)
-			throws com.liferay.portal.kernel.exception.PortalException {
+	public static DDMFormInstanceRecordVersion getDDMFormInstanceRecordVersion(
+			long formInstanceRecordVersionId)
+		throws PortalException {
 
 		return getService().getDDMFormInstanceRecordVersion(
 			formInstanceRecordVersionId);
@@ -251,9 +265,8 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	 * @param end the upper bound of the range of ddm form instance record versions (not inclusive)
 	 * @return the range of ddm form instance record versions
 	 */
-	public static java.util.List
-		<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion>
-			getDDMFormInstanceRecordVersions(int start, int end) {
+	public static List<DDMFormInstanceRecordVersion>
+		getDDMFormInstanceRecordVersions(int start, int end) {
 
 		return getService().getDDMFormInstanceRecordVersions(start, end);
 	}
@@ -267,33 +280,26 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 		return getService().getDDMFormInstanceRecordVersionsCount();
 	}
 
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-				getFormInstanceRecordVersion(
-					long ddmFormInstanceRecordVersionId)
-			throws com.liferay.portal.kernel.exception.PortalException {
+	public static DDMFormInstanceRecordVersion getFormInstanceRecordVersion(
+			long ddmFormInstanceRecordVersionId)
+		throws PortalException {
 
 		return getService().getFormInstanceRecordVersion(
 			ddmFormInstanceRecordVersionId);
 	}
 
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-				getFormInstanceRecordVersion(
-					long ddmFormInstanceId, String version)
-			throws com.liferay.portal.kernel.exception.PortalException {
+	public static DDMFormInstanceRecordVersion getFormInstanceRecordVersion(
+			long ddmFormInstanceId, String version)
+		throws PortalException {
 
 		return getService().getFormInstanceRecordVersion(
 			ddmFormInstanceId, version);
 	}
 
-	public static java.util.List
-		<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion>
-			getFormInstanceRecordVersions(
-				long ddmFormInstanceRecordId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.dynamic.data.mapping.model.
-						DDMFormInstanceRecordVersion> orderByComparator) {
+	public static List<DDMFormInstanceRecordVersion>
+		getFormInstanceRecordVersions(
+			long ddmFormInstanceRecordId, int start, int end,
+			OrderByComparator<DDMFormInstanceRecordVersion> orderByComparator) {
 
 		return getService().getFormInstanceRecordVersions(
 			ddmFormInstanceRecordId, start, end, orderByComparator);
@@ -313,13 +319,21 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 		return getService().getIndexableActionableDynamicQuery();
 	}
 
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-				getLatestFormInstanceRecordVersion(long ddmFormInstanceId)
-			throws com.liferay.portal.kernel.exception.PortalException {
+	public static DDMFormInstanceRecordVersion
+			getLatestFormInstanceRecordVersion(long ddmFormInstanceId)
+		throws PortalException {
 
 		return getService().getLatestFormInstanceRecordVersion(
 			ddmFormInstanceId);
+	}
+
+	public static DDMFormInstanceRecordVersion
+			getLatestFormInstanceRecordVersion(
+				long ddmFormInstanceRecordId, int status)
+		throws PortalException {
+
+		return getService().getLatestFormInstanceRecordVersion(
+			ddmFormInstanceRecordId, status);
 	}
 
 	/**
@@ -331,9 +345,11 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -341,43 +357,25 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	/**
 	 * Updates the ddm form instance record version in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMFormInstanceRecordVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ddmFormInstanceRecordVersion the ddm form instance record version
 	 * @return the ddm form instance record version that was updated
 	 */
-	public static
-		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
-			updateDDMFormInstanceRecordVersion(
-				com.liferay.dynamic.data.mapping.model.
-					DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion) {
+	public static DDMFormInstanceRecordVersion
+		updateDDMFormInstanceRecordVersion(
+			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion) {
 
 		return getService().updateDDMFormInstanceRecordVersion(
 			ddmFormInstanceRecordVersion);
 	}
 
 	public static DDMFormInstanceRecordVersionLocalService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	private static ServiceTracker
-		<DDMFormInstanceRecordVersionLocalService,
-		 DDMFormInstanceRecordVersionLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			DDMFormInstanceRecordVersionLocalService.class);
-
-		ServiceTracker
-			<DDMFormInstanceRecordVersionLocalService,
-			 DDMFormInstanceRecordVersionLocalService> serviceTracker =
-				new ServiceTracker
-					<DDMFormInstanceRecordVersionLocalService,
-					 DDMFormInstanceRecordVersionLocalService>(
-						 bundle.getBundleContext(),
-						 DDMFormInstanceRecordVersionLocalService.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile DDMFormInstanceRecordVersionLocalService _service;
 
 }

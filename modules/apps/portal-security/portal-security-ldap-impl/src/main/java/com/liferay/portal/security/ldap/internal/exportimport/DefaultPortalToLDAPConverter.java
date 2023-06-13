@@ -19,12 +19,14 @@ import com.liferay.expando.kernel.util.ExpandoConverterUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.PwdEncryptorException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Image;
+import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.security.auth.PasswordModificationThreadLocal;
@@ -32,6 +34,7 @@ import com.liferay.portal.kernel.security.ldap.LDAPSettings;
 import com.liferay.portal.kernel.security.pwd.PasswordEncryptor;
 import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.kernel.service.ImageLocalService;
+import com.liferay.portal.kernel.service.ListTypeService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -535,18 +538,8 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 			!algorithm.equals(PasswordEncryptorUtil.TYPE_NONE)) {
 
 			try {
-				StringBundler sb = new StringBundler(4);
-
-				if (!hasLegacyPasswordEncryptionAlgorithm()) {
-					sb.append(StringPool.OPEN_CURLY_BRACE);
-					sb.append(algorithm);
-					sb.append(StringPool.CLOSE_CURLY_BRACE);
-				}
-
-				sb.append(
-					_passwordEncryptor.encrypt(algorithm, password, null));
-
-				password = sb.toString();
+				password = _passwordEncryptor.encrypt(
+					algorithm, password, null);
 			}
 			catch (PwdEncryptorException pwdEncryptorException) {
 				throw new SystemException(pwdEncryptorException);
@@ -557,11 +550,8 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 			UserConverterKeys.PASSWORD);
 
 		if (passwordKey.equals("unicodePwd")) {
-			String quotedPassword = StringPool.QUOTE.concat(
-				password
-			).concat(
-				StringPool.QUOTE
-			);
+			String quotedPassword = StringBundler.concat(
+				StringPool.QUOTE, password, StringPool.QUOTE);
 
 			try {
 				byte[] unicodePassword = quotedPassword.getBytes("UTF-16LE");
@@ -592,8 +582,7 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 			String ldapAttributeName = (String)entry.getValue();
 
 			try {
-				Object attributeValue = BeanPropertiesUtil.getObjectSilent(
-					object, fieldName);
+				Object attributeValue = _getAttributeValue(object, fieldName);
 
 				if (attributeValue != null) {
 					addModificationItem(
@@ -731,6 +720,33 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 		_passwordEncryptor = passwordEncryptor;
 	}
 
+	private Object _getAttributeValue(Object object, String fieldName)
+		throws PortalException {
+
+		boolean listTypeFieldName = false;
+
+		if (fieldName.equals("prefix")) {
+			fieldName = "prefixId";
+			listTypeFieldName = true;
+		}
+		else if (fieldName.equals("suffix")) {
+			fieldName = "suffixId";
+			listTypeFieldName = true;
+		}
+
+		Object attributeValue = BeanPropertiesUtil.getObjectSilent(
+			object, fieldName);
+
+		if ((attributeValue != null) && listTypeFieldName) {
+			ListType listType = _listTypeService.getListType(
+				(Long)attributeValue);
+
+			attributeValue = listType.getName();
+		}
+
+		return attributeValue;
+	}
+
 	private static final String _DEFAULT_DN = "cn";
 
 	private static final String _OBJECT_CLASS = "objectclass";
@@ -744,6 +760,10 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 	private ConfigurationProvider<LDAPServerConfiguration>
 		_ldapServerConfigurationProvider;
 	private LDAPSettings _ldapSettings;
+
+	@Reference
+	private ListTypeService _listTypeService;
+
 	private PasswordEncryptor _passwordEncryptor;
 
 	@Reference

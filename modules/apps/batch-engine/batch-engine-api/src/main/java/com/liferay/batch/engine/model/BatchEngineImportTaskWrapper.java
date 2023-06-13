@@ -68,7 +68,7 @@ public class BatchEngineImportTaskWrapper
 		attributes.put("operation", getOperation());
 		attributes.put("parameters", getParameters());
 		attributes.put("startTime", getStartTime());
-		attributes.put("version", getVersion());
+		attributes.put("taskItemDelegateName", getTaskItemDelegateName());
 
 		return attributes;
 	}
@@ -192,10 +192,11 @@ public class BatchEngineImportTaskWrapper
 			setStartTime(startTime);
 		}
 
-		String version = (String)attributes.get("version");
+		String taskItemDelegateName = (String)attributes.get(
+			"taskItemDelegateName");
 
-		if (version != null) {
-			setVersion(version);
+		if (taskItemDelegateName != null) {
+			setTaskItemDelegateName(taskItemDelegateName);
 		}
 	}
 
@@ -380,6 +381,16 @@ public class BatchEngineImportTaskWrapper
 	}
 
 	/**
+	 * Returns the task item delegate name of this batch engine import task.
+	 *
+	 * @return the task item delegate name of this batch engine import task
+	 */
+	@Override
+	public String getTaskItemDelegateName() {
+		return model.getTaskItemDelegateName();
+	}
+
+	/**
 	 * Returns the user ID of this batch engine import task.
 	 *
 	 * @return the user ID of this batch engine import task
@@ -407,16 +418,6 @@ public class BatchEngineImportTaskWrapper
 	@Override
 	public String getUuid() {
 		return model.getUuid();
-	}
-
-	/**
-	 * Returns the version of this batch engine import task.
-	 *
-	 * @return the version of this batch engine import task
-	 */
-	@Override
-	public String getVersion() {
-		return model.getVersion();
 	}
 
 	@Override
@@ -607,6 +608,16 @@ public class BatchEngineImportTaskWrapper
 	}
 
 	/**
+	 * Sets the task item delegate name of this batch engine import task.
+	 *
+	 * @param taskItemDelegateName the task item delegate name of this batch engine import task
+	 */
+	@Override
+	public void setTaskItemDelegateName(String taskItemDelegateName) {
+		model.setTaskItemDelegateName(taskItemDelegateName);
+	}
+
+	/**
 	 * Sets the user ID of this batch engine import task.
 	 *
 	 * @param userId the user ID of this batch engine import task
@@ -634,16 +645,6 @@ public class BatchEngineImportTaskWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	/**
-	 * Sets the version of this batch engine import task.
-	 *
-	 * @param version the version of this batch engine import task
-	 */
-	@Override
-	public void setVersion(String version) {
-		model.setVersion(version);
 	}
 
 	@Override

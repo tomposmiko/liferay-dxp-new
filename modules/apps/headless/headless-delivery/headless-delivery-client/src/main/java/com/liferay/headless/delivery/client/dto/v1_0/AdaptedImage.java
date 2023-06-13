@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.AdaptedImageSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class AdaptedImage {
+public class AdaptedImage implements Cloneable, Serializable {
+
+	public static AdaptedImage toDTO(String json) {
+		return AdaptedImageSerDes.toDTO(json);
+	}
 
 	public String getContentUrl() {
 		return contentUrl;
@@ -48,6 +54,27 @@ public class AdaptedImage {
 	}
 
 	protected String contentUrl;
+
+	public String getContentValue() {
+		return contentValue;
+	}
+
+	public void setContentValue(String contentValue) {
+		this.contentValue = contentValue;
+	}
+
+	public void setContentValue(
+		UnsafeSupplier<String, Exception> contentValueUnsafeSupplier) {
+
+		try {
+			contentValue = contentValueUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String contentValue;
 
 	public Integer getHeight() {
 		return height;
@@ -132,6 +159,11 @@ public class AdaptedImage {
 	}
 
 	protected Integer width;
+
+	@Override
+	public AdaptedImage clone() throws CloneNotSupportedException {
+		return (AdaptedImage)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

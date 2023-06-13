@@ -23,5 +23,5 @@ function ${namespace}editWithImageEditor(
 }
 
 function ${namespace}_onSaveEditSuccess() {
-	Liferay.Portlet.refresh('#p_p_id${namespace}');
+	Liferay.Util.navigate('${redirectURL}');
 }

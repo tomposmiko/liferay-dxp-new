@@ -90,20 +90,16 @@ public final class AMAttribute<T, V> {
 	 * namespace.
 	 *
 	 * @param name a value that uniquely identifies the attribute
-	 * @param converter a function that converts a <code>String</code> to a
-	 *        value of the correct type; this function should throw an {@link
-	 *        com.liferay.adaptive.media.exception.AMRuntimeException.AMAttributeFormatException}
-	 *        if it cannot convert the <code>String</code>
 	 * @param amDistanceComparator the comparator to order the two arguments
 	 *        based on the distance between their values; it should return a
 	 *        value between {@link Long#MIN_VALUE} and {@link Long#MAX_VALUE}
 	 */
 	public AMAttribute(
-		String name, Function<String, V> converter,
+		String name, Function<String, V> converterFunction,
 		AMDistanceComparator<V> amDistanceComparator) {
 
 		_name = name;
-		_converterFunction = converter;
+		_converterFunction = converterFunction;
 		_amDistanceComparator = amDistanceComparator;
 	}
 

@@ -38,16 +38,16 @@ public class ConfigurationScreenConfigurationEntry
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof ConfigurationEntry)) {
+		if (!(object instanceof ConfigurationEntry)) {
 			return false;
 		}
 
-		ConfigurationEntry configurationEntry = (ConfigurationEntry)obj;
+		ConfigurationEntry configurationEntry = (ConfigurationEntry)object;
 
 		if (Objects.equals(getCategory(), configurationEntry.getCategory()) &&
 			Objects.equals(getKey(), configurationEntry.getKey()) &&
@@ -71,7 +71,8 @@ public class ConfigurationScreenConfigurationEntry
 		PortletURL portletURL = renderResponse.createRenderURL();
 
 		portletURL.setParameter(
-			"mvcRenderCommandName", "/view_configuration_screen");
+			"mvcRenderCommandName",
+			"/configuration_admin/view_configuration_screen");
 		portletURL.setParameter(
 			"configurationScreenKey", _configurationScreen.getKey());
 

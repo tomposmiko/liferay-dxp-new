@@ -36,6 +36,14 @@ definition {
 			Pause(locator1 = "3000");
 		}
 
+		if (isSet(applications)) {
+			for (var application : list "${applications}") {
+				AssertElementNotPresent(
+					key_application = "${application}",
+					locator1 = "ExportPersonalData#EXPORT_PROCESS_APPLICATION_IN_PROGRESS");
+			}
+		}
+
 		AssertElementPresent(locator1 = "ExportPersonalData#EXPORT_PROCESS_SUCCESSFUL");
 
 		if (isSet(applications)) {
@@ -58,11 +66,9 @@ definition {
 			MenuItem.clickNoError(menuItem = "Anonymize");
 
 			AssertConfirm(value1 = "Are you sure you want to anonymize the entities of this application?");
-
 		}
 
 		if (isSet(allApplications)) {
-
 			PortletEntry.selectAll();
 
 			Click(locator1 = "Icon#TOOLBAR_ELLIPSIS");
@@ -100,7 +106,16 @@ definition {
 
 			MenuItem.clickNoError(menuItem = "Delete");
 
-			AssertConfirm(value1 = "Are you sure you want to delete the selected items?");
+			AssertConfirm.assertConfirmationNoError(value1 = "Are you sure you want to delete the selected items?");
+
+			if (isSet(anonymizeData)) {
+				AssertElementPresent(
+					key_tab = "Auto Anonymize Data",
+					locator1 = "NavTab#ACTIVE_TAB_LINK");
+			}
+			else {
+				AssertConfirm.assertConfirmationNoError(value1 = "All personal data associated with this user's applications has been deleted or anonymized. The user can now be deleted. Click OK to delete the user.");
+			}
 		}
 
 		Alert.viewSuccessMessage();
@@ -130,12 +145,12 @@ definition {
 
 	macro filterByApplications {
 		Click.clickNoWaitForVisible(
-			key_applications = "${applications}",
-			locator1 = "DataErasure#REVIEW_DATA_APPLICATIONS_SELECT");
+			key_selectData = "${applications}",
+			locator1 = "DataErasure#REVIEW_DATA_SELECT");
 
 		AssertElementPresent(
-			key_applications = "${applications}",
-			locator1 = "DataErasure#REVIEW_DATA_APPLICATIONS_SELECTED");
+			key_dataSelected = "${applications}",
+			locator1 = "DataErasure#REVIEW_DATA_SELECTED");
 
 		AssertTextEquals.assertPartialText(
 			key_applications = "${applications}",
@@ -150,12 +165,12 @@ definition {
 
 	macro filterByScope {
 		Click.clickNoWaitForVisible(
-			key_scope = "${scope}",
-			locator1 = "DataErasure#REVIEW_DATA_SCOPE_SELECT");
+			key_selectData = "${scope}",
+			locator1 = "DataErasure#REVIEW_DATA_SELECT");
 
 		AssertElementPresent(
-			key_scope = "${scope}",
-			locator1 = "DataErasure#REVIEW_DATA_SCOPE_SELECTED");
+			key_dataSelected = "${scope}",
+			locator1 = "DataErasure#REVIEW_DATA_SELECTED");
 	}
 
 	macro viewEntryRowInApplicationCP {
@@ -167,7 +182,7 @@ definition {
 	}
 
 	macro viewNoEntryInApplicationCP {
-		if (IsElementNotPresent(locator1 = "NavTab#ACTIVE_TAB_LINK", key_tab = "Review Data")) {
+		if (IsElementNotPresent(key_tab = "Review Data", locator1 = "NavTab#ACTIVE_TAB_LINK")) {
 			Navigator.gotoNavTab(navTab = "Review Data");
 		}
 

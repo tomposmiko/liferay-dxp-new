@@ -59,7 +59,6 @@ public abstract class KaleoProcessFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -85,14 +84,5 @@ public abstract class KaleoProcessFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KaleoProcessFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(KaleoFormsPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

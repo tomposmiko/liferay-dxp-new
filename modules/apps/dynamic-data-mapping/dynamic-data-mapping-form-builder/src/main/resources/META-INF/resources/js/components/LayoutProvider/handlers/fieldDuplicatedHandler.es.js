@@ -12,92 +12,216 @@
  * details.
  */
 
-import * as FormSupport from 'dynamic-data-mapping-form-renderer/js/components/FormRenderer/FormSupport.es';
-import {PagesVisitor} from 'dynamic-data-mapping-form-renderer/js/util/visitors.es';
+import {
+	FormSupport,
+	PagesVisitor,
+	generateInstanceId,
+} from 'dynamic-data-mapping-form-renderer';
 
+import {getDefaultFieldName} from '../../../util/fieldSupport.es';
 import {sub} from '../../../util/strings.es';
 import {getFieldLocalizedValue} from '../util/fields.es';
+import {
+	getSettingsContextProperty,
+	updateField,
+	updateSettingsContextInstanceId,
+	updateSettingsContextProperty,
+} from '../util/settingsContext.es';
 
-const handleFieldDuplicated = (
-	{editingLanguageId, fieldNameGenerator},
-	state,
-	event
-) => {
-	const {columnIndex, pageIndex, rowIndex} = event.indexes;
-	const {pages} = state;
+export const getLabel = (originalField, editingLanguageId) => {
+	return sub(Liferay.Language.get('copy-of-x'), [
+		getFieldLocalizedValue(
+			originalField.settingsContext.pages,
+			'label',
+			editingLanguageId
+		),
+	]);
+};
 
-	const field = FormSupport.getField(pages, pageIndex, rowIndex, columnIndex);
-
-	const localizedLabel = getFieldLocalizedValue(
-		field.settingsContext.pages,
-		'label',
-		editingLanguageId
+export const getValidation = (originalField) => {
+	const validation = getSettingsContextProperty(
+		originalField.settingsContext,
+		'validation'
 	);
 
-	const label = sub(Liferay.Language.get('copy-of-x'), [localizedLabel]);
-	const newFieldName = fieldNameGenerator(label);
-	const oldFieldName = field.fieldName;
-	const visitor = new PagesVisitor(field.settingsContext.pages);
+	return validation;
+};
 
-	const duplicatedField = {
-		...field,
-		fieldName: newFieldName,
-		label,
-		name: newFieldName,
-		settingsContext: {
-			...field.settingsContext,
-			pages: visitor.mapFields(field => {
-				if (field.fieldName === 'name') {
-					field = {
-						...field,
-						value: newFieldName
-					};
-				} else if (field.fieldName === 'label') {
-					field = {
-						...field,
-						localizedValue: {
-							...field.localizedValue,
-							[editingLanguageId]: label
-						},
-						value: label
-					};
-				} else if (field.fieldName === 'validation') {
-					const expression = field.value.expression;
+export const createDuplicatedField = (originalField, props, blacklist = []) => {
+	const {editingLanguageId, fieldNameGenerator} = props;
+	const newFieldName = fieldNameGenerator(
+		getDefaultFieldName(),
+		null,
+		blacklist
+	);
 
-					if (expression && expression.value) {
-						field = {
-							...field,
-							value: {
-								...field.value,
-								expression: {
-									...field.value.expression,
-									value: expression.value.replace(
-										oldFieldName,
-										newFieldName
-									)
-								}
+	let duplicatedField = updateField(
+		props,
+		originalField,
+		'name',
+		newFieldName
+	);
+
+	duplicatedField = updateField(
+		props,
+		duplicatedField,
+		'fieldReference',
+		newFieldName
+	);
+
+	duplicatedField.instanceId = generateInstanceId(8);
+
+	const label = getLabel(originalField, editingLanguageId);
+
+	duplicatedField = updateField(props, duplicatedField, 'label', label);
+
+	if (duplicatedField.nestedFields?.length > 0) {
+		duplicatedField.nestedFields = duplicatedField.nestedFields.map(
+			(field) => {
+				const newDuplicatedNestedField = createDuplicatedField(
+					field,
+					props,
+					blacklist
+				);
+
+				blacklist.push(newDuplicatedNestedField.fieldName);
+
+				const visitor = new PagesVisitor([
+					{
+						rows: duplicatedField.rows ?? [],
+					},
+				]);
+
+				const layout = visitor.mapColumns((column) => {
+					return {
+						...column,
+						fields: column.fields.map((fieldName) => {
+							if (fieldName === field.fieldName) {
+								return newDuplicatedNestedField.fieldName;
 							}
-						};
-					}
+
+							return fieldName;
+						}),
+					};
+				});
+
+				duplicatedField.rows = layout[0].rows;
+
+				return newDuplicatedNestedField;
+			}
+		);
+
+		duplicatedField.settingsContext = updateSettingsContextProperty(
+			props.editingLanguageId,
+			duplicatedField.settingsContext,
+			'rows',
+			duplicatedField.rows
+		);
+	}
+
+	duplicatedField.settingsContext = updateSettingsContextInstanceId(
+		duplicatedField
+	);
+
+	return updateField(
+		props,
+		duplicatedField,
+		'validation',
+		getValidation(duplicatedField)
+	);
+};
+
+export const duplicateField = (
+	activePage,
+	props,
+	pages,
+	originalField,
+	duplicatedField
+) => {
+	const visitor = new PagesVisitor(pages);
+
+	const parentField = FormSupport.getParentField(
+		pages,
+		originalField.fieldName
+	);
+
+	if (parentField) {
+		return visitor.mapFields(
+			(field) => {
+				if (field.fieldName === parentField.fieldName) {
+					const nestedFields = field.nestedFields
+						? [...field.nestedFields, duplicatedField]
+						: [duplicatedField];
+
+					field = updateField(
+						props,
+						field,
+						'nestedFields',
+						nestedFields
+					);
+
+					let pages = [{rows: field.rows}];
+
+					const {rowIndex} = FormSupport.getFieldIndexes(
+						pages,
+						originalField.fieldName
+					);
+
+					const newRow = FormSupport.implAddRow(12, [
+						duplicatedField.fieldName,
+					]);
+
+					pages = FormSupport.addRow(
+						pages,
+						rowIndex + 1,
+						activePage,
+						newRow
+					);
+
+					return updateField(props, field, 'rows', pages[0].rows);
 				}
-				return {
-					...field
-				};
-			})
-		}
-	};
-	const newRowIndex = rowIndex + 1;
+
+				return field;
+			},
+			true,
+			true
+		);
+	}
+
+	const {rowIndex} = FormSupport.getFieldIndexes(
+		pages,
+		originalField.fieldName
+	);
 
 	const newRow = FormSupport.implAddRow(12, [duplicatedField]);
+
+	return FormSupport.addRow(pages, rowIndex + 1, activePage, newRow);
+};
+
+const handleFieldDuplicated = (props, state, {activePage, fieldName}) => {
+	const {pages} = state;
+
+	if (activePage === undefined) {
+		activePage = state.activePage;
+	}
+
+	const originalField = JSON.parse(
+		JSON.stringify(FormSupport.findFieldByFieldName(pages, fieldName))
+	);
+
+	const duplicatedField = createDuplicatedField(originalField, props);
 
 	return {
 		focusedField: {
 			...duplicatedField,
-			columnIndex,
-			pageIndex,
-			rowIndex: newRowIndex
 		},
-		pages: FormSupport.addRow(pages, newRowIndex, pageIndex, newRow)
+		pages: duplicateField(
+			activePage,
+			props,
+			pages,
+			originalField,
+			duplicatedField
+		),
 	};
 };
 

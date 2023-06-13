@@ -14,14 +14,15 @@
 
 package com.liferay.roles.item.selector;
 
-import com.liferay.item.selector.BaseItemSelectorCriterion;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
 /**
  * @author Alessio Antonio Rendina
+ * @deprecated As of Mueller (7.2.x), , with no direct replacement
  */
-public class RoleItemSelectorCriterion extends BaseItemSelectorCriterion {
+@Deprecated
+public class RoleItemSelectorCriterion extends BaseRoleItemSelectorCriterion {
 
 	public RoleItemSelectorCriterion() {
 	}

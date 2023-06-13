@@ -24,9 +24,9 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.saml.constants.SamlWebKeys;
-import com.liferay.saml.opensaml.integration.SamlBinding;
+import com.liferay.saml.opensaml.integration.internal.binding.SamlBinding;
+import com.liferay.saml.opensaml.integration.internal.metadata.MetadataManager;
 import com.liferay.saml.opensaml.integration.internal.util.OpenSamlUtil;
-import com.liferay.saml.opensaml.integration.metadata.MetadataManager;
 import com.liferay.saml.persistence.model.SamlSpSession;
 import com.liferay.saml.persistence.service.SamlSpSessionLocalService;
 import com.liferay.saml.runtime.SamlException;
@@ -80,7 +80,7 @@ import org.opensaml.xmlsec.impl.BasicSignatureValidationParametersResolver;
  */
 public abstract class BaseProfile {
 
-	public MessageContext decodeSamlMessage(
+	public MessageContext<?> decodeSamlMessage(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, SamlBinding samlBinding,
 			boolean requireSignature)
@@ -170,10 +170,11 @@ public abstract class BaseProfile {
 		samlMetadataContext.setEntityDescriptor(entityDescriptor);
 		samlMetadataContext.setRoleDescriptor(roleDescriptor);
 
-		MessageHandler messageHandler =
-			metadataManager.getSecurityMessageHandler(
-				httpServletRequest, samlBindingContext.getBindingUri(),
-				requireSignature);
+		MessageHandler<SAMLObject> messageHandler =
+			(MessageHandler<SAMLObject>)
+				metadataManager.getSecurityMessageHandler(
+					httpServletRequest, samlBindingContext.getBindingUri(),
+					requireSignature);
 
 		SecurityParametersContext securityParametersContext =
 			inboundMessageContext.getSubcontext(
@@ -464,7 +465,7 @@ public abstract class BaseProfile {
 			HttpServletResponse httpServletResponse)
 		throws PortalException {
 
-		InOutOperationContext inOutOperationContext =
+		InOutOperationContext<?, XMLObject> inOutOperationContext =
 			messageContext.getSubcontext(InOutOperationContext.class);
 
 		MessageContext<XMLObject> outboundMessageContext =

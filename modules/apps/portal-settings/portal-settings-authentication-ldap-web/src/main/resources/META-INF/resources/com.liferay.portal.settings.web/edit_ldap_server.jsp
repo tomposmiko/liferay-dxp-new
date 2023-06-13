@@ -21,7 +21,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
-long ldapServerId = ParamUtil.getLong(request, "ldapServerId", 0);
+long ldapServerId = ParamUtil.getLong(request, "ldapServerId");
 
 LDAPServerConfiguration ldapServerConfiguration = ldapServerConfigurationProvider.getConfiguration(themeDisplay.getCompanyId(), ldapServerId);
 
@@ -140,9 +140,9 @@ portletDisplay.setURLBack(backURL);
 renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "add-ldap-server") : LanguageUtil.get(resourceBundle, "edit-ldap-server"));
 %>
 
-<portlet:actionURL name="/portal_settings/edit_ldap_server" var="editLDAPServerURL" />
+<portlet:actionURL name="/portal_settings_authentication_ldap/edit_ldap_server" var="editLDAPServerURL" />
 
-<aui:form action="<%= editLDAPServerURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveEntry(false);" %>'>
+<aui:form action="<%= editLDAPServerURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveEntry(false);" %>'>
 	<liferay-ui:error exception="<%= DuplicateLDAPServerNameException.class %>" message="please-enter-a-unique-ldap-server-name" />
 	<liferay-ui:error exception="<%= LDAPFilterException.class %>" message="please-enter-a-valid-ldap-search-filter" />
 	<liferay-ui:error exception="<%= LDAPServerNameException.class %>" message="please-enter-a-valid-ldap-server-name" />
@@ -164,12 +164,12 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			<h3><liferay-ui:message key="default-values" /></h3>
 
 			<aui:field-wrapper label="load-default-server-configuration-for">
-				<aui:input label="Apache Directory Server" name="defaultLdap" onClick='<%= renderResponse.getNamespace() + "updateDefaultLdap('apache');" %>' type="radio" value="apache" />
-				<aui:input label="Fedora Directory Server" name="defaultLdap" onClick='<%= renderResponse.getNamespace() + "updateDefaultLdap('fedora');" %>' type="radio" value="fedora" />
-				<aui:input label="Microsoft Active Directory Server" name="defaultLdap" onClick='<%= renderResponse.getNamespace() + "updateDefaultLdap('microsoft');" %>' type="radio" value="microsoft" />
-				<aui:input label="Novell eDirectory" name="defaultLdap" onClick='<%= renderResponse.getNamespace() + "updateDefaultLdap('novell');" %>' type="radio" value="novell" />
-				<aui:input label="OpenLDAP" name="defaultLdap" onClick='<%= renderResponse.getNamespace() + "updateDefaultLdap('open');" %>' type="radio" value="open" />
-				<aui:input label="other-directory-server" name="defaultLdap" onClick='<%= renderResponse.getNamespace() + "updateDefaultLdap('other');" %>' type="radio" value="other" />
+				<aui:input label="Apache Directory Server" name="defaultLdap" onClick='<%= liferayPortletResponse.getNamespace() + "updateDefaultLdap('apache');" %>' type="radio" value="apache" />
+				<aui:input label="Fedora Directory Server" name="defaultLdap" onClick='<%= liferayPortletResponse.getNamespace() + "updateDefaultLdap('fedora');" %>' type="radio" value="fedora" />
+				<aui:input label="Microsoft Active Directory Server" name="defaultLdap" onClick='<%= liferayPortletResponse.getNamespace() + "updateDefaultLdap('microsoft');" %>' type="radio" value="microsoft" />
+				<aui:input label="Novell eDirectory" name="defaultLdap" onClick='<%= liferayPortletResponse.getNamespace() + "updateDefaultLdap('novell');" %>' type="radio" value="novell" />
+				<aui:input label="OpenLDAP" name="defaultLdap" onClick='<%= liferayPortletResponse.getNamespace() + "updateDefaultLdap('open');" %>' type="radio" value="open" />
+				<aui:input label="other-directory-server" name="defaultLdap" onClick='<%= liferayPortletResponse.getNamespace() + "updateDefaultLdap('other');" %>' type="radio" value="other" />
 			</aui:field-wrapper>
 		</aui:fieldset>
 
@@ -187,7 +187,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			<aui:button-row>
 
 				<%
-				String taglibOnClick = renderResponse.getNamespace() + "testSettings('ldapConnection');";
+				String taglibOnClick = liferayPortletResponse.getNamespace() + "testSettings('ldapConnection');";
 				%>
 
 				<aui:button onClick="<%= taglibOnClick %>" value="test-ldap-connection" />
@@ -225,6 +225,8 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 
 			<aui:input cssClass="lfr-textarea" helpMessage="enter-properties-file-synxtax-comma-delimiter" label="custom-contact-mapping" name='<%= "ldap--" + LDAPConstants.CONTACT_CUSTOM_MAPPINGS + "--" %>' type="textarea" value="<%= StringUtil.merge(ldapServerConfiguration.contactCustomMappings(), StringPool.COMMA) %>" />
 
+			<aui:input cssClass="lfr-textarea" helpMessage="enter-properties-file-synxtax-comma-delimiter" label="user-ignore-attributes" name='<%= "ldap--" + LDAPConstants.USER_IGNORE_ATTRIBUTES + "--" %>' type="textarea" value="<%= StringUtil.merge(ldapServerConfiguration.userIgnoreAttributes(), StringPool.COMMA) %>" />
+
 			<aui:input name='<%= "ldap--" + LDAPConstants.USER_MAPPINGS + "--" %>' type="hidden" />
 
 			<aui:input name='<%= "ldap--" + LDAPConstants.CONTACT_MAPPINGS + "--" %>' type="hidden" value="<%= StringUtil.merge(ldapServerConfiguration.contactMappings(), StringPool.COMMA) %>" />
@@ -232,7 +234,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			<aui:button-row>
 
 				<%
-				String taglibOnClick = renderResponse.getNamespace() + "testSettings('ldapUsers');";
+				String taglibOnClick = liferayPortletResponse.getNamespace() + "testSettings('ldapUsers');";
 				%>
 
 				<aui:button onClick="<%= taglibOnClick %>" value="test-ldap-users" />
@@ -257,7 +259,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			<aui:button-row>
 
 				<%
-				String taglibOnClick = renderResponse.getNamespace() + "testSettings('ldapGroups');";
+				String taglibOnClick = liferayPortletResponse.getNamespace() + "testSettings('ldapGroups');";
 				%>
 
 				<aui:button onClick="<%= taglibOnClick %>" value="test-ldap-groups" />
@@ -278,17 +280,17 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 	</aui:fieldset-group>
 
 	<aui:button-row>
-		<aui:button name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveLdap();" %>' value="save" />
+		<aui:button name="saveButton" onClick='<%= liferayPortletResponse.getNamespace() + "saveLdap();" %>' value="save" />
 
 		<aui:button href="<%= redirect %>" name="cancelButton" type="cancel" />
 	</aui:button-row>
 </aui:form>
 
-<script>
+<aui:script>
 	function <portlet:namespace />mapValues(fields, fieldValues) {
 		var form = document.<portlet:namespace />fm;
 
-		return fields.reduce(function(prev, item, index) {
+		return fields.reduce(function (prev, item, index) {
 			var mappingElement = Liferay.Util.getFormElement(
 				form,
 				fieldValues[index]
@@ -315,7 +317,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			'portrait',
 			'screenName',
 			'status',
-			'uuid'
+			'uuid',
 		];
 		var userMappingFieldValues = [
 			'userMappingEmailAddress',
@@ -329,7 +331,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			'userMappingPortrait',
 			'userMappingScreenName',
 			'userMappingStatus',
-			'userMappingUuid'
+			'userMappingUuid',
 		];
 
 		var form = document.<portlet:namespace />fm;
@@ -343,7 +345,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 		var groupMappingFieldValues = [
 			'groupMappingDescription',
 			'groupMappingGroupName',
-			'groupMappingUser'
+			'groupMappingUser',
 		];
 
 		var groupMapping = <portlet:namespace />mapValues(
@@ -356,8 +358,8 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 				<%= Constants.CMD %>:
 					'<%= (ldapServerId <= 0) ? Constants.ADD : Constants.UPDATE %>',
 				'ldap--<%= LDAPConstants.USER_MAPPINGS %>--': userMapping,
-				'ldap--<%= LDAPConstants.GROUP_MAPPINGS %>--': groupMapping
-			}
+				'ldap--<%= LDAPConstants.GROUP_MAPPINGS %>--': groupMapping,
+			},
 		});
 	}
 
@@ -407,7 +409,8 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			userMappingLastName = 'sn';
 			userMappingPassword = 'userPassword';
 			userMappingScreenName = 'cn';
-		} else if (ldapType === 'fedora') {
+		}
+		else if (ldapType === 'fedora') {
 			baseDN = 'dc=localdomain';
 			baseProviderURL = 'ldap://localhost:19389';
 			importUserSearchFilter = '(objectClass=inetOrgPerson)';
@@ -420,7 +423,8 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			userMappingLastName = 'sn';
 			userMappingPassword = 'userPassword';
 			userMappingScreenName = 'uid';
-		} else if (ldapType === 'microsoft') {
+		}
+		else if (ldapType === 'microsoft') {
 			baseDN = 'dc=example,dc=com';
 			baseProviderURL = 'ldap://localhost:389';
 			credentials = 'secret';
@@ -439,7 +443,8 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			userMappingMiddleName = 'middleName';
 			userMappingPassword = 'unicodePwd';
 			userMappingScreenName = 'sAMAccountName';
-		} else if (ldapType === 'novell') {
+		}
+		else if (ldapType === 'novell') {
 			baseProviderURL = 'ldap://localhost:389';
 			credentials = 'secret';
 			principal = 'cn=admin,ou=test';
@@ -450,7 +455,8 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			userMappingLastName = 'sn';
 			userMappingPassword = 'userPassword';
 			userMappingScreenName = 'cn';
-		} else if (ldapType === 'open') {
+		}
+		else if (ldapType === 'open') {
 			baseDN = 'dc=example,dc=com';
 			baseProviderURL = 'ldap://localhost:389';
 			credentials = 'secret';
@@ -495,141 +501,147 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			'ldap--<%= LDAPConstants.USERS_DN %>--': baseDN,
 			'ldap--<%= LDAPConstants.USER_DEFAULT_OBJECT_CLASSES %>--': exportMappingUserDefaultObjectClass,
 			'ldap--<%= LDAPConstants.GROUPS_DN %>--': baseDN,
-			'ldap--<%= LDAPConstants.GROUP_DEFAULT_OBJECT_CLASSES %>--': exportMappingGroupDefaultObjectClass
+			'ldap--<%= LDAPConstants.GROUP_DEFAULT_OBJECT_CLASSES %>--': exportMappingGroupDefaultObjectClass,
 		});
 	}
 
-	Liferay.provide(
-		window,
-		'<portlet:namespace />testSettings',
-		function(type) {
-			var A = AUI();
+	window['<portlet:namespace />testSettings'] = function (type) {
+		var baseUrl;
 
-			var url = null;
+		var data = {
+			p_auth: '<%= AuthTokenUtil.getToken(request) %>',
+		};
 
-			var data = {
-				p_auth: '<%= AuthTokenUtil.getToken(request) %>'
-			};
+		if (type === 'ldapConnection') {
+			baseUrl =
+				'<portlet:renderURL copyCurrentRenderParameters="<%= false %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcRenderCommandName" value="/portal_settings_authentication_ldap/test_ldap_connection" /></portlet:renderURL>';
+		}
+		else if (type === 'ldapGroups') {
+			baseUrl =
+				'<portlet:renderURL copyCurrentRenderParameters="<%= false %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcRenderCommandName" value="/portal_settings_authentication_ldap/test_ldap_groups" /></portlet:renderURL>';
 
-			if (type === 'ldapConnection') {
-				url =
-					'<portlet:renderURL copyCurrentRenderParameters="<%= false %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcRenderCommandName" value="/portal_settings/test_ldap_connection" /></portlet:renderURL>';
-			} else if (type === 'ldapGroups') {
-				url =
-					'<portlet:renderURL copyCurrentRenderParameters="<%= false %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcRenderCommandName" value="/portal_settings/test_ldap_groups" /></portlet:renderURL>';
+			data.<portlet:namespace />importGroupSearchFilter =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />ldap--<%= LDAPConstants.GROUP_SEARCH_FILTER %>--'
+				].value;
+			data.<portlet:namespace />groupMappingDescription =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />groupMappingDescription'
+				].value;
+			data.<portlet:namespace />groupMappingGroupName =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />groupMappingGroupName'
+				].value;
+			data.<portlet:namespace />groupMappingUser =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />groupMappingUser'
+				].value;
+		}
+		else if (type === 'ldapUsers') {
+			baseUrl =
+				'<portlet:renderURL copyCurrentRenderParameters="<%= false %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcRenderCommandName" value="/portal_settings_authentication_ldap/test_ldap_users" /></portlet:renderURL>';
 
-				data.<portlet:namespace />importGroupSearchFilter =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />ldap--<%= LDAPConstants.GROUP_SEARCH_FILTER %>--'
-					].value;
-				data.<portlet:namespace />groupMappingDescription =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />groupMappingDescription'
-					].value;
-				data.<portlet:namespace />groupMappingGroupName =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />groupMappingGroupName'
-					].value;
-				data.<portlet:namespace />groupMappingUser =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />groupMappingUser'
-					].value;
-			} else if (type === 'ldapUsers') {
-				url =
-					'<portlet:renderURL copyCurrentRenderParameters="<%= false %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcRenderCommandName" value="/portal_settings/test_ldap_users" /></portlet:renderURL>';
+			data.<portlet:namespace />importUserSearchFilter =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />ldap--<%= LDAPConstants.USER_SEARCH_FILTER %>--'
+				].value;
+			data.<portlet:namespace />userMappingEmailAddress =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingEmailAddress'
+				].value;
+			data.<portlet:namespace />userMappingFirstName =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingFirstName'
+				].value;
+			data.<portlet:namespace />userMappingFullName =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingFullName'
+				].value;
+			data.<portlet:namespace />userMappingGroup =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingGroup'
+				].value;
+			data.<portlet:namespace />userMappingJobTitle =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingJobTitle'
+				].value;
+			data.<portlet:namespace />userMappingLastName =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingLastName'
+				].value;
+			data.<portlet:namespace />userMappingMiddleName =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingMiddleName'
+				].value;
+			data.<portlet:namespace />userMappingPassword =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingPassword'
+				].value;
+			data.<portlet:namespace />userMappingPortrait =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingPortrait'
+				].value;
+			data.<portlet:namespace />userMappingScreenName =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingScreenName'
+				].value;
+			data.<portlet:namespace />userMappingStatus =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingStatus'
+				].value;
+			data.<portlet:namespace />userMappingUuid =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />userMappingUuid'
+				].value;
+		}
 
-				data.<portlet:namespace />importUserSearchFilter =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />ldap--<%= LDAPConstants.USER_SEARCH_FILTER %>--'
-					].value;
-				data.<portlet:namespace />userMappingEmailAddress =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingEmailAddress'
-					].value;
-				data.<portlet:namespace />userMappingFirstName =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingFirstName'
-					].value;
-				data.<portlet:namespace />userMappingFullName =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingFullName'
-					].value;
-				data.<portlet:namespace />userMappingGroup =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingGroup'
-					].value;
-				data.<portlet:namespace />userMappingJobTitle =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingJobTitle'
-					].value;
-				data.<portlet:namespace />userMappingLastName =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingLastName'
-					].value;
-				data.<portlet:namespace />userMappingMiddleName =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingMiddleName'
-					].value;
-				data.<portlet:namespace />userMappingPassword =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingPassword'
-					].value;
-				data.<portlet:namespace />userMappingPortrait =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingPortrait'
-					].value;
-				data.<portlet:namespace />userMappingScreenName =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingScreenName'
-					].value;
-				data.<portlet:namespace />userMappingStatus =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingStatus'
-					].value;
-				data.<portlet:namespace />userMappingUuid =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />userMappingUuid'
-					].value;
-			}
+		if (baseUrl != null) {
+			data.<portlet:namespace />ldapServerId =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />ldapServerId'
+				].value;
+			data.<portlet:namespace />baseProviderURL =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />ldap--<%= LDAPConstants.BASE_PROVIDER_URL %>--'
+				].value;
+			data.<portlet:namespace />baseDN =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />ldap--<%= LDAPConstants.BASE_DN %>--'
+				].value;
+			data.<portlet:namespace />principal =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />ldap--<%= LDAPConstants.SECURITY_PRINCIPAL %>--'
+				].value;
+			data.<portlet:namespace />credentials =
+				document.<portlet:namespace />fm[
+					'<portlet:namespace />ldap--<%= LDAPConstants.SECURITY_CREDENTIAL %>--'
+				].value;
 
-			if (url != null) {
-				data.<portlet:namespace />ldapServerId =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />ldapServerId'
-					].value;
-				data.<portlet:namespace />baseProviderURL =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />ldap--<%= LDAPConstants.BASE_PROVIDER_URL %>--'
-					].value;
-				data.<portlet:namespace />baseDN =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />ldap--<%= LDAPConstants.BASE_DN %>--'
-					].value;
-				data.<portlet:namespace />principal =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />ldap--<%= LDAPConstants.SECURITY_PRINCIPAL %>--'
-					].value;
-				data.<portlet:namespace />credentials =
-					document.<portlet:namespace />fm[
-						'<portlet:namespace />ldap--<%= LDAPConstants.SECURITY_CREDENTIAL %>--'
-					].value;
-
-				var dialog = Liferay.Util.Window.getWindow({
-					dialog: {
-						destroyOnHide: true
-					},
-					title: '<%= UnicodeLanguageUtil.get(request, "ldap") %>'
+			Liferay.Util.fetch(new URL(baseUrl), {
+				body: Liferay.Util.objectToURLSearchParams(data),
+				method: 'POST',
+			})
+				.then(function (response) {
+					return response.text();
+				})
+				.then(function (text) {
+					Liferay.Util.openModal({
+						bodyHTML: text,
+						size: 'full-screen',
+						title: '<%= UnicodeLanguageUtil.get(request, "ldap") %>',
+					});
+				})
+				.catch(function (error) {
+					Liferay.Util.openToast({
+						message: Liferay.Language.get(
+							'an-unexpected-system-error-occurred'
+						),
+						type: 'danger',
+					});
 				});
-
-				dialog.plug(A.Plugin.IO, {
-					data: data,
-					uri: url
-				});
-			}
-		},
-		['aui-io', 'aui-io-plugin-deprecated', 'liferay-util-window']
-	);
-</script>
+		}
+	};
+</aui:script>
 
 <%
 PortalUtil.addPortletBreadcrumbEntry(request, (ldapServerId == 0) ? LanguageUtil.get(request, "add-ldap-server") : ldapServerName, currentURL);

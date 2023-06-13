@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * The persistence utility for the message-boards message service. This utility wraps <code>com.liferay.message.boards.service.persistence.impl.MBMessagePersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -2152,6 +2148,70 @@ public class MBMessageUtil {
 	 */
 	public static int filterCountByG_C(long groupId, long categoryId) {
 		return getPersistence().filterCountByG_C(groupId, categoryId);
+	}
+
+	/**
+	 * Returns the message-boards message where groupId = &#63; and urlSubject = &#63; or throws a <code>NoSuchMessageException</code> if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param urlSubject the url subject
+	 * @return the matching message-boards message
+	 * @throws NoSuchMessageException if a matching message-boards message could not be found
+	 */
+	public static MBMessage findByG_US(long groupId, String urlSubject)
+		throws com.liferay.message.boards.exception.NoSuchMessageException {
+
+		return getPersistence().findByG_US(groupId, urlSubject);
+	}
+
+	/**
+	 * Returns the message-boards message where groupId = &#63; and urlSubject = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param urlSubject the url subject
+	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 */
+	public static MBMessage fetchByG_US(long groupId, String urlSubject) {
+		return getPersistence().fetchByG_US(groupId, urlSubject);
+	}
+
+	/**
+	 * Returns the message-boards message where groupId = &#63; and urlSubject = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param urlSubject the url subject
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 */
+	public static MBMessage fetchByG_US(
+		long groupId, String urlSubject, boolean useFinderCache) {
+
+		return getPersistence().fetchByG_US(
+			groupId, urlSubject, useFinderCache);
+	}
+
+	/**
+	 * Removes the message-boards message where groupId = &#63; and urlSubject = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param urlSubject the url subject
+	 * @return the message-boards message that was removed
+	 */
+	public static MBMessage removeByG_US(long groupId, String urlSubject)
+		throws com.liferay.message.boards.exception.NoSuchMessageException {
+
+		return getPersistence().removeByG_US(groupId, urlSubject);
+	}
+
+	/**
+	 * Returns the number of message-boards messages where groupId = &#63; and urlSubject = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param urlSubject the url subject
+	 * @return the number of matching message-boards messages
+	 */
+	public static int countByG_US(long groupId, String urlSubject) {
+		return getPersistence().countByG_US(groupId, urlSubject);
 	}
 
 	/**
@@ -6770,24 +6830,9 @@ public class MBMessageUtil {
 	}
 
 	public static MBMessagePersistence getPersistence() {
-		return _serviceTracker.getService();
+		return _persistence;
 	}
 
-	private static ServiceTracker<MBMessagePersistence, MBMessagePersistence>
-		_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(MBMessagePersistence.class);
-
-		ServiceTracker<MBMessagePersistence, MBMessagePersistence>
-			serviceTracker =
-				new ServiceTracker<MBMessagePersistence, MBMessagePersistence>(
-					bundle.getBundleContext(), MBMessagePersistence.class,
-					null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile MBMessagePersistence _persistence;
 
 }

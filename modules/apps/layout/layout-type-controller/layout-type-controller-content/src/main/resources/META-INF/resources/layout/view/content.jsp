@@ -18,7 +18,13 @@
 
 <%
 String ppid = ParamUtil.getString(request, "p_p_id");
+
+RenderContentLayoutDisplayContext renderContentLayoutDisplayContext = new RenderContentLayoutDisplayContext(request, response);
 %>
+
+<liferay-util:html-top>
+	<%= renderContentLayoutDisplayContext.getPortletHeaderPaths() %>
+</liferay-util:html-top>
 
 <liferay-ui:success key="layoutPublished" message="the-page-was-published-succesfully" />
 
@@ -50,13 +56,16 @@ String ppid = ParamUtil.getString(request, "p_p_id");
 
 	</c:when>
 	<c:otherwise>
-		<liferay-layout:render-fragment-layout
-			groupId="<%= layout.getGroupId() %>"
-			mode="<%= FragmentEntryLinkConstants.VIEW %>"
-			plid="<%= layout.getPlid() %>"
-			showPreview="<%= true %>"
-		/>
+		<div class="layout-content portlet-layout" id="main-content" role="main">
+			<liferay-layout:render-fragment-layout
+				showPreview="<%= true %>"
+			/>
+		</div>
 	</c:otherwise>
 </c:choose>
 
 <liferay-ui:layout-common />
+
+<liferay-util:html-bottom>
+	<%= renderContentLayoutDisplayContext.getPortletFooterPaths() %>
+</liferay-util:html-bottom>

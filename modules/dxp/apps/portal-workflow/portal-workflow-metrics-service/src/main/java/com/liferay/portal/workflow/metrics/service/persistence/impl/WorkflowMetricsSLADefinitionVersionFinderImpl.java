@@ -14,7 +14,6 @@
 
 package com.liferay.portal.workflow.metrics.service.persistence.impl;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -57,30 +56,29 @@ public class WorkflowMetricsSLADefinitionVersionFinderImpl
 			String sql = _customSQL.get(getClass(), FIND_BY_C_CD_P_S);
 
 			if (processId == null) {
-				sql = StringUtil.replace(
-					sql, "(WMSLADefinitionVersion.processId = ? ) AND",
-					StringPool.BLANK);
+				sql = StringUtil.removeSubstring(
+					sql, "(WMSLADefinitionVersion.processId = ? ) AND");
 			}
 
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
 
-			q.addEntity(
+			sqlQuery.addEntity(
 				"WorkflowMetricsSLADefinitionVersion",
 				WorkflowMetricsSLADefinitionVersionImpl.class);
 
-			QueryPos qPos = QueryPos.getInstance(q);
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			qPos.add(companyId);
-			qPos.add(createDate);
+			queryPos.add(companyId);
+			queryPos.add(createDate);
 
 			if (processId != null) {
-				qPos.add(processId);
+				queryPos.add(processId);
 			}
 
-			qPos.add(status);
+			queryPos.add(status);
 
 			return (List<WorkflowMetricsSLADefinitionVersion>)QueryUtil.list(
-				q, getDialect(), start, end);
+				sqlQuery, getDialect(), start, end);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);

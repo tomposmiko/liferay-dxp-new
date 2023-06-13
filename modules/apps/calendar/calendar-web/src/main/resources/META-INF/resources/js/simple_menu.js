@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-calendar-simple-menu',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var getClassName = A.getClassName;
@@ -36,7 +36,7 @@ AUI.add(
 
 		var DEFAULT_ALIGN_POINTS = [
 			A.WidgetPositionAlign.TL,
-			A.WidgetPositionAlign.BL
+			A.WidgetPositionAlign.BL,
 		];
 
 		var STR_BLANK = '';
@@ -55,7 +55,7 @@ AUI.add(
 		var getItemHandler = A.cached((id, items) => {
 			var found = null;
 
-			items.some(item => {
+			items.some((item) => {
 				if (item.id === id) {
 					found = item;
 				}
@@ -69,27 +69,27 @@ AUI.add(
 		var SimpleMenu = A.Component.create({
 			ATTRS: {
 				alignNode: {
-					value: null
+					value: null,
 				},
 
 				hiddenItems: {
 					validator: isArray,
-					value: []
+					value: [],
 				},
 
 				host: {
-					value: null
+					value: null,
 				},
 
 				items: {
 					validator: isArray,
-					value: []
+					value: [],
 				},
 
 				toggler: {
 					setter: A.one,
-					value: null
-				}
+					value: null,
+				},
 			},
 
 			AUGMENTS: [
@@ -98,7 +98,7 @@ AUI.add(
 				A.WidgetPositionAlign,
 				A.WidgetPositionConstrain,
 				A.WidgetStack,
-				A.WidgetStdMod
+				A.WidgetStdMod,
 			],
 
 			NAME: 'simple-menu',
@@ -166,7 +166,7 @@ AUI.add(
 
 						var align = {
 							node: instance.get('alignNode'),
-							points: DEFAULT_ALIGN_POINTS
+							points: DEFAULT_ALIGN_POINTS,
 						};
 
 						var centered = false;
@@ -184,7 +184,7 @@ AUI.add(
 							align,
 							centered,
 							modal,
-							width
+							width,
 						});
 					}
 				},
@@ -197,7 +197,7 @@ AUI.add(
 
 					instance.items = A.NodeList.create();
 
-					items.forEach(item => {
+					items.forEach((item) => {
 						var caption = item.caption;
 
 						if (!Object.prototype.hasOwnProperty.call(item, 'id')) {
@@ -224,7 +224,7 @@ AUI.add(
 
 						if (item.icon) {
 							icon = Lang.sub(TPL_ICON, {
-								iconClass: item.icon
+								iconClass: item.icon,
 							});
 
 							caption = [icon, caption].join(STR_SPACE);
@@ -234,7 +234,7 @@ AUI.add(
 							Lang.sub(TPL_SIMPLE_MENU_ITEM, {
 								cssClass,
 								icon,
-								id
+								id,
 							})
 						);
 
@@ -250,7 +250,7 @@ AUI.add(
 					var instance = this;
 
 					if (instance.get('rendered')) {
-						instance.items.each(item => {
+						instance.items.each((item) => {
 							var id = item.attr('data-id');
 
 							item.toggleClass(
@@ -293,7 +293,7 @@ AUI.add(
 							'visibleChange',
 							instance._onVisibleChange,
 							instance
-						)
+						),
 					];
 				},
 
@@ -309,8 +309,8 @@ AUI.add(
 					instance.get('boundingBox').unselectable();
 
 					instance._renderItems(instance.get('items'));
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.SimpleMenu = SimpleMenu;
@@ -327,7 +327,7 @@ AUI.add(
 			'widget-position-align',
 			'widget-position-constrain',
 			'widget-stack',
-			'widget-stdmod'
-		]
+			'widget-stdmod',
+		],
 	}
 );

@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	property = {
 		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
-		"mvc.command.name=/admin/update_oauth2_application"
+		"mvc.command.name=/oauth2_provider/update_o_auth2_application"
 	},
 	service = MVCRenderCommand.class
 )
@@ -59,10 +59,9 @@ public class UpdateOAuth2ApplicationMVCRenderCommand
 
 		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
 			new OAuth2AdminPortletDisplayContext(
-				_oAuth2ApplicationService,
-				_oAuth2ApplicationScopeAliasesLocalService,
-				_oAuth2ProviderConfiguration, renderRequest,
-				getThemeDisplay(renderRequest), _dlurlHelper);
+				_dlurlHelper, _oAuth2ApplicationScopeAliasesLocalService,
+				_oAuth2ApplicationService, _oAuth2ProviderConfiguration,
+				renderRequest, getThemeDisplay(renderRequest));
 
 		renderRequest.setAttribute(
 			OAuth2ProviderWebKeys.OAUTH2_ADMIN_PORTLET_DISPLAY_CONTEXT,

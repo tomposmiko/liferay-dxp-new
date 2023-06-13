@@ -14,7 +14,11 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.index;
 
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
+
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -22,9 +26,16 @@ import org.junit.Test;
  */
 public class RankingTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Test
 	public void testDefaults() {
-		Ranking ranking = new Ranking.RankingBuilder().build();
+		Ranking.RankingBuilder rankingBuilder = new Ranking.RankingBuilder();
+
+		Ranking ranking = rankingBuilder.build();
 
 		Assert.assertEquals("[]", String.valueOf(ranking.getAliases()));
 		Assert.assertEquals("[]", String.valueOf(ranking.getBlockIds()));

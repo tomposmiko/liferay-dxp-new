@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.comparator.UserScreenNameComparator;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.vldap.server.internal.BaseVLDAPTestCase;
 import com.liferay.vldap.server.internal.directory.builder.CommunitiesBuilder;
 import com.liferay.vldap.server.internal.directory.builder.CommunityBuilder;
@@ -88,6 +89,8 @@ import org.apache.directory.api.ldap.model.name.Dn;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -99,6 +102,11 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
  */
 @PrepareForTest(LdapUtil.class)
 public class DirectoryTreeTest extends BaseVLDAPTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
@@ -721,9 +729,7 @@ public class DirectoryTreeTest extends BaseVLDAPTestCase {
 
 		Dn dn = new Dn("ou=test,ou=liferay.com,o=Liferay");
 
-		SearchBase searchBase = directoryTree.getSearchBase(dn, 0);
-
-		Assert.assertNull(searchBase);
+		Assert.assertNull(directoryTree.getSearchBase(dn, 0));
 	}
 
 	@Test
@@ -756,9 +762,7 @@ public class DirectoryTreeTest extends BaseVLDAPTestCase {
 
 		Dn dn = new Dn("o=test");
 
-		SearchBase searchBase = directoryTree.getSearchBase(dn, 0);
-
-		Assert.assertNull(searchBase);
+		Assert.assertNull(directoryTree.getSearchBase(dn, 0));
 	}
 
 	@Test
@@ -776,9 +780,7 @@ public class DirectoryTreeTest extends BaseVLDAPTestCase {
 
 		Dn dn = new Dn("ou=test,o=Liferay");
 
-		SearchBase searchBase = directoryTree.getSearchBase(dn, 0);
-
-		Assert.assertNull(searchBase);
+		Assert.assertNull(directoryTree.getSearchBase(dn, 0));
 	}
 
 	@Test
@@ -806,9 +808,7 @@ public class DirectoryTreeTest extends BaseVLDAPTestCase {
 	public void testGetSearchBaseWithNullDn() throws Exception {
 		DirectoryTree directoryTree = new DirectoryTree();
 
-		SearchBase searchBase = directoryTree.getSearchBase(null, 0);
-
-		Assert.assertNull(searchBase);
+		Assert.assertNull(directoryTree.getSearchBase(null, 0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -939,9 +939,7 @@ public class DirectoryTreeTest extends BaseVLDAPTestCase {
 
 		Dn dn = new Dn("ou=Users,ou=liferay.com,o=Liferay");
 
-		SearchBase searchBase = directoryTree.getSearchBase(dn, 0);
-
-		assertUsersSearchBase(searchBase);
+		assertUsersSearchBase(directoryTree.getSearchBase(dn, 0));
 	}
 
 	@Test

@@ -49,7 +49,7 @@ List<LayoutPageTemplateEntry> masterLayoutPageTemplateEntries = selectLayoutPage
 		document.body,
 		'click',
 		'.select-master-layout-option',
-		function(event) {
+		function (event) {
 			dom.removeClasses(
 				document.querySelectorAll('.form-check-card.active'),
 				'active'
@@ -62,13 +62,13 @@ List<LayoutPageTemplateEntry> masterLayoutPageTemplateEntries = selectLayoutPage
 			Liferay.Util.getOpener().Liferay.fire(
 				'<%= HtmlUtil.escape(eventName) %>',
 				{
-					data: event.delegateTarget.dataset
+					data: event.delegateTarget.dataset,
 				}
 			);
 		}
 	);
 
-	var onDestroyPortlet = function() {
+	var onDestroyPortlet = function () {
 		delegateHandler.removeListener();
 
 		Liferay.detach('destroyPortlet', onDestroyPortlet);

@@ -23,6 +23,7 @@ import State, {Config} from 'metal-state';
  * @review
  */
 class MarkerBase extends State {
+
 	/**
 	 * Initializes the instance with a native marker which will handle all
 	 * the execution. This function may be moved to the class constructor in
@@ -48,7 +49,7 @@ class MarkerBase extends State {
 
 		this[functionName] =
 			this[functionName] ||
-			(nativeEvent => {
+			((nativeEvent) => {
 				this._handleNativeEvent(nativeEvent, externalEventType);
 			});
 
@@ -109,6 +110,7 @@ class MarkerBase extends State {
  * @type {!Object}
  */
 MarkerBase.STATE = {
+
 	/**
 	 * Location to be used
 	 * @review
@@ -116,10 +118,10 @@ MarkerBase.STATE = {
 	 */
 	location: Config.shapeOf({
 		lat: Config.number().required(),
-		lng: Config.number().required()
+		lng: Config.number().required(),
 	}).value({
 		lat: 0,
-		lng: 0
+		lng: 0,
 	}),
 
 	/**
@@ -127,7 +129,7 @@ MarkerBase.STATE = {
 	 * @review
 	 * @type {Object}
 	 */
-	map: Config.object().value({})
+	map: Config.object().value({}),
 };
 
 window.Liferay = window.Liferay || {};

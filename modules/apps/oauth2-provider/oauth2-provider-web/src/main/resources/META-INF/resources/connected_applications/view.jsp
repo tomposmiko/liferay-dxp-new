@@ -27,7 +27,7 @@ int userOAuth2AuthorizationsCount = OAuth2AuthorizationServiceUtil.getUserOAuth2
 	disabled="<%= userOAuth2AuthorizationsCount == 0 %>"
 	filterDropdownItems="<%= oAuth2ConnectedApplicationsManagementToolbarDisplayContext.getFilterDropdownItems() %>"
 	itemsTotal="<%= userOAuth2AuthorizationsCount %>"
-	namespace="<%= renderResponse.getNamespace() %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	searchContainerId="oAuth2ConnectedApplicationsSearchContainer"
 	selectable="<%= true %>"
 	showSearch="<%= false %>"
@@ -35,7 +35,7 @@ int userOAuth2AuthorizationsCount = OAuth2AuthorizationServiceUtil.getUserOAuth2
 	sortingURL="<%= String.valueOf(oAuth2ConnectedApplicationsManagementToolbarDisplayContext.getSortingURL()) %>"
 />
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<aui:form action="<%= currentURLObj %>" name="fm">
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="oAuth2AuthorizationIds" type="hidden" />
@@ -68,7 +68,7 @@ int userOAuth2AuthorizationsCount = OAuth2AuthorizationServiceUtil.getUserOAuth2
 				/>
 
 				<portlet:renderURL var="viewURL">
-					<portlet:param name="mvcRenderCommandName" value="/connected_applications/view" />
+					<portlet:param name="mvcRenderCommandName" value="/oauth2_provider/view_connected_applications" />
 					<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2Authorization.getOAuth2ApplicationId()) %>" />
 					<portlet:param name="oAuth2AuthorizationId" value="<%= String.valueOf(oAuth2Authorization.getOAuth2AuthorizationId()) %>" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -99,7 +99,7 @@ int userOAuth2AuthorizationsCount = OAuth2AuthorizationServiceUtil.getUserOAuth2
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <script>
 	function <portlet:namespace />removeAccess() {
@@ -115,10 +115,10 @@ int userOAuth2AuthorizationsCount = OAuth2AuthorizationServiceUtil.getUserOAuth2
 					oAuth2AuthorizationIds: Liferay.Util.listCheckedExcept(
 						form,
 						'<portlet:namespace />allRowIds'
-					)
+					),
 				},
 				url:
-					'<portlet:actionURL name="/connected_applications/revoke_oauth2_authorizations" />'
+					'<portlet:actionURL name="/connected_applications/revoke_oauth2_authorizations" />',
 			});
 		}
 	}

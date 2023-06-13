@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-menu-filter',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var CSS_HIDE = 'hide';
@@ -31,20 +31,25 @@ AUI.add(
 		var MenuFilter = A.Component.create({
 			ATTRS: {
 				content: {
-					setter: A.one
+					setter: A.one,
 				},
 
 				inputNode: {
 					validator: Lang.isString,
-					value: '.menu-item-filter'
+					value: '.menu-item-filter',
+				},
+
+				menu: {
+					validator: Lang.isObject,
+					value: {},
 				},
 
 				strings: {
 					validator: Lang.isObject,
 					value: {
-						placeholder: 'Search'
-					}
-				}
+						placeholder: Liferay.Language.get('search'),
+					},
+				},
 			},
 
 			AUGMENTS: A.AutoCompleteBase,
@@ -56,12 +61,17 @@ AUI.add(
 			prototype: {
 				_filterMenu(event) {
 					var instance = this;
+					var menuInstance = instance.get('menu');
 
 					instance._menuItems.addClass(CSS_HIDE);
 
-					event.results.forEach(result => {
+					event.results.forEach((result) => {
 						result.raw.node.removeClass(CSS_HIDE);
 					});
+
+					if (menuInstance) {
+						menuInstance._focusManager.refresh();
+					}
 				},
 
 				_renderUI() {
@@ -73,7 +83,7 @@ AUI.add(
 
 					node.prepend(
 						Lang.sub(TPL_INPUT_FILTER, {
-							placeholder: instance.get('strings').placeholder
+							placeholder: instance.get('strings').placeholder,
 						})
 					);
 
@@ -96,8 +106,8 @@ AUI.add(
 					instance.get('inputNode').val(STR_EMPTY);
 
 					instance._menuItems.removeClass(CSS_HIDE);
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.MenuFilter = MenuFilter;
@@ -108,7 +118,7 @@ AUI.add(
 			'aui-component',
 			'aui-node',
 			'autocomplete-base',
-			'autocomplete-filters'
-		]
+			'autocomplete-filters',
+		],
 	}
 );

@@ -16,16 +16,16 @@ import Component from 'metal-component';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 
-import templates from './PageRenderer.soy.js';
+import templates from './PageRenderer.soy';
 
 class PageRenderer extends Component {}
 
 PageRenderer.STATE = {
 	items: Config.arrayOf(
 		Config.shapeOf({
-			type: Config.string()
+			type: Config.string(),
 		})
-	)
+	),
 };
 
 Soy.register(PageRenderer, templates);

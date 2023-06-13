@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.jdbc.OutputBlob;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -117,7 +118,7 @@ public class CTSContentLocalServiceImpl extends CTSContentLocalServiceBaseImpl {
 			List<CTSContent> ctsContents = ctsContentPersistence.findByC_R_P_S(
 				companyId, repositoryId, path, storeType, 0, 1, null);
 
-			if ((ctsContents == null) || ctsContents.isEmpty()) {
+			if (ListUtil.isEmpty(ctsContents)) {
 				throw new NoSuchContentException(path);
 			}
 
@@ -160,8 +161,16 @@ public class CTSContentLocalServiceImpl extends CTSContentLocalServiceBaseImpl {
 		long companyId, long repositoryId, String path, String version,
 		String storeType) {
 
-		int count = ctsContentPersistence.countByC_R_P_V_S(
-			companyId, repositoryId, path, version, storeType);
+		int count = 0;
+
+		if (version.isEmpty()) {
+			count = ctsContentPersistence.countByC_R_P_S(
+				companyId, repositoryId, path, storeType);
+		}
+		else {
+			count = ctsContentPersistence.countByC_R_P_V_S(
+				companyId, repositoryId, path, version, storeType);
+		}
 
 		if (count > 0) {
 			return true;

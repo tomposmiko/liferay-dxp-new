@@ -10,134 +10,231 @@
  */
 
 import {ClayCheckbox} from '@clayui/form';
+import ClayIcon from '@clayui/icon';
+import ClayLayout from '@clayui/layout';
 import ClayTable from '@clayui/table';
-import React, {useContext, useState, useCallback, useEffect} from 'react';
+import React, {useContext} from 'react';
 
 import QuickActionKebab from '../../shared/components/quick-action-kebab/QuickActionKebab.es';
 import moment from '../../shared/util/moment.es';
-import {ModalContext} from './modal/ModalContext.es';
-import {InstanceListContext} from './store/InstanceListPageStore.es';
+import {capitalize} from '../../shared/util/util.es';
+import {AppContext} from '../AppContext.es';
+import {InstanceListContext} from './InstanceListPageProvider.es';
+import {ModalContext} from './modal/ModalProvider.es';
 
-const Item = taskItem => {
-	const {selectedItems = [], setInstanceId, setSelectedItems} = useContext(
-		InstanceListContext
-	);
-	const [checked, setChecked] = useState(false);
+const getSLAStatusIcon = (slaStatus) => {
+	const items = {
+		OnTime: {
+			bgColor: 'bg-success-light',
+			iconColor: 'text-success',
+			iconName: 'check-circle',
+		},
+		Overdue: {
+			bgColor: 'bg-danger-light',
+			iconColor: 'text-danger',
+			iconName: 'exclamation-circle',
+		},
+		Untracked: {
+			bgColor: 'bg-info-light',
+			iconColor: 'text-info',
+			iconName: 'hr',
+		},
+	};
 
-	useEffect(() => {
-		setChecked(selectedItems.find(item => item.id === id) !== undefined);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedItems]);
+	return items[slaStatus] || items.Untracked;
+};
+
+const Item = ({isAdmin, totalCount, ...instance}) => {
+	const {userId} = useContext(AppContext);
+	const {
+		selectedItems = [],
+		setInstanceId,
+		setSelectAll,
+		setSelectedItems,
+	} = useContext(InstanceListContext);
+	const {openModal} = useContext(ModalContext);
 
 	const {
 		assetTitle,
 		assetType,
-		assigneeUsers,
-		creatorUser,
+		assignees = [],
+		completed,
+		creator,
 		dateCreated,
 		id,
-		status,
-		taskNames = []
-	} = taskItem;
+		slaStatus,
+		taskNames = [Liferay.Language.get('not-available')],
+	} = instance;
 
-	const completed = status === 'Completed';
+	const checked = !!selectedItems.find((item) => item.id === id);
+
+	const assignedToUser = !!assignees.find(({id}) => id === Number(userId));
+	const assigneeNames = assignees.map((user) => user.name).join(', ');
+	const {reviewer} = assignees.find(({id}) => id === -1) || {};
+
+	let disableCheckbox = completed;
+
+	if (!isAdmin) {
+		disableCheckbox = !assignedToUser && !reviewer;
+	}
+
+	const slaStatusIcon = getSLAStatusIcon(slaStatus);
+
 	const formattedAssignees = !completed
-		? assigneeUsers && assigneeUsers.length
-			? assigneeUsers.map(assigneeUser => assigneeUser.name).join(', ')
-			: Liferay.Language.get('unassigned')
+		? assigneeNames
 		: Liferay.Language.get('not-available');
 
-	const handleCheck = ({target}) => {
-		setChecked(target.checked);
+	const formattedTaskNames = !completed
+		? taskNames.join(', ')
+		: Liferay.Language.get('completed');
 
-		if (target.checked) {
-			setSelectedItems([...selectedItems, taskItem]);
-		} else {
-			setSelectedItems(selectedItems.filter(item => item.id !== id));
-		}
+	const handleCheck = ({target}) => {
+		const updatedItems = target.checked
+			? [...selectedItems, instance]
+			: selectedItems.filter((item) => item.id !== id);
+
+		setSelectAll(totalCount > 0 && totalCount === updatedItems.length);
+		setSelectedItems(updatedItems);
 	};
 
-	const updateInstanceId = () => setInstanceId(id);
-
 	return (
-		<ClayTable.Row data-testid="instanceRow">
+		<ClayTable.Row className={checked ? 'table-active' : ''}>
 			<ClayTable.Cell>
-				<ClayCheckbox
-					checked={checked}
-					data-testid="instanceCheckbox"
-					onChange={handleCheck}
-				/>
+				<div className="table-first-element-group">
+					<ClayCheckbox
+						checked={checked}
+						disabled={disableCheckbox}
+						onChange={handleCheck}
+					/>
+
+					<span
+						className={`sticker sticker-sm ${slaStatusIcon.bgColor}`}
+					>
+						<span className="inline-item">
+							<ClayIcon
+								className={slaStatusIcon.iconColor}
+								symbol={slaStatusIcon.iconName}
+							/>
+						</span>
+					</span>
+				</div>
 			</ClayTable.Cell>
 
 			<ClayTable.Cell>
 				<span
 					className="link-text"
-					data-target="#instanceDetailModal"
-					data-testid="instanceIdLink"
-					data-toggle="modal"
-					onClick={updateInstanceId}
+					onClick={() => {
+						setInstanceId(id);
+
+						openModal('instanceDetails');
+					}}
 					tabIndex="-1"
 				>
 					<strong>{id}</strong>
 				</span>
 			</ClayTable.Cell>
 
-			<ClayTable.Cell data-testid="assetInfoCell">
-				{`${assetType}: ${assetTitle} `}
-			</ClayTable.Cell>
+			<ClayTable.Cell>{`${assetType}: ${assetTitle}`}</ClayTable.Cell>
 
-			<ClayTable.Cell data-testid="taskNamesCell">
-				{!completed
-					? taskNames.join(', ')
-					: Liferay.Language.get('completed')}
-			</ClayTable.Cell>
+			<ClayTable.Cell>{formattedTaskNames}</ClayTable.Cell>
 
-			<ClayTable.Cell data-testid="assigneesCell">
-				{formattedAssignees}
-			</ClayTable.Cell>
+			<ClayTable.Cell>{formattedAssignees}</ClayTable.Cell>
 
-			<ClayTable.Cell data-testid="creatorUserCell">
-				{creatorUser ? creatorUser.name : ''}
-			</ClayTable.Cell>
+			<ClayTable.Cell>{creator ? creator.name : ''}</ClayTable.Cell>
 
-			<ClayTable.Cell data-testid="dateCreatedCell">
+			<ClayTable.Cell>
 				{moment
 					.utc(dateCreated)
 					.format(Liferay.Language.get('mmm-dd-yyyy-lt'))}
 			</ClayTable.Cell>
 
 			<ClayTable.Cell style={{paddingRight: '0rem'}}>
-				<QuickActionMenu taskItem={taskItem} />
+				<QuickActionMenu
+					disabled={disableCheckbox}
+					instance={instance}
+				/>
 			</ClayTable.Cell>
 		</ClayTable.Row>
 	);
 };
 
-const QuickActionMenu = ({taskItem}) => {
-	const {setSingleModal} = useContext(ModalContext);
-	const handleClickReassigneeTask = useCallback(
-		() => {
-			setSingleModal({
-				selectedItem: taskItem,
-				visible: true
-			});
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[taskItem]
-	);
+const QuickActionMenu = ({disabled, instance}) => {
+	const {openModal, setSingleTransition} = useContext(ModalContext);
+	const {setSelectedItem, setSelectedItems} = useContext(InstanceListContext);
+	const {transitions = [], taskNames = []} = instance;
+
+	const handleClick = (bulkModal, singleModal) => {
+		if (taskNames.length > 1) {
+			setSelectedItems([instance]);
+			openModal(bulkModal);
+		}
+		else {
+			setSelectedItem(instance);
+			openModal(singleModal);
+		}
+	};
+
+	const transitionLabel = capitalize(Liferay.Language.get('transition'));
+	const updateDueDateItem = {
+		icon: 'date',
+		label: Liferay.Language.get('update-due-date'),
+		onClick: () => handleClick('bulkUpdateDueDate', 'updateDueDate'),
+	};
 
 	const kebabItems = [
 		{
-			action: handleClickReassigneeTask,
 			icon: 'change',
-			title: Liferay.Language.get('reassign-task')
-		}
+			label: Liferay.Language.get('reassign-task'),
+			onClick: () => handleClick('bulkReassign', 'singleReassign'),
+		},
+		updateDueDateItem,
 	];
 
+	if (transitions.length > 0) {
+		const transitionItems = [
+			{
+				type: 'divider',
+			},
+			{
+				items: transitions.map(({label, name}) => ({
+					label,
+					name,
+					onClick: () => {
+						openModal('singleTransition');
+						setSelectedItem(instance);
+						setSingleTransition({
+							title: label,
+							transitionName: name,
+						});
+					},
+				})),
+				label: transitionLabel,
+				name: transitionLabel,
+				type: 'group',
+			},
+		];
+
+		kebabItems.push(...transitionItems);
+	}
+	else if (transitions.length === 0 && taskNames.length > 1) {
+		kebabItems.splice(
+			1,
+			1,
+			{
+				label: transitionLabel,
+				onClick: () => {
+					setSelectedItems([instance]);
+					openModal('bulkTransition');
+				},
+			},
+			updateDueDateItem
+		);
+	}
+
 	return (
-		<div className="autofit-col">
-			<QuickActionKebab items={kebabItems} />
-		</div>
+		<ClayLayout.ContentCol>
+			<QuickActionKebab disabled={disabled} items={kebabItems} />
+		</ClayLayout.ContentCol>
 	);
 };
 

@@ -14,30 +14,30 @@
 
 AUI.add(
 	'liferay-panel-search',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var PanelSearch = A.Component.create({
 			ATTRS: {
 				categorySelector: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				inputNode: {
-					setter: A.one
+					setter: A.one,
 				},
 
 				nodeContainerSelector: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				nodeList: {
-					setter: A.one
+					setter: A.one,
 				},
 
 				nodeSelector: {
-					validator: Lang.isString
-				}
+					validator: Lang.isString,
+				},
 			},
 
 			EXTENDS: A.Base,
@@ -75,7 +75,7 @@ AUI.add(
 				_setItemsVisibility(visible) {
 					var instance = this;
 
-					instance._nodes.each(item => {
+					instance._nodes.each((item) => {
 						var contentItem = item;
 
 						var nodeContainerSelector = instance.get(
@@ -102,7 +102,7 @@ AUI.add(
 					if (!instance._collapsedCategories) {
 						instance._collapsedCategories = [];
 
-						categories.each(item => {
+						categories.each((item) => {
 							var header = item.one('.list-group-heading');
 
 							if (header && header.hasClass('collapsed')) {
@@ -117,7 +117,7 @@ AUI.add(
 						instance._setItemsVisibility(true);
 
 						if (instance._collapsedCategories) {
-							instance._collapsedCategories.forEach(item => {
+							instance._collapsedCategories.forEach((item) => {
 								item.one('.list-group-heading').addClass(
 									'collapsed'
 								);
@@ -126,16 +126,18 @@ AUI.add(
 
 							instance._collapsedCategories = null;
 						}
-					} else if (query === '*') {
+					}
+					else if (query === '*') {
 						categories.show();
 
 						instance._setItemsVisibility(true);
-					} else {
+					}
+					else {
 						categories.hide();
 
 						instance._setItemsVisibility(false);
 
-						event.results.forEach(item => {
+						event.results.forEach((item) => {
 							var node = item.raw.node;
 
 							var nodeContainerSelector = instance.get(
@@ -180,21 +182,21 @@ AUI.add(
 					var applicationSearch = new Liferay.SearchFilter({
 						inputNode: instance.get('inputNode'),
 						nodeList,
-						nodeSelector: instance.get('nodeSelector')
+						nodeSelector: instance.get('nodeSelector'),
 					});
 
 					instance._nodes = applicationSearch._nodes;
 					instance._search = applicationSearch;
 
 					instance._bindUISearch();
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.PanelSearch = PanelSearch;
 	},
 	'',
 	{
-		requires: ['aui-base', 'liferay-search-filter']
+		requires: ['aui-base', 'liferay-search-filter'],
 	}
 );

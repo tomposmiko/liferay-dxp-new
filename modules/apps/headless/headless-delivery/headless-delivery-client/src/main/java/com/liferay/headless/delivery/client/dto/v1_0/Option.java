@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.OptionSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Option {
+public class Option implements Cloneable, Serializable {
+
+	public static Option toDTO(String json) {
+		return OptionSerDes.toDTO(json);
+	}
 
 	public String getLabel() {
 		return label;
@@ -92,6 +98,11 @@ public class Option {
 	}
 
 	protected String value;
+
+	@Override
+	public Option clone() throws CloneNotSupportedException {
+		return (Option)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

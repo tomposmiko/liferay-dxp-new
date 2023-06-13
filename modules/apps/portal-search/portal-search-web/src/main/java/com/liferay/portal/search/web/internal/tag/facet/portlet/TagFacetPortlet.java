@@ -14,10 +14,13 @@
 
 package com.liferay.portal.search.web.internal.tag.facet.portlet;
 
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.search.searcher.SearchRequest;
+import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.web.internal.facet.display.builder.AssetTagsSearchFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetTagsSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.tag.facet.builder.AssetTagsFacetConfiguration;
@@ -106,7 +109,7 @@ public class TagFacetPortlet extends MVCPortlet {
 			new AssetTagsFacetConfigurationImpl(facet.getFacetConfiguration());
 
 		AssetTagsSearchFacetDisplayBuilder assetTagsSearchFacetDisplayBuilder =
-			new AssetTagsSearchFacetDisplayBuilder();
+			createTagsSearchFacetDisplayBuilder(renderRequest);
 
 		assetTagsSearchFacetDisplayBuilder.setDisplayStyle(
 			tagFacetPortletPreferences.getDisplayStyle());
@@ -117,6 +120,8 @@ public class TagFacetPortlet extends MVCPortlet {
 			assetTagsFacetConfiguration.getFrequencyThreshold());
 		assetTagsSearchFacetDisplayBuilder.setMaxTerms(
 			assetTagsFacetConfiguration.getMaxTerms());
+		assetTagsSearchFacetDisplayBuilder.setPaginationStartParameterName(
+			getPaginationStartParameterName(portletSharedSearchResponse));
 
 		String parameterName = tagFacetPortletPreferences.getParameterName();
 
@@ -130,8 +135,30 @@ public class TagFacetPortlet extends MVCPortlet {
 		return assetTagsSearchFacetDisplayBuilder.build();
 	}
 
+	protected AssetTagsSearchFacetDisplayBuilder
+		createTagsSearchFacetDisplayBuilder(RenderRequest renderRequest) {
+
+		try {
+			return new AssetTagsSearchFacetDisplayBuilder(renderRequest);
+		}
+		catch (ConfigurationException configurationException) {
+			throw new RuntimeException(configurationException);
+		}
+	}
+
 	protected String getAggregationName(RenderRequest renderRequest) {
 		return portal.getPortletId(renderRequest);
+	}
+
+	protected String getPaginationStartParameterName(
+		PortletSharedSearchResponse portletSharedSearchResponse) {
+
+		SearchResponse searchResponse =
+			portletSharedSearchResponse.getSearchResponse();
+
+		SearchRequest searchRequest = searchResponse.getRequest();
+
+		return searchRequest.getPaginationStartParameterName();
 	}
 
 	@Reference

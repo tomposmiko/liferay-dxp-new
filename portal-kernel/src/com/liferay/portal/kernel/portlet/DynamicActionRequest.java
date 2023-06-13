@@ -55,8 +55,9 @@ public class DynamicActionRequest extends ActionRequestWrapper {
 
 		super(actionRequest);
 
-		_params = new HashMap<>();
 		_inherit = inherit;
+
+		_params = new HashMap<>();
 
 		if (params != null) {
 			_params.putAll(params);
@@ -125,10 +126,10 @@ public class DynamicActionRequest extends ActionRequestWrapper {
 		Set<String> names = new LinkedHashSet<>();
 
 		if (_inherit) {
-			Enumeration<String> enu = super.getParameterNames();
+			Enumeration<String> enumeration = super.getParameterNames();
 
-			while (enu.hasMoreElements()) {
-				names.add(enu.nextElement());
+			while (enumeration.hasMoreElements()) {
+				names.add(enumeration.nextElement());
 			}
 		}
 

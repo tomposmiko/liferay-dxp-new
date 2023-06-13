@@ -1,7 +1,7 @@
 definition {
 
 	macro _openDescriptiveMenulistCP {
-		if (!(contains("${webContentTitleEscapeCharacter}", "{webContentTitleEscapeCharacter}"))) {
+		if (isSet(webContentTitleEscapeCharacter)) {
 			var key_webContentTitle = "${webContentTitleEscapeCharacter}";
 		}
 		else {
@@ -10,9 +10,16 @@ definition {
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "WC#ENTRY_LIST_TITLE",
-			value1 = "${webContentTitle}");
+		if ("${liveSite}" == "true") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "WC#ENTRY_LIST_TITLE_ON_LIVE",
+				value1 = "${webContentTitle}");
+		}
+		else {
+			AssertTextEquals.assertPartialText(
+				locator1 = "WC#ENTRY_LIST_TITLE",
+				value1 = "${webContentTitle}");
+		}
 
 		Click.waitForMenuToggleJSClick(locator1 = "WC#ENTRY_LIST_MENULIST_ICON");
 	}
@@ -25,12 +32,16 @@ definition {
 		MenuItem.click(menuItem = "Basic Web Content");
 
 		AssertVisible(locator1 = "TextInput#TITLE");
+
+		while (IsElementNotPresent(locator1 = "WCEditWebContent#SIDEBAR")) {
+			Pause(locator1 = "1000");
+		}
 	}
 
 	macro gotoAddWithStructureCP {
 		LexiconEntry.gotoAdd();
 
-		if (IsElementPresent(locator1 = "MenuItem#ANY_MENU_ITEM", key_menuItem = "${structureName}")) {
+		if (IsElementPresent(key_menuItem = "${structureName}", locator1 = "MenuItem#ANY_MENU_ITEM")) {
 			MenuItem.click(menuItem = "${structureName}");
 		}
 		else {
@@ -93,7 +104,7 @@ definition {
 	macro gotoMoreStructuresViaPlusButton {
 		LexiconEntry.gotoAdd();
 
-		if (IsElementPresent(locator1 = "Button#ANY", key_text = "More")) {
+		if (IsElementPresent(key_text = "More", locator1 = "Button#ANY")) {
 			AssertElementPresent(
 				key_caption = "Showing ${pageMod} Elements",
 				locator1 = "Dropdown#CAPTION");
@@ -101,11 +112,12 @@ definition {
 
 		Button.clickMore();
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 	}
 
 	macro gotoPreviewEntryCP {
 		WebContentNavigator._openDescriptiveMenulistCP(
+			liveSite = "${liveSite}",
 			webContentTitle = "${webContentTitle}",
 			webContentTitleEscapeCharacter = "${webContentTitleEscapeCharacter}");
 
@@ -119,9 +131,16 @@ definition {
 
 		AssertElementPresent.pauseAssertVisible(locator1 = "WC#ENTRY_LIST_THUMBNAIL");
 
-		AssertTextEquals(
-			locator1 = "WC#ENTRY_LIST_WORKFLOW_STATUS",
-			value1 = "${webContentStatus}");
+		if ("${translationStatus}" == "true") {
+			AssertTextEquals(
+				locator1 = "WC#ENTRY_LIST_WORKFLOW_TRANSLATIONE_STATUS",
+				value1 = "${webContentStatus}");
+		}
+		else {
+			AssertTextEquals(
+				locator1 = "WC#ENTRY_LIST_WORKFLOW_STATUS",
+				value1 = "${webContentStatus}");
+		}
 
 		WebContentNavigator.gotoEditCP(webContentTitle = "${webContentTitle}");
 	}

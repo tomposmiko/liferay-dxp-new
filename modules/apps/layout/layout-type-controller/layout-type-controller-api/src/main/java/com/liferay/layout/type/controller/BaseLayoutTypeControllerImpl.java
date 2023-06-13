@@ -14,17 +14,18 @@
 
 package com.liferay.layout.type.controller;
 
+import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.servlet.TransferHeadersHelperUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -150,13 +151,20 @@ public abstract class BaseLayoutTypeControllerImpl
 		try {
 			Map<Locale, String> friendlyURLMap = layout.getFriendlyURLMap();
 
-			Collection<String> values = friendlyURLMap.values();
+			Set<Locale> locales = LanguageUtil.getAvailableLocales(
+				layout.getGroupId());
 
-			return values.contains(friendlyURL);
+			for (Locale locale : locales) {
+				if (friendlyURL.equals(friendlyURLMap.get(locale))) {
+					return true;
+				}
+			}
 		}
 		catch (SystemException systemException) {
 			throw new RuntimeException(systemException);
 		}
+
+		return false;
 	}
 
 	protected void addAttributes(HttpServletRequest httpServletRequest) {
@@ -165,6 +173,17 @@ public abstract class BaseLayoutTypeControllerImpl
 	protected abstract ServletResponse createServletResponse(
 		HttpServletResponse httpServletResponse,
 		UnsyncStringWriter unsyncStringWriter);
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #createServletResponse(HttpServletResponse,
+	 *             UnsyncStringWriter)}
+	 */
+	@Deprecated
+	protected abstract ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
+			unsyncStringWriter);
 
 	protected abstract String getEditPage();
 

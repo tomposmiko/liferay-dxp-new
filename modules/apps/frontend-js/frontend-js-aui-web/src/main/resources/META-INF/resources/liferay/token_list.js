@@ -15,13 +15,13 @@
 /**
  * The Token List Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-token-list
  */
 
 AUI().add(
 	'liferay-token-list',
-	A => {
+	(A) => {
 		var TPL_TOKEN = A.Template(
 			'<tpl for=".">',
 			'<span class="lfr-token" data-fieldValues="{fieldValues}" data-clearFields="{clearFields}">',
@@ -34,12 +34,13 @@ AUI().add(
 				getTokenText(str, values) {
 					if ('html' in values) {
 						str = values.html;
-					} else {
+					}
+					else {
 						str = A.Escape.html(str);
 					}
 
 					return str;
-				}
+				},
 			}
 		);
 
@@ -47,11 +48,11 @@ AUI().add(
 			ATTRS: {
 				children: {
 					validator: Array.isArray,
-					value: []
+					value: [],
 				},
 				cssClass: {
-					value: 'lfr-token-list'
-				}
+					value: 'lfr-token-list',
+				},
 			},
 
 			NAME: 'liferaytokenlist',
@@ -75,7 +76,7 @@ AUI().add(
 					var instance = this;
 
 					instance.fire('close', {
-						item: event.currentTarget.ancestor('.lfr-token')
+						item: event.currentTarget.ancestor('.lfr-token'),
 					});
 				},
 
@@ -87,7 +88,8 @@ AUI().add(
 
 						if (Array.isArray(token)) {
 							instance._buffer = buffer.concat(token);
-						} else {
+						}
+						else {
 							buffer.push(token);
 						}
 
@@ -108,7 +110,7 @@ AUI().add(
 					);
 
 					instance.publish('close', {
-						defaultFn: A.bind('_defCloseFn', instance)
+						defaultFn: A.bind('_defCloseFn', instance),
 					});
 				},
 
@@ -127,14 +129,14 @@ AUI().add(
 					var instance = this;
 
 					instance.add(instance.get('children'));
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.TokenList = TokenList;
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-template-deprecated', 'escape']
+		requires: ['aui-base', 'aui-template-deprecated', 'escape'],
 	}
 );

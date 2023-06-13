@@ -17,7 +17,6 @@ package com.liferay.layout.content.page.editor.web.internal.model.listener;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
@@ -88,7 +87,8 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 		}
 
 		try {
-			Indexer indexer = IndexerRegistryUtil.getIndexer(Layout.class);
+			Indexer<Layout> indexer = IndexerRegistryUtil.getIndexer(
+				Layout.class);
 
 			indexer.delete(layout);
 		}
@@ -101,39 +101,46 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 		}
 	}
 
+	private void _copySiteNavigationMenuId(
+		Layout layout, UnicodeProperties unicodeProperties) {
+
+		UnicodeProperties typeSettingsUnicodeProperties =
+			layout.getTypeSettingsProperties();
+
+		if (typeSettingsUnicodeProperties.containsKey("siteNavigationMenuId")) {
+			String siteNavigationMenuId =
+				typeSettingsUnicodeProperties.getProperty(
+					"siteNavigationMenuId");
+
+			unicodeProperties.put("siteNavigationMenuId", siteNavigationMenuId);
+		}
+	}
+
 	private Void _copyStructure(
 			LayoutPageTemplateEntry layoutPageTemplateEntry, Layout layout)
 		throws Exception {
 
-		Layout draftLayout = _layoutLocalService.fetchLayout(
-			_portal.getClassNameId(Layout.class), layout.getPlid());
+		Layout draftLayout = layout.fetchDraftLayout();
 
-		Layout pagetTemplateLayout = _layoutLocalService.getLayout(
+		Layout pageTemplateLayout = _layoutLocalService.getLayout(
 			layoutPageTemplateEntry.getPlid());
 
-		LayoutPageTemplateStructure layoutPageTemplateStructure =
-			_layoutPageTemplateStructureLocalService.
-				fetchLayoutPageTemplateStructure(
-					pagetTemplateLayout.getGroupId(),
-					_portal.getClassNameId(Layout.class),
-					pagetTemplateLayout.getPlid());
-
-		if (layoutPageTemplateStructure == null) {
-			_layoutPageTemplateStructureLocalService.
-				rebuildLayoutPageTemplateStructure(
-					pagetTemplateLayout.getGroupId(),
-					_portal.getClassNameId(Layout.class),
-					pagetTemplateLayout.getPlid());
-		}
+		_layoutPageTemplateStructureLocalService.
+			fetchLayoutPageTemplateStructure(
+				pageTemplateLayout.getGroupId(), pageTemplateLayout.getPlid(),
+				true);
 
 		draftLayout = _layoutCopyHelper.copyLayout(
-			pagetTemplateLayout, draftLayout);
+			pageTemplateLayout, draftLayout);
 
 		draftLayout.setStatus(WorkflowConstants.STATUS_APPROVED);
 
-		UnicodeProperties properties = draftLayout.getTypeSettingsProperties();
+		UnicodeProperties unicodeProperties =
+			draftLayout.getTypeSettingsProperties();
 
-		properties.put("published", Boolean.FALSE.toString());
+		unicodeProperties.put("published", Boolean.FALSE.toString());
+
+		_copySiteNavigationMenuId(layout, unicodeProperties);
 
 		_layoutLocalService.updateLayout(draftLayout);
 
@@ -170,7 +177,11 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	}
 
 	private void _reindexLayout(Layout layout) {
-		Indexer indexer = IndexerRegistryUtil.getIndexer(Layout.class);
+		Indexer<Layout> indexer = IndexerRegistryUtil.getIndexer(Layout.class);
+
+		if (indexer == null) {
+			return;
+		}
 
 		try {
 			indexer.reindex(layout);

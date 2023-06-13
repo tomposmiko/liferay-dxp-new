@@ -12,14 +12,45 @@
  * details.
  */
 
-import {updateField} from './fieldEditedHandler.es';
+import {updateField, updateFieldReference} from '../util/settingsContext.es';
+import {findInvalidFieldReference, updateState} from './fieldEditedHandler.es';
 
-export const handleFieldBlurred = (state, event) => {
-	const {propertyName, propertyValue} = event;
-	let newState = {pages: state.pages};
+export const handleFieldBlurred = (props, state, event) => {
+	let newState = {
+		fieldHovered: {},
+		pages: state.pages,
+	};
 
-	if (propertyName === 'name' && propertyValue === '') {
-		newState = updateField(state, propertyName, propertyValue);
+	if (event) {
+		const {propertyName, propertyValue} = event;
+
+		if (propertyName === 'name' && propertyValue === '') {
+			newState = updateField(state, propertyName, propertyValue);
+		}
+
+		if (
+			propertyName === 'fieldReference' &&
+			(propertyValue === '' ||
+				findInvalidFieldReference(
+					state.focusedField,
+					state.pages,
+					propertyValue
+				))
+		) {
+			newState = updateState(
+				props,
+				{
+					...state,
+					focusedField: updateFieldReference(
+						state.focusedField,
+						false,
+						true
+					),
+				},
+				propertyName,
+				state.focusedField.fieldName
+			);
+		}
 	}
 
 	return newState;

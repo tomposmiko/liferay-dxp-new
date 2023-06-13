@@ -11,34 +11,34 @@
 
 import ClayAutocomplete from '@clayui/autocomplete';
 import ClayDropDown from '@clayui/drop-down';
-import React, {useCallback} from 'react';
+import React from 'react';
 
-const DropDown = ({active, items, match, onSelect, setActive, setValue}) => {
-	const handleSelect = useCallback(
-		item => {
-			setValue(() => item.name);
-			onSelect(item);
-			setActive(false);
-		},
-		[onSelect, setActive, setValue]
-	);
-
+const DropDown = ({
+	active,
+	activeItem,
+	id = '',
+	items,
+	match,
+	onSelect,
+	setActiveItem,
+}) => {
 	return (
 		<ClayAutocomplete.DropDown active={active}>
-			<ClayDropDown.ItemList data-testid="dropDownList">
+			<ClayDropDown.ItemList id={`dropDownList${id}`}>
 				{items.length > 0 ? (
 					items.map((item, index) => (
 						<ClayAutocomplete.Item
-							data-testid="dropDownListItem"
+							className={index === activeItem ? 'active' : ''}
 							key={index}
 							match={match}
-							onClick={() => handleSelect(item)}
+							onMouseDown={() => onSelect(item)}
+							onMouseOver={() => setActiveItem(index)}
 							value={item.name}
 						/>
 					))
 				) : (
 					<ClayDropDown.Item className="disabled">
-						{Liferay.Language.get('no-results-found')}
+						{Liferay.Language.get('no-results-were-found')}
 					</ClayDropDown.Item>
 				)}
 			</ClayDropDown.ItemList>

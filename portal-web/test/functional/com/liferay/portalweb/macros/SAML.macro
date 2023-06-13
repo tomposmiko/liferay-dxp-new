@@ -1,6 +1,6 @@
 definition {
 
-	@description = "Configures Liferay SAML as the IdP and Liferay SAML as the SP."
+	@description = "Configures Liferay SAML as the IdP"
 	macro configureLiferaySAMLAsIdP {
 
 		// Configure IdP (Identity Provider) on specific Portal URL or default to current URL
@@ -14,8 +14,8 @@ definition {
 			Navigator.openSpecificURL(url = "${idpURL}");
 		}
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "Security",
 			panel = "Control Panel",
 			portlet = "SAML Admin");
 
@@ -27,7 +27,7 @@ definition {
 			certificateUsage = "SIGNING",
 			samlKeyPassword = "${samlEntityID}");
 
-		if ((isSet(idpSessionIdleTimeout)) || (isSet(idpSessionMaximumAge))) {
+		if (isSet(idpSessionIdleTimeout) || isSet(idpSessionMaximumAge)) {
 			SAMLNavigation.gotoIdentityProvider();
 
 			SAMLRole.configureIdentityProvider(
@@ -44,16 +44,25 @@ definition {
 		SAMLPortlet.configureIdentityProvider();
 	}
 
+	@description = "Configures Liferay SAML as the SP."
 	macro configureLiferaySAMLAsSP {
-		User.loginPG(
-			password = "test",
-			specificURL = "${spURL}",
-			userEmailAddress = "test@liferay.com");
+		if (isSet(userEmailAddress)) {
+			User.loginPG(
+				password = "test",
+				specificURL = "${spURL}",
+				userEmailAddress = "${userEmailAddress}");
+		}
+		else {
+			User.loginPG(
+				password = "test",
+				specificURL = "${spURL}",
+				userEmailAddress = "test@liferay.com");
+		}
 
 		Navigator.openSpecificURL(url = "${spURL}");
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "Security",
 			panel = "Control Panel",
 			portlet = "SAML Admin");
 
@@ -87,6 +96,7 @@ definition {
 			spURL = "${spURL}");
 	}
 
+	@description = "Connect SP and IdP."
 	macro connectSPAndIdP {
 
 		// Add a configured IdP connection to an SP
@@ -100,8 +110,8 @@ definition {
 				userEmailAddress = "test@liferay.com");
 		}
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "Security",
 			panel = "Control Panel",
 			portlet = "SAML Admin");
 
@@ -132,8 +142,8 @@ definition {
 				userEmailAddress = "test@liferay.com");
 		}
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "Security",
 			panel = "Control Panel",
 			portlet = "SAML Admin");
 
@@ -151,9 +161,8 @@ definition {
 
 	@description = "Sign into portal by executing a IdP initiated SSO login. The IdP will redirect to the SP. If the same users with the same email address are present on both instances, it will authenticate and show the SP. SAML can authenticate across major portal versions, that is, the IdP can be Portal 6.1 EE GA3 and the SP can be Portal 6.2. EE GA1. For testing purposes, it is obvious if the authentication succeeds or fails if the IdP and SP are different portal versions."
 	macro executeIdPInitiatedSSO {
-
 		if ("${autoLogin}" == "true") {
-			Navigator.openSpecificURL(url = "${idpInitiatedSSOURL}");
+			Open.openNoError(locator1 = "${idpInitiatedSSOURL}");
 
 			AssertElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE");
 		}
@@ -165,7 +174,7 @@ definition {
 				userEmailAddress = "${userEmailAddress}");
 		}
 
-		Pause(locator1 = "2000");
+		Pause(locator1 = "1000");
 
 		AssertLocation.assertPartialLocation(value1 = "${spURL}");
 	}
@@ -187,9 +196,17 @@ definition {
 				userEmailAddress = "test@liferay.com");
 		}
 
-		Pause(locator1 = "2000");
+		Pause(locator1 = "1000");
 
 		AssertLocation.assertPartialLocation(value1 = "${specificURL}");
+	}
+
+	macro waitForSLO {
+		var key_title = "Signing Out from Services";
+
+		WaitForElementPresent(locator1 = "Header#H3_TITLE");
+
+		Pause(locator1 = "5000");
 	}
 
 }

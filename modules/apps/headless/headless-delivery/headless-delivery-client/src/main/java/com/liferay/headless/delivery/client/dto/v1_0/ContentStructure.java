@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.ContentStructureSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -28,7 +30,32 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ContentStructure {
+public class ContentStructure implements Cloneable, Serializable {
+
+	public static ContentStructure toDTO(String json) {
+		return ContentStructureSerDes.toDTO(json);
+	}
+
+	public String getAssetLibraryKey() {
+		return assetLibraryKey;
+	}
+
+	public void setAssetLibraryKey(String assetLibraryKey) {
+		this.assetLibraryKey = assetLibraryKey;
+	}
+
+	public void setAssetLibraryKey(
+		UnsafeSupplier<String, Exception> assetLibraryKeyUnsafeSupplier) {
+
+		try {
+			assetLibraryKey = assetLibraryKeyUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String assetLibraryKey;
 
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
@@ -261,6 +288,11 @@ public class ContentStructure {
 	}
 
 	protected Long siteId;
+
+	@Override
+	public ContentStructure clone() throws CloneNotSupportedException {
+		return (ContentStructure)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

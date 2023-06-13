@@ -22,14 +22,14 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		editSegmentsExperimentStatusURL,
 		editSegmentsExperimentURL,
 		editSegmentsVariantURL,
-		runSegmentsExperimentURL
+		runSegmentsExperimentURL,
 	} = endpoints;
 
 	function createExperiment(body) {
 		return _fetchWithError(createSegmentsExperimentURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -37,7 +37,7 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		return _fetchWithError(createSegmentsVariantURL, {
 			body: _getFormDataRequest(body, contentPageEditorNamespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -45,7 +45,7 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		return _fetchWithError(deleteSegmentsExperimentURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -53,7 +53,7 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		return _fetchWithError(deleteSegmentsVariantURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -61,7 +61,7 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		return _fetchWithError(editSegmentsExperimentURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -69,7 +69,7 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		return _fetchWithError(editSegmentsExperimentStatusURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -77,7 +77,7 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		return _fetchWithError(editSegmentsVariantURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -87,17 +87,19 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 			{
 				body: _getFormDataRequest(body, namespace),
 				credentials: 'include',
-				method: 'POST'
+				method: 'POST',
 			}
 		);
 	}
 
 	function publishExperience(body) {
+
 		// TODO somehow type this
+
 		return _fetchWithError(editSegmentsExperimentStatusURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -105,7 +107,7 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		return _fetchWithError(runSegmentsExperimentURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
-			method: 'POST'
+			method: 'POST',
 		});
 	}
 
@@ -119,7 +121,7 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 		editVariant,
 		getEstimatedTime,
 		publishExperience,
-		runExperiment
+		runExperiment,
 	};
 }
 
@@ -135,9 +137,9 @@ APIService.propTypes = {
 		editSegmentsExperimentStatusURL: PropTypes.string.isRequired,
 		editSegmentsExperimentURL: PropTypes.string.isRequired,
 		editSegmentsVariantURL: PropTypes.string.isRequired,
-		runSegmentsExperimentURL: PropTypes.string.isRequired
+		runSegmentsExperimentURL: PropTypes.string.isRequired,
 	}),
-	namespace: PropTypes.string.isRequired
+	namespace: PropTypes.string.isRequired,
 };
 
 export default APIService;
@@ -164,9 +166,12 @@ export function _getFormDataRequest(body, prefix, formData = new FormData()) {
  */
 function _fetchWithError(url, options = {}) {
 	return fetch(url, options)
-		.then(response => response.json())
-		.then(objectResponse => {
-			if (objectResponse.error) throw objectResponse.error;
+		.then((response) => response.json())
+		.then((objectResponse) => {
+			if (objectResponse.error) {
+				throw objectResponse.error;
+			}
+
 			return objectResponse;
 		});
 }

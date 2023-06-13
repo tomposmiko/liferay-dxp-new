@@ -16,10 +16,12 @@ package com.liferay.blogs.service.base;
 
 import com.liferay.blogs.model.BlogsStatsUser;
 import com.liferay.blogs.service.BlogsStatsUserLocalService;
+import com.liferay.blogs.service.BlogsStatsUserLocalServiceUtil;
 import com.liferay.blogs.service.persistence.BlogsEntryFinder;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
 import com.liferay.blogs.service.persistence.BlogsStatsUserFinder;
 import com.liferay.blogs.service.persistence.BlogsStatsUserPersistence;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -39,16 +41,20 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -69,11 +75,15 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>BlogsStatsUserLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.blogs.service.BlogsStatsUserLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>BlogsStatsUserLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>BlogsStatsUserLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the blogs stats user to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BlogsStatsUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param blogsStatsUser the blogs stats user
 	 * @return the blogs stats user that was added
@@ -101,6 +111,10 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	/**
 	 * Deletes the blogs stats user with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BlogsStatsUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param statsUserId the primary key of the blogs stats user
 	 * @return the blogs stats user that was removed
 	 * @throws PortalException if a blogs stats user with the primary key could not be found
@@ -116,6 +130,10 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	/**
 	 * Deletes the blogs stats user from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BlogsStatsUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param blogsStatsUser the blogs stats user
 	 * @return the blogs stats user that was removed
 	 */
@@ -123,6 +141,18 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	@Override
 	public BlogsStatsUser deleteBlogsStatsUser(BlogsStatsUser blogsStatsUser) {
 		return blogsStatsUserPersistence.remove(blogsStatsUser);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return blogsStatsUserPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -276,6 +306,16 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return blogsStatsUserPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -284,6 +324,13 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 			(BlogsStatsUser)persistedModel);
 	}
 
+	public BasePersistence<BlogsStatsUser> getBasePersistence() {
+		return blogsStatsUserPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -320,6 +367,10 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	/**
 	 * Updates the blogs stats user in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect BlogsStatsUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param blogsStatsUser the blogs stats user
 	 * @return the blogs stats user that was updated
 	 */
@@ -327,6 +378,11 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	@Override
 	public BlogsStatsUser updateBlogsStatsUser(BlogsStatsUser blogsStatsUser) {
 		return blogsStatsUserPersistence.update(blogsStatsUser);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -340,6 +396,8 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		blogsStatsUserLocalService = (BlogsStatsUserLocalService)aopProxy;
+
+		_setLocalServiceUtilService(blogsStatsUserLocalService);
 	}
 
 	/**
@@ -381,6 +439,22 @@ public abstract class BlogsStatsUserLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		BlogsStatsUserLocalService blogsStatsUserLocalService) {
+
+		try {
+			Field field = BlogsStatsUserLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, blogsStatsUserLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

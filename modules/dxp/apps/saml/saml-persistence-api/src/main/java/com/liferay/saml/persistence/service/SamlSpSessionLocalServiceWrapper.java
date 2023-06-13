@@ -36,6 +36,10 @@ public class SamlSpSessionLocalServiceWrapper
 	/**
 	 * Adds the saml sp session to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlSpSessionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param samlSpSession the saml sp session
 	 * @return the saml sp session that was added
 	 */
@@ -59,6 +63,17 @@ public class SamlSpSessionLocalServiceWrapper
 			samlIdpEntityId, samlSpSessionKey, assertionXml, jSessionId,
 			nameIdFormat, nameIdNameQualifier, nameIdSPNameQualifier,
 			nameIdValue, sessionIndex, serviceContext);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _samlSpSessionLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -88,6 +103,10 @@ public class SamlSpSessionLocalServiceWrapper
 	/**
 	 * Deletes the saml sp session with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlSpSessionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param samlSpSessionId the primary key of the saml sp session
 	 * @return the saml sp session that was removed
 	 * @throws PortalException if a saml sp session with the primary key could not be found
@@ -103,6 +122,10 @@ public class SamlSpSessionLocalServiceWrapper
 	/**
 	 * Deletes the saml sp session from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlSpSessionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param samlSpSession the saml sp session
 	 * @return the saml sp session that was removed
 	 */
@@ -111,6 +134,18 @@ public class SamlSpSessionLocalServiceWrapper
 		com.liferay.saml.persistence.model.SamlSpSession samlSpSession) {
 
 		return _samlSpSessionLocalService.deleteSamlSpSession(samlSpSession);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _samlSpSessionLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _samlSpSessionLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -229,6 +264,19 @@ public class SamlSpSessionLocalServiceWrapper
 
 	@Override
 	public com.liferay.saml.persistence.model.SamlSpSession
+		fetchSamlSpSessionBySessionIndex(long companyId, String sessionIndex) {
+
+		return _samlSpSessionLocalService.fetchSamlSpSessionBySessionIndex(
+			companyId, sessionIndex);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #fetchSamlSpSessionBySessionIndex(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.saml.persistence.model.SamlSpSession
 		fetchSamlSpSessionBySessionIndex(String sessionIndex) {
 
 		return _samlSpSessionLocalService.fetchSamlSpSessionBySessionIndex(
@@ -259,6 +307,9 @@ public class SamlSpSessionLocalServiceWrapper
 		return _samlSpSessionLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -371,6 +422,10 @@ public class SamlSpSessionLocalServiceWrapper
 
 	/**
 	 * Updates the saml sp session in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlSpSessionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param samlSpSession the saml sp session
 	 * @return the saml sp session that was updated

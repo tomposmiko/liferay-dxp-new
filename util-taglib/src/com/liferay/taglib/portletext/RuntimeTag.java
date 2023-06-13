@@ -30,11 +30,11 @@ import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletJSONUtil;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletParameterUtil;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryConstants;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.RestrictPortletServletRequest;
+import com.liferay.portal.kernel.portlet.constants.PortletPreferencesFactoryConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
@@ -194,15 +194,19 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 
 		String portletInstanceKey = portletName;
 
-		if (Validator.isNotNull(instanceId) && !instanceId.startsWith("0")) {
+		if (Validator.isNotNull(instanceId) && !instanceId.equals("0")) {
 			portletInstanceKey = PortletIdCodec.encode(
 				PortletIdCodec.decodePortletName(portletName),
 				PortletIdCodec.decodeUserId(portletName), instanceId);
 		}
 
+		boolean resetLifecycleRender = false;
+
 		if (!Objects.equals(
 				portletInstanceKey,
 				httpServletRequest.getParameter("p_p_id"))) {
+
+			resetLifecycleRender = true;
 
 			Set<String> keySet = parameterMap.keySet();
 
@@ -225,11 +229,18 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 			}
 		}
 
-		queryString = PortletParameterUtil.addNamespace(
-			portletInstanceKey, queryString);
+		if (Validator.isNotNull(queryString)) {
+			queryString = PortletParameterUtil.addNamespace(
+				portletInstanceKey, queryString);
 
-		httpServletRequest = DynamicServletRequest.addQueryString(
-			restrictPortletServletRequest, parameterMap, queryString, false);
+			httpServletRequest = DynamicServletRequest.addQueryString(
+				restrictPortletServletRequest, parameterMap, queryString,
+				false);
+		}
+		else {
+			httpServletRequest = new DynamicServletRequest(
+				restrictPortletServletRequest, parameterMap, false);
+		}
 
 		try {
 			httpServletRequest.setAttribute(
@@ -335,8 +346,21 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 
 			embeddedPortletIds.push(portletInstanceKey);
 
-			PortletContainerUtil.render(
-				httpServletRequest, httpServletResponse, portlet);
+			boolean lifecycleRender = themeDisplay.isLifecycleRender();
+
+			try {
+				if (resetLifecycleRender) {
+					themeDisplay.setLifecycleRender(true);
+				}
+
+				PortletContainerUtil.render(
+					httpServletRequest, httpServletResponse, portlet);
+			}
+			finally {
+				if (resetLifecycleRender) {
+					themeDisplay.setLifecycleRender(lifecycleRender);
+				}
+			}
 
 			embeddedPortletIds.pop();
 

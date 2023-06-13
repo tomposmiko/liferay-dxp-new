@@ -14,9 +14,16 @@
 
 package com.liferay.change.tracking.service;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for CTEntry. This utility wraps
@@ -41,20 +48,22 @@ public class CTEntryLocalServiceUtil {
 	/**
 	 * Adds the ct entry to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ctEntry the ct entry
 	 * @return the ct entry that was added
 	 */
-	public static com.liferay.change.tracking.model.CTEntry addCTEntry(
-		com.liferay.change.tracking.model.CTEntry ctEntry) {
-
+	public static CTEntry addCTEntry(CTEntry ctEntry) {
 		return getService().addCTEntry(ctEntry);
 	}
 
-	public static com.liferay.change.tracking.model.CTEntry addCTEntry(
+	public static CTEntry addCTEntry(
 			long ctCollectionId, long modelClassNameId,
 			com.liferay.portal.kernel.model.change.tracking.CTModel<?> ctModel,
 			long userId, int changeType)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().addCTEntry(
 			ctCollectionId, modelClassNameId, ctModel, userId, changeType);
@@ -66,22 +75,33 @@ public class CTEntryLocalServiceUtil {
 	 * @param ctEntryId the primary key for the new ct entry
 	 * @return the new ct entry
 	 */
-	public static com.liferay.change.tracking.model.CTEntry createCTEntry(
-		long ctEntryId) {
-
+	public static CTEntry createCTEntry(long ctEntryId) {
 		return getService().createCTEntry(ctEntryId);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
 	}
 
 	/**
 	 * Deletes the ct entry from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ctEntry the ct entry
 	 * @return the ct entry that was removed
 	 * @throws PortalException
 	 */
-	public static com.liferay.change.tracking.model.CTEntry deleteCTEntry(
-			com.liferay.change.tracking.model.CTEntry ctEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static CTEntry deleteCTEntry(CTEntry ctEntry)
+		throws PortalException {
 
 		return getService().deleteCTEntry(ctEntry);
 	}
@@ -89,31 +109,37 @@ public class CTEntryLocalServiceUtil {
 	/**
 	 * Deletes the ct entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ctEntryId the primary key of the ct entry
 	 * @return the ct entry that was removed
 	 * @throws PortalException if a ct entry with the primary key could not be found
 	 */
-	public static com.liferay.change.tracking.model.CTEntry deleteCTEntry(
-			long ctEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public static CTEntry deleteCTEntry(long ctEntryId) throws PortalException {
 		return getService().deleteCTEntry(ctEntryId);
 	}
 
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -123,9 +149,7 @@ public class CTEntryLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -141,9 +165,8 @@ public class CTEntryLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -161,10 +184,9 @@ public class CTEntryLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -176,9 +198,7 @@ public class CTEntryLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -190,19 +210,17 @@ public class CTEntryLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.change.tracking.model.CTEntry fetchCTEntry(
-		long ctEntryId) {
-
+	public static CTEntry fetchCTEntry(long ctEntryId) {
 		return getService().fetchCTEntry(ctEntryId);
 	}
 
-	public static com.liferay.change.tracking.model.CTEntry fetchCTEntry(
+	public static CTEntry fetchCTEntry(
 		long ctCollectionId, long modelClassNameId, long modelClassPK) {
 
 		return getService().fetchCTEntry(
@@ -215,17 +233,13 @@ public class CTEntryLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	public static java.util.List<com.liferay.change.tracking.model.CTEntry>
-		getCTCollectionCTEntries(long ctCollectionId) {
-
+	public static List<CTEntry> getCTCollectionCTEntries(long ctCollectionId) {
 		return getService().getCTCollectionCTEntries(ctCollectionId);
 	}
 
-	public static java.util.List<com.liferay.change.tracking.model.CTEntry>
-		getCTCollectionCTEntries(
-			long ctCollectionId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.change.tracking.model.CTEntry> orderByComparator) {
+	public static List<CTEntry> getCTCollectionCTEntries(
+		long ctCollectionId, int start, int end,
+		OrderByComparator<CTEntry> orderByComparator) {
 
 		return getService().getCTCollectionCTEntries(
 			ctCollectionId, start, end, orderByComparator);
@@ -246,14 +260,12 @@ public class CTEntryLocalServiceUtil {
 	 * @param end the upper bound of the range of ct entries (not inclusive)
 	 * @return the range of ct entries
 	 */
-	public static java.util.List<com.liferay.change.tracking.model.CTEntry>
-		getCTEntries(int start, int end) {
-
+	public static List<CTEntry> getCTEntries(int start, int end) {
 		return getService().getCTEntries(start, end);
 	}
 
-	public static java.util.List<com.liferay.change.tracking.model.CTEntry>
-		getCTEntries(long ctCollectionId, long modelClassNameId) {
+	public static List<CTEntry> getCTEntries(
+		long ctCollectionId, long modelClassNameId) {
 
 		return getService().getCTEntries(ctCollectionId, modelClassNameId);
 	}
@@ -274,14 +286,17 @@ public class CTEntryLocalServiceUtil {
 	 * @return the ct entry
 	 * @throws PortalException if a ct entry with the primary key could not be found
 	 */
-	public static com.liferay.change.tracking.model.CTEntry getCTEntry(
-			long ctEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public static CTEntry getCTEntry(long ctEntryId) throws PortalException {
 		return getService().getCTEntry(ctEntryId);
 	}
 
-	public static java.util.List<Long> getExclusiveModelClassPKs(
+	public static long getCTRowCTCollectionId(CTEntry ctEntry)
+		throws PortalException {
+
+		return getService().getCTRowCTCollectionId(ctEntry);
+	}
+
+	public static List<Long> getExclusiveModelClassPKs(
 		long ctCollectionId, long modelClassNameId) {
 
 		return getService().getExclusiveModelClassPKs(
@@ -304,9 +319,11 @@ public class CTEntryLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -320,33 +337,21 @@ public class CTEntryLocalServiceUtil {
 	/**
 	 * Updates the ct entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ctEntry the ct entry
 	 * @return the ct entry that was updated
 	 */
-	public static com.liferay.change.tracking.model.CTEntry updateCTEntry(
-		com.liferay.change.tracking.model.CTEntry ctEntry) {
-
+	public static CTEntry updateCTEntry(CTEntry ctEntry) {
 		return getService().updateCTEntry(ctEntry);
 	}
 
 	public static CTEntryLocalService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	private static ServiceTracker<CTEntryLocalService, CTEntryLocalService>
-		_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(CTEntryLocalService.class);
-
-		ServiceTracker<CTEntryLocalService, CTEntryLocalService>
-			serviceTracker =
-				new ServiceTracker<CTEntryLocalService, CTEntryLocalService>(
-					bundle.getBundleContext(), CTEntryLocalService.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile CTEntryLocalService _service;
 
 }

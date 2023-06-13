@@ -33,6 +33,10 @@ public class MDRRuleLocalServiceWrapper
 	/**
 	 * Adds the mdr rule to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRRuleLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mdrRule the mdr rule
 	 * @return the mdr rule that was added
 	 */
@@ -61,13 +65,13 @@ public class MDRRuleLocalServiceWrapper
 			long ruleGroupId, java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap, String type,
 			com.liferay.portal.kernel.util.UnicodeProperties
-				typeSettingsProperties,
+				typeSettingsUnicodeProperties,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _mdrRuleLocalService.addRule(
-			ruleGroupId, nameMap, descriptionMap, type, typeSettingsProperties,
-			serviceContext);
+			ruleGroupId, nameMap, descriptionMap, type,
+			typeSettingsUnicodeProperties, serviceContext);
 	}
 
 	@Override
@@ -104,7 +108,22 @@ public class MDRRuleLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _mdrRuleLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the mdr rule with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRRuleLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ruleId the primary key of the mdr rule
 	 * @return the mdr rule that was removed
@@ -120,6 +139,10 @@ public class MDRRuleLocalServiceWrapper
 
 	/**
 	 * Deletes the mdr rule from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRRuleLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param mdrRule the mdr rule
 	 * @return the mdr rule that was removed
@@ -155,6 +178,18 @@ public class MDRRuleLocalServiceWrapper
 	@Override
 	public void deleteRules(long ruleGroupId) {
 		_mdrRuleLocalService.deleteRules(ruleGroupId);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _mdrRuleLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _mdrRuleLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -403,6 +438,9 @@ public class MDRRuleLocalServiceWrapper
 		return _mdrRuleLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -437,9 +475,11 @@ public class MDRRuleLocalServiceWrapper
 		getRules(
 			long ruleGroupId, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.mobile.device.rules.model.MDRRule> obc) {
+				<com.liferay.mobile.device.rules.model.MDRRule>
+					orderByComparator) {
 
-		return _mdrRuleLocalService.getRules(ruleGroupId, start, end, obc);
+		return _mdrRuleLocalService.getRules(
+			ruleGroupId, start, end, orderByComparator);
 	}
 
 	@Override
@@ -449,6 +489,10 @@ public class MDRRuleLocalServiceWrapper
 
 	/**
 	 * Updates the mdr rule in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRRuleLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param mdrRule the mdr rule
 	 * @return the mdr rule that was updated
@@ -478,13 +522,13 @@ public class MDRRuleLocalServiceWrapper
 			long ruleId, java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap, String type,
 			com.liferay.portal.kernel.util.UnicodeProperties
-				typeSettingsProperties,
+				typeSettingsUnicodeProperties,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _mdrRuleLocalService.updateRule(
-			ruleId, nameMap, descriptionMap, type, typeSettingsProperties,
-			serviceContext);
+			ruleId, nameMap, descriptionMap, type,
+			typeSettingsUnicodeProperties, serviceContext);
 	}
 
 	@Override

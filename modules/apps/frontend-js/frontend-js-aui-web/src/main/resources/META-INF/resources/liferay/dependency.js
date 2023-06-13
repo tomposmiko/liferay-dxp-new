@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	var A = AUI().use('oop');
 
 	var usedModules = {};
@@ -49,7 +49,8 @@
 				proxy = AOP.method;
 
 				AOP.method = methodFn;
-			} else {
+			}
+			else {
 				obj[methodName] = methodFn;
 			}
 
@@ -86,7 +87,7 @@
 				delete obj._yuiaop[methodName];
 			}
 
-			var proxy = function() {
+			var proxy = function () {
 				var args = arguments;
 
 				var context = obj;
@@ -142,12 +143,12 @@
 				}
 			};
 
-			proxy.toString = function() {
+			proxy.toString = function () {
 				return methodFn.toString();
 			};
 
 			obj[methodName] = proxy;
-		}
+		},
 	};
 
 	Liferay.Dependency = Dependency;

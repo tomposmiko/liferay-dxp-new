@@ -563,11 +563,11 @@ public class PluginPackageUtil {
 
 		sb.append(repositoryURL);
 		sb.append(StringPool.SLASH);
-		sb.append(PluginPackage.REPOSITORY_XML_FILENAME_PREFIX);
+		sb.append(PluginPackage.REPOSITORY_XML_FILE_NAME_PREFIX);
 		sb.append(StringPool.DASH);
 		sb.append(ReleaseInfo.getVersion());
 		sb.append(StringPool.PERIOD);
-		sb.append(PluginPackage.REPOSITORY_XML_FILENAME_EXTENSION);
+		sb.append(PluginPackage.REPOSITORY_XML_FILE_NAME_EXTENSION);
 
 		String pluginsXmlURL = sb.toString();
 
@@ -594,9 +594,9 @@ public class PluginPackageUtil {
 
 				sb.append(repositoryURL);
 				sb.append(StringPool.SLASH);
-				sb.append(PluginPackage.REPOSITORY_XML_FILENAME_PREFIX);
+				sb.append(PluginPackage.REPOSITORY_XML_FILE_NAME_PREFIX);
 				sb.append(StringPool.PERIOD);
-				sb.append(PluginPackage.REPOSITORY_XML_FILENAME_EXTENSION);
+				sb.append(PluginPackage.REPOSITORY_XML_FILE_NAME_EXTENSION);
 
 				pluginsXmlURL = sb.toString();
 
@@ -1071,7 +1071,7 @@ public class PluginPackageUtil {
 		PluginPackage pluginPackage = new PluginPackageImpl(
 			StringBundler.concat(
 				artifactGroupId, StringPool.SLASH, artifactId, StringPool.SLASH,
-				version, StringPool.SLASH, "war"));
+				version, "/war"));
 
 		pluginPackage.setName(artifactId);
 

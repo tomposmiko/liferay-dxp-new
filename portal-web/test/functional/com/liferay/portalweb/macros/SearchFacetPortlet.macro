@@ -13,8 +13,7 @@ definition {
 			facetValueName = "${facetValueName}",
 			searchPage = "${searchPage}",
 			searchTerm = "${searchTerm}",
-			searchURL = "${searchURL}"
-		);
+			searchURL = "${searchURL}");
 
 		AssertLocation(value1 = "${searchURL}");
 
@@ -27,8 +26,7 @@ definition {
 
 			var searchURL = SearchFacetPortlet.clearFacetAndViewURL(
 				facetClass = "${facetClearClass}",
-				searchURL = "${searchURL}"
-			);
+				searchURL = "${searchURL}");
 		}
 
 		return "${searchURL}";
@@ -57,8 +55,7 @@ definition {
 
 			var searchURL = SearchFacetPortlet.generateFacetClearedURL(
 				facetClass = "${facetClass}",
-				searchURL = "${searchURL}"
-			);
+				searchURL = "${searchURL}");
 
 			AssertLocation(value1 = "${searchURL}");
 
@@ -91,8 +88,7 @@ definition {
 		if (!(isSet(searchURL))) {
 			var searchURL = SearchPortlets.getSearchTermURL(
 				searchPage = "${searchPage}",
-				searchTerm = "${searchTerm}"
-			);
+				searchTerm = "${searchTerm}");
 		}
 
 		if ("${facetClass}" == "type") {
@@ -120,11 +116,11 @@ definition {
 			var facetValueList = ListUtil.sort("${facetValueList}");
 
 			for (var facetValueListValue : list "${facetValueList}") {
-				var searchURL = "${searchURL}&amp;${facetClass}=${facetValueListValue}";
+				var searchURL = "${searchURL}&${facetClass}=${facetValueListValue}";
 			}
 		}
 		else {
-			var searchURL = "${searchURL}&amp;${facetClass}=${facetValue}";
+			var searchURL = "${searchURL}&${facetClass}=${facetValue}";
 		}
 
 		return "${searchURL}";
@@ -198,6 +194,30 @@ definition {
 		return "${facetTypeValue}";
 	}
 
+	macro moveAssetTypesToAvailable {
+		Portlet.gotoPortletOptions(
+			portletName = "Type Facet",
+			portletOption = "Configuration");
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		for (var assetType : list "${assetType}") {
+			AssertClick(
+				locator1 = "Search#TYPE_FACET_CURRENT_ASSET_TYPE",
+				value1 = "${assetType}");
+
+			Click(locator1 = "Button#MOVE_CURRENT_TO_AVAILABLE");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "Search#TYPE_FACET_AVAILABLE_ASSET_TYPE",
+				value1 = "${assetType}");
+		}
+
+		PortletEntry.save();
+
+		IFrame.closeFrame();
+	}
+
 	macro uncheckFacet {
 		FormFields.disableCheckbox(fieldName = "${facetValueName}");
 	}
@@ -209,12 +229,56 @@ definition {
 			facetClass = "${facetClass}",
 			facetValue = "${facetValue}",
 			facetValueName = "${facetValueName}",
-			searchURL = "${searchURL}"
-		);
+			searchURL = "${searchURL}");
 
 		AssertLocation(value1 = "${searchURL}");
 
 		return "${searchURL}";
+	}
+
+	macro updateFacetConfiguration {
+		Portlet.gotoPortletOptions(
+			portletName = "${portletName}",
+			portletOption = "Configuration");
+
+		WaitForLiferayEvent.initializeLiferayEventLog();
+
+		SelectFrameTop();
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		if (isSet(displayTemplate)) {
+			Select(
+				key_fieldLabel = "Display Template",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${displayTemplate}");
+		}
+
+		if (isSet(parameterName)) {
+			FormFields.editText(
+				fieldName = "parameterName",
+				fieldValue = "${parameterName}");
+		}
+
+		if (isSet(maxTerms)) {
+			FormFields.editText(
+				fieldName = "maxTerms",
+				fieldValue = "${maxTerms}");
+		}
+
+		if (isSet(frequencyThreshold)) {
+			FormFields.editText(
+				fieldName = "frequencyThreshold",
+				fieldValue = "${frequencyThreshold}");
+		}
+
+		if ("${displayFrequencies}" == "disable") {
+			FormFields.disableCheckbox(fieldName = "frequenciesVisible");
+		}
+
+		PortletEntry.save();
+
+		IFrame.closeFrame();
 	}
 
 }

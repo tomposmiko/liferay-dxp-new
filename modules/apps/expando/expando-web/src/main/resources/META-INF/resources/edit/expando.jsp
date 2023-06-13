@@ -31,7 +31,7 @@ if (columnId > 0) {
 	expandoColumn = ExpandoColumnServiceUtil.fetchExpandoColumn(columnId);
 }
 
-int type = ParamUtil.getInteger(request, "type", 0);
+int type = ParamUtil.getInteger(request, "type");
 
 if (expandoColumn != null) {
 	type = expandoColumn.getType();
@@ -115,14 +115,14 @@ else {
 	<portlet:param name="mvcPath" value="/edit/expando.jsp" />
 </portlet:actionURL>
 
-<div class="container-fluid container-fluid-max-xl">
+<clay:container-fluid>
 	<liferay-ui:breadcrumb
 		showCurrentGroup="<%= false %>"
 		showGuestGroup="<%= false %>"
 		showLayout="<%= false %>"
 		showPortletBreadcrumb="<%= true %>"
 	/>
-</div>
+</clay:container-fluid>
 
 <liferay-frontend:edit-form
 	action="<%= editExpandoURL %>"
@@ -153,7 +153,7 @@ else {
 				</c:choose>
 
 				<div class="form-text">
-					<liferay-ui:message key="custom-field-key-help" />
+					<liferay-ui:message arguments="&lt;liferay-expando:custom-attribute /&gt;" key="custom-field-key-help" translateArguments="<%= false %>" />
 				</div>
 			</aui:field-wrapper>
 

@@ -129,7 +129,7 @@ else {
 <aui:script use="aui-base,aui-io-deprecated,aui-io-upload">
 	var form = A.one('#<portlet:namespace />fm');
 
-	form.one('.send-message').on('click', function(event) {
+	form.one('.send-message').on('click', function (event) {
 		Liferay.Mail.setStatus(
 			'info',
 			'<liferay-ui:message key="sending-message" />',
@@ -145,11 +145,11 @@ else {
 			dataType: 'JSON',
 			form: {
 				id: form.getDOMNode(),
-				upload: true
+				upload: true,
 			},
 			method: 'POST',
 			on: {
-				complete: function(event, id, obj) {
+				complete: function (event, id, obj) {
 					try {
 						var responseData = JSON.parse(obj.responseText);
 
@@ -167,18 +167,19 @@ else {
 								Liferay.Mail.keywords
 							);
 						}
-					} catch (e) {
+					}
+					catch (e) {
 						Liferay.Mail.setStatus(
 							'error',
 							'<liferay-ui:message key="unable-to-send-message" />'
 						);
 					}
-				}
-			}
+				},
+			},
 		});
 	});
 
-	form.one('.save-draft').on('click', function(event) {
+	form.one('.save-draft').on('click', function (event) {
 		document.<portlet:namespace />fm.<portlet:namespace />body.value = window.<portlet:namespace />editor.getHTML();
 
 		Liferay.Mail.setStatus(
@@ -190,28 +191,28 @@ else {
 		A.io.request(themeDisplay.getLayoutURL() + '/-/mail/save_draft', {
 			dataType: 'JSON',
 			form: {
-				id: form.getDOMNode()
+				id: form.getDOMNode(),
 			},
 			on: {
-				failure: function(event, id, obj) {
+				failure: function (event, id, obj) {
 					Liferay.Mail.setStatus(
 						'error',
 						'<liferay-ui:message key="unable-to-save-draft" />'
 					);
 				},
-				success: function(event, id, obj) {
+				success: function (event, id, obj) {
 					var responseData = this.get('responseData');
 
 					Liferay.Mail.setStatus(
 						responseData.status,
 						responseData.message
 					);
-				}
-			}
+				},
+			},
 		});
 	});
 
-	form.one('.add-attachment').on('click', function(event) {
+	form.one('.add-attachment').on('click', function (event) {
 		var countNode = form.one(
 			'input[name=<portlet:namespace />attachmentCount]'
 		);

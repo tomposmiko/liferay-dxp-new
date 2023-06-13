@@ -15,8 +15,10 @@
 package com.liferay.portal.vulcan.yaml.config;
 
 /**
- * @author Peter Shin
+ * @author     Peter Shin
+ * @deprecated As of Athanasius (7.3.x)
  */
+@Deprecated
 public class ConfigYAML {
 
 	public String getApiDir() {
@@ -37,6 +39,10 @@ public class ConfigYAML {
 
 	public String getClientDir() {
 		return _clientDir;
+	}
+
+	public String getClientMavenGroupId() {
+		return _clientMavenGroupId;
 	}
 
 	public String getImplDir() {
@@ -65,6 +71,10 @@ public class ConfigYAML {
 
 	public boolean isForcePredictableSchemaPropertyName() {
 		return _forcePredictableSchemaPropertyName;
+	}
+
+	public boolean isGenerateBatch() {
+		return _generateBatch;
 	}
 
 	public boolean isGenerateGraphQL() {
@@ -99,6 +109,10 @@ public class ConfigYAML {
 		_clientDir = clientDir;
 	}
 
+	public void setClientMavenGroupId(String clientMavenGroupId) {
+		_clientMavenGroupId = clientMavenGroupId;
+	}
+
 	public void setForcePredictableContentApplicationXML(
 		boolean forcePredictableContentApplicationXML) {
 
@@ -117,6 +131,10 @@ public class ConfigYAML {
 
 		_forcePredictableSchemaPropertyName =
 			forcePredictableSchemaPropertyName;
+	}
+
+	public void setGenerateBatch(boolean generateBatch) {
+		_generateBatch = generateBatch;
 	}
 
 	public void setGenerateGraphQL(boolean generateGraphQL) {
@@ -152,9 +170,11 @@ public class ConfigYAML {
 	private Application _application;
 	private String _author;
 	private String _clientDir;
+	private String _clientMavenGroupId;
 	private boolean _forcePredictableContentApplicationXML = true;
 	private boolean _forcePredictableOperationId = true;
 	private boolean _forcePredictableSchemaPropertyName = true;
+	private boolean _generateBatch = true;
 	private boolean _generateGraphQL = true;
 	private boolean _generateREST = true;
 	private String _implDir = "src/main/java";

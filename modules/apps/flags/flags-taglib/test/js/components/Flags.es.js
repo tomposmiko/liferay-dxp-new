@@ -17,34 +17,36 @@ import {
 	cleanup,
 	fireEvent,
 	render,
-	waitForElement
+	waitForElement,
 } from '@testing-library/react';
 import React from 'react';
 import {act} from 'react-dom/test-utils';
 
 import Flags from '../../../src/main/resources/META-INF/resources/flags/js/components/Flags.es';
 
-const formDataToObject = formData =>
+const formDataToObject = (formData) =>
 	Array.from(formData).reduce(
 		(memo, [key, val]) => ({
 			...memo,
-			[key]: val
+			[key]: val,
 		}),
 		{}
 	);
 
 function _renderFlagsComponent({
+	captchaURI = '',
 	companyName = 'Liferay',
 	baseData = {},
 	onlyIcon = false,
 	pathTermsOfUse = '/',
 	reasons = {value: 'text', value2: 'text2'},
 	signedIn = false,
-	uri = '//'
+	uri = '//',
 } = {}) {
 	return render(
 		<Flags
 			baseData={baseData}
+			captchaURI={captchaURI}
 			companyName={companyName}
 			onlyIcon={onlyIcon}
 			pathTermsOfUse={pathTermsOfUse}
@@ -53,7 +55,7 @@ function _renderFlagsComponent({
 			uri={uri}
 		/>,
 		{
-			baseElement: document.body
+			baseElement: document.body,
 		}
 	);
 }
@@ -77,8 +79,8 @@ describe('Flags', () => {
 	it('submits a report successfully with baseData', async () => {
 		const {getByRole} = _renderFlagsComponent({
 			baseData: {
-				testingField: 'testingValue'
-			}
+				testingField: 'testingValue',
+			},
 		});
 		fetch.mockResponse('');
 
@@ -86,6 +88,10 @@ describe('Flags', () => {
 			fireEvent.click(getByRole('button'));
 
 			const form = await waitForElement(() => getByRole('form'));
+
+			[...form.elements].forEach((element) => {
+				element.value = 'someValue';
+			});
 
 			fireEvent.submit(form);
 		});

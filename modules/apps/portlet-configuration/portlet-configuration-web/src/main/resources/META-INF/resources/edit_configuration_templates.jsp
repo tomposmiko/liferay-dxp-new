@@ -36,7 +36,7 @@ PortletConfigurationTemplatesManagementToolbarDisplayContext portletConfiguratio
 				displayContext="<%= portletConfigurationTemplatesManagementToolbarDisplayContext %>"
 			/>
 
-			<div class="container-fluid-1280">
+			<clay:container-fluid>
 				<liferay-ui:error exception="<%= NoSuchPortletItemException.class %>" message="the-setup-could-not-be-found" />
 
 				<div class="button-holder text-center">
@@ -130,7 +130,7 @@ PortletConfigurationTemplatesManagementToolbarDisplayContext portletConfiguratio
 						markupView="lexicon"
 					/>
 				</liferay-ui:search-container>
-			</div>
+			</clay:container-fluid>
 		</div>
 	</aui:form>
 </div>
@@ -139,11 +139,11 @@ PortletConfigurationTemplatesManagementToolbarDisplayContext portletConfiguratio
 	Liferay.component(
 		'<%= PortletConfigurationWebKeys.ARCHIVED_SETUPS_DROPDOWN_DEFAULT_EVENT_HANDLER %>',
 		new ArchivedSetuptsDropdownDefaultEventHandler.default({
-			namespace: '<portlet:namespace />'
+			namespace: '<portlet:namespace />',
 		}),
 		{
 			destroyOnNavigate: true,
-			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>'
+			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>',
 		}
 	);
 </aui:script>
@@ -152,11 +152,11 @@ PortletConfigurationTemplatesManagementToolbarDisplayContext portletConfiguratio
 	Liferay.component(
 		'<%= portletConfigurationTemplatesManagementToolbarDisplayContext.getDefaultEventHandler() %>',
 		new ManagementToolbarDefaultEventHandler.default({
-			namespace: '<portlet:namespace />'
+			namespace: '<portlet:namespace />',
 		}),
 		{
 			destroyOnNavigate: true,
-			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>'
+			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>',
 		}
 	);
 </aui:script>

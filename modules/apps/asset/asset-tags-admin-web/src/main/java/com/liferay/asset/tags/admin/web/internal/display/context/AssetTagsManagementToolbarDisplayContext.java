@@ -17,9 +17,10 @@ package com.liferay.asset.tags.admin.web.internal.display.context;
 import com.liferay.asset.tags.constants.AssetTagsAdminPortletKeys;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuUtil;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -57,43 +58,38 @@ public class AssetTagsManagementToolbarDisplayContext
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		return new DropdownItemList() {
-			{
-				if (_assetTagsDisplayContext.isShowTagsActions()) {
-					PortletURL mergeTagsURL =
-						liferayPortletResponse.createRenderURL();
+		return DropdownItemListBuilder.add(
+			_assetTagsDisplayContext::isShowTagsActions,
+			dropdownItem -> {
+				PortletURL mergeTagsURL =
+					liferayPortletResponse.createRenderURL();
 
-					mergeTagsURL.setParameter("mvcPath", "/merge_tag.jsp");
-					mergeTagsURL.setParameter(
-						"mergeTagIds", "[$MERGE_TAGS_IDS$]");
+				mergeTagsURL.setParameter("mvcPath", "/merge_tag.jsp");
+				mergeTagsURL.setParameter("mergeTagIds", "[$MERGE_TAGS_IDS$]");
 
-					add(
-						dropdownItem -> {
-							dropdownItem.putData("action", "mergeTags");
-							dropdownItem.putData(
-								"mergeTagsURL", mergeTagsURL.toString());
-							dropdownItem.setIcon("merge");
-							dropdownItem.setLabel(
-								LanguageUtil.get(request, "merge"));
-							dropdownItem.setQuickAction(true);
-						});
-				}
-
-				add(
-					dropdownItem -> {
-						dropdownItem.putData("action", "deleteTags");
-						dropdownItem.setIcon("times-circle");
-						dropdownItem.setLabel(
-							LanguageUtil.get(request, "delete"));
-						dropdownItem.setQuickAction(true);
-					});
+				dropdownItem.putData("action", "mergeTags");
+				dropdownItem.putData("mergeTagsURL", mergeTagsURL.toString());
+				dropdownItem.setIcon("merge");
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "merge"));
+				dropdownItem.setQuickAction(true);
 			}
-		};
+		).add(
+			dropdownItem -> {
+				dropdownItem.putData("action", "deleteTags");
+				dropdownItem.setIcon("times-circle");
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "delete"));
+				dropdownItem.setQuickAction(true);
+			}
+		).build();
 	}
 
 	@Override
 	public String getClearResultsURL() {
 		PortletURL clearResultsURL = getPortletURL();
+
+		clearResultsURL.setParameter("keywords", StringPool.BLANK);
 
 		return clearResultsURL.toString();
 	}
@@ -105,13 +101,15 @@ public class AssetTagsManagementToolbarDisplayContext
 
 	@Override
 	public CreationMenu getCreationMenu() {
-		return CreationMenuUtil.addPrimaryDropdownItem(
+		return CreationMenuBuilder.addPrimaryDropdownItem(
 			dropdownItem -> {
 				dropdownItem.setHref(
 					liferayPortletResponse.createRenderURL(), "mvcPath",
 					"/edit_tag.jsp");
-				dropdownItem.setLabel(LanguageUtil.get(request, "add-tag"));
-			});
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "add-tag"));
+			}
+		).build();
 	}
 
 	@Override
@@ -133,8 +131,9 @@ public class AssetTagsManagementToolbarDisplayContext
 
 	@Override
 	public Boolean isShowCreationMenu() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		if (AssetTagsPermission.contains(
 				themeDisplay.getPermissionChecker(),
@@ -146,6 +145,11 @@ public class AssetTagsManagementToolbarDisplayContext
 		}
 
 		return false;
+	}
+
+	@Override
+	protected String getDisplayStyle() {
+		return _assetTagsDisplayContext.getDisplayStyle();
 	}
 
 	@Override

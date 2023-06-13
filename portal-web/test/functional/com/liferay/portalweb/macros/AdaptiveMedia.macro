@@ -19,7 +19,7 @@ definition {
 
 		AssertElementPresent(locator1 = "AdaptiveMediaTable#PROGRESS_SUCCESS");
 
-		Alert.closeMessage(messageType = "GENERIC");
+		Alert.viewSuccessMessage();
 	}
 
 	macro addImageResolution {
@@ -132,7 +132,7 @@ definition {
 
 		MenuItem.click(menuItem = "Edit");
 
-		if (!(contains("${imageNameEdit}", "{imageNameEdit}"))) {
+		if (isSet(imageNameEdit)) {
 			PortletEntry.inputName(name = "${imageNameEdit}");
 		}
 
@@ -150,19 +150,43 @@ definition {
 			AssertNotEditable(locator1 = "Radio#CUSTOM_URL");
 		}
 		else {
-			if (!(contains("${maxHeightEdit}", "{maxHeightEdit}"))) {
+			if (isSet(maxHeightEdit)) {
+				Click(locator1 = "TextInput#MAX_HEIGHT");
+
+				var count = "0";
+
+				while ("${count}" != "${backspaceCount}") {
+					KeyPress(
+						locator1 = "TextInput#MAX_HEIGHT",
+						value1 = "\BACK_SPACE");
+
+					var count = ${count} + 1;
+				}
+
 				Type(
 					locator1 = "TextInput#MAX_HEIGHT",
 					value1 = "${maxHeightEdit}");
 			}
 
-			if (!(contains("${maxWidthEdit}", "{maxWidthEdit}"))) {
+			if (isSet(maxWidthEdit)) {
+				Click(locator1 = "TextInput#MAX_WIDTH");
+
+				var count = "0";
+
+				while ("${count}" != "${backspaceCount}") {
+					KeyPress(
+						locator1 = "TextInput#MAX_WIDTH",
+						value1 = "\BACK_SPACE");
+
+					var count = ${count} + 1;
+				}
+
 				Type(
 					locator1 = "TextInput#MAX_WIDTH",
 					value1 = "${maxWidthEdit}");
 			}
 
-			if (!(contains("${imageIDEdit}", "{imageIDEdit}"))) {
+			if (isSet(imageIDEdit)) {
 				Click(locator1 = "Radio#CUSTOM_URL");
 
 				Type(
@@ -268,6 +292,8 @@ definition {
 	}
 
 	macro viewNumberOfAdaptedImages {
+		AssertElementPresent(locator1 = "AdaptiveMediaTable#INFO_ICON");
+
 		Click(locator1 = "AdaptiveMediaTable#INFO_ICON");
 
 		var key_numberOfAdaptedImages = "${numberOfAdaptedImages}";

@@ -14,7 +14,7 @@
 
 package com.liferay.frontend.theme.contributor.extender.internal.servlet.taglib;
 
-import com.liferay.frontend.theme.contributor.extender.BundleWebResources;
+import com.liferay.frontend.theme.contributor.extender.internal.BundleWebResources;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
@@ -62,6 +62,12 @@ public class ThemeContributorTopHeadDynamicInclude implements DynamicInclude {
 				WebKeys.THEME_DISPLAY);
 
 		String portalCDNURL = themeDisplay.getCDNBaseURL();
+
+		if (!_portal.isCDNDynamicResourcesEnabled(
+				themeDisplay.getCompanyId())) {
+
+			portalCDNURL = themeDisplay.getPortalURL();
+		}
 
 		if (_cssResourceURLs.length > 0) {
 			if (themeDisplay.isThemeCssFastLoad()) {
@@ -182,7 +188,7 @@ public class ThemeContributorTopHeadDynamicInclude implements DynamicInclude {
 
 		_cssResourceURLs = cssResourceURLs.toArray(new String[0]);
 
-		StringBundler sb = new StringBundler(cssResourceURLs.size() * 2 + 1);
+		StringBundler sb = new StringBundler((cssResourceURLs.size() * 2) + 1);
 
 		for (String cssResourceURL : cssResourceURLs) {
 			sb.append("&");
@@ -195,7 +201,7 @@ public class ThemeContributorTopHeadDynamicInclude implements DynamicInclude {
 
 		_jsResourceURLs = jsResourceURLs.toArray(new String[0]);
 
-		sb = new StringBundler(jsResourceURLs.size() * 2 + 1);
+		sb = new StringBundler((jsResourceURLs.size() * 2) + 1);
 
 		for (String jsResourceURL : jsResourceURLs) {
 			sb.append("&");
@@ -244,11 +250,8 @@ public class ThemeContributorTopHeadDynamicInclude implements DynamicInclude {
 		for (String resourceURL : resourceURLs) {
 			String staticResourceURL = _portal.getStaticResourceURL(
 				httpServletRequest,
-				portalURL.concat(
-					_portal.getPathProxy()
-				).concat(
-					resourceURL
-				),
+				StringBundler.concat(
+					portalURL, _portal.getPathProxy(), resourceURL),
 				themeLastModified);
 
 			printWriter.write("<link data-senna-track=\"permanent\" href=\"");
@@ -264,11 +267,8 @@ public class ThemeContributorTopHeadDynamicInclude implements DynamicInclude {
 		for (String resourceURL : resourceURLs) {
 			String staticResourceURL = _portal.getStaticResourceURL(
 				httpServletRequest,
-				portalURL.concat(
-					_portal.getPathProxy()
-				).concat(
-					resourceURL
-				),
+				StringBundler.concat(
+					portalURL, _portal.getPathProxy(), resourceURL),
 				themeLastModified);
 
 			printWriter.write("<script data-senna-track=\"permanent\" src=\"");

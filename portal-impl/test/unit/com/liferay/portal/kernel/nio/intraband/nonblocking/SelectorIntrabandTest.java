@@ -15,12 +15,12 @@
 package com.liferay.portal.kernel.nio.intraband.nonblocking;
 
 import com.liferay.portal.kernel.nio.intraband.BaseIntraband;
-import com.liferay.portal.kernel.nio.intraband.BaseIntrabandHelper;
+import com.liferay.portal.kernel.nio.intraband.BaseIntrabandUtil;
 import com.liferay.portal.kernel.nio.intraband.ChannelContext;
 import com.liferay.portal.kernel.nio.intraband.ClosedIntrabandException;
 import com.liferay.portal.kernel.nio.intraband.CompletionHandler;
 import com.liferay.portal.kernel.nio.intraband.Datagram;
-import com.liferay.portal.kernel.nio.intraband.DatagramHelper;
+import com.liferay.portal.kernel.nio.intraband.DatagramUtil;
 import com.liferay.portal.kernel.nio.intraband.IntrabandTestUtil;
 import com.liferay.portal.kernel.nio.intraband.RecordCompletionHandler;
 import com.liferay.portal.kernel.nio.intraband.RecordDatagramReceiveHandler;
@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.AdviseWith;
-import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.IOException;
 
@@ -77,7 +77,6 @@ public class SelectorIntrabandTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			AspectJNewEnvTestRule.INSTANCE,
 			new CodeCoverageAssertor() {
 
 				@Override
@@ -85,7 +84,8 @@ public class SelectorIntrabandTest {
 					assertClasses.add(SelectionKeyRegistrationReference.class);
 				}
 
-			});
+			},
+			LiferayUnitTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -199,8 +199,8 @@ public class SelectorIntrabandTest {
 			Jdk14LogImplAdvice.reset();
 
 			try {
-				DatagramHelper.writeTo(
-					DatagramHelper.createACKResponseDatagram(sequenceId),
+				DatagramUtil.writeTo(
+					DatagramUtil.createACKResponseDatagram(sequenceId),
 					gatheringByteChannel);
 			}
 			finally {
@@ -219,8 +219,8 @@ public class SelectorIntrabandTest {
 			Jdk14LogImplAdvice.reset();
 
 			try {
-				DatagramHelper.writeTo(
-					DatagramHelper.createACKResponseDatagram(sequenceId),
+				DatagramUtil.writeTo(
+					DatagramUtil.createACKResponseDatagram(sequenceId),
 					gatheringByteChannel);
 			}
 			finally {
@@ -234,28 +234,28 @@ public class SelectorIntrabandTest {
 			Datagram requestDatagram = Datagram.createRequestDatagram(
 				_TYPE, _DATA);
 
-			DatagramHelper.setAttachment(requestDatagram, new Object());
+			DatagramUtil.setAttachment(requestDatagram, new Object());
 
 			RecordCompletionHandler<Object> recordCompletionHandler =
 				new RecordCompletionHandler<>();
 
-			DatagramHelper.setCompletionHandler(
+			DatagramUtil.setCompletionHandler(
 				requestDatagram, recordCompletionHandler);
 
-			DatagramHelper.setSequenceId(requestDatagram, sequenceId);
-			DatagramHelper.setTimeout(requestDatagram, 10000);
+			DatagramUtil.setSequenceId(requestDatagram, sequenceId);
+			DatagramUtil.setTimeout(requestDatagram, 10000);
 
-			BaseIntrabandHelper.addResponseWaitingDatagram(
+			BaseIntrabandUtil.addResponseWaitingDatagram(
 				_selectorIntraband, requestDatagram);
 
-			DatagramHelper.writeTo(
-				DatagramHelper.createACKResponseDatagram(sequenceId),
+			DatagramUtil.writeTo(
+				DatagramUtil.createACKResponseDatagram(sequenceId),
 				gatheringByteChannel);
 
 			recordCompletionHandler.waitUntilDelivered();
 
 			Assert.assertSame(
-				DatagramHelper.getAttachment(requestDatagram),
+				DatagramUtil.getAttachment(requestDatagram),
 				recordCompletionHandler.getAttachment());
 
 			// Receive response, no request, with log
@@ -265,7 +265,7 @@ public class SelectorIntrabandTest {
 			Jdk14LogImplAdvice.reset();
 
 			try {
-				DatagramHelper.writeTo(
+				DatagramUtil.writeTo(
 					Datagram.createResponseDatagram(requestDatagram, _DATA),
 					gatheringByteChannel);
 			}
@@ -287,9 +287,9 @@ public class SelectorIntrabandTest {
 			try {
 				requestDatagram = Datagram.createRequestDatagram(_TYPE, _DATA);
 
-				DatagramHelper.setSequenceId(requestDatagram, sequenceId);
+				DatagramUtil.setSequenceId(requestDatagram, sequenceId);
 
-				DatagramHelper.writeTo(
+				DatagramUtil.writeTo(
 					Datagram.createResponseDatagram(requestDatagram, _DATA),
 					gatheringByteChannel);
 			}
@@ -303,30 +303,30 @@ public class SelectorIntrabandTest {
 
 			requestDatagram = Datagram.createRequestDatagram(_TYPE, _DATA);
 
-			DatagramHelper.setAttachment(requestDatagram, new Object());
+			DatagramUtil.setAttachment(requestDatagram, new Object());
 
 			recordCompletionHandler = new RecordCompletionHandler<>();
 
-			DatagramHelper.setCompletionHandler(
+			DatagramUtil.setCompletionHandler(
 				requestDatagram, recordCompletionHandler);
 
-			DatagramHelper.setCompletionTypes(
+			DatagramUtil.setCompletionTypes(
 				requestDatagram,
 				EnumSet.of(CompletionHandler.CompletionType.REPLIED));
-			DatagramHelper.setSequenceId(requestDatagram, sequenceId);
-			DatagramHelper.setTimeout(requestDatagram, 10000);
+			DatagramUtil.setSequenceId(requestDatagram, sequenceId);
+			DatagramUtil.setTimeout(requestDatagram, 10000);
 
-			BaseIntrabandHelper.addResponseWaitingDatagram(
+			BaseIntrabandUtil.addResponseWaitingDatagram(
 				_selectorIntraband, requestDatagram);
 
-			DatagramHelper.writeTo(
+			DatagramUtil.writeTo(
 				Datagram.createResponseDatagram(requestDatagram, _DATA),
 				gatheringByteChannel);
 
 			recordCompletionHandler.waitUntilReplied();
 
 			Assert.assertSame(
-				DatagramHelper.getAttachment(requestDatagram),
+				DatagramUtil.getAttachment(requestDatagram),
 				recordCompletionHandler.getAttachment());
 
 			// Receive response, with request, without replied completion
@@ -336,25 +336,25 @@ public class SelectorIntrabandTest {
 
 			requestDatagram = Datagram.createRequestDatagram(_TYPE, _DATA);
 
-			DatagramHelper.setCompletionTypes(
+			DatagramUtil.setCompletionTypes(
 				requestDatagram,
 				EnumSet.noneOf(CompletionHandler.CompletionType.class));
 
 			recordCompletionHandler = new RecordCompletionHandler<>();
 
-			DatagramHelper.setCompletionHandler(
+			DatagramUtil.setCompletionHandler(
 				requestDatagram, recordCompletionHandler);
 
-			DatagramHelper.setSequenceId(requestDatagram, sequenceId);
-			DatagramHelper.setTimeout(requestDatagram, 10000);
+			DatagramUtil.setSequenceId(requestDatagram, sequenceId);
+			DatagramUtil.setTimeout(requestDatagram, 10000);
 
-			BaseIntrabandHelper.addResponseWaitingDatagram(
+			BaseIntrabandUtil.addResponseWaitingDatagram(
 				_selectorIntraband, requestDatagram);
 
 			Jdk14LogImplAdvice.reset();
 
 			try {
-				DatagramHelper.writeTo(
+				DatagramUtil.writeTo(
 					Datagram.createResponseDatagram(requestDatagram, _DATA),
 					gatheringByteChannel);
 			}
@@ -374,25 +374,25 @@ public class SelectorIntrabandTest {
 
 			requestDatagram = Datagram.createRequestDatagram(_TYPE, _DATA);
 
-			DatagramHelper.setCompletionTypes(
+			DatagramUtil.setCompletionTypes(
 				requestDatagram,
 				EnumSet.noneOf(CompletionHandler.CompletionType.class));
 
 			recordCompletionHandler = new RecordCompletionHandler<>();
 
-			DatagramHelper.setCompletionHandler(
+			DatagramUtil.setCompletionHandler(
 				requestDatagram, recordCompletionHandler);
 
-			DatagramHelper.setSequenceId(requestDatagram, sequenceId);
-			DatagramHelper.setTimeout(requestDatagram, 10000);
+			DatagramUtil.setSequenceId(requestDatagram, sequenceId);
+			DatagramUtil.setTimeout(requestDatagram, 10000);
 
-			BaseIntrabandHelper.addResponseWaitingDatagram(
+			BaseIntrabandUtil.addResponseWaitingDatagram(
 				_selectorIntraband, requestDatagram);
 
 			Jdk14LogImplAdvice.reset();
 
 			try {
-				DatagramHelper.writeTo(
+				DatagramUtil.writeTo(
 					Datagram.createResponseDatagram(requestDatagram, _DATA),
 					gatheringByteChannel);
 			}
@@ -409,13 +409,13 @@ public class SelectorIntrabandTest {
 
 			requestDatagram = Datagram.createRequestDatagram(_TYPE, _DATA);
 
-			DatagramHelper.setAckRequest(requestDatagram);
-			DatagramHelper.setSequenceId(requestDatagram, sequenceId);
+			DatagramUtil.setAckRequest(requestDatagram);
+			DatagramUtil.setSequenceId(requestDatagram, sequenceId);
 
 			Jdk14LogImplAdvice.reset();
 
 			try {
-				DatagramHelper.writeTo(requestDatagram, gatheringByteChannel);
+				DatagramUtil.writeTo(requestDatagram, gatheringByteChannel);
 			}
 			finally {
 				Jdk14LogImplAdvice.waitUntilWarnCalled();
@@ -425,9 +425,8 @@ public class SelectorIntrabandTest {
 				scatteringByteChannel);
 
 			Assert.assertEquals(
-				sequenceId, DatagramHelper.getSequenceId(ackResponseDatagram));
-			Assert.assertTrue(
-				DatagramHelper.isAckResponse(ackResponseDatagram));
+				sequenceId, DatagramUtil.getSequenceId(ackResponseDatagram));
+			Assert.assertTrue(DatagramUtil.isAckResponse(ackResponseDatagram));
 
 			ByteBuffer dataByteBuffer = ackResponseDatagram.getDataByteBuffer();
 
@@ -444,12 +443,12 @@ public class SelectorIntrabandTest {
 
 			requestDatagram = Datagram.createRequestDatagram(_TYPE, _DATA);
 
-			DatagramHelper.setSequenceId(requestDatagram, sequenceId);
+			DatagramUtil.setSequenceId(requestDatagram, sequenceId);
 
 			Jdk14LogImplAdvice.reset();
 
 			try {
-				DatagramHelper.writeTo(requestDatagram, gatheringByteChannel);
+				DatagramUtil.writeTo(requestDatagram, gatheringByteChannel);
 			}
 			finally {
 				Jdk14LogImplAdvice.waitUntilIsWarnEnableCalled();
@@ -463,7 +462,7 @@ public class SelectorIntrabandTest {
 
 			requestDatagram = Datagram.createRequestDatagram(_TYPE, _DATA);
 
-			DatagramHelper.setSequenceId(requestDatagram, sequenceId);
+			DatagramUtil.setSequenceId(requestDatagram, sequenceId);
 
 			RecordDatagramReceiveHandler recordDatagramReceiveHandler =
 				new RecordDatagramReceiveHandler();
@@ -474,7 +473,7 @@ public class SelectorIntrabandTest {
 			Jdk14LogImplAdvice.reset();
 
 			try {
-				DatagramHelper.writeTo(requestDatagram, gatheringByteChannel);
+				DatagramUtil.writeTo(requestDatagram, gatheringByteChannel);
 			}
 			finally {
 				Jdk14LogImplAdvice.waitUntilErrorCalled();
@@ -484,7 +483,7 @@ public class SelectorIntrabandTest {
 				recordDatagramReceiveHandler.getReceiveDatagram();
 
 			Assert.assertEquals(
-				sequenceId, DatagramHelper.getSequenceId(receiveDatagram));
+				sequenceId, DatagramUtil.getSequenceId(receiveDatagram));
 			Assert.assertEquals(_TYPE, receiveDatagram.getType());
 
 			dataByteBuffer = receiveDatagram.getDataByteBuffer();
@@ -630,9 +629,10 @@ public class SelectorIntrabandTest {
 					Assert.fail();
 				}
 				catch (IOException ioException) {
-					Throwable cause = ioException.getCause();
+					Throwable throwable = ioException.getCause();
 
-					Assert.assertTrue(cause instanceof InterruptedException);
+					Assert.assertTrue(
+						throwable instanceof InterruptedException);
 				}
 
 				interruptThread.join();
@@ -848,9 +848,10 @@ public class SelectorIntrabandTest {
 					Assert.fail();
 				}
 				catch (IOException ioException) {
-					Throwable cause = ioException.getCause();
+					Throwable throwable = ioException.getCause();
 
-					Assert.assertTrue(cause instanceof InterruptedException);
+					Assert.assertTrue(
+						throwable instanceof InterruptedException);
 				}
 
 				interruptThread.join();
@@ -1111,12 +1112,12 @@ public class SelectorIntrabandTest {
 				Assert.assertSame(requestDatagram, sendingQueue.peek());
 			}
 
-			Datagram receiveDatagram = IntrabandTestUtil.readDatagramFully(
+			Datagram receiveDatagram1 = IntrabandTestUtil.readDatagramFully(
 				scatteringByteChannel);
 
-			Assert.assertEquals(_TYPE, receiveDatagram.getType());
+			Assert.assertEquals(_TYPE, receiveDatagram1.getType());
 
-			ByteBuffer dataByteBuffer = receiveDatagram.getDataByteBuffer();
+			ByteBuffer dataByteBuffer = receiveDatagram1.getDataByteBuffer();
 
 			Assert.assertArrayEquals(_DATA, dataByteBuffer.array());
 
@@ -1156,21 +1157,21 @@ public class SelectorIntrabandTest {
 				Assert.assertSame(requestDatagram2, datagrams[1]);
 			}
 
-			Datagram receiveDatagram1 = IntrabandTestUtil.readDatagramFully(
-				scatteringByteChannel);
-
-			Assert.assertEquals(_TYPE, receiveDatagram1.getType());
-
-			dataByteBuffer = receiveDatagram1.getDataByteBuffer();
-
-			Assert.assertArrayEquals(_DATA, dataByteBuffer.array());
-
 			Datagram receiveDatagram2 = IntrabandTestUtil.readDatagramFully(
 				scatteringByteChannel);
 
 			Assert.assertEquals(_TYPE, receiveDatagram2.getType());
 
 			dataByteBuffer = receiveDatagram2.getDataByteBuffer();
+
+			Assert.assertArrayEquals(_DATA, dataByteBuffer.array());
+
+			Datagram receiveDatagram3 = IntrabandTestUtil.readDatagramFully(
+				scatteringByteChannel);
+
+			Assert.assertEquals(_TYPE, receiveDatagram3.getType());
+
+			dataByteBuffer = receiveDatagram3.getDataByteBuffer();
 
 			Assert.assertArrayEquals(_DATA, dataByteBuffer.array());
 
@@ -1226,12 +1227,12 @@ public class SelectorIntrabandTest {
 				Assert.assertSame(requestDatagram2, sendingQueue.peek());
 			}
 
-			receiveDatagram2 = IntrabandTestUtil.readDatagramFully(
+			receiveDatagram3 = IntrabandTestUtil.readDatagramFully(
 				scatteringByteChannel);
 
-			Assert.assertEquals(_TYPE, receiveDatagram2.getType());
+			Assert.assertEquals(_TYPE, receiveDatagram3.getType());
 
-			dataByteBuffer = receiveDatagram2.getDataByteBuffer();
+			dataByteBuffer = receiveDatagram3.getDataByteBuffer();
 
 			Assert.assertArrayEquals(_DATA, dataByteBuffer.array());
 
@@ -1249,14 +1250,14 @@ public class SelectorIntrabandTest {
 				registrationReference,
 				Datagram.createRequestDatagram(_TYPE, hugeBuffer));
 
-			receiveDatagram = DatagramHelper.createReceiveDatagram();
+			receiveDatagram1 = DatagramUtil.createReceiveDatagram();
 
 			channelContext = (ChannelContext)writeSelectionKey.attachment();
 
 			int count = 0;
 
-			while (!DatagramHelper.readFrom(
-						receiveDatagram, scatteringByteChannel)) {
+			while (!DatagramUtil.readFrom(
+						receiveDatagram1, scatteringByteChannel)) {
 
 				count++;
 			}
@@ -1267,7 +1268,7 @@ public class SelectorIntrabandTest {
 
 			Assert.assertTrue(sendingQueue.isEmpty());
 
-			dataByteBuffer = receiveDatagram.getDataByteBuffer();
+			dataByteBuffer = receiveDatagram1.getDataByteBuffer();
 
 			Assert.assertArrayEquals(
 				hugeBuffer.array(), dataByteBuffer.array());

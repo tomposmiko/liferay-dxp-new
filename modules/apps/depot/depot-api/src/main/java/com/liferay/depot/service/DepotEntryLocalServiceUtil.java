@@ -14,9 +14,17 @@
 
 package com.liferay.depot.service;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the local service utility for DepotEntry. This utility wraps
@@ -41,20 +49,30 @@ public class DepotEntryLocalServiceUtil {
 	/**
 	 * Adds the depot entry to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DepotEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param depotEntry the depot entry
 	 * @return the depot entry that was added
 	 */
-	public static com.liferay.depot.model.DepotEntry addDepotEntry(
-		com.liferay.depot.model.DepotEntry depotEntry) {
-
+	public static DepotEntry addDepotEntry(DepotEntry depotEntry) {
 		return getService().addDepotEntry(depotEntry);
 	}
 
-	public static com.liferay.depot.model.DepotEntry addDepotEntry(
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
+	public static DepotEntry addDepotEntry(
+			com.liferay.portal.kernel.model.Group group,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
+
+		return getService().addDepotEntry(group, serviceContext);
+	}
+
+	public static DepotEntry addDepotEntry(
+			Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
 
 		return getService().addDepotEntry(
 			nameMap, descriptionMap, serviceContext);
@@ -66,34 +84,47 @@ public class DepotEntryLocalServiceUtil {
 	 * @param depotEntryId the primary key for the new depot entry
 	 * @return the new depot entry
 	 */
-	public static com.liferay.depot.model.DepotEntry createDepotEntry(
-		long depotEntryId) {
-
+	public static DepotEntry createDepotEntry(long depotEntryId) {
 		return getService().createDepotEntry(depotEntryId);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
 	}
 
 	/**
 	 * Deletes the depot entry from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DepotEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param depotEntry the depot entry
 	 * @return the depot entry that was removed
 	 */
-	public static com.liferay.depot.model.DepotEntry deleteDepotEntry(
-		com.liferay.depot.model.DepotEntry depotEntry) {
-
+	public static DepotEntry deleteDepotEntry(DepotEntry depotEntry) {
 		return getService().deleteDepotEntry(depotEntry);
 	}
 
 	/**
 	 * Deletes the depot entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DepotEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param depotEntryId the primary key of the depot entry
 	 * @return the depot entry that was removed
 	 * @throws PortalException if a depot entry with the primary key could not be found
 	 */
-	public static com.liferay.depot.model.DepotEntry deleteDepotEntry(
-			long depotEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static DepotEntry deleteDepotEntry(long depotEntryId)
+		throws PortalException {
 
 		return getService().deleteDepotEntry(depotEntryId);
 	}
@@ -101,17 +132,22 @@ public class DepotEntryLocalServiceUtil {
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -121,9 +157,7 @@ public class DepotEntryLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -139,9 +173,8 @@ public class DepotEntryLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -159,10 +192,9 @@ public class DepotEntryLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -174,9 +206,7 @@ public class DepotEntryLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -188,15 +218,13 @@ public class DepotEntryLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.depot.model.DepotEntry fetchDepotEntry(
-		long depotEntryId) {
-
+	public static DepotEntry fetchDepotEntry(long depotEntryId) {
 		return getService().fetchDepotEntry(depotEntryId);
 	}
 
@@ -207,15 +235,13 @@ public class DepotEntryLocalServiceUtil {
 	 * @param groupId the primary key of the group
 	 * @return the matching depot entry, or <code>null</code> if a matching depot entry could not be found
 	 */
-	public static com.liferay.depot.model.DepotEntry
-		fetchDepotEntryByUuidAndGroupId(String uuid, long groupId) {
+	public static DepotEntry fetchDepotEntryByUuidAndGroupId(
+		String uuid, long groupId) {
 
 		return getService().fetchDepotEntryByUuidAndGroupId(uuid, groupId);
 	}
 
-	public static com.liferay.depot.model.DepotEntry fetchGroupDepotEntry(
-		long groupId) {
-
+	public static DepotEntry fetchGroupDepotEntry(long groupId) {
 		return getService().fetchGroupDepotEntry(groupId);
 	}
 
@@ -236,9 +262,7 @@ public class DepotEntryLocalServiceUtil {
 	 * @param end the upper bound of the range of depot entries (not inclusive)
 	 * @return the range of depot entries
 	 */
-	public static java.util.List<com.liferay.depot.model.DepotEntry>
-		getDepotEntries(int start, int end) {
-
+	public static List<DepotEntry> getDepotEntries(int start, int end) {
 		return getService().getDepotEntries(start, end);
 	}
 
@@ -249,8 +273,8 @@ public class DepotEntryLocalServiceUtil {
 	 * @param companyId the primary key of the company
 	 * @return the matching depot entries, or an empty list if no matches were found
 	 */
-	public static java.util.List<com.liferay.depot.model.DepotEntry>
-		getDepotEntriesByUuidAndCompanyId(String uuid, long companyId) {
+	public static List<DepotEntry> getDepotEntriesByUuidAndCompanyId(
+		String uuid, long companyId) {
 
 		return getService().getDepotEntriesByUuidAndCompanyId(uuid, companyId);
 	}
@@ -265,11 +289,9 @@ public class DepotEntryLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the range of matching depot entries, or an empty list if no matches were found
 	 */
-	public static java.util.List<com.liferay.depot.model.DepotEntry>
-		getDepotEntriesByUuidAndCompanyId(
-			String uuid, long companyId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.depot.model.DepotEntry> orderByComparator) {
+	public static List<DepotEntry> getDepotEntriesByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<DepotEntry> orderByComparator) {
 
 		return getService().getDepotEntriesByUuidAndCompanyId(
 			uuid, companyId, start, end, orderByComparator);
@@ -291,9 +313,8 @@ public class DepotEntryLocalServiceUtil {
 	 * @return the depot entry
 	 * @throws PortalException if a depot entry with the primary key could not be found
 	 */
-	public static com.liferay.depot.model.DepotEntry getDepotEntry(
-			long depotEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static DepotEntry getDepotEntry(long depotEntryId)
+		throws PortalException {
 
 		return getService().getDepotEntry(depotEntryId);
 	}
@@ -306,11 +327,22 @@ public class DepotEntryLocalServiceUtil {
 	 * @return the matching depot entry
 	 * @throws PortalException if a matching depot entry could not be found
 	 */
-	public static com.liferay.depot.model.DepotEntry
-			getDepotEntryByUuidAndGroupId(String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static DepotEntry getDepotEntryByUuidAndGroupId(
+			String uuid, long groupId)
+		throws PortalException {
 
 		return getService().getDepotEntryByUuidAndGroupId(uuid, groupId);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
+	public static List<DepotEntry> getDepotEntryGroupRelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return getService().getDepotEntryGroupRelsByUuidAndCompanyId(
+			uuid, companyId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
@@ -321,9 +353,27 @@ public class DepotEntryLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
-	public static com.liferay.depot.model.DepotEntry getGroupDepotEntry(
-			long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static List<DepotEntry> getGroupConnectedDepotEntries(
+			long groupId, boolean ddmStructuresAvailable, int start, int end)
+		throws PortalException {
+
+		return getService().getGroupConnectedDepotEntries(
+			groupId, ddmStructuresAvailable, start, end);
+	}
+
+	public static List<DepotEntry> getGroupConnectedDepotEntries(
+			long groupId, int start, int end)
+		throws PortalException {
+
+		return getService().getGroupConnectedDepotEntries(groupId, start, end);
+	}
+
+	public static int getGroupConnectedDepotEntriesCount(long groupId) {
+		return getService().getGroupConnectedDepotEntriesCount(groupId);
+	}
+
+	public static DepotEntry getGroupDepotEntry(long groupId)
+		throws PortalException {
 
 		return getService().getGroupDepotEntry(groupId);
 	}
@@ -344,9 +394,11 @@ public class DepotEntryLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -354,49 +406,35 @@ public class DepotEntryLocalServiceUtil {
 	/**
 	 * Updates the depot entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DepotEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param depotEntry the depot entry
 	 * @return the depot entry that was updated
 	 */
-	public static com.liferay.depot.model.DepotEntry updateDepotEntry(
-		com.liferay.depot.model.DepotEntry depotEntry) {
-
+	public static DepotEntry updateDepotEntry(DepotEntry depotEntry) {
 		return getService().updateDepotEntry(depotEntry);
 	}
 
-	public static com.liferay.depot.model.DepotEntry updateDepotEntry(
-			long depotEntryId, java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			java.util.Map<String, Boolean> depotAppCustomizationMap,
+	public static DepotEntry updateDepotEntry(
+			long depotEntryId, Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap,
+			Map<String, Boolean> depotAppCustomizationMap,
 			com.liferay.portal.kernel.util.UnicodeProperties
-				typeSettingsProperties,
+				typeSettingsUnicodeProperties,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().updateDepotEntry(
 			depotEntryId, nameMap, descriptionMap, depotAppCustomizationMap,
-			typeSettingsProperties, serviceContext);
+			typeSettingsUnicodeProperties, serviceContext);
 	}
 
 	public static DepotEntryLocalService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	private static ServiceTracker
-		<DepotEntryLocalService, DepotEntryLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(DepotEntryLocalService.class);
-
-		ServiceTracker<DepotEntryLocalService, DepotEntryLocalService>
-			serviceTracker =
-				new ServiceTracker
-					<DepotEntryLocalService, DepotEntryLocalService>(
-						bundle.getBundleContext(), DepotEntryLocalService.class,
-						null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile DepotEntryLocalService _service;
 
 }

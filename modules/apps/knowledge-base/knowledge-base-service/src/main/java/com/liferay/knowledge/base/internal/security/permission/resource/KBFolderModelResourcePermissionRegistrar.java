@@ -50,7 +50,8 @@ public class KBFolderModelResourcePermissionRegistrar {
 		properties.put("model.class.name", KBFolder.class.getName());
 
 		_serviceRegistration = bundleContext.registerService(
-			ModelResourcePermission.class,
+			(Class<ModelResourcePermission<KBFolder>>)
+				(Class<?>)ModelResourcePermission.class,
 			ModelResourcePermissionFactory.create(
 				KBFolder.class, KBFolder::getKbFolderId,
 				_kbFolderLocalService::getKBFolder, _portletResourcePermission,
@@ -77,7 +78,8 @@ public class KBFolderModelResourcePermissionRegistrar {
 	)
 	private PortletResourcePermission _portletResourcePermission;
 
-	private ServiceRegistration<ModelResourcePermission> _serviceRegistration;
+	private ServiceRegistration<ModelResourcePermission<KBFolder>>
+		_serviceRegistration;
 
 	private class KBFolderDynamicInheritanceModelResourcePermissionLogic
 		implements ModelResourcePermissionLogic<KBFolder> {
@@ -107,9 +109,9 @@ public class KBFolderModelResourcePermissionRegistrar {
 		}
 
 		private KBFolderDynamicInheritanceModelResourcePermissionLogic(
-			ModelResourcePermission<KBFolder> modelResourcePermission) {
+			ModelResourcePermission<KBFolder> kbFolderModelResourcePermission) {
 
-			_kbFolderModelResourcePermission = modelResourcePermission;
+			_kbFolderModelResourcePermission = kbFolderModelResourcePermission;
 		}
 
 		private final ModelResourcePermission<KBFolder>

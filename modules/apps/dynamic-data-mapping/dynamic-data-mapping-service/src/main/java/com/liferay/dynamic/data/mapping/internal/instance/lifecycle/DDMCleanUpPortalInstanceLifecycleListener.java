@@ -21,10 +21,11 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalService;
+import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -44,15 +45,22 @@ public class DDMCleanUpPortalInstanceLifecycleListener
 	public void portalInstancePreunregistered(Company company)
 		throws Exception {
 
-		for (DDMTemplate ddmTemplate :
-				_ddmTemplateLocalService.getTemplatesByGroupId(
-					company.getGroupId())) {
+		Group group = company.getGroup();
 
-			_deleteDDMTemplate(ddmTemplate);
-		}
+		_deleteDDMTemplates(group);
 
 		Queue<DDMStructure> queue = new LinkedList<>(
 			_ddmStructureLocalService.getStructures(company.getGroupId()));
+
+		if (group.hasStagingGroup()) {
+			Group stagingGroup = group.getStagingGroup();
+
+			_deleteDDMTemplates(stagingGroup);
+
+			queue.addAll(
+				_ddmStructureLocalService.getStructures(
+					stagingGroup.getGroupId()));
+		}
 
 		Deque<DDMStructure> deque = new LinkedList<>();
 
@@ -78,13 +86,13 @@ public class DDMCleanUpPortalInstanceLifecycleListener
 				_deleteDDMTemplate(ddmTemplate);
 			}
 
+			_storageEngine.deleteByDDMStructure(ddmStructure.getStructureId());
+
 			_ddmStructureLocalService.deleteStructure(ddmStructure);
 		}
 	}
 
-	private void _deleteDDMTemplate(DDMTemplate ddmTemplate)
-		throws PortalException {
-
+	private void _deleteDDMTemplate(DDMTemplate ddmTemplate) throws Exception {
 		_ddmTemplateVersionLocalService.deleteTemplateVersions(
 			ddmTemplate.getTemplateId());
 
@@ -92,6 +100,15 @@ public class DDMCleanUpPortalInstanceLifecycleListener
 			ddmTemplate.getTemplateId());
 
 		_ddmTemplateLocalService.deleteTemplate(ddmTemplate);
+	}
+
+	private void _deleteDDMTemplates(Group group) throws Exception {
+		for (DDMTemplate ddmTemplate :
+				_ddmTemplateLocalService.getTemplatesByGroupId(
+					group.getGroupId())) {
+
+			_deleteDDMTemplate(ddmTemplate);
+		}
 	}
 
 	@Reference
@@ -108,5 +125,8 @@ public class DDMCleanUpPortalInstanceLifecycleListener
 
 	@Reference
 	private DDMTemplateVersionLocalService _ddmTemplateVersionLocalService;
+
+	@Reference
+	private StorageEngine _storageEngine;
 
 }

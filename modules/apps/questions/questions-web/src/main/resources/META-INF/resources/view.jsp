@@ -16,24 +16,40 @@
 
 <%@ include file="/init.jsp" %>
 
-<%
-String questionsRootElementId = renderResponse.getNamespace() + "-questions-root";
-%>
-
 <portlet:renderURL var="basePortletURL" />
 
-<div id="<%= questionsRootElementId %>">
+<div id="<%= liferayPortletResponse.getNamespace() + "-questions-root" %>">
 
 	<%
-	Map<String, Object> data = new HashMap<>();
-
-	data.put("isOmniAdmin", permissionChecker.isOmniadmin());
-	data.put("siteKey", String.valueOf(themeDisplay.getScopeGroupId()));
-	data.put("userId", String.valueOf(themeDisplay.getUserId()));
+	QuestionsConfiguration questionsConfiguration = portletDisplay.getPortletInstanceConfiguration(QuestionsConfiguration.class);
 	%>
 
 	<react:component
-		data="<%= data %>"
 		module="js/index.es"
+		props='<%=
+			HashMapBuilder.<String, Object>put(
+				"defaultRank", renderRequest.getAttribute(QuestionsWebKeys.DEFAULT_RANK)
+			).put(
+				"imageBrowseURL", renderRequest.getAttribute(QuestionsWebKeys.IMAGE_BROWSE_URL)
+			).put(
+				"includeContextPath", renderRequest.getAttribute("javax.servlet.include.context_path")
+			).put(
+				"isOmniAdmin", permissionChecker.isOmniadmin()
+			).put(
+				"redirectToLogin", questionsConfiguration.enableRedirectToLogin()
+			).put(
+				"rootTopicId", questionsConfiguration.rootTopicId()
+			).put(
+				"showCardsForTopicNavigation", questionsConfiguration.showCardsForTopicNavigation()
+			).put(
+				"siteKey", String.valueOf(themeDisplay.getScopeGroupId())
+			).put(
+				"tagSelectorURL", renderRequest.getAttribute(QuestionsWebKeys.TAG_SELECTOR_URL)
+			).put(
+				"userId", String.valueOf(themeDisplay.getUserId())
+			).put(
+				"useTopicNamesInURL", questionsConfiguration.useTopicNamesInURL()
+			).build()
+		%>'
 	/>
 </div>

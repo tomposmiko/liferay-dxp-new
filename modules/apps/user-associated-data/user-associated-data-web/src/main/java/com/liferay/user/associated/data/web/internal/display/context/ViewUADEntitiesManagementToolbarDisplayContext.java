@@ -16,9 +16,8 @@ package com.liferay.user.associated.data.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -60,29 +59,24 @@ public class ViewUADEntitiesManagementToolbarDisplayContext
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		return new DropdownItemList() {
-			{
-				add(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							StringBundler.concat(
-								"javascript:", getNamespace(),
-								"doAnonymizeMultiple();"));
-						dropdownItem.setLabel(
-							LanguageUtil.get(request, "anonymize"));
-					});
-
-				add(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							StringBundler.concat(
-								"javascript:", getNamespace(),
-								"doDeleteMultiple();"));
-						dropdownItem.setLabel(
-							LanguageUtil.get(request, "delete"));
-					});
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.setHref(
+					StringBundler.concat(
+						"javascript:", getNamespace(),
+						"doAnonymizeMultiple();"));
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "anonymize"));
 			}
-		};
+		).add(
+			dropdownItem -> {
+				dropdownItem.setHref(
+					StringBundler.concat(
+						"javascript:", getNamespace(), "doDeleteMultiple();"));
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "delete"));
+			}
+		).build();
 	}
 
 	@Override
@@ -96,9 +90,7 @@ public class ViewUADEntitiesManagementToolbarDisplayContext
 
 	@Override
 	public String getComponentId() {
-		return StringBundler.concat(
-			"viewUADEntitiesManagementToolbar", StringPool.UNDERLINE,
-			StringUtil.randomId());
+		return "viewUADEntitiesManagementToolbar_" + StringUtil.randomId();
 	}
 
 	@Override
@@ -157,7 +149,8 @@ public class ViewUADEntitiesManagementToolbarDisplayContext
 		};
 
 		for (String parameterName : parameterNames) {
-			String value = ParamUtil.getString(request, parameterName);
+			String value = ParamUtil.getString(
+				httpServletRequest, parameterName);
 
 			if (Validator.isNotNull(value)) {
 				portletURL.setParameter(parameterName, (String)null);

@@ -15,8 +15,8 @@
 package com.liferay.bookmarks.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.bookmarks.constants.BookmarksFolderConstants;
 import com.liferay.bookmarks.model.BookmarksFolder;
-import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderServiceUtil;
 import com.liferay.bookmarks.test.util.BookmarksTestUtil;
@@ -106,7 +106,7 @@ public class BookmarksFolderLocalServiceTreeTest
 		BookmarksFolder folder = BookmarksTestUtil.addFolder(
 			group.getGroupId(), parentFolderId, RandomTestUtil.randomString());
 
-		folder.setTreePath(null);
+		folder.setTreePath("/0/");
 
 		return BookmarksFolderLocalServiceUtil.updateBookmarksFolder(folder);
 	}

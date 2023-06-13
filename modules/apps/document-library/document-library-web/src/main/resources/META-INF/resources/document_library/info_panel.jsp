@@ -25,21 +25,12 @@ List<Folder> folders = (List<Folder>)request.getAttribute(WebKeys.DOCUMENT_LIBRA
 List<FileEntry> fileEntries = (List<FileEntry>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRIES);
 List<FileShortcut> fileShortcuts = (List<FileShortcut>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUTS);
 
-Map<String, Object> infoPanelToggleData = new HashMap<>();
-
-infoPanelToggleData.put("toggle", liferayPortletResponse.getNamespace() + "infoPanelId");
-
 if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(fileEntries) && ListUtil.isEmpty(fileShortcuts)) {
 	long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"), ParamUtil.getLong(request, "folderId"));
 
 	folders = new ArrayList<>();
 
-	Folder folder = (Folder)request.getAttribute("view.jsp-folder");
-
-	if (folder != null) {
-		folders.add(folder);
-	}
-	else if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+	if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 		folders.add(DLAppLocalServiceUtil.getFolder(folderId));
 	}
 	else {
@@ -102,7 +93,7 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(fileEntries) && ListUtil.isEmp
 
 						<c:if test="<%= folder != null %>">
 							<dt class="sidebar-dt">
-								<liferay-ui:message key="created" />
+								<liferay-ui:message key="created-by" />
 							</dt>
 							<dd class="sidebar-dd">
 								<%= HtmlUtil.escape(folder.getUserName()) %>
@@ -231,7 +222,7 @@ if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(fileEntries) && ListUtil.isEmp
 							<liferay-ui:message key="size" />
 						</dt>
 						<dd class="sidebar-dd">
-							<%= TextFormatter.formatStorageSize(fileEntry.getSize(), locale) %>
+							<%= LanguageUtil.formatStorageSize(fileEntry.getSize(), locale) %>
 						</dd>
 
 						<c:if test="<%= fileEntry.getModel() instanceof DLFileEntry %>">

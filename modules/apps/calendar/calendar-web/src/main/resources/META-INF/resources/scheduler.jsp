@@ -26,9 +26,7 @@ boolean hideDayView = ParamUtil.getBoolean(request, "hideDayView");
 boolean hideMonthView = ParamUtil.getBoolean(request, "hideMonthView");
 boolean hideWeekView = ParamUtil.getBoolean(request, "hideWeekView");
 String permissionsCalendarBookingURL = ParamUtil.getString(request, "permissionsCalendarBookingURL");
-boolean preventPersistence = ParamUtil.getBoolean(request, "preventPersistence");
 boolean readOnly = ParamUtil.getBoolean(request, "readOnly");
-boolean showAddEventBtn = ParamUtil.getBoolean(request, "showAddEventBtn");
 boolean showSchedulerHeader = ParamUtil.getBoolean(request, "showSchedulerHeader", true);
 String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookingURL");
 %>
@@ -46,21 +44,21 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 
 	var showMoreStrings = {
 		close: '<liferay-ui:message key="close" />',
-		showMore: '<liferay-ui:message key="show-x-more" />'
+		showMore: '<liferay-ui:message key="show-x-more" />',
 	};
 
 	<c:if test="<%= !hideDayView %>">
 		window.<portlet:namespace />dayView = new Liferay.SchedulerDayView({
 			headerViewConfig: {
 				eventsOverlayConstrain: '#p_p_id<portlet:namespace />',
-				strings: showMoreStrings
+				strings: showMoreStrings,
 			},
 			height: 700,
 			isoTime: <%= useIsoTimeFormat %>,
 			readOnly: <%= readOnly %>,
 			strings: {
-				allDay: '<liferay-ui:message key="all-day" />'
-			}
+				allDay: '<liferay-ui:message key="all-day" />',
+			},
 		});
 	</c:if>
 
@@ -69,14 +67,14 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 			headerViewConfig: {
 				displayDaysInterval: A.DataType.DateMath.WEEK_LENGTH,
 				eventsOverlayConstrain: '#p_p_id<portlet:namespace />',
-				strings: showMoreStrings
+				strings: showMoreStrings,
 			},
 			height: 700,
 			isoTime: <%= useIsoTimeFormat %>,
 			readOnly: <%= readOnly %>,
 			strings: {
-				allDay: '<liferay-ui:message key="all-day" />'
-			}
+				allDay: '<liferay-ui:message key="all-day" />',
+			},
 		});
 	</c:if>
 
@@ -86,7 +84,7 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 			height: 'auto',
 			isoTime: <%= useIsoTimeFormat %>,
 			readOnly: <%= readOnly %>,
-			strings: showMoreStrings
+			strings: showMoreStrings,
 		});
 	</c:if>
 
@@ -97,13 +95,13 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 			isoTime: <%= useIsoTimeFormat %>,
 			readOnly: <%= readOnly %>,
 			strings: {
-				noEvents: '<liferay-ui:message key="no-events" />'
-			}
+				noEvents: '<liferay-ui:message key="no-events" />',
+			},
 		});
 	</c:if>
 
 	<c:if test="<%= !readOnly && (defaultCalendar != null) %>">
-		var width = Math.min(Liferay.Util.getWindowWidth(), 550);
+		var width = Math.min(window.innerWidth, 550);
 
 		window.<portlet:namespace />eventRecorder = new Liferay.SchedulerEventRecorder({
 			bodyTemplate: new A.Template(
@@ -120,15 +118,15 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 			permissionsCalendarBookingURL:
 				'<%= HtmlUtil.escapeJS(permissionsCalendarBookingURL) %>',
 			popover: {
-				width: width
+				width: width,
 			},
 			portletNamespace: '<portlet:namespace />',
 			remoteServices: remoteServices,
 			showHeader: <%= showSchedulerHeader %>,
 			strings: {
-				'description-hint': '<liferay-ui:message key="description-hint" />'
+				'description-hint': '<liferay-ui:message key="description-hint" />',
 			},
-			viewCalendarBookingURL: '<%= HtmlUtil.escapeJS(viewCalendarBookingURL) %>'
+			viewCalendarBookingURL: '<%= HtmlUtil.escapeJS(viewCalendarBookingURL) %>',
 		});
 	</c:if>
 
@@ -155,33 +153,28 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 			window['<portlet:namespace /><%= HtmlUtil.escapeJS(activeView) %>View'],
 		ariaLabels: {
 			agenda: '<liferay-ui:message key="agenda-view" />',
+			calendar: '<liferay-ui:message key="calendar-views" />',
 			day: '<liferay-ui:message key="day-view" />',
 			month: '<liferay-ui:message key="month-view" />',
 			next: '<liferay-ui:message key="next" />',
 			previous: '<liferay-ui:message key="previous" />',
 			today: '<liferay-ui:message key="today-view" />',
 			week: '<liferay-ui:message key="week-view" />',
-			year: '<liferay-ui:message key="year-view" />'
+			year: '<liferay-ui:message key="year-view" />',
 		},
 		boundingBox: '#<portlet:namespace />scheduler',
 		calendarContainer: calendarContainer,
 
 		<%
 		java.util.Calendar nowJCalendar = CalendarFactoryUtil.getCalendar(userTimeZone);
-
-		int nowYear = nowJCalendar.get(java.util.Calendar.YEAR);
-		int nowMonth = nowJCalendar.get(java.util.Calendar.MONTH);
-		int nowDay = nowJCalendar.get(java.util.Calendar.DAY_OF_MONTH);
-		int nowHour = nowJCalendar.get(java.util.Calendar.HOUR_OF_DAY);
-		int nowMinute = nowJCalendar.get(java.util.Calendar.MINUTE);
 		%>
 
 		currentTime: new Date(
-			<%= nowYear %>,
-			<%= nowMonth %>,
-			<%= nowDay %>,
-			<%= nowHour %>,
-			<%= nowMinute %>
+			<%= nowJCalendar.get(java.util.Calendar.YEAR) %>,
+			<%= nowJCalendar.get(java.util.Calendar.MONTH) %>,
+			<%= nowJCalendar.get(java.util.Calendar.DAY_OF_MONTH) %>,
+			<%= nowJCalendar.get(java.util.Calendar.HOUR_OF_DAY) %>,
+			<%= nowJCalendar.get(java.util.Calendar.MINUTE) %>
 		),
 		currentTimeFn: A.bind(remoteServices.getCurrentTime, remoteServices),
 
@@ -189,13 +182,13 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 		java.util.Calendar dateJCalendar = CalendarFactoryUtil.getCalendar(userTimeZone);
 
 		dateJCalendar.setTimeInMillis(date);
-
-		int dateYear = dateJCalendar.get(java.util.Calendar.YEAR);
-		int dateMonth = dateJCalendar.get(java.util.Calendar.MONTH);
-		int dateDay = dateJCalendar.get(java.util.Calendar.DAY_OF_MONTH);
 		%>
 
-		date: new Date(<%= dateYear %>, <%= dateMonth %>, <%= dateDay %>),
+		date: new Date(
+			<%= dateJCalendar.get(java.util.Calendar.YEAR) %>,
+			<%= dateJCalendar.get(java.util.Calendar.MONTH) %>,
+			<%= dateJCalendar.get(java.util.Calendar.DAY_OF_MONTH) %>
+		),
 
 		<c:if test="<%= !themeDisplay.isSignedIn() || ((defaultCalendar != null) && !CalendarPermission.contains(themeDisplay.getPermissionChecker(), defaultCalendar, CalendarActionKeys.MANAGE_BOOKINGS)) %>">
 			disabled: true,
@@ -209,33 +202,34 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 		items: A.Object.values(calendarContainer.get('availableCalendars')),
 		maxDaysDisplayed: <%= maxDaysDisplayed %>,
 		portletNamespace: '<portlet:namespace />',
-		preventPersistence: <%= preventPersistence %>,
+		preventPersistence: <%= ParamUtil.getBoolean(request, "preventPersistence") %>,
 		remoteServices: remoteServices,
 		render: true,
-		showAddEventBtn: <%= showAddEventBtn %>,
+		showAddEventBtn: <%= ParamUtil.getBoolean(request, "showAddEventBtn") %>,
 		showHeader: <%= showSchedulerHeader %>,
 		strings: {
 			agenda: '<liferay-ui:message key="agenda" />',
+			currentDate: '<liferay-ui:message key="current-date" />',
 			day: '<liferay-ui:message key="day" />',
 			month: '<liferay-ui:message key="month" />',
 			today: '<liferay-ui:message key="today" />',
 			week: '<liferay-ui:message key="week" />',
-			year: '<liferay-ui:message key="year" />'
+			year: '<liferay-ui:message key="year" />',
 		},
 
 		<%
 		java.util.Calendar todayJCalendar = CalendarFactoryUtil.getCalendar(userTimeZone);
-
-		int todayYear = todayJCalendar.get(java.util.Calendar.YEAR);
-		int todayMonth = todayJCalendar.get(java.util.Calendar.MONTH);
-		int todayDay = todayJCalendar.get(java.util.Calendar.DAY_OF_MONTH);
 		%>
 
-		todayDate: new Date(<%= todayYear %>, <%= todayMonth %>, <%= todayDay %>),
-		views: views
+		todayDate: new Date(
+			<%= todayJCalendar.get(java.util.Calendar.YEAR) %>,
+			<%= todayJCalendar.get(java.util.Calendar.MONTH) %>,
+			<%= todayJCalendar.get(java.util.Calendar.DAY_OF_MONTH) %>
+		),
+		views: views,
 	});
 
-	var destroySchedulers = function(event) {
+	var destroySchedulers = function (event) {
 		if (event.portletId === '<%= portletDisplay.getId() %>') {
 			window.<portlet:namespace />scheduler.destroy();
 

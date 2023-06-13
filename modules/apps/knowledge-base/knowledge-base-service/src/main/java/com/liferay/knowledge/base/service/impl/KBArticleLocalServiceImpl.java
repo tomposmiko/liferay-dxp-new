@@ -39,7 +39,7 @@ import com.liferay.knowledge.base.internal.util.KBArticleDiffUtil;
 import com.liferay.knowledge.base.internal.util.KBArticleLocalSiblingNavigationHelper;
 import com.liferay.knowledge.base.internal.util.KBCommentUtil;
 import com.liferay.knowledge.base.internal.util.KBSectionEscapeUtil;
-import com.liferay.knowledge.base.internal.util.KnowledgeBaseConstants;
+import com.liferay.knowledge.base.internal.util.constants.KnowledgeBaseConstants;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.base.KBArticleLocalServiceBaseImpl;
@@ -84,6 +84,7 @@ import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -975,6 +976,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			curKBArticle.setPriority(priority);
 
 			curKBArticle = kbArticlePersistence.update(curKBArticle);
+
+			indexKBArticle(curKBArticle);
 		}
 
 		if (kbArticle.getKbFolderId() != kbFolderId) {
@@ -990,12 +993,13 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 				for (KBArticle kbArticleVersion : kbArticleVersions) {
 					kbArticleVersion.setKbFolderId(kbFolderId);
 
-					kbArticlePersistence.update(kbArticleVersion);
+					kbArticleVersion = kbArticlePersistence.update(
+						kbArticleVersion);
+
+					indexKBArticle(kbArticleVersion);
 				}
 			}
 		}
-
-		// Social
 
 		KBArticle latestKBArticle = getLatestKBArticle(
 			resourcePrimKey, WorkflowConstants.STATUS_ANY);
@@ -1009,6 +1013,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 				resourcePrimKey, AdminActivityKeys.MOVE_KB_ARTICLE,
 				extraDataJSONObject.toString(), 0);
 		}
+
+		indexKBArticle(latestKBArticle);
 	}
 
 	@Override
@@ -1150,6 +1156,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle = kbArticlePersistence.update(kbArticle);
 
 		if (oldKBArticle.isApproved()) {
+			oldKBArticle.setModifiedDate(oldKBArticle.getModifiedDate());
 			oldKBArticle.setLatest(false);
 
 			kbArticlePersistence.update(oldKBArticle);
@@ -1293,6 +1300,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			KBArticle oldKBArticle = kbArticlePersistence.findByR_V(
 				resourcePrimKey, kbArticle.getVersion() - 1);
 
+			oldKBArticle.setModifiedDate(oldKBArticle.getModifiedDate());
 			oldKBArticle.setMain(false);
 
 			kbArticlePersistence.update(oldKBArticle);
@@ -1696,6 +1704,18 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			uniqueUrlTitle, maxLength, StringPool.DASH + suffix);
 	}
 
+	protected void indexKBArticle(KBArticle kbArticle) {
+		TransactionCommitCallbackUtil.registerCallback(
+			() -> {
+				Indexer<KBArticle> indexer = _indexerRegistry.getIndexer(
+					KBArticle.class);
+
+				indexer.reindex(kbArticle);
+
+				return null;
+			});
+	}
+
 	protected String normalizeUrlTitle(String urlTitle) {
 		if (Validator.isNull(urlTitle)) {
 			return null;
@@ -1848,15 +1868,16 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		List<KBArticle> kbArticles1 = getKBArticleAndAllDescendantKBArticles(
 			resourcePrimKey, WorkflowConstants.STATUS_ANY, null);
 
-		for (KBArticle kbArticle1 : kbArticles1) {
+		for (KBArticle curKBArticle1 : kbArticles1) {
 			List<KBArticle> kbArticles2 = getKBArticleVersions(
-				kbArticle1.getResourcePrimKey(), WorkflowConstants.STATUS_ANY,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+				curKBArticle1.getResourcePrimKey(),
+				WorkflowConstants.STATUS_ANY, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
 
-			for (KBArticle kbArticle2 : kbArticles2) {
-				kbArticle2.setRootResourcePrimKey(rootResourcePrimKey);
+			for (KBArticle curKBArticle2 : kbArticles2) {
+				curKBArticle2.setRootResourcePrimKey(rootResourcePrimKey);
 
-				kbArticlePersistence.update(kbArticle2);
+				kbArticlePersistence.update(curKBArticle2);
 			}
 		}
 

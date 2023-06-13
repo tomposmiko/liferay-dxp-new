@@ -2,11 +2,13 @@
 <head>
 <title>Staging</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Staging</td></tr>
 </thead>
+
 <tbody>
 <!--DELETIONS-->
 <tr>
@@ -21,6 +23,11 @@
 </tr>
 <!--PROCESSES-->
 <tr>
+	<td>PROCESS_HALF_DISPLAY_PAGE</td>
+	<td>//div[contains(@id,'backgroundTasksSearchContainer')]//td[contains(@class,'lfr-entry-action-column')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PROCESS_SUCCESSFUL</td>
 	<td>//*[@data-qa-id='processResult'][contains(.,'Successful')] | //h6[contains(.,'Successful')]</td>
 	<td></td>
@@ -33,6 +40,11 @@
 <tr>
 	<td>PROCESS_RESULT</td>
 	<td>//*[@data-qa-id='processResult'] | //h6[contains(@class,'background-task-status-row')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PROCESS_TITLE</td>
+	<td>//strong[contains(@class,'process-title')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -72,8 +84,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>STAGING_PUBLISH_TEMPLATE_LINK</td>
+	<td>//div[contains(@class,'dropdown-menu show')]//a[contains(@class,'dropdown-item') and contains(.,'${key_publishTemplateName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>STAGING_PUBLISH_TO_LIVE_BUTTON</td>
 	<td>//button[contains(.,'Publish to Live')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>STAGING_PUBLISH_TO_LIVE_CUSTOM_PUBLICATION</td>
+	<td>//button[contains(.,'Publish to Live')]/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -113,8 +135,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>STAGING_BUTTON</td>
+	<td>//a[contains(@value,'staging')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>STAGING_VIEW</td>
 	<td>//body[contains(@class,'local-staging')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>STAGING_CONNECTION_TOOLTIP</td>
+	<td>//span[contains(@class,'lfr-portal-tooltip') and contains(@title,'${key_connectionInfo}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>STAGING_LINK_LIVE</td>
+	<td>//a[contains(@data-qa-id,'live')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -129,12 +166,12 @@
 </tr>
 <tr>
 	<td>SITE_PAGES_VARIATION_DROPDOWN</td>
-	<td>//a[contains(@class,'staging-variation-selector') and contains(.,'${key_sitePagesVariationName}')]/span</td>
+	<td>//a[contains(@class,'staging-variation-selector') and contains(.,'${key_sitePagesVariationName}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGE_VARIATION_DROPDOWN</td>
-	<td>//a[contains(@class,'staging-variation-selector') and contains(.,'${key_pageVariationName}')]/span</td>
+	<td>//a[contains(@class,'staging-variation-selector') and contains(.,'${key_pageVariationName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -166,6 +203,11 @@
 <tr>
 	<td>SITE_PAGES_VARIATION_MENULIST_NAME</td>
 	<td>xpath=(//ul//li//a[contains(.,'${key_sitePagesVariationName}')])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_PAGES_VARIATION_MENULIST_ACTIVE</td>
+	<td>//li[contains(@class,'active')]//a[contains(@class,'miller-columns-item-mask')][contains(.,'${key_sitePagesVariationName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -217,6 +259,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LIVE_MENU_MESSAGE_DETAILS</td>
+	<td>//span[@class='last-publication-variation-details']</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -224,7 +271,7 @@
 <!--PUBLICATION_SUMMARY-->
 <tr>
 	<td>PUBLICATION_CONTENT</td>
-	<td>//div[@class='process-summary-section' and contains(.,'${key_contentName}')]</td>
+	<td>//div[@class='process-summary-subsection' and contains(.,'${key_contentName}')]</td>
 	<td></td>
 </tr>
 <tr>

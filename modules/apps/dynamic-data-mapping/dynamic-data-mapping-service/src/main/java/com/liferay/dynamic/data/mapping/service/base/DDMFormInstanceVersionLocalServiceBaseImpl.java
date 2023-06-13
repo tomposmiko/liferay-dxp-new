@@ -16,7 +16,10 @@ package com.liferay.dynamic.data.mapping.service.base;
 
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceVersionPersistence;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -36,16 +39,22 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -67,11 +76,15 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>DDMFormInstanceVersionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>DDMFormInstanceVersionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>DDMFormInstanceVersionLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the ddm form instance version to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMFormInstanceVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ddmFormInstanceVersion the ddm form instance version
 	 * @return the ddm form instance version that was added
@@ -103,6 +116,10 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	/**
 	 * Deletes the ddm form instance version with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMFormInstanceVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param formInstanceVersionId the primary key of the ddm form instance version
 	 * @return the ddm form instance version that was removed
 	 * @throws PortalException if a ddm form instance version with the primary key could not be found
@@ -119,6 +136,10 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	/**
 	 * Deletes the ddm form instance version from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMFormInstanceVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ddmFormInstanceVersion the ddm form instance version
 	 * @return the ddm form instance version that was removed
 	 */
@@ -128,6 +149,18 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 		DDMFormInstanceVersion ddmFormInstanceVersion) {
 
 		return ddmFormInstanceVersionPersistence.remove(ddmFormInstanceVersion);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return ddmFormInstanceVersionPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -293,6 +326,16 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return ddmFormInstanceVersionPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -301,6 +344,13 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 			(DDMFormInstanceVersion)persistedModel);
 	}
 
+	public BasePersistence<DDMFormInstanceVersion> getBasePersistence() {
+		return ddmFormInstanceVersionPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -340,6 +390,10 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	/**
 	 * Updates the ddm form instance version in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMFormInstanceVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ddmFormInstanceVersion the ddm form instance version
 	 * @return the ddm form instance version that was updated
 	 */
@@ -351,11 +405,17 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 		return ddmFormInstanceVersionPersistence.update(ddmFormInstanceVersion);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			DDMFormInstanceVersionLocalService.class,
-			IdentifiableOSGiService.class, PersistedModelLocalService.class
+			IdentifiableOSGiService.class, CTService.class,
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -363,6 +423,8 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddmFormInstanceVersionLocalService =
 			(DDMFormInstanceVersionLocalService)aopProxy;
+
+		_setLocalServiceUtilService(ddmFormInstanceVersionLocalService);
 	}
 
 	/**
@@ -375,8 +437,23 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 		return DDMFormInstanceVersionLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<DDMFormInstanceVersion> getCTPersistence() {
+		return ddmFormInstanceVersionPersistence;
+	}
+
+	@Override
+	public Class<DDMFormInstanceVersion> getModelClass() {
 		return DDMFormInstanceVersion.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<DDMFormInstanceVersion>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(ddmFormInstanceVersionPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -405,6 +482,23 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService) {
+
+		try {
+			Field field =
+				DDMFormInstanceVersionLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmFormInstanceVersionLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

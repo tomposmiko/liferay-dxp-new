@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	AUI().applyConfig({
 		groups: {
 			contactscenter: {
@@ -29,12 +29,12 @@
 							'datasource-io',
 							'json-parse',
 							'liferay-portlet-base',
-							'liferay-util-window'
-						]
-					}
+							'liferay-util-window',
+						],
+					},
 				},
-				root: MODULE_PATH + '/js/'
-			}
-		}
+				root: MODULE_PATH + '/js/',
+			},
+		},
 	});
 })();

@@ -41,10 +41,9 @@
 					Properties resourceLimitsProperties = ImageMagickUtil.getResourceLimitsProperties();
 
 					for (String label : _IMAGEMAGICK_RESOURCE_LIMIT_LABELS) {
-						String name = "imageMagickLimit" + StringUtil.upperCaseFirstLetter(label);
 					%>
 
-						<aui:input cssClass="lfr-input-text-container" label="<%= label %>" name="<%= name %>" type="text" value="<%= resourceLimitsProperties.getProperty(label) %>" />
+						<aui:input cssClass="lfr-input-text-container" label="<%= label %>" name='<%= "imageMagickLimit" + StringUtil.upperCaseFirstLetter(label) %>' type="text" value="<%= resourceLimitsProperties.getProperty(label) %>" />
 
 					<%
 					}
@@ -67,7 +66,7 @@
 					XugglerInstallException xie = (XugglerInstallException)errorException;
 					%>
 
-					<liferay-ui:message arguments="<%= xie.getMessage() %>" key="an-unexpected-error-occurred-while-installing-xuggler-x" translateArguments="<%= false %>" />
+					<liferay-ui:message arguments="<%= HtmlUtil.escape(xie.getMessage()) %>" key="an-unexpected-error-occurred-while-installing-xuggler-x" translateArguments="<%= false %>" />
 				</liferay-ui:error>
 
 				<c:choose>
@@ -128,16 +127,11 @@
 						</div>
 
 						<aui:select label="jar-file" name="jarName">
-
-							<%
-							if (Validator.isNull(guess)) {
-							%>
-
+							<c:if test="<%= Validator.isNull(guess) %>">
 								<aui:option label="unknown" value="" />
+							</c:if>
 
 							<%
-							}
-
 							for (String xugglerOption : xugglerOptions) {
 								String jarFile = PropsUtil.get(PropsKeys.XUGGLER_JAR_FILE, new Filter(xugglerOption));
 								String jarName = PropsUtil.get(PropsKeys.XUGGLER_JAR_NAME, new Filter(xugglerOption));

@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.petra.string.StringPool;
@@ -36,8 +37,9 @@ public class FileEntryInfoDisplayObjectProvider
 	implements InfoDisplayObjectProvider<FileEntry> {
 
 	public FileEntryInfoDisplayObjectProvider(FileEntry fileEntry) {
-		_assetEntry = _getAssetEntry(fileEntry);
 		_fileEntry = fileEntry;
+
+		_assetEntry = _getAssetEntry(fileEntry);
 	}
 
 	@Override
@@ -90,17 +92,19 @@ public class FileEntryInfoDisplayObjectProvider
 	}
 
 	private AssetEntry _getAssetEntry(FileEntry fileEntry) {
-		AssetRendererFactory assetRendererFactory =
+		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(getClassNameId());
+				getAssetRendererFactoryByClassNameId(
+					PortalUtil.getClassNameId(DLFileEntry.class));
 
 		if (assetRendererFactory == null) {
 			return null;
 		}
 
 		try {
-			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
-				fileEntry.getFileEntryId());
+			AssetRenderer<?> assetRenderer =
+				assetRendererFactory.getAssetRenderer(
+					fileEntry.getFileEntryId());
 
 			return assetRendererFactory.getAssetEntry(
 				DLFileEntryConstants.getClassName(),

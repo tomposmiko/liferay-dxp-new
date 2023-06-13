@@ -16,11 +16,11 @@ package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.admin.web.internal.handler.LayoutExceptionRequestHandler;
+import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.HashMap;
@@ -60,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
-		"mvc.command.name=/layout/add_simple_layout"
+		"mvc.command.name=/layout_admin/add_simple_layout"
 	},
 	service = MVCActionCommand.class
 )
@@ -83,49 +84,60 @@ public class AddSimpleLayoutMVCActionCommand
 			actionRequest, "privateLayout");
 		long parentLayoutId = ParamUtil.getLong(
 			actionRequest, "parentLayoutId");
-		String name = ParamUtil.getString(actionRequest, "name");
-		String type = ParamUtil.getString(actionRequest, "type");
-		long masterLayoutPlid = ParamUtil.getLong(
-			actionRequest, "masterLayoutPlid");
-
 		Map<Locale, String> nameMap = HashMapBuilder.put(
-			LocaleUtil.getSiteDefault(), name
+			LocaleUtil.getSiteDefault(),
+			ParamUtil.getString(actionRequest, "name")
 		).build();
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			Layout.class.getName(), actionRequest);
-
-		UnicodeProperties typeSettingsProperties =
+		String type = ParamUtil.getString(actionRequest, "type");
+		UnicodeProperties typeSettingsUnicodeProperties =
 			PropertiesParamUtil.getProperties(
 				actionRequest, "TypeSettingsProperties--");
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+		long masterLayoutPlid = ParamUtil.getLong(
+			actionRequest, "masterLayoutPlid");
+
+		if (!Objects.equals(type, LayoutConstants.TYPE_CONTENT)) {
+			LayoutPageTemplateEntry defaultLayoutPageTemplateEntry =
+				_layoutPageTemplateEntryService.
+					fetchDefaultLayoutPageTemplateEntry(
+						groupId,
+						LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT,
+						WorkflowConstants.STATUS_APPROVED);
+
+			if (defaultLayoutPageTemplateEntry != null) {
+				masterLayoutPlid = defaultLayoutPageTemplateEntry.getPlid();
+			}
+		}
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			Layout.class.getName(), actionRequest);
 
 		try {
 			Layout layout = _layoutService.addLayout(
 				groupId, privateLayout, parentLayoutId, nameMap,
 				new HashMap<>(), new HashMap<>(), new HashMap<>(),
-				new HashMap<>(), type, typeSettingsProperties.toString(), false,
-				masterLayoutPlid, new HashMap<>(), serviceContext);
+				new HashMap<>(), type, typeSettingsUnicodeProperties.toString(),
+				false, masterLayoutPlid, new HashMap<>(), serviceContext);
 
-			LayoutTypePortlet layoutTypePortlet =
-				(LayoutTypePortlet)layout.getLayoutType();
+			if (!Objects.equals(type, LayoutConstants.TYPE_CONTENT)) {
+				LayoutTypePortlet layoutTypePortlet =
+					(LayoutTypePortlet)layout.getLayoutType();
 
-			layoutTypePortlet.setLayoutTemplateId(
-				themeDisplay.getUserId(),
-				PropsValues.DEFAULT_LAYOUT_TEMPLATE_ID);
+				layoutTypePortlet.setLayoutTemplateId(
+					themeDisplay.getUserId(),
+					PropsValues.DEFAULT_LAYOUT_TEMPLATE_ID);
 
-			_layoutService.updateLayout(
-				groupId, privateLayout, layout.getLayoutId(),
-				layout.getTypeSettings());
+				_layoutService.updateLayout(
+					groupId, privateLayout, layout.getLayoutId(),
+					layout.getTypeSettings());
+			}
 
-			_actionUtil.updateLookAndFeel(
+			ActionUtil.updateLookAndFeel(
 				actionRequest, themeDisplay.getCompanyId(), liveGroupId,
 				stagingGroupId, privateLayout, layout.getLayoutId(),
 				layout.getTypeSettingsProperties());
 
-			Layout draftLayout = _layoutLocalService.fetchLayout(
-				_portal.getClassNameId(Layout.class), layout.getPlid());
+			Layout draftLayout = layout.fetchDraftLayout();
 
 			if (draftLayout != null) {
 				_layoutLocalService.updateLayout(
@@ -142,16 +154,11 @@ public class AddSimpleLayoutMVCActionCommand
 				redirectURL = getContentRedirectURL(actionRequest, layout);
 			}
 
-			jsonObject.put("redirectURL", redirectURL);
-
 			JSONPortletResponseUtil.writeJSON(
-				actionRequest, actionResponse, jsonObject);
+				actionRequest, actionResponse,
+				JSONUtil.put("redirectURL", redirectURL));
 		}
 		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException, portalException);
-			}
-
 			SessionErrors.add(actionRequest, "layoutNameInvalid");
 
 			hideDefaultErrorMessage(actionRequest);
@@ -161,17 +168,14 @@ public class AddSimpleLayoutMVCActionCommand
 		}
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		AddSimpleLayoutMVCActionCommand.class);
-
-	@Reference
-	private ActionUtil _actionUtil;
-
 	@Reference
 	private LayoutExceptionRequestHandler _layoutExceptionRequestHandler;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutPageTemplateEntryService _layoutPageTemplateEntryService;
 
 	@Reference
 	private LayoutService _layoutService;

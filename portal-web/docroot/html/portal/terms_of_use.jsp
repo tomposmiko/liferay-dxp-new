@@ -28,7 +28,7 @@ if (referer.equals(themeDisplay.getPathMain() + "/portal/update_terms_of_use")) 
 TermsOfUseContentProvider termsOfUseContentProvider = TermsOfUseContentProviderUtil.getTermsOfUseContentProvider();
 %>
 
-<div class="sheet sheet-lg">
+<div class="mt-4 sheet sheet-lg">
 	<div class="sheet-header">
 		<div class="autofit-padded-no-gutters-x autofit-row">
 			<div class="autofit-col autofit-col-expand">
@@ -44,6 +44,7 @@ TermsOfUseContentProvider termsOfUseContentProvider = TermsOfUseContentProviderU
 	</div>
 
 	<aui:form action='<%= themeDisplay.getPathMain() + "/portal/update_terms_of_use" %>' name="fm">
+		<aui:input name="p_auth" type="hidden" value="<%= AuthTokenUtil.getToken(request) %>" />
 		<aui:input name="doAsUserId" type="hidden" value="<%= themeDisplay.getDoAsUserId() %>" />
 		<aui:input name="<%= WebKeys.REFERER %>" type="hidden" value="<%= referer %>" />
 

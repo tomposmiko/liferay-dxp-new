@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.impl.VirtualLayout;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -58,6 +59,8 @@ import java.util.ResourceBundle;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Julio Camarero
@@ -176,9 +179,21 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 		if (group.isStagedRemotely()) {
 			Layout layout = _themeDisplay.getLayout();
 
+			boolean privateLayout = layout.isPrivateLayout();
+
+			if (layout instanceof VirtualLayout) {
+				VirtualLayout virtualLayout = (VirtualLayout)layout;
+
+				Group targetGroup = virtualLayout.getGroup();
+
+				if (!targetGroup.hasPrivateLayouts()) {
+					privateLayout = false;
+				}
+			}
+
 			try {
 				_liveGroupURL = StagingUtil.getRemoteSiteURL(
-					group, layout.isPrivateLayout());
+					group, privateLayout);
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
@@ -190,9 +205,9 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 						portalException.getMessage());
 			}
 			catch (SystemException systemException) {
-				Throwable cause = systemException.getCause();
+				Throwable throwable = systemException.getCause();
 
-				if (!(cause instanceof ConnectException)) {
+				if (!(throwable instanceof ConnectException)) {
 					throw systemException;
 				}
 
@@ -352,23 +367,34 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 	public boolean isDisplaySiteLink() {
 		Group group = getGroup();
 
-		Layout layout = LayoutLocalServiceUtil.fetchFirstLayout(
-			group.getGroupId(), false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			false);
+		Layout layout = _getFirstLayout(group);
 
-		if ((layout != null) && !layout.isHidden()) {
-			return true;
+		if ((layout == null) && group.isStaged()) {
+			layout = _getFirstLayout(StagingUtil.getLiveGroup(group));
 		}
 
-		layout = LayoutLocalServiceUtil.fetchFirstLayout(
-			group.getGroupId(), true, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			false);
-
-		if ((layout != null) && !layout.isHidden()) {
+		if (layout != null) {
 			return true;
 		}
 
 		return false;
+	}
+
+	public boolean isFirstLayout() {
+		Layout layout = _getFirstLayout(getGroup());
+
+		if ((layout == null) || (layout.getPlid() != _themeDisplay.getPlid())) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean isShowLayoutsTree() throws PortalException {
+		ProductMenuDisplayContext productMenuDisplayContext =
+			new ProductMenuDisplayContext(_portletRequest, _portletResponse);
+
+		return productMenuDisplayContext.isShowLayoutsTree();
 	}
 
 	public boolean isShowSiteAdministration() throws PortalException {
@@ -390,14 +416,19 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 
 	public boolean isShowSiteSelector() throws PortalException {
 		List<Group> mySites = getMySites();
+
+		if (!mySites.isEmpty()) {
+			return true;
+		}
+
 		List<Group> recentSites = _recentGroupManager.getRecentGroups(
 			PortalUtil.getHttpServletRequest(_portletRequest));
 
-		if (mySites.isEmpty() && recentSites.isEmpty()) {
-			return false;
+		if (!recentSites.isEmpty()) {
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	public boolean isShowStagingInfo() throws PortalException {
@@ -476,14 +507,43 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 			return;
 		}
 
-		_groupProvider.setGroup(
-			PortalUtil.getHttpServletRequest(_portletRequest), _group);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(_portletRequest);
+
+		_recentGroupManager.addRecentGroup(httpServletRequest, groupId);
+
+		_groupProvider.setGroup(httpServletRequest, _group);
+	}
+
+	private Layout _getFirstLayout(Group group) {
+		if (_firstLayout != null) {
+			return _firstLayout;
+		}
+
+		Layout layout = LayoutLocalServiceUtil.fetchFirstLayout(
+			group.getGroupId(), false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			false);
+
+		if ((layout != null) && !layout.isHidden()) {
+			return layout;
+		}
+
+		layout = LayoutLocalServiceUtil.fetchFirstLayout(
+			group.getGroupId(), true, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			false);
+
+		if ((layout != null) && !layout.isHidden()) {
+			return layout;
+		}
+
+		return null;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SiteAdministrationPanelCategoryDisplayContext.class);
 
 	private Boolean _collapsedPanel;
+	private Layout _firstLayout;
 	private Group _group;
 	private String _groupName;
 	private final GroupProvider _groupProvider;

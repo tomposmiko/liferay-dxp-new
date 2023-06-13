@@ -45,7 +45,7 @@ childPages = ListUtil.sort(childPages);
 childPages.remove(wikiPage);
 %>
 
-<aui:form action="<%= movePageURL %>" method="post" name="changeParentFm" onSubmit='<%= renderResponse.getNamespace() + "changeParent();" %>'>
+<aui:form action="<%= movePageURL %>" method="post" name="changeParentFm" onSubmit='<%= liferayPortletResponse.getNamespace() + "changeParent();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="nodeId" type="hidden" value="<%= node.getNodeId() %>" />
 	<aui:input name="title" type="hidden" value="<%= title %>" />
@@ -58,43 +58,45 @@ childPages.remove(wikiPage);
 
 		<%
 		boolean newParentAvailable = true;
-
-		if (childPages.isEmpty()) {
-			newParentAvailable = false;
 		%>
 
-			<aui:select disabled="<%= true %>" label="new-parent" name="newParentTitle">
-				<aui:option label="not-available" value="" />
-			</aui:select>
-
-		<%
-		}
-		else {
-		%>
-
-			<aui:select label="new-parent" name="newParentTitle">
-				<aui:option label="none" selected="<%= Validator.isNull(wikiPage.getParentTitle()) %>" value="" />
+		<c:choose>
+			<c:when test="<%= childPages.isEmpty() %>">
 
 				<%
-				for (WikiPage childPage : childPages) {
-					if (Validator.isNull(childPage.getRedirectTitle())) {
-						request.setAttribute(WikiWebKeys.WIKI_TREE_WALKER_DEPTH, 1);
-						request.setAttribute(WikiWebKeys.WIKI_TREE_WALKER_PAGE, wikiPage);
-						request.setAttribute(WikiWebKeys.WIKI_TREE_WALKER_PARENT, childPage);
+				newParentAvailable = false;
 				%>
 
-						<liferay-util:include page="/wiki/page_tree.jsp" servletContext="<%= application %>" />
+				<aui:select disabled="<%= true %>" label="new-parent" name="newParentTitle">
+					<aui:option label="not-available" value="" />
+				</aui:select>
+			</c:when>
+			<c:otherwise>
+				<aui:select label="new-parent" name="newParentTitle">
+					<aui:option label="none" selected="<%= Validator.isNull(wikiPage.getParentTitle()) %>" value="" />
 
-				<%
+					<%
+					for (WikiPage childPage : childPages) {
+					%>
+
+						<c:if test="<%= Validator.isNull(childPage.getRedirectTitle()) %>">
+
+							<%
+							request.setAttribute(WikiWebKeys.WIKI_TREE_WALKER_DEPTH, 1);
+							request.setAttribute(WikiWebKeys.WIKI_TREE_WALKER_PAGE, wikiPage);
+							request.setAttribute(WikiWebKeys.WIKI_TREE_WALKER_PARENT, childPage);
+							%>
+
+							<liferay-util:include page="/wiki/page_tree.jsp" servletContext="<%= application %>" />
+						</c:if>
+
+					<%
 					}
-				}
-				%>
+					%>
 
-			</aui:select>
-
-		<%
-		}
-		%>
+				</aui:select>
+			</c:otherwise>
+		</c:choose>
 
 		<c:if test="<%= pending %>">
 			<div class="alert alert-info">
@@ -105,7 +107,7 @@ childPages.remove(wikiPage);
 		<aui:button-row>
 			<c:choose>
 				<c:when test="<%= hasWorkflowDefinitionLink %>">
-					<aui:button disabled="<%= pending %>" name="publishButton" onClick='<%= renderResponse.getNamespace() + "publishPage();" %>' value="submit-for-publication" />
+					<aui:button disabled="<%= pending %>" name="publishButton" onClick='<%= liferayPortletResponse.getNamespace() + "publishPage();" %>' value="submit-for-publication" />
 				</c:when>
 				<c:otherwise>
 					<aui:button disabled="<%= !newParentAvailable %>" type="submit" value="change-parent" />

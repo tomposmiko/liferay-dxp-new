@@ -38,9 +38,9 @@ if (displayTerms.getGroupId() == 0) {
 	searchTerms.setGroupId(groupId);
 }
 
-LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
-
-params.put("includeGlobalScope", Boolean.TRUE);
+LinkedHashMap<String, Object> params = LinkedHashMapBuilder.<String, Object>put(
+	"includeGlobalScope", Boolean.TRUE
+).build();
 
 int mdrRuleGroupsCount = MDRRuleGroupLocalServiceUtil.searchByKeywordsCount(searchTerms.getGroupId(), searchTerms.getKeywords(), params, searchTerms.isAndOperator());
 
@@ -68,7 +68,7 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 			/>
 
 			<li>
-				<aui:form action="<%= portletURL.toString() %>" name="searchFm">
+				<aui:form action="<%= portletURL %>" name="searchFm">
 					<liferay-ui:input-search
 						markupView="lexicon"
 					/>
@@ -78,7 +78,7 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 	</liferay-frontend:management-bar>
 </c:if>
 
-<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="selectRuleGroupFm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="selectRuleGroupFm">
 	<liferay-ui:search-container
 		searchContainer="<%= ruleGroupSearch %>"
 	>
@@ -92,10 +92,11 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 			<%
 			MDRRuleGroupInstance ruleGroupInstance = MDRRuleGroupInstanceLocalServiceUtil.fetchRuleGroupInstance(className, classPK, ruleGroup.getRuleGroupId());
 
-			Map<String, Object> data = new HashMap<String, Object>();
-
-			data.put("rulegroupid", ruleGroup.getRuleGroupId());
-			data.put("rulegroupname", ruleGroup.getName());
+			Map<String, Object> data = HashMapBuilder.<String, Object>put(
+				"rulegroupid", ruleGroup.getRuleGroupId()
+			).put(
+				"rulegroupname", ruleGroup.getName()
+			).build();
 			%>
 
 			<c:choose>
@@ -174,10 +175,3 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectRuleGroupFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
-	);
-</aui:script>

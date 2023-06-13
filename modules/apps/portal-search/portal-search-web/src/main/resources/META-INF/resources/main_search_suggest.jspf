@@ -23,7 +23,7 @@
 			<li>
 
 				<%
-				String taglibSearchCollatedKeywords = renderResponse.getNamespace() + "searchKeywords('" + HtmlUtil.escapeJS(hits.getCollatedSpellCheckResult()) + "')";
+				String taglibSearchCollatedKeywords = liferayPortletResponse.getNamespace() + "searchKeywords('" + HtmlUtil.escapeJS(hits.getCollatedSpellCheckResult()) + "')";
 				%>
 
 				<aui:a href="javascript:;" onclick="<%= taglibSearchCollatedKeywords %>">
@@ -61,7 +61,7 @@
 					<li>
 
 						<%
-						String taglibOnClick = renderResponse.getNamespace() + "searchKeywords('" + HtmlUtil.escapeJS(querySuggestion) + "')";
+						String taglibOnClick = liferayPortletResponse.getNamespace() + "searchKeywords('" + HtmlUtil.escapeJS(querySuggestion) + "')";
 						%>
 
 						<aui:a href="javascript:;" onClick="<%= taglibOnClick %>">
@@ -96,8 +96,8 @@
 	function <portlet:namespace />searchKeywords(newKeywords) {
 		Liferay.Util.postForm(document.<portlet:namespace />fm, {
 			data: {
-				keywords: newKeywords
-			}
+				keywords: newKeywords,
+			},
 		});
 	}
 </script>

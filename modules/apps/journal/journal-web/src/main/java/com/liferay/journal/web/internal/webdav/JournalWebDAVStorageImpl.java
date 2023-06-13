@@ -18,11 +18,12 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.webdav.DDMWebDAV;
+import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalFolderService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.webdav.BaseWebDAVStorageImpl;
 import com.liferay.portal.kernel.webdav.Resource;
@@ -108,16 +109,11 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 	protected List<Resource> getFolders(WebDAVRequest webDAVRequest)
 		throws Exception {
 
-		List<Resource> resources = new ArrayList<>();
-
-		resources.add(
+		return ListUtil.fromArray(
 			_ddmWebDAV.toResource(
-				webDAVRequest, DDMWebDAV.TYPE_STRUCTURES, getRootPath(), true));
-		resources.add(
+				webDAVRequest, DDMWebDAV.TYPE_STRUCTURES, getRootPath(), true),
 			_ddmWebDAV.toResource(
 				webDAVRequest, DDMWebDAV.TYPE_TEMPLATES, getRootPath(), true));
-
-		return resources;
 	}
 
 	protected List<Resource> getStructures(WebDAVRequest webDAVRequest)

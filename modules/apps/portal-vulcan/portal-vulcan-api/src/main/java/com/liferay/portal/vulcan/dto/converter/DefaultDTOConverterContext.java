@@ -16,10 +16,14 @@ package com.liferay.portal.vulcan.dto.converter;
 
 import com.liferay.portal.kernel.model.User;
 
+import java.io.Serializable;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.core.UriInfo;
 
@@ -29,6 +33,10 @@ import javax.ws.rs.core.UriInfo;
  */
 public class DefaultDTOConverterContext implements DTOConverterContext {
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
 	public DefaultDTOConverterContext(
 		boolean acceptAllLanguages, DTOConverterRegistry dtoConverterRegistry,
 		Object id, Locale locale, UriInfo uriInfo, User user) {
@@ -39,36 +47,64 @@ public class DefaultDTOConverterContext implements DTOConverterContext {
 	}
 
 	public DefaultDTOConverterContext(
-		boolean acceptAllLanguages, Map<String, Map> actions,
-		DTOConverterRegistry dtoConverterRegistry, Object id, Locale locale,
+		boolean acceptAllLanguages, Map<String, Map<String, String>> actions,
+		DTOConverterRegistry dtoConverterRegistry,
+		HttpServletRequest httpServletRequest, Object id, Locale locale,
 		UriInfo uriInfo, User user) {
 
 		_acceptAllLanguages = acceptAllLanguages;
 		_actions = actions;
 		_dtoConverterRegistry = dtoConverterRegistry;
+		_httpServletRequest = httpServletRequest;
 		_id = id;
 		_locale = locale;
 		_uriInfo = uriInfo;
 		_user = user;
+
+		_attributes = new HashMap<>();
+	}
+
+	public DefaultDTOConverterContext(
+		boolean acceptAllLanguages, Map<String, Map<String, String>> actions,
+		DTOConverterRegistry dtoConverterRegistry, Object id, Locale locale,
+		UriInfo uriInfo, User user) {
+
+		this(
+			acceptAllLanguages, actions, dtoConverterRegistry, null, id, locale,
+			uriInfo, user);
 	}
 
 	public DefaultDTOConverterContext(
 		DTOConverterRegistry dtoConverterRegistry, Object id, Locale locale,
 		UriInfo uriInfo, User user) {
 
-		this(false, dtoConverterRegistry, id, locale, uriInfo, user);
+		this(
+			false, new HashMap<>(), dtoConverterRegistry, id, locale, uriInfo,
+			user);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
 	public DefaultDTOConverterContext(Object id, Locale locale) {
-		this(id, locale, null, null);
+		this(false, new HashMap<>(), null, id, locale, null, null);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
 	public DefaultDTOConverterContext(
 		Object id, Locale locale, UriInfo uriInfo) {
 
-		this(id, locale, uriInfo, null);
+		this(false, new HashMap<>(), null, id, locale, uriInfo, null);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
 	public DefaultDTOConverterContext(
 		Object id, Locale locale, UriInfo uriInfo, User user) {
 
@@ -76,13 +112,28 @@ public class DefaultDTOConverterContext implements DTOConverterContext {
 	}
 
 	@Override
-	public Map<String, Map> getActions() {
+	public Map<String, Map<String, String>> getActions() {
 		return _actions;
+	}
+
+	@Override
+	public Object getAttribute(String name) {
+		return _attributes.get(name);
+	}
+
+	@Override
+	public Map<String, Object> getAttributes() {
+		return _attributes;
 	}
 
 	@Override
 	public DTOConverterRegistry getDTOConverterRegistry() {
 		return _dtoConverterRegistry;
+	}
+
+	@Override
+	public HttpServletRequest getHttpServletRequest() {
+		return _httpServletRequest;
 	}
 
 	@Override
@@ -119,12 +170,29 @@ public class DefaultDTOConverterContext implements DTOConverterContext {
 		return _acceptAllLanguages;
 	}
 
+	@Override
+	public Object removeAttribute(String name) {
+		return _attributes.remove(name);
+	}
+
+	@Override
+	public void setAttribute(String name, Object value) {
+		_attributes.put(name, value);
+	}
+
+	@Override
+	public void setAttributes(Map<String, Serializable> attributes) {
+		_attributes.putAll(attributes);
+	}
+
 	private final boolean _acceptAllLanguages;
-	private final Map<String, Map> _actions;
+	private final Map<String, Map<String, String>> _actions;
+	private final Map<String, Object> _attributes;
 	private final DTOConverterRegistry _dtoConverterRegistry;
+	private final HttpServletRequest _httpServletRequest;
 	private final Object _id;
 	private final Locale _locale;
-	private UriInfo _uriInfo;
+	private final UriInfo _uriInfo;
 	private final User _user;
 
 }

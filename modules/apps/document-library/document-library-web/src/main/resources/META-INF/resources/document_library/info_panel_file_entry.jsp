@@ -21,34 +21,45 @@ FileEntry fileEntry = (FileEntry)request.getAttribute("info_panel.jsp-fileEntry"
 FileVersion fileVersion = (FileVersion)request.getAttribute("info_panel.jsp-fileVersion");
 boolean hideActions = GetterUtil.getBoolean(request.getAttribute("info_panel_file_entry.jsp-hideActions"));
 
+DLPortletInstanceSettings dlPortletInstanceSettings = dlRequestHelper.getDLPortletInstanceSettings();
 DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = dlDisplayContextProvider.getDLViewFileVersionDisplayContext(request, response, fileVersion);
 
 long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 %>
 
 <div class="sidebar-header">
-	<c:if test="<%= !hideActions %>">
-		<ul class="sidebar-header-actions">
-			<li>
-				<liferay-util:include page="/document_library/file_entry_action.jsp" servletContext="<%= application %>" />
-			</li>
-		</ul>
-	</c:if>
+	<clay:content-row
+		cssClass="sidebar-section"
+	>
+		<c:if test="<%= !hideActions %>">
+			<clay:content-col>
+				<ul class="autofit-padded-no-gutters autofit-row">
+					<li class="autofit-col">
+						<liferay-util:include page="/document_library/file_entry_action.jsp" servletContext="<%= application %>" />
+					</li>
+				</ul>
+			</clay:content-col>
+		</c:if>
 
-	<h1 class="sidebar-title">
-		<%= HtmlUtil.escape(fileVersion.getTitle()) %>
-	</h1>
+		<clay:content-col
+			expand="<%= true %>"
+		>
+			<h1 class="sidebar-title">
+				<%= HtmlUtil.escape(fileVersion.getTitle()) %>
+			</h1>
 
-	<c:if test="<%= dlViewFileVersionDisplayContext.isVersionInfoVisible() %>">
-		<clay:label
-			label='<%= LanguageUtil.get(request, "version") + StringPool.SPACE + fileVersion.getVersion() %>'
-			style="info"
-		/>
-	</c:if>
+			<c:if test="<%= dlViewFileVersionDisplayContext.isVersionInfoVisible() %>">
+				<clay:label
+					displayType="info"
+					label='<%= LanguageUtil.get(request, "version") + StringPool.SPACE + fileVersion.getVersion() %>'
+				/>
+			</c:if>
 
-	<aui:model-context bean="<%= fileVersion %>" model="<%= DLFileVersion.class %>" />
+			<aui:model-context bean="<%= fileVersion %>" model="<%= DLFileVersion.class %>" />
 
-	<aui:workflow-status model="<%= DLFileEntry.class %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= fileVersion.getStatus() %>" />
+			<aui:workflow-status model="<%= DLFileEntry.class %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= fileVersion.getStatus() %>" />
+		</clay:content-col>
+	</clay:content-row>
 </div>
 
 <div class="sidebar-body">
@@ -64,6 +75,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 	<liferay-ui:tabs
 		cssClass="navbar-no-collapse"
 		names="<%= tabsNames %>"
+		param='<%= "tabs_" + fileEntry.getFileEntryId() %>'
 		refresh="<%= false %>"
 	>
 		<liferay-ui:section>
@@ -81,21 +93,29 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 			<liferay-dynamic-section:dynamic-section
 				name="com.liferay.document.library.web#/document_library/info_panel_file_entry.jsp#fileEntryOwner"
 			>
-				<div class="autofit-row sidebar-panel widget-metadata">
-					<div class="autofit-col inline-item-before">
+				<clay:content-row
+					cssClass="sidebar-panel widget-metadata"
+				>
 
-						<%
-						User owner = UserLocalServiceUtil.fetchUser(fileEntry.getUserId());
-						%>
+					<%
+					User owner = UserLocalServiceUtil.fetchUser(fileEntry.getUserId());
+					%>
 
+					<clay:content-col
+						cssClass="inline-item-before"
+					>
 						<liferay-ui:user-portrait
 							user="<%= owner %>"
 						/>
-					</div>
+					</clay:content-col>
 
-					<div class="autofit-col autofit-col-expand">
-						<div class="autofit-row">
-							<div class="autofit-col autofit-col-expand">
+					<clay:content-col
+						expand="<%= true %>"
+					>
+						<clay:content-row>
+							<clay:content-col
+								expand="<%= true %>"
+							>
 								<div class="component-title h4 username">
 									<c:if test="<%= owner != null %>">
 										<a href="<%= owner.isDefaultUser() ? StringPool.BLANK : owner.getDisplayURL(themeDisplay) %>"><%= HtmlUtil.escape(owner.getFullName()) %></a>
@@ -105,10 +125,10 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 								<small class="text-muted">
 									<liferay-ui:message key="owner" />
 								</small>
-							</div>
-						</div>
-					</div>
-				</div>
+							</clay:content-col>
+						</clay:content-row>
+					</clay:content-col>
+				</clay:content-row>
 			</liferay-dynamic-section:dynamic-section>
 
 			<c:if test="<%= dlViewFileVersionDisplayContext.isDownloadLinkVisible() || dlViewFileVersionDisplayContext.isSharingLinkVisible() %>">
@@ -124,22 +144,24 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 
 									<c:choose>
 										<c:when test="<%= conversions.length > 0 %>">
-											<div class="btn-group-item" data-analytics-file-entry-id="<%= String.valueOf(fileEntry.getFileEntryId()) %>">
+											<div class="btn-group-item" data-analytics-file-entry-id="<%= String.valueOf(fileEntry.getFileEntryId()) %>" data-analytics-file-entry-title="<%= String.valueOf(fileEntry.getTitle()) %>">
 												<clay:dropdown-menu
 													dropdownItems='<%=
 														new JSPDropdownItemList(pageContext) {
 															{
-																ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+																ThemeDisplay themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-																Map<String, Object> data = new HashMap<>();
-
-																data.put("analytics-file-entry-id", String.valueOf(fileEntry.getFileEntryId()));
+																Map<String, Object> data = HashMapBuilder.<String, Object>put(
+																	"analytics-file-entry-id", String.valueOf(fileEntry.getFileEntryId())
+																).put(
+																	"analytics-file-entry-title", String.valueOf(fileEntry.getTitle())
+																).build();
 
 																add(
 																	dropdownItem -> {
 																		dropdownItem.setData(data);
 																		dropdownItem.setHref(DLURLHelperUtil.getDownloadURL(fileEntry, fileVersion, themeDisplay, StringPool.BLANK, false, true));
-																		dropdownItem.setLabel(LanguageUtil.get(request, "this-version"));
+																		dropdownItem.setLabel(LanguageUtil.get(httpServletRequest, "this-version"));
 																		dropdownItem.setSeparator(true);
 																	});
 
@@ -158,48 +180,41 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 																					}
 																				}
 																			});
-																		dropdownGroupItem.setLabel(LanguageUtil.get(request, "convert-to"));
-																	}
-																);
-
+																		dropdownGroupItem.setLabel(LanguageUtil.get(httpServletRequest, "convert-to"));
+																	});
 															}
 														}
 													%>'
-													label='<%= LanguageUtil.get(request, "download") %>'
-													style="primary"
-													triggerCssClasses="btn-sm"
+													label="download"
+													small="<%= true %>"
 												/>
 											</div>
 										</c:when>
 										<c:otherwise>
-
-											<%
-											Map<String, String> data = new HashMap<>();
-
-											data.put("analytics-file-entry-id", String.valueOf(fileEntry.getFileEntryId()));
-											%>
-
 											<div class="btn-group-item">
 												<clay:link
-													buttonStyle="primary"
-													data="<%= data %>"
-													elementClasses="btn-sm"
+													data-analytics-file-entry-id="<%= fileEntry.getFileEntryId() %>"
+													data-analytics-file-entry-title="<%= fileEntry.getTitle() %>"
+													displayType="primary"
 													href="<%= DLURLHelperUtil.getDownloadURL(fileEntry, fileVersion, themeDisplay, StringPool.BLANK, false, true) %>"
-													label='<%= LanguageUtil.get(resourceBundle, "download") %>'
-													title='<%= LanguageUtil.format(resourceBundle, "file-size-x", TextFormatter.formatStorageSize(fileVersion.getSize(), locale), false) %>'
+													label="download"
+													small="<%= true %>"
+													title='<%= LanguageUtil.format(resourceBundle, "file-size-x", LanguageUtil.formatStorageSize(fileVersion.getSize(), locale), false) %>'
+													type="button"
 												/>
 											</div>
 										</c:otherwise>
 									</c:choose>
 								</c:when>
 								<c:otherwise>
-									<div class="btn-group-item" data-analytics-file-entry-id="<%= String.valueOf(fileEntry.getFileEntryId()) %>">
+									<div class="btn-group-item" data-analytics-file-entry-id="<%= String.valueOf(fileEntry.getFileEntryId()) %>" data-analytics-file-entry-title="<%= String.valueOf(fileEntry.getTitle()) %>">
 										<clay:link
-											buttonStyle="primary"
-											elementClasses="btn-sm"
+											displayType="primary"
 											href="<%= DLURLHelperUtil.getDownloadURL(fileEntry, fileVersion, themeDisplay, StringPool.BLANK, false, true) %>"
-											label='<%= LanguageUtil.get(resourceBundle, "download") %>'
-											title='<%= LanguageUtil.format(resourceBundle, "file-size-x", TextFormatter.formatStorageSize(fileVersion.getSize(), locale), false) %>'
+											label="download"
+											small="<%= true %>"
+											title='<%= LanguageUtil.format(resourceBundle, "file-size-x", LanguageUtil.formatStorageSize(fileVersion.getSize(), locale), false) %>'
+											type="button"
 										/>
 									</div>
 								</c:otherwise>
@@ -231,10 +246,6 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 						}
 
 						String urlInputId = liferayPortletResponse.getNamespace() + "urlInput";
-
-						Map<String, String> urlButtonData = new HashMap<>();
-
-						urlButtonData.put("clipboard-target", "#" + urlInputId);
 						%>
 
 						<div class="form-group">
@@ -247,11 +258,11 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 
 								<span class="input-group-append input-group-item input-group-item-shrink">
 									<clay:button
-										data="<%= urlButtonData %>"
-										elementClasses="btn-secondary dm-infopanel-copy-clipboard lfr-portal-tooltip"
+										cssClass="dm-infopanel-copy-clipboard lfr-portal-tooltip"
+										data-clipboard-target='<%= "#" + urlInputId %>'
+										displayType="secondary"
 										icon="paste"
-										style="secondary"
-										title='<%= LanguageUtil.get(resourceBundle, "copy-link") %>'
+										title="copy-link"
 									/>
 								</span>
 							</div>
@@ -263,17 +274,13 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 							String webDavHelpMessage = null;
 
 							if (BrowserSnifferUtil.isWindows(request)) {
-								webDavHelpMessage = LanguageUtil.format(request, "webdav-windows-help", new Object[] {"https://support.microsoft.com/en-us/kb/892211", "https://dev.liferay.com/discover/portal/-/knowledge_base/7-0/publishing-files#desktop-access-to-documents-and-media"}, false);
+								webDavHelpMessage = LanguageUtil.format(request, "webdav-windows-help", new Object[] {"https://support.microsoft.com/en-us/kb/892211", "https://help.liferay.com/hc/en-us/articles/360028720352-Desktop-Access-to-Documents-and-Media"}, false);
 							}
 							else {
-								webDavHelpMessage = LanguageUtil.format(request, "webdav-help", "https://dev.liferay.com/discover/portal/-/knowledge_base/7-0/publishing-files#desktop-access-to-documents-and-media", false);
+								webDavHelpMessage = LanguageUtil.format(request, "webdav-help", "https://help.liferay.com/hc/en-us/articles/360028720352-Desktop-Access-to-Documents-and-Media", false);
 							}
 
 							String webDavURLInputId = liferayPortletResponse.getNamespace() + "webDavURLInput";
-
-							Map<String, String> webDavButtonData = new HashMap<>();
-
-							webDavButtonData.put("clipboard-target", "#" + webDavURLInputId);
 							%>
 
 							<div class="form-group">
@@ -290,11 +297,11 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 
 									<span class="input-group-append input-group-item input-group-item-shrink">
 										<clay:button
-											data="<%= webDavButtonData %>"
-											elementClasses="btn-secondary dm-infopanel-copy-clipboard lfr-portal-tooltip"
+											cssClass="dm-infopanel-copy-clipboard lfr-portal-tooltip"
+											data-clipboard-target='<%= "#" + webDavURLInputId %>'
+											displayType="secondary"
 											icon="paste"
-											style="secondary"
-											title='<%= LanguageUtil.get(resourceBundle, "copy-link") %>'
+											title="copy-link"
 										/>
 									</span>
 								</div>
@@ -334,7 +341,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 					<liferay-ui:message key="size" />
 				</dt>
 				<dd class="sidebar-dd">
-					<%= HtmlUtil.escape(TextFormatter.formatStorageSize(fileVersion.getSize(), locale)) %>
+					<%= HtmlUtil.escape(LanguageUtil.formatStorageSize(fileVersion.getSize(), locale)) %>
 				</dd>
 				<dt class="sidebar-dt">
 					<liferay-ui:message key="modified" />
@@ -346,7 +353,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 					<liferay-ui:message key="created" />
 				</dt>
 				<dd class="sidebar-dd">
-					<liferay-ui:message arguments="<%= new Object[] {dateFormatDateTime.format(fileVersion.getCreateDate()), HtmlUtil.escape(fileVersion.getUserName())} %>" key="x-by-x" translateArguments="<%= false %>" />
+					<liferay-ui:message arguments="<%= new Object[] {dateFormatDateTime.format(fileEntry.getCreateDate()), HtmlUtil.escape(fileEntry.getUserName())} %>" key="x-by-x" translateArguments="<%= false %>" />
 				</dd>
 
 				<%
@@ -375,7 +382,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 						<liferay-ui:message key="ratings" />
 					</dt>
 					<dd class="sidebar-dd">
-						<liferay-ui:ratings
+						<liferay-ratings:ratings
 							className="<%= DLFileEntryConstants.getClassName() %>"
 							classPK="<%= fileEntry.getFileEntryId() %>"
 							inTrash="<%= fileEntry.isInTrash() %>"
@@ -451,7 +458,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 									cssClass="metadata"
 									defaultState="closed"
 									extended="<%= true %>"
-									id='<%= "documentLibraryMetadataPanel" + StringPool.UNDERLINE + ddmStructure.getStructureId() %>'
+									id='<%= "documentLibraryMetadataPanel_" + fileEntry.getFileEntryId() %>'
 									markupView="lexicon"
 									persistState="<%= true %>"
 									title="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>"
@@ -513,19 +520,17 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 						if (fileEntryMetadata != null) {
 							ddmFormValues = dlViewFileVersionDisplayContext.getDDMFormValues(fileEntryMetadata.getDDMStorageId());
 						}
-
-						if (ddmFormValues != null) {
-							String name = "metadata." + ddmStructure.getStructureKey();
 				%>
 
+						<c:if test="<%= ddmFormValues != null %>">
 							<liferay-ui:panel
 								collapsible="<%= true %>"
 								cssClass="lfr-asset-metadata"
 								defaultState="closed"
-								id='<%= "documentLibraryMetadataPanel" + StringPool.UNDERLINE + ddmStructure.getStructureId() %>'
+								id='<%= "documentLibraryMetadataPanel_" + fileEntry.getFileEntryId() %>'
 								markupView="lexicon"
 								persistState="<%= true %>"
-								title="<%= name %>"
+								title='<%= "metadata." + ddmStructure.getStructureKey() %>'
 							>
 								<liferay-ddm:html
 									classNameId="<%= PortalUtil.getClassNameId(com.liferay.dynamic.data.mapping.model.DDMStructure.class) %>"
@@ -538,9 +543,9 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 									showEmptyFieldLabel="<%= false %>"
 								/>
 							</liferay-ui:panel>
+						</c:if>
 
 				<%
-						}
 					}
 				}
 				catch (Exception e) {

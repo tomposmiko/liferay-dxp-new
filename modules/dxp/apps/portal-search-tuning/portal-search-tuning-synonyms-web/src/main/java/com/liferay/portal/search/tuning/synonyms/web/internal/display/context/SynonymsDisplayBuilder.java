@@ -15,8 +15,9 @@
 package com.liferay.portal.search.tuning.synonyms.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.Language;
@@ -26,13 +27,12 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.hits.SearchHits;
-import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.sort.Sorts;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.DocumentToSynonymSetTranslator;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSet;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexName;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.request.SearchSynonymSetRequest;
 import com.liferay.portal.search.tuning.synonyms.web.internal.request.SearchSynonymSetResponse;
 
@@ -57,8 +57,7 @@ public class SynonymsDisplayBuilder {
 
 	public SynonymsDisplayBuilder(
 		DocumentToSynonymSetTranslator documentToSynonymSetTranslator,
-		HttpServletRequest httpServletRequest,
-		IndexNameBuilder indexNameBuilder, Language language, Portal portal,
+		HttpServletRequest httpServletRequest, Language language, Portal portal,
 		Queries queries, RenderRequest renderRequest,
 		RenderResponse renderResponse, SearchEngineAdapter searchEngineAdapter,
 		SearchEngineInformation searchEngineInformation, Sorts sorts,
@@ -66,7 +65,6 @@ public class SynonymsDisplayBuilder {
 
 		_documentToSynonymSetTranslator = documentToSynonymSetTranslator;
 		_httpServletRequest = httpServletRequest;
-		_indexNameBuilder = indexNameBuilder;
 		_language = language;
 		_portal = portal;
 		_queries = queries;
@@ -113,7 +111,8 @@ public class SynonymsDisplayBuilder {
 	protected RenderURL buildEditRenderURL(SynonymSet synonymSet) {
 		RenderURL editRenderURL = _renderResponse.createRenderURL();
 
-		editRenderURL.setParameter("mvcRenderCommandName", "editSynonymSet");
+		editRenderURL.setParameter(
+			"mvcRenderCommandName", "/synonyms/edit_synonym_sets");
 		editRenderURL.setParameter(
 			"redirect", _portal.getCurrentURL(_httpServletRequest));
 		editRenderURL.setParameter("synonymSetId", synonymSet.getId());
@@ -188,79 +187,64 @@ public class SynonymsDisplayBuilder {
 	protected List<DropdownItem> buildSynonymSetDropdownItemList(
 		SynonymSet synonymSet, RenderURL editRenderURL) {
 
-		return new DropdownItemList() {
-			{
-				add(
-					dropdownItem -> {
-						dropdownItem.setHref(editRenderURL);
-						dropdownItem.setLabel(
-							_language.get(_httpServletRequest, "edit"));
-						dropdownItem.setQuickAction(true);
-					});
-
-				add(
-					dropdownItem -> {
-						dropdownItem.putData("action", "delete");
-
-						ActionURL deleteURL = _renderResponse.createActionURL();
-
-						deleteURL.setParameter(
-							ActionRequest.ACTION_NAME, "deleteSynonymSet");
-						deleteURL.setParameter(Constants.CMD, Constants.DELETE);
-						deleteURL.setParameter("rowIds", synonymSet.getId());
-						deleteURL.setParameter(
-							"redirect",
-							_portal.getCurrentURL(_httpServletRequest));
-
-						dropdownItem.putData("deleteURL", deleteURL.toString());
-
-						dropdownItem.setIcon("times");
-						dropdownItem.setLabel(
-							_language.get(_httpServletRequest, "delete"));
-						dropdownItem.setQuickAction(true);
-					});
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.setHref(editRenderURL);
+				dropdownItem.setLabel(
+					_language.get(_httpServletRequest, "edit"));
+				dropdownItem.setQuickAction(true);
 			}
-		};
+		).add(
+			dropdownItem -> {
+				dropdownItem.putData("action", "delete");
+
+				ActionURL deleteURL = _renderResponse.createActionURL();
+
+				deleteURL.setParameter(
+					ActionRequest.ACTION_NAME, "/synonyms/delete_synonym_sets");
+				deleteURL.setParameter(Constants.CMD, Constants.DELETE);
+				deleteURL.setParameter("rowIds", synonymSet.getId());
+				deleteURL.setParameter(
+					"redirect", _portal.getCurrentURL(_httpServletRequest));
+
+				dropdownItem.putData("deleteURL", deleteURL.toString());
+
+				dropdownItem.setIcon("times");
+				dropdownItem.setLabel(
+					_language.get(_httpServletRequest, "delete"));
+				dropdownItem.setQuickAction(true);
+			}
+		).build();
 	}
 
 	protected SynonymSetIndexName buildSynonymSetIndexName() {
 		return _synonymSetIndexNameBuilder.getSynonymSetIndexName(
-			_indexNameBuilder.getIndexName(
-				_portal.getCompanyId(_renderRequest)));
+			_portal.getCompanyId(_renderRequest));
 	}
 
 	protected CreationMenu getCreationMenu() {
-		return new CreationMenu() {
-			{
-				addPrimaryDropdownItem(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							_renderResponse.createRenderURL(),
-							"mvcRenderCommandName", "editSynonymSet",
-							"redirect",
-							_portal.getCurrentURL(_httpServletRequest));
-						dropdownItem.setLabel(
-							_language.get(
-								_httpServletRequest, "new-synonym-set"));
-					});
+		return CreationMenuBuilder.addPrimaryDropdownItem(
+			dropdownItem -> {
+				dropdownItem.setHref(
+					_renderResponse.createRenderURL(), "mvcRenderCommandName",
+					"/synonyms/edit_synonym_sets", "redirect",
+					_portal.getCurrentURL(_httpServletRequest));
+				dropdownItem.setLabel(
+					_language.get(_httpServletRequest, "new-synonym-set"));
 			}
-		};
+		).build();
 	}
 
 	protected List<DropdownItem> getDropdownItems() {
-		return new DropdownItemList() {
-			{
-				add(
-					dropdownItem -> {
-						dropdownItem.putData(
-							"action", "deleteMultipleSynonyms");
-						dropdownItem.setIcon("times-circle");
-						dropdownItem.setLabel(
-							_language.get(_httpServletRequest, "delete"));
-						dropdownItem.setQuickAction(true);
-					});
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.putData("action", "deleteMultipleSynonyms");
+				dropdownItem.setIcon("times-circle");
+				dropdownItem.setLabel(
+					_language.get(_httpServletRequest, "delete"));
+				dropdownItem.setQuickAction(true);
 			}
-		};
+		).build();
 	}
 
 	protected boolean isDisabledManagementBar(
@@ -284,7 +268,6 @@ public class SynonymsDisplayBuilder {
 	private final DocumentToSynonymSetTranslator
 		_documentToSynonymSetTranslator;
 	private final HttpServletRequest _httpServletRequest;
-	private final IndexNameBuilder _indexNameBuilder;
 	private final Language _language;
 	private final Portal _portal;
 	private final Queries _queries;

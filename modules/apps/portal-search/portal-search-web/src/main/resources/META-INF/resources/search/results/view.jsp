@@ -24,16 +24,16 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
+page import="com.liferay.portal.kernel.model.User" %><%@
 page import="com.liferay.portal.kernel.search.Document" %><%@
+page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.search.results.configuration.SearchResultsPortletInstanceConfiguration" %><%@
 page import="com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletDisplayContext" %>
 
-<%@ page import="java.util.HashMap" %><%@
-page import="java.util.List" %><%@
-page import="java.util.Map" %>
+<%@ page import="java.util.List" %>
 
 <portlet:defineObjects />
 
@@ -49,12 +49,6 @@ SearchResultsPortletInstanceConfiguration searchResultsPortletInstanceConfigurat
 List<SearchResultSummaryDisplayContext> searchResultSummaryDisplayContexts = searchResultsPortletDisplayContext.getSearchResultSummaryDisplayContexts();
 
 SearchContainer<Document> searchContainer = searchResultsPortletDisplayContext.getSearchContainer();
-
-Map<String, Object> contextObjects = new HashMap<String, Object>();
-
-contextObjects.put("namespace", renderResponse.getNamespace());
-contextObjects.put("searchContainer", searchContainer);
-contextObjects.put("searchResultsPortletDisplayContext", searchResultsPortletDisplayContext);
 %>
 
 <c:choose>
@@ -70,15 +64,25 @@ contextObjects.put("searchResultsPortletDisplayContext", searchResultsPortletDis
 	<c:otherwise>
 		<liferay-ddm:template-renderer
 			className="<%= SearchResultSummaryDisplayContext.class.getName() %>"
-			contextObjects="<%= contextObjects %>"
+			contextObjects='<%=
+				HashMapBuilder.<String, Object>put(
+					"namespace", liferayPortletResponse.getNamespace()
+				).put(
+					"searchContainer", searchContainer
+				).put(
+					"searchResultsPortletDisplayContext", searchResultsPortletDisplayContext
+				).put(
+					"userClassName", User.class.getName()
+				).build()
+			%>'
 			displayStyle="<%= searchResultsPortletInstanceConfiguration.displayStyle() %>"
 			displayStyleGroupId="<%= searchResultsPortletDisplayContext.getDisplayStyleGroupId() %>"
 			entries="<%= searchResultSummaryDisplayContexts %>"
 		/>
 
-		<aui:form useNamespace="<%= false %>">
+		<aui:form action="#" useNamespace="<%= false %>">
 			<liferay-ui:search-paginator
-				id='<%= renderResponse.getNamespace() + "searchContainerTag" %>'
+				id='<%= liferayPortletResponse.getNamespace() + "searchContainerTag" %>'
 				markupView="lexicon"
 				searchContainer="<%= searchContainer %>"
 			/>

@@ -13,7 +13,7 @@
  */
 
 import ClayButton from '@clayui/button';
-import {ItemSelectorDialog} from 'frontend-js-web';
+import {openSelectionModal} from 'frontend-js-web';
 import propTypes from 'prop-types';
 import React from 'react';
 
@@ -26,9 +26,9 @@ class SelectEntityInput extends React.Component {
 			id: propTypes.string,
 			multiple: propTypes.bool,
 			title: propTypes.string,
-			uri: propTypes.string
+			uri: propTypes.string,
 		}),
-		value: propTypes.oneOfType([propTypes.string, propTypes.number])
+		value: propTypes.oneOfType([propTypes.string, propTypes.number]),
 	};
 
 	/**
@@ -39,50 +39,40 @@ class SelectEntityInput extends React.Component {
 	_handleSelectEntity = () => {
 		const {
 			onChange,
-			selectEntity: {id, multiple, title, uri}
+			selectEntity: {id, multiple, title, uri},
 		} = this.props;
 
 		if (multiple) {
-			const itemSelectorDialog = new ItemSelectorDialog({
+			openSelectionModal({
 				buttonAddLabel: Liferay.Language.get('select'),
-				eventName: id,
-				title,
-				url: uri
-			});
+				multiple: true,
+				onSelect: (selectedItems) => {
+					if (selectedItems) {
+						const selectedValues = selectedItems.map((item) => ({
+							displayValue: item.name,
+							value: item.id,
+						}));
 
-			itemSelectorDialog.open();
-
-			itemSelectorDialog.on('selectedItemChange', event => {
-				const selectedItems = event.selectedItem;
-
-				if (selectedItems) {
-					const selectedValues = selectedItems.map(item => ({
-						displayValue: item.name,
-						value: item.id
-					}));
-
-					onChange(selectedValues);
-				}
-			});
-		} else {
-			Liferay.Util.selectEntity(
-				{
-					dialog: {
-						constrain: true,
-						destroyOnHide: true,
-						modal: true
-					},
-					id,
-					title,
-					uri
+						onChange(selectedValues);
+					}
 				},
-				event => {
+				selectEventName: id,
+				title,
+				url: uri,
+			});
+		}
+		else {
+			openSelectionModal({
+				onSelect: (event) => {
 					onChange({
 						displayValue: event.entityname,
-						value: event.entityid
+						value: event.entityid,
 					});
-				}
-			);
+				},
+				selectEventName: id,
+				title,
+				url: uri,
+			});
 		}
 	};
 

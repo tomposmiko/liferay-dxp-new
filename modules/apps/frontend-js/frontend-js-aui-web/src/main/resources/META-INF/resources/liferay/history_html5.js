@@ -21,7 +21,7 @@
 
 AUI.add(
 	'liferay-history-html5',
-	A => {
+	(A) => {
 		var AObject = A.Object;
 		var History = Liferay.History;
 		var Lang = A.Lang;
@@ -74,7 +74,7 @@ AUI.add(
 
 					var uriData = [
 						LOCATION.search.substr(1),
-						LOCATION.hash.substr(1)
+						LOCATION.hash.substr(1),
 					];
 
 					var hash = uriData[1];
@@ -95,12 +95,14 @@ AUI.add(
 							state = hashMap;
 
 							A.each(state, (value1, key1) => {
-								instance.PROTECTED_HASH_KEYS.forEach(value2 => {
-									if (value2.test(key1)) {
-										delete state[key1];
-										protectedHashMap[key1] = value1;
+								instance.PROTECTED_HASH_KEYS.forEach(
+									(value2) => {
+										if (value2.test(key1)) {
+											delete state[key1];
+											protectedHashMap[key1] = value1;
+										}
 									}
-								});
+								);
 							});
 
 							uriData.pop();
@@ -122,7 +124,7 @@ AUI.add(
 
 					uriData[0] = QueryString.stringify(queryMap, {
 						eq: History.VALUE_SEPARATOR,
-						sep: History.PAIR_SEPARATOR
+						sep: History.PAIR_SEPARATOR,
 					});
 
 					uriData.unshift(
@@ -152,7 +154,7 @@ AUI.add(
 						state,
 						options
 					);
-				}
+				},
 			},
 			true
 		);
@@ -162,7 +164,7 @@ AUI.add(
 		requires: [
 			'history-html5',
 			'liferay-history',
-			'querystring-stringify-simple'
-		]
+			'querystring-stringify-simple',
+		],
 	}
 );

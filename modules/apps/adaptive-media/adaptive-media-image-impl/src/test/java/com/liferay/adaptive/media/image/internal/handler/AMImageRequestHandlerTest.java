@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.InputStream;
 
@@ -52,6 +53,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -61,6 +64,11 @@ import org.mockito.Mockito;
  * @author Alejandro Tardín
  */
 public class AMImageRequestHandlerTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws PortalException {
@@ -356,16 +364,16 @@ public class AMImageRequestHandlerTest {
 
 		String uuid = "testUuid" + Math.random();
 
-		final Map<String, String> properties = HashMapBuilder.put(
-			"configuration-uuid", uuid
-		).put(
-			"max-height", String.valueOf(height)
-		).put(
-			"max-width", String.valueOf(width)
-		).build();
-
 		AMImageConfigurationEntryImpl amImageConfigurationEntryImpl =
-			new AMImageConfigurationEntryImpl(uuid, uuid, properties);
+			new AMImageConfigurationEntryImpl(
+				uuid, uuid,
+				HashMapBuilder.put(
+					"configuration-uuid", uuid
+				).put(
+					"max-height", String.valueOf(height)
+				).put(
+					"max-width", String.valueOf(width)
+				).build());
 
 		Mockito.when(
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
@@ -390,14 +398,16 @@ public class AMImageRequestHandlerTest {
 			"pathInfo"
 		);
 
-		Map<String, String> pathProperties = HashMapBuilder.put(
-			"configuration-uuid", amImageConfigurationEntry.getUUID()
-		).build();
-
 		Mockito.when(
 			_pathInterpreter.interpretPath(httpServletRequest.getPathInfo())
 		).thenReturn(
-			Optional.of(Tuple.of(fileVersion, pathProperties))
+			Optional.of(
+				Tuple.of(
+					fileVersion,
+					HashMapBuilder.put(
+						"configuration-uuid",
+						amImageConfigurationEntry.getUUID()
+					).build()))
 		);
 
 		return httpServletRequest;
@@ -449,14 +459,14 @@ public class AMImageRequestHandlerTest {
 			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenAnswer(
 			invocation -> {
-				Function<AMImageQueryBuilder, AMQuery>
+				Function<AMImageQueryBuilder, AMQuery<?, ?>>
 					amImageQueryBuilderFunction = invocation.getArgumentAt(
 						0, Function.class);
 
 				AMImageQueryBuilderImpl amImageQueryBuilderImpl =
 					new AMImageQueryBuilderImpl();
 
-				AMQuery amQuery = amImageQueryBuilderFunction.apply(
+				AMQuery<?, ?> amQuery = amImageQueryBuilderFunction.apply(
 					amImageQueryBuilderImpl);
 
 				Map<AMAttribute<AMImageProcessor, ?>, Object> amAttributes =
@@ -502,14 +512,14 @@ public class AMImageRequestHandlerTest {
 			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenAnswer(
 			invocation -> {
-				Function<AMImageQueryBuilder, AMQuery>
+				Function<AMImageQueryBuilder, AMQuery<?, ?>>
 					amImageQueryBuilderFunction = invocation.getArgumentAt(
 						0, Function.class);
 
 				AMImageQueryBuilderImpl amImageQueryBuilderImpl =
 					new AMImageQueryBuilderImpl();
 
-				AMQuery amQuery = amImageQueryBuilderFunction.apply(
+				AMQuery<?, ?> amQuery = amImageQueryBuilderFunction.apply(
 					amImageQueryBuilderImpl);
 
 				if (!AMImageQueryBuilderImpl.AM_QUERY.equals(amQuery)) {

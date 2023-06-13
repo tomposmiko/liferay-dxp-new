@@ -18,6 +18,7 @@ import com.liferay.portal.search.aggregation.Aggregation;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
 import com.liferay.portal.search.filter.ComplexQueryPart;
 import com.liferay.portal.search.groupby.GroupByRequest;
+import com.liferay.portal.search.highlight.Highlight;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.rescore.Rescore;
 import com.liferay.portal.search.sort.Sort;
@@ -40,6 +41,8 @@ public interface SearchRequest {
 	public Map<String, Aggregation> getAggregationsMap();
 
 	public List<ComplexQueryPart> getComplexQueryParts();
+
+	public String getConnectionId();
 
 	public List<String> getEntryClassNames();
 
@@ -66,15 +69,26 @@ public interface SearchRequest {
 	 */
 	public List<GroupByRequest> getGroupByRequests();
 
+	public Highlight getHighlight();
+
 	public List<String> getIncludeContributors();
 
 	public List<String> getIndexes();
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getModelIndexerClassNames()}
+	 */
+	@Deprecated
 	public List<Class<?>> getModelIndexerClasses();
+
+	public List<String> getModelIndexerClassNames();
 
 	public String getPaginationStartParameterName();
 
 	public Map<String, PipelineAggregation> getPipelineAggregationsMap();
+
+	public List<ComplexQueryPart> getPostFilterComplexQueryParts();
 
 	public Query getPostFilterQuery();
 

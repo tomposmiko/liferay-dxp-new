@@ -28,12 +28,13 @@ import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
 import com.liferay.headless.delivery.client.resource.v1_0.NavigationMenuResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.NavigationMenuSerDes;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -108,7 +110,9 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		NavigationMenuResource.Builder builder =
 			NavigationMenuResource.builder();
 
-		navigationMenuResource = builder.locale(
+		navigationMenuResource = builder.authentication(
+			"test@liferay.com", "test"
+		).locale(
 			LocaleUtil.getDefault()
 		).build();
 	}
@@ -190,6 +194,70 @@ public abstract class BaseNavigationMenuResourceTestCase {
 	}
 
 	@Test
+	public void testDeleteNavigationMenu() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		NavigationMenu navigationMenu =
+			testDeleteNavigationMenu_addNavigationMenu();
+
+		assertHttpResponseStatusCode(
+			204,
+			navigationMenuResource.deleteNavigationMenuHttpResponse(
+				navigationMenu.getId()));
+
+		assertHttpResponseStatusCode(
+			404,
+			navigationMenuResource.getNavigationMenuHttpResponse(
+				navigationMenu.getId()));
+
+		assertHttpResponseStatusCode(
+			404, navigationMenuResource.getNavigationMenuHttpResponse(0L));
+	}
+
+	protected NavigationMenu testDeleteNavigationMenu_addNavigationMenu()
+		throws Exception {
+
+		return navigationMenuResource.postSiteNavigationMenu(
+			testGroup.getGroupId(), randomNavigationMenu());
+	}
+
+	@Test
+	public void testGraphQLDeleteNavigationMenu() throws Exception {
+		NavigationMenu navigationMenu =
+			testGraphQLDeleteNavigationMenu_addNavigationMenu();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteNavigationMenu",
+						new HashMap<String, Object>() {
+							{
+								put("navigationMenuId", navigationMenu.getId());
+							}
+						})),
+				"JSONObject/data", "Object/deleteNavigationMenu"));
+		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"navigationMenu",
+					new HashMap<String, Object>() {
+						{
+							put("navigationMenuId", navigationMenu.getId());
+						}
+					},
+					new GraphQLField("id"))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray.length() > 0);
+	}
+
+	protected NavigationMenu testGraphQLDeleteNavigationMenu_addNavigationMenu()
+		throws Exception {
+
+		return testGraphQLNavigationMenu_addNavigationMenu();
+	}
+
+	@Test
 	public void testGetNavigationMenu() throws Exception {
 		NavigationMenu postNavigationMenu =
 			testGetNavigationMenu_addNavigationMenu();
@@ -205,53 +273,103 @@ public abstract class BaseNavigationMenuResourceTestCase {
 	protected NavigationMenu testGetNavigationMenu_addNavigationMenu()
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return navigationMenuResource.postSiteNavigationMenu(
+			testGroup.getGroupId(), randomNavigationMenu());
 	}
 
 	@Test
 	public void testGraphQLGetNavigationMenu() throws Exception {
 		NavigationMenu navigationMenu =
-			testGraphQLNavigationMenu_addNavigationMenu();
-
-		List<GraphQLField> graphQLFields = getGraphQLFields();
-
-		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"navigationMenu",
-				new HashMap<String, Object>() {
-					{
-						put("navigationMenuId", navigationMenu.getId());
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
+			testGraphQLGetNavigationMenu_addNavigationMenu();
 
 		Assert.assertTrue(
-			equalsJSONObject(
+			equals(
 				navigationMenu,
-				dataJSONObject.getJSONObject("navigationMenu")));
+				NavigationMenuSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"navigationMenu",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"navigationMenuId",
+											navigationMenu.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/navigationMenu"))));
+	}
+
+	@Test
+	public void testGraphQLGetNavigationMenuNotFound() throws Exception {
+		Long irrelevantNavigationMenuId = RandomTestUtil.randomLong();
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"navigationMenu",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"navigationMenuId",
+									irrelevantNavigationMenuId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected NavigationMenu testGraphQLGetNavigationMenu_addNavigationMenu()
+		throws Exception {
+
+		return testGraphQLNavigationMenu_addNavigationMenu();
+	}
+
+	@Test
+	public void testPutNavigationMenu() throws Exception {
+		NavigationMenu postNavigationMenu =
+			testPutNavigationMenu_addNavigationMenu();
+
+		NavigationMenu randomNavigationMenu = randomNavigationMenu();
+
+		NavigationMenu putNavigationMenu =
+			navigationMenuResource.putNavigationMenu(
+				postNavigationMenu.getId(), randomNavigationMenu);
+
+		assertEquals(randomNavigationMenu, putNavigationMenu);
+		assertValid(putNavigationMenu);
+
+		NavigationMenu getNavigationMenu =
+			navigationMenuResource.getNavigationMenu(putNavigationMenu.getId());
+
+		assertEquals(randomNavigationMenu, getNavigationMenu);
+		assertValid(getNavigationMenu);
+	}
+
+	protected NavigationMenu testPutNavigationMenu_addNavigationMenu()
+		throws Exception {
+
+		return navigationMenuResource.postSiteNavigationMenu(
+			testGroup.getGroupId(), randomNavigationMenu());
 	}
 
 	@Test
 	public void testGetSiteNavigationMenusPage() throws Exception {
-		Page<NavigationMenu> page =
-			navigationMenuResource.getSiteNavigationMenusPage(
-				testGetSiteNavigationMenusPage_getSiteId(),
-				Pagination.of(1, 2));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
 		Long siteId = testGetSiteNavigationMenusPage_getSiteId();
 		Long irrelevantSiteId =
 			testGetSiteNavigationMenusPage_getIrrelevantSiteId();
 
-		if ((irrelevantSiteId != null)) {
+		Page<NavigationMenu> page =
+			navigationMenuResource.getSiteNavigationMenusPage(
+				siteId, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantSiteId != null) {
 			NavigationMenu irrelevantNavigationMenu =
 				testGetSiteNavigationMenusPage_addNavigationMenu(
 					irrelevantSiteId, randomIrrelevantNavigationMenu());
@@ -276,7 +394,7 @@ public abstract class BaseNavigationMenuResourceTestCase {
 				siteId, randomNavigationMenu());
 
 		page = navigationMenuResource.getSiteNavigationMenusPage(
-			siteId, Pagination.of(1, 2));
+			siteId, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -284,6 +402,10 @@ public abstract class BaseNavigationMenuResourceTestCase {
 			Arrays.asList(navigationMenu1, navigationMenu2),
 			(List<NavigationMenu>)page.getItems());
 		assertValid(page);
+
+		navigationMenuResource.deleteNavigationMenu(navigationMenu1.getId());
+
+		navigationMenuResource.deleteNavigationMenu(navigationMenu2.getId());
 	}
 
 	@Test
@@ -339,8 +461,8 @@ public abstract class BaseNavigationMenuResourceTestCase {
 			Long siteId, NavigationMenu navigationMenu)
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return navigationMenuResource.postSiteNavigationMenu(
+			siteId, navigationMenu);
 	}
 
 	protected Long testGetSiteNavigationMenusPage_getSiteId() throws Exception {
@@ -355,65 +477,200 @@ public abstract class BaseNavigationMenuResourceTestCase {
 
 	@Test
 	public void testGraphQLGetSiteNavigationMenusPage() throws Exception {
-		List<GraphQLField> graphQLFields = new ArrayList<>();
-
-		List<GraphQLField> itemsGraphQLFields = getGraphQLFields();
-
-		graphQLFields.add(
-			new GraphQLField(
-				"items", itemsGraphQLFields.toArray(new GraphQLField[0])));
-
-		graphQLFields.add(new GraphQLField("page"));
-		graphQLFields.add(new GraphQLField("totalCount"));
+		Long siteId = testGetSiteNavigationMenusPage_getSiteId();
 
 		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"navigationMenus",
-				new HashMap<String, Object>() {
-					{
-						put("page", 1);
-						put("pageSize", 2);
-						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
+			"navigationMenus",
+			new HashMap<String, Object>() {
+				{
+					put("page", 1);
+					put("pageSize", 10);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
+					put("siteKey", "\"" + siteId + "\"");
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
 
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
-
-		JSONObject navigationMenusJSONObject = dataJSONObject.getJSONObject(
-			"navigationMenus");
+		JSONObject navigationMenusJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/navigationMenus");
 
 		Assert.assertEquals(0, navigationMenusJSONObject.get("totalCount"));
 
 		NavigationMenu navigationMenu1 =
-			testGraphQLNavigationMenu_addNavigationMenu();
+			testGraphQLGetSiteNavigationMenusPage_addNavigationMenu();
 		NavigationMenu navigationMenu2 =
-			testGraphQLNavigationMenu_addNavigationMenu();
+			testGraphQLGetSiteNavigationMenusPage_addNavigationMenu();
 
-		jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
+		navigationMenusJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/navigationMenus");
 
-		dataJSONObject = jsonObject.getJSONObject("data");
+		Assert.assertEquals(2, navigationMenusJSONObject.getLong("totalCount"));
 
-		navigationMenusJSONObject = dataJSONObject.getJSONObject(
-			"navigationMenus");
-
-		Assert.assertEquals(2, navigationMenusJSONObject.get("totalCount"));
-
-		assertEqualsJSONArray(
+		assertEqualsIgnoringOrder(
 			Arrays.asList(navigationMenu1, navigationMenu2),
-			navigationMenusJSONObject.getJSONArray("items"));
+			Arrays.asList(
+				NavigationMenuSerDes.toDTOs(
+					navigationMenusJSONObject.getString("items"))));
+	}
+
+	protected NavigationMenu
+			testGraphQLGetSiteNavigationMenusPage_addNavigationMenu()
+		throws Exception {
+
+		return testGraphQLNavigationMenu_addNavigationMenu();
+	}
+
+	@Test
+	public void testPostSiteNavigationMenu() throws Exception {
+		NavigationMenu randomNavigationMenu = randomNavigationMenu();
+
+		NavigationMenu postNavigationMenu =
+			testPostSiteNavigationMenu_addNavigationMenu(randomNavigationMenu);
+
+		assertEquals(randomNavigationMenu, postNavigationMenu);
+		assertValid(postNavigationMenu);
+	}
+
+	protected NavigationMenu testPostSiteNavigationMenu_addNavigationMenu(
+			NavigationMenu navigationMenu)
+		throws Exception {
+
+		return navigationMenuResource.postSiteNavigationMenu(
+			testGetSiteNavigationMenusPage_getSiteId(), navigationMenu);
+	}
+
+	@Test
+	public void testGraphQLPostSiteNavigationMenu() throws Exception {
+		NavigationMenu randomNavigationMenu = randomNavigationMenu();
+
+		NavigationMenu navigationMenu =
+			testGraphQLNavigationMenu_addNavigationMenu(randomNavigationMenu);
+
+		Assert.assertTrue(equals(randomNavigationMenu, navigationMenu));
+	}
+
+	protected void appendGraphQLFieldValue(StringBuilder sb, Object value)
+		throws Exception {
+
+		if (value instanceof Object[]) {
+			StringBuilder arraySB = new StringBuilder("[");
+
+			for (Object object : (Object[])value) {
+				if (arraySB.length() > 1) {
+					arraySB.append(", ");
+				}
+
+				arraySB.append("{");
+
+				Class<?> clazz = object.getClass();
+
+				for (java.lang.reflect.Field field :
+						getDeclaredFields(clazz.getSuperclass())) {
+
+					arraySB.append(field.getName());
+					arraySB.append(": ");
+
+					appendGraphQLFieldValue(arraySB, field.get(object));
+
+					arraySB.append(", ");
+				}
+
+				arraySB.setLength(arraySB.length() - 2);
+
+				arraySB.append("}");
+			}
+
+			arraySB.append("]");
+
+			sb.append(arraySB.toString());
+		}
+		else if (value instanceof String) {
+			sb.append("\"");
+			sb.append(value);
+			sb.append("\"");
+		}
+		else {
+			sb.append(value);
+		}
 	}
 
 	protected NavigationMenu testGraphQLNavigationMenu_addNavigationMenu()
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return testGraphQLNavigationMenu_addNavigationMenu(
+			randomNavigationMenu());
+	}
+
+	protected NavigationMenu testGraphQLNavigationMenu_addNavigationMenu(
+			NavigationMenu navigationMenu)
+		throws Exception {
+
+		JSONDeserializer<NavigationMenu> jsonDeserializer =
+			JSONFactoryUtil.createJSONDeserializer();
+
+		StringBuilder sb = new StringBuilder("{");
+
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(NavigationMenu.class)) {
+
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append(field.getName());
+			sb.append(": ");
+
+			appendGraphQLFieldValue(sb, field.get(navigationMenu));
+		}
+
+		sb.append("}");
+
+		List<GraphQLField> graphQLFields = getGraphQLFields();
+
+		graphQLFields.add(new GraphQLField("id"));
+
+		return jsonDeserializer.deserialize(
+			JSONUtil.getValueAsString(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"createSiteNavigationMenu",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"siteKey",
+									"\"" + testGroup.getGroupId() + "\"");
+								put("navigationMenu", sb.toString());
+							}
+						},
+						graphQLFields)),
+				"JSONObject/data", "JSONObject/createSiteNavigationMenu"),
+			NavigationMenu.class);
+	}
+
+	protected void assertContains(
+		NavigationMenu navigationMenu, List<NavigationMenu> navigationMenus) {
+
+		boolean contains = false;
+
+		for (NavigationMenu item : navigationMenus) {
+			if (equals(navigationMenu, item)) {
+				contains = true;
+
+				break;
+			}
+		}
+
+		Assert.assertTrue(
+			navigationMenus + " does not contain " + navigationMenu, contains);
 	}
 
 	protected void assertHttpResponseStatusCode(
@@ -469,26 +726,7 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		}
 	}
 
-	protected void assertEqualsJSONArray(
-		List<NavigationMenu> navigationMenus, JSONArray jsonArray) {
-
-		for (NavigationMenu navigationMenu : navigationMenus) {
-			boolean contains = false;
-
-			for (Object object : jsonArray) {
-				if (equalsJSONObject(navigationMenu, (JSONObject)object)) {
-					contains = true;
-
-					break;
-				}
-			}
-
-			Assert.assertTrue(
-				jsonArray + " does not contain " + navigationMenu, contains);
-		}
-	}
-
-	protected void assertValid(NavigationMenu navigationMenu) {
+	protected void assertValid(NavigationMenu navigationMenu) throws Exception {
 		boolean valid = true;
 
 		if (navigationMenu.getDateCreated() == null) {
@@ -512,6 +750,14 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (navigationMenu.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("creator", additionalAssertFieldName)) {
 				if (navigationMenu.getCreator() == null) {
 					valid = false;
@@ -532,6 +778,14 @@ public abstract class BaseNavigationMenuResourceTestCase {
 					"navigationMenuItems", additionalAssertFieldName)) {
 
 				if (navigationMenu.getNavigationMenuItems() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("navigationType", additionalAssertFieldName)) {
+				if (navigationMenu.getNavigationType() == null) {
 					valid = false;
 				}
 
@@ -567,13 +821,53 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		return new String[0];
 	}
 
-	protected List<GraphQLField> getGraphQLFields() {
+	protected List<GraphQLField> getGraphQLFields() throws Exception {
 		List<GraphQLField> graphQLFields = new ArrayList<>();
 
-		for (String additionalAssertFieldName :
-				getAdditionalAssertFieldNames()) {
+		graphQLFields.add(new GraphQLField("siteId"));
 
-			graphQLFields.add(new GraphQLField(additionalAssertFieldName));
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(
+					com.liferay.headless.delivery.dto.v1_0.NavigationMenu.
+						class)) {
+
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			graphQLFields.addAll(getGraphQLFields(field));
+		}
+
+		return graphQLFields;
+	}
+
+	protected List<GraphQLField> getGraphQLFields(
+			java.lang.reflect.Field... fields)
+		throws Exception {
+
+		List<GraphQLField> graphQLFields = new ArrayList<>();
+
+		for (java.lang.reflect.Field field : fields) {
+			com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+				vulcanGraphQLField = field.getAnnotation(
+					com.liferay.portal.vulcan.graphql.annotation.GraphQLField.
+						class);
+
+			if (vulcanGraphQLField != null) {
+				Class<?> clazz = field.getType();
+
+				if (clazz.isArray()) {
+					clazz = clazz.getComponentType();
+				}
+
+				List<GraphQLField> childrenGraphQLFields = getGraphQLFields(
+					getDeclaredFields(clazz));
+
+				graphQLFields.add(
+					new GraphQLField(field.getName(), childrenGraphQLFields));
+			}
 		}
 
 		return graphQLFields;
@@ -598,6 +892,17 @@ public abstract class BaseNavigationMenuResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)navigationMenu1.getActions(),
+						(Map)navigationMenu2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("creator", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -665,6 +970,17 @@ public abstract class BaseNavigationMenuResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("navigationType", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						navigationMenu1.getNavigationType(),
+						navigationMenu2.getNavigationType())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -673,36 +989,43 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		return true;
 	}
 
-	protected boolean equalsJSONObject(
-		NavigationMenu navigationMenu, JSONObject jsonObject) {
+	protected boolean equals(
+		Map<String, Object> map1, Map<String, Object> map2) {
 
-		for (String fieldName : getAdditionalAssertFieldNames()) {
-			if (Objects.equals("id", fieldName)) {
-				if (!Objects.deepEquals(
-						navigationMenu.getId(), jsonObject.getLong("id"))) {
+		if (Objects.equals(map1.keySet(), map2.keySet())) {
+			for (Map.Entry<String, Object> entry : map1.entrySet()) {
+				if (entry.getValue() instanceof Map) {
+					if (!equals(
+							(Map)entry.getValue(),
+							(Map)map2.get(entry.getKey()))) {
+
+						return false;
+					}
+				}
+				else if (!Objects.deepEquals(
+							entry.getValue(), map2.get(entry.getKey()))) {
 
 					return false;
 				}
-
-				continue;
 			}
 
-			if (Objects.equals("name", fieldName)) {
-				if (!Objects.deepEquals(
-						navigationMenu.getName(),
-						jsonObject.getString("name"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			throw new IllegalArgumentException(
-				"Invalid field name " + fieldName);
+			return true;
 		}
 
-		return true;
+		return false;
+	}
+
+	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
+		throws Exception {
+
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
+
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -755,6 +1078,11 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
+
+		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
 		if (entityFieldName.equals("creator")) {
 			throw new IllegalArgumentException(
@@ -845,6 +1173,11 @@ public abstract class BaseNavigationMenuResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("navigationType")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("siteId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -871,13 +1204,33 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		return httpResponse.getContent();
 	}
 
+	protected JSONObject invokeGraphQLMutation(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField mutationGraphQLField = new GraphQLField(
+			"mutation", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(mutationGraphQLField.toString()));
+	}
+
+	protected JSONObject invokeGraphQLQuery(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField queryGraphQLField = new GraphQLField(
+			"query", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(queryGraphQLField.toString()));
+	}
+
 	protected NavigationMenu randomNavigationMenu() throws Exception {
 		return new NavigationMenu() {
 			{
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				id = RandomTestUtil.randomLong();
-				name = RandomTestUtil.randomString();
+				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				siteId = testGroup.getGroupId();
 			}
 		};
@@ -906,9 +1259,22 @@ public abstract class BaseNavigationMenuResourceTestCase {
 			this(key, new HashMap<>(), graphQLFields);
 		}
 
+		public GraphQLField(String key, List<GraphQLField> graphQLFields) {
+			this(key, new HashMap<>(), graphQLFields);
+		}
+
 		public GraphQLField(
 			String key, Map<String, Object> parameterMap,
 			GraphQLField... graphQLFields) {
+
+			_key = key;
+			_parameterMap = parameterMap;
+			_graphQLFields = Arrays.asList(graphQLFields);
+		}
+
+		public GraphQLField(
+			String key, Map<String, Object> parameterMap,
+			List<GraphQLField> graphQLFields) {
 
 			_key = key;
 			_parameterMap = parameterMap;
@@ -926,25 +1292,25 @@ public abstract class BaseNavigationMenuResourceTestCase {
 						_parameterMap.entrySet()) {
 
 					sb.append(entry.getKey());
-					sb.append(":");
+					sb.append(": ");
 					sb.append(entry.getValue());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append(")");
 			}
 
-			if (_graphQLFields.length > 0) {
+			if (!_graphQLFields.isEmpty()) {
 				sb.append("{");
 
 				for (GraphQLField graphQLField : _graphQLFields) {
 					sb.append(graphQLField.toString());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append("}");
 			}
@@ -952,14 +1318,14 @@ public abstract class BaseNavigationMenuResourceTestCase {
 			return sb.toString();
 		}
 
-		private final GraphQLField[] _graphQLFields;
+		private final List<GraphQLField> _graphQLFields;
 		private final String _key;
 		private final Map<String, Object> _parameterMap;
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseNavigationMenuResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseNavigationMenuResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

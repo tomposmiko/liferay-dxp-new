@@ -61,7 +61,6 @@ public abstract class CalendarResourceFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -87,14 +86,5 @@ public abstract class CalendarResourceFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CalendarResourceFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(CalendarPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

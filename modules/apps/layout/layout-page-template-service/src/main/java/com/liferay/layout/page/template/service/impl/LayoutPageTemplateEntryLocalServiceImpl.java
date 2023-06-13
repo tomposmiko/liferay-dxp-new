@@ -15,24 +15,29 @@
 package com.liferay.layout.page.template.service.impl;
 
 import com.liferay.asset.kernel.NoSuchClassTypeException;
-import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.info.display.contributor.InfoDisplayContributor;
-import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
+import com.liferay.info.item.InfoItemFormVariation;
+import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.provider.InfoItemFormProvider;
+import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.exception.LayoutPageTemplateEntryNameException;
+import com.liferay.layout.page.template.internal.validator.LayoutPageTemplateEntryValidator;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.base.LayoutPageTemplateEntryLocalServiceBaseImpl;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.NoSuchClassNameException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.ClassName;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ColorScheme;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -40,26 +45,28 @@ import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.ThemeFactoryUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.staging.StagingGroupHelper;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,6 +74,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -101,20 +109,8 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		Company company = _companyLocalService.getCompany(
 			layoutPrototype.getCompanyId());
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		long groupId = company.getGroupId();
-
-		if (serviceContext != null) {
-			long scopeGroupId = serviceContext.getScopeGroupId();
-
-			if (scopeGroupId != 0) {
-				groupId = scopeGroupId;
-			}
-		}
-
-		return addLayoutPageTemplateEntry(groupId, layoutPrototype);
+		return addLayoutPageTemplateEntry(
+			company.getGroupId(), layoutPrototype);
 	}
 
 	/**
@@ -204,17 +200,44 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			serviceContext.getModifiedDate(new Date()));
 		layoutPageTemplateEntry.setLayoutPageTemplateCollectionId(
 			layoutPageTemplateCollectionId);
+		layoutPageTemplateEntry.setLayoutPageTemplateEntryKey(
+			_generateLayoutPageTemplateEntryKey(groupId, name));
 		layoutPageTemplateEntry.setClassNameId(classNameId);
 		layoutPageTemplateEntry.setClassTypeId(classTypeId);
 		layoutPageTemplateEntry.setName(name);
 		layoutPageTemplateEntry.setType(type);
 		layoutPageTemplateEntry.setPreviewFileEntryId(previewFileEntryId);
 		layoutPageTemplateEntry.setDefaultTemplate(defaultTemplate);
+
+		layoutPageTemplateEntry = layoutPageTemplateEntryPersistence.update(
+			layoutPageTemplateEntry);
+
+		if ((type == LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE) &&
+			(layoutPrototypeId == 0)) {
+
+			serviceContext.setAttribute(
+				"layoutPageTemplateEntryId", layoutPageTemplateEntryId);
+
+			LayoutPrototype layoutPrototype =
+				_layoutPrototypeLocalService.addLayoutPrototype(
+					userId, user.getCompanyId(),
+					Collections.singletonMap(
+						LocaleUtil.getMostRelevantLocale(), name),
+					Collections.emptyMap(), true, serviceContext);
+
+			layoutPrototypeId = layoutPrototype.getLayoutPrototypeId();
+
+			Layout layout = layoutPrototype.getLayout();
+
+			plid = layout.getPlid();
+		}
+
 		layoutPageTemplateEntry.setLayoutPrototypeId(layoutPrototypeId);
 
 		if (plid == 0) {
 			Layout layout = _addLayout(
-				userId, groupId, name, type, masterLayoutPlid, serviceContext);
+				userId, groupId, name, type, masterLayoutPlid, status,
+				serviceContext);
 
 			if (layout != null) {
 				plid = layout.getPlid();
@@ -377,6 +400,13 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			}
 		}
 
+		// Portlet file entry
+
+		if (layoutPageTemplateEntry.getPreviewFileEntryId() > 0) {
+			PortletFileRepositoryUtil.deletePortletFileEntry(
+				layoutPageTemplateEntry.getPreviewFileEntryId());
+		}
+
 		// Dynamic data mapping structure link
 
 		if (Objects.equals(
@@ -424,6 +454,14 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		return layoutPageTemplateEntryPersistence.fetchByPrimaryKey(
 			layoutPageTemplateEntryId);
+	}
+
+	@Override
+	public LayoutPageTemplateEntry fetchLayoutPageTemplateEntry(
+		long groupId, String layoutPageTemplateEntryKey) {
+
+		return layoutPageTemplateEntryPersistence.fetchByG_LPTEK(
+			groupId, layoutPageTemplateEntryKey);
 	}
 
 	@Override
@@ -678,8 +716,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		Map<Locale, String> titleMap = Collections.singletonMap(
 			LocaleUtil.getSiteDefault(), name);
 
-		Layout draftLayout = layoutLocalService.fetchLayout(
-			classNameLocalService.getClassNameId(Layout.class),
+		Layout draftLayout = layoutLocalService.fetchDraftLayout(
 			layoutPageTemplateEntry.getPlid());
 
 		ServiceContext serviceContext =
@@ -699,6 +736,19 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			draftLayout.getKeywordsMap(), draftLayout.getRobotsMap(),
 			draftLayout.getType(), draftLayout.isHidden(),
 			draftLayout.getFriendlyURLMap(), draftLayout.getIconImage(), null,
+			draftLayout.getMasterLayoutPlid(),
+			draftLayout.getStyleBookEntryId(), serviceContext);
+
+		Layout layout = layoutLocalService.getLayout(
+			layoutPageTemplateEntry.getPlid());
+
+		layoutLocalService.updateLayout(
+			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
+			layout.getParentLayoutId(), titleMap, titleMap,
+			layout.getDescriptionMap(), layout.getKeywordsMap(),
+			layout.getRobotsMap(), layout.getType(), layout.isHidden(),
+			layout.getFriendlyURLMap(), layout.getIconImage(), null,
+			layout.getMasterLayoutPlid(), layout.getStyleBookEntryId(),
 			serviceContext);
 
 		return layoutPageTemplateEntry;
@@ -733,7 +783,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		_fragmentEntryLinkLocalService.updateFragmentEntryLinks(
 			serviceContext.getUserId(), layoutPageTemplateEntry.getGroupId(),
-			classNameLocalService.getClassNameId(Layout.class.getName()),
 			layoutPageTemplateEntry.getPlid(), fragmentEntryIds, editableValues,
 			serviceContext);
 
@@ -793,24 +842,48 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			long classNameId, long classTypeId, long groupId, Locale locale)
 		throws PortalException {
 
-		ClassName className = _classNameLocalService.getClassName(classNameId);
+		String className = StringPool.BLANK;
 
-		InfoDisplayContributor<?> infoDisplayContributor =
-			_infoDisplayContributorTracker.getInfoDisplayContributor(
-				className.getClassName());
+		try {
+			className = _portal.getClassName(classNameId);
+		}
+		catch (RuntimeException runtimeException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(runtimeException, runtimeException);
+			}
 
-		if (infoDisplayContributor == null) {
 			throw new NoSuchClassNameException(
 				"Class name does not exist for class name ID " + classNameId);
 		}
 
-		List<ClassType> classTypes = infoDisplayContributor.getClassTypes(
-			groupId, locale);
+		InfoItemFormProvider<?> infoItemFormProvider =
+			_infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFormProvider.class, className);
 
-		if (!classTypes.isEmpty() &&
-			!ListUtil.exists(
-				classTypes,
-				classType -> classTypeId == classType.getClassTypeId())) {
+		if (infoItemFormProvider == null) {
+			throw new PortalException(
+				"No item form provider is registered for class name ID " +
+					classNameId);
+		}
+
+		InfoItemFormVariationsProvider<?> infoItemFormVariationsProvider =
+			_infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFormVariationsProvider.class, className);
+
+		if (infoItemFormVariationsProvider == null) {
+			return;
+		}
+
+		Collection<InfoItemFormVariation> infoItemFormVariations =
+			infoItemFormVariationsProvider.getInfoItemFormVariations(groupId);
+
+		Stream<InfoItemFormVariation> stream = infoItemFormVariations.stream();
+
+		if (!infoItemFormVariations.isEmpty() &&
+			!stream.anyMatch(
+				infoItemFormVariation -> Objects.equals(
+					String.valueOf(classTypeId),
+					infoItemFormVariation.getKey()))) {
 
 			throw new NoSuchClassTypeException(
 				"Class type does not exist for class name ID " + classNameId);
@@ -825,12 +898,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 				groupId);
 		}
 
-		for (char c : _BLACKLIST_CHAR) {
-			if (name.indexOf(c) >= 0) {
-				throw new LayoutPageTemplateEntryNameException.
-					MustNotContainInvalidCharacters(c);
-			}
-		}
+		LayoutPageTemplateEntryValidator.validateNameCharacters(name);
 
 		int nameMaxLength = ModelHintsUtil.getMaxLength(
 			LayoutPageTemplateEntry.class.getName(), "name");
@@ -859,7 +927,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 	private Layout _addLayout(
 			long userId, long groupId, String name, int type,
-			long masterLayoutPlid, ServiceContext serviceContext)
+			long masterLayoutPlid, int status, ServiceContext serviceContext)
 		throws PortalException {
 
 		boolean privateLayout = false;
@@ -875,23 +943,29 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		Map<Locale, String> titleMap = Collections.singletonMap(
 			LocaleUtil.getSiteDefault(), name);
 
-		String typeSettings = StringPool.BLANK;
+		UnicodeProperties typeSettingsUnicodeProperties =
+			new UnicodeProperties();
+
+		if (status == WorkflowConstants.STATUS_APPROVED) {
+			typeSettingsUnicodeProperties.put("published", "true");
+		}
 
 		if ((type == LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT) ||
 			(masterLayoutPlid > 0)) {
 
-			UnicodeProperties typeSettingsProperties = new UnicodeProperties();
-
-			typeSettingsProperties.setProperty(
+			typeSettingsUnicodeProperties.setProperty(
 				"lfr-theme:regular:show-footer", Boolean.FALSE.toString());
-			typeSettingsProperties.setProperty(
+			typeSettingsUnicodeProperties.setProperty(
 				"lfr-theme:regular:show-header", Boolean.FALSE.toString());
-			typeSettingsProperties.setProperty(
+			typeSettingsUnicodeProperties.setProperty(
 				"lfr-theme:regular:show-header-search",
 				Boolean.FALSE.toString());
-
-			typeSettings = typeSettingsProperties.toString();
+			typeSettingsUnicodeProperties.setProperty(
+				"lfr-theme:regular:wrap-widget-page-content",
+				Boolean.FALSE.toString());
 		}
+
+		String typeSettings = typeSettingsUnicodeProperties.toString();
 
 		serviceContext.setAttribute(
 			"layout.instanceable.allowed", Boolean.TRUE);
@@ -903,13 +977,40 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		serviceContext.setModifiedDate(layout.getModifiedDate());
 
-		layoutLocalService.addLayout(
+		Layout draftLayout = layoutLocalService.addLayout(
 			userId, groupId, privateLayout, layout.getParentLayoutId(),
 			classNameLocalService.getClassNameId(Layout.class),
 			layout.getPlid(), layout.getNameMap(), titleMap,
 			layout.getDescriptionMap(), layout.getKeywordsMap(),
 			layout.getRobotsMap(), layoutType, layout.getTypeSettings(), true,
 			true, masterLayoutPlid, Collections.emptyMap(), serviceContext);
+
+		if ((type == LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT) ||
+			(masterLayoutPlid > 0)) {
+
+			String defaultRegularThemeId =
+				ThemeFactoryUtil.getDefaultRegularThemeId(
+					layout.getCompanyId());
+
+			String colorSchemeId = _getColorSchemeId(
+				layout.getCompanyId(), defaultRegularThemeId, StringPool.BLANK);
+
+			draftLayout = layoutLocalService.updateLookAndFeel(
+				groupId, privateLayout, draftLayout.getLayoutId(),
+				defaultRegularThemeId, colorSchemeId, StringPool.BLANK);
+
+			layout = layoutLocalService.updateLookAndFeel(
+				groupId, privateLayout, layout.getLayoutId(),
+				defaultRegularThemeId, colorSchemeId, StringPool.BLANK);
+		}
+
+		if (status == WorkflowConstants.STATUS_DRAFT) {
+			layoutLocalService.updateStatus(
+				userId, draftLayout.getPlid(), status, serviceContext);
+
+			layout = layoutLocalService.updateStatus(
+				userId, layout.getPlid(), status, serviceContext);
+		}
 
 		return layout;
 	}
@@ -937,6 +1038,51 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		return copyDLFileEntry.getFileEntryId();
 	}
 
+	private String _generateLayoutPageTemplateEntryKey(
+		long groupId, String name) {
+
+		String layoutPageTemplateEntryKey = StringUtil.toLowerCase(name.trim());
+
+		layoutPageTemplateEntryKey = StringUtil.replace(
+			layoutPageTemplateEntryKey, CharPool.SPACE, CharPool.DASH);
+
+		String curLayoutPageTemplateEntryKey = layoutPageTemplateEntryKey;
+
+		int count = 0;
+
+		while (true) {
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				layoutPageTemplateEntryPersistence.fetchByG_LPTEK(
+					groupId, curLayoutPageTemplateEntryKey);
+
+			if (layoutPageTemplateEntry == null) {
+				return curLayoutPageTemplateEntryKey;
+			}
+
+			curLayoutPageTemplateEntryKey =
+				curLayoutPageTemplateEntryKey + CharPool.DASH + count++;
+		}
+	}
+
+	private String _getColorSchemeId(
+		long companyId, String themeId, String colorSchemeId) {
+
+		Theme theme = _themeLocalService.getTheme(companyId, themeId);
+
+		if (!theme.hasColorSchemes()) {
+			colorSchemeId = StringPool.BLANK;
+		}
+
+		if (Validator.isNull(colorSchemeId)) {
+			ColorScheme colorScheme = _themeLocalService.getColorScheme(
+				companyId, themeId, colorSchemeId);
+
+			colorSchemeId = colorScheme.getColorSchemeId();
+		}
+
+		return colorSchemeId;
+	}
+
 	private String _getUniqueCopyName(
 		long groupId, String sourceName, int type, Locale locale) {
 
@@ -960,13 +1106,8 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		return name;
 	}
 
-	private static final char[] _BLACKLIST_CHAR = {
-		';', '/', '?', ':', '@', '=', '&', '\"', '<', '>', '#', '%', '{', '}',
-		'|', '\\', '^', '~', '[', ']', '`'
-	};
-
-	@Reference
-	private ClassNameLocalService _classNameLocalService;
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutPageTemplateEntryLocalServiceImpl.class);
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -981,10 +1122,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
 	@Reference
-	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
-
-	@Reference
-	private LayoutLocalService _layoutLocalService;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
@@ -997,5 +1135,8 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 	@Reference
 	private StagingGroupHelper _stagingGroupHelper;
+
+	@Reference
+	private ThemeLocalService _themeLocalService;
 
 }

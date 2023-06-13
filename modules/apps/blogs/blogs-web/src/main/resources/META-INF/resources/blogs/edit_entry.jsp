@@ -45,57 +45,20 @@ String coverImageCaption = BeanParamUtil.getString(entry, request, "coverImageCa
 long coverImageFileEntryId = BeanParamUtil.getLong(entry, request, "coverImageFileEntryId");
 long smallImageFileEntryId = BeanParamUtil.getLong(entry, request, "smallImageFileEntryId");
 
+BlogsFileUploadsConfiguration blogsFileUploadsConfiguration = ConfigurationProviderUtil.getSystemConfiguration(BlogsFileUploadsConfiguration.class);
+BlogsGroupServiceSettings blogsGroupServiceSettings = BlogsGroupServiceSettings.getInstance(scopeGroupId);
+
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
 renderResponse.setTitle((entry != null) ? BlogsEntryUtil.getDisplayTitle(resourceBundle, entry) : LanguageUtil.get(request, "new-blog-entry"));
-
-BlogsGroupServiceSettings blogsGroupServiceSettings = BlogsGroupServiceSettings.getInstance(scopeGroupId);
-
-BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortletInstanceConfigurationUtil.getBlogsPortletInstanceConfiguration(themeDisplay);
 %>
-
-<liferay-util:buffer
-	var="saveStatus"
->
-	<c:choose>
-		<c:when test="<%= entry != null %>">
-			<small class="text-capitalize text-muted" id="<portlet:namespace />saveStatus">
-				<aui:workflow-status markupView="lexicon" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= entry.getStatus() %>" />
-
-				<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - entry.getStatusDate().getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
-			</small>
-		</c:when>
-		<c:otherwise>
-			<small class="text-capitalize text-muted" id="<portlet:namespace />saveStatus"></small>
-		</c:otherwise>
-	</c:choose>
-</liferay-util:buffer>
-
-<liferay-util:buffer
-	var="readingTime"
->
-	<c:if test="<%= blogsPortletInstanceConfiguration.enableReadingTime() %>">
-		<small class="reading-time-wrapper text-muted">
-			<liferay-reading-time:reading-time
-				displayStyle="descriptive"
-				id="readingTime"
-				model="<%= entry %>"
-			/>
-		</small>
-	</c:if>
-</liferay-util:buffer>
-
-<liferay-frontend:info-bar
-	fixed="<%= true %>"
->
-	<%= saveStatus %>
-	<%= readingTime %>
-</liferay-frontend:info-bar>
 
 <portlet:actionURL name="/blogs/edit_entry" var="editEntryURL" />
 
-<div class="container-fluid-1280 entry-body">
+<clay:container-fluid
+	cssClass="entry-body"
+>
 	<aui:form action="<%= editEntryURL %>" cssClass="edit-entry" enctype="multipart/form-data" method="post" name="fm" onSubmit="event.preventDefault();">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
@@ -108,20 +71,29 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 			<liferay-ui:error exception="<%= DuplicateFriendlyURLEntryException.class %>" message="the-url-title-is-already-in-use-please-enter-a-unique-url-title" />
 			<liferay-ui:error exception="<%= EntryContentException.class %>" message="please-enter-valid-content" />
 			<liferay-ui:error exception="<%= EntryCoverImageCropException.class %>" message="an-error-occurred-while-cropping-the-cover-image" />
+
+			<liferay-ui:error exception="<%= EntrySmallImageNameException.class %>">
+				<liferay-ui:message key="image-names-must-end-with-one-of-the-following-extensions" /> <%= StringUtil.merge(blogsFileUploadsConfiguration.imageExtensions()) %>.
+			</liferay-ui:error>
+
 			<liferay-ui:error exception="<%= EntryDescriptionException.class %>" message="please-enter-a-valid-abstract" />
 			<liferay-ui:error exception="<%= EntryTitleException.class %>" message="please-enter-a-valid-title" />
 			<liferay-ui:error exception="<%= EntryUrlTitleException.class %>" message="please-enter-a-valid-url-title" />
 
 			<liferay-ui:error exception="<%= LiferayFileItemException.class %>">
-				<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(LiferayFileItem.THRESHOLD_SIZE, locale) %>" key="please-enter-valid-content-with-valid-content-size-no-larger-than-x" translateArguments="<%= false %>" />
+				<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(LiferayFileItem.THRESHOLD_SIZE, locale) %>" key="please-enter-valid-content-with-valid-content-size-no-larger-than-x" translateArguments="<%= false %>" />
 			</liferay-ui:error>
 
 			<liferay-ui:error exception="<%= FileSizeException.class %>">
-				<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(DLValidatorUtil.getMaxAllowableSize(), locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
+				<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(DLValidatorUtil.getMaxAllowableSize(), locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
+			</liferay-ui:error>
+
+			<liferay-ui:error exception="<%= ImageResolutionException.class %>">
+				<liferay-ui:message arguments="<%= new String[] {String.valueOf(PropsValues.IMAGE_TOOL_IMAGE_MAX_HEIGHT), String.valueOf(PropsValues.IMAGE_TOOL_IMAGE_MAX_WIDTH)} %>" key="image-dimensions-exceed-max-dimensions-x-high-x-wide" translateArguments="<%= false %>" />
 			</liferay-ui:error>
 
 			<liferay-ui:error exception="<%= UploadRequestSizeException.class %>">
-				<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(UploadServletRequestConfigurationHelperUtil.getMaxSize(), locale) %>" key="request-is-larger-than-x-and-could-not-be-processed" translateArguments="<%= false %>" />
+				<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(UploadServletRequestConfigurationHelperUtil.getMaxSize(), locale) %>" key="request-is-larger-than-x-and-could-not-be-processed" translateArguments="<%= false %>" />
 			</liferay-ui:error>
 
 			<liferay-asset:asset-categories-error />
@@ -131,7 +103,6 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 			<aui:model-context bean="<%= entry %>" model="<%= BlogsEntry.class %>" />
 
 			<%
-			BlogsFileUploadsConfiguration blogsFileUploadsConfiguration = ConfigurationProviderUtil.getSystemConfiguration(BlogsFileUploadsConfiguration.class);
 			BlogsItemSelectorHelper blogsItemSelectorHelper = (BlogsItemSelectorHelper)request.getAttribute(BlogsWebKeys.BLOGS_ITEM_SELECTOR_HELPER);
 			RequestBackedPortletURLFactory requestBackedPortletURLFactory = RequestBackedPortletURLFactoryUtil.create(liferayPortletRequest);
 			%>
@@ -160,10 +131,13 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 
 					<aui:input name="coverImageCaption" type="hidden" />
 
-					<div class="col-md-8 col-md-offset-2">
+					<clay:col
+						cssClass="col-md-offset-2"
+						md="8"
+					>
 						<div class="cover-image-caption <%= (coverImageFileEntryId == 0) ? "invisible" : "" %>">
 							<small>
-								<liferay-ui:input-editor
+								<liferay-editor:editor
 									contents="<%= coverImageCaption %>"
 									editorName="alloyeditor"
 									name="coverImageCaptionEditor"
@@ -172,39 +146,27 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 								/>
 							</small>
 						</div>
-					</div>
+					</clay:col>
 
-					<div class="col-md-8 col-md-offset-2">
+					<clay:col
+						cssClass="col-md-offset-2"
+						md="8"
+					>
 						<div class="entry-title form-group">
-							<liferay-ui:input-editor
-								contents="<%= HtmlUtil.escape(title) %>"
-								editorName="alloyeditor"
-								name="titleEditor"
-								onChangeMethod="onChangeTitle"
-								placeholder="title"
-								required="<%= true %>"
-								showSource="<%= false %>"
-							>
-								<aui:validator name="required" />
-							</liferay-ui:input-editor>
-						</div>
 
-						<aui:input name="title" type="hidden" />
+							<%
+							int titleMaxLength = ModelHintsUtil.getMaxLength(BlogsEntry.class.getName(), "title");
+							%>
+
+							<aui:input autoSize="<%= true %>" cssClass="form-control-edit form-control-edit-title form-control-unstyled" label="" maxlength="<%= String.valueOf(titleMaxLength) %>" name="title" onChange='<%= liferayPortletResponse.getNamespace() + "onChangeTitle(event.target.value)" %>' placeholder='<%= LanguageUtil.get(request, "title") + StringPool.BLANK + " *" %>' required="<%= true %>" showRequiredLabel="<%= true %>" type="textarea" value="<%= HtmlUtil.escape(title) %>" />
+						</div>
 
 						<div class="entry-subtitle">
-							<liferay-ui:input-editor
-								contents="<%= HtmlUtil.escape(subtitle) %>"
-								editorName="alloyeditor"
-								name="subtitleEditor"
-								placeholder="subtitle"
-								showSource="<%= false %>"
-							/>
+							<aui:input autoSize="<%= true %>" cssClass="form-control-edit form-control-edit-subtitle form-control-unstyled" label="" name="subtitle" placeholder='<%= LanguageUtil.get(request, "subtitle") %>' type="textarea" />
 						</div>
 
-						<aui:input name="subtitle" type="hidden" />
-
 						<div class="entry-content form-group">
-							<liferay-ui:input-editor
+							<liferay-editor:editor
 								contents="<%= content %>"
 								editorName='<%= PropsUtil.get("editor.wysiwyg.portal-web.docroot.html.portlet.blogs.edit_entry.jsp") %>'
 								name="contentEditor"
@@ -213,17 +175,18 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 								required="<%= true %>"
 							>
 								<aui:validator name="required" />
-							</liferay-ui:input-editor>
+							</liferay-editor:editor>
 						</div>
 
 						<aui:input name="content" type="hidden" />
-					</div>
+					</clay:col>
 				</aui:fieldset>
 
 				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="categorization">
 					<liferay-asset:asset-categories-selector
 						className="<%= BlogsEntry.class.getName() %>"
 						classPK="<%= entryId %>"
+						visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
 					/>
 
 					<liferay-asset:asset-tags-selector
@@ -243,8 +206,6 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 
 					<%
 					Portlet portlet = PortletLocalServiceUtil.getPortletById(BlogsPortletKeys.BLOGS);
-
-					String friendlyURLPrefix = StringUtil.shorten("/-/" + portlet.getFriendlyURLMapping(), 40) + StringPool.SLASH;
 					%>
 
 					<div class="clearfix form-group">
@@ -271,7 +232,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 						</div>
 
 						<aui:field-wrapper cssClass="form-group" disabled="<%= automaticURL %>" helpMessage='<%= LanguageUtil.format(resourceBundle, "for-example-x", "<em>one-day-in-the-life-of-marion-cotillard</em>") %>' label="blog-entry-url" name="urlTitle">
-							<div class="form-text"><%= friendlyURLPrefix %></div>
+							<div class="form-text"><%= StringUtil.shorten("/-/" + portlet.getFriendlyURLMapping(), 40) + StringPool.SLASH %></div>
 
 							<aui:input cssClass="input-medium" disabled="<%= automaticURL %>" ignoreRequestValue="<%= true %>" label="" name="urlTitle" prefix="/" type="text" value="<%= urlTitle %>" />
 						</aui:field-wrapper>
@@ -295,7 +256,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 						</div>
 
 						<div class="entry-description form-group">
-							<aui:input disabled="<%= !customAbstract %>" label="description" name="description" onChange='<%= renderResponse.getNamespace() + "setCustomDescription(this.value);" %>' type="text" value="<%= description %>">
+							<aui:input disabled="<%= !customAbstract %>" label="description" name="description" onChange='<%= liferayPortletResponse.getNamespace() + "setCustomDescription(this.value);" %>' type="text" value="<%= description %>">
 								<aui:validator name="required" />
 							</aui:input>
 						</div>
@@ -307,6 +268,9 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 						</div>
 
 						<div class="lfr-blogs-small-image-selector">
+							<c:if test="<%= entry != null %>">
+								<aui:input name="smallImageURL" type="hidden" value="<%= entry.getSmallImageURL() %>" />
+							</c:if>
 
 							<%
 							String smallImageSelectedItemEventName = liferayPortletResponse.getNamespace() + "smallImageSelectedItem";
@@ -327,19 +291,10 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 					<aui:input label="display-date" name="displayDate" />
 
 					<c:if test="<%= (entry != null) && blogsGroupServiceSettings.isEmailEntryUpdatedEnabled() %>">
-
-						<%
-						boolean sendEmailEntryUpdated = ParamUtil.getBoolean(request, "sendEmailEntryUpdated");
-						%>
-
-						<aui:input helpMessage="comments-regarding-the-blog-entry-update" label="send-email-entry-updated" name="sendEmailEntryUpdated" type="toggle-switch" value="<%= sendEmailEntryUpdated %>" />
-
-						<%
-						String emailEntryUpdatedComment = ParamUtil.getString(request, "emailEntryUpdatedComment");
-						%>
+						<aui:input helpMessage="comments-regarding-the-blog-entry-update" label="send-email-entry-updated" name="sendEmailEntryUpdated" type="toggle-switch" value='<%= ParamUtil.getBoolean(request, "sendEmailEntryUpdated") %>' />
 
 						<div id="<portlet:namespace />emailEntryUpdatedCommentWrapper">
-							<aui:input label="" name="emailEntryUpdatedComment" type="textarea" value="<%= emailEntryUpdatedComment %>" />
+							<aui:input label="" name="emailEntryUpdatedComment" type="textarea" value='<%= ParamUtil.getString(request, "emailEntryUpdatedComment") %>' />
 						</div>
 					</c:if>
 
@@ -452,7 +407,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 			<aui:button href="<%= redirect %>" name="cancelButton" type="cancel" />
 		</aui:button-row>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <portlet:actionURL name="/blogs/edit_entry" var="editEntryURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 	<portlet:param name="ajax" value="<%= Boolean.TRUE.toString() %>" />
@@ -501,7 +456,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 				ADD: '<%= Constants.ADD %>',
 				CMD: '<%= Constants.CMD %>',
 				STATUS_DRAFT: '<%= WorkflowConstants.STATUS_DRAFT %>',
-				UPDATE: '<%= Constants.UPDATE %>'
+				UPDATE: '<%= Constants.UPDATE %>',
 			},
 			descriptionLength: '<%= PropsValues.BLOGS_PAGE_ABSTRACT_LENGTH %>',
 			editEntryURL: '<%= editEntryURL %>',
@@ -515,15 +470,15 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 					status: '<%= entry.getStatus() %>',
 					subtitle: '<%= UnicodeFormatter.toString(subtitle) %>',
 					title: '<%= UnicodeFormatter.toString(title) %>',
-					userId: '<%= entry.getUserId() %>'
+					userId: '<%= entry.getUserId() %>',
 				},
 			</c:if>
 
-			namespace: '<portlet:namespace />'
+			namespace: '<portlet:namespace />',
 		})
 	);
 
-	var clearSaveDraftHandle = function(event) {
+	var clearSaveDraftHandle = function (event) {
 		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
 			blogs.destroy();
 
@@ -542,6 +497,7 @@ if (entry != null) {
 	portletURL.setParameter("entryId", String.valueOf(entry.getEntryId()));
 
 	PortalUtil.addPortletBreadcrumbEntry(request, BlogsEntryUtil.getDisplayTitle(resourceBundle, entry), portletURL.toString());
+
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
 }
 else {

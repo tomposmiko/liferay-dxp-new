@@ -16,12 +16,15 @@ package com.liferay.asset.list.service.base;
 
 import com.liferay.asset.list.model.AssetListEntrySegmentsEntryRel;
 import com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalService;
+import com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalServiceUtil;
 import com.liferay.asset.list.service.persistence.AssetListEntrySegmentsEntryRelPersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -42,16 +45,22 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -73,11 +82,15 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>AssetListEntrySegmentsEntryRelLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>AssetListEntrySegmentsEntryRelLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>AssetListEntrySegmentsEntryRelLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the asset list entry segments entry rel to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetListEntrySegmentsEntryRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param assetListEntrySegmentsEntryRel the asset list entry segments entry rel
 	 * @return the asset list entry segments entry rel that was added
@@ -111,6 +124,10 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 	/**
 	 * Deletes the asset list entry segments entry rel with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetListEntrySegmentsEntryRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetListEntrySegmentsEntryRelId the primary key of the asset list entry segments entry rel
 	 * @return the asset list entry segments entry rel that was removed
 	 * @throws PortalException if a asset list entry segments entry rel with the primary key could not be found
@@ -128,6 +145,10 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 	/**
 	 * Deletes the asset list entry segments entry rel from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetListEntrySegmentsEntryRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetListEntrySegmentsEntryRel the asset list entry segments entry rel
 	 * @return the asset list entry segments entry rel that was removed
 	 */
@@ -138,6 +159,18 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 
 		return assetListEntrySegmentsEntryRelPersistence.remove(
 			assetListEntrySegmentsEntryRel);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return assetListEntrySegmentsEntryRelPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -394,6 +427,16 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return assetListEntrySegmentsEntryRelPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -403,6 +446,15 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 				(AssetListEntrySegmentsEntryRel)persistedModel);
 	}
 
+	public BasePersistence<AssetListEntrySegmentsEntryRel>
+		getBasePersistence() {
+
+		return assetListEntrySegmentsEntryRelPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -497,6 +549,10 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 	/**
 	 * Updates the asset list entry segments entry rel in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetListEntrySegmentsEntryRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetListEntrySegmentsEntryRel the asset list entry segments entry rel
 	 * @return the asset list entry segments entry rel that was updated
 	 */
@@ -509,11 +565,17 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 			assetListEntrySegmentsEntryRel);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			AssetListEntrySegmentsEntryRelLocalService.class,
-			IdentifiableOSGiService.class, PersistedModelLocalService.class
+			IdentifiableOSGiService.class, CTService.class,
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -521,6 +583,8 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		assetListEntrySegmentsEntryRelLocalService =
 			(AssetListEntrySegmentsEntryRelLocalService)aopProxy;
+
+		_setLocalServiceUtilService(assetListEntrySegmentsEntryRelLocalService);
 	}
 
 	/**
@@ -533,8 +597,24 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 		return AssetListEntrySegmentsEntryRelLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<AssetListEntrySegmentsEntryRel> getCTPersistence() {
+		return assetListEntrySegmentsEntryRelPersistence;
+	}
+
+	@Override
+	public Class<AssetListEntrySegmentsEntryRel> getModelClass() {
 		return AssetListEntrySegmentsEntryRel.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<AssetListEntrySegmentsEntryRel>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(
+			assetListEntrySegmentsEntryRelPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -563,6 +643,24 @@ public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		AssetListEntrySegmentsEntryRelLocalService
+			assetListEntrySegmentsEntryRelLocalService) {
+
+		try {
+			Field field =
+				AssetListEntrySegmentsEntryRelLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, assetListEntrySegmentsEntryRelLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

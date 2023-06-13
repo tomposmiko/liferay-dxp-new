@@ -58,7 +58,7 @@ for (String previewFileURL : previewFileURLs) {
 					'#<portlet:namespace /><%= randomNamespace %>previewFileContent',
 				fixedAttributes: {
 					allowfullscreen: 'true',
-					wmode: 'opaque'
+					wmode: 'opaque',
 				},
 
 				<c:if test="<%= Validator.isNotNull(oggPreviewFileURL) %>">
@@ -66,18 +66,18 @@ for (String previewFileURL : previewFileURLs) {
 				</c:if>
 
 				<c:if test="<%= Validator.isNotNull(mp3PreviewFileURL) %>">
-					url: '<%= HtmlUtil.escapeJS(mp3PreviewFileURL) %>'
+					url: '<%= HtmlUtil.escapeJS(mp3PreviewFileURL) %>',
 				</c:if>
 			}).render();
 
 			if (audio._audio) {
 				var audioNode = audio._audio.getDOMNode();
 
-				audioNode.addEventListener('pause', function() {
+				audioNode.addEventListener('pause', function () {
 					playing = false;
 				});
 
-				audioNode.addEventListener('play', function() {
+				audioNode.addEventListener('play', function () {
 					window.parent.Liferay.fire(
 						'<portlet:namespace /><%= randomNamespace %>Audio:play'
 					);
@@ -88,7 +88,7 @@ for (String previewFileURL : previewFileURLs) {
 
 			window.parent.Liferay.on(
 				'<portlet:namespace /><%= randomNamespace %>ImageViewer:currentIndexChange',
-				function() {
+				function () {
 					if (playing) {
 						audio.pause();
 					}
@@ -97,7 +97,7 @@ for (String previewFileURL : previewFileURLs) {
 
 			window.parent.Liferay.on(
 				'<portlet:namespace /><%= randomNamespace %>ImageViewer:close',
-				function() {
+				function () {
 					audio.load();
 				}
 			);
@@ -113,20 +113,20 @@ for (String previewFileURL : previewFileURLs) {
 				fixedAttributes: {
 					allowfullscreen: 'true',
 					bgColor: '#000000',
-					wmode: 'opaque'
+					wmode: 'opaque',
 				},
 
 				on: {
-					pause: function() {
+					pause: function () {
 						playing = false;
 					},
-					play: function() {
+					play: function () {
 						window.parent.Liferay.fire(
 							'<portlet:namespace /><%= randomNamespace %>Video:play'
 						);
 
 						playing = true;
-					}
+					},
 				},
 
 				<c:if test="<%= Validator.isNotNull(ogvPreviewFileURL) %>">
@@ -136,13 +136,13 @@ for (String previewFileURL : previewFileURLs) {
 				poster: '<%= HtmlUtil.escapeJS(videoThumbnailURL) %>',
 
 				<c:if test="<%= Validator.isNotNull(mp4PreviewFileURL) %>">
-					url: '<%= HtmlUtil.escapeJS(mp4PreviewFileURL) %>'
+					url: '<%= HtmlUtil.escapeJS(mp4PreviewFileURL) %>',
 				</c:if>
 			}).render();
 
 			window.parent.Liferay.on(
 				'<portlet:namespace /><%= randomNamespace %>ImageViewer:currentIndexChange',
-				function() {
+				function () {
 					if (playing) {
 						video.pause();
 					}
@@ -151,7 +151,7 @@ for (String previewFileURL : previewFileURLs) {
 
 			window.parent.Liferay.on(
 				'<portlet:namespace /><%= randomNamespace %>ImageViewer:close',
-				function() {
+				function () {
 					video.load();
 				}
 			);

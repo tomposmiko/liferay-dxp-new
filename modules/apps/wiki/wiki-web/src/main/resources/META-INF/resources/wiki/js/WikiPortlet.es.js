@@ -23,6 +23,7 @@ import {EventHandler} from 'metal-events';
  * @extends {Component}
  */
 class WikiPortlet extends PortletBase {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -43,7 +44,7 @@ class WikiPortlet extends PortletBase {
 			this.currentFormatIndex = formatSelect.selectedIndex;
 
 			this.eventHandler_.add(
-				formatSelect.addEventListener('change', e => {
+				formatSelect.addEventListener('change', (e) => {
 					this.changeWikiFormat_(e);
 				})
 			);
@@ -53,7 +54,7 @@ class WikiPortlet extends PortletBase {
 
 		if (publishButton) {
 			this.eventHandler_.add(
-				publishButton.addEventListener('click', e => {
+				publishButton.addEventListener('click', (e) => {
 					this.publishPage_(e);
 				})
 			);
@@ -63,7 +64,7 @@ class WikiPortlet extends PortletBase {
 
 		if (saveButton) {
 			this.eventHandler_.add(
-				saveButton.addEventListener('click', e => {
+				saveButton.addEventListener('click', (e) => {
 					this.saveDraft_(e);
 				})
 			);
@@ -71,7 +72,7 @@ class WikiPortlet extends PortletBase {
 
 		const searchContainerId = this.ns('pageAttachments');
 
-		Liferay.componentReady(searchContainerId).then(searchContainer => {
+		Liferay.componentReady(searchContainerId).then((searchContainer) => {
 			this.eventHandler_.add(
 				searchContainer
 					.get('contentBox')
@@ -109,7 +110,8 @@ class WikiPortlet extends PortletBase {
 		if (confirm(confirmMessage)) {
 			this.one('form').setAttribute('action', this.renderUrl);
 			this.save_();
-		} else {
+		}
+		else {
 			formatSelect.selectedIndex = this.currentFormatIndex;
 		}
 	}
@@ -169,10 +171,11 @@ class WikiPortlet extends PortletBase {
 
 		if (tempImages.length > 0) {
 			if (confirm(this.strings.confirmDiscardImages)) {
-				tempImages.forEach(node => {
+				tempImages.forEach((node) => {
 					node.parentElement.remove();
 				});
-			} else {
+			}
+			else {
 				discardTempImages = false;
 			}
 		}
@@ -188,12 +191,6 @@ class WikiPortlet extends PortletBase {
 	save_() {
 		if (this.removeTempImages_()) {
 			this.one('#' + this.constants.CMD).value = this.currentAction;
-
-			const titleEditor = window[this.ns('titleEditor')];
-
-			if (titleEditor) {
-				this.one('#title').value = titleEditor.getText();
-			}
 
 			const contentEditor = window[this.ns('contentEditor')];
 
@@ -223,6 +220,7 @@ class WikiPortlet extends PortletBase {
  * @type {!Object}
  */
 WikiPortlet.STATE = {
+
 	/**
 	 * Portlet's constants
 	 * @instance
@@ -230,7 +228,7 @@ WikiPortlet.STATE = {
 	 * @type {!Object}
 	 */
 	constants: {
-		validator: core.isObject
+		validator: core.isObject,
 	},
 
 	/**
@@ -241,7 +239,7 @@ WikiPortlet.STATE = {
 	 * @type {String}
 	 */
 	currentAction: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -251,7 +249,7 @@ WikiPortlet.STATE = {
 	 * @type {String}
 	 */
 	renderUrl: {
-		validator: core.isString
+		validator: core.isString,
 	},
 
 	/**
@@ -268,9 +266,9 @@ WikiPortlet.STATE = {
 			),
 			confirmLoseFormatting: Liferay.Language.get(
 				'you-may-lose-formatting-when-switching-from-x-to-x'
-			)
-		}
-	}
+			),
+		},
+	},
 };
 
 export default WikiPortlet;

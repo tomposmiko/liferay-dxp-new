@@ -32,7 +32,6 @@ import com.liferay.registry.util.StringPlus;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -93,18 +92,21 @@ public abstract class BaseAuthTokenWhitelist implements AuthTokenWhitelist {
 	}
 
 	protected void registerPortalProperty(String key) {
-		Registry registry = RegistryUtil.getRegistry();
-
 		String[] values = PropsUtil.getArray(key);
 
-		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
-			key, values
-		).build();
+		if (values.length > 0) {
+			Registry registry = RegistryUtil.getRegistry();
 
-		ServiceRegistration<Object> serviceRegistration =
-			registry.registerService(Object.class, new Object(), properties);
+			ServiceRegistration<Object> serviceRegistration =
+				registry.registerService(
+					Object.class, new Object(),
+					HashMapBuilder.<String, Object>put(
+						key, values
+					).build());
 
-		serviceRegistrations.put(StringUtil.merge(values), serviceRegistration);
+			serviceRegistrations.put(
+				StringUtil.merge(values), serviceRegistration);
+		}
 	}
 
 	protected ServiceTracker<Object, Object> trackWhitelistServices(

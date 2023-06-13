@@ -16,11 +16,12 @@ package com.liferay.portal.configuration.metatype.util;
 
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-
-import java.util.Map;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -28,28 +29,30 @@ import org.junit.Test;
  */
 public class ParameterMapUtilWhenSettingAParameterMapTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
 	public void setUp() throws ConfigurationException {
-		ParameterMapUtilTestUtil.TestBean testBean =
-			ParameterMapUtilTestUtil.getTestBean();
-
-		Map<String, String[]> parameterMap = HashMapBuilder.put(
-			"testBoolean1", new String[] {"false"}
-		).put(
-			"testString1",
-			new String[] {ParameterMapUtilTestUtil.PARAMETER_MAP_STRING}
-		).put(
-			"testStringArray1",
-			ParameterMapUtilTestUtil.PARAMETER_MAP_STRING_ARRAY
-		).build();
-
 		_testBean = ParameterMapUtil.setParameterMap(
-			ParameterMapUtilTestUtil.TestBean.class, testBean, parameterMap);
+			ParameterMapUtilTestUtil.TestBean.class,
+			ParameterMapUtilTestUtil.getTestBean(),
+			HashMapBuilder.put(
+				"testBoolean1", new String[] {"false"}
+			).put(
+				"testString1",
+				new String[] {ParameterMapUtilTestUtil.PARAMETER_MAP_STRING}
+			).put(
+				"testStringArray1",
+				ParameterMapUtilTestUtil.PARAMETER_MAP_STRING_ARRAY
+			).build());
 	}
 
 	@Test
 	public void testValuesInTheParameterMapAreReadFirst() {
-		Assert.assertEquals(false, _testBean.testBoolean1());
+		Assert.assertFalse(_testBean.testBoolean1());
 		Assert.assertEquals(
 			ParameterMapUtilTestUtil.PARAMETER_MAP_STRING,
 			_testBean.testString1());
@@ -60,7 +63,7 @@ public class ParameterMapUtilWhenSettingAParameterMapTest {
 
 	@Test
 	public void testValuesNotInTheParameterMapAreReadFromBean() {
-		Assert.assertEquals(true, _testBean.testBoolean2());
+		Assert.assertTrue(_testBean.testBoolean2());
 		Assert.assertEquals(
 			ParameterMapUtilTestUtil.TEST_BEAN_STRING, _testBean.testString2());
 		Assert.assertArrayEquals(

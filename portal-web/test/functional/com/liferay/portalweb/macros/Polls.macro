@@ -183,7 +183,7 @@ definition {
 	macro addPollPG {
 		Click(locator1 = "Polls#ADD_NEW_POLL");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		LexiconEntry.gotoAdd();
 
@@ -206,9 +206,9 @@ definition {
 
 	macro DeletePollCP {
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Polls");
+			category = "Content & Data",
+			portlet = "Polls",
+			site = "${site}");
 
 		Click(
 			key_pollsQuestionTitle = "${pollsQuestionTitle}",
@@ -223,12 +223,32 @@ definition {
 			value1 = "Your request completed successfully.");
 	}
 
+	macro selectPollPageEditor {
+		Portlet.gotoPortletOptions(
+			portletName = "Polls Display",
+			portletOption = "Configuration");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		Select(
+			locator1 = "Polls#TITLE_DROPDOWN_SELECT",
+			value1 = "${pollsQuestionTitle}");
+
+		PortletEntry.save();
+
+		AssertSelectedLabel(
+			locator1 = "Polls#TITLE_DROPDOWN_SELECT",
+			value1 = "${pollsQuestionTitle}");
+
+		SelectFrame(value1 = "relative=top");
+	}
+
 	macro selectPollPG {
 		MouseOver.mouseOverNotVisible(locator1 = "Polls#SELECT_QUESTION");
 
 		Click(locator1 = "Polls#SELECT_QUESTION");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		Select(
 			locator1 = "Polls#TITLE_DROPDOWN_SELECT",
@@ -247,8 +267,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Polls");
 
 		while (IsElementPresent(locator1 = "Polls#POLLS_TABLE_ACTIONS_GENERIC")) {
@@ -269,7 +288,7 @@ definition {
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Polls#POLL_QUESTION",
-			value1 = "What is your favorite Liferay portlet?");
+			value1 = "${pollsQuestion}");
 
 		for (var questionChoiceList : list "${pollsQuestionChoiceList}") {
 			var key_pollsQuestionChoice = "${questionChoiceList}";

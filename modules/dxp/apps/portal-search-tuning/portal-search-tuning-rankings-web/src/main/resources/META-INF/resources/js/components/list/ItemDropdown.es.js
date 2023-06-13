@@ -23,18 +23,18 @@ class ItemDropdown extends Component {
 		itemCount: PropTypes.number,
 		onClickHide: PropTypes.func,
 		onClickPin: PropTypes.func,
-		pinned: PropTypes.bool
+		pinned: PropTypes.bool,
 	};
 
 	static defaultProps = {
-		itemCount: 1
+		itemCount: 1,
 	};
 
 	state = {
-		show: false
+		show: false,
 	};
 
-	_handleDropdownAction = actionFn => event => {
+	_handleDropdownAction = (actionFn) => (event) => {
 		event.preventDefault();
 
 		actionFn(event);
@@ -42,7 +42,7 @@ class ItemDropdown extends Component {
 		this.setState({show: false});
 	};
 
-	_handleSetShow = value => {
+	_handleSetShow = (value) => {
 		this.setState({show: value});
 	};
 

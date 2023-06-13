@@ -12,11 +12,10 @@
  * details.
  */
 
-(function() {
-	var adjustScrollTop = function() {
-		var controlMenu;
-		var controlMenuId;
-		var controlMenuScroll;
+(function () {
+	var adjustScrollTop = function () {
+		var controlMenuContainer;
+		var controlMenuContainerScroll;
 		var errorFieldLabel;
 		var labelScroll;
 
@@ -30,19 +29,28 @@
 			window.scrollBy(0, -labelScroll);
 		}
 
-		if (Liferay.ControlMenu) {
-			controlMenuId = Liferay.ControlMenu._namespace + 'ControlMenu';
-			controlMenu = document.getElementById(controlMenuId);
+		controlMenuContainer = document.querySelector(
+			'.control-menu-container'
+		);
 
-			if (controlMenu) {
-				controlMenuScroll = controlMenu.offsetHeight || 0;
+		if (controlMenuContainer) {
+			controlMenuContainerScroll = controlMenuContainer.offsetHeight || 0;
 
-				window.scrollBy(0, -controlMenuScroll);
-			}
+			window.scrollBy(0, -controlMenuContainerScroll);
 		}
 	};
 
-	var handleFormRegistered = function(event) {
+	window.addEventListener('hashchange', adjustScrollTop);
+
+	var handlePageLoad = function () {
+		if (window.location.hash) {
+			adjustScrollTop();
+		}
+	};
+
+	window.addEventListener('load', handlePageLoad);
+
+	var handleFormRegistered = function (event) {
 		if (event.form && event.form.formValidator) {
 			AUI().Do.after(
 				adjustScrollTop,

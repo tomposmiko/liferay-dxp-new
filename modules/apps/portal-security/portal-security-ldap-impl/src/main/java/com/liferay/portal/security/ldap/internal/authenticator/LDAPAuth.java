@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.security.auth.PasswordModificationThreadLocal;
 import com.liferay.portal.kernel.security.ldap.LDAPSettings;
 import com.liferay.portal.kernel.security.pwd.PasswordEncryptor;
+import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -54,6 +55,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import javax.naming.AuthenticationException;
@@ -250,7 +252,10 @@ public class LDAPAuth implements Authenticator {
 				String ldapPassword = new String((byte[])userPassword.get());
 
 				if (Validator.isNotNull(
-						ldapAuthConfiguration.passwordEncryptionAlgorithm())) {
+						ldapAuthConfiguration.passwordEncryptionAlgorithm()) &&
+					!Objects.equals(
+						ldapAuthConfiguration.passwordEncryptionAlgorithm(),
+						PasswordEncryptorUtil.TYPE_NONE)) {
 
 					ldapPassword = removeEncryptionAlgorithm(ldapPassword);
 
@@ -295,7 +300,7 @@ public class LDAPAuth implements Authenticator {
 			return FAILURE;
 		}
 
-		NamingEnumeration<SearchResult> enu = null;
+		NamingEnumeration<SearchResult> enumeration = null;
 
 		try {
 			LDAPServerConfiguration ldapServerConfiguration =
@@ -342,11 +347,11 @@ public class LDAPAuth implements Authenticator {
 				SearchControls.SUBTREE_SCOPE, 1, 0,
 				new String[] {userMappingsScreenName}, false, false);
 
-			enu = safeLdapContext.search(
+			enumeration = safeLdapContext.search(
 				LDAPUtil.getBaseDNSafeLdapName(ldapServerConfiguration),
 				authSearchSafeLdapFilterTemplate, searchControls);
 
-			if (!enu.hasMoreElements()) {
+			if (!enumeration.hasMoreElements()) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"No results found with search filter: " +
@@ -362,7 +367,7 @@ public class LDAPAuth implements Authenticator {
 						authSearchSafeLdapFilterTemplate);
 			}
 
-			SearchResult searchResult = enu.nextElement();
+			SearchResult searchResult = enumeration.nextElement();
 
 			Attributes attributes = _portalLDAP.getUserAttributes(
 				ldapServerId, companyId, safeLdapContext,
@@ -457,8 +462,8 @@ public class LDAPAuth implements Authenticator {
 			return FAILURE;
 		}
 		finally {
-			if (enu != null) {
-				enu.close();
+			if (enumeration != null) {
+				enumeration.close();
 			}
 
 			safeLdapContext.close();

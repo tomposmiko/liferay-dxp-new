@@ -1,5 +1,11 @@
 definition {
 
+	macro clickBookmarkIcon {
+		Click(
+			key_socialBookmark = StringUtil.toLowerCase("${socialBookmark}"),
+			locator1 = "SocialBookmarks#SOCIAL_BOOKMARK_ICON");
+	}
+
 	macro viewBookmarkIcons {
 		for (var socialBookmark : list "${socialBookmarks}") {
 			AssertElementPresent(
@@ -9,7 +15,7 @@ definition {
 	}
 
 	macro viewBookmarkMenuItems {
-		Click(locator1 = "Icon#SHARE");
+		Click.pauseClickAt(locator1 = "Icon#SHARE");
 
 		for (var socialBookmark : list "${socialBookmarks}") {
 			MenuItem.viewPresent(menuItem = "${socialBookmark}");

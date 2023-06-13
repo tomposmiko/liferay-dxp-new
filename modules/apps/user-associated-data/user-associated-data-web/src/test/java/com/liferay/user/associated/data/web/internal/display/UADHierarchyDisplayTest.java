@@ -17,6 +17,7 @@ package com.liferay.user.associated.data.web.internal.display;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.user.associated.data.display.UADHierarchyDeclaration;
 
 import java.util.HashMap;
@@ -25,12 +26,19 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Drew Brokke
  */
 public class UADHierarchyDisplayTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -108,7 +116,7 @@ public class UADHierarchyDisplayTest {
 
 	@Test
 	public void testFieldValueCount() throws Exception {
-		List items = _uadHierarchyDisplay.search(
+		List<Object> items = _uadHierarchyDisplay.search(
 			DummyContainer.class, DummyService.DEFAULT_CONTAINER_ID, _USER_ID,
 			null, "", null, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
@@ -134,11 +142,12 @@ public class UADHierarchyDisplayTest {
 		for (DummyContainer dummyContainer :
 				_dummyContainerService.getEntities()) {
 
-			List items = _uadHierarchyDisplay.search(
+			List<Object> items = _uadHierarchyDisplay.search(
 				DummyContainer.class, dummyContainer.getId(), _USER_ID, null,
 				"", "name", "asc", QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 			Assert.assertEquals(
+				items.toString(),
 				(int)_userFolderAndItemCountMap.get(dummyContainer.getId()),
 				items.size());
 		}

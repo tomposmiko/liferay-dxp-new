@@ -17,7 +17,11 @@ package com.liferay.data.engine.service.impl;
 import com.liferay.data.engine.model.DEDataDefinitionFieldLink;
 import com.liferay.data.engine.service.base.DEDataDefinitionFieldLinkLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.ServiceContext;
 
+import java.util.Date;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -34,14 +38,39 @@ public class DEDataDefinitionFieldLinkLocalServiceImpl
 
 	@Override
 	public DEDataDefinitionFieldLink addDEDataDefinitionFieldLink(
-		long groupId, long classNameId, long classPK, long ddmStructureId,
-		String fieldName) {
+			long groupId, long classNameId, long classPK, long ddmStructureId,
+			String fieldName)
+		throws PortalException {
+
+		return addDEDataDefinitionFieldLink(
+			groupId, classNameId, classPK, ddmStructureId, fieldName,
+			new ServiceContext());
+	}
+
+	@Override
+	public DEDataDefinitionFieldLink addDEDataDefinitionFieldLink(
+			long groupId, long classNameId, long classPK, long ddmStructureId,
+			String fieldName, ServiceContext serviceContext)
+		throws PortalException {
 
 		DEDataDefinitionFieldLink deDataDefinitionFieldLink =
 			deDataDefinitionFieldLinkPersistence.create(
 				counterLocalService.increment());
 
+		deDataDefinitionFieldLink.setUuid(serviceContext.getUuid());
 		deDataDefinitionFieldLink.setGroupId(groupId);
+
+		Group group = groupLocalService.getGroup(groupId);
+
+		deDataDefinitionFieldLink.setCompanyId(group.getCompanyId());
+
+		Date now = new Date();
+
+		deDataDefinitionFieldLink.setCreateDate(
+			serviceContext.getCreateDate(now));
+		deDataDefinitionFieldLink.setModifiedDate(
+			serviceContext.getModifiedDate(now));
+
 		deDataDefinitionFieldLink.setClassNameId(classNameId);
 		deDataDefinitionFieldLink.setClassPK(classPK);
 		deDataDefinitionFieldLink.setDdmStructureId(ddmStructureId);
@@ -64,20 +93,82 @@ public class DEDataDefinitionFieldLinkLocalServiceImpl
 		deDataDefinitionFieldLinkPersistence.removeByC_C(classNameId, classPK);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             DEDataDefinitionFieldLinkLocalServiceImpl#deleteDEDataDefinitionFieldLinks(
+	 *             long, long, String[])}
+	 */
+	@Deprecated
 	@Override
 	public void deleteDEDataDefinitionFieldLinks(
 		long classNameId, long ddmStructureId, String fieldName) {
 
-		deDataDefinitionFieldLinkPersistence.removeByC_DDMSI_F(
-			classNameId, ddmStructureId, fieldName);
+		deleteDEDataDefinitionFieldLinks(
+			classNameId, ddmStructureId, new String[] {fieldName});
+	}
+
+	@Override
+	public void deleteDEDataDefinitionFieldLinks(
+		long classNameId, long ddmStructureId, String[] fieldNames) {
+
+		for (String fieldName : fieldNames) {
+			deDataDefinitionFieldLinkPersistence.removeByC_DDMSI_F(
+				classNameId, ddmStructureId, fieldName);
+		}
+	}
+
+	@Override
+	public DEDataDefinitionFieldLink fetchDEDataDefinitionFieldLinks(
+		long classNameId, long classPK, long ddmStructureId, String fieldName) {
+
+		return deDataDefinitionFieldLinkPersistence.fetchByC_C_DDMSI_F(
+			classNameId, classPK, ddmStructureId, fieldName);
 	}
 
 	@Override
 	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
+		long ddmStructureId) {
+
+		return deDataDefinitionFieldLinkPersistence.findByDDMStructureId(
+			ddmStructureId);
+	}
+
+	@Override
+	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
+		long classNameId, long ddmStructureId) {
+
+		return deDataDefinitionFieldLinkPersistence.findByC_DDMSI(
+			classNameId, ddmStructureId);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             DEDataDefinitionFieldLinkLocalServiceImpl#getDEDataDefinitionFieldLinks(
+	 *             long, long, String[])}
+	 */
+	@Deprecated
+	@Override
+	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
 		long classNameId, long ddmStructureId, String fieldName) {
 
+		return getDEDataDefinitionFieldLinks(
+			classNameId, ddmStructureId, new String[] {fieldName});
+	}
+
+	@Override
+	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
+		long classNameId, long ddmStructureId, String[] fieldNames) {
+
 		return deDataDefinitionFieldLinkPersistence.findByC_DDMSI_F(
-			classNameId, ddmStructureId, fieldName);
+			classNameId, ddmStructureId, fieldNames);
+	}
+
+	@Override
+	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
+		long ddmStructureId, String[] fieldNames) {
+
+		return deDataDefinitionFieldLinkPersistence.findByDDMSI_F(
+			ddmStructureId, fieldNames);
 	}
 
 }

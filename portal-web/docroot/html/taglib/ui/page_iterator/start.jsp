@@ -56,6 +56,7 @@ if (Validator.isNull(id)) {
 }
 
 int start = (cur - 1) * delta;
+
 int end = cur * delta;
 
 if (end > total) {
@@ -75,22 +76,24 @@ else {
 	}
 }
 
-String deltaURL = HttpUtil.removeParameter(url, namespace + deltaParam);
+if (deltaConfigurable) {
+	url = HttpUtil.setParameter(url, namespace + deltaParam, String.valueOf(delta));
+}
 
 NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-
-if (forcePost && (portletURL != null)) {
-	url = url.split(namespace)[0];
 %>
+
+<c:if test="<%= forcePost && (portletURL != null) %>">
+
+	<%
+	url = url.split(namespace)[0];
+	%>
 
 	<form action="<%= HtmlUtil.escapeAttribute(url) %>" id="<%= randomNamespace + namespace %>pageIteratorFm" method="post" name="<%= randomNamespace + namespace %>pageIteratorFm">
 		<aui:input name="<%= curParam %>" type="hidden" />
 		<liferay-portlet:renderURLParams portletURL="<%= portletURL %>" />
 	</form>
-
-<%
-}
-%>
+</c:if>
 
 <c:if test='<%= type.equals("approximate") || type.equals("more") || type.equals("regular") || (type.equals("article") && (total > resultRowsSize)) %>'>
 	<div class="taglib-page-iterator" id="<%= namespace + id %>">
@@ -204,7 +207,7 @@ if (forcePost && (portletURL != null)) {
 								<liferay-ui:icon
 									message="<%= String.valueOf(i) %>"
 									onClick='<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>'
-									url='<%= HtmlUtil.escapeJS(url + namespace + curParam + "=" + i + urlAnchor) %>'
+									url="<%= HtmlUtil.escapeJSLink(HttpUtil.setParameter(url + urlAnchor, namespace + curParam, i)) %>"
 								/>
 
 							<%
@@ -234,12 +237,14 @@ if (forcePost && (portletURL != null)) {
 										if (curDelta > SearchContainer.MAX_DELTA) {
 											continue;
 										}
+
+										String curDeltaURL = HttpUtil.setParameter(url + urlAnchor, namespace + deltaParam, curDelta);
 									%>
 
 										<liferay-ui:icon
 											message="<%= String.valueOf(curDelta) %>"
 											onClick='<%= forcePost ? _getOnClick(namespace, deltaParam, curDelta) : "" %>'
-											url='<%= HtmlUtil.escapeJS(deltaURL + "&" + namespace + deltaParam + "=" + curDelta + urlAnchor) %>'
+											url="<%= HtmlUtil.escapeJSLink(curDeltaURL) %>"
 										/>
 
 									<%
@@ -320,7 +325,7 @@ private String _getHREF(String formName, String curParam, int cur, String jsCall
 	String href = null;
 
 	if (Validator.isNotNull(url)) {
-		href = HtmlUtil.escape(url + curParam + "=" + cur + urlAnchor);
+		href = HtmlUtil.escapeHREF(HttpUtil.addParameter(HttpUtil.removeParameter(url, curParam) + urlAnchor, curParam, cur));
 	}
 	else {
 		href = "javascript:document." + formName + "." + curParam + ".value = '" + cur + "'; " + jsCall;
@@ -328,9 +333,7 @@ private String _getHREF(String formName, String curParam, int cur, String jsCall
 
 	return href;
 }
-%>
 
-<%!
 private String _getOnClick(String namespace, String curParam, int cur) {
 	return "event.preventDefault(); " + namespace + "submitForm('" + namespace + curParam + "','" + cur + "');";
 }

@@ -23,10 +23,14 @@ import com.liferay.adaptive.media.image.html.constants.AMImageHTMLConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -58,13 +62,26 @@ public class AMBackwardsCompatibilityHtmlContentTransformer
 			return html;
 		}
 
-		return super.transform(html);
+		Document document = _parseDocument(html);
+
+		for (Element imgElement : document.select("img:not(picture > img)")) {
+			String imgElementString = imgElement.toString();
+
+			String replacement = super.transform(imgElementString);
+
+			imgElement.replaceWith(_parseNode(replacement));
+		}
+
+		Element body = document.body();
+
+		return body.html();
 	}
 
 	@Override
 	protected FileEntry getFileEntry(Matcher matcher) throws PortalException {
-		if (StringUtil.containsIgnoreCase(
-				matcher.group(0),
+		String imgTag = matcher.group(0);
+
+		if (imgTag.contains(
 				AMImageHTMLConstants.ATTRIBUTE_NAME_FILE_ENTRY_ID)) {
 
 			return null;
@@ -102,9 +119,30 @@ public class AMBackwardsCompatibilityHtmlContentTransformer
 		return _amImageHTMLTagFactory.create(originalImgTag, fileEntry);
 	}
 
+	private Document _parseDocument(String html) {
+		Document document = Jsoup.parseBodyFragment(html);
+
+		Document.OutputSettings outputSettings = new Document.OutputSettings();
+
+		outputSettings.prettyPrint(false);
+		outputSettings.syntax(Document.OutputSettings.Syntax.xml);
+
+		document.outputSettings(outputSettings);
+
+		return document;
+	}
+
+	private Node _parseNode(String tag) {
+		Document document = _parseDocument(tag);
+
+		Node bodyNode = document.body();
+
+		return bodyNode.childNode(0);
+	}
+
 	private static final Pattern _pattern = Pattern.compile(
-		"<img\\s+src=['\"]/documents/(\\d+)/(\\d+)/([^/?]+)" +
-			"(?:/([-0-9a-fA-F]+))?(?:\\?t=\\d+)?['\"]\\s*/>");
+		"<img\\s+(?:[^>]*\\s)*src=['\"](?:/?[^\\s]*)/documents/(\\d+)/(\\d+)" +
+			"/([^/?]+)(?:/([-0-9a-fA-F]+))?(?:\\?t=\\d+)?['\"][^>]*/>");
 
 	@Reference
 	private AMImageHTMLTagFactory _amImageHTMLTagFactory;

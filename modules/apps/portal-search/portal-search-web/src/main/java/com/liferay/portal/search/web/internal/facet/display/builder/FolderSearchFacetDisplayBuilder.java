@@ -15,15 +15,20 @@
 package com.liferay.portal.search.web.internal.facet.display.builder;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
+import com.liferay.portal.kernel.theme.PortletDisplay;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.facet.display.context.FolderSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.FolderSearchFacetTermDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.FolderTitleLookup;
+import com.liferay.portal.search.web.internal.folder.facet.configuration.FolderFacetPortletInstanceConfiguration;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,10 +37,25 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.portlet.RenderRequest;
+
 /**
  * @author Lino Alves
  */
 public class FolderSearchFacetDisplayBuilder {
+
+	public FolderSearchFacetDisplayBuilder(RenderRequest renderRequest)
+		throws ConfigurationException {
+
+		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+
+		_folderFacetPortletInstanceConfiguration =
+			portletDisplay.getPortletInstanceConfiguration(
+				FolderFacetPortletInstanceConfiguration.class);
+	}
 
 	public FolderSearchFacetDisplayContext build() {
 		FolderSearchFacetDisplayContext folderSearchFacetDisplayContext =
@@ -45,10 +65,16 @@ public class FolderSearchFacetDisplayBuilder {
 			folderSearchFacetTermDisplayContexts =
 				buildFolderSearchFacetTermDisplayContexts();
 
+		folderSearchFacetDisplayContext.setDisplayStyleGroupId(
+			getDisplayStyleGroupId());
 		folderSearchFacetDisplayContext.setFolderSearchFacetTermDisplayContexts(
 			folderSearchFacetTermDisplayContexts);
-
+		folderSearchFacetDisplayContext.
+			setFolderFacetPortletInstanceConfiguration(
+				_folderFacetPortletInstanceConfiguration);
 		folderSearchFacetDisplayContext.setNothingSelected(isNothingSelected());
+		folderSearchFacetDisplayContext.setPaginationStartParameterName(
+			_paginationStartParameterName);
 		folderSearchFacetDisplayContext.setParameterName(_parameterName);
 		folderSearchFacetDisplayContext.setParameterValue(
 			getFirstParameterValueString());
@@ -79,6 +105,12 @@ public class FolderSearchFacetDisplayBuilder {
 
 	public void setMaxTerms(int maxTerms) {
 		_maxTerms = maxTerms;
+	}
+
+	public void setPaginationStartParameterName(
+		String paginationStartParameterName) {
+
+		_paginationStartParameterName = paginationStartParameterName;
 	}
 
 	public void setParameterName(String parameterName) {
@@ -187,6 +219,17 @@ public class FolderSearchFacetDisplayBuilder {
 		return null;
 	}
 
+	protected long getDisplayStyleGroupId() {
+		long displayStyleGroupId =
+			_folderFacetPortletInstanceConfiguration.displayStyleGroupId();
+
+		if (displayStyleGroupId <= 0) {
+			displayStyleGroupId = _themeDisplay.getScopeGroupId();
+		}
+
+		return displayStyleGroupId;
+	}
+
 	protected FolderSearchFacetTermDisplayContext
 		getEmptyFolderSearchFacetTermDisplayContext(long folderId) {
 
@@ -235,6 +278,10 @@ public class FolderSearchFacetDisplayBuilder {
 	}
 
 	protected List<TermCollector> getTermCollectors() {
+		if (_facet == null) {
+			return Collections.emptyList();
+		}
+
 		FacetCollector facetCollector = _facet.getFacetCollector();
 
 		if (facetCollector == null) {
@@ -276,11 +323,15 @@ public class FolderSearchFacetDisplayBuilder {
 	}
 
 	private Facet _facet;
+	private final FolderFacetPortletInstanceConfiguration
+		_folderFacetPortletInstanceConfiguration;
 	private FolderTitleLookup _folderTitleLookup;
 	private boolean _frequenciesVisible;
 	private int _frequencyThreshold;
 	private int _maxTerms;
+	private String _paginationStartParameterName;
 	private String _parameterName;
 	private List<Long> _selectedFolderIds = Collections.emptyList();
+	private final ThemeDisplay _themeDisplay;
 
 }

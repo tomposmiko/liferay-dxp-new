@@ -43,11 +43,6 @@ components:
                     example: 2019-27-09'T'08:23:33'Z'
                     format: date-time
                     type: string
-                version:
-                    description:
-                        The version of item class.
-                    example: v1.0
-                    type: string
             type: object
         ImportTask:
             # @review
@@ -98,15 +93,8 @@ components:
                     example: 2019-27-09'T'08:23:33'Z'
                     format: date-time
                     type: string
-                version:
-                    description:
-                        The version of item class.
-                    example: v1.0
-                    type: string
             type: object
 info:
-    description:
-        ""
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -139,6 +127,10 @@ paths:
                   name: fieldNames
                   schema:
                       type: string
+                - in: query
+                  name: taskItemDelegateName
+                  schema:
+                      type: string
             responses:
                 202:
                     content:
@@ -150,29 +142,6 @@ paths:
                                 $ref: "#/components/schemas/ExportTask"
                     description:
                         Async
-            tags: ["ExportTask"]
-    /export-task/{exportTaskId}/content:
-        # @review
-        get:
-            description:
-                Retrieves the exported content.
-            operationId: getExportTaskContent
-            parameters:
-                - in: path
-                  name: exportTaskId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-            responses:
-                200:
-                    content:
-                        application/octet-stream:
-                            schema:
-                                format: binary
-                                type: string
-                    description:
-                        ""
             tags: ["ExportTask"]
     /export-task/{exportTaskId}:
         # @review
@@ -196,8 +165,27 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/ExportTask"
-                    description:
-                        ""
+            tags: ["ExportTask"]
+    /export-task/{exportTaskId}/content:
+        # @review
+        get:
+            description:
+                Retrieves the exported content.
+            operationId: getExportTaskContent
+            parameters:
+                - in: path
+                  name: exportTaskId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/octet-stream:
+                            schema:
+                                format: binary
+                                type: string
             tags: ["ExportTask"]
     /import-task/{className}:
         # @review
@@ -213,6 +201,10 @@ paths:
                       type: string
                 - in: query
                   name: callbackURL
+                  schema:
+                      type: string
+                - in: query
+                  name: taskItemDelegateName
                   schema:
                       type: string
             requestBody:
@@ -266,6 +258,10 @@ paths:
                   name: fieldNameMapping
                   schema:
                       type: string
+                - in: query
+                  name: taskItemDelegateName
+                  schema:
+                      type: string
             requestBody:
                 content:
                     application/json:
@@ -311,6 +307,10 @@ paths:
                       type: string
                 - in: query
                   name: callbackURL
+                  schema:
+                      type: string
+                - in: query
+                  name: taskItemDelegateName
                   schema:
                       type: string
             requestBody:
@@ -368,6 +368,4 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/ImportTask"
-                    description:
-                        ""
             tags: ["ImportTask"]

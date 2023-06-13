@@ -17,10 +17,10 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
-long formInstanceId = ParamUtil.getLong(request, renderResponse.getNamespace() + "formInstanceId");
+long formInstanceId = ParamUtil.getLong(request, liferayPortletResponse.getNamespace() + "formInstanceId");
 %>
 
-<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="exportFormInstance" var="exportFormInstanceURL">
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/dynamic_data_mapping_form/export_form_instance" var="exportFormInstanceURL">
 	<portlet:param name="formInstanceId" value="<%= String.valueOf(formInstanceId) %>" />
 </liferay-portlet:resourceURL>
 
@@ -28,7 +28,7 @@ long formInstanceId = ParamUtil.getLong(request, renderResponse.getNamespace() +
 StringBundler sb = new StringBundler(5);
 
 sb.append("javascript:");
-sb.append(renderResponse.getNamespace());
+sb.append(liferayPortletResponse.getNamespace());
 sb.append("exportFormInstance('");
 sb.append(exportFormInstanceURL);
 sb.append("');");

@@ -86,9 +86,9 @@ public class AuthVerifierTest {
 
 		properties.put(
 			JaxrsWhiteboardConstants.JAX_RS_NAME, "guest-no-allowed");
-		properties.put("auth.verifier.guest.allowed", false);
 		properties.put(
 			"auth-verifier-guest-allowed-test-servlet-context-helper", true);
+		properties.put("auth.verifier.guest.allowed", false);
 
 		_registerServletContextHelper(
 			"auth-verifier-guest-allowed-false-test", properties);
@@ -96,9 +96,9 @@ public class AuthVerifierTest {
 		properties = new HashMapDictionary<>();
 
 		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "guest-allowed");
-		properties.put("auth.verifier.guest.allowed", true);
 		properties.put(
 			"auth-verifier-guest-allowed-test-servlet-context-helper", true);
+		properties.put("auth.verifier.guest.allowed", true);
 
 		_registerServletContextHelper(
 			"auth-verifier-guest-allowed-true-test", properties);
@@ -115,23 +115,23 @@ public class AuthVerifierTest {
 		properties = new HashMapDictionary<>();
 
 		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			"(auth-verifier-guest-allowed-test-servlet-context-helper=true)");
+		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME,
 			"cxf-servlet");
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN,
 			"/guestAllowed");
-		properties.put(
-			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
-			"(auth-verifier-guest-allowed-test-servlet-context-helper=true)");
 
 		_registerServlet(properties, GuestAllowedHttpServlet::new);
 
 		properties = new HashMapDictionary<>();
 
 		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "filter-enabled");
-		properties.put("auth.verifier.guest.allowed", true);
 		properties.put(
 			"auth-verifier-tracker-test-servlet-context-helper", true);
+		properties.put("auth.verifier.guest.allowed", true);
 
 		_registerServletContextHelper(
 			"auth-verifier-filter-tracker-enabled-test", properties);
@@ -179,14 +179,14 @@ public class AuthVerifierTest {
 		properties = new HashMapDictionary<>();
 
 		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			"auth-verifier-filter-tracker-remote-access-test");
+		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME,
 			"cxf-servlet");
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN,
 			"/remoteAccess");
-		properties.put(
-			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
-			"auth-verifier-filter-tracker-remote-access-test");
 
 		_registerServlet(properties, RemoteAccessHttpServlet::new);
 
@@ -195,13 +195,13 @@ public class AuthVerifierTest {
 		properties.put(
 			JaxrsWhiteboardConstants.JAX_RS_NAME,
 			"auth-verifier-filter-override-matched");
-		properties.put("auth.verifier.guest.allowed", true);
 		properties.put(
 			"auth-verifier-matched-test-auth-verifier-filter-helper", true);
 		properties.put(
 			"auth.verifier.auth.verifier.AuthVerifierTest$TestAuthVerifier." +
 				"urls.includes",
 			"*");
+		properties.put("auth.verifier.guest.allowed", true);
 
 		_registerServletContextHelper(
 			"auth-verifier-filter-override-matched-test", properties);
@@ -211,13 +211,13 @@ public class AuthVerifierTest {
 		properties.put(
 			JaxrsWhiteboardConstants.JAX_RS_NAME,
 			"auth-verifier-filter-override-not-matched");
-		properties.put("auth.verifier.guest.allowed", true);
 		properties.put(
 			"auth-verifier-matched-test-auth-verifier-filter-helper", true);
 		properties.put(
 			"auth.verifier.auth.verifier.AuthVerifierTest$TestAuthVerifier." +
 				"urls.includes",
 			"/wrongPath");
+		properties.put("auth.verifier.guest.allowed", true);
 
 		_registerServletContextHelper(
 			"auth-verifier-filter-override-not-matched-test", properties);
@@ -227,9 +227,9 @@ public class AuthVerifierTest {
 		properties.put(
 			JaxrsWhiteboardConstants.JAX_RS_NAME,
 			"auth-verifier-filter-override-missing");
-		properties.put("auth.verifier.guest.allowed", true);
 		properties.put(
 			"auth-verifier-matched-test-auth-verifier-filter-helper", true);
+		properties.put("auth.verifier.guest.allowed", true);
 
 		_registerServletContextHelper(
 			"auth-verifier-filter-override-missing-test", properties);
@@ -237,13 +237,13 @@ public class AuthVerifierTest {
 		properties = new HashMapDictionary<>();
 
 		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+			"(auth-verifier-matched-test-auth-verifier-filter-helper=true)");
+		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME,
 			"cxf-servlet");
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/*");
-		properties.put(
-			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
-			"(auth-verifier-matched-test-auth-verifier-filter-helper=true)");
 
 		_registerServlet(properties, AuthVerifierMatchedHttpServlet::new);
 
@@ -486,9 +486,7 @@ public class AuthVerifierTest {
 
 			PrintWriter printWriter = httpServletResponse.getWriter();
 
-			String remoteUser = httpServletRequest.getRemoteUser();
-
-			if (Validator.isNull(remoteUser)) {
+			if (Validator.isNull(httpServletRequest.getRemoteUser())) {
 				printWriter.write("no-remote-user");
 			}
 			else {
@@ -516,7 +514,7 @@ public class AuthVerifierTest {
 
 			httpServletRequest.setAttribute("MATCHED", Boolean.TRUE);
 
-			return null;
+			return new AuthVerifierResult();
 		}
 
 	}

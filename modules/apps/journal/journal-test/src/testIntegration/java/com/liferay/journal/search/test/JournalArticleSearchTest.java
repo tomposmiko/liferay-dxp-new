@@ -15,6 +15,7 @@
 package com.liferay.journal.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.dynamic.data.mapping.configuration.DDMIndexerConfiguration;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -26,14 +27,15 @@ import com.liferay.dynamic.data.mapping.test.util.search.TestOrderHelper;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
+import com.liferay.journal.constants.JournalArticleConstants;
+import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFolder;
-import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.service.JournalFolderServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ClassedModel;
@@ -61,6 +63,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -75,8 +78,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -95,6 +100,23 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		ConfigurationTestUtil.saveConfiguration(
+			DDMIndexerConfiguration.class.getName(),
+			new HashMapDictionary() {
+				{
+					put("enableLegacyDDMIndexFields", false);
+				}
+			});
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		ConfigurationTestUtil.deleteConfiguration(
+			DDMIndexerConfiguration.class.getName());
+	}
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
@@ -109,19 +131,19 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 
 		serviceContext.setCompanyId(TestPropsValues.getCompanyId());
 
-		PortalPreferences portalPreferenceces =
+		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(
 				TestPropsValues.getUserId(), true);
 
 		_originalPortalPreferencesXML = PortletPreferencesFactoryUtil.toXML(
-			portalPreferenceces);
+			portalPreferences);
 
-		portalPreferenceces.setValue("", "articleCommentsEnabled", "true");
+		portalPreferences.setValue("", "articleCommentsEnabled", "true");
 
 		PortalPreferencesLocalServiceUtil.updatePreferences(
 			TestPropsValues.getCompanyId(),
 			PortletKeys.PREFS_OWNER_TYPE_COMPANY,
-			PortletPreferencesFactoryUtil.toXML(portalPreferenceces));
+			PortletPreferencesFactoryUtil.toXML(portalPreferences));
 
 		_journalServiceConfiguration =
 			ConfigurationProviderUtil.getCompanyConfiguration(
@@ -158,7 +180,7 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 
 		JournalArticle article = JournalTestUtil.addArticle(
 			group.getGroupId(), JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			JournalArticleConstants.CLASSNAME_ID_DEFAULT, articleId, false,
+			JournalArticleConstants.CLASS_NAME_ID_DEFAULT, articleId, false,
 			keywordsMap, keywordsMap, keywordsMap, null,
 			LocaleUtil.getDefault(), null, true, true, serviceContext);
 
@@ -238,6 +260,7 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 		testOrderHelper.testOrderByDDMNumberField();
 	}
 
+	@Ignore
 	@Test
 	public void testOrderByDDMNumberFieldRepeatable() throws Exception {
 		TestOrderHelper testOrderHelper =
@@ -304,7 +327,8 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 
 		searchContext.setSorts(sort);
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(JournalArticle.class);
+		Indexer<JournalArticle> indexer = IndexerRegistryUtil.getIndexer(
+			JournalArticle.class);
 
 		searchContext.setAttribute(Field.CONTENT, "some test");
 
@@ -334,7 +358,8 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 
 		searchContext.setSorts(sort);
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(JournalArticle.class);
+		Indexer<JournalArticle> indexer = IndexerRegistryUtil.getIndexer(
+			JournalArticle.class);
 
 		searchContext.setAttribute(Field.CONTENT, "test");
 
@@ -357,7 +382,6 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 			String.valueOf(article2.getResourcePrimKey()));
 	}
 
-	@Ignore
 	@Override
 	@Test
 	public void testSearchAttachments() throws Exception {
@@ -628,11 +652,10 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 				fieldValues.length);
 
 			for (String fieldValue : fieldValues) {
-				Map<Locale, String> map = HashMapBuilder.put(
-					LocaleUtil.US, fieldValue
-				).build();
-
-				contents.add(map);
+				contents.add(
+					HashMapBuilder.put(
+						LocaleUtil.US, fieldValue
+					).build());
 			}
 
 			String content = DDMStructureTestUtil.getSampleStructuredContent(

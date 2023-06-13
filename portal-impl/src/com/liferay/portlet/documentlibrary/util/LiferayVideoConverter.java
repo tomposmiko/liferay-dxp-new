@@ -180,7 +180,7 @@ public class LiferayVideoConverter extends LiferayConverter {
 		}
 
 		boolean keyPacketFound = false;
-		int nonKeyAfterKeyCount = 0;
+		int nonkeyAfterKeyCount = 0;
 		boolean onlyDecodeKeyPackets = false;
 		int previousPacketSize = -1;
 
@@ -194,8 +194,6 @@ public class LiferayVideoConverter extends LiferayConverter {
 
 			int streamIndex = inputIPacket.getStreamIndex();
 
-			IStreamCoder inputIStreamCoder = inputIStreamCoders[streamIndex];
-
 			IStreamCoder outputIStreamCoder = outputIStreamCoders[streamIndex];
 
 			if (outputIStreamCoder == null) {
@@ -205,6 +203,8 @@ public class LiferayVideoConverter extends LiferayConverter {
 			IStream iStream = _inputIContainer.getStream(streamIndex);
 
 			long timeStampOffset = getStreamTimeStampOffset(iStream);
+
+			IStreamCoder inputIStreamCoder = inputIStreamCoders[streamIndex];
 
 			if (inputIStreamCoder.getCodecType() ==
 					ICodec.Type.CODEC_TYPE_AUDIO) {
@@ -222,12 +222,12 @@ public class LiferayVideoConverter extends LiferayConverter {
 
 				keyPacketFound = isKeyPacketFound(inputIPacket, keyPacketFound);
 
-				nonKeyAfterKeyCount = countNonKeyAfterKey(
-					inputIPacket, keyPacketFound, nonKeyAfterKeyCount);
+				nonkeyAfterKeyCount = countNonKeyAfterKey(
+					inputIPacket, keyPacketFound, nonkeyAfterKeyCount);
 
 				if (isStartDecoding(
 						inputIPacket, inputIStreamCoder, keyPacketFound,
-						nonKeyAfterKeyCount, onlyDecodeKeyPackets)) {
+						nonkeyAfterKeyCount, onlyDecodeKeyPackets)) {
 
 					int value = decodeVideo(
 						iVideoResamplers[streamIndex],
@@ -398,32 +398,12 @@ public class LiferayVideoConverter extends LiferayConverter {
 
 		outputIStreamCoder.setFrameRate(iRational);
 
-		if (inputIStreamCoder.getHeight() <= 0) {
-			throw new RuntimeException(
-				"Unable to determine height for " + _inputURL);
-		}
-
-		if (_height == 0) {
-			_height = inputIStreamCoder.getHeight();
-		}
-
-		outputIStreamCoder.setHeight(_height);
+		_computeDimensions(inputIStreamCoder, outputIStreamCoder);
 
 		outputIStreamCoder.setPixelType(IPixelFormat.Type.YUV420P);
 		outputIStreamCoder.setTimeBase(
 			IRational.make(
 				iRational.getDenominator(), iRational.getNumerator()));
-
-		if (inputIStreamCoder.getWidth() <= 0) {
-			throw new RuntimeException(
-				"Unable to determine width for " + _inputURL);
-		}
-
-		if (_width == 0) {
-			_width = inputIStreamCoder.getWidth();
-		}
-
-		outputIStreamCoder.setWidth(_width);
 
 		iVideoResamplers[index] = createIVideoResampler(
 			inputIStreamCoder, outputIStreamCoder, _height, _width);
@@ -441,6 +421,72 @@ public class LiferayVideoConverter extends LiferayConverter {
 			Configuration.configure(_ffpresetProperties, outputIStreamCoder);
 		}
 	}
+
+	private void _computeDimensions(
+		IStreamCoder inputIStreamCoder, IStreamCoder outputIStreamCoder) {
+
+		if (inputIStreamCoder.getHeight() <= 0) {
+			throw new RuntimeException(
+				"Unable to determine height for " + _inputURL);
+		}
+
+		if (inputIStreamCoder.getWidth() <= 0) {
+			throw new RuntimeException(
+				"Unable to determine width for " + _inputURL);
+		}
+
+		double aspectRatio =
+			(double)inputIStreamCoder.getWidth() /
+				inputIStreamCoder.getHeight();
+
+		if (inputIStreamCoder.getWidth() > inputIStreamCoder.getHeight()) {
+			if (_width == 0) {
+				_width = inputIStreamCoder.getWidth();
+			}
+			else {
+				_width = Math.min(inputIStreamCoder.getWidth(), _width);
+			}
+
+			if (_height == 0) {
+				_height = inputIStreamCoder.getHeight();
+			}
+			else {
+				_height = (int)Math.ceil(_width / aspectRatio);
+			}
+		}
+		else {
+			if (_height == 0) {
+				_height = inputIStreamCoder.getHeight();
+			}
+			else {
+				_height = Math.min(inputIStreamCoder.getHeight(), _height);
+			}
+
+			if (_width == 0) {
+				_width = inputIStreamCoder.getWidth();
+			}
+			else {
+				_width = (int)Math.ceil(_height * aspectRatio);
+			}
+		}
+
+		double heightRatio = _height / (double)inputIStreamCoder.getHeight();
+		double widthRatio = _width / (double)inputIStreamCoder.getWidth();
+
+		if ((heightRatio < _RATIO_THRESHOLD) ||
+			(widthRatio < _RATIO_THRESHOLD)) {
+
+			_height = (int)Math.ceil(
+				inputIStreamCoder.getHeight() * _RATIO_THRESHOLD);
+			_width = (int)Math.ceil(
+				inputIStreamCoder.getWidth() * _RATIO_THRESHOLD);
+		}
+
+		outputIStreamCoder.setHeight(_height);
+		outputIStreamCoder.setWidth(_width);
+	}
+
+	private static final double _RATIO_THRESHOLD = (double)1 / 3;
 
 	private static final int _VIDEO_BIT_RATE_DEFAULT = 250000;
 

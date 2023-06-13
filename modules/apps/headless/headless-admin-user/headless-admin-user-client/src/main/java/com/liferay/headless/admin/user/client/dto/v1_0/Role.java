@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.RoleSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -28,7 +30,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Role {
+public class Role implements Cloneable, Serializable {
+
+	public static Role toDTO(String json) {
+		return RoleSerDes.toDTO(json);
+	}
 
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
@@ -237,6 +243,11 @@ public class Role {
 	}
 
 	protected String roleType;
+
+	@Override
+	public Role clone() throws CloneNotSupportedException {
+		return (Role)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

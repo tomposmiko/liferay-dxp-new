@@ -14,23 +14,21 @@
 
 package com.liferay.message.boards.service.impl;
 
-import com.liferay.message.boards.internal.util.MBThreadUtil;
+import com.liferay.message.boards.internal.util.MBUserRankUtil;
 import com.liferay.message.boards.model.MBStatsUser;
-import com.liferay.message.boards.model.MBThread;
+import com.liferay.message.boards.model.MBThreadTable;
 import com.liferay.message.boards.service.base.MBStatsUserLocalServiceBaseImpl;
 import com.liferay.message.boards.service.persistence.MBMessagePersistence;
 import com.liferay.message.boards.service.persistence.MBThreadPersistence;
+import com.liferay.message.boards.settings.MBGroupServiceSettings;
+import com.liferay.petra.sql.dsl.DSLFunctionFactoryUtil;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.kernel.dao.orm.Disjunction;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryDefinition;
-import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -120,35 +118,23 @@ public class MBStatsUserLocalServiceImpl
 
 	@Override
 	public Date getLastPostDateByUserId(long groupId, long userId) {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
-			MBThread.class, MBStatsUserLocalServiceImpl.class.getClassLoader());
-
-		Projection projection = ProjectionFactoryUtil.max("lastPostDate");
-
-		dynamicQuery.setProjection(projection);
-
-		Property userIdProperty = PropertyFactoryUtil.forName("userId");
-
-		dynamicQuery.add(userIdProperty.eq(userId));
-
-		Property threadIdProperty = PropertyFactoryUtil.forName("threadId");
-
-		Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
-
-		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
-			WorkflowConstants.STATUS_IN_TRASH);
-
-		List<MBThread> threads = MBThreadUtil.getGroupThreads(
-			_mbThreadPersistence, groupId, queryDefinition);
-
-		for (MBThread thread : threads) {
-			disjunction.add(threadIdProperty.ne(thread.getThreadId()));
-		}
-
-		dynamicQuery.add(disjunction);
-
-		List<Date> results = _mbThreadPersistence.findWithDynamicQuery(
-			dynamicQuery);
+		List<Date> results = _mbThreadPersistence.dslQuery(
+			DSLQueryFactoryUtil.select(
+				DSLFunctionFactoryUtil.max(
+					MBThreadTable.INSTANCE.lastPostDate
+				).as(
+					"maxLastPostDate"
+				)
+			).from(
+				MBThreadTable.INSTANCE
+			).where(
+				MBThreadTable.INSTANCE.userId.eq(
+					userId
+				).and(
+					MBThreadTable.INSTANCE.status.neq(
+						WorkflowConstants.STATUS_IN_TRASH)
+				)
+			));
 
 		return results.get(0);
 	}
@@ -157,9 +143,7 @@ public class MBStatsUserLocalServiceImpl
 	public long getMessageCountByGroupId(long groupId) {
 		DynamicQuery dynamicQuery = mbStatsUserLocalService.dynamicQuery();
 
-		Projection projection = ProjectionFactoryUtil.sum("messageCount");
-
-		dynamicQuery.setProjection(projection);
+		dynamicQuery.setProjection(ProjectionFactoryUtil.sum("messageCount"));
 
 		Property property = PropertyFactoryUtil.forName("groupId");
 
@@ -178,9 +162,7 @@ public class MBStatsUserLocalServiceImpl
 	public long getMessageCountByUserId(long userId) {
 		DynamicQuery dynamicQuery = mbStatsUserLocalService.dynamicQuery();
 
-		Projection projection = ProjectionFactoryUtil.sum("messageCount");
-
-		dynamicQuery.setProjection(projection);
+		dynamicQuery.setProjection(ProjectionFactoryUtil.sum("messageCount"));
 
 		Property property = PropertyFactoryUtil.forName("userId");
 
@@ -237,6 +219,15 @@ public class MBStatsUserLocalServiceImpl
 	@Override
 	public List<MBStatsUser> getStatsUsersByUserId(long userId) {
 		return mbStatsUserPersistence.findByUserId(userId);
+	}
+
+	@Override
+	public String[] getUserRank(long groupId, String languageId, long userId)
+		throws PortalException {
+
+		return MBUserRankUtil.getUserRank(
+			MBGroupServiceSettings.getInstance(groupId), languageId,
+			getStatsUser(groupId, userId));
 	}
 
 	@Override

@@ -15,7 +15,9 @@
 package com.liferay.portal.internal.increment;
 
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -36,8 +39,10 @@ import org.junit.Test;
 public class BatchablePipeTest {
 
 	@ClassRule
-	public static final CodeCoverageAssertor codeCoverageAssertor =
-		CodeCoverageAssertor.INSTANCE;
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@Test
 	public void testBatchPutAndGet() {
@@ -247,8 +252,6 @@ public class BatchablePipeTest {
 
 		final IncreasableEntry<String, Integer> increasableEntry1 =
 			new IntegerIncreasableEntry("test", 1);
-		final IncreasableEntry<String, Integer> increasableEntry2 =
-			new IntegerIncreasableEntry("test", 2);
 		IncreasableEntry<String, Integer> increasableEntry3 =
 			new IntegerIncreasableEntry("test", 3);
 
@@ -267,6 +270,9 @@ public class BatchablePipeTest {
 						newValue) {
 
 					if (oldValue.increasableEntry == increasableEntry1) {
+						IncreasableEntry<String, Integer> increasableEntry2 =
+							new IntegerIncreasableEntry("test", 2);
+
 						put(
 							key,
 							new BatchablePipe.IncreasableEntryWrapper

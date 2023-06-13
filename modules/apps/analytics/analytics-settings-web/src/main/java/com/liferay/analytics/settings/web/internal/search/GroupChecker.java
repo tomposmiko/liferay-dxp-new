@@ -17,6 +17,7 @@ package com.liferay.analytics.settings.web.internal.search;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.model.Group;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.portlet.RenderResponse;
@@ -29,19 +30,22 @@ import javax.servlet.http.HttpServletRequest;
 public class GroupChecker extends EmptyOnClickRowChecker {
 
 	public GroupChecker(
-		RenderResponse renderResponse, boolean disableAll, Set<String> ids) {
+		RenderResponse renderResponse, String channelId, Set<String> ids,
+		String mvcRenderCommandName) {
 
 		super(renderResponse);
 
-		_disableAll = disableAll;
+		_channelId = channelId;
 		_ids = ids;
+		_mvcRenderCommandName = mvcRenderCommandName;
 	}
 
 	@Override
-	public boolean isChecked(Object obj) {
-		Group group = (Group)obj;
+	public boolean isChecked(Object object) {
+		Group group = (Group)object;
 
-		return _ids.contains(String.valueOf(group.getGroupId()));
+		return Objects.equals(
+			group.getTypeSettingsProperty("analyticsChannelId"), _channelId);
 	}
 
 	@Override
@@ -50,7 +54,7 @@ public class GroupChecker extends EmptyOnClickRowChecker {
 		boolean disabled, String name, String value, String checkBoxRowIds,
 		String checkBoxAllRowIds, String checkBoxPostOnClick) {
 
-		if (_disableAll) {
+		if (!checked && _ids.contains(value)) {
 			disabled = true;
 		}
 
@@ -59,7 +63,8 @@ public class GroupChecker extends EmptyOnClickRowChecker {
 			checkBoxAllRowIds, checkBoxPostOnClick);
 	}
 
-	private final boolean _disableAll;
+	private final String _channelId;
 	private final Set<String> _ids;
+	private final String _mvcRenderCommandName;
 
 }

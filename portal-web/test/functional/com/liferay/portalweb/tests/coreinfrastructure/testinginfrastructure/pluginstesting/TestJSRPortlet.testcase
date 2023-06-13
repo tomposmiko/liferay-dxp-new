@@ -3,8 +3,8 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Test Plugins";
 	property portlet.plugins.includes = "test-jsr-286-plt-26-6-portlet";
+	property testray.main.component.name = "Test Plugins";
 
 	setUp {
 		User.firstLoginPG();
@@ -18,7 +18,6 @@ definition {
 	test ViewJSR {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Test JSR 286 PLT.26.6 Page");

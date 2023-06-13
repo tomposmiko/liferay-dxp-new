@@ -19,21 +19,24 @@
 <%
 ItemSelectorViewDescriptorRendererDisplayContext itemSelectorViewDescriptorRendererDisplayContext = (ItemSelectorViewDescriptorRendererDisplayContext)request.getAttribute(ItemSelectorViewDescriptorRendererDisplayContext.class.getName());
 
-ItemSelectorViewDescriptor itemSelectorViewDescriptor = itemSelectorViewDescriptorRendererDisplayContext.getItemSelectorViewDescriptor();
+ItemSelectorViewDescriptor<Object> itemSelectorViewDescriptor = itemSelectorViewDescriptorRendererDisplayContext.getItemSelectorViewDescriptor();
 
-SearchContainer searchContainer = itemSelectorViewDescriptor.getSearchContainer();
+SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisplayContext.getSearchContainer();
 %>
 
 <c:if test="<%= itemSelectorViewDescriptor.isShowManagementToolbar() %>">
 	<clay:management-toolbar
-		displayContext="<%= new ItemSelectorViewDescriptorRendererManagementToolbarDisplayContext(itemSelectorViewDescriptor, request, liferayPortletRequest, liferayPortletResponse, searchContainer) %>"
+		displayContext="<%= new ItemSelectorViewDescriptorRendererManagementToolbarDisplayContext(itemSelectorViewDescriptorRendererDisplayContext, request, liferayPortletRequest, liferayPortletResponse, searchContainer) %>"
 	/>
 </c:if>
 
-<div class="container-fluid container-fluid-max-xl item-selector lfr-item-viewer" id="<portlet:namespace />entriesContainer">
+<clay:container-fluid
+	cssClass="item-selector lfr-item-viewer"
+	id='<%= liferayPortletResponse.getNamespace() + "entriesContainer" %>'
+>
 	<c:if test="<%= itemSelectorViewDescriptor.isShowBreadcrumb() %>">
 		<liferay-site-navigation:breadcrumb
-			breadcrumbEntries="<%= itemSelectorViewDescriptorRendererDisplayContext.getBreadcrumbEntries(currentURLObj, request, liferayPortletResponse) %>"
+			breadcrumbEntries="<%= itemSelectorViewDescriptorRendererDisplayContext.getBreadcrumbEntries(currentURLObj) %>"
 		/>
 	</c:if>
 
@@ -44,77 +47,211 @@ SearchContainer searchContainer = itemSelectorViewDescriptor.getSearchContainer(
 	>
 		<liferay-ui:search-container-row
 			className="Object"
-			cssClass="entry-display-style"
+			cssClass="entry"
 			modelVar="entry"
 		>
 
 			<%
-			row.setCssClass("entry entry-card lfr-asset-item " + row.getCssClass());
-
 			ItemSelectorViewDescriptor.ItemDescriptor itemDescriptor = itemSelectorViewDescriptor.getItemDescriptor(row.getObject());
 
 			row.setData(
 				HashMapBuilder.<String, Object>put(
-					"value",
-					itemDescriptor.getPayload()
+					"value", itemDescriptor.getPayload()
 				).build());
 			%>
 
-			<liferay-ui:search-container-column-text>
-				<c:choose>
-					<c:when test="<%= itemDescriptor.isCompact() %>">
-						<clay:horizontal-card
-							horizontalCard="<%= new ItemDescriptorHorizontalCard(itemDescriptor, renderRequest) %>"
+			<c:choose>
+				<c:when test="<%= itemSelectorViewDescriptorRendererDisplayContext.isIconDisplayStyle() %>">
+
+					<%
+					row.setCssClass("entry-card entry-display-style lfr-asset-item " + row.getCssClass());
+					%>
+
+					<liferay-ui:search-container-column-text>
+						<c:choose>
+							<c:when test="<%= itemDescriptor.isCompact() %>">
+								<clay:horizontal-card
+									horizontalCard="<%= new ItemDescriptorHorizontalCard(itemDescriptor, renderRequest, searchContainer.getRowChecker()) %>"
+								/>
+							</c:when>
+							<c:otherwise>
+								<clay:vertical-card
+									verticalCard="<%= new ItemDescriptorVerticalCard(itemDescriptor, renderRequest, searchContainer.getRowChecker()) %>"
+								/>
+							</c:otherwise>
+						</c:choose>
+					</liferay-ui:search-container-column-text>
+				</c:when>
+				<c:when test="<%= itemSelectorViewDescriptorRendererDisplayContext.isDescriptiveDisplayStyle() %>">
+
+					<%
+					row.setCssClass("item-selector-list-row " + row.getCssClass());
+					%>
+
+					<c:if test="<%= itemDescriptor.getUserId() != UserConstants.USER_ID_DEFAULT %>">
+						<liferay-ui:search-container-column-user
+							showDetails="<%= false %>"
+							userId="<%= itemDescriptor.getUserId() %>"
 						/>
-					</c:when>
-					<c:otherwise>
-						<clay:vertical-card
-							verticalCard="<%= new ItemDescriptorVerticalCard(itemDescriptor, renderRequest) %>"
+					</c:if>
+
+					<c:if test="<%= Validator.isNotNull(itemDescriptor.getImageURL()) %>">
+						<liferay-ui:search-container-column-image
+							src="<%= itemDescriptor.getImageURL() %>"
 						/>
-					</c:otherwise>
-				</c:choose>
-			</liferay-ui:search-container-column-text>
+					</c:if>
+
+					<liferay-ui:search-container-column-text
+						colspan="<%= 2 %>"
+					>
+						<c:if test="<%= Objects.nonNull(itemDescriptor.getModifiedDate()) %>">
+
+							<%
+							Date modifiedDate = itemDescriptor.getModifiedDate();
+
+							String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true);
+							%>
+
+							<c:choose>
+								<c:when test="<%= Validator.isNotNull(itemDescriptor.getUserName()) %>">
+									<span class="text-default">
+										<liferay-ui:message arguments="<%= new String[] {itemDescriptor.getUserName(), modifiedDateDescription} %>" key="x-modified-x-ago" />
+									</span>
+								</c:when>
+								<c:otherwise>
+									<span class="text-default">
+										<liferay-ui:message arguments="<%= modifiedDateDescription %>" key="modified-x-ago" />
+									</span>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
+
+						<p class="font-weight-bold h5">
+							<%= itemDescriptor.getTitle(locale) %>
+						</p>
+
+						<p class="h6 text-default">
+							<%= itemDescriptor.getSubtitle(locale) %>
+						</p>
+					</liferay-ui:search-container-column-text>
+				</c:when>
+				<c:otherwise>
+					<liferay-ui:search-container-column-text
+						cssClass="table-cell-expand table-cell-minw-200 table-title"
+						name="title"
+						value="<%= itemDescriptor.getTitle(locale) %>"
+					/>
+
+					<liferay-ui:search-container-column-text
+						cssClass="table-cell-expand-smaller table-cell-minw-150"
+						name="user"
+						value="<%= itemDescriptor.getUserName() %>"
+					/>
+
+					<liferay-ui:search-container-column-text
+						cssClass="table-cell-expand-smaller table-cell-minw-150"
+						name="modified-date"
+					>
+						<c:if test="<%= Objects.nonNull(itemDescriptor.getModifiedDate()) %>">
+
+							<%
+							Date modifiedDate = itemDescriptor.getModifiedDate();
+							%>
+
+							<span class="text-default">
+								<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true) %>" key="modified-x-ago" />
+							</span>
+						</c:if>
+					</liferay-ui:search-container-column-text>
+				</c:otherwise>
+			</c:choose>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator
-			displayStyle="icon"
+			displayStyle="<%= itemSelectorViewDescriptorRendererDisplayContext.getDisplayStyle() %>"
 			markupView="lexicon"
 			searchContainer="<%= searchContainer %>"
 		/>
 	</liferay-ui:search-container>
-</div>
+</clay:container-fluid>
 
-<aui:script require="metal-dom/src/all/dom as dom">
-	var selectItemHandler = dom.delegate(
-		document.querySelector('#<portlet:namespace/>entriesContainer'),
-		'click',
-		'.entry',
-		function(event) {
-			dom.removeClasses(
-				document.querySelectorAll('.form-check-card.active'),
-				'active'
-			);
-			dom.addClasses(
-				dom.closest(event.delegateTarget, '.form-check-card'),
-				'active'
+<c:choose>
+	<c:when test="<%= itemSelectorViewDescriptorRendererDisplayContext.isMultipleSelection() %>">
+		<aui:script use="liferay-search-container">
+			var searchContainer = Liferay.SearchContainer.get(
+				'<portlet:namespace />entries'
 			);
 
-			Liferay.Util.getOpener().Liferay.fire(
-				'<%= itemSelectorViewDescriptorRendererDisplayContext.getItemSelectedEventName() %>',
-				{
-					data: {
-						returnType:
-							'<%= itemSelectorViewDescriptorRendererDisplayContext.getReturnType() %>',
-						value: event.delegateTarget.dataset.value
+			searchContainer.on('rowToggled', function (event) {
+				var searchContainerItems = event.elements.allSelectedElements;
+
+				var arr = [];
+
+				searchContainerItems.each(function () {
+					var domElement = this.ancestor('li');
+
+					if (domElement == null) {
+						domElement = this.ancestor('tr');
 					}
+
+					if (domElement == null) {
+						domElement = this.ancestor('dd');
+					}
+
+					if (domElement != null) {
+						var itemValue = domElement.getDOM().dataset.value;
+
+						arr.push(itemValue);
+					}
+				});
+
+				Liferay.Util.getOpener().Liferay.fire(
+					'<%= itemSelectorViewDescriptorRendererDisplayContext.getItemSelectedEventName() %>',
+					{
+						data: {
+							returnType:
+								'<%= itemSelectorViewDescriptorRendererDisplayContext.getReturnType() %>',
+							value: arr,
+						},
+					}
+				);
+			});
+		</aui:script>
+	</c:when>
+	<c:otherwise>
+		<aui:script require="metal-dom/src/all/dom as dom">
+			var selectItemHandler = dom.delegate(
+				document.querySelector('#<portlet:namespace />entriesContainer'),
+				'click',
+				'.entry',
+				function (event) {
+					dom.removeClasses(
+						document.querySelectorAll('.form-check-card.active'),
+						'active'
+					);
+					dom.addClasses(
+						dom.closest(event.delegateTarget, '.form-check-card'),
+						'active'
+					);
+
+					Liferay.Util.getOpener().Liferay.fire(
+						'<%= itemSelectorViewDescriptorRendererDisplayContext.getItemSelectedEventName() %>',
+						{
+							data: {
+								returnType:
+									'<%= itemSelectorViewDescriptorRendererDisplayContext.getReturnType() %>',
+								value: event.delegateTarget.dataset.value,
+							},
+						}
+					);
 				}
 			);
-		}
-	);
 
-	Liferay.on('destroyPortlet', function removeListener() {
-		selectItemHandler.removeListener();
+			Liferay.on('destroyPortlet', function removeListener() {
+				selectItemHandler.removeListener();
 
-		Liferay.detach('destroyPortlet', removeListener);
-	});
-</aui:script>
+				Liferay.detach('destroyPortlet', removeListener);
+			});
+		</aui:script>
+	</c:otherwise>
+</c:choose>

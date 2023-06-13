@@ -23,12 +23,14 @@ import com.liferay.message.boards.exception.MailingListOutUserNameException;
 import com.liferay.message.boards.internal.messaging.MailingListRequest;
 import com.liferay.message.boards.model.MBMailingList;
 import com.liferay.message.boards.service.base.MBMailingListLocalServiceBaseImpl;
-import com.liferay.petra.lang.SafeClosable;
+import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
@@ -203,8 +205,8 @@ public class MBMailingListLocalServiceImpl
 		// Scheduler
 
 		if (active) {
-			try (SafeClosable safeClosable =
-					ProxyModeThreadLocal.setWithSafeClosable(true)) {
+			try (SafeCloseable safeCloseable =
+					ProxyModeThreadLocal.setWithSafeCloseable(true)) {
 
 				unscheduleMailingList(mailingList);
 
@@ -225,16 +227,22 @@ public class MBMailingListLocalServiceImpl
 	}
 
 	@Deactivate
-	protected void deactivate() throws Exception {
-		_unregister.close();
+	@Override
+	protected void deactivate() {
+		super.deactivate();
+
+		try {
+			_unregister.close();
+		}
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
 	}
 
 	protected String getSchedulerGroupName(MBMailingList mailingList) {
-		return DestinationNames.MESSAGE_BOARDS_MAILING_LIST.concat(
-			StringPool.SLASH
-		).concat(
-			String.valueOf(mailingList.getMailingListId())
-		);
+		return StringBundler.concat(
+			DestinationNames.MESSAGE_BOARDS_MAILING_LIST, StringPool.SLASH,
+			mailingList.getMailingListId());
 	}
 
 	protected void scheduleMailingList(MBMailingList mailingList)
@@ -262,10 +270,15 @@ public class MBMailingListLocalServiceImpl
 		mailingListRequest.setInPassword(mailingList.getInPassword());
 		mailingListRequest.setAllowAnonymous(mailingList.isAllowAnonymous());
 
+		Message message = new Message();
+
+		message.put("companyId", mailingList.getCompanyId());
+
+		message.setPayload(mailingListRequest);
+
 		SchedulerEngineHelperUtil.schedule(
 			trigger, StorageType.PERSISTED, null,
-			DestinationNames.MESSAGE_BOARDS_MAILING_LIST, mailingListRequest,
-			0);
+			DestinationNames.MESSAGE_BOARDS_MAILING_LIST, message, 0);
 	}
 
 	protected void unscheduleMailingList(MBMailingList mailingList)

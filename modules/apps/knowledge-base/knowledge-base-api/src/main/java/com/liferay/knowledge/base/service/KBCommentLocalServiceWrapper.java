@@ -35,6 +35,10 @@ public class KBCommentLocalServiceWrapper
 	/**
 	 * Adds the kb comment to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBCommentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kbComment the kb comment
 	 * @return the kb comment that was added
 	 */
@@ -80,7 +84,22 @@ public class KBCommentLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kbCommentLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the kb comment from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBCommentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbComment the kb comment
 	 * @return the kb comment that was removed
@@ -96,6 +115,10 @@ public class KBCommentLocalServiceWrapper
 
 	/**
 	 * Deletes the kb comment with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBCommentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbCommentId the primary key of the kb comment
 	 * @return the kb comment that was removed
@@ -125,6 +148,18 @@ public class KBCommentLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kbCommentLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _kbCommentLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _kbCommentLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -334,10 +369,11 @@ public class KBCommentLocalServiceWrapper
 		getKBComments(
 			long groupId, int status, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.knowledge.base.model.KBComment> obc) {
+				<com.liferay.knowledge.base.model.KBComment>
+					orderByComparator) {
 
 		return _kbCommentLocalService.getKBComments(
-			groupId, status, start, end, obc);
+			groupId, status, start, end, orderByComparator);
 	}
 
 	@Override
@@ -345,9 +381,11 @@ public class KBCommentLocalServiceWrapper
 		getKBComments(
 			long groupId, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.knowledge.base.model.KBComment> obc) {
+				<com.liferay.knowledge.base.model.KBComment>
+					orderByComparator) {
 
-		return _kbCommentLocalService.getKBComments(groupId, start, end, obc);
+		return _kbCommentLocalService.getKBComments(
+			groupId, start, end, orderByComparator);
 	}
 
 	@Override
@@ -376,10 +414,11 @@ public class KBCommentLocalServiceWrapper
 		getKBComments(
 			String className, long classPK, int status, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.knowledge.base.model.KBComment> obc) {
+				<com.liferay.knowledge.base.model.KBComment>
+					orderByComparator) {
 
 		return _kbCommentLocalService.getKBComments(
-			className, classPK, status, start, end, obc);
+			className, classPK, status, start, end, orderByComparator);
 	}
 
 	@Override
@@ -387,7 +426,8 @@ public class KBCommentLocalServiceWrapper
 		getKBComments(
 			String className, long classPK, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				orderByComparator) {
+				<com.liferay.knowledge.base.model.KBComment>
+					orderByComparator) {
 
 		return _kbCommentLocalService.getKBComments(
 			className, classPK, start, end, orderByComparator);
@@ -489,6 +529,9 @@ public class KBCommentLocalServiceWrapper
 		return _kbCommentLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -499,6 +542,10 @@ public class KBCommentLocalServiceWrapper
 
 	/**
 	 * Updates the kb comment in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KBCommentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kbComment the kb comment
 	 * @return the kb comment that was updated

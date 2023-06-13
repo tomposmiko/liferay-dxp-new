@@ -2,15 +2,17 @@
 <head>
 <title>AlloyEditor</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">AlloyEditor</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>EDITOR</td>
-	<td>//div[contains(@class,'cke_editable_inline') and contains(@id,'_${key_editor}')]</td>
+	<td>//div[contains(@class,'cke_editable_inline') and contains(@id,'_${key_editor}')] | //div[contains(@class,'form-group')]//textarea[contains(@id,'_${key_editor}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -31,6 +33,11 @@
 <tr>
 	<td>CONTENT_FIELD_UNDERLINE</td>
 	<td>//div[contains(@class,'alloy-editor-container')]//div[(contains(@data-placeholder,'Write your content here...') or contains(@data-placeholder,'Content')) and contains(@title,'Rich Text Editor')]//u[contains(.,'${key_underlineContent}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>IMAGE_TOOLBAR</td>
+	<td>//div[contains(@class,'ae-toolbar') and contains(@class,'alloy-editor')]</td>
 	<td></td>
 </tr>
 <tr>

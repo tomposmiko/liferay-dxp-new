@@ -46,6 +46,28 @@ public class SegmentsExperienceRequestProcessorRegistryImpl
 	public long[] getSegmentsExperienceIds(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, long groupId,
+			long classNameId, long classPK)
+		throws PortalException {
+
+		long[] segmentsExperienceIds = new long[0];
+
+		for (SegmentsExperienceRequestProcessor
+				segmentsExperienceRequestProcessor :
+					getSegmentsExperienceRequestProcessors()) {
+
+			segmentsExperienceIds =
+				segmentsExperienceRequestProcessor.getSegmentsExperienceIds(
+					httpServletRequest, httpServletResponse, groupId,
+					classNameId, classPK, segmentsExperienceIds);
+		}
+
+		return segmentsExperienceIds;
+	}
+
+	@Override
+	public long[] getSegmentsExperienceIds(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, long groupId,
 			long classNameId, long classPK, long[] segmentsEntryIds)
 		throws PortalException {
 
@@ -82,7 +104,7 @@ public class SegmentsExperienceRequestProcessorRegistryImpl
 		_serviceTrackerList = ServiceTrackerListFactory.open(
 			bundleContext, SegmentsExperienceRequestProcessor.class,
 			Collections.reverseOrder(
-				new PropertyServiceReferenceComparator(
+				new PropertyServiceReferenceComparator<>(
 					"segments.experience.request.processor.priority")));
 	}
 

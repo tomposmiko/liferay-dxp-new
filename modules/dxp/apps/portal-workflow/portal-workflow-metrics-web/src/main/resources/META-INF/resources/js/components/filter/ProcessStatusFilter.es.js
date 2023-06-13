@@ -16,28 +16,43 @@ import {useFilterName} from '../../shared/components/filter/hooks/useFilterName.
 import {useFilterStatic} from '../../shared/components/filter/hooks/useFilterStatic.es';
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
 
+const processStatusConstants = {
+	completed: 'Completed',
+	pending: 'Pending',
+};
+
+const processStatuses = [
+	{
+		key: processStatusConstants.completed,
+		name: Liferay.Language.get('completed'),
+	},
+	{
+		key: processStatusConstants.pending,
+		name: Liferay.Language.get('pending'),
+	},
+];
+
 const ProcessStatusFilter = ({
 	className,
-	dispatch,
 	filterKey = filterConstants.processStatus.key,
 	options = {},
-	prefixKey = ''
+	prefixKey = '',
 }) => {
-	const defaultOptions = {
+	options = {
 		hideControl: false,
 		multiple: true,
 		position: 'left',
-		withSelectionTitle: false
+		withSelectionTitle: false,
+		withoutRouteParams: false,
+		...options,
 	};
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	options = useMemo(() => ({...defaultOptions, ...options}), [options]);
 
-	const {items, selectedItems} = useFilterStatic(
-		dispatch,
+	const {items, selectedItems} = useFilterStatic({
 		filterKey,
 		prefixKey,
-		processStatuses
-	);
+		staticItems: processStatuses,
+		...options,
+	});
 
 	const defaultItem = useMemo(() => (items ? items[0] : undefined), [items]);
 
@@ -60,22 +75,6 @@ const ProcessStatusFilter = ({
 		/>
 	);
 };
-
-const processStatusConstants = {
-	completed: 'Completed',
-	pending: 'Pending'
-};
-
-const processStatuses = [
-	{
-		key: processStatusConstants.completed,
-		name: Liferay.Language.get('completed')
-	},
-	{
-		key: processStatusConstants.pending,
-		name: Liferay.Language.get('pending')
-	}
-];
 
 export default ProcessStatusFilter;
 export {processStatusConstants};

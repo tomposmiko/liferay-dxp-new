@@ -26,7 +26,7 @@ definition {
 			Uncheck(locator1 = "ServerAdministrationExternalServices#OPEN_OFFICE_ENABLED_CHECKBOX");
 		}
 
-		if ((isSet(installXuggler)) && (IsElementNotPresent(locator1 = "ServerAdministrationExternalServices#XUGGLER_ENABLED_CHECKBOX"))) {
+		if (isSet(installXuggler) && (IsElementNotPresent(locator1 = "ServerAdministrationExternalServices#XUGGLER_ENABLED_CHECKBOX"))) {
 			Panel.expandPanel(panel = "Enabling Xuggler provides video conversion functionality.");
 
 			AssertClick(
@@ -140,6 +140,13 @@ definition {
 			locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
 			value1 = "${language}");
 
+		if ("${htmlOutput}" == "true") {
+			Select(
+				key_selectFieldLabel = "Output",
+				locator1 = "Select#ANY",
+				value1 = "HTML");
+		}
+
 		Type(
 			locator1 = "ServerAdministrationScript#SCRIPT_TEXT",
 			value1 = "${script}");
@@ -174,8 +181,8 @@ definition {
 	}
 
 	macro tearDownDMFileUploadSettings {
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "System",
 			panel = "Control Panel",
 			portlet = "Server Administration");
 
@@ -191,8 +198,8 @@ definition {
 	}
 
 	macro tearDownMailServerSettings {
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "System",
 			panel = "Control Panel",
 			portlet = "Server Administration");
 

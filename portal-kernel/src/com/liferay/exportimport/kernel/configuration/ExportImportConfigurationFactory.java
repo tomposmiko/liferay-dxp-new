@@ -14,6 +14,7 @@
 
 package com.liferay.exportimport.kernel.configuration;
 
+import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalServiceUtil;
@@ -49,11 +50,9 @@ public class ExportImportConfigurationFactory {
 		boolean privateLayout = ParamUtil.getBoolean(
 			portletRequest, "privateLayout");
 
-		Map<String, String[]> parameterMap = _getParameterMap(portletRequest);
-
 		return buildDefaultLocalPublishingExportImportConfiguration(
 			themeDisplay.getUser(), sourceGroupId, targetGroupId, privateLayout,
-			parameterMap);
+			_getParameterMap(portletRequest));
 	}
 
 	public static ExportImportConfiguration
@@ -109,12 +108,10 @@ public class ExportImportConfigurationFactory {
 			portletRequest, "secureConnection");
 		long remoteGroupId = ParamUtil.getLong(portletRequest, "remoteGroupId");
 
-		Map<String, String[]> parameterMap = _getParameterMap(portletRequest);
-
 		return buildDefaultRemotePublishingExportImportConfiguration(
 			themeDisplay.getUser(), sourceGroupId, privateLayout, remoteAddress,
 			remotePort, remotePathContext, secureConnection, remoteGroupId,
-			parameterMap);
+			_getParameterMap(portletRequest));
 	}
 
 	public static ExportImportConfiguration

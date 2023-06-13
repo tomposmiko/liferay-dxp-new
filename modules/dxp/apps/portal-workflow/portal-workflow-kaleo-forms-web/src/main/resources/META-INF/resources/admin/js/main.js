@@ -11,41 +11,41 @@
 
 AUI.add(
 	'liferay-kaleo-forms-admin',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var STEPS_MAP = {
 			DETAILS: 1,
 			FIELDS: 2,
 			FORMS: 4,
-			WORKFLOW: 3
+			WORKFLOW: 3,
 		};
 
 		var KaleoFormsAdmin = A.Component.create({
 			ATTRS: {
 				currentURL: {
-					value: null
+					value: null,
 				},
 
 				form: {
-					value: null
+					value: null,
 				},
 
 				kaleoProcessId: {
-					value: null
+					value: null,
 				},
 
 				portletId: {
-					value: null
+					value: null,
 				},
 
 				saveInPortletSessionURL: {
-					value: null
+					value: null,
 				},
 
 				tabView: {
-					value: null
-				}
+					value: null,
+				},
 			},
 
 			AUGMENTS: [Liferay.PortletBase],
@@ -127,7 +127,7 @@ AUI.add(
 						'translatedLanguages' + Lang.String.capitalize(name)
 					] = translatedLanguages.join();
 
-					translatedLanguages.forEach(item => {
+					translatedLanguages.forEach((item) => {
 						localizedValuesMap[
 							name + item
 						] = inputLocalized.getValue(item);
@@ -174,7 +174,7 @@ AUI.add(
 						ddmStructureName,
 						ddmTemplateId,
 						kaleoTaskFormPairsData,
-						workflowDefinition
+						workflowDefinition,
 					});
 				},
 
@@ -250,7 +250,7 @@ AUI.add(
 									formsSearchContainer +
 										' .lfr-icon-menu .dropdown-toggle'
 								),
-								item => {
+								(item) => {
 									Liferay.Menu.register(item.get('id'));
 								}
 							);
@@ -326,7 +326,7 @@ AUI.add(
 
 					instance.formWizard = new Liferay.KaleoFormWizard({
 						form: instance.get('form'),
-						tabView: instance.get('tabView')
+						tabView: instance.get('tabView'),
 					});
 
 					instance.bindUI();
@@ -337,7 +337,7 @@ AUI.add(
 					var instance = this;
 
 					A.io.request(instance.get('saveInPortletSessionURL'), {
-						data: instance.ns(data)
+						data: instance.ns(data),
 					});
 				},
 
@@ -373,16 +373,26 @@ AUI.add(
 						instance.nextBtn.show();
 						instance.prevBtn.hide();
 						instance.submitBtn.hide();
-					} else if (currentStep === STEPS_MAP.FORMS) {
+					}
+					else if (currentStep === STEPS_MAP.FORMS) {
 						instance.nextBtn.hide();
 						instance.prevBtn.show();
 						instance.submitBtn.show();
-					} else {
+					}
+					else {
 						instance.nextBtn.show();
 						instance.prevBtn.show();
 						instance.submitBtn.hide();
 					}
-				}
+				},
+			},
+		});
+
+		const inputElement = document.querySelector('.lfr-input-text');
+
+		inputElement.addEventListener('keydown', (event) => {
+			if (event.keyCode === 13) {
+				event.preventDefault();
 			}
 		});
 
@@ -398,7 +408,7 @@ AUI.add(
 			'liferay-kaleo-forms-components',
 			'liferay-portlet-url',
 			'liferay-store',
-			'node-load'
-		]
+			'node-load',
+		],
 	}
 );

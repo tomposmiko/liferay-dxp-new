@@ -35,10 +35,11 @@ public class NotificationRecipient {
 		String emailAddress,
 		NotificationReceptionType notificationReceptionType) {
 
-		_companyId = 0;
 		_emailAddress = emailAddress;
-		_fullName = null;
 		_notificationReceptionType = notificationReceptionType;
+
+		_companyId = 0;
+		_fullName = null;
 		_screenName = null;
 		_userId = 0;
 	}
@@ -46,26 +47,27 @@ public class NotificationRecipient {
 	public NotificationRecipient(
 		User user, NotificationReceptionType notificationReceptionType) {
 
+		_notificationReceptionType = notificationReceptionType;
+
 		_companyId = user.getCompanyId();
 		_emailAddress = user.getEmailAddress();
 		_fullName = user.getFullName();
-		_notificationReceptionType = notificationReceptionType;
 		_screenName = user.getScreenName();
 		_userId = user.getUserId();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof NotificationRecipient)) {
+		if (!(object instanceof NotificationRecipient)) {
 			return false;
 		}
 
 		NotificationRecipient notificationRecipient =
-			(NotificationRecipient)obj;
+			(NotificationRecipient)object;
 
 		if ((_companyId == notificationRecipient._companyId) &&
 			Objects.equals(

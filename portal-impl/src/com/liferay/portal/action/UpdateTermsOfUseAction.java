@@ -14,10 +14,11 @@
 
 package com.liferay.portal.action;
 
+import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
 import com.liferay.portal.kernel.service.UserServiceUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.struts.Action;
-import com.liferay.portal.struts.ActionConstants;
+import com.liferay.portal.struts.constants.ActionConstants;
 import com.liferay.portal.struts.model.ActionForward;
 import com.liferay.portal.struts.model.ActionMapping;
 
@@ -34,6 +35,9 @@ public class UpdateTermsOfUseAction implements Action {
 			ActionMapping actionMapping, HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
 		throws Exception {
+
+		AuthTokenUtil.checkCSRFToken(
+			httpServletRequest, UpdateTermsOfUseAction.class.getName());
 
 		UserServiceUtil.updateAgreedToTermsOfUse(
 			PortalUtil.getUserId(httpServletRequest), true);

@@ -58,8 +58,8 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		this(dlFileEntry, dlFileEntry.isEscapedModel());
 	}
 
-	public LiferayFileEntry(DLFileEntry fileEntry, boolean escapedModel) {
-		_dlFileEntry = fileEntry;
+	public LiferayFileEntry(DLFileEntry dlFileEntry, boolean escapedModel) {
+		_dlFileEntry = dlFileEntry;
 		_escapedModel = escapedModel;
 	}
 
@@ -78,16 +78,16 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof LiferayFileEntry)) {
+		if (!(object instanceof LiferayFileEntry)) {
 			return false;
 		}
 
-		LiferayFileEntry liferayFileEntry = (LiferayFileEntry)obj;
+		LiferayFileEntry liferayFileEntry = (LiferayFileEntry)object;
 
 		if (Objects.equals(_dlFileEntry, liferayFileEntry._dlFileEntry)) {
 			return true;

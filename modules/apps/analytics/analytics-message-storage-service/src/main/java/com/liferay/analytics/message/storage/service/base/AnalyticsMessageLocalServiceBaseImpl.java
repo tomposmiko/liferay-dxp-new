@@ -17,8 +17,10 @@ package com.liferay.analytics.message.storage.service.base;
 import com.liferay.analytics.message.storage.model.AnalyticsMessage;
 import com.liferay.analytics.message.storage.model.AnalyticsMessageBodyBlobModel;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
+import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalServiceUtil;
 import com.liferay.analytics.message.storage.service.persistence.AnalyticsMessagePersistence;
 import com.liferay.petra.io.AutoDeleteFileInputStream;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -41,6 +43,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -49,6 +52,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import java.io.InputStream;
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.sql.Blob;
 
 import java.util.List;
@@ -56,6 +61,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -77,11 +83,15 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>AnalyticsMessageLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.analytics.message.storage.service.AnalyticsMessageLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>AnalyticsMessageLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>AnalyticsMessageLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the analytics message to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AnalyticsMessageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param analyticsMessage the analytics message
 	 * @return the analytics message that was added
@@ -111,6 +121,10 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 	/**
 	 * Deletes the analytics message with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AnalyticsMessageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param analyticsMessageId the primary key of the analytics message
 	 * @return the analytics message that was removed
 	 * @throws PortalException if a analytics message with the primary key could not be found
@@ -126,6 +140,10 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 	/**
 	 * Deletes the analytics message from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AnalyticsMessageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param analyticsMessage the analytics message
 	 * @return the analytics message that was removed
 	 */
@@ -135,6 +153,18 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 		AnalyticsMessage analyticsMessage) {
 
 		return analyticsMessagePersistence.remove(analyticsMessage);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return analyticsMessagePersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -291,6 +321,16 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return analyticsMessagePersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -299,6 +339,13 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 			(AnalyticsMessage)persistedModel);
 	}
 
+	public BasePersistence<AnalyticsMessage> getBasePersistence() {
+		return analyticsMessagePersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -334,6 +381,10 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 
 	/**
 	 * Updates the analytics message in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AnalyticsMessageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param analyticsMessage the analytics message
 	 * @return the analytics message that was updated
@@ -406,6 +457,11 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 		}
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
@@ -417,6 +473,8 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		analyticsMessageLocalService = (AnalyticsMessageLocalService)aopProxy;
+
+		_setLocalServiceUtilService(analyticsMessageLocalService);
 	}
 
 	/**
@@ -458,6 +516,23 @@ public abstract class AnalyticsMessageLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		AnalyticsMessageLocalService analyticsMessageLocalService) {
+
+		try {
+			Field field =
+				AnalyticsMessageLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, analyticsMessageLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

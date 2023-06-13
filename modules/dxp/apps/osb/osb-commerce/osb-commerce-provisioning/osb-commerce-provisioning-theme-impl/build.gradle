@@ -1,0 +1,4 @@
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "release.dxp.api"
+	compileOnly project(":dxp:apps:osb:osb-commerce:osb-commerce-provisioning:osb-commerce-provisioning-api")
+}

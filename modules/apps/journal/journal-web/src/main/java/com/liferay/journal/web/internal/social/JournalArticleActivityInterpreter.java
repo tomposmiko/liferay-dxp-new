@@ -18,22 +18,24 @@ import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.journal.constants.JournalActivityKeys;
+import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
+import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.web.internal.util.JournalResourceBundleLoader;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionHelper;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.social.kernel.model.BaseSocialActivityInterpreter;
 import com.liferay.social.kernel.model.SocialActivity;
@@ -60,54 +62,59 @@ public class JournalArticleActivityInterpreter
 	}
 
 	@Override
+	protected ResourceBundleLoader acquireResourceBundleLoader() {
+		return JournalResourceBundleLoader.INSTANCE;
+	}
+
+	@Override
 	protected String getPath(
 			SocialActivity activity, ServiceContext serviceContext)
 		throws Exception {
 
-		LiferayPortletRequest liferayPortletRequest =
-			serviceContext.getLiferayPortletRequest();
+		try {
+			LiferayPortletRequest liferayPortletRequest =
+				serviceContext.getLiferayPortletRequest();
 
-		LiferayPortletResponse liferayPortletResponse =
-			serviceContext.getLiferayPortletResponse();
+			LiferayPortletResponse liferayPortletResponse =
+				serviceContext.getLiferayPortletResponse();
 
-		if ((liferayPortletRequest != null) &&
-			(liferayPortletResponse != null)) {
+			if ((liferayPortletRequest != null) &&
+				(liferayPortletResponse != null)) {
 
-			AssetRendererFactory journalArticleAssetRendererFactory =
-				AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
-					JournalArticle.class);
+				AssetRendererFactory<?> journalArticleAssetRendererFactory =
+					AssetRendererFactoryRegistryUtil.
+						getAssetRendererFactoryByClass(JournalArticle.class);
 
-			AssetRenderer journalArticleAssetRenderer =
-				journalArticleAssetRendererFactory.getAssetRenderer(
+				AssetRenderer<?> journalArticleAssetRenderer =
+					journalArticleAssetRendererFactory.getAssetRenderer(
+						activity.getClassPK());
+
+				return journalArticleAssetRenderer.getURLViewInContext(
+					serviceContext.getLiferayPortletRequest(),
+					serviceContext.getLiferayPortletResponse(), null);
+			}
+
+			JournalArticle article =
+				_journalArticleLocalService.getLatestArticle(
 					activity.getClassPK());
 
-			return journalArticleAssetRenderer.getURLViewInContext(
-				serviceContext.getLiferayPortletRequest(),
-				serviceContext.getLiferayPortletResponse(), null);
+			Layout layout = article.getLayout();
+
+			if (layout != null) {
+				String groupFriendlyURL = _portal.getGroupFriendlyURL(
+					layout.getLayoutSet(), serviceContext.getThemeDisplay());
+
+				return StringBundler.concat(
+					groupFriendlyURL,
+					JournalArticleConstants.CANONICAL_URL_SEPARATOR,
+					article.getUrlTitle());
+			}
+
+			return null;
 		}
-
-		JournalArticle article = _journalArticleLocalService.getLatestArticle(
-			activity.getClassPK());
-
-		Layout layout = article.getLayout();
-
-		if (layout != null) {
-			String groupFriendlyURL = _portal.getGroupFriendlyURL(
-				layout.getLayoutSet(), serviceContext.getThemeDisplay());
-
-			return groupFriendlyURL.concat(
-				JournalArticleConstants.CANONICAL_URL_SEPARATOR
-			).concat(
-				article.getUrlTitle()
-			);
+		catch (NoSuchArticleException noSuchArticleException) {
+			return null;
 		}
-
-		return null;
-	}
-
-	@Override
-	protected ResourceBundleLoader getResourceBundleLoader() {
-		return JournalResourceBundleLoader.INSTANCE;
 	}
 
 	@Override
@@ -163,7 +170,7 @@ public class JournalArticleActivityInterpreter
 				_journalArticleLocalService.getLatestArticle(
 					activity.getClassPK());
 
-			return ModelResourcePermissionHelper.contains(
+			return ModelResourcePermissionUtil.contains(
 				_journalFolderModelResourcePermission, permissionChecker,
 				article.getGroupId(), article.getFolderId(),
 				ActionKeys.ADD_ARTICLE);

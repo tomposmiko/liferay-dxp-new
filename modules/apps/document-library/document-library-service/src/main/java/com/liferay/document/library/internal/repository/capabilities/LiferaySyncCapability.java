@@ -17,6 +17,7 @@ package com.liferay.document.library.internal.repository.capabilities;
 import com.liferay.document.library.sync.constants.DLSyncConstants;
 import com.liferay.document.library.sync.model.DLSyncEvent;
 import com.liferay.document.library.sync.service.DLSyncEventLocalService;
+import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -33,13 +34,13 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.registry.RepositoryEventRegistry;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.repository.capabilities.util.GroupServiceAdapter;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -117,8 +118,10 @@ public class LiferaySyncCapability
 	protected void registerDLSyncEventCallback(
 		String event, FileEntry fileEntry) {
 
-		if (isStagingGroup(fileEntry.getGroupId()) ||
-			!(fileEntry instanceof LiferayFileEntry)) {
+		if (!CTCollectionThreadLocal.isProductionMode() ||
+			isStagingGroup(fileEntry.getGroupId()) ||
+			!(fileEntry instanceof LiferayFileEntry) ||
+			CompanyThreadLocal.isDeleteInProcess()) {
 
 			return;
 		}
@@ -139,8 +142,10 @@ public class LiferaySyncCapability
 	}
 
 	protected void registerDLSyncEventCallback(String event, Folder folder) {
-		if (isStagingGroup(folder.getGroupId()) ||
-			!(folder instanceof LiferayFolder)) {
+		if (!CTCollectionThreadLocal.isProductionMode() ||
+			isStagingGroup(folder.getGroupId()) ||
+			!(folder instanceof LiferayFolder) ||
+			CompanyThreadLocal.isDeleteInProcess()) {
 
 			return;
 		}
@@ -164,7 +169,7 @@ public class LiferaySyncCapability
 				public Void call() throws Exception {
 					Message message = new Message();
 
-					Map<String, Object> values =
+					message.setValues(
 						HashMapBuilder.<String, Object>put(
 							"event", event
 						).put(
@@ -173,9 +178,7 @@ public class LiferaySyncCapability
 							"type", type
 						).put(
 							"typePK", typePK
-						).build();
-
-					message.setValues(values);
+						).build());
 
 					_messageBus.sendMessage(
 						DestinationNames.DOCUMENT_LIBRARY_SYNC_EVENT_PROCESSOR,

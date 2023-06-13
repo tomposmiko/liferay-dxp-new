@@ -24,6 +24,7 @@ WikiPortletInstanceConfiguration wikiPortletInstanceConfiguration = wikiRequestH
 boolean followRedirect = ParamUtil.getBoolean(request, "followRedirect", true);
 
 WikiNode node = (WikiNode)request.getAttribute(WikiWebKeys.WIKI_NODE);
+
 WikiPage wikiPage = (WikiPage)request.getAttribute(WikiWebKeys.WIKI_PAGE);
 
 WikiPage originalPage = null;
@@ -36,10 +37,17 @@ if (followRedirect && (redirectPage != null)) {
 
 String title = wikiPage.getTitle();
 String parentTitle = wikiPage.getParentTitle();
-List<WikiPage> childPages = wikiPage.getViewableChildPages();
+
+List<WikiPage> childPages = new ArrayList<>();
+
+for (WikiPage curChildPage : wikiPage.getViewableChildPages()) {
+	if (curChildPage.getRedirectPage() == null) {
+		childPages.add(curChildPage);
+	}
+}
 
 boolean preview = false;
-boolean print = ParamUtil.getString(request, "viewMode").equals(Constants.PRINT);
+boolean print = Objects.equals(ParamUtil.getString(request, "viewMode"), Constants.PRINT);
 
 PortletURL viewPageURL = renderResponse.createRenderURL();
 
@@ -147,11 +155,15 @@ if (portletTitleBasedNavigation) {
 					<c:choose>
 						<c:when test="<%= print %>">
 							<aui:script>
-								print();
-
-								setTimeout(function() {
+								window.onafterprint = function () {
 									window.close();
-								}, 100);
+								};
+
+								window.onfocus = function () {
+									window.close();
+								};
+
+								print();
 							</aui:script>
 						</c:when>
 						<c:otherwise>
@@ -171,7 +183,7 @@ if (portletTitleBasedNavigation) {
 				</c:if>
 
 				<%
-				List entries = new ArrayList();
+				List<WikiPage> entries = new ArrayList<>();
 
 				entries.add(wikiPage);
 
@@ -185,17 +197,6 @@ if (portletTitleBasedNavigation) {
 				catch (Exception e) {
 					formattedContent = wikiPage.getContent();
 				}
-
-				Map<String, Object> contextObjects = new HashMap<String, Object>();
-
-				contextObjects.put("assetEntry", layoutAssetEntry);
-				contextObjects.put("formattedContent", formattedContent);
-				contextObjects.put("viewURL", viewPageURL.toString());
-				contextObjects.put("wikiPortletInstanceConfiguration", wikiPortletInstanceConfiguration);
-
-				// Deprecated
-
-				contextObjects.put("wikiPortletInstanceOverriddenConfiguration", wikiPortletInstanceConfiguration);
 				%>
 
 				<c:if test="<%= !portletTitleBasedNavigation %>">
@@ -204,7 +205,19 @@ if (portletTitleBasedNavigation) {
 
 				<liferay-ddm:template-renderer
 					className="<%= WikiPage.class.getName() %>"
-					contextObjects="<%= contextObjects %>"
+					contextObjects='<%=
+						HashMapBuilder.<String, Object>put(
+							"assetEntry", layoutAssetEntry
+						).put(
+							"formattedContent", formattedContent
+						).put(
+							"viewURL", viewPageURL.toString()
+						).put(
+							"wikiPortletInstanceConfiguration", wikiPortletInstanceConfiguration
+						).put(
+							"wikiPortletInstanceOverriddenConfiguration", wikiPortletInstanceConfiguration
+						).build()
+					%>'
 					displayStyle="<%= wikiPortletInstanceSettingsHelper.getDisplayStyle() %>"
 					displayStyleGroupId="<%= wikiPortletInstanceSettingsHelper.getDisplayStyleGroupId() %>"
 					entries="<%= entries %>"
@@ -270,7 +283,7 @@ if (portletTitleBasedNavigation) {
 									label="<%= true %>"
 									markupView="lexicon"
 									message="print"
-									url='<%= "javascript:" + renderResponse.getNamespace() + "printPage();" %>'
+									url='<%= "javascript:" + liferayPortletResponse.getNamespace() + "printPage();" %>'
 								/>
 							</div>
 						</c:if>
@@ -355,7 +368,7 @@ if (portletTitleBasedNavigation) {
 
 								<c:if test="<%= wikiPortletInstanceSettingsHelper.isEnablePageRatings() %>">
 									<div class="page-ratings">
-										<liferay-ui:ratings
+										<liferay-ratings:ratings
 											className="<%= WikiPage.class.getName() %>"
 											classPK="<%= wikiPage.getResourcePrimKey() %>"
 											inTrash="<%= wikiPage.isInTrash() %>"
@@ -391,19 +404,20 @@ if (portletTitleBasedNavigation) {
 				</liferay-ddm:template-renderer>
 
 				<%
-				if (!wikiPage.getTitle().equals(wikiGroupServiceConfiguration.frontPageName())) {
+				if (!Objects.equals(wikiPage.getTitle(), wikiGroupServiceConfiguration.frontPageName())) {
 					if (!portletName.equals(WikiPortletKeys.WIKI_DISPLAY)) {
 						PortalUtil.setPageSubtitle(wikiPage.getTitle(), request);
 
 						String description = wikiPage.getContent();
 
-						if (wikiPage.getFormat().equals("html")) {
+						if (Objects.equals(wikiPage.getFormat(), "html")) {
 							description = HtmlUtil.stripHtml(description);
 						}
 
 						description = StringUtil.shorten(description, 200);
 
 						PortalUtil.setPageDescription(description, request);
+
 						PortalUtil.setPageKeywords(assetHelper.getAssetKeywords(WikiPage.class.getName(), wikiPage.getResourcePrimKey()), request);
 					}
 

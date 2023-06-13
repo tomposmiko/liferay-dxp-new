@@ -73,6 +73,12 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
+		LexiconEntry.changeDisplayStyle(displayStyle = "Cards");
+
+		AssertVisible(
+			key_dmDocumentTitle = "DM Document Title 1",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_SHARED");
+
 		DMDocumentSharing.addDocumentWithOnlyOwnerPermissions(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentFile = "Document_1.png",
@@ -87,6 +93,12 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		AssertVisible(
+			key_dmDocumentTitle = "DM Document Title 2",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_SHARED");
+
 		DMDocumentSharing.addDocumentWithOnlyOwnerPermissions(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentFile = "Document_1.odt",
@@ -98,6 +110,14 @@ definition {
 			sharingPermissions = "Comment",
 			userEmailAddress = "userea@liferay.com",
 			userName = "userfn userln");
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
+
+		AssertVisible(
+			key_dmDocumentTitle = "DM Document Title 3",
+			locator1 = "DocumentsAndMedia#TABLE_DOCUMENT_SHARED");
 
 		User.logoutPG();
 
@@ -169,6 +189,7 @@ definition {
 		AssertTextEquals(
 			locator1 = "Sharing#NOTIFICATIONS_DELETE_ENTRY_TITLE",
 			value1 = "Notification no longer applies.");
+
 		AssertTextEquals(
 			locator1 = "Sharing#NOTIFICATIONS_DELETE_ENTRY_CONTENT",
 			value1 = "Notification for Sharing was deleted.");
@@ -180,9 +201,11 @@ definition {
 		AssertElementPresent(
 			key_status = "Not Visible",
 			locator1 = "Sharing#SHARED_CONTENT_CONTENT_STATUS");
+
 		AssertElementNotPresent(
 			key_contentTitle = "DM Document Title",
 			locator1 = "Sharing#SHARED_CONTENT_CONTENT_OPTIONS");
+
 		AssertElementNotPresent(
 			key_contentTitle = "DM Document Title",
 			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE");
@@ -191,7 +214,7 @@ definition {
 	@description = "This test asserts only one entry displays in a user's Shared Content app when multiple users share the same document to him."
 	@priority = "4"
 	test AssertSingleEntry {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -270,11 +293,14 @@ definition {
 
 		UserBar.gotoDropdownItem(dropdownItem = "Shared Content");
 
+		DMDocumentSharing.viewSharedFlag();
+
 		var key_contentTitle = "DM Document Title";
 
 		AssertTextEquals(
 			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE",
 			value1 = "DM Document Title");
+
 		AssertElementNotPresent(
 			key_contentTitle = "DM Document Title",
 			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE_2");
@@ -286,13 +312,14 @@ definition {
 		property custom.properties = "message.boards.message.formats.default=html${line.separator}pop.server.notifications.enabled=true${line.separator}pop.server.subdomain=${line.separator}mail.session.mail.smtp.auth=true${line.separator}mail.session.mail.store.protocol=pop3${line.separator}mail.session.mail.transport.protocol=smtp";
 		property dummy.socket.proxy.disabled = "true";
 		property test.name.skip.portal.instance = "DMSharing#GoToSharedContentViaEmail";
+
 		var portalURL = PropsUtil.get("portal.url");
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		Gmail.login(
-			userEmailAddress = PropsUtil.get("email.address.3"),
-			userPassword = PropsUtil.get("email.password.3"));
+			userEmailAddress = PropsUtil.get("email.address.4"),
+			userPassword = PropsUtil.get("email.password.4"));
 
 		Gmail.gotoHtmlMode();
 
@@ -300,8 +327,8 @@ definition {
 
 		Navigator.openSpecificURL(url = "${portalURL}");
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "System",
 			panel = "Control Panel",
 			portlet = "Server Administration");
 
@@ -312,8 +339,8 @@ definition {
 
 		Navigator.openURL();
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "System",
 			panel = "Control Panel",
 			portlet = "Virtual Instances");
 
@@ -321,21 +348,25 @@ definition {
 			mailDomain = "gmail.com",
 			virtualHost = "localhost");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
 		JSONUser.addUser(
-			userEmailAddress = PropsUtil.get("email.address.3"),
+			userEmailAddress = PropsUtil.get("email.address.4"),
 			userFirstName = "userfn1",
 			userLastName = "userln1",
 			userScreenName = "usersn1");
 
-		JSONUser.setFirstPassword(
-			agreeToTermsAndAnswerReminderQuery = "true",
-			requireReset = "false",
-			userEmailAddress = PropsUtil.get("email.address.3"));
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.editPasswordCP(
+			userEmailAddress = PropsUtil.get("email.address.4"),
+			userScreenName = "usersn1");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
@@ -347,14 +378,14 @@ definition {
 		DMNavigator.gotoShare(dmDocumentTitle = "DM Document Title");
 
 		DMDocument.sharePG(
-			userEmailAddress = PropsUtil.get("email.address.3"),
+			userEmailAddress = PropsUtil.get("email.address.4"),
 			userName = "userfn1 userln1");
 
 		User.logoutPG();
 
 		User.loginUserPG(
 			password = "test",
-			userEmailAddress = PropsUtil.get("email.address.3"));
+			userEmailAddress = PropsUtil.get("email.address.4"));
 
 		Pause(locator1 = "30000");
 
@@ -412,9 +443,54 @@ definition {
 			dmDocumentTitle = "DM Document Title");
 	}
 
+	@description = "This test covers LPS-94284 and LPS-105038. It ensures that the invalid email cannot be added if it has space, also covers the input field that still contains the invalid email after pressing enter."
+	@priority = "4"
+	test InvalidAddressCanNotBeShared {
+		DMDocumentSharing.addDocumentWithOnlyOwnerPermissions(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.doc",
+			dmDocumentTitle = "DM Document Title 1");
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoShare(dmDocumentTitle = "DM Document Title 1");
+
+		IFrame.selectModalFrame();
+
+		Type.sendKeys(
+			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_INPUT",
+			value1 = "userea2@liferay.com ");
+
+		KeyPress(
+			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_INPUT",
+			value1 = "\RETURN");
+
+		AssertElementPresent(
+			key_userEmailAddress = "userea2@liferay.com",
+			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_FEEDBACK_ITEM");
+
+		AssertElementNotPresent(
+			key_userName = "userea2@liferay.com",
+			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_TAG");
+
+		Type(
+			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_INPUT",
+			value1 = "userea3@liferay.com");
+
+		KeyPress(
+			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_INPUT",
+			value1 = "\RETURN");
+
+		AssertTextEquals(
+			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_INPUT",
+			value1 = "userea3@liferay.com");
+	}
+
 	@description = "This test covers LPS-94294. It ensures that sharing a document to a user, and changing its sharing permissions via Manage Collaborators. This test also covers permissions and making sure users only have access to sharing permissions assigned to him."
 	@priority = "5"
 	test ManageCollaborators {
+		property portal.acceptance = "true";
+
 		DMDocumentSharing.addDocumentWithOnlyOwnerPermissions(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentFile = "Document_1.doc",
@@ -596,38 +672,11 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
-	@description = "This test covers LPS-94284. It ensures that the invalid email still does not add if it has a space."
-	@priority = "4"
-	test ShareViaInvalidAddress {
-		DMDocumentSharing.addDocumentWithOnlyOwnerPermissions(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.doc",
-			dmDocumentTitle = "DM Document Title 1");
-
-		DMNavigator.gotoShare(dmDocumentTitle = "DM Document Title 1");
-
-		IFrame.selectModalFrame();
-
-		Type.sendKeys(
-			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_INPUT",
-			value1 = "userea2@liferay.com ");
-
-		KeyPress(
-			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_INPUT",
-			value1 = "\RETURN");
-
-		AssertElementPresent(
-			key_userEmailAddress = "userea2@liferay.com",
-			locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_FEEDBACK_ITEM");
-
-		var key_userName = "userea2@liferay.com";
-
-		AssertElementNotPresent(locator1 = "Sharing#MODAL_INVITE_TO_COLLABORATE_TAG");
-	}
-
 	@description = "This test covers LPS-94585. It ensures that users can share via Shared Content app."
 	@priority = "5"
 	test ShareViaSharedContent {
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
 		JSONUser.addUser(
 			userEmailAddress = "userea2@liferay.com",
 			userFirstName = "userfn2",
@@ -675,7 +724,7 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -710,19 +759,19 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		User.UnassignRegularRoleCP(
+		User.unassignRegularRoleCP(
 			regularRoleName = "Administrator",
 			userScreenName = "usersn");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
-			panel = "Site Administration",
-			portlet = "Memberships");
+			portlet = "Memberships",
+			site = "${siteName}");
 
 		Site.assignUserAsMemberCP(
 			userFirstName = "userfn",
@@ -768,6 +817,8 @@ definition {
 	@description = "This test share an content to a user and disable the sharing option. This test asserts that a collaborator without sharing permissions will not be able to share this content."
 	@priority = "5"
 	test ShareWithNoSharingPermissions {
+		property portal.acceptance = "true";
+
 		JSONUser.addUser(
 			userEmailAddress = "userea1@liferay.com",
 			userFirstName = "userfn1",
@@ -822,11 +873,11 @@ definition {
 		DMDocument.addPG(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentFile = "Document_1.doc",
-			dmDocumentTitle = "DM Document&apos;s Title",
+			dmDocumentTitle = "DM Document's Title",
 			viewableBy = "Owner");
 
 		Click(
-			key_dmDocumentTitle = "DM Document&apos;s Title",
+			key_dmDocumentTitle = "DM Document's Title",
 			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS_SPECIFIC");
 
 		ClickNoError(
@@ -842,7 +893,7 @@ definition {
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		Click(
-			key_dmDocumentTitle = "DM Document&apos;s Title",
+			key_dmDocumentTitle = "DM Document's Title",
 			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS_SPECIFIC");
 
 		ClickNoError(
@@ -866,7 +917,7 @@ definition {
 
 		Notifications.viewNewSharedContent(
 			contentSharingPermission = "viewing",
-			contentTitle = "DM Document&apos;s Title",
+			contentTitle = "DM Document's Title",
 			ownerName = "Test Test",
 			specialCharacter = "true");
 	}

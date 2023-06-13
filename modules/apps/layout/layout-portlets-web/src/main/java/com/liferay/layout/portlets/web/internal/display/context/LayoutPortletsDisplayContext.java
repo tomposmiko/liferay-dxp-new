@@ -14,12 +14,14 @@
 
 package com.liferay.layout.portlets.web.internal.display.context;
 
+import com.liferay.layout.portlets.web.internal.constants.LayoutsPortletsPortletKeys;
 import com.liferay.layout.portlets.web.internal.search.PortletSearch;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletCategory;
+import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -69,8 +71,9 @@ public class LayoutPortletsDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle", "list");
+		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
+			_httpServletRequest, LayoutsPortletsPortletKeys.LAYOUT_PORTLETS,
+			"list");
 
 		return _displayStyle;
 	}
@@ -117,8 +120,8 @@ public class LayoutPortletsDisplayContext {
 		return portletURL;
 	}
 
-	public SearchContainer getSearchContainer() {
-		SearchContainer searchContainer = new PortletSearch(
+	public SearchContainer<Portlet> getSearchContainer() {
+		SearchContainer<Portlet> searchContainer = new PortletSearch(
 			_renderRequest, getPortletURL());
 
 		searchContainer.setEmptyResultsMessage("there-are-no-widgets");
@@ -127,7 +130,7 @@ public class LayoutPortletsDisplayContext {
 		searchContainer.setOrderByType(getOrderByType());
 		searchContainer.setTotal(_layoutPortlets.size());
 
-		List results = ListUtil.sort(
+		List<Portlet> results = ListUtil.sort(
 			_layoutPortlets, searchContainer.getOrderByComparator());
 
 		results = ListUtil.subList(

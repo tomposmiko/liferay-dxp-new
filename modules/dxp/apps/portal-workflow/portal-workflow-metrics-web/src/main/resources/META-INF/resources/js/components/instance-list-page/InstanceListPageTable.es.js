@@ -10,16 +10,25 @@
  */
 
 import ClayTable from '@clayui/table';
-import React from 'react';
+import React, {useEffect} from 'react';
 
+import {useIsAdmin} from '../../shared/hooks/useIsAdmin.es';
 import {Item} from './InstanceListPageItem.es';
 
-const Table = ({items}) => {
+const Table = ({items, totalCount}) => {
+	const {fetchData, isAdmin} = useIsAdmin();
+
+	useEffect(() => {
+		fetchData();
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	return (
 		<ClayTable>
 			<ClayTable.Head>
 				<ClayTable.Row>
-					<ClayTable.Cell headingCell style={{width: '3%'}} />
+					<ClayTable.Cell headingCell style={{width: '7%'}} />
 					<ClayTable.Cell headingCell style={{width: '8%'}}>
 						{Liferay.Language.get('id')}
 					</ClayTable.Cell>
@@ -49,7 +58,12 @@ const Table = ({items}) => {
 
 			<ClayTable.Body>
 				{items.map((item, index) => (
-					<Table.Item {...item} key={index} />
+					<Table.Item
+						{...item}
+						isAdmin={isAdmin}
+						key={index}
+						totalCount={totalCount}
+					/>
 				))}
 			</ClayTable.Body>
 		</ClayTable>

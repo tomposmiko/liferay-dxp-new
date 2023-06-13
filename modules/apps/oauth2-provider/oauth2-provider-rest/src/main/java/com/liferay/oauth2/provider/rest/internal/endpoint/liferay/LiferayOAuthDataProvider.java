@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -907,10 +908,10 @@ public class LiferayOAuthDataProvider
 	}
 
 	protected UserSubject populateUserSubject(
-		long companyId, long userId, String username) {
+		long companyId, long userId, String userName) {
 
 		UserSubject userSubject = new UserSubject(
-			username, String.valueOf(userId));
+			userName, String.valueOf(userId));
 
 		Map<String, String> properties = userSubject.getProperties();
 
@@ -936,7 +937,7 @@ public class LiferayOAuthDataProvider
 	protected void saveRefreshToken(RefreshToken refreshToken) {
 		List<String> accessTokens = refreshToken.getAccessTokens();
 
-		if ((accessTokens == null) || accessTokens.isEmpty()) {
+		if (ListUtil.isEmpty(accessTokens)) {
 			throw new OAuthServiceException("Unable to find granted token");
 		}
 
@@ -966,19 +967,6 @@ public class LiferayOAuthDataProvider
 
 	protected long toCXFTime(Date dateCreated) {
 		return dateCreated.getTime() / 1000;
-	}
-
-	private static void _invokeTransactionally(Runnable runnable)
-		throws Throwable {
-
-		TransactionInvokerUtil.invoke(
-			TransactionConfig.Factory.create(
-				Propagation.REQUIRED, new Class<?>[] {Exception.class}),
-			() -> {
-				runnable.run();
-
-				return null;
-			});
 	}
 
 	private Collection<LiferayOAuth2Scope> _getLiferayOAuth2Scopes(
@@ -1028,6 +1016,17 @@ public class LiferayOAuthDataProvider
 
 		return httpServletRequest.getRemoteAddr() + " - " +
 			httpServletRequest.getRemoteHost();
+	}
+
+	private void _invokeTransactionally(Runnable runnable) throws Throwable {
+		TransactionInvokerUtil.invoke(
+			TransactionConfig.Factory.create(
+				Propagation.REQUIRED, new Class<?>[] {Exception.class}),
+			() -> {
+				runnable.run();
+
+				return null;
+			});
 	}
 
 	private void _transactionalSaveServerAccessToken(
@@ -1115,7 +1114,7 @@ public class LiferayOAuthDataProvider
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		LiferayOAuthDataProvider.class);
 
 	@Reference(

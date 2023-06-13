@@ -33,6 +33,8 @@ MasterLayoutManagementToolbarDisplayContext masterLayoutManagementToolbarDisplay
 	displayContext="<%= masterLayoutManagementToolbarDisplayContext %>"
 />
 
+<liferay-ui:success key="masterPagePublished" message="the-master-page-was-published-succesfully" />
+
 <portlet:actionURL name="/layout_page_template/delete_master_layout" var="deleteMasterLayoutURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
@@ -56,11 +58,10 @@ MasterLayoutManagementToolbarDisplayContext masterLayoutManagementToolbarDisplay
 			<%
 			row.setCssClass("entry-card lfr-asset-item");
 
-			Map<String, Object> rowData = new HashMap<>();
-
-			rowData.put("actions", masterLayoutManagementToolbarDisplayContext.getAvailableActions(layoutPageTemplateEntry));
-
-			row.setData(rowData);
+			row.setData(
+				HashMapBuilder.<String, Object>put(
+					"actions", masterLayoutManagementToolbarDisplayContext.getAvailableActions(layoutPageTemplateEntry)
+				).build());
 			%>
 
 			<liferay-ui:search-container-column-text>

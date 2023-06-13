@@ -9,16 +9,15 @@
  * distribution rights of the Software.
  */
 
+import ClayIcon from '@clayui/icon';
 import React from 'react';
-
-import Icon from '../Icon.es';
 
 const FilterSearch = ({
 	children,
 	filteredItems,
 	onChange,
 	searchTerm,
-	totalCount
+	totalCount,
 }) => {
 	const emptyResults = filteredItems.length === 0;
 	const searchEnabled = totalCount > 12;
@@ -31,7 +30,6 @@ const FilterSearch = ({
 						<div className="input-group-item">
 							<input
 								className="form-control input-group-inset input-group-inset-after"
-								data-testid="filterSearch"
 								onChange={onChange}
 								placeholder={Liferay.Language.get('search-for')}
 								type="text"
@@ -40,7 +38,7 @@ const FilterSearch = ({
 
 							<span className="input-group-inset-item input-group-inset-item-after">
 								<span className="ml-2 mr-2">
-									<Icon iconName="search" />
+									<ClayIcon symbol="search" />
 								</span>
 							</span>
 						</div>

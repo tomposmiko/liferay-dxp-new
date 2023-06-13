@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.RatingSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -28,18 +30,23 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Rating {
+public class Rating implements Cloneable, Serializable {
 
-	public Map<String, Map> getActions() {
+	public static Rating toDTO(String json) {
+		return RatingSerDes.toDTO(json);
+	}
+
+	public Map<String, Map<String, String>> getActions() {
 		return actions;
 	}
 
-	public void setActions(Map<String, Map> actions) {
+	public void setActions(Map<String, Map<String, String>> actions) {
 		this.actions = actions;
 	}
 
 	public void setActions(
-		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+		UnsafeSupplier<Map<String, Map<String, String>>, Exception>
+			actionsUnsafeSupplier) {
 
 		try {
 			actions = actionsUnsafeSupplier.get();
@@ -49,7 +56,7 @@ public class Rating {
 		}
 	}
 
-	protected Map<String, Map> actions;
+	protected Map<String, Map<String, String>> actions;
 
 	public Double getBestRating() {
 		return bestRating;
@@ -195,6 +202,11 @@ public class Rating {
 	}
 
 	protected Double worstRating;
+
+	@Override
+	public Rating clone() throws CloneNotSupportedException {
+		return (Rating)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

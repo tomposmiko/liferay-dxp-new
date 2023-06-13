@@ -24,21 +24,21 @@ axios.defaults.headers.common[
 ] = Liferay.ThemeDisplay.getBCP47LanguageId();
 
 axios.defaults.params = {
-	['p_auth']: Liferay.authToken
+	['p_auth']: Liferay.authToken,
 };
 
-axios.defaults.paramsSerializer = params =>
+axios.defaults.paramsSerializer = (params) =>
 	qs.stringify(params, {arrayFormat: 'repeat'});
 
 const adminClient = axios.create({
-	baseURL: '/o/headless-admin-workflow/v1.0'
+	baseURL: '/o/headless-admin-workflow/v1.0',
 });
 
 const metricsClient = axios.create({
-	baseURL: '/o/portal-workflow-metrics/v1.0'
+	baseURL: '/o/portal-workflow-metrics/v1.0',
 });
 
-const getClient = admin => {
+const getClient = (admin) => {
 	return admin ? adminClient : metricsClient;
 };
 

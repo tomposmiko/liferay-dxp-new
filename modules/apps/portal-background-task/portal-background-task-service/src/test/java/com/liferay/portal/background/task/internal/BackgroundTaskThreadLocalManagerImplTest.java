@@ -15,12 +15,15 @@
 package com.liferay.portal.background.task.internal;
 
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.Serializable;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -29,16 +32,18 @@ import org.junit.Test;
 public class BackgroundTaskThreadLocalManagerImplTest
 	extends BaseBackgroundTaskTestCase {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Test
 	public void testDeserializeThreadLocals() {
-		Map<String, Serializable> taskContextMap =
+		backgroundTaskThreadLocalManagerImpl.deserializeThreadLocals(
 			HashMapBuilder.<String, Serializable>put(
 				BackgroundTaskThreadLocalManagerImpl.KEY_THREAD_LOCAL_VALUES,
 				initializeThreadLocalValues()
-			).build();
-
-		backgroundTaskThreadLocalManagerImpl.deserializeThreadLocals(
-			taskContextMap);
+			).build());
 
 		assertThreadLocalValues();
 	}
@@ -47,10 +52,8 @@ public class BackgroundTaskThreadLocalManagerImplTest
 	public void testGetThreadLocalValues() {
 		initalizeThreadLocals();
 
-		Map<String, Serializable> threadLocalValues =
-			backgroundTaskThreadLocalManagerImpl.getThreadLocalValues();
-
-		assertThreadLocalValues(threadLocalValues);
+		assertThreadLocalValues(
+			backgroundTaskThreadLocalManagerImpl.getThreadLocalValues());
 	}
 
 	@Test
@@ -71,11 +74,8 @@ public class BackgroundTaskThreadLocalManagerImplTest
 
 	@Test
 	public void testSetThreadLocalValues() {
-		Map<String, Serializable> threadLocalValues =
-			initializeThreadLocalValues();
-
 		backgroundTaskThreadLocalManagerImpl.setThreadLocalValues(
-			threadLocalValues);
+			initializeThreadLocalValues());
 
 		assertThreadLocalValues();
 	}

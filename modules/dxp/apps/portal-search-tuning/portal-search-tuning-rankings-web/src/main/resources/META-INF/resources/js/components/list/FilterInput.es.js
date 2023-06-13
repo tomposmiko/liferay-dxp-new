@@ -21,19 +21,19 @@ class FilterInput extends Component {
 		disableSearch: PropTypes.bool,
 		onChange: PropTypes.func,
 		onSubmit: PropTypes.func,
-		searchBarTerm: PropTypes.string
+		searchBarTerm: PropTypes.string,
 	};
 	static defaultProps = {
-		disableSearch: false
+		disableSearch: false,
 	};
 
-	_handleChange = event => {
+	_handleChange = (event) => {
 		event.preventDefault();
 
 		this.props.onChange(event.target.value);
 	};
 
-	_handleKeyDown = event => {
+	_handleKeyDown = (event) => {
 		if (event.key === 'Enter' && event.currentTarget.value.trim()) {
 			this.props.onSubmit();
 		}

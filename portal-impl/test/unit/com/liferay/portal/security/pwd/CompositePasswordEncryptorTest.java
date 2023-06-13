@@ -20,6 +20,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.security.pwd.PasswordEncryptor;
 import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.kernel.util.DigesterUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.DigesterImpl;
 import com.liferay.portal.util.PropsValues;
 
@@ -28,12 +29,19 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Tomas Polesovsky
  */
 public class CompositePasswordEncryptorTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -163,6 +171,14 @@ public class CompositePasswordEncryptorTest {
 		runTests(
 			PasswordEncryptorUtil.TYPE_PBKDF2 + "WithHmacSHA1/128/50000",
 			"password", "AAAAoAAAw1AbW1e1Str9wSLWIX5X9swLn+j5/5+m6auSPdva",
+			PasswordEncryptorUtil.TYPE_PBKDF2 + "WithHmacSHA1");
+	}
+
+	@Test
+	public void testEncryptPBKDF2With720000RoundsAnd128Key() throws Exception {
+		runTests(
+			PasswordEncryptorUtil.TYPE_PBKDF2 + "WithHmacSHA1/128/720000",
+			"password", "AAAAoAAB9ADyaBP3fTtsBh8YlRn1CU7VLYR/mnH7ADMNMz2o",
 			PasswordEncryptorUtil.TYPE_PBKDF2 + "WithHmacSHA1");
 	}
 

@@ -22,7 +22,7 @@ import com.liferay.bulk.selection.internal.constants.BulkSelectionBackgroundTask
 import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
+import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.User;
@@ -75,7 +75,10 @@ public class BulkSelectionSelectionRunnerImpl implements BulkSelectionRunner {
 		Class<? extends BulkSelectionAction> bulkSelectionActionClass =
 			bulkSelectionAction.getClass();
 
-		Map<String, Serializable> taskContextMap =
+		_backgroundTaskLocalService.addBackgroundTask(
+			user.getUserId(), CompanyConstants.SYSTEM,
+			bulkSelectionActionClass.getName(),
+			BulkSelectionBackgroundTaskExecutor.class.getName(),
 			HashMapBuilder.<String, Serializable>put(
 				BackgroundTaskContextMapConstants.DELETE_ON_SUCCESS, true
 			).put(
@@ -100,12 +103,7 @@ public class BulkSelectionSelectionRunnerImpl implements BulkSelectionRunner {
 				BulkSelectionBackgroundTaskConstants.
 					BULK_SELECTION_PARAMETER_MAP,
 				new HashMap<>(bulkSelection.getParameterMap())
-			).build();
-
-		_backgroundTaskLocalService.addBackgroundTask(
-			user.getUserId(), CompanyConstants.SYSTEM,
-			bulkSelectionActionClass.getName(),
-			BulkSelectionBackgroundTaskExecutor.class.getName(), taskContextMap,
+			).build(),
 			new ServiceContext());
 	}
 

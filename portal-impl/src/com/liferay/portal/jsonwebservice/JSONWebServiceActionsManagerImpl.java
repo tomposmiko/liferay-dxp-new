@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MethodParameter;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -508,11 +509,8 @@ public class JSONWebServiceActionsManagerImpl
 		int offset = 0;
 
 		if (Validator.isNotNull(contextName)) {
-			String pathPrefix = StringPool.SLASH.concat(
-				contextName
-			).concat(
-				StringPool.PERIOD
-			);
+			String pathPrefix = StringBundler.concat(
+				StringPool.SLASH, contextName, StringPool.PERIOD);
 
 			if (path.startsWith(pathPrefix)) {
 				offset = pathPrefix.length();
@@ -532,9 +530,7 @@ public class JSONWebServiceActionsManagerImpl
 		List<JSONWebServiceActionConfig> jsonWebServiceActionConfigs =
 			_pathIndexedJSONWebServiceActionConfigs.get(path);
 
-		if ((jsonWebServiceActionConfigs == null) ||
-			jsonWebServiceActionConfigs.isEmpty()) {
-
+		if (ListUtil.isEmpty(jsonWebServiceActionConfigs)) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(

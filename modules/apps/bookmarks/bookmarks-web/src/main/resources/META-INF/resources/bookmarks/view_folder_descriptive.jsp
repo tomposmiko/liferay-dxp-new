@@ -41,8 +41,8 @@ rowURL.setParameter("folderId", String.valueOf(folder.getFolderId()));
 </h5>
 
 <%
-int foldersCount = BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, folder.getFolderId());
 int entriesCount = BookmarksEntryServiceUtil.getEntriesCount(scopeGroupId, folder.getFolderId());
+int foldersCount = BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, folder.getFolderId());
 %>
 
 <span class="h6">

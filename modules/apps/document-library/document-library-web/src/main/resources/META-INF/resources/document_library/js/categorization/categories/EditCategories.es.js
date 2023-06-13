@@ -13,7 +13,7 @@
  */
 
 import {useModal} from '@clayui/modal';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 
 import EditCategoriesContext from './EditCategoriesContext.es';
 import EditCategoriesModal from './EditCategoriesModal.es';
@@ -23,28 +23,30 @@ function EditCategories(props) {
 	const [selectAll, setSelectAll] = useState();
 	const [folderId, setFolderId] = useState();
 	const [showModal, setShowModal] = useState();
+	const {namespace} = useContext(EditCategoriesContext);
+	const bridgeComponentId = `${namespace}EditCategoriesComponent`;
 
 	const handleOnClose = () => {
 		setShowModal(false);
 	};
 
-	const {observer} = useModal({
-		onClose: handleOnClose
+	const {observer, onClose} = useModal({
+		onClose: handleOnClose,
 	});
 
-	if (!Liferay.component(props.componentId)) {
+	if (!Liferay.component(bridgeComponentId)) {
 		Liferay.component(
-			props.componentId,
+			bridgeComponentId,
 			{
 				open: (fileEntries, selectAll, folderId) => {
 					setFileEntries(fileEntries);
 					setSelectAll(selectAll);
 					setFolderId(folderId);
 					setShowModal(true);
-				}
+				},
 			},
 			{
-				destroyOnNavigate: true
+				destroyOnNavigate: true,
 			}
 		);
 	}
@@ -57,7 +59,7 @@ function EditCategories(props) {
 					fileEntries={fileEntries}
 					folderId={folderId}
 					observer={observer}
-					onModalClose={handleOnClose}
+					onModalClose={onClose}
 					selectAll={selectAll}
 				/>
 			)}
@@ -65,7 +67,7 @@ function EditCategories(props) {
 	);
 }
 
-export default function({context, props}) {
+export default function ({context, props}) {
 	return (
 		<EditCategoriesContext.Provider value={context}>
 			<EditCategories {...props} />

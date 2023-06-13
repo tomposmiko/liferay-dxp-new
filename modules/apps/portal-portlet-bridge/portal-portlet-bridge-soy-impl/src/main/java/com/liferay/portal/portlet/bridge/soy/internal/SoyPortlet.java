@@ -16,9 +16,9 @@ package com.liferay.portal.portlet.bridge.soy.internal;
 
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolverUtil;
+import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
@@ -187,7 +187,7 @@ public class SoyPortlet extends MVCPortlet {
 			}
 		}
 		catch (Exception exception) {
-			_log.error("Error on the Serve Resource Phase", exception);
+			_log.error("Unable to serve resource", exception);
 		}
 	}
 
@@ -359,6 +359,8 @@ public class SoyPortlet extends MVCPortlet {
 			portletNamespace + "pjax", "true");
 
 		redirect = HttpUtil.setParameter(redirect, "p_p_lifecycle", "2");
+		redirect = HttpUtil.setParameter(
+			redirect, portletNamespace + "soy_route", true);
 
 		httpServletResponse.sendRedirect(redirect);
 	}
@@ -412,10 +414,10 @@ public class SoyPortlet extends MVCPortlet {
 	private void _copyRequestAttributes(
 		PortletRequest portletRequest, ResourceRequest resourceRequest) {
 
-		Enumeration<String> attributeNames = portletRequest.getAttributeNames();
+		Enumeration<String> enumeration = portletRequest.getAttributeNames();
 
-		while (attributeNames.hasMoreElements()) {
-			String attributeName = attributeNames.nextElement();
+		while (enumeration.hasMoreElements()) {
+			String attributeName = enumeration.nextElement();
 
 			resourceRequest.setAttribute(
 				attributeName, portletRequest.getAttribute(attributeName));
@@ -425,12 +427,10 @@ public class SoyPortlet extends MVCPortlet {
 	private Template _createRequestTemplate(PortletRequest portletRequest)
 		throws TemplateException {
 
-		List<TemplateResource> templateResources = _getTemplateResources();
-
 		Template template = TemplateManagerUtil.getTemplate(
 			TemplateConstants.LANG_TYPE_SOY,
 			SoyTemplateResourceFactoryUtil.createSoyTemplateResource(
-				templateResources),
+				_getTemplateResources()),
 			false);
 
 		portletRequest.setAttribute(WebKeys.TEMPLATE, template);
@@ -518,8 +518,7 @@ public class SoyPortlet extends MVCPortlet {
 	}
 
 	private boolean _isRoutedRequest(PortletRequest portletRequest) {
-		return Validator.isNotNull(
-			portletRequest.getParameter("original_p_p_lifecycle"));
+		return Validator.isNotNull(portletRequest.getParameter("soy_route"));
 	}
 
 	private void _prepareSessionMessages(
@@ -617,9 +616,9 @@ public class SoyPortlet extends MVCPortlet {
 				"portal-portlet-bridge-soy-impl/router/SoyPortletRouter as " +
 					"SoyPortletRouter"));
 
-		String path = getPath(portletRequest, portletResponse);
-
-		requiredModules.addAll(getJavaScriptRequiredModules(path));
+		requiredModules.addAll(
+			getJavaScriptRequiredModules(
+				getPath(portletRequest, portletResponse)));
 
 		String requiredModulesString = StringUtil.merge(requiredModules);
 

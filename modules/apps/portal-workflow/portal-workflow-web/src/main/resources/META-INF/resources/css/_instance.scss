@@ -6,6 +6,10 @@
 		z-index: 1;
 	}
 
+	.task-content-author {
+		padding-top: 1em;
+	}
+
 	.task-content-actions {
 		float: right;
 
@@ -24,11 +28,27 @@
 	font-weight: bold;
 }
 
-.workflow-instance-container {
-	.asset-type,
-	.status,
-	.definition,
-	.end-date {
-		margin-right: 20px;
+.instance-content-container {
+	margin: 24px 0;
+	overflow-y: auto;
+	word-break: break-all;
+
+	.modal-footer .btn-toolbar .btn-secondary {
+		margin-right: 10px;
+	}
+
+	.modal-open .modal {
+		min-height: 325px;
+		min-width: 500px;
+		overflow-y: hidden !important;
+	}
+
+	.workflow-instance-container {
+		.asset-type,
+		.status,
+		.definition,
+		.end-date {
+			margin-right: 20px;
+		}
 	}
 }

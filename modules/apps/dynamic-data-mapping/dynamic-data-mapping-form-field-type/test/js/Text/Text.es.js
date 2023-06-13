@@ -12,126 +12,245 @@
  * details.
  */
 
+import {act, cleanup, fireEvent, render} from '@testing-library/react';
+import {PageProvider} from 'dynamic-data-mapping-form-renderer';
+import React from 'react';
+
 import Text from '../../../src/main/resources/META-INF/resources/Text/Text.es';
 
-let component;
 const spritemap = 'icons.svg';
 
 const defaultTextConfig = {
 	name: 'textField',
-	spritemap
+	spritemap,
 };
 
+const TextWithProvider = (props) => (
+	<PageProvider value={{editingLanguageId: 'en_US'}}>
+		<Text {...props} />
+	</PageProvider>
+);
+
 describe('Field Text', () => {
-	afterEach(() => {
-		if (component) {
-			component.dispose();
-		}
+	// eslint-disable-next-line no-console
+	const originalWarn = console.warn;
+
+	beforeAll(() => {
+		// eslint-disable-next-line no-console
+		console.warn = (...args) => {
+			if (/DataProvider: Trying/.test(args[0])) {
+				return;
+			}
+			originalWarn.call(console, ...args);
+		};
+	});
+
+	afterAll(() => {
+		// eslint-disable-next-line no-console
+		console.warn = originalWarn;
+	});
+
+	afterEach(cleanup);
+
+	beforeEach(() => {
+		jest.useFakeTimers();
+		fetch.mockResponseOnce(JSON.stringify({}));
 	});
 
 	it('is not readOnly', () => {
-		component = new Text({
-			...defaultTextConfig,
-			readOnly: false
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} readOnly={false} />
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		expect(component).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
+	});
+
+	it('is readOnly', () => {
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} readOnly={true} />
+		);
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		expect(container).toMatchSnapshot();
 	});
 
 	it('has a helptext', () => {
-		component = new Text({
-			...defaultTextConfig,
-			tip: 'Type something'
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} tip="Type something" />
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		expect(component).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
 	});
 
 	it('has an id', () => {
-		component = new Text({
-			...defaultTextConfig,
-			id: 'ID'
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} id="Id" />
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		expect(component).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
 	});
 
 	it('has a label', () => {
-		component = new Text({
-			...defaultTextConfig,
-			label: 'label'
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} label="label" />
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		expect(component).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
 	});
 
 	it('has a placeholder', () => {
-		component = new Text({
-			...defaultTextConfig,
-			placeholder: 'Placeholder'
+		const {container} = render(
+			<TextWithProvider
+				{...defaultTextConfig}
+				placeholder="Placeholder"
+			/>
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		expect(component).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
+	});
+
+	it('hides autocomplete dropdown menu when container layout is hidden', () => {
+		const props = {
+			autocomplete: true,
+			options: [
+				{label: 'Option 1', value: 'Option1'},
+				{label: 'Option 2', value: 'Option2'},
+			],
+			value: 'Option',
+			...defaultTextConfig,
+		};
+
+		render(
+			<div className="ddm-page-container-layout hide">
+				<TextWithProvider {...props} />
+			</div>
+		);
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		const autocompleteDropdownMenu = document.body.querySelector(
+			'.autocomplete-dropdown-menu'
+		);
+
+		const classList = autocompleteDropdownMenu.classList;
+
+		expect(classList.contains('show')).toBeFalsy();
 	});
 
 	it('is not required', () => {
-		component = new Text({
-			...defaultTextConfig,
-			required: false
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} required={false} />
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		expect(component).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
+	});
+
+	it('renders autocomplete dropdown menu', () => {
+		const props = {
+			autocomplete: true,
+			options: [
+				{label: 'Option 1', value: 'Option1'},
+				{label: 'Option 2', value: 'Option2'},
+			],
+			value: 'Option',
+			...defaultTextConfig,
+		};
+
+		render(
+			<div className="ddm-page-container-layout">
+				<TextWithProvider {...props} />
+			</div>
+		);
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		const autocompleteDropdownMenu = document.body.querySelector(
+			'.autocomplete-dropdown-menu'
+		);
+
+		const classList = autocompleteDropdownMenu.classList;
+
+		expect(classList.contains('show')).toBeTruthy();
 	});
 
 	it('renders Label if showLabel is true', () => {
-		component = new Text({
-			...defaultTextConfig,
-			label: 'text',
-			showLabel: true
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} label="text" showLabel />
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		expect(component).toMatchSnapshot();
-	});
-
-	it('has a spritemap', () => {
-		component = new Text(defaultTextConfig);
-
-		expect(component).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
 	});
 
 	it('has a value', () => {
-		component = new Text({
-			...defaultTextConfig,
-			value: 'value'
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} value="value" />
+		);
+
+		act(() => {
+			jest.runAllTimers();
 		});
 
-		expect(component).toMatchSnapshot();
+		expect(container).toMatchSnapshot();
 	});
 
-	it('emits a field edit with correct parameters', done => {
-		const handleFieldEdited = data => {
-			expect(data).toEqual(
-				expect.objectContaining({
-					fieldInstance: component,
-					originalEvent: expect.any(Object),
-					value: expect.any(String)
-				})
-			);
-			done();
-		};
+	it('emits a field edit with correct parameters', () => {
+		const onChange = jest.fn();
 
-		const events = {fieldEdited: handleFieldEdited};
+		const {container} = render(
+			<TextWithProvider
+				{...defaultTextConfig}
+				key="input"
+				onChange={onChange}
+			/>
+		);
 
-		component = new Text({
-			...defaultTextConfig,
-			events,
-			key: 'input'
-		});
+		const input = container.querySelector('input');
 
-		component._handleFieldChanged({
+		fireEvent.change(input, {
 			target: {
-				value: 'test'
-			}
+				value: 'test',
+			},
 		});
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		expect(onChange).toHaveBeenCalled();
 	});
 });

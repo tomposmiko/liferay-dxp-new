@@ -18,7 +18,7 @@ import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.servlet.filters.uploadservletrequest.UploadServletRequestFilter;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.InputStream;
 
@@ -29,6 +29,8 @@ import java.lang.reflect.Method;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -37,6 +39,11 @@ import org.springframework.mock.web.MockHttpServletRequest;
  * @author Preston Crary
  */
 public class LiferayInputStreamTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -103,8 +110,7 @@ public class LiferayInputStreamTest {
 		throws Exception {
 
 		_mockHttpServletRequest.setAttribute(
-			UploadServletRequestFilter.COPY_MULTIPART_STREAM_TO_FILE,
-			Boolean.FALSE);
+			LiferayInputStream.COPY_MULTIPART_STREAM_TO_FILE, Boolean.FALSE);
 
 		testInitialRead(_UNCACHEABLE_BYTES);
 	}
@@ -157,7 +163,7 @@ public class LiferayInputStreamTest {
 		_mockHttpServletRequest.setContent(content);
 
 		_mockHttpServletRequest.setAttribute(
-			UploadServletRequestFilter.COPY_MULTIPART_STREAM_TO_FILE, readable);
+			LiferayInputStream.COPY_MULTIPART_STREAM_TO_FILE, readable);
 
 		_liferayInputStream = new LiferayInputStream(_mockHttpServletRequest);
 

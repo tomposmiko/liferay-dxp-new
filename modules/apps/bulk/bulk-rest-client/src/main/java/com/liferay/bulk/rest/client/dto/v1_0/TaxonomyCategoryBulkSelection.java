@@ -17,6 +17,8 @@ package com.liferay.bulk.rest.client.dto.v1_0;
 import com.liferay.bulk.rest.client.function.UnsafeSupplier;
 import com.liferay.bulk.rest.client.serdes.v1_0.TaxonomyCategoryBulkSelectionSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class TaxonomyCategoryBulkSelection {
+public class TaxonomyCategoryBulkSelection implements Cloneable, Serializable {
+
+	public static TaxonomyCategoryBulkSelection toDTO(String json) {
+		return TaxonomyCategoryBulkSelectionSerDes.toDTO(json);
+	}
 
 	public DocumentBulkSelection getDocumentBulkSelection() {
 		return documentBulkSelection;
@@ -99,6 +105,13 @@ public class TaxonomyCategoryBulkSelection {
 	}
 
 	protected Long[] taxonomyCategoryIdsToRemove;
+
+	@Override
+	public TaxonomyCategoryBulkSelection clone()
+		throws CloneNotSupportedException {
+
+		return (TaxonomyCategoryBulkSelection)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

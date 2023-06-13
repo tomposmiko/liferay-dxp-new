@@ -18,6 +18,7 @@ import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
@@ -34,6 +35,7 @@ import com.liferay.portal.kernel.exception.UserIdException;
 import com.liferay.portal.kernel.exception.UserReminderQueryException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Contact;
@@ -100,6 +102,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
+		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ACCOUNT,
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/users_admin/edit_user"
@@ -117,7 +120,6 @@ public class EditUserMVCActionCommand extends BaseMVCActionCommand {
 		String screenName = ParamUtil.getString(actionRequest, "screenName");
 		String emailAddress = ParamUtil.getString(
 			actionRequest, "emailAddress");
-		long facebookId = 0;
 		String languageId = ParamUtil.getString(actionRequest, "languageId");
 		String firstName = ParamUtil.getString(actionRequest, "firstName");
 		String middleName = ParamUtil.getString(actionRequest, "middleName");
@@ -140,19 +142,17 @@ public class EditUserMVCActionCommand extends BaseMVCActionCommand {
 
 		User user = _userService.addUser(
 			themeDisplay.getCompanyId(), true, null, null, autoScreenName,
-			screenName, emailAddress, facebookId, null,
-			LocaleUtil.fromLanguageId(languageId), firstName, middleName,
-			lastName, prefixId, suffixId, male, birthdayMonth, birthdayDay,
-			birthdayYear, jobTitle, null, organizationIds, null, null,
-			new ArrayList<Address>(), new ArrayList<EmailAddress>(),
-			new ArrayList<Phone>(), new ArrayList<Website>(),
-			new ArrayList<AnnouncementsDelivery>(), sendEmail, serviceContext);
+			screenName, emailAddress, LocaleUtil.fromLanguageId(languageId),
+			firstName, middleName, lastName, prefixId, suffixId, male,
+			birthdayMonth, birthdayDay, birthdayYear, jobTitle, null,
+			organizationIds, null, null, new ArrayList<Address>(),
+			new ArrayList<EmailAddress>(), new ArrayList<Phone>(),
+			new ArrayList<Website>(), new ArrayList<AnnouncementsDelivery>(),
+			sendEmail, serviceContext);
 
 		user.setComments(comments);
 
-		user = userLocalService.updateUser(user);
-
-		return user;
+		return userLocalService.updateUser(user);
 	}
 
 	protected void deleteRole(ActionRequest actionRequest) throws Exception {
@@ -169,24 +169,29 @@ public class EditUserMVCActionCommand extends BaseMVCActionCommand {
 		long[] deleteUserIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "deleteUserIds"), 0L);
 
-		for (long deleteUserId : deleteUserIds) {
-			if (cmd.equals(Constants.DEACTIVATE) ||
-				cmd.equals(Constants.RESTORE)) {
+		try (SafeCloseable safeCloseable =
+				ProxyModeThreadLocal.setWithSafeCloseable(true)) {
 
-				int status = WorkflowConstants.STATUS_APPROVED;
+			for (long deleteUserId : deleteUserIds) {
+				if (cmd.equals(Constants.DEACTIVATE) ||
+					cmd.equals(Constants.RESTORE)) {
 
-				if (cmd.equals(Constants.DEACTIVATE)) {
-					status = WorkflowConstants.STATUS_INACTIVE;
+					int status = WorkflowConstants.STATUS_APPROVED;
+
+					if (cmd.equals(Constants.DEACTIVATE)) {
+						status = WorkflowConstants.STATUS_INACTIVE;
+					}
+
+					ServiceContext serviceContext =
+						ServiceContextFactory.getInstance(
+							User.class.getName(), actionRequest);
+
+					_userService.updateStatus(
+						deleteUserId, status, serviceContext);
 				}
-
-				ServiceContext serviceContext =
-					ServiceContextFactory.getInstance(
-						User.class.getName(), actionRequest);
-
-				_userService.updateStatus(deleteUserId, status, serviceContext);
-			}
-			else {
-				_userService.deleteUser(deleteUserId);
+				else {
+					_userService.deleteUser(deleteUserId);
+				}
 			}
 		}
 	}
@@ -195,6 +200,14 @@ public class EditUserMVCActionCommand extends BaseMVCActionCommand {
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
+
+		String portletId = _portal.getPortletId(actionRequest);
+
+		if (portletId.equals(UsersAdminPortletKeys.MY_ACCOUNT) &&
+			redirectToLogin(actionRequest, actionResponse)) {
+
+			return;
+		}
 
 		actionRequest = _wrapActionRequest(actionRequest);
 
@@ -425,7 +438,6 @@ public class EditUserMVCActionCommand extends BaseMVCActionCommand {
 		String oldEmailAddress = user.getEmailAddress();
 		String emailAddress = BeanParamUtil.getString(
 			user, actionRequest, "emailAddress");
-		long facebookId = user.getFacebookId();
 
 		boolean deleteLogo = ParamUtil.getBoolean(actionRequest, "deleteLogo");
 
@@ -475,12 +487,13 @@ public class EditUserMVCActionCommand extends BaseMVCActionCommand {
 
 		user = _userService.updateUser(
 			user.getUserId(), oldPassword, null, null, user.isPasswordReset(),
-			null, null, screenName, emailAddress, facebookId, user.getOpenId(),
-			!deleteLogo, portraitBytes, languageId, user.getTimeZoneId(),
-			user.getGreeting(), comments, firstName, middleName, lastName,
-			prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear,
-			null, null, null, null, null, jobTitle, null, null, null, null,
-			null, null, null, null, null, null, serviceContext);
+			null, null, screenName, emailAddress, !deleteLogo, portraitBytes,
+			languageId, user.getTimeZoneId(), user.getGreeting(), comments,
+			firstName, middleName, lastName, prefixId, suffixId, male,
+			birthdayMonth, birthdayDay, birthdayYear, contact.getSmsSn(),
+			contact.getFacebookSn(), contact.getJabberSn(),
+			contact.getSkypeSn(), contact.getTwitterSn(), jobTitle, null, null,
+			null, null, null, null, null, null, null, null, serviceContext);
 
 		if (oldScreenName.equals(user.getScreenName())) {
 			oldScreenName = StringPool.BLANK;
@@ -557,6 +570,10 @@ public class EditUserMVCActionCommand extends BaseMVCActionCommand {
 
 	private DLAppLocalService _dlAppLocalService;
 	private ListTypeLocalService _listTypeLocalService;
+
+	@Reference
+	private Portal _portal;
+
 	private UserService _userService;
 
 }

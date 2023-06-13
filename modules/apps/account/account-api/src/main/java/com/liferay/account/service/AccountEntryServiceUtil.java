@@ -14,9 +14,11 @@
 
 package com.liferay.account.service;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import com.liferay.account.model.AccountEntry;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.util.List;
 
 /**
  * Provides the remote service utility for AccountEntry. This utility wraps
@@ -37,25 +39,59 @@ public class AccountEntryServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.account.service.impl.AccountEntryServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static com.liferay.account.model.AccountEntry addAccountEntry(
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addAccountEntry(long, long, String, String, String[],
+	 byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
+	public static AccountEntry addAccountEntry(
 			long userId, long parentAccountEntryId, String name,
 			String description, String[] domains, byte[] logoBytes, int status)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().addAccountEntry(
 			userId, parentAccountEntryId, name, description, domains, logoBytes,
 			status);
 	}
 
-	public static java.util.List<com.liferay.account.model.AccountEntry>
-			getAccountEntries(
-				long companyId, int status, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.account.model.AccountEntry> obc)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addAccountEntry(long, long, String, String, String[],
+	 byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
+	public static AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			status, serviceContext);
+	}
+
+	public static AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes,
+			String taxIdNumber, String type, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			taxIdNumber, type, status, serviceContext);
+	}
+
+	public static List<AccountEntry> getAccountEntries(
+			long companyId, int status, int start, int end,
+			OrderByComparator<AccountEntry> orderByComparator)
+		throws PortalException {
 
 		return getService().getAccountEntries(
-			companyId, status, start, end, obc);
+			companyId, status, start, end, orderByComparator);
 	}
 
 	/**
@@ -67,24 +103,19 @@ public class AccountEntryServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult
+		<AccountEntry> search(
+			String keywords, java.util.LinkedHashMap<String, Object> params,
+			int cur, int delta, String orderByField, boolean reverse) {
+
+		return getService().search(
+			keywords, params, cur, delta, orderByField, reverse);
+	}
+
 	public static AccountEntryService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	private static ServiceTracker<AccountEntryService, AccountEntryService>
-		_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(AccountEntryService.class);
-
-		ServiceTracker<AccountEntryService, AccountEntryService>
-			serviceTracker =
-				new ServiceTracker<AccountEntryService, AccountEntryService>(
-					bundle.getBundleContext(), AccountEntryService.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile AccountEntryService _service;
 
 }

@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.dao.db;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
@@ -29,6 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,9 +51,9 @@ public class DBInspector {
 		try {
 			return _connection.getSchema();
 		}
-		catch (Throwable t) {
+		catch (Throwable throwable) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(t, t);
+				_log.debug(throwable, throwable);
 			}
 
 			return null;
@@ -146,6 +148,31 @@ public class DBInspector {
 		}
 	}
 
+	public boolean hasIndex(String tableName, String indexName)
+		throws Exception {
+
+		DB db = DBManagerUtil.getDB();
+		DatabaseMetaData databaseMetaData = _connection.getMetaData();
+
+		try (ResultSet resultSet = db.getIndexResultSet(
+				_connection, normalizeName(tableName, databaseMetaData))) {
+
+			while (resultSet.next()) {
+				if (Objects.equals(
+						normalizeName(indexName, databaseMetaData),
+						resultSet.getString("index_name"))) {
+
+					return true;
+				}
+			}
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+		}
+
+		return false;
+	}
+
 	public boolean hasRows(String tableName) {
 		try (PreparedStatement ps = _connection.prepareStatement(
 				"select count(*) from " + tableName);
@@ -188,6 +215,31 @@ public class DBInspector {
 		}
 
 		return false;
+	}
+
+	public boolean isNullable(String tableName, String columnName)
+		throws SQLException {
+
+		DatabaseMetaData databaseMetaData = _connection.getMetaData();
+
+		try (ResultSet rs = databaseMetaData.getColumns(
+				getCatalog(), getSchema(),
+				normalizeName(tableName, databaseMetaData),
+				normalizeName(columnName, databaseMetaData))) {
+
+			if (!rs.next()) {
+				throw new SQLException(
+					StringBundler.concat(
+						"Column ", tableName, StringPool.PERIOD, columnName,
+						" does not exist"));
+			}
+
+			if (rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable) {
+				return true;
+			}
+
+			return false;
+		}
 	}
 
 	public String normalizeName(String name) throws SQLException {

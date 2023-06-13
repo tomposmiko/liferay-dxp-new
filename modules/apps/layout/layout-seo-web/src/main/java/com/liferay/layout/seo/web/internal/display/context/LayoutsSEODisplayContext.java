@@ -14,6 +14,10 @@
 
 package com.liferay.layout.seo.web.internal.display.context;
 
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.model.ClassType;
+import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.exception.StorageException;
@@ -21,11 +25,19 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.StorageEngine;
+import com.liferay.info.exception.NoSuchFormVariationException;
+import com.liferay.info.form.InfoForm;
+import com.liferay.info.item.InfoItemClassDetails;
+import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.provider.InfoItemDetailsProvider;
+import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.seo.canonical.url.LayoutSEOCanonicalURLProvider;
 import com.liferay.layout.seo.kernel.LayoutSEOLinkManager;
 import com.liferay.layout.seo.model.LayoutSEOEntry;
@@ -34,6 +46,7 @@ import com.liferay.layout.seo.service.LayoutSEOEntryLocalServiceUtil;
 import com.liferay.layout.seo.service.LayoutSEOSiteLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -48,14 +61,19 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.MimeResponse;
@@ -71,7 +89,9 @@ public class LayoutsSEODisplayContext {
 
 	public LayoutsSEODisplayContext(
 		DLAppService dlAppService, DLURLHelper dlurlHelper,
+		InfoItemServiceTracker infoItemServiceTracker,
 		ItemSelector itemSelector,
+		LayoutPageTemplateEntryLocalService layoutPageTemplateEntryLocalService,
 		LayoutSEOCanonicalURLProvider layoutSEOCanonicalURLProvider,
 		LayoutSEOLinkManager layoutSEOLinkManager,
 		LayoutSEOSiteLocalService layoutSEOSiteLocalService,
@@ -81,7 +101,10 @@ public class LayoutsSEODisplayContext {
 
 		_dlAppService = dlAppService;
 		_dlurlHelper = dlurlHelper;
+		_infoItemServiceTracker = infoItemServiceTracker;
 		_itemSelector = itemSelector;
+		_layoutPageTemplateEntryLocalService =
+			layoutPageTemplateEntryLocalService;
 		_layoutSEOCanonicalURLProvider = layoutSEOCanonicalURLProvider;
 		_layoutSEOLinkManager = layoutSEOLinkManager;
 		_layoutSEOSiteLocalService = layoutSEOSiteLocalService;
@@ -155,10 +178,14 @@ public class LayoutsSEODisplayContext {
 		}
 
 		try {
-			return _dlurlHelper.getImagePreviewURL(
-				_dlAppService.getFileEntry(
-					layoutSEOSite.getOpenGraphImageFileEntryId()),
-				_themeDisplay);
+			FileEntry fileEntry = _dlAppService.getFileEntry(
+				layoutSEOSite.getOpenGraphImageFileEntryId());
+
+			if (fileEntry.isInTrash()) {
+				return StringPool.BLANK;
+			}
+
+			return _dlurlHelper.getImagePreviewURL(fileEntry, _themeDisplay);
 		}
 		catch (PortalException portalException) {
 			_log.error(portalException, portalException);
@@ -168,45 +195,40 @@ public class LayoutsSEODisplayContext {
 	}
 
 	public Map<Locale, String> getDefaultPageTitleMap() {
-		Map<Locale, String> titleMap = new HashMap<>();
+		return HashMapBuilder.putAll(
+			_selLayout.getNameMap()
+		).putAll(
+			_selLayout.getTitleMap()
+		).build();
+	}
 
-		titleMap.putAll(_selLayout.getNameMap());
-		titleMap.putAll(_selLayout.getTitleMap());
+	public Map<Locale, String> getDefaultPageTitleWithSuffixMap()
+		throws PortalException {
 
-		return titleMap;
+		Map<Locale, String> defaultPageTitleMap = getDefaultPageTitleMap();
+
+		String pageTitleSuffix = getPageTitleSuffix();
+
+		if (Validator.isNull(pageTitleSuffix)) {
+			return defaultPageTitleMap;
+		}
+
+		Set<Map.Entry<Locale, String>> set = defaultPageTitleMap.entrySet();
+
+		Stream<Map.Entry<Locale, String>> stream = set.stream();
+
+		return stream.collect(
+			Collectors.toMap(
+				Map.Entry::getKey,
+				entry -> entry.getValue() + " - " + pageTitleSuffix));
+	}
+
+	public PortletURL getEditCustomMetaTagsURL() {
+		return _getPortletURL("/layout/edit_custom_meta_tags");
 	}
 
 	public PortletURL getEditOpenGraphURL() {
-		LiferayPortletURL liferayPortletURL =
-			_liferayPortletResponse.createLiferayPortletURL(
-				_liferayPortletRequest.getPlid(),
-				_liferayPortletRequest.getPortletName(),
-				PortletRequest.ACTION_PHASE, MimeResponse.Copy.ALL);
-
-		liferayPortletURL.setParameter(
-			ActionRequest.ACTION_NAME, "/layout/edit_open_graph");
-
-		liferayPortletURL.setParameter(
-			"mvcRenderCommandName",
-			_liferayPortletRequest.getParameter("mvcRenderCommandName"));
-		liferayPortletURL.setParameter(
-			"tabs1", _liferayPortletRequest.getParameter("tabs1"));
-		liferayPortletURL.setParameter(
-			"screenNavigationCategoryKey",
-			_liferayPortletRequest.getParameter("screenNavigationCategoryKey"));
-		liferayPortletURL.setParameter(
-			"screenNavigationEntryKey",
-			_liferayPortletRequest.getParameter("screenNavigationEntryKey"));
-		liferayPortletURL.setParameter(
-			"selPlid", _liferayPortletRequest.getParameter("selPlid"));
-		liferayPortletURL.setParameter(
-			"privateLayout",
-			_liferayPortletRequest.getParameter("privateLayout"));
-		liferayPortletURL.setParameter(
-			"displayStyle",
-			_liferayPortletRequest.getParameter("displayStyle"));
-
-		return liferayPortletURL;
+		return _getPortletURL("/layout/edit_open_graph");
 	}
 
 	public long getGroupId() {
@@ -265,6 +287,10 @@ public class LayoutsSEODisplayContext {
 			FileEntry fileEntry = _dlAppService.getFileEntry(
 				layoutSEOEntry.getOpenGraphImageFileEntryId());
 
+			if (fileEntry.isInTrash()) {
+				return StringPool.BLANK;
+			}
+
 			return fileEntry.getTitle();
 		}
 		catch (Exception exception) {
@@ -284,16 +310,43 @@ public class LayoutsSEODisplayContext {
 		}
 
 		try {
-			return _dlurlHelper.getImagePreviewURL(
-				_dlAppService.getFileEntry(
-					layoutSEOEntry.getOpenGraphImageFileEntryId()),
-				_themeDisplay);
+			FileEntry fileEntry = _dlAppService.getFileEntry(
+				layoutSEOEntry.getOpenGraphImageFileEntryId());
+
+			if (fileEntry.isInTrash()) {
+				return StringPool.BLANK;
+			}
+
+			return _dlurlHelper.getImagePreviewURL(fileEntry, _themeDisplay);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
 
 			return StringPool.BLANK;
 		}
+	}
+
+	public HashMap<String, Object> getOpenGraphMappingData()
+		throws PortalException {
+
+		return HashMapBuilder.<String, Object>putAll(
+			_getBaseSEOMappingData(
+				_getInfoForm(_getLayoutPageTemplateEntry()),
+				_getLayoutPageTemplateEntry())
+		).put(
+			"openGraphDescription",
+			_selLayout.getTypeSettingsProperty(
+				"mapped-openGraphDescription", "description")
+		).put(
+			"openGraphImage",
+			_selLayout.getTypeSettingsProperty("mapped-openGraphImage", null)
+		).put(
+			"openGraphImageAlt",
+			_selLayout.getTypeSettingsProperty("mapped-openGraphImageAlt", null)
+		).put(
+			"openGraphTitle",
+			_selLayout.getTypeSettingsProperty("mapped-openGraphTitle", "title")
+		).build();
 	}
 
 	public String getPageTitleSuffix() throws PortalException {
@@ -361,6 +414,20 @@ public class LayoutsSEODisplayContext {
 			layout.getLayoutId());
 	}
 
+	public HashMap<String, Object> getSEOMappingData() throws PortalException {
+		return HashMapBuilder.<String, Object>putAll(
+			_getBaseSEOMappingData(
+				_getInfoForm(_getLayoutPageTemplateEntry()),
+				_getLayoutPageTemplateEntry())
+		).put(
+			"description",
+			_selLayout.getTypeSettingsProperty(
+				"mapped-description", "description")
+		).put(
+			"title", _selLayout.getTypeSettingsProperty("mapped-title", "title")
+		).build();
+	}
+
 	public boolean isPrivateLayout() {
 		if (_privateLayout != null) {
 			return _privateLayout;
@@ -374,9 +441,9 @@ public class LayoutsSEODisplayContext {
 			return _privateLayout;
 		}
 
-		Layout selLayout = getSelLayout();
-
 		if (getSelLayout() != null) {
+			Layout selLayout = getSelLayout();
+
 			_privateLayout = selLayout.isPrivateLayout();
 
 			return _privateLayout;
@@ -396,6 +463,97 @@ public class LayoutsSEODisplayContext {
 		return _privateLayout;
 	}
 
+	private HashMap<String, Object> _getBaseSEOMappingData(
+			InfoForm infoForm, LayoutPageTemplateEntry layoutPageTemplateEntry)
+		throws PortalException {
+
+		return HashMapBuilder.<String, Object>put(
+			"defaultLanguageId", _selLayout.getDefaultLanguageId()
+		).put(
+			"fields",
+			infoForm.getAllInfoFields(
+			).stream(
+			).map(
+				infoField -> JSONUtil.put(
+					"key", infoField.getName()
+				).put(
+					"label", infoField.getLabel(_themeDisplay.getLocale())
+				).put(
+					"type",
+					infoField.getInfoFieldType(
+					).getName()
+				)
+			).collect(
+				Collectors.toList()
+			)
+		).put(
+			"selectedSource",
+			JSONUtil.put(
+				"className", layoutPageTemplateEntry.getClassName()
+			).put(
+				"classNameLabel",
+				_getTypeLabel(layoutPageTemplateEntry.getClassName())
+			).put(
+				"classTypeId", layoutPageTemplateEntry.getClassTypeId()
+			).put(
+				"classTypeLabel",
+				_getSubtypeLabel(
+					layoutPageTemplateEntry.getClassName(),
+					layoutPageTemplateEntry.getClassTypeId())
+			)
+		).build();
+	}
+
+	private InfoForm _getInfoForm(
+			LayoutPageTemplateEntry layoutPageTemplateEntry)
+		throws NoSuchFormVariationException {
+
+		InfoItemFormProvider<?> infoItemFormProvider =
+			_infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFormProvider.class,
+				layoutPageTemplateEntry.getClassName());
+
+		return infoItemFormProvider.getInfoForm(
+			String.valueOf(layoutPageTemplateEntry.getClassTypeId()));
+	}
+
+	private LayoutPageTemplateEntry _getLayoutPageTemplateEntry() {
+		return _layoutPageTemplateEntryLocalService.
+			fetchLayoutPageTemplateEntryByPlid(_selPlid);
+	}
+
+	private PortletURL _getPortletURL(String actionName) {
+		LiferayPortletURL liferayPortletURL =
+			_liferayPortletResponse.createLiferayPortletURL(
+				_liferayPortletRequest.getPlid(),
+				_liferayPortletRequest.getPortletName(),
+				PortletRequest.ACTION_PHASE, MimeResponse.Copy.ALL);
+
+		liferayPortletURL.setParameter(ActionRequest.ACTION_NAME, actionName);
+
+		liferayPortletURL.setParameter(
+			"mvcRenderCommandName",
+			_liferayPortletRequest.getParameter("mvcRenderCommandName"));
+		liferayPortletURL.setParameter(
+			"tabs1", _liferayPortletRequest.getParameter("tabs1"));
+		liferayPortletURL.setParameter(
+			"screenNavigationCategoryKey",
+			_liferayPortletRequest.getParameter("screenNavigationCategoryKey"));
+		liferayPortletURL.setParameter(
+			"screenNavigationEntryKey",
+			_liferayPortletRequest.getParameter("screenNavigationEntryKey"));
+		liferayPortletURL.setParameter(
+			"selPlid", _liferayPortletRequest.getParameter("selPlid"));
+		liferayPortletURL.setParameter(
+			"privateLayout",
+			_liferayPortletRequest.getParameter("privateLayout"));
+		liferayPortletURL.setParameter(
+			"displayStyle",
+			_liferayPortletRequest.getParameter("displayStyle"));
+
+		return liferayPortletURL;
+	}
+
 	private Long _getSelPlid() {
 		if (_selPlid != null) {
 			return _selPlid;
@@ -407,6 +565,41 @@ public class LayoutsSEODisplayContext {
 		return _selPlid;
 	}
 
+	private String _getSubtypeLabel(String className, long classTypeId)
+		throws PortalException {
+
+		AssetRendererFactory<?> assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				className);
+
+		if ((assetRendererFactory == null) || (classTypeId <= 0)) {
+			return StringPool.BLANK;
+		}
+
+		ClassTypeReader classTypeReader =
+			assetRendererFactory.getClassTypeReader();
+
+		ClassType classType = classTypeReader.getClassType(
+			classTypeId, _themeDisplay.getLocale());
+
+		return classType.getName();
+	}
+
+	private String _getTypeLabel(String className) {
+		InfoItemDetailsProvider infoItemDetailsProvider =
+			_infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemDetailsProvider.class, className);
+
+		if (infoItemDetailsProvider == null) {
+			return StringPool.BLANK;
+		}
+
+		InfoItemClassDetails infoItemClassDetails =
+			infoItemDetailsProvider.getInfoItemClassDetails();
+
+		return infoItemClassDetails.getLabel(_themeDisplay.getLocale());
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutsSEODisplayContext.class);
 
@@ -415,8 +608,11 @@ public class LayoutsSEODisplayContext {
 	private final DLURLHelper _dlurlHelper;
 	private final GroupDisplayContextHelper _groupDisplayContextHelper;
 	private final HttpServletRequest _httpServletRequest;
+	private final InfoItemServiceTracker _infoItemServiceTracker;
 	private final ItemSelector _itemSelector;
 	private Long _layoutId;
+	private final LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
 	private final LayoutSEOCanonicalURLProvider _layoutSEOCanonicalURLProvider;
 	private final LayoutSEOLinkManager _layoutSEOLinkManager;
 	private final LayoutSEOSiteLocalService _layoutSEOSiteLocalService;

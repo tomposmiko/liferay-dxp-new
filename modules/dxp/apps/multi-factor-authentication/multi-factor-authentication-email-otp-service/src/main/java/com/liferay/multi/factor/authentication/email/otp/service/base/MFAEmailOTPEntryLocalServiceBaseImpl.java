@@ -16,7 +16,9 @@ package com.liferay.multi.factor.authentication.email.otp.service.base;
 
 import com.liferay.multi.factor.authentication.email.otp.model.MFAEmailOTPEntry;
 import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntryLocalService;
+import com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntryLocalServiceUtil;
 import com.liferay.multi.factor.authentication.email.otp.service.persistence.MFAEmailOTPEntryPersistence;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -36,16 +38,20 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -67,11 +73,15 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>MFAEmailOTPEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.multi.factor.authentication.email.otp.service.MFAEmailOTPEntryLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>MFAEmailOTPEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>MFAEmailOTPEntryLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the mfa email otp entry to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MFAEmailOTPEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param mfaEmailOTPEntry the mfa email otp entry
 	 * @return the mfa email otp entry that was added
@@ -101,6 +111,10 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 	/**
 	 * Deletes the mfa email otp entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MFAEmailOTPEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mfaEmailOTPEntryId the primary key of the mfa email otp entry
 	 * @return the mfa email otp entry that was removed
 	 * @throws PortalException if a mfa email otp entry with the primary key could not be found
@@ -116,6 +130,10 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 	/**
 	 * Deletes the mfa email otp entry from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MFAEmailOTPEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mfaEmailOTPEntry the mfa email otp entry
 	 * @return the mfa email otp entry that was removed
 	 */
@@ -125,6 +143,18 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 		MFAEmailOTPEntry mfaEmailOTPEntry) {
 
 		return mfaEmailOTPEntryPersistence.remove(mfaEmailOTPEntry);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return mfaEmailOTPEntryPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -281,6 +311,16 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return mfaEmailOTPEntryPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -289,6 +329,13 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 			(MFAEmailOTPEntry)persistedModel);
 	}
 
+	public BasePersistence<MFAEmailOTPEntry> getBasePersistence() {
+		return mfaEmailOTPEntryPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -325,6 +372,10 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 	/**
 	 * Updates the mfa email otp entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MFAEmailOTPEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mfaEmailOTPEntry the mfa email otp entry
 	 * @return the mfa email otp entry that was updated
 	 */
@@ -334,6 +385,11 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 		MFAEmailOTPEntry mfaEmailOTPEntry) {
 
 		return mfaEmailOTPEntryPersistence.update(mfaEmailOTPEntry);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -347,6 +403,8 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		mfaEmailOTPEntryLocalService = (MFAEmailOTPEntryLocalService)aopProxy;
+
+		_setLocalServiceUtilService(mfaEmailOTPEntryLocalService);
 	}
 
 	/**
@@ -388,6 +446,23 @@ public abstract class MFAEmailOTPEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		MFAEmailOTPEntryLocalService mfaEmailOTPEntryLocalService) {
+
+		try {
+			Field field =
+				MFAEmailOTPEntryLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mfaEmailOTPEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

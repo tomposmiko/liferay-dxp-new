@@ -40,11 +40,10 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 		>
 
 			<%
-			Map<String, Object> rowData = new HashMap<>();
-
-			rowData.put("actions", siteNavigationAdminManagementToolbarDisplayContext.getAvailableActions(siteNavigationMenu));
-
-			row.setData(rowData);
+			row.setData(
+				HashMapBuilder.<String, Object>put(
+					"actions", siteNavigationAdminManagementToolbarDisplayContext.getAvailableActions(siteNavigationMenu)
+				).build());
 			%>
 
 			<portlet:renderURL var="editSiteNavigationMenuURL">
@@ -104,11 +103,17 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 						value="<%= HtmlUtil.escape(siteNavigationMenu.getName()) %>"
 					/>
 
-					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand-smaller"
-						name="add-new-pages"
-						value='<%= siteNavigationMenu.isAuto() ? LanguageUtil.get(request, "yes") : StringPool.BLANK %>'
-					/>
+					<%
+					Group scopeGroup = themeDisplay.getScopeGroup();
+					%>
+
+					<c:if test="<%= !scopeGroup.isCompany() %>">
+						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand-smaller"
+							name="add-new-pages"
+							value='<%= siteNavigationMenu.isAuto() ? LanguageUtil.get(request, "yes") : StringPool.BLANK %>'
+						/>
+					</c:if>
 
 					<liferay-ui:search-container-column-text
 						cssClass="table-cell-expand-smaller table-cell-minw-150"
@@ -147,7 +152,7 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 		document.body,
 		'click',
 		'.<portlet:namespace />update-site-navigation-menu-action-option > a',
-		function(event) {
+		function (event) {
 			var data = event.delegateTarget.dataset;
 
 			event.preventDefault();
@@ -164,7 +169,7 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 				mainFieldValue: data.mainFieldValue,
 				namespace: '<portlet:namespace />',
 				spritemap:
-					'<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg'
+					'<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 			});
 		}
 	);

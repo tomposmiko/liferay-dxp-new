@@ -14,13 +14,18 @@
 
 package com.liferay.journal.web.internal.display.context;
 
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLinkLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMStructureServiceUtil;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -61,7 +66,9 @@ public class JournalSelectDDMStructureDisplayContext {
 		return _classPK;
 	}
 
-	public SearchContainer getDDMStructureSearch() throws Exception {
+	public SearchContainer<DDMStructure> getDDMStructureSearch()
+		throws Exception {
+
 		if (_ddmStructureSearch != null) {
 			return _ddmStructureSearch;
 		}
@@ -70,7 +77,7 @@ public class JournalSelectDDMStructureDisplayContext {
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		SearchContainer ddmStructureSearch = new SearchContainer(
+		SearchContainer<DDMStructure> ddmStructureSearch = new SearchContainer(
 			_renderRequest, _getPortletURL(), null, "there-are-no-structures");
 
 		if (Validator.isNotNull(_getKeywords())) {
@@ -89,7 +96,7 @@ public class JournalSelectDDMStructureDisplayContext {
 		ddmStructureSearch.setOrderByComparator(orderByComparator);
 		ddmStructureSearch.setOrderByType(orderByType);
 
-		long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(
+		long[] groupIds = _getCurrentAndAncestorSiteAndDepotGroupIds(
 			themeDisplay.getScopeGroupId());
 
 		int total = 0;
@@ -166,7 +173,7 @@ public class JournalSelectDDMStructureDisplayContext {
 		}
 
 		_orderByType = ParamUtil.getString(
-			_renderRequest, "orderByType", "asc");
+			_renderRequest, "orderByType", "desc");
 
 		return _orderByType;
 	}
@@ -187,6 +194,17 @@ public class JournalSelectDDMStructureDisplayContext {
 		}
 
 		return false;
+	}
+
+	private long[] _getCurrentAndAncestorSiteAndDepotGroupIds(long groupId)
+		throws Exception {
+
+		return ArrayUtil.append(
+			PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId),
+			ListUtil.toLongArray(
+				DepotEntryLocalServiceUtil.getGroupConnectedDepotEntries(
+					groupId, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+				DepotEntry::getGroupId));
 	}
 
 	private String _getKeywords() {
@@ -265,7 +283,7 @@ public class JournalSelectDDMStructureDisplayContext {
 	}
 
 	private Long _classPK;
-	private SearchContainer _ddmStructureSearch;
+	private SearchContainer<DDMStructure> _ddmStructureSearch;
 	private final HttpServletRequest _httpServletRequest;
 	private String _keywords;
 	private String _orderByCol;

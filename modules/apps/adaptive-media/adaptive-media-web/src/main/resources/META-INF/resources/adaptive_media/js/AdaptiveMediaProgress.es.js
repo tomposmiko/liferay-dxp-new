@@ -12,13 +12,15 @@
  * details.
  */
 
+import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
 import ClayProgressBar from '@clayui/progress-bar';
 import {useIsMounted, useTimeout} from 'frontend-js-react-web';
 import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useCallback, useState, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
-import {enableEntryIcon, disableEntryIcon} from './utils/entryIcons.es';
+import {disableEntryIcon, enableEntryIcon} from './utils/entryIcons.es';
 
 const AdaptiveMediaProgress = ({
 	adaptedImages,
@@ -30,7 +32,7 @@ const AdaptiveMediaProgress = ({
 	percentageUrl,
 	tooltip,
 	totalImages,
-	uuid
+	uuid,
 }) => {
 	const delay = useTimeout();
 	const isMounted = useIsMounted();
@@ -39,14 +41,57 @@ const AdaptiveMediaProgress = ({
 		autoStartProgress
 	);
 	const [percentage, setPercentage] = useState(
-		(adaptedImages / totalImages) * 100 || 0
+		Math.ceil((adaptedImages / totalImages) * 100) || 0
 	);
 	const [progressBarTooltip, setProgressBarTooltip] = useState(
 		adaptedImages + '/' + totalImages
 	);
 
+	const [imagesFailed, setImagesFailed] = useState(0);
+
+	const updateProgress = useCallback(() => {
+		fetch(percentageUrl)
+			.then((res) => res.json())
+			.then(({adaptedImages, errors, totalImages}) => {
+				if (isMounted()) {
+					setImagesFailed(errors);
+
+					setPercentage(
+						Math.ceil((adaptedImages / totalImages) * 100) || 0
+					);
+
+					setProgressBarTooltip(
+						tooltip ? tooltip : adaptedImages + '/' + totalImages
+					);
+				}
+
+				if (adaptedImages + errors === totalImages) {
+					if (isMounted()) {
+						setShowLoadingIndicator(false);
+					}
+
+					enableEntryIcon(
+						document.getElementById(
+							`${namespace}icon-disable-${uuid}`
+						)
+					);
+				}
+				else {
+					delay(updateProgress, intervalSpeed);
+				}
+			});
+	}, [
+		delay,
+		intervalSpeed,
+		isMounted,
+		namespace,
+		percentageUrl,
+		tooltip,
+		uuid,
+	]);
+
 	const startProgress = useCallback(
-		backgroundTaskUrl => {
+		(backgroundTaskUrl) => {
 			fetch(backgroundTaskUrl);
 
 			if (isMounted()) {
@@ -68,43 +113,11 @@ const AdaptiveMediaProgress = ({
 		[delay, intervalSpeed, isMounted, namespace, updateProgress, uuid]
 	);
 
-	const updateProgress = useCallback(() => {
-		fetch(percentageUrl)
-			.then(res => res.json())
-			.then(({adaptedImages, totalImages}) => {
-				if (isMounted()) {
-					setPercentage(
-						Math.round((adaptedImages / totalImages) * 100) || 0
-					);
+	const onClickRetry = () => {
+		setImagesFailed(0);
 
-					setProgressBarTooltip(
-						tooltip ? tooltip : adaptedImages + '/' + totalImages
-					);
-				}
-
-				if (adaptedImages === totalImages) {
-					if (isMounted()) {
-						setShowLoadingIndicator(false);
-					}
-
-					enableEntryIcon(
-						document.getElementById(
-							`${namespace}icon-disable-${uuid}`
-						)
-					);
-				} else {
-					delay(updateProgress, intervalSpeed);
-				}
-			});
-	}, [
-		delay,
-		intervalSpeed,
-		isMounted,
-		namespace,
-		percentageUrl,
-		tooltip,
-		uuid
-	]);
+		startProgress();
+	};
 
 	useEffect(() => {
 		if (autoStartProgress) {
@@ -116,15 +129,39 @@ const AdaptiveMediaProgress = ({
 		Liferay.component(
 			adaptiveMediaProgressComponentId,
 			{
-				startProgress
+				startProgress,
 			},
 			{
-				destroyOnNavigate: true
+				destroyOnNavigate: true,
 			}
 		);
 	}
 
-	return (
+	return imagesFailed > 0 ? (
+		<div className="progress-error-container">
+			<span className="text-danger">
+				<ClayIcon symbol="exclamation-full" />
+				<span>
+					<strong>{Liferay.Language.get('error')}: </strong>
+					{imagesFailed === 1
+						? Liferay.Language.get('1-image-failed-process')
+						: Liferay.Util.sub(
+								Liferay.Language.get('x-images-failed-process'),
+								imagesFailed
+						  )}
+				</span>
+			</span>
+
+			<ClayButton
+				borderless
+				className="text-danger"
+				onClick={onClickRetry}
+				small
+			>
+				{Liferay.Language.get('retry')}
+			</ClayButton>
+		</div>
+	) : (
 		<>
 			<div
 				className={`progress-container ${disabled ? 'disabled' : ''}`}
@@ -155,9 +192,7 @@ AdaptiveMediaProgress.propTypes = {
 	showLoadingIndicator: PropTypes.bool,
 	tooltip: PropTypes.string,
 	totalImages: PropTypes.number,
-	uuid: PropTypes.string
+	uuid: PropTypes.string,
 };
 
-export default function(props) {
-	return <AdaptiveMediaProgress {...props} />;
-}
+export default AdaptiveMediaProgress;

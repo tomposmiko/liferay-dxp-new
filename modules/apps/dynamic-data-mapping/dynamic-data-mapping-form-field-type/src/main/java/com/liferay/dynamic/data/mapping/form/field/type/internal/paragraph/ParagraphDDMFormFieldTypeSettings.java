@@ -68,10 +68,11 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 						@DDMFormLayoutColumn(
 							size = 12,
 							value = {
-								"name", "validation", "showLabel", "repeatable",
-								"predefinedValue", "visibilityExpression",
-								"fieldNamespace", "indexType", "localizable",
-								"readOnly", "dataType", "type"
+								"name", "fieldReference", "validation",
+								"showLabel", "repeatable", "predefinedValue",
+								"visibilityExpression", "fieldNamespace",
+								"indexType", "localizable", "readOnly",
+								"dataType", "type"
 							}
 						)
 					}
@@ -96,7 +97,7 @@ public interface ParagraphDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		dataType = "string", label = "%body-text",
-		properties = "placeholder=%enter-body-text", type = "editor"
+		properties = "placeholder=%enter-body-text", type = "rich_text"
 	)
 	public LocalizedValue text();
 

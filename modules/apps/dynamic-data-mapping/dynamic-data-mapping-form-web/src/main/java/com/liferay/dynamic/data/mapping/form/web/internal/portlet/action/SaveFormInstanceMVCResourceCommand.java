@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
-		"mvc.command.name=saveFormInstance"
+		"mvc.command.name=/dynamic_data_mapping_form/save_form_instance"
 	},
 	service = MVCResourceCommand.class
 )
@@ -57,7 +57,7 @@ public class SaveFormInstanceMVCResourceCommand
 
 			writeResponse(resourceRequest, resourceResponse, formInstance);
 		}
-		catch (Throwable t) {
+		catch (Throwable throwable) {
 			resourceResponse.setProperty(
 				ResourceResponse.HTTP_STATUS_CODE,
 				String.valueOf(HttpServletResponse.SC_BAD_REQUEST));

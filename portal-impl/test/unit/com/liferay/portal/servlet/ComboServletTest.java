@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.language.LanguageImpl;
 import com.liferay.portal.model.impl.PortletAppImpl;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.tools.ToolDependencies;
 import com.liferay.portal.util.FileImpl;
 import com.liferay.portal.util.HttpImpl;
@@ -51,6 +52,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -68,6 +71,11 @@ import org.springframework.mock.web.MockServletContext;
  * @author Raymond Augé
  */
 public class ComboServletTest extends PowerMockito {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -216,6 +224,14 @@ public class ComboServletTest extends PowerMockito {
 	}
 
 	@Test
+	public void testInvalidResourcePath() throws Exception {
+		Assert.assertNull(
+			_comboServlet.getResourceRequestDispatcher(
+				_mockHttpServletRequest, _mockHttpServletResponse,
+				_TEST_PORTLET_ID + ":js/javascript.js"));
+	}
+
+	@Test
 	public void testMixedExtensionsRequest() throws Exception {
 		FileUtil fileUtil = new FileUtil();
 
@@ -278,9 +294,7 @@ public class ComboServletTest extends PowerMockito {
 	protected void setUpComboServlet() throws ServletException {
 		_comboServlet = new ComboServlet();
 
-		ServletConfig servletConfig = getServletConfig();
-
-		_comboServlet.init(servletConfig);
+		_comboServlet.init(getServletConfig());
 	}
 
 	protected void setUpPluginServletContext() {

@@ -18,7 +18,7 @@
 
 <%
 long fileEntryTypeId = ParamUtil.getLong(request, "fileEntryTypeId");
-String eventName = ParamUtil.getString(request, "eventName", renderResponse.getNamespace() + "selectFileEntryType");
+String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectFileEntryType");
 
 long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId);
 
@@ -35,14 +35,14 @@ portletURL.setParameter("eventName", eventName);
 				add(
 					navigationItem -> {
 						navigationItem.setActive(true);
-						navigationItem.setLabel(LanguageUtil.get(request, "document-types"));
+						navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "document-types"));
 					});
 			}
 		}
 	%>'
 />
 
-<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="selectFileEntryTypeFm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="selectFileEntryTypeFm">
 	<liferay-ui:search-container
 		iteratorURL="<%= portletURL %>"
 	>
@@ -61,11 +61,10 @@ portletURL.setParameter("eventName", eventName);
 				row.setCssClass("select-action active");
 			}
 
-			Map<String, Object> rowData = new HashMap<String, Object>();
-
-			rowData.put("fileEntryTypeId", fileEntryType.getFileEntryTypeId());
-
-			row.setData(rowData);
+			row.setData(
+				HashMapBuilder.<String, Object>put(
+					"fileEntryTypeId", fileEntryType.getFileEntryTypeId()
+				).build());
 			%>
 
 			<liferay-ui:search-container-column-icon
@@ -95,7 +94,7 @@ portletURL.setParameter("eventName", eventName);
 
 	form.delegate(
 		'click',
-		function(event) {
+		function (event) {
 			event.preventDefault();
 
 			var currentTarget = event.currentTarget;
@@ -107,7 +106,9 @@ portletURL.setParameter("eventName", eventName);
 			Liferay.Util.getOpener().Liferay.fire(
 				'<%= HtmlUtil.escapeJS(eventName) %>',
 				{
-					data: currentTarget.attr('data-fileEntryTypeId')
+					data: {
+						value: currentTarget.attr('data-fileEntryTypeId'),
+					},
 				}
 			);
 		},

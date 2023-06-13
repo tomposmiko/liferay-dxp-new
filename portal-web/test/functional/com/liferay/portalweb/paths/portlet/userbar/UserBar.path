@@ -2,11 +2,13 @@
 <head>
 <title>UserBar</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">UserBar</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>USER_AVATAR_DROPDOWN_ITEM</td>
@@ -20,12 +22,17 @@
 </tr>
 <tr>
 	<td>USER_AVATAR_DROPDOWN_PORTAL_OPEN</td>
-	<td>//div[contains(@class,'dropdown-menu-personal-menu') and contains(@class,'show')]</td>
+	<td>//*[contains(@class,'dropdown-menu') and contains(@class,'show')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_AVATAR_DROPDOWN_MYRAYLIFE</td>
+	<td>//a[contains(@class,'dropdown-item')][normalize-space(text())='My Raylife']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>USER_AVATAR_DROPDOWN_SIGNOUT</td>
-	<td>//div[contains(@class,'dropdown-menu-personal-menu') and contains(@class,'show')]//a[contains(.,'Sign Out') or contains(.,'Salir')]</td>
+	<td>//a[contains(@class,'dropdown-item')][contains(.,'Sign Out') or contains(.,'Salir')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -36,6 +43,11 @@
 <tr>
 	<td>USER_AVATAR_ICON_IE</td>
 	<td>//span[@class='user-avatar-link']//span[contains(@class,'sticker-overlay')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_AVATAR_ICON_PNG</td>
+	<td>portal/screenshots/user/user_avatar_icon.png</td>
 	<td></td>
 </tr>
 <tr>
@@ -56,6 +68,11 @@
 <tr>
 	<td>USER_AVATAR_PORTRAIT</td>
 	<td>//button//img[contains(@src,'user_portrait')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_AVATAR_TOGGLE</td>
+	<td>//button[contains(@data-toggle,'dropdown')]//span[contains(@class,'user-icon')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -86,6 +103,11 @@
 <tr>
 	<td>USER_SIGN_IN</td>
 	<td>//span[contains(@class,'sign-in')]/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_SIGN_IN_PNG</td>
+	<td>portal/screenshots/user/user_personal_bar_sign_in.png</td>
 	<td></td>
 </tr>
 </tbody>

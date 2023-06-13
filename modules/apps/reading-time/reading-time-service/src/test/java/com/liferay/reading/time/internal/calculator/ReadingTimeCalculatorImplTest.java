@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.reading.time.calculator.ReadingTimeCalculator;
 
 import java.time.Duration;
@@ -29,12 +30,19 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Alejandro Tardín
  */
 public class ReadingTimeCalculatorImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testAcceptsHTMLAndText() {
@@ -66,7 +74,7 @@ public class ReadingTimeCalculatorImplTest {
 		Duration readingTimeDuration = _calculateReadingTime(
 			sb.toString(), "text/html", LocaleUtil.getDefault());
 
-		Assert.assertEquals(60 + 3 * 3, readingTimeDuration.getSeconds());
+		Assert.assertEquals(60 + (3 * 3), readingTimeDuration.getSeconds());
 	}
 
 	@Test

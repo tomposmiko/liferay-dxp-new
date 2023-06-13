@@ -14,7 +14,16 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.model.UserTrackerPath;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for UserTrackerPath. This utility wraps
@@ -39,14 +48,27 @@ public class UserTrackerPathLocalServiceUtil {
 	/**
 	 * Adds the user tracker path to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect UserTrackerPathLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param userTrackerPath the user tracker path
 	 * @return the user tracker path that was added
 	 */
-	public static com.liferay.portal.kernel.model.UserTrackerPath
-		addUserTrackerPath(
-			com.liferay.portal.kernel.model.UserTrackerPath userTrackerPath) {
+	public static UserTrackerPath addUserTrackerPath(
+		UserTrackerPath userTrackerPath) {
 
 		return getService().addUserTrackerPath(userTrackerPath);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -55,8 +77,8 @@ public class UserTrackerPathLocalServiceUtil {
 	 * @param userTrackerPathId the primary key for the new user tracker path
 	 * @return the new user tracker path
 	 */
-	public static com.liferay.portal.kernel.model.UserTrackerPath
-		createUserTrackerPath(long userTrackerPathId) {
+	public static UserTrackerPath createUserTrackerPath(
+		long userTrackerPathId) {
 
 		return getService().createUserTrackerPath(userTrackerPathId);
 	}
@@ -64,10 +86,9 @@ public class UserTrackerPathLocalServiceUtil {
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
@@ -75,13 +96,16 @@ public class UserTrackerPathLocalServiceUtil {
 	/**
 	 * Deletes the user tracker path with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect UserTrackerPathLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param userTrackerPathId the primary key of the user tracker path
 	 * @return the user tracker path that was removed
 	 * @throws PortalException if a user tracker path with the primary key could not be found
 	 */
-	public static com.liferay.portal.kernel.model.UserTrackerPath
-			deleteUserTrackerPath(long userTrackerPathId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static UserTrackerPath deleteUserTrackerPath(long userTrackerPathId)
+		throws PortalException {
 
 		return getService().deleteUserTrackerPath(userTrackerPathId);
 	}
@@ -89,19 +113,28 @@ public class UserTrackerPathLocalServiceUtil {
 	/**
 	 * Deletes the user tracker path from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect UserTrackerPathLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param userTrackerPath the user tracker path
 	 * @return the user tracker path that was removed
 	 */
-	public static com.liferay.portal.kernel.model.UserTrackerPath
-		deleteUserTrackerPath(
-			com.liferay.portal.kernel.model.UserTrackerPath userTrackerPath) {
+	public static UserTrackerPath deleteUserTrackerPath(
+		UserTrackerPath userTrackerPath) {
 
 		return getService().deleteUserTrackerPath(userTrackerPath);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -111,9 +144,7 @@ public class UserTrackerPathLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -129,9 +160,8 @@ public class UserTrackerPathLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -149,10 +179,9 @@ public class UserTrackerPathLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -164,9 +193,7 @@ public class UserTrackerPathLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -178,15 +205,13 @@ public class UserTrackerPathLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.portal.kernel.model.UserTrackerPath
-		fetchUserTrackerPath(long userTrackerPathId) {
-
+	public static UserTrackerPath fetchUserTrackerPath(long userTrackerPathId) {
 		return getService().fetchUserTrackerPath(userTrackerPathId);
 	}
 
@@ -212,9 +237,11 @@ public class UserTrackerPathLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -226,9 +253,8 @@ public class UserTrackerPathLocalServiceUtil {
 	 * @return the user tracker path
 	 * @throws PortalException if a user tracker path with the primary key could not be found
 	 */
-	public static com.liferay.portal.kernel.model.UserTrackerPath
-			getUserTrackerPath(long userTrackerPathId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static UserTrackerPath getUserTrackerPath(long userTrackerPathId)
+		throws PortalException {
 
 		return getService().getUserTrackerPath(userTrackerPathId);
 	}
@@ -244,16 +270,14 @@ public class UserTrackerPathLocalServiceUtil {
 	 * @param end the upper bound of the range of user tracker paths (not inclusive)
 	 * @return the range of user tracker paths
 	 */
-	public static java.util.List
-		<com.liferay.portal.kernel.model.UserTrackerPath> getUserTrackerPaths(
-			int start, int end) {
+	public static List<UserTrackerPath> getUserTrackerPaths(
+		int start, int end) {
 
 		return getService().getUserTrackerPaths(start, end);
 	}
 
-	public static java.util.List
-		<com.liferay.portal.kernel.model.UserTrackerPath> getUserTrackerPaths(
-			long userTrackerId, int start, int end) {
+	public static List<UserTrackerPath> getUserTrackerPaths(
+		long userTrackerId, int start, int end) {
 
 		return getService().getUserTrackerPaths(userTrackerId, start, end);
 	}
@@ -270,26 +294,23 @@ public class UserTrackerPathLocalServiceUtil {
 	/**
 	 * Updates the user tracker path in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect UserTrackerPathLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param userTrackerPath the user tracker path
 	 * @return the user tracker path that was updated
 	 */
-	public static com.liferay.portal.kernel.model.UserTrackerPath
-		updateUserTrackerPath(
-			com.liferay.portal.kernel.model.UserTrackerPath userTrackerPath) {
+	public static UserTrackerPath updateUserTrackerPath(
+		UserTrackerPath userTrackerPath) {
 
 		return getService().updateUserTrackerPath(userTrackerPath);
 	}
 
 	public static UserTrackerPathLocalService getService() {
-		if (_service == null) {
-			_service =
-				(UserTrackerPathLocalService)PortalBeanLocatorUtil.locate(
-					UserTrackerPathLocalService.class.getName());
-		}
-
 		return _service;
 	}
 
-	private static UserTrackerPathLocalService _service;
+	private static volatile UserTrackerPathLocalService _service;
 
 }

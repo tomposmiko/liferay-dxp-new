@@ -14,7 +14,7 @@
 
 package com.liferay.login.web.internal.portlet.util;
 
-import com.liferay.login.web.internal.constants.LoginPortletKeys;
+import com.liferay.login.web.constants.LoginPortletKeys;
 import com.liferay.petra.content.ContentUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -129,14 +129,13 @@ public class LoginUtil {
 		String companyPortletPreferencesTemplateKey,
 		String portalPropertiesTemplateKey) {
 
-		PortletPreferences companyPortletPreferences =
-			PrefsPropsUtil.getPreferences(companyId, true);
-
 		String xml = LocalizationUtil.getLocalizationXmlFromPreferences(
 			portletPreferences, portletRequest, portletPreferencesTemplateKey,
 			"preferences", null);
 
 		if (xml == null) {
+			PortletPreferences companyPortletPreferences =
+				PrefsPropsUtil.getPreferences(companyId, true);
 			String defaultContent = ContentUtil.get(
 				PortalClassLoaderUtil.getClassLoader(),
 				PropsUtil.get(portalPropertiesTemplateKey));

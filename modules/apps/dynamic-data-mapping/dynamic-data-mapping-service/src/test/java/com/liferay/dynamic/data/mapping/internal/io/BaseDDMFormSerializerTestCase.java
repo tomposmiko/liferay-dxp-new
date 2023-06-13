@@ -22,10 +22,10 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,17 +66,12 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 	}
 
 	protected List<DDMFormField> createDDMFormFields() {
-		List<DDMFormField> ddmFormFields = new ArrayList<>();
-
-		ddmFormFields.add(
-			createNestedDDMFormFields("ParentField", "ChildField"));
-
-		ddmFormFields.add(createRadioDDMFormField("BooleanField"));
-		ddmFormFields.add(createSelectDDMFormField("SelectField"));
-		ddmFormFields.add(createTextDDMFormField("TextField"));
-		ddmFormFields.add(createHTMLDDMFormField("HTMLField"));
-
-		return ddmFormFields;
+		return ListUtil.fromArray(
+			createNestedDDMFormFields("ParentField", "ChildField"),
+			createRadioDDMFormField("BooleanField"),
+			createSelectDDMFormField("SelectField"),
+			createTextDDMFormField("TextField"),
+			createHTMLDDMFormField("HTMLField"));
 	}
 
 	protected DDMFormField createHTMLDDMFormField(String name) {
@@ -148,11 +143,8 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 			});
 		ddmFormFieldValidation.setErrorMessageLocalizedValue(
 			DDMFormValuesTestUtil.createLocalizedValue(
-				"Field ".concat(
-					ddmFormField.getName()
-				).concat(
-					" must not be empty."
-				),
+				StringBundler.concat(
+					"Field ", ddmFormField.getName(), " must not be empty."),
 				LocaleUtil.US));
 
 		ddmFormField.setDDMFormFieldValidation(ddmFormFieldValidation);
@@ -190,9 +182,7 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 
 		createNotEmptyValidation(ddmFormField);
 
-		DDMFormFieldOptions ddmFormFieldOptions = createDDMFormFieldOptions();
-
-		ddmFormField.setDDMFormFieldOptions(ddmFormFieldOptions);
+		ddmFormField.setDDMFormFieldOptions(createDDMFormFieldOptions());
 
 		return ddmFormField;
 	}

@@ -16,7 +16,7 @@ package com.liferay.calendar.internal.search;
 
 import com.liferay.calendar.model.CalendarBooking;
 import com.liferay.calendar.service.CalendarBookingLocalService;
-import com.liferay.calendar.workflow.CalendarBookingWorkflowConstants;
+import com.liferay.calendar.workflow.constants.CalendarBookingWorkflowConstants;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -41,19 +41,19 @@ public class CalendarBookingBatchReindexerImpl
 
 		batchIndexingActionable.setAddCriteriaMethod(
 			dynamicQuery -> {
-				Property calendarIdPropery = PropertyFactoryUtil.forName(
+				Property calendarIdProperty = PropertyFactoryUtil.forName(
 					"calendarId");
 
-				dynamicQuery.add(calendarIdPropery.eq(calendarId));
+				dynamicQuery.add(calendarIdProperty.eq(calendarId));
 
 				Property statusProperty = PropertyFactoryUtil.forName("status");
 
-				int[] statuses = {
-					WorkflowConstants.STATUS_APPROVED,
-					CalendarBookingWorkflowConstants.STATUS_MAYBE
-				};
-
-				dynamicQuery.add(statusProperty.in(statuses));
+				dynamicQuery.add(
+					statusProperty.in(
+						new int[] {
+							WorkflowConstants.STATUS_APPROVED,
+							CalendarBookingWorkflowConstants.STATUS_MAYBE
+						}));
 			});
 		batchIndexingActionable.setCompanyId(companyId);
 		batchIndexingActionable.setPerformActionMethod(

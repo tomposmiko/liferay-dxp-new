@@ -14,9 +14,16 @@
 
 package com.liferay.portal.lock.service;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.lock.model.Lock;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for Lock. This utility wraps
@@ -41,12 +48,14 @@ public class LockLocalServiceUtil {
 	/**
 	 * Adds the lock to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LockLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param lock the lock
 	 * @return the lock that was added
 	 */
-	public static com.liferay.portal.lock.model.Lock addLock(
-		com.liferay.portal.lock.model.Lock lock) {
-
+	public static Lock addLock(Lock lock) {
 		return getService().addLock(lock);
 	}
 
@@ -60,49 +69,68 @@ public class LockLocalServiceUtil {
 	 * @param lockId the primary key for the new lock
 	 * @return the new lock
 	 */
-	public static com.liferay.portal.lock.model.Lock createLock(long lockId) {
+	public static Lock createLock(long lockId) {
 		return getService().createLock(lockId);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
 	}
 
 	/**
 	 * Deletes the lock from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LockLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param lock the lock
 	 * @return the lock that was removed
 	 */
-	public static com.liferay.portal.lock.model.Lock deleteLock(
-		com.liferay.portal.lock.model.Lock lock) {
-
+	public static Lock deleteLock(Lock lock) {
 		return getService().deleteLock(lock);
 	}
 
 	/**
 	 * Deletes the lock with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LockLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param lockId the primary key of the lock
 	 * @return the lock that was removed
 	 * @throws PortalException if a lock with the primary key could not be found
 	 */
-	public static com.liferay.portal.lock.model.Lock deleteLock(long lockId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public static Lock deleteLock(long lockId) throws PortalException {
 		return getService().deleteLock(lockId);
 	}
 
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -112,9 +140,7 @@ public class LockLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -130,9 +156,8 @@ public class LockLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -150,10 +175,9 @@ public class LockLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -165,9 +189,7 @@ public class LockLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -179,25 +201,21 @@ public class LockLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.portal.lock.model.Lock fetchLock(long lockId) {
+	public static Lock fetchLock(long lockId) {
 		return getService().fetchLock(lockId);
 	}
 
-	public static com.liferay.portal.lock.model.Lock fetchLock(
-		String className, long key) {
-
+	public static Lock fetchLock(String className, long key) {
 		return getService().fetchLock(className, key);
 	}
 
-	public static com.liferay.portal.lock.model.Lock fetchLock(
-		String className, String key) {
-
+	public static Lock fetchLock(String className, String key) {
 		return getService().fetchLock(className, key);
 	}
 
@@ -208,8 +226,8 @@ public class LockLocalServiceUtil {
 	 * @param companyId the primary key of the company
 	 * @return the matching lock, or <code>null</code> if a matching lock could not be found
 	 */
-	public static com.liferay.portal.lock.model.Lock
-		fetchLockByUuidAndCompanyId(String uuid, long companyId) {
+	public static Lock fetchLockByUuidAndCompanyId(
+		String uuid, long companyId) {
 
 		return getService().fetchLockByUuidAndCompanyId(uuid, companyId);
 	}
@@ -234,22 +252,18 @@ public class LockLocalServiceUtil {
 	 * @return the lock
 	 * @throws PortalException if a lock with the primary key could not be found
 	 */
-	public static com.liferay.portal.lock.model.Lock getLock(long lockId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public static Lock getLock(long lockId) throws PortalException {
 		return getService().getLock(lockId);
 	}
 
-	public static com.liferay.portal.lock.model.Lock getLock(
-			String className, long key)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static Lock getLock(String className, long key)
+		throws PortalException {
 
 		return getService().getLock(className, key);
 	}
 
-	public static com.liferay.portal.lock.model.Lock getLock(
-			String className, String key)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static Lock getLock(String className, String key)
+		throws PortalException {
 
 		return getService().getLock(className, key);
 	}
@@ -262,9 +276,8 @@ public class LockLocalServiceUtil {
 	 * @return the matching lock
 	 * @throws PortalException if a matching lock could not be found
 	 */
-	public static com.liferay.portal.lock.model.Lock getLockByUuidAndCompanyId(
-			String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static Lock getLockByUuidAndCompanyId(String uuid, long companyId)
+		throws PortalException {
 
 		return getService().getLockByUuidAndCompanyId(uuid, companyId);
 	}
@@ -280,9 +293,7 @@ public class LockLocalServiceUtil {
 	 * @param end the upper bound of the range of locks (not inclusive)
 	 * @return the range of locks
 	 */
-	public static java.util.List<com.liferay.portal.lock.model.Lock> getLocks(
-		int start, int end) {
-
+	public static List<Lock> getLocks(int start, int end) {
 		return getService().getLocks(start, end);
 	}
 
@@ -304,9 +315,11 @@ public class LockLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -327,58 +340,55 @@ public class LockLocalServiceUtil {
 		return getService().isLocked(className, key);
 	}
 
-	public static com.liferay.portal.lock.model.Lock lock(
+	public static Lock lock(
 			long userId, String className, long key, String owner,
 			boolean inheritable, long expirationTime)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().lock(
 			userId, className, key, owner, inheritable, expirationTime);
 	}
 
-	public static com.liferay.portal.lock.model.Lock lock(
+	public static Lock lock(
 			long userId, String className, long key, String owner,
 			boolean inheritable, long expirationTime, boolean renew)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().lock(
 			userId, className, key, owner, inheritable, expirationTime, renew);
 	}
 
-	public static com.liferay.portal.lock.model.Lock lock(
+	public static Lock lock(
 			long userId, String className, String key, String owner,
 			boolean inheritable, long expirationTime)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().lock(
 			userId, className, key, owner, inheritable, expirationTime);
 	}
 
-	public static com.liferay.portal.lock.model.Lock lock(
+	public static Lock lock(
 			long userId, String className, String key, String owner,
 			boolean inheritable, long expirationTime, boolean renew)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().lock(
 			userId, className, key, owner, inheritable, expirationTime, renew);
 	}
 
-	public static com.liferay.portal.lock.model.Lock lock(
-		String className, String key, String owner) {
-
+	public static Lock lock(String className, String key, String owner) {
 		return getService().lock(className, key, owner);
 	}
 
-	public static com.liferay.portal.lock.model.Lock lock(
+	public static Lock lock(
 		String className, String key, String expectedOwner,
 		String updatedOwner) {
 
 		return getService().lock(className, key, expectedOwner, updatedOwner);
 	}
 
-	public static com.liferay.portal.lock.model.Lock refresh(
-			String uuid, long companyId, long expirationTime)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static Lock refresh(String uuid, long companyId, long expirationTime)
+		throws PortalException {
 
 		return getService().refresh(uuid, companyId, expirationTime);
 	}
@@ -398,32 +408,21 @@ public class LockLocalServiceUtil {
 	/**
 	 * Updates the lock in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LockLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param lock the lock
 	 * @return the lock that was updated
 	 */
-	public static com.liferay.portal.lock.model.Lock updateLock(
-		com.liferay.portal.lock.model.Lock lock) {
-
+	public static Lock updateLock(Lock lock) {
 		return getService().updateLock(lock);
 	}
 
 	public static LockLocalService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	private static ServiceTracker<LockLocalService, LockLocalService>
-		_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(LockLocalService.class);
-
-		ServiceTracker<LockLocalService, LockLocalService> serviceTracker =
-			new ServiceTracker<LockLocalService, LockLocalService>(
-				bundle.getBundleContext(), LockLocalService.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile LockLocalService _service;
 
 }

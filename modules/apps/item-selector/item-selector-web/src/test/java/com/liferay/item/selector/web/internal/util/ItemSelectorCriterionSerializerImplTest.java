@@ -23,11 +23,14 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -35,6 +38,11 @@ import org.junit.Test;
  * @author Roberto Díaz
  */
 public class ItemSelectorCriterionSerializerImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -63,13 +71,13 @@ public class ItemSelectorCriterionSerializerImplTest {
 		String json = _stubItemSelectorCriterionSerializerImpl.serialize(
 			_flickrItemSelectorCriterion);
 
-		Class<? extends ItemSelectorReturnType>
-			testURLItemSelectorReturnTypeClass =
-				_testURLItemSelectorReturnType.getClass();
+		String itemSelectorReturnTypeKey =
+			ItemSelectorKeyUtil.getItemSelectorReturnTypeKey(
+				TestURLItemSelectorReturnType.class);
 
 		json = _assert(
 			"\"desiredItemSelectorReturnTypes\":\"" +
-				testURLItemSelectorReturnTypeClass.getName() + "\"",
+				itemSelectorReturnTypeKey + "\"",
 			json);
 
 		json = _assert("\"tags\":[\"me\",\"photo\",\"picture\"]", json);

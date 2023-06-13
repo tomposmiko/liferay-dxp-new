@@ -47,7 +47,7 @@
 				<arg value="pkill -1 -f com.liferay.portal.tools.db.upgrade.client.jar" />
 			</exec>
 
-			<echo message="SIGHUP signals sent to db_upgrade script and upgrade client jar." />
+			<echo>SIGHUP signals sent to db_upgrade script and upgrade client jar.</echo>
 		</sequential>
 	</macrodef>
 
@@ -72,7 +72,7 @@
 				<if>
 					<contains string="${jinfo.output}" substring="MaxHeapSize=4294967296" />
 					<then>
-						<echo message="Java memory was successfully set to 4GB during the upgrade process." />
+						<echo>Java memory was successfully set to 4GB during the upgrade process.</echo>
 					</then>
 					<else>
 						<fail message="Could not verify that Java memory was set to 4GB" />
@@ -115,7 +115,7 @@
 			</then>
 		</if>
 
-		<echo message="The upgrade client custom log file was created successfully." />
+		<echo>The upgrade client custom log file was created successfully.</echo>
 
 		<delete file="${db.upgrade.client.home}/logs/log_file.txt" />
 
@@ -161,11 +161,36 @@
 					</elseif>
 				</if>
 
-				<echo message="A Gogo shell opened successfully." />
+				<echo>A Gogo shell opened successfully.</echo>
 
 				<stop-one-java-process process.name="jar" />
 			</sequential>
 		</parallel>
+
+		<clean-database-upgrade-client />
+	</target>
+
+	<target name="check-upgrade-client-gogoshell-command-output">
+		<rebuild-upgrade-database />
+
+		<get-database-upgrade-client-paths />
+
+		<run-expect
+			db.upgrade.client.home="${db.upgrade.client.home}"
+			file.suffix.bat="${file.suffix.bat}"
+			expect.file="check-upgrade-client-gogoshell-command-output.expect"
+		/>
+
+		<fail message="Prefix g! for command does not exist!">
+			<condition>
+				<not>
+					<resourcecontains
+						resource="${db.upgrade.client.log}"
+						substring="g! upgrade:check"
+					/>
+				</not>
+			</condition>
+		</fail>
 
 		<clean-database-upgrade-client />
 	</target>
@@ -229,6 +254,20 @@
 		<clean-database-upgrade-client />
 	</target>
 
+	<target name="check-upgrade-client-gogoshell-help-output">
+		<rebuild-upgrade-database />
+
+		<get-database-upgrade-client-paths />
+
+		<run-expect
+			db.upgrade.client.home="${db.upgrade.client.home}"
+			file.suffix.bat="${file.suffix.bat}"
+			expect.file="check-upgrade-client-gogoshell-help-output.expect"
+		/>
+
+		<clean-database-upgrade-client />
+	</target>
+
 	<target name="check-upgrade-client-help">
 		<get-database-upgrade-client-paths />
 
@@ -248,7 +287,7 @@
 		<if>
 			<contains string="${upgrade.help.output}" substring="-h,--help" />
 			<then>
-				<echo message="The upgrade client help screen appeared successfully" />
+				<echo>The upgrade client help screen appeared successfully</echo>
 			</then>
 			<else>
 				<fail message="The upgrade client help screen failed to appear." />
@@ -284,14 +323,14 @@
 					<then>
 						<clean-database-upgrade-client />
 
-						<echo message="The upgrade client correctly failed to run on a version older than Java SE 8." />
+						<echo>The upgrade client correctly failed to run on a version older than Java SE 8.</echo>
 					</then>
 					<else>
 						<fail message="The upgrade client should not be able to run on versions older than Java SE 8." />
 					</else>
 				</if>
 
-				<echo message="${java.error.available}: Unsupported major.minor version" />
+				<echo>${java.error.available}: Unsupported major.minor version</echo>
 			</sequential>
 		</parallel>
 
@@ -329,10 +368,10 @@
 				<if>
 					<contains string="${upgrade.process.output}" substring="Database upgrade client is already running" />
 					<then>
-						<echo message="PASSED. Second Upgrade process is denied from starting." />
+						<echo>Second upgrade process did not start.</echo>
 					</then>
 					<else>
-						<fail message="FAILED. Upgrade Client is attempting to start a second upgrade process." />
+						<fail message="Upgrade client is attempting to start a second upgrade process." />
 					</else>
 				</if>
 			</sequential>
@@ -371,7 +410,7 @@
 					srcFile="${db.upgrade.client.log}"
 				/>
 
-				<echo message="${upgrade.log.contents}" />
+				<echo>${upgrade.log.contents}</echo>
 
 				<fail if="upgrade.failed" message="Upgrade has failed." />
 			</sequential>
@@ -421,7 +460,7 @@ upgrade.database.auto.run=false</echo>
 				<if>
 					<contains string="${select.result}" substring="0.0.1" />
 					<then>
-						<echo message="The upgrade client only upgrades core." />
+						<echo>The upgrade client only upgrades core.</echo>
 					</then>
 					<else>
 						<fail message="The upgrade client upgrades core and modules." />
@@ -468,7 +507,7 @@ upgrade.database.auto.run=false</echo>
 					<if>
 						<available file="${db.upgrade.client.home}/@{upgrade.file}" />
 						<then>
-							<echo message="@{upgrade.file} is present." />
+							<echo>@{upgrade.file} is present.</echo>
 						</then>
 						<else>
 							<fail message="@{upgrade.file} is not present." />

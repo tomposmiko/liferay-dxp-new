@@ -17,51 +17,51 @@ import ClayForm, {ClayInput, ClaySelectWithOption} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {
 	AssetTagsSelector,
-	AssetVocabularyCategoriesSelector
+	AssetVocabularyCategoriesSelector,
 } from 'asset-taglib';
 import PropTypes from 'prop-types';
 import React, {useCallback, useState} from 'react';
 
 const DEFAULT_RULE = {
 	queryContains: true,
-	type: 'assetTags'
+	type: 'assetTags',
 };
 
 const QUERY_AND_OPERATOR_OPTIONS = [
 	{
 		label: Liferay.Language.get('all'),
-		value: true
+		value: true,
 	},
 	{
 		label: Liferay.Language.get('any'),
-		value: false
-	}
+		value: false,
+	},
 ];
 
 const QUERY_CONTAINS_OPTIONS = [
 	{
 		label: Liferay.Language.get('contains'),
-		value: true
+		value: true,
 	},
 	{
 		label: Liferay.Language.get('does-not-contain'),
-		value: false
-	}
+		value: false,
+	},
 ];
 
 const RULE_TYPE_OPTIONS = [
 	{
 		label: Liferay.Language.get('categories'),
-		value: 'assetCategories'
+		value: 'assetCategories',
 	},
 	{
 		label: Liferay.Language.get('keywords'),
-		value: 'keywords'
+		value: 'keywords',
 	},
 	{
 		label: Liferay.Language.get('tags'),
-		value: 'assetTags'
-	}
+		value: 'assetTags',
+	},
 ];
 
 function AssetCategories({
@@ -70,7 +70,7 @@ function AssetCategories({
 	index,
 	namespace,
 	rule,
-	vocabularyIds
+	vocabularyIds,
 }) {
 	const [selectedItems, setSelectedItems] = useState(
 		rule.selectedItems || []
@@ -78,6 +78,10 @@ function AssetCategories({
 
 	return (
 		<ClayForm.Group>
+			<label htmlFor={`${namespace}queryCategoryIds${index}`}>
+				{Liferay.Language.get('categories')}
+			</label>
+
 			<AssetVocabularyCategoriesSelector
 				categoryIds={rule.queryValues ? rule.queryValues : ''}
 				eventName={`${namespace}selectCategory`}
@@ -138,6 +142,7 @@ function Keywords({index, namespace, onChange, rule}) {
 
 function Rule({
 	categorySelectorURL,
+	disabled,
 	groupIds,
 	index,
 	namespace,
@@ -145,7 +150,7 @@ function Rule({
 	onRuleChange,
 	rule,
 	tagSelectorURL,
-	vocabularyIds
+	vocabularyIds,
 }) {
 	return (
 		<>
@@ -234,28 +239,31 @@ function Rule({
 				</div>
 			</div>
 
-			<div className="container-trash">
-				<ClayButton
-					className="condition-card-delete"
-					data-index={index}
-					monospaced
-					onClick={onDeleteRule}
-					small
-				>
-					<ClayIcon symbol="trash" />
-				</ClayButton>
-			</div>
+			{!disabled && (
+				<div className="container-trash">
+					<ClayButton
+						className="condition-card-delete"
+						data-index={index}
+						monospaced
+						onClick={onDeleteRule}
+						small
+					>
+						<ClayIcon symbol="trash" />
+					</ClayButton>
+				</div>
+			)}
 		</>
 	);
 }
 
 function AutoField({
 	categorySelectorURL,
+	disabled,
 	groupIds,
 	namespace,
 	rules,
 	tagSelectorURL,
-	vocabularyIds
+	vocabularyIds,
 }) {
 	const [currentRules, setCurrentRules] = useState(rules);
 
@@ -264,12 +272,12 @@ function AutoField({
 	}, [currentRules]);
 
 	const handleDeleteRule = useCallback(
-		event => {
+		(event) => {
 			const index = parseInt(event.currentTarget.dataset.index, 10);
 
 			setCurrentRules([
 				...currentRules.slice(0, index),
-				...currentRules.slice(index + 1, currentRules.length)
+				...currentRules.slice(index + 1, currentRules.length),
 			]);
 		},
 
@@ -277,7 +285,7 @@ function AutoField({
 	);
 
 	const handleRuleChange = useCallback(
-		event => {
+		(event) => {
 			const index = parseInt(event.currentTarget.dataset.index, 10);
 			const property = event.currentTarget.dataset.property;
 
@@ -290,9 +298,9 @@ function AutoField({
 				...currentRules.slice(0, index),
 				{
 					...rule,
-					[property]: event.currentTarget.value
+					[property]: event.currentTarget.value,
 				},
-				...currentRules.slice(index + 1, currentRules.length)
+				...currentRules.slice(index + 1, currentRules.length),
 			]);
 		},
 		[currentRules]
@@ -319,6 +327,7 @@ function AutoField({
 					<li className="timeline-item" key={index}>
 						<Rule
 							categorySelectorURL={categorySelectorURL}
+							disabled={disabled}
 							groupIds={groupIds}
 							index={index}
 							namespace={namespace}
@@ -332,18 +341,20 @@ function AutoField({
 				))}
 			</ul>
 
-			<div className="addbutton-timeline-item">
-				<div className="add-condition timeline-increment-icon">
-					<ClayButton
-						className="form-builder-rule-add-condition form-builder-timeline-add-item"
-						monospaced
-						onClick={handleAddRule}
-						small
-					>
-						<ClayIcon symbol="plus" />
-					</ClayButton>
+			{!disabled && (
+				<div className="addbutton-timeline-item">
+					<div className="add-condition timeline-increment-icon">
+						<ClayButton
+							className="form-builder-rule-add-condition form-builder-timeline-add-item"
+							monospaced
+							onClick={handleAddRule}
+							small
+						>
+							<ClayIcon symbol="plus" />
+						</ClayButton>
+					</div>
 				</div>
-			</div>
+			)}
 		</>
 	);
 }
@@ -364,18 +375,16 @@ AutoField.propTypes = {
 						label: PropTypes.string,
 						value: PropTypes.oneOfType([
 							PropTypes.number,
-							PropTypes.string
-						])
+							PropTypes.string,
+						]),
 					})
-				)
+				),
 			]),
-			type: PropTypes.string
+			type: PropTypes.string,
 		})
 	),
 	tagSelectorURL: PropTypes.string,
-	vocabularyIds: PropTypes.arrayOf(PropTypes.string)
+	vocabularyIds: PropTypes.arrayOf(PropTypes.string),
 };
 
-export default function(props) {
-	return <AutoField {...props} />;
-}
+export default AutoField;

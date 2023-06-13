@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.mapping.service.impl;
 import com.liferay.dynamic.data.mapping.data.provider.configuration.DDMDataProviderConfiguration;
 import com.liferay.dynamic.data.mapping.exception.DataProviderInstanceNameException;
 import com.liferay.dynamic.data.mapping.exception.DataProviderInstanceURLException;
+import com.liferay.dynamic.data.mapping.exception.DuplicateDataProviderInstanceInputParameterNameException;
 import com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException;
 import com.liferay.dynamic.data.mapping.exception.RequiredDataProviderInstanceException;
 import com.liferay.dynamic.data.mapping.internal.data.provider.configuration.activator.DDMDataProviderConfigurationActivator;
@@ -48,9 +49,15 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.net.URL;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -293,16 +300,18 @@ public class DDMDataProviderInstanceLocalServiceImpl
 			DDMFormValues ddmFormValues, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userLocalService.getUser(userId);
-
 		validate(nameMap, ddmFormValues);
 
 		DDMDataProviderInstance dataProviderInstance =
 			ddmDataProviderInstancePersistence.findByPrimaryKey(
 				dataProviderInstanceId);
 
+		User user = userLocalService.getUser(userId);
+
 		dataProviderInstance.setUserId(user.getUserId());
 		dataProviderInstance.setUserName(user.getFullName());
+
+		dataProviderInstance.setModifiedDate(new Date());
 		dataProviderInstance.setNameMap(nameMap);
 		dataProviderInstance.setDescriptionMap(descriptionMap);
 		dataProviderInstance.setDefinition(serialize(ddmFormValues));
@@ -368,6 +377,8 @@ public class DDMDataProviderInstanceLocalServiceImpl
 			_validateLocalNetworkURL(ddmFormValues);
 		}
 
+		_validateInputParameterNames(ddmFormValues);
+
 		_ddmFormValuesValidator.validate(ddmFormValues);
 	}
 
@@ -385,6 +396,58 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		}
 
 		return true;
+	}
+
+	private void _validateInputParameterNames(DDMFormValues ddmFormValues)
+		throws PortalException {
+
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
+			ddmFormValues.getDDMFormFieldValuesMap();
+
+		if (!ddmFormFieldValuesMap.containsKey("inputParameters")) {
+			return;
+		}
+
+		List<DDMFormFieldValue> inputParameters = ddmFormFieldValuesMap.get(
+			"inputParameters");
+
+		Stream<DDMFormFieldValue> inputParametersStream =
+			inputParameters.stream();
+
+		List<DDMFormFieldValue> inputParameterNamesList =
+			inputParametersStream.flatMap(
+				inputParameter -> inputParameter.getNestedDDMFormFieldValuesMap(
+				).get(
+					"inputParameterName"
+				).stream()
+			).collect(
+				Collectors.toList()
+			);
+
+		Stream<DDMFormFieldValue> inputParameterNamesStream =
+			inputParameterNamesList.stream();
+
+		Collection<String> inputParameterNames =
+			inputParameterNamesStream.flatMap(
+				inputParameterName -> inputParameterName.getValue(
+				).getValues(
+				).values(
+				).stream()
+			).collect(
+				Collectors.toList()
+			);
+
+		Set<String> inputParameterNamesSet = new HashSet<>();
+
+		for (String inputParameterName : inputParameterNames) {
+			if (inputParameterNamesSet.contains(inputParameterName)) {
+				throw new DuplicateDataProviderInstanceInputParameterNameException(
+					"Duplicate data provider input parameter name: " +
+						inputParameterName);
+			}
+
+			inputParameterNamesSet.add(inputParameterName);
+		}
 	}
 
 	private void _validateLocalNetworkURL(DDMFormValues ddmFormValues)

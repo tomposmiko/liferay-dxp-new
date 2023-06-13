@@ -41,9 +41,13 @@ public interface ModelSearchDefinition {
 	public void setModelVisibilityContributor(
 		ModelVisibilityContributor modelVisibilityContributor);
 
+	public void setSearchEngineId(String searchEngineId);
+
 	public void setSearchResultPermissionFilterSuppressed(
 		boolean searchResultPermissionFilterSuppressed);
 
 	public void setSelectAllLocales(boolean selectAllLocales);
+
+	public void setStagingAware(boolean stagingAware);
 
 }

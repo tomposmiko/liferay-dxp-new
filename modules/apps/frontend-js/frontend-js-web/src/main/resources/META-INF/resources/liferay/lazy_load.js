@@ -12,11 +12,11 @@
  * details.
  */
 
-(function(Liferay) {
-	Liferay.lazyLoad = function() {
+(function (Liferay) {
+	Liferay.lazyLoad = function () {
 		var failureCallback;
 
-		var isFunction = function(val) {
+		var isFunction = function (val) {
 			return typeof val === 'function';
 		};
 
@@ -28,13 +28,15 @@
 
 			successCallback = isFunction(arguments[1]) ? arguments[1] : null;
 			failureCallback = isFunction(arguments[2]) ? arguments[2] : null;
-		} else {
+		}
+		else {
 			modules = [];
 
 			for (var i = 0; i < arguments.length; ++i) {
 				if (typeof arguments[i] === 'string') {
 					modules[i] = arguments[i];
-				} else if (isFunction(arguments[i])) {
+				}
+				else if (isFunction(arguments[i])) {
 					successCallback = arguments[i];
 					failureCallback = isFunction(arguments[++i])
 						? arguments[i]
@@ -44,7 +46,7 @@
 			}
 		}
 
-		return function() {
+		return function () {
 			var args = [];
 
 			for (var i = 0; i < arguments.length; ++i) {
@@ -53,7 +55,7 @@
 
 			Liferay.Loader.require(
 				modules,
-				function() {
+				function () {
 					for (var i = 0; i < arguments.length; ++i) {
 						args.splice(i, 0, arguments[i]);
 					}

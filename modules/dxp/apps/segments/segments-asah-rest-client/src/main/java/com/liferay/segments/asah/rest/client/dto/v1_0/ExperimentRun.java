@@ -17,6 +17,8 @@ package com.liferay.segments.asah.rest.client.dto.v1_0;
 import com.liferay.segments.asah.rest.client.function.UnsafeSupplier;
 import com.liferay.segments.asah.rest.client.serdes.v1_0.ExperimentRunSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ExperimentRun {
+public class ExperimentRun implements Cloneable, Serializable {
+
+	public static ExperimentRun toDTO(String json) {
+		return ExperimentRunSerDes.toDTO(json);
+	}
 
 	public Double getConfidenceLevel() {
 		return confidenceLevel;
@@ -91,6 +97,11 @@ public class ExperimentRun {
 	}
 
 	protected String status;
+
+	@Override
+	public ExperimentRun clone() throws CloneNotSupportedException {
+		return (ExperimentRun)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

@@ -20,11 +20,11 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.headless.common.spi.resource.SPIRatingResource;
-import com.liferay.headless.common.spi.service.context.ServiceContextUtil;
+import com.liferay.headless.common.spi.service.context.ServiceContextRequestUtil;
 import com.liferay.headless.delivery.dto.v1_0.BlogPosting;
 import com.liferay.headless.delivery.dto.v1_0.Image;
 import com.liferay.headless.delivery.dto.v1_0.Rating;
-import com.liferay.headless.delivery.dto.v1_0.TaxonomyCategory;
+import com.liferay.headless.delivery.dto.v1_0.TaxonomyCategoryBrief;
 import com.liferay.headless.delivery.internal.dto.v1_0.converter.BlogPostingDTOConverter;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.EntityFieldsUtil;
@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -57,9 +58,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import java.util.Map;
-import java.util.Optional;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -113,26 +112,43 @@ public class BlogPostingResourceImpl
 
 	@Override
 	public Page<BlogPosting> getSiteBlogPostingsPage(
-			Long siteId, String search, Filter filter, Pagination pagination,
-			Sort[] sorts)
+			Long siteId, String search, Aggregation aggregation, Filter filter,
+			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
 		return SearchUtil.search(
+			HashMapBuilder.put(
+				"create",
+				addAction(
+					"ADD_ENTRY", "postSiteBlogPosting", "com.liferay.blogs",
+					siteId)
+			).put(
+				"subscribe",
+				addAction(
+					"SUBSCRIBE", "putSiteBlogPostingSubscribe",
+					"com.liferay.blogs", siteId)
+			).put(
+				"unsubscribe",
+				addAction(
+					"SUBSCRIBE", "putSiteBlogPostingUnsubscribe",
+					"com.liferay.blogs", siteId)
+			).build(),
 			booleanQuery -> {
 			},
 			filter, BlogsEntry.class, search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
+				searchContext.addVulcanAggregation(aggregation);
 				searchContext.setAttribute(
 					Field.STATUS, WorkflowConstants.STATUS_APPROVED);
 				searchContext.setCompanyId(contextCompany.getCompanyId());
 				searchContext.setGroupIds(new long[] {siteId});
 			},
+			sorts,
 			document -> _toBlogPosting(
 				_blogsEntryService.getEntry(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))),
-			sorts, (Map)_getListActions(siteId));
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
 	@Override
@@ -151,8 +167,7 @@ public class BlogPostingResourceImpl
 
 		LocalDateTime localDateTime = LocalDateTimeUtil.toLocalDateTime(
 			blogPosting.getDatePublished());
-		Optional<Image> imageOptional = Optional.ofNullable(
-			blogPosting.getImage());
+		Image image = blogPosting.getImage();
 
 		return _toBlogPosting(
 			_blogsEntryService.addEntry(
@@ -161,23 +176,13 @@ public class BlogPostingResourceImpl
 				blogPosting.getArticleBody(), localDateTime.getMonthValue() - 1,
 				localDateTime.getDayOfMonth(), localDateTime.getYear(),
 				localDateTime.getHour(), localDateTime.getMinute(), true, true,
-				new String[0],
-				imageOptional.map(
-					Image::getCaption
-				).orElse(
-					null
-				),
-				_getImageSelector(
-					imageOptional.map(
-						Image::getImageId
-					).orElse(
-						null
-					)),
+				new String[0], _getCaption(image), _getImageSelector(image),
 				null,
-				ServiceContextUtil.createServiceContext(
+				ServiceContextRequestUtil.createServiceContext(
 					blogPosting.getTaxonomyCategoryIds(),
 					blogPosting.getKeywords(),
 					_getExpandoBridgeAttributes(blogPosting), siteId,
+					contextHttpServletRequest,
 					blogPosting.getViewableByAsString())));
 	}
 
@@ -188,8 +193,7 @@ public class BlogPostingResourceImpl
 
 		LocalDateTime localDateTime = LocalDateTimeUtil.toLocalDateTime(
 			blogPosting.getDatePublished());
-		Optional<Image> imageOptional = Optional.ofNullable(
-			blogPosting.getImage());
+		Image image = blogPosting.getImage();
 		BlogsEntry blogsEntry = _blogsEntryService.getEntry(blogPostingId);
 
 		return _toBlogPosting(
@@ -200,24 +204,13 @@ public class BlogPostingResourceImpl
 				blogPosting.getArticleBody(), localDateTime.getMonthValue() - 1,
 				localDateTime.getDayOfMonth(), localDateTime.getYear(),
 				localDateTime.getHour(), localDateTime.getMinute(), true, true,
-				new String[0],
-				imageOptional.map(
-					Image::getCaption
-				).orElse(
-					null
-				),
-				_getImageSelector(
-					imageOptional.map(
-						Image::getImageId
-					).orElse(
-						null
-					)),
+				new String[0], _getCaption(image), _getImageSelector(image),
 				null,
-				ServiceContextUtil.createServiceContext(
+				ServiceContextRequestUtil.createServiceContext(
 					blogPosting.getTaxonomyCategoryIds(),
 					blogPosting.getKeywords(),
 					_getExpandoBridgeAttributes(blogPosting),
-					blogsEntry.getGroupId(),
+					blogsEntry.getGroupId(), contextHttpServletRequest,
 					blogPosting.getViewableByAsString())));
 	}
 
@@ -257,29 +250,24 @@ public class BlogPostingResourceImpl
 				});
 		}
 
-		TaxonomyCategory[] taxonomyCategories =
-			blogPosting.getTaxonomyCategories();
+		TaxonomyCategoryBrief[] taxonomyCategoryBriefs =
+			blogPosting.getTaxonomyCategoryBriefs();
 
-		if (taxonomyCategories != null) {
+		if (taxonomyCategoryBriefs != null) {
 			blogPosting.setTaxonomyCategoryIds(
 				transform(
-					taxonomyCategories, TaxonomyCategory::getTaxonomyCategoryId,
+					taxonomyCategoryBriefs,
+					TaxonomyCategoryBrief::getTaxonomyCategoryId,
 					Long[].class));
 		}
 	}
 
-	private Map<String, Map<String, String>> _getActions(
-		BlogsEntry blogsEntry) {
+	private String _getCaption(Image image) {
+		if (image == null) {
+			return null;
+		}
 
-		return HashMapBuilder.<String, Map<String, String>>put(
-			"delete", addAction("DELETE", blogsEntry, "deleteBlogPosting")
-		).put(
-			"get", addAction("VIEW", blogsEntry, "getBlogPosting")
-		).put(
-			"replace", addAction("UPDATE", blogsEntry, "putBlogPosting")
-		).put(
-			"update", addAction("UPDATE", blogsEntry, "patchBlogPosting")
-		).build();
+		return image.getCaption();
 	}
 
 	private Map<String, Serializable> _getExpandoBridgeAttributes(
@@ -291,13 +279,14 @@ public class BlogPostingResourceImpl
 			contextAcceptLanguage.getPreferredLocale());
 	}
 
-	private ImageSelector _getImageSelector(Long imageId) {
-		if ((imageId == null) || (imageId == 0)) {
+	private ImageSelector _getImageSelector(Image image) {
+		if ((image == null) || (image.getImageId() == 0)) {
 			return new ImageSelector();
 		}
 
 		try {
-			FileEntry fileEntry = _dlAppService.getFileEntry(imageId);
+			FileEntry fileEntry = _dlAppService.getFileEntry(
+				image.getImageId());
 
 			return new ImageSelector(
 				FileUtil.getBytes(fileEntry.getContentStream()),
@@ -305,42 +294,54 @@ public class BlogPostingResourceImpl
 				"{\"height\": 0, \"width\": 0, \"x\": 0, \"y\": 0}");
 		}
 		catch (Exception exception) {
-			throw new BadRequestException(
-				"Unable to get file entry " + imageId, exception);
+			throw new RuntimeException(
+				"Unable to get file entry " + image.getImageId(), exception);
 		}
-	}
-
-	private Map<String, Map<String, String>> _getListActions(Long siteId) {
-		return HashMapBuilder.<String, Map<String, String>>put(
-			"create",
-			addAction(
-				"ADD_ENTRY", "postSiteBlogPosting", "com.liferay.blogs", siteId)
-		).put(
-			"subscribe",
-			addAction(
-				"SUBSCRIBE", "putSiteBlogPostingSubscribe", "com.liferay.blogs",
-				siteId)
-		).put(
-			"unsubscribe",
-			addAction(
-				"SUBSCRIBE", "putSiteBlogPostingUnsubscribe",
-				"com.liferay.blogs", siteId)
-		).build();
 	}
 
 	private SPIRatingResource<Rating> _getSPIRatingResource() {
 		return new SPIRatingResource<>(
 			BlogsEntry.class.getName(), _ratingsEntryLocalService,
-			ratingsEntry -> RatingUtil.toRating(
-				_portal, ratingsEntry, _userLocalService),
+			ratingsEntry -> {
+				BlogsEntry blogsEntry = _blogsEntryService.getEntry(
+					ratingsEntry.getClassPK());
+
+				return RatingUtil.toRating(
+					HashMapBuilder.put(
+						"create",
+						addAction("VIEW", blogsEntry, "postBlogPostingMyRating")
+					).put(
+						"delete",
+						addAction(
+							"VIEW", blogsEntry, "deleteBlogPostingMyRating")
+					).put(
+						"get",
+						addAction("VIEW", blogsEntry, "getBlogPostingMyRating")
+					).put(
+						"replace",
+						addAction("VIEW", blogsEntry, "putBlogPostingMyRating")
+					).build(),
+					_portal, ratingsEntry, _userLocalService);
+			},
 			contextUser);
 	}
 
 	private BlogPosting _toBlogPosting(BlogsEntry blogsEntry) throws Exception {
 		return _blogPostingDTOConverter.toDTO(
 			new DefaultDTOConverterContext(
-				false, (Map)_getActions(blogsEntry), _dtoConverterRegistry,
-				blogsEntry.getEntryId(),
+				contextAcceptLanguage.isAcceptAllLanguages(),
+				HashMapBuilder.put(
+					"delete",
+					addAction("DELETE", blogsEntry, "deleteBlogPosting")
+				).put(
+					"get", addAction("VIEW", blogsEntry, "getBlogPosting")
+				).put(
+					"replace", addAction("UPDATE", blogsEntry, "putBlogPosting")
+				).put(
+					"update",
+					addAction("UPDATE", blogsEntry, "patchBlogPosting")
+				).build(),
+				_dtoConverterRegistry, blogsEntry.getEntryId(),
 				contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
 				contextUser));
 	}

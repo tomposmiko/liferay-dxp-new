@@ -12,24 +12,26 @@
  * details.
  */
 
-import {ClayButtonWithIcon} from '@clayui/button';
+import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
+import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
-import React, {useState, useMemo} from 'react';
+import PropTypes from 'prop-types';
+import React, {useMemo, useState} from 'react';
 
 import {updateLanguageId} from '../actions/index';
 import {BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR} from '../config/constants/backgroundImageFragmentEntryProcessor';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../config/constants/editableFragmentEntryProcessor';
 import {TRANSLATION_STATUS_TYPE} from '../config/constants/translationStatusType';
 
-const getEditableValues = fragmentEntryLinks =>
+const getEditableValues = (fragmentEntryLinks) =>
 	Object.values(fragmentEntryLinks)
 		.filter(
-			fragmentEntryLink =>
+			(fragmentEntryLink) =>
 				!fragmentEntryLink.masterLayout &&
 				fragmentEntryLink.editableValues
 		)
-		.map(fragmentEntryLink => [
+		.map((fragmentEntryLink) => [
 			...Object.values(
 				fragmentEntryLink.editableValues[
 					EDITABLE_FRAGMENT_ENTRY_PROCESSOR
@@ -39,33 +41,33 @@ const getEditableValues = fragmentEntryLinks =>
 				fragmentEntryLink.editableValues[
 					BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR
 				] || {}
-			)
+			),
 		])
 		.reduce(
 			(editableValuesA, editableValuesB) => [
 				...editableValuesA,
-				...editableValuesB
+				...editableValuesB,
 			],
 			[]
 		);
 
-const isTranslated = (editableValue, languageId, segmentExperienceId) =>
-	editableValue[languageId] ||
-	(segmentExperienceId in editableValue &&
-		editableValue[segmentExperienceId][languageId]);
+const isTranslated = (editableValue, languageId) => editableValue[languageId];
 
 const getTranslationStatus = ({
 	editableValuesLength,
 	isDefault,
-	translatedValuesLength
+	translatedValuesLength,
 }) => {
 	if (isDefault) {
 		return TRANSLATION_STATUS_TYPE.default;
-	} else if (translatedValuesLength === 0) {
+	}
+	else if (translatedValuesLength === 0) {
 		return TRANSLATION_STATUS_TYPE.untranslated;
-	} else if (translatedValuesLength < editableValuesLength) {
+	}
+	else if (translatedValuesLength < editableValuesLength) {
 		return TRANSLATION_STATUS_TYPE.translating;
-	} else if (translatedValuesLength === editableValuesLength) {
+	}
+	else if (translatedValuesLength === editableValuesLength) {
 		return TRANSLATION_STATUS_TYPE.translated;
 	}
 };
@@ -76,7 +78,7 @@ const TRANSLATION_STATUS_LANGUAGE = {
 	[TRANSLATION_STATUS_TYPE.translating]: Liferay.Language.get('translating'),
 	[TRANSLATION_STATUS_TYPE.untranslated]: Liferay.Language.get(
 		'not-translated'
-	)
+	),
 };
 
 const TranslationItem = ({
@@ -87,12 +89,12 @@ const TranslationItem = ({
 	languageId,
 	languageLabel,
 	onClick,
-	translatedValuesLength
+	translatedValuesLength,
 }) => {
 	const status = getTranslationStatus({
 		editableValuesLength,
 		isDefault,
-		translatedValuesLength
+		translatedValuesLength,
 	});
 
 	return (
@@ -102,7 +104,7 @@ const TranslationItem = ({
 			) : (
 				<span>{languageLabel}</span>
 			)}
-			<span className="dropdown-item-indicator-end">
+			<span className="dropdown-item-indicator-end page-editor__translation__label-wrapper">
 				<div
 					className={classNames(
 						'page-editor__translation__label label',
@@ -112,7 +114,7 @@ const TranslationItem = ({
 					{TRANSLATION_STATUS_LANGUAGE[status]}
 					{TRANSLATION_STATUS_TYPE[status] ===
 						TRANSLATION_STATUS_TYPE.translating &&
-						`${translatedValuesLength}/${editableValuesLength}`}
+						` ${translatedValuesLength}/${editableValuesLength}`}
 				</div>
 			</span>
 		</ClayDropDown.Item>
@@ -125,7 +127,7 @@ export default function Translation({
 	dispatch,
 	fragmentEntryLinks,
 	languageId,
-	segmentsExperienceId
+	showNotTranslated = true,
 }) {
 	const [active, setActive] = useState(false);
 	const editableValues = useMemo(
@@ -141,21 +143,31 @@ export default function Translation({
 
 		return Object.keys({
 			[defaultLanguageId]: defaultLanguage,
-			...availableLanguagesMut
-		}).map(languageId => ({
-			languageId,
-			values: editableValues.filter(editableValue =>
-				isTranslated(editableValue, languageId, segmentsExperienceId)
+			...availableLanguagesMut,
+		})
+			.filter(
+				(languageId) =>
+					showNotTranslated ||
+					editableValues.filter(
+						(editableValue) =>
+							isTranslated(editableValue, languageId) ||
+							languageId === defaultLanguageId
+					).length > 0
 			)
-		}));
+			.map((languageId) => ({
+				languageId,
+				values: editableValues.filter((editableValue) =>
+					isTranslated(editableValue, languageId)
+				),
+			}));
 	}, [
 		availableLanguages,
 		defaultLanguageId,
 		editableValues,
-		segmentsExperienceId
+		showNotTranslated,
 	]);
 
-	const {languageIcon} = availableLanguages[languageId];
+	const {languageIcon, languageLabel} = availableLanguages[languageId];
 
 	return (
 		<ClayDropDown
@@ -163,19 +175,23 @@ export default function Translation({
 			hasLeftSymbols
 			hasRightSymbols
 			menuElementAttrs={{
-				className: 'page-editor__translation'
+				className: 'page-editor__translation',
 			}}
 			onActiveChange={setActive}
 			trigger={
-				<ClayButtonWithIcon
+				<ClayButton
+					aria-pressed={active}
+					className="btn-monospaced"
 					displayType="secondary"
 					small
-					symbol={languageIcon}
-				/>
+				>
+					<ClayIcon symbol={languageIcon} />
+					<span className="sr-only">{languageLabel}</span>
+				</ClayButton>
 			}
 		>
 			<ClayDropDown.ItemList>
-				{languageValues.map(language => (
+				{languageValues.map((language) => (
 					<TranslationItem
 						editableValuesLength={editableValues.length}
 						isDefault={language.languageId === defaultLanguageId}
@@ -192,15 +208,28 @@ export default function Translation({
 						onClick={() => {
 							dispatch(
 								updateLanguageId({
-									languageId: language.languageId
+									languageId: language.languageId,
 								})
 							);
 							setActive(false);
 						}}
-						translatedValuesLength={languageValues.values.length}
+						translatedValuesLength={language.values.length}
 					/>
 				))}
 			</ClayDropDown.ItemList>
 		</ClayDropDown>
 	);
 }
+
+Translation.propTypes = {
+	availableLanguages: PropTypes.objectOf(
+		PropTypes.shape({
+			languageIcon: PropTypes.string.isRequired,
+			languageLabel: PropTypes.string.isRequired,
+		})
+	).isRequired,
+	defaultLanguageId: PropTypes.string.isRequired,
+	dispatch: PropTypes.func.isRequired,
+	fragmentEntryLinks: PropTypes.object.isRequired,
+	languageId: PropTypes.string.isRequired,
+};

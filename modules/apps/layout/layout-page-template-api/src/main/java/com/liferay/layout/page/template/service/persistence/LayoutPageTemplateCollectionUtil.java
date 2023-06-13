@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * The persistence utility for the layout page template collection service. This utility wraps <code>com.liferay.layout.page.template.service.persistence.impl.LayoutPageTemplateCollectionPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -816,6 +812,83 @@ public class LayoutPageTemplateCollectionUtil {
 	}
 
 	/**
+	 * Returns the layout page template collection where groupId = &#63; and layoutPageTemplateCollectionKey = &#63; or throws a <code>NoSuchPageTemplateCollectionException</code> if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPageTemplateCollectionKey the layout page template collection key
+	 * @return the matching layout page template collection
+	 * @throws NoSuchPageTemplateCollectionException if a matching layout page template collection could not be found
+	 */
+	public static LayoutPageTemplateCollection findByG_LPTCK(
+			long groupId, String layoutPageTemplateCollectionKey)
+		throws com.liferay.layout.page.template.exception.
+			NoSuchPageTemplateCollectionException {
+
+		return getPersistence().findByG_LPTCK(
+			groupId, layoutPageTemplateCollectionKey);
+	}
+
+	/**
+	 * Returns the layout page template collection where groupId = &#63; and layoutPageTemplateCollectionKey = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPageTemplateCollectionKey the layout page template collection key
+	 * @return the matching layout page template collection, or <code>null</code> if a matching layout page template collection could not be found
+	 */
+	public static LayoutPageTemplateCollection fetchByG_LPTCK(
+		long groupId, String layoutPageTemplateCollectionKey) {
+
+		return getPersistence().fetchByG_LPTCK(
+			groupId, layoutPageTemplateCollectionKey);
+	}
+
+	/**
+	 * Returns the layout page template collection where groupId = &#63; and layoutPageTemplateCollectionKey = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPageTemplateCollectionKey the layout page template collection key
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching layout page template collection, or <code>null</code> if a matching layout page template collection could not be found
+	 */
+	public static LayoutPageTemplateCollection fetchByG_LPTCK(
+		long groupId, String layoutPageTemplateCollectionKey,
+		boolean useFinderCache) {
+
+		return getPersistence().fetchByG_LPTCK(
+			groupId, layoutPageTemplateCollectionKey, useFinderCache);
+	}
+
+	/**
+	 * Removes the layout page template collection where groupId = &#63; and layoutPageTemplateCollectionKey = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPageTemplateCollectionKey the layout page template collection key
+	 * @return the layout page template collection that was removed
+	 */
+	public static LayoutPageTemplateCollection removeByG_LPTCK(
+			long groupId, String layoutPageTemplateCollectionKey)
+		throws com.liferay.layout.page.template.exception.
+			NoSuchPageTemplateCollectionException {
+
+		return getPersistence().removeByG_LPTCK(
+			groupId, layoutPageTemplateCollectionKey);
+	}
+
+	/**
+	 * Returns the number of layout page template collections where groupId = &#63; and layoutPageTemplateCollectionKey = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPageTemplateCollectionKey the layout page template collection key
+	 * @return the number of matching layout page template collections
+	 */
+	public static int countByG_LPTCK(
+		long groupId, String layoutPageTemplateCollectionKey) {
+
+		return getPersistence().countByG_LPTCK(
+			groupId, layoutPageTemplateCollectionKey);
+	}
+
+	/**
 	 * Returns the layout page template collection where groupId = &#63; and name = &#63; or throws a <code>NoSuchPageTemplateCollectionException</code> if it could not be found.
 	 *
 	 * @param groupId the group ID
@@ -1328,29 +1401,10 @@ public class LayoutPageTemplateCollectionUtil {
 	}
 
 	public static LayoutPageTemplateCollectionPersistence getPersistence() {
-		return _serviceTracker.getService();
+		return _persistence;
 	}
 
-	private static ServiceTracker
-		<LayoutPageTemplateCollectionPersistence,
-		 LayoutPageTemplateCollectionPersistence> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			LayoutPageTemplateCollectionPersistence.class);
-
-		ServiceTracker
-			<LayoutPageTemplateCollectionPersistence,
-			 LayoutPageTemplateCollectionPersistence> serviceTracker =
-				new ServiceTracker
-					<LayoutPageTemplateCollectionPersistence,
-					 LayoutPageTemplateCollectionPersistence>(
-						 bundle.getBundleContext(),
-						 LayoutPageTemplateCollectionPersistence.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile LayoutPageTemplateCollectionPersistence
+		_persistence;
 
 }

@@ -159,7 +159,7 @@ public class UpgradeExecutor {
 		release = _releaseLocalService.fetchRelease(bundleSymbolicName);
 
 		if (release != null) {
-			_releasePublisher.publish(release);
+			_releasePublisher.publish(release, _isInitialRelease(upgradeInfos));
 		}
 
 		return release;
@@ -168,6 +168,28 @@ public class UpgradeExecutor {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
+	}
+
+	private boolean _isInitialRelease(List<UpgradeInfo> upgradeInfos) {
+		UpgradeInfo upgradeInfo = upgradeInfos.get(0);
+
+		UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
+
+		if (upgradeStep instanceof DummyUpgradeStep) {
+			return false;
+		}
+
+		String fromSchemaVersion = upgradeInfo.getFromSchemaVersionString();
+
+		String upgradeStepName = upgradeStep.toString();
+
+		if (fromSchemaVersion.equals("0.0.0") &&
+			upgradeStepName.equals("Initial Database Creation")) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -273,25 +295,7 @@ public class UpgradeExecutor {
 				return true;
 			}
 
-			UpgradeInfo upgradeInfo = _upgradeInfos.get(0);
-
-			UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
-
-			if (upgradeStep instanceof DummyUpgradeStep) {
-				return false;
-			}
-
-			String fromSchemaVersion = upgradeInfo.getFromSchemaVersionString();
-
-			String upgradeStepName = upgradeStep.toString();
-
-			if (fromSchemaVersion.equals("0.0.0") &&
-				upgradeStepName.equals("Initial Database Creation")) {
-
-				return false;
-			}
-
-			return true;
+			return !_isInitialRelease(_upgradeInfos);
 		}
 
 		private void _updateReleaseState(int state) {

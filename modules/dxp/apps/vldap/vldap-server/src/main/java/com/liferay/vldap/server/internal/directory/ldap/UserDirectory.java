@@ -15,6 +15,7 @@
 package com.liferay.vldap.server.internal.directory.ldap;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
@@ -30,7 +31,6 @@ import com.liferay.portal.kernel.service.ImageServiceUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.vldap.server.internal.handler.util.LdapHandlerThreadLocal;
 import com.liferay.vldap.server.internal.portal.security.samba.PortalSambaUtil;
@@ -40,7 +40,6 @@ import com.liferay.vldap.server.internal.util.PortletPropsValues;
 import java.text.Format;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -112,14 +111,12 @@ public class UserDirectory extends Directory {
 		long groupClassNameId = PortalUtil.getClassNameId(
 			Group.class.getName());
 
-		LinkedHashMap<String, Object> params =
-			LinkedHashMapBuilder.<String, Object>put(
-				"usersGroups", user.getUserId()
-			).build();
-
 		List<Group> groups = GroupLocalServiceUtil.search(
 			user.getCompanyId(), new long[] {groupClassNameId}, null, null,
-			params, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			LinkedHashMapBuilder.<String, Object>put(
+				"usersGroups", user.getUserId()
+			).build(),
+			true, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		for (Group group : groups) {
 			String value = LdapUtil.buildName(
@@ -239,8 +236,7 @@ public class UserDirectory extends Directory {
 		addAttribute(
 			"sambaSID",
 			StringBundler.concat(
-				"S-1-5-21-", String.valueOf(company.getCompanyId()), "-",
-				String.valueOf(user.getUserId())));
+				"S-1-5-21-", company.getCompanyId(), "-", user.getUserId()));
 	}
 
 	private static final Format _format =

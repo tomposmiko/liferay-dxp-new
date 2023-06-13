@@ -34,9 +34,11 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.osgi.web.portlet.container.test.BasePortletContainerTestCase;
 import com.liferay.portal.osgi.web.portlet.container.test.util.PortletContainerTestUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.theme.ThemeDisplayFactory;
 import com.liferay.portal.upload.LiferayServletRequest;
+import com.liferay.upload.UniqueFileNameProvider;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -111,7 +113,9 @@ public class UploadPortletTest extends BasePortletContainerTestCase {
 		};
 
 		registerMVCActionCommand(
-			new TestUploadMVCActionCommand(_testUploadPortlet));
+			new TestUploadMVCActionCommand(
+				_testUploadPortlet, _uniqueFileNameProvider));
+
 		registerMVCPortlet(_testUploadPortlet);
 	}
 
@@ -193,9 +197,6 @@ public class UploadPortletTest extends BasePortletContainerTestCase {
 		properties.put(
 			"com.liferay.portlet.use-default-template",
 			Boolean.TRUE.toString());
-		properties.put(
-			"com.liferay.portlet.webdav-storage-token",
-			TestUploadPortlet.MVC_PATH);
 		properties.put("javax.portlet.display-name", "Test Upload Portlet");
 		properties.put("javax.portlet.expiration-cache", "0");
 		properties.put(
@@ -290,5 +291,8 @@ public class UploadPortletTest extends BasePortletContainerTestCase {
 	}
 
 	private TestUploadPortlet _testUploadPortlet;
+
+	@Inject
+	private UniqueFileNameProvider _uniqueFileNameProvider;
 
 }

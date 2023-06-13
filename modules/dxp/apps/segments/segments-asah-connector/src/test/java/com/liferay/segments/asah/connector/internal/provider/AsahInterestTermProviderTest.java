@@ -19,10 +19,13 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.segments.asah.connector.internal.cache.AsahInterestTermCache;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -35,6 +38,11 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AsahInterestTermProviderTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -61,7 +69,9 @@ public class AsahInterestTermProviderTest {
 		);
 
 		Assert.assertArrayEquals(
-			interestTerms, _asahInterestTermProvider.getInterestTerms(userId));
+			interestTerms,
+			_asahInterestTermProvider.getInterestTerms(
+				RandomTestUtil.randomLong(), userId));
 
 		Mockito.verify(
 			_messageBus, Mockito.never()
@@ -74,7 +84,8 @@ public class AsahInterestTermProviderTest {
 	public void testGetInterestTermsWithEmptyAcClientUserId() {
 		Assert.assertArrayEquals(
 			new String[0],
-			_asahInterestTermProvider.getInterestTerms(StringPool.BLANK));
+			_asahInterestTermProvider.getInterestTerms(
+				RandomTestUtil.randomLong(), StringPool.BLANK));
 	}
 
 	@Test
@@ -88,7 +99,9 @@ public class AsahInterestTermProviderTest {
 		);
 
 		Assert.assertArrayEquals(
-			new String[0], _asahInterestTermProvider.getInterestTerms(userId));
+			new String[0],
+			_asahInterestTermProvider.getInterestTerms(
+				RandomTestUtil.randomLong(), userId));
 
 		Mockito.verify(
 			_messageBus, Mockito.times(1)

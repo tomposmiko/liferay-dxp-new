@@ -15,13 +15,13 @@
 package com.liferay.portal.tools;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.portal.kernel.util.OSDetector;
 import com.liferay.portal.kernel.util.PropertiesUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.FileImpl;
@@ -557,9 +557,9 @@ public class PluginsSummaryBuilder {
 		File relengChangeLogMD5File = new File(
 			webInfDir, "liferay-releng.changelog.md5");
 
-		String md5Checksum = FileUtil.getMD5Checksum(relengChangeLogFile);
-
-		FileUtil.write(relengChangeLogMD5File, md5Checksum);
+		FileUtil.write(
+			relengChangeLogMD5File,
+			FileUtil.getMD5Checksum(relengChangeLogFile));
 	}
 
 	private String _updateRelengPropertiesFile(

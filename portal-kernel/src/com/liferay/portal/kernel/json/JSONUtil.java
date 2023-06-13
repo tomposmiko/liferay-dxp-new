@@ -15,8 +15,13 @@
 package com.liferay.portal.kernel.json;
 
 import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.lang.reflect.Array;
 
@@ -36,6 +41,7 @@ import java.util.stream.Collector;
 /**
  * @author Brian Wing Shun Chan
  * @author Rachael Koestartyo
+ * @author Hugo Huijser
  */
 public class JSONUtil {
 
@@ -106,14 +112,28 @@ public class JSONUtil {
 		String key = parts[1];
 
 		if (type.equals("JSONArray")) {
-			JSONObject jsonObject = (JSONObject)object;
+			if (object instanceof JSONArray) {
+				JSONArray jsonArray = (JSONArray)object;
 
-			value = jsonObject.getJSONArray(key);
+				value = jsonArray.getJSONArray(GetterUtil.getInteger(key));
+			}
+			else if (object instanceof JSONObject) {
+				JSONObject jsonObject = (JSONObject)object;
+
+				value = jsonObject.getJSONArray(key);
+			}
 		}
 		else if (type.equals("JSONObject")) {
-			JSONObject jsonObject = (JSONObject)object;
+			if (object instanceof JSONArray) {
+				JSONArray jsonArray = (JSONArray)object;
 
-			value = jsonObject.getJSONObject(key);
+				value = jsonArray.getJSONObject(GetterUtil.getInteger(key));
+			}
+			else if (object instanceof JSONObject) {
+				JSONObject jsonObject = (JSONObject)object;
+
+				value = jsonObject.getJSONObject(key);
+			}
 		}
 		else if (type.equals("Object")) {
 			if (object instanceof JSONArray) {
@@ -135,11 +155,51 @@ public class JSONUtil {
 		return getValue(value, Arrays.copyOfRange(paths, 1, paths.length));
 	}
 
+	public static boolean getValueAsBoolean(Object object, String... paths) {
+		return GetterUtil.getBoolean(getValue(object, paths));
+	}
+
+	public static double getValueAsDouble(Object object, String... paths) {
+		return GetterUtil.getDouble(getValue(object, paths));
+	}
+
+	public static int getValueAsInt(Object object, String... paths) {
+		return GetterUtil.getInteger(getValue(object, paths));
+	}
+
+	public static JSONArray getValueAsJSONArray(
+		Object object, String... paths) {
+
+		return (JSONArray)getValue(object, paths);
+	}
+
+	public static JSONObject getValueAsJSONObject(
+		Object object, String... paths) {
+
+		return (JSONObject)getValue(object, paths);
+	}
+
+	public static long getValueAsLong(Object object, String... paths) {
+		return GetterUtil.getLong(getValue(object, paths));
+	}
+
+	public static String getValueAsString(Object object, String... paths) {
+		return String.valueOf(getValue(object, paths));
+	}
+
 	public static boolean hasValue(JSONArray jsonArray, Object value) {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			if (Objects.equals(value, jsonArray.get(i))) {
 				return true;
 			}
+		}
+
+		return false;
+	}
+
+	public static boolean isEmpty(JSONArray jsonArray) {
+		if ((jsonArray == null) || (jsonArray.length() == 0)) {
+			return true;
 		}
 
 		return false;
@@ -152,6 +212,10 @@ public class JSONUtil {
 			return true;
 		}
 		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(jsonException);
+			}
+
 			return false;
 		}
 	}
@@ -168,17 +232,17 @@ public class JSONUtil {
 			return _createJSONObject(jsonObject1.toString());
 		}
 
-		JSONObject jsonObject = _createJSONObject(jsonObject1.toString());
+		JSONObject jsonObject3 = _createJSONObject(jsonObject1.toString());
 
 		Iterator<String> iterator = jsonObject2.keys();
 
 		while (iterator.hasNext()) {
 			String key = iterator.next();
 
-			jsonObject.put(key, jsonObject2.get(key));
+			jsonObject3.put(key, jsonObject2.get(key));
 		}
 
-		return jsonObject;
+		return jsonObject3;
 	}
 
 	public static JSONArray put(Object value) {
@@ -248,6 +312,300 @@ public class JSONUtil {
 		List<T> list = toList(jsonArray, unsafeFunction);
 
 		return list.toArray((T[])Array.newInstance(clazz, 0));
+	}
+
+	public static double[] toDoubleArray(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new double[0];
+		}
+
+		double[] values = new double[jsonArray.length()];
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values[i] = jsonArray.getDouble(i);
+		}
+
+		return values;
+	}
+
+	public static double[] toDoubleArray(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new double[0];
+		}
+
+		List<Double> values = toDoubleList(jsonArray, jsonObjectKey);
+
+		return ArrayUtil.toArray(values.toArray(new Double[0]));
+	}
+
+	public static List<Double> toDoubleList(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new ArrayList<>();
+		}
+
+		List<Double> values = new ArrayList<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values.add(jsonArray.getDouble(i));
+		}
+
+		return values;
+	}
+
+	public static List<Double> toDoubleList(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new ArrayList<>();
+		}
+
+		List<Double> values = new ArrayList<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(jsonObject.getDouble(jsonObjectKey));
+			}
+		}
+
+		return values;
+	}
+
+	public static Set<Double> toDoubleSet(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new HashSet<>();
+		}
+
+		Set<Double> values = new HashSet<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values.add(jsonArray.getDouble(i));
+		}
+
+		return values;
+	}
+
+	public static Set<Double> toDoubleSet(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new HashSet<>();
+		}
+
+		Set<Double> values = new HashSet<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(jsonObject.getDouble(jsonObjectKey));
+			}
+		}
+
+		return values;
+	}
+
+	public static float[] toFloatArray(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new float[0];
+		}
+
+		float[] values = new float[jsonArray.length()];
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values[i] = GetterUtil.getFloat(jsonArray.get(i));
+		}
+
+		return values;
+	}
+
+	public static float[] toFloatArray(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new float[0];
+		}
+
+		List<Float> values = toFloatList(jsonArray, jsonObjectKey);
+
+		return ArrayUtil.toArray(values.toArray(new Float[0]));
+	}
+
+	public static List<Float> toFloatList(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new ArrayList<>();
+		}
+
+		List<Float> values = new ArrayList<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values.add(GetterUtil.getFloat(jsonArray.get(i)));
+		}
+
+		return values;
+	}
+
+	public static List<Float> toFloatList(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new ArrayList<>();
+		}
+
+		List<Float> values = new ArrayList<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(GetterUtil.getFloat(jsonObject.get(jsonObjectKey)));
+			}
+		}
+
+		return values;
+	}
+
+	public static Set<Float> toFloatSet(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new HashSet<>();
+		}
+
+		Set<Float> values = new HashSet<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values.add(GetterUtil.getFloat(jsonArray.get(i)));
+		}
+
+		return values;
+	}
+
+	public static Set<Float> toFloatSet(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new HashSet<>();
+		}
+
+		Set<Float> values = new HashSet<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(GetterUtil.getFloat(jsonObject.get(jsonObjectKey)));
+			}
+		}
+
+		return values;
+	}
+
+	public static int[] toIntegerArray(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new int[0];
+		}
+
+		int[] values = new int[jsonArray.length()];
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values[i] = jsonArray.getInt(i);
+		}
+
+		return values;
+	}
+
+	public static int[] toIntegerArray(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new int[0];
+		}
+
+		List<Integer> values = toIntegerList(jsonArray, jsonObjectKey);
+
+		return ArrayUtil.toArray(values.toArray(new Integer[0]));
+	}
+
+	public static List<Integer> toIntegerList(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new ArrayList<>();
+		}
+
+		List<Integer> values = new ArrayList<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values.add(jsonArray.getInt(i));
+		}
+
+		return values;
+	}
+
+	public static List<Integer> toIntegerList(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new ArrayList<>();
+		}
+
+		List<Integer> values = new ArrayList<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(jsonObject.getInt(jsonObjectKey));
+			}
+		}
+
+		return values;
+	}
+
+	public static Set<Integer> toIntegerSet(JSONArray jsonArray) {
+		if (jsonArray == null) {
+			return new HashSet<>();
+		}
+
+		Set<Integer> values = new HashSet<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			values.add(jsonArray.getInt(i));
+		}
+
+		return values;
+	}
+
+	public static Set<Integer> toIntegerSet(
+		JSONArray jsonArray, String jsonObjectKey) {
+
+		if (jsonArray == null) {
+			return new HashSet<>();
+		}
+
+		Set<Integer> values = new HashSet<>(jsonArray.length());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			Object value = jsonObject.opt(jsonObjectKey);
+
+			if (value != null) {
+				values.add(jsonObject.getInt(jsonObjectKey));
+			}
+		}
+
+		return values;
 	}
 
 	public static <T> JSONArray toJSONArray(
@@ -321,7 +679,7 @@ public class JSONUtil {
 		throws Exception {
 
 		if (jsonArray == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		List<T> values = new ArrayList<>(jsonArray.length());
@@ -361,7 +719,7 @@ public class JSONUtil {
 
 	public static List<Long> toLongList(JSONArray jsonArray) {
 		if (jsonArray == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		List<Long> values = new ArrayList<>(jsonArray.length());
@@ -377,7 +735,7 @@ public class JSONUtil {
 		JSONArray jsonArray, String jsonObjectKey) {
 
 		if (jsonArray == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		List<Long> values = new ArrayList<>(jsonArray.length());
@@ -397,7 +755,7 @@ public class JSONUtil {
 
 	public static Set<Long> toLongSet(JSONArray jsonArray) {
 		if (jsonArray == null) {
-			return Collections.emptySet();
+			return new HashSet<>();
 		}
 
 		Set<Long> values = new HashSet<>(jsonArray.length());
@@ -413,7 +771,7 @@ public class JSONUtil {
 		JSONArray jsonArray, String jsonObjectKey) {
 
 		if (jsonArray == null) {
-			return Collections.emptySet();
+			return new HashSet<>();
 		}
 
 		Set<Long> values = new HashSet<>(jsonArray.length());
@@ -459,7 +817,7 @@ public class JSONUtil {
 
 	public static List<Object> toObjectList(JSONArray jsonArray) {
 		if (jsonArray == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		List<Object> values = new ArrayList<>(jsonArray.length());
@@ -475,7 +833,7 @@ public class JSONUtil {
 		JSONArray jsonArray, String jsonObjectKey) {
 
 		if (jsonArray == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		List<Object> values = new ArrayList<>(jsonArray.length());
@@ -495,7 +853,7 @@ public class JSONUtil {
 
 	public static Set<Object> toObjectSet(JSONArray jsonArray) {
 		if (jsonArray == null) {
-			return Collections.emptySet();
+			return new HashSet<>();
 		}
 
 		Set<Object> values = new HashSet<>(jsonArray.length());
@@ -511,7 +869,7 @@ public class JSONUtil {
 		JSONArray jsonArray, String jsonObjectKey) {
 
 		if (jsonArray == null) {
-			return Collections.emptySet();
+			return new HashSet<>();
 		}
 
 		Set<Object> values = new HashSet<>(jsonArray.length());
@@ -527,6 +885,14 @@ public class JSONUtil {
 		}
 
 		return values;
+	}
+
+	public static String toString(JSONArray jsonArray) {
+		return _toString(jsonArray, StringPool.TAB, 0);
+	}
+
+	public static String toString(JSONObject jsonObject) {
+		return _toString(jsonObject, StringPool.TAB, 0);
 	}
 
 	public static String[] toStringArray(JSONArray jsonArray) {
@@ -557,7 +923,7 @@ public class JSONUtil {
 
 	public static List<String> toStringList(JSONArray jsonArray) {
 		if (jsonArray == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		List<String> values = new ArrayList<>(jsonArray.length());
@@ -573,7 +939,7 @@ public class JSONUtil {
 		JSONArray jsonArray, String jsonObjectKey) {
 
 		if (jsonArray == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		List<String> values = new ArrayList<>(jsonArray.length());
@@ -593,7 +959,7 @@ public class JSONUtil {
 
 	public static Set<String> toStringSet(JSONArray jsonArray) {
 		if (jsonArray == null) {
-			return Collections.emptySet();
+			return new HashSet<>();
 		}
 
 		Set<String> values = new HashSet<>(jsonArray.length());
@@ -609,7 +975,7 @@ public class JSONUtil {
 		JSONArray jsonArray, String jsonObjectKey) {
 
 		if (jsonArray == null) {
-			return Collections.emptySet();
+			return new HashSet<>();
 		}
 
 		Set<String> values = new HashSet<>(jsonArray.length());
@@ -640,5 +1006,106 @@ public class JSONUtil {
 
 		return JSONFactoryUtil.createJSONObject(json);
 	}
+
+	private static String _getIndent(String indent, int level) {
+		StringBundler sb = new StringBundler(level);
+
+		for (int i = 0; i < level; i++) {
+			sb.append(indent);
+		}
+
+		return sb.toString();
+	}
+
+	private static String _getString(Object value, String indent, int level) {
+		if (value instanceof JSONArray) {
+			return _toString((JSONArray)value, indent, level);
+		}
+
+		if (value instanceof JSONObject) {
+			return _toString((JSONObject)value, indent, level);
+		}
+
+		if (value instanceof String) {
+			return StringBundler.concat(
+				StringPool.QUOTE,
+				StringUtil.replace(
+					(String)value, new String[] {"\\", "\"", "\n", "\r", "\t"},
+					new String[] {"\\\\", "\\\"", "\\n", "\\r", "\\t"}),
+				StringPool.QUOTE);
+		}
+
+		return value.toString();
+	}
+
+	private static String _toString(
+		JSONArray jsonArray, String indent, int level) {
+
+		if (jsonArray.length() == 0) {
+			return StringBundler.concat(
+				"[\n", _getIndent(indent, level), StringPool.CLOSE_BRACKET);
+		}
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(StringPool.OPEN_BRACKET);
+		sb.append("\n");
+
+		for (Object value : toObjectList(jsonArray)) {
+			sb.append(_getIndent(indent, level + 1));
+			sb.append(_getString(value, indent, level + 1));
+			sb.append(StringPool.COMMA);
+			sb.append("\n");
+		}
+
+		sb.setIndex(sb.index() - 2);
+
+		sb.append("\n");
+
+		sb.append(_getIndent(indent, level));
+
+		sb.append(StringPool.CLOSE_BRACKET);
+
+		return sb.toString();
+	}
+
+	private static String _toString(
+		JSONObject jsonObject, String indent, int level) {
+
+		if (jsonObject.length() == 0) {
+			return StringBundler.concat(
+				"{\n", _getIndent(indent, level), StringPool.CLOSE_CURLY_BRACE);
+		}
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(StringPool.OPEN_CURLY_BRACE);
+		sb.append("\n");
+
+		List<String> keys = new ArrayList<>(jsonObject.keySet());
+
+		Collections.sort(keys);
+
+		for (String key : keys) {
+			sb.append(_getIndent(indent, level + 1));
+			sb.append(_getString(key, indent, level + 1));
+			sb.append(": ");
+			sb.append(_getString(jsonObject.get(key), indent, level + 1));
+			sb.append(StringPool.COMMA);
+			sb.append("\n");
+		}
+
+		sb.setIndex(sb.index() - 2);
+
+		sb.append("\n");
+
+		sb.append(_getIndent(indent, level));
+
+		sb.append(StringPool.CLOSE_CURLY_BRACE);
+
+		return sb.toString();
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(JSONUtil.class);
 
 }

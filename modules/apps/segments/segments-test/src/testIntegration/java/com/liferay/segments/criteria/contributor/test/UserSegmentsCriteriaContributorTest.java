@@ -46,13 +46,13 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portlet.expando.util.test.ExpandoTestUtil;
+import com.liferay.portletmvc4spring.test.mock.web.portlet.MockPortletRequest;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributor;
 import com.liferay.segments.field.Field;
-import com.liferay.spring.mock.web.portlet.MockPortletRequest;
 
 import java.io.Serializable;
 
@@ -154,7 +154,7 @@ public class UserSegmentsCriteriaContributorTest {
 		Set<String> complexEntityFieldNames = stream.filter(
 			field -> StringUtil.startsWith(field.getName(), "customField/")
 		).map(
-			field -> StringUtil.replace(field.getName(), "customField/", "")
+			field -> StringUtil.removeSubstring(field.getName(), "customField/")
 		).collect(
 			Collectors.toSet()
 		);
@@ -183,9 +183,9 @@ public class UserSegmentsCriteriaContributorTest {
 		List<Field> fields = segmentsCriteriaContributor.getFields(
 			_getMockPortletRequest());
 
-		Stream<Field> fieldStream = fields.stream();
+		Stream<Field> fieldsStream = fields.stream();
 
-		Optional<Field> optionalField = fieldStream.filter(
+		Optional<Field> optionalField = fieldsStream.filter(
 			field -> StringUtil.endsWith(
 				field.getName(),
 				Normalizer.normalizeIdentifier(expandoColumn.getName()))
@@ -197,15 +197,15 @@ public class UserSegmentsCriteriaContributorTest {
 
 		List<Field.Option> options = field.getOptions();
 
-		Stream<Field.Option> optionStream = options.stream();
+		Stream<Field.Option> optionsStream = options.stream();
 
-		List<String> optionValues = optionStream.map(
-			Field.Option::getValue
-		).collect(
-			Collectors.toList()
-		);
-
-		Assert.assertEquals(Arrays.asList(defaultValue), optionValues);
+		Assert.assertEquals(
+			Arrays.asList(defaultValue),
+			optionsStream.map(
+				Field.Option::getValue
+			).collect(
+				Collectors.toList()
+			));
 	}
 
 	@Test
@@ -216,9 +216,9 @@ public class UserSegmentsCriteriaContributorTest {
 		List<Field> fields = segmentsCriteriaContributor.getFields(
 			_getMockPortletRequest());
 
-		Stream<Field> fieldStream = fields.stream();
+		Stream<Field> fieldsStream = fields.stream();
 
-		Optional<Field> optionalField = fieldStream.filter(
+		Optional<Field> optionalField = fieldsStream.filter(
 			field -> Objects.equals(field.getName(), "groupIds")
 		).findFirst();
 
@@ -228,10 +228,9 @@ public class UserSegmentsCriteriaContributorTest {
 
 		Assert.assertEquals("id", field.getType());
 
-		Field.SelectEntity selectEntity = field.getSelectEntity();
-
 		Assert.assertNotNull(
-			"ID type fields must contain a select entity,", selectEntity);
+			"ID type fields must contain a select entity,",
+			field.getSelectEntity());
 	}
 
 	private ExpandoColumn _addExpandoColumn(

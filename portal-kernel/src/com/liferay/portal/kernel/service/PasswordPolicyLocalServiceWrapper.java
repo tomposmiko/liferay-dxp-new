@@ -57,6 +57,10 @@ public class PasswordPolicyLocalServiceWrapper
 	/**
 	 * Adds the password policy to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PasswordPolicyLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param passwordPolicy the password policy
 	 * @return the password policy that was added
 	 */
@@ -88,6 +92,17 @@ public class PasswordPolicyLocalServiceWrapper
 			passwordPolicyId);
 	}
 
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _passwordPolicyLocalService.createPersistedModel(primaryKeyObj);
+	}
+
 	@Override
 	public void deleteNondefaultPasswordPolicies(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -97,6 +112,10 @@ public class PasswordPolicyLocalServiceWrapper
 
 	/**
 	 * Deletes the password policy with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PasswordPolicyLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param passwordPolicyId the primary key of the password policy
 	 * @return the password policy that was removed
@@ -113,6 +132,10 @@ public class PasswordPolicyLocalServiceWrapper
 
 	/**
 	 * Deletes the password policy from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PasswordPolicyLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param passwordPolicy the password policy
 	 * @return the password policy that was removed
@@ -135,6 +158,18 @@ public class PasswordPolicyLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _passwordPolicyLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _passwordPolicyLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _passwordPolicyLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -396,6 +431,9 @@ public class PasswordPolicyLocalServiceWrapper
 			uuid, companyId);
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -409,10 +447,11 @@ public class PasswordPolicyLocalServiceWrapper
 		search(
 			long companyId, java.lang.String name, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.portal.kernel.model.PasswordPolicy> obc) {
+				<com.liferay.portal.kernel.model.PasswordPolicy>
+					orderByComparator) {
 
 		return _passwordPolicyLocalService.search(
-			companyId, name, start, end, obc);
+			companyId, name, start, end, orderByComparator);
 	}
 
 	@Override
@@ -445,6 +484,10 @@ public class PasswordPolicyLocalServiceWrapper
 
 	/**
 	 * Updates the password policy in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PasswordPolicyLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param passwordPolicy the password policy
 	 * @return the password policy that was updated

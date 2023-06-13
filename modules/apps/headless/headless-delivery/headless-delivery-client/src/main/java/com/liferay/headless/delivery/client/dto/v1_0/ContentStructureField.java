@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.ContentStructureFieldSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ContentStructureField {
+public class ContentStructureField implements Cloneable, Serializable {
+
+	public static ContentStructureField toDTO(String json) {
+		return ContentStructureFieldSerDes.toDTO(json);
+	}
 
 	public String getDataType() {
 		return dataType;
@@ -328,6 +334,11 @@ public class ContentStructureField {
 	}
 
 	protected Boolean showLabel;
+
+	@Override
+	public ContentStructureField clone() throws CloneNotSupportedException {
+		return (ContentStructureField)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

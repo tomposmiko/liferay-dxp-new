@@ -1,9 +1,9 @@
 @component-name = "portal-collaboration"
 definition {
 
+	property custom.properties = "default.layout.template.id=1_column";
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property custom.properties = "default.layout.template.id=1_column";
 	property testray.main.component.name = "Adaptive Media";
 
 	setUp {
@@ -20,7 +20,7 @@ definition {
 	test AddAMIWithHighDensityResolution {
 		property portal.acceptance = "true";
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -51,7 +51,7 @@ definition {
 
 	@priority = "5"
 	test AddAMIWithZeroPixels {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -62,7 +62,7 @@ definition {
 			maxWidth = "0",
 			zero = "true");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -72,13 +72,13 @@ definition {
 
 	@priority = "4"
 	test AddAndEditEntriesWithSpecialCharacters {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
 
 		AdaptiveMedia.addImageResolution(
-			description = "1234567890!@#$%^&amp;*()~`",
+			description = "1234567890!@#$%^&*()~`",
 			imageName = "abcdefghijklmnopqrstuvwxyz",
 			maxHeight = "25",
 			maxWidth = "25");
@@ -88,22 +88,22 @@ definition {
 			imageNameEdit = "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
 		AdaptiveMedia.addImageResolution(
-			imageName = "1234567890!@#$%^&amp;*()~`",
+			imageName = "1234567890!@#$%^&*()~`",
 			maxHeight = "75",
 			maxWidth = "75");
 
 		AdaptiveMedia.editImageResolution(
-			imageName = "1234567890!@#$%^&amp;*()~`",
-			imageNameEdit = "[]\{}|:&quot;;&apos;,./&gt;&lt;?");
+			imageName = "1234567890!@#$%^&*()~`",
+			imageNameEdit = "[]\{}|:&quot;;',./><?");
 
 		AdaptiveMedia.gotoImageVariantEntry(imageName = "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-		AdaptiveMedia.viewImageVariantDescription(description = "1234567890!@#$%^&amp;*()~`");
+		AdaptiveMedia.viewImageVariantDescription(description = "1234567890!@#$%^&*()~`");
 	}
 
 	@priority = "5"
 	test AddAndUpdateAMIWithImagesInDM {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -119,17 +119,13 @@ definition {
 			maxWidth = "320",
 			percentAdapted = "0");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Documents and Media");
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentTitle = "Document_1.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
-		DMDocument.addCP(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "Document_1.jpg");
-
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -152,6 +148,7 @@ definition {
 		AdaptiveMedia.viewNumberOfAdaptedImages(numberOfAdaptedImages = "0/1");
 
 		AdaptiveMedia.editImageResolution(
+			backspaceCount = "4",
 			imageName = "High Resolution",
 			imageNameEdit = "High Resolution Edited",
 			maxHeightEdit = "1080",
@@ -164,7 +161,7 @@ definition {
 
 	@priority = "4"
 	test AddDuplicateImageResolution {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -177,7 +174,7 @@ definition {
 
 		Navigator.openURL();
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -191,7 +188,7 @@ definition {
 
 		Navigator.openURL();
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -201,7 +198,7 @@ definition {
 
 	@priority = "4"
 	test AddImageResolutionWithNoDimensions {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -212,7 +209,7 @@ definition {
 			maxWidth = "",
 			noDimensions = "true");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -222,7 +219,7 @@ definition {
 
 	@priority = "4"
 	test AddImageResolutionWithSingleDimension {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -253,20 +250,20 @@ definition {
 	@priority = "5"
 	test AssertAdaptedImageInBlogsEntry {
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Documents and Media");
 
-		DMDocument.addCP(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "Adaptive Media Image Description",
-			dmDocumentFile = "high_resolution_photo.jpg",
-			dmDocumentTitle = "high_resolution_photo.jpg");
+			dmDocumentTitle = "high_resolution_photo.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "high_resolution_photo.jpg");
 
 		Pause(locator1 = "3000");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		BlogsNavigator.gotoAddEntry();
@@ -286,30 +283,19 @@ definition {
 		Button.clickPublish();
 	}
 
-	// This is not an acceptance test and is temporarily quarantined.
-
 	@priority = "5"
 	test AssertAdaptedImageInWebContent {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Adaptive Media");
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "Adaptive Media Image Description",
-			dmDocumentFile = "high_resolution_photo.jpg",
-			dmDocumentTitle = "high_resolution_photo.jpg");
+			dmDocumentTitle = "high_resolution_photo.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "high_resolution_photo.jpg");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		WebContentNavigator.gotoAddCP();
@@ -325,7 +311,13 @@ definition {
 			webContentContent = "Web Content Content",
 			webContentTitle = "Web Content Title");
 
+		SelectFrame.selectFrameNoLoading(
+			key_fieldLabel = "content",
+			locator1 = "CKEditor#BODY_FIELD_IFRAME_WEB_CONTENT_ARTICLE");
+
 		AdaptiveMedia.viewImageVariantURL(imageName = "high_resolution_photo.jpg");
+
+		SelectFrameTop();
 
 		Button.clickPublish();
 	}
@@ -333,21 +325,19 @@ definition {
 	@description = "This ensures that the SVG image can be added and optimized in a blog entry."
 	@priority = "5"
 	test AssertAdaptedSVGImageInBlogsEntry {
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Documents and Media");
+		property portal.acceptance = "true";
 
-		DMDocument.addCP(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "Adaptive Media Image Description",
-			dmDocumentFile = "Document_1.svg",
-			dmDocumentTitle = "Document_1.svg");
+			dmDocumentTitle = "Document_1.svg",
+			groupName = "Guest",
+			mimeType = "image/svg+xml",
+			sourceFileName = "Document_1.svg");
 
 		Pause(locator1 = "3000");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Blogs");
 
 		BlogsNavigator.gotoAddEntry();
@@ -369,7 +359,7 @@ definition {
 
 	@priority = "5"
 	test CannotAddNonNumericWidthOrHeight {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -379,7 +369,7 @@ definition {
 			maxHeight = "notallowed",
 			maxWidth = "notallowed");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -389,7 +379,7 @@ definition {
 
 	@priority = "5"
 	test EditAndDeleteDisabledAMI {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -412,6 +402,7 @@ definition {
 			percentAdapted = "0");
 
 		AdaptiveMedia.editImageResolution(
+			backspaceCount = "4",
 			imageName = "Small Image Variant",
 			imageNameEdit = "Large Image Variant",
 			maxHeightEdit = "1000",
@@ -429,7 +420,7 @@ definition {
 
 	@priority = "5"
 	test EditImageResolutionWithAdaptedImages {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -459,17 +450,14 @@ definition {
 			maxWidth = "100",
 			percentAdapted = "0");
 
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "Document_1.jpg");
+			dmDocumentTitle = "Document_1.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -487,7 +475,7 @@ definition {
 
 	@priority = "4"
 	test EditImageResolutionWithNoDimensions {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -503,13 +491,14 @@ definition {
 			maxWidth = "1000");
 
 		AdaptiveMedia.editImageResolution(
+			backspaceCount = "4",
 			imageName = "testResolution",
 			imageNameEdit = "testResolutionEdit",
 			maxHeightEdit = "",
 			maxWidthEdit = "",
 			noDimensions = "true");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -519,7 +508,7 @@ definition {
 
 	@priority = "5"
 	test EditImageResolutionWithoutAdaptedImage {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -537,6 +526,7 @@ definition {
 			percentAdapted = "0");
 
 		AdaptiveMedia.editImageResolution(
+			backspaceCount = "4",
 			imageIDEdit = "large-image",
 			imageName = "Small Image Variant",
 			imageNameEdit = "Large Image Variant",
@@ -553,7 +543,7 @@ definition {
 
 	@priority = "4"
 	test EditImageResolutionWithSingleDimension {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -564,9 +554,10 @@ definition {
 			maxWidth = "1000");
 
 		AdaptiveMedia.editImageResolution(
+			backspaceCount = "4",
 			imageName = "testResolutionWidth",
 			imageNameEdit = "testResolutionWidthEdit",
-			maxHeightEdit = "");
+			maxHeightEdit = "0");
 
 		AdaptiveMedia.viewImageResolutionTableEntry(
 			imageName = "testResolutionWidthEdit",
@@ -579,9 +570,10 @@ definition {
 			maxWidth = "1000");
 
 		AdaptiveMedia.editImageResolution(
+			backspaceCount = "4",
 			imageName = "testResolutionHeight",
 			imageNameEdit = "testResolutionHeightEdit",
-			maxWidthEdit = "");
+			maxWidthEdit = "0");
 
 		AdaptiveMedia.viewImageResolutionTableEntry(
 			imageName = "testResolutionHeightEdit",
@@ -591,17 +583,14 @@ definition {
 
 	@priority = "4"
 	test OptimizeAllImageResolutions {
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "Document_1.jpg");
+			dmDocumentTitle = "Document_1.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -626,7 +615,7 @@ definition {
 
 	@priority = "4"
 	test ViewAutomaticAndCustomImageVariantIDs {
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -640,7 +629,7 @@ definition {
 
 		AdaptiveMedia.viewImageVariantID(imageVariantID = "small-image-variant");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -653,7 +642,7 @@ definition {
 
 		AdaptiveMedia.viewImageVariantID(imageVariantID = "edited-small-image-variant");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -668,7 +657,7 @@ definition {
 
 		AdaptiveMedia.viewImageVariantID(imageVariantID = "custom-id");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -682,15 +671,12 @@ definition {
 		AdaptiveMedia.viewImageVariantID(imageVariantID = "custom-id");
 	}
 
-	// This is not an acceptance test and is temporarily quarantined.
-
 	@priority = "4"
 	test ViewNoImageResolutionInNewVirtualInstance {
-		property portal.acceptance = "quarantine";
 		property test.name.skip.portal.instance = "AdaptiveMedia#ViewNoImageResolutionInNewVirtualInstance";
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
+		ApplicationsMenu.gotoPortlet(
+			category = "System",
 			panel = "Control Panel",
 			portlet = "Virtual Instances");
 
@@ -701,7 +687,7 @@ definition {
 
 		PortalInstances.viewCP(virtualHost = "www.able.com");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -718,7 +704,7 @@ definition {
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -732,7 +718,7 @@ definition {
 
 		SitePages.openPagesAdmin(siteURLKey = "Site Name");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -749,18 +735,15 @@ definition {
 			percentAdapted = "0");
 
 		for (var entryCount : list "1,2") {
-			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
-				panel = "Site Administration",
-				portlet = "Documents and Media");
-
-			DMDocument.addCP(
+			JSONDocument.addFileWithUploadedFile(
 				dmDocumentDescription = "DM Document Description",
-				dmDocumentFile = "Document_${entryCount}.jpg",
-				dmDocumentTitle = "Document_${entryCount}.jpg");
+				dmDocumentTitle = "Document_${entryCount}.jpg",
+				groupName = "Site Name",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_${entryCount}.jpg");
 		}
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");
@@ -773,23 +756,18 @@ definition {
 
 		JSONGroup.addGroup(groupName = "Another Site Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "Another Site Name");
-
 		for (var entryCount : list "1,2") {
-			ProductMenu.gotoPortlet(
-				category = "Content &amp; Data",
-				panel = "Site Administration",
-				portlet = "Documents and Media");
-
-			DMDocument.addCP(
+			JSONDocument.addFileWithUploadedFile(
 				dmDocumentDescription = "DM Document Description",
-				dmDocumentFile = "Document_${entryCount}.jpg",
-				dmDocumentTitle = "Document_${entryCount}.jpg");
+				dmDocumentTitle = "Document_${entryCount}.jpg",
+				groupName = "Another Site Name",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_${entryCount}.jpg");
 		}
 
-		Navigator.openSiteURL(siteName = "Site Name");
+		SitePages.openPagesAdmin(siteURLKey = "Site Name");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Adaptive Media");

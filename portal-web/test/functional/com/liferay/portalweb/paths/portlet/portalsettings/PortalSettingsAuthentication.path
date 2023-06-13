@@ -2,11 +2,13 @@
 <head>
 <title>PortalSettingsAuthentication</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">PortalSettingsAuthentication</td></tr>
 </thead>
+
 <tbody>
 <!--AUTHENTICATION_GENERAL-->
 <tr>
@@ -356,21 +358,15 @@
 	<td></td>
 	<td></td>
 </tr>
-<!--AUTHENTICATION_OPEN_ID-->
-<tr>
-	<td>AUTHENTICATION_OPEN_ID_ENABLED_CHECKBOX</td>
-	<td>//input[contains(@name,'openid_enabled')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--AUTHENTICATION_OPEN_ID_CONNECT-->
 <tr>
 	<td>AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX</td>
 	<td>//input[contains(@name,'openid_connect_enabled')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>AUTHENTICATION_OPEN_ID_CONNECT_ENABLED_CHECKBOX_SYSTEM_LEVEL</td>
+	<td>//input[contains(@name,'enabled')]</td>
 	<td></td>
 </tr>
 <tr>

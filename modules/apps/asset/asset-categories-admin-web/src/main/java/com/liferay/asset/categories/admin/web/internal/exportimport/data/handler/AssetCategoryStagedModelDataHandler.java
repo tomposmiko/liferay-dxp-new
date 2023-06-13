@@ -27,6 +27,7 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -152,12 +153,16 @@ public class AssetCategoryStagedModelDataHandler
 				category.getCategoryId());
 
 		for (AssetCategoryProperty categoryProperty : categoryProperties) {
-			Element propertyElement = categoryElement.addElement("property");
+			if (!_exists(categoryElement, categoryProperty)) {
+				Element propertyElement = categoryElement.addElement(
+					"property");
 
-			propertyElement.addAttribute(
-				"userUuid", categoryProperty.getUserUuid());
-			propertyElement.addAttribute("key", categoryProperty.getKey());
-			propertyElement.addAttribute("value", categoryProperty.getValue());
+				propertyElement.addAttribute(
+					"userUuid", categoryProperty.getUserUuid());
+				propertyElement.addAttribute("key", categoryProperty.getKey());
+				propertyElement.addAttribute(
+					"value", categoryProperty.getValue());
+			}
 		}
 
 		String categoryPath = ExportImportPathUtil.getModelPath(category);
@@ -229,11 +234,9 @@ public class AssetCategoryStagedModelDataHandler
 			String key = propertyElement.attributeValue("key");
 			String value = propertyElement.attributeValue("value");
 
-			properties[i] = key.concat(
-				AssetCategoryConstants.PROPERTY_KEY_VALUE_SEPARATOR
-			).concat(
-				value
-			);
+			properties[i] = StringBundler.concat(
+				key, AssetCategoryConstants.PROPERTY_KEY_VALUE_SEPARATOR,
+				value);
 		}
 
 		ServiceContext serviceContext = createServiceContext(
@@ -320,6 +323,20 @@ public class AssetCategoryStagedModelDataHandler
 		}
 
 		return titleMap;
+	}
+
+	private boolean _exists(
+		Element categoryElement, AssetCategoryProperty categoryProperty) {
+
+		String key = categoryProperty.getKey();
+
+		for (Element propertyElement : categoryElement.elements("property")) {
+			if (key.equals(propertyElement.attributeValue("key"))) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Reference

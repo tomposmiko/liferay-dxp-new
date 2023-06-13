@@ -13,4 +13,22 @@ definition {
 		selenium.assertLiferayErrors();
 	}
 
+	function scrollWebElementIntoViewTop {
+		WaitForSPARefresh();
+
+		selenium.waitForElementPresent();
+
+		var javascript = '''
+var element = document.evaluate("${locator1}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
+element.scrollIntoView(true);
+		''';
+
+		selenium.runScript("${javascript}");
+
+		selenium.assertJavaScriptErrors();
+
+		selenium.assertLiferayErrors();
+	}
+
 }

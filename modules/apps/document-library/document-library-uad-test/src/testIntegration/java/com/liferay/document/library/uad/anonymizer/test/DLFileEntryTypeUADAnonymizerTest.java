@@ -75,11 +75,11 @@ public class DLFileEntryTypeUADAnonymizerTest
 		throws Exception {
 
 		DLFileEntryTypeUADTestUtil.cleanUpDependencies(
-			_dlFileEntryTypeLocalService, _portal, baseModels);
+			_dlFileEntryTypeLocalService, baseModels);
 	}
 
 	@Override
-	protected UADAnonymizer getUADAnonymizer() {
+	protected UADAnonymizer<DLFileEntryType> getUADAnonymizer() {
 		return _uadAnonymizer;
 	}
 
@@ -122,6 +122,6 @@ public class DLFileEntryTypeUADAnonymizerTest
 	private Portal _portal;
 
 	@Inject(filter = "component.name=*.DLFileEntryTypeUADAnonymizer")
-	private UADAnonymizer _uadAnonymizer;
+	private UADAnonymizer<DLFileEntryType> _uadAnonymizer;
 
 }

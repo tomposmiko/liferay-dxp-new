@@ -24,15 +24,19 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.fragment.service.http.FragmentEntryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class FragmentEntrySoap implements Serializable {
 
 	public static FragmentEntrySoap toSoapModel(FragmentEntry model) {
 		FragmentEntrySoap soapModel = new FragmentEntrySoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setCtCollectionId(model.getCtCollectionId());
 		soapModel.setUuid(model.getUuid());
+		soapModel.setHeadId(model.getHeadId());
 		soapModel.setFragmentEntryId(model.getFragmentEntryId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -46,6 +50,7 @@ public class FragmentEntrySoap implements Serializable {
 		soapModel.setCss(model.getCss());
 		soapModel.setHtml(model.getHtml());
 		soapModel.setJs(model.getJs());
+		soapModel.setCacheable(model.isCacheable());
 		soapModel.setConfiguration(model.getConfiguration());
 		soapModel.setPreviewFileEntryId(model.getPreviewFileEntryId());
 		soapModel.setReadOnly(model.isReadOnly());
@@ -116,12 +121,28 @@ public class FragmentEntrySoap implements Serializable {
 		_mvccVersion = mvccVersion;
 	}
 
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	public void setCtCollectionId(long ctCollectionId) {
+		_ctCollectionId = ctCollectionId;
+	}
+
 	public String getUuid() {
 		return _uuid;
 	}
 
 	public void setUuid(String uuid) {
 		_uuid = uuid;
+	}
+
+	public long getHeadId() {
+		return _headId;
+	}
+
+	public void setHeadId(long headId) {
+		_headId = headId;
 	}
 
 	public long getFragmentEntryId() {
@@ -228,6 +249,18 @@ public class FragmentEntrySoap implements Serializable {
 		_js = js;
 	}
 
+	public boolean getCacheable() {
+		return _cacheable;
+	}
+
+	public boolean isCacheable() {
+		return _cacheable;
+	}
+
+	public void setCacheable(boolean cacheable) {
+		_cacheable = cacheable;
+	}
+
 	public String getConfiguration() {
 		return _configuration;
 	}
@@ -305,7 +338,9 @@ public class FragmentEntrySoap implements Serializable {
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
+	private long _headId;
 	private long _fragmentEntryId;
 	private long _groupId;
 	private long _companyId;
@@ -319,6 +354,7 @@ public class FragmentEntrySoap implements Serializable {
 	private String _css;
 	private String _html;
 	private String _js;
+	private boolean _cacheable;
 	private String _configuration;
 	private long _previewFileEntryId;
 	private boolean _readOnly;

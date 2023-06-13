@@ -38,6 +38,8 @@ public class SelectUsersManagementToolbarDisplayContext
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			selectUsersDisplayContext.getUserSearchContainer());
+
+		_selectUsersDisplayContext = selectUsersDisplayContext;
 	}
 
 	@Override
@@ -67,6 +69,16 @@ public class SelectUsersManagementToolbarDisplayContext
 	}
 
 	@Override
+	protected String getDefaultDisplayStyle() {
+		return "icon";
+	}
+
+	@Override
+	protected String getDisplayStyle() {
+		return _selectUsersDisplayContext.getDisplayStyle();
+	}
+
+	@Override
 	protected String[] getDisplayViews() {
 		return new String[] {"list", "descriptive", "icon"};
 	}
@@ -80,5 +92,7 @@ public class SelectUsersManagementToolbarDisplayContext
 	protected String[] getOrderByKeys() {
 		return new String[] {"first-name", "screen-name"};
 	}
+
+	private final SelectUsersDisplayContext _selectUsersDisplayContext;
 
 }

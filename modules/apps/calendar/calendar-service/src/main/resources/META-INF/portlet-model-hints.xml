@@ -40,7 +40,9 @@
 		<field name="vEventUid" type="String">
 			<hint name="max-length">255</hint>
 		</field>
-		<field localized="true" name="title" type="String" />
+		<field localized="true" name="title" type="String">
+			<hint name="max-length">4000</hint>
+		</field>
 		<field localized="true" name="description" type="String">
 			<hint-collection name="EDITOR" />
 		</field>
@@ -79,7 +81,9 @@
 		<field name="modifiedDate" type="Date" />
 		<field name="calendarId" type="long" />
 		<field name="notificationType" type="String" />
-		<field name="notificationTypeSettings" type="String" />
+		<field name="notificationTypeSettings" type="String">
+			<hint name="max-length">200</hint>
+		</field>
 		<field name="notificationTemplateType" type="String" />
 		<field name="subject" type="String" />
 		<field name="body" type="String">

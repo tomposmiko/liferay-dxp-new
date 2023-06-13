@@ -11,6 +11,8 @@
 
 import {fetch} from 'frontend-js-web';
 
+import {isNull} from './util.es';
+
 /**
  * Fetches basic response given the url and parameters.
  * @param {string} url The base url to fetch.
@@ -20,13 +22,13 @@ import {fetch} from 'frontend-js-web';
 export function fetchResponse(url, params) {
 	const fetchUrl = new URL(url);
 
-	Object.keys(params).forEach(property => {
-		if (params[property]) {
+	Object.keys(params).forEach((property) => {
+		if (!isNull(params[property])) {
 			fetchUrl.searchParams.set(property, params[property]);
 		}
 	});
 
-	return fetch(fetchUrl).then(response => response.json());
+	return fetch(fetchUrl).then((response) => response.json());
 }
 
 /**
@@ -37,8 +39,8 @@ export function fetchResponse(url, params) {
  * @returns {Promise} The fetch request promise.
  */
 export function fetchDocuments(url, params) {
-	return fetchResponse(url, params).then(data => ({
+	return fetchResponse(url, params).then((data) => ({
 		items: data.documents,
-		total: data.total
+		total: data.total,
 	}));
 }

@@ -143,13 +143,32 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 						importX + _CSS_IMPORT_BEGIN.length(), importY);
 				}
 
+				String normalizedImportFileName = importFileName;
+
+				if (!importFileName.isEmpty()) {
+					char firstCharacter = importFileName.charAt(0);
+
+					if ((firstCharacter == CharPool.APOSTROPHE) ||
+						(firstCharacter == CharPool.QUOTE)) {
+
+						normalizedImportFileName = importFileName.substring(
+							1, importFileName.length() - 1);
+					}
+				}
+
 				String importContent = null;
 
-				if (Validator.isUrl(importFileName)) {
+				if (Validator.isUrl(normalizedImportFileName)) {
 					ServletPaths downServletPaths = servletPaths.down(
-						importFileName);
+						normalizedImportFileName);
 
 					importContent = downServletPaths.getContent();
+
+					if (importContent == null) {
+						importContent =
+							_CSS_IMPORT_BEGIN + importFileName +
+								_CSS_IMPORT_END;
+					}
 				}
 				else {
 					int queryPos = importFileName.indexOf(CharPool.QUESTION);
@@ -423,12 +442,12 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 					fileLastModifiedTime) {
 
 				if (cacheContentTypeFile.exists()) {
-					String contentType = FileUtil.read(cacheContentTypeFile);
-
-					httpServletResponse.setContentType(contentType);
+					httpServletResponse.setContentType(
+						FileUtil.read(cacheContentTypeFile));
 				}
 				else if (resourcePath.endsWith(_CSS_EXTENSION)) {
-					httpServletResponse.setContentType(ContentTypes.TEXT_CSS);
+					httpServletResponse.setContentType(
+						ContentTypes.TEXT_CSS_UTF8);
 				}
 				else if (resourcePath.endsWith(_JAVASCRIPT_EXTENSION)) {
 					httpServletResponse.setContentType(
@@ -450,10 +469,11 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 				content = getCssContent(
 					httpServletRequest, httpServletResponse, resourcePath);
 
-				httpServletResponse.setContentType(ContentTypes.TEXT_CSS);
+				httpServletResponse.setContentType(ContentTypes.TEXT_CSS_UTF8);
 
 				if (!_isLegacyIe(httpServletRequest)) {
-					FileUtil.write(cacheContentTypeFile, ContentTypes.TEXT_CSS);
+					FileUtil.write(
+						cacheContentTypeFile, ContentTypes.TEXT_CSS_UTF8);
 				}
 			}
 			else if (resourcePath.endsWith(_JAVASCRIPT_EXTENSION)) {

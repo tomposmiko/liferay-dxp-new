@@ -37,6 +37,10 @@ public class KaleoDefinitionVersionLocalServiceWrapper
 	/**
 	 * Adds the kaleo definition version to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoDefinitionVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoDefinitionVersion the kaleo definition version
 	 * @return the kaleo definition version that was added
 	 */
@@ -53,13 +57,14 @@ public class KaleoDefinitionVersionLocalServiceWrapper
 	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion
 			addKaleoDefinitionVersion(
-				String name, String title, String description, String content,
-				String version,
+				long kaleoDefinitionId, String name, String title,
+				String description, String content, String version,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoDefinitionVersionLocalService.addKaleoDefinitionVersion(
-			name, title, description, content, version, serviceContext);
+			kaleoDefinitionId, name, title, description, content, version,
+			serviceContext);
 	}
 
 	/**
@@ -77,7 +82,23 @@ public class KaleoDefinitionVersionLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoDefinitionVersionLocalService.createPersistedModel(
+			primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the kaleo definition version from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoDefinitionVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoDefinitionVersion the kaleo definition version
 	 * @return the kaleo definition version that was removed
@@ -96,6 +117,10 @@ public class KaleoDefinitionVersionLocalServiceWrapper
 
 	/**
 	 * Deletes the kaleo definition version with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoDefinitionVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoDefinitionVersionId the primary key of the kaleo definition version
 	 * @return the kaleo definition version that was removed
@@ -117,6 +142,16 @@ public class KaleoDefinitionVersionLocalServiceWrapper
 
 		_kaleoDefinitionVersionLocalService.deleteKaleoDefinitionVersion(
 			companyId, name, version);
+	}
+
+	@Override
+	public void deleteKaleoDefinitionVersions(
+			com.liferay.portal.workflow.kaleo.model.KaleoDefinition
+				kaleoDefinition)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_kaleoDefinitionVersionLocalService.deleteKaleoDefinitionVersions(
+			kaleoDefinition);
 	}
 
 	@Override
@@ -148,6 +183,18 @@ public class KaleoDefinitionVersionLocalServiceWrapper
 
 		return _kaleoDefinitionVersionLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _kaleoDefinitionVersionLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _kaleoDefinitionVersionLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -476,6 +523,9 @@ public class KaleoDefinitionVersionLocalServiceWrapper
 		return _kaleoDefinitionVersionLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -487,6 +537,10 @@ public class KaleoDefinitionVersionLocalServiceWrapper
 
 	/**
 	 * Updates the kaleo definition version in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoDefinitionVersionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoDefinitionVersion the kaleo definition version
 	 * @return the kaleo definition version that was updated

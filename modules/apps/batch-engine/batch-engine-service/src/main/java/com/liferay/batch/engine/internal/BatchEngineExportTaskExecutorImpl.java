@@ -17,13 +17,13 @@ package com.liferay.batch.engine.internal;
 import com.liferay.batch.engine.BatchEngineExportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineTaskContentType;
 import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
-import com.liferay.batch.engine.BatchEngineTaskOperation;
 import com.liferay.batch.engine.configuration.BatchEngineTaskConfiguration;
-import com.liferay.batch.engine.internal.item.BatchEngineTaskItemResourceDelegate;
-import com.liferay.batch.engine.internal.item.BatchEngineTaskItemResourceDelegateFactory;
+import com.liferay.batch.engine.internal.item.BatchEngineTaskItemDelegateExecutor;
+import com.liferay.batch.engine.internal.item.BatchEngineTaskItemDelegateExecutorFactory;
 import com.liferay.batch.engine.internal.writer.BatchEngineExportTaskItemWriter;
 import com.liferay.batch.engine.internal.writer.BatchEngineExportTaskItemWriterFactory;
 import com.liferay.batch.engine.model.BatchEngineExportTask;
+import com.liferay.batch.engine.pagination.Page;
 import com.liferay.batch.engine.service.BatchEngineExportTaskLocalService;
 import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.sort.SortParserProvider;
-import com.liferay.portal.vulcan.pagination.Page;
 
 import java.io.IOException;
 
@@ -83,15 +82,15 @@ public class BatchEngineExportTaskExecutorImpl
 				BatchEngineTaskExecuteStatus.COMPLETED, batchEngineExportTask,
 				null);
 		}
-		catch (Throwable t) {
+		catch (Throwable throwable) {
 			_log.error(
 				"Unable to update batch engine export task " +
 					batchEngineExportTask,
-				t);
+				throwable);
 
 			_updateBatchEngineExportTask(
 				BatchEngineTaskExecuteStatus.FAILED, batchEngineExportTask,
-				t.getMessage());
+				throwable.getMessage());
 		}
 	}
 
@@ -111,11 +110,10 @@ public class BatchEngineExportTaskExecutorImpl
 					batchEngineTaskConfiguration.csvFileColumnDelimiter(),
 					StringPool.COMMA));
 
-		_batchEngineTaskItemResourceDelegateFactory =
-			new BatchEngineTaskItemResourceDelegateFactory(
-				_batchEngineTaskMethodRegistry, _companyLocalService,
-				_expressionConvert, _filterParserProvider, _sortParserProvider,
-				_userLocalService);
+		_batchEngineTaskItemDelegateExecutorFactory =
+			new BatchEngineTaskItemDelegateExecutorFactory(
+				_batchEngineTaskMethodRegistry, _expressionConvert,
+				_filterParserProvider, _sortParserProvider);
 	}
 
 	private void _exportItems(BatchEngineExportTask batchEngineExportTask)
@@ -124,15 +122,16 @@ public class BatchEngineExportTaskExecutorImpl
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			new UnsyncByteArrayOutputStream();
 
-		try (BatchEngineTaskItemResourceDelegate
-				batchEngineTaskItemResourceDelegate =
-					_batchEngineTaskItemResourceDelegateFactory.create(
-						BatchEngineTaskOperation.READ,
+		try (BatchEngineTaskItemDelegateExecutor
+				batchEngineTaskItemDelegateExecutor =
+					_batchEngineTaskItemDelegateExecutorFactory.create(
+						batchEngineExportTask.getTaskItemDelegateName(),
 						batchEngineExportTask.getClassName(),
-						batchEngineExportTask.getCompanyId(),
+						_companyLocalService.getCompany(
+							batchEngineExportTask.getCompanyId()),
 						batchEngineExportTask.getParameters(),
-						batchEngineExportTask.getUserId(),
-						batchEngineExportTask.getVersion());
+						_userLocalService.getUser(
+							batchEngineExportTask.getUserId()));
 			ZipOutputStream zipOutputStream = _getZipOutputStream(
 				batchEngineExportTask.getContentType(),
 				unsyncByteArrayOutputStream);
@@ -153,7 +152,7 @@ public class BatchEngineExportTaskExecutorImpl
 					throw new InterruptedException();
 				}
 
-				page = batchEngineTaskItemResourceDelegate.getItems(
+				page = batchEngineTaskItemDelegateExecutor.getItems(
 					pageIndex++, _batchSize);
 
 				Collection<?> items = page.getItems();
@@ -225,8 +224,8 @@ public class BatchEngineExportTaskExecutorImpl
 	private BatchEngineExportTaskLocalService
 		_batchEngineExportTaskLocalService;
 
-	private BatchEngineTaskItemResourceDelegateFactory
-		_batchEngineTaskItemResourceDelegateFactory;
+	private BatchEngineTaskItemDelegateExecutorFactory
+		_batchEngineTaskItemDelegateExecutorFactory;
 
 	@Reference
 	private BatchEngineTaskMethodRegistry _batchEngineTaskMethodRegistry;

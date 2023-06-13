@@ -43,6 +43,10 @@ public class PhoneLocalServiceWrapper
 	/**
 	 * Adds the phone to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PhoneLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param phone the phone
 	 * @return the phone that was added
 	 */
@@ -51,6 +55,17 @@ public class PhoneLocalServiceWrapper
 		com.liferay.portal.kernel.model.Phone phone) {
 
 		return _phoneLocalService.addPhone(phone);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _phoneLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -78,6 +93,10 @@ public class PhoneLocalServiceWrapper
 	/**
 	 * Deletes the phone with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PhoneLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param phoneId the primary key of the phone
 	 * @return the phone that was removed
 	 * @throws PortalException if a phone with the primary key could not be found
@@ -91,6 +110,10 @@ public class PhoneLocalServiceWrapper
 
 	/**
 	 * Deletes the phone from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PhoneLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param phone the phone
 	 * @return the phone that was removed
@@ -107,6 +130,18 @@ public class PhoneLocalServiceWrapper
 		long companyId, java.lang.String className, long classPK) {
 
 		_phoneLocalService.deletePhones(companyId, className, classPK);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _phoneLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _phoneLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -251,6 +286,9 @@ public class PhoneLocalServiceWrapper
 		return _phoneLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -341,6 +379,10 @@ public class PhoneLocalServiceWrapper
 
 	/**
 	 * Updates the phone in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PhoneLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param phone the phone
 	 * @return the phone that was updated

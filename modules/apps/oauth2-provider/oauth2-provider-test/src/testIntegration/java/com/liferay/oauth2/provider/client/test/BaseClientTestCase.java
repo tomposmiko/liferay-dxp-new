@@ -116,13 +116,16 @@ public abstract class BaseClientTestCase {
 
 		String pAuthToken = parsePAuthToken(response);
 
-		Map<String, NewCookie> cookies = response.getCookies();
+		Map<String, NewCookie> newCookies = response.getCookies();
 
-		NewCookie newCookie = cookies.get(CookieKeys.JSESSIONID);
+		NewCookie cookieSupportNewCookie = newCookies.get(
+			CookieKeys.COOKIE_SUPPORT);
+		NewCookie jSessionIdNewCookie = newCookies.get(CookieKeys.JSESSIONID);
 
 		invocationBuilder = getInvocationBuilder(hostname, getLoginWebTarget());
 
-		invocationBuilder.cookie(newCookie);
+		invocationBuilder.cookie(cookieSupportNewCookie);
+		invocationBuilder.cookie(jSessionIdNewCookie);
 
 		MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
 
@@ -132,15 +135,15 @@ public abstract class BaseClientTestCase {
 
 		response = invocationBuilder.post(Entity.form(formData));
 
-		cookies = response.getCookies();
+		newCookies = response.getCookies();
 
-		newCookie = cookies.get(CookieKeys.JSESSIONID);
+		jSessionIdNewCookie = newCookies.get(CookieKeys.JSESSIONID);
 
-		if (newCookie == null) {
+		if (jSessionIdNewCookie == null) {
 			return null;
 		}
 
-		return newCookie.toCookie();
+		return jSessionIdNewCookie.toCookie();
 	}
 
 	protected Function<WebTarget, Invocation.Builder>
@@ -154,13 +157,11 @@ public abstract class BaseClientTestCase {
 			Invocation.Builder invocationBuilder = getInvocationBuilder(
 				hostname, webtarget);
 
-			invocationBuilder = invocationBuilder.accept(
+			return invocationBuilder.accept(
 				"text/html"
 			).cookie(
 				authenticatedCookie
 			);
-
-			return invocationBuilder;
 		};
 	}
 
@@ -177,17 +178,17 @@ public abstract class BaseClientTestCase {
 			String user, String password, String hostname, String scope) {
 
 		return (clientId, invocationBuilder) -> {
-			String authorizationCode = getCodeResponse(
-				user, password, hostname,
-				getCodeFunction(
-					webTarget -> webTarget.queryParam(
-						"client_id", clientId
-					).queryParam(
-						"response_type", "code"
-					).queryParam(
-						"scope", scope
-					)),
-				this::parseAuthorizationCodeString);
+			String authorizationCode = parseAuthorizationCodeString(
+				getCodeResponse(
+					user, password, hostname,
+					getCodeFunction(
+						webTarget -> webTarget.queryParam(
+							"client_id", clientId
+						).queryParam(
+							"response_type", "code"
+						).queryParam(
+							"scope", scope
+						))));
 
 			BiFunction<String, Invocation.Builder, Response>
 				authorizationCodePKCEBiFunction =
@@ -218,17 +219,17 @@ public abstract class BaseClientTestCase {
 
 			final String codeChallenge = base64UrlDigest;
 
-			String authorizationCode = getCodeResponse(
-				userName, password, hostname,
-				getCodeFunction(
-					webTarget -> webTarget.queryParam(
-						"client_id", clientId
-					).queryParam(
-						"code_challenge", codeChallenge
-					).queryParam(
-						"response_type", "code"
-					)),
-				this::parseAuthorizationCodeString);
+			String authorizationCode = parseAuthorizationCodeString(
+				getCodeResponse(
+					userName, password, hostname,
+					getCodeFunction(
+						webTarget -> webTarget.queryParam(
+							"client_id", clientId
+						).queryParam(
+							"code_challenge", codeChallenge
+						).queryParam(
+							"response_type", "code"
+						))));
 
 			BiFunction<String, Invocation.Builder, Response>
 				authorizationCodePKCEBiFunction =
@@ -325,22 +326,18 @@ public abstract class BaseClientTestCase {
 			invocationBuilder = invocationBuilderFunction.apply(
 				getAuthorizeDecisionWebTarget());
 
-			response = invocationBuilder.post(Entity.form(formData));
-
-			return response;
+			return invocationBuilder.post(Entity.form(formData));
 		};
 	}
 
-	protected <T> T getCodeResponse(
+	protected Response getCodeResponse(
 		String login, String password, String hostname,
 		Function<Function<WebTarget, Invocation.Builder>, Response>
-			authorizationResponseFunction,
-		Function<Response, T> codeParser) {
+			authorizationResponseFunction) {
 
-		return codeParser.apply(
-			authorizationResponseFunction.apply(
-				getAuthenticatedInvocationBuilderFunction(
-					login, password, hostname)));
+		return authorizationResponseFunction.apply(
+			getAuthenticatedInvocationBuilderFunction(
+				login, password, hostname));
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>

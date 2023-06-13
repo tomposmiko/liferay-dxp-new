@@ -23,7 +23,7 @@ scopeGroup = themeDisplay.getScopeGroup();
 <c:if test="<%= GroupPermissionUtil.contains(permissionChecker, scopeGroup, ActionKeys.EXPORT_IMPORT_PORTLET_INFO) && (Objects.equals(cmd, Constants.EXPORT) || (Objects.equals(cmd, Constants.PUBLISH) && (scopeGroup.isStagingGroup() || scopeGroup.isStagedRemotely()) && scopeGroup.isStagedPortlet(portletDisplay.getId()))) %>">
 
 	<%
-	String taglibURL = "javascript:Liferay.fire('" + renderResponse.getNamespace() + cmd + "'); void(0);";
+	String taglibURL = "javascript:Liferay.fire('" + liferayPortletResponse.getNamespace() + cmd + "'); void(0);";
 	%>
 
 	<liferay-frontend:management-bar-button
@@ -51,7 +51,7 @@ scopeGroup = themeDisplay.getScopeGroup();
 				exportImportEntityUrl: '<%= portletURL.toString() %>',
 				namespace: '<portlet:namespace />',
 				searchContainerId: '<%= searchContainerId %>',
-				searchContainerMappingId: '<%= searchContainerMappingId %>'
+				searchContainerMappingId: '<%= searchContainerMappingId %>',
 			}
 		);
 	</aui:script>

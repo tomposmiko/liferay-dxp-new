@@ -162,7 +162,8 @@ public class UpgradeModules extends UpgradeProcess {
 		"com.liferay.product.navigation.product.menu.web",
 		"com.liferay.quick.note.web", "com.liferay.ratings.page.ratings.web",
 		"com.liferay.rss.web", "com.liferay.server.admin.web",
-		"com.liferay.site.browser.web", "com.liferay.site.my.sites.web",
+		"com.liferay.shopping.service", "com.liferay.site.browser.web",
+		"com.liferay.site.my.sites.web",
 		"com.liferay.site.navigation.breadcrumb.web",
 		"com.liferay.site.navigation.directory.web",
 		"com.liferay.site.navigation.language.web",
@@ -184,14 +185,14 @@ public class UpgradeModules extends UpgradeProcess {
 		{"contacts-portlet", "com.liferay.contacts.service", "Contacts"},
 		{
 			"kaleo-designer-portlet",
-			"com.liferay.portal.workflow.kaleo.designer.service",
-			"KaleoDesigner"
+			"com.liferay.portal.workflow.kaleo.designer.web", "KaleoDesigner"
 		},
 		{
 			"kaleo-forms-portlet",
 			"com.liferay.portal.workflow.kaleo.forms.service", "KaleoForms"
 		},
 		{"kaleo-web", "com.liferay.portal.workflow.kaleo.service", "Kaleo"},
+		{"knowledge-base-portlet", "com.liferay.knowledge.base.service", "KB"},
 		{
 			"marketplace-portlet", "com.liferay.marketplace.service",
 			"Marketplace"

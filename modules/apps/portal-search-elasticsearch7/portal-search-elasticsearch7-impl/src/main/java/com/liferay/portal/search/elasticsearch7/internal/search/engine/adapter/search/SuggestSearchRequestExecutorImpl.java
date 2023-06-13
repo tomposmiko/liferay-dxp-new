@@ -119,7 +119,8 @@ public class SuggestSearchRequestExecutorImpl
 
 		RestHighLevelClient restHighLevelClient =
 			_elasticsearchClientResolver.getRestHighLevelClient(
-				suggestSearchRequest.getConnectionId(), true);
+				suggestSearchRequest.getConnectionId(),
+				suggestSearchRequest.isPreferLocalCluster());
 
 		try {
 			return restHighLevelClient.search(
@@ -142,26 +143,6 @@ public class SuggestSearchRequestExecutorImpl
 		SuggesterTranslator<SuggestionBuilder> suggesterTranslator) {
 
 		_suggesterTranslator = suggesterTranslator;
-	}
-
-	protected SuggestSearchResult translate(
-		Suggest.Suggestion
-			<? extends Suggest.Suggestion.Entry
-				<? extends Suggest.Suggestion.Entry.Option>> suggestion) {
-
-		SuggestSearchResult suggestSearchResult = new SuggestSearchResult(
-			suggestion.getName());
-
-		for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>
-				suggestionEntry : suggestion) {
-
-			SuggestSearchResult.Entry suggesterResultEntry = translate(
-				suggestionEntry);
-
-			suggestSearchResult.addEntry(suggesterResultEntry);
-		}
-
-		return suggestSearchResult;
 	}
 
 	protected SuggestSearchResult.Entry.Option translate(
@@ -213,6 +194,26 @@ public class SuggestSearchRequestExecutorImpl
 		}
 
 		return suggesterResultEntry;
+	}
+
+	protected SuggestSearchResult translate(
+		Suggest.Suggestion
+			<? extends Suggest.Suggestion.Entry
+				<? extends Suggest.Suggestion.Entry.Option>> suggestion) {
+
+		SuggestSearchResult suggestSearchResult = new SuggestSearchResult(
+			suggestion.getName());
+
+		for (Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>
+				suggestionEntry : suggestion) {
+
+			SuggestSearchResult.Entry suggesterResultEntry = translate(
+				suggestionEntry);
+
+			suggestSearchResult.addEntry(suggesterResultEntry);
+		}
+
+		return suggestSearchResult;
 	}
 
 	private ElasticsearchClientResolver _elasticsearchClientResolver;

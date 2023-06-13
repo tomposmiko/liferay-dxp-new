@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch7.internal;
 
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.IndexWriter;
 import com.liferay.portal.kernel.search.suggest.QuerySuggester;
@@ -21,21 +22,31 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
+import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreationHelper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
+import com.liferay.portal.search.elasticsearch7.internal.facet.CompositeFacetProcessor;
 import com.liferay.portal.search.elasticsearch7.internal.facet.DefaultFacetProcessor;
 import com.liferay.portal.search.elasticsearch7.internal.facet.FacetProcessor;
+import com.liferay.portal.search.elasticsearch7.internal.facet.ModifiedFacetProcessor;
+import com.liferay.portal.search.elasticsearch7.internal.facet.NestedFacetProcessor;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.ElasticsearchEngineAdapterFixture;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.index.IndexNameBuilder;
+import com.liferay.portal.search.internal.facet.ModifiedFacetImpl;
+import com.liferay.portal.search.internal.facet.NestedFacetImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderFactoryImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderFactoryImpl;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.util.DigesterImpl;
 import com.liferay.portal.util.LocalizationImpl;
+
+import java.util.Collections;
+import java.util.Map;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
 
@@ -55,7 +66,7 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 		return _companyId;
 	}
 
-	public ElasticsearchFixture getElasticsearchFixture() {
+	public ElasticsearchClientResolver getElasticsearchClientResolver() {
 		return _elasticsearchFixture;
 	}
 
@@ -115,15 +126,25 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 		_indexWriter = indexWriter;
 		_searchEngineAdapter = searchEngineAdapter;
 
-		elasticsearchIndexSearcher.activate(
-			_elasticsearchFixture.getElasticsearchConfigurationProperties());
-
 		createIndex(indexNameBuilder);
 	}
 
 	@Override
 	public void tearDown() throws Exception {
 		_elasticsearchFixture.tearDown();
+	}
+
+	protected static ElasticsearchConfigurationWrapper
+		createElasticsearchConfigurationWrapper(
+			Map<String, Object> properties) {
+
+		return new ElasticsearchConfigurationWrapper() {
+			{
+				setElasticsearchConfiguration(
+					ConfigurableUtil.createConfigurable(
+						ElasticsearchConfiguration.class, properties));
+			}
+		};
 	}
 
 	protected static ElasticsearchEngineAdapterFixture
@@ -175,6 +196,10 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 
 		return new ElasticsearchIndexSearcher() {
 			{
+				setElasticsearchConfigurationWrapper(
+					createElasticsearchConfigurationWrapper(
+						elasticsearchFixture.
+							getElasticsearchConfigurationProperties()));
 				setIndexNameBuilder(indexNameBuilder);
 				setProps(createProps());
 				setQuerySuggester(
@@ -185,10 +210,6 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 					new SearchRequestBuilderFactoryImpl());
 				setSearchResponseBuilderFactory(
 					new SearchResponseBuilderFactoryImpl());
-
-				activate(
-					elasticsearchFixture.
-						getElasticsearchConfigurationProperties());
 			}
 		};
 	}
@@ -200,15 +221,15 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 
 		return new ElasticsearchIndexWriter() {
 			{
+				setElasticsearchConfigurationWrapper(
+					createElasticsearchConfigurationWrapper(
+						elasticsearchFixture.
+							getElasticsearchConfigurationProperties()));
 				setIndexNameBuilder(indexNameBuilder);
 				setSearchEngineAdapter(searchEngineAdapter);
 				setSpellCheckIndexWriter(
 					createElasticsearchSpellCheckIndexWriter(
 						searchEngineAdapter, indexNameBuilder, localization));
-
-				activate(
-					elasticsearchFixture.
-						getElasticsearchConfigurationProperties());
 			}
 		};
 	}
@@ -245,7 +266,19 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 			return _facetProcessor;
 		}
 
-		return new DefaultFacetProcessor();
+		return new CompositeFacetProcessor() {
+			{
+				defaultFacetProcessor = new DefaultFacetProcessor();
+				setFacetProcessor(
+					new ModifiedFacetProcessor(),
+					Collections.singletonMap(
+						"class.name", ModifiedFacetImpl.class.getName()));
+				setFacetProcessor(
+					new NestedFacetProcessor(),
+					Collections.singletonMap(
+						"class.name", NestedFacetImpl.class.getName()));
+			}
+		};
 	}
 
 	protected void setElasticsearchFixture(

@@ -19,7 +19,7 @@
 <%
 boolean invokingSession = false;
 
-if (session.getId().equals(MaintenanceUtil.getSessionId())) {
+if (Objects.equals(session.getId(), MaintenanceUtil.getSessionId())) {
 	invokingSession = true;
 }
 %>
@@ -49,20 +49,13 @@ if (session.getId().equals(MaintenanceUtil.getSessionId())) {
 														</td>
 													</tr>
 
-													<%
-													if (invokingSession) {
-													%>
-
+													<c:if test="<%= invokingSession %>">
 														<tr>
 															<td>
 																<%= MaintenanceUtil.getStatus() %>
 															</td>
 														</tr>
-
-													<%
-													}
-													%>
-
+													</c:if>
 												</table>
 
 												<br />

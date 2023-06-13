@@ -33,6 +33,10 @@ public class CTEntryLocalServiceWrapper
 	/**
 	 * Adds the ct entry to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ctEntry the ct entry
 	 * @return the ct entry that was added
 	 */
@@ -68,7 +72,22 @@ public class CTEntryLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ctEntryLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the ct entry from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctEntry the ct entry
 	 * @return the ct entry that was removed
@@ -84,6 +103,10 @@ public class CTEntryLocalServiceWrapper
 
 	/**
 	 * Deletes the ct entry with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctEntryId the primary key of the ct entry
 	 * @return the ct entry that was removed
@@ -106,6 +129,18 @@ public class CTEntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ctEntryLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _ctEntryLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _ctEntryLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -294,6 +329,14 @@ public class CTEntryLocalServiceWrapper
 	}
 
 	@Override
+	public long getCTRowCTCollectionId(
+			com.liferay.change.tracking.model.CTEntry ctEntry)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ctEntryLocalService.getCTRowCTCollectionId(ctEntry);
+	}
+
+	@Override
 	public java.util.List<Long> getExclusiveModelClassPKs(
 		long ctCollectionId, long modelClassNameId) {
 
@@ -318,6 +361,9 @@ public class CTEntryLocalServiceWrapper
 		return _ctEntryLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -334,6 +380,10 @@ public class CTEntryLocalServiceWrapper
 
 	/**
 	 * Updates the ct entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctEntry the ct entry
 	 * @return the ct entry that was updated

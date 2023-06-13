@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.lang.reflect.Field;
 
@@ -141,13 +142,17 @@ public abstract class BaseBatchEngineExportTaskItemWriterTestCase {
 
 		sb.append("{");
 
-		if (fieldNames.contains("createDate")) {
+		if (fieldNames.contains("createDate") &&
+			(item.getCreateDate() != null)) {
+
 			sb.append("\"createDate\": ");
 			sb.append(_formatJSONValue(item.getCreateDate()));
 			sb.append(StringPool.COMMA);
 		}
 
-		if (fieldNames.contains("description")) {
+		if (fieldNames.contains("description") &&
+			(item.getDescription() != null)) {
+
 			sb.append("\"description\": ");
 			sb.append(_formatJSONValue(item.getDescription()));
 			sb.append(StringPool.COMMA);
@@ -165,6 +170,10 @@ public abstract class BaseBatchEngineExportTaskItemWriterTestCase {
 			sb.append("\"name\": {");
 
 			for (Map.Entry<String, String> entry : name.entrySet()) {
+				if (entry.getValue() == null) {
+					continue;
+				}
+
 				sb.append("\"");
 				sb.append(entry.getKey());
 				sb.append("\": ");
@@ -198,7 +207,7 @@ public abstract class BaseBatchEngineExportTaskItemWriterTestCase {
 	protected static final List<String> columnFieldNames = Arrays.asList(
 		"createDate", "description", "id", "name_en", "name_hr");
 	protected static final DateFormat dateFormat = new SimpleDateFormat(
-		"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		"yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 	protected static Map<String, Field> fieldMap = ItemClassIndexUtil.index(
 		Item.class);
 	protected static final List<String> jsonFieldNames = Arrays.asList(
@@ -210,7 +219,9 @@ public abstract class BaseBatchEngineExportTaskItemWriterTestCase {
 		}
 
 		if (value instanceof Date) {
-			return "\"" + dateFormat.format(value) + "\"";
+			return "\"" +
+				StringUtil.replace(dateFormat.format(value), 'Z', "+00:00") +
+					"\"";
 		}
 
 		if (value instanceof String) {

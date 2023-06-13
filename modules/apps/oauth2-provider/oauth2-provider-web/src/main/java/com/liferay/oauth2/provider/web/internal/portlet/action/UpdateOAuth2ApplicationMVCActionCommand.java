@@ -65,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	property = {
 		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
-		"mvc.command.name=/admin/update_oauth2_application"
+		"mvc.command.name=/oauth2_provider/update_o_auth2_application"
 	},
 	service = MVCActionCommand.class
 )
@@ -90,9 +90,9 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 
 		OAuth2AdminPortletDisplayContext oAuth2AdminPortletDisplayContext =
 			new OAuth2AdminPortletDisplayContext(
-				_oAuth2ApplicationService,
-				_oAuth2ApplicationScopeAliasesLocalService,
-				_oAuth2ProviderConfiguration, request, null, _dlurlHelper);
+				_dlurlHelper, _oAuth2ApplicationScopeAliasesLocalService,
+				_oAuth2ApplicationService, _oAuth2ProviderConfiguration,
+				request, null);
 
 		String[] oAuth2Features =
 			oAuth2AdminPortletDisplayContext.getOAuth2Features(
@@ -101,7 +101,7 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 		List<String> featuresList = new ArrayList<>();
 
 		for (String feature : oAuth2Features) {
-			if (ParamUtil.getBoolean(request, "feature-" + feature, false)) {
+			if (ParamUtil.getBoolean(request, "feature-" + feature)) {
 				featuresList.add(feature);
 			}
 		}

@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * The persistence utility for the saml sp session service. This utility wraps <code>com.liferay.saml.persistence.service.persistence.impl.SamlSpSessionPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -476,6 +472,73 @@ public class SamlSpSessionUtil {
 	}
 
 	/**
+	 * Returns the saml sp session where companyId = &#63; and sessionIndex = &#63; or throws a <code>NoSuchSpSessionException</code> if it could not be found.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @return the matching saml sp session
+	 * @throws NoSuchSpSessionException if a matching saml sp session could not be found
+	 */
+	public static SamlSpSession findByC_SI(long companyId, String sessionIndex)
+		throws com.liferay.saml.persistence.exception.NoSuchSpSessionException {
+
+		return getPersistence().findByC_SI(companyId, sessionIndex);
+	}
+
+	/**
+	 * Returns the saml sp session where companyId = &#63; and sessionIndex = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @return the matching saml sp session, or <code>null</code> if a matching saml sp session could not be found
+	 */
+	public static SamlSpSession fetchByC_SI(
+		long companyId, String sessionIndex) {
+
+		return getPersistence().fetchByC_SI(companyId, sessionIndex);
+	}
+
+	/**
+	 * Returns the saml sp session where companyId = &#63; and sessionIndex = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching saml sp session, or <code>null</code> if a matching saml sp session could not be found
+	 */
+	public static SamlSpSession fetchByC_SI(
+		long companyId, String sessionIndex, boolean useFinderCache) {
+
+		return getPersistence().fetchByC_SI(
+			companyId, sessionIndex, useFinderCache);
+	}
+
+	/**
+	 * Removes the saml sp session where companyId = &#63; and sessionIndex = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @return the saml sp session that was removed
+	 */
+	public static SamlSpSession removeByC_SI(
+			long companyId, String sessionIndex)
+		throws com.liferay.saml.persistence.exception.NoSuchSpSessionException {
+
+		return getPersistence().removeByC_SI(companyId, sessionIndex);
+	}
+
+	/**
+	 * Returns the number of saml sp sessions where companyId = &#63; and sessionIndex = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @return the number of matching saml sp sessions
+	 */
+	public static int countByC_SI(long companyId, String sessionIndex) {
+		return getPersistence().countByC_SI(companyId, sessionIndex);
+	}
+
+	/**
 	 * Caches the saml sp session in the entity cache if it is enabled.
 	 *
 	 * @param samlSpSession the saml sp session
@@ -624,25 +687,9 @@ public class SamlSpSessionUtil {
 	}
 
 	public static SamlSpSessionPersistence getPersistence() {
-		return _serviceTracker.getService();
+		return _persistence;
 	}
 
-	private static ServiceTracker
-		<SamlSpSessionPersistence, SamlSpSessionPersistence> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(SamlSpSessionPersistence.class);
-
-		ServiceTracker<SamlSpSessionPersistence, SamlSpSessionPersistence>
-			serviceTracker =
-				new ServiceTracker
-					<SamlSpSessionPersistence, SamlSpSessionPersistence>(
-						bundle.getBundleContext(),
-						SamlSpSessionPersistence.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile SamlSpSessionPersistence _persistence;
 
 }

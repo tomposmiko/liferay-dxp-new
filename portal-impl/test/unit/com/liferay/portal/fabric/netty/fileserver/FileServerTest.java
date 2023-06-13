@@ -22,6 +22,7 @@ import com.liferay.portal.fabric.netty.fileserver.handlers.FileRequestChannelHan
 import com.liferay.portal.fabric.netty.fileserver.handlers.FileResponseChannelHandler;
 import com.liferay.portal.fabric.netty.fileserver.handlers.FileServerTestUtil;
 import com.liferay.portal.fabric.netty.util.NamedThreadFactory;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -49,12 +50,19 @@ import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Shuyang Zhou
  */
 public class FileServerTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
@@ -180,7 +188,7 @@ public class FileServerTest {
 		}
 	}
 
-	private void _connectClient() throws InterruptedException {
+	private void _connectClient() throws Exception {
 		Bootstrap bootstrap = new Bootstrap();
 
 		bootstrap.group(_nioEventLoopGroup);
@@ -210,7 +218,7 @@ public class FileServerTest {
 		_clientChannel = channelFuture.channel();
 	}
 
-	private void _disconnectClient() throws InterruptedException {
+	private void _disconnectClient() throws Exception {
 		ChannelFuture channelFuture = _clientChannel.close();
 
 		channelFuture.sync();
@@ -268,7 +276,7 @@ public class FileServerTest {
 		throw new IllegalStateException("Unable to start server");
 	}
 
-	private void _stopServer() throws InterruptedException {
+	private void _stopServer() throws Exception {
 		try {
 			ChannelFuture channelFuture = _serverChannel.close();
 

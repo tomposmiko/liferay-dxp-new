@@ -38,16 +38,14 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 	portletURL="<%= restoreTrashEntriesURL %>"
 />
 
-<%@ include file="/message_boards_admin/nav.jspf" %>
+<%@ include file="/message_boards/nav.jspf" %>
 
 <%
 MBAdminListDisplayContext mbAdminListDisplayContext = mbDisplayContextProvider.getMbAdminListDisplayContext(request, response, categoryId);
 
-int entriesDelta = mbAdminListDisplayContext.getEntriesDelta();
-
 PortletURL portletURL = mbEntriesManagementToolbarDisplayContext.getPortletURL();
 
-SearchContainer entriesSearchContainer = new SearchContainer(renderRequest, null, null, "cur1", 0, entriesDelta, portletURL, null, "there-are-no-threads-or-categories");
+SearchContainer entriesSearchContainer = new SearchContainer(renderRequest, null, null, "cur1", 0, mbAdminListDisplayContext.getEntriesDelta(), portletURL, null, "there-are-no-threads-or-categories");
 
 mbAdminListDisplayContext.setEntriesDelta(entriesSearchContainer);
 
@@ -102,7 +100,7 @@ if (category != null) {
 
 	<portlet:actionURL name="/message_boards/edit_entry" var="editEntryURL" />
 
-	var deleteEntries = function() {
+	var deleteEntries = function () {
 		if (
 			<%= trashHelper.isTrashEnabled(scopeGroupId) %> ||
 			confirm(
@@ -112,41 +110,41 @@ if (category != null) {
 			Liferay.Util.postForm(form, {
 				data: {
 					<%= Constants.CMD %>:
-						'<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>'
+						'<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>',
 				},
-				url: '<%= editEntryURL %>'
+				url: '<%= editEntryURL %>',
 			});
 		}
 	};
 
-	var lockEntries = function() {
+	var lockEntries = function () {
 		Liferay.Util.postForm(form, {
 			data: {
-				<%= Constants.CMD %>: '<%= Constants.LOCK %>'
+				<%= Constants.CMD %>: '<%= Constants.LOCK %>',
 			},
-			url: '<%= editEntryURL %>'
+			url: '<%= editEntryURL %>',
 		});
 	};
 
-	var unlockEntries = function() {
+	var unlockEntries = function () {
 		Liferay.Util.postForm(form, {
 			data: {
-				<%= Constants.CMD %>: '<%= Constants.UNLOCK %>'
+				<%= Constants.CMD %>: '<%= Constants.UNLOCK %>',
 			},
-			url: '<%= editEntryURL %>'
+			url: '<%= editEntryURL %>',
 		});
 	};
 
 	var ACTIONS = {
 		deleteEntries: deleteEntries,
 		lockEntries: lockEntries,
-		unlockEntries: unlockEntries
+		unlockEntries: unlockEntries,
 	};
 
-	Liferay.componentReady('mbEntriesManagementToolbar').then(function(
+	Liferay.componentReady('mbEntriesManagementToolbar').then(function (
 		managementToolbar
 	) {
-		managementToolbar.on('actionItemClicked', function(event) {
+		managementToolbar.on('actionItemClicked', function (event) {
 			var itemData = event.data.item.data;
 
 			if (itemData && itemData.action && ACTIONS[itemData.action]) {

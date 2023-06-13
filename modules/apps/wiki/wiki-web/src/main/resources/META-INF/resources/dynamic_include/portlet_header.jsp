@@ -23,11 +23,9 @@ WikiNode node = (WikiNode)request.getAttribute(WikiWebKeys.WIKI_NODE);
 
 WikiWebComponentProvider wikiWebComponentProvider = WikiWebComponentProvider.getWikiWebComponentProvider();
 
-WikiGroupServiceConfiguration wikiGroupServiceConfiguration = wikiWebComponentProvider.getWikiGroupServiceConfiguration();
-
 WikiRequestHelper wikiRequestHelper = new WikiRequestHelper(request);
 
-WikiURLHelper wikiURLHelper = new WikiURLHelper(wikiRequestHelper, portletResponse, wikiGroupServiceConfiguration);
+WikiURLHelper wikiURLHelper = new WikiURLHelper(wikiRequestHelper, portletResponse, wikiWebComponentProvider.getWikiGroupServiceConfiguration());
 
 PortletURL searchURL = wikiURLHelper.getSearchURL();
 %>
@@ -38,9 +36,9 @@ PortletURL searchURL = wikiURLHelper.getSearchURL();
 	<aui:input name="nodeId" type="hidden" value="<%= node.getNodeId() %>" />
 
 	<liferay-ui:input-search
-		id='<%= portletResponse.getNamespace() + "keywords1" %>'
+		id='<%= (PortalUtil.getLiferayPortletResponse(portletResponse)).getNamespace() + "keywords1" %>'
 		markupView="lexicon"
-		name='<%= portletResponse.getNamespace() + "keywords" %>'
+		name='<%= (PortalUtil.getLiferayPortletResponse(portletResponse)).getNamespace() + "keywords" %>'
 		useNamespace="<%= false %>"
 	/>
 </aui:form>

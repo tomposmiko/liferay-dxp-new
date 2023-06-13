@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Component;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
-		"mvc.command.name=/delete_uad_applications"
+		"mvc.command.name=/user_associated_data/delete_uad_applications"
 	},
 	service = MVCActionCommand.class
 )
@@ -55,15 +55,19 @@ public class DeleteUADApplicationsMVCActionCommand
 		long selectedUserId = getSelectedUserId(actionRequest);
 
 		for (String applicationKey : getApplicationKeys(actionRequest)) {
-			for (UADDisplay uadDisplay :
+			for (UADDisplay<?> uadDisplay :
 					uadRegistry.getApplicationUADDisplays(applicationKey)) {
 
 				Class<?> typeClass = uadDisplay.getTypeClass();
 
-				UADAnonymizer uadAnonymizer = uadRegistry.getUADAnonymizer(
-					typeClass.getName());
+				UADAnonymizer<Object> uadAnonymizer =
+					(UADAnonymizer<Object>)uadRegistry.getUADAnonymizer(
+						typeClass.getName());
 
-				List<Object> entities = uadDisplay.search(
+				UADDisplay<Object> objectUADDisplay =
+					(UADDisplay<Object>)uadDisplay;
+
+				List<Object> entities = objectUADDisplay.search(
 					selectedUserId, groupIds, null, null, null,
 					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 

@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -57,7 +58,8 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerTest {
 				Collection<String> tagNames =
 					_gCloudNaturalLanguageDocumentAssetAutoTagger.getTagNames(
 						RandomTestUtil.randomLong(),
-						RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN);
+						Arrays.toString(RandomTestUtil.randomStrings(20)),
+						ContentTypes.TEXT_PLAIN);
 
 				Assert.assertEquals(
 					tagNames.toString(), Collections.emptySet(), tagNames);
@@ -95,7 +97,8 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerTest {
 				try {
 					_gCloudNaturalLanguageDocumentAssetAutoTagger.getTagNames(
 						RandomTestUtil.randomLong(),
-						RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN);
+						Arrays.toString(RandomTestUtil.randomStrings(20)),
+						ContentTypes.TEXT_PLAIN);
 
 					Assert.fail();
 				}
@@ -123,7 +126,8 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerTest {
 				Collection<String> tagNames =
 					_gCloudNaturalLanguageDocumentAssetAutoTagger.getTagNames(
 						RandomTestUtil.randomLong(),
-						RandomTestUtil.randomString(), ContentTypes.IMAGE_JPEG);
+						Arrays.toString(RandomTestUtil.randomStrings(20)),
+						ContentTypes.IMAGE_JPEG);
 
 				Assert.assertEquals(
 					tagNames.toString(), Collections.emptySet(), tagNames);
@@ -138,7 +142,7 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerTest {
 
 		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
 				new ConfigurationTemporarySwapper(
-					_G_CLOUD_NATURAL_LANGUAGE_AUTO_TAG_CONFIGURATION_CLASS_NAME,
+					_CLASS_NAME_G_CLOUD_NATURAL_LANGUAGE_ASSET_AUTO_TAGGER_COMPANY_CONFIGURATION,
 					new HashMapDictionary<String, Object>() {
 						{
 							put("entityEndpointEnabled", false);
@@ -157,7 +161,7 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerTest {
 
 		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
 				new ConfigurationTemporarySwapper(
-					_G_CLOUD_NATURAL_LANGUAGE_AUTO_TAG_CONFIGURATION_CLASS_NAME,
+					_CLASS_NAME_G_CLOUD_NATURAL_LANGUAGE_ASSET_AUTO_TAGGER_COMPANY_CONFIGURATION,
 					new HashMapDictionary<String, Object>() {
 						{
 							put("apiKey", apiKey);
@@ -171,7 +175,7 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerTest {
 	}
 
 	private static final String
-		_G_CLOUD_NATURAL_LANGUAGE_AUTO_TAG_CONFIGURATION_CLASS_NAME =
+		_CLASS_NAME_G_CLOUD_NATURAL_LANGUAGE_ASSET_AUTO_TAGGER_COMPANY_CONFIGURATION =
 			"com.liferay.asset.auto.tagger.google.cloud.natural.language." +
 				"internal.configuration." +
 					"GCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration";

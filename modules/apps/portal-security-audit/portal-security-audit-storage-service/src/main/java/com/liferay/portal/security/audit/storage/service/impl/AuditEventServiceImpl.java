@@ -15,6 +15,7 @@
 package com.liferay.portal.security.audit.storage.service.impl;
 
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.Component;
 	},
 	service = AopService.class
 )
+@CTAware
 public class AuditEventServiceImpl extends AuditEventServiceBaseImpl {
 
 	@Override
@@ -60,7 +62,7 @@ public class AuditEventServiceImpl extends AuditEventServiceBaseImpl {
 	@Override
 	public List<AuditEvent> getAuditEvents(
 			long companyId, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<AuditEvent> orderByComparator)
 		throws PortalException {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
@@ -109,7 +111,7 @@ public class AuditEventServiceImpl extends AuditEventServiceBaseImpl {
 			String classPK, String clientHost, String clientIP,
 			String serverName, int serverPort, String sessionID,
 			boolean andSearch, int start, int end,
-			OrderByComparator orderByComparator)
+			OrderByComparator<AuditEvent> orderByComparator)
 		throws PortalException {
 
 		PermissionChecker permissionChecker = getPermissionChecker();

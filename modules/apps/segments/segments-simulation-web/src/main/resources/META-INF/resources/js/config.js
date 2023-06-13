@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	AUI().applyConfig({
 		groups: {
 			segmentssimulation: {
@@ -22,11 +22,11 @@
 				modules: {
 					'liferay-portlet-segments-simulation': {
 						path: 'main.js',
-						requires: ['aui-base', 'liferay-portlet-base']
-					}
+						requires: ['aui-base', 'liferay-portlet-base'],
+					},
 				},
-				root: MODULE_PATH + '/js/'
-			}
-		}
+				root: MODULE_PATH + '/js/',
+			},
+		},
 	});
 })();

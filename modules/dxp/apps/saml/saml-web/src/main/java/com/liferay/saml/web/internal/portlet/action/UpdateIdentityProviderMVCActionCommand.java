@@ -20,9 +20,9 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.saml.constants.SamlPortletKeys;
 import com.liferay.saml.runtime.configuration.SamlProviderConfigurationHelper;
 import com.liferay.saml.util.PortletPropsKeys;
-import com.liferay.saml.web.internal.constants.SamlAdminPortletKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -36,8 +36,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + SamlAdminPortletKeys.SAML_ADMIN,
-		"mvc.command.name=/admin/updateIdentityProvider"
+		"javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN,
+		"mvc.command.name=/admin/update_identity_provider"
 	},
 	service = MVCActionCommand.class
 )
@@ -49,27 +49,28 @@ public class UpdateIdentityProviderMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		UnicodeProperties properties = PropertiesParamUtil.getProperties(
+		UnicodeProperties unicodeProperties = PropertiesParamUtil.getProperties(
 			actionRequest, "settings--");
 
 		String nameIdentifierAttributeType = ParamUtil.getString(
 			actionRequest, "nameIdentifierAttributeType");
 
 		if (Validator.isNotNull(nameIdentifierAttributeType)) {
-			String nameIdentifierAttribute = properties.getProperty(
+			String nameIdentifierAttribute = unicodeProperties.getProperty(
 				PortletPropsKeys.SAML_IDP_METADATA_NAME_ID_ATTRIBUTE);
 
 			nameIdentifierAttribute =
 				nameIdentifierAttributeType + ":" + nameIdentifierAttribute;
 
-			properties.setProperty(
+			unicodeProperties.setProperty(
 				PortletPropsKeys.SAML_IDP_METADATA_NAME_ID_ATTRIBUTE,
 				nameIdentifierAttribute);
 		}
 
-		_samlProviderConfigurationHelper.updateProperties(properties);
+		_samlProviderConfigurationHelper.updateProperties(unicodeProperties);
 
-		actionResponse.setRenderParameter("mvcRenderCommandName", "/admin");
+		actionResponse.setRenderParameter(
+			"mvcRenderCommandName", "/admin/view");
 		actionResponse.setRenderParameter("tabs1", "identity-provider");
 	}
 

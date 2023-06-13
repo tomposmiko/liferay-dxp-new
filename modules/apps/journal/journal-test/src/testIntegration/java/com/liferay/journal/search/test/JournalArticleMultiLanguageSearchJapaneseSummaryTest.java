@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.search.test.util.SummaryFixture;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -115,7 +116,8 @@ public class JournalArticleMultiLanguageSearchJapaneseSummaryTest {
 
 		setSnippets(highlightedTitle, highlightedContent, document, locale);
 
-		_summaryFixture.assertSummary(highlightedTitle, _KEYWORD, document);
+		_summaryFixture.assertSummary(
+			highlightedTitle, highlightedContent, document);
 	}
 
 	@Test
@@ -138,6 +140,9 @@ public class JournalArticleMultiLanguageSearchJapaneseSummaryTest {
 		_summaryFixture.assertSummary(
 			highlightedTitle, highlightedContent, document);
 	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected JournalArticle addArticle(
 		String title, String content, Locale locale) {

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.service;
 
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -61,11 +62,15 @@ public interface KaleoTransitionLocalService
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link KaleoTransitionLocalServiceUtil} to access the kaleo transition local service. Add custom service methods to <code>com.liferay.portal.workflow.kaleo.service.impl.KaleoTransitionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.portal.workflow.kaleo.service.impl.KaleoTransitionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the kaleo transition local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link KaleoTransitionLocalServiceUtil} if injection and service tracking are not available.
 	 */
 
 	/**
 	 * Adds the kaleo transition to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTransitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTransition the kaleo transition
 	 * @return the kaleo transition that was added
@@ -74,8 +79,8 @@ public interface KaleoTransitionLocalService
 	public KaleoTransition addKaleoTransition(KaleoTransition kaleoTransition);
 
 	public KaleoTransition addKaleoTransition(
-			long kaleoDefinitionVersionId, long kaleoNodeId,
-			Transition transition, KaleoNode sourceKaleoNode,
+			long kaleoDefinitionId, long kaleoDefinitionVersionId,
+			long kaleoNodeId, Transition transition, KaleoNode sourceKaleoNode,
 			KaleoNode targetKaleoNode, ServiceContext serviceContext)
 		throws PortalException;
 
@@ -88,6 +93,12 @@ public interface KaleoTransitionLocalService
 	@Transactional(enabled = false)
 	public KaleoTransition createKaleoTransition(long kaleoTransitionId);
 
+	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
+
 	public void deleteCompanyKaleoTransitions(long companyId);
 
 	public void deleteKaleoDefinitionVersionKaleoTransitions(
@@ -95,6 +106,10 @@ public interface KaleoTransitionLocalService
 
 	/**
 	 * Deletes the kaleo transition from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTransitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTransition the kaleo transition
 	 * @return the kaleo transition that was removed
@@ -105,6 +120,10 @@ public interface KaleoTransitionLocalService
 
 	/**
 	 * Deletes the kaleo transition with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTransitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTransitionId the primary key of the kaleo transition
 	 * @return the kaleo transition that was removed
@@ -120,6 +139,12 @@ public interface KaleoTransitionLocalService
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public <T> T dslQuery(DSLQuery dslQuery);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int dslQueryCount(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -254,6 +279,9 @@ public interface KaleoTransitionLocalService
 	 */
 	public String getOSGiServiceIdentifier();
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -261,6 +289,10 @@ public interface KaleoTransitionLocalService
 
 	/**
 	 * Updates the kaleo transition in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTransitionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTransition the kaleo transition
 	 * @return the kaleo transition that was updated

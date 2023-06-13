@@ -46,7 +46,6 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "view-at
 %>
 
 <clay:navigation-bar
-	inverted="<%= true %>"
 	navigationItems='<%= expandoDisplayContext.getNavigationItems("fields") %>'
 />
 
@@ -60,18 +59,18 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "view-at
 	showSearch="<%= false %>"
 />
 
-<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 	<aui:input name="columnIds" type="hidden" />
 
-	<div class="container-fluid container-fluid-max-xl">
+	<clay:container-fluid>
 		<liferay-ui:breadcrumb
 			showCurrentGroup="<%= false %>"
 			showGuestGroup="<%= false %>"
 			showLayout="<%= false %>"
 			showPortletBreadcrumb="<%= true %>"
 		/>
-	</div>
+	</clay:container-fluid>
 
 	<liferay-ui:search-container
 		emptyResultsMessage='<%= LanguageUtil.format(request, "no-custom-fields-are-defined-for-x", HtmlUtil.escape(modelResourceName), false) %>'

@@ -7,7 +7,7 @@ create table BatchEngineExportTask (
 	createDate DATE null,
 	modifiedDate DATE null,
 	callbackURL VARCHAR(75) null,
-	className VARCHAR(75) null,
+	className VARCHAR(255) null,
 	content BLOB,
 	contentType VARCHAR(75) null,
 	endTime DATE null,
@@ -16,7 +16,7 @@ create table BatchEngineExportTask (
 	executeStatus VARCHAR(75) null,
 	parameters TEXT null,
 	startTime DATE null,
-	version VARCHAR(75) null
+	taskItemDelegateName VARCHAR(75) null
 );
 
 create table BatchEngineImportTask (
@@ -29,7 +29,7 @@ create table BatchEngineImportTask (
 	modifiedDate DATE null,
 	batchSize LONG,
 	callbackURL VARCHAR(75) null,
-	className VARCHAR(75) null,
+	className VARCHAR(255) null,
 	content BLOB,
 	contentType VARCHAR(75) null,
 	endTime DATE null,
@@ -39,5 +39,5 @@ create table BatchEngineImportTask (
 	operation VARCHAR(75) null,
 	parameters TEXT null,
 	startTime DATE null,
-	version VARCHAR(75) null
+	taskItemDelegateName VARCHAR(75) null
 );

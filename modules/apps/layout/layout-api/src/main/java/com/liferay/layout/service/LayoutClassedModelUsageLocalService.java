@@ -14,9 +14,14 @@
 
 package com.liferay.layout.service;
 
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.layout.model.LayoutClassedModelUsage;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -27,6 +32,8 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -48,18 +55,20 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutClassedModelUsageLocalServiceUtil
  * @generated
  */
+@CTAware
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface LayoutClassedModelUsageLocalService
-	extends BaseLocalService, PersistedModelLocalService {
+	extends BaseLocalService, CTService<LayoutClassedModelUsage>,
+			PersistedModelLocalService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link LayoutClassedModelUsageLocalServiceUtil} to access the layout classed model usage local service. Add custom service methods to <code>com.liferay.layout.service.impl.LayoutClassedModelUsageLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.layout.service.impl.LayoutClassedModelUsageLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the layout classed model usage local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link LayoutClassedModelUsageLocalServiceUtil} if injection and service tracking are not available.
 	 */
 	public LayoutClassedModelUsage addDefaultLayoutClassedModelUsage(
 		long groupId, long classNameId, long classPK,
@@ -67,6 +76,10 @@ public interface LayoutClassedModelUsageLocalService
 
 	/**
 	 * Adds the layout classed model usage to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutClassedModelUsageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutClassedModelUsage the layout classed model usage
 	 * @return the layout classed model usage that was added
@@ -90,7 +103,17 @@ public interface LayoutClassedModelUsageLocalService
 		long layoutClassedModelUsageId);
 
 	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
+
+	/**
 	 * Deletes the layout classed model usage from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutClassedModelUsageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutClassedModelUsage the layout classed model usage
 	 * @return the layout classed model usage that was removed
@@ -101,6 +124,10 @@ public interface LayoutClassedModelUsageLocalService
 
 	/**
 	 * Deletes the layout classed model usage with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutClassedModelUsageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutClassedModelUsageId the primary key of the layout classed model usage
 	 * @return the layout classed model usage that was removed
@@ -124,6 +151,12 @@ public interface LayoutClassedModelUsageLocalService
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public <T> T dslQuery(DSLQuery dslQuery);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int dslQueryCount(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -215,6 +248,10 @@ public interface LayoutClassedModelUsageLocalService
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		PortletDataContext portletDataContext);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
@@ -276,6 +313,34 @@ public interface LayoutClassedModelUsageLocalService
 		long plid);
 
 	/**
+	 * Returns all the layout classed model usages matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the layout classed model usages
+	 * @param companyId the primary key of the company
+	 * @return the matching layout classed model usages, or an empty list if no matches were found
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<LayoutClassedModelUsage>
+		getLayoutClassedModelUsagesByUuidAndCompanyId(
+			String uuid, long companyId);
+
+	/**
+	 * Returns a range of layout classed model usages matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the layout classed model usages
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of layout classed model usages
+	 * @param end the upper bound of the range of layout classed model usages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching layout classed model usages, or an empty list if no matches were found
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<LayoutClassedModelUsage>
+		getLayoutClassedModelUsagesByUuidAndCompanyId(
+			String uuid, long companyId, int start, int end,
+			OrderByComparator<LayoutClassedModelUsage> orderByComparator);
+
+	/**
 	 * Returns the number of layout classed model usages.
 	 *
 	 * @return the number of layout classed model usages
@@ -297,6 +362,9 @@ public interface LayoutClassedModelUsageLocalService
 	 */
 	public String getOSGiServiceIdentifier();
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -313,11 +381,30 @@ public interface LayoutClassedModelUsageLocalService
 	/**
 	 * Updates the layout classed model usage in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutClassedModelUsageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutClassedModelUsage the layout classed model usage
 	 * @return the layout classed model usage that was updated
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public LayoutClassedModelUsage updateLayoutClassedModelUsage(
 		LayoutClassedModelUsage layoutClassedModelUsage);
+
+	@Override
+	@Transactional(enabled = false)
+	public CTPersistence<LayoutClassedModelUsage> getCTPersistence();
+
+	@Override
+	@Transactional(enabled = false)
+	public Class<LayoutClassedModelUsage> getModelClass();
+
+	@Override
+	@Transactional(rollbackFor = Throwable.class)
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<LayoutClassedModelUsage>, R, E>
+				updateUnsafeFunction)
+		throws E;
 
 }

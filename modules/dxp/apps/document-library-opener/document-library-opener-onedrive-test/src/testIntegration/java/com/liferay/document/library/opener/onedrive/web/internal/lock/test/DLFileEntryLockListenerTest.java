@@ -18,21 +18,22 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
-import com.liferay.document.library.opener.onedrive.web.internal.test.util.PropsValuesReplacer;
 import com.liferay.osgi.util.service.OSGiServiceUtil;
 import com.liferay.petra.function.UnsafeRunnable;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.lock.LockListener;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
-import com.liferay.portal.kernel.test.util.TestDataConstants;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.test.rule.Inject;
@@ -142,8 +143,9 @@ public class DLFileEntryLockListenerTest {
 			UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
-		try (PropsValuesReplacer propsValuesReplacer = new PropsValuesReplacer(
-				"DL_FILE_ENTRY_LOCK_POLICY", 0)) {
+		try (SafeCloseable safeCloseable =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"DL_FILE_ENTRY_LOCK_POLICY", 0)) {
 
 			unsafeRunnable.run();
 		}
@@ -153,8 +155,9 @@ public class DLFileEntryLockListenerTest {
 			UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
-		try (PropsValuesReplacer propsValuesReplacer = new PropsValuesReplacer(
-				"DL_FILE_ENTRY_LOCK_POLICY", 1)) {
+		try (SafeCloseable safeCloseable =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"DL_FILE_ENTRY_LOCK_POLICY", 1)) {
 
 			unsafeRunnable.run();
 		}

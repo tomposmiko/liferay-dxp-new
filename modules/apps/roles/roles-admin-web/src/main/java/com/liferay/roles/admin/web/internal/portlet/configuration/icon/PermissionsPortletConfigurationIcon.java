@@ -16,6 +16,8 @@ package com.liferay.roles.admin.web.internal.portlet.configuration.icon;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -68,9 +70,7 @@ public class PermissionsPortletConfigurationIcon
 			WebKeys.THEME_DISPLAY);
 
 		try {
-			long roleId = _getRoleId(portletRequest);
-
-			Role role = _roleService.fetchRole(roleId);
+			Role role = _roleService.fetchRole(_getRoleId(portletRequest));
 
 			int[] roleTypes = {role.getType()};
 
@@ -88,6 +88,9 @@ public class PermissionsPortletConfigurationIcon
 				themeDisplay.getRequest());
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		return url;
@@ -122,6 +125,9 @@ public class PermissionsPortletConfigurationIcon
 			return false;
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		return false;
@@ -141,6 +147,9 @@ public class PermissionsPortletConfigurationIcon
 		return ParamUtil.getLong(
 			_portal.getHttpServletRequest(portletRequest), "roleId");
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PermissionsPortletConfigurationIcon.class);
 
 	@Reference
 	private Portal _portal;

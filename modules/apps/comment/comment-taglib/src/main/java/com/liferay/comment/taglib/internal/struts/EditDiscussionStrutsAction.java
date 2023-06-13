@@ -21,10 +21,8 @@ import com.liferay.message.boards.exception.MessageBodyException;
 import com.liferay.message.boards.exception.NoSuchMessageException;
 import com.liferay.message.boards.exception.RequiredMessageException;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.comment.Comment;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.comment.DiscussionPermission;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -86,9 +84,6 @@ public class EditDiscussionStrutsAction implements StrutsAction {
 			namespacedHttpServletRequest, Constants.CMD);
 
 		try {
-			String redirect = _portal.escapeRedirect(
-				ParamUtil.getString(namespacedHttpServletRequest, "redirect"));
-
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
 				long commentId = updateComment(namespacedHttpServletRequest);
 
@@ -99,15 +94,13 @@ public class EditDiscussionStrutsAction implements StrutsAction {
 					String randomNamespace = ParamUtil.getString(
 						namespacedHttpServletRequest, "randomNamespace");
 
-					JSONObject jsonObject = JSONUtil.put(
-						"commentId", commentId
-					).put(
-						"randomNamespace", randomNamespace
-					);
-
 					writeJSON(
 						namespacedHttpServletRequest, httpServletResponse,
-						jsonObject);
+						JSONUtil.put(
+							"commentId", commentId
+						).put(
+							"randomNamespace", randomNamespace
+						));
 
 					return null;
 				}
@@ -121,6 +114,9 @@ public class EditDiscussionStrutsAction implements StrutsAction {
 			else if (cmd.equals(Constants.UNSUBSCRIBE_FROM_COMMENTS)) {
 				subscribeToComments(namespacedHttpServletRequest, false);
 			}
+
+			String redirect = _portal.escapeRedirect(
+				ParamUtil.getString(namespacedHttpServletRequest, "redirect"));
 
 			if (Validator.isNotNull(redirect)) {
 				httpServletResponse.sendRedirect(redirect);
@@ -202,8 +198,6 @@ public class EditDiscussionStrutsAction implements StrutsAction {
 
 		String className = ParamUtil.getString(httpServletRequest, "className");
 		long classPK = ParamUtil.getLong(httpServletRequest, "classPK");
-		long parentCommentId = ParamUtil.getLong(
-			httpServletRequest, "parentCommentId");
 		String subject = ParamUtil.getString(httpServletRequest, "subject");
 		String body = ParamUtil.getString(httpServletRequest, "body");
 
@@ -212,8 +206,6 @@ public class EditDiscussionStrutsAction implements StrutsAction {
 
 		DiscussionPermission discussionPermission = _getDiscussionPermission(
 			themeDisplay);
-
-		AssetEntry assetEntry = _getAssetEntry(commentId, className, classPK);
 
 		if (commentId <= 0) {
 
@@ -238,18 +230,20 @@ public class EditDiscussionStrutsAction implements StrutsAction {
 				}
 			}
 
+			long parentCommentId = ParamUtil.getLong(
+				httpServletRequest, "parentCommentId");
+
 			String name = PrincipalThreadLocal.getName();
 
 			PrincipalThreadLocal.setName(user.getUserId());
 
 			try {
 				discussionPermission.checkAddPermission(
-					assetEntry.getCompanyId(), assetEntry.getGroupId(),
-					assetEntry.getClassName(), assetEntry.getClassPK());
+					themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
+					className, classPK);
 
 				commentId = _commentManager.addComment(
-					user.getUserId(), assetEntry.getClassName(),
-					assetEntry.getClassPK(), user.getFullName(),
+					user.getUserId(), className, classPK, user.getFullName(),
 					parentCommentId, subject, body, serviceContextFunction);
 			}
 			finally {
@@ -263,17 +257,16 @@ public class EditDiscussionStrutsAction implements StrutsAction {
 			discussionPermission.checkUpdatePermission(commentId);
 
 			commentId = _commentManager.updateComment(
-				themeDisplay.getUserId(), assetEntry.getClassName(),
-				assetEntry.getClassPK(), commentId, subject, body,
-				serviceContextFunction);
+				themeDisplay.getUserId(), className, classPK, commentId,
+				subject, body, serviceContextFunction);
 		}
 
 		// Subscription
 
 		if (PropsValues.DISCUSSION_SUBSCRIBE) {
 			_commentManager.subscribeDiscussion(
-				themeDisplay.getUserId(), assetEntry.getGroupId(),
-				assetEntry.getClassName(), assetEntry.getClassPK());
+				themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
+				className, classPK);
 		}
 
 		return commentId;
@@ -281,33 +274,19 @@ public class EditDiscussionStrutsAction implements StrutsAction {
 
 	protected void writeJSON(
 			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, Object jsonObj)
+			HttpServletResponse httpServletResponse, Object object)
 		throws IOException {
 
 		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
-		ServletResponseUtil.write(httpServletResponse, jsonObj.toString());
+		ServletResponseUtil.write(httpServletResponse, object.toString());
 
 		httpServletResponse.flushBuffer();
 	}
 
-	private AssetEntry _getAssetEntry(
-			long commentId, String className, long classPK)
-		throws PortalException {
-
-		if (Validator.isNotNull(className) && (classPK > 0)) {
-			return _assetEntryLocalService.getEntry(className, classPK);
-		}
-
-		Comment comment = _commentManager.fetchComment(commentId);
-
-		return _assetEntryLocalService.getEntry(
-			comment.getClassName(), comment.getClassPK());
-	}
-
 	private DiscussionPermission _getDiscussionPermission(
 			ThemeDisplay themeDisplay)
-		throws PrincipalException {
+		throws Exception {
 
 		DiscussionPermission discussionPermission =
 			_commentManager.getDiscussionPermission(

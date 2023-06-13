@@ -11,8 +11,7 @@ definition {
 		User.firstLoginPG();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		Navigator.gotoNavItem(navItem = "Structures");
@@ -24,13 +23,12 @@ definition {
 		DynamicDataMapping.addField(
 			field = "Image",
 			fieldFieldLabel = "Image",
-			fieldName = "image");
+			fieldName = "Image");
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 
 		Navigator.gotoNavItem(navItem = "Templates");
@@ -42,8 +40,7 @@ definition {
 			templateName = "WC Template Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Web Content");
 	}
 
@@ -62,7 +59,7 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-69593."
+	@description = "This is a use case for LPS-69593 and LRQA-61632. Assert the selected image is kept in Image field under localized."
 	@priority = "4"
 	test ViewFieldTranslations {
 		property test.name.skip.portal.instance = "DDMStructureWithImageField#ViewFieldTranslations";
@@ -78,7 +75,7 @@ definition {
 			uploadFileName = "Document_3.png");
 
 		FormFields.editTextAlt(
-			fieldName = "image",
+			fieldName = "Image",
 			fieldValue = "English (United States) Image Description");
 
 		PortletEntry.changeLocale(locale = "es-ES");
@@ -88,7 +85,7 @@ definition {
 			fieldValue = "Spanish (Spain) Title");
 
 		FormFields.editTextAlt(
-			fieldName = "image",
+			fieldName = "Image",
 			fieldValue = "Spanish (Spain) Image Description");
 
 		PortletEntry.changeLocale(locale = "pt-BR");
@@ -98,17 +95,25 @@ definition {
 			fieldValue = "Portuguese (Brazil) Title");
 
 		FormFields.editTextAlt(
-			fieldName = "image",
+			fieldName = "Image",
 			fieldValue = "Portuguese (Brazil) Image Description");
 
-		PortletEntry.changeLocale(locale = "en-US");
+		PortletEntry.publish();
+
+		WebContentAdmin.gotoEntry(entry = "English (United States) Title");
 
 		FormFields.viewTextValue(
 			fieldName = "title",
 			fieldValue = "English (United States) Title");
 
+		AssertAttributeValue(
+			attribute1 = "value",
+			key_fieldName = "Image",
+			locator1 = "TextInput#SELECTOR_INPUT",
+			value1 = "Document_3.png");
+
 		FormFields.viewTextValueAlt(
-			fieldName = "image",
+			fieldName = "Image",
 			fieldValue = "English (United States) Image Description");
 
 		PortletEntry.changeLocale(locale = "es-ES");
@@ -117,8 +122,14 @@ definition {
 			fieldName = "title",
 			fieldValue = "Spanish (Spain) Title");
 
+		AssertAttributeValue(
+			attribute1 = "value",
+			key_fieldName = "Image",
+			locator1 = "TextInput#SELECTOR_INPUT",
+			value1 = "Document_3.png");
+
 		FormFields.viewTextValueAlt(
-			fieldName = "image",
+			fieldName = "Image",
 			fieldValue = "Spanish (Spain) Image Description");
 
 		PortletEntry.changeLocale(locale = "pt-BR");
@@ -127,8 +138,14 @@ definition {
 			fieldName = "title",
 			fieldValue = "Portuguese (Brazil) Title");
 
+		AssertAttributeValue(
+			attribute1 = "value",
+			key_fieldName = "Image",
+			locator1 = "TextInput#SELECTOR_INPUT",
+			value1 = "Document_3.png");
+
 		FormFields.viewTextValueAlt(
-			fieldName = "image",
+			fieldName = "Image",
 			fieldValue = "Portuguese (Brazil) Image Description");
 	}
 

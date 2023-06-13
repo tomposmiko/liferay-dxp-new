@@ -18,7 +18,7 @@ export function durationAsMilliseconds(days, fullHours) {
 		.duration({
 			days,
 			hours,
-			minutes
+			minutes,
 		})
 		.asMilliseconds();
 }
@@ -29,17 +29,17 @@ export function formatDuration(millisecondsDuration) {
 	const durationParts = [
 		{
 			label: Liferay.Language.get('days-abbreviation'),
-			value: duration.days
+			value: duration.days,
 		},
 		{
 			label: Liferay.Language.get('hours-abbreviation'),
-			value: duration.hours
+			value: duration.hours,
 		},
 		{
 			label: Liferay.Language.get('minutes-abbreviation'),
-			value: duration.minutes
-		}
-	].filter(part => part.value > 0);
+			value: duration.minutes,
+		},
+	].filter((part) => part.value > 0);
 
 	if (!durationParts.length) {
 		return `${duration.seconds ? 1 : 0}${Liferay.Language.get(
@@ -47,11 +47,11 @@ export function formatDuration(millisecondsDuration) {
 		)}`;
 	}
 
-	return durationParts.map(part => `${part.value}${part.label}`).join(' ');
+	return durationParts.map((part) => `${part.value}${part.label}`).join(' ');
 }
 
 export function formatHours(hours, minutes) {
-	const padHours = value =>
+	const padHours = (value) =>
 		(value && value.toString().padStart(2, '0')) || '00';
 
 	if (hours || minutes) {
@@ -69,6 +69,6 @@ export function getDurationValues(durationValue) {
 		days: parseInt(fullDuration.asDays()) || null,
 		hours: fullDuration.hours() || null,
 		minutes: fullDuration.minutes() || null,
-		seconds: fullDuration.seconds() || null
+		seconds: fullDuration.seconds() || null,
 	};
 }

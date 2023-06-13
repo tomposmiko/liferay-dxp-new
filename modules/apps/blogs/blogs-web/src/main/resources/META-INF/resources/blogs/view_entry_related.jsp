@@ -25,7 +25,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 %>
 
 <c:if test="<%= blogsEntry != null %>">
-	<div class="col-lg-6">
+	<div class="card-page-item">
 		<div class="card">
 
 			<%
@@ -34,19 +34,23 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 			if (Validator.isNull(imageURL)) {
 				imageURL = blogsEntry.getSmallImageURL(themeDisplay);
 			}
+
+			if (Validator.isNull(imageURL)) {
+				imageURL = PortalUtil.getPathContext(request) + "/images/cover_image_placeholder.jpg";
+			}
 			%>
 
-			<c:if test="<%= Validator.isNotNull(imageURL) %>">
-				<div class="card-header">
-					<div class="aspect-ratio aspect-ratio-8-to-3">
-						<img alt="thumbnail" class="aspect-ratio-item-center-middle aspect-ratio-item-fluid" src="<%= HtmlUtil.escape(imageURL) %>" />
-					</div>
+			<div class="card-header">
+				<div class="aspect-ratio aspect-ratio-8-to-3">
+					<img alt="thumbnail" class="aspect-ratio-item-center-middle aspect-ratio-item-fluid" src="<%= HtmlUtil.escape(imageURL) %>" />
 				</div>
-			</c:if>
+			</div>
 
 			<div class="card-body widget-topbar">
-				<div class="autofit-row card-title">
-					<div class="autofit-col autofit-col-expand">
+				<div class="card-title">
+					<clay:content-col
+						expand="<%= true %>"
+					>
 						<portlet:renderURL var="blogsEntryURL">
 							<portlet:param name="mvcRenderCommandName" value="/blogs/view_entry" />
 							<portlet:param name="redirect" value="<%= redirect %>" />
@@ -62,58 +66,56 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 						<h3 class="title"><a class="title-link" href="<%= blogsEntryURL %>">
 							<%= HtmlUtil.escape(BlogsEntryUtil.getDisplayTitle(resourceBundle, blogsEntry)) %></a>
 						</h3>
-					</div>
+					</clay:content-col>
 				</div>
 
-				<div class="autofit-row widget-metadata">
-					<div class="autofit-col inline-item-before">
+				<clay:content-row
+					cssClass="autofit-padded-no-gutters widget-metadata"
+				>
 
-						<%
-						User blogsEntryUser = UserLocalServiceUtil.fetchUser(blogsEntry.getUserId());
+					<%
+					User blogsEntryUser = UserLocalServiceUtil.fetchUser(blogsEntry.getUserId());
+					String blogsEntryUserURL = StringPool.BLANK;
 
-						String blogsEntryUserURL = StringPool.BLANK;
+					if ((blogsEntryUser != null) && !blogsEntryUser.isDefaultUser() && !user.isDefaultUser()) {
+						blogsEntryUserURL = blogsEntryUser.getDisplayURL(themeDisplay);
+					}
+					%>
 
-						if ((blogsEntryUser != null) && !blogsEntryUser.isDefaultUser()) {
-							blogsEntryUserURL = blogsEntryUser.getDisplayURL(themeDisplay);
-						}
-						%>
-
+					<clay:content-col>
 						<liferay-ui:user-portrait
 							user="<%= blogsEntryUser %>"
 						/>
-					</div>
+					</clay:content-col>
 
-					<div class="autofit-col autofit-col-expand">
-						<div class="autofit-row">
-							<div class="autofit-col autofit-col-expand">
-								<div class="text-truncate-inline">
-									<a class="text-truncate username" href="<%= blogsEntryUserURL %>"><%= HtmlUtil.escape(blogsEntry.getUserName()) %></a>
-								</div>
-
-								<div class="text-secondary">
-									<%= DateUtil.getDate(blogsEntry.getStatusDate(), "dd MMM", locale) %>
-
-									<c:if test="<%= blogsPortletInstanceConfiguration.enableReadingTime() %>">
-										- <liferay-reading-time:reading-time displayStyle="descriptive" model="<%= blogsEntry %>" />
-									</c:if>
-								</div>
+					<clay:content-col
+						expand="<%= true %>"
+					>
+						<clay:content-section>
+							<div class="text-truncate-inline">
+								<a class="text-truncate username" href="<%= blogsEntryUserURL %>"><%= HtmlUtil.escape(blogsEntry.getUserName()) %></a>
 							</div>
-						</div>
-					</div>
-				</div>
+
+							<div class="text-secondary">
+								<%= DateUtil.getDate(blogsEntry.getStatusDate(), "dd MMM", locale) %>
+								<c:if test="<%= blogsPortletInstanceConfiguration.enableReadingTime() %>">
+									- <liferay-reading-time:reading-time displayStyle="descriptive" model="<%= blogsEntry %>" />
+								</c:if>
+							</div>
+						</clay:content-section>
+					</clay:content-col>
+				</clay:content-row>
 			</div>
 
 			<div class="card-footer">
-				<div class="card-row">
 
-					<%
-					request.setAttribute("entry_toolbar.jsp-entry", blogsEntry);
-					%>
+				<%
+				request.setAttribute("entry_toolbar.jsp-entry", blogsEntry);
+				%>
 
-					<liferay-util:include page="/blogs/entry_toolbar.jsp" servletContext="<%= application %>">
-						<liferay-util:param name="showOnlyIcons" value="<%= Boolean.TRUE.toString() %>" />
-					</liferay-util:include>
-				</div>
+				<liferay-util:include page="/blogs/entry_toolbar.jsp" servletContext="<%= application %>">
+					<liferay-util:param name="showOnlyIcons" value="<%= Boolean.TRUE.toString() %>" />
+				</liferay-util:include>
 			</div>
 		</div>
 	</div>

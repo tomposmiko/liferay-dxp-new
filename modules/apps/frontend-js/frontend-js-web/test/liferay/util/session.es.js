@@ -16,7 +16,7 @@
 
 import {
 	getSessionValue,
-	setSessionValue
+	setSessionValue,
 } from '../../../src/main/resources/META-INF/resources/liferay/util/session.es';
 
 describe('Session API', () => {
@@ -39,12 +39,22 @@ describe('Session API', () => {
 		it('deserializes session serialized objects', () => {
 			fetch.mockResponse('serialize://{"key1":"value1","key2":"value2"}');
 
-			getSessionValue('key').then(value => {
+			getSessionValue('key').then((value) => {
 				expect(value).toEqual({
 					key1: 'value1',
-					key2: 'value2'
+					key2: 'value2',
 				});
 			});
+		});
+
+		it('propagates `useHttpSession` to server when `true`', () => {
+			getSessionValue('key', {useHttpSession: true});
+
+			expect(fetch).toHaveBeenCalledTimes(1);
+
+			expect(fetch.mock.calls[0][1].body.get('useHttpSession')).toBe(
+				'true'
+			);
 		});
 	});
 
@@ -64,7 +74,7 @@ describe('Session API', () => {
 		it('POSTs a key/serializedValue to the session_click endpoint for object values', () => {
 			setSessionValue('key', {
 				key1: 'value1',
-				key2: 'value2'
+				key2: 'value2',
 			});
 
 			expect(fetch).toHaveBeenCalledTimes(1);
@@ -75,6 +85,16 @@ describe('Session API', () => {
 
 			expect(fetch.mock.calls[0][1].body.get('key')).toBe(
 				'serialize://{"key1":"value1","key2":"value2"}'
+			);
+		});
+
+		it('propagates `useHttpSession` to server when `true`', () => {
+			setSessionValue('key', 'value', {useHttpSession: true});
+
+			expect(fetch).toHaveBeenCalledTimes(1);
+
+			expect(fetch.mock.calls[0][1].body.get('useHttpSession')).toBe(
+				'true'
 			);
 		});
 	});

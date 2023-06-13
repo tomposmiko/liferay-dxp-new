@@ -24,10 +24,14 @@ import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.groupby.GroupByResponse;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
+import com.liferay.portal.search.hits.SearchHitsBuilder;
+import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
+import com.liferay.portal.search.internal.hits.SearchHitsBuilderFactoryImpl;
 import com.liferay.portal.search.internal.legacy.searcher.FacetContextImpl;
 import com.liferay.portal.search.searcher.FacetContext;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.searcher.SearchTimeValue;
 import com.liferay.portal.search.stats.StatsResponse;
 
 import java.io.Serializable;
@@ -49,8 +53,9 @@ import java.util.stream.Stream;
 public class SearchResponseImpl implements SearchResponse, Serializable {
 
 	public SearchResponseImpl(SearchContext searchContext) {
-		_facetContextImpl = new FacetContextImpl(searchContext);
 		_searchContext = searchContext;
+
+		_facetContextImpl = new FacetContextImpl(searchContext);
 	}
 
 	public void addFederatedSearchResponse(SearchResponse searchResponse) {
@@ -140,7 +145,19 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 
 	@Override
 	public SearchHits getSearchHits() {
+		if (_searchHits == null) {
+			SearchHitsBuilder searchHitsBuilder =
+				_searchHitsBuilderFactory.getSearchHitsBuilder();
+
+			return searchHitsBuilder.build();
+		}
+
 		return _searchHits;
+	}
+
+	@Override
+	public SearchTimeValue getSearchTimeValue() {
+		return _searchTimeValue;
 	}
 
 	@Override
@@ -199,6 +216,10 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 		_searchHits = searchHits;
 	}
 
+	public void setSearchTimeValue(SearchTimeValue searchTimeValue) {
+		_searchTimeValue = searchTimeValue;
+	}
+
 	public void setStatsResponseMap(Map<String, StatsResponse> map) {
 		_statsResponseMap.clear();
 
@@ -252,7 +273,10 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 	private String _responseString = StringPool.BLANK;
 	private final SearchContext _searchContext;
 	private SearchHits _searchHits;
+	private final SearchHitsBuilderFactory _searchHitsBuilderFactory =
+		new SearchHitsBuilderFactoryImpl();
 	private SearchRequest _searchRequest;
+	private SearchTimeValue _searchTimeValue;
 	private final Map<String, StatsResponse> _statsResponseMap =
 		new LinkedHashMap<>();
 

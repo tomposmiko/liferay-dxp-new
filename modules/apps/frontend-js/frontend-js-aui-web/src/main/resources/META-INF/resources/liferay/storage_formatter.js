@@ -15,49 +15,49 @@
 /**
  * The Storage Formatter Utility
  *
- * @deprecated As of Athanasius(7.3.x), replaced by Liferay.Util.formatStorage
+ * @deprecated As of Athanasius (7.3.x), replaced by Liferay.Util.formatStorage
  * @module liferay-storage-formatter
  */
 
 AUI.add(
 	'liferay-storage-formatter',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
-		var StorageFormatter = function() {};
+		var StorageFormatter = function () {};
 
 		StorageFormatter.NAME = 'storageformatter';
 
 		StorageFormatter.ATTRS = {
 			addSpaceBeforeSuffix: {
 				validator: Lang.isBoolean,
-				value: false
+				value: false,
 			},
 
 			decimalSeparator: {
 				validator: Lang.isString,
-				value: '.'
+				value: '.',
 			},
 
 			denominator: {
 				validator: Lang.isNumber,
-				value: 1024.0
+				value: 1024.0,
 			},
 
 			suffixGB: {
 				validator: Lang.isString,
-				value: 'GB'
+				value: 'GB',
 			},
 
 			suffixKB: {
 				validator: Lang.isString,
-				value: 'KB'
+				value: 'KB',
 			},
 
 			suffixMB: {
 				validator: Lang.isString,
-				value: 'MB'
-			}
+				value: 'MB',
+			},
 		};
 
 		StorageFormatter.prototype = {
@@ -77,15 +77,15 @@ AUI.add(
 					denominator,
 					suffixGB,
 					suffixKB,
-					suffixMB
+					suffixMB,
 				});
-			}
+			},
 		};
 
 		Liferay.StorageFormatter = StorageFormatter;
 	},
 	'',
 	{
-		requires: ['aui-base', 'datatype-number-format']
+		requires: ['aui-base', 'datatype-number-format'],
 	}
 );

@@ -28,6 +28,8 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 
 	defaultLanguageId = ddmFormDefaultLanguageId;
 }
+
+DDMWebConfiguration ddmWebConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DDMWebConfiguration.class);
 %>
 
 <div class="alert alert-danger hide lfr-message-response" id="<portlet:namespace />messageContainer"></div>
@@ -86,49 +88,43 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 
 	var STR_VALUE = 'value';
 
-	var displayWarning = function(message) {
-		new Liferay.Notification({
-			closeable: true,
-			delay: {
-				hide: 5000,
-				show: 0
-			},
-			duration: 500,
+	var displayWarning = function (message) {
+		Liferay.Util.openToast({
 			message: message,
-			title: '<liferay-ui:message key="warning" />',
-			type: 'warning'
-		}).render('body');
+			type: 'warning',
+		});
 	};
 
 	var formEditor;
 
-	var getContentValue = function() {
+	var getContentValue = function () {
 		var content;
 
 		if (formEditor && !checkViewTabActive()) {
 			content = formEditor.get(STR_VALUE);
-		} else {
+		}
+		else {
 			content = formBuilder.getContent();
 		}
 
 		return content;
 	};
 
-	var getFormEditor = function() {
+	var getFormEditor = function () {
 		if (!formEditor) {
 			formEditor = new A.AceEditor({
 				boundingBox: '#<portlet:namespace />formBuilderEditor',
 				height: 600,
 				mode: 'xml',
 				tabSize: 4,
-				width: 600
+				width: 600,
 			}).render();
 		}
 
 		return formEditor;
 	};
 
-	var checkViewTabActive = function() {
+	var checkViewTabActive = function () {
 		var formBuilderTab = A.one('#<portlet:namespace />formBuilderTab');
 
 		var viewTabActive = false;
@@ -142,7 +138,7 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 		return viewTabActive;
 	};
 
-	var reloadFormBuilderData = function(content) {
+	var reloadFormBuilderData = function (content) {
 		if (!Lang.isValue(content)) {
 			content = window.<portlet:namespace />getContentDefinition();
 		}
@@ -157,10 +153,12 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 			displayWarning(
 				'<liferay-ui:message key="you-cannot-remove-default-attributes" />'
 			);
-		} else {
+		}
+		else {
 			try {
 				content = JSON.parse(content);
-			} catch (e) {
+			}
+			catch (e) {
 				displayWarning(
 					'<liferay-ui:message key="you-have-entered-invalid-json" />'
 				);
@@ -179,7 +177,7 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 		}
 	};
 
-	var setEditorSize = function() {
+	var setEditorSize = function () {
 		if (!checkViewTabActive()) {
 			getFormEditor().set(
 				'width',
@@ -190,7 +188,7 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 		}
 	};
 
-	var switchToSource = function() {
+	var switchToSource = function () {
 		setEditorSize();
 
 		var content = formBuilder.getContent();
@@ -198,10 +196,11 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 		getFormEditor().set(STR_VALUE, content);
 	};
 
-	var switchToView = function() {
+	var switchToView = function () {
 		if (formEditor) {
 			reloadFormBuilderData(formEditor.get(STR_VALUE));
-		} else if (formBuilder) {
+		}
+		else if (formBuilder) {
 			reloadFormBuilderData(formBuilder.getContent());
 		}
 	};
@@ -231,6 +230,7 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 		portletNamespace: '<portlet:namespace />',
 		portletResourceNamespace: '<portlet:namespace />',
 		readOnly: <%= ParamUtil.getBoolean(request, "formBuilderReadOnly") %>,
+		requiredDescriptionEnabled: <%= ddmWebConfiguration.enableSettingTheImageDescriptionAsOptional() %>,
 		srcNode: '#<portlet:namespace />formBuilderContent',
 		translationManager: {
 			<c:if test="<%= Validator.isNotNull(journalEditDDMStructuresDisplayContext.getAvailableLocalesJSONArrayString()) %>">
@@ -242,8 +242,8 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 			defaultLocale: '<%= HtmlUtil.escapeJS(defaultLanguageId) %>',
 			localesMap: <%= journalEditDDMStructuresDisplayContext.getLocalesMap() %>,
 			srcNode:
-				'#<portlet:namespace />translationManager .lfr-translation-manager-content'
-		}
+				'#<portlet:namespace />translationManager .lfr-translation-manager-content',
+		},
 	}).render();
 
 	var dialog = Liferay.Util.getWindow();
@@ -252,17 +252,18 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 		dialog.after('widthChange', setEditorSize);
 	}
 
-	var afterShowTab = function(event) {
+	var afterShowTab = function (event) {
 		if (checkViewTabActive()) {
 			switchToView();
-		} else {
+		}
+		else {
 			switchToSource();
 		}
 	};
 
 	Liferay.after('showTab', afterShowTab);
 
-	var onDestroyPortlet = function(event) {
+	var onDestroyPortlet = function (event) {
 		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
 			Liferay.detach('showTab', afterShowTab);
 			Liferay.detach('destroyPortlet', onDestroyPortlet);
@@ -270,7 +271,7 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 			var propertyList = formBuilder.propertyList;
 
 			if (propertyList) {
-				propertyList.get('data').each(function(model) {
+				propertyList.get('data').each(function (model) {
 					var editor = model.get('editor');
 
 					if (editor) {
@@ -289,11 +290,11 @@ if ((ddmForm != null) && (ddmForm.getDefaultLocale() != null)) {
 
 	window.<portlet:namespace />getContentValue = getContentValue;
 
-	Liferay.on('<portlet:namespace />saveTemplate', function(event) {
+	Liferay.on('<portlet:namespace />saveTemplate', function (event) {
 		A.one('#<portlet:namespace />scriptContent').val(getContentValue());
 	});
 
 	Liferay.fire('<portlet:namespace />formBuilderLoaded', {
-		formBuilder: formBuilder
+		formBuilder: formBuilder,
 	});
 </aui:script>

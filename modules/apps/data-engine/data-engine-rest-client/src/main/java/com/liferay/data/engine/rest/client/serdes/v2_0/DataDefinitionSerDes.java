@@ -16,6 +16,7 @@ package com.liferay.data.engine.rest.client.serdes.v2_0;
 
 import com.liferay.data.engine.rest.client.dto.v2_0.DataDefinition;
 import com.liferay.data.engine.rest.client.dto.v2_0.DataDefinitionField;
+import com.liferay.data.engine.rest.client.dto.v2_0.DataRule;
 import com.liferay.data.engine.rest.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
@@ -61,7 +62,7 @@ public class DataDefinitionSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+			"yyyy-MM-dd'T'HH:mm:ssXX");
 
 		if (dataDefinition.getAvailableLanguageIds() != null) {
 			if (sb.length() > 1) {
@@ -139,6 +140,26 @@ public class DataDefinitionSerDes {
 			sb.append(_escape(dataDefinition.getDataDefinitionKey()));
 
 			sb.append("\"");
+		}
+
+		if (dataDefinition.getDataRules() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dataRules\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < dataDefinition.getDataRules().length; i++) {
+				sb.append(String.valueOf(dataDefinition.getDataRules()[i]));
+
+				if ((i + 1) < dataDefinition.getDataRules().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (dataDefinition.getDateCreated() != null) {
@@ -281,7 +302,7 @@ public class DataDefinitionSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+			"yyyy-MM-dd'T'HH:mm:ssXX");
 
 		if (dataDefinition.getAvailableLanguageIds() == null) {
 			map.put("availableLanguageIds", null);
@@ -318,13 +339,32 @@ public class DataDefinitionSerDes {
 				String.valueOf(dataDefinition.getDataDefinitionKey()));
 		}
 
-		map.put(
-			"dateCreated",
-			liferayToJSONDateFormat.format(dataDefinition.getDateCreated()));
+		if (dataDefinition.getDataRules() == null) {
+			map.put("dataRules", null);
+		}
+		else {
+			map.put("dataRules", String.valueOf(dataDefinition.getDataRules()));
+		}
 
-		map.put(
-			"dateModified",
-			liferayToJSONDateFormat.format(dataDefinition.getDateModified()));
+		if (dataDefinition.getDateCreated() == null) {
+			map.put("dateCreated", null);
+		}
+		else {
+			map.put(
+				"dateCreated",
+				liferayToJSONDateFormat.format(
+					dataDefinition.getDateCreated()));
+		}
+
+		if (dataDefinition.getDateModified() == null) {
+			map.put("dateModified", null);
+		}
+		else {
+			map.put(
+				"dateModified",
+				liferayToJSONDateFormat.format(
+					dataDefinition.getDateModified()));
+		}
 
 		if (dataDefinition.getDefaultDataLayout() == null) {
 			map.put("defaultDataLayout", null);
@@ -441,6 +481,18 @@ public class DataDefinitionSerDes {
 						(String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "dataRules")) {
+				if (jsonParserFieldValue != null) {
+					dataDefinition.setDataRules(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> DataRuleSerDes.toDTO((String)object)
+						).toArray(
+							size -> new DataRule[size]
+						));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					dataDefinition.setDateCreated(
@@ -502,10 +554,6 @@ public class DataDefinitionSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else {
-				throw new IllegalArgumentException(
-					"Unsupported field name " + jsonParserFieldName);
-			}
 		}
 
 	}
@@ -534,7 +582,7 @@ public class DataDefinitionSerDes {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
-			sb.append("\":");
+			sb.append("\": ");
 
 			Object value = entry.getValue();
 
@@ -560,14 +608,17 @@ public class DataDefinitionSerDes {
 
 				sb.append("]");
 			}
-			else {
+			else if (value instanceof String) {
 				sb.append("\"");
 				sb.append(_escape(entry.getValue()));
 				sb.append("\"");
 			}
+			else {
+				sb.append(String.valueOf(entry.getValue()));
+			}
 
 			if (iterator.hasNext()) {
-				sb.append(",");
+				sb.append(", ");
 			}
 		}
 

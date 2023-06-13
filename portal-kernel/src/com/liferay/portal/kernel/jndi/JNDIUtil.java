@@ -40,10 +40,10 @@ public class JNDIUtil {
 			_log.debug("Lookup " + location);
 		}
 
-		Object obj = null;
+		Object object = null;
 
 		try {
-			obj = context.lookup(location);
+			object = context.lookup(location);
 		}
 		catch (NamingException namingException1) {
 
@@ -51,29 +51,29 @@ public class JNDIUtil {
 
 			if (location.contains("java:comp/env/")) {
 				try {
-					String newLocation = StringUtil.replace(
-						location, "java:comp/env/", "");
+					String newLocation = StringUtil.removeSubstring(
+						location, "java:comp/env/");
 
 					if (_log.isDebugEnabled()) {
 						_log.debug(namingException1.getMessage());
 						_log.debug("Attempt " + newLocation);
 					}
 
-					obj = context.lookup(newLocation);
+					object = context.lookup(newLocation);
 				}
 				catch (NamingException namingException2) {
 
 					// java:comp/env/ObjectName to java:ObjectName
 
-					String newLocation = StringUtil.replace(
-						location, "comp/env/", "");
+					String newLocation = StringUtil.removeSubstring(
+						location, "comp/env/");
 
 					if (_log.isDebugEnabled()) {
 						_log.debug(namingException2.getMessage());
 						_log.debug("Attempt " + newLocation);
 					}
 
-					obj = context.lookup(newLocation);
+					object = context.lookup(newLocation);
 				}
 			}
 			else if (location.contains("java:")) {
@@ -81,15 +81,15 @@ public class JNDIUtil {
 				// java:ObjectName to ObjectName
 
 				try {
-					String newLocation = StringUtil.replace(
-						location, "java:", "");
+					String newLocation = StringUtil.removeSubstring(
+						location, "java:");
 
 					if (_log.isDebugEnabled()) {
 						_log.debug(namingException1.getMessage());
 						_log.debug("Attempt " + newLocation);
 					}
 
-					obj = context.lookup(newLocation);
+					object = context.lookup(newLocation);
 				}
 				catch (NamingException namingException2) {
 
@@ -103,7 +103,7 @@ public class JNDIUtil {
 						_log.debug("Attempt " + newLocation);
 					}
 
-					obj = context.lookup(newLocation);
+					object = context.lookup(newLocation);
 				}
 			}
 			else if (!location.contains("java:")) {
@@ -118,7 +118,7 @@ public class JNDIUtil {
 						_log.debug("Attempt " + newLocation);
 					}
 
-					obj = context.lookup(newLocation);
+					object = context.lookup(newLocation);
 				}
 				catch (NamingException namingException2) {
 
@@ -131,7 +131,7 @@ public class JNDIUtil {
 						_log.debug("Attempt " + newLocation);
 					}
 
-					obj = context.lookup(newLocation);
+					object = context.lookup(newLocation);
 				}
 			}
 			else {
@@ -139,7 +139,7 @@ public class JNDIUtil {
 			}
 		}
 
-		return obj;
+		return object;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(JNDIUtil.class);

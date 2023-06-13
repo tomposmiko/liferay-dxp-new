@@ -25,10 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * The persistence utility for the ddm structure link service. This utility wraps <code>com.liferay.dynamic.data.mapping.service.persistence.impl.DDMStructureLinkPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -121,182 +117,6 @@ public class DDMStructureLinkUtil {
 		DDMStructureLink ddmStructureLink, ServiceContext serviceContext) {
 
 		return getPersistence().update(ddmStructureLink, serviceContext);
-	}
-
-	/**
-	 * Returns all the ddm structure links where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @return the matching ddm structure links
-	 */
-	public static List<DDMStructureLink> findByClassNameId(long classNameId) {
-		return getPersistence().findByClassNameId(classNameId);
-	}
-
-	/**
-	 * Returns a range of all the ddm structure links where classNameId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMStructureLinkModelImpl</code>.
-	 * </p>
-	 *
-	 * @param classNameId the class name ID
-	 * @param start the lower bound of the range of ddm structure links
-	 * @param end the upper bound of the range of ddm structure links (not inclusive)
-	 * @return the range of matching ddm structure links
-	 */
-	public static List<DDMStructureLink> findByClassNameId(
-		long classNameId, int start, int end) {
-
-		return getPersistence().findByClassNameId(classNameId, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the ddm structure links where classNameId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMStructureLinkModelImpl</code>.
-	 * </p>
-	 *
-	 * @param classNameId the class name ID
-	 * @param start the lower bound of the range of ddm structure links
-	 * @param end the upper bound of the range of ddm structure links (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching ddm structure links
-	 */
-	public static List<DDMStructureLink> findByClassNameId(
-		long classNameId, int start, int end,
-		OrderByComparator<DDMStructureLink> orderByComparator) {
-
-		return getPersistence().findByClassNameId(
-			classNameId, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the ddm structure links where classNameId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMStructureLinkModelImpl</code>.
-	 * </p>
-	 *
-	 * @param classNameId the class name ID
-	 * @param start the lower bound of the range of ddm structure links
-	 * @param end the upper bound of the range of ddm structure links (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching ddm structure links
-	 */
-	public static List<DDMStructureLink> findByClassNameId(
-		long classNameId, int start, int end,
-		OrderByComparator<DDMStructureLink> orderByComparator,
-		boolean useFinderCache) {
-
-		return getPersistence().findByClassNameId(
-			classNameId, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first ddm structure link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching ddm structure link
-	 * @throws NoSuchStructureLinkException if a matching ddm structure link could not be found
-	 */
-	public static DDMStructureLink findByClassNameId_First(
-			long classNameId,
-			OrderByComparator<DDMStructureLink> orderByComparator)
-		throws com.liferay.dynamic.data.mapping.exception.
-			NoSuchStructureLinkException {
-
-		return getPersistence().findByClassNameId_First(
-			classNameId, orderByComparator);
-	}
-
-	/**
-	 * Returns the first ddm structure link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching ddm structure link, or <code>null</code> if a matching ddm structure link could not be found
-	 */
-	public static DDMStructureLink fetchByClassNameId_First(
-		long classNameId,
-		OrderByComparator<DDMStructureLink> orderByComparator) {
-
-		return getPersistence().fetchByClassNameId_First(
-			classNameId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last ddm structure link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching ddm structure link
-	 * @throws NoSuchStructureLinkException if a matching ddm structure link could not be found
-	 */
-	public static DDMStructureLink findByClassNameId_Last(
-			long classNameId,
-			OrderByComparator<DDMStructureLink> orderByComparator)
-		throws com.liferay.dynamic.data.mapping.exception.
-			NoSuchStructureLinkException {
-
-		return getPersistence().findByClassNameId_Last(
-			classNameId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last ddm structure link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching ddm structure link, or <code>null</code> if a matching ddm structure link could not be found
-	 */
-	public static DDMStructureLink fetchByClassNameId_Last(
-		long classNameId,
-		OrderByComparator<DDMStructureLink> orderByComparator) {
-
-		return getPersistence().fetchByClassNameId_Last(
-			classNameId, orderByComparator);
-	}
-
-	/**
-	 * Returns the ddm structure links before and after the current ddm structure link in the ordered set where classNameId = &#63;.
-	 *
-	 * @param structureLinkId the primary key of the current ddm structure link
-	 * @param classNameId the class name ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next ddm structure link
-	 * @throws NoSuchStructureLinkException if a ddm structure link with the primary key could not be found
-	 */
-	public static DDMStructureLink[] findByClassNameId_PrevAndNext(
-			long structureLinkId, long classNameId,
-			OrderByComparator<DDMStructureLink> orderByComparator)
-		throws com.liferay.dynamic.data.mapping.exception.
-			NoSuchStructureLinkException {
-
-		return getPersistence().findByClassNameId_PrevAndNext(
-			structureLinkId, classNameId, orderByComparator);
-	}
-
-	/**
-	 * Removes all the ddm structure links where classNameId = &#63; from the database.
-	 *
-	 * @param classNameId the class name ID
-	 */
-	public static void removeByClassNameId(long classNameId) {
-		getPersistence().removeByClassNameId(classNameId);
-	}
-
-	/**
-	 * Returns the number of ddm structure links where classNameId = &#63;.
-	 *
-	 * @param classNameId the class name ID
-	 * @return the number of matching ddm structure links
-	 */
-	public static int countByClassNameId(long classNameId) {
-		return getPersistence().countByClassNameId(classNameId);
 	}
 
 	/**
@@ -898,27 +718,9 @@ public class DDMStructureLinkUtil {
 	}
 
 	public static DDMStructureLinkPersistence getPersistence() {
-		return _serviceTracker.getService();
+		return _persistence;
 	}
 
-	private static ServiceTracker
-		<DDMStructureLinkPersistence, DDMStructureLinkPersistence>
-			_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			DDMStructureLinkPersistence.class);
-
-		ServiceTracker<DDMStructureLinkPersistence, DDMStructureLinkPersistence>
-			serviceTracker =
-				new ServiceTracker
-					<DDMStructureLinkPersistence, DDMStructureLinkPersistence>(
-						bundle.getBundleContext(),
-						DDMStructureLinkPersistence.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile DDMStructureLinkPersistence _persistence;
 
 }

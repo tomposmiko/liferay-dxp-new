@@ -112,9 +112,9 @@ public class ModelValidationResults {
 		}
 
 		public FailureBuilder exceptionFailure(
-			String message, Throwable cause) {
+			String message, Throwable throwable) {
 
-			modelValidationResults._exceptions.put(message, cause);
+			modelValidationResults._exceptions.put(message, throwable);
 
 			return this;
 		}
@@ -134,9 +134,9 @@ public class ModelValidationResults {
 		}
 
 		public WarningBuilder exceptionWarning(
-			String message, Throwable cause) {
+			String message, Throwable throwable) {
 
-			modelValidationResults._exceptions.put(message, cause);
+			modelValidationResults._exceptions.put(message, throwable);
 
 			return this;
 		}
@@ -159,8 +159,8 @@ public class ModelValidationResults {
 
 	private static final int _WARNING = 2;
 
-	private Map<String, Throwable> _exceptions = new HashMap<>();
-	private Map<String, Object> _fields = new HashMap<>();
+	private final Map<String, Throwable> _exceptions = new HashMap<>();
+	private final Map<String, Object> _fields = new HashMap<>();
 	private final int _outcome;
 
 	private static class Builder {

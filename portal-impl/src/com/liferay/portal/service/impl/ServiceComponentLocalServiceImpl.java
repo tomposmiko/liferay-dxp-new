@@ -134,12 +134,12 @@ public class ServiceComponentLocalServiceImpl
 
 		long previousBuildNumber = 0;
 		ServiceComponent previousServiceComponent = null;
-		ServiceComponent serviceComponent = null;
 
 		Map<String, ServiceComponent> serviceComponents =
 			_getServiceComponents();
 
-		serviceComponent = serviceComponents.get(buildNamespace);
+		ServiceComponent serviceComponent = serviceComponents.get(
+			buildNamespace);
 
 		if (serviceComponent == null) {
 			long serviceComponentId = counterLocalService.increment();
@@ -153,6 +153,26 @@ public class ServiceComponentLocalServiceImpl
 		}
 		else {
 			previousBuildNumber = serviceComponent.getBuildNumber();
+
+			if (previousBuildNumber < buildNumber) {
+				List<ServiceComponent> currentServiceComponents =
+					serviceComponentPersistence.findByBuildNamespace(
+						buildNamespace, 0, 1);
+
+				ServiceComponent currentServiceComponent =
+					currentServiceComponents.get(0);
+
+				long currentBuildNumber =
+					currentServiceComponent.getBuildNumber();
+
+				if (currentBuildNumber > previousBuildNumber) {
+					serviceComponent = currentServiceComponent;
+
+					previousBuildNumber = currentBuildNumber;
+
+					_serviceComponents.put(buildNamespace, serviceComponent);
+				}
+			}
 
 			if (previousBuildNumber < buildNumber) {
 				previousServiceComponent = serviceComponent;
@@ -531,9 +551,9 @@ public class ServiceComponentLocalServiceImpl
 				_log.info("Running " + buildNamespace + " SQL scripts");
 			}
 
-			db.runSQLTemplateString(tablesSQL, true, false);
-			db.runSQLTemplateString(sequencesSQL, true, false);
-			db.runSQLTemplateString(indexesSQL, true, false);
+			db.runSQLTemplateString(tablesSQL, false);
+			db.runSQLTemplateString(sequencesSQL, false);
+			db.runSQLTemplateString(indexesSQL, false);
 		}
 		else if (PropsValues.SCHEMA_MODULE_BUILD_AUTO_UPGRADE) {
 			if (_log.isWarnEnabled()) {
@@ -555,7 +575,7 @@ public class ServiceComponentLocalServiceImpl
 					_log.info("Upgrading database with tables.sql");
 				}
 
-				db.runSQLTemplateString(tablesSQL, true, false);
+				db.runSQLTemplateString(tablesSQL, false);
 
 				upgradeModels(classLoader, previousServiceComponent, tablesSQL);
 			}
@@ -567,7 +587,7 @@ public class ServiceComponentLocalServiceImpl
 					_log.info("Upgrading database with sequences.sql");
 				}
 
-				db.runSQLTemplateString(sequencesSQL, true, false);
+				db.runSQLTemplateString(sequencesSQL, false);
 			}
 
 			if (!indexesSQL.equals(previousServiceComponent.getIndexesSQL()) ||
@@ -577,7 +597,7 @@ public class ServiceComponentLocalServiceImpl
 					_log.info("Upgrading database with indexes.sql");
 				}
 
-				db.runSQLTemplateString(indexesSQL, true, false);
+				db.runSQLTemplateString(indexesSQL, false);
 			}
 		}
 	}

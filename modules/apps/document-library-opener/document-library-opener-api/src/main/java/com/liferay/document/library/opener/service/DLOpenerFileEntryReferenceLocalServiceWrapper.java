@@ -38,6 +38,10 @@ public class DLOpenerFileEntryReferenceLocalServiceWrapper
 	/**
 	 * Adds the dl opener file entry reference to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLOpenerFileEntryReferenceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param dlOpenerFileEntryReference the dl opener file entry reference
 	 * @return the dl opener file entry reference that was added
 	 */
@@ -129,7 +133,23 @@ public class DLOpenerFileEntryReferenceLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _dlOpenerFileEntryReferenceLocalService.createPersistedModel(
+			primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the dl opener file entry reference from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLOpenerFileEntryReferenceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param dlOpenerFileEntryReference the dl opener file entry reference
 	 * @return the dl opener file entry reference that was removed
@@ -160,6 +180,10 @@ public class DLOpenerFileEntryReferenceLocalServiceWrapper
 
 	/**
 	 * Deletes the dl opener file entry reference with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLOpenerFileEntryReferenceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param dlOpenerFileEntryReferenceId the primary key of the dl opener file entry reference
 	 * @return the dl opener file entry reference that was removed
@@ -194,6 +218,18 @@ public class DLOpenerFileEntryReferenceLocalServiceWrapper
 
 		return _dlOpenerFileEntryReferenceLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _dlOpenerFileEntryReferenceLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _dlOpenerFileEntryReferenceLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -421,6 +457,9 @@ public class DLOpenerFileEntryReferenceLocalServiceWrapper
 			getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -432,6 +471,10 @@ public class DLOpenerFileEntryReferenceLocalServiceWrapper
 
 	/**
 	 * Updates the dl opener file entry reference in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLOpenerFileEntryReferenceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param dlOpenerFileEntryReference the dl opener file entry reference
 	 * @return the dl opener file entry reference that was updated

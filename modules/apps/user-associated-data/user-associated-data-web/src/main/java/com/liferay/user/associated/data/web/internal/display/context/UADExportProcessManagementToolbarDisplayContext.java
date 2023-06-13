@@ -16,8 +16,10 @@ package com.liferay.user.associated.data.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.BaseManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -44,7 +46,7 @@ public class UADExportProcessManagementToolbarDisplayContext
 		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		SearchContainer searchContainer) {
+		SearchContainer<BackgroundTask> searchContainer) {
 
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse);
@@ -67,52 +69,47 @@ public class UADExportProcessManagementToolbarDisplayContext
 
 	@Override
 	public CreationMenu getCreationMenu() {
-		CreationMenu creationMenu = new CreationMenu();
-
-		creationMenu.addPrimaryDropdownItem(
+		return CreationMenuBuilder.addPrimaryDropdownItem(
 			dropdownItem -> {
-				User selectedUser = PortalUtil.getSelectedUser(request);
+				User selectedUser = PortalUtil.getSelectedUser(
+					httpServletRequest);
 
 				dropdownItem.setHref(
 					liferayPortletResponse.createRenderURL(),
-					"mvcRenderCommandName", "/add_uad_export_processes",
-					"backURL", PortalUtil.getCurrentURL(request), "p_u_i_d",
+					"mvcRenderCommandName",
+					"/user_associated_data/add_uad_export_processes", "backURL",
+					PortalUtil.getCurrentURL(httpServletRequest), "p_u_i_d",
 					String.valueOf(selectedUser.getUserId()));
 
 				dropdownItem.setLabel(
-					LanguageUtil.get(request, "add-export-processes"));
-			});
-
-		return creationMenu;
+					LanguageUtil.get(
+						httpServletRequest, "add-export-processes"));
+			}
+		).build();
 	}
 
+	@Override
 	public List<LabelItem> getFilterLabelItems() {
-		return new LabelItemList() {
-			{
-				String navigation = getNavigation();
+		String navigation = getNavigation();
 
-				if (!navigation.equals("all")) {
-					add(
-						labelItem -> {
-							PortletURL removeLabelURL = getPortletURL();
+		return LabelItemListBuilder.add(
+			() -> !navigation.equals("all"),
+			labelItem -> {
+				PortletURL removeLabelURL = getPortletURL();
 
-							removeLabelURL.setParameter(
-								"navigation", (String)null);
+				removeLabelURL.setParameter("navigation", (String)null);
 
-							labelItem.putData(
-								"removeLabelURL", removeLabelURL.toString());
+				labelItem.putData("removeLabelURL", removeLabelURL.toString());
 
-							labelItem.setCloseable(true);
+				labelItem.setCloseable(true);
 
-							String label = String.format(
-								"%s: %s", LanguageUtil.get(request, "status"),
-								LanguageUtil.get(request, navigation));
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(httpServletRequest, "status"),
+					LanguageUtil.get(httpServletRequest, navigation));
 
-							labelItem.setLabel(label);
-						});
-				}
+				labelItem.setLabel(label);
 			}
-		};
+		).build();
 	}
 
 	@Override
@@ -120,6 +117,7 @@ public class UADExportProcessManagementToolbarDisplayContext
 		return _searchContainer.getTotal();
 	}
 
+	@Override
 	public PortletURL getPortletURL() {
 		try {
 			return PortletURLUtil.clone(_currentURL, _liferayPortletResponse);
@@ -153,6 +151,6 @@ public class UADExportProcessManagementToolbarDisplayContext
 
 	private final PortletURL _currentURL;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final SearchContainer _searchContainer;
+	private final SearchContainer<BackgroundTask> _searchContainer;
 
 }

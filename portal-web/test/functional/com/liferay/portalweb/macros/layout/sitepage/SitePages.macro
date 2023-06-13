@@ -6,7 +6,7 @@ definition {
 			pageTemplateName = "${pageTemplateName}",
 			sitePageType = "${sitePageType}");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		SitePages._addPageToNavigationMenu(
 			assertCheckboxMissing = "${assertCheckboxMissing}",
@@ -24,17 +24,46 @@ definition {
 
 		SelectFrame.selectFrameTop();
 
+		Alert.viewSuccessMessage();
+
 		if ("${sitePageType}" == "Embedded") {
+			Page._addPageTypeEmbedded(pageTypeURL = "${pageTypeURL}");
+		}
+		else if ("${sitePageType}" == "Full Page Application") {
+			if (isSet(portlet)) {
+				Page._addPageTypeFullPageApplication(portlet = "${portlet}");
+			}
+		}
+		else if ("${sitePageType}" == "Link to a Page of This Site") {
+			if (isSet(linkPageName)) {
+				Click(locator1 = "SitePagesEditPage#LINK_TO_PAGE_SELECT_BUTTON");
+
+				SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+				Pause(locator1 = "3000");
+
+				AssertClick.assertPartialTextClickAt(
+					key_nodeName = "${linkPageName}",
+					locator1 = "Treeview#NODE_UNSELECTED",
+					value1 = "${linkPageName}");
+
+				SelectFrameTop();
+			}
+		}
+		else if ("${sitePageType}" == "Link to URL") {
 			Type(
-				locator1 = "SitePagesEditPage#PAGE_TYPE_EMBEDDED_URL_FIELD",
+				locator1 = "TextInput#URL",
 				value1 = "${pageTypeURL}");
+		}
+		else if ("${sitePageType}" == "Panel") {
+			if (isSet(componentName)) {
+				Page._addPageTypePanel(componentName = "${componentName}");
+			}
 		}
 
 		if (isSet(inheritChanges)) {
 			Page.togglePageTemplateInheritChanges(toggleValue = "${inheritChanges}");
 		}
-
-		VerifyElementPresent(locator1 = "Message#SUCCESS");
 
 		AssertVisible(locator1 = "TextInput#NAME");
 
@@ -45,20 +74,13 @@ definition {
 		}
 
 		Button.click(button = "Save");
-
-		WaitForSPARefresh();
-
-		//TODO find a better fix as we should not be navigating like this for every test. Workaround caused by LPS-104246
-
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			panel = "Site Administration",
-			portlet = "Pages");
 	}
 
 	@summary = "Add newly created pages to specified navigation menus or assert that the option to add the pages to navigation menus is missing."
 	macro _addPageToNavigationMenu {
 		if (isSet(navigationMenus)) {
+			Pause(locator1 = "5000");
+
 			for (var navigationMenu : list "${navigationMenus}") {
 				if ("${assertCheckboxMissing}" == "true") {
 					AssertElementNotPresent(
@@ -127,7 +149,7 @@ definition {
 	}
 
 	macro _selectPageType {
-		if (!(contains("${pageTemplateName}", "{pageTemplateName}"))) {
+		if (isSet(pageTemplateName)) {
 			var sitePageType = "${pageTemplateName}";
 
 			if (isSet(collectionName)) {
@@ -160,6 +182,8 @@ definition {
 			key_pageName = "${parentPageName}",
 			locator1 = "SitePages#LIST_GROUP_ITEM_PLUS_ICON");
 
+		DropdownMenuItem.click(menuItem = "Add Page");
+
 		SitePages._addPage(
 			assertCheckboxMissing = "${assertCheckboxMissing}",
 			navigationMenus = "${navigationMenus}",
@@ -169,6 +193,12 @@ definition {
 	}
 
 	macro addPrivateChildPage {
+		if (IsTextNotEqual(locator1 = "ControlMenu#HEADING", value1 = "Pages")) {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+		}
+
 		SitePages.togglePrivacy(privacy = "Private Pages");
 
 		SitePages.addChildPage(
@@ -181,12 +211,18 @@ definition {
 	}
 
 	macro addPrivatePage {
+		if (IsTextNotEqual(locator1 = "ControlMenu#HEADING", value1 = "Pages")) {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+		}
+
 		Pause(locator1 = "3000");
 
-		var key_breadcrumbName="Pages";
+		var key_breadcrumbName = "Pages";
 
 		if ("${siteTemplate}" == "true") {
-			LexiconEntry.gotoAdd();
+			LexiconEntry.gotoAddMenuItem(menuItem = "Add Site Template Page");
 		}
 		else if (IsElementPresent(locator1 = "Message#EMPTY_INFO_TAGLIB")) {
 			SitePages.gotoAddFirstPage(pageType = "Private Page");
@@ -208,6 +244,12 @@ definition {
 	}
 
 	macro addPublicChildPage {
+		if (IsTextNotEqual(locator1 = "ControlMenu#HEADING", value1 = "Pages")) {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+		}
+
 		SitePages.togglePrivacy(privacy = "Public Pages");
 
 		SitePages.addChildPage(
@@ -220,9 +262,15 @@ definition {
 	}
 
 	macro addPublicPage {
+		if (IsTextNotEqual(locator1 = "ControlMenu#HEADING", value1 = "Pages")) {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+		}
+
 		Pause(locator1 = "3000");
 
-		var key_breadcrumbName="Pages";
+		var key_breadcrumbName = "Pages";
 
 		if (IsElementPresent(locator1 = "Message#EMPTY_INFO_TAGLIB")) {
 			SitePages.gotoAddFirstPage(pageType = "Public Page");
@@ -239,19 +287,59 @@ definition {
 			assertCheckboxMissing = "${assertCheckboxMissing}",
 			categoryName = "${categoryName}",
 			collectionName = "${collectionName}",
+			componentName = "${componentName}",
 			customDescription = "${customDescription}",
 			customTitle = "${customTitle}",
 			inheritChanges = "${inheritChanges}",
+			linkPageName = "${linkPageName}",
 			navigationMenus = "${navigationMenus}",
 			openGraph = "${openGraph}",
 			pageName = "${pageName}",
 			pageTemplateName = "${pageTemplateName}",
 			pageTypeURL = "${pageTypeURL}",
+			portlet = "${portlet}",
 			sitePageType = "${sitePageType}",
 			vocabularyName = "${vocabularyName}");
 	}
 
+	macro addPublicPageUnderSitePagesVariation {
+		LexiconEntry.gotoAddMenuItem(menuItem = "Public Page");
+
+		SitePages._selectPageType(
+			collectionName = "${collectionName}",
+			pageTemplateName = "${pageTemplateName}",
+			sitePageType = "${sitePageType}");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		PortletEntry.inputName(name = "${pageName}");
+
+		Button.clickAdd();
+
+		SelectFrame.selectFrameTop();
+
+		VerifyElementPresent(locator1 = "Message#SUCCESS");
+
+		AssertVisible(locator1 = "TextInput#NAME");
+
+		Button.click(button = "Save");
+
+		WaitForSPARefresh();
+	}
+
+	macro checkPage {
+		var key_pageName = "${pageName}";
+
+		Check.checkNotVisible(locator1 = "SitePages#LIST_GROUP_ITEM_CHECKBOX");
+	}
+
 	macro configureChildPage {
+		if (IsTextNotEqual(locator1 = "ControlMenu#HEADING", value1 = "Pages")) {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+		}
+
 		SitePages.gotoPageMenuItem(
 			menuItem = "Configure",
 			pageName = "${pageName}",
@@ -269,10 +357,11 @@ definition {
 	}
 
 	macro configurePage {
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			panel = "Site Administration",
-			portlet = "Pages");
+		if (IsTextNotEqual(locator1 = "ControlMenu#HEADING", value1 = "Pages")) {
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+		}
 
 		SitePages.togglePrivacy(privacy = "${privacy}");
 
@@ -292,11 +381,7 @@ definition {
 	}
 
 	macro deletePage {
-		var browserType = PropsUtil.get("browser.type");
-
-		if ("${browserType}" == "chrome") {
-			MetalComponent.waitForLayout();
-		}
+		WaitForPageLoad();
 
 		Click(
 			key_pageName = "${pageName}",
@@ -304,7 +389,12 @@ definition {
 
 		MenuItem.clickNoError(menuItem = "Delete");
 
-		AssertConfirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+		if (isSet(hasChildren)) {
+			AssertConfirm(value1 = "This page has child pages that will also be removed. Are you sure you want to delete this page?");
+		}
+		else {
+			AssertConfirm(value1 = "Are you sure you want to delete this page?");
+		}
 
 		if (isSet(failure)) {
 			if (IsElementPresent(locator1 = "Message#ERROR_2")) {
@@ -349,20 +439,16 @@ definition {
 
 		Refresh();
 
-		Click(locator1 = "Message#NO_PAGES");
+		Click(locator1 = "Message#EMPTY_INFO_TAGLIB");
 
-		Click(locator1 = "Dropdown#EMPTY_MESSAGE_DROPDOWN");
+		Click.waitForMenuToggleJSClick(locator1 = "Dropdown#EMPTY_MESSAGE_DROPDOWN");
 
 		Click(locator1 = "MenuItem#DROPDOWN_MENU_ITEM");
 	}
 
 	@summary = "Go to the pageMenuItem of a Site Page. Parent pages hierarchy is required to navigate to child pages."
 	macro gotoPageMenuItem {
-		var browserType = PropsUtil.get("browser.type");
-
-		if ("${browserType}" == "chrome") {
-			MetalComponent.waitForLayout();
-		}
+		WaitForPageLoad();
 
 		if (isSet(parentPagesHierarchy)) {
 			for (var parentPage : list "${parentPagesHierarchy}") {
@@ -386,6 +472,16 @@ definition {
 		MenuItem.click(menuItem = "${menuItem}");
 	}
 
+	macro movePageToPageUp {
+		var key_pageName = "${pageName}";
+		var key_pageNameTo = "${pageNameTo}";
+
+		DragAndDrop.javaScriptDragAndDropToUp(
+			locator1 = "SitePages#LIST_GROUP_ITEM_DRAG_HANDLER",
+			locator2 = "SitePages#LIST_GROUP_ITEM_DROP_TARGET",
+			value1 = "");
+	}
+
 	macro openPagesAdmin {
 		var siteURLKey = StringUtil.replace("${siteURLKey}", " ", "-");
 		var siteURLKey = StringUtil.lowerCase("${siteURLKey}");
@@ -396,17 +492,25 @@ definition {
 	}
 
 	macro togglePrivacy {
-		var browserType = PropsUtil.get("browser.type");
+		WaitForPageLoad();
 
-		if ("${browserType}" == "chrome") {
-			MetalComponent.waitForLayout();
-		}
-
-		if (IsElementNotPresent(locator1 = "Breadcrumb#BREADCRUMB_ENTRY_EXACT_MATCH", key_breadcrumbName = "${privacy}")) {
+		if (IsElementNotPresent(key_breadcrumbName = "${privacy}", locator1 = "Breadcrumb#BREADCRUMB_ENTRY_EXACT_MATCH")) {
 			Click(
 				key_itemName = "${privacy}",
 				locator1 = "SitePages#LIST_GROUP_ITEM");
 		}
+	}
+
+	macro viewCheckboxChecked {
+		AssertChecked.assertCheckedNotVisible(
+			key_pageName = "${pageName}",
+			locator1 = "SitePages#LIST_GROUP_ITEM_CHECKBOX");
+	}
+
+	macro viewPageItems {
+		AssertVisible(
+			key_pageName = "${pageName}",
+			locator1 = "SitePages#LIST_GROUP_ITEM_ENTRY_TITLE");
 	}
 
 }

@@ -15,7 +15,9 @@
 package com.liferay.petra.io.unsync;
 
 import com.liferay.petra.io.OutputStreamWriter;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -41,8 +44,10 @@ import org.junit.Test;
 public class UnsyncPrintWriterTest extends BaseWriterTestCase {
 
 	@ClassRule
-	public static final CodeCoverageAssertor codeCoverageAssertor =
-		CodeCoverageAssertor.INSTANCE;
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@After
 	public void tearDown() throws Exception {
@@ -604,12 +609,12 @@ public class UnsyncPrintWriterTest extends BaseWriterTestCase {
 		return new UnsyncPrintWriter(new StringWriter());
 	}
 
-	private static Writer _getOut(UnsyncPrintWriter unsyncPrintWriter) {
+	private Writer _getOut(UnsyncPrintWriter unsyncPrintWriter) {
 		try {
 			return (Writer)_writerField.get(unsyncPrintWriter);
 		}
-		catch (Throwable t) {
-			throw new RuntimeException(t);
+		catch (Throwable throwable) {
+			throw new RuntimeException(throwable);
 		}
 	}
 

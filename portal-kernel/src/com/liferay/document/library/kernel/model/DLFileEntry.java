@@ -109,6 +109,10 @@ public interface DLFileEntry
 
 	public com.liferay.portal.kernel.lock.Lock getLock();
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	public String getLuceneProperties();
 
 	public long getReadCount();
@@ -121,6 +125,6 @@ public interface DLFileEntry
 
 	public void setExtraSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties
-			extraSettingsProperties);
+			extraSettingsUnicodeProperties);
 
 }

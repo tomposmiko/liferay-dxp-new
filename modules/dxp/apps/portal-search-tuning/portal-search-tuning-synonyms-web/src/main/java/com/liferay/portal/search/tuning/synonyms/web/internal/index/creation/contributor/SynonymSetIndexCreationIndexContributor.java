@@ -14,19 +14,17 @@
 
 package com.liferay.portal.search.tuning.synonyms.web.internal.index.creation.contributor;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.spi.model.index.contributor.IndexContributor;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexReader;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.synchronizer.IndexToFilterSynchronizer;
 
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Adam Brandizzi
@@ -43,28 +41,26 @@ public class SynonymSetIndexCreationIndexContributor
 			return;
 		}
 
-		if (!_synonymSetIndexReader.isExists(
-				_synonymSetIndexNameBuilder.getSynonymSetIndexName(
-					companyIndexName))) {
+		SynonymSetIndexName synonymSetIndexName =
+			() ->
+				companyIndexName + StringPool.DASH + SYNONYMS_INDEX_NAME_SUFFIX;
 
+		if (!_synonymSetIndexReader.isExists(synonymSetIndexName)) {
 			return;
 		}
 
-		_indexToFilterSynchronizer.copyToFilter(companyIndexName);
+		_indexToFilterSynchronizer.copyToFilter(
+			synonymSetIndexName, companyIndexName, false);
 	}
+
+	protected static final String SYNONYMS_INDEX_NAME_SUFFIX =
+		"search-tuning-synonyms";
 
 	@Reference
 	private IndexToFilterSynchronizer _indexToFilterSynchronizer;
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile SearchEngineInformation _searchEngineInformation;
-
 	@Reference
-	private SynonymSetIndexNameBuilder _synonymSetIndexNameBuilder;
+	private SearchEngineInformation _searchEngineInformation;
 
 	@Reference
 	private SynonymSetIndexReader _synonymSetIndexReader;

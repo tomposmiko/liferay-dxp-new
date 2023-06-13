@@ -9,55 +9,59 @@
  * distribution rights of the Software.
  */
 
-import {render, findAllByTestId, findByTestId} from '@testing-library/react';
+import {render} from '@testing-library/react';
 import React from 'react';
 
 import CompletionVelocityCard from '../../../../src/main/resources/META-INF/resources/js/components/process-metrics/completion-velocity/CompletionVelocityCard.es';
+import {stringify} from '../../../../src/main/resources/META-INF/resources/js/shared/components/router/queryString.es';
 import {jsonSessionStorage} from '../../../../src/main/resources/META-INF/resources/js/shared/util/storage.es';
 import {MockRouter} from '../../../mock/MockRouter.es';
 
 import '@testing-library/jest-dom/extend-expect';
 
-const {processId, query} = {
+const {filters, processId} = {
+	filters: {
+		completionDateEnd: '2019-12-09T00:00:00Z',
+		completionDateStart: '2019-12-03T00:00:00Z',
+		completionTimeRange: ['7'],
+		completionVelocityUnit: ['Days'],
+	},
 	processId: 12345,
-	query:
-		'?filters.completionvelocityUnit%5B0%5D=Days&filters.completiontimeRange%5B0%5D=7'
 };
-
 const data = {
 	histograms: [
 		{
 			key: '2019-12-03T00:00',
-			value: 0.0
+			value: 0.0,
 		},
 		{
 			key: '2019-12-04T00:00',
-			value: 0.0
+			value: 0.0,
 		},
 		{
 			key: '2019-12-05T00:00',
-			value: 0.0
+			value: 0.0,
 		},
 		{
 			key: '2019-12-06T00:00',
-			value: 0.0
+			value: 0.0,
 		},
 		{
 			key: '2019-12-07T00:00',
-			value: 0.0
+			value: 0.0,
 		},
 		{
 			key: '2019-12-08T00:00',
-			value: 0.8
+			value: 0.8,
 		},
 		{
 			key: '2019-12-09T00:00',
-			value: 0.0
-		}
+			value: 0.0,
+		},
 	],
-	value: 0.36
+	value: 0.36,
 };
-
+const query = stringify({filters});
 const timeRangeData = {
 	items: [
 		{
@@ -65,27 +69,27 @@ const timeRangeData = {
 			dateStart: '2019-12-03T00:00:00Z',
 			defaultTimeRange: false,
 			id: 7,
-			name: 'Last 7 Days'
+			name: 'Last 7 Days',
 		},
 		{
 			dateEnd: '2019-12-09T00:00:00Z',
 			dateStart: '2019-11-10T00:00:00Z',
 			defaultTimeRange: true,
 			id: 30,
-			name: 'Last 30 Days'
-		}
+			name: 'Last 30 Days',
+		},
 	],
-	totalCount: 2
+	totalCount: 2,
 };
 
 describe('The completion velocity card component should', () => {
-	let getByTestId;
+	let container, getAllByText, getByText;
 
 	beforeAll(() => {
 		jsonSessionStorage.set('timeRanges', timeRangeData);
 
 		const clientMock = {
-			get: jest.fn().mockResolvedValue({data})
+			get: jest.fn().mockResolvedValue({data}),
 		};
 
 		const renderResult = render(
@@ -94,37 +98,25 @@ describe('The completion velocity card component should', () => {
 			</MockRouter>
 		);
 
-		getByTestId = renderResult.getByTestId;
+		container = renderResult.container;
+		getAllByText = renderResult.getAllByText;
+		getByText = renderResult.getByText;
 	});
 
-	test('Be rendered with time range filter', async () => {
-		const timeRangeFilter = getByTestId('timeRangeFilter');
-		const filterItems = await findAllByTestId(
-			timeRangeFilter,
-			'filterItem'
-		);
-		const activeItem = filterItems.find(item =>
-			item.className.includes('active')
-		);
-		const activeItemName = await findByTestId(activeItem, 'filterItemName');
+	test('Be rendered with time range filter', () => {
+		const timeRangeFilter = getByText('Last 30 Days');
+		const activeItem = container.querySelector('.active');
 
 		expect(timeRangeFilter).not.toBeNull();
-		expect(activeItemName).toHaveTextContent('Last 7 Days');
+		expect(activeItem).toHaveTextContent('Last 7 Days');
 	});
 
-	test('Be rendered with time range filter', async () => {
-		const velocityUnitFilter = await getByTestId('velocityUnitFilter');
-		const filterItems = await findAllByTestId(
-			velocityUnitFilter,
-			'filterItem'
-		);
+	test('Be rendered with velocity unit filter', () => {
+		const velocityUnitFilter = getAllByText('inst-day')[0];
 
-		const activeItem = filterItems.find(item =>
-			item.className.includes('active')
-		);
-		const activeItemName = await findByTestId(activeItem, 'filterItemName');
+		const activeItem = container.querySelectorAll('.active')[1];
 
 		expect(velocityUnitFilter).not.toBeNull();
-		expect(activeItemName).toHaveTextContent('inst-day');
+		expect(activeItem).toHaveTextContent('inst-day');
 	});
 });

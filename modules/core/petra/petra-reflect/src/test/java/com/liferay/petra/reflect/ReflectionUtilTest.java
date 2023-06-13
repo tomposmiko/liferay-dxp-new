@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.test.SwappableSecurityManager;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
-import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -46,7 +46,7 @@ public class ReflectionUtilTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@Test
 	public void testArrayClone() throws Exception {
@@ -132,11 +132,11 @@ public class ReflectionUtilTest {
 		Assert.assertSame(
 			TestClass._privateStaticFinalObject, staticField.get(null));
 
-		Object obj = new Object();
+		Object object = new Object();
 
-		staticField.set(null, obj);
+		staticField.set(null, object);
 
-		Assert.assertSame(obj, TestClass._privateStaticFinalObject);
+		Assert.assertSame(object, TestClass._privateStaticFinalObject);
 
 		TestClass testClass = new TestClass();
 
@@ -147,9 +147,9 @@ public class ReflectionUtilTest {
 		Assert.assertTrue(Modifier.isFinal(field.getModifiers()));
 		Assert.assertSame(testClass._privateFinalObject, field.get(testClass));
 
-		field.set(testClass, obj);
+		field.set(testClass, object);
 
-		Assert.assertSame(obj, testClass._privateFinalObject);
+		Assert.assertSame(object, testClass._privateFinalObject);
 	}
 
 	@Test

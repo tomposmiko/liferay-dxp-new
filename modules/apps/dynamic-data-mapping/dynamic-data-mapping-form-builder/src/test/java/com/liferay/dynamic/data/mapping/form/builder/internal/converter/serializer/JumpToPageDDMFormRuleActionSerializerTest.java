@@ -15,6 +15,8 @@
 package com.liferay.dynamic.data.mapping.form.builder.internal.converter.serializer;
 
 import com.liferay.dynamic.data.mapping.form.builder.internal.converter.model.action.JumpToPageDDMFormRuleAction;
+import com.liferay.dynamic.data.mapping.spi.converter.serializer.SPIDDMFormRuleSerializerContext;
+import com.liferay.petra.string.StringPool;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,15 +53,34 @@ public class JumpToPageDDMFormRuleActionSerializerTest extends PowerMockito {
 					_jumpToPageDDMFormRuleAction);
 
 		String result = jumpToPageDDMFormRuleActionSerializer.serialize(
-			_ddmFormRuleSerializerContext);
+			_spiDDMFormRuleSerializerContext);
 
 		Assert.assertEquals("jumpPage(1, 3)", result);
 	}
 
-	@Mock
-	private DDMFormRuleSerializerContext _ddmFormRuleSerializerContext;
+	@Test
+	public void testSerializeWithEmptyTarget() {
+		when(
+			_jumpToPageDDMFormRuleAction.getTarget()
+		).thenReturn(
+			StringPool.BLANK
+		);
+
+		JumpToPageDDMFormRuleActionSerializer
+			jumpToPageDDMFormRuleActionSerializer =
+				new JumpToPageDDMFormRuleActionSerializer(
+					_jumpToPageDDMFormRuleAction);
+
+		String result = jumpToPageDDMFormRuleActionSerializer.serialize(
+			_spiDDMFormRuleSerializerContext);
+
+		Assert.assertNull(result);
+	}
 
 	@Mock
 	private JumpToPageDDMFormRuleAction _jumpToPageDDMFormRuleAction;
+
+	@Mock
+	private SPIDDMFormRuleSerializerContext _spiDDMFormRuleSerializerContext;
 
 }

@@ -12,7 +12,7 @@
  * details.
  */
 
-(function(Liferay) {
+(function (Liferay) {
 	var DOMTaskRunner = {
 		_scheduledTasks: [],
 
@@ -59,7 +59,7 @@
 					}
 				}
 			}
-		}
+		},
 	};
 
 	Liferay.DOMTaskRunner = DOMTaskRunner;

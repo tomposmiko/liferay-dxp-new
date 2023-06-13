@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.LocationSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Location {
+public class Location implements Cloneable, Serializable {
+
+	public static Location toDTO(String json) {
+		return LocationSerDes.toDTO(json);
+	}
 
 	public String getAddressCountry() {
 		return addressCountry;
@@ -113,6 +119,11 @@ public class Location {
 	}
 
 	protected Long id;
+
+	@Override
+	public Location clone() throws CloneNotSupportedException {
+		return (Location)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

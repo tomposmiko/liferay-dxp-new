@@ -26,10 +26,10 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,18 +50,15 @@ public class DLAppServiceWhenSearchingFileEntriesTest
 	public void testShouldFindFileEntryByAssetTagName() throws Exception {
 		String fileName = RandomTestUtil.randomString();
 
-		String[] assetTagNames = {"hello", "world"};
-
 		FileEntry fileEntry = DLAppServiceTestUtil.addFileEntry(
 			group.getGroupId(), parentFolder.getFolderId(), fileName, fileName,
-			assetTagNames);
+			new String[] {"hello", "world"});
 
 		DLAppServiceTestUtil.search(fileEntry, "hello", true);
 		DLAppServiceTestUtil.search(fileEntry, "world", true);
 		DLAppServiceTestUtil.search(fileEntry, "liferay", false);
 	}
 
-	@Ignore
 	@Test
 	public void testShouldFindFileEntryByAssetTagNameAfterUpdate()
 		throws Exception {
@@ -94,18 +91,19 @@ public class DLAppServiceWhenSearchingFileEntriesTest
 		DLAppServiceTestUtil.search(fileEntry, "liferay", true);
 	}
 
-	@Ignore
 	@Test
 	public void testShouldFindFileEntryInRootFolder() throws Exception {
 		DLAppServiceTestUtil.searchFile(
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 	}
 
-	@Ignore
 	@Test
 	public void testShouldFindFileEntryInSubfolder() throws Exception {
 		DLAppServiceTestUtil.searchFile(
 			group.getGroupId(), parentFolder.getFolderId());
 	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
 
 }

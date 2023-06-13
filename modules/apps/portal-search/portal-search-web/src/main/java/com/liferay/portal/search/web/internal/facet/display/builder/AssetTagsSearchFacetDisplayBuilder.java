@@ -15,13 +15,18 @@
 package com.liferay.portal.search.web.internal.facet.display.builder;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
+import com.liferay.portal.kernel.theme.PortletDisplay;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetTagsSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetTagsSearchFacetTermDisplayContext;
+import com.liferay.portal.search.web.internal.tag.facet.configuration.TagFacetPortletInstanceConfiguration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,10 +34,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.portlet.RenderRequest;
+
 /**
  * @author Lino Alves
  */
 public class AssetTagsSearchFacetDisplayBuilder {
+
+	public AssetTagsSearchFacetDisplayBuilder(RenderRequest renderRequest)
+		throws ConfigurationException {
+
+		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+
+		_tagFacetPortletInstanceConfiguration =
+			portletDisplay.getPortletInstanceConfiguration(
+				TagFacetPortletInstanceConfiguration.class);
+	}
 
 	public AssetTagsSearchFacetDisplayContext build() {
 		AssetTagsSearchFacetDisplayContext assetTagsSearchFacetDisplayContext =
@@ -40,18 +60,36 @@ public class AssetTagsSearchFacetDisplayBuilder {
 
 		assetTagsSearchFacetDisplayContext.setCloudWithCount(
 			isCloudWithCount());
+		assetTagsSearchFacetDisplayContext.setDisplayStyleGroupId(
+			getDisplayStyleGroupId());
 		assetTagsSearchFacetDisplayContext.setFacetLabel(getFacetLabel());
 		assetTagsSearchFacetDisplayContext.setNothingSelected(
 			isNothingSelected());
+		assetTagsSearchFacetDisplayContext.setPaginationStartParameterName(
+			_paginationStartParameterName);
 		assetTagsSearchFacetDisplayContext.setParameterName(_parameterName);
 		assetTagsSearchFacetDisplayContext.setParameterValue(
 			getFirstParameterValue());
 		assetTagsSearchFacetDisplayContext.setParameterValues(_selectedTags);
 		assetTagsSearchFacetDisplayContext.setRenderNothing(isRenderNothing());
+		assetTagsSearchFacetDisplayContext.
+			setTagFacetPortletInstanceConfiguration(
+				_tagFacetPortletInstanceConfiguration);
 		assetTagsSearchFacetDisplayContext.setTermDisplayContexts(
 			buildTermDisplayContexts());
 
 		return assetTagsSearchFacetDisplayContext;
+	}
+
+	public long getDisplayStyleGroupId() {
+		long displayStyleGroupId =
+			_tagFacetPortletInstanceConfiguration.displayStyleGroupId();
+
+		if (displayStyleGroupId <= 0) {
+			displayStyleGroupId = _themeDisplay.getScopeGroupId();
+		}
+
+		return displayStyleGroupId;
 	}
 
 	public void setDisplayStyle(String displayStyle) {
@@ -72,6 +110,12 @@ public class AssetTagsSearchFacetDisplayBuilder {
 
 	public void setMaxTerms(int maxTerms) {
 		_maxTerms = maxTerms;
+	}
+
+	public void setPaginationStartParameterName(
+		String paginationStartParameterName) {
+
+		_paginationStartParameterName = paginationStartParameterName;
 	}
 
 	public void setParameterName(String parameterName) {
@@ -222,10 +266,15 @@ public class AssetTagsSearchFacetDisplayBuilder {
 	}
 
 	protected String getFacetLabel() {
-		FacetConfiguration facetConfiguration = _facet.getFacetConfiguration();
+		if (_facet != null) {
+			FacetConfiguration facetConfiguration =
+				_facet.getFacetConfiguration();
 
-		if (facetConfiguration != null) {
-			return facetConfiguration.getLabel();
+			if (facetConfiguration != null) {
+				return facetConfiguration.getLabel();
+			}
+
+			return StringPool.BLANK;
 		}
 
 		return StringPool.BLANK;
@@ -244,12 +293,14 @@ public class AssetTagsSearchFacetDisplayBuilder {
 
 		double popularity = maxCount - (maxCount - (frequency - minCount));
 
-		popularity = 1 + (popularity * multiplier);
-
-		return popularity;
+		return 1 + (popularity * multiplier);
 	}
 
 	protected List<TermCollector> getTermCollectors() {
+		if (_facet == null) {
+			return Collections.emptyList();
+		}
+
 		FacetCollector facetCollector = _facet.getFacetCollector();
 
 		return facetCollector.getTermCollectors();
@@ -294,7 +345,11 @@ public class AssetTagsSearchFacetDisplayBuilder {
 	private boolean _frequenciesVisible;
 	private int _frequencyThreshold;
 	private int _maxTerms;
+	private String _paginationStartParameterName;
 	private String _parameterName;
 	private List<String> _selectedTags = Collections.emptyList();
+	private final TagFacetPortletInstanceConfiguration
+		_tagFacetPortletInstanceConfiguration;
+	private final ThemeDisplay _themeDisplay;
 
 }

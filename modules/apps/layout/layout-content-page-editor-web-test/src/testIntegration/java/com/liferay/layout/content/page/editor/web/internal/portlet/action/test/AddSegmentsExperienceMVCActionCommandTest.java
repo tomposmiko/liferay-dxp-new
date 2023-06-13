@@ -15,15 +15,16 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.layout.test.util.LayoutTestUtil;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -40,14 +42,14 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portletmvc4spring.test.mock.web.portlet.MockActionResponse;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceService;
 import com.liferay.segments.test.util.SegmentsTestUtil;
 
 import javax.portlet.ActionRequest;
-
-import javax.servlet.http.HttpServletRequest;
+import javax.portlet.ActionResponse;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -78,6 +80,8 @@ public class AddSegmentsExperienceMVCActionCommandTest {
 
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
 
+		_layout = _addLayout();
+
 		ServiceContextThreadLocal.pushServiceContext(new ServiceContext());
 	}
 
@@ -88,16 +92,13 @@ public class AddSegmentsExperienceMVCActionCommandTest {
 
 	@Test
 	public void testAddSegmentsExperiment() throws Exception {
-		Layout layout = LayoutTestUtil.addLayout(_group);
-
 		String name = RandomTestUtil.randomString(10);
 
 		SegmentsEntry segmentsEntry = SegmentsTestUtil.addSegmentsEntry(
 			_group.getGroupId());
 
 		JSONObject responseJSONObject = _addSegmentsExperience(
-			layout.getClassNameId(), layout.getPlid(), name,
-			segmentsEntry.getSegmentsEntryId());
+			name, segmentsEntry.getSegmentsEntryId());
 
 		JSONObject segmentsExperienceJSONObject =
 			responseJSONObject.getJSONObject("segmentsExperience");
@@ -125,44 +126,57 @@ public class AddSegmentsExperienceMVCActionCommandTest {
 			segmentsExperienceId, segmentsExperience.getSegmentsExperienceId());
 	}
 
-	private JSONObject _addSegmentsExperience(
-			long classNameId, long classPK, String name, long segmentsEntryId)
+	private Layout _addLayout() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
+
+		return _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), _group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK, serviceContext);
+	}
+
+	private JSONObject _addSegmentsExperience(String name, long segmentsEntryId)
 		throws Exception {
 
-		AddSegmentsExperienceMVCActionCommandTest.MockActionRequest
-			mockActionRequest = _getMockActionRequest(
-				classNameId, classPK, name, segmentsEntryId);
+		MockLiferayPortletActionRequest mockActionRequest =
+			_getMockLiferayPortletActionRequest(name, segmentsEntryId);
 
 		return ReflectionTestUtil.invoke(
 			_mvcActionCommand, "addSegmentsExperience",
-			new Class<?>[] {ActionRequest.class}, mockActionRequest);
+			new Class<?>[] {ActionRequest.class, ActionResponse.class},
+			mockActionRequest, new MockActionResponse());
 	}
 
-	private MockActionRequest _getMockActionRequest(
-			long classNameId, long classPK, String name, long segmentsEntryId)
-		throws PortalException {
+	private MockLiferayPortletActionRequest _getMockLiferayPortletActionRequest(
+			String name, long segmentsEntryId)
+		throws Exception {
 
-		MockActionRequest mockActionRequest = new MockActionRequest();
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+			new MockLiferayPortletActionRequest();
 
-		mockActionRequest.addParameter(
-			"classNameId", String.valueOf(classNameId));
-		mockActionRequest.addParameter("classPK", String.valueOf(classPK));
-		mockActionRequest.addParameter("name", name);
-		mockActionRequest.addParameter(
+		mockLiferayPortletActionRequest.addParameter("name", name);
+		mockLiferayPortletActionRequest.addParameter(
 			"segmentsEntryId", String.valueOf(segmentsEntryId));
-		mockActionRequest.setAttribute(
+		mockLiferayPortletActionRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
 
-		return mockActionRequest;
+		return mockLiferayPortletActionRequest;
 	}
 
-	private ThemeDisplay _getThemeDisplay() throws PortalException {
+	private ThemeDisplay _getThemeDisplay() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		themeDisplay.setCompany(_company);
+		themeDisplay.setLayout(_layout);
+		themeDisplay.setLayoutSet(_layout.getLayoutSet());
 		themeDisplay.setLocale(LocaleUtil.getDefault());
 		themeDisplay.setPermissionChecker(
 			PermissionThreadLocal.getPermissionChecker());
+		themeDisplay.setPlid(_layout.getPlid());
 		themeDisplay.setRequest(new MockHttpServletRequest());
 		themeDisplay.setScopeGroupId(_group.getGroupId());
 		themeDisplay.setServerName("localhost");
@@ -181,20 +195,15 @@ public class AddSegmentsExperienceMVCActionCommandTest {
 	@DeleteAfterTestRun
 	private Group _group;
 
+	private Layout _layout;
+
+	@Inject
+	private LayoutLocalService _layoutLocalService;
+
 	@Inject(filter = "mvc.command.name=/content_layout/add_segments_experience")
 	private MVCActionCommand _mvcActionCommand;
 
 	@Inject
 	private SegmentsExperienceService _segmentsExperienceService;
-
-	private static class MockActionRequest
-		extends MockLiferayPortletActionRequest {
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return new MockHttpServletRequest();
-		}
-
-	}
 
 }

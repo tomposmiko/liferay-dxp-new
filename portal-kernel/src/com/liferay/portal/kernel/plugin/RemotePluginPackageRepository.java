@@ -51,9 +51,11 @@ public class RemotePluginPackageRepository {
 
 		_artifactURLIndex.put(pluginPackage.getArtifactURL(), pluginPackage);
 		_moduleIdIndex.put(pluginPackage.getModuleId(), pluginPackage);
+
 		_addToGroupAndArtifactIndex(
 			pluginPackage.getGroupId(), pluginPackage.getArtifactId(),
 			pluginPackage);
+
 		_pluginPackages.add(pluginPackage);
 		_tags.addAll(pluginPackage.getTags());
 	}
@@ -92,9 +94,11 @@ public class RemotePluginPackageRepository {
 	public void removePlugin(PluginPackage pluginPackage) {
 		_artifactURLIndex.remove(pluginPackage.getArtifactURL());
 		_moduleIdIndex.remove(pluginPackage.getModuleId());
+
 		_removeFromGroupAndArtifactIndex(
 			pluginPackage.getGroupId(), pluginPackage.getArtifactId(),
 			pluginPackage.getModuleId());
+
 		_pluginPackages.remove(pluginPackage);
 	}
 
@@ -125,15 +129,15 @@ public class RemotePluginPackageRepository {
 			groupId, artifactId);
 
 		if (pluginPackages != null) {
-			Iterator<PluginPackage> itr = pluginPackages.iterator();
+			Iterator<PluginPackage> iterator = pluginPackages.iterator();
 
-			while (itr.hasNext()) {
-				PluginPackage pluginPackage = itr.next();
+			while (iterator.hasNext()) {
+				PluginPackage pluginPackage = iterator.next();
 
 				String pluginPackageModuleId = pluginPackage.getModuleId();
 
 				if (pluginPackageModuleId.equals(moduleId)) {
-					itr.remove();
+					iterator.remove();
 
 					break;
 				}

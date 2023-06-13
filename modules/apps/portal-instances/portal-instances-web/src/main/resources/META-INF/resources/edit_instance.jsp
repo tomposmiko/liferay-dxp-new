@@ -39,7 +39,7 @@ renderResponse.setTitle((selCompany == null) ? LanguageUtil.get(request, "new-in
 
 <portlet:actionURL name="/portal_instances/edit_instance" var="editInstanceURL" />
 
-<aui:form action="<%= editInstanceURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveCompany();" %>'>
+<aui:form action="<%= editInstanceURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveCompany();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="companyId" type="hidden" value="<%= companyId %>" />
@@ -71,7 +71,9 @@ renderResponse.setTitle((selCompany == null) ? LanguageUtil.get(request, "new-in
 
 			<aui:input name="maxUsers" />
 
-			<aui:input disabled="<%= (selCompany != null) && (selCompany.getCompanyId() == PortalInstancesLocalServiceUtil.getDefaultCompanyId()) %>" name="active" type="toggle-switch" value="<%= (selCompany != null) ? selCompany.isActive() : true %>" />
+			<c:if test="<%= (selCompany == null) || (selCompany.getCompanyId() != PortalInstancesLocalServiceUtil.getDefaultCompanyId()) %>">
+				<aui:input inlineLabel="right" labelCssClass="simple-toggle-switch" name="active" type="toggle-switch" value="<%= (selCompany != null) ? selCompany.isActive() : true %>" />
+			</c:if>
 		</aui:fieldset>
 	</aui:fieldset-group>
 

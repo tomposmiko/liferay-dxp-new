@@ -24,7 +24,7 @@
 	action="<%= configurationActionURL %>"
 	method="post"
 	name="fm"
-	onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveConfiguration();" %>'
+	onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveConfiguration();" %>'
 >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
@@ -142,8 +142,8 @@
 			Liferay.Util.postForm(form, {
 				data: {
 					hiddenNodes: Liferay.Util.listSelect(availableVisibleNodes),
-					visibleNodes: Liferay.Util.listSelect(currentVisibleNodes)
-				}
+					visibleNodes: Liferay.Util.listSelect(currentVisibleNodes),
+				},
 			});
 		}
 	}

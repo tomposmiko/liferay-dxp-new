@@ -40,9 +40,9 @@ APIUtil.fetchDocuments = jest.fn((url, config) => {
 			keywords,
 			url === FETCH_HIDDEN_DOCUMENTS_URL
 		)
-	).then(data => ({
+	).then((data) => ({
 		items: data.documents,
-		total: data.total
+		total: data.total,
 	}));
 
 	return p;

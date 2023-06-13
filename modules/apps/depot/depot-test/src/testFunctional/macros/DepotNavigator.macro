@@ -1,5 +1,17 @@
 definition {
 
+	macro gotoDefineCustomLanguages {
+		DepotNavigator.gotoEdit(depotName = "${depotName}");
+
+		DepotNavigator.gotoLanguages(depotName = "${depotName}");
+
+		Pause(locator1 = "3000");
+
+		Click.clickNoMouseOverNoWaitForVisible(
+			key_languagesOption = "Define a custom default language and additional active languages for this asset library.",
+			locator1 = "Radio#DEPOT_LANGUAGES_OPTION");
+	}
+
 	macro gotoDepot {
 		if (isSet(listView)) {
 			var key_listEntry = "${depotName}";
@@ -8,7 +20,6 @@ definition {
 				locator1 = "LexiconList#LIST_ENTRY_TITLE_LINK",
 				value1 = "${depotName}");
 		}
-
 		else if (isSet(tableView)) {
 			var key_tableEntry = "${depotName}";
 
@@ -16,28 +27,31 @@ definition {
 				locator1 = "LexiconTable#TABLE_ENTRY_TITLE_LINK",
 				value1 = "${depotName}");
 		}
-
 		else {
 			var key_card = "${depotName}";
 
 			Click(
-				locator1 = "LexiconCard#CARD_TITLE",
+				locator1 = "Card#CARD_TITLE",
 				value1 = "${depotName}");
 		}
 
-		AssertTextNotEquals(
-			locator1 = "ControlMenu#HEADING",
-			value1 = "Repositories");
-
-		if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_CLOSED")) {
-			Click.clickNoSPARefresh(locator1 = "ProductMenu#TOGGLE");
-		}
-
-		ProductMenuHelper.gotoPortlet(portlet = "${portlet}");
-
 		AssertTextEquals(
 			locator1 = "ControlMenu#HEADING",
-			value1 = "${portlet}");
+			value1 = "Asset Libraries");
+
+		if (isSet(noViewApplicationPermission)) {
+			AssertTextEquals(
+				locator1 = "Message#INFO",
+				value1 = "Info:You do not have access to any applications in this asset library.");
+		}
+		else {
+			for (var portletName : list "Web Content,Documents and Media,Collections,Categories,Tags,Recycle Bin,Memberships,Asset Library Settings,Workflow") {
+				AssertTextEquals(
+					key_card = "${portletName}",
+					locator1 = "Card#CARD",
+					value1 = "${portletName}");
+			}
+		}
 	}
 
 	macro gotoDepotPortlet {
@@ -48,7 +62,6 @@ definition {
 				locator1 = "LexiconList#LIST_ENTRY_TITLE_LINK",
 				value1 = "${depotName}");
 		}
-
 		else if (isSet(tableView)) {
 			var key_tableEntry = "${depotName}";
 
@@ -56,33 +69,54 @@ definition {
 				locator1 = "LexiconTable#TABLE_ENTRY_TITLE_LINK",
 				value1 = "${depotName}");
 		}
-
 		else {
 			var key_card = "${depotName}";
 
 			Click(
-				locator1 = "LexiconCard#CARD_TITLE",
+				locator1 = "Card#CARD_TITLE",
 				value1 = "${depotName}");
 		}
 
-		ProductMenu.gotoPortlet(
-			category = "${category}",
-			panel = "Site Administration",
+		DepotNavigator.gotoPortlet(
+			depotName = "${depotName}",
 			portlet = "${portlet}");
+
+		AssertElementNotPresent(locator1 = "ProductMenu#TOGGLE");
 	}
 
-	macro gotoDepotViaSpaceIcon {
-		ProductMenuHelper.expandPanel(panel = "Site Administration");
+	macro gotoDepotPortletViaBreadcrumb {
+		if (isSet(otherDepotName)) {
+			Click(
+				key_breadcrumbName = "Asset Libraries",
+				locator1 = "Breadcrumb#BREADCRUMB_ENTRY_LINK");
 
-		ProductMenuHelper.openWorkspace();
+			LexiconEntry.changeDisplayStyle(displayStyle = "cards");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+			Click(
+				key_card = "${otherDepotName}",
+				locator1 = "Card#CARD_TITLE");
 
-		Pause(locator1 = "3000");
+			DepotNavigator.gotoPortlet(
+				depotName = "${otherDepotName}",
+				portlet = "${portlet}");
+		}
+		else {
+			Click(
+				key_breadcrumbName = "${depotName}",
+				locator1 = "Breadcrumb#BREADCRUMB_ENTRY_LINK");
 
-		Navigator.gotoNavItem(navItem = "Repositories");
+			DepotNavigator.gotoPortlet(
+				depotName = "${depotName}",
+				portlet = "${portlet}");
+		}
 
-		SiteSelector.selectSite(site = "${depotName}");
+		if (("${portlet}" == "Export") || ("${portlet}" == "Import")) {
+			Pause(locator1 = "2000");
+		}
+
+		AssertTextEquals(
+			locator1 = "Breadcrumb#BREADCRUMB_ENTRY_ACTIVE_ENTRY",
+			value1 = "${portlet}");
 	}
 
 	macro gotoEdit {
@@ -115,18 +149,147 @@ definition {
 			value1 = "Languages");
 	}
 
+	macro gotoPortlet {
+		Click(
+			key_card = "${portlet}",
+			locator1 = "Card#CARD");
+
+		if (("${portlet}" == "Settings") || ("${portlet}" == "Asset Library Settings")) {
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "${depotName}");
+		}
+		else {
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "${portlet}");
+		}
+	}
+
+	macro gotoShare {
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		AssertElementPresent.pauseAssertVisible(
+			key_dmDocumentTitle = "${dmDocumentTitle}",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
+
+		Click(
+			key_dmDocumentTitle = "${dmDocumentTitle}",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
+
+		WaitForLiferayEvent.initializeLiferayEventLog();
+
+		MenuItem.click(menuItem = "Share");
+	}
+
+	macro gotoShareFromInfoPanel {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		LexiconEntry.gotoEntry(rowEntry = "${dmDocumentTitle}");
+
+		DMDocument.viewDocumentTitleCmdPG(dmDocumentTitle = "${dmDocumentTitle}");
+
+		Click.clickAt(locator1 = "Icon#INFO");
+
+		AssertElementPresent(locator1 = "Button#SHARE_SIDEBAR");
+
+		Click(locator1 = "Button#SHARE_SIDEBAR");
+	}
+
 	macro gotoSites {
 		Click(
 			key_tab = "Sites",
 			locator1 = "NavTab#TAB_LINK");
 
-		AssertElementPresent(
+		AssertElementPresent.assertVisible(
 			key_title = "Connected Sites",
 			locator1 = "Header#H3_TITLE");
 	}
 
 	macro openDepotAdmin {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/control_panel/manage?p_p_id=com_liferay_depot_web_portlet_DepotAdminPortlet");
+	}
+
+	macro openDepotAssetListsAdmin {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}/~/control_panel/manage?p_p_id=com_liferay_asset_list_web_portlet_AssetListPortlet");
+	}
+
+	macro openDepotAssetListsAdminStaging {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}-staging/~/control_panel/manage?p_p_id=com_liferay_asset_list_web_portlet_AssetListPortlet");
+	}
+
+	macro openDepotCategoriesAdmin {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}/~/control_panel/manage/-/categories_admin/vocabularies");
+	}
+
+	macro openDepotCategoriesAdminStaging {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}-staging/~/control_panel/manage/-/categories_admin/vocabularies");
+	}
+
+	macro openDepotDashboard {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}/~/control_panel/manage?p_p_id=com_liferay_depot_web_portlet_DepotAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&_com_liferay_depot_web_portlet_DepotAdminPortlet_mvcRenderCommandName=%2Fdepot%2Fview_depot_dashboard&_com_liferay_depot_web_portlet_DepotAdminPortlet_depotEntryId=${depotId}&p_p_auth=IhHOQ7UJ");
+	}
+
+	macro openDepotDocumentsAndMediaAdmin {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet");
+	}
+
+	macro openDepotDocumentsAndMediaAdminStaging {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}-staging/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet");
+	}
+
+	macro openDepotMembershipsAdmin {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}/~/control_panel/manage/-/site_memberships");
+	}
+
+	macro openDepotRecycleBinAdmin {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}/~/control_panel/manage/-/recycle_bin/entries");
+	}
+
+	macro openDepotRecycleBinAdminStaging {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}-staging/~/control_panel/manage/-/recycle_bin/entries");
+	}
+
+	macro openDepotWebContentAdmin {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet");
+	}
+
+	macro openDepotWebContentAdminStaging {
+		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/asset-library-${depotId}-staging/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet");
+	}
+
+	macro switchStagingStatus {
+		Click(locator1 = "Button#STAGING_INDICATOR");
+
+		DropdownMenuItem.click(menuItem = "${stagingItem}");
+
+		if ("${stagingItem}" == "Publish to Live") {
+			SelectFrame(locator1 = "IFrame#MODAL_BODY");
+		}
 	}
 
 }

@@ -54,15 +54,16 @@ RulesEngine rulesEngine = (RulesEngine)request.getAttribute(RulesEngine.class.ge
 
 						<%
 						for (AssetEntry assetEntry : assetEntries) {
-							AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
+							AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
 
 							if (assetRendererFactory == null) {
 								continue;
 							}
 
-							AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK());
+							AssetRenderer<?> assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK());
 
 							request.setAttribute(WebKeys.ASSET_RENDERER, assetRenderer);
+
 							request.setAttribute(WebKeys.ASSET_RENDERER_FACTORY, assetRendererFactory);
 						%>
 

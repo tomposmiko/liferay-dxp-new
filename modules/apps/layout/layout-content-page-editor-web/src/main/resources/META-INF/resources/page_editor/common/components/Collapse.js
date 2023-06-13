@@ -17,46 +17,56 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
-export default function Collapse(props) {
-	const [open, setOpen] = useState(props.open);
-	const icon = open ? 'angle-down' : 'angle-right';
+export default function Collapse({children, label, open}) {
+	const [isOpen, setIsOpen] = useState(open);
+	const collapseIcon = isOpen ? 'angle-down-small' : 'angle-right-small';
+	const collapseIconClassName = isOpen ? 'open' : 'closed';
 
 	useEffect(() => {
-		setOpen(props.open);
-	}, [props.open]);
+		setIsOpen(open);
+	}, [open]);
 
 	const handleClick = () => {
-		setOpen(!open);
+		setIsOpen(!isOpen);
 	};
 
 	return (
-		<div className="mb-2">
+		<div
+			className={classNames(
+				'panel-group-flush',
+				'page-editor__collapse panel-group'
+			)}
+		>
 			<button
-				aria-expanded={open}
+				aria-expanded={isOpen}
 				className={classNames(
-					'page-editor__collapse',
-					'align-items-end',
 					'btn',
 					'btn-unstyled',
 					'collapse-icon',
-					'd-flex',
-					'justify-content-between',
 					'sheet-subtitle',
-					'w-100'
+					{
+						collapsed: !isOpen,
+					}
 				)}
 				onClick={handleClick}
-				type="button"
 			>
-				{props.label}
-				<ClayIcon key={icon} symbol={icon} />
+				<span className="c-inner ellipsis" tabIndex="-1">
+					{label}
+					<span className={`collapse-icon-${collapseIconClassName}`}>
+						<ClayIcon key={collapseIcon} symbol={collapseIcon} />
+					</span>
+				</span>
 			</button>
 
-			{open && props.children}
+			<div className="page-editor__collapse__content">
+				{isOpen && children}
+			</div>
 		</div>
 	);
 }
 
 Collapse.propTypes = {
 	children: PropTypes.node.isRequired,
-	open: PropTypes.bool
+	label: PropTypes.string,
+	open: PropTypes.bool,
 };

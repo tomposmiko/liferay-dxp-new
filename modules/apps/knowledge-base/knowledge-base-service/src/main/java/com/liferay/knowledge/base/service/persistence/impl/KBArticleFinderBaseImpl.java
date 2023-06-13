@@ -59,7 +59,6 @@ public abstract class KBArticleFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -85,14 +84,5 @@ public abstract class KBArticleFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBArticleFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(KBPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

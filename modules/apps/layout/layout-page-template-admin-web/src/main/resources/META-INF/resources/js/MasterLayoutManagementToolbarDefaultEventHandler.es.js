@@ -24,7 +24,7 @@ class MasterLayoutManagementToolbarDefaultEventHandler extends DefaultEventHandl
 			mainFieldName: 'name',
 			mainFieldPlaceholder: Liferay.Language.get('name'),
 			namespace: this.namespace,
-			spritemap: this.spritemap
+			spritemap: this.spritemap,
 		});
 	}
 
@@ -37,10 +37,14 @@ class MasterLayoutManagementToolbarDefaultEventHandler extends DefaultEventHandl
 			submitForm(this.one('#fm'));
 		}
 	}
+
+	exportMasterLayouts(itemData) {
+		submitForm(this.one('#fm'), itemData.exportMasterLayoutURL);
+	}
 }
 
 MasterLayoutManagementToolbarDefaultEventHandler.STATE = {
-	spritemap: Config.string()
+	spritemap: Config.string(),
 };
 
 export default MasterLayoutManagementToolbarDefaultEventHandler;

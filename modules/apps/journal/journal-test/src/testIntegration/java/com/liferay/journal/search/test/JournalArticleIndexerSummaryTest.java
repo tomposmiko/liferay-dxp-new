@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.search.test.util.SummaryFixture;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -95,9 +96,8 @@ public class JournalArticleIndexerSummaryTest {
 		String content = "test content";
 		String title = "test title";
 
-		Document document = getDocument(title, content);
-
-		_summaryFixture.assertSummary(title, content, document);
+		_summaryFixture.assertSummary(
+			title, content, getDocument(title, content));
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class JournalArticleIndexerSummaryTest {
 
 		setFields(staleTitle, staleContent, document);
 
-		_summaryFixture.assertSummary(staleTitle, content, document);
+		_summaryFixture.assertSummary(staleTitle, staleContent, document);
 	}
 
 	@Test
@@ -151,13 +151,12 @@ public class JournalArticleIndexerSummaryTest {
 
 		setSnippets(staleHighlightedTitle, staleHighlightedContent, document);
 
-		String highlightedContent = StringBundler.concat(
-			HighlightUtil.HIGHLIGHT_TAG_OPEN, "test",
-			HighlightUtil.HIGHLIGHT_TAG_CLOSE, " content");
-
 		_summaryFixture.assertSummary(
-			staleHighlightedTitle, highlightedContent, document);
+			staleHighlightedTitle, staleHighlightedContent, document);
 	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected Document getDocument(String title, String content)
 		throws Exception {

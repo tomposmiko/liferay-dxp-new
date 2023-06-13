@@ -9,8 +9,8 @@
  * distribution rights of the Software.
  */
 
-export default function(nameSpace) {
-	const deleteMultipleSynonyms = function() {
+export default function (nameSpace) {
+	const deleteMultipleSynonyms = function () {
 		if (
 			confirm(
 				Liferay.Language.get(
@@ -25,12 +25,12 @@ export default function(nameSpace) {
 	};
 
 	const ACTIONS = {
-		deleteMultipleSynonyms
+		deleteMultipleSynonyms,
 	};
 
 	Liferay.componentReady('synonymSetsEntriesManagementToolbar').then(
-		managementToolbar => {
-			managementToolbar.on('actionItemClicked', event => {
+		(managementToolbar) => {
+			managementToolbar.on('actionItemClicked', (event) => {
 				const itemData = event.data.item.data;
 
 				if (itemData && itemData.action && ACTIONS[itemData.action]) {

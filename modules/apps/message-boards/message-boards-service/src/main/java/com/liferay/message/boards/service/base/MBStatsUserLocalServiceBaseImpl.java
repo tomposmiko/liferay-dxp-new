@@ -16,7 +16,10 @@ package com.liferay.message.boards.service.base;
 
 import com.liferay.message.boards.model.MBStatsUser;
 import com.liferay.message.boards.service.MBStatsUserLocalService;
+import com.liferay.message.boards.service.MBStatsUserLocalServiceUtil;
 import com.liferay.message.boards.service.persistence.MBStatsUserPersistence;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -36,16 +39,22 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -66,11 +75,15 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>MBStatsUserLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.message.boards.service.MBStatsUserLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>MBStatsUserLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>MBStatsUserLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the message boards stats user to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MBStatsUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param mbStatsUser the message boards stats user
 	 * @return the message boards stats user that was added
@@ -98,6 +111,10 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 	/**
 	 * Deletes the message boards stats user with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MBStatsUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param statsUserId the primary key of the message boards stats user
 	 * @return the message boards stats user that was removed
 	 * @throws PortalException if a message boards stats user with the primary key could not be found
@@ -113,6 +130,10 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 	/**
 	 * Deletes the message boards stats user from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MBStatsUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mbStatsUser the message boards stats user
 	 * @return the message boards stats user that was removed
 	 */
@@ -120,6 +141,18 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 	@Override
 	public MBStatsUser deleteMBStatsUser(MBStatsUser mbStatsUser) {
 		return mbStatsUserPersistence.remove(mbStatsUser);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return mbStatsUserPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -271,6 +304,15 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return mbStatsUserPersistence.create(((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -279,6 +321,13 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 			(MBStatsUser)persistedModel);
 	}
 
+	public BasePersistence<MBStatsUser> getBasePersistence() {
+		return mbStatsUserPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -315,6 +364,10 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 	/**
 	 * Updates the message boards stats user in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MBStatsUserLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mbStatsUser the message boards stats user
 	 * @return the message boards stats user that was updated
 	 */
@@ -324,17 +377,24 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 		return mbStatsUserPersistence.update(mbStatsUser);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			MBStatsUserLocalService.class, IdentifiableOSGiService.class,
-			PersistedModelLocalService.class
+			CTService.class, PersistedModelLocalService.class
 		};
 	}
 
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		mbStatsUserLocalService = (MBStatsUserLocalService)aopProxy;
+
+		_setLocalServiceUtilService(mbStatsUserLocalService);
 	}
 
 	/**
@@ -347,8 +407,23 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 		return MBStatsUserLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<MBStatsUser> getCTPersistence() {
+		return mbStatsUserPersistence;
+	}
+
+	@Override
+	public Class<MBStatsUser> getModelClass() {
 		return MBStatsUser.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<MBStatsUser>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(mbStatsUserPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -376,6 +451,22 @@ public abstract class MBStatsUserLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		MBStatsUserLocalService mbStatsUserLocalService) {
+
+		try {
+			Field field = MBStatsUserLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mbStatsUserLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

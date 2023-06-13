@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -46,6 +48,7 @@ public class DDMFormInstanceRecordWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
+		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("formInstanceRecordId", getFormInstanceRecordId());
 		attributes.put("groupId", getGroupId());
@@ -60,6 +63,7 @@ public class DDMFormInstanceRecordWrapper
 		attributes.put("formInstanceVersion", getFormInstanceVersion());
 		attributes.put("storageId", getStorageId());
 		attributes.put("version", getVersion());
+		attributes.put("ipAddress", getIpAddress());
 		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
@@ -71,6 +75,12 @@ public class DDMFormInstanceRecordWrapper
 
 		if (mvccVersion != null) {
 			setMvccVersion(mvccVersion);
+		}
+
+		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
+
+		if (ctCollectionId != null) {
+			setCtCollectionId(ctCollectionId);
 		}
 
 		String uuid = (String)attributes.get("uuid");
@@ -159,6 +169,12 @@ public class DDMFormInstanceRecordWrapper
 			setVersion(version);
 		}
 
+		String ipAddress = (String)attributes.get("ipAddress");
+
+		if (ipAddress != null) {
+			setIpAddress(ipAddress);
+		}
+
 		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
 
 		if (lastPublishDate != null) {
@@ -184,6 +200,16 @@ public class DDMFormInstanceRecordWrapper
 	@Override
 	public Date getCreateDate() {
 		return model.getCreateDate();
+	}
+
+	/**
+	 * Returns the ct collection ID of this ddm form instance record.
+	 *
+	 * @return the ct collection ID of this ddm form instance record
+	 */
+	@Override
+	public long getCtCollectionId() {
+		return model.getCtCollectionId();
 	}
 
 	@Override
@@ -254,6 +280,16 @@ public class DDMFormInstanceRecordWrapper
 	@Override
 	public long getGroupId() {
 		return model.getGroupId();
+	}
+
+	/**
+	 * Returns the ip address of this ddm form instance record.
+	 *
+	 * @return the ip address of this ddm form instance record
+	 */
+	@Override
+	public String getIpAddress() {
+		return model.getIpAddress();
 	}
 
 	/**
@@ -433,6 +469,16 @@ public class DDMFormInstanceRecordWrapper
 	}
 
 	/**
+	 * Sets the ct collection ID of this ddm form instance record.
+	 *
+	 * @param ctCollectionId the ct collection ID of this ddm form instance record
+	 */
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		model.setCtCollectionId(ctCollectionId);
+	}
+
+	/**
 	 * Sets the form instance ID of this ddm form instance record.
 	 *
 	 * @param formInstanceId the form instance ID of this ddm form instance record
@@ -470,6 +516,16 @@ public class DDMFormInstanceRecordWrapper
 	@Override
 	public void setGroupId(long groupId) {
 		model.setGroupId(groupId);
+	}
+
+	/**
+	 * Sets the ip address of this ddm form instance record.
+	 *
+	 * @param ipAddress the ip address of this ddm form instance record
+	 */
+	@Override
+	public void setIpAddress(String ipAddress) {
+		model.setIpAddress(ipAddress);
 	}
 
 	/**
@@ -600,6 +656,20 @@ public class DDMFormInstanceRecordWrapper
 	@Override
 	public void setVersionUserUuid(String versionUserUuid) {
 		model.setVersionUserUuid(versionUserUuid);
+	}
+
+	@Override
+	public Map<String, Function<DDMFormInstanceRecord, Object>>
+		getAttributeGetterFunctions() {
+
+		return model.getAttributeGetterFunctions();
+	}
+
+	@Override
+	public Map<String, BiConsumer<DDMFormInstanceRecord, Object>>
+		getAttributeSetterBiConsumers() {
+
+		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

@@ -20,14 +20,14 @@ import React, {Component} from 'react';
 class CriteriaSidebarSearchBar extends Component {
 	static propTypes = {
 		onChange: PropTypes.func.isRequired,
-		searchValue: PropTypes.string
+		searchValue: PropTypes.string,
 	};
 
-	_handleChange = event => {
+	_handleChange = (event) => {
 		this.props.onChange(event.target.value);
 	};
 
-	_handleClear = event => {
+	_handleClear = (event) => {
 		event.preventDefault();
 
 		this.props.onChange('');

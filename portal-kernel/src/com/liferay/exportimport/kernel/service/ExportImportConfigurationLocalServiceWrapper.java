@@ -60,6 +60,10 @@ public class ExportImportConfigurationLocalServiceWrapper
 	/**
 	 * Adds the export import configuration to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ExportImportConfigurationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param exportImportConfiguration the export import configuration
 	 * @return the export import configuration that was added
 	 */
@@ -119,7 +123,23 @@ public class ExportImportConfigurationLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _exportImportConfigurationLocalService.createPersistedModel(
+			primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the export import configuration from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ExportImportConfigurationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param exportImportConfiguration the export import configuration
 	 * @return the export import configuration that was removed
@@ -136,6 +156,10 @@ public class ExportImportConfigurationLocalServiceWrapper
 
 	/**
 	 * Deletes the export import configuration with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ExportImportConfigurationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param exportImportConfigurationId the primary key of the export import configuration
 	 * @return the export import configuration that was removed
@@ -166,6 +190,18 @@ public class ExportImportConfigurationLocalServiceWrapper
 
 		return _exportImportConfigurationLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _exportImportConfigurationLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _exportImportConfigurationLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -440,6 +476,9 @@ public class ExportImportConfigurationLocalServiceWrapper
 			getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -502,6 +541,10 @@ public class ExportImportConfigurationLocalServiceWrapper
 
 	/**
 	 * Updates the export import configuration in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ExportImportConfigurationLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param exportImportConfiguration the export import configuration
 	 * @return the export import configuration that was updated

@@ -32,6 +32,7 @@
 
 	<div class="form-group">
 		<@liferay_ui["input-editor"]
+			configKey="rich_text"
 			contents="${fieldValue}"
 			contentsLanguageId="${requestedLocale}"
 			cssClass="${cssClass}"
@@ -60,7 +61,9 @@
 				function() {
 					var A = AUI();
 
-					var field = A.one('#${portletNamespace}${namespacedFieldName}');
+					var field = A.one(
+						'input[name="${portletNamespace}${namespacedFieldName}"]'
+					);
 
 					field.val(window['${portletNamespace}${namespacedFieldName}Editor'].getHTML());
 

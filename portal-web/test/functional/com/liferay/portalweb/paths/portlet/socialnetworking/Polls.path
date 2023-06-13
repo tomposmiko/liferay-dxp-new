@@ -2,11 +2,13 @@
 <head>
 <title>Polls</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">Polls</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>CHOICE_FIELD</td>
@@ -66,17 +68,17 @@
 <!--POLLS_TABLE-->
 <tr>
 	<td>POLLS_TABLE_TITLE</td>
-	<td>//tr[contains(.,'${key_pollsQuestionTitle}')]/td[1]//a</td>
+	<td>//tr[contains(.,'${key_pollsQuestionTitle}')]/td[2]//a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>POLLS_TABLE_ACTION</td>
-	<td>//tr[contains(.,'${key_pollsQuestionTitle}')]/td[5]//div/a</td>
+	<td>//td/a[contains(.,'${key_pollsQuestionTitle}')]/../../td[6]//div/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>POLLS_TABLE_ACTIONS_GENERIC</td>
-	<td>//tr/td[5]//a</td>
+	<td>//tr/td[6]//a</td>
 	<td></td>
 </tr>
 <tr>

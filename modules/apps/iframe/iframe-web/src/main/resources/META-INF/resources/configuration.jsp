@@ -17,16 +17,35 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String htmlAttributes =
-	"alt=" + iFramePortletInstanceConfiguration.alt() + "\n" +
-	"border=" + iFramePortletInstanceConfiguration.border() + "\n" +
-	"bordercolor=" + iFramePortletInstanceConfiguration.bordercolor() + "\n" +
-	"frameborder=" + iFramePortletInstanceConfiguration.frameborder() + "\n" +
-	"hspace=" + iFramePortletInstanceConfiguration.hspace() + "\n" +
-	"longdesc=" + iFramePortletInstanceConfiguration.longdesc() + "\n" +
-	"scrolling=" + iFramePortletInstanceConfiguration.scrolling() + "\n" +
-	"title=" + iFramePortletInstanceConfiguration.title() + "\n" +
-	"vspace=" + iFramePortletInstanceConfiguration.vspace() + "\n";
+StringBundler sb = new StringBundler(27);
+
+sb.append("alt=");
+sb.append(iFramePortletInstanceConfiguration.alt());
+sb.append("\n");
+sb.append("border=");
+sb.append(iFramePortletInstanceConfiguration.border());
+sb.append("\n");
+sb.append("bordercolor=");
+sb.append(iFramePortletInstanceConfiguration.bordercolor());
+sb.append("\n");
+sb.append("frameborder=");
+sb.append(iFramePortletInstanceConfiguration.frameborder());
+sb.append("\n");
+sb.append("hspace=");
+sb.append(iFramePortletInstanceConfiguration.hspace());
+sb.append("\n");
+sb.append("longdesc=");
+sb.append(iFramePortletInstanceConfiguration.longdesc());
+sb.append("\n");
+sb.append("scrolling=");
+sb.append(iFramePortletInstanceConfiguration.scrolling());
+sb.append("\n");
+sb.append("title=");
+sb.append(iFramePortletInstanceConfiguration.title());
+sb.append("\n");
+sb.append("vspace=");
+sb.append(iFramePortletInstanceConfiguration.vspace());
+sb.append("\n");
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
@@ -141,7 +160,7 @@ String htmlAttributes =
 					<aui:input name="preferences--width--" type="text" value="<%= iFramePortletInstanceConfiguration.width() %>" />
 				</div>
 
-				<aui:input cssClass="lfr-textarea-container" name="preferences--htmlAttributes--" onKeyDown="Liferay.Util.checkTab(this); Liferay.Util.disableEsc();" type="textarea" value="<%= htmlAttributes %>" wrap="soft" />
+				<aui:input cssClass="lfr-textarea-container" name="preferences--htmlAttributes--" onKeyDown="Liferay.Util.checkTab(this); Liferay.Util.disableEsc();" type="textarea" value="<%= sb.toString() %>" wrap="soft" />
 			</liferay-frontend:fieldset>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>

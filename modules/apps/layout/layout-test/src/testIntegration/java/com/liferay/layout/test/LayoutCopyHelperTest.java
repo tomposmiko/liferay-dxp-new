@@ -24,15 +24,16 @@ import com.liferay.asset.test.util.AssetTestUtil;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
-import com.liferay.layout.page.template.util.LayoutPageTemplateStructureHelperUtil;
 import com.liferay.layout.test.constants.LayoutPortletKeys;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.layout.util.LayoutCopyHelper;
+import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -42,9 +43,10 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -54,7 +56,6 @@ import java.awt.image.BufferedImage;
 
 import java.io.ByteArrayOutputStream;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -128,69 +129,65 @@ public class LayoutCopyHelperTest {
 
 	@Test
 	public void testCopyContentLayoutStructure() throws Exception {
-		Layout sourceLayout = LayoutTestUtil.addLayout(
-			_group.getGroupId(), StringPool.BLANK);
+		Layout sourceLayout = _addContentLayout();
 
-		List<FragmentEntryLink> fragmentEntryLinks = new ArrayList<>();
+		LayoutStructure layoutStructure = new LayoutStructure();
 
-		FragmentEntryLink fragmentEntryLink1 =
+		layoutStructure.addRootLayoutStructureItem();
+
+		LayoutStructureItem containerLayoutStructureItem =
+			layoutStructure.addContainerStyledLayoutStructureItem(
+				layoutStructure.getMainItemId(), 0);
+
+		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				sourceLayout.getUserId(), sourceLayout.getGroupId(), 0, 0,
-				_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
+				sourceLayout.getUserId(), sourceLayout.getGroupId(), 0, 0, 0,
+				sourceLayout.getPlid(), StringPool.BLANK, StringPool.BLANK,
 				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 0, null,
-				_serviceContext);
+				StringPool.BLANK, 0, null, _serviceContext);
 
-		fragmentEntryLinks.add(fragmentEntryLink1);
+		layoutStructure.addFragmentStyledLayoutStructureItem(
+			fragmentEntryLink.getFragmentEntryLinkId(),
+			containerLayoutStructureItem.getItemId(), 0);
 
-		FragmentEntryLink fragmentEntryLink2 =
-			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				sourceLayout.getUserId(), sourceLayout.getGroupId(), 0, 0,
-				_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 0, null,
-				_serviceContext);
+		fragmentEntryLink = _fragmentEntryLinkLocalService.addFragmentEntryLink(
+			sourceLayout.getUserId(), sourceLayout.getGroupId(), 0, 0, 0,
+			sourceLayout.getPlid(), StringPool.BLANK, StringPool.BLANK,
+			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+			StringPool.BLANK, 0, null, _serviceContext);
 
-		fragmentEntryLinks.add(fragmentEntryLink2);
-
-		JSONObject jsonObject =
-			LayoutPageTemplateStructureHelperUtil.
-				generateContentLayoutStructure(fragmentEntryLinks);
+		layoutStructure.addFragmentStyledLayoutStructureItem(
+			fragmentEntryLink.getFragmentEntryLinkId(),
+			containerLayoutStructureItem.getItemId(), 0);
 
 		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
 			sourceLayout.getUserId(), sourceLayout.getGroupId(),
-			_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
-			jsonObject.toString(), _serviceContext);
+			sourceLayout.getPlid(), layoutStructure.toString(),
+			_serviceContext);
 
-		Layout targetLayout = LayoutTestUtil.addLayout(
-			_group.getGroupId(), StringPool.BLANK);
+		Layout targetLayout = _addContentLayout();
 
 		Assert.assertTrue(
 			ListUtil.isNotEmpty(
-				_fragmentEntryLinkLocalService.getFragmentEntryLinks(
-					_group.getGroupId(), _portal.getClassNameId(Layout.class),
-					sourceLayout.getPlid())));
+				_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
+					_group.getGroupId(), sourceLayout.getPlid())));
 
 		Assert.assertFalse(
 			ListUtil.isNotEmpty(
-				_fragmentEntryLinkLocalService.getFragmentEntryLinks(
-					_group.getGroupId(), _portal.getClassNameId(Layout.class),
-					targetLayout.getPlid())));
+				_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
+					_group.getGroupId(), targetLayout.getPlid())));
 
 		_layoutCopyHelper.copyLayout(sourceLayout, targetLayout);
 
 		Assert.assertNotNull(
 			_layoutPageTemplateStructureLocalService.
 				fetchLayoutPageTemplateStructure(
-					targetLayout.getGroupId(),
-					_portal.getClassNameId(Layout.class),
-					targetLayout.getPlid()));
+					targetLayout.getGroupId(), targetLayout.getPlid()));
 
 		Assert.assertTrue(
 			ListUtil.isNotEmpty(
-				_fragmentEntryLinkLocalService.getFragmentEntryLinks(
-					_group.getGroupId(), _portal.getClassNameId(Layout.class),
-					targetLayout.getPlid())));
+				_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
+					_group.getGroupId(), targetLayout.getPlid())));
 	}
 
 	@Test
@@ -201,14 +198,15 @@ public class LayoutCopyHelperTest {
 		BufferedImage bufferedImage = new BufferedImage(
 			1, 1, BufferedImage.TYPE_INT_RGB);
 
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		ByteArrayOutputStream byteArrayOutputStream =
+			new ByteArrayOutputStream();
 
-		ImageIO.write(bufferedImage, "jpg", outputStream);
+		ImageIO.write(bufferedImage, "jpg", byteArrayOutputStream);
 
-		outputStream.flush();
+		byteArrayOutputStream.flush();
 
 		sourceLayout = LayoutLocalServiceUtil.updateIconImage(
-			sourceLayout.getPlid(), outputStream.toByteArray());
+			sourceLayout.getPlid(), byteArrayOutputStream.toByteArray());
 
 		Layout targetLayout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), StringPool.BLANK);
@@ -298,40 +296,59 @@ public class LayoutCopyHelperTest {
 
 	@Test
 	public void testCopyTypeSettings() throws Exception {
-		UnicodeProperties sourceProperties = new UnicodeProperties();
+		UnicodeProperties sourceUnicodeProperties = new UnicodeProperties();
 
-		sourceProperties.setProperty(
+		sourceUnicodeProperties.setProperty(
 			"lfr-theme:regular:show-footer", Boolean.TRUE.toString());
-		sourceProperties.setProperty(
+		sourceUnicodeProperties.setProperty(
 			"lfr-theme:regular:show-header", Boolean.TRUE.toString());
 
 		Layout sourceLayout = LayoutTestUtil.addLayout(
-			_group.getGroupId(), sourceProperties.toString());
+			_group.getGroupId(), sourceUnicodeProperties.toString());
 
 		Layout targetLayout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), StringPool.BLANK);
 
-		UnicodeProperties targetProperties = new UnicodeProperties();
+		UnicodeProperties targetUnicodeProperties = new UnicodeProperties();
 
-		targetProperties.fastLoad(targetLayout.getTypeSettings());
+		targetUnicodeProperties.fastLoad(targetLayout.getTypeSettings());
 
 		Assert.assertNull(
-			targetProperties.getProperty("lfr-theme:regular:show-footer"));
+			targetUnicodeProperties.getProperty(
+				"lfr-theme:regular:show-footer"));
 		Assert.assertNull(
-			targetProperties.getProperty("lfr-theme:regular:show-header"));
+			targetUnicodeProperties.getProperty(
+				"lfr-theme:regular:show-header"));
 
 		_layoutCopyHelper.copyLayout(sourceLayout, targetLayout);
 
 		targetLayout = _layoutLocalService.fetchLayout(targetLayout.getPlid());
 
-		targetProperties.fastLoad(targetLayout.getTypeSettings());
+		targetUnicodeProperties.fastLoad(targetLayout.getTypeSettings());
 
 		Assert.assertEquals(
 			Boolean.TRUE.toString(),
-			targetProperties.getProperty("lfr-theme:regular:show-footer"));
+			targetUnicodeProperties.getProperty(
+				"lfr-theme:regular:show-footer"));
 		Assert.assertEquals(
 			Boolean.TRUE.toString(),
-			targetProperties.getProperty("lfr-theme:regular:show-header"));
+			targetUnicodeProperties.getProperty(
+				"lfr-theme:regular:show-header"));
+	}
+
+	private Layout _addContentLayout() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+
+		return _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), _group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK, serviceContext);
 	}
 
 	@Inject
@@ -358,9 +375,6 @@ public class LayoutCopyHelperTest {
 	@Inject
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
-
-	@Inject
-	private Portal _portal;
 
 	@Inject(
 		filter = "javax.portlet.name=" + LayoutPortletKeys.LAYOUT_TEST_PORTLET

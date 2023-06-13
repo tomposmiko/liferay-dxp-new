@@ -12,11 +12,7 @@
  * details.
  */
 
-import {
-	storeNewLayoutData,
-	updateFragmentEntryLinksEditableValues,
-	addExperience
-} from './utils';
+import {addExperience, storeNewLayoutData} from './utils';
 
 function createExperienceReducer(state, payload) {
 	let nextState = state;
@@ -25,7 +21,7 @@ function createExperienceReducer(state, payload) {
 
 	const newExperience = {
 		...segmentsExperience,
-		hasLockedSegmentsExperiment: false
+		hasLockedSegmentsExperiment: false,
 	};
 
 	nextState = addExperience(nextState, newExperience);
@@ -34,10 +30,13 @@ function createExperienceReducer(state, payload) {
 		newExperience.segmentsExperienceId,
 		layoutData
 	);
-	nextState = updateFragmentEntryLinksEditableValues(
-		nextState,
-		fragmentEntryLinks
-	);
+	nextState = {
+		...nextState,
+		fragmentEntryLinks: {
+			...nextState.fragmentEntryLinks,
+			...fragmentEntryLinks,
+		},
+	};
 
 	return nextState;
 }

@@ -42,14 +42,12 @@ if (layoutTypePortlet != null) {
 if (layout != null) {
 	String ppid = ParamUtil.getString(request, "p_p_id");
 
-	if (layout.isTypeEmbedded() || layout.isTypePortlet()) {
-		if (themeDisplay.isStateMaximized() || themeDisplay.isStatePopUp() || (layout.isSystem() && Objects.equals(layout.getFriendlyURL(), PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL))) {
-			if (Validator.isNotNull(ppid)) {
-				Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), ppid);
+	if ((layout.isTypeEmbedded() || layout.isTypePortlet()) && (themeDisplay.isStateMaximized() || themeDisplay.isStatePopUp() || (layout.isSystem() && Objects.equals(layout.getFriendlyURL(), PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL)))) {
+		if (Validator.isNotNull(ppid)) {
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), ppid);
 
-				if ((portlet != null) && !portlets.contains(portlet)) {
-					portlets.add(portlet);
-				}
+			if ((portlet != null) && !portlets.contains(portlet)) {
+				portlets.add(portlet);
 			}
 		}
 	}
@@ -113,17 +111,23 @@ if (layout != null) {
 
 <%
 List<String> markupHeaders = (List<String>)request.getAttribute(MimeResponse.MARKUP_HEAD_ELEMENT);
-
-if (markupHeaders != null) {
-	for (String markupHeader : markupHeaders) {
 %>
+
+<c:if test="<%= markupHeaders != null %>">
+
+	<%
+	for (String markupHeader : markupHeaders) {
+	%>
 
 		<%= markupHeader %>
 
-<%
+	<%
 	}
-}
+	%>
 
+</c:if>
+
+<%
 com.liferay.petra.string.StringBundler pageTopSB = OutputTag.getDataSB(request, WebKeys.PAGE_TOP);
 %>
 

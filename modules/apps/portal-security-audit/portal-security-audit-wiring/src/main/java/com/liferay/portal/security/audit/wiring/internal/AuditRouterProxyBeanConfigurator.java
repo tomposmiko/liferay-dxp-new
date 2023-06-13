@@ -72,14 +72,14 @@ public class AuditRouterProxyBeanConfigurator {
 
 		schedulerEngineDictionary.put("audit.router.proxy", Boolean.TRUE);
 
-		_auditRouterSesrviceRegistration = bundleContext.registerService(
+		_auditRouterServiceRegistration = bundleContext.registerService(
 			AuditRouter.class, auditRouter, schedulerEngineDictionary);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		if (_auditRouterSesrviceRegistration != null) {
-			_auditRouterSesrviceRegistration.unregister();
+		if (_auditRouterServiceRegistration != null) {
+			_auditRouterServiceRegistration.unregister();
 		}
 	}
 
@@ -92,6 +92,6 @@ public class AuditRouterProxyBeanConfigurator {
 		ProxyMessageListener proxyMessageListener) {
 	}
 
-	private ServiceRegistration<AuditRouter> _auditRouterSesrviceRegistration;
+	private ServiceRegistration<AuditRouter> _auditRouterServiceRegistration;
 
 }

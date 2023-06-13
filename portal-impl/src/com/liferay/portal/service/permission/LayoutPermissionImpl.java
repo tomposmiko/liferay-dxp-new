@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.kernel.service.permission.UserGroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 import com.liferay.portal.util.LayoutTypeControllerTracker;
 import com.liferay.portal.util.PropsValues;
@@ -277,6 +278,15 @@ public class LayoutPermissionImpl
 
 				parentLayoutId = parentLayout.getParentLayoutId();
 			}
+		}
+
+		if ((layout.getClassNameId() == PortalUtil.getClassNameId(
+				Layout.class)) &&
+			(layout.getClassPK() != 0) &&
+			permissionChecker.hasPermission(
+				group, Layout.class.getName(), layout.getClassPK(), actionId)) {
+
+			return true;
 		}
 
 		if (permissionChecker.hasPermission(
@@ -592,8 +602,6 @@ public class LayoutPermissionImpl
 				if (count >= 0) {
 					return true;
 				}
-
-				return false;
 			}
 			catch (PortalException | RuntimeException exception) {
 				throw exception;
@@ -610,16 +618,16 @@ public class LayoutPermissionImpl
 	private static class CacheKey {
 
 		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
+		public boolean equals(Object object) {
+			if (this == object) {
 				return true;
 			}
 
-			if (!(obj instanceof CacheKey)) {
+			if (!(object instanceof CacheKey)) {
 				return false;
 			}
 
-			CacheKey cacheKey = (CacheKey)obj;
+			CacheKey cacheKey = (CacheKey)object;
 
 			if ((_plid == cacheKey._plid) &&
 				(_mvccVersion == cacheKey._mvccVersion) &&

@@ -25,33 +25,34 @@ function AssetCategoriesSelector({
 	onVocabulariesChange,
 	portletURL,
 	useFallbackInput,
-	vocabularies = []
+	vocabularies = [],
 }) {
 	return (
 		<div id={id}>
 			{vocabularies.map((vocabulary, index) => {
 				const label = vocabulary.group
-					? `${vocabulary.title} ${vocabulary.group}`
+					? `${vocabulary.title} (${vocabulary.group})`
 					: vocabulary.title;
+				const vocabularyInputName = inputName + vocabulary.id;
 
 				return (
 					<AssetVocabularyCategoriesSelector
 						eventName={eventName}
 						groupIds={groupIds}
 						id={`namespace_assetCategoriesSelector_${vocabulary.id}`}
-						inputName={inputName}
+						inputName={vocabularyInputName}
 						key={vocabulary.id}
 						label={label}
-						onSelectedItemsChange={selectedItems => {
+						onSelectedItemsChange={(selectedItems) => {
 							const newVocabulary = {
 								...vocabulary,
-								selectedItems
+								selectedItems,
 							};
 
 							onVocabulariesChange([
 								...vocabularies.slice(0, index),
 								newVocabulary,
-								...vocabularies.slice(index + 1)
+								...vocabularies.slice(index + 1),
 							]);
 						}}
 						portletURL={portletURL}
@@ -75,7 +76,7 @@ AssetCategoriesSelector.propTypes = {
 	label: PropTypes.string,
 	onVocabulariesChange: PropTypes.func.isRequired,
 	portletURL: PropTypes.string.isRequired,
-	useFallbackInput: PropTypes.bool
+	useFallbackInput: PropTypes.bool,
 };
 
 export default AssetCategoriesSelector;

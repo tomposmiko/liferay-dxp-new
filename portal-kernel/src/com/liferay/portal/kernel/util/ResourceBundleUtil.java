@@ -14,8 +14,11 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.portal.kernel.language.LanguageBuilderUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.language.UTF8Control;
+import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
+import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
@@ -107,8 +110,42 @@ public class ResourceBundleUtil {
 		return map;
 	}
 
-	public static ResourceBundleLoader getResourceBundleLoader(
-		final String baseName, final ClassLoader classLoader) {
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getLocalizationMap(ResourceBundleLoader, String)}
+	 */
+	@Deprecated
+	public static Map<Locale, String> getLocalizationMap(
+		com.liferay.portal.kernel.util.ResourceBundleLoader
+			resourceBundleLoader,
+		String key) {
+
+		return getLocalizationMap(
+			new ResourceBundleLoader() {
+
+				@Override
+				public ResourceBundle loadResourceBundle(Locale locale) {
+					return resourceBundleLoader.loadResourceBundle(locale);
+				}
+
+			},
+			key);
+	}
+
+	public static ResourceBundle getModuleAndPortalResourceBundle(
+		Locale locale, Class<?> clazz) {
+
+		return new AggregateResourceBundle(
+			getBundle(locale, clazz), PortalUtil.getResourceBundle(locale));
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static com.liferay.portal.kernel.util.ResourceBundleLoader
+		getResourceBundleLoader(
+			final String baseName, final ClassLoader classLoader) {
 
 		return new ClassResourceBundleLoader(baseName, classLoader);
 	}
@@ -119,7 +156,7 @@ public class ResourceBundleUtil {
 		}
 
 		try {
-			return resourceBundle.getString(key);
+			return LanguageBuilderUtil.fixValue(resourceBundle.getString(key));
 		}
 		catch (MissingResourceException missingResourceException) {
 			return null;

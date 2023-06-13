@@ -18,8 +18,11 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.util.AssetRendererFactoryLookup;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentHelper;
@@ -30,6 +33,8 @@ import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -42,6 +47,7 @@ import com.liferay.portal.search.internal.summary.SummaryBuilderFactoryImpl;
 import com.liferay.portal.search.web.internal.display.context.PortletURLFactory;
 import com.liferay.portal.search.web.internal.display.context.SearchResultPreferences;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
 
 import java.util.Collections;
@@ -49,8 +55,12 @@ import java.util.Locale;
 
 import javax.portlet.PortletURL;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Matchers;
@@ -64,14 +74,22 @@ import org.mockito.MockitoAnnotations;
  */
 public class SearchResultSummaryDisplayBuilderTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
 		setUpAssetRenderer();
+		setUpGroupLocalService();
 		setUpHtmlUtil();
 		setUpLocaleThreadLocal();
-		setUpProps();
+		setUpPropsUtil();
+		setUpUser();
+		setUpUserLocalService();
 
 		themeDisplay = createThemeDisplay();
 	}
@@ -137,6 +155,27 @@ public class SearchResultSummaryDisplayBuilderTest {
 	}
 
 	@Test
+	public void testNoStagingLabel() throws Exception {
+		String entryClassName = RandomTestUtil.randomString();
+
+		long entryClassPK = RandomTestUtil.randomLong();
+
+		whenAssetRendererFactoryGetAssetRenderer(entryClassPK, assetRenderer);
+
+		whenAssetRendererFactoryLookupGetAssetRendererFactoryByClassName(
+			entryClassName);
+
+		whenGroupLocalServiceGetGroup(false);
+
+		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext =
+			build(createDocument(entryClassName, entryClassPK));
+
+		Assert.assertEquals(
+			_SUMMARY_TITLE,
+			searchResultSummaryDisplayContext.getHighlightedTitle());
+	}
+
+	@Test
 	public void testResultIsTemporarilyUnavailable() throws Exception {
 		ruinAssetRendererFactoryLookup();
 
@@ -145,6 +184,28 @@ public class SearchResultSummaryDisplayBuilderTest {
 
 		Assert.assertTrue(
 			searchResultSummaryDisplayContext.isTemporarilyUnavailable());
+	}
+
+	@Test
+	public void testStagingLabel() throws Exception {
+		String entryClassName = RandomTestUtil.randomString();
+
+		long entryClassPK = RandomTestUtil.randomLong();
+
+		whenAssetRendererFactoryGetAssetRenderer(entryClassPK, assetRenderer);
+
+		whenAssetRendererFactoryLookupGetAssetRendererFactoryByClassName(
+			entryClassName);
+
+		whenGroupLocalServiceGetGroup(true);
+		whenLanguageGet("staged");
+
+		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext =
+			build(createDocument(entryClassName, entryClassPK));
+
+		Assert.assertEquals(
+			_SUMMARY_TITLE + " (staged)",
+			searchResultSummaryDisplayContext.getHighlightedTitle());
 	}
 
 	@Test
@@ -397,9 +458,10 @@ public class SearchResultSummaryDisplayBuilderTest {
 			assetRendererFactoryLookup);
 		searchResultSummaryDisplayBuilder.setFastDateFormatFactory(
 			fastDateFormatFactory);
+		searchResultSummaryDisplayBuilder.setGroupLocalService(
+			groupLocalService);
 		searchResultSummaryDisplayBuilder.setIndexerRegistry(indexerRegistry);
-		searchResultSummaryDisplayBuilder.setLanguage(
-			Mockito.mock(Language.class));
+		searchResultSummaryDisplayBuilder.setLanguage(language);
 		searchResultSummaryDisplayBuilder.setLocale(locale);
 		searchResultSummaryDisplayBuilder.setPortletURLFactory(
 			portletURLFactory);
@@ -412,6 +474,7 @@ public class SearchResultSummaryDisplayBuilderTest {
 		searchResultSummaryDisplayBuilder.setSummaryBuilderFactory(
 			new SummaryBuilderFactoryImpl());
 		searchResultSummaryDisplayBuilder.setThemeDisplay(themeDisplay);
+		searchResultSummaryDisplayBuilder.setUserLocalService(userLocalService);
 
 		return searchResultSummaryDisplayBuilder;
 	}
@@ -420,8 +483,8 @@ public class SearchResultSummaryDisplayBuilderTest {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		themeDisplay.setCompany(Mockito.mock(Company.class));
-		themeDisplay.setUser(Mockito.mock(User.class));
 		themeDisplay.setPermissionChecker(permissionChecker);
+		themeDisplay.setUser(Mockito.mock(User.class));
 
 		return themeDisplay;
 	}
@@ -454,6 +517,16 @@ public class SearchResultSummaryDisplayBuilderTest {
 		);
 	}
 
+	protected void setUpGroupLocalService() {
+		Mockito.doReturn(
+			group
+		).when(
+			groupLocalService
+		).fetchGroup(
+			Mockito.anyLong()
+		);
+	}
+
 	protected void setUpHtmlUtil() throws Exception {
 		HtmlUtil htmlUtil = new HtmlUtil();
 
@@ -464,8 +537,34 @@ public class SearchResultSummaryDisplayBuilderTest {
 		LocaleThreadLocal.setThemeDisplayLocale(LocaleUtil.US);
 	}
 
-	protected void setUpProps() {
+	protected void setUpPropsUtil() {
 		PropsTestUtil.setProps(Collections.emptyMap());
+	}
+
+	protected void setUpUser() throws PortalException {
+		Mockito.doReturn(
+			RandomTestUtil.randomString()
+		).when(
+			user
+		).getPortraitURL(
+			Mockito.any()
+		);
+
+		Mockito.doReturn(
+			RandomTestUtil.randomLong()
+		).when(
+			user
+		).getPortraitId();
+	}
+
+	protected void setUpUserLocalService() {
+		Mockito.doReturn(
+			user
+		).when(
+			userLocalService
+		).fetchUser(
+			Mockito.anyLong()
+		);
 	}
 
 	protected void whenAssetEntryLocalServiceFetchEntry(
@@ -518,6 +617,16 @@ public class SearchResultSummaryDisplayBuilderTest {
 		);
 	}
 
+	protected void whenGroupLocalServiceGetGroup(boolean stagingGroup)
+		throws PortalException {
+
+		Mockito.doReturn(
+			stagingGroup
+		).when(
+			group
+		).isStagingGroup();
+	}
+
 	protected void whenIndexerRegistryGetIndexer(
 		String className, Indexer<?> indexer) {
 
@@ -527,6 +636,16 @@ public class SearchResultSummaryDisplayBuilderTest {
 			indexerRegistry
 		).getIndexer(
 			className
+		);
+	}
+
+	protected void whenLanguageGet(String string) {
+		Mockito.doReturn(
+			string
+		).when(
+			language
+		).get(
+			Mockito.any(HttpServletRequest.class), Mockito.anyString()
 		);
 	}
 
@@ -546,7 +665,16 @@ public class SearchResultSummaryDisplayBuilderTest {
 		new FastDateFormatFactoryImpl();
 
 	@Mock
+	protected Group group;
+
+	@Mock
+	protected GroupLocalService groupLocalService;
+
+	@Mock
 	protected IndexerRegistry indexerRegistry;
+
+	@Mock
+	protected Language language;
 
 	protected Locale locale = LocaleUtil.US;
 
@@ -557,6 +685,12 @@ public class SearchResultSummaryDisplayBuilderTest {
 	protected PortletURLFactory portletURLFactory;
 
 	protected ThemeDisplay themeDisplay;
+
+	@Mock
+	protected User user;
+
+	@Mock
+	protected UserLocalService userLocalService;
 
 	private static final String _SUMMARY_CONTENT =
 		RandomTestUtil.randomString();

@@ -17,7 +17,7 @@
 <%@ include file="/com.liferay.portal.settings.web/init.jsp" %>
 
 <%
-long ldapServerId = ParamUtil.getLong(request, "ldapServerId", 0);
+long ldapServerId = ParamUtil.getLong(request, "ldapServerId");
 
 String baseProviderURL = ParamUtil.getString(request, "baseProviderURL");
 String baseDN = ParamUtil.getString(request, "baseDN");
@@ -79,7 +79,7 @@ List<SearchResult> searchResults = new ArrayList<SearchResult>();
 try {
 	safePortalLDAP.getGroups(themeDisplay.getCompanyId(), safeLdapContext, new byte[0], 20, SafeLdapNameFactory.fromUnsafe(baseDN), groupSafeLdapFilter, attributeIds, searchResults);
 }
-catch (NameNotFoundException | InvalidNameException nnfe) {
+catch (InvalidNameException | NameNotFoundException exception) {
 %>
 
 	<liferay-ui:message key="please-enter-a-valid-ldap-base-dn" />
@@ -120,10 +120,9 @@ catch (NameNotFoundException | InvalidNameException nnfe) {
 
 			attribute = safePortalLDAP.getMultivaluedAttribute(themeDisplay.getCompanyId(), safeLdapContext, SafeLdapNameFactory.fromUnsafe(baseDN), safeLdapFilter, attribute);
 		}
-
-		if (counter == 0) {
 	%>
 
+		<c:if test="<%= counter == 0 %>">
 			<col width="5%" />
 			<col width="25%" />
 			<col width="60%" />
@@ -143,10 +142,9 @@ catch (NameNotFoundException | InvalidNameException nnfe) {
 					<liferay-ui:message key="members" />
 				</th>
 			</tr>
+		</c:if>
 
 		<%
-		}
-
 		counter++;
 		%>
 
@@ -167,33 +165,24 @@ catch (NameNotFoundException | InvalidNameException nnfe) {
 
 	<%
 	}
-
-	if (counter == 0) {
 	%>
 
+	<c:if test="<%= counter == 0 %>">
 		<tr>
 			<td colspan="4">
 				<liferay-ui:message key="no-groups-were-found" />
 			</td>
 		</tr>
-
-	<%
-	}
-	%>
-
+	</c:if>
 </table>
 
-<%
-if (showMissingAttributeMessage) {
-%>
-
+<c:if test="<%= showMissingAttributeMessage %>">
 	<div class="alert alert-info">
 		<liferay-ui:message key="the-above-results-include-groups-which-are-missing-the-required-attributes-(group-name-and-user).-these-groups-will-not-be-imported-until-these-attributes-are-filled-in" />
 	</div>
+</c:if>
 
 <%
-}
-
 if (safeLdapContext != null) {
 	safeLdapContext.close();
 }

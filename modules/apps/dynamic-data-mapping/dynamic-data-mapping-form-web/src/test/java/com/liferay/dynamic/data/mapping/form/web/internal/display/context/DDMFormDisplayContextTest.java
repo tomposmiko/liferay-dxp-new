@@ -22,10 +22,15 @@ import com.liferay.dynamic.data.mapping.form.web.internal.configuration.DDMFormW
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
+import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
+import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -33,25 +38,33 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
+import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsImpl;
-import com.liferay.spring.mock.web.portlet.MockRenderRequest;
-import com.liferay.spring.mock.web.portlet.MockRenderResponse;
+import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderRequest;
+import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderResponse;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,6 +74,7 @@ import org.junit.runner.RunWith;
 
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -71,7 +85,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 /**
  * @author Adam Brandizzi
  */
-@PrepareForTest(LocaleUtil.class)
+@PrepareForTest({LocaleUtil.class, PortletPermissionUtil.class})
 @RunWith(PowerMockRunner.class)
 public class DDMFormDisplayContextTest extends PowerMockito {
 
@@ -126,7 +140,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		DDMFormDisplayContext ddmFormDisplayContext =
 			createDDMFormDisplayContext(renderRequest);
 
-		Assert.assertEquals(false, ddmFormDisplayContext.isAutosaveEnabled());
+		Assert.assertFalse(ddmFormDisplayContext.isAutosaveEnabled());
 	}
 
 	@Test
@@ -146,7 +160,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		DDMFormDisplayContext ddmFormDisplayContext =
 			createDDMFormDisplayContext(renderRequest);
 
-		Assert.assertEquals(false, ddmFormDisplayContext.isAutosaveEnabled());
+		Assert.assertFalse(ddmFormDisplayContext.isAutosaveEnabled());
 	}
 
 	@Test
@@ -172,7 +186,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		DDMFormDisplayContext ddmFormDisplayContext =
 			createDDMFormDisplayContext(renderRequest);
 
-		Assert.assertEquals(true, ddmFormDisplayContext.isAutosaveEnabled());
+		Assert.assertTrue(ddmFormDisplayContext.isAutosaveEnabled());
 	}
 
 	@Test
@@ -198,7 +212,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		DDMFormDisplayContext ddmFormDisplayContext =
 			createDDMFormDisplayContext(renderRequest);
 
-		Assert.assertEquals(false, ddmFormDisplayContext.isAutosaveEnabled());
+		Assert.assertFalse(ddmFormDisplayContext.isAutosaveEnabled());
 	}
 
 	@Test
@@ -301,12 +315,97 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		Assert.assertTrue(createDDMFormDisplayContext.isFormShared());
 	}
 
+	@Test
+	public void testIsShowIconInEditMode() throws Exception {
+		_mockHttpServletRequest.addParameter("p_l_mode", Constants.EDIT);
+
+		DDMFormDisplayContext ddmFormDisplayContext = createSpy(
+			false, false, false);
+
+		Assert.assertFalse(ddmFormDisplayContext.isShowConfigurationIcon());
+	}
+
+	@Test
+	public void testIsShowIconInPreview() throws Exception {
+		DDMFormDisplayContext ddmFormDisplayContext = createSpy(
+			false, true, false);
+
+		Assert.assertFalse(ddmFormDisplayContext.isShowConfigurationIcon());
+	}
+
+	@Test
+	public void testIsShowIconWithPermission() throws Exception {
+		mockPortletPermissionUtil();
+
+		DDMFormDisplayContext ddmFormDisplayContext = createSpy(
+			false, false, true);
+
+		Assert.assertTrue(ddmFormDisplayContext.isShowConfigurationIcon());
+	}
+
+	@Test
+	public void testIsShowIconWithSharedForm() throws Exception {
+		DDMFormDisplayContext ddmFormDisplayContext = createSpy(
+			true, false, true);
+
+		Assert.assertFalse(ddmFormDisplayContext.isShowConfigurationIcon());
+	}
+
+	@Test
+	public void testIsShowSuccessPage() throws Exception {
+		mockDDMFormInstance(mock(DDMFormInstanceSettings.class));
+
+		MockRenderRequest mockRenderRequest = mockRenderRequest();
+
+		SessionMessages.add(
+			mockRenderRequest,
+			SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE);
+
+		DDMFormDisplayContext ddmFormDisplayContext =
+			createDDMFormDisplayContext(mockRenderRequest);
+
+		Assert.assertTrue(ddmFormDisplayContext.isShowSuccessPage());
+	}
+
+	@Test
+	public void testIsShowSuccessPageWithRedirectURL() throws Exception {
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
+			DDMFormInstanceSettings.class);
+
+		when(
+			ddmFormInstanceSettings.redirectURL()
+		).thenReturn(
+			"http://localhost:8080/web/forms/shared/-/form/123"
+		);
+
+		mockDDMFormInstance(ddmFormInstanceSettings);
+
+		MockRenderRequest mockRenderRequest = mockRenderRequest();
+
+		SessionMessages.add(
+			mockRenderRequest,
+			SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE);
+
+		DDMFormDisplayContext ddmFormDisplayContext =
+			createDDMFormDisplayContext(mockRenderRequest);
+
+		Assert.assertFalse(ddmFormDisplayContext.isShowSuccessPage());
+	}
+
 	protected DDMForm createDDMForm(
 		Set<Locale> availableLocales, Locale locale) {
 
 		DDMForm ddmForm = new DDMForm();
 
 		ddmForm.setAvailableLocales(availableLocales);
+
+		DDMFormSuccessPageSettings ddmFormSuccessPageSettings =
+			new DDMFormSuccessPageSettings();
+
+		ddmFormSuccessPageSettings.setEnabled(true);
+
+		ddmForm.setDDMFormSuccessPageSettings(ddmFormSuccessPageSettings);
+
 		ddmForm.setDefaultLocale(locale);
 
 		return ddmForm;
@@ -326,13 +425,42 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 			renderRequest, new MockRenderResponse(),
 			mock(DDMFormFieldTypeServicesTracker.class),
 			_ddmFormInstanceLocalService,
+			mock(DDMFormInstanceRecordService.class),
 			mock(DDMFormInstanceRecordVersionLocalService.class),
-			_ddmFormInstanceService,
-			mock(DDMFormInstanceVersionLocalService.class),
+			_ddmFormInstanceService, _mockDDMFormInstanceVersionLocalService(),
 			mock(DDMFormRenderer.class), mock(DDMFormValuesFactory.class),
 			mock(DDMFormValuesMerger.class), _ddmFormWebConfiguration,
-			mock(GroupLocalService.class), new JSONFactoryImpl(),
+			mock(DDMStorageAdapterTracker.class), mock(GroupLocalService.class),
+			new JSONFactoryImpl(),
 			mock(WorkflowDefinitionLinkLocalService.class), mock(Portal.class));
+	}
+
+	protected DDMFormDisplayContext createSpy(
+			boolean formShared, boolean preview, boolean sharedURL)
+		throws PortalException {
+
+		DDMFormDisplayContext ddmFormDisplayContext = spy(
+			createDDMFormDisplayContext());
+
+		Mockito.doReturn(
+			formShared
+		).when(
+			ddmFormDisplayContext
+		).isFormShared();
+
+		Mockito.doReturn(
+			preview
+		).when(
+			ddmFormDisplayContext
+		).isPreview();
+
+		Mockito.doReturn(
+			sharedURL
+		).when(
+			ddmFormDisplayContext
+		).isSharedURL();
+
+		return ddmFormDisplayContext;
 	}
 
 	protected DDMFormInstance mockDDMFormInstance() throws PortalException {
@@ -348,6 +476,33 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		);
 
 		return formInstance;
+	}
+
+	protected void mockDDMFormInstance(
+			DDMFormInstanceSettings ddmFormInstanceSettings)
+		throws Exception {
+
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
+
+		when(
+			ddmFormInstance.getSettingsModel()
+		).thenReturn(
+			ddmFormInstanceSettings
+		);
+
+		DDMStructure ddmStructure = _mockDDMStructure();
+
+		when(
+			ddmFormInstance.getStructure()
+		).thenReturn(
+			ddmStructure
+		);
+
+		when(
+			_ddmFormInstanceService.fetchFormInstance(Matchers.anyLong())
+		).thenReturn(
+			ddmFormInstance
+		);
 	}
 
 	protected DDMFormInstanceSettings
@@ -372,6 +527,19 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		);
 
 		return ddmFormInstanceSettings;
+	}
+
+	protected void mockPortletPermissionUtil() throws PortalException {
+		mockStatic(PortletPermissionUtil.class);
+
+		when(
+			PortletPermissionUtil.contains(
+				Matchers.any(PermissionChecker.class),
+				Matchers.any(Layout.class), Matchers.anyString(),
+				Matchers.anyString())
+		).thenReturn(
+			true
+		);
 	}
 
 	protected MockRenderRequest mockRenderRequest() {
@@ -465,7 +633,79 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		).thenReturn(
 			_request
 		);
+
+		when(
+			PortalUtil.getLiferayPortletRequest(
+				Matchers.any(RenderRequest.class))
+		).thenReturn(
+			Mockito.mock(LiferayPortletRequest.class)
+		);
+
+		when(
+			PortalUtil.getOriginalServletRequest(
+				Matchers.any(HttpServletRequest.class))
+		).thenReturn(
+			_mockHttpServletRequest
+		);
 	}
+
+	private DDMForm _createDDMForm(
+		Set<Locale> availableLocales, Locale locale) {
+
+		DDMForm ddmForm = new DDMForm();
+
+		ddmForm.setAvailableLocales(availableLocales);
+
+		DDMFormSuccessPageSettings ddmFormSuccessPageSettings =
+			new DDMFormSuccessPageSettings();
+
+		ddmFormSuccessPageSettings.setEnabled(true);
+
+		ddmForm.setDDMFormSuccessPageSettings(ddmFormSuccessPageSettings);
+
+		ddmForm.setDefaultLocale(locale);
+
+		return ddmForm;
+	}
+
+	private DDMFormInstanceVersionLocalService
+			_mockDDMFormInstanceVersionLocalService()
+		throws PortalException {
+
+		DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService =
+			mock(DDMFormInstanceVersionLocalService.class);
+
+		DDMFormInstanceVersion ddmFormInstanceVersion = mock(
+			DDMFormInstanceVersion.class);
+
+		when(
+			ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
+				Matchers.anyLong(), Matchers.anyInt())
+		).thenReturn(
+			ddmFormInstanceVersion
+		);
+
+		return ddmFormInstanceVersionLocalService;
+	}
+
+	private DDMStructure _mockDDMStructure() throws Exception {
+		DDMStructure ddmStructure = mock(DDMStructure.class);
+
+		Locale defaultLocale = LocaleUtil.fromLanguageId(_DEFAULT_LANGUAGE_ID);
+
+		DDMForm ddmForm = _createDDMForm(
+			new HashSet<>(Arrays.asList(defaultLocale)), defaultLocale);
+
+		when(
+			ddmStructure.getDDMForm()
+		).thenReturn(
+			ddmForm
+		);
+
+		return ddmStructure;
+	}
+
+	private static final String _DEFAULT_LANGUAGE_ID = "es_ES";
 
 	@Mock
 	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
@@ -478,6 +718,9 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 
 	@Mock
 	private Language _language;
+
+	private final MockHttpServletRequest _mockHttpServletRequest =
+		new MockHttpServletRequest();
 
 	@Mock
 	private MockHttpServletRequest _request;

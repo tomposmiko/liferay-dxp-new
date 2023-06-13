@@ -14,7 +14,16 @@
 
 package com.liferay.social.kernel.service;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.social.kernel.model.SocialActivityAchievement;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for SocialActivityAchievement. This utility wraps
@@ -38,7 +47,7 @@ public class SocialActivityAchievementLocalServiceUtil {
 	public static void addActivityAchievement(
 			long userId, long groupId,
 			com.liferay.social.kernel.model.SocialAchievement achievement)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		getService().addActivityAchievement(userId, groupId, achievement);
 	}
@@ -46,16 +55,28 @@ public class SocialActivityAchievementLocalServiceUtil {
 	/**
 	 * Adds the social activity achievement to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SocialActivityAchievementLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param socialActivityAchievement the social activity achievement
 	 * @return the social activity achievement that was added
 	 */
-	public static com.liferay.social.kernel.model.SocialActivityAchievement
-		addSocialActivityAchievement(
-			com.liferay.social.kernel.model.SocialActivityAchievement
-				socialActivityAchievement) {
+	public static SocialActivityAchievement addSocialActivityAchievement(
+		SocialActivityAchievement socialActivityAchievement) {
 
 		return getService().addSocialActivityAchievement(
 			socialActivityAchievement);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -64,8 +85,8 @@ public class SocialActivityAchievementLocalServiceUtil {
 	 * @param activityAchievementId the primary key for the new social activity achievement
 	 * @return the new social activity achievement
 	 */
-	public static com.liferay.social.kernel.model.SocialActivityAchievement
-		createSocialActivityAchievement(long activityAchievementId) {
+	public static SocialActivityAchievement createSocialActivityAchievement(
+		long activityAchievementId) {
 
 		return getService().createSocialActivityAchievement(
 			activityAchievementId);
@@ -74,10 +95,9 @@ public class SocialActivityAchievementLocalServiceUtil {
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
@@ -85,13 +105,17 @@ public class SocialActivityAchievementLocalServiceUtil {
 	/**
 	 * Deletes the social activity achievement with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SocialActivityAchievementLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param activityAchievementId the primary key of the social activity achievement
 	 * @return the social activity achievement that was removed
 	 * @throws PortalException if a social activity achievement with the primary key could not be found
 	 */
-	public static com.liferay.social.kernel.model.SocialActivityAchievement
-			deleteSocialActivityAchievement(long activityAchievementId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static SocialActivityAchievement deleteSocialActivityAchievement(
+			long activityAchievementId)
+		throws PortalException {
 
 		return getService().deleteSocialActivityAchievement(
 			activityAchievementId);
@@ -100,21 +124,29 @@ public class SocialActivityAchievementLocalServiceUtil {
 	/**
 	 * Deletes the social activity achievement from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SocialActivityAchievementLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param socialActivityAchievement the social activity achievement
 	 * @return the social activity achievement that was removed
 	 */
-	public static com.liferay.social.kernel.model.SocialActivityAchievement
-		deleteSocialActivityAchievement(
-			com.liferay.social.kernel.model.SocialActivityAchievement
-				socialActivityAchievement) {
+	public static SocialActivityAchievement deleteSocialActivityAchievement(
+		SocialActivityAchievement socialActivityAchievement) {
 
 		return getService().deleteSocialActivityAchievement(
 			socialActivityAchievement);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -124,9 +156,7 @@ public class SocialActivityAchievementLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -142,9 +172,8 @@ public class SocialActivityAchievementLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -162,10 +191,9 @@ public class SocialActivityAchievementLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -177,9 +205,7 @@ public class SocialActivityAchievementLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -191,21 +217,21 @@ public class SocialActivityAchievementLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.social.kernel.model.SocialActivityAchievement
-		fetchSocialActivityAchievement(long activityAchievementId) {
+	public static SocialActivityAchievement fetchSocialActivityAchievement(
+		long activityAchievementId) {
 
 		return getService().fetchSocialActivityAchievement(
 			activityAchievementId);
 	}
 
-	public static com.liferay.social.kernel.model.SocialActivityAchievement
-		fetchUserAchievement(long userId, long groupId, String name) {
+	public static SocialActivityAchievement fetchUserAchievement(
+		long userId, long groupId, String name) {
 
 		return getService().fetchUserAchievement(userId, groupId, name);
 	}
@@ -216,16 +242,14 @@ public class SocialActivityAchievementLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	public static java.util.List
-		<com.liferay.social.kernel.model.SocialActivityAchievement>
-			getGroupAchievements(long groupId) {
+	public static List<SocialActivityAchievement> getGroupAchievements(
+		long groupId) {
 
 		return getService().getGroupAchievements(groupId);
 	}
 
-	public static java.util.List
-		<com.liferay.social.kernel.model.SocialActivityAchievement>
-			getGroupAchievements(long groupId, String name) {
+	public static List<SocialActivityAchievement> getGroupAchievements(
+		long groupId, String name) {
 
 		return getService().getGroupAchievements(groupId, name);
 	}
@@ -238,9 +262,8 @@ public class SocialActivityAchievementLocalServiceUtil {
 		return getService().getGroupAchievementsCount(groupId, name);
 	}
 
-	public static java.util.List
-		<com.liferay.social.kernel.model.SocialActivityAchievement>
-			getGroupFirstAchievements(long groupId) {
+	public static List<SocialActivityAchievement> getGroupFirstAchievements(
+		long groupId) {
 
 		return getService().getGroupFirstAchievements(groupId);
 	}
@@ -265,9 +288,11 @@ public class SocialActivityAchievementLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -279,9 +304,9 @@ public class SocialActivityAchievementLocalServiceUtil {
 	 * @return the social activity achievement
 	 * @throws PortalException if a social activity achievement with the primary key could not be found
 	 */
-	public static com.liferay.social.kernel.model.SocialActivityAchievement
-			getSocialActivityAchievement(long activityAchievementId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static SocialActivityAchievement getSocialActivityAchievement(
+			long activityAchievementId)
+		throws PortalException {
 
 		return getService().getSocialActivityAchievement(activityAchievementId);
 	}
@@ -297,9 +322,8 @@ public class SocialActivityAchievementLocalServiceUtil {
 	 * @param end the upper bound of the range of social activity achievements (not inclusive)
 	 * @return the range of social activity achievements
 	 */
-	public static java.util.List
-		<com.liferay.social.kernel.model.SocialActivityAchievement>
-			getSocialActivityAchievements(int start, int end) {
+	public static List<SocialActivityAchievement> getSocialActivityAchievements(
+		int start, int end) {
 
 		return getService().getSocialActivityAchievements(start, end);
 	}
@@ -313,9 +337,8 @@ public class SocialActivityAchievementLocalServiceUtil {
 		return getService().getSocialActivityAchievementsCount();
 	}
 
-	public static java.util.List
-		<com.liferay.social.kernel.model.SocialActivityAchievement>
-			getUserAchievements(long userId, long groupId) {
+	public static List<SocialActivityAchievement> getUserAchievements(
+		long userId, long groupId) {
 
 		return getService().getUserAchievements(userId, groupId);
 	}
@@ -327,29 +350,24 @@ public class SocialActivityAchievementLocalServiceUtil {
 	/**
 	 * Updates the social activity achievement in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SocialActivityAchievementLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param socialActivityAchievement the social activity achievement
 	 * @return the social activity achievement that was updated
 	 */
-	public static com.liferay.social.kernel.model.SocialActivityAchievement
-		updateSocialActivityAchievement(
-			com.liferay.social.kernel.model.SocialActivityAchievement
-				socialActivityAchievement) {
+	public static SocialActivityAchievement updateSocialActivityAchievement(
+		SocialActivityAchievement socialActivityAchievement) {
 
 		return getService().updateSocialActivityAchievement(
 			socialActivityAchievement);
 	}
 
 	public static SocialActivityAchievementLocalService getService() {
-		if (_service == null) {
-			_service =
-				(SocialActivityAchievementLocalService)
-					PortalBeanLocatorUtil.locate(
-						SocialActivityAchievementLocalService.class.getName());
-		}
-
 		return _service;
 	}
 
-	private static SocialActivityAchievementLocalService _service;
+	private static volatile SocialActivityAchievementLocalService _service;
 
 }

@@ -17,6 +17,8 @@ package com.liferay.portal.workflow.metrics.rest.client.dto.v1_0;
 import com.liferay.portal.workflow.metrics.rest.client.function.UnsafeSupplier;
 import com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0.NodeKeySerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class NodeKey {
+public class NodeKey implements Cloneable, Serializable {
+
+	public static NodeKey toDTO(String json) {
+		return NodeKeySerDes.toDTO(json);
+	}
 
 	public String getExecutionType() {
 		return executionType;
@@ -67,6 +73,11 @@ public class NodeKey {
 	}
 
 	protected String id;
+
+	@Override
+	public NodeKey clone() throws CloneNotSupportedException {
+		return (NodeKey)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

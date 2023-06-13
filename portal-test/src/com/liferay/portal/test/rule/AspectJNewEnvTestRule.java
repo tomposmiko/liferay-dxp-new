@@ -40,6 +40,7 @@ import java.util.List;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * @author Shuyang Zhou
@@ -48,6 +49,17 @@ public class AspectJNewEnvTestRule extends NewEnvTestRule {
 
 	public static final AspectJNewEnvTestRule INSTANCE =
 		new AspectJNewEnvTestRule();
+
+	@Override
+	public Statement apply(Statement statement, Description description) {
+		AdviseWith adviseWith = description.getAnnotation(AdviseWith.class);
+
+		if (adviseWith == null) {
+			return statement;
+		}
+
+		return super.apply(statement, description);
+	}
 
 	@Override
 	protected List<String> createArguments(Description description) {
@@ -65,7 +77,7 @@ public class AspectJNewEnvTestRule extends NewEnvTestRule {
 			return arguments;
 		}
 
-		StringBundler sb = new StringBundler(adviceClasses.length * 2 + 1);
+		StringBundler sb = new StringBundler((adviceClasses.length * 2) + 1);
 
 		sb.append("-DaspectClasses=");
 
@@ -111,15 +123,11 @@ public class AspectJNewEnvTestRule extends NewEnvTestRule {
 			}
 		}
 
-		String className = description.getClassName();
-
 		File dumpDir = new File(
 			System.getProperty("junit.aspectj.dump"),
-			className.concat(
-				StringPool.PERIOD
-			).concat(
-				description.getMethodName()
-			));
+			StringBundler.concat(
+				description.getClassName(), StringPool.PERIOD,
+				description.getMethodName()));
 
 		try {
 			return new WeavingClassLoader(
@@ -141,11 +149,8 @@ public class AspectJNewEnvTestRule extends NewEnvTestRule {
 
 		File dumpDir = new File(
 			System.getProperty("junit.aspectj.dump"),
-			className.concat(
-				StringPool.PERIOD
-			).concat(
-				methodKey.getMethodName()
-			));
+			StringBundler.concat(
+				className, StringPool.PERIOD, methodKey.getMethodName()));
 
 		return new SwitchClassLoaderProcessCallable(processCallable, dumpDir);
 	}

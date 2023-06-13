@@ -22,6 +22,7 @@ Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 long folderId = BeanParamUtil.getLong(folder, request, "folderId", DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 long groupId = BeanParamUtil.getLong(folder, request, "groupId");
+
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectFileEntry_" + groupId);
 
 if (folder != null) {
@@ -34,18 +35,16 @@ portletURL.setParameter("mvcRenderCommandName", "/document_library/select_file_e
 portletURL.setParameter("groupId", String.valueOf(groupId));
 portletURL.setParameter("folderId", String.valueOf(folderId));
 
-SearchContainer dlSearchContainer = new SearchContainer(liferayPortletRequest, null, null, "curEntry", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
+SearchContainer<Object> dlSearchContainer = new SearchContainer(liferayPortletRequest, null, null, "curEntry", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
 
-int foldersAndFileEntriesAndFileShortcutsCount = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(groupId, folderId, WorkflowConstants.STATUS_APPROVED, true);
-
-dlSearchContainer.setTotal(foldersAndFileEntriesAndFileShortcutsCount);
+dlSearchContainer.setTotal(DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(groupId, folderId, WorkflowConstants.STATUS_APPROVED, true));
 
 List<Object> foldersAndFileEntriesAndFileShortcuts = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(groupId, folderId, WorkflowConstants.STATUS_APPROVED, true, dlSearchContainer.getStart(), dlSearchContainer.getEnd(), dlSearchContainer.getOrderByComparator());
 
 dlSearchContainer.setResults(foldersAndFileEntriesAndFileShortcuts);
 %>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<aui:form method="post" name="selectFileEntryFm">
 		<liferay-ui:breadcrumb
 			showGuestGroup="<%= false %>"
@@ -84,7 +83,7 @@ dlSearchContainer.setResults(foldersAndFileEntriesAndFileShortcuts);
 						%>
 
 						<liferay-ui:search-container-column-text
-							name="title"
+							name="name"
 						>
 							<aui:a href="<%= rowURL.toString() %>">
 								<%= curFolder.getName() %>
@@ -99,17 +98,19 @@ dlSearchContainer.setResults(foldersAndFileEntriesAndFileShortcuts);
 
 						<c:if test="<%= fileVersion.isApproved() %>">
 							<liferay-ui:search-container-column-text
-								name="title"
+								name="name"
 							>
-
-								<%
-								Map<String, Object> data = new HashMap<String, Object>();
-
-								data.put("entryid", fileEntry.getFileEntryId());
-								data.put("entryname", HtmlUtil.unescape(fileEntry.getTitle()));
-								%>
-
-								<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
+								<aui:a
+									cssClass="selector-button"
+									data='<%=
+										HashMapBuilder.<String, Object>put(
+											"entryid", fileEntry.getFileEntryId()
+										).put(
+											"entryname", HtmlUtil.unescape(fileEntry.getTitle())
+										).build()
+									%>'
+									href="javascript:;"
+								>
 									<%= fileEntry.getTitle() %>
 								</aui:a>
 
@@ -130,7 +131,7 @@ dlSearchContainer.setResults(foldersAndFileEntriesAndFileShortcuts);
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <aui:script>
 	Liferay.Util.selectEntityHandler(

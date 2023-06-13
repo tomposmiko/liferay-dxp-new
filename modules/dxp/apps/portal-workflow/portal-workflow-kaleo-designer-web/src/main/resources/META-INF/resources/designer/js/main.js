@@ -11,7 +11,7 @@
 
 AUI.add(
 	'liferay-portlet-kaleo-designer',
-	A => {
+	(A) => {
 		var DiagramBuilder = A.DiagramBuilder;
 		var Lang = A.Lang;
 
@@ -47,55 +47,55 @@ AUI.add(
 				aceEditorConfig: {
 					setter: '_setAceEditor',
 					validator: isObject,
-					value: null
+					value: null,
 				},
 
 				availableFields: {
 					validator: isObject,
 					valueFn() {
 						return KaleoDesigner.AVAILABLE_FIELDS.DEFAULT;
-					}
+					},
 				},
 
 				availablePropertyModels: {
 					validator: isObject,
 					valueFn() {
 						return KaleoDesigner.AVAILABLE_PROPERTY_MODELS.DEFAULT;
-					}
+					},
 				},
 
 				contentTabView: {
 					setter: '_setContentTabView',
 					validator: isObject,
 					value: null,
-					writeOnce: true
+					writeOnce: true,
 				},
 
 				data: {
 					validator: isObject,
-					value: {}
+					value: {},
 				},
 
 				definition: {
 					lazyAdd: false,
-					setter: '_setDefinition'
+					setter: '_setDefinition',
 				},
 
 				portletNamespace: {
-					value: STR_BLANK
+					value: STR_BLANK,
 				},
 
 				portletResourceNamespace: {
-					value: STR_BLANK
+					value: STR_BLANK,
 				},
 
 				propertyList: {
 					value: {
 						strings: {
 							propertyName: Liferay.Language.get('property-name'),
-							value: Liferay.Language.get('value')
-						}
-					}
+							value: Liferay.Language.get('value'),
+						},
+					},
 				},
 
 				strings: {
@@ -110,9 +110,9 @@ AUI.add(
 							'are-you-sure-you-want-to-delete-the-selected-nodes'
 						),
 						save: Liferay.Language.get('save'),
-						settings: Liferay.Language.get('settings')
-					}
-				}
+						settings: Liferay.Language.get('settings'),
+					},
+				},
 			},
 
 			EXTENDS: DiagramBuilder,
@@ -153,7 +153,7 @@ AUI.add(
 
 					var defaultGetEditorFn = dataTable.getEditor;
 
-					dataTable.getEditor = function() {
+					dataTable.getEditor = function () {
 						var editor = defaultGetEditorFn.apply(this, arguments);
 
 						if (editor) {
@@ -162,13 +162,15 @@ AUI.add(
 								editor
 							);
 
-							editor._setToolbar = function(val) {
+							editor._setToolbar = function (val) {
 								var toolbar = defaultSetToolbarFn(val);
 
 								if (toolbar && toolbar.children) {
 									toolbar.children = toolbar.children.map(
-										children => {
-											children = children.map(item => {
+										(children) => {
+											children = children.map((item) => {
+												item.cssClass = 'btn-secondary';
+
 												delete item.icon;
 
 												return item;
@@ -202,6 +204,19 @@ AUI.add(
 
 						if (tabContentNode === instance.sourceNode) {
 							instance.showEditor();
+						}
+						else {
+							if (
+								!XMLUtil.validateDefinition(
+									instance.getEditorContent()
+								)
+							) {
+								instance.showErrorMessage(
+									Liferay.Language.get(
+										'please-enter-valid-content'
+									)
+								);
+							}
 						}
 					}
 				},
@@ -255,7 +270,7 @@ AUI.add(
 							height: canvasRegion.height,
 							mode: 'xml',
 							tabSize: 4,
-							width: canvasRegion.width
+							width: canvasRegion.width,
 						},
 						val
 					);
@@ -275,7 +290,7 @@ AUI.add(
 							selectionChange: A.bind(
 								instance._afterSelectionChangeKaleoDesigner,
 								instance
-							)
+							),
 						},
 						boundingBox: boundingBox.one('.tabbable'),
 						bubbleTargets: instance,
@@ -286,7 +301,7 @@ AUI.add(
 							'.tabbable .tabbable-content .tabview-content'
 						),
 						cssClass: 'tabbable',
-						listNode: contentTabListNode
+						listNode: contentTabListNode,
 					};
 
 					if (!contentTabListNode) {
@@ -294,11 +309,11 @@ AUI.add(
 
 						defaultValue.items = [
 							{
-								label: strings.view
+								label: strings.view,
 							},
 							{
-								label: strings.source
-							}
+								label: strings.source,
+							},
 						];
 					}
 
@@ -329,7 +344,8 @@ AUI.add(
 									KaleoDesignerStrings.inspectTaskMessage +
 									'</div>'
 							);
-						} else {
+						}
+						else {
 							KaleoDesigner.superclass._uiSetAvailableFields.apply(
 								this,
 								arguments
@@ -404,7 +420,8 @@ AUI.add(
 							this,
 							arguments
 						);
-					} else {
+					}
+					else {
 						instance.closeEditProperties();
 					}
 
@@ -458,6 +475,22 @@ AUI.add(
 						'destroyPortlet',
 						A.bind(instance._onDestroyPortlet, instance)
 					);
+
+					document.addEventListener('keydown', (event) => {
+						const baseCellEditorPopup = document.querySelector(
+							'.basecelleditor'
+						);
+
+						if (
+							baseCellEditorPopup &&
+							!baseCellEditorPopup.contains(event.target) &&
+							event.code === 'Enter'
+						) {
+							baseCellEditorPopup.classList.add(
+								'actions-cell-editor-hidden'
+							);
+						}
+					});
 				},
 
 				setEditorContent(content) {
@@ -494,39 +527,16 @@ AUI.add(
 					}
 				},
 
-				showSuccessMessage() {
-					var instance = this;
-
-					var successMessage = Liferay.Language.get(
-						'definition-imported-sucessfully'
-					);
-
-					var alert = instance._alert;
-
-					if (alert) {
-						alert.destroy();
-					}
-
-					alert = new Liferay.Alert({
-						closeable: true,
-						delay: {
-							hide: 3000,
-							show: 0
-						},
-						icon: 'check',
-						message: successMessage,
-						type: 'success'
+				showErrorMessage(message) {
+					Liferay.Util.openToast({
+						container: document.querySelector(
+							'.lfr-alert-container'
+						),
+						message,
+						type: 'danger',
 					});
-
-					if (!alert.get('rendered')) {
-						alert.render('.portlet-column');
-					}
-
-					alert.show();
-
-					instance._alert = alert;
-				}
-			}
+				},
+			},
 		});
 
 		KaleoDesigner.AVAILABLE_FIELDS = {
@@ -534,44 +544,44 @@ AUI.add(
 				{
 					iconClass: 'diamond',
 					label: Liferay.Language.get('condition-node'),
-					type: 'condition'
+					type: 'condition',
 				},
 				{
 					iconClass: 'arrow-end',
 					label: Liferay.Language.get('end-node'),
-					type: 'end'
+					type: 'end',
 				},
 				{
 					iconClass: 'arrow-split',
 					label: Liferay.Language.get('fork-node'),
-					type: 'fork'
+					type: 'fork',
 				},
 				{
 					iconClass: 'arrow-join',
 					label: Liferay.Language.get('join-node'),
-					type: 'join'
+					type: 'join',
 				},
 				{
 					iconClass: 'arrow-xor',
 					label: Liferay.Language.get('join-xor-node'),
-					type: 'join-xor'
+					type: 'join-xor',
 				},
 				{
 					iconClass: 'arrow-start',
 					label: Liferay.Language.get('start-node'),
-					type: 'start'
+					type: 'start',
 				},
 				{
 					iconClass: 'circle',
 					label: Liferay.Language.get('state-node'),
-					type: 'state'
+					type: 'state',
 				},
 				{
 					iconClass: 'square',
 					label: Liferay.Language.get('task-node'),
-					type: 'task'
-				}
-			]
+					type: 'task',
+				},
+			],
 		};
 
 		KaleoDesigner.AVAILABLE_PROPERTY_MODELS = {
@@ -588,11 +598,11 @@ AUI.add(
 							attributeName: 'assignments',
 							editor: new KaleoDesignerEditors.AssignmentsEditor(),
 							formatter: PropertyListFormatter.assignmentsType,
-							name: strings.assignments
-						}
+							name: strings.assignments,
+						},
 					]);
-				}
-			}
+				},
+			},
 		};
 
 		Liferay.KaleoDesigner = KaleoDesigner;
@@ -610,7 +620,7 @@ AUI.add(
 			'liferay-kaleo-designer-nodes',
 			'liferay-kaleo-designer-utils',
 			'liferay-kaleo-designer-xml-util',
-			'liferay-util-window'
-		]
+			'liferay-util-window',
+		],
 	}
 );

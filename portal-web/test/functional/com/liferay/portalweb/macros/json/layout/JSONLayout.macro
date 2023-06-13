@@ -6,7 +6,11 @@ definition {
 
 		var friendlyURL = JSONLayoutSetter.setFriendlyURL(friendlyURL = "${friendlyURL}");
 
-		var groupId = JSONLayoutSetter.setGroupId(groupKey = "${groupName}", parentGroupName = "${parentGroupName}");
+		var groupId = JSONLayoutSetter.setGroupId(
+			grandParentGroupName = "${grandParentGroupName}",
+			groupKey = "${groupName}",
+			parentGroupName = "${parentGroupName}",
+			site = "${site}");
 
 		var parentLayoutId = JSONLayoutSetter.setParentLayoutId(
 			groupId = "${groupId}",
@@ -68,7 +72,11 @@ definition {
 
 		var friendlyURL = JSONLayoutSetter.setFriendlyURL(friendlyURL = "${friendlyURL}");
 
-		var groupId = JSONLayoutSetter.setGroupId(groupKey = "${groupName}", parentGroupName = "${parentGroupName}", grandParentGroupName = "${grandParentGroupName}");
+		var groupId = JSONLayoutSetter.setGroupId(
+			grandParentGroupName = "${grandParentGroupName}",
+			groupKey = "${groupName}",
+			parentGroupName = "${parentGroupName}",
+			site = "${site}");
 
 		var parentLayoutId = JSONLayoutSetter.setParentLayoutId(
 			groupId = "${groupId}",
@@ -128,7 +136,11 @@ definition {
 	macro addWidgetToPrivateLayout {
 		Variables.assertDefined(parameterList = "${groupName},${layoutName},${widgetName}");
 
-		var groupId = JSONLayoutSetter.setGroupId(groupName = "${groupName}");
+		var groupId = JSONLayoutSetter.setGroupId(
+			grandParentGroupName = "${grandParentGroupName}",
+			groupKey = "${groupName}",
+			parentGroupName = "${parentGroupName}",
+			site = "${site}");
 
 		var layoutId = JSONLayoutSetter.setLayoutId(
 			groupId = "${groupId}",
@@ -152,7 +164,11 @@ definition {
 	macro addWidgetToPublicLayout {
 		Variables.assertDefined(parameterList = "${groupName},${layoutName},${widgetName}");
 
-		var groupId = JSONLayoutSetter.setGroupId(groupName = "${groupName}");
+		var groupId = JSONLayoutSetter.setGroupId(
+			grandParentGroupName = "${grandParentGroupName}",
+			groupKey = "${groupName}",
+			parentGroupName = "${parentGroupName}",
+			site = "${site}");
 
 		var layoutId = JSONLayoutSetter.setLayoutId(
 			groupId = "${groupId}",
@@ -211,7 +227,13 @@ definition {
 	macro updateLayoutTemplateOfPublicLayout {
 		Variables.assertDefined(parameterList = "${groupName},${layoutName},${layoutTemplate}");
 
-		var groupId = JSONGroupAPI._getGroupIdByName(groupName = "${groupName}");
+		if (!(isSet(site))) {
+			var site = "true";
+		}
+
+		var groupId = JSONGroupAPI._getGroupIdByName(
+			groupName = "${groupName}",
+			site = "${site}");
 
 		var groupId = JSONLayoutSetter.setGroupId(groupName = "${groupName}");
 

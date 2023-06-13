@@ -59,7 +59,6 @@ public abstract class BlogsEntryFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -85,14 +84,5 @@ public abstract class BlogsEntryFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BlogsEntryFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(BlogsPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

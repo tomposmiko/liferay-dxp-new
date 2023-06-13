@@ -14,10 +14,13 @@
 
 package com.liferay.change.tracking.web.internal.display;
 
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,77 +30,92 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CTEntryDiffDisplay {
 
+	public static final String TYPE_AFTER = "after";
+
+	public static final String TYPE_BEFORE = "before";
+
 	public CTEntryDiffDisplay(
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, String changeType,
 		CTCollection ctCollection,
 		CTDisplayRendererRegistry ctDisplayRendererRegistry, CTEntry ctEntry,
-		Language language, String name) {
+		CTEntryLocalService ctEntryLocalService,
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, Language language) {
 
-		_httpServletRequest = httpServletRequest;
-		_httpServletResponse = httpServletResponse;
-		_changeType = changeType;
 		_ctCollection = ctCollection;
 		_ctDisplayRendererRegistry = ctDisplayRendererRegistry;
 		_ctEntry = ctEntry;
+		_ctEntryLocalService = ctEntryLocalService;
+		_httpServletRequest = httpServletRequest;
+		_httpServletResponse = httpServletResponse;
 		_language = language;
-		_name = name;
 	}
 
 	public String getLeftTitle() {
-		String title = StringBundler.concat(
-			_language.get(_httpServletRequest, "production"), " : ", _name);
-
-		if (_changeType.equals("added")) {
-			title = StringBundler.concat(
-				title, " (", _language.get(_httpServletRequest, "new"), ")");
+		if (isChangeType(CTConstants.CT_CHANGE_TYPE_DELETION)) {
+			return StringBundler.concat(
+				_language.get(_httpServletRequest, "production"), " (",
+				_language.get(_httpServletRequest, "deleted"), ")");
 		}
 
-		return title;
+		return _language.get(_httpServletRequest, "production");
 	}
 
 	public String getRightTitle() {
-		String title = StringBundler.concat(
-			_ctCollection.getName(), " : ", _name);
-
-		if (_changeType.equals("deleted")) {
-			title = StringBundler.concat(
-				title, " (", _language.get(_httpServletRequest, "deleted"),
-				")");
+		if (isChangeType(CTConstants.CT_CHANGE_TYPE_ADDITION)) {
+			return StringBundler.concat(
+				_language.get(_httpServletRequest, "publication"), " : ",
+				_ctCollection.getName(), " (",
+				_language.get(_httpServletRequest, "new"), ")");
 		}
 
-		return title;
+		return StringBundler.concat(
+			_language.get(_httpServletRequest, "publication"), " : ",
+			_ctCollection.getName());
 	}
 
-	public void renderLeftView() throws Exception {
-		if (!_changeType.equals("added")) {
-			long ctCollectionId = _ctCollection.getCtCollectionId();
+	public boolean isChangeType(int changeType) {
+		if (_ctEntry.getChangeType() == changeType) {
+			return true;
+		}
 
-			if (_changeType.equals("deleted")) {
-				ctCollectionId = 0;
-			}
+		return false;
+	}
+
+	public void renderLeftCTRow() throws Exception {
+		if (_ctCollection.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+			_ctDisplayRendererRegistry.renderCTEntry(
+				_httpServletRequest, _httpServletResponse,
+				_ctEntry.getCtCollectionId(), _ctEntry, TYPE_BEFORE);
+		}
+		else {
+			_ctDisplayRendererRegistry.renderCTEntry(
+				_httpServletRequest, _httpServletResponse,
+				CTConstants.CT_COLLECTION_ID_PRODUCTION, _ctEntry, TYPE_BEFORE);
+		}
+	}
+
+	public void renderRightCTRow() throws Exception {
+		if (_ctCollection.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+			long ctCollectionId = _ctEntryLocalService.getCTRowCTCollectionId(
+				_ctEntry);
 
 			_ctDisplayRendererRegistry.renderCTEntry(
-				_httpServletRequest, _httpServletResponse, _ctEntry,
-				ctCollectionId);
+				_httpServletRequest, _httpServletResponse, ctCollectionId,
+				_ctEntry, TYPE_AFTER);
 		}
-	}
-
-	public void renderRightView() throws Exception {
-		if (!_changeType.equals("deleted")) {
+		else {
 			_ctDisplayRendererRegistry.renderCTEntry(
-				_httpServletRequest, _httpServletResponse, _ctEntry,
-				_ctCollection.getCtCollectionId());
+				_httpServletRequest, _httpServletResponse,
+				_ctCollection.getCtCollectionId(), _ctEntry, TYPE_AFTER);
 		}
 	}
 
-	private final String _changeType;
 	private final CTCollection _ctCollection;
 	private final CTDisplayRendererRegistry _ctDisplayRendererRegistry;
 	private final CTEntry _ctEntry;
+	private final CTEntryLocalService _ctEntryLocalService;
 	private final HttpServletRequest _httpServletRequest;
 	private final HttpServletResponse _httpServletResponse;
 	private final Language _language;
-	private final String _name;
 
 }

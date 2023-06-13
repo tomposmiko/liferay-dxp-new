@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -77,12 +76,11 @@ public class PortletDataContextReferencesTest {
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
 			_group.getGroupId(), TestPropsValues.getUserId());
 
-		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
-
 		_portletDataContext =
 			PortletDataContextFactoryUtil.createExportPortletDataContext(
 				TestPropsValues.getCompanyId(), _group.getGroupId(),
-				new HashMap<String, String[]>(), null, null, zipWriter);
+				new HashMap<String, String[]>(), null, null,
+				ZipWriterFactoryUtil.getZipWriter());
 
 		Document document = SAXReaderUtil.createDocument();
 
@@ -350,9 +348,7 @@ public class PortletDataContextReferencesTest {
 
 	@Test
 	public void testNotReferenceMissingReference() throws Exception {
-		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
-
-		_portletDataContext.setZipWriter(zipWriter);
+		_portletDataContext.setZipWriter(ZipWriterFactoryUtil.getZipWriter());
 
 		Element bookmarksEntryElement =
 			_portletDataContext.getExportDataElement(_bookmarksEntry);
@@ -417,6 +413,38 @@ public class PortletDataContextReferencesTest {
 				GetterUtil.getBoolean(
 					referenceElement.attributeValue("missing")));
 		}
+	}
+
+	@Test
+	public void testSetImportDataElementCacheEnabled() throws Exception {
+		_portletDataContext.setImportDataElementCacheEnabled(true);
+
+		_portletDataContext.addClassedModel(
+			_portletDataContext.getExportDataElement(_bookmarksEntry),
+			ExportImportPathUtil.getModelPath(_bookmarksEntry), _bookmarksEntry,
+			BookmarksEntry.class);
+
+		Assert.assertTrue(
+			_portletDataContext.getImportDataElement(_bookmarksEntry) ==
+				_portletDataContext.getImportDataElement(_bookmarksEntry));
+
+		_portletDataContext.addClassedModel(
+			_portletDataContext.getExportDataElement(_bookmarksFolder),
+			ExportImportPathUtil.getModelPath(_bookmarksFolder),
+			_bookmarksFolder, BookmarksFolder.class);
+
+		Assert.assertTrue(
+			_portletDataContext.getImportDataElement(_bookmarksFolder) ==
+				_portletDataContext.getImportDataElement(_bookmarksFolder));
+
+		_portletDataContext.setImportDataElementCacheEnabled(false);
+
+		Assert.assertFalse(
+			_portletDataContext.getImportDataElement(_bookmarksEntry) ==
+				_portletDataContext.getImportDataElement(_bookmarksEntry));
+		Assert.assertFalse(
+			_portletDataContext.getImportDataElement(_bookmarksFolder) ==
+				_portletDataContext.getImportDataElement(_bookmarksFolder));
 	}
 
 	private BookmarksEntry _bookmarksEntry;

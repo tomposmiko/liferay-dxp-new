@@ -15,16 +15,16 @@
 /**
  * The Autocomplete Input Caretindex Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-autocomplete-input-caretindex
  */
 
 AUI.add(
 	'liferay-autocomplete-input-caretindex',
-	A => {
+	(A) => {
 		var STR_INPUT_NODE = 'inputNode';
 
-		var AutcompleteInputCaretIndex = function() {};
+		var AutcompleteInputCaretIndex = function () {};
 
 		AutcompleteInputCaretIndex.prototype = {
 			_getCaretIndex(node) {
@@ -36,7 +36,7 @@ AUI.add(
 
 				return {
 					end: input.selectionStart,
-					start: input.selectionStart
+					start: input.selectionStart,
 				};
 			},
 
@@ -50,13 +50,13 @@ AUI.add(
 				Liferay.Util.focusFormField(input);
 
 				input.setSelectionRange(caretIndex, caretIndex);
-			}
+			},
 		};
 
 		A.Base.mix(Liferay.AutoCompleteTextarea, [AutcompleteInputCaretIndex]);
 	},
 	'',
 	{
-		requires: ['liferay-autocomplete-textarea']
+		requires: ['liferay-autocomplete-textarea'],
 	}
 );

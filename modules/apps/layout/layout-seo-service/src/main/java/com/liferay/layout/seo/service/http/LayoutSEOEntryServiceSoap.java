@@ -61,9 +61,83 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see LayoutSEOEntryServiceHttp
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class LayoutSEOEntryServiceSoap {
+
+	public static com.liferay.layout.seo.model.LayoutSEOEntrySoap
+			copyLayoutSEOEntry(
+				long userId, long groupId, boolean privateLayout, long layoutId,
+				boolean canonicalURLEnabled,
+				String[] canonicalURLMapLanguageIds,
+				String[] canonicalURLMapValues, long copyDDMStorageId,
+				boolean openGraphDescriptionEnabled,
+				String[] openGraphDescriptionMapLanguageIds,
+				String[] openGraphDescriptionMapValues,
+				String[] openGraphImageAltMapLanguageIds,
+				String[] openGraphImageAltMapValues,
+				long openGraphImageFileEntryId, boolean openGraphTitleEnabled,
+				String[] openGraphTitleMapLanguageIds,
+				String[] openGraphTitleMapValues,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			Map<Locale, String> canonicalURLMap =
+				LocalizationUtil.getLocalizationMap(
+					canonicalURLMapLanguageIds, canonicalURLMapValues);
+			Map<Locale, String> openGraphDescriptionMap =
+				LocalizationUtil.getLocalizationMap(
+					openGraphDescriptionMapLanguageIds,
+					openGraphDescriptionMapValues);
+			Map<Locale, String> openGraphImageAltMap =
+				LocalizationUtil.getLocalizationMap(
+					openGraphImageAltMapLanguageIds,
+					openGraphImageAltMapValues);
+			Map<Locale, String> openGraphTitleMap =
+				LocalizationUtil.getLocalizationMap(
+					openGraphTitleMapLanguageIds, openGraphTitleMapValues);
+
+			com.liferay.layout.seo.model.LayoutSEOEntry returnValue =
+				LayoutSEOEntryServiceUtil.copyLayoutSEOEntry(
+					userId, groupId, privateLayout, layoutId,
+					canonicalURLEnabled, canonicalURLMap, copyDDMStorageId,
+					openGraphDescriptionEnabled, openGraphDescriptionMap,
+					openGraphImageAltMap, openGraphImageFileEntryId,
+					openGraphTitleEnabled, openGraphTitleMap, serviceContext);
+
+			return com.liferay.layout.seo.model.LayoutSEOEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.layout.seo.model.LayoutSEOEntrySoap
+			updateCustomMetaTags(
+				long groupId, boolean privateLayout, long layoutId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.layout.seo.model.LayoutSEOEntry returnValue =
+				LayoutSEOEntryServiceUtil.updateCustomMetaTags(
+					groupId, privateLayout, layoutId, serviceContext);
+
+			return com.liferay.layout.seo.model.LayoutSEOEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
 
 	public static com.liferay.layout.seo.model.LayoutSEOEntrySoap
 			updateLayoutSEOEntry(

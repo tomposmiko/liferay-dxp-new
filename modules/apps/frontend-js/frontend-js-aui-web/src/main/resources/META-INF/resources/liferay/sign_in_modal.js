@@ -12,9 +12,14 @@
  * details.
  */
 
+/**
+ * Sign-in modal
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
+ */
+
 AUI.add(
 	'liferay-sign-in-modal',
-	A => {
+	(A) => {
 		var NAME = 'signinmodal';
 
 		var WIN = A.config.win;
@@ -22,13 +27,14 @@ AUI.add(
 		var SignInModal = A.Component.create({
 			ATTRS: {
 				resetFormValidator: {
-					value: true
+					value: true,
 				},
 
 				signInPortlet: {
 					setter: A.one,
-					value: '#p_p_id_com_liferay_login_web_portlet_LoginPortlet_'
-				}
+					value:
+						'#p_p_id_com_liferay_login_web_portlet_LoginPortlet_',
+				},
 			},
 
 			EXTENDS: A.Plugin.Base,
@@ -43,7 +49,7 @@ AUI.add(
 
 					instance._host.on('click', A.bind('_load', instance));
 
-					var destroyModal = function() {
+					var destroyModal = function () {
 						instance.destroy();
 
 						Liferay.detach('screenLoad', destroyModal);
@@ -62,7 +68,8 @@ AUI.add(
 						instance._hasSignInForm
 					) {
 						instance._loadDOM();
-					} else {
+					}
+					else {
 						instance._loadIO();
 					}
 				},
@@ -92,11 +99,12 @@ AUI.add(
 					);
 
 					Liferay.Util.fetch(modalSignInURL)
-						.then(response => response.text())
-						.then(response => {
+						.then((response) => response.text())
+						.then((response) => {
 							if (response) {
 								instance._setModalContent(response);
-							} else {
+							}
+							else {
 								instance._redirectPage();
 							}
 						})
@@ -148,15 +156,15 @@ AUI.add(
 													);
 												}
 											}
-										}
+										},
 									},
 									height: 450,
-									width: 560
+									width: 560,
 								},
 								id: NAME,
-								title: Liferay.Language.get('sign-in')
+								title: Liferay.Language.get('sign-in'),
 							},
-							dialogWindow => {
+							(dialogWindow) => {
 								var bodyNode = dialogWindow.bodyNode;
 
 								bodyNode.plug(A.Plugin.ParseContent);
@@ -164,7 +172,8 @@ AUI.add(
 								bodyNode.setContent(content);
 							}
 						);
-					} else {
+					}
+					else {
 						dialog.bodyNode.setContent(content);
 
 						dialog.show();
@@ -216,8 +225,8 @@ AUI.add(
 					}
 
 					instance._bindUI();
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.SignInModal = SignInModal;
@@ -231,7 +240,7 @@ AUI.add(
 			'liferay-form',
 			'liferay-portlet-url',
 			'liferay-util-window',
-			'plugin'
-		]
+			'plugin',
+		],
 	}
 );

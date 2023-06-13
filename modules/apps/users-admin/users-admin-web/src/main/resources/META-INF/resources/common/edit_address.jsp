@@ -49,7 +49,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 	<aui:input name="listType" type="hidden" value="<%= ListTypeConstants.ADDRESS %>" />
 	<aui:input name="primaryKey" type="hidden" value="<%= String.valueOf(editContactInformationDisplayContext.getPrimaryKey()) %>" />
 
-	<div class="container-fluid container-fluid-max-xl">
+	<clay:container-fluid>
 		<div class="sheet-lg" id="breadcrumb">
 			<liferay-ui:breadcrumb
 				showCurrentGroup="<%= false %>"
@@ -59,12 +59,12 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 			/>
 		</div>
 
-		<div class="sheet sheet-lg">
-			<div class="sheet-header">
+		<clay:sheet>
+			<clay:sheet-header>
 				<h2 class="sheet-title"><%= editContactInformationDisplayContext.getSheetTitle() %></h2>
-			</div>
+			</clay:sheet-header>
 
-			<div class="sheet-section">
+			<clay:sheet-section>
 				<aui:model-context bean="<%= address %>" model="<%= Address.class %>" />
 
 				<aui:input checked="<%= (address != null)? address.isPrimary() : false %>" id="addressPrimary" label="make-primary" name="addressPrimary" type="checkbox" />
@@ -110,17 +110,17 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 				</div>
 
 				<aui:input cssClass="mailing-ctrl" fieldParam="addressMailing" id="addressMailing" name="mailing" />
-			</div>
+			</clay:sheet-section>
 
-			<div class="sheet-footer">
+			<clay:sheet-footer>
 				<aui:button primary="<%= true %>" type="submit" />
 
 				<aui:button href="<%= editContactInformationDisplayContext.getRedirect() %>" type="cancel" />
-			</div>
-		</div>
-	</div>
+			</clay:sheet-footer>
+		</clay:sheet>
+	</clay:container-fluid>
 
-	<aui:script use="liferay-dynamic-select">
+	<script>
 		new Liferay.DynamicSelect([
 			{
 				select: '<portlet:namespace />addressCountryId',
@@ -128,17 +128,17 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 				selectDesc: 'nameCurrentValue',
 				selectId: 'countryId',
 				selectSort: '<%= true %>',
-				selectVal: '<%= countryId %>'
+				selectVal: '<%= countryId %>',
 			},
 			{
 				select: '<portlet:namespace />addressRegionId',
 				selectData: Liferay.Address.getRegions,
 				selectDesc: 'name',
 				selectId: 'regionId',
-				selectVal: '<%= regionId %>'
-			}
+				selectVal: '<%= regionId %>',
+			},
 		]);
-	</aui:script>
+	</script>
 </aui:form>
 
 <aui:script use="liferay-form">
@@ -150,12 +150,13 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 		Liferay.Service(
 			'/country/get-country',
 			{
-				countryId: countryId
+				countryId: countryId,
 			},
-			function(response, err) {
+			function (response, err) {
 				if (err) {
 					console.error(err);
-				} else {
+				}
+				else {
 					updateAddressZipRequired(response.zipRequired);
 				}
 			}
@@ -167,7 +168,8 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 
 		if (value > 0) {
 			checkCountry(value);
-		} else {
+		}
+		else {
 			updateAddressZipRequired(false);
 		}
 	}
@@ -183,7 +185,8 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 
 		if (required) {
 			addressZipRequiredWrapper.removeAttribute('hidden');
-		} else {
+		}
+		else {
 			addressZipRequiredWrapper.setAttribute('hidden', true);
 		}
 

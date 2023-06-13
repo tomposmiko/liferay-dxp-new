@@ -39,6 +39,10 @@ public class DDMTemplateLocalServiceWrapper
 	/**
 	 * Adds the ddm template to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMTemplateLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ddmTemplate the ddm template
 	 * @return the ddm template that was added
 	 */
@@ -254,7 +258,22 @@ public class DDMTemplateLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ddmTemplateLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the ddm template from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMTemplateLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ddmTemplate the ddm template
 	 * @return the ddm template that was removed
@@ -266,6 +285,10 @@ public class DDMTemplateLocalServiceWrapper
 
 	/**
 	 * Deletes the ddm template with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMTemplateLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param templateId the primary key of the ddm template
 	 * @return the ddm template that was removed
@@ -333,6 +356,18 @@ public class DDMTemplateLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_ddmTemplateLocalService.deleteTemplates(groupId, classNameId);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _ddmTemplateLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _ddmTemplateLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -631,6 +666,9 @@ public class DDMTemplateLocalServiceWrapper
 		return _ddmTemplateLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -810,6 +848,18 @@ public class DDMTemplateLocalServiceWrapper
 
 	@Override
 	public java.util.List<DDMTemplate> getTemplates(
+		long companyId, long[] groupIds, long[] classNameIds, long[] classPKs,
+		long resourceClassNameId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<DDMTemplate>
+			orderByComparator) {
+
+		return _ddmTemplateLocalService.getTemplates(
+			companyId, groupIds, classNameIds, classPKs, resourceClassNameId,
+			start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<DDMTemplate> getTemplates(
 		long[] groupIds, long classNameId, long classPK) {
 
 		return _ddmTemplateLocalService.getTemplates(
@@ -952,6 +1002,15 @@ public class DDMTemplateLocalServiceWrapper
 	public int getTemplatesCount(long groupId, long classNameId, long classPK) {
 		return _ddmTemplateLocalService.getTemplatesCount(
 			groupId, classNameId, classPK);
+	}
+
+	@Override
+	public int getTemplatesCount(
+		long companyId, long[] groupIds, long[] classNameIds, long[] classPKs,
+		long resourceClassNameId) {
+
+		return _ddmTemplateLocalService.getTemplatesCount(
+			companyId, groupIds, classNameIds, classPKs, resourceClassNameId);
 	}
 
 	/**
@@ -1363,6 +1422,10 @@ public class DDMTemplateLocalServiceWrapper
 
 	/**
 	 * Updates the ddm template in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DDMTemplateLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ddmTemplate the ddm template
 	 * @return the ddm template that was updated

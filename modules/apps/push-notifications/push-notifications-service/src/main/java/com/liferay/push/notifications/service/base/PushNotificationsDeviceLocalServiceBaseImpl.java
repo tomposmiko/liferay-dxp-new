@@ -14,6 +14,7 @@
 
 package com.liferay.push.notifications.service.base;
 
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -33,19 +34,24 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.push.notifications.model.PushNotificationsDevice;
 import com.liferay.push.notifications.service.PushNotificationsDeviceLocalService;
+import com.liferay.push.notifications.service.PushNotificationsDeviceLocalServiceUtil;
 import com.liferay.push.notifications.service.persistence.PushNotificationsDevicePersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -67,11 +73,15 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>PushNotificationsDeviceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.push.notifications.service.PushNotificationsDeviceLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>PushNotificationsDeviceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>PushNotificationsDeviceLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the push notifications device to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PushNotificationsDeviceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param pushNotificationsDevice the push notifications device
 	 * @return the push notifications device that was added
@@ -105,6 +115,10 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 	/**
 	 * Deletes the push notifications device with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PushNotificationsDeviceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param pushNotificationsDeviceId the primary key of the push notifications device
 	 * @return the push notifications device that was removed
 	 * @throws PortalException if a push notifications device with the primary key could not be found
@@ -122,6 +136,10 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 	/**
 	 * Deletes the push notifications device from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PushNotificationsDeviceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param pushNotificationsDevice the push notifications device
 	 * @return the push notifications device that was removed
 	 */
@@ -132,6 +150,18 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 
 		return pushNotificationsDevicePersistence.remove(
 			pushNotificationsDevice);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return pushNotificationsDevicePersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -297,6 +327,16 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return pushNotificationsDevicePersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -306,6 +346,13 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 				(PushNotificationsDevice)persistedModel);
 	}
 
+	public BasePersistence<PushNotificationsDevice> getBasePersistence() {
+		return pushNotificationsDevicePersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -345,6 +392,10 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 	/**
 	 * Updates the push notifications device in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PushNotificationsDeviceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param pushNotificationsDevice the push notifications device
 	 * @return the push notifications device that was updated
 	 */
@@ -355,6 +406,11 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 
 		return pushNotificationsDevicePersistence.update(
 			pushNotificationsDevice);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -369,6 +425,8 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		pushNotificationsDeviceLocalService =
 			(PushNotificationsDeviceLocalService)aopProxy;
+
+		_setLocalServiceUtilService(pushNotificationsDeviceLocalService);
 	}
 
 	/**
@@ -411,6 +469,24 @@ public abstract class PushNotificationsDeviceLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		PushNotificationsDeviceLocalService
+			pushNotificationsDeviceLocalService) {
+
+		try {
+			Field field =
+				PushNotificationsDeviceLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, pushNotificationsDeviceLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

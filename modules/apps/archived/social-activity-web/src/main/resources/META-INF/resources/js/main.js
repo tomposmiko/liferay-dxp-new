@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-social-activity-admin',
-	function(A) {
+	function (A) {
 		var Lang = A.Lang;
 
 		var Node = A.Node;
@@ -24,7 +24,7 @@ AUI.add(
 		var COL_LIMIT_TYPE = [
 			Liferay.Language.get('social-activity-limit-type-times-a-day'),
 			Liferay.Language.get('social-activity-limit-type-times'),
-			Liferay.Language.get('social-activity-limit-type-times-per-period')
+			Liferay.Language.get('social-activity-limit-type-times-per-period'),
 		];
 
 		var CSS_SETTINGS_ICON_CLOSE = 'settings-icon-close';
@@ -123,7 +123,7 @@ AUI.add(
 			'form.update-socialactivity-form';
 
 		var SRC_UI = {
-			src: STR_UI
+			src: STR_UI,
 		};
 
 		var TPL_BUTTON_HOLDER =
@@ -228,7 +228,7 @@ AUI.add(
 			NAME: 'socialactivityadmin',
 
 			prototype: {
-				initializer: function(config) {
+				initializer: function (config) {
 					var instance = this;
 
 					instance._originalConfig = config;
@@ -264,7 +264,7 @@ AUI.add(
 
 					instance._settingsInput = settingsInput;
 
-					var getSocialActivitySettingMappingCallback = function(
+					var getSocialActivitySettingMappingCallback = function (
 						result,
 						modelName
 					) {
@@ -278,7 +278,7 @@ AUI.add(
 
 					settings.delegate(
 						'click',
-						A.throttle(function(event) {
+						A.throttle(function (event) {
 							var currentTarget = event.currentTarget;
 
 							if (
@@ -291,7 +291,8 @@ AUI.add(
 									currentTarget,
 									getSocialActivitySettingMappingCallback
 								);
-							} else if (currentTarget.test(SELECTOR_INPUT)) {
+							}
+							else if (currentTarget.test(SELECTOR_INPUT)) {
 								instance._updateCheckboxStatus(event);
 							}
 						}, 250),
@@ -300,7 +301,7 @@ AUI.add(
 
 					var lastIndex = socialActivityItems.size() - 1;
 
-					A.some(socialActivityItems, function(
+					A.some(socialActivityItems, function (
 						item,
 						index,
 						collection
@@ -320,7 +321,7 @@ AUI.add(
 							instance._getSocialActivitySettingMapping(
 								themeDisplay.getScopeGroupIdOrLiveGroupId(),
 								modelName,
-								function(result) {
+								function (result) {
 									getSocialActivitySettingMappingCallback(
 										result,
 										modelName
@@ -335,7 +336,7 @@ AUI.add(
 					});
 				},
 
-				_addSettingsDisplay: function(config) {
+				_addSettingsDisplay: function (config) {
 					var instance = this;
 
 					instance.settingsDisplay = new SettingsDisplay(
@@ -343,7 +344,7 @@ AUI.add(
 					).render(instance._contentBox.empty());
 				},
 
-				_getItemByName: function(currentForm, name, ignoreNamespace) {
+				_getItemByName: function (currentForm, name, ignoreNamespace) {
 					var instance = this;
 
 					var inputName = name;
@@ -355,16 +356,16 @@ AUI.add(
 					return currentForm.one('[name=' + inputName + ']');
 				},
 
-				_getJsonSettings: function(settingsDisplay) {
+				_getJsonSettings: function (settingsDisplay) {
 					var instance = this;
 
 					return {
 						actions: settingsDisplay.getSettingsJSON(),
-						modelName: instance._originalConfig.modelName
+						modelName: instance._originalConfig.modelName,
 					};
 				},
 
-				_getSocialActivitySettingMapping: function(
+				_getSocialActivitySettingMapping: function (
 					groupId,
 					modelName,
 					callback
@@ -375,13 +376,13 @@ AUI.add(
 						'/socialactivitysetting/get-json-activity-definitions',
 						{
 							className: modelName,
-							groupId: groupId
+							groupId: groupId,
 						},
 						callback
 					);
 				},
 
-				_onSocialActivityFormSubmit: function(event) {
+				_onSocialActivityFormSubmit: function (event) {
 					var instance = this;
 
 					var form = event.currentTarget;
@@ -393,7 +394,7 @@ AUI.add(
 					submitForm(form);
 				},
 
-				_revealSection: function(
+				_revealSection: function (
 					menuItem,
 					getSocialActivitySettingMappingCallback
 				) {
@@ -406,7 +407,7 @@ AUI.add(
 					instance._getSocialActivitySettingMapping(
 						themeDisplay.getScopeGroupIdOrLiveGroupId(),
 						modelName,
-						function(result) {
+						function (result) {
 							getSocialActivitySettingMappingCallback(
 								result,
 								modelName
@@ -415,7 +416,7 @@ AUI.add(
 					);
 				},
 
-				_updateCheckboxStatus: function(event) {
+				_updateCheckboxStatus: function (event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -429,12 +430,12 @@ AUI.add(
 						{
 							className: modelName,
 							enabled: currentTarget.attr('checked'),
-							groupId: themeDisplay.getScopeGroupIdOrLiveGroupId()
+							groupId: themeDisplay.getScopeGroupIdOrLiveGroupId(),
 						}
 					);
 				},
 
-				_updateSocialActivitySettings: function(form) {
+				_updateSocialActivitySettings: function (form) {
 					var instance = this;
 
 					instance._settingsInput.val(
@@ -442,37 +443,37 @@ AUI.add(
 							instance._getJsonSettings(instance.settingsDisplay)
 						)
 					);
-				}
-			}
+				},
+			},
 		});
 
 		var SettingsDisplay = A.Component.create({
 			ATTRS: {
 				buttonsNode: {
-					valueFn: function() {
+					valueFn: function () {
 						return Node.create(TPL_BUTTON_HOLDER);
-					}
+					},
 				},
 
 				id: {
-					value: STR_BLANK
+					value: STR_BLANK,
 				},
 
 				modelName: {
-					value: STR_BLANK
-				}
+					value: STR_BLANK,
+				},
 			},
 
 			NAME: STR_SETTINGS_DISPLAY,
 
 			prototype: {
-				initializer: function(config) {
+				initializer: function (config) {
 					var instance = this;
 
 					instance._settingsFields = {};
 				},
 
-				renderUI: function() {
+				renderUI: function () {
 					var instance = this;
 
 					var contentBox = instance.get(STR_CONTENT_BOX);
@@ -492,7 +493,7 @@ AUI.add(
 						headerText: Liferay.Language.get(
 							'social-activity-setting-header-label'
 						),
-						saveText: STR_SAVE
+						saveText: STR_SAVE,
 					});
 
 					var bodyNode = settingsNode.one('.container-drop-box');
@@ -500,7 +501,7 @@ AUI.add(
 
 					var actionsNode = headerNode.one('.settings-actions');
 
-					originalConfig.dataSet.forEach(function(item, index) {
+					originalConfig.dataSet.forEach(function (item, index) {
 						item.localizedName =
 							activityDefinitionLanguageKeys[
 								item.modelName + '.' + item.languageKey
@@ -535,7 +536,7 @@ AUI.add(
 					contentBox.append(settingsNode);
 				},
 
-				bindUI: function() {
+				bindUI: function () {
 					var instance = this;
 
 					instance.actionsNode.delegate(
@@ -550,7 +551,7 @@ AUI.add(
 						instance._onBodyNodeClick,
 						[
 							SELECTOR_SETTINGS_ICON_CLOSE,
-							SELECTOR_SETTINGS_ICON_TOGGLE
+							SELECTOR_SETTINGS_ICON_TOGGLE,
 						].join(),
 						instance
 					);
@@ -561,7 +562,7 @@ AUI.add(
 					);
 				},
 
-				getSettingsJSON: function() {
+				getSettingsJSON: function () {
 					var instance = this;
 
 					var settingsJSON = [];
@@ -575,7 +576,7 @@ AUI.add(
 					return settingsJSON;
 				},
 
-				_afterSettingsFieldCollapsed: function(event) {
+				_afterSettingsFieldCollapsed: function (event) {
 					var instance = this;
 
 					var collapsed = event.newVal;
@@ -586,14 +587,15 @@ AUI.add(
 
 					if (!collapsed) {
 						node = instance.bodyNode;
-					} else {
+					}
+					else {
 						instance._toggleLimitFields(item, false);
 					}
 
 					node.append(item);
 				},
 
-				_handleConjunction: function() {
+				_handleConjunction: function () {
 					var instance = this;
 
 					var actionsNode = instance.actionsNode;
@@ -616,21 +618,23 @@ AUI.add(
 						actionsNode.insert(actionsConjunction, children.last());
 
 						actionsConjunction.show();
-					} else {
+					}
+					else {
 						actionsConjunction.hide();
 
 						instance.headerNode.toggle(childrenSize == 1);
 					}
 				},
 
-				_onBodyNodeClick: function(event) {
+				_onBodyNodeClick: function (event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
 
 					if (currentTarget.test(SELECTOR_SETTINGS_ICON_CLOSE)) {
 						instance._toggleField(event, true);
-					} else {
+					}
+					else {
 						var collapsed = !currentTarget.hasClass(
 							CSS_SETTINGS_ICON_EXPANDED
 						);
@@ -642,7 +646,7 @@ AUI.add(
 					}
 				},
 
-				_toggleField: function(event, collapsed) {
+				_toggleField: function (event, collapsed) {
 					var instance = this;
 
 					var field = Widget.getByNode(event.currentTarget);
@@ -654,7 +658,7 @@ AUI.add(
 					instance._handleConjunction();
 				},
 
-				_toggleLimitFields: function(item, collapsed) {
+				_toggleLimitFields: function (item, collapsed) {
 					var instance = this;
 
 					item.one(SELECTOR_SETTINGS_LIMIT).toggle(collapsed);
@@ -673,68 +677,68 @@ AUI.add(
 					);
 
 					toggleIcon.attr('title', title);
-				}
-			}
+				},
+			},
 		});
 
 		var SettingsField = A.Component.create({
 			ATTRS: {
 				active: {
-					value: false
+					value: false,
 				},
 
 				activityType: {
-					value: 0
+					value: 0,
 				},
 
 				collapsed: {
-					value: false
+					value: false,
 				},
 
 				contributionIncrement: {
-					value: 0
+					value: 0,
 				},
 
 				contributionLimitEnabled: {
-					value: true
+					value: true,
 				},
 
 				contributionLimitPeriod: {
-					value: 1
+					value: 1,
 				},
 
 				contributionLimitValue: {
-					value: 0
+					value: 0,
 				},
 
 				languageKey: {
-					value: STR_BLANK
+					value: STR_BLANK,
 				},
 
 				localizedName: {
-					value: STR_BLANK
+					value: STR_BLANK,
 				},
 
 				participationIncrement: {
-					value: 0
+					value: 0,
 				},
 
 				participationLimitEnabled: {
-					value: true
+					value: true,
 				},
 
 				participationLimitPeriod: {
-					value: 1
+					value: 1,
 				},
 
 				participationLimitValue: {
-					value: 0
+					value: 0,
 				},
 
 				selected: {
 					setter: A.DataType.Boolean.parse,
-					value: false
-				}
+					value: false,
+				},
 			},
 
 			NAME: STR_SETTINGS_FIELD,
@@ -744,7 +748,7 @@ AUI.add(
 			prototype: {
 				BOUNDING_TEMPLATE: TPL_BOUNDING_BOX_SETTINGS_FIELD,
 
-				initializer: function(config) {
+				initializer: function (config) {
 					var instance = this;
 
 					var counters = config.counters;
@@ -772,7 +776,8 @@ AUI.add(
 							limitEnabledKey = STR_PARTICIPATION_LIMIT_ENABLED;
 							limitPeriodKey = STR_PARTICIPATION_LIMIT_PERIOD;
 							limitValueKey = STR_PARTICIPATION_LIMIT_VALUE;
-						} else if (counter.name != 'contribution') {
+						}
+						else if (counter.name != 'contribution') {
 							continue;
 						}
 
@@ -789,7 +794,7 @@ AUI.add(
 					instance.setAttrs(attrs);
 				},
 
-				renderUI: function() {
+				renderUI: function () {
 					var instance = this;
 
 					var contentBox = instance.get(STR_CONTENT_BOX);
@@ -819,7 +824,7 @@ AUI.add(
 							),
 							limitValues:
 								counterSettings.contributionLimitValues,
-							type: 'contribution'
+							type: 'contribution',
 						});
 					}
 
@@ -838,7 +843,7 @@ AUI.add(
 							),
 							limitValues:
 								counterSettings.participationLimitValues,
-							type: 'participation'
+							type: 'participation',
 						});
 					}
 
@@ -847,12 +852,12 @@ AUI.add(
 							{
 								text: Liferay.Language.get('limit'),
 								title: STR_EXPAND,
-								type: 'toggle'
+								type: 'toggle',
 							},
 							{
 								title: Liferay.Language.get('close'),
-								type: 'close'
-							}
+								type: 'close',
+							},
 						],
 						contributionIncrement: instance.get(
 							STR_CONTRIBUTION_INCREMENT
@@ -881,7 +886,7 @@ AUI.add(
 						),
 						thirdText: Liferay.Language.get(
 							'social-activity-setting-third-text'
-						)
+						),
 					});
 
 					limitNode
@@ -891,13 +896,13 @@ AUI.add(
 					contentBox.append(limitNode);
 				},
 
-				syncUI: function() {
+				syncUI: function () {
 					var instance = this;
 
 					instance.set('collapsed', !instance.get(STR_ACTIVE));
 				},
 
-				getSettingsJSON: function() {
+				getSettingsJSON: function () {
 					var instance = this;
 
 					return instance.getAttrs([
@@ -911,11 +916,11 @@ AUI.add(
 						STR_PARTICIPATION_INCREMENT,
 						STR_PARTICIPATION_LIMIT_ENABLED,
 						STR_PARTICIPATION_LIMIT_PERIOD,
-						STR_PARTICIPATION_LIMIT_VALUE
+						STR_PARTICIPATION_LIMIT_VALUE,
 					]);
 				},
 
-				_selectOnChange: function(event) {
+				_selectOnChange: function (event) {
 					var instance = this;
 
 					var selectId = event.currentTarget.attr('id');
@@ -927,7 +932,7 @@ AUI.add(
 					instance.set(selectId, event.currentTarget.val(), SRC_UI);
 				},
 
-				_setToDefaultValue: function() {
+				_setToDefaultValue: function () {
 					var instance = this;
 
 					instance.reset(STR_CONTRIBUTION_INCREMENT);
@@ -938,7 +943,7 @@ AUI.add(
 					instance.reset(STR_PARTICIPATION_LIMIT_VALUE);
 				},
 
-				_uiSetCollapsed: function(value) {
+				_uiSetCollapsed: function (value) {
 					var instance = this;
 
 					var boundingBox = instance.get(STR_BOUNDING_BOX);
@@ -947,7 +952,7 @@ AUI.add(
 					boundingBox.toggleClass(CSS_TOKEN, value);
 				},
 
-				_uiSetContributionIncrement: function(value, src) {
+				_uiSetContributionIncrement: function (value, src) {
 					var instance = this;
 
 					var contributionIncrementNode = instance
@@ -967,12 +972,12 @@ AUI.add(
 
 							parent.transition({
 								backgroundColor: SocialActivity.FADE_COLOR_END,
-								duration: 1.5
+								duration: 1.5,
 							});
 						}
 					}
-				}
-			}
+				},
+			},
 		});
 
 		var SocialActivity = Liferay.namespace('Portlet.SocialActivity');
@@ -991,7 +996,7 @@ AUI.add(
 			'aui-datatype',
 			'aui-template-deprecated',
 			'liferay-portlet-base',
-			'transition'
-		]
+			'transition',
+		],
 	}
 );

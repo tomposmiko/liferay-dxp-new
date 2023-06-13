@@ -73,7 +73,7 @@ public class UpgradeDDMFormFieldValidation extends UpgradeProcess {
 					if (_upgradeValidation(
 							jsonObject1.getJSONArray("fields"))) {
 
-						ps2.setString(1, jsonObject1.toJSONString());
+						ps2.setString(1, jsonObject1.toString());
 
 						ps2.setLong(2, structureId);
 
@@ -92,7 +92,7 @@ public class UpgradeDDMFormFieldValidation extends UpgradeProcess {
 							if (_upgradeValidation(
 									jsonObject2.getJSONArray("fields"))) {
 
-								ps4.setString(1, jsonObject2.toJSONString());
+								ps4.setString(1, jsonObject2.toString());
 
 								long structureVersionId = rs2.getLong(
 									"structureVersionId");
@@ -177,8 +177,6 @@ public class UpgradeDDMFormFieldValidation extends UpgradeProcess {
 		for (int i = 0; i < fieldsJSONArray.length(); i++) {
 			JSONObject jsonObject = fieldsJSONArray.getJSONObject(i);
 
-			String name = jsonObject.getString("name");
-
 			JSONObject validationJSONObject = jsonObject.getJSONObject(
 				"validation");
 
@@ -188,7 +186,8 @@ public class UpgradeDDMFormFieldValidation extends UpgradeProcess {
 
 				String value = expressionJSONObject.getString("value");
 
-				String upgradedValue = _upgradeExpression(value, name);
+				String upgradedValue = _upgradeExpression(
+					value, jsonObject.getString("name"));
 
 				expressionJSONObject.put("value", upgradedValue);
 

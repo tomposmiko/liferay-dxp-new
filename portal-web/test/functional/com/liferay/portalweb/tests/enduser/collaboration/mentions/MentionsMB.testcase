@@ -24,13 +24,13 @@ definition {
 
 		User.logoutPG();
 
-		User.firstLoginPG(
+		User.loginPG(
 			password = "test",
 			userEmailAddress = "userea@liferay.com");
 
 		User.logoutPG();
 
-		User.firstLoginPG();
+		User.loginPG();
 	}
 
 	tearDown {
@@ -48,13 +48,54 @@ definition {
 		}
 	}
 
+	@description = "This test covers LPS-117986. It ensures that multiple mentions can be added to thread."
+	@priority = "4"
+	test MultipleMentionsCanBeAddedToThread {
+		JSONUser.addUser(
+			userEmailAddress = "userea2@liferay.com",
+			userFirstName = "userfn2",
+			userLastName = "userln2",
+			userScreenName = "usersn2");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea2@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea2@liferay.com",
+			userLoginFullName = "userfn2 userln2");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "test@liferay.com",
+			userLoginFullName = "Test Test");
+
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "guest");
+
+		Mentions.addMentionViaMessageBoardThread(
+			mentionsUserScreenNameList = "usersn,usersn2",
+			multipleMentions = "true",
+			threadSubject = "Thread Subject");
+
+		Mentions.viewMentionTagLink(
+			mentionsUserFullName = "userfn userln",
+			mentionsUserScreenName = "usersn");
+
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "guest");
+
+		MessageboardsThread.gotoCP(threadSubject = "Thread Subject");
+
+		Mentions.viewMentionTagLink(
+			mentionsUserFullName = "userfn2 userln2",
+			mentionsUserScreenName = "usersn2");
+	}
+
 	@priority = "5"
 	test ViewMentionViaMessageBoardsThread {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		Mentions.addMentionViaMessageBoardThread(
@@ -65,8 +106,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		MessageboardsThread.gotoCP(threadSubject = "Thread Subject");
@@ -81,8 +121,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		MessageboardsThread.addCP(
@@ -92,8 +131,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		Mentions.addMentionViaMessageBoardsReply(
@@ -105,8 +143,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		MessageboardsThread.gotoCP(threadSubject = "Thread Subject");
@@ -129,8 +166,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		MessageboardsThread.addCP(
@@ -140,26 +176,24 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		Mentions.addMentionViaMessageBoardThreadEdit(
 			mentionsUserFullName = "userfn userln",
 			mentionsUserScreenName = "usersn",
-			threadBody = "Thread Body",
+			threadBody = "Thread Body Edit",
 			threadSubject = "Thread Subject");
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Message Boards");
 
 		MessageboardsThread.viewCP(
 			replyCount = "0",
-			threadBody = "Thread Body",
+			threadBody = "Thread Body Edit",
 			threadSubject = "Thread Subject");
 
 		Mentions.viewMentionTagLink(

@@ -37,7 +37,7 @@ KBTemplatesManagementToolbarDisplayContext kbTemplatesManagementToolbarDisplayCo
 	sortingURL="<%= String.valueOf(kbTemplatesManagementToolbarDisplayContext.getSortingURL()) %>"
 />
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<liferay-portlet:renderURL varImpl="searchURL">
 		<portlet:param name="mvcPath" value="/admin/view_templates.jsp" />
 	</liferay-portlet:renderURL>
@@ -59,11 +59,10 @@ KBTemplatesManagementToolbarDisplayContext kbTemplatesManagementToolbarDisplayCo
 				>
 
 					<%
-					Map<String, Object> rowData = new HashMap<String, Object>();
-
-					rowData.put("actions", StringUtil.merge(kbTemplatesManagementToolbarDisplayContext.getAvailableActions(kbTemplate)));
-
-					row.setData(rowData);
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", StringUtil.merge(kbTemplatesManagementToolbarDisplayContext.getAvailableActions(kbTemplate))
+						).build());
 					%>
 
 					<liferay-ui:search-container-column-user
@@ -110,10 +109,10 @@ KBTemplatesManagementToolbarDisplayContext kbTemplatesManagementToolbarDisplayCo
 			</liferay-ui:search-container>
 		</aui:fieldset>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
-<aui:script>
-	var deleteKBTemplates = function() {
+<script>
+	var deleteKBTemplates = function () {
 		if (
 			confirm(
 				'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-templates" />'
@@ -140,13 +139,13 @@ KBTemplatesManagementToolbarDisplayContext kbTemplatesManagementToolbarDisplayCo
 	};
 
 	var ACTIONS = {
-		deleteKBTemplates: deleteKBTemplates
+		deleteKBTemplates: deleteKBTemplates,
 	};
 
-	Liferay.componentReady('kbTemplatesManagementToolbar').then(function(
+	Liferay.componentReady('kbTemplatesManagementToolbar').then(function (
 		managementToolbar
 	) {
-		managementToolbar.on('actionItemClicked', function(event) {
+		managementToolbar.on('actionItemClicked', function (event) {
 			var itemData = event.data.item.data;
 
 			if (itemData && itemData.action && ACTIONS[itemData.action]) {
@@ -154,4 +153,4 @@ KBTemplatesManagementToolbarDisplayContext kbTemplatesManagementToolbarDisplayCo
 			}
 		});
 	});
-</aui:script>
+</script>

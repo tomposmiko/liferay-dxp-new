@@ -16,10 +16,6 @@
 
 <%@ include file="/init.jsp" %>
 
-<%
-String redirect = ParamUtil.getString(request, "redirect");
-%>
-
 <liferay-ui:error exception="<%= NoSuchArticleException.class %>" message="the-web-content-could-not-be-found" />
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
@@ -40,7 +36,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 			<liferay-frontend:fieldset>
 				<div id="<portlet:namespace />articlePreview">
 					<liferay-util:include page="/journal_resources.jsp" servletContext="<%= application %>">
-						<liferay-util:param name="refererPortletName" value="<%= renderResponse.getNamespace() %>" />
+						<liferay-util:param name="refererPortletName" value="<%= liferayPortletResponse.getNamespace() %>" />
 					</liferay-util:include>
 				</div>
 			</liferay-frontend:fieldset>
@@ -50,7 +46,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 	<liferay-frontend:edit-form-footer>
 		<aui:button name="saveButton" type="submit" />
 
-		<aui:button href="<%= redirect %>" type="cancel" />
+		<aui:button href='<%= ParamUtil.getString(request, "redirect") %>' type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
@@ -62,62 +58,24 @@ String redirect = ParamUtil.getString(request, "redirect");
 		'<portlet:namespace />assetEntryId'
 	);
 
-	dom.delegate(articlePreview, 'click', '.web-content-selector', function(event) {
+	dom.delegate(articlePreview, 'click', '.web-content-selector', function (
+		event
+	) {
 		event.preventDefault();
 
-		<%
-		PortletURL selectWebContentURL = PortletProviderUtil.getPortletURL(request, JournalArticle.class.getName(), PortletProvider.Action.BROWSE);
-
-		Group scopeGroup = GroupLocalServiceUtil.getGroup(themeDisplay.getScopeGroupId());
-
-		if (scopeGroup.isLayoutPrototype()) {
-			Group companyGroup = GroupLocalServiceUtil.getCompanyGroup(scopeGroup.getCompanyId());
-
-			selectWebContentURL.setParameter("selectedGroupIds", String.valueOf(companyGroup.getGroupId()));
-		}
-		else {
-			selectWebContentURL.setParameter("groupId", String.valueOf(journalContentDisplayContext.getGroupId()));
-
-			if (journalContentDisplayContext.getSelectedGroupIds() != null) {
-				selectWebContentURL.setParameter("selectedGroupIds", StringUtil.merge(journalContentDisplayContext.getSelectedGroupIds()));
-			}
-			else {
-				selectWebContentURL.setParameter("selectedGroupId", String.valueOf(themeDisplay.getScopeGroupId()));
-			}
-		}
-
-		selectWebContentURL.setParameter("refererAssetEntryId", "[$ARTICLE_REFERER_ASSET_ENTRY_ID$]");
-		selectWebContentURL.setParameter("typeSelection", JournalArticle.class.getName());
-		selectWebContentURL.setParameter("showNonindexable", String.valueOf(Boolean.TRUE));
-		selectWebContentURL.setParameter("showScheduled", String.valueOf(Boolean.TRUE));
-		selectWebContentURL.setParameter("eventName", "selectContent");
-		selectWebContentURL.setWindowState(LiferayWindowState.POP_UP);
-		%>
-
-		var baseSelectWebContentURI = '<%= selectWebContentURL.toString() %>';
-
-		Liferay.Util.selectEntity(
-			{
-				dialog: {
-					constrain: true,
-					destroyOnHide: true,
-					modal: true
-				},
-				eventName: 'selectContent',
-				id: 'selectContent',
-				title: '<liferay-ui:message key="select-web-content" />',
-				uri: baseSelectWebContentURI.replace(
-					encodeURIComponent('[$ARTICLE_REFERER_ASSET_ENTRY_ID$]'),
-					assetEntryIdInput.value
-				)
+		Liferay.Util.openSelectionModal({
+			onSelect: function (selectedItem) {
+				if (selectedItem) {
+					retrieveWebContent(selectedItem.assetclasspk);
+				}
 			},
-			function(event) {
-				retrieveWebContent(event.assetclasspk);
-			}
-		);
+			selectEventName: '<portlet:namespace />selectedItem',
+			title: '<liferay-ui:message key="select-web-content" />',
+			url: '<%= journalContentDisplayContext.getItemSelectorURL() %>',
+		});
 	});
 
-	dom.delegate(articlePreview, 'click', '.selector-button', function(event) {
+	dom.delegate(articlePreview, 'click', '.selector-button', function (event) {
 		event.preventDefault();
 		retrieveWebContent(-1);
 	});
@@ -130,6 +88,6 @@ String redirect = ParamUtil.getString(request, "redirect");
 			uri
 		);
 
-		location.href = uri;
+		Liferay.Util.navigate(uri);
 	}
 </aui:script>

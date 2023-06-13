@@ -17,7 +17,7 @@
 <%@ include file="/image_gallery_display/init.jsp" %>
 
 <%
-SearchContainer igSearchContainer = (SearchContainer)request.getAttribute("view.jsp-igSearchContainer");
+SearchContainer<?> igSearchContainer = (SearchContainer)request.getAttribute("view.jsp-igSearchContainer");
 
 DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(igRequestHelper);
 %>
@@ -42,10 +42,10 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 
 				boolean hasAudio = AudioProcessorUtil.hasAudio(fileVersion);
 				boolean hasImages = ImageProcessorUtil.hasImages(fileVersion);
+
 				boolean hasPDFImages = PDFProcessorUtil.hasImages(fileVersion);
 				boolean hasVideo = VideoProcessorUtil.hasVideo(fileVersion);
 
-				String imagePreviewURL = null;
 				String imageURL = themeDisplay.getPathThemeImages() + "/file_system/large/" + DLUtil.getGenericName(fileEntry.getExtension()) + ".png";
 				int playerHeight = 500;
 
@@ -64,16 +64,13 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 							dataOptions += "&" + audioContainer + "PreviewURL=" + HtmlUtil.escapeURL(DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&supportedAudio=1&audioPreview=1&type=" + audioContainer));
 						}
 
-						imagePreviewURL = DLURLHelperUtil.getImagePreviewURL(fileEntry, fileVersion, themeDisplay);
 						imageURL = DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, HtmlUtil.escapeURL("&audioPreview=1") + "&supportedAudio=1&mediaGallery=1");
 						playerHeight = 43;
 					}
 					else if (hasImages) {
-						imagePreviewURL = DLURLHelperUtil.getThumbnailSrc(fileEntry, fileVersion, themeDisplay);
 						imageURL = DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imagePreview=1");
 					}
 					else if (hasPDFImages) {
-						imagePreviewURL = DLURLHelperUtil.getImagePreviewURL(fileEntry, fileVersion, themeDisplay);
 						imageURL = DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&previewFileIndex=1");
 					}
 					else if (hasVideo) {
@@ -81,10 +78,15 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 							dataOptions += "&" + videoContainer + "PreviewURL=" + HtmlUtil.escapeURL(DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&supportedVideo=1&videoPreview=1&type=" + videoContainer));
 						}
 
-						imagePreviewURL = DLURLHelperUtil.getImagePreviewURL(fileEntry, fileVersion, themeDisplay);
 						imageURL = DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&supportedVideo=1&mediaGallery=1");
 						playerHeight = PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_HEIGHT;
 					}
+				}
+
+				String thumbnailSrc = null;
+
+				if (PropsValues.DL_FILE_ENTRY_THUMBNAIL_ENABLED) {
+					thumbnailSrc = DLURLHelperUtil.getThumbnailSrc(fileEntry, fileVersion, themeDisplay);
 				}
 
 				String title = fileEntry.getTitle();
@@ -93,13 +95,13 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 					title += " - " + fileEntry.getDescription();
 				}
 
-				row.setCssClass("lfr-asset-item");
+				row.setCssClass("card-page-item card-page-item-asset");
 				%>
 
 				<liferay-ui:search-container-column-text>
-					<div class="image-link preview" <%= (hasAudio || hasVideo) ? "data-options=\"height=" + playerHeight + "&thumbnailURL=" + HtmlUtil.escapeURL(DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1")) + "&width=640" + dataOptions + "\"" : StringPool.BLANK %> href="<%= imageURL %>" thumbnailId="<%= thumbnailId %>" title="<%= HtmlUtil.escapeAttribute(title) %>">
+					<a class="image-link preview" <%= (hasAudio || hasVideo) ? "data-options=\"height=" + playerHeight + "&thumbnailURL=" + HtmlUtil.escapeURL(DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1")) + "&width=640" + dataOptions + "\"" : StringPool.BLANK %> href="<%= imageURL %>" thumbnailId="<%= thumbnailId %>" title="<%= title %>">
 						<c:choose>
-							<c:when test="<%= Validator.isNull(imagePreviewURL) %>">
+							<c:when test="<%= Validator.isNull(thumbnailSrc) %>">
 								<liferay-frontend:icon-vertical-card
 									actionJsp='<%= dlPortletInstanceSettingsHelper.isShowActions() ? "/image_gallery_display/image_action.jsp" : StringPool.BLANK %>'
 									actionJspServletContext="<%= application %>"
@@ -116,13 +118,13 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 									actionJspServletContext="<%= application %>"
 									cardCssClass="card-interactive card-interactive-secondary"
 									cssClass="entry-display-style"
-									imageUrl="<%= imagePreviewURL %>"
+									imageUrl="<%= thumbnailSrc %>"
 									resultRow="<%= row %>"
 									title="<%= dlPortletInstanceSettingsHelper.isShowActions() ? fileEntry.getTitle() : StringPool.BLANK %>"
 								/>
 							</c:otherwise>
 						</c:choose>
-					</div>
+					</a>
 				</liferay-ui:search-container-column-text>
 			</c:when>
 			<c:otherwise>
@@ -181,7 +183,7 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 	var imageViewer = new A.ImageViewer({
 		after: {
 			<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
-				load: function(event) {
+				load: function (event) {
 					var instance = this;
 
 					var currentLink = instance.getCurrentLink();
@@ -201,7 +203,7 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 
 						actions.append(action);
 					}
-				}
+				},
 			</c:if>
 		},
 		delay: 5000,
@@ -211,7 +213,7 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 		maxHeight: maxHeight,
 		maxWidth: maxWidth,
 		on: {
-			currentIndexChange: function() {
+			currentIndexChange: function () {
 				if (playingMediaIndex != -1) {
 					Liferay.fire(
 						'<portlet:namespace />ImageViewer:currentIndexChange'
@@ -220,13 +222,13 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 					playingMediaIndex = -1;
 				}
 			},
-			visibleChange: function(event) {
+			visibleChange: function (event) {
 				if (!event.newVal && playingMediaIndex != -1) {
 					Liferay.fire('<portlet:namespace />ImageViewer:close');
 
 					playingMediaIndex = -1;
 				}
-			}
+			},
 		},
 		playingLabel: '(<liferay-ui:message key="playing" />)',
 		plugins: [
@@ -242,14 +244,14 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 							mp4PreviewURL: '',
 							oggPreviewURL: '',
 							ogvPreviewURL: '',
-							thumbnailURL: ''
-						})
-					}
+							thumbnailURL: '',
+						}),
+					},
 				},
-				fn: A.MediaViewerPlugin
-			}
+				fn: A.MediaViewerPlugin,
+			},
 		],
-		zIndex: ++Liferay.zIndex.WINDOW
+		zIndex: ++Liferay.zIndex.WINDOW,
 	});
 
 	imageViewer.TPL_CLOSE = imageViewer.TPL_CLOSE.replace(
@@ -264,23 +266,24 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 
 	imageViewer.TPL_PLAYER = TPL_PLAYER_PLAY;
 
-	imageViewer._syncPlaying = function() {
+	imageViewer._syncPlaying = function () {
 		if (this.get('playing')) {
 			this._player.setHTML(TPL_PLAYER_PAUSE);
-		} else {
+		}
+		else {
 			this._player.setHTML(TPL_PLAYER_PLAY);
 		}
 	};
 
 	imageViewer.render();
 
-	Liferay.on('<portlet:namespace />Video:play', function() {
+	Liferay.on('<portlet:namespace />Video:play', function () {
 		imageViewer.pause();
 
 		playingMediaIndex = this.get('currentIndex');
 	});
 
-	Liferay.on('<portlet:namespace />Audio:play', function() {
+	Liferay.on('<portlet:namespace />Audio:play', function () {
 		imageViewer.pause();
 
 		playingMediaIndex = this.get('currentIndex');
@@ -288,7 +291,7 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 
 	var onClickLinksDefaultFn = imageViewer._onClickLinks;
 
-	imageViewer._onClickLinks = function(event) {
+	imageViewer._onClickLinks = function (event) {
 		if (!event.target.ancestor('.dropdown')) {
 			onClickLinksDefaultFn.call(this, event);
 		}

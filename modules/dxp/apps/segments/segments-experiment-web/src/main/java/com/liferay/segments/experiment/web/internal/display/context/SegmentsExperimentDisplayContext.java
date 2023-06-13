@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -147,9 +148,6 @@ public class SegmentsExperimentDisplayContext {
 		).put(
 			"selectedSegmentsExperienceId", _getSelectedSegmentsExperienceId()
 		).put(
-			"viewSegmentsExperimentDetailsURL",
-			_getViewSegmentsExperimentDetailsURL()
-		).put(
 			"winnerSegmentsVariantId", _getWinnerSegmentsExperienceId()
 		).build();
 	}
@@ -195,7 +193,8 @@ public class SegmentsExperimentDisplayContext {
 	}
 
 	private String _getCreateSegmentsExperimentURL() {
-		return _getSegmentsExperimentActionURL("/add_segments_experiment");
+		return _getSegmentsExperimentActionURL(
+			"/segments_experiment/add_segments_experiment");
 	}
 
 	private String _getCreateSegmentsVariantURL() {
@@ -204,28 +203,28 @@ public class SegmentsExperimentDisplayContext {
 	}
 
 	private String _getDeleteSegmentsExperimentURL() {
-		return _getSegmentsExperimentActionURL("/delete_segments_experiment");
+		return _getSegmentsExperimentActionURL(
+			"/segments_experiment/delete_segments_experiment");
 	}
 
 	private String _getDeleteSegmentsVariantURL() {
 		return _getSegmentsExperimentActionURL(
-			"/delete_segments_experiment_rel");
+			"/segments_experiment/delete_segments_experiment_rel");
 	}
 
 	private String _getEditSegmentsExperimentStatusURL() {
 		return _getSegmentsExperimentActionURL(
-			"/edit_segments_experiment_status");
+			"/segments_experiment/edit_segments_experiment_status");
 	}
 
 	private String _getEditSegmentsExperimentURL() {
-		return _getSegmentsExperimentActionURL("/edit_segments_experiment");
+		return _getSegmentsExperimentActionURL(
+			"/segments_experiment/edit_segments_experiment");
 	}
 
 	private String _getEditSegmentsVariantLayoutURL() throws PortalException {
-		Layout layout = _themeDisplay.getLayout();
-
-		Layout draftLayout = _layoutLocalService.fetchLayout(
-			_portal.getClassNameId(Layout.class), layout.getPlid());
+		Layout draftLayout = _layoutLocalService.fetchDraftLayout(
+			_themeDisplay.getPlid());
 
 		if (draftLayout == null) {
 			return StringPool.BLANK;
@@ -245,7 +244,8 @@ public class SegmentsExperimentDisplayContext {
 	}
 
 	private String _getEditSegmentsVariantURL() {
-		return _getSegmentsExperimentActionURL("/edit_segments_experiment_rel");
+		return _getSegmentsExperimentActionURL(
+			"/segments_experiment/edit_segments_experiment_rel");
 	}
 
 	private Map<String, Object> _getEndpoints() throws PortalException {
@@ -319,7 +319,8 @@ public class SegmentsExperimentDisplayContext {
 	}
 
 	private String _getRunSegmentsExperimenttURL() {
-		return _getSegmentsExperimentActionURL("/run_segments_experiment");
+		return _getSegmentsExperimentActionURL(
+			"/segments_experiment/run_segments_experiment");
 	}
 
 	private long _getSegmentsExperienceId() throws PortalException {
@@ -478,37 +479,28 @@ public class SegmentsExperimentDisplayContext {
 			return _segmentsExperienceId;
 		}
 
-		LongStream stream = Arrays.stream(
-			GetterUtil.getLongValues(
-				_httpServletRequest.getAttribute(
-					SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS)));
+		HttpServletRequest originalHttpServletRequest =
+			_portal.getOriginalServletRequest(_httpServletRequest);
 
-		_segmentsExperienceId = stream.findFirst(
-		).orElse(
-			SegmentsExperienceConstants.ID_DEFAULT
-		);
+		long selectedSegmentsExperienceId = ParamUtil.getLong(
+			originalHttpServletRequest, "segmentsExperienceId", -1);
+
+		if (selectedSegmentsExperienceId != -1) {
+			_segmentsExperienceId = selectedSegmentsExperienceId;
+		}
+		else {
+			LongStream longStream = Arrays.stream(
+				GetterUtil.getLongValues(
+					_httpServletRequest.getAttribute(
+						SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS)));
+
+			_segmentsExperienceId = longStream.findFirst(
+			).orElse(
+				SegmentsExperienceConstants.ID_DEFAULT
+			);
+		}
 
 		return _segmentsExperienceId;
-	}
-
-	private String _getViewSegmentsExperimentDetailsURL()
-		throws PortalException {
-
-		SegmentsExperiment segmentsExperiment = _getSegmentsExperiment();
-
-		if (segmentsExperiment == null) {
-			return StringPool.BLANK;
-		}
-
-		String liferayAnalyticsURL = getLiferayAnalyticsURL(
-			segmentsExperiment.getCompanyId());
-
-		if (Validator.isNull(liferayAnalyticsURL)) {
-			return StringPool.BLANK;
-		}
-
-		return liferayAnalyticsURL + "/tests/overview/" +
-			segmentsExperiment.getSegmentsExperimentKey();
 	}
 
 	private String _getWinnerSegmentsExperienceId() {

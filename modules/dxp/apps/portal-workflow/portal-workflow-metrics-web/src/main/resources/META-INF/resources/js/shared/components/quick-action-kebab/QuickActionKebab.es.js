@@ -10,65 +10,71 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayDropDown from '@clayui/drop-down';
+import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
-import React, {useState} from 'react';
+import React from 'react';
 
-import {DropDownItem} from './DropDownItem.es';
-import {IconItem} from './IconItem';
+const IconItem = ({icon, onClick}) => {
+	return (
+		<>
+			<button
+				className="component-action quick-action-item"
+				onClick={onClick}
+				role="button"
+			>
+				<ClayIcon symbol={icon} />
+			</button>
+		</>
+	);
+};
 
-const QuickActionKebab = ({dropDownItems = [], iconItems = [], items = []}) => {
+const QuickActionKebab = ({
+	dropDownItems = [],
+	disabled = false,
+	iconItems = [],
+	items = [],
+}) => {
 	if (items.length > 0) {
 		dropDownItems = items;
-		iconItems = items;
+		iconItems = items.filter(({icon}) => icon);
 	}
+
+	dropDownItems = dropDownItems.map((item) => ({
+		...item,
+	}));
 
 	return (
 		<>
-			<div className="quick-action-menu">
-				{iconItems.map((iconItem, index) => (
-					<IconItem
-						action={iconItem.action}
-						icon={iconItem.icon}
-						key={index}
-					/>
-				))}
-			</div>
+			{!disabled && iconItems.length > 0 && (
+				<div className="quick-action-menu">
+					{iconItems.map(({icon, onClick}, index) => (
+						<IconItem icon={icon} key={index} onClick={onClick} />
+					))}
+				</div>
+			)}
 
 			{dropDownItems.length > 0 && (
-				<KebabDropDown>
-					{dropDownItems.map((dropDownItem, index) => (
-						<DropDownItem
-							action={dropDownItem.action}
-							key={index}
-							title={dropDownItem.title}
-						/>
-					))}
-				</KebabDropDown>
+				<KebabDropDown disabled={disabled} items={dropDownItems} />
 			)}
 		</>
 	);
 };
 
-const KebabDropDown = ({children}) => {
-	const [active, setActive] = useState(false);
-
+const KebabDropDown = ({disabled, items}) => {
 	return (
-		<ClayDropDown
-			active={active}
-			onActiveChange={setActive}
+		<ClayDropDownWithItems
+			items={items}
 			trigger={
 				<ClayButton
 					className="component-action"
+					disabled={disabled}
 					displayType="unstyled"
 					monospaced
 				>
 					<ClayIcon symbol="ellipsis-v" />
 				</ClayButton>
 			}
-		>
-			{children}
-		</ClayDropDown>
+		/>
 	);
 };
 

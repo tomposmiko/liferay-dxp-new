@@ -20,7 +20,8 @@
 List<ScopeDisplay> scopeDisplays = (List<ScopeDisplay>)request.getAttribute(UADWebKeys.SCOPE_DISPLAYS);
 int totalReviewableUADEntitiesCount = (int)request.getAttribute(UADWebKeys.TOTAL_UAD_ENTITIES_COUNT);
 List<UADApplicationSummaryDisplay> uadApplicationSummaryDisplays = (List<UADApplicationSummaryDisplay>)request.getAttribute(UADWebKeys.UAD_APPLICATION_SUMMARY_DISPLAY_LIST);
-List<UADDisplay> uadDisplays = (List<UADDisplay>)request.getAttribute(UADWebKeys.APPLICATION_UAD_DISPLAYS);
+List<UADDisplay<?>> uadDisplays = (List<UADDisplay<?>>)request.getAttribute(UADWebKeys.APPLICATION_UAD_DISPLAYS);
+
 ViewUADEntitiesDisplay viewUADEntitiesDisplay = (ViewUADEntitiesDisplay)request.getAttribute(UADWebKeys.VIEW_UAD_ENTITIES_DISPLAY);
 
 long[] groupIds = viewUADEntitiesDisplay.getGroupIds();
@@ -37,11 +38,15 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 
 <liferay-util:include page="/uad_data_navigation_bar.jsp" servletContext="<%= application %>" />
 
-<div class="container-fluid container-fluid-max-xl container-form-lg">
-	<div class="row">
-		<div class="col-lg-3">
+<clay:container-fluid
+	cssClass="container-form-lg"
+>
+	<clay:row>
+		<clay:col
+			lg="3"
+		>
 			<div class="panel panel-secondary">
-				<div class="collapse-icon collapse-icon-middle panel-header" data-target="#<portlet:namespace />scopePanelBody" data-toggle="collapse">
+				<div class="collapse-icon collapse-icon-middle panel-header" data-target="#<portlet:namespace />scopePanelBody" data-toggle="liferay-collapse">
 					<span class="panel-title">
 						<%= StringUtil.toUpperCase(LanguageUtil.get(request, "scope"), locale) %>
 					</span>
@@ -75,7 +80,7 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 			</div>
 
 			<div class="panel panel-secondary">
-				<div class="collapse-icon collapse-icon-middle panel-header" data-target="#<portlet:namespace />applicationPanelBody" data-toggle="collapse">
+				<div class="collapse-icon collapse-icon-middle panel-header" data-target="#<portlet:namespace />applicationPanelBody" data-toggle="liferay-collapse">
 					<span class="panel-title">
 
 						<%
@@ -119,7 +124,7 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 			<c:if test="<%= !Objects.equals(viewUADEntitiesDisplay.getApplicationKey(), UADConstants.ALL_APPLICATIONS) %>">
 				<div class="panel-group">
 					<div class="panel panel-secondary">
-						<div class="collapse-icon collapse-icon-middle panel-header" data-target="#<portlet:namespace />entitiesTypePanelBody" data-toggle="collapse">
+						<div class="collapse-icon collapse-icon-middle panel-header" data-target="#<portlet:namespace />entitiesTypePanelBody" data-toggle="liferay-collapse">
 							<span class="panel-title">
 
 								<%
@@ -153,7 +158,7 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 									<c:otherwise>
 
 										<%
-										for (UADDisplay uadDisplay : uadDisplays) {
+										for (UADDisplay<?> uadDisplay : uadDisplays) {
 											long count = uadDisplay.searchCount(selectedUser.getUserId(), groupIds, null);
 										%>
 
@@ -176,23 +181,27 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 					</div>
 				</div>
 			</c:if>
-		</div>
+		</clay:col>
 
-		<div class="col-lg-9">
-			<div class="sheet">
-				<div class="sheet-header">
+		<clay:col
+			lg="9"
+		>
+			<clay:sheet
+				size="full"
+			>
+				<clay:sheet-header>
 					<h2 class="sheet-title"><liferay-ui:message key="review-data" /></h2>
-				</div>
+				</clay:sheet-header>
 
-				<div class="sheet-section">
+				<clay:sheet-section>
 					<h3 class="sheet-subtitle">
 						<liferay-ui:message key="status-summary" />
 					</h3>
 
 					<strong><liferay-ui:message key="remaining-items" />: </strong><%= totalReviewableUADEntitiesCount %>
-				</div>
+				</clay:sheet-section>
 
-				<div class="sheet-section">
+				<clay:sheet-section>
 					<c:choose>
 						<c:when test="<%= totalReviewableUADEntitiesCount == 0 %>">
 							<liferay-ui:empty-result-message
@@ -205,15 +214,15 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 							<liferay-util:include page="/view_uad_entities.jsp" servletContext="<%= application %>" />
 						</c:otherwise>
 					</c:choose>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+				</clay:sheet-section>
+			</clay:sheet>
+		</clay:col>
+	</clay:row>
+</clay:container-fluid>
 
 <portlet:renderURL var="reviewUADDataURL">
 	<portlet:param name="p_u_i_d" value="<%= String.valueOf(selectedUser.getUserId()) %>" />
-	<portlet:param name="mvcRenderCommandName" value="/review_uad_data" />
+	<portlet:param name="mvcRenderCommandName" value="/user_associated_data/review_uad_data" />
 	<portlet:param name="applicationKey" value="<%= viewUADEntitiesDisplay.getApplicationKey() %>" />
 	<portlet:param name="scope" value="<%= scope %>" />
 </portlet:renderURL>
@@ -223,13 +232,13 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 
 	var clickListeners = [];
 
-	var registerClickHandler = function(element, clickHandlerFn) {
+	var registerClickHandler = function (element, clickHandlerFn) {
 		clickListeners.push(
 			dom.delegate(element, 'click', 'input', clickHandlerFn)
 		);
 	};
 
-	registerClickHandler(<portlet:namespace />applicationPanelBody, function(
+	registerClickHandler(<portlet:namespace />applicationPanelBody, function (
 		event
 	) {
 		var url = new URL(baseURL, window.location.origin);
@@ -243,7 +252,7 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 	});
 
 	<c:if test="<%= !Objects.equals(viewUADEntitiesDisplay.getApplicationKey(), UADConstants.ALL_APPLICATIONS) %>">
-		registerClickHandler(<portlet:namespace />entitiesTypePanelBody, function(
+		registerClickHandler(<portlet:namespace />entitiesTypePanelBody, function (
 			event
 		) {
 			var url = new URL(baseURL, window.location.origin);
@@ -257,7 +266,7 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 		});
 	</c:if>
 
-	registerClickHandler(<portlet:namespace />scopePanelBody, function(event) {
+	registerClickHandler(<portlet:namespace />scopePanelBody, function (event) {
 		var url = new URL(baseURL, window.location.origin);
 
 		url.searchParams.set('<portlet:namespace />applicationKey', '');

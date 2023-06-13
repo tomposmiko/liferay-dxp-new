@@ -26,8 +26,13 @@ DepotAdminManagementToolbarDisplayContext depotAdminManagementToolbarDisplayCont
 	displayContext="<%= depotAdminManagementToolbarDisplayContext %>"
 />
 
-<div class="closed container-fluid-1280 sidenav-container sidenav-right">
+<clay:container-fluid
+	cssClass="closed sidenav-container sidenav-right"
+>
 	<div class="sidenav-content">
+		<liferay-ui:error exception="<%= DepotEntryStagedException.class %>" message="cannot-delete-a-staged-asset-library.-unstage-the-asset-library-and-try-again" />
+		<liferay-ui:error exception="<%= RequiredFileEntryTypeException.class %>" message="cannot-delete-a-document-type-that-is-presently-used-by-one-or-more-documents-in-a-connected-site" />
+
 		<portlet:actionURL name="deleteGroups" var="deleteGroupsURL" />
 
 		<aui:form action="<%= depotAdminDisplayContext.getIteratorURL() %>" cssClass="container-fluid-1280" name="fm">
@@ -57,7 +62,7 @@ DepotAdminManagementToolbarDisplayContext depotAdminManagementToolbarDisplayCont
 						<c:when test="<%= depotAdminDisplayContext.isDisplayStyleDescriptive() %>">
 							<liferay-ui:search-container-column-text>
 								<liferay-ui:search-container-column-icon
-									icon="repository"
+									icon="books"
 									toggleRowChecker="<%= true %>"
 								/>
 							</liferay-ui:search-container-column-text>
@@ -70,6 +75,15 @@ DepotAdminManagementToolbarDisplayContext depotAdminManagementToolbarDisplayCont
 										<%= HtmlUtil.escape(depotEntryGroup.getDescriptiveName(locale)) %>
 									</aui:a>
 								</h5>
+
+								<h6>
+
+									<%
+									int depotEntryConnectedGroupsCount = depotAdminDisplayContext.getDepotEntryConnectedGroupsCount(depotEntry);
+									%>
+
+									<liferay-ui:message arguments="<%= depotEntryConnectedGroupsCount %>" key='<%= (depotEntryConnectedGroupsCount != 1) ? "x-connected-sites" : "x-connected-site" %>' />
+								</h6>
 							</liferay-ui:search-container-column-text>
 
 							<liferay-ui:search-container-column-text>
@@ -100,6 +114,12 @@ DepotAdminManagementToolbarDisplayContext depotAdminManagementToolbarDisplayCont
 								<aui:a href="<%= depotAdminDisplayContext.getViewDepotURL(depotEntry) %>" label="<%= HtmlUtil.escape(depotEntryGroup.getDescriptiveName(locale)) %>" localizeLabel="<%= false %>" />
 							</liferay-ui:search-container-column-text>
 
+							<liferay-ui:search-container-column-text
+								cssClass="table-cell-expand table-cell-minw-200"
+								name="num-of-connections"
+								value="<%= String.valueOf(depotAdminDisplayContext.getDepotEntryConnectedGroupsCount(depotEntry)) %>"
+							/>
+
 							<liferay-ui:search-container-column-text>
 								<clay:dropdown-actions
 									defaultEventHandler="<%= DepotAdminWebKeys.DEPOT_ENTRY_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
@@ -118,7 +138,7 @@ DepotAdminManagementToolbarDisplayContext depotAdminManagementToolbarDisplayCont
 			</liferay-ui:search-container>
 		</aui:form>
 	</div>
-</div>
+</clay:container-fluid>
 
 <liferay-frontend:component
 	componentId="<%= DepotAdminWebKeys.DEPOT_ENTRY_DROPDOWN_DEFAULT_EVENT_HANDLER %>"

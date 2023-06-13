@@ -14,9 +14,16 @@
 
 package com.liferay.asset.display.page.service;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for AssetDisplayPageEntry. This utility wraps
@@ -41,35 +48,35 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	/**
 	 * Adds the asset display page entry to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetDisplayPageEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetDisplayPageEntry the asset display page entry
 	 * @return the asset display page entry that was added
 	 */
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-		addAssetDisplayPageEntry(
-			com.liferay.asset.display.page.model.AssetDisplayPageEntry
-				assetDisplayPageEntry) {
+	public static AssetDisplayPageEntry addAssetDisplayPageEntry(
+		AssetDisplayPageEntry assetDisplayPageEntry) {
 
 		return getService().addAssetDisplayPageEntry(assetDisplayPageEntry);
 	}
 
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-			addAssetDisplayPageEntry(
-				long userId, long groupId, long classNameId, long classPK,
-				long layoutPageTemplateEntryId, int type,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static AssetDisplayPageEntry addAssetDisplayPageEntry(
+			long userId, long groupId, long classNameId, long classPK,
+			long layoutPageTemplateEntryId, int type,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
 
 		return getService().addAssetDisplayPageEntry(
 			userId, groupId, classNameId, classPK, layoutPageTemplateEntryId,
 			type, serviceContext);
 	}
 
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-			addAssetDisplayPageEntry(
-				long userId, long groupId, long classNameId, long classPK,
-				long layoutPageTemplateEntryId,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static AssetDisplayPageEntry addAssetDisplayPageEntry(
+			long userId, long groupId, long classNameId, long classPK,
+			long layoutPageTemplateEntryId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
 
 		return getService().addAssetDisplayPageEntry(
 			userId, groupId, classNameId, classPK, layoutPageTemplateEntryId,
@@ -82,23 +89,35 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param assetDisplayPageEntryId the primary key for the new asset display page entry
 	 * @return the new asset display page entry
 	 */
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-		createAssetDisplayPageEntry(long assetDisplayPageEntryId) {
+	public static AssetDisplayPageEntry createAssetDisplayPageEntry(
+		long assetDisplayPageEntryId) {
 
 		return getService().createAssetDisplayPageEntry(
 			assetDisplayPageEntryId);
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the asset display page entry from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetDisplayPageEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param assetDisplayPageEntry the asset display page entry
 	 * @return the asset display page entry that was removed
 	 */
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-		deleteAssetDisplayPageEntry(
-			com.liferay.asset.display.page.model.AssetDisplayPageEntry
-				assetDisplayPageEntry) {
+	public static AssetDisplayPageEntry deleteAssetDisplayPageEntry(
+		AssetDisplayPageEntry assetDisplayPageEntry) {
 
 		return getService().deleteAssetDisplayPageEntry(assetDisplayPageEntry);
 	}
@@ -106,13 +125,17 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	/**
 	 * Deletes the asset display page entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetDisplayPageEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetDisplayPageEntryId the primary key of the asset display page entry
 	 * @return the asset display page entry that was removed
 	 * @throws PortalException if a asset display page entry with the primary key could not be found
 	 */
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-			deleteAssetDisplayPageEntry(long assetDisplayPageEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static AssetDisplayPageEntry deleteAssetDisplayPageEntry(
+			long assetDisplayPageEntryId)
+		throws PortalException {
 
 		return getService().deleteAssetDisplayPageEntry(
 			assetDisplayPageEntryId);
@@ -120,7 +143,7 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 
 	public static void deleteAssetDisplayPageEntry(
 			long groupId, long classNameId, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		getService().deleteAssetDisplayPageEntry(groupId, classNameId, classPK);
 	}
@@ -128,17 +151,22 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -148,9 +176,7 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -166,9 +192,8 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -186,10 +211,9 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -201,9 +225,7 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -215,21 +237,20 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-		fetchAssetDisplayPageEntry(long assetDisplayPageEntryId) {
+	public static AssetDisplayPageEntry fetchAssetDisplayPageEntry(
+		long assetDisplayPageEntryId) {
 
 		return getService().fetchAssetDisplayPageEntry(assetDisplayPageEntryId);
 	}
 
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-		fetchAssetDisplayPageEntry(
-			long groupId, long classNameId, long classPK) {
+	public static AssetDisplayPageEntry fetchAssetDisplayPageEntry(
+		long groupId, long classNameId, long classPK) {
 
 		return getService().fetchAssetDisplayPageEntry(
 			groupId, classNameId, classPK);
@@ -242,7 +263,7 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param groupId the primary key of the group
 	 * @return the matching asset display page entry, or <code>null</code> if a matching asset display page entry could not be found
 	 */
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
+	public static AssetDisplayPageEntry
 		fetchAssetDisplayPageEntryByUuidAndGroupId(String uuid, long groupId) {
 
 		return getService().fetchAssetDisplayPageEntryByUuidAndGroupId(
@@ -266,21 +287,29 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param end the upper bound of the range of asset display page entries (not inclusive)
 	 * @return the range of asset display page entries
 	 */
-	public static java.util.List
-		<com.liferay.asset.display.page.model.AssetDisplayPageEntry>
-			getAssetDisplayPageEntries(int start, int end) {
+	public static List<AssetDisplayPageEntry> getAssetDisplayPageEntries(
+		int start, int end) {
 
 		return getService().getAssetDisplayPageEntries(start, end);
 	}
 
-	public static java.util.List
-		<com.liferay.asset.display.page.model.AssetDisplayPageEntry>
-			getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
-				long layoutPageTemplateEntryId) {
+	public static List<AssetDisplayPageEntry>
+		getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
+			long layoutPageTemplateEntryId) {
 
 		return getService().
 			getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
 				layoutPageTemplateEntryId);
+	}
+
+	public static List<AssetDisplayPageEntry>
+		getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
+			long layoutPageTemplateEntryId, int start, int end,
+			OrderByComparator<AssetDisplayPageEntry> orderByComparator) {
+
+		return getService().
+			getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
+				layoutPageTemplateEntryId, start, end, orderByComparator);
 	}
 
 	/**
@@ -290,10 +319,9 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param companyId the primary key of the company
 	 * @return the matching asset display page entries, or an empty list if no matches were found
 	 */
-	public static java.util.List
-		<com.liferay.asset.display.page.model.AssetDisplayPageEntry>
-			getAssetDisplayPageEntriesByUuidAndCompanyId(
-				String uuid, long companyId) {
+	public static List<AssetDisplayPageEntry>
+		getAssetDisplayPageEntriesByUuidAndCompanyId(
+			String uuid, long companyId) {
 
 		return getService().getAssetDisplayPageEntriesByUuidAndCompanyId(
 			uuid, companyId);
@@ -309,13 +337,10 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the range of matching asset display page entries, or an empty list if no matches were found
 	 */
-	public static java.util.List
-		<com.liferay.asset.display.page.model.AssetDisplayPageEntry>
-			getAssetDisplayPageEntriesByUuidAndCompanyId(
-				String uuid, long companyId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.asset.display.page.model.AssetDisplayPageEntry>
-						orderByComparator) {
+	public static List<AssetDisplayPageEntry>
+		getAssetDisplayPageEntriesByUuidAndCompanyId(
+			String uuid, long companyId, int start, int end,
+			OrderByComparator<AssetDisplayPageEntry> orderByComparator) {
 
 		return getService().getAssetDisplayPageEntriesByUuidAndCompanyId(
 			uuid, companyId, start, end, orderByComparator);
@@ -346,9 +371,9 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @return the asset display page entry
 	 * @throws PortalException if a asset display page entry with the primary key could not be found
 	 */
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-			getAssetDisplayPageEntry(long assetDisplayPageEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static AssetDisplayPageEntry getAssetDisplayPageEntry(
+			long assetDisplayPageEntryId)
+		throws PortalException {
 
 		return getService().getAssetDisplayPageEntry(assetDisplayPageEntryId);
 	}
@@ -361,9 +386,9 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 * @return the matching asset display page entry
 	 * @throws PortalException if a matching asset display page entry could not be found
 	 */
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
+	public static AssetDisplayPageEntry
 			getAssetDisplayPageEntryByUuidAndGroupId(String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws PortalException {
 
 		return getService().getAssetDisplayPageEntryByUuidAndGroupId(
 			uuid, groupId);
@@ -393,9 +418,11 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -403,51 +430,32 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	/**
 	 * Updates the asset display page entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetDisplayPageEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetDisplayPageEntry the asset display page entry
 	 * @return the asset display page entry that was updated
 	 */
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-		updateAssetDisplayPageEntry(
-			com.liferay.asset.display.page.model.AssetDisplayPageEntry
-				assetDisplayPageEntry) {
+	public static AssetDisplayPageEntry updateAssetDisplayPageEntry(
+		AssetDisplayPageEntry assetDisplayPageEntry) {
 
 		return getService().updateAssetDisplayPageEntry(assetDisplayPageEntry);
 	}
 
-	public static com.liferay.asset.display.page.model.AssetDisplayPageEntry
-			updateAssetDisplayPageEntry(
-				long assetDisplayPageEntryId, long layoutPageTemplateEntryId,
-				int type)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static AssetDisplayPageEntry updateAssetDisplayPageEntry(
+			long assetDisplayPageEntryId, long layoutPageTemplateEntryId,
+			int type)
+		throws PortalException {
 
 		return getService().updateAssetDisplayPageEntry(
 			assetDisplayPageEntryId, layoutPageTemplateEntryId, type);
 	}
 
 	public static AssetDisplayPageEntryLocalService getService() {
-		return _serviceTracker.getService();
+		return _service;
 	}
 
-	private static ServiceTracker
-		<AssetDisplayPageEntryLocalService, AssetDisplayPageEntryLocalService>
-			_serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			AssetDisplayPageEntryLocalService.class);
-
-		ServiceTracker
-			<AssetDisplayPageEntryLocalService,
-			 AssetDisplayPageEntryLocalService> serviceTracker =
-				new ServiceTracker
-					<AssetDisplayPageEntryLocalService,
-					 AssetDisplayPageEntryLocalService>(
-						 bundle.getBundleContext(),
-						 AssetDisplayPageEntryLocalService.class, null);
-
-		serviceTracker.open();
-
-		_serviceTracker = serviceTracker;
-	}
+	private static volatile AssetDisplayPageEntryLocalService _service;
 
 }

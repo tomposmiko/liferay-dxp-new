@@ -56,7 +56,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	property = {
 		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_CONNECTED_APPLICATIONS,
-		"mvc.command.name=/", "mvc.command.name=/connected_applications/view"
+		"mvc.command.name=/",
+		"mvc.command.name=/oauth2_provider/view_connected_applications"
 	},
 	service = MVCRenderCommand.class
 )
@@ -95,7 +96,7 @@ public class ViewConnectedApplicationsMVCRenderCommand
 			OAuth2ConnectedApplicationsPortletDisplayContext
 				oAuth2ConnectedApplicationsPortletDisplayContext =
 					new OAuth2ConnectedApplicationsPortletDisplayContext(
-						renderRequest, _dlURLHelper);
+						_dlURLHelper, _oAuth2ApplicationService, renderRequest);
 
 			renderRequest.setAttribute(
 				OAuth2ProviderWebKeys.
@@ -142,8 +143,8 @@ public class ViewConnectedApplicationsMVCRenderCommand
 		OAuth2ConnectedApplicationsPortletDisplayContext
 			oAuth2ConnectedApplicationsPortletDisplayContext =
 				new OAuth2ConnectedApplicationsPortletDisplayContext(
-					assignableScopes, renderRequest, _oAuth2ApplicationService,
-					oAuth2Authorization, _dlURLHelper);
+					assignableScopes, _dlURLHelper, _oAuth2ApplicationService,
+					oAuth2Authorization, renderRequest);
 
 		renderRequest.setAttribute(
 			OAuth2ProviderWebKeys.

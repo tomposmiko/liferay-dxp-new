@@ -16,8 +16,8 @@ package com.liferay.portal.background.task.internal.messaging;
 
 import com.liferay.portal.background.task.internal.lock.BackgroundTaskLockHelper;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
+import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -34,6 +34,7 @@ public class BackgroundTaskQueuingMessageListener extends BaseMessageListener {
 		BackgroundTaskManager backgroundTaskManager, LockManager lockManager) {
 
 		_backgroundTaskManager = backgroundTaskManager;
+
 		_backgroundTaskLockHelper = new BackgroundTaskLockHelper(lockManager);
 	}
 

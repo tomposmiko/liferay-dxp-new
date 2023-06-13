@@ -22,14 +22,14 @@ import {PROPERTY_TYPES} from '../../utils/constants.es';
 import {DragTypes} from '../../utils/drag-types.es';
 
 const TYPE_ICON_MAP = {
-	[PROPERTY_TYPES.BOOLEAN]: 'text',
+	[PROPERTY_TYPES.BOOLEAN]: 'check-circle',
 	[PROPERTY_TYPES.COLLECTION]: 'table',
 	[PROPERTY_TYPES.DATE]: 'date',
 	[PROPERTY_TYPES.DATE_TIME]: 'date',
 	[PROPERTY_TYPES.DOUBLE]: 'decimal',
 	[PROPERTY_TYPES.ID]: 'diagram',
 	[PROPERTY_TYPES.INTEGER]: 'integer',
-	[PROPERTY_TYPES.STRING]: 'text'
+	[PROPERTY_TYPES.STRING]: 'text',
 };
 
 /**
@@ -43,9 +43,9 @@ function beginDrag({defaultValue, name, propertyKey, type}) {
 		criterion: {
 			defaultValue,
 			propertyName: name,
-			type
+			type,
 		},
-		propertyKey
+		propertyKey,
 	};
 }
 
@@ -58,7 +58,7 @@ class CriteriaSidebarItem extends Component {
 		label: PropTypes.string,
 		name: PropTypes.string,
 		propertyKey: PropTypes.string.isRequired,
-		type: PropTypes.string
+		type: PropTypes.string,
 	};
 
 	render() {
@@ -67,7 +67,7 @@ class CriteriaSidebarItem extends Component {
 			connectDragSource,
 			dragging,
 			label,
-			type
+			type,
 		} = this.props;
 
 		const classes = getCN(
@@ -97,10 +97,10 @@ class CriteriaSidebarItem extends Component {
 export default dragSource(
 	DragTypes.PROPERTY,
 	{
-		beginDrag
+		beginDrag,
 	},
 	(connect, monitor) => ({
 		connectDragSource: connect.dragSource(),
-		dragging: monitor.isDragging()
+		dragging: monitor.isDragging(),
 	})
 )(CriteriaSidebarItem);

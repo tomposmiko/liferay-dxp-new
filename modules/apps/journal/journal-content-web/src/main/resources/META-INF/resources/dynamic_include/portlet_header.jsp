@@ -20,7 +20,7 @@
 JournalArticle article = journalContentDisplayContext.getArticle();
 %>
 
-<liferay-ui:success key='<%= JournalContentPortletKeys.JOURNAL_CONTENT + "requestProcessed" %>' message="your-request-completed-successfully" />
+<liferay-ui:success key='<%= portletDisplay.getId() + "requestProcessed" %>' message="your-request-completed-successfully" />
 
 <div class="visible-interaction">
 	<liferay-ui:icon-menu
@@ -35,16 +35,18 @@ JournalArticle article = journalContentDisplayContext.getArticle();
 
 			<%
 			JournalArticle latestArticle = journalContentDisplayContext.getLatestArticle();
-
-			Map<String, Object> data = new HashMap<String, Object>();
-
-			data.put("destroyOnHide", true);
-			data.put("id", HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset");
-			data.put("title", HtmlUtil.escape(latestArticle.getTitle(locale)));
 			%>
 
 			<liferay-ui:icon
-				data="<%= data %>"
+				data='<%=
+					HashMapBuilder.<String, Object>put(
+						"destroyOnHide", true
+					).put(
+						"id", HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset"
+					).put(
+						"title", HtmlUtil.escape(latestArticle.getTitle(locale))
+					).build()
+				%>'
 				id="editWebContentIcon"
 				message="edit-web-content"
 				url="<%= journalContentDisplayContext.getURLEdit() %>"
@@ -80,20 +82,21 @@ JournalArticle article = journalContentDisplayContext.getArticle();
 
 			<%
 			JournalArticle latestArticle = journalContentDisplayContext.getLatestArticle();
-
-			Map<String, Object> data = new HashMap<String, Object>();
-
-			data.put("destroyOnHide", true);
-			data.put("id", HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset");
-			data.put("title", HtmlUtil.escape(latestArticle.getTitle(locale)));
 			%>
 
 			<liferay-ui:icon
-				data="<%= data %>"
+				data='<%=
+					HashMapBuilder.<String, Object>put(
+						"destroyOnHide", true
+					).put(
+						"id", HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset"
+					).put(
+						"title", HtmlUtil.escape(latestArticle.getTitle(locale))
+					).build()
+				%>'
 				id="basicViewHistoryIcon"
 				message="view-history"
 				url="<%= journalContentDisplayContext.getURLViewHistory() %>"
-				useDialog="<%= true %>"
 			/>
 		</c:if>
 	</liferay-ui:icon-menu>

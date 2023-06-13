@@ -17,12 +17,12 @@ package com.liferay.journal.web.internal.portlet.action;
 import com.liferay.dynamic.data.mapping.exception.TemplateScriptException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureServiceUtil;
+import com.liferay.journal.constants.JournalArticleConstants;
+import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFeed;
 import com.liferay.journal.model.JournalFolder;
-import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.service.JournalFeedServiceUtil;
@@ -263,10 +263,6 @@ public class ActionUtil {
 		long classNameId = ParamUtil.getLong(httpServletRequest, "classNameId");
 		long classPK = ParamUtil.getLong(httpServletRequest, "classPK");
 		String articleId = ParamUtil.getString(httpServletRequest, "articleId");
-		long ddmStructureId = ParamUtil.getLong(
-			httpServletRequest, "ddmStructureId");
-		String ddmStructureKey = ParamUtil.getString(
-			httpServletRequest, "ddmStructureKey");
 		int status = ParamUtil.getInteger(
 			httpServletRequest, "status", WorkflowConstants.STATUS_ANY);
 
@@ -285,7 +281,7 @@ public class ActionUtil {
 				groupId, articleId, status);
 		}
 		else if ((classNameId > 0) &&
-				 (classPK > JournalArticleConstants.CLASSNAME_ID_DEFAULT)) {
+				 (classPK > JournalArticleConstants.CLASS_NAME_ID_DEFAULT)) {
 
 			String className = PortalUtil.getClassName(classNameId);
 
@@ -298,6 +294,11 @@ public class ActionUtil {
 			}
 		}
 		else {
+			long ddmStructureId = ParamUtil.getLong(
+				httpServletRequest, "ddmStructureId");
+			String ddmStructureKey = ParamUtil.getString(
+				httpServletRequest, "ddmStructureKey");
+
 			DDMStructure ddmStructure = null;
 
 			if (Validator.isNotNull(ddmStructureKey)) {
@@ -330,7 +331,7 @@ public class ActionUtil {
 				article.setId(0);
 				article.setGroupId(groupId);
 				article.setClassNameId(
-					JournalArticleConstants.CLASSNAME_ID_DEFAULT);
+					JournalArticleConstants.CLASS_NAME_ID_DEFAULT);
 				article.setClassPK(0);
 				article.setArticleId(null);
 				article.setVersion(0);
@@ -377,12 +378,13 @@ public class ActionUtil {
 	public static JournalFeed getFeed(HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
 		String feedId = ParamUtil.getString(httpServletRequest, "feedId");
 
 		JournalFeed feed = null;
 
 		if (Validator.isNotNull(feedId)) {
+			long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
+
 			feed = JournalFeedServiceUtil.getFeed(groupId, feedId);
 		}
 
@@ -398,10 +400,6 @@ public class ActionUtil {
 	public static JournalFolder getFolder(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		long folderId = ParamUtil.getLong(httpServletRequest, "folderId");
 
 		JournalFolder folder = null;
@@ -412,6 +410,10 @@ public class ActionUtil {
 			folder = JournalFolderServiceUtil.fetchFolder(folderId);
 		}
 		else {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
 			JournalPermission.check(
 				themeDisplay.getPermissionChecker(),
 				themeDisplay.getScopeGroup(), ActionKeys.VIEW);

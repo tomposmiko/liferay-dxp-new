@@ -12,8 +12,6 @@
  * details.
  */
 
-import {isFunction, isString} from 'metal';
-
 /**
  * Returns a list of regions by country
  * @callback callback
@@ -21,11 +19,11 @@ import {isFunction, isString} from 'metal';
  * @return {array} Array of regions by country
  */
 export default function getRegions(callback, selectKey) {
-	if (!isFunction(callback)) {
+	if (typeof callback !== 'function') {
 		throw new TypeError('Parameter callback must be a function');
 	}
 
-	if (!isString(selectKey)) {
+	if (typeof selectKey !== 'string') {
 		throw new TypeError('Parameter selectKey must be a string');
 	}
 
@@ -33,7 +31,7 @@ export default function getRegions(callback, selectKey) {
 		'/region/get-regions',
 		{
 			active: true,
-			countryId: parseInt(selectKey, 10)
+			countryId: parseInt(selectKey, 10),
 		},
 		callback
 	);

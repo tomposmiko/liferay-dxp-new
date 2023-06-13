@@ -17,15 +17,15 @@
 <%@ include file="/wiki/init.jsp" %>
 
 <%
-WikiPage wikiPage = (WikiPage)request.getAttribute(WikiWebKeys.WIKI_PAGE);
 WikiNode node = (WikiNode)request.getAttribute(WikiWebKeys.WIKI_NODE);
+WikiPage wikiPage = (WikiPage)request.getAttribute(WikiWebKeys.WIKI_PAGE);
 %>
 
 <portlet:actionURL name="/wiki/edit_page_attachment" var="undoTrashURL">
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
 </portlet:actionURL>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<liferay-trash:undo
 		portletURL="<%= undoTrashURL %>"
 	/>
@@ -69,4 +69,4 @@ WikiNode node = (WikiNode)request.getAttribute(WikiWebKeys.WIKI_NODE);
 	%>
 
 	<%@ include file="/wiki/attachments_list.jspf" %>
-</div>
+</clay:container-fluid>

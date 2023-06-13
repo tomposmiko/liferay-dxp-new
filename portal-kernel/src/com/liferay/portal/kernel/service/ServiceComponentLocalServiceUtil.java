@@ -14,7 +14,16 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.model.ServiceComponent;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service utility for ServiceComponent. This utility wraps
@@ -39,14 +48,27 @@ public class ServiceComponentLocalServiceUtil {
 	/**
 	 * Adds the service component to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ServiceComponentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param serviceComponent the service component
 	 * @return the service component that was added
 	 */
-	public static com.liferay.portal.kernel.model.ServiceComponent
-		addServiceComponent(
-			com.liferay.portal.kernel.model.ServiceComponent serviceComponent) {
+	public static ServiceComponent addServiceComponent(
+		ServiceComponent serviceComponent) {
 
 		return getService().addServiceComponent(serviceComponent);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel createPersistedModel(
+			Serializable primaryKeyObj)
+		throws PortalException {
+
+		return getService().createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -55,8 +77,8 @@ public class ServiceComponentLocalServiceUtil {
 	 * @param serviceComponentId the primary key for the new service component
 	 * @return the new service component
 	 */
-	public static com.liferay.portal.kernel.model.ServiceComponent
-		createServiceComponent(long serviceComponentId) {
+	public static ServiceComponent createServiceComponent(
+		long serviceComponentId) {
 
 		return getService().createServiceComponent(serviceComponentId);
 	}
@@ -64,10 +86,9 @@ public class ServiceComponentLocalServiceUtil {
 	/**
 	 * @throws PortalException
 	 */
-	public static com.liferay.portal.kernel.model.PersistedModel
-			deletePersistedModel(
-				com.liferay.portal.kernel.model.PersistedModel persistedModel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static PersistedModel deletePersistedModel(
+			PersistedModel persistedModel)
+		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
 	}
@@ -75,13 +96,17 @@ public class ServiceComponentLocalServiceUtil {
 	/**
 	 * Deletes the service component with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ServiceComponentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param serviceComponentId the primary key of the service component
 	 * @return the service component that was removed
 	 * @throws PortalException if a service component with the primary key could not be found
 	 */
-	public static com.liferay.portal.kernel.model.ServiceComponent
-			deleteServiceComponent(long serviceComponentId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static ServiceComponent deleteServiceComponent(
+			long serviceComponentId)
+		throws PortalException {
 
 		return getService().deleteServiceComponent(serviceComponentId);
 	}
@@ -89,12 +114,15 @@ public class ServiceComponentLocalServiceUtil {
 	/**
 	 * Deletes the service component from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ServiceComponentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param serviceComponent the service component
 	 * @return the service component that was removed
 	 */
-	public static com.liferay.portal.kernel.model.ServiceComponent
-		deleteServiceComponent(
-			com.liferay.portal.kernel.model.ServiceComponent serviceComponent) {
+	public static ServiceComponent deleteServiceComponent(
+		ServiceComponent serviceComponent) {
 
 		return getService().deleteServiceComponent(serviceComponent);
 	}
@@ -108,9 +136,15 @@ public class ServiceComponentLocalServiceUtil {
 			serviceComponentConfiguration, classLoader);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
-		dynamicQuery() {
+	public static <T> T dslQuery(DSLQuery dslQuery) {
+		return getService().dslQuery(dslQuery);
+	}
 
+	public static int dslQueryCount(DSLQuery dslQuery) {
+		return getService().dslQueryCount(dslQuery);
+	}
+
+	public static DynamicQuery dynamicQuery() {
 		return getService().dynamicQuery();
 	}
 
@@ -120,9 +154,7 @@ public class ServiceComponentLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -138,9 +170,8 @@ public class ServiceComponentLocalServiceUtil {
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
 
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
@@ -158,10 +189,9 @@ public class ServiceComponentLocalServiceUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
 	 */
-	public static <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator) {
+	public static <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
 
 		return getService().dynamicQuery(
 			dynamicQuery, start, end, orderByComparator);
@@ -173,9 +203,7 @@ public class ServiceComponentLocalServiceUtil {
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows matching the dynamic query
 	 */
-	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
-
+	public static long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -187,14 +215,14 @@ public class ServiceComponentLocalServiceUtil {
 	 * @return the number of rows matching the dynamic query
 	 */
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
+		DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.portal.kernel.model.ServiceComponent
-		fetchServiceComponent(long serviceComponentId) {
+	public static ServiceComponent fetchServiceComponent(
+		long serviceComponentId) {
 
 		return getService().fetchServiceComponent(serviceComponentId);
 	}
@@ -212,10 +240,7 @@ public class ServiceComponentLocalServiceUtil {
 		return getService().getIndexableActionableDynamicQuery();
 	}
 
-	public static java.util.List
-		<com.liferay.portal.kernel.model.ServiceComponent>
-			getLatestServiceComponents() {
-
+	public static List<ServiceComponent> getLatestServiceComponents() {
 		return getService().getLatestServiceComponents();
 	}
 
@@ -228,9 +253,11 @@ public class ServiceComponentLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.model.PersistedModel
-			getPersistedModel(java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	/**
+	 * @throws PortalException
+	 */
+	public static PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
 	}
@@ -242,9 +269,8 @@ public class ServiceComponentLocalServiceUtil {
 	 * @return the service component
 	 * @throws PortalException if a service component with the primary key could not be found
 	 */
-	public static com.liferay.portal.kernel.model.ServiceComponent
-			getServiceComponent(long serviceComponentId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static ServiceComponent getServiceComponent(long serviceComponentId)
+		throws PortalException {
 
 		return getService().getServiceComponent(serviceComponentId);
 	}
@@ -260,9 +286,8 @@ public class ServiceComponentLocalServiceUtil {
 	 * @param end the upper bound of the range of service components (not inclusive)
 	 * @return the range of service components
 	 */
-	public static java.util.List
-		<com.liferay.portal.kernel.model.ServiceComponent> getServiceComponents(
-			int start, int end) {
+	public static List<ServiceComponent> getServiceComponents(
+		int start, int end) {
 
 		return getService().getServiceComponents(start, end);
 	}
@@ -276,13 +301,12 @@ public class ServiceComponentLocalServiceUtil {
 		return getService().getServiceComponentsCount();
 	}
 
-	public static com.liferay.portal.kernel.model.ServiceComponent
-			initServiceComponent(
-				com.liferay.portal.kernel.service.configuration.
-					ServiceComponentConfiguration serviceComponentConfiguration,
-				ClassLoader classLoader, String buildNamespace,
-				long buildNumber, long buildDate)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public static ServiceComponent initServiceComponent(
+			com.liferay.portal.kernel.service.configuration.
+				ServiceComponentConfiguration serviceComponentConfiguration,
+			ClassLoader classLoader, String buildNamespace, long buildNumber,
+			long buildDate)
+		throws PortalException {
 
 		return getService().initServiceComponent(
 			serviceComponentConfiguration, classLoader, buildNamespace,
@@ -292,21 +316,23 @@ public class ServiceComponentLocalServiceUtil {
 	/**
 	 * Updates the service component in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ServiceComponentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param serviceComponent the service component
 	 * @return the service component that was updated
 	 */
-	public static com.liferay.portal.kernel.model.ServiceComponent
-		updateServiceComponent(
-			com.liferay.portal.kernel.model.ServiceComponent serviceComponent) {
+	public static ServiceComponent updateServiceComponent(
+		ServiceComponent serviceComponent) {
 
 		return getService().updateServiceComponent(serviceComponent);
 	}
 
 	public static void upgradeDB(
 			ClassLoader classLoader, String buildNamespace, long buildNumber,
-			com.liferay.portal.kernel.model.ServiceComponent
-				previousServiceComponent,
-			String tablesSQL, String sequencesSQL, String indexesSQL)
+			ServiceComponent previousServiceComponent, String tablesSQL,
+			String sequencesSQL, String indexesSQL)
 		throws Exception {
 
 		getService().upgradeDB(
@@ -319,15 +345,9 @@ public class ServiceComponentLocalServiceUtil {
 	}
 
 	public static ServiceComponentLocalService getService() {
-		if (_service == null) {
-			_service =
-				(ServiceComponentLocalService)PortalBeanLocatorUtil.locate(
-					ServiceComponentLocalService.class.getName());
-		}
-
 		return _service;
 	}
 
-	private static ServiceComponentLocalService _service;
+	private static volatile ServiceComponentLocalService _service;
 
 }

@@ -14,8 +14,8 @@
 
 package com.liferay.journal.test.util.search;
 
+import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -59,10 +59,13 @@ public class JournalArticleSearchFixture {
 			journalArticleBlueprint.getDescriptionMap();
 		String contentString = journalArticleBlueprint.getContentString();
 
-		ServiceContext serviceContext = getServiceContext(groupId, userId);
+		ServiceContext serviceContext = getServiceContext(
+			journalArticleBlueprint);
 
 		serviceContext.setAssetCategoryIds(
 			journalArticleBlueprint.getAssetCategoryIds());
+		serviceContext.setExpandoBridgeAttributes(
+			journalArticleBlueprint.getExpandoBridgeAttributes());
 
 		if (journalArticleBlueprint.isWorkflowEnabled()) {
 			serviceContext.setWorkflowAction(
@@ -121,6 +124,27 @@ public class JournalArticleSearchFixture {
 		}
 	}
 
+	protected ServiceContext getServiceContext(
+		JournalArticleBlueprint journalArticleBlueprint) {
+
+		if (journalArticleBlueprint.getServiceContext() != null) {
+			return journalArticleBlueprint.getServiceContext();
+		}
+
+		try {
+			return ServiceContextTestUtil.getServiceContext(
+				journalArticleBlueprint.getGroupId(),
+				journalArticleBlueprint.getUserId());
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	protected ServiceContext getServiceContext(long groupId, long userId) {
 		try {
 			return ServiceContextTestUtil.getServiceContext(groupId, userId);

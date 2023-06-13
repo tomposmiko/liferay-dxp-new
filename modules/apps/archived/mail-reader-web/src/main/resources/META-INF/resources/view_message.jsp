@@ -39,7 +39,7 @@ MailManager mailManager = MailManager.getInstance(request);
 		mailManager.markAsRead(message.getAccountId(), folderId, message.getMessageId());
 	}
 
-	int pageNumber = (int)(Math.ceil(messageNumber / (double)messagesPerPage));
+	int pageNumber = (int)Math.ceil(messageNumber / (double)messagesPerPage);
 
 	Folder folder = FolderLocalServiceUtil.getFolder(folderId);
 
@@ -149,10 +149,10 @@ MailManager mailManager = MailManager.getInstance(request);
 		<aui:script use="aui-io-plugin-deprecated">
 			A.one('#messageContentContainer').plug(A.Plugin.IO, {
 				data: Liferay.Util.ns('<portlet:namespace />', {
-					messageId: <%= message.getMessageId() %>
+					messageId: <%= message.getMessageId() %>,
 				}),
 				method: 'POST',
-				uri: themeDisplay.getLayoutURL() + '/-/mail/view_message_content'
+				uri: themeDisplay.getLayoutURL() + '/-/mail/view_message_content',
 			});
 		</aui:script>
 	</c:if>

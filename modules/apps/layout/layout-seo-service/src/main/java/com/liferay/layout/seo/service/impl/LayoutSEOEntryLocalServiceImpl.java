@@ -15,7 +15,9 @@
 package com.liferay.layout.seo.service.impl;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.dynamic.data.mapping.util.DDM;
@@ -30,11 +32,16 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -48,6 +55,38 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class LayoutSEOEntryLocalServiceImpl
 	extends LayoutSEOEntryLocalServiceBaseImpl {
+
+	@Override
+	public LayoutSEOEntry copyLayoutSEOEntry(
+			long userId, long groupId, boolean privateLayout, long layoutId,
+			boolean canonicalURLEnabled, Map<Locale, String> canonicalURLMap,
+			long copyDDMStorageId, boolean openGraphDescriptionEnabled,
+			Map<Locale, String> openGraphDescriptionMap,
+			Map<Locale, String> openGraphImageAltMap,
+			long openGraphImageFileEntryId, boolean openGraphTitleEnabled,
+			Map<Locale, String> openGraphTitleMap,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		LayoutSEOEntry layoutSEOEntry = layoutSEOEntryPersistence.fetchByG_P_L(
+			groupId, privateLayout, layoutId);
+
+		if (layoutSEOEntry == null) {
+			return _addLayoutSEOEntry(
+				userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
+				canonicalURLMap, copyDDMStorageId, openGraphDescriptionEnabled,
+				openGraphDescriptionMap, openGraphImageAltMap,
+				openGraphImageFileEntryId, openGraphTitleEnabled,
+				openGraphTitleMap, serviceContext);
+		}
+
+		return updateLayoutSEOEntry(
+			userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
+			canonicalURLMap, openGraphDescriptionEnabled,
+			openGraphDescriptionMap, openGraphImageAltMap,
+			openGraphImageFileEntryId, openGraphTitleEnabled, openGraphTitleMap,
+			serviceContext);
+	}
 
 	@Override
 	public void deleteLayoutSEOEntry(
@@ -74,6 +113,37 @@ public class LayoutSEOEntryLocalServiceImpl
 	}
 
 	@Override
+	public LayoutSEOEntry updateCustomMetaTags(
+			long userId, long groupId, boolean privateLayout, long layoutId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		LayoutSEOEntry layoutSEOEntry = layoutSEOEntryPersistence.fetchByG_P_L(
+			groupId, privateLayout, layoutId);
+
+		if (layoutSEOEntry == null) {
+			return _addLayoutSEOEntry(
+				userId, groupId, privateLayout, layoutId, false,
+				Collections.emptyMap(), 0, false, Collections.emptyMap(),
+				Collections.emptyMap(), 0, false, Collections.emptyMap(),
+				serviceContext);
+		}
+
+		layoutSEOEntry.setModifiedDate(DateUtil.newDate());
+
+		DDMStructure ddmStructure = _getDDMStructure(
+			_groupLocalService.getGroup(groupId));
+
+		long ddmStorageId = _updateDDMStorage(
+			layoutSEOEntry.getCompanyId(), layoutSEOEntry.getDDMStorageId(), 0,
+			ddmStructure.getStructureId(), serviceContext);
+
+		layoutSEOEntry.setDDMStorageId(ddmStorageId);
+
+		return layoutSEOEntryPersistence.update(layoutSEOEntry);
+	}
+
+	@Override
 	public LayoutSEOEntry updateLayoutSEOEntry(
 			long userId, long groupId, boolean privateLayout, long layoutId,
 			boolean canonicalURLEnabled, Map<Locale, String> canonicalURLMap,
@@ -91,7 +161,7 @@ public class LayoutSEOEntryLocalServiceImpl
 		if (layoutSEOEntry == null) {
 			return _addLayoutSEOEntry(
 				userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
-				canonicalURLMap, openGraphDescriptionEnabled,
+				canonicalURLMap, 0, openGraphDescriptionEnabled,
 				openGraphDescriptionMap, openGraphImageAltMap,
 				openGraphImageFileEntryId, openGraphTitleEnabled,
 				openGraphTitleMap, serviceContext);
@@ -100,15 +170,6 @@ public class LayoutSEOEntryLocalServiceImpl
 		layoutSEOEntry.setModifiedDate(DateUtil.newDate());
 		layoutSEOEntry.setCanonicalURLEnabled(canonicalURLEnabled);
 		layoutSEOEntry.setCanonicalURLMap(canonicalURLMap);
-
-		DDMStructure ddmStructure = _getDDMStructure(
-			_groupLocalService.getGroup(groupId));
-
-		long ddmStorageId = _updateDDMStorage(
-			layoutSEOEntry.getCompanyId(), layoutSEOEntry.getDDMStorageId(),
-			ddmStructure.getStructureId(), serviceContext);
-
-		layoutSEOEntry.setDDMStorageId(ddmStorageId);
 
 		layoutSEOEntry.setOpenGraphDescriptionEnabled(
 			openGraphDescriptionEnabled);
@@ -141,7 +202,7 @@ public class LayoutSEOEntryLocalServiceImpl
 		if (layoutSEOEntry == null) {
 			return _addLayoutSEOEntry(
 				userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
-				canonicalURLMap, false, Collections.emptyMap(),
+				canonicalURLMap, 0, false, Collections.emptyMap(),
 				Collections.emptyMap(), 0, false, Collections.emptyMap(),
 				serviceContext);
 		}
@@ -156,7 +217,7 @@ public class LayoutSEOEntryLocalServiceImpl
 	private LayoutSEOEntry _addLayoutSEOEntry(
 			long userId, long groupId, boolean privateLayout, long layoutId,
 			boolean canonicalURLEnabled, Map<Locale, String> canonicalURLMap,
-			boolean openGraphDescriptionEnabled,
+			long copyDDMStorageId, boolean openGraphDescriptionEnabled,
 			Map<Locale, String> openGraphDescriptionMap,
 			Map<Locale, String> openGraphImageAltMap,
 			long openGraphImageFileEntryId, boolean openGraphTitleEnabled,
@@ -191,7 +252,7 @@ public class LayoutSEOEntryLocalServiceImpl
 
 		long ddmStorageId = _updateDDMStorage(
 			layoutSEOEntry.getCompanyId(), layoutSEOEntry.getDDMStorageId(),
-			ddmStructure.getStructureId(), serviceContext);
+			copyDDMStorageId, ddmStructure.getStructureId(), serviceContext);
 
 		layoutSEOEntry.setDDMStorageId(ddmStorageId);
 
@@ -210,6 +271,68 @@ public class LayoutSEOEntryLocalServiceImpl
 		return layoutSEOEntryPersistence.update(layoutSEOEntry);
 	}
 
+	private DDMFormValues _getDDMFormValues(
+			long copyDDMStorageId, long structureId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		DDMFormValues ddmFormValues = null;
+
+		if (copyDDMStorageId != 0) {
+			ddmFormValues = _storageEngine.getDDMFormValues(copyDDMStorageId);
+		}
+		else {
+			ddmFormValues = _ddm.getDDMFormValues(
+				structureId, String.valueOf(structureId), serviceContext);
+		}
+
+		Set<Locale> availableLocales = new HashSet<>();
+		Set<DDMFormFieldValue> ddmFormFieldValues = new LinkedHashSet<>();
+
+		for (DDMFormFieldValue ddmFormFieldValue :
+				ddmFormValues.getDDMFormFieldValues()) {
+
+			Value value = ddmFormFieldValue.getValue();
+
+			if (value == null) {
+				continue;
+			}
+
+			for (Locale locale : ddmFormValues.getAvailableLocales()) {
+				if (!Validator.isBlank(value.getString(locale))) {
+					availableLocales.add(locale);
+
+					ddmFormFieldValues.add(ddmFormFieldValue);
+
+					continue;
+				}
+
+				for (DDMFormFieldValue nestedDDMFormFieldValue :
+						ddmFormFieldValue.getNestedDDMFormFieldValues()) {
+
+					Value nestedDDMFormFieldValueValue =
+						nestedDDMFormFieldValue.getValue();
+
+					if (!Validator.isBlank(
+							nestedDDMFormFieldValueValue.getString(locale))) {
+
+						availableLocales.add(locale);
+
+						ddmFormFieldValues.add(ddmFormFieldValue);
+
+						break;
+					}
+				}
+			}
+		}
+
+		ddmFormValues.setAvailableLocales(availableLocales);
+		ddmFormValues.setDDMFormFieldValues(
+			new ArrayList<>(ddmFormFieldValues));
+
+		return ddmFormValues;
+	}
+
 	private DDMStructure _getDDMStructure(Group group) throws PortalException {
 		Group companyGroup = _groupLocalService.getCompanyGroup(
 			group.getCompanyId());
@@ -222,15 +345,19 @@ public class LayoutSEOEntryLocalServiceImpl
 	}
 
 	private long _updateDDMStorage(
-			long companyId, long ddmStorageId, long structureId,
-			ServiceContext serviceContext)
+			long companyId, long ddmStorageId, long copyDDMStorageId,
+			long structureId, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMFormValues ddmFormValues = _ddm.getDDMFormValues(
-			structureId, String.valueOf(structureId), serviceContext);
+		DDMFormValues ddmFormValues = _getDDMFormValues(
+			copyDDMStorageId, structureId, serviceContext);
 
 		if (ListUtil.isEmpty(ddmFormValues.getDDMFormFieldValues())) {
-			return ddmStorageId;
+			if (ddmStorageId != 0) {
+				_storageEngine.deleteByClass(ddmStorageId);
+			}
+
+			return 0;
 		}
 
 		if (ddmStorageId == 0) {

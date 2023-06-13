@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistryUtil;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserNotificationEventPersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
@@ -43,10 +44,13 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.social.kernel.service.persistence.SocialActivityPersistence;
 import com.liferay.tasks.model.TasksEntry;
 import com.liferay.tasks.service.TasksEntryLocalService;
+import com.liferay.tasks.service.TasksEntryLocalServiceUtil;
 import com.liferay.tasks.service.persistence.TasksEntryFinder;
 import com.liferay.tasks.service.persistence.TasksEntryPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -70,11 +74,15 @@ public abstract class TasksEntryLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>TasksEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.tasks.service.TasksEntryLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>TasksEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>TasksEntryLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the tasks entry to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TasksEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param tasksEntry the tasks entry
 	 * @return the tasks entry that was added
@@ -102,6 +110,10 @@ public abstract class TasksEntryLocalServiceBaseImpl
 	/**
 	 * Deletes the tasks entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TasksEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param tasksEntryId the primary key of the tasks entry
 	 * @return the tasks entry that was removed
 	 * @throws PortalException if a tasks entry with the primary key could not be found
@@ -116,6 +128,10 @@ public abstract class TasksEntryLocalServiceBaseImpl
 
 	/**
 	 * Deletes the tasks entry from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TasksEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param tasksEntry the tasks entry
 	 * @return the tasks entry that was removed
@@ -278,6 +294,15 @@ public abstract class TasksEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return tasksEntryPersistence.create(((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -286,6 +311,13 @@ public abstract class TasksEntryLocalServiceBaseImpl
 			(TasksEntry)persistedModel);
 	}
 
+	public BasePersistence<TasksEntry> getBasePersistence() {
+		return tasksEntryPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -321,6 +353,10 @@ public abstract class TasksEntryLocalServiceBaseImpl
 
 	/**
 	 * Updates the tasks entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TasksEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param tasksEntry the tasks entry
 	 * @return the tasks entry that was updated
@@ -654,11 +690,15 @@ public abstract class TasksEntryLocalServiceBaseImpl
 	public void afterPropertiesSet() {
 		PersistedModelLocalServiceRegistryUtil.register(
 			"com.liferay.tasks.model.TasksEntry", tasksEntryLocalService);
+
+		_setLocalServiceUtilService(tasksEntryLocalService);
 	}
 
 	public void destroy() {
 		PersistedModelLocalServiceRegistryUtil.unregister(
 			"com.liferay.tasks.model.TasksEntry");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -700,6 +740,22 @@ public abstract class TasksEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		TasksEntryLocalService tasksEntryLocalService) {
+
+		try {
+			Field field = TasksEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, tasksEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

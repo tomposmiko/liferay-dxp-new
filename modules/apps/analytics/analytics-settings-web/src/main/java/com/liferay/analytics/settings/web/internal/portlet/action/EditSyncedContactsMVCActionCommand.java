@@ -14,10 +14,13 @@
 
 package com.liferay.analytics.settings.web.internal.portlet.action;
 
+import com.liferay.analytics.settings.web.internal.display.context.FieldDisplayContext;
 import com.liferay.analytics.settings.web.internal.util.AnalyticsSettingsUtil;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -43,7 +46,7 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
-		"mvc.command.name=/analytics/edit_synced_contacts"
+		"mvc.command.name=/analytics_settings/edit_synced_contacts"
 	},
 	service = MVCActionCommand.class
 )
@@ -56,6 +59,8 @@ public class EditSyncedContactsMVCActionCommand
 			Dictionary<String, Object> configurationProperties)
 		throws Exception {
 
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
 		boolean syncAllContacts = ParamUtil.getBoolean(
 			actionRequest, "syncAllContacts");
 		String[] syncedOrganizationIds = ParamUtil.getStringValues(
@@ -67,21 +72,63 @@ public class EditSyncedContactsMVCActionCommand
 			"syncAllContacts", String.valueOf(syncAllContacts));
 
 		if (!syncAllContacts) {
-			String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+			String referrer = ParamUtil.getString(actionRequest, "referrer");
 
-			if (Objects.equals(cmd, "update_synced_groups")) {
+			if (Objects.equals(referrer, "update_synced_groups")) {
 				configurationProperties.put(
 					"syncedUserGroupIds", syncedUserGroupIds);
+
+				syncedUserGroupIds = GetterUtil.getStringValues(
+					configurationProperties.get("syncedUserGroupIds"));
+			}
+			else if (Objects.equals(referrer, "update_synced_organizations")) {
+				configurationProperties.put(
+					"syncedOrganizationIds", syncedOrganizationIds);
 
 				syncedOrganizationIds = GetterUtil.getStringValues(
 					configurationProperties.get("syncedOrganizationIds"));
 			}
-			else if (Objects.equals(cmd, "update_synced_organizations")) {
-				configurationProperties.put(
-					"syncedOrganizationIds", syncedOrganizationIds);
+		}
 
-				syncedUserGroupIds = GetterUtil.getStringValues(
-					configurationProperties.get("syncedUserGroupIds"));
+		if (Objects.equals(cmd, "update_synced_contacts_fields")) {
+			boolean exit = ParamUtil.getBoolean(actionRequest, "exit");
+
+			if (exit) {
+				if (ArrayUtil.isEmpty(
+						GetterUtil.getStringValues(
+							configurationProperties.get(
+								"syncedContactFieldNames")))) {
+
+					configurationProperties.put(
+						"syncedContactFieldNames",
+						FieldDisplayContext.REQUIRED_CONTACT_FIELD_NAMES);
+				}
+
+				if (ArrayUtil.isEmpty(
+						GetterUtil.getStringValues(
+							configurationProperties.get(
+								"syncedUserFieldNames")))) {
+
+					configurationProperties.put(
+						"syncedUserFieldNames",
+						FieldDisplayContext.REQUIRED_USER_FIELD_NAMES);
+				}
+			}
+			else {
+				String[] syncedContactFieldNames = ArrayUtil.append(
+					FieldDisplayContext.REQUIRED_CONTACT_FIELD_NAMES,
+					ParamUtil.getStringValues(
+						actionRequest, "syncedContactFieldNames"));
+
+				String[] syncedUserFieldNames = ArrayUtil.append(
+					FieldDisplayContext.REQUIRED_USER_FIELD_NAMES,
+					ParamUtil.getStringValues(
+						actionRequest, "syncedUserFieldNames"));
+
+				configurationProperties.put(
+					"syncedContactFieldNames", syncedContactFieldNames);
+				configurationProperties.put(
+					"syncedUserFieldNames", syncedUserFieldNames);
 			}
 		}
 
@@ -117,20 +164,25 @@ public class EditSyncedContactsMVCActionCommand
 			themeDisplay.getCompanyId(),
 			String.format(
 				"api/1.0/data-sources/%s/details",
-				AnalyticsSettingsUtil.getAsahFaroBackendDataSourceId(
+				AnalyticsSettingsUtil.getDataSourceId(
 					themeDisplay.getCompanyId())));
 
 		StatusLine statusLine = httpResponse.getStatusLine();
 
 		if (statusLine.getStatusCode() == HttpStatus.SC_FORBIDDEN) {
-			disconnectDataSource(themeDisplay.getCompanyId(), httpResponse);
+			checkResponse(themeDisplay.getCompanyId(), httpResponse);
 
 			return;
 		}
 
 		if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+			_log.error("Unable to notify Analytics Cloud");
+
 			throw new PortalException("Invalid token");
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditSyncedContactsMVCActionCommand.class);
 
 }

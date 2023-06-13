@@ -119,6 +119,9 @@ public interface Staging {
 
 	public long getRecentLayoutSetBranchId(User user, long layoutSetId);
 
+	public Layout getRemoteLayout(long userId, long stagingGroupId, long plid)
+		throws PortalException;
+
 	public long getRemoteLayoutPlid(long userId, long stagingGroupId, long plid)
 		throws PortalException;
 
@@ -139,6 +142,9 @@ public interface Staging {
 
 	public WorkflowTask getWorkflowTask(
 			long userId, LayoutRevision layoutRevision)
+		throws PortalException;
+
+	public boolean hasRemoteLayout(long userId, long stagingGroupId, long plid)
 		throws PortalException;
 
 	public boolean hasWorkflowTask(long userId, LayoutRevision layoutRevision)
@@ -253,6 +259,11 @@ public interface Staging {
 
 	public void setRecentLayoutSetBranchId(
 			User user, long layoutSetId, long layoutSetBranchId)
+		throws PortalException;
+
+	public void setRemoteSiteURL(
+			Group stagingGroup, boolean overrideRemoteSiteURL,
+			String remoteSiteURL)
 		throws PortalException;
 
 	public String stripProtocolFromRemoteAddress(String remoteAddress);

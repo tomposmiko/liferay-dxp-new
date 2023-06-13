@@ -14,11 +14,14 @@
 
 package com.liferay.portal.workflow.kaleo.definition;
 
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.workflow.kaleo.definition.exception.KaleoDefinitionValidationException;
 
 import java.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -31,16 +34,22 @@ public class DurationScaleTest {
 		"year"
 	};
 
-	@Test(expected = IllegalArgumentException.class)
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
+	@Test(
+		expected = KaleoDefinitionValidationException.InvalidDurationScale.class
+	)
 	public void testParseInvalidScale() throws Exception {
-		DurationScale.valueOf("random text");
+		DurationScale.parse("random text");
 	}
 
 	@Test
 	public void testParseValidScales() throws Exception {
 		for (String scale : SCALES) {
-			DurationScale durationScale = DurationScale.valueOf(
-				StringUtil.toUpperCase(scale));
+			DurationScale durationScale = DurationScale.parse(scale);
 
 			Assert.assertEquals(scale, durationScale.getValue());
 		}

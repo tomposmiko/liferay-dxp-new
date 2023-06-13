@@ -29,7 +29,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 
 <clay:navigation-bar
 	inverted="<%= true %>"
-	navigationItems='<%= journalDisplayContext.getNavigationBarItems("feeds") %>'
+	navigationItems='<%= journalDisplayContext.getNavigationItems("feeds") %>'
 />
 
 <clay:management-toolbar
@@ -66,11 +66,10 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 				editURL = editFeedURL.toString();
 			}
 
-			Map<String, Object> rowData = new HashMap<>();
-
-			rowData.put("actions", journalFeedsManagementToolbarDisplayContext.getAvailableActions(feed));
-
-			row.setData(rowData);
+			row.setData(
+				HashMapBuilder.<String, Object>put(
+					"actions", journalFeedsManagementToolbarDisplayContext.getAvailableActions(feed)
+				).build());
 			%>
 
 			<c:choose>

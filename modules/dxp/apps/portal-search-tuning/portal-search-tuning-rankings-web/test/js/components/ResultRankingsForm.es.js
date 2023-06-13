@@ -10,10 +10,11 @@
  */
 
 import {
+	act,
 	fireEvent,
 	render,
 	waitForElement,
-	within
+	within,
 } from '@testing-library/react';
 import React from 'react';
 
@@ -23,7 +24,7 @@ import {
 	FETCH_SEARCH_DOCUMENTS_URL,
 	FETCH_VISIBLE_DOCUMENTS_URL,
 	FORM_NAME,
-	VALIDATE_FORM_URL
+	VALIDATE_FORM_URL,
 } from '../mocks/data.es';
 
 import '@testing-library/jest-dom/extend-expect';
@@ -49,6 +50,12 @@ function renderTestResultRankingsForm(props) {
 	);
 }
 
+jest.useFakeTimers();
+
+afterEach(() => {
+	act(() => jest.runAllTimers());
+});
+
 describe('ResultRankingsForm', () => {
 	it('renders the results ranking form', () => {
 		const {container} = renderTestResultRankingsForm();
@@ -71,7 +78,7 @@ describe('ResultRankingsForm', () => {
 
 			await waitForElement(() => getByTestId(expected[0]));
 
-			expected.forEach(id => {
+			expected.forEach((id) => {
 				expect(getByTestId(id)).toBeInTheDocument();
 			});
 		}
@@ -87,12 +94,12 @@ describe('ResultRankingsForm', () => {
 		${['one', 'two', 'three']} | ${['one']}   | ${['one', 'two', 'three']}         | ${'no duplicate aliases'}
 	`('renders $description', ({addedAliases, expected, initialAliases}) => {
 		const {container} = renderTestResultRankingsForm({
-			initialAliases
+			initialAliases,
 		});
 
 		const input = container.querySelector('.form-control-inset');
 
-		addedAliases.forEach(alias => {
+		addedAliases.forEach((alias) => {
 			fireEvent.change(input, {target: {value: alias}});
 
 			fireEvent.keyDown(input, {key: 'Enter', keyCode: 13, which: 13});
@@ -111,7 +118,7 @@ describe('ResultRankingsForm', () => {
 
 	it('removes an initial alias after clicking delete', async () => {
 		const {container} = renderTestResultRankingsForm({
-			initialAliases: ['one', 'two', 'three']
+			initialAliases: ['one', 'two', 'three'],
 		});
 		const tagsElementClose = container.querySelectorAll(
 			'.label-item-after button'
@@ -132,7 +139,7 @@ describe('ResultRankingsForm', () => {
 		const {
 			container,
 			getByTestId,
-			getByText
+			getByText,
 		} = renderTestResultRankingsForm();
 
 		if (selector.includes('Removed')) {
@@ -156,7 +163,7 @@ describe('ResultRankingsForm', () => {
 			const {
 				container,
 				getByTestId,
-				getByText
+				getByText,
 			} = renderTestResultRankingsForm();
 
 			const order = selector.includes('Removed')
@@ -232,7 +239,7 @@ describe('ResultRankingsForm', () => {
 		${'inactive'} | ${'active'}   | ${false}
 	`('updates the state to $newState', async ({expected, newState, state}) => {
 		const {container, getByLabelText} = renderTestResultRankingsForm({
-			initialInactive: !expected
+			initialInactive: !expected,
 		});
 
 		fireEvent.click(getByLabelText(state));

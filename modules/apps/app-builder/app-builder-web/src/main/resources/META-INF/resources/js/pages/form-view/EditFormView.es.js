@@ -12,8 +12,9 @@
  * details.
  */
 
-import {withDragAndDropContext} from 'data-engine-taglib';
-import React, {useState, useContext} from 'react';
+import React, {useContext, useState} from 'react';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
 import {createPortal} from 'react-dom';
 
 import {AppContext} from '../../AppContext.es';
@@ -25,7 +26,7 @@ import FormViewUpperToolbar from './FormViewUpperToolbar.es';
 const parseProps = ({dataDefinitionId, dataLayoutId, ...props}) => ({
 	...props,
 	dataDefinitionId: Number(dataDefinitionId),
-	dataLayoutId: Number(dataLayoutId)
+	dataLayoutId: Number(dataLayoutId),
 });
 
 const FormViewControlMenu = ({backURL, dataLayoutId}) => {
@@ -40,13 +41,14 @@ const FormViewControlMenu = ({backURL, dataLayoutId}) => {
 	);
 };
 
-const EditFormView = withDragAndDropContext(props => {
+const EditFormView = (props) => {
 	const {
 		customObjectSidebarElementId,
 		dataDefinitionId,
 		dataLayoutBuilder,
 		dataLayoutId,
-		newCustomObject
+		newCustomObject,
+		showTranslationManager,
 	} = parseProps(props);
 	const {basePortletURL} = useContext(AppContext);
 
@@ -56,26 +58,39 @@ const EditFormView = withDragAndDropContext(props => {
 		backURL = basePortletURL;
 	}
 
+	let WrapperComponent = ({children}) => children;
+
+	if (document.querySelector('.change-tracking-indicator')) {
+		WrapperComponent = ({children}) => (
+			<div className="publications-enabled">{children}</div>
+		);
+	}
+
 	return (
-		<FormViewContextProvider
-			dataDefinitionId={dataDefinitionId}
-			dataLayoutBuilder={dataLayoutBuilder}
-			dataLayoutId={dataLayoutId}
-		>
-			<FormViewControlMenu
-				backURL={backURL}
-				dataLayoutId={dataLayoutId}
-			/>
+		<DndProvider backend={HTML5Backend}>
+			<FormViewContextProvider dataLayoutBuilder={dataLayoutBuilder}>
+				<WrapperComponent>
+					<FormViewControlMenu
+						backURL={backURL}
+						dataLayoutId={dataLayoutId}
+					/>
 
-			<FormViewUpperToolbar newCustomObject={newCustomObject} />
+					<FormViewUpperToolbar
+						newCustomObject={newCustomObject}
+						showTranslationManager={showTranslationManager}
+					/>
 
-			{createPortal(
-				<CustomObjectSidebar />,
-				document.querySelector(`#${customObjectSidebarElementId}`)
-			)}
-		</FormViewContextProvider>
+					{createPortal(
+						<CustomObjectSidebar />,
+						document.querySelector(
+							`#${customObjectSidebarElementId}`
+						)
+					)}
+				</WrapperComponent>
+			</FormViewContextProvider>
+		</DndProvider>
 	);
-});
+};
 
 export default ({dataLayoutBuilderId, ...props}) => {
 	const [dataLayoutBuilder, setDataLayoutBuilder] = useState();

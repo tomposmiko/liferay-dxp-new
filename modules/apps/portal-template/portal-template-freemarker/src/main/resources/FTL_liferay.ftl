@@ -19,9 +19,11 @@ LPS-30525.
 </#if>
 
 <#if themeDisplay??>
-	<#assign css_main_file = htmlUtil.escape(portalUtil.getStaticResourceURL(request, "${themeDisplay.getPathThemeCss()}/main.css")) />
-	<#assign is_signed_in = themeDisplay.isSignedIn() />
-	<#assign js_main_file = htmlUtil.escape(portalUtil.getStaticResourceURL(request, "${themeDisplay.getPathThemeJavaScript()}/main.js")) />
+	<#assign
+		css_main_file = htmlUtil.escape(portalUtil.getStaticResourceURL(request, "${themeDisplay.getPathThemeCss()}/main.css"))
+		is_signed_in = themeDisplay.isSignedIn()
+		js_main_file = htmlUtil.escape(portalUtil.getStaticResourceURL(request, "${themeDisplay.getPathThemeJavaScript()}/main.js"))
+	/>
 
 	<#if !is_setup_complete>
 		<#assign is_setup_complete = themeDisplay.isImpersonated() />
@@ -64,9 +66,9 @@ LPS-30525.
 	file_name
 >
 	<#if file_name == css_main_file>
-		<link class="lfr-css-file" href="${file_name}" id="mainLiferayThemeCSS" rel="stylesheet" type="text/css" />
+		<link class="lfr-css-file" href="${htmlUtil.escape(portalUtil.getStaticResourceURL(request, file_name))}" id="mainLiferayThemeCSS" rel="stylesheet" type="text/css" />
 	<#else>
-		<link class="lfr-css-file" href="${file_name}" rel="stylesheet" type="text/css" />
+		<link class="lfr-css-file" href="${htmlUtil.escape(portalUtil.getStaticResourceURL(request, file_name))}" rel="stylesheet" type="text/css" />
 	</#if>
 </#macro>
 
@@ -79,9 +81,9 @@ ${dateUtil.getCurrentDate(format, locale)}</#macro>
 	file_name
 >
 	<#if file_name == js_main_file>
-		<script id="mainLiferayThemeJavaScript" src="${file_name}" type="text/javascript"></script>
+		<script id="mainLiferayThemeJavaScript" src="${htmlUtil.escape(portalUtil.getStaticResourceURL(request, file_name))}" type="text/javascript"></script>
 	<#else>
-		<script src="${file_name}" type="text/javascript"></script>
+		<script src="${htmlUtil.escape(portalUtil.getStaticResourceURL(request, file_name))}" type="text/javascript"></script>
 	</#if>
 </#macro>
 

@@ -59,7 +59,6 @@ public abstract class MicroblogsEntryFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -85,14 +84,5 @@ public abstract class MicroblogsEntryFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		MicroblogsEntryFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(MicroblogsPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

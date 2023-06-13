@@ -18,9 +18,12 @@ import com.liferay.document.library.configuration.DLConfiguration;
 import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.util.DLValidator;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FileImpl;
 
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -29,6 +32,11 @@ import org.mockito.Mockito;
  * @author Adolfo Pérez
  */
 public class DLValidatorImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -65,9 +73,7 @@ public class DLValidatorImplTest {
 		_validateFileExtension("test.GIF");
 	}
 
-	private void _validateFileExtension(String fileName)
-		throws FileExtensionException {
-
+	private void _validateFileExtension(String fileName) throws Exception {
 		Mockito.when(
 			_dlConfiguration.fileExtensions()
 		).thenReturn(

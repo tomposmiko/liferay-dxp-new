@@ -31,22 +31,33 @@ import java.util.Set;
 public class DDMFormFieldOptions implements Serializable {
 
 	public DDMFormFieldOptions() {
-		_defaultLocale = LocaleUtil.getDefault();
+		this(LocaleUtil.getDefault());
 	}
 
 	public DDMFormFieldOptions(DDMFormFieldOptions ddmFormFieldOptions) {
 		_defaultLocale = ddmFormFieldOptions._defaultLocale;
+
+		Map<String, String> optionsReferences =
+			ddmFormFieldOptions._optionsReferences;
 
 		Map<String, LocalizedValue> options = ddmFormFieldOptions._options;
 
 		for (Map.Entry<String, LocalizedValue> entry : options.entrySet()) {
 			LocalizedValue localizedValue = entry.getValue();
 
+			String optionValue = entry.getKey();
+
 			for (Locale locale : localizedValue.getAvailableLocales()) {
 				addOptionLabel(
-					entry.getKey(), locale, localizedValue.getString(locale));
+					optionValue, locale, localizedValue.getString(locale));
 			}
+
+			addOptionReference(optionValue, optionsReferences.get(optionValue));
 		}
+	}
+
+	public DDMFormFieldOptions(Locale defaultLocale) {
+		_defaultLocale = defaultLocale;
 	}
 
 	public void addOption(String value) {
@@ -67,17 +78,21 @@ public class DDMFormFieldOptions implements Serializable {
 		labels.addString(locale, label);
 	}
 
+	public void addOptionReference(String optionValue, String optionReference) {
+		_optionsReferences.put(optionValue, optionReference);
+	}
+
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof DDMFormFieldOptions)) {
+		if (!(object instanceof DDMFormFieldOptions)) {
 			return false;
 		}
 
-		DDMFormFieldOptions ddmFormFieldOptions = (DDMFormFieldOptions)obj;
+		DDMFormFieldOptions ddmFormFieldOptions = (DDMFormFieldOptions)object;
 
 		if (Objects.equals(
 				_defaultLocale, ddmFormFieldOptions._defaultLocale) &&
@@ -97,8 +112,16 @@ public class DDMFormFieldOptions implements Serializable {
 		return _options.get(optionValue);
 	}
 
+	public String getOptionReference(String optionValue) {
+		return _optionsReferences.get(optionValue);
+	}
+
 	public Map<String, LocalizedValue> getOptions() {
 		return _options;
+	}
+
+	public Map<String, String> getOptionsReferences() {
+		return _optionsReferences;
 	}
 
 	public Set<String> getOptionsValues() {
@@ -122,5 +145,7 @@ public class DDMFormFieldOptions implements Serializable {
 
 	private Locale _defaultLocale;
 	private final Map<String, LocalizedValue> _options = new LinkedHashMap<>();
+	private final Map<String, String> _optionsReferences =
+		new LinkedHashMap<>();
 
 }

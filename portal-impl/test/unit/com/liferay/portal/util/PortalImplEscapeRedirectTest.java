@@ -19,17 +19,25 @@ import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Tomas Polesovsky
  */
 public class PortalImplEscapeRedirectTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -58,12 +66,9 @@ public class PortalImplEscapeRedirectTest {
 			new String[] {"google.com", "localhost"});
 
 		try {
-			Assert.assertEquals("/", _portalImpl.escapeRedirect("/"));
-			Assert.assertEquals(
-				"/web/guest", _portalImpl.escapeRedirect("/web/guest"));
-			Assert.assertEquals(
-				"/a/b;c=d?e=f&g=h#x=y",
-				_portalImpl.escapeRedirect("/a/b;c=d?e=f&g=h#x=y"));
+
+			// Allowed domains
+
 			Assert.assertEquals(
 				"http://localhost",
 				_portalImpl.escapeRedirect("http://localhost"));
@@ -72,39 +77,41 @@ public class PortalImplEscapeRedirectTest {
 				_portalImpl.escapeRedirect(
 					"https://localhost:8080/a/b;c=d?e=f&g=h#x=y"));
 			Assert.assertEquals(
-				"google.com", _portalImpl.escapeRedirect("google.com"));
-			Assert.assertEquals(
 				"http://google.com",
 				_portalImpl.escapeRedirect("http://google.com"));
 			Assert.assertEquals(
 				"https://google.com:8080/a/b;c=d?e=f&g=h#x=y",
 				_portalImpl.escapeRedirect(
 					"https://google.com:8080/a/b;c=d?e=f&g=h#x=y"));
-			Assert.assertEquals(
-				"test:test@google.com",
-				_portalImpl.escapeRedirect("test:test@google.com"));
-			Assert.assertEquals(
-				"test@google.com",
-				_portalImpl.escapeRedirect("test@google.com"));
-			Assert.assertEquals(
-				":@google.com", _portalImpl.escapeRedirect(":@google.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect("liferay.com"));
 			Assert.assertNull(_portalImpl.escapeRedirect("http://liferay.com"));
 			Assert.assertNull(
 				_portalImpl.escapeRedirect(
 					"https://liferay.com:8080/a/b;c=d?e=f&g=h#x=y"));
-			Assert.assertNull(_portalImpl.escapeRedirect("google.comsuffix"));
-			Assert.assertNull(_portalImpl.escapeRedirect("google.com.suffix"));
-			Assert.assertNull(_portalImpl.escapeRedirect("prefixgoogle.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect("prefix.google.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect(":google.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect("test:google.com"));
+
+			// Disabled domains
+
 			Assert.assertNull(
-				_portalImpl.escapeRedirect("test:test@liferay.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect("test@liferay.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect("@liferay.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect(":@liferay.com"));
+				_portalImpl.escapeRedirect("https://google.comsuffix"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect("https://google.com.suffix"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect("https://prefixgoogle.com"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect("https://prefix.google.com"));
+
+			// Invalid URLs
+
 			Assert.assertNull(_portalImpl.escapeRedirect("//www.google.com"));
+			Assert.assertNull(_portalImpl.escapeRedirect("//www.google.com/"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect("//www.google.com//www.google.com"));
+			Assert.assertNull(_portalImpl.escapeRedirect("https:google.com"));
+			Assert.assertNull(_portalImpl.escapeRedirect(":@liferay.com"));
+			Assert.assertNull(_portalImpl.escapeRedirect("http:/web"));
+			Assert.assertNull(_portalImpl.escapeRedirect("http:web"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect(
+					"https://google.com\uFFFD@localhost"));
 		}
 		finally {
 			setPropsValuesValue(
@@ -128,12 +135,9 @@ public class PortalImplEscapeRedirectTest {
 			new String[] {"127.0.0.1", "SERVER_IP"});
 
 		try {
-			Assert.assertEquals("/", _portalImpl.escapeRedirect("/"));
-			Assert.assertEquals(
-				"/web/guest", _portalImpl.escapeRedirect("/web/guest"));
-			Assert.assertEquals(
-				"/a/b;c=d?e=f&g=h#x=y",
-				_portalImpl.escapeRedirect("/a/b;c=d?e=f&g=h#x=y"));
+
+			// Absolute URL
+
 			Assert.assertEquals(
 				"http://localhost",
 				_portalImpl.escapeRedirect("http://localhost"));
@@ -154,15 +158,18 @@ public class PortalImplEscapeRedirectTest {
 						"https://" + computerAddress + "/a/b;c=d?e=f&g=h#x=y"));
 			}
 
-			Assert.assertNull(_portalImpl.escapeRedirect("liferay.com"));
 			Assert.assertNull(_portalImpl.escapeRedirect("http://liferay.com"));
 			Assert.assertNull(
 				_portalImpl.escapeRedirect(
 					"https://liferay.com:8080/a/b;c=d?e=f&g=h#x=y"));
-			Assert.assertNull(_portalImpl.escapeRedirect("127.0.0.1suffix"));
-			Assert.assertNull(_portalImpl.escapeRedirect("127.0.0.1.suffix"));
-			Assert.assertNull(_portalImpl.escapeRedirect("prefix127.0.0.1"));
-			Assert.assertNull(_portalImpl.escapeRedirect("prefix.127.0.0.1"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect("http://127.0.0.1suffix"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect("http://127.0.0.1.suffix"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect("http://prefix127.0.0.1"));
+			Assert.assertNull(
+				_portalImpl.escapeRedirect("http://prefix.127.0.0.1"));
 		}
 		finally {
 			setPropsValuesValue("DNS_SECURITY_THREAD_LIMIT", 10);
@@ -172,6 +179,51 @@ public class PortalImplEscapeRedirectTest {
 			setPropsValuesValue(
 				"REDIRECT_URL_SECURITY_MODE", redirectURLSecurityMode);
 		}
+	}
+
+	@Test
+	public void testEscapeRedirectWithRelativeURL() throws Exception {
+
+		// Relative path
+
+		Assert.assertEquals("/", _portalImpl.escapeRedirect("/"));
+		Assert.assertEquals(
+			"/web/guest", _portalImpl.escapeRedirect("/web/guest"));
+		Assert.assertEquals(
+			"/a/b;c=d?e=f&g=h#x=y",
+			_portalImpl.escapeRedirect("/a/b;c=d?e=f&g=h#x=y"));
+		Assert.assertEquals(
+			"liferay.com", _portalImpl.escapeRedirect("liferay.com"));
+		Assert.assertEquals("/", _portalImpl.escapeRedirect("/"));
+		Assert.assertEquals(
+			"/web/guest", _portalImpl.escapeRedirect("/web/guest"));
+		Assert.assertEquals(
+			"/a/b;c=d?e=f&g=h#x=y",
+			_portalImpl.escapeRedirect("/a/b;c=d?e=f&g=h#x=y"));
+		Assert.assertEquals(
+			"/web/http:", _portalImpl.escapeRedirect("/web/http:"));
+		Assert.assertEquals(
+			"web/http:", _portalImpl.escapeRedirect("web/http:"));
+		Assert.assertEquals(
+			"test@google.com", _portalImpl.escapeRedirect("test@google.com"));
+		Assert.assertNull(_portalImpl.escapeRedirect("///liferay.com"));
+		Assert.assertEquals(
+			"user/test/~/control_panel/manage/-/select/image%2Clurl/",
+			_portalImpl.escapeRedirect(
+				"user/test/~/control_panel/manage/-/select/image%2Clurl/"));
+		Assert.assertEquals(
+			"user/test/~/control_panel/manage/-/select/image,url/",
+			_portalImpl.escapeRedirect(
+				"user/test/~/control_panel/manage/-/select/image,url/"));
+		Assert.assertEquals(
+			"?param1=abc", _portalImpl.escapeRedirect("?param1=abc"));
+		Assert.assertEquals("#abc", _portalImpl.escapeRedirect("#abc"));
+		Assert.assertEquals("", _portalImpl.escapeRedirect(""));
+
+		// Relative path with protocol
+
+		Assert.assertNull(_portalImpl.escapeRedirect("https:/path"));
+		Assert.assertNull(_portalImpl.escapeRedirect("test:/google.com"));
 	}
 
 	@Test
@@ -186,6 +238,9 @@ public class PortalImplEscapeRedirectTest {
 			new String[] {"*.test.liferay.com", "google.com"});
 
 		try {
+
+			// Relative path
+
 			Assert.assertEquals("/", _portalImpl.escapeRedirect("/"));
 			Assert.assertEquals(
 				"/web/guest", _portalImpl.escapeRedirect("/web/guest"));
@@ -195,6 +250,9 @@ public class PortalImplEscapeRedirectTest {
 			Assert.assertEquals(
 				"test.liferay.com",
 				_portalImpl.escapeRedirect("test.liferay.com"));
+
+			// Absolute URL
+
 			Assert.assertEquals(
 				"http://test.liferay.com",
 				_portalImpl.escapeRedirect("http://test.liferay.com"));
@@ -203,18 +261,15 @@ public class PortalImplEscapeRedirectTest {
 				_portalImpl.escapeRedirect(
 					"https://test.liferay.com:8080/a/b;c=d?e=f&g=h#x=y"));
 			Assert.assertEquals(
-				"second.test.liferay.com",
-				_portalImpl.escapeRedirect("second.test.liferay.com"));
-			Assert.assertEquals(
 				"http://second.test.liferay.com",
 				_portalImpl.escapeRedirect("http://second.test.liferay.com"));
 			Assert.assertEquals(
-				"https://second.test.liferay.com:8080/a/b;c=d?e=f&g=h#x=y",
+				"https://second.test.liferay.com:8080/a;c=d?e=f&g=h#x=y",
 				_portalImpl.escapeRedirect(
-					"https://second.test.liferay.com:8080/a/b;c=d?e=f&g=h#x=" +
-						"y"));
+					"https://second.test.liferay.com:8080/a;c=d?e=f&g=h#x=y"));
 			Assert.assertEquals(
-				"google.com", _portalImpl.escapeRedirect("google.com"));
+				"http://google.com",
+				_portalImpl.escapeRedirect("http://google.com"));
 			Assert.assertEquals(
 				"http://google.com",
 				_portalImpl.escapeRedirect("http://google.com"));
@@ -222,21 +277,16 @@ public class PortalImplEscapeRedirectTest {
 				"https://google.com:8080/a/b;c=d?e=f&g=h#x=y",
 				_portalImpl.escapeRedirect(
 					"https://google.com:8080/a/b;c=d?e=f&g=h#x=y"));
-			Assert.assertNull(_portalImpl.escapeRedirect("liferay.com"));
 			Assert.assertNull(_portalImpl.escapeRedirect("http://liferay.com"));
 			Assert.assertNull(
 				_portalImpl.escapeRedirect(
 					"https://liferay.com:8080/a/b;c=d?e=f&g=h#x=y"));
 			Assert.assertNull(
-				_portalImpl.escapeRedirect("test.liferay.comsuffix"));
+				_portalImpl.escapeRedirect("http://test.liferay.comsuffix"));
 			Assert.assertNull(
-				_portalImpl.escapeRedirect("test.liferay.com.suffix"));
+				_portalImpl.escapeRedirect("http://test.liferay.com.suffix"));
 			Assert.assertNull(
-				_portalImpl.escapeRedirect("prefixtest.liferay.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect("google.comsuffix"));
-			Assert.assertNull(_portalImpl.escapeRedirect("google.com.suffix"));
-			Assert.assertNull(_portalImpl.escapeRedirect("prefixgoogle.com"));
-			Assert.assertNull(_portalImpl.escapeRedirect("prefix.google.com"));
+				_portalImpl.escapeRedirect("http://prefixtest.liferay.com"));
 		}
 		finally {
 			setPropsValuesValue(

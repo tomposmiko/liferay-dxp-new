@@ -34,7 +34,6 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDMBeanTranslatorUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -99,19 +98,22 @@ public class DLFileEntryTypeServiceTest {
 			DLFileEntryTypeLocalServiceUtil.getFileEntryType(
 				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
 
-		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
+		DDMStructure ddmStructure1 = DDMStructureTestUtil.addStructure(
 			_group.getGroupId(), DLFileEntryMetadata.class.getName());
 
 		_dlFileEntryType1 = DLFileEntryTypeServiceUtil.addFileEntryType(
 			_group.getGroupId(), StringUtil.randomString(),
 			StringUtil.randomString(),
-			new long[] {ddmStructure.getStructureId()},
+			new long[] {ddmStructure1.getStructureId()},
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		DDMStructure ddmStructure2 = DDMStructureTestUtil.addStructure(
+			_group.getGroupId(), DLFileEntryMetadata.class.getName());
 
 		_dlFileEntryType2 = DLFileEntryTypeServiceUtil.addFileEntryType(
 			_group.getGroupId(), StringUtil.randomString(),
 			StringUtil.randomString(),
-			new long[] {ddmStructure.getStructureId()},
+			new long[] {ddmStructure2.getStructureId()},
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		_dlFileEntryTypes = DLFileEntryTypeLocalServiceUtil.getFileEntryTypes(
@@ -160,10 +162,10 @@ public class DLFileEntryTypeServiceTest {
 			ddmFormDeserializerDeserializeResponse =
 				_ddmFormDeserializer.deserialize(builder.build());
 
-		DDMForm ddmForm = ddmFormDeserializerDeserializeResponse.getDDMForm();
-
 		serviceContext.setAttribute(
-			"ddmForm", DDMBeanTranslatorUtil.translate(ddmForm));
+			"ddmForm",
+			DDMBeanTranslatorUtil.translate(
+				ddmFormDeserializerDeserializeResponse.getDDMForm()));
 
 		User user = TestPropsValues.getUser();
 
@@ -340,7 +342,7 @@ public class DLFileEntryTypeServiceTest {
 
 		DDMForm ddmForm = new DDMForm();
 
-		ddmForm.addDDMFormField(new DDMFormField("text", "Text"));
+		ddmForm.addDDMFormField(new DDMFormField("text", "text"));
 		ddmForm.setAvailableLocales(
 			Collections.singleton(LocaleUtil.getDefault()));
 		ddmForm.setDefaultLocale(LocaleUtil.getDefault());
@@ -350,9 +352,12 @@ public class DLFileEntryTypeServiceTest {
 
 		DLFileEntryType dlFileEntryType =
 			DLFileEntryTypeServiceUtil.addFileEntryType(
-				_group.getGroupId(), StringUtil.randomString(),
-				StringUtil.randomString(),
-				new long[] {ddmStructure.getStructureId()}, serviceContext);
+				_group.getGroupId(), ddmStructure.getStructureId(), null,
+				Collections.singletonMap(
+					LocaleUtil.US, StringUtil.randomString()),
+				Collections.singletonMap(
+					LocaleUtil.US, StringUtil.randomString()),
+				serviceContext);
 
 		serviceContext.setAttribute(
 			"ddmForm", DDMBeanTranslatorUtil.translate(new DDMForm()));
@@ -404,7 +409,7 @@ public class DLFileEntryTypeServiceTest {
 
 	private ServiceContext _getFolderServiceContext(
 			DLFileEntryType... dlFileEntryTypes)
-		throws PortalException {
+		throws Exception {
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());

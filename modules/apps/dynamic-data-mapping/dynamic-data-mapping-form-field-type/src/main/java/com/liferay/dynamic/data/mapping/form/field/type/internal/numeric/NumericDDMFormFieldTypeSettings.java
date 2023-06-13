@@ -68,11 +68,11 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 						@DDMFormLayoutColumn(
 							size = 12,
 							value = {
-								"name", "predefinedValue",
+								"name", "fieldReference", "predefinedValue",
 								"visibilityExpression", "fieldNamespace",
-								"indexType", "localizable", "readOnly", "type",
-								"showLabel", "repeatable", "validation",
-								"tooltip"
+								"indexType", "localizable", "nativeField",
+								"readOnly", "type", "showLabel", "repeatable",
+								"validation", "tooltip"
 							}
 						)
 					}
@@ -94,10 +94,7 @@ public interface NumericDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		dataType = "string", label = "%placeholder-text",
-		properties = {
-			"placeholder=%enter-placeholder-text",
-			"tooltip=%enter-text-that-assists-the-user-but-is-not-submitted-as-a-field-value"
-		},
+		properties = "tooltip=%enter-text-that-assists-the-user-but-is-not-submitted-as-a-field-value",
 		type = "text"
 	)
 	public LocalizedValue placeholder();

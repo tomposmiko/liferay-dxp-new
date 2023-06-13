@@ -12,86 +12,25 @@
  * details.
  */
 
+import {useThunk} from 'frontend-js-react-web';
 import React, {
-	useReducer,
 	useCallback,
-	useRef,
-	useEffect,
 	useContext,
+	useEffect,
 	useMemo,
-	useState
+	useReducer,
+	useRef,
 } from 'react';
 
-import useThunk from '../../core/hooks/useThunk';
-import {SERVICE_NETWORK_STATUS_TYPES} from '../config/constants/serviceNetworkStatusTypes';
+import useUndo from '../components/undo/useUndo';
 
-const INITIAL_STATE = {
-	/**
-	 * A collection of dynamically loaded reducers that may be loaded from
-	 * plugins at runtime.
-	 *
-	 * TODO: potentially allow us to specify a ranking here to determine order
-	 */
-	draft: true,
-	masterLayoutData: {},
-	network: {
-		error: null,
-		lastFetch: null,
-		status: SERVICE_NETWORK_STATUS_TYPES.Idle
-	},
-	reducers: {},
-	sidebarOpen: true,
-	singleSegmentsExperienceMode: false
-};
+const StoreDispatchContext = React.createContext(() => {});
+const StoreGetStateContext = React.createContext(null);
+const StoreSubscriptionContext = React.createContext([() => {}, () => {}]);
 
-/**
- * Prepares the initial contents of the store based on server data.
- *
- * Data that goes in the store should be of "global" interest across the
- * app. Actions (user interactions, network activity etc) update that state,
- * and any interested component can obtain updates via the provided
- * useSelector hook.
- *
- * This is in contrast to immutable config, managed in the neigboring
- * config directory. Immutable config may be of interest across the app,
- * but it does not change in response to actions or events; it remains
- * static over the lifetime of the app.
- *
- * State which is not of "global" interest should go in component-local state
- * (see the `useState` hook) or a in more localized context objects that apply
- * to specific subtrees.
- */
-export function getInitialState([data, config]) {
-	const state = {
-		...transformServerData(data, config)
-	};
-
-	// Exclude keys that were partitioned off into config.
-	Object.keys(config).forEach(key => {
-		delete state[key];
-	});
-
-	return {
-		...INITIAL_STATE,
-		...state
-	};
-}
-
-/**
- * We may need to transform server data before initializing
- * the application state. These changes should be either temporary
- * or only related to non-persited states.
- */
-function transformServerData(data, {panels}) {
-	return {
-		...data,
-
-		// By default, show first panel of first section.
-		sidebarPanelId: panels && panels[0] && panels[0][0]
-	};
-}
-
-const StoreContext = React.createContext(null);
+const DEFAULT_COMPARE_EQUAL = (a, b) => a === b;
+const DEFAULT_DISPATCH = () => {};
+const DEFAULT_GET_STATE = () => ({});
 
 /**
  * Although StoreContextProvider creates a full functional store,
@@ -104,41 +43,37 @@ const StoreContext = React.createContext(null);
  */
 export const StoreAPIContextProvider = ({
 	children,
-	dispatch = () => {},
-	getState = () => ({})
+	dispatch = DEFAULT_DISPATCH,
+	getState = DEFAULT_GET_STATE,
 }) => {
+	const state = getState();
+
 	const subscribers = useRef([]);
 
-	const subscribe = useCallback(subscriber => {
+	const subscribe = useCallback((subscriber) => {
 		subscribers.current = [...subscribers.current, subscriber];
 	}, []);
 
-	const unsubscribe = useCallback(subscriber => {
+	const unsubscribe = useCallback((subscriber) => {
 		subscribers.current = subscribers.current.filter(
-			_subscriber => _subscriber !== subscriber
+			(_subscriber) => _subscriber !== subscriber
 		);
 	}, []);
 
-	useEffect(() => {
-		storeRef.current.dispatch = dispatch;
-	}, [dispatch]);
+	const subscriptionContext = useRef([subscribe, unsubscribe]);
 
 	useEffect(() => {
-		storeRef.current.getState = getState;
-		subscribers.current.forEach(subscriber => subscriber());
-	}, [getState]);
-
-	const storeRef = useRef({
-		dispatch,
-		getState,
-		subscribe,
-		unsubscribe
-	});
+		subscribers.current.forEach((subscriber) => subscriber(state));
+	}, [state]);
 
 	return (
-		<StoreContext.Provider value={storeRef}>
-			{children}
-		</StoreContext.Provider>
+		<StoreSubscriptionContext.Provider value={subscriptionContext.current}>
+			<StoreDispatchContext.Provider value={dispatch}>
+				<StoreGetStateContext.Provider value={getState}>
+					{children}
+				</StoreGetStateContext.Provider>
+			</StoreDispatchContext.Provider>
+		</StoreSubscriptionContext.Provider>
 	);
 };
 
@@ -152,10 +87,13 @@ export const StoreAPIContextProvider = ({
  */
 export const StoreContextProvider = ({children, initialState, reducer}) => {
 	const [state, dispatch] = useThunk(
-		useReducer(reducer, initialState, getInitialState)
+		useUndo(useReducer(reducer, initialState))
 	);
 
-	const getState = useCallback(() => state, [state]);
+	const stateRef = useRef(state);
+	const getState = useCallback(() => stateRef.current, []);
+
+	stateRef.current = state;
 
 	return (
 		<StoreAPIContextProvider dispatch={dispatch} getState={getState}>
@@ -167,28 +105,19 @@ export const StoreContextProvider = ({children, initialState, reducer}) => {
 /**
  * @see https://react-redux.js.org/api/hooks#usedispatch
  */
-export const useDispatch = () => {
-	const storeRef = useContext(StoreContext);
+export const useDispatch = () => useContext(StoreDispatchContext);
 
-	if (process.env.NODE_ENV === 'test' && !storeRef) {
-		throw new Error('StoreContextProvider was not found');
-	}
-
-	return storeRef.current.dispatch;
-};
-
-/**
- * @see https://react-redux.js.org/api/hooks#useselector
- */
-export const useSelector = (selector, compareEqual = (a, b) => a === b) => {
-	const storeRef = useContext(StoreContext);
-
-	if (process.env.NODE_ENV === 'test' && !storeRef) {
-		throw new Error('StoreContextProvider was not found');
-	}
+export const useSelectorCallback = (
+	selector,
+	dependencies,
+	compareEqual = DEFAULT_COMPARE_EQUAL
+) => {
+	const getState = useContext(StoreGetStateContext);
+	const [subscribe, unsubscribe] = useContext(StoreSubscriptionContext);
 
 	const initialState = useMemo(
-		() => selector(storeRef.current.getState()),
+		() => selector(getState()),
+
 		// We really want to call selector here just on component mount.
 		// This provides an initial value that will be recalculated when
 		// store suscription has been called.
@@ -196,25 +125,33 @@ export const useSelector = (selector, compareEqual = (a, b) => a === b) => {
 		[]
 	);
 
-	const [selectorState, setSelectorState] = useState(initialState);
+	const [selectorState, setSelectorState] = useReducer(
+		(state, nextState) =>
+			compareEqual(state, nextState) ? state : nextState,
+		initialState
+	);
+
+	/* eslint-disable-next-line react-hooks/exhaustive-deps */
+	const selectorCallback = useCallback(selector, dependencies);
 
 	useEffect(() => {
-		const store = storeRef.current;
-
-		const onStoreChange = () => {
-			const nextState = selector(storeRef.current.getState());
-
-			if (!compareEqual(selectorState, nextState)) {
-				setSelectorState(nextState);
-			}
+		const onStoreChange = (nextState) => {
+			setSelectorState(selectorCallback(nextState));
 		};
 
-		store.subscribe(onStoreChange);
+		setSelectorState(selectorCallback(getState()));
+		subscribe(onStoreChange);
 
 		return () => {
-			store.unsubscribe(onStoreChange);
+			unsubscribe(onStoreChange);
 		};
-	}, [selectorState, storeRef, selector, compareEqual]);
+	}, [getState, selectorCallback, subscribe, unsubscribe]);
 
 	return selectorState;
 };
+
+/**
+ * @see https://react-redux.js.org/api/hooks#useselector
+ */
+export const useSelector = (selector, compareEqual = DEFAULT_COMPARE_EQUAL) =>
+	useSelectorCallback(selector, [], compareEqual);

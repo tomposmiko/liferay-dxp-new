@@ -13,30 +13,42 @@
  */
 
 import {ClayModalProvider} from '@clayui/modal';
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import AppContext from './AppContext.es';
 import AppContextProvider from './AppContextProvider.es';
+import {UPDATE_APP_PROPS} from './actions.es';
+import MultiPanelSidebar from './components/sidebar/MultiPanelSidebar.es';
+import initializeSidebarConfig from './components/sidebar/initializeSidebarConfig.es';
 import DataLayoutBuilder from './data-layout-builder/DataLayoutBuilder.es';
 import DataLayoutBuilderContextProvider from './data-layout-builder/DataLayoutBuilderContextProvider.es';
-import DataLayoutBuilderSidebar from './data-layout-builder/DataLayoutBuilderSidebar.es';
-import DataLayoutBuilderDragAndDrop from './drag-and-drop/DataLayoutBuilderDragAndDrop.es';
-import withDragAndDropContext from './drag-and-drop/withDragAndDropContext.es';
+import DragLayer from './drag-and-drop/DragLayer.es';
 
 const parseProps = ({
 	dataDefinitionId,
 	dataLayoutId,
 	fieldTypesModules,
+	groupId,
 	...props
 }) => ({
 	...props,
 	dataDefinitionId: Number(dataDefinitionId),
 	dataLayoutId: Number(dataLayoutId),
-	fieldTypesModules: fieldTypesModules.split(',')
+	fieldTypesModules: fieldTypesModules.split(','),
+	groupId: Number(groupId),
 });
 
-const AppContent = ({dataLayoutBuilder, setDataLayoutBuilder, ...props}) => {
+const AppContent = ({
+	dataLayoutBuilder,
+	setChildrenContext,
+	setDataLayoutBuilder,
+	sidebarConfig,
+	...props
+}) => {
 	const [state, dispatch] = useContext(AppContext);
+	const {panels, sidebarPanels, sidebarVariant} = sidebarConfig;
 
 	useEffect(() => {
 		if (dataLayoutBuilder) {
@@ -44,36 +56,57 @@ const AppContent = ({dataLayoutBuilder, setDataLayoutBuilder, ...props}) => {
 		}
 	}, [dataLayoutBuilder, state]);
 
+	useEffect(() => {
+		if (setChildrenContext) {
+			setChildrenContext({dataLayoutBuilder, dispatch, state});
+		}
+	}, [dataLayoutBuilder, dispatch, setChildrenContext, state]);
+
+	useEffect(() => {
+		if (!setChildrenContext) {
+			dispatch({payload: props, type: UPDATE_APP_PROPS});
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dispatch, setChildrenContext]);
+
 	return (
 		<>
 			<DataLayoutBuilder
 				appContext={[state, dispatch]}
-				defaultLanguageId={themeDisplay.getLanguageId()}
-				editingLanguageId={themeDisplay.getLanguageId()}
+				config={state.config}
 				onLoad={setDataLayoutBuilder}
-				{...props}
+				{...parseProps(props)}
 			/>
 
 			{dataLayoutBuilder && (
 				<DataLayoutBuilderContextProvider
 					dataLayoutBuilder={dataLayoutBuilder}
 				>
-					<DataLayoutBuilderSidebar />
-
-					<DataLayoutBuilderDragAndDrop
-						dataLayoutBuilder={dataLayoutBuilder}
+					<MultiPanelSidebar
+						panels={panels}
+						sidebarPanels={sidebarPanels}
+						variant={sidebarVariant}
 					/>
+
+					<DragLayer />
 				</DataLayoutBuilderContextProvider>
 			)}
 		</>
 	);
 };
 
-const App = withDragAndDropContext(props => {
-	const {dataDefinitionId, dataLayoutId, fieldTypesModules} = parseProps(
-		props
-	);
+const App = (props) => {
+	const {
+		config,
+		contentType,
+		dataDefinitionId,
+		dataLayoutId,
+		fieldSetContentType,
+		fieldTypesModules,
+		groupId,
+	} = parseProps(props);
 
+	const sidebarConfig = initializeSidebarConfig(props);
 	const [loaded, setLoaded] = useState(false);
 	const [dataLayoutBuilder, setDataLayoutBuilder] = useState(null);
 
@@ -84,24 +117,29 @@ const App = withDragAndDropContext(props => {
 	}, [fieldTypesModules]);
 
 	return (
-		<ClayModalProvider>
-			{loaded && (
-				<AppContextProvider
-					dataDefinitionId={dataDefinitionId}
-					dataLayoutBuilder={dataLayoutBuilder}
-					dataLayoutId={dataLayoutId}
-				>
-					<AppContent
+		<DndProvider backend={HTML5Backend}>
+			<ClayModalProvider>
+				{loaded && (
+					<AppContextProvider
+						config={config}
+						contentType={contentType}
+						dataDefinitionId={dataDefinitionId}
 						dataLayoutBuilder={dataLayoutBuilder}
-						setDataLayoutBuilder={setDataLayoutBuilder}
-						{...props}
-					/>
-				</AppContextProvider>
-			)}
-		</ClayModalProvider>
+						dataLayoutId={dataLayoutId}
+						fieldSetContentType={fieldSetContentType}
+						groupId={groupId}
+					>
+						<AppContent
+							dataLayoutBuilder={dataLayoutBuilder}
+							setDataLayoutBuilder={setDataLayoutBuilder}
+							sidebarConfig={sidebarConfig}
+							{...props}
+						/>
+					</AppContextProvider>
+				)}
+			</ClayModalProvider>
+		</DndProvider>
 	);
-});
+};
 
-export default function(props) {
-	return <App {...props} />;
-}
+export default App;

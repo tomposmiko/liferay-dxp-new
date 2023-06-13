@@ -19,6 +19,7 @@ import com.liferay.adaptive.media.handler.AMRequestHandler;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Optional;
 
@@ -27,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -35,6 +38,11 @@ import org.mockito.Mockito;
  * @author Adolfo Pérez
  */
 public class AMServletTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -51,9 +59,10 @@ public class AMServletTest {
 		);
 
 		Mockito.when(
-			_amRequestHandlerLocator.locateForPattern(Mockito.anyString())
+			(AMRequestHandler<Object>)_amRequestHandlerLocator.locateForPattern(
+				Mockito.anyString())
 		).thenReturn(
-			_amRequestHandler
+			(AMRequestHandler<Object>)_amRequestHandler
 		);
 
 		Mockito.when(
@@ -80,9 +89,10 @@ public class AMServletTest {
 		);
 
 		Mockito.when(
-			_amRequestHandlerLocator.locateForPattern(Mockito.anyString())
+			(AMRequestHandler<Object>)_amRequestHandlerLocator.locateForPattern(
+				Mockito.anyString())
 		).thenReturn(
-			_amRequestHandler
+			(AMRequestHandler<Object>)_amRequestHandler
 		);
 
 		Mockito.when(
@@ -109,9 +119,10 @@ public class AMServletTest {
 		);
 
 		Mockito.when(
-			_amRequestHandlerLocator.locateForPattern(Mockito.anyString())
+			(AMRequestHandler<Object>)_amRequestHandlerLocator.locateForPattern(
+				Mockito.anyString())
 		).thenReturn(
-			_amRequestHandler
+			(AMRequestHandler<Object>)_amRequestHandler
 		);
 
 		Mockito.when(
@@ -138,9 +149,10 @@ public class AMServletTest {
 		);
 
 		Mockito.when(
-			_amRequestHandlerLocator.locateForPattern(Mockito.anyString())
+			(AMRequestHandler<Object>)_amRequestHandlerLocator.locateForPattern(
+				Mockito.anyString())
 		).thenReturn(
-			_amRequestHandler
+			(AMRequestHandler<Object>)_amRequestHandler
 		);
 
 		Mockito.when(

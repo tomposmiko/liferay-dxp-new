@@ -14,10 +14,18 @@
 
 package com.liferay.layout.service.base;
 
+import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
+import com.liferay.exportimport.kernel.lar.ManifestSummary;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
+import com.liferay.layout.service.LayoutClassedModelUsageLocalServiceUtil;
 import com.liferay.layout.service.persistence.LayoutClassedModelUsageFinder;
 import com.liferay.layout.service.persistence.LayoutClassedModelUsagePersistence;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -27,8 +35,11 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.PersistedModel;
@@ -37,16 +48,22 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -68,11 +85,15 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>LayoutClassedModelUsageLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.layout.service.LayoutClassedModelUsageLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>LayoutClassedModelUsageLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>LayoutClassedModelUsageLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the layout classed model usage to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutClassedModelUsageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param layoutClassedModelUsage the layout classed model usage
 	 * @return the layout classed model usage that was added
@@ -106,6 +127,10 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 	/**
 	 * Deletes the layout classed model usage with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutClassedModelUsageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutClassedModelUsageId the primary key of the layout classed model usage
 	 * @return the layout classed model usage that was removed
 	 * @throws PortalException if a layout classed model usage with the primary key could not be found
@@ -123,6 +148,10 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 	/**
 	 * Deletes the layout classed model usage from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutClassedModelUsageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutClassedModelUsage the layout classed model usage
 	 * @return the layout classed model usage that was removed
 	 */
@@ -133,6 +162,18 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 
 		return layoutClassedModelUsagePersistence.remove(
 			layoutClassedModelUsage);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return layoutClassedModelUsagePersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -309,6 +350,110 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 			"layoutClassedModelUsageId");
 	}
 
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+
+		final ExportActionableDynamicQuery exportActionableDynamicQuery =
+			new ExportActionableDynamicQuery() {
+
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary =
+						portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(
+						stagedModelType, modelAdditionCount);
+
+					long modelDeletionCount =
+						ExportImportHelperUtil.getModelDeletionCount(
+							portletDataContext, stagedModelType);
+
+					manifestSummary.addModelDeletionCount(
+						stagedModelType, modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
+
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(
+						dynamicQuery, "modifiedDate");
+
+					StagedModelType stagedModelType =
+						exportActionableDynamicQuery.getStagedModelType();
+
+					long referrerClassNameId =
+						stagedModelType.getReferrerClassNameId();
+
+					Property classNameIdProperty = PropertyFactoryUtil.forName(
+						"classNameId");
+
+					if ((referrerClassNameId !=
+							StagedModelType.REFERRER_CLASS_NAME_ID_ALL) &&
+						(referrerClassNameId !=
+							StagedModelType.REFERRER_CLASS_NAME_ID_ANY)) {
+
+						dynamicQuery.add(
+							classNameIdProperty.eq(
+								stagedModelType.getReferrerClassNameId()));
+					}
+					else if (referrerClassNameId ==
+								StagedModelType.REFERRER_CLASS_NAME_ID_ANY) {
+
+						dynamicQuery.add(classNameIdProperty.isNotNull());
+					}
+				}
+
+			});
+
+		exportActionableDynamicQuery.setCompanyId(
+			portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod
+				<LayoutClassedModelUsage>() {
+
+				@Override
+				public void performAction(
+						LayoutClassedModelUsage layoutClassedModelUsage)
+					throws PortalException {
+
+					StagedModelDataHandlerUtil.exportStagedModel(
+						portletDataContext, layoutClassedModelUsage);
+				}
+
+			});
+		exportActionableDynamicQuery.setStagedModelType(
+			new StagedModelType(
+				PortalUtil.getClassNameId(
+					LayoutClassedModelUsage.class.getName()),
+				StagedModelType.REFERRER_CLASS_NAME_ID_ALL));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return layoutClassedModelUsagePersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
 	/**
 	 * @throws PortalException
 	 */
@@ -321,12 +466,54 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 				(LayoutClassedModelUsage)persistedModel);
 	}
 
+	public BasePersistence<LayoutClassedModelUsage> getBasePersistence() {
+		return layoutClassedModelUsagePersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
 		return layoutClassedModelUsagePersistence.findByPrimaryKey(
 			primaryKeyObj);
+	}
+
+	/**
+	 * Returns all the layout classed model usages matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the layout classed model usages
+	 * @param companyId the primary key of the company
+	 * @return the matching layout classed model usages, or an empty list if no matches were found
+	 */
+	@Override
+	public List<LayoutClassedModelUsage>
+		getLayoutClassedModelUsagesByUuidAndCompanyId(
+			String uuid, long companyId) {
+
+		return layoutClassedModelUsagePersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of layout classed model usages matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the layout classed model usages
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of layout classed model usages
+	 * @param end the upper bound of the range of layout classed model usages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching layout classed model usages, or an empty list if no matches were found
+	 */
+	@Override
+	public List<LayoutClassedModelUsage>
+		getLayoutClassedModelUsagesByUuidAndCompanyId(
+			String uuid, long companyId, int start, int end,
+			OrderByComparator<LayoutClassedModelUsage> orderByComparator) {
+
+		return layoutClassedModelUsagePersistence.findByUuid_C(
+			uuid, companyId, start, end, orderByComparator);
 	}
 
 	/**
@@ -376,6 +563,10 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 	/**
 	 * Updates the layout classed model usage in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect LayoutClassedModelUsageLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param layoutClassedModelUsage the layout classed model usage
 	 * @return the layout classed model usage that was updated
 	 */
@@ -388,11 +579,17 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 			layoutClassedModelUsage);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			LayoutClassedModelUsageLocalService.class,
-			IdentifiableOSGiService.class, PersistedModelLocalService.class
+			IdentifiableOSGiService.class, CTService.class,
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -400,6 +597,8 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		layoutClassedModelUsageLocalService =
 			(LayoutClassedModelUsageLocalService)aopProxy;
+
+		_setLocalServiceUtilService(layoutClassedModelUsageLocalService);
 	}
 
 	/**
@@ -412,8 +611,23 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 		return LayoutClassedModelUsageLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<LayoutClassedModelUsage> getCTPersistence() {
+		return layoutClassedModelUsagePersistence;
+	}
+
+	@Override
+	public Class<LayoutClassedModelUsage> getModelClass() {
 		return LayoutClassedModelUsage.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<LayoutClassedModelUsage>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(layoutClassedModelUsagePersistence);
 	}
 
 	protected String getModelClassName() {
@@ -445,6 +659,24 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		LayoutClassedModelUsageLocalService
+			layoutClassedModelUsageLocalService) {
+
+		try {
+			Field field =
+				LayoutClassedModelUsageLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutClassedModelUsageLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected LayoutClassedModelUsageLocalService
 		layoutClassedModelUsageLocalService;
 
@@ -458,6 +690,10 @@ public abstract class LayoutClassedModelUsageLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.GroupLocalService
+		groupLocalService;
 
 	@Reference
 	protected com.liferay.portal.kernel.service.LayoutLocalService

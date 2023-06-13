@@ -30,8 +30,10 @@ import com.liferay.message.boards.service.MBCategoryLocalService;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.search.model.uid.UIDFactory;
 import com.liferay.portal.search.similar.results.web.internal.contributor.asset.publisher.AssetPublisherSimilarResultsContributor;
 import com.liferay.portal.search.similar.results.web.internal.contributor.blogs.BlogsSimilarResultsContributor;
 import com.liferay.portal.search.similar.results.web.internal.contributor.document.library.DocumentLibrarySimilarResultsContributor;
@@ -50,6 +52,7 @@ import com.liferay.portal.search.similar.results.web.internal.util.http.HttpHelp
 import com.liferay.portal.search.similar.results.web.spi.contributor.SimilarResultsContributor;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.CriteriaHelper;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.DestinationHelper;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiNodeLocalService;
@@ -61,6 +64,8 @@ import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Matchers;
@@ -73,6 +78,11 @@ import org.mockito.MockitoAnnotations;
  * @author André de Oliveira
  */
 public class SimilarResultsUidsAndDestinationsTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -158,7 +168,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			journalArticle
 		).getId();
 
-		AssetRenderer assetRenderer = Mockito.mock(AssetRenderer.class);
+		AssetRenderer<?> assetRenderer = Mockito.mock(AssetRenderer.class);
 
 		Mockito.doReturn(
 			journalArticle
@@ -183,6 +193,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 		setUpDestinationAssetEntry(assetEntry2);
 
 		setUpDestinationClassName(className2);
+
+		setUpUIDFactory(expectedUID);
 
 		assertSimilarResultsContributor(
 			urlString, expectedUID, expectedDestination);
@@ -212,7 +224,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 
 		AssetEntry assetEntry = getAssetEntry(className, classPK);
 
-		AssetRenderer assetRenderer = Mockito.mock(AssetRenderer.class);
+		AssetRenderer<?> assetRenderer = Mockito.mock(AssetRenderer.class);
 
 		Mockito.doReturn(
 			urlTitle
@@ -238,6 +250,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 		setUpBlogsEntryLocalService(blogsEntry);
 		setUpInputGroupId(groupId);
 		setUpDestinationAssetRenderer(assetRenderer);
+		setUpUIDFactory(expectedUID);
 
 		assertSimilarResultsContributor(
 			urlString, expectedUID, expectedDestination);
@@ -269,7 +282,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			dlFileEntry
 		).getFileEntryId();
 
-		AssetRenderer assetRenderer = Mockito.mock(AssetRenderer.class);
+		AssetRenderer<?> assetRenderer = Mockito.mock(AssetRenderer.class);
 
 		Mockito.doReturn(
 			dlFileEntry
@@ -277,9 +290,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			assetRenderer
 		).getAssetObject();
 
-		AssetEntry assetEntry = getAssetEntry(className, 12345);
-
-		setUpAssetEntryLocalServiceFetchUUID(assetEntry);
+		setUpAssetEntryLocalServiceFetchUUID(getAssetEntry(className, 12345));
 
 		setUpDestinationAssetRenderer(assetRenderer);
 		setUpDestinationClassName(className);
@@ -316,7 +327,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			dlFolder
 		).getFolderId();
 
-		AssetRenderer assetRenderer = Mockito.mock(AssetRenderer.class);
+		AssetRenderer<?> assetRenderer = Mockito.mock(AssetRenderer.class);
 
 		Mockito.doReturn(
 			dlFolder
@@ -324,9 +335,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			assetRenderer
 		).getAssetObject();
 
-		AssetEntry assetEntry = getAssetEntry(className, 12345);
-
-		setUpAssetEntryLocalServiceFetchUUID(assetEntry);
+		setUpAssetEntryLocalServiceFetchUUID(getAssetEntry(className, 12345));
 
 		setUpDestinationAssetRenderer(assetRenderer);
 		setUpDestinationClassName(className);
@@ -409,9 +418,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			destinationHelper
 		).getClassPK();
 
-		AssetEntry assetEntry = getAssetEntry(className, 12345);
-
-		setUpAssetEntryLocalServiceFetchUUID(assetEntry);
+		setUpAssetEntryLocalServiceFetchUUID(getAssetEntry(className, 12345));
 
 		setUpInputGroupId(groupId);
 		setUpMBMessageLocalService(messageId);
@@ -443,9 +450,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			"http://localhost:8080/web/guest/blabal?className=", className,
 			"&classPK=", classPK);
 
-		AssetEntry assetEntry = getAssetEntry(className, classPK);
-
-		setUpDestinationAssetEntry(assetEntry);
+		setUpDestinationAssetEntry(getAssetEntry(className, classPK));
 
 		assertSimilarResultsContributor(
 			urlString, expectedUID, expectedDestination);
@@ -465,9 +470,9 @@ public class SimilarResultsUidsAndDestinationsTest {
 
 		String expectedUID = "ClassNamePortlet_PORTLET_34567";
 
-		String expectedDestination =
-			"http://localhost:8080/web/guest/blabal?classNameId=" +
-				classNameId2 + "&classPK=" + classPK2;
+		String expectedDestination = StringBundler.concat(
+			"http://localhost:8080/web/guest/blabal?classNameId=", classNameId2,
+			"&classPK=", classPK2);
 
 		AssetEntry assetEntry1 = getAssetEntry(className, classPK1);
 
@@ -640,7 +645,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			wikiPage
 		).getTitle();
 
-		AssetRenderer assetRenderer = Mockito.mock(AssetRenderer.class);
+		AssetRenderer<?> assetRenderer = Mockito.mock(AssetRenderer.class);
 
 		Mockito.doReturn(
 			wikiPage
@@ -648,12 +653,11 @@ public class SimilarResultsUidsAndDestinationsTest {
 			assetRenderer
 		).getAssetObject();
 
-		AssetEntry assetEntry = getAssetEntry(className, classPK);
-
-		setUpAssetEntryLocalServiceFetchUUID(assetEntry);
+		setUpAssetEntryLocalServiceFetchUUID(getAssetEntry(className, classPK));
 
 		setUpDestinationAssetRenderer(assetRenderer);
 		setUpInputGroupId(groupId);
+		setUpUIDFactory(expectedUID);
 		setUpWikiNodeLocalService(wikiNode);
 		setUpWikiPageLocalService(wikiPage);
 
@@ -680,6 +684,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			{
 				setAssetEntryLocalService(_assetEntryLocalService);
 				setHttpHelper(_httpHelper);
+				setUIDFactory(_uidFactory);
 			}
 		};
 	}
@@ -687,9 +692,9 @@ public class SimilarResultsUidsAndDestinationsTest {
 	protected SimilarResultsContributor createBlogsSimilarResultsContributor() {
 		return new BlogsSimilarResultsContributor() {
 			{
-				setAssetEntryLocalService(_assetEntryLocalService);
 				setBlogsEntryLocalService(_blogsEntryLocalService);
 				setHttpHelper(_httpHelper);
+				setUIDFactory(_uidFactory);
 			}
 		};
 	}
@@ -808,6 +813,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 			{
 				setAssetEntryLocalService(_assetEntryLocalService);
 				setHttpHelper(_httpHelper);
+				setUIDFactory(_uidFactory);
 				setWikiNodeLocalService(_wikiNodeLocalService);
 				setWikiPageLocalService(_wikiPageLocalService);
 			}
@@ -903,7 +909,9 @@ public class SimilarResultsUidsAndDestinationsTest {
 		).getAssetEntry();
 	}
 
-	protected void setUpDestinationAssetRenderer(AssetRenderer assetRenderer) {
+	protected void setUpDestinationAssetRenderer(
+		AssetRenderer<?> assetRenderer) {
+
 		Mockito.doReturn(
 			assetRenderer
 		).when(
@@ -970,6 +978,14 @@ public class SimilarResultsUidsAndDestinationsTest {
 			_mbMessageLocalService.fetchMBMessage(Matchers.anyLong())
 		).thenReturn(
 			mbMessage
+		);
+	}
+
+	protected void setUpUIDFactory(String uid) {
+		Mockito.when(
+			_uidFactory.getUID(Matchers.any(ClassedModel.class))
+		).thenReturn(
+			uid
 		);
 	}
 
@@ -1042,6 +1058,9 @@ public class SimilarResultsUidsAndDestinationsTest {
 
 	private SimilarResultsContributorsRegistry
 		_similarResultsContributorsRegistry;
+
+	@Mock
+	private UIDFactory _uidFactory;
 
 	@Mock
 	private WikiNodeLocalService _wikiNodeLocalService;

@@ -71,15 +71,15 @@ definition {
 			locator1 = "KnowledgeBase#FOLDER_SELECT_DROPDOWN",
 			value1 = "${kbFolderName}");
 
-		AssertClick(
-			locator1 = "KnowledgeBase#FOLDER_SELECT_OPTION",
-			value1 = "${kbFolderName}");
+		Click.clickNoMouseOver(
+			key_kbFolderName = "${kbFolderName}",
+			locator1 = "KnowledgeBase#FOLDER_SELECT_OPTION");
 	}
 
 	macro selectParentCP {
 		var key_kbArticleTitle = "${kbFolderName}";
 
-		SelectFrame(locator1 = "KnowledgeBaseSelectParent#IFRAME");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		if ("${kbFolderName}" == "Home") {
 			Click(locator1 = "KnowledgeBaseSelectParent#BREADCRUMB_HOME");
@@ -109,8 +109,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Knowledge Base");
 
 		while (IsElementPresent(locator1 = "KnowledgeBase#FOLDER_TABLE_HEADER")) {

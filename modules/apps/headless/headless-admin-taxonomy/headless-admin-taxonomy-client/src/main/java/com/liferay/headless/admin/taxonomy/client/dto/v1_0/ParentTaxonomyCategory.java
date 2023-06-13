@@ -17,6 +17,8 @@ package com.liferay.headless.admin.taxonomy.client.dto.v1_0;
 import com.liferay.headless.admin.taxonomy.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.ParentTaxonomyCategorySerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class ParentTaxonomyCategory {
+public class ParentTaxonomyCategory implements Cloneable, Serializable {
+
+	public static ParentTaxonomyCategory toDTO(String json) {
+		return ParentTaxonomyCategorySerDes.toDTO(json);
+	}
 
 	public Long getId() {
 		return id;
@@ -65,6 +71,11 @@ public class ParentTaxonomyCategory {
 	}
 
 	protected String name;
+
+	@Override
+	public ParentTaxonomyCategory clone() throws CloneNotSupportedException {
+		return (ParentTaxonomyCategory)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.comment.upgrade.UpgradeDiscussionSubscriptionClassName;
+import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStorageLinkLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalService;
@@ -48,12 +49,13 @@ import com.liferay.journal.internal.upgrade.v1_1_0.UpgradeJournalArticleLocalize
 import com.liferay.journal.internal.upgrade.v1_1_1.UpgradeFileUploadsConfiguration;
 import com.liferay.journal.internal.upgrade.v1_1_2.UpgradeCheckIntervalConfiguration;
 import com.liferay.journal.internal.upgrade.v1_1_3.UpgradeResourcePermissions;
-import com.liferay.journal.internal.upgrade.v1_1_4.UpgradeUrlTitle;
 import com.liferay.journal.internal.upgrade.v1_1_5.UpgradeContentImages;
 import com.liferay.journal.internal.upgrade.v1_1_6.UpgradeAssetDisplayPageEntry;
 import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalArticleTable;
 import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalFeedTable;
 import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalFolderTable;
+import com.liferay.journal.internal.upgrade.v3_2_1.UpgradeJournalArticleLocalization;
+import com.liferay.journal.internal.upgrade.v3_3_0.UpgradeStorageLinks;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.change.tracking.store.CTStoreFactory;
 import com.liferay.portal.configuration.upgrade.PrefsPropsToConfigurationUpgradeHelper;
@@ -66,6 +68,7 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.capabilities.PortalCapabilityLocator;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ImageLocalService;
@@ -81,6 +84,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeCTModel;
 import com.liferay.portal.kernel.upgrade.UpgradeMVCCVersion;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
+import com.liferay.portlet.documentlibrary.store.StoreFactory;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.io.PrintWriter;
@@ -169,7 +173,7 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 			new UpgradeImageTypeContent(
 				_imageLocalService, _journalArticleImageUpgradeHelper,
 				_portletFileRepository),
-			new UpgradeJournalArticleLocalizedValues());
+			new UpgradeJournalArticleLocalizedValues(_counterLocalService));
 
 		registry.register(
 			"1.1.0", "1.1.1",
@@ -183,7 +187,10 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.1.2", "1.1.3", new UpgradeResourcePermissions(_resourceActions));
 
-		registry.register("1.1.3", "1.1.4", new UpgradeUrlTitle());
+		registry.register(
+			"1.1.3", "1.1.4",
+			new com.liferay.journal.internal.upgrade.v1_1_4.
+				UpgradeJournalArticle());
 
 		registry.register(
 			"1.1.4", "1.1.5",
@@ -197,10 +204,14 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.1.6", "1.1.7",
 			new UpgradeDiscussionSubscriptionClassName(
+				_assetEntryLocalService, _classNameLocalService,
 				_subscriptionLocalService, JournalArticle.class.getName(),
-				UpgradeDiscussionSubscriptionClassName.DeletionMode.ADD_NEW));
+				UpgradeDiscussionSubscriptionClassName.DeletionMode.UPDATE));
 
-		registry.register("1.1.7", "1.1.8", new DummyUpgradeStep());
+		registry.register(
+			"1.1.7", "1.1.8",
+			new com.liferay.journal.internal.upgrade.v1_1_8.
+				UpgradeJournalArticle());
 
 		registry.register(
 			"1.1.8", "2.0.0",
@@ -215,10 +226,7 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 			new com.liferay.journal.internal.upgrade.v3_0_0.
 				UpgradeJournalArticleImage(_imageLocalService));
 
-		registry.register(
-			"3.0.0", "3.0.1",
-			new com.liferay.journal.internal.upgrade.v3_0_1.
-				UpgradeJournalArticle());
+		registry.register("3.0.0", "3.0.1", new DummyUpgradeStep());
 
 		registry.register("3.0.1", "3.0.2", new DummyUpgradeStep());
 
@@ -242,6 +250,33 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 			new UpgradeCTModel(
 				"JournalArticleLocalization", "JournalArticleResource",
 				"JournalArticle", "JournalFolder"));
+
+		registry.register(
+			"3.2.0", "3.2.1", new UpgradeJournalArticleLocalization());
+
+		registry.register(
+			"3.2.1", "3.2.2",
+			new com.liferay.journal.internal.upgrade.v3_2_2.
+				UpgradeJournalArticleLocalization());
+
+		registry.register("3.2.2", "3.2.3", new DummyUpgradeStep());
+
+		registry.register(
+			"3.2.3", "3.2.4",
+			new com.liferay.journal.internal.upgrade.v3_2_4.
+				UpgradeJournalArticle());
+
+		registry.register(
+			"3.2.4", "3.3.0",
+			new UpgradeCTModel("JournalContentSearch", "JournalFeed"));
+
+		registry.register(
+			"3.3.0", "3.4.0", new UpgradeStorageLinks(_classNameLocalService));
+
+		registry.register(
+			"3.4.0", "3.4.1",
+			new com.liferay.journal.internal.upgrade.v3_4_1.
+				UpgradeJournalArticleLocalization());
 	}
 
 	protected void deleteTempImages() throws Exception {
@@ -287,10 +322,16 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
 
 	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
 	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference
+	private CounterLocalService _counterLocalService;
 
 	@Reference
 	private CTStoreFactory _ctStoreFactory;
@@ -340,6 +381,9 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Reference
 	private SettingsFactory _settingsFactory;
+
+	@Reference(target = "(dl.store.impl.enabled=true)")
+	private StoreFactory _storeFactory;
 
 	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;

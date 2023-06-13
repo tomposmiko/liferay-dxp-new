@@ -14,163 +14,84 @@
 
 package com.liferay.layout.type.controller.portlet.internal.display.context;
 
-import com.liferay.info.constants.InfoDisplayWebKeys;
-import com.liferay.info.display.contributor.InfoDisplayContributor;
-import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
-import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
-import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Eudaldo Alonso
  */
 public class PortletLayoutDisplayContext {
 
-	public PortletLayoutDisplayContext(HttpServletRequest httpServletRequest) {
-		_httpServletRequest = httpServletRequest;
+	public PortletLayoutDisplayContext(
+		LayoutPageTemplateEntryLocalService layoutPageTemplateEntryLocalService,
+		LayoutPageTemplateStructureLocalService
+			layoutPageTemplateStructureLocalService) {
 
-		_infoDisplayContributorTracker =
-			(InfoDisplayContributorTracker)httpServletRequest.getAttribute(
-				InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR_TRACKER);
+		_layoutPageTemplateEntryLocalService =
+			layoutPageTemplateEntryLocalService;
+		_layoutPageTemplateStructureLocalService =
+			layoutPageTemplateStructureLocalService;
 	}
 
-	public String getBackgroundImage(JSONObject rowConfigJSONObject)
-		throws PortalException {
-
-		if (rowConfigJSONObject == null) {
-			return StringPool.BLANK;
+	public LayoutStructure getLayoutStructure(long groupId, Layout layout) {
+		if (_layoutStructure != null) {
+			return _layoutStructure;
 		}
 
-		JSONObject backgroundImageJSONObject =
-			rowConfigJSONObject.getJSONObject("backgroundImage");
+		LayoutPageTemplateEntry masterLayoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.
+				fetchLayoutPageTemplateEntryByPlid(
+					layout.getMasterLayoutPlid());
 
-		if (backgroundImageJSONObject == null) {
-			return rowConfigJSONObject.getString(
-				"backgroundImage", StringPool.BLANK);
+		if (masterLayoutPageTemplateEntry == null) {
+			_layoutStructure = _getDefaultMasterLayoutStructure();
+
+			return _layoutStructure;
 		}
 
-		String fieldId = backgroundImageJSONObject.getString("fieldId");
+		LayoutPageTemplateStructure masterLayoutPageTemplateStructure =
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					masterLayoutPageTemplateEntry.getGroupId(),
+					masterLayoutPageTemplateEntry.getPlid());
 
-		if (Validator.isNotNull(fieldId)) {
-			long classNameId = backgroundImageJSONObject.getLong("classNameId");
-			long classPK = backgroundImageJSONObject.getLong("classPK");
+		String data = masterLayoutPageTemplateStructure.getData(
+			SegmentsExperienceConstants.ID_DEFAULT);
 
-			if ((classNameId != 0L) && (classPK != 0L)) {
-				InfoDisplayContributor infoDisplayContributor =
-					_infoDisplayContributorTracker.getInfoDisplayContributor(
-						PortalUtil.getClassName(classNameId));
+		if (Validator.isNull(data)) {
+			_layoutStructure = _getDefaultMasterLayoutStructure();
 
-				if (infoDisplayContributor != null) {
-					InfoDisplayObjectProvider infoDisplayObjectProvider =
-						infoDisplayContributor.getInfoDisplayObjectProvider(
-							classPK);
-
-					if (infoDisplayObjectProvider != null) {
-						Object object =
-							infoDisplayContributor.getInfoDisplayFieldValue(
-								infoDisplayObjectProvider.getDisplayObject(),
-								fieldId, LocaleUtil.getDefault());
-
-						if (object instanceof JSONObject) {
-							JSONObject fieldValueJSONObject =
-								(JSONObject)object;
-
-							return fieldValueJSONObject.getString(
-								"url", StringPool.BLANK);
-						}
-					}
-				}
-			}
+			return _layoutStructure;
 		}
 
-		String backgroundImageURL = backgroundImageJSONObject.getString("url");
+		_layoutStructure = LayoutStructure.of(data);
 
-		if (Validator.isNotNull(backgroundImageURL)) {
-			return backgroundImageURL;
-		}
-
-		return StringPool.BLANK;
+		return _layoutStructure;
 	}
 
-	public JSONArray getStructureJSONArray() {
-		try {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)_httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
+	private LayoutStructure _getDefaultMasterLayoutStructure() {
+		LayoutStructure layoutStructure = new LayoutStructure();
 
-			Layout layout = LayoutLocalServiceUtil.fetchLayout(
-				themeDisplay.getPlid());
+		LayoutStructureItem rootLayoutStructureItem =
+			layoutStructure.addRootLayoutStructureItem();
 
-			LayoutPageTemplateEntry masterLayoutPageTemplateEntry =
-				LayoutPageTemplateEntryLocalServiceUtil.
-					fetchLayoutPageTemplateEntryByPlid(
-						layout.getMasterLayoutPlid());
+		layoutStructure.addDropZoneLayoutStructureItem(
+			rootLayoutStructureItem.getItemId(), 0);
 
-			if (masterLayoutPageTemplateEntry == null) {
-				return _getDefaultStructureJSONArray();
-			}
-
-			LayoutPageTemplateStructure masterLayoutPageTemplateStructure =
-				LayoutPageTemplateStructureLocalServiceUtil.
-					fetchLayoutPageTemplateStructure(
-						masterLayoutPageTemplateEntry.getGroupId(),
-						PortalUtil.getClassNameId(Layout.class),
-						masterLayoutPageTemplateEntry.getPlid());
-
-			String data = masterLayoutPageTemplateStructure.getData(
-				SegmentsExperienceConstants.ID_DEFAULT);
-
-			if (Validator.isNull(data)) {
-				return _getDefaultStructureJSONArray();
-			}
-
-			JSONObject dataJSONObject = JSONFactoryUtil.createJSONObject(data);
-
-			return dataJSONObject.getJSONArray("structure");
-		}
-		catch (Exception exception) {
-			_log.error("Unable to get structure JSON array", exception);
-
-			return null;
-		}
+		return layoutStructure;
 	}
 
-	private JSONArray _getDefaultStructureJSONArray() {
-		return JSONUtil.putAll(
-			JSONUtil.put(
-				"columns",
-				JSONUtil.putAll(
-					JSONUtil.put(
-						"fragmentEntryLinkIds", JSONUtil.putAll("drop-zone")
-					).put(
-						"size", 12
-					))));
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PortletLayoutDisplayContext.class);
-
-	private final HttpServletRequest _httpServletRequest;
-	private final InfoDisplayContributorTracker _infoDisplayContributorTracker;
+	private final LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
+	private final LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureLocalService;
+	private LayoutStructure _layoutStructure;
 
 }

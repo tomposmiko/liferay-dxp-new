@@ -15,8 +15,10 @@
 package com.liferay.portal.reports.engine.console.web.internal.admin.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
@@ -95,45 +97,33 @@ public class ReportsEngineDisplayContext {
 			return null;
 		}
 
-		return new CreationMenu() {
-			{
-				if (isDefinitionsTabSelected()) {
-					addPrimaryDropdownItem(
-						dropdownItem -> {
-							dropdownItem.setHref(
-								_liferayPortletResponse.createRenderURL(),
-								"mvcPath",
-								"/admin/definition/edit_definition.jsp",
-								"redirect",
-								PortalUtil.getCurrentURL(
-									_reportsEngineRequestHelper.getRequest()));
+		return CreationMenuBuilder.addPrimaryDropdownItem(
+			() -> isDefinitionsTabSelected(),
+			dropdownItem -> {
+				dropdownItem.setHref(
+					_liferayPortletResponse.createRenderURL(), "mvcPath",
+					"/admin/definition/edit_definition.jsp", "redirect",
+					PortalUtil.getCurrentURL(
+						_reportsEngineRequestHelper.getRequest()));
 
-							dropdownItem.setLabel(
-								LanguageUtil.get(
-									_reportsEngineRequestHelper.getRequest(),
-									"add"));
-						});
-				}
-
-				if (isSourcesTabSelected()) {
-					addPrimaryDropdownItem(
-						dropdownItem -> {
-							dropdownItem.setHref(
-								_liferayPortletResponse.createRenderURL(),
-								"mvcPath",
-								"/admin/data_source/edit_data_source.jsp",
-								"redirect",
-								PortalUtil.getCurrentURL(
-									_reportsEngineRequestHelper.getRequest()));
-
-							dropdownItem.setLabel(
-								LanguageUtil.get(
-									_reportsEngineRequestHelper.getRequest(),
-									"add"));
-						});
-				}
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						_reportsEngineRequestHelper.getRequest(), "add"));
 			}
-		};
+		).addPrimaryDropdownItem(
+			() -> isSourcesTabSelected(),
+			dropdownItem -> {
+				dropdownItem.setHref(
+					_liferayPortletResponse.createRenderURL(), "mvcPath",
+					"/admin/data_source/edit_data_source.jsp", "redirect",
+					PortalUtil.getCurrentURL(
+						_reportsEngineRequestHelper.getRequest()));
+
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						_reportsEngineRequestHelper.getRequest(), "add"));
+			}
+		).build();
 	}
 
 	public String getDisplayStyle() {
@@ -173,39 +163,27 @@ public class ReportsEngineDisplayContext {
 	}
 
 	public DropdownItemList getFilterOptions() {
-		return new DropdownItemList() {
-			{
-				addGroup(
-					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
-							new DropdownItemList() {
-								{
-									add(
-										_getFilterNavigationDropdownItem(
-											"all"));
-								}
-							});
-						dropdownGroupItem.setLabel(
-							LanguageUtil.get(
-								_reportsEngineRequestHelper.getRequest(),
-								"filter"));
-					});
-
-				addGroup(
-					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
-							new DropdownItemList() {
-								{
-									add(_getOrderByDropdownItem("create-date"));
-								}
-							});
-						dropdownGroupItem.setLabel(
-							LanguageUtil.get(
-								_reportsEngineRequestHelper.getRequest(),
-								"order-by"));
-					});
+		return DropdownItemListBuilder.addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(
+					DropdownItemListBuilder.add(
+						_getFilterNavigationDropdownItem("all")
+					).build());
+				dropdownGroupItem.setLabel(
+					LanguageUtil.get(
+						_reportsEngineRequestHelper.getRequest(), "filter"));
 			}
-		};
+		).addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(
+					DropdownItemListBuilder.add(
+						_getOrderByDropdownItem("create-date")
+					).build());
+				dropdownGroupItem.setLabel(
+					LanguageUtil.get(
+						_reportsEngineRequestHelper.getRequest(), "order-by"));
+			}
+		).build();
 	}
 
 	public String getOrderByType() {
@@ -249,7 +227,7 @@ public class ReportsEngineDisplayContext {
 		return portletURL;
 	}
 
-	public SearchContainer getSearchContainer() throws PortalException {
+	public SearchContainer<?> getSearchContainer() throws PortalException {
 		if (_searchContainer == null) {
 			if (isDefinitionsTabSelected()) {
 				_searchContainer = _getDefinitionSearch();
@@ -294,7 +272,7 @@ public class ReportsEngineDisplayContext {
 	}
 
 	public int getTotalItems() throws PortalException {
-		SearchContainer searchContainer = getSearchContainer();
+		SearchContainer<?> searchContainer = getSearchContainer();
 
 		return searchContainer.getTotal();
 	}
@@ -410,14 +388,16 @@ public class ReportsEngineDisplayContext {
 		EntryDisplayTerms displayTerms =
 			(EntryDisplayTerms)entrySearch.getDisplayTerms();
 
-		Date startDate = PortalUtil.getDate(
-			displayTerms.getStartDateMonth(), displayTerms.getStartDateDay(),
-			displayTerms.getStartDateYear(), _themeDisplay.getTimeZone(), null);
-		Date endDate = PortalUtil.getDate(
-			displayTerms.getEndDateMonth(), displayTerms.getEndDateDay() + 1,
-			displayTerms.getEndDateYear(), _themeDisplay.getTimeZone(), null);
-
 		if (displayTerms.isAdvancedSearch()) {
+			Date startDate = PortalUtil.getDate(
+				displayTerms.getStartDateMonth(),
+				displayTerms.getStartDateDay(), displayTerms.getStartDateYear(),
+				_themeDisplay.getTimeZone(), null);
+			Date endDate = PortalUtil.getDate(
+				displayTerms.getEndDateMonth(),
+				displayTerms.getEndDateDay() + 1, displayTerms.getEndDateYear(),
+				_themeDisplay.getTimeZone(), null);
+
 			int total = EntryServiceUtil.getEntriesCount(
 				_themeDisplay.getSiteGroupId(),
 				displayTerms.getDefinitionName(), null, startDate, endDate,
@@ -463,7 +443,7 @@ public class ReportsEngineDisplayContext {
 				Objects.equals(_getNavigation(), navigation));
 			dropdownItem.setHref(
 				getPortletURL(), "navigation", navigation, "mvcPath",
-				"/addmin/view.jsp", "tabs1", _getTabs1());
+				"/admin/view.jsp", "tabs1", _getTabs1());
 			dropdownItem.setLabel(
 				LanguageUtil.get(
 					_reportsEngineRequestHelper.getRequest(), navigation));
@@ -573,7 +553,7 @@ public class ReportsEngineDisplayContext {
 	private String _orderByType;
 	private final PortalPreferences _portalPreferences;
 	private final ReportsEngineRequestHelper _reportsEngineRequestHelper;
-	private SearchContainer _searchContainer;
+	private SearchContainer<?> _searchContainer;
 	private final ThemeDisplay _themeDisplay;
 
 }

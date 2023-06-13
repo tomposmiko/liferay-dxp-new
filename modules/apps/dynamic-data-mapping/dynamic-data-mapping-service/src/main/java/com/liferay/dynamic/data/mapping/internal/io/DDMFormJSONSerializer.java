@@ -30,11 +30,14 @@ import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +72,12 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		addSuccessPageSettings(
 			jsonObject, ddmForm.getDDMFormSuccessPageSettings());
 
+		if (Validator.isNotNull(ddmForm.getDefinitionSchemaVersion())) {
+			jsonObject.put(
+				"definitionSchemaVersion",
+				ddmForm.getDefinitionSchemaVersion());
+		}
+
 		DDMFormSerializerSerializeResponse.Builder builder =
 			DDMFormSerializerSerializeResponse.Builder.newBuilder(
 				jsonObject.toString());
@@ -98,6 +107,8 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 	protected void addFields(
 		JSONObject jsonObject, List<DDMFormField> ddmFormFields) {
 
+		_trim(ddmFormFields);
+
 		jsonObject.put("fields", fieldsToJSONArray(ddmFormFields));
 	}
 
@@ -107,6 +118,8 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		if (nestedDDMFormFields.isEmpty()) {
 			return;
 		}
+
+		_trim(nestedDDMFormFields);
 
 		jsonObject.put("nestedFields", fieldsToJSONArray(nestedDDMFormFields));
 	}
@@ -157,7 +170,8 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 			return;
 		}
 
-		jsonObject.put("rules", rulesToJSONArray(ddmFormRules));
+		jsonObject.put(
+			"rules", DDMFormRuleJSONSerializer.serialize(ddmFormRules));
 	}
 
 	protected void addSuccessPageSettings(
@@ -210,30 +224,12 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 				"label",
 				toJSONObject(ddmFormFieldOptions.getOptionLabels(optionValue))
 			).put(
+				"reference", ddmFormFieldOptions.getOptionReference(optionValue)
+			).put(
 				"value", optionValue
 			);
 
 			jsonArray.put(jsonObject);
-		}
-
-		return jsonArray;
-	}
-
-	protected JSONArray ruleActionsToJSONArray(List<String> ruleActions) {
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
-
-		for (String ruleAction : ruleActions) {
-			jsonArray.put(ruleAction);
-		}
-
-		return jsonArray;
-	}
-
-	protected JSONArray rulesToJSONArray(List<DDMFormRule> ddmFormRules) {
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
-
-		for (DDMFormRule ddmFormRule : ddmFormRules) {
-			jsonArray.put(toJSONObject(ddmFormRule));
 		}
 
 		return jsonArray;
@@ -258,6 +254,9 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 					ddmFormFieldTypeSetting.getType(), "validation")) {
 
 			return toJSONObject((DDMFormFieldValidation)property);
+		}
+		else if (_isArray(property)) {
+			return _jsonFactory.createJSONArray((Object[])property);
 		}
 
 		return String.valueOf(property);
@@ -323,20 +322,6 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		return jsonObject;
 	}
 
-	protected JSONObject toJSONObject(DDMFormRule ddmFormRule) {
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
-
-		jsonObject.put(
-			"actions", ruleActionsToJSONArray(ddmFormRule.getActions())
-		).put(
-			"condition", ddmFormRule.getCondition()
-		).put(
-			"enabled", ddmFormRule.isEnabled()
-		);
-
-		return jsonObject;
-	}
-
 	protected JSONObject toJSONObject(
 		DDMFormSuccessPageSettings ddmFormSuccessPageSettings) {
 
@@ -373,6 +358,67 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		}
 
 		return jsonObject;
+	}
+
+	private static void _trim(List<DDMFormField> ddmFormFields) {
+		if (ddmFormFields.isEmpty()) {
+			return;
+		}
+
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			LocalizedValue localizedValue = _trim(
+				ddmFormField.getPredefinedValue());
+
+			ddmFormField.setPredefinedValue(localizedValue);
+
+			localizedValue = _trim(ddmFormField.getStyle());
+
+			ddmFormField.setStyle(localizedValue);
+
+			localizedValue = _trim(ddmFormField.getTip());
+
+			ddmFormField.setTip(localizedValue);
+		}
+	}
+
+	private static LocalizedValue _trim(LocalizedValue rawLocalizedValue) {
+		if (rawLocalizedValue == null) {
+			return null;
+		}
+
+		LocalizedValue localizedValue = new LocalizedValue();
+
+		Map<Locale, String> predefinedValuesMap = rawLocalizedValue.getValues();
+
+		for (Map.Entry<Locale, String> entry : predefinedValuesMap.entrySet()) {
+			String value = entry.getValue();
+
+			if (value != null) {
+				value = StringUtil.trim(value);
+
+				if (value.length() == 0) {
+					localizedValue.addString(entry.getKey(), StringPool.BLANK);
+				}
+				else {
+					localizedValue.addString(entry.getKey(), entry.getValue());
+				}
+			}
+			else {
+				localizedValue.addString(entry.getKey(), entry.getValue());
+			}
+		}
+
+		return localizedValue;
+	}
+
+	private boolean _isArray(Object value) {
+		if (value == null) {
+			return false;
+		}
+
+		Class<?> clazz = value.getClass();
+
+		return clazz.isArray();
 	}
 
 	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;

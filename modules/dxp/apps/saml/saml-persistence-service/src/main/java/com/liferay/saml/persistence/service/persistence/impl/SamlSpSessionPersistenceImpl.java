@@ -16,6 +16,7 @@ package com.liferay.saml.persistence.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -26,36 +27,47 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.saml.persistence.exception.NoSuchSpSessionException;
 import com.liferay.saml.persistence.model.SamlSpSession;
+import com.liferay.saml.persistence.model.SamlSpSessionTable;
 import com.liferay.saml.persistence.model.impl.SamlSpSessionImpl;
 import com.liferay.saml.persistence.model.impl.SamlSpSessionModelImpl;
 import com.liferay.saml.persistence.service.persistence.SamlSpSessionPersistence;
+import com.liferay.saml.persistence.service.persistence.SamlSpSessionUtil;
 import com.liferay.saml.persistence.service.persistence.impl.constants.SamlPersistenceConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -110,20 +122,20 @@ public class SamlSpSessionPersistenceImpl
 		SamlSpSession samlSpSession = fetchBySamlSpSessionKey(samlSpSessionKey);
 
 		if (samlSpSession == null) {
-			StringBundler msg = new StringBundler(4);
+			StringBundler sb = new StringBundler(4);
 
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			msg.append("samlSpSessionKey=");
-			msg.append(samlSpSessionKey);
+			sb.append("samlSpSessionKey=");
+			sb.append(samlSpSessionKey);
 
-			msg.append("}");
+			sb.append("}");
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(msg.toString());
+				_log.debug(sb.toString());
 			}
 
-			throw new NoSuchSpSessionException(msg.toString());
+			throw new NoSuchSpSessionException(sb.toString());
 		}
 
 		return samlSpSession;
@@ -177,39 +189,37 @@ public class SamlSpSessionPersistenceImpl
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler sb = new StringBundler(3);
 
-			query.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
+			sb.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
 
 			boolean bindSamlSpSessionKey = false;
 
 			if (samlSpSessionKey.isEmpty()) {
-				query.append(
-					_FINDER_COLUMN_SAMLSPSESSIONKEY_SAMLSPSESSIONKEY_3);
+				sb.append(_FINDER_COLUMN_SAMLSPSESSIONKEY_SAMLSPSESSIONKEY_3);
 			}
 			else {
 				bindSamlSpSessionKey = true;
 
-				query.append(
-					_FINDER_COLUMN_SAMLSPSESSIONKEY_SAMLSPSESSIONKEY_2);
+				sb.append(_FINDER_COLUMN_SAMLSPSESSIONKEY_SAMLSPSESSIONKEY_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindSamlSpSessionKey) {
-					qPos.add(samlSpSessionKey);
+					queryPos.add(samlSpSessionKey);
 				}
 
-				List<SamlSpSession> list = q.list();
+				List<SamlSpSession> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
@@ -227,11 +237,6 @@ public class SamlSpSessionPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(
-						_finderPathFetchBySamlSpSessionKey, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -279,45 +284,41 @@ public class SamlSpSessionPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(2);
+			StringBundler sb = new StringBundler(2);
 
-			query.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
+			sb.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
 
 			boolean bindSamlSpSessionKey = false;
 
 			if (samlSpSessionKey.isEmpty()) {
-				query.append(
-					_FINDER_COLUMN_SAMLSPSESSIONKEY_SAMLSPSESSIONKEY_3);
+				sb.append(_FINDER_COLUMN_SAMLSPSESSIONKEY_SAMLSPSESSIONKEY_3);
 			}
 			else {
 				bindSamlSpSessionKey = true;
 
-				query.append(
-					_FINDER_COLUMN_SAMLSPSESSIONKEY_SAMLSPSESSIONKEY_2);
+				sb.append(_FINDER_COLUMN_SAMLSPSESSIONKEY_SAMLSPSESSIONKEY_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindSamlSpSessionKey) {
-					qPos.add(samlSpSessionKey);
+					queryPos.add(samlSpSessionKey);
 				}
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -353,20 +354,20 @@ public class SamlSpSessionPersistenceImpl
 		SamlSpSession samlSpSession = fetchByJSessionId(jSessionId);
 
 		if (samlSpSession == null) {
-			StringBundler msg = new StringBundler(4);
+			StringBundler sb = new StringBundler(4);
 
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			msg.append("jSessionId=");
-			msg.append(jSessionId);
+			sb.append("jSessionId=");
+			sb.append(jSessionId);
 
-			msg.append("}");
+			sb.append("}");
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(msg.toString());
+				_log.debug(sb.toString());
 			}
 
-			throw new NoSuchSpSessionException(msg.toString());
+			throw new NoSuchSpSessionException(sb.toString());
 		}
 
 		return samlSpSession;
@@ -418,37 +419,37 @@ public class SamlSpSessionPersistenceImpl
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler sb = new StringBundler(3);
 
-			query.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
+			sb.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
 
 			boolean bindJSessionId = false;
 
 			if (jSessionId.isEmpty()) {
-				query.append(_FINDER_COLUMN_JSESSIONID_JSESSIONID_3);
+				sb.append(_FINDER_COLUMN_JSESSIONID_JSESSIONID_3);
 			}
 			else {
 				bindJSessionId = true;
 
-				query.append(_FINDER_COLUMN_JSESSIONID_JSESSIONID_2);
+				sb.append(_FINDER_COLUMN_JSESSIONID_JSESSIONID_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindJSessionId) {
-					qPos.add(jSessionId);
+					queryPos.add(jSessionId);
 				}
 
-				List<SamlSpSession> list = q.list();
+				List<SamlSpSession> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
@@ -480,11 +481,6 @@ public class SamlSpSessionPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(
-						_finderPathFetchByJSessionId, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -532,43 +528,41 @@ public class SamlSpSessionPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(2);
+			StringBundler sb = new StringBundler(2);
 
-			query.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
+			sb.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
 
 			boolean bindJSessionId = false;
 
 			if (jSessionId.isEmpty()) {
-				query.append(_FINDER_COLUMN_JSESSIONID_JSESSIONID_3);
+				sb.append(_FINDER_COLUMN_JSESSIONID_JSESSIONID_3);
 			}
 			else {
 				bindJSessionId = true;
 
-				query.append(_FINDER_COLUMN_JSESSIONID_JSESSIONID_2);
+				sb.append(_FINDER_COLUMN_JSESSIONID_JSESSIONID_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindJSessionId) {
-					qPos.add(jSessionId);
+					queryPos.add(jSessionId);
 				}
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -700,54 +694,54 @@ public class SamlSpSessionPersistenceImpl
 		}
 
 		if (list == null) {
-			StringBundler query = null;
+			StringBundler sb = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
+				sb = new StringBundler(
 					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
-				query = new StringBundler(3);
+				sb = new StringBundler(3);
 			}
 
-			query.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
+			sb.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
 
 			boolean bindNameIdValue = false;
 
 			if (nameIdValue.isEmpty()) {
-				query.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_3);
+				sb.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_3);
 			}
 			else {
 				bindNameIdValue = true;
 
-				query.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_2);
+				sb.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_2);
 			}
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
 			else {
-				query.append(SamlSpSessionModelImpl.ORDER_BY_JPQL);
+				sb.append(SamlSpSessionModelImpl.ORDER_BY_JPQL);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindNameIdValue) {
-					qPos.add(nameIdValue);
+					queryPos.add(nameIdValue);
 				}
 
 				list = (List<SamlSpSession>)QueryUtil.list(
-					q, getDialect(), start, end);
+					query, getDialect(), start, end);
 
 				cacheResult(list);
 
@@ -756,10 +750,6 @@ public class SamlSpSessionPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(finderPath, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -791,16 +781,16 @@ public class SamlSpSessionPersistenceImpl
 			return samlSpSession;
 		}
 
-		StringBundler msg = new StringBundler(4);
+		StringBundler sb = new StringBundler(4);
 
-		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("nameIdValue=");
-		msg.append(nameIdValue);
+		sb.append("nameIdValue=");
+		sb.append(nameIdValue);
 
-		msg.append("}");
+		sb.append("}");
 
-		throw new NoSuchSpSessionException(msg.toString());
+		throw new NoSuchSpSessionException(sb.toString());
 	}
 
 	/**
@@ -846,16 +836,16 @@ public class SamlSpSessionPersistenceImpl
 			return samlSpSession;
 		}
 
-		StringBundler msg = new StringBundler(4);
+		StringBundler sb = new StringBundler(4);
 
-		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("nameIdValue=");
-		msg.append(nameIdValue);
+		sb.append("nameIdValue=");
+		sb.append(nameIdValue);
 
-		msg.append("}");
+		sb.append("}");
 
-		throw new NoSuchSpSessionException(msg.toString());
+		throw new NoSuchSpSessionException(sb.toString());
 	}
 
 	/**
@@ -934,28 +924,28 @@ public class SamlSpSessionPersistenceImpl
 		Session session, SamlSpSession samlSpSession, String nameIdValue,
 		OrderByComparator<SamlSpSession> orderByComparator, boolean previous) {
 
-		StringBundler query = null;
+		StringBundler sb = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(
+			sb = new StringBundler(
 				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			sb = new StringBundler(3);
 		}
 
-		query.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
+		sb.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
 
 		boolean bindNameIdValue = false;
 
 		if (nameIdValue.isEmpty()) {
-			query.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_3);
+			sb.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_3);
 		}
 		else {
 			bindNameIdValue = true;
 
-			query.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_2);
+			sb.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_2);
 		}
 
 		if (orderByComparator != null) {
@@ -963,72 +953,72 @@ public class SamlSpSessionPersistenceImpl
 				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
-				query.append(WHERE_AND);
+				sb.append(WHERE_AND);
 			}
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
-				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByConditionFields[i]);
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
 					else {
-						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
 					}
 				}
 				else {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(WHERE_GREATER_THAN);
+						sb.append(WHERE_GREATER_THAN);
 					}
 					else {
-						query.append(WHERE_LESSER_THAN);
+						sb.append(WHERE_LESSER_THAN);
 					}
 				}
 			}
 
-			query.append(ORDER_BY_CLAUSE);
+			sb.append(ORDER_BY_CLAUSE);
 
 			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
-				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(ORDER_BY_ASC_HAS_NEXT);
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
 					}
 					else {
-						query.append(ORDER_BY_DESC_HAS_NEXT);
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
 					}
 				}
 				else {
 					if (orderByComparator.isAscending() ^ previous) {
-						query.append(ORDER_BY_ASC);
+						sb.append(ORDER_BY_ASC);
 					}
 					else {
-						query.append(ORDER_BY_DESC);
+						sb.append(ORDER_BY_DESC);
 					}
 				}
 			}
 		}
 		else {
-			query.append(SamlSpSessionModelImpl.ORDER_BY_JPQL);
+			sb.append(SamlSpSessionModelImpl.ORDER_BY_JPQL);
 		}
 
-		String sql = query.toString();
+		String sql = sb.toString();
 
-		Query q = session.createQuery(sql);
+		Query query = session.createQuery(sql);
 
-		q.setFirstResult(0);
-		q.setMaxResults(2);
+		query.setFirstResult(0);
+		query.setMaxResults(2);
 
-		QueryPos qPos = QueryPos.getInstance(q);
+		QueryPos queryPos = QueryPos.getInstance(query);
 
 		if (bindNameIdValue) {
-			qPos.add(nameIdValue);
+			queryPos.add(nameIdValue);
 		}
 
 		if (orderByComparator != null) {
@@ -1036,11 +1026,11 @@ public class SamlSpSessionPersistenceImpl
 					orderByComparator.getOrderByConditionValues(
 						samlSpSession)) {
 
-				qPos.add(orderByConditionValue);
+				queryPos.add(orderByConditionValue);
 			}
 		}
 
-		List<SamlSpSession> list = q.list();
+		List<SamlSpSession> list = query.list();
 
 		if (list.size() == 2) {
 			return list.get(1);
@@ -1082,43 +1072,41 @@ public class SamlSpSessionPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(2);
+			StringBundler sb = new StringBundler(2);
 
-			query.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
+			sb.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
 
 			boolean bindNameIdValue = false;
 
 			if (nameIdValue.isEmpty()) {
-				query.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_3);
+				sb.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_3);
 			}
 			else {
 				bindNameIdValue = true;
 
-				query.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_2);
+				sb.append(_FINDER_COLUMN_NAMEIDVALUE_NAMEIDVALUE_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindNameIdValue) {
-					qPos.add(nameIdValue);
+					queryPos.add(nameIdValue);
 				}
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -1152,20 +1140,20 @@ public class SamlSpSessionPersistenceImpl
 		SamlSpSession samlSpSession = fetchBySessionIndex(sessionIndex);
 
 		if (samlSpSession == null) {
-			StringBundler msg = new StringBundler(4);
+			StringBundler sb = new StringBundler(4);
 
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			msg.append("sessionIndex=");
-			msg.append(sessionIndex);
+			sb.append("sessionIndex=");
+			sb.append(sessionIndex);
 
-			msg.append("}");
+			sb.append("}");
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(msg.toString());
+				_log.debug(sb.toString());
 			}
 
-			throw new NoSuchSpSessionException(msg.toString());
+			throw new NoSuchSpSessionException(sb.toString());
 		}
 
 		return samlSpSession;
@@ -1219,37 +1207,37 @@ public class SamlSpSessionPersistenceImpl
 		}
 
 		if (result == null) {
-			StringBundler query = new StringBundler(3);
+			StringBundler sb = new StringBundler(3);
 
-			query.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
+			sb.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
 
 			boolean bindSessionIndex = false;
 
 			if (sessionIndex.isEmpty()) {
-				query.append(_FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_3);
+				sb.append(_FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_3);
 			}
 			else {
 				bindSessionIndex = true;
 
-				query.append(_FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_2);
+				sb.append(_FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindSessionIndex) {
-					qPos.add(sessionIndex);
+					queryPos.add(sessionIndex);
 				}
 
-				List<SamlSpSession> list = q.list();
+				List<SamlSpSession> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
@@ -1281,11 +1269,6 @@ public class SamlSpSessionPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(
-						_finderPathFetchBySessionIndex, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -1333,43 +1316,41 @@ public class SamlSpSessionPersistenceImpl
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
 		if (count == null) {
-			StringBundler query = new StringBundler(2);
+			StringBundler sb = new StringBundler(2);
 
-			query.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
+			sb.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
 
 			boolean bindSessionIndex = false;
 
 			if (sessionIndex.isEmpty()) {
-				query.append(_FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_3);
+				sb.append(_FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_3);
 			}
 			else {
 				bindSessionIndex = true;
 
-				query.append(_FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_2);
+				sb.append(_FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_2);
 			}
 
-			String sql = query.toString();
+			String sql = sb.toString();
 
 			Session session = null;
 
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
-				QueryPos qPos = QueryPos.getInstance(q);
+				QueryPos queryPos = QueryPos.getInstance(query);
 
 				if (bindSessionIndex) {
-					qPos.add(sessionIndex);
+					queryPos.add(sessionIndex);
 				}
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(finderPath, finderArgs);
-
 				throw processException(exception);
 			}
 			finally {
@@ -1386,17 +1367,285 @@ public class SamlSpSessionPersistenceImpl
 	private static final String _FINDER_COLUMN_SESSIONINDEX_SESSIONINDEX_3 =
 		"(samlSpSession.sessionIndex IS NULL OR samlSpSession.sessionIndex = '')";
 
+	private FinderPath _finderPathFetchByC_SI;
+	private FinderPath _finderPathCountByC_SI;
+
+	/**
+	 * Returns the saml sp session where companyId = &#63; and sessionIndex = &#63; or throws a <code>NoSuchSpSessionException</code> if it could not be found.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @return the matching saml sp session
+	 * @throws NoSuchSpSessionException if a matching saml sp session could not be found
+	 */
+	@Override
+	public SamlSpSession findByC_SI(long companyId, String sessionIndex)
+		throws NoSuchSpSessionException {
+
+		SamlSpSession samlSpSession = fetchByC_SI(companyId, sessionIndex);
+
+		if (samlSpSession == null) {
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			sb.append("companyId=");
+			sb.append(companyId);
+
+			sb.append(", sessionIndex=");
+			sb.append(sessionIndex);
+
+			sb.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(sb.toString());
+			}
+
+			throw new NoSuchSpSessionException(sb.toString());
+		}
+
+		return samlSpSession;
+	}
+
+	/**
+	 * Returns the saml sp session where companyId = &#63; and sessionIndex = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @return the matching saml sp session, or <code>null</code> if a matching saml sp session could not be found
+	 */
+	@Override
+	public SamlSpSession fetchByC_SI(long companyId, String sessionIndex) {
+		return fetchByC_SI(companyId, sessionIndex, true);
+	}
+
+	/**
+	 * Returns the saml sp session where companyId = &#63; and sessionIndex = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching saml sp session, or <code>null</code> if a matching saml sp session could not be found
+	 */
+	@Override
+	public SamlSpSession fetchByC_SI(
+		long companyId, String sessionIndex, boolean useFinderCache) {
+
+		sessionIndex = Objects.toString(sessionIndex, "");
+
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, sessionIndex};
+		}
+
+		Object result = null;
+
+		if (useFinderCache) {
+			result = finderCache.getResult(
+				_finderPathFetchByC_SI, finderArgs, this);
+		}
+
+		if (result instanceof SamlSpSession) {
+			SamlSpSession samlSpSession = (SamlSpSession)result;
+
+			if ((companyId != samlSpSession.getCompanyId()) ||
+				!Objects.equals(
+					sessionIndex, samlSpSession.getSessionIndex())) {
+
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(_SQL_SELECT_SAMLSPSESSION_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_SI_COMPANYID_2);
+
+			boolean bindSessionIndex = false;
+
+			if (sessionIndex.isEmpty()) {
+				sb.append(_FINDER_COLUMN_C_SI_SESSIONINDEX_3);
+			}
+			else {
+				bindSessionIndex = true;
+
+				sb.append(_FINDER_COLUMN_C_SI_SESSIONINDEX_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				if (bindSessionIndex) {
+					queryPos.add(sessionIndex);
+				}
+
+				List<SamlSpSession> list = query.list();
+
+				if (list.isEmpty()) {
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByC_SI, finderArgs, list);
+					}
+				}
+				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									companyId, sessionIndex
+								};
+							}
+
+							_log.warn(
+								"SamlSpSessionPersistenceImpl.fetchByC_SI(long, String, boolean) with parameters (" +
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
+					SamlSpSession samlSpSession = list.get(0);
+
+					result = samlSpSession;
+
+					cacheResult(samlSpSession);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (SamlSpSession)result;
+		}
+	}
+
+	/**
+	 * Removes the saml sp session where companyId = &#63; and sessionIndex = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @return the saml sp session that was removed
+	 */
+	@Override
+	public SamlSpSession removeByC_SI(long companyId, String sessionIndex)
+		throws NoSuchSpSessionException {
+
+		SamlSpSession samlSpSession = findByC_SI(companyId, sessionIndex);
+
+		return remove(samlSpSession);
+	}
+
+	/**
+	 * Returns the number of saml sp sessions where companyId = &#63; and sessionIndex = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param sessionIndex the session index
+	 * @return the number of matching saml sp sessions
+	 */
+	@Override
+	public int countByC_SI(long companyId, String sessionIndex) {
+		sessionIndex = Objects.toString(sessionIndex, "");
+
+		FinderPath finderPath = _finderPathCountByC_SI;
+
+		Object[] finderArgs = new Object[] {companyId, sessionIndex};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(_SQL_COUNT_SAMLSPSESSION_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_SI_COMPANYID_2);
+
+			boolean bindSessionIndex = false;
+
+			if (sessionIndex.isEmpty()) {
+				sb.append(_FINDER_COLUMN_C_SI_SESSIONINDEX_3);
+			}
+			else {
+				bindSessionIndex = true;
+
+				sb.append(_FINDER_COLUMN_C_SI_SESSIONINDEX_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				if (bindSessionIndex) {
+					queryPos.add(sessionIndex);
+				}
+
+				count = (Long)query.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_C_SI_COMPANYID_2 =
+		"samlSpSession.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_SI_SESSIONINDEX_2 =
+		"samlSpSession.sessionIndex = ?";
+
+	private static final String _FINDER_COLUMN_C_SI_SESSIONINDEX_3 =
+		"(samlSpSession.sessionIndex IS NULL OR samlSpSession.sessionIndex = '')";
+
 	public SamlSpSessionPersistenceImpl() {
-		setModelClass(SamlSpSession.class);
-
-		setModelImplClass(SamlSpSessionImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("terminated", "terminated_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(SamlSpSession.class);
+
+		setModelImplClass(SamlSpSessionImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(SamlSpSessionTable.INSTANCE);
 	}
 
 	/**
@@ -1407,8 +1656,8 @@ public class SamlSpSessionPersistenceImpl
 	@Override
 	public void cacheResult(SamlSpSession samlSpSession) {
 		entityCache.putResult(
-			entityCacheEnabled, SamlSpSessionImpl.class,
-			samlSpSession.getPrimaryKey(), samlSpSession);
+			SamlSpSessionImpl.class, samlSpSession.getPrimaryKey(),
+			samlSpSession);
 
 		finderCache.putResult(
 			_finderPathFetchBySamlSpSessionKey,
@@ -1422,8 +1671,15 @@ public class SamlSpSessionPersistenceImpl
 			_finderPathFetchBySessionIndex,
 			new Object[] {samlSpSession.getSessionIndex()}, samlSpSession);
 
-		samlSpSession.resetOriginalValues();
+		finderCache.putResult(
+			_finderPathFetchByC_SI,
+			new Object[] {
+				samlSpSession.getCompanyId(), samlSpSession.getSessionIndex()
+			},
+			samlSpSession);
 	}
+
+	private int _valueObjectFinderCacheListThreshold;
 
 	/**
 	 * Caches the saml sp sessions in the entity cache if it is enabled.
@@ -1432,15 +1688,19 @@ public class SamlSpSessionPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(List<SamlSpSession> samlSpSessions) {
+		if ((_valueObjectFinderCacheListThreshold == 0) ||
+			((_valueObjectFinderCacheListThreshold > 0) &&
+			 (samlSpSessions.size() > _valueObjectFinderCacheListThreshold))) {
+
+			return;
+		}
+
 		for (SamlSpSession samlSpSession : samlSpSessions) {
 			if (entityCache.getResult(
-					entityCacheEnabled, SamlSpSessionImpl.class,
-					samlSpSession.getPrimaryKey()) == null) {
+					SamlSpSessionImpl.class, samlSpSession.getPrimaryKey()) ==
+						null) {
 
 				cacheResult(samlSpSession);
-			}
-			else {
-				samlSpSession.resetOriginalValues();
 			}
 		}
 	}
@@ -1470,28 +1730,13 @@ public class SamlSpSessionPersistenceImpl
 	 */
 	@Override
 	public void clearCache(SamlSpSession samlSpSession) {
-		entityCache.removeResult(
-			entityCacheEnabled, SamlSpSessionImpl.class,
-			samlSpSession.getPrimaryKey());
-
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-
-		clearUniqueFindersCache((SamlSpSessionModelImpl)samlSpSession, true);
+		entityCache.removeResult(SamlSpSessionImpl.class, samlSpSession);
 	}
 
 	@Override
 	public void clearCache(List<SamlSpSession> samlSpSessions) {
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-
 		for (SamlSpSession samlSpSession : samlSpSessions) {
-			entityCache.removeResult(
-				entityCacheEnabled, SamlSpSessionImpl.class,
-				samlSpSession.getPrimaryKey());
-
-			clearUniqueFindersCache(
-				(SamlSpSessionModelImpl)samlSpSession, true);
+			entityCache.removeResult(SamlSpSessionImpl.class, samlSpSession);
 		}
 	}
 
@@ -1502,8 +1747,7 @@ public class SamlSpSessionPersistenceImpl
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Serializable primaryKey : primaryKeys) {
-			entityCache.removeResult(
-				entityCacheEnabled, SamlSpSessionImpl.class, primaryKey);
+			entityCache.removeResult(SamlSpSessionImpl.class, primaryKey);
 		}
 	}
 
@@ -1534,70 +1778,16 @@ public class SamlSpSessionPersistenceImpl
 		finderCache.putResult(
 			_finderPathFetchBySessionIndex, args, samlSpSessionModelImpl,
 			false);
-	}
 
-	protected void clearUniqueFindersCache(
-		SamlSpSessionModelImpl samlSpSessionModelImpl, boolean clearCurrent) {
+		args = new Object[] {
+			samlSpSessionModelImpl.getCompanyId(),
+			samlSpSessionModelImpl.getSessionIndex()
+		};
 
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-				samlSpSessionModelImpl.getSamlSpSessionKey()
-			};
-
-			finderCache.removeResult(_finderPathCountBySamlSpSessionKey, args);
-			finderCache.removeResult(_finderPathFetchBySamlSpSessionKey, args);
-		}
-
-		if ((samlSpSessionModelImpl.getColumnBitmask() &
-			 _finderPathFetchBySamlSpSessionKey.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				samlSpSessionModelImpl.getOriginalSamlSpSessionKey()
-			};
-
-			finderCache.removeResult(_finderPathCountBySamlSpSessionKey, args);
-			finderCache.removeResult(_finderPathFetchBySamlSpSessionKey, args);
-		}
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-				samlSpSessionModelImpl.getJSessionId()
-			};
-
-			finderCache.removeResult(_finderPathCountByJSessionId, args);
-			finderCache.removeResult(_finderPathFetchByJSessionId, args);
-		}
-
-		if ((samlSpSessionModelImpl.getColumnBitmask() &
-			 _finderPathFetchByJSessionId.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				samlSpSessionModelImpl.getOriginalJSessionId()
-			};
-
-			finderCache.removeResult(_finderPathCountByJSessionId, args);
-			finderCache.removeResult(_finderPathFetchByJSessionId, args);
-		}
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-				samlSpSessionModelImpl.getSessionIndex()
-			};
-
-			finderCache.removeResult(_finderPathCountBySessionIndex, args);
-			finderCache.removeResult(_finderPathFetchBySessionIndex, args);
-		}
-
-		if ((samlSpSessionModelImpl.getColumnBitmask() &
-			 _finderPathFetchBySessionIndex.getColumnBitmask()) != 0) {
-
-			Object[] args = new Object[] {
-				samlSpSessionModelImpl.getOriginalSessionIndex()
-			};
-
-			finderCache.removeResult(_finderPathCountBySessionIndex, args);
-			finderCache.removeResult(_finderPathFetchBySessionIndex, args);
-		}
+		finderCache.putResult(
+			_finderPathCountByC_SI, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByC_SI, args, samlSpSessionModelImpl, false);
 	}
 
 	/**
@@ -1730,24 +1920,24 @@ public class SamlSpSessionPersistenceImpl
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		Date now = new Date();
+		Date date = new Date();
 
 		if (isNew && (samlSpSession.getCreateDate() == null)) {
 			if (serviceContext == null) {
-				samlSpSession.setCreateDate(now);
+				samlSpSession.setCreateDate(date);
 			}
 			else {
-				samlSpSession.setCreateDate(serviceContext.getCreateDate(now));
+				samlSpSession.setCreateDate(serviceContext.getCreateDate(date));
 			}
 		}
 
 		if (!samlSpSessionModelImpl.hasSetModifiedDate()) {
 			if (serviceContext == null) {
-				samlSpSession.setModifiedDate(now);
+				samlSpSession.setModifiedDate(date);
 			}
 			else {
 				samlSpSession.setModifiedDate(
-					serviceContext.getModifiedDate(now));
+					serviceContext.getModifiedDate(date));
 			}
 		}
 
@@ -1756,10 +1946,8 @@ public class SamlSpSessionPersistenceImpl
 		try {
 			session = openSession();
 
-			if (samlSpSession.isNew()) {
+			if (isNew) {
 				session.save(samlSpSession);
-
-				samlSpSession.setNew(false);
 			}
 			else {
 				samlSpSession = (SamlSpSession)session.merge(samlSpSession);
@@ -1772,51 +1960,14 @@ public class SamlSpSessionPersistenceImpl
 			closeSession(session);
 		}
 
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-
-		if (!_columnBitmaskEnabled) {
-			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
-		}
-		else if (isNew) {
-			Object[] args = new Object[] {
-				samlSpSessionModelImpl.getNameIdValue()
-			};
-
-			finderCache.removeResult(_finderPathCountByNameIdValue, args);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindByNameIdValue, args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(
-				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
-		}
-		else {
-			if ((samlSpSessionModelImpl.getColumnBitmask() &
-				 _finderPathWithoutPaginationFindByNameIdValue.
-					 getColumnBitmask()) != 0) {
-
-				Object[] args = new Object[] {
-					samlSpSessionModelImpl.getOriginalNameIdValue()
-				};
-
-				finderCache.removeResult(_finderPathCountByNameIdValue, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByNameIdValue, args);
-
-				args = new Object[] {samlSpSessionModelImpl.getNameIdValue()};
-
-				finderCache.removeResult(_finderPathCountByNameIdValue, args);
-				finderCache.removeResult(
-					_finderPathWithoutPaginationFindByNameIdValue, args);
-			}
-		}
-
 		entityCache.putResult(
-			entityCacheEnabled, SamlSpSessionImpl.class,
-			samlSpSession.getPrimaryKey(), samlSpSession, false);
+			SamlSpSessionImpl.class, samlSpSessionModelImpl, false, true);
 
-		clearUniqueFindersCache(samlSpSessionModelImpl, false);
 		cacheUniqueFindersCache(samlSpSessionModelImpl);
+
+		if (isNew) {
+			samlSpSession.setNew(false);
+		}
 
 		samlSpSession.resetOriginalValues();
 
@@ -1961,19 +2112,19 @@ public class SamlSpSessionPersistenceImpl
 		}
 
 		if (list == null) {
-			StringBundler query = null;
+			StringBundler sb = null;
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(
+				sb = new StringBundler(
 					2 + (orderByComparator.getOrderByFields().length * 2));
 
-				query.append(_SQL_SELECT_SAMLSPSESSION);
+				sb.append(_SQL_SELECT_SAMLSPSESSION);
 
 				appendOrderByComparator(
-					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
-				sql = query.toString();
+				sql = sb.toString();
 			}
 			else {
 				sql = _SQL_SELECT_SAMLSPSESSION;
@@ -1986,10 +2137,10 @@ public class SamlSpSessionPersistenceImpl
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(sql);
+				Query query = session.createQuery(sql);
 
 				list = (List<SamlSpSession>)QueryUtil.list(
-					q, getDialect(), start, end);
+					query, getDialect(), start, end);
 
 				cacheResult(list);
 
@@ -1998,10 +2149,6 @@ public class SamlSpSessionPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
-				if (useFinderCache) {
-					finderCache.removeResult(finderPath, finderArgs);
-				}
-
 				throw processException(exception);
 			}
 			finally {
@@ -2039,17 +2186,14 @@ public class SamlSpSessionPersistenceImpl
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(_SQL_COUNT_SAMLSPSESSION);
+				Query query = session.createQuery(_SQL_COUNT_SAMLSPSESSION);
 
-				count = (Long)q.uniqueResult();
+				count = (Long)query.uniqueResult();
 
 				finderCache.putResult(
 					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception exception) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
-
 				throw processException(exception);
 			}
 			finally {
@@ -2089,83 +2233,119 @@ public class SamlSpSessionPersistenceImpl
 	 * Initializes the saml sp session persistence.
 	 */
 	@Activate
-	public void activate() {
-		SamlSpSessionModelImpl.setEntityCacheEnabled(entityCacheEnabled);
-		SamlSpSessionModelImpl.setFinderCacheEnabled(finderCacheEnabled);
+	public void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
 
-		_finderPathWithPaginationFindAll = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SamlSpSessionImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_argumentsResolverServiceRegistration = _bundleContext.registerService(
+			ArgumentsResolver.class, new SamlSpSessionModelArgumentsResolver(),
+			MapUtil.singletonDictionary(
+				"model.class.name", SamlSpSession.class.getName()));
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SamlSpSessionImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-			new String[0]);
+		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
+			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathCountAll = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathWithPaginationFindAll = _createFinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
+			new String[0], true);
+
+		_finderPathWithoutPaginationFindAll = _createFinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
+			new String[0], true);
+
+		_finderPathCountAll = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-			new String[0]);
+			new String[0], new String[0], false);
 
-		_finderPathFetchBySamlSpSessionKey = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SamlSpSessionImpl.class,
+		_finderPathFetchBySamlSpSessionKey = _createFinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchBySamlSpSessionKey",
 			new String[] {String.class.getName()},
-			SamlSpSessionModelImpl.SAMLSPSESSIONKEY_COLUMN_BITMASK);
+			new String[] {"samlSpSessionKey"}, true);
 
-		_finderPathCountBySamlSpSessionKey = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountBySamlSpSessionKey = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"countBySamlSpSessionKey", new String[] {String.class.getName()});
+			"countBySamlSpSessionKey", new String[] {String.class.getName()},
+			new String[] {"samlSpSessionKey"}, false);
 
-		_finderPathFetchByJSessionId = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SamlSpSessionImpl.class,
+		_finderPathFetchByJSessionId = _createFinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByJSessionId",
-			new String[] {String.class.getName()},
-			SamlSpSessionModelImpl.JSESSIONID_COLUMN_BITMASK);
+			new String[] {String.class.getName()}, new String[] {"jSessionId"},
+			true);
 
-		_finderPathCountByJSessionId = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByJSessionId = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByJSessionId",
-			new String[] {String.class.getName()});
+			new String[] {String.class.getName()}, new String[] {"jSessionId"},
+			false);
 
-		_finderPathWithPaginationFindByNameIdValue = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SamlSpSessionImpl.class,
+		_finderPathWithPaginationFindByNameIdValue = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByNameIdValue",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
-			});
+			},
+			new String[] {"nameIdValue"}, true);
 
-		_finderPathWithoutPaginationFindByNameIdValue = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SamlSpSessionImpl.class,
+		_finderPathWithoutPaginationFindByNameIdValue = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByNameIdValue",
-			new String[] {String.class.getName()},
-			SamlSpSessionModelImpl.NAMEIDVALUE_COLUMN_BITMASK);
+			new String[] {String.class.getName()}, new String[] {"nameIdValue"},
+			true);
 
-		_finderPathCountByNameIdValue = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountByNameIdValue = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByNameIdValue",
-			new String[] {String.class.getName()});
+			new String[] {String.class.getName()}, new String[] {"nameIdValue"},
+			false);
 
-		_finderPathFetchBySessionIndex = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, SamlSpSessionImpl.class,
+		_finderPathFetchBySessionIndex = _createFinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchBySessionIndex",
 			new String[] {String.class.getName()},
-			SamlSpSessionModelImpl.SESSIONINDEX_COLUMN_BITMASK);
+			new String[] {"sessionIndex"}, true);
 
-		_finderPathCountBySessionIndex = new FinderPath(
-			entityCacheEnabled, finderCacheEnabled, Long.class,
+		_finderPathCountBySessionIndex = _createFinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countBySessionIndex",
-			new String[] {String.class.getName()});
+			new String[] {String.class.getName()},
+			new String[] {"sessionIndex"}, false);
+
+		_finderPathFetchByC_SI = _createFinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByC_SI",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "sessionIndex"}, true);
+
+		_finderPathCountByC_SI = _createFinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_SI",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "sessionIndex"}, false);
+
+		_setSamlSpSessionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
+		_setSamlSpSessionUtilPersistence(null);
+
 		entityCache.removeCache(SamlSpSessionImpl.class.getName());
-		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		_argumentsResolverServiceRegistration.unregister();
+
+		for (ServiceRegistration<FinderPath> serviceRegistration :
+				_serviceRegistrations) {
+
+			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSamlSpSessionUtilPersistence(
+		SamlSpSessionPersistence samlSpSessionPersistence) {
+
+		try {
+			Field field = SamlSpSessionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, samlSpSessionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@Override
@@ -2174,12 +2354,6 @@ public class SamlSpSessionPersistenceImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
-
-		_columnBitmaskEnabled = GetterUtil.getBoolean(
-			configuration.get(
-				"value.object.column.bitmask.enabled.com.liferay.saml.persistence.model.SamlSpSession"),
-			true);
 	}
 
 	@Override
@@ -2200,7 +2374,7 @@ public class SamlSpSessionPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private boolean _columnBitmaskEnabled;
+	private BundleContext _bundleContext;
 
 	@Reference
 	protected EntityCache entityCache;
@@ -2234,13 +2408,103 @@ public class SamlSpSessionPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"terminated"});
 
-	static {
-		try {
-			Class.forName(SamlPersistenceConstants.class.getName());
+	private FinderPath _createFinderPath(
+		String cacheName, String methodName, String[] params,
+		String[] columnNames, boolean baseModelResult) {
+
+		FinderPath finderPath = new FinderPath(
+			cacheName, methodName, params, columnNames, baseModelResult);
+
+		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
+			_serviceRegistrations.add(
+				_bundleContext.registerService(
+					FinderPath.class, finderPath,
+					MapUtil.singletonDictionary("cache.name", cacheName)));
 		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
+
+		return finderPath;
+	}
+
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+	private ServiceRegistration<ArgumentsResolver>
+		_argumentsResolverServiceRegistration;
+
+	private static class SamlSpSessionModelArgumentsResolver
+		implements ArgumentsResolver {
+
+		@Override
+		public Object[] getArguments(
+			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
+			boolean original) {
+
+			String[] columnNames = finderPath.getColumnNames();
+
+			if ((columnNames == null) || (columnNames.length == 0)) {
+				if (baseModel.isNew()) {
+					return new Object[0];
+				}
+
+				return null;
+			}
+
+			SamlSpSessionModelImpl samlSpSessionModelImpl =
+				(SamlSpSessionModelImpl)baseModel;
+
+			long columnBitmask = samlSpSessionModelImpl.getColumnBitmask();
+
+			if (!checkColumn || (columnBitmask == 0)) {
+				return _getValue(samlSpSessionModelImpl, columnNames, original);
+			}
+
+			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
+				finderPath);
+
+			if (finderPathColumnBitmask == null) {
+				finderPathColumnBitmask = 0L;
+
+				for (String columnName : columnNames) {
+					finderPathColumnBitmask |=
+						samlSpSessionModelImpl.getColumnBitmask(columnName);
+				}
+
+				_finderPathColumnBitmasksCache.put(
+					finderPath, finderPathColumnBitmask);
+			}
+
+			if ((columnBitmask & finderPathColumnBitmask) != 0) {
+				return _getValue(samlSpSessionModelImpl, columnNames, original);
+			}
+
+			return null;
 		}
+
+		private static Object[] _getValue(
+			SamlSpSessionModelImpl samlSpSessionModelImpl, String[] columnNames,
+			boolean original) {
+
+			Object[] arguments = new Object[columnNames.length];
+
+			for (int i = 0; i < arguments.length; i++) {
+				String columnName = columnNames[i];
+
+				if (original) {
+					arguments[i] =
+						samlSpSessionModelImpl.getColumnOriginalValue(
+							columnName);
+				}
+				else {
+					arguments[i] = samlSpSessionModelImpl.getColumnValue(
+						columnName);
+				}
+			}
+
+			return arguments;
+		}
+
+		private static final Map<FinderPath, Long>
+			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
+
 	}
 
 }

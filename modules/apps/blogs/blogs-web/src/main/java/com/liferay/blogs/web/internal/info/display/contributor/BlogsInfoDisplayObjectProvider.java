@@ -38,8 +38,9 @@ public class BlogsInfoDisplayObjectProvider
 	public BlogsInfoDisplayObjectProvider(BlogsEntry blogsEntry)
 		throws PortalException {
 
-		_assetEntry = _getAssetEntry(blogsEntry);
 		_blogsEntry = blogsEntry;
+
+		_assetEntry = _getAssetEntry(blogsEntry);
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class BlogsInfoDisplayObjectProvider
 
 	@Override
 	public String getURLTitle(Locale locale) {
-		AssetRenderer assetRenderer = _assetEntry.getAssetRenderer();
+		AssetRenderer<?> assetRenderer = _assetEntry.getAssetRenderer();
 
 		return assetRenderer.getUrlTitle(locale);
 	}
@@ -103,11 +104,10 @@ public class BlogsInfoDisplayObjectProvider
 	private AssetEntry _getAssetEntry(BlogsEntry blogsEntry)
 		throws PortalException {
 
-		long classNameId = PortalUtil.getClassNameId(BlogsEntry.class);
-
-		AssetRendererFactory assetRendererFactory =
+		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(classNameId);
+				getAssetRendererFactoryByClassNameId(
+					PortalUtil.getClassNameId(BlogsEntry.class));
 
 		return assetRendererFactory.getAssetEntry(
 			BlogsEntry.class.getName(), blogsEntry.getEntryId());

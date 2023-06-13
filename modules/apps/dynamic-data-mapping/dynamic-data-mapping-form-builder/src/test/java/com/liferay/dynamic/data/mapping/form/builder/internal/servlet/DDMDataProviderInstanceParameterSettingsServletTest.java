@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeR
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeResponse;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.PortalImpl;
@@ -167,6 +169,13 @@ public class DDMDataProviderInstanceParameterSettingsServletTest
 		).set(
 			_ddmFormValuesJSONDeserializer, _jsonFactory
 		);
+
+		PowerMockito.field(
+			DDMFormValuesJSONDeserializer.class, "_serviceTrackerMap"
+		).set(
+			_ddmFormValuesJSONDeserializer,
+			ProxyFactory.newDummyInstance(ServiceTrackerMap.class)
+		);
 	}
 
 	protected void setUpGetDataProviderParametersSettingsMVCResourceCommand()
@@ -200,9 +209,7 @@ public class DDMDataProviderInstanceParameterSettingsServletTest
 	protected void setUpLanguageUtil() {
 		LanguageUtil languageUtil = new LanguageUtil();
 
-		Language language = PowerMockito.mock(Language.class);
-
-		languageUtil.setLanguage(language);
+		languageUtil.setLanguage(PowerMockito.mock(Language.class));
 	}
 
 	protected void setUpPortalClassLoaderUtil() {

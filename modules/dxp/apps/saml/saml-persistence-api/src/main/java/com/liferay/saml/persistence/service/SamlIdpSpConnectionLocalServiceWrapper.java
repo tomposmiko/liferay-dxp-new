@@ -36,6 +36,10 @@ public class SamlIdpSpConnectionLocalServiceWrapper
 	/**
 	 * Adds the saml idp sp connection to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlIdpSpConnectionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param samlIdpSpConnection the saml idp sp connection
 	 * @return the saml idp sp connection that was added
 	 */
@@ -69,6 +73,18 @@ public class SamlIdpSpConnectionLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _samlIdpSpConnectionLocalService.createPersistedModel(
+			primaryKeyObj);
+	}
+
+	/**
 	 * Creates a new saml idp sp connection with the primary key. Does not add the saml idp sp connection to the database.
 	 *
 	 * @param samlIdpSpConnectionId the primary key for the new saml idp sp connection
@@ -97,6 +113,10 @@ public class SamlIdpSpConnectionLocalServiceWrapper
 	/**
 	 * Deletes the saml idp sp connection with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlIdpSpConnectionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param samlIdpSpConnectionId the primary key of the saml idp sp connection
 	 * @return the saml idp sp connection that was removed
 	 * @throws PortalException if a saml idp sp connection with the primary key could not be found
@@ -113,6 +133,10 @@ public class SamlIdpSpConnectionLocalServiceWrapper
 	/**
 	 * Deletes the saml idp sp connection from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlIdpSpConnectionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param samlIdpSpConnection the saml idp sp connection
 	 * @return the saml idp sp connection that was removed
 	 */
@@ -124,6 +148,18 @@ public class SamlIdpSpConnectionLocalServiceWrapper
 
 		return _samlIdpSpConnectionLocalService.deleteSamlIdpSpConnection(
 			samlIdpSpConnection);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _samlIdpSpConnectionLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _samlIdpSpConnectionLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -250,6 +286,9 @@ public class SamlIdpSpConnectionLocalServiceWrapper
 		return _samlIdpSpConnectionLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -328,7 +367,8 @@ public class SamlIdpSpConnectionLocalServiceWrapper
 			getSamlIdpSpConnections(
 				long companyId, int start, int end,
 				com.liferay.portal.kernel.util.OrderByComparator
-					orderByComparator) {
+					<com.liferay.saml.persistence.model.SamlIdpSpConnection>
+						orderByComparator) {
 
 		return _samlIdpSpConnectionLocalService.getSamlIdpSpConnections(
 			companyId, start, end, orderByComparator);
@@ -378,6 +418,10 @@ public class SamlIdpSpConnectionLocalServiceWrapper
 
 	/**
 	 * Updates the saml idp sp connection in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlIdpSpConnectionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param samlIdpSpConnection the saml idp sp connection
 	 * @return the saml idp sp connection that was updated

@@ -38,7 +38,7 @@ SelectOrganizationUsersManagementToolbarDisplayContext selectOrganizationUsersMa
 
 PortletURL portletURL = selectOrganizationUsersManagementToolbarDisplayContext.getPortletURL();
 
-SearchContainer userSearchContainer = selectOrganizationUsersManagementToolbarDisplayContext.getSearchContainer();
+SearchContainer<User> userSearchContainer = selectOrganizationUsersManagementToolbarDisplayContext.getSearchContainer();
 %>
 
 <liferay-ui:membership-policy-error />
@@ -57,7 +57,7 @@ SearchContainer userSearchContainer = selectOrganizationUsersManagementToolbarDi
 	viewTypeItems="<%= selectOrganizationUsersManagementToolbarDisplayContext.getViewTypeItems() %>"
 />
 
-<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="fm">
 	<liferay-ui:search-container
 		id="users"
 		searchContainer="<%= userSearchContainer %>"
@@ -131,7 +131,7 @@ SearchContainer userSearchContainer = selectOrganizationUsersManagementToolbarDi
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />users');
 
-	searchContainer.on('rowToggled', function(event) {
+	searchContainer.on('rowToggled', function (event) {
 		var selectedItems = event.elements.allSelectedElements;
 
 		var result = {};
@@ -139,8 +139,8 @@ SearchContainer userSearchContainer = selectOrganizationUsersManagementToolbarDi
 		if (!selectedItems.isEmpty()) {
 			result = {
 				data: {
-					value: selectedItems.get('value').join(',')
-				}
+					value: selectedItems.get('value').join(','),
+				},
 			};
 		}
 

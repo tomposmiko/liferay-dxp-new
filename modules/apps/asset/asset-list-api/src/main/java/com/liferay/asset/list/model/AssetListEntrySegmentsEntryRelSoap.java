@@ -24,8 +24,10 @@ import java.util.List;
  * This class is used by SOAP remote services.
  *
  * @author Brian Wing Shun Chan
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class AssetListEntrySegmentsEntryRelSoap implements Serializable {
 
 	public static AssetListEntrySegmentsEntryRelSoap toSoapModel(
@@ -35,6 +37,7 @@ public class AssetListEntrySegmentsEntryRelSoap implements Serializable {
 			new AssetListEntrySegmentsEntryRelSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setCtCollectionId(model.getCtCollectionId());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setAssetListEntrySegmentsEntryRelId(
 			model.getAssetListEntrySegmentsEntryRelId());
@@ -116,6 +119,14 @@ public class AssetListEntrySegmentsEntryRelSoap implements Serializable {
 
 	public void setMvccVersion(long mvccVersion) {
 		_mvccVersion = mvccVersion;
+	}
+
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	public void setCtCollectionId(long ctCollectionId) {
+		_ctCollectionId = ctCollectionId;
 	}
 
 	public String getUuid() {
@@ -217,6 +228,7 @@ public class AssetListEntrySegmentsEntryRelSoap implements Serializable {
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
 	private long _assetListEntrySegmentsEntryRelId;
 	private long _groupId;

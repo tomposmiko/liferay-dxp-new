@@ -63,6 +63,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -106,29 +108,6 @@ public class DLReferencesExportImportContentProcessor
 		}
 	}
 
-	protected void deleteTimestampParameters(StringBuilder sb, int beginPos) {
-		beginPos = sb.indexOf(StringPool.CLOSE_BRACKET, beginPos);
-
-		if ((beginPos == -1) || (beginPos == (sb.length() - 1)) ||
-			(sb.charAt(beginPos + 1) != CharPool.QUESTION)) {
-
-			return;
-		}
-
-		int endPos = StringUtil.indexOfAny(
-			sb.toString(), _DL_REFERENCE_LEGACY_STOP_STRINGS, beginPos + 2);
-
-		if (endPos == -1) {
-			return;
-		}
-
-		String urlParams = sb.substring(beginPos + 1, endPos);
-
-		urlParams = _http.removeParameter(urlParams, "t");
-
-		sb.replace(beginPos + 1, endPos, urlParams);
-	}
-
 	protected ObjectValuePair<String, Integer>
 		getDLReferenceEndPosObjectValuePair(
 			String content, int beginPos, int endPos) {
@@ -139,25 +118,34 @@ public class DLReferencesExportImportContentProcessor
 			stopStrings = _DL_REFERENCE_STOP_STRINGS;
 		}
 
-		endPos = StringUtil.indexOfAny(content, stopStrings, beginPos, endPos);
+		int urlPatternPos = StringUtil.indexOfAny(
+			content, stopStrings, beginPos, endPos);
 
-		if (endPos == -1) {
-			return null;
+		if (urlPatternPos == -1) {
+			if (endPos != content.length()) {
+				return null;
+			}
+
+			urlPatternPos = endPos;
 		}
 
 		return new ObjectValuePair<>(
-			content.substring(beginPos, endPos), endPos);
+			content.substring(beginPos, urlPatternPos), urlPatternPos);
 	}
 
 	protected Map<String, String[]> getDLReferenceParameters(
 		long groupId, String content, int beginPos, int endPos) {
 
+		ObjectValuePair<String, Integer> dlReferenceEndPosObjectValuePair =
+			getDLReferenceEndPosObjectValuePair(content, beginPos, endPos);
+
+		if (dlReferenceEndPosObjectValuePair == null) {
+			return null;
+		}
+
 		boolean legacyURL = isLegacyURL(content, beginPos);
 
 		Map<String, String[]> map = new HashMap<>();
-
-		ObjectValuePair<String, Integer> dlReferenceEndPosObjectValuePair =
-			getDLReferenceEndPosObjectValuePair(content, beginPos, endPos);
 
 		String dlReference = dlReferenceEndPosObjectValuePair.getKey();
 
@@ -178,7 +166,12 @@ public class DLReferencesExportImportContentProcessor
 
 			if (Objects.equals(pathArray[2], "portlet_file_entry")) {
 				map.put("groupId", new String[] {pathArray[3]});
-				map.put("title", new String[] {_http.decodeURL(pathArray[4])});
+				map.put(
+					"title",
+					new String[] {
+						StringUtils.substringBefore(
+							_http.decodeURL(pathArray[4]), StringPool.POUND)
+					});
 			}
 			else {
 				map.put("groupId", new String[] {pathArray[2]});
@@ -186,7 +179,11 @@ public class DLReferencesExportImportContentProcessor
 				if (pathArray.length == 5) {
 					map.put("folderId", new String[] {pathArray[3]});
 					map.put(
-						"title", new String[] {_http.decodeURL(pathArray[4])});
+						"title",
+						new String[] {
+							StringUtils.substringBefore(
+								_http.decodeURL(pathArray[4]), StringPool.POUND)
+						});
 				}
 			}
 
@@ -395,10 +392,13 @@ public class DLReferencesExportImportContentProcessor
 
 				String path = ExportImportPathUtil.getModelPath(fileEntry);
 
-				StringBundler exportedReferenceSB = new StringBundler(6);
+				StringBundler exportedReferenceSB = new StringBundler(10);
 
 				exportedReferenceSB.append("[$dl-reference=");
 				exportedReferenceSB.append(path);
+				exportedReferenceSB.append("$,$include-uuid=");
+				exportedReferenceSB.append(
+					dlReferenceParameters.containsKey("uuid"));
 				exportedReferenceSB.append("$]");
 
 				if (fileEntry.isInTrash()) {
@@ -406,19 +406,13 @@ public class DLReferencesExportImportContentProcessor
 
 					exportedReferenceSB.append("[#dl-reference=");
 					exportedReferenceSB.append(originalReference);
+					exportedReferenceSB.append("#,#include-uuid=");
+					exportedReferenceSB.append(
+						dlReferenceParameters.containsKey("uuid"));
 					exportedReferenceSB.append("#]");
 				}
 
 				sb.replace(beginPos, endPos, exportedReferenceSB.toString());
-
-				int deleteTimestampParametersOffset = beginPos;
-
-				if (fileEntry.isInTrash()) {
-					deleteTimestampParametersOffset = sb.indexOf(
-						"[#dl-reference=", beginPos);
-				}
-
-				deleteTimestampParameters(sb, deleteTimestampParametersOffset);
 			}
 			catch (Exception exception) {
 				StringBundler exceptionSB = new StringBundler(6);
@@ -484,7 +478,11 @@ public class DLReferencesExportImportContentProcessor
 					groupId, className, classPK);
 			}
 
-			while (content.contains("[$dl-reference=" + path + "$]")) {
+			while (content.contains(
+						"[$dl-reference=" + path + "$,$include-uuid=false$]") ||
+				   content.contains(
+					   "[$dl-reference=" + path + "$,$include-uuid=true$]")) {
+
 				try {
 					StagedModelDataHandlerUtil.importReferenceStagedModel(
 						portletDataContext, stagedModel, DLFileEntry.class,
@@ -554,6 +552,9 @@ public class DLReferencesExportImportContentProcessor
 						content = StringUtil.replace(
 							content, exportedReference, originalReference);
 					}
+					else {
+						throw portalException;
+					}
 
 					continue;
 				}
@@ -563,18 +564,33 @@ public class DLReferencesExportImportContentProcessor
 					StringPool.BLANK, false, false);
 
 				if (url.contains(StringPool.QUESTION)) {
-					content = StringUtil.replace(content, "$]?", "$]&");
+					url = url.substring(
+						0, url.lastIndexOf(StringPool.QUESTION));
 				}
 
-				String exportedReference = "[$dl-reference=" + path + "$]";
+				String urlWithoutUUID = url.substring(
+					0, url.lastIndexOf(StringPool.SLASH));
+
+				String exportedReferenceWithoutUUID =
+					"[$dl-reference=" + path + "$,$include-uuid=false$]";
+				String exportedReferenceWithUUID =
+					"[$dl-reference=" + path + "$,$include-uuid=true$]";
 
 				if (content.startsWith("[#dl-reference=", endPos)) {
-					endPos = content.indexOf("#]", beginPos) + 2;
+					endPos = content.indexOf("#,#include-uuid=", beginPos) + 2;
 
-					exportedReference = content.substring(beginPos, endPos);
+					exportedReferenceWithoutUUID =
+						content.substring(beginPos, endPos) +
+							"#include-uuid=false#]";
+					exportedReferenceWithUUID =
+						content.substring(beginPos, endPos) +
+							"#include-uuid=true#]";
 				}
 
-				content = StringUtil.replace(content, exportedReference, url);
+				content = StringUtil.replace(
+					content, exportedReferenceWithUUID, url);
+				content = StringUtil.replace(
+					content, exportedReferenceWithoutUUID, urlWithoutUUID);
 			}
 		}
 
@@ -612,6 +628,12 @@ public class DLReferencesExportImportContentProcessor
 			Map<String, String[]> dlReferenceParameters =
 				getDLReferenceParameters(
 					groupId, content, beginPos + pathContext.length(), endPos);
+
+			if (dlReferenceParameters == null) {
+				endPos = beginPos - 1;
+
+				continue;
+			}
 
 			FileEntry fileEntry = getFileEntry(dlReferenceParameters);
 
@@ -723,18 +745,21 @@ public class DLReferencesExportImportContentProcessor
 
 	private static final String[] _DL_REFERENCE_LEGACY_STOP_STRINGS = {
 		StringPool.APOSTROPHE, StringPool.APOSTROPHE_ENCODED,
-		StringPool.CLOSE_BRACKET, StringPool.CLOSE_CURLY_BRACE,
-		StringPool.CLOSE_PARENTHESIS, StringPool.GREATER_THAN,
-		StringPool.LESS_THAN, StringPool.PIPE, StringPool.QUOTE,
-		StringPool.QUOTE_ENCODED, StringPool.SPACE
+		StringPool.BACK_SLASH + StringPool.APOSTROPHE,
+		StringPool.BACK_SLASH + StringPool.QUOTE, StringPool.CLOSE_BRACKET,
+		StringPool.CLOSE_CURLY_BRACE, StringPool.CLOSE_PARENTHESIS,
+		StringPool.GREATER_THAN, StringPool.LESS_THAN, StringPool.PIPE,
+		StringPool.QUOTE, StringPool.QUOTE_ENCODED, StringPool.SPACE
 	};
 
 	private static final String[] _DL_REFERENCE_STOP_STRINGS = {
 		StringPool.APOSTROPHE, StringPool.APOSTROPHE_ENCODED,
-		StringPool.CLOSE_BRACKET, StringPool.CLOSE_CURLY_BRACE,
-		StringPool.CLOSE_PARENTHESIS, StringPool.GREATER_THAN,
-		StringPool.LESS_THAN, StringPool.PIPE, StringPool.QUESTION,
-		StringPool.QUOTE, StringPool.QUOTE_ENCODED, StringPool.SPACE
+		StringPool.BACK_SLASH + StringPool.APOSTROPHE,
+		StringPool.BACK_SLASH + StringPool.QUOTE, StringPool.CLOSE_BRACKET,
+		StringPool.CLOSE_CURLY_BRACE, StringPool.CLOSE_PARENTHESIS,
+		StringPool.GREATER_THAN, StringPool.LESS_THAN, StringPool.NEW_LINE,
+		StringPool.PIPE, StringPool.QUESTION, StringPool.QUOTE,
+		StringPool.QUOTE_ENCODED, StringPool.SPACE
 	};
 
 	private static final int _OFFSET_HREF_ATTRIBUTE = 6;

@@ -39,7 +39,7 @@ AssetListEntry assetListEntry = assetPublisherDisplayContext.fetchAssetListEntry
 	<aui:button name="clearAssetListButton" value="clear" />
 </div>
 
-<script>
+<aui:script sandbox="<%= true %>">
 	var assetListEntryId = document.getElementById(
 		'<portlet:namespace />assetListEntryId'
 	);
@@ -52,34 +52,23 @@ AssetListEntry assetListEntry = assetPublisherDisplayContext.fetchAssetListEntry
 	);
 
 	if (selectAssetListButton) {
-		selectAssetListButton.addEventListener('click', function(event) {
-			var uri =
-				'<%= assetPublisherDisplayContext.getAssetListSelectorURL() %>';
+		selectAssetListButton.addEventListener('click', function () {
+			Liferay.Util.openSelectionModal({
+				onSelect: function (selectedItem) {
+					if (selectedItem) {
+						var itemValue = JSON.parse(selectedItem.value);
 
-			uri = Liferay.Util.addParams(
-				'<%= assetPublisherDisplayContext.getAssetListPortletNamespace() %>assetListEntryId=' +
-					assetListEntryId.value,
-				uri
-			);
+						assetListEntryId.value = itemValue.classPK;
 
-			Liferay.Util.selectEntity(
-				{
-					dialog: {
-						constrain: true,
-						destroyOnHide: true
-					},
-					eventName:
-						'<%= assetPublisherDisplayContext.getSelectAssetListEventName() %>',
-					id: '<portlet:namespace />selectAssetList',
-					title: '<liferay-ui:message key="select-content-set" />',
-					uri: uri
+						assetListTitle.innerHTML = itemValue.title;
+					}
 				},
-				function(event) {
-					assetListEntryId.value = event.assetlistentryid;
-
-					assetListTitle.innerHTML = event.assetlistentrytitle;
-				}
-			);
+				selectEventName:
+					'<%= assetPublisherDisplayContext.getSelectAssetListEventName() %>',
+				title: '<liferay-ui:message key="select-collection" />',
+				url:
+					'<%= assetPublisherDisplayContext.getAssetListSelectorURL() %>',
+			});
 		});
 	}
 
@@ -88,10 +77,10 @@ AssetListEntry assetListEntry = assetPublisherDisplayContext.fetchAssetListEntry
 	);
 
 	if (clearAssetListButton) {
-		clearAssetListButton.addEventListener('click', function(event) {
+		clearAssetListButton.addEventListener('click', function (event) {
 			assetListTitle.innerHTML = '<liferay-ui:message key="none" />';
 
 			assetListEntryId.value = '';
 		});
 	}
-</script>
+</aui:script>

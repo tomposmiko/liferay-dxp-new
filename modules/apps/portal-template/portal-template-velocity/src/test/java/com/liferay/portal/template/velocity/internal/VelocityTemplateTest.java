@@ -14,8 +14,8 @@
 
 package com.liferay.portal.template.velocity.internal;
 
+import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateException;
@@ -24,11 +24,14 @@ import com.liferay.portal.kernel.template.TemplateResourceCache;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.template.ClassLoaderResourceParser;
 import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.velocity.configuration.VelocityEngineConfiguration;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FileImpl;
+import com.liferay.portal.util.PropsImpl;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -50,6 +53,8 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -57,6 +62,11 @@ import org.junit.Test;
  * @author Raymond Augé
  */
 public class VelocityTemplateTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -74,6 +84,8 @@ public class VelocityTemplateTest {
 		};
 
 		_velocityTemplateResourceLoader = new VelocityTemplateResourceLoader();
+
+		PropsUtil.setProps(new PropsImpl());
 
 		ReflectionTestUtil.setFieldValue(
 			_velocityTemplateResourceLoader, "_velocityTemplateResourceCache",
@@ -346,12 +358,11 @@ public class VelocityTemplateTest {
 
 	@Test
 	public void testProcessTemplate8() throws Exception {
-		Map<String, Object> context = HashMapBuilder.<String, Object>put(
-			_TEST_KEY, _TEST_VALUE
-		).build();
-
 		Template template = new VelocityTemplate(
-			new MockTemplateResource(_TEMPLATE_FILE_NAME), context,
+			new MockTemplateResource(_TEMPLATE_FILE_NAME),
+			HashMapBuilder.<String, Object>put(
+				_TEST_KEY, _TEST_VALUE
+			).build(),
 			_velocityEngine, _templateContextHelper, _templateResourceCache,
 			false);
 

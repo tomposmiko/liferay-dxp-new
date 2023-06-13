@@ -20,13 +20,14 @@ import com.liferay.layout.seo.kernel.LayoutSEOLinkManager;
 import com.liferay.layout.seo.service.LayoutSEOEntryLocalService;
 import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -34,9 +35,10 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -50,6 +52,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Alicia Garcia
@@ -70,7 +74,21 @@ public class LayoutSEOLinkManagerCanonicalLayoutSEOLinkTest {
 
 		_layout.setGroupId(_group.getGroupId());
 
+		ServiceContext serviceContext = new ServiceContext();
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
 		_themeDisplay = _getThemeDisplay();
+
+		mockHttpServletRequest.setAttribute(
+			WebKeys.THEME_DISPLAY, _themeDisplay);
+
+		_themeDisplay.setRequest(mockHttpServletRequest);
+
+		serviceContext.setRequest(mockHttpServletRequest);
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 	}
 
 	@Test
@@ -160,7 +178,7 @@ public class LayoutSEOLinkManagerCanonicalLayoutSEOLinkTest {
 			});
 	}
 
-	private ThemeDisplay _getThemeDisplay() throws PortalException {
+	private ThemeDisplay _getThemeDisplay() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		Company company = _companyLocalService.getCompany(
@@ -174,11 +192,11 @@ public class LayoutSEOLinkManagerCanonicalLayoutSEOLinkTest {
 		themeDisplay.setPermissionChecker(
 			PermissionThreadLocal.getPermissionChecker());
 		themeDisplay.setPlid(_layout.getPlid());
+		themeDisplay.setScopeGroupId(_group.getGroupId());
 		themeDisplay.setSecure(false);
 		themeDisplay.setServerName(_VIRTUAL_HOSTNAME);
 		themeDisplay.setServerPort(_SERVER_PORT);
 		themeDisplay.setSiteGroupId(_group.getGroupId());
-		themeDisplay.setScopeGroupId(_group.getGroupId());
 
 		return themeDisplay;
 	}
@@ -190,11 +208,9 @@ public class LayoutSEOLinkManagerCanonicalLayoutSEOLinkTest {
 		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
 				new ConfigurationTemporarySwapper(
 					_LAYOUT_SEO_CONFIGURATION_PID,
-					new HashMapDictionary<String, Object>() {
-						{
-							put("canonicalURL", "localized-url");
-						}
-					})) {
+					HashMapDictionaryBuilder.<String, Object>put(
+						"canonicalURL", "localized-url"
+					).build())) {
 
 			unsafeRunnable.run();
 		}

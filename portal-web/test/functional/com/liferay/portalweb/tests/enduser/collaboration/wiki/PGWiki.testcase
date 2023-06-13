@@ -4,6 +4,7 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Wiki";
+
 	var pageName = "Wiki Test Page";
 	var portletName = "Wiki";
 
@@ -43,13 +44,14 @@ definition {
 	@priority = "5"
 	test AddChildSiteWikiFrontPageFormatHTML {
 		property testray.component.names = "Training";
+
 		var portalURL = PropsUtil.get("portal.url");
 
 		JSONGroup.addGroup(groupName = "Site Name");
 
 		SitePages.openPagesAdmin(siteURLKey = "Site Name");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites");
@@ -61,31 +63,21 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "Child SiteName");
 
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
+			category = "Content & Data",
 			portlet = "Wiki");
 
 		WikiNavigator.gotoNode(wikiNodeName = "Main");
 
 		WikiNavigator.gotoCP(wikiPageTitle = "FrontPage");
 
-		AssertClick(
-			locator1 = "Wiki#FRONTPAGE_DEFAULT_MESSAGE",
-			value1 = "This page is empty. Edit it to add some text.");
-
-		WikiEntry.selectPageFormat(pageFormat = "HTML");
-
-		WikiEntry.confirmHTML();
-
-		AlloyEditor.addContent(content = '''<!DOCTYPE html> <html lang="en"> <body> <h1>My First Heading</h1> <p>My first paragraph.</p> </body> </html>''');
-
-		PortletEntry.publish();
+		WikiPage.addFrontPagePG(
+			htmlSource = "true",
+			wikiPageContent = "${wikiPageContent}");
 
 		SitePages.openPagesAdmin(siteURLKey = "Child SiteName");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPrivatePage(pageName = "Child Site Page");
@@ -110,7 +102,11 @@ definition {
 			locator1 = "Link#EDIT",
 			value1 = "Edit");
 
-		AlloyEditor.addContent(content = '''<!DOCTYPE html> <html lang="en"> <body> <h1>Edited My First Heading</h1> <p>Edited My first paragraph.</p> </body> </html>''');
+		var wikiPageContent = '''<!DOCTYPE html> <html lang="en"> <body> <h1>Edited My First Heading</h1> <p>Edited My first paragraph.</p> </body> </html>''';
+
+		CKEditor.addSourceContent(content = "${wikiPageContent}");
+
+		SelectFrame(value1 = "relative=top");
 
 		PortletEntry.publish();
 
@@ -125,7 +121,6 @@ definition {
 
 	@priority = "4"
 	test AddFrontPageChildPageFormatHTML {
-
 		var welcomeToLiferay = '''
 				<p><a href="http://www.liferay.com">Welcome to LIFERAY</a></p>
 			''';
@@ -140,13 +135,19 @@ definition {
 			locator1 = "Link#ADD_CHILD_PAGE",
 			value1 = "Add Child Page");
 
-		WikiEntry.selectPageFormat(pageFormat = "HTML");
-
-		WikiEntry.confirmHTML();
-
 		WikiEntry.addPageTitle(wikiPageTitle = "Wiki FrontPage Child Page Title");
 
-		AlloyEditor.addSourceContent(content = "${welcomeToLiferay}");
+		Panel.expandPanel(panel = "Configuration");
+
+		SelectNoError(
+			locator1 = "Wiki#ADD_PAGE_FORMAT_DROPDOWN",
+			value1 = "HTML");
+
+		AssertConfirm(value1 = "You may lose some formatting when switching from Creole to HTML. Do you want to continue?");
+
+		CKEditor.addSourceContent(content = "${welcomeToLiferay}");
+
+		SelectFrame(value1 = "relative=top");
 
 		PortletEntry.publish();
 
@@ -173,7 +174,7 @@ definition {
 		WikiPage.addFrontPageChildPageInvalidTitle(
 			wikiChildPageContent = "Wiki FrontPage Child Page Content",
 			wikiChildPageInvalidTitle = "true",
-			wikiChildPageTitle = "Wiki\ Front\ Page\ Child\ Page\ Title\");
+			wikiChildPageTitle = "Wiki\ Front\ Page\ Child\ Page\ Title");
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -227,7 +228,7 @@ definition {
 		WikiPage.addFrontPageChildPageInvalidTitle(
 			wikiChildPageContent = "Wiki FrontPage Child Page Content",
 			wikiChildPageInvalidTitle = "true",
-			wikiChildPageTitle = "Wiki&lt; Front&lt; Page&lt; Child&lt; Page&lt; Title&lt;");
+			wikiChildPageTitle = "Wiki< Front< Page< Child< Page< Title<");
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -236,7 +237,7 @@ definition {
 		WikiPage.addFrontPageChildPageInvalidTitle(
 			wikiChildPageContent = "Wiki FrontPage Child Page Content",
 			wikiChildPageInvalidTitle = "true",
-			wikiChildPageTitle = "Wiki&gt; Front&gt; Page&gt; Child&gt; Page&gt; Title&gt;");
+			wikiChildPageTitle = "Wiki> Front> Page> Child> Page> Title>");
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -263,21 +264,13 @@ definition {
 
 	@priority = "4"
 	test AddFrontPageContentWithNoJavascript {
+		var wikiPageContent = '''<p id='demo'>PASS</p> <script type='text/javascript'>document.getElementById('demo').innerHTML = 'this code should not be read by the client';</script>''';
+
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
-		AssertClick(
-			locator1 = "Wiki#FRONTPAGE_DEFAULT_MESSAGE",
-			value1 = "This page is empty. Edit it to add some text.");
-
-		WikiEntry.selectPageFormat(pageFormat = "HTML");
-
-		WikiEntry.confirmHTML();
-
-		AlloyEditor.addSourceContent(content = '''
-				<p id="demo">PASS</p><script type="text/javascript">document.getElementById('demo').innerHTML="this code should not be read by the client";</script>
-			''');
-
-		PortletEntry.publish();
+		WikiPage.addFrontPagePG(
+			htmlSource = "true",
+			wikiPageContent = "${wikiPageContent}");
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -414,6 +407,8 @@ definition {
 
 	@priority = "5"
 	test AddPageWithChildPage {
+		property portal.acceptance = "true";
+
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
 		WikiNavigator.gotoAllPagesPG();
@@ -444,6 +439,7 @@ definition {
 
 	@priority = "5"
 	test AddPageWithHTMLFormat {
+		property portal.acceptance = "true";
 
 		var welcomeToLiferay = '''
 				<p><a href="http://www.liferay.com">Welcome to LIFERAY</a></p>
@@ -455,13 +451,23 @@ definition {
 
 		WikiNavigator.gotoAddPageViaPG();
 
-		WikiEntry.selectPageFormat(pageFormat = "HTML");
-
-		WikiEntry.confirmHTML();
-
 		WikiEntry.addPageTitle(wikiPageTitle = "Wiki Page Title");
 
-		AlloyEditor.addSourceContent(content = "${welcomeToLiferay}");
+		Panel.expandPanel(panel = "Configuration");
+
+		SelectNoError(
+			locator1 = "Wiki#ADD_PAGE_FORMAT_DROPDOWN",
+			value1 = "HTML");
+
+		AssertConfirm(value1 = "You may lose some formatting when switching from Creole to HTML. Do you want to continue?");
+
+		Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
+
+		Type.typeCodeMirrorEditorNoError(
+			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
+			value1 = "${welcomeToLiferay}");
+
+		SelectFrame(value1 = "relative=top");
 
 		PortletEntry.publish();
 
@@ -483,28 +489,35 @@ definition {
 	@description = "This test covers LPS-95711. It ensures that an image can be added to the front page via URL."
 	@priority = "4"
 	test AddPageWithImageViaURL {
+		property test.name.skip.portal.instance = "PGWiki#AddPageWithImageViaURL";
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "Document_2.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_2.jpg");
+
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
 		WikiNavigator.gotoFrontPagePG();
 
 		WikiNavigator.gotoBodyLinkPG(wikiPageContent = "This page is empty. Edit it to add some text.");
 
-		ItemSelector.gotoItemSelectorViaAlloyEditor();
+		ItemSelector.gotoItemSelectorViaCKEditor();
 
 		ItemSelector.addFromURL(
-			imageSourceURL = "https://raw.githubusercontent.com/liferay/liferay-portal/master/portal-web/test/functional/com/liferay/portalweb/dependencies/Document_1.jpg",
+			imageSourceURL = "http://localhost:8080/webdav/guest/document_library/Document_2.jpg",
 			navTab = "URL");
 
-		AssertElementPresent(
-			key_contentImageName = "Document_1.jpg",
-			locator1 = "Wiki#CONTENT_IMAGE_NAME");
+		CKEditor.viewEntryContentImage(contentImageName = "Document_2.jpg");
 
 		PortletEntry.publish();
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
 		AssertElementPresent(
-			key_contentImageName = "Document_1.jpg",
+			key_contentImageName = "Document_2.jpg",
 			locator1 = "Wiki#CONTENT_IMAGE_NAME");
 	}
 
@@ -512,7 +525,6 @@ definition {
 	test AddPageWithInlineImage {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.configurePage(
@@ -561,6 +573,7 @@ definition {
 
 		WikiPage.viewPageWithAttachment(
 			attachmentFileName = "Document_1.jpg",
+			inlineImage = "true",
 			wikiPageContent = "Wiki Page Content",
 			wikiPageTitle = "Wiki Page Title");
 	}
@@ -606,6 +619,8 @@ definition {
 
 		WikiEntry.addPageContent(wikiPageContent = "Wiki Page Content");
 
+		SelectFrame(value1 = "relative=top");
+
 		WikiEntry.cancel();
 
 		WikiTable.viewNoEntry(wikiPageTitle = "Wiki Page Title");
@@ -623,6 +638,8 @@ definition {
 
 		WikiEntry.addPageContent(wikiPageContent = "Wiki Page Content");
 
+		SelectFrame(value1 = "relative=top");
+
 		PortletEntry.publish();
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
@@ -632,6 +649,8 @@ definition {
 		WikiNavigator.gotoEntryEditViaPGTable(wikiPageTitle = "Wiki Page Title");
 
 		WikiEntry.addPageContent(wikiPageContent = "Edited Wiki Page Content");
+
+		SelectFrame(value1 = "relative=top");
 
 		WikiEntry.cancel();
 
@@ -688,6 +707,8 @@ definition {
 
 		WikiEntry.addPageContent(wikiPageContent = "Wiki Page Content");
 
+		SelectFrame(value1 = "relative=top");
+
 		PortletEntry.publish();
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
@@ -699,6 +720,8 @@ definition {
 		WikiEntry.addPageTitle(wikiPageTitle = "Copied Wiki Page Title");
 
 		WikiEntry.addPageContent(wikiPageContent = "Copied Wiki Page Content");
+
+		SelectFrame(value1 = "relative=top");
 
 		PortletEntry.publish();
 
@@ -734,6 +757,8 @@ definition {
 
 	@priority = "5"
 	test DeletePage {
+		property portal.acceptance = "true";
+
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
 		WikiNavigator.gotoAllPagesPG();
@@ -767,6 +792,8 @@ definition {
 
 		WikiEntry.addPageContent(wikiPageContent = "Wiki Page Content");
 
+		SelectFrame(value1 = "relative=top");
+
 		WikiEntry.saveAsDraft();
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
@@ -775,17 +802,9 @@ definition {
 
 		WikiNavigator.gotoEntryEditViaPGTable(wikiPageTitle = "Wiki Page Title");
 
-		AssertElementPresent(
-			key_editor = "content",
-			locator1 = "AlloyEditor#EDITOR");
-
-		Click(
-			key_editor = "content",
-			locator1 = "AlloyEditor#EDITOR");
-
-		AssertElementPresent(locator1 = "AlloyEditor#CONTENT_ADD_BUTTON");
-
 		WikiEntry.addPageContent(wikiPageContent = "Edited Wiki Page Content");
+
+		SelectFrame(value1 = "relative=top");
 
 		PortletEntry.publish();
 
@@ -1075,6 +1094,8 @@ definition {
 
 		WikiEntry.addPageContent(wikiPageContent = "Wiki Page Content");
 
+		SelectFrame(value1 = "relative=top");
+
 		PortletEntry.publish();
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
@@ -1084,6 +1105,8 @@ definition {
 		WikiNavigator.gotoEntryEditViaPGTable(wikiPageTitle = "Wiki Page Title");
 
 		WikiEntry.addPageContent(wikiPageContent = "Edited Wiki Page Content");
+
+		SelectFrame(value1 = "relative=top");
 
 		WikiEntry.saveAsDraft();
 

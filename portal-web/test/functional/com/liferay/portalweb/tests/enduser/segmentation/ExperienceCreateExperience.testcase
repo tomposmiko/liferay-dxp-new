@@ -24,7 +24,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "People",
-			panel = "Site Administration",
 			portlet = "Segments");
 
 		LexiconEntry.gotoAdd();
@@ -53,24 +52,100 @@ definition {
 		}
 	}
 
-	@description = "Validate if the user can create a Experience"
+	@description = "When the user creates a new experience, it is always placed in the last position of the list, always below the default experience and always set as non-active"
 	@priority = "5"
-	test AddDefaultExperienceWithBannerCenter {
+	test AddNewAnyoneExperience {
+		property portal.acceptance = "true";
+
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/experience-content-page");
 
 		ContentPages.clickPencil();
 
 		PageEditor.addFragment(
-			collectionName = "Featured Content",
-			fragmentName = "Banner Center");
+			collectionName = "Basic Components",
+			fragmentName = "Heading");
+
+		PageEditor.editFragmentText(
+			fragmentName = "Heading",
+			id = "element-text",
+			text = "Default");
 
 		Button.clickPublish();
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/experience-content-page");
 
+		ContentPages.clickPencil();
+
+		PageEditor.addExperience(
+			experienceName = "NewAnyoneExperience",
+			segmentName = "Anyone");
+
+		Refresh();
+
+		PageEditor.changeExperience(newExperience = "NewAnyoneExperience");
+
+		PageEditor.editFragmentText(
+			fragmentName = "Heading",
+			id = "element-text",
+			text = "Anyone1");
+
+		Button.clickPublish();
+
+		User.logoutPG();
+
+		Navigator.gotoSitePage(
+			pageName = "Experience Content Page",
+			siteName = "Test Site Name");
+
 		AssertTextEquals(
-			locator1 = "Experience#BANNER_CENTER_TITLE_EXAMPLE_PORTLET",
-			value1 = "Banner Title Example");
+			locator1 = "Experience#FRAGMENT_HEADING",
+			value1 = "Default");
+
+		User.firstLoginPG();
+	}
+
+	@description = "When the user clicks on the Duplicate option of an experience, a new experience with [the same name] + Copy and the same audience (Segment) appears in the last position of the list, always below the default experience"
+	@priority = "5"
+	test DuplicateExperience {
+		property portal.acceptance = "true";
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/experience-content-page");
+
+		ContentPages.clickPencil();
+
+		PageEditor.addExperience(
+			experienceName = "NewExp1",
+			segmentName = "AddSegmentUserEmailAddressContains Test");
+
+		Refresh();
+
+		PageEditor.changeExperience(newExperience = "NewExp1");
+
+		PageEditor.duplicateExperience(experienceName = "NewExp1");
+
+		PageEditor.clickPublish();
+	}
+
+	@description = "Validate experience edition and deletion"
+	@priority = "5"
+	test EditAndDeleteExperience {
+		property portal.acceptance = "true";
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/experience-content-page");
+
+		ContentPages.clickPencil();
+
+		PageEditor.addExperience(
+			experienceName = "exp1",
+			segmentName = "AddSegmentUserEmailAddressContains Test");
+
+		Refresh();
+
+		PageEditor.editExperience(newExperience = "exp1_edited");
+
+		PageEditor.deleteExperience(experienceName = "exp1_edited");
+
+		PageEditor.clickPublish();
 	}
 
 }

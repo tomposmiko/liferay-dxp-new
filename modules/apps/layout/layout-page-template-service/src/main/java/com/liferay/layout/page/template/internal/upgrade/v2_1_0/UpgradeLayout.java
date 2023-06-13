@@ -17,7 +17,7 @@ package com.liferay.layout.page.template.internal.upgrade.v2_1_0;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
-import com.liferay.layout.page.template.internal.upgrade.v2_0_0.util.LayoutPageTemplateEntryTable;
+import com.liferay.layout.page.template.internal.upgrade.v2_1_0.util.LayoutPageTemplateEntryTable;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -67,9 +67,9 @@ public class UpgradeLayout extends UpgradeProcess {
 	protected void upgradeLayout() throws Exception {
 		StringBundler sb = new StringBundler(3);
 
-		sb.append("select layoutPageTemplateEntryId, userId, groupId, name, ");
-		sb.append("type_, layoutPrototypeId from LayoutPageTemplateEntry ");
-		sb.append("where plid is null or plid = 0");
+		sb.append("select layoutPageTemplateEntryId, groupId, companyId, ");
+		sb.append("userId, name, type_, layoutPrototypeId, companyId from ");
+		sb.append("LayoutPageTemplateEntry where plid is null or plid = 0");
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -82,6 +82,7 @@ public class UpgradeLayout extends UpgradeProcess {
 						"layoutPageTemplateEntryId = ?"))) {
 
 			while (rs.next()) {
+				long companyId = rs.getLong("companyId");
 				long userId = rs.getLong("userId");
 				long groupId = rs.getLong("groupId");
 				String name = rs.getString("name");
@@ -89,7 +90,7 @@ public class UpgradeLayout extends UpgradeProcess {
 				long layoutPrototypeId = rs.getLong("layoutPrototypeId");
 
 				long plid = _getPlid(
-					userId, groupId, name, type, layoutPrototypeId,
+					companyId, userId, groupId, name, type, layoutPrototypeId,
 					serviceContext);
 
 				ps.setLong(1, plid);
@@ -108,21 +109,20 @@ public class UpgradeLayout extends UpgradeProcess {
 							LayoutPageTemplateEntry.class),
 						layoutPageTemplateEntryId);
 
-				Layout draftLayout = _layoutLocalService.fetchLayout(
-					PortalUtil.getClassNameId(Layout.class), plid);
+				Layout draftLayout = _layoutLocalService.fetchDraftLayout(plid);
 
 				for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
 					fragmentEntryLink.setClassNameId(
 						PortalUtil.getClassNameId(Layout.class));
 					fragmentEntryLink.setClassPK(plid);
+					fragmentEntryLink.setPlid(plid);
 
 					_fragmentEntryLinkLocalService.updateFragmentEntryLink(
 						fragmentEntryLink);
 
 					_fragmentEntryLinkLocalService.addFragmentEntryLink(
 						draftLayout.getUserId(), draftLayout.getGroupId(), 0,
-						fragmentEntryLink.getFragmentEntryId(),
-						PortalUtil.getClassNameId(Layout.class),
+						fragmentEntryLink.getFragmentEntryId(), 0,
 						draftLayout.getPlid(), fragmentEntryLink.getCss(),
 						fragmentEntryLink.getHtml(), fragmentEntryLink.getJs(),
 						fragmentEntryLink.getConfiguration(),
@@ -136,13 +136,15 @@ public class UpgradeLayout extends UpgradeProcess {
 	}
 
 	protected void upgradeSchema() throws Exception {
-		alter(
-			LayoutPageTemplateEntryTable.class,
-			new AlterTableAddColumn("plid LONG"));
+		if (!hasColumn(LayoutPageTemplateEntryTable.TABLE_NAME, "plid")) {
+			alter(
+				LayoutPageTemplateEntryTable.class,
+				new AlterTableAddColumn("plid", "LONG"));
+		}
 	}
 
 	private long _getPlid(
-			long userId, long groupId, String name, int type,
+			long companyId, long userId, long groupId, String name, int type,
 			long layoutPrototypeId, ServiceContext serviceContext)
 		throws Exception {
 
@@ -173,9 +175,9 @@ public class UpgradeLayout extends UpgradeProcess {
 			"layout.instanceable.allowed", Boolean.TRUE);
 
 		Layout layout = _layoutLocalService.addLayout(
-			userId, groupId, privateLayout, 0, titleMap, titleMap, null, null,
-			null, layoutType, StringPool.BLANK, true, true, new HashMap<>(),
-			serviceContext);
+			PortalUtil.getValidUserId(companyId, userId), groupId,
+			privateLayout, 0, titleMap, titleMap, null, null, null, layoutType,
+			StringPool.BLANK, true, true, new HashMap<>(), serviceContext);
 
 		_layoutLocalService.addLayout(
 			layout.getUserId(), layout.getGroupId(), privateLayout,

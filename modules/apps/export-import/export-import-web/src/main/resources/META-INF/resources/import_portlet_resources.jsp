@@ -50,7 +50,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 	<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
 
 	<div class="export-dialog-tree">
-		<div class="container-fluid-1280">
+		<clay:container-fluid>
 			<aui:fieldset-group markupView="lexicon">
 				<aui:fieldset cssClass="options-group" label="file">
 					<dl class="import-file-details options">
@@ -69,7 +69,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 							Date exportDate = manifestSummary.getExportDate();
 							%>
 
-							<span onmouseover="Liferay.Portal.ToolTip.show(this, '<%= HtmlUtil.escapeJS(dateFormatDateTime.format(exportDate)) %>')">
+							<span class="lfr-portal-tooltip" title="<%= HtmlUtil.escape(dateFormatDateTime.format(exportDate)) %>">
 								<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - exportDate.getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
 							</span>
 						</dd>
@@ -83,7 +83,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 							<liferay-ui:message key="size" />
 						</dt>
 						<dd>
-							<%= TextFormatter.formatStorageSize(fileEntry.getSize(), locale) %>
+							<%= LanguageUtil.formatStorageSize(fileEntry.getSize(), locale) %>
 						</dd>
 					</dl>
 				</aui:fieldset>
@@ -133,13 +133,17 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 											<li>
 												<span class="selected-labels" id="<portlet:namespace />selectedConfiguration_<%= selPortlet.getRootPortletId() %>"></span>
 
-												<%
-												Map<String, Object> data = new HashMap<String, Object>();
-
-												data.put("portletid", selPortlet.getRootPortletId());
-												%>
-
-												<aui:a cssClass="configuration-link modify-link" data="<%= data %>" href="javascript:;" label="change" method="get" />
+												<aui:a
+													cssClass="configuration-link modify-link"
+													data='<%=
+														HashMapBuilder.<String, Object>put(
+															"portletid", selPortlet.getRootPortletId()
+														).build()
+													%>'
+													href="javascript:;"
+													label="change"
+													method="get"
+												/>
 											</li>
 										</ul>
 
@@ -188,10 +192,9 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 										<%
 										PortletDataHandlerControl[] importControls = portletDataHandler.getImportControls();
 										PortletDataHandlerControl[] metadataControls = portletDataHandler.getImportMetadataControls();
-
-										if (ArrayUtil.isNotEmpty(importControls) || ArrayUtil.isNotEmpty(metadataControls)) {
 										%>
 
+										<c:if test="<%= ArrayUtil.isNotEmpty(importControls) || ArrayUtil.isNotEmpty(metadataControls) %>">
 											<div class="hide" id="<portlet:namespace />content_<%= selPortlet.getRootPortletId() %>">
 												<ul class="lfr-tree list-unstyled">
 													<li class="tree-item">
@@ -221,19 +224,22 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 																	PortletDataHandlerBoolean control = (PortletDataHandlerBoolean)metadataControl;
 
 																	PortletDataHandlerControl[] childrenControls = control.getChildren();
-
-																	if (ArrayUtil.isNotEmpty(childrenControls)) {
-																		request.setAttribute("render_controls.jsp-controls", childrenControls);
 																%>
+
+																	<c:if test="<%= ArrayUtil.isNotEmpty(childrenControls) %>">
+
+																		<%
+																		request.setAttribute("render_controls.jsp-controls", childrenControls);
+																		%>
 
 																		<aui:field-wrapper label="content-metadata">
 																			<ul class="lfr-tree list-unstyled">
 																				<liferay-util:include page="/render_controls.jsp" servletContext="<%= application %>" />
 																			</ul>
 																		</aui:field-wrapper>
+																	</c:if>
 
 																<%
-																	}
 																}
 																%>
 
@@ -247,13 +253,18 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 												<li class="tree-item">
 													<span class="selected-labels" id="<portlet:namespace />selectedContent_<%= selPortlet.getRootPortletId() %>"></span>
 
-													<%
-													Map<String, Object> data = new HashMap<String, Object>();
-
-													data.put("portletid", selPortlet.getRootPortletId());
-													%>
-
-													<aui:a cssClass="content-link modify-link" data="<%= data %>" href="javascript:;" id='<%= "contentLink_" + selPortlet.getRootPortletId() %>' label="change" method="get" />
+													<aui:a
+														cssClass="content-link modify-link"
+														data='<%=
+															HashMapBuilder.<String, Object>put(
+																"portletid", selPortlet.getRootPortletId()
+															).build()
+														%>'
+														href="javascript:;"
+														id='<%= "contentLink_" + selPortlet.getRootPortletId() %>'
+														label="change"
+														method="get"
+													/>
 												</li>
 											</ul>
 
@@ -263,11 +274,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 													'<portlet:namespace />showChangeContent<%= StringPool.UNDERLINE + selPortlet.getRootPortletId() %>'
 												);
 											</aui:script>
-
-										<%
-										}
-										%>
-
+										</c:if>
 									</li>
 								</ul>
 
@@ -340,7 +347,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 					<aui:input data-name='<%= LanguageUtil.get(request, "always-use-my-user-id") %>' id="alwaysCurrentUserId" label="<%= taglibUseTheCurrentUserAsAuthorLabel %>" name="<%= PortletDataHandlerKeys.USER_ID_STRATEGY %>" type="radio" value="<%= UserIdStrategy.ALWAYS_CURRENT_USER_ID %>" />
 				</aui:fieldset>
 			</aui:fieldset-group>
-		</div>
+		</clay:container-fluid>
 	</div>
 
 	<aui:button-row>
@@ -365,6 +372,6 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(them
 		locale: '<%= locale.toLanguageTag() %>',
 		namespace: '<portlet:namespace />',
 		ratingsNode: '#<%= PortletDataHandlerKeys.RATINGS %>',
-		timeZoneOffset: <%= timeZoneOffset %>
+		timeZoneOffset: <%= timeZoneOffset %>,
 	});
 </aui:script>

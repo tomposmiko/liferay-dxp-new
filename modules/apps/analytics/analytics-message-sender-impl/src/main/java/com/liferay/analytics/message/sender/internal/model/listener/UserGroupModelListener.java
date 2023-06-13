@@ -14,15 +14,16 @@
 
 package com.liferay.analytics.message.sender.internal.model.listener;
 
-import com.liferay.analytics.message.sender.model.EntityModelListener;
-import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
+import com.liferay.analytics.message.sender.model.listener.BaseEntityModelListener;
+import com.liferay.analytics.message.sender.model.listener.EntityModelListener;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
-import com.liferay.portal.kernel.util.ArrayUtil;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -37,13 +38,31 @@ import org.osgi.service.component.annotations.Reference;
 public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 
 	@Override
-	public List<String> getAttributeNames() {
+	public List<String> getAttributeNames(long companyId) {
 		return _attributeNames;
+	}
+
+	@Override
+	public long[] getMembershipIds(User user) {
+		return user.getUserGroupIds();
+	}
+
+	@Override
+	public String getModelClassName() {
+		return UserGroup.class.getName();
 	}
 
 	@Override
 	public void onAfterRemove(UserGroup userGroup)
 		throws ModelListenerException {
+
+		if (!analyticsConfigurationTracker.isActive()) {
+			return;
+		}
+
+		if (isExcluded(userGroup)) {
+			return;
+		}
 
 		updateConfigurationProperties(
 			userGroup.getCompanyId(), "syncedUserGroupIds",
@@ -51,8 +70,13 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 	}
 
 	@Override
-	protected UserGroup getOriginalModel(UserGroup userGroup) throws Exception {
-		return _userGroupLocalService.getUserGroup(userGroup.getUserGroupId());
+	protected ActionableDynamicQuery getActionableDynamicQuery() {
+		return _userGroupLocalService.getActionableDynamicQuery();
+	}
+
+	@Override
+	protected UserGroup getModel(long id) throws Exception {
+		return _userGroupLocalService.getUserGroup(id);
 	}
 
 	@Override
@@ -60,26 +84,8 @@ public class UserGroupModelListener extends BaseEntityModelListener<UserGroup> {
 		return "userGroupId";
 	}
 
-	@Override
-	protected boolean isExcluded(UserGroup userGroup) {
-		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationTracker.getAnalyticsConfiguration(
-				userGroup.getCompanyId());
-
-		if (!ArrayUtil.contains(
-				analyticsConfiguration.syncedUserGroupIds(),
-				userGroup.getUserGroupId())) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private static final List<String> _attributeNames = Arrays.asList(
-		"addedByLDAPImport", "companyId", "createDate", "description",
-		"externalReferenceCode", "modifiedDate", "name", "parentUserGroupId",
-		"userId", "userName", "uuid");
+	private static final List<String> _attributeNames =
+		Collections.singletonList("name");
 
 	@Reference
 	private UserGroupLocalService _userGroupLocalService;

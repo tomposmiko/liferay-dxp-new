@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.cluster.ClusterNodeResponses;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.cluster.FutureClusterResponses;
 import com.liferay.portal.kernel.test.rule.NewEnv;
-import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionary;
@@ -34,15 +33,20 @@ import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PropsImpl;
 
 import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -51,6 +55,16 @@ import org.junit.Test;
  */
 @NewEnv(type = NewEnv.Type.CLASSLOADER)
 public class ClusterExecutorImplTest extends BaseClusterTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
+	@BeforeClass
+	public static void setUpClass() {
+		PropsUtil.setProps(new PropsImpl());
+	}
 
 	@Test
 	public void testClusterEventListener() {
@@ -368,21 +382,20 @@ public class ClusterExecutorImplTest extends BaseClusterTestCase {
 		Assert.assertTrue(ClusterInvokeThreadLocal.isEnabled());
 	}
 
-	@Rule
-	public final NewEnvTestRule newEnvTestRule = NewEnvTestRule.INSTANCE;
-
 	protected ClusterExecutorImpl getClusterExecutorImpl() {
 		ClusterExecutorImpl clusterExecutorImpl = new ClusterExecutorImpl();
 
-		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
-			PropsKeys.CLUSTER_LINK_CHANNEL_NAME_CONTROL,
-			"test-channel-name-control"
-		).put(
-			PropsKeys.CLUSTER_LINK_CHANNEL_PROPERTIES_CONTROL,
-			"test-channel-properties-control"
-		).build();
-
-		clusterExecutorImpl.setProps(PropsTestUtil.setProps(properties));
+		clusterExecutorImpl.setProps(
+			PropsTestUtil.setProps(
+				HashMapBuilder.<String, Object>put(
+					PropsKeys.CLUSTER_LINK_CHANNEL_NAME_CONTROL,
+					"test-channel-name-control"
+				).put(
+					PropsKeys.CLUSTER_LINK_CHANNEL_PROPERTIES_CONTROL,
+					"test-channel-properties-control"
+				).put(
+					"configuration.override.", new Properties()
+				).build()));
 
 		clusterExecutorImpl.setClusterChannelFactory(
 			new TestClusterChannelFactory());

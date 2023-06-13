@@ -39,7 +39,7 @@ DDMTemplate template = (DDMTemplate)row.getObject();
 			<portlet:param name="groupId" value="<%= String.valueOf(template.getGroupId()) %>" />
 			<portlet:param name="templateId" value="<%= String.valueOf(template.getTemplateId()) %>" />
 			<portlet:param name="type" value="<%= template.getType() %>" />
-			<portlet:param name="structureAvailableFields" value='<%= renderResponse.getNamespace() + "getAvailableFields" %>' />
+			<portlet:param name="structureAvailableFields" value='<%= liferayPortletResponse.getNamespace() + "getAvailableFields" %>' />
 		</portlet:renderURL>
 
 		<liferay-ui:icon
@@ -81,7 +81,7 @@ DDMTemplate template = (DDMTemplate)row.getObject();
 	</c:if>
 
 	<c:if test="<%= DDMTemplatePermission.contains(permissionChecker, template, ActionKeys.DELETE) %>">
-		<portlet:actionURL name="deleteTemplate" var="deleteURL">
+		<portlet:actionURL name="/dynamic_data_mapping/delete_template" var="deleteURL">
 			<portlet:param name="mvcPath" value="/view_template.jsp" />
 			<portlet:param name="templateId" value="<%= String.valueOf(template.getTemplateId()) %>" />
 			<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />

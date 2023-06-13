@@ -2,11 +2,13 @@
 <head>
 <title>UsersAndOrganizationsEditUser</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">UsersAndOrganizationsEditUser</td></tr>
 </thead>
+
 <tbody>
 <!--DETAILS-->
 <tr>
@@ -65,6 +67,21 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DETAILS_CATEGORY_SELECT</td>
+	<td>//label[contains(.,'${key_vocabularyName}')]//following-sibling::div//button[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_TAG_FIELD_INPUT</td>
+	<td>//label[contains(.,'Tags')]//following-sibling::div//*[contains(@class,'form-control-inset')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_TAG_FIELD</td>
+	<td>//label[contains(.,'Tags')]//following-sibling::div//span[contains(.,'${key_userTag}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DETAILS_USER_ID_FIELD</td>
 	<td>//input[contains(@id,'userId')]</td>
 	<td></td>
@@ -85,6 +102,11 @@
 	<td></td>
 </tr>
 <!--PASSWORD-->
+<tr>
+	<td>PASSWORD_CONFIRM_PASSWORD_FIELD</td>
+	<td>//input[contains(@id,'password')]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>PASSWORD_NEW_PASSWORD_FIELD</td>
 	<td>//input[contains(@id,'password1')]</td>
@@ -127,10 +149,66 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--DEPOT-->
+<tr>
+	<td>DEPOT_SELECT_LINK</td>
+	<td>//a[contains(@id,'selectDepotGroupLink')]/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEPOT_ROLES_SELECT_BUTTON</td>
+	<td>//button[contains(@data-rolename,'${roleTitle}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEPOT_ROLES_SELECT_LINK</td>
+	<td>//a[contains(@id,'selectDepotRoleLink')]/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEPOT_ROLES_TITLE</td>
+	<td>//tr/td[normalize-space(text())='${key_roleTitle}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEPOT_ROLES_TABLE_NAME</td>
+	<td>//div[contains(@class,'table')]//tr[contains(.,'${key_depotRoleName}')]/td[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEPOT_TABLE_NAME</td>
+	<td>//tr[contains(.,'${key_depotName}')]/td[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEPOT_TABLE_SPECIFIC_NAME</td>
+	<td>//tr[${key_position}][contains(.,'${key_depotName}')]/td[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--USER_GROUPS-->
 <tr>
 	<td>USER_GROUPS_TABLE_NAME</td>
 	<td>//tr[contains(.,'${key_userGroupName}')]/td[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_GROUPS_TABLE_REMOVE</td>
+	<td>//tr[contains(.,'${key_userGroupName}')]//span[contains(@class,' lfr-portal-tooltip')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_GROUPS_CHOOSE_BUTTON</td>
+	<td>//*[*[normalize-space(text())='${key_userGroupName}']]/..//following-sibling::td/*[contains(.,'Choose')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_GROUPS_SELECT_LINK</td>
+	<td>//a[contains(@id,'openUserGroupsLink')]/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -224,6 +302,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PERSONAL_SITE_MY_PROFILE</td>
+	<td>//div[contains(@class,'form-group')]//select[contains(@id,'publicLayoutSetPrototypeId')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -257,6 +340,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>VOCABULARY_LABEL</td>
+	<td>//div/label[contains(.,'${key_vocabularyName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -276,6 +364,11 @@
 <tr>
 	<td>UPLOAD_IMAGE_SELECT</td>
 	<td>//label[contains(@id,'uploadImage')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_PORTRAIT_CROPPER</td>
+	<td>//div[contains(@class,'image-cropper')]//div</td>
 	<td></td>
 </tr>
 <tr>

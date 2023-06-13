@@ -12,112 +12,260 @@
  * details.
  */
 
+import {useMutation, useQuery} from '@apollo/client';
+import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
-import {ClayPaginationWithBasicItems} from '@clayui/pagination';
-import {Editor} from 'frontend-editor-ckeditor-web';
-import React, {useCallback, useEffect, useState} from 'react';
+import ClayIcon from '@clayui/icon';
+import ClayNavigationBar from '@clayui/navigation-bar';
+import {ClayTooltipProvider} from '@clayui/tooltip';
+import classNames from 'classnames';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
+import {withRouter} from 'react-router-dom';
 
+import {AppContext} from '../../AppContext.es';
 import Answer from '../../components/Answer.es';
+import ArticleBodyRenderer from '../../components/ArticleBodyRenderer.es';
+import Breadcrumb from '../../components/Breadcrumb.es';
 import CreatorRow from '../../components/CreatorRow.es';
-import KeywordList from '../../components/KeywordList.es';
+import DeleteQuestion from '../../components/DeleteQuestion.es';
+import Link from '../../components/Link.es';
+import PaginatedList from '../../components/PaginatedList.es';
+import QuestionsEditor from '../../components/QuestionsEditor';
 import Rating from '../../components/Rating.es';
+import RelatedQuestions from '../../components/RelatedQuestions.es';
+import SectionLabel from '../../components/SectionLabel.es';
 import Subscription from '../../components/Subscription.es';
+import TagList from '../../components/TagList.es';
+import TextLengthValidation from '../../components/TextLengthValidation.es';
+import useQueryParams from '../../hooks/useQueryParams.es';
 import {
-	createAnswer,
-	getThread,
-	markAsAnswerMessageBoardMessage
+	createAnswerQuery,
+	getMessagesQuery,
+	getThreadQuery,
+	markAsAnswerMessageBoardMessageQuery,
 } from '../../utils/client.es';
 import lang from '../../utils/lang.es';
 import {
 	dateToBriefInternationalHuman,
-	getCKEditorConfig
+	getContextLink,
+	stripHTML,
 } from '../../utils/utils.es';
 
-export default ({
-	match: {
-		params: {questionId}
-	}
-}) => {
-	const [answers, setAnswers] = useState([]);
-	const [articleBody, setArticleBody] = useState();
-	const [page, setPage] = useState(1);
-	const [question, setQuestion] = useState();
+export default withRouter(
+	({
+		location,
+		match: {
+			params: {questionId, sectionTitle},
+			url,
+		},
+	}) => {
+		const context = useContext(AppContext);
 
-	useEffect(() => {
-		loadThread();
-	}, [loadThread]);
+		const queryParams = useQueryParams(location);
 
-	const loadThread = useCallback(
-		() =>
-			getThread(questionId, page).then(data => {
-				setQuestion(data);
-				setAnswers(data.messageBoardMessages.items);
-			}),
-		[page, questionId]
-	);
+		const sort = queryParams.get('sort') || 'active';
 
-	const postAnswer = () => {
-		createAnswer(articleBody, question.id).then(() => {
-			setArticleBody('');
-			return loadThread();
+		const [articleBody, setArticleBody] = useState();
+		const [showDeleteModalPanel, setShowDeleteModalPanel] = useState(false);
+
+		const [page, setPage] = useState(1);
+		const [pageSize, setPageSize] = useState(20);
+
+		const {
+			loading,
+			data: {messageBoardThreadByFriendlyUrlPath: question = {}} = {},
+		} = useQuery(getThreadQuery, {
+			context: {
+				uri: '/o/graphql?nestedFields=lastPostDate',
+			},
+			variables: {
+				friendlyUrlPath: questionId,
+				siteKey: context.siteKey,
+			},
 		});
-	};
 
-	const deleteAnswer = useCallback(
-		answer => {
-			setAnswers([
-				...answers.filter(otherAnswer => answer.id !== otherAnswer.id)
-			]);
-		},
-		[answers]
-	);
+		sectionTitle =
+			sectionTitle || sectionTitle === '0'
+				? sectionTitle
+				: question.messageBoardSection &&
+				  question.messageBoardSection.title;
 
-	const answerChange = useCallback(
-		answerId => {
-			const answer = answers.find(
-				answer => answer.showAsAnswer && answer.id !== answerId
-			);
+		const {
+			data: {messageBoardThreadMessageBoardMessages = {}} = {},
+			refetch,
+		} = useQuery(getMessagesQuery, {
+			context: {
+				uri: '/o/graphql?nestedFields=lastPostDate',
+			},
+			skip: !question || !question.id,
+			variables: {
+				messageBoardThreadId: question.id,
+				page: sort === 'votes' ? 1 : page,
+				pageSize: sort === 'votes' ? 100 : pageSize,
+				sort:
+					sort === 'votes' || sort === 'active'
+						? 'dateModified:desc'
+						: 'dateCreated:desc',
+			},
+		});
 
-			if (answer !== null) {
-				markAsAnswerMessageBoardMessage(answer.id, false).then(() => {
-					setAnswers([
-						...answers.map(otherAnswer => {
-							otherAnswer.showAsAnswer =
-								otherAnswer.id === answerId;
-							return otherAnswer;
-						})
-					]);
-				});
-			}
-		},
-		[answers]
-	);
+		const [answers, setAnswers] = useState({});
 
-	return (
-		<section>
-			{question && (
-				<div className="autofit-padded autofit-row">
-					<div className="autofit-col">
-						<Rating
-							aggregateRating={question.aggregateRating}
-							entityId={question.id}
-							myRating={
-								question.myRating &&
-								question.myRating.ratingValue
+		useEffect(() => {
+			if (messageBoardThreadMessageBoardMessages.totalCount) {
+				if (sort !== 'votes') {
+					setAnswers({...messageBoardThreadMessageBoardMessages});
+				}
+				else {
+					const items = [
+						...[
+							...messageBoardThreadMessageBoardMessages.items,
+						].sort((answer1, answer2) => {
+							if (answer2.showAsAnswer) {
+								return 1;
 							}
-							type={'Thread'}
-						/>
-					</div>
+							if (answer1.showAsAnswer) {
+								return -1;
+							}
 
-					<div className="autofit-col autofit-col-expand">
-						<div className="autofit-section">
-							<div className="autofit-row">
-								<div className="autofit-col-expand">
-									<h1 className="question-headline">
-										{question.headline}
-									</h1>
-									<p>
-										<small>
+							const ratingValue1 =
+								(answer1.aggregateRating &&
+									answer1.aggregateRating.ratingValue) ||
+								0;
+							const ratingValue2 =
+								(answer2.aggregateRating &&
+									answer2.aggregateRating.ratingValue) ||
+								0;
+
+							return ratingValue2 - ratingValue1;
+						}),
+					];
+
+					setAnswers({
+						...messageBoardThreadMessageBoardMessages,
+						items,
+					});
+				}
+			}
+		}, [messageBoardThreadMessageBoardMessages, pageSize, sort]);
+
+		const [createAnswer] = useMutation(createAnswerQuery, {
+			context: getContextLink(`${sectionTitle}/${questionId}`),
+			onCompleted() {
+				setArticleBody('');
+				refetch();
+			},
+		});
+
+		const deleteAnswer = useCallback(
+			(answer) => {
+				setAnswers({
+					...answers,
+					items: [
+						...answers.items.filter(
+							(otherAnswer) => answer.id !== otherAnswer.id
+						),
+					],
+					totalCount: answers.totalCount - 1,
+				});
+			},
+			[answers]
+		);
+
+		const [markAsAnswerMessageBoardMessage] = useMutation(
+			markAsAnswerMessageBoardMessageQuery,
+			{
+				onCompleted() {
+					refetch();
+				},
+			}
+		);
+
+		const answerChange = useCallback(
+			(answerId) => {
+				const answer = answers.items.find(
+					(answer) => answer.showAsAnswer && answer.id !== answerId
+				);
+
+				if (answer) {
+					markAsAnswerMessageBoardMessage({
+						variables: {
+							messageBoardMessageId: answer.id,
+							showAsAnswer: false,
+						},
+					});
+				}
+			},
+			[markAsAnswerMessageBoardMessage, answers.items]
+		);
+
+		return (
+			<section className="questions-section questions-section-single">
+				<Breadcrumb
+					section={
+						question.messageBoardSection || context.rootTopicId
+					}
+				/>
+
+				<div className="c-mt-5 questions-container">
+					{!loading && (
+						<div className="row">
+							<div className="col-md-1 text-md-center">
+								<Rating
+									aggregateRating={question.aggregateRating}
+									disabled={!!question.locked}
+									entityId={question.id}
+									myRating={
+										question.myRating &&
+										question.myRating.ratingValue
+									}
+									type={'Thread'}
+								/>
+							</div>
+
+							<div className="col-md-10">
+								<div className="align-items-end flex-column-reverse flex-md-row row">
+									<div className="c-mt-4 c-mt-md-0 col-md-8">
+										{!!question.messageBoardSection &&
+											!!question.messageBoardSection
+												.numberOfMessageBoardSections && (
+												<Link
+													to={`/questions/${
+														context.useTopicNamesInURL
+															? sectionTitle
+															: question
+																	.messageBoardSection
+																	.id
+													}`}
+												>
+													<SectionLabel
+														section={
+															question.messageBoardSection
+														}
+													/>
+												</Link>
+											)}
+
+										<h1
+											className={classNames(
+												'c-mt-2',
+												'question-headline',
+												{
+													'question-seen':
+														question.seen,
+												}
+											)}
+										>
+											{question.headline}
+
+											{!!question.locked && (
+												<span className="c-ml-2">
+													<ClayIcon symbol="lock" />
+												</span>
+											)}
+										</h1>
+
+										<p className="c-mb-0 small text-secondary">
 											{Liferay.Language.get('asked')}{' '}
 											{dateToBriefInternationalHuman(
 												question.dateCreated
@@ -136,101 +284,249 @@ export default ({
 												),
 												[question.viewCount]
 											)}
-										</small>
-									</p>
+										</p>
+									</div>
+
+									{!question.locked && (
+										<div className="col-md-4 text-right">
+											<ClayButton.Group
+												className="questions-actions"
+												spaced={true}
+											>
+												{question.actions.subscribe && (
+													<Subscription
+														question={question}
+													/>
+												)}
+
+												{question.actions.delete && (
+													<>
+														<DeleteQuestion
+															deleteModalVisibility={
+																showDeleteModalPanel
+															}
+															question={question}
+															setDeleteModalVisibility={
+																setShowDeleteModalPanel
+															}
+														/>
+														<ClayTooltipProvider>
+															<ClayButton
+																data-tooltip-align="top"
+																displayType="secondary"
+																onClick={() =>
+																	setShowDeleteModalPanel(
+																		true
+																	)
+																}
+																title={Liferay.Language.get(
+																	'delete'
+																)}
+															>
+																<ClayIcon symbol="trash" />
+															</ClayButton>
+														</ClayTooltipProvider>
+													</>
+												)}
+
+												{question.actions.replace && (
+													<Link to={`${url}/edit`}>
+														<ClayButton displayType="secondary">
+															{Liferay.Language.get(
+																'edit'
+															)}
+														</ClayButton>
+													</Link>
+												)}
+											</ClayButton.Group>
+										</div>
+									)}
 								</div>
-								<div>
-									<Subscription
-										onSubscription={subscribed =>
-											setQuestion({
-												...question,
-												subscribed
-											})
-										}
-										question={question}
+
+								<div className="c-mt-4">
+									<ArticleBodyRenderer {...question} />
+								</div>
+
+								<div className="c-mt-4">
+									<TagList
+										sectionTitle={sectionTitle}
+										tags={question.keywords}
 									/>
 								</div>
-							</div>
-							<div>
-								<p>{question.articleBody}</p>
-							</div>
 
-							<KeywordList keywords={question.keywords} />
-						</div>
-
-						<div
-							className="autofit-row"
-							style={{alignItems: 'center'}}
-						>
-							<div className="autofit-col-expand">
-								<hr />
-							</div>
-							<div>
-								<CreatorRow question={question} />
-							</div>
-						</div>
-
-						<h3 className="subtitle">
-							{answers.length} {Liferay.Language.get('answers')}
-						</h3>
-
-						{answers.map(answer => (
-							<Answer
-								answer={answer}
-								answerChange={answerChange}
-								creatorId={question.creator.id}
-								deleteAnswer={deleteAnswer}
-								key={answer.id}
-							/>
-						))}
-
-						{!!answers.totalCount &&
-							answers.totalCount > answers.pageSize && (
-								<ClayPaginationWithBasicItems
-									activePage={page}
-									ellipsisBuffer={2}
-									onPageChange={setPage}
-									totalPages={Math.ceil(
-										answers.totalCount / answers.pageSize
-									)}
-								/>
-							)}
-
-						<ClayForm>
-							<ClayForm.Group className="form-group-sm">
-								<label htmlFor="basicInput">
-									{Liferay.Language.get('your-answer')}
-								</label>
-
-								<Editor
-									config={getCKEditorConfig()}
-									data={articleBody}
-									onBeforeLoad={CKEDITOR => {
-										CKEDITOR.disableAutoInline = true;
-									}}
-									onChange={event =>
-										setArticleBody(event.editor.getData())
-									}
-								/>
-							</ClayForm.Group>
-						</ClayForm>
-
-						<div className="sheet-footer">
-							<div className="btn-group-item">
-								<div className="btn-group-item">
-									<button
-										className="btn btn-primary"
-										disabled={!articleBody}
-										onClick={postAnswer}
-									>
-										{Liferay.Language.get('post-answer')}
-									</button>
+								<div className="c-mt-4 position-relative questions-creator text-center text-md-right">
+									<CreatorRow question={question} />
 								</div>
+
+								<h3 className="c-mt-4 text-secondary">
+									{answers.totalCount}{' '}
+									{Liferay.Language.get('answers')}
+								</h3>
+
+								{!!answers.totalCount && (
+									<div className="border-bottom c-mt-3">
+										<ClayNavigationBar triggerLabel="Active">
+											<ClayNavigationBar.Item
+												active={sort === 'active'}
+											>
+												<Link
+													className="link-unstyled nav-link"
+													to={`${url}?sort=active`}
+												>
+													{Liferay.Language.get(
+														'active'
+													)}
+												</Link>
+											</ClayNavigationBar.Item>
+
+											<ClayNavigationBar.Item
+												active={sort === 'oldest'}
+											>
+												<Link
+													className="link-unstyled nav-link"
+													to={`${url}?sort=oldest`}
+												>
+													{Liferay.Language.get(
+														'oldest'
+													)}
+												</Link>
+											</ClayNavigationBar.Item>
+
+											<ClayNavigationBar.Item
+												active={sort === 'votes'}
+											>
+												<Link
+													className="link-unstyled nav-link"
+													to={`${url}?sort=votes`}
+												>
+													{Liferay.Language.get(
+														'votes'
+													)}
+												</Link>
+											</ClayNavigationBar.Item>
+										</ClayNavigationBar>
+									</div>
+								)}
+
+								<div className="c-mt-3">
+									<PaginatedList
+										activeDelta={pageSize}
+										activePage={page}
+										changeDelta={setPageSize}
+										changePage={setPage}
+										data={answers}
+									>
+										{(answer) => (
+											<Answer
+												answer={answer}
+												answerChange={answerChange}
+												canMarkAsAnswer={
+													!question.locked &&
+													!!question.actions.replace
+												}
+												deleteAnswer={deleteAnswer}
+												editable={!question.locked}
+												key={answer.id}
+											/>
+										)}
+									</PaginatedList>
+								</div>
+
+								{question &&
+									question.actions &&
+									question.actions['reply-to-thread'] && (
+										<div className="c-mt-5">
+											<ClayForm>
+												<ClayForm.Group className="form-group-sm">
+													<label htmlFor="basicInput">
+														{Liferay.Language.get(
+															'your-answer'
+														)}
+
+														<span className="c-ml-2 reference-mark">
+															<ClayIcon symbol="asterisk" />
+														</span>
+													</label>
+
+													<div className="c-mt-2">
+														{question.locked && (
+															<div className="question-locked-text">
+																<span>
+																	<ClayIcon symbol="lock" />
+																</span>
+																{Liferay.Language.get(
+																	'this-question-is-closed-new-answers-and-comments-are-disabled'
+																)}
+															</div>
+														)}
+														<QuestionsEditor
+															contents={
+																articleBody
+															}
+															cssClass={
+																question.locked
+																	? 'question-locked'
+																	: ''
+															}
+															editorConfig={{
+																readOnly:
+																	question.locked,
+															}}
+															onChange={(
+																event
+															) => {
+																setArticleBody(
+																	event.editor.getData()
+																);
+															}}
+														/>
+													</div>
+
+													<ClayForm.FeedbackGroup>
+														<ClayForm.FeedbackItem>
+															<TextLengthValidation
+																text={
+																	articleBody
+																}
+															/>
+														</ClayForm.FeedbackItem>
+													</ClayForm.FeedbackGroup>
+												</ClayForm.Group>
+											</ClayForm>
+
+											{!question.locked && (
+												<ClayButton
+													disabled={
+														!articleBody ||
+														stripHTML(articleBody)
+															.length < 15
+													}
+													displayType="primary"
+													onClick={() => {
+														createAnswer({
+															variables: {
+																articleBody,
+																messageBoardThreadId:
+																	question.id,
+															},
+														});
+													}}
+												>
+													{Liferay.Language.get(
+														'post-answer'
+													)}
+												</ClayButton>
+											)}
+										</div>
+									)}
 							</div>
 						</div>
-					</div>
+					)}
+					{question && question.id && (
+						<RelatedQuestions question={question} />
+					)}
 				</div>
-			)}
-		</section>
-	);
-};
+			</section>
+		);
+	}
+);

@@ -47,9 +47,8 @@ portletURL.setParameter("portletResource", portletResource);
 							navigationItem -> {
 								navigationItem.setActive(tabs2.equals("export"));
 								navigationItem.setHref(portletURL.toString());
-								navigationItem.setLabel(LanguageUtil.get(request, "export"));
-							}
-						);
+								navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "export"));
+							});
 
 						portletURL.setParameter("tabs2", "import");
 
@@ -57,9 +56,8 @@ portletURL.setParameter("portletResource", portletResource);
 							navigationItem -> {
 								navigationItem.setActive(tabs2.equals("import"));
 								navigationItem.setHref(portletURL.toString());
-								navigationItem.setLabel(LanguageUtil.get(request, "import"));
-							}
-						);
+								navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "import"));
+							});
 					}
 				}
 			%>'

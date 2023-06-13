@@ -17,14 +17,12 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:search:searchContainer");
-
-DisplayTerms displayTerms = searchContainer.getDisplayTerms();
+SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("liferay-ui:search:searchContainer");
 %>
 
 <liferay-ui:search-toggle
 	buttonLabel="search"
-	displayTerms="<%= displayTerms %>"
+	displayTerms="<%= searchContainer.getDisplayTerms() %>"
 	id="toggle_id_audit_event_search"
 >
 	<aui:input label="user-id" name="userId" value="<%= (userId != 0) ? String.valueOf(userId) : StringPool.BLANK %>" />
@@ -53,6 +51,7 @@ DisplayTerms displayTerms = searchContainer.getDisplayTerms();
 			dayValue="<%= startDateDay %>"
 			monthParam="startDateMonth"
 			monthValue="<%= startDateMonth %>"
+			name="startDate"
 			yearParam="startDateYear"
 			yearValue="<%= startDateYear %>"
 		/>
@@ -64,6 +63,7 @@ DisplayTerms displayTerms = searchContainer.getDisplayTerms();
 			hourValue="<%= startDateHour %>"
 			minuteParam="startDateMinute"
 			minuteValue="<%= startDateMinute %>"
+			name="startDateTime"
 		/>
 	</aui:field-wrapper>
 
@@ -73,6 +73,7 @@ DisplayTerms displayTerms = searchContainer.getDisplayTerms();
 			dayValue="<%= endDateDay %>"
 			monthParam="endDateMonth"
 			monthValue="<%= endDateMonth %>"
+			name="endDate"
 			yearParam="endDateYear"
 			yearValue="<%= endDateYear %>"
 		/>
@@ -84,6 +85,7 @@ DisplayTerms displayTerms = searchContainer.getDisplayTerms();
 			hourValue="<%= endDateHour %>"
 			minuteParam="endDateMinute"
 			minuteValue="<%= endDateMinute %>"
+			name="endDateTime"
 		/>
 	</aui:field-wrapper>
 </liferay-ui:search-toggle>

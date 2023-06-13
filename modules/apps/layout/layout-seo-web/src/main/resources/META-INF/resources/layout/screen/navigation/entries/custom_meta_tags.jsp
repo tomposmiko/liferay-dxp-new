@@ -28,21 +28,21 @@ if (Validator.isNull(backURL)) {
 }
 %>
 
-<aui:form action="<%= layoutsSEODisplayContext.getEditOpenGraphURL() %>" method="post" name="fm">
+<aui:form action="<%= layoutsSEODisplayContext.getEditCustomMetaTagsURL() %>" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= layoutsSEODisplayContext.getRedirectURL() %>" />
 	<aui:input name="portletResource" type="hidden" value='<%= ParamUtil.getString(request, "portletResource") %>' />
 	<aui:input name="groupId" type="hidden" value="<%= layoutsSEODisplayContext.getGroupId() %>" />
 	<aui:input name="privateLayout" type="hidden" value="<%= layoutsSEODisplayContext.isPrivateLayout() %>" />
 	<aui:input name="layoutId" type="hidden" value="<%= layoutsSEODisplayContext.getLayoutId() %>" />
 
-	<div class="sheet sheet-lg">
-		<div class="sheet-header">
+	<clay:sheet>
+		<clay:sheet-header>
 			<h2 class="sheet-title"><liferay-ui:message key="custom-meta-tags" /></h2>
 
 			<p class="text-muted">
 				<liferay-ui:message key="custom-meta-tags-description" />
 			</p>
-		</div>
+		</clay:sheet-header>
 
 		<liferay-ui:error exception="<%= DDMFormValuesValidationException.class %>" message="field-validation-failed" />
 
@@ -50,9 +50,15 @@ if (Validator.isNull(backURL)) {
 
 			<%
 			DDMFormValuesValidationException.RequiredValue rv = (DDMFormValuesValidationException.RequiredValue)errorException;
+
+			String fieldLabelValue = rv.getFieldLabelValue(themeDisplay.getLocale());
+
+			if (Validator.isNull(fieldLabelValue)) {
+				fieldLabelValue = rv.getFieldName();
+			}
 			%>
 
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(rv.getFieldName()) %>" key="no-value-is-defined-for-field-x" translateArguments="<%= false %>" />
+			<liferay-ui:message arguments="<%= HtmlUtil.escape(fieldLabelValue) %>" key="no-value-is-defined-for-field-x" translateArguments="<%= false %>" />
 		</liferay-ui:error>
 
 		<liferay-ddm:html
@@ -66,10 +72,10 @@ if (Validator.isNull(backURL)) {
 			requestedLocale="<%= locale %>"
 		/>
 
-		<div class="sheet-footer">
+		<clay:sheet-footer>
 			<aui:button primary="<%= true %>" type="submit" />
 
 			<aui:button href="<%= backURL %>" type="cancel" />
-		</div>
-	</div>
+		</clay:sheet-footer>
+	</clay:sheet>
 </aui:form>

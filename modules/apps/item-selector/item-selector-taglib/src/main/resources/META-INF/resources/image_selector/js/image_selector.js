@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-image-selector',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var CHANGE_IMAGE_CONTROLS_DELAY = 5000;
@@ -57,48 +57,49 @@ AUI.add(
 		var ImageSelector = A.Component.create({
 			ATTRS: {
 				errorNode: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				fileEntryImageNode: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				fileNameNode: {
 					validator: Lang.isString,
-					value: '.file-name'
+					value: '.file-name',
 				},
 
 				itemSelectorEventName: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				itemSelectorURL: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				maxFileSize: {
 					setter: Lang.toInt,
 					value:
-						Liferay.PropsValues.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE
+						Liferay.PropsValues
+							.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE,
 				},
 
 				paramName: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				progressDataNode: {
 					validator: Lang.isString,
-					value: '.progress-data'
+					value: '.progress-data',
 				},
 
 				uploadURL: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				validExtensions: {
-					validator: Lang.isString
-				}
+					validator: Lang.isString,
+				},
 			},
 
 			AUGMENTS: [Liferay.PortletBase],
@@ -117,11 +118,11 @@ AUI.add(
 					);
 
 					instance.publish(STR_ERROR_MESSAGE, {
-						defaultFn: A.bind('_showErrorMessage', instance)
+						defaultFn: A.bind('_showErrorMessage', instance),
 					});
 
 					instance.publish(STR_IMAGE_DATA, {
-						defaultFn: A.bind('_defImageDataFn', instance)
+						defaultFn: A.bind('_defImageDataFn', instance),
 					});
 
 					instance._eventHandles = [
@@ -153,7 +154,7 @@ AUI.add(
 							.on(STR_CLICK, instance._onDeleteClick, instance),
 						instance
 							.one('#cancelUpload')
-							.on(STR_CLICK, instance._cancelUpload, instance)
+							.on(STR_CLICK, instance._cancelUpload, instance),
 					];
 				},
 
@@ -180,7 +181,7 @@ AUI.add(
 
 					var progressBar = new A.ProgressBar({
 						boundingBox: instance.one('.progressbar'),
-						height: PROGRESS_HEIGHT
+						height: PROGRESS_HEIGHT,
 					}).render();
 
 					instance._progressBar = progressBar;
@@ -230,37 +231,20 @@ AUI.add(
 				_onBrowseClick() {
 					var instance = this;
 
-					Liferay.Loader.require(
-						'frontend-js-web/liferay/ItemSelectorDialog.es',
-						ItemSelectorDialog => {
-							var itemSelectorDialog = new ItemSelectorDialog.default(
-								{
-									eventName: instance.get(
-										'itemSelectorEventName'
-									),
-									singleSelect: true,
-									url: instance.get('itemSelectorURL')
-								}
-							);
+					Liferay.Util.openSelectionModal({
+						onSelect: (selectedItem) => {
+							if (selectedItem) {
+								instance._updateImageData(
+									JSON.parse(selectedItem.value)
+								);
 
-							itemSelectorDialog.open();
-
-							itemSelectorDialog.on(
-								'selectedItemChange',
-								event => {
-									var selectedItem = event.selectedItem;
-
-									if (selectedItem) {
-										instance._updateImageData(
-											JSON.parse(selectedItem.value)
-										);
-
-										Liferay.fire(STR_IMAGE_SELECTED);
-									}
-								}
-							);
-						}
-					);
+								Liferay.fire(STR_IMAGE_SELECTED);
+							}
+						},
+						selectEventName: instance.get('itemSelectorEventName'),
+						title: Liferay.Language.get('select-file'),
+						url: instance.get('itemSelectorURL'),
+					});
 
 					instance._cancelTimer();
 				},
@@ -273,7 +257,7 @@ AUI.add(
 					var instance = this;
 
 					Liferay.fire(STR_IMAGE_DELETED, {
-						imageData: null
+						imageData: null,
 					});
 
 					instance._updateImageData(event);
@@ -300,7 +284,7 @@ AUI.add(
 							name: filename.substring(
 								0,
 								filename.indexOf(STR_DOT)
-							)
+							),
 						});
 
 						fileNameNode.html(fileDataTemplate);
@@ -368,16 +352,17 @@ AUI.add(
 						imageData = image;
 
 						instance.fire(STR_IMAGE_DATA, {
-							imageData: image
+							imageData: image,
 						});
-					} else {
+					}
+					else {
 						instance.fire(STR_ERROR_MESSAGE, {
-							error: data.error
+							error: data.error,
 						});
 					}
 
 					Liferay.fire(fireEvent, {
-						imageData
+						imageData,
 					});
 				},
 
@@ -425,7 +410,7 @@ AUI.add(
 								),
 								totalUnit: bytesTotal.substring(
 									bytesTotalSpaceIndex + 1
-								)
+								),
 							}
 						);
 
@@ -470,9 +455,9 @@ AUI.add(
 								'_onUploadProgress',
 								instance
 							),
-							uploadstart: A.bind('_onUploadStart', instance)
+							uploadstart: A.bind('_onUploadStart', instance),
 						},
-						uploadURL: instance.get('uploadURL')
+						uploadURL: instance.get('uploadURL'),
 					}).render();
 
 					instance._createProgressBar();
@@ -496,7 +481,8 @@ AUI.add(
 						errorType === STATUS_CODE.SC_FILE_CUSTOM_EXCEPTION
 					) {
 						message = error.message;
-					} else if (
+					}
+					else if (
 						errorType === STATUS_CODE.SC_FILE_EXTENSION_EXCEPTION
 					) {
 						if (instance.get('validExtensions')) {
@@ -506,20 +492,23 @@ AUI.add(
 								),
 								[instance.get('validExtensions')]
 							);
-						} else {
+						}
+						else {
 							message = Lang.sub(
 								Liferay.Language.get(
 									'please-enter-a-file-with-a-valid-file-type'
 								)
 							);
 						}
-					} else if (
+					}
+					else if (
 						errorType === STATUS_CODE.SC_FILE_NAME_EXCEPTION
 					) {
 						message = Liferay.Language.get(
 							'please-enter-a-file-with-a-valid-file-name'
 						);
-					} else if (
+					}
+					else if (
 						errorType === STATUS_CODE.SC_FILE_SIZE_EXCEPTION
 					) {
 						message = Lang.sub(
@@ -529,10 +518,11 @@ AUI.add(
 							[
 								Liferay.Util.formatStorage(
 									instance.get('maxFileSize')
-								)
+								),
 							]
 						);
-					} else if (
+					}
+					else if (
 						errorType ===
 						STATUS_CODE.SC_UPLOAD_REQUEST_SIZE_EXCEPTION
 					) {
@@ -568,7 +558,7 @@ AUI.add(
 						'.browse-image-controls'
 					);
 
-					errorNodeAlert.on('visibleChange', event => {
+					errorNodeAlert.on('visibleChange', (event) => {
 						if (!event.newVal) {
 							browseImageControls.show();
 						}
@@ -587,7 +577,7 @@ AUI.add(
 							if (!instance._uploadCompleted) {
 								instance._updateImageData({
 									fileEntryId: '-1',
-									url: reader.result
+									url: reader.result,
 								});
 							}
 						});
@@ -616,8 +606,8 @@ AUI.add(
 					instance.fire(STR_IMAGE_DATA, {
 						imageData: {
 							fileEntryId: imageData.fileEntryId || 0,
-							url: imageData.url || ''
-						}
+							url: imageData.url || '',
+						},
 					});
 				},
 
@@ -651,8 +641,8 @@ AUI.add(
 
 					instance._bindUI();
 					instance._renderUploader();
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.ImageSelector = ImageSelector;
@@ -663,7 +653,7 @@ AUI.add(
 			'aui-base',
 			'aui-progressbar',
 			'liferay-portlet-base',
-			'uploader'
-		]
+			'uploader',
+		],
 	}
 );

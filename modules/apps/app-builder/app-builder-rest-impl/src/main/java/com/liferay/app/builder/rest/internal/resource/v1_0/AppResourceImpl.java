@@ -15,12 +15,12 @@
 package com.liferay.app.builder.rest.internal.resource.v1_0;
 
 import com.liferay.app.builder.constants.AppBuilderAppConstants;
+import com.liferay.app.builder.constants.AppBuilderConstants;
 import com.liferay.app.builder.deploy.AppDeployer;
 import com.liferay.app.builder.deploy.AppDeployerTracker;
-import com.liferay.app.builder.exception.AppBuilderAppStatusException;
 import com.liferay.app.builder.model.AppBuilderApp;
 import com.liferay.app.builder.model.AppBuilderAppDeployment;
-import com.liferay.app.builder.rest.constant.v1_0.DeploymentAction;
+import com.liferay.app.builder.model.AppBuilderAppVersion;
 import com.liferay.app.builder.rest.dto.v1_0.App;
 import com.liferay.app.builder.rest.dto.v1_0.AppDeployment;
 import com.liferay.app.builder.rest.internal.constants.AppBuilderActionKeys;
@@ -31,6 +31,7 @@ import com.liferay.app.builder.rest.internal.resource.v1_0.util.LocalizedValueUt
 import com.liferay.app.builder.rest.resource.v1_0.AppResource;
 import com.liferay.app.builder.service.AppBuilderAppDeploymentLocalService;
 import com.liferay.app.builder.service.AppBuilderAppLocalService;
+import com.liferay.app.builder.service.AppBuilderAppVersionLocalService;
 import com.liferay.app.builder.util.comparator.AppBuilderAppCreateDateComparator;
 import com.liferay.app.builder.util.comparator.AppBuilderAppModifiedDateComparator;
 import com.liferay.app.builder.util.comparator.AppBuilderAppNameComparator;
@@ -42,12 +43,18 @@ import com.liferay.dynamic.data.mapping.model.DDMStructureLayout;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
+import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.QueryFilter;
+import com.liferay.portal.kernel.search.filter.TermFilter;
+import com.liferay.portal.kernel.search.filter.TermsFilter;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -67,14 +74,14 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -96,21 +103,244 @@ public class AppResourceImpl
 
 	@Override
 	public void deleteApp(Long appId) throws Exception {
-		_checkPermissions(appId, ActionKeys.DELETE);
+		_modelResourcePermission.check(
+			PermissionThreadLocal.getPermissionChecker(), appId,
+			ActionKeys.DELETE);
 
 		_appBuilderAppLocalService.deleteAppBuilderApp(appId);
 	}
 
 	@Override
 	public App getApp(Long appId) throws Exception {
-		_checkPermissions(appId, ActionKeys.VIEW);
+		_modelResourcePermission.check(
+			PermissionThreadLocal.getPermissionChecker(), appId,
+			ActionKeys.VIEW);
 
 		return _toApp(_appBuilderAppLocalService.getAppBuilderApp(appId));
 	}
 
 	@Override
+	public Page<App> getAppsPage(
+			Boolean active, String[] deploymentTypes, String keywords,
+			String scope, Long[] userIds, Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		if (pagination.getPageSize() > 250) {
+			throw new BadRequestException(
+				LanguageUtil.format(
+					contextAcceptLanguage.getPreferredLocale(),
+					"page-size-is-greater-than-x", 250));
+		}
+
+		if (ArrayUtil.isEmpty(sorts)) {
+			sorts = new Sort[] {
+				new Sort(
+					Field.getSortableFieldName(Field.MODIFIED_DATE),
+					Sort.STRING_TYPE, true)
+			};
+		}
+
+		if (Objects.isNull(active) && ArrayUtil.isEmpty(deploymentTypes) &&
+			Validator.isNull(keywords) && ArrayUtil.isEmpty(userIds)) {
+
+			if (Validator.isNull(scope)) {
+				return Page.of(
+					transform(
+						_appBuilderAppLocalService.getCompanyAppBuilderApps(
+							contextCompany.getCompanyId(),
+							pagination.getStartPosition(),
+							pagination.getEndPosition(),
+							_toOrderByComparator(sorts[0])),
+						this::_toApp),
+					pagination,
+					_appBuilderAppLocalService.getCompanyAppBuilderAppsCount(
+						contextCompany.getCompanyId()));
+			}
+
+			return Page.of(
+				transform(
+					_appBuilderAppLocalService.getCompanyAppBuilderApps(
+						contextCompany.getCompanyId(), scope,
+						pagination.getStartPosition(),
+						pagination.getEndPosition(),
+						_toOrderByComparator(sorts[0])),
+					this::_toApp),
+				pagination,
+				_appBuilderAppLocalService.getCompanyAppBuilderAppsCount(
+					contextCompany.getCompanyId(), scope));
+		}
+
+		return SearchUtil.search(
+			Collections.emptyMap(),
+			booleanQuery -> {
+				BooleanFilter booleanFilter =
+					booleanQuery.getPreBooleanFilter();
+
+				if (Objects.nonNull(active)) {
+					booleanFilter.add(
+						new TermFilter("active", String.valueOf(active)),
+						BooleanClauseOccur.MUST);
+				}
+
+				if (ArrayUtil.isNotEmpty(deploymentTypes)) {
+					BooleanQuery deploymentTypesBooleanQuery =
+						new BooleanQueryImpl();
+
+					for (String deploymentType : deploymentTypes) {
+						deploymentTypesBooleanQuery.addTerm(
+							"deploymentTypes", deploymentType);
+					}
+
+					booleanFilter.add(
+						new QueryFilter(deploymentTypesBooleanQuery),
+						BooleanClauseOccur.MUST);
+				}
+
+				if (ArrayUtil.isNotEmpty(userIds)) {
+					TermsFilter userIdTermsFilter = new TermsFilter("userId");
+
+					userIdTermsFilter.addValues(
+						Stream.of(
+							userIds
+						).map(
+							String::valueOf
+						).toArray(
+							String[]::new
+						));
+
+					booleanFilter.add(
+						userIdTermsFilter, BooleanClauseOccur.MUST);
+				}
+
+				if (Validator.isNotNull(scope)) {
+					BooleanQuery scopeBooleanQuery = new BooleanQueryImpl();
+
+					scopeBooleanQuery.addTerm("scope", scope);
+
+					booleanFilter.add(
+						new QueryFilter(scopeBooleanQuery),
+						BooleanClauseOccur.MUST);
+				}
+			},
+			null, AppBuilderApp.class, keywords, pagination,
+			queryConfig -> queryConfig.setSelectedFieldNames(
+				Field.ENTRY_CLASS_PK),
+			searchContext -> {
+				searchContext.setAttribute(
+					Field.CLASS_NAME_ID,
+					_portal.getClassNameId(AppBuilderApp.class));
+				searchContext.setAttribute(Field.NAME, keywords);
+				searchContext.setCompanyId(contextCompany.getCompanyId());
+			},
+			sorts,
+			document -> _toApp(
+				_appBuilderAppLocalService.fetchAppBuilderApp(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
+	}
+
+	@Override
 	public Page<App> getDataDefinitionAppsPage(
-			Long dataDefinitionId, String keywords, Pagination pagination,
+			Long dataDefinitionId, String keywords, String scope,
+			Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		if (pagination.getPageSize() > 250) {
+			throw new BadRequestException(
+				LanguageUtil.format(
+					contextAcceptLanguage.getPreferredLocale(),
+					"page-size-is-greater-than-x", 250));
+		}
+
+		if (ArrayUtil.isEmpty(sorts)) {
+			sorts = new Sort[] {
+				new Sort(
+					Field.getSortableFieldName(Field.MODIFIED_DATE),
+					Sort.STRING_TYPE, true)
+			};
+		}
+
+		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
+			dataDefinitionId);
+
+		if (Validator.isNotNull(keywords)) {
+			return SearchUtil.search(
+				Collections.emptyMap(),
+				booleanQuery -> {
+					if (Validator.isNotNull(scope)) {
+						BooleanFilter booleanFilter =
+							booleanQuery.getPreBooleanFilter();
+
+						BooleanQuery scopeBooleanQuery = new BooleanQueryImpl();
+
+						scopeBooleanQuery.addTerm("scope", scope);
+
+						booleanFilter.add(
+							new QueryFilter(scopeBooleanQuery),
+							BooleanClauseOccur.MUST);
+					}
+				},
+				null, AppBuilderApp.class, keywords, pagination,
+				queryConfig -> queryConfig.setSelectedFieldNames(
+					Field.ENTRY_CLASS_PK),
+				searchContext -> {
+					searchContext.setAttribute(
+						Field.CLASS_NAME_ID,
+						_portal.getClassNameId(AppBuilderApp.class));
+					searchContext.setAttribute(Field.NAME, keywords);
+					searchContext.setAttribute(
+						"ddmStructureId", dataDefinitionId);
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+					searchContext.setGroupIds(
+						new long[] {ddmStructure.getGroupId()});
+				},
+				sorts,
+				document -> _toApp(
+					_appBuilderAppLocalService.fetchAppBuilderApp(
+						GetterUtil.getLong(
+							document.get(Field.ENTRY_CLASS_PK)))));
+		}
+
+		if (Validator.isNotNull(scope)) {
+			return Page.of(
+				transform(
+					_appBuilderAppLocalService.getAppBuilderApps(
+						ddmStructure.getGroupId(),
+						contextCompany.getCompanyId(),
+						ddmStructure.getStructureId(), scope,
+						pagination.getStartPosition(),
+						pagination.getEndPosition(),
+						_toOrderByComparator(sorts[0])),
+					this::_toApp),
+				pagination,
+				_appBuilderAppLocalService.getAppBuilderAppsCount(
+					ddmStructure.getGroupId(), contextCompany.getCompanyId(),
+					ddmStructure.getStructureId(), scope));
+		}
+
+		return Page.of(
+			transform(
+				_appBuilderAppLocalService.getAppBuilderApps(
+					ddmStructure.getGroupId(), contextCompany.getCompanyId(),
+					ddmStructure.getStructureId(),
+					pagination.getStartPosition(), pagination.getEndPosition(),
+					_toOrderByComparator(sorts[0])),
+				this::_toApp),
+			pagination,
+			_appBuilderAppLocalService.getAppBuilderAppsCount(
+				ddmStructure.getGroupId(), contextCompany.getCompanyId(),
+				ddmStructure.getStructureId()));
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return _entityModel;
+	}
+
+	@Override
+	public Page<App> getSiteAppsPage(
+			Long siteId, String keywords, String scope, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
 
@@ -129,91 +359,33 @@ public class AppResourceImpl
 			};
 		}
 
-		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
-			dataDefinitionId);
-
-		if (Validator.isNull(keywords)) {
-			return Page.of(
-				transform(
-					_appBuilderAppLocalService.getAppBuilderApps(
-						ddmStructure.getGroupId(),
-						contextCompany.getCompanyId(),
-						ddmStructure.getStructureId(),
-						pagination.getStartPosition(),
-						pagination.getEndPosition(),
-						_toOrderByComparator(
-							(Sort)ArrayUtil.getValue(sorts, 0))),
-					this::_toApp),
-				pagination,
-				_appBuilderAppLocalService.getAppBuilderAppsCount(
-					ddmStructure.getGroupId(), contextCompany.getCompanyId(),
-					ddmStructure.getStructureId()));
-		}
-
-		return SearchUtil.search(
-			booleanQuery -> {
-			},
-			null, AppBuilderApp.class, keywords, pagination,
-			queryConfig -> queryConfig.setSelectedFieldNames(
-				Field.ENTRY_CLASS_PK),
-			searchContext -> {
-				searchContext.setAttribute(
-					Field.CLASS_NAME_ID,
-					_portal.getClassNameId(AppBuilderApp.class));
-				searchContext.setAttribute(Field.NAME, keywords);
-				searchContext.setAttribute("ddmStructureId", dataDefinitionId);
-				searchContext.setCompanyId(contextCompany.getCompanyId());
-				searchContext.setGroupIds(
-					new long[] {ddmStructure.getGroupId()});
-			},
-			document -> _toApp(
-				_appBuilderAppLocalService.getAppBuilderApp(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))),
-			sorts);
-	}
-
-	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return _entityModel;
-	}
-
-	@Override
-	public Page<App> getSiteAppsPage(
-			Long siteId, String keywords, Pagination pagination, Sort[] sorts)
-		throws Exception {
-
-		if (pagination.getPageSize() > 250) {
-			throw new BadRequestException(
-				LanguageUtil.format(
-					contextAcceptLanguage.getPreferredLocale(),
-					"page-size-is-greater-than-x", 250));
-		}
-
-		if (ArrayUtil.isEmpty(sorts)) {
-			sorts = new Sort[] {
-				new Sort(
-					Field.getSortableFieldName(Field.MODIFIED_DATE),
-					Sort.STRING_TYPE, true)
-			};
-		}
-
-		if (Validator.isNull(keywords)) {
+		if (Validator.isNull(keywords) && Validator.isNull(scope)) {
 			return Page.of(
 				transform(
 					_appBuilderAppLocalService.getAppBuilderApps(
 						siteId, pagination.getStartPosition(),
 						pagination.getEndPosition(),
-						_toOrderByComparator(
-							(Sort)ArrayUtil.getValue(sorts, 0))),
+						_toOrderByComparator(sorts[0])),
 					this::_toApp),
 				pagination,
 				_appBuilderAppLocalService.getAppBuilderAppsCount(siteId));
 		}
 
 		return SearchUtil.search(
+			Collections.emptyMap(),
 			booleanQuery -> {
+				if (Validator.isNotNull(scope)) {
+					BooleanFilter booleanFilter =
+						booleanQuery.getPreBooleanFilter();
+
+					BooleanQuery scopeBooleanQuery = new BooleanQueryImpl();
+
+					scopeBooleanQuery.addTerm("scope", scope);
+
+					booleanFilter.add(
+						new QueryFilter(scopeBooleanQuery),
+						BooleanClauseOccur.MUST);
+				}
 			},
 			null, AppBuilderApp.class, keywords, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
@@ -226,35 +398,55 @@ public class AppResourceImpl
 				searchContext.setCompanyId(contextCompany.getCompanyId());
 				searchContext.setGroupIds(new long[] {siteId});
 			},
+			sorts,
 			document -> _toApp(
-				_appBuilderAppLocalService.getAppBuilderApp(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))),
-			sorts);
+				_appBuilderAppLocalService.fetchAppBuilderApp(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
 	@Override
 	public App postDataDefinitionApp(Long dataDefinitionId, App app)
 		throws Exception {
 
-		_checkPortletPermissions();
+		if (!_portletResourcePermission.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				contextCompany.getGroupId(), ActionKeys.MANAGE)) {
+
+			_portletResourcePermission.check(
+				PermissionThreadLocal.getPermissionChecker(),
+				contextCompany.getGroupId(), AppBuilderActionKeys.ADD_APP);
+		}
 
 		_validate(
-			app.getDataLayoutId(), app.getDataListViewId(), app.getName(),
-			app.getStatus());
+			app.getActive(), app.getDataLayoutId(), app.getDataListViewId(),
+			app.getName());
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
 			dataDefinitionId);
-		AppBuilderAppConstants.Status appBuilderAppConstantsStatus =
-			AppBuilderAppConstants.Status.parse(app.getStatus());
 
-		AppBuilderApp appBuilderApp =
-			_appBuilderAppLocalService.addAppBuilderApp(
+		AppBuilderApp appBuilderApp = null;
+
+		if (Objects.isNull(app.getDataRecordCollectionId())) {
+			appBuilderApp = _appBuilderAppLocalService.addAppBuilderApp(
 				ddmStructure.getGroupId(), contextCompany.getCompanyId(),
-				PrincipalThreadLocal.getUserId(), dataDefinitionId,
+				PrincipalThreadLocal.getUserId(), app.getActive(),
+				dataDefinitionId, GetterUtil.getLong(app.getDataLayoutId()),
+				GetterUtil.getLong(app.getDataListViewId()),
+				LocalizedValueUtil.toLocaleStringMap(app.getName()),
+				GetterUtil.getString(
+					app.getScope(), AppBuilderAppConstants.SCOPE_STANDARD));
+		}
+		else {
+			appBuilderApp = _appBuilderAppLocalService.addAppBuilderApp(
+				ddmStructure.getGroupId(), contextCompany.getCompanyId(),
+				PrincipalThreadLocal.getUserId(), app.getActive(),
+				app.getDataRecordCollectionId(), dataDefinitionId,
 				GetterUtil.getLong(app.getDataLayoutId()),
 				GetterUtil.getLong(app.getDataListViewId()),
 				LocalizedValueUtil.toLocaleStringMap(app.getName()),
-				appBuilderAppConstantsStatus.getValue());
+				GetterUtil.getString(
+					app.getScope(), AppBuilderAppConstants.SCOPE_STANDARD));
+		}
 
 		app.setId(appBuilderApp.getAppBuilderAppId());
 
@@ -279,25 +471,24 @@ public class AppResourceImpl
 
 	@Override
 	public App putApp(Long appId, App app) throws Exception {
-		_checkPermissions(appId, ActionKeys.UPDATE);
+		_modelResourcePermission.check(
+			PermissionThreadLocal.getPermissionChecker(), appId,
+			ActionKeys.UPDATE);
 
 		_validate(
-			app.getDataLayoutId(), app.getDataListViewId(), app.getName(),
-			app.getStatus());
+			app.getActive(), app.getDataLayoutId(), app.getDataListViewId(),
+			app.getName());
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
 			app.getDataDefinitionId());
-		AppBuilderAppConstants.Status appBuilderAppConstantsStatus =
-			AppBuilderAppConstants.Status.parse(app.getStatus());
 
 		AppBuilderApp appBuilderApp =
 			_appBuilderAppLocalService.updateAppBuilderApp(
-				PrincipalThreadLocal.getUserId(), appId,
+				PrincipalThreadLocal.getUserId(), appId, app.getActive(),
 				ddmStructure.getStructureId(),
 				GetterUtil.getLong(app.getDataLayoutId()),
 				GetterUtil.getLong(app.getDataListViewId()),
-				LocalizedValueUtil.toLocaleStringMap(app.getName()),
-				appBuilderAppConstantsStatus.getValue());
+				LocalizedValueUtil.toLocaleStringMap(app.getName()));
 
 		List<AppBuilderAppDeployment> appBuilderAppDeployments =
 			_appBuilderAppDeploymentLocalService.getAppBuilderAppDeployments(
@@ -318,11 +509,7 @@ public class AppResourceImpl
 			AppDeployer appDeployer = _appDeployerTracker.getAppDeployer(
 				appDeployment.getType());
 
-			if ((appDeployer != null) &&
-				Objects.equals(
-					appBuilderAppConstantsStatus,
-					AppBuilderAppConstants.Status.DEPLOYED)) {
-
+			if ((appDeployer != null) && app.getActive()) {
 				appDeployer.deploy(appId);
 			}
 		}
@@ -331,29 +518,20 @@ public class AppResourceImpl
 	}
 
 	@Override
-	public Response putAppDeployment(
-			Long appId, DeploymentAction deploymentAction)
-		throws Exception {
-
-		_checkPermissions(appId, ActionKeys.UPDATE);
-
-		List<AppBuilderAppDeployment> appBuilderAppDeployments =
-			_appBuilderAppDeploymentLocalService.getAppBuilderAppDeployments(
-				appId);
+	public Response putAppDeploy(Long appId) throws Exception {
+		_modelResourcePermission.check(
+			PermissionThreadLocal.getPermissionChecker(), appId,
+			ActionKeys.UPDATE);
 
 		for (AppBuilderAppDeployment appBuilderAppDeployment :
-				appBuilderAppDeployments) {
+				_appBuilderAppDeploymentLocalService.
+					getAppBuilderAppDeployments(appId)) {
 
 			AppDeployer appDeployer = _appDeployerTracker.getAppDeployer(
 				appBuilderAppDeployment.getType());
 
 			if (appDeployer != null) {
-				if (deploymentAction.equals(DeploymentAction.DEPLOY)) {
-					appDeployer.deploy(appId);
-				}
-				else {
-					appDeployer.undeploy(appId);
-				}
+				appDeployer.deploy(appId);
 			}
 		}
 
@@ -362,31 +540,27 @@ public class AppResourceImpl
 		return responseBuilder.build();
 	}
 
-	private void _checkPermissions(long appId, String actionId)
-		throws PortalException {
-
-		if (_portletResourcePermission.contains(
-				PermissionThreadLocal.getPermissionChecker(),
-				contextCompany.getGroupId(), ActionKeys.MANAGE)) {
-
-			return;
-		}
-
+	@Override
+	public Response putAppUndeploy(Long appId) throws Exception {
 		_modelResourcePermission.check(
-			PermissionThreadLocal.getPermissionChecker(), appId, actionId);
-	}
+			PermissionThreadLocal.getPermissionChecker(), appId,
+			ActionKeys.UPDATE);
 
-	private void _checkPortletPermissions() throws PortalException {
-		if (_portletResourcePermission.contains(
-				PermissionThreadLocal.getPermissionChecker(),
-				contextCompany.getGroupId(), ActionKeys.MANAGE)) {
+		for (AppBuilderAppDeployment appBuilderAppDeployment :
+				_appBuilderAppDeploymentLocalService.
+					getAppBuilderAppDeployments(appId)) {
 
-			return;
+			AppDeployer appDeployer = _appDeployerTracker.getAppDeployer(
+				appBuilderAppDeployment.getType());
+
+			if (appDeployer != null) {
+				appDeployer.undeploy(appId);
+			}
 		}
 
-		_portletResourcePermission.check(
-			PermissionThreadLocal.getPermissionChecker(),
-			contextCompany.getGroupId(), AppBuilderActionKeys.ADD_APP);
+		Response.ResponseBuilder responseBuilder = Response.accepted();
+
+		return responseBuilder.build();
 	}
 
 	@Reference(
@@ -399,12 +573,14 @@ public class AppResourceImpl
 		_modelResourcePermission = modelResourcePermission;
 	}
 
-	private App _toApp(AppBuilderApp appBuilderApp) throws Exception {
-		AppBuilderAppConstants.Status appBuilderAppConstantsStatus =
-			AppBuilderAppConstants.Status.parse(appBuilderApp.getStatus());
+	private App _toApp(AppBuilderApp appBuilderApp) {
+		if (appBuilderApp == null) {
+			return null;
+		}
 
 		return new App() {
 			{
+				active = appBuilderApp.isActive();
 				appDeployments = transformToArray(
 					_appBuilderAppDeploymentLocalService.
 						getAppBuilderAppDeployments(
@@ -420,14 +596,33 @@ public class AppResourceImpl
 				dataDefinitionId = appBuilderApp.getDdmStructureId();
 				dataLayoutId = appBuilderApp.getDdmStructureLayoutId();
 				dataListViewId = appBuilderApp.getDeDataListViewId();
+				dataRecordCollectionId = appBuilderApp.getDdlRecordSetId();
 				dateCreated = appBuilderApp.getCreateDate();
 				dateModified = appBuilderApp.getModifiedDate();
 				id = appBuilderApp.getAppBuilderAppId();
 				name = LocalizedValueUtil.toStringObjectMap(
 					appBuilderApp.getNameMap());
 				siteId = appBuilderApp.getGroupId();
-				status = appBuilderAppConstantsStatus.getLabel();
 				userId = appBuilderApp.getUserId();
+
+				setDataDefinitionName(
+					() -> {
+						DDMStructure ddmStructure =
+							_ddmStructureLocalService.getDDMStructure(
+								appBuilderApp.getDdmStructureId());
+
+						return ddmStructure.getName(
+							contextAcceptLanguage.getPreferredLocale());
+					});
+				setVersion(
+					() -> {
+						AppBuilderAppVersion latestAppBuilderAppVersion =
+							_appBuilderAppVersionLocalService.
+								getLatestAppBuilderAppVersion(
+									appBuilderApp.getAppBuilderAppId());
+
+						return latestAppBuilderAppVersion.getVersion();
+					});
 			}
 		};
 	}
@@ -443,7 +638,7 @@ public class AppResourceImpl
 			jsonObject.put(entry.getKey(), entry.getValue());
 		}
 
-		return jsonObject.toJSONString();
+		return jsonObject.toString();
 	}
 
 	private OrderByComparator<AppBuilderApp> _toOrderByComparator(Sort sort) {
@@ -481,9 +676,13 @@ public class AppResourceImpl
 	}
 
 	private void _validate(
-			Long dataLayoutId, Long dataListViewId, Map<String, Object> name,
-			String status)
+			Boolean active, Long dataLayoutId, Long dataListViewId,
+			Map<String, Object> name)
 		throws Exception {
+
+		if (Objects.isNull(active)) {
+			throw new InvalidAppException("Active is null");
+		}
 
 		if ((dataLayoutId == null) && (dataListViewId == null)) {
 			throw new InvalidAppException(
@@ -524,26 +723,12 @@ public class AppResourceImpl
 					throw new InvalidAppException(
 						"The app name has more than 30 characters");
 				}
-
-				Matcher matcher = _invalidAppNameCharsPattern.matcher(
-					localizedName);
-
-				if (matcher.matches()) {
-					throw new InvalidAppException(
-						"The app name must not contain special characters");
-				}
 			}
-		}
-
-		if (Validator.isNull(AppBuilderAppConstants.Status.parse(status))) {
-			throw new AppBuilderAppStatusException("Invalid status " + status);
 		}
 	}
 
 	private static final EntityModel _entityModel =
 		new AppBuilderAppEntityModel();
-	private static final Pattern _invalidAppNameCharsPattern = Pattern.compile(
-		".*[$&+,:;=\\\\?@#|/'<>.^*()%!-].*");
 
 	@Reference
 	private AppBuilderAppDeploymentLocalService
@@ -551,6 +736,9 @@ public class AppResourceImpl
 
 	@Reference
 	private AppBuilderAppLocalService _appBuilderAppLocalService;
+
+	@Reference
+	private AppBuilderAppVersionLocalService _appBuilderAppVersionLocalService;
 
 	@Reference
 	private AppDeployerTracker _appDeployerTracker;
@@ -569,7 +757,9 @@ public class AppResourceImpl
 	@Reference
 	private Portal _portal;
 
-	@Reference(target = "(resource.name=com.liferay.app.builder)")
+	@Reference(
+		target = "(resource.name=" + AppBuilderConstants.RESOURCE_NAME + ")"
+	)
 	private PortletResourcePermission _portletResourcePermission;
 
 	@Reference

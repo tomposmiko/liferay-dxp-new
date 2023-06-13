@@ -15,6 +15,8 @@
 package com.liferay.portlet.configuration.web.internal.portlet;
 
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -31,6 +33,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfigWrapper;
 import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletConfigurationLayoutUtil;
+import com.liferay.portal.kernel.portlet.PortletConfigurationListener;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -70,6 +73,8 @@ import com.liferay.portlet.configuration.web.internal.constants.PortletConfigura
 import com.liferay.portlet.configuration.web.internal.constants.PortletConfigurationWebKeys;
 import com.liferay.portlet.portletconfiguration.action.ActionUtil;
 import com.liferay.portlet.portletconfiguration.util.PublicRenderParameterConfiguration;
+import com.liferay.roles.admin.constants.RolesAdminWebKeys;
+import com.liferay.roles.admin.role.type.contributor.provider.RoleTypeContributorProvider;
 
 import java.io.IOException;
 
@@ -98,6 +103,8 @@ import javax.portlet.ResourceResponse;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -221,10 +228,10 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 		actionRequest = ActionUtil.getWrappedActionRequest(
 			actionRequest, portletPreferences);
 
-		Enumeration<String> enu = portletPreferences.getNames();
+		Enumeration<String> enumeration = portletPreferences.getNames();
 
-		while (enu.hasMoreElements()) {
-			String name = enu.nextElement();
+		while (enumeration.hasMoreElements()) {
+			String name = enumeration.nextElement();
 
 			if (name.startsWith(
 					PublicRenderParameterConfiguration.IGNORE_PREFIX) ||
@@ -348,7 +355,9 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 
 		Portlet portlet = ActionUtil.getPortlet(actionRequest);
 
-		PortletPreferences portletPreferences = actionRequest.getPreferences();
+		PortletPreferences portletPreferences =
+			ActionUtil.getLayoutPortletSetup(
+				actionRequest, ActionUtil.getPortlet(actionRequest));
 
 		actionRequest = ActionUtil.getWrappedActionRequest(
 			actionRequest, portletPreferences);
@@ -544,9 +553,8 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 		Map<Long, String[]> roleIdsToActionIds = new HashMap<>();
 
 		for (long roleId : roleIds) {
-			String[] actionIds = getActionIds(actionRequest, roleId, false);
-
-			roleIdsToActionIds.put(roleId, actionIds);
+			roleIdsToActionIds.put(
+				roleId, getActionIds(actionRequest, roleId, false));
 		}
 
 		_resourcePermissionService.setIndividualResourcePermissions(
@@ -576,6 +584,13 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 
 			portletPreferences.store();
 		}
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, PortletConfigurationListener.class,
+			"javax.portlet.name");
 	}
 
 	protected void checkEditPermissionsJSP(PortletRequest request)
@@ -618,6 +633,10 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 
 			if (mvcPath.equals("/edit_permissions.jsp")) {
 				checkEditPermissionsJSP(renderRequest);
+
+				renderRequest.setAttribute(
+					RolesAdminWebKeys.ROLE_TYPE_CONTRIBUTOR_PROVIDER,
+					_roleTypeContributorProvider);
 
 				super.doDispatch(renderRequest, renderResponse);
 
@@ -698,10 +717,10 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 
 		List<String> actionIds = new ArrayList<>();
 
-		Enumeration<String> enu = actionRequest.getParameterNames();
+		Enumeration<String> enumeration = actionRequest.getParameterNames();
 
-		while (enu.hasMoreElements()) {
-			String name = enu.nextElement();
+		while (enumeration.hasMoreElements()) {
+			String name = enumeration.nextElement();
 
 			if (name.startsWith(roleId + ActionUtil.ACTION)) {
 				int pos = name.indexOf(ActionUtil.ACTION);
@@ -773,18 +792,18 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 				scopeLayoutUuid, layout.getGroupId(), layout.isPrivateLayout());
 
 			if (!scopeLayout.hasScopeGroup()) {
-				Map<Locale, String> nameMap = HashMapBuilder.put(
-					LocaleUtil.getDefault(),
-					String.valueOf(scopeLayout.getPlid())
-				).build();
-
 				_groupLocalService.addGroup(
 					themeDisplay.getUserId(),
 					GroupConstants.DEFAULT_PARENT_GROUP_ID,
 					Layout.class.getName(), scopeLayout.getPlid(),
-					GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0,
-					true, GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null,
-					false, true, null);
+					GroupConstants.DEFAULT_LIVE_GROUP_ID,
+					HashMapBuilder.put(
+						LocaleUtil.getDefault(),
+						String.valueOf(scopeLayout.getPlid())
+					).build(),
+					null, 0, true,
+					GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false,
+					true, null);
 			}
 
 			scopeGroupId = scopeLayout.getGroupId();
@@ -1058,6 +1077,14 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 		}
 
 		portletPreferences.store();
+
+		PortletConfigurationListener portletConfigurationListener =
+			_serviceTrackerMap.getService(portlet.getPortletName());
+
+		if (portletConfigurationListener != null) {
+			portletConfigurationListener.onUpdateScope(
+				portlet.getPortletId(), portletPreferences);
+		}
 	}
 
 	private void _handleException(
@@ -1090,6 +1117,12 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 	private final ThreadLocal<PortletRequest> _portletRequestThreadLocal =
 		new CentralizedThreadLocal<>("_portletRequestThreadLocal");
 	private ResourcePermissionService _resourcePermissionService;
+
+	@Reference
+	private RoleTypeContributorProvider _roleTypeContributorProvider;
+
+	private ServiceTrackerMap<String, PortletConfigurationListener>
+		_serviceTrackerMap;
 
 	private class PortletConfigurationPortletPortletConfig
 		extends LiferayPortletConfigWrapper {

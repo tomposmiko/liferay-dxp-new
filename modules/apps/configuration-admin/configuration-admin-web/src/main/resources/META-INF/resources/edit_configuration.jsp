@@ -29,13 +29,13 @@ String bindRedirectURL = currentURL;
 
 PortletURL viewFactoryInstancesURL = renderResponse.createRenderURL();
 
-viewFactoryInstancesURL.setParameter("mvcRenderCommandName", "/view_factory_instances");
+viewFactoryInstancesURL.setParameter("mvcRenderCommandName", "/configuration_admin/view_factory_instances");
 
 ConfigurationModel configurationModel = (ConfigurationModel)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MODEL);
 
 viewFactoryInstancesURL.setParameter("factoryPid", configurationModel.getFactoryPid());
 
-if (!configurationModel.isCompanyFactory() && configurationModel.isFactory()) {
+if (configurationModel.isFactory()) {
 	bindRedirectURL = viewFactoryInstancesURL.toString();
 }
 
@@ -45,7 +45,7 @@ ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay = (Configurati
 
 ConfigurationCategoryDisplay configurationCategoryDisplay = configurationCategoryMenuDisplay.getConfigurationCategoryDisplay();
 
-String categoryDisplayName = HtmlUtil.escape(configurationCategoryDisplay.getCategoryLabel(locale));
+String categoryDisplayName = configurationCategoryDisplay.getCategoryLabel(locale);
 
 String viewCategoryHREF = ConfigurationCategoryUtil.getHREF(configurationCategoryMenuDisplay, liferayPortletResponse, renderRequest, renderResponse);
 
@@ -59,7 +59,7 @@ ResourceBundle componentResourceBundle = resourceBundleLoader.loadResourceBundle
 
 String configurationModelName = (componentResourceBundle != null) ? LanguageUtil.get(componentResourceBundle, configurationModel.getName()) : configurationModel.getName();
 
-if (configurationModel.isFactory() && !configurationModel.isCompanyFactory()) {
+if (configurationModel.isFactory()) {
 	PortalUtil.addPortletBreadcrumbEntry(request, configurationModelName, viewFactoryInstancesURL.toString());
 }
 
@@ -78,28 +78,36 @@ renderResponse.setTitle(categoryDisplayName);
 	<liferay-ui:message key="<%= cmle.causeMessage %>" localizeKey="<%= false %>" />
 </liferay-ui:error>
 
-<portlet:actionURL name="bindConfiguration" var="bindConfigurationActionURL" />
-<portlet:actionURL name="deleteConfiguration" var="deleteConfigurationActionURL" />
+<portlet:actionURL name="/configuration_admin/bind_configuration" var="bindConfigurationActionURL" />
+<portlet:actionURL name="/configuration_admin/delete_configuration" var="deleteConfigurationActionURL" />
 
-<div class="container-fluid container-fluid-max-xl">
-	<div class="col-12">
+<clay:container-fluid>
+	<clay:col
+		size="12"
+	>
 		<liferay-ui:breadcrumb
 			showCurrentGroup="<%= false %>"
 			showGuestGroup="<%= false %>"
 			showLayout="<%= false %>"
 			showParentGroups="<%= false %>"
 		/>
-	</div>
-</div>
+	</clay:col>
+</clay:container-fluid>
 
-<div class="container-fluid container-fluid-max-xl">
-	<div class="row">
-		<div class="col-md-3">
+<clay:container-fluid>
+	<clay:row>
+		<clay:col
+			md="3"
+		>
 			<liferay-util:include page="/configuration_category_menu.jsp" servletContext="<%= application %>" />
-		</div>
+		</clay:col>
 
-		<div class="col-md-9">
-			<div class="sheet sheet-lg">
+		<clay:col
+			md="9"
+		>
+			<clay:sheet
+				size="full"
+			>
 				<aui:form action="<%= bindConfigurationActionURL %>" method="post" name="fm">
 					<aui:input name="redirect" type="hidden" value="<%= bindRedirectURL %>" />
 					<aui:input name="factoryPid" type="hidden" value="<%= configurationModel.getFactoryPid() %>" />
@@ -108,10 +116,9 @@ renderResponse.setTitle(categoryDisplayName);
 					<%
 					String configurationTitle = null;
 
-					ConfigurationScopeDisplayContext
-						configurationScopeDisplayContext = ConfigurationScopeDisplayContextFactory.create(renderRequest);
+					ConfigurationScopeDisplayContext configurationScopeDisplayContext = ConfigurationScopeDisplayContextFactory.create(renderRequest);
 
-					if (configurationModel.isFactory() && !configurationModel.isCompanyFactory()) {
+					if (configurationModel.isFactory()) {
 						if (configurationModel.hasScopeConfiguration(configurationScopeDisplayContext.getScope())) {
 							configurationTitle = configurationModel.getLabel();
 						}
@@ -135,8 +142,8 @@ renderResponse.setTitle(categoryDisplayName);
 								showWhenSingleIcon="<%= true %>"
 							>
 								<c:choose>
-									<c:when test="<%= configurationModel.isFactory() && !configurationModel.isCompanyFactory() %>">
-										<portlet:actionURL name="deleteConfiguration" var="deleteConfigActionURL">
+									<c:when test="<%= configurationModel.isFactory() %>">
+										<portlet:actionURL name="/configuration_admin/delete_configuration" var="deleteConfigActionURL">
 											<portlet:param name="redirect" value="<%= currentURL %>" />
 											<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
 											<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
@@ -149,7 +156,7 @@ renderResponse.setTitle(categoryDisplayName);
 										/>
 									</c:when>
 									<c:otherwise>
-										<portlet:actionURL name="deleteConfiguration" var="deleteConfigActionURL">
+										<portlet:actionURL name="/configuration_admin/delete_configuration" var="deleteConfigActionURL">
 											<portlet:param name="redirect" value="<%= currentURL %>" />
 											<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
 											<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
@@ -163,18 +170,16 @@ renderResponse.setTitle(categoryDisplayName);
 									</c:otherwise>
 								</c:choose>
 
-								<c:if test="<%= ExtendedObjectClassDefinition.Scope.SYSTEM.equals(configurationScopeDisplayContext.getScope()) %>">
-									<portlet:resourceURL id="export" var="exportURL">
-										<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
-										<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
-									</portlet:resourceURL>
+								<portlet:resourceURL id="/configuration_admin/export_configuration" var="exportURL">
+									<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
+									<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
+								</portlet:resourceURL>
 
-									<liferay-ui:icon
-										message="export"
-										method="get"
-										url="<%= exportURL %>"
-									/>
-								</c:if>
+								<liferay-ui:icon
+									message="export"
+									method="get"
+									url="<%= exportURL %>"
+								/>
 
 								<%
 								List<ConfigurationMenuItem> configurationMenuItems = (List<ConfigurationMenuItem>)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MENU_ITEMS);
@@ -208,6 +213,8 @@ renderResponse.setTitle(categoryDisplayName);
 						</aui:alert>
 					</c:if>
 
+					<liferay-util:dynamic-include key='<%= "com.liferay.configuration.admin.web#/edit_configuration.jsp#" + configurationModel.getFactoryPid() + "#pre" %>' />
+
 					<%
 					String configurationModelDescription = (componentResourceBundle != null) ? LanguageUtil.format(componentResourceBundle, configurationModel.getDescription(), configurationModel.getDescriptionArguments()) : configurationModel.getDescription();
 					%>
@@ -224,6 +231,8 @@ renderResponse.setTitle(categoryDisplayName);
 					configurationFormRenderer.render(request, PipingServletResponse.createPipingServletResponse(pageContext));
 					%>
 
+					<liferay-util:dynamic-include key='<%= "com.liferay.configuration.admin.web#/edit_configuration.jsp#" + configurationModel.getFactoryPid() + "#post" %>' />
+
 					<aui:button-row>
 						<c:choose>
 							<c:when test="<%= configurationModel.hasScopeConfiguration(configurationScopeDisplayContext.getScope()) %>">
@@ -237,7 +246,7 @@ renderResponse.setTitle(categoryDisplayName);
 						<aui:button href="<%= redirect %>" name="cancel" type="cancel" />
 					</aui:button-row>
 				</aui:form>
-			</div>
-		</div>
-	</div>
-</div>
+			</clay:sheet>
+		</clay:col>
+	</clay:row>
+</clay:container-fluid>

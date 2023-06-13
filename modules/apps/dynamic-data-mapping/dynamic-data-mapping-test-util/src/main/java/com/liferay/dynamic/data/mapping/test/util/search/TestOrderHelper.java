@@ -32,7 +32,7 @@ import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.render.ValueAccessor;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
-import com.liferay.dynamic.data.mapping.storage.FieldConstants;
+import com.liferay.dynamic.data.mapping.storage.constants.FieldConstants;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDMBeanTranslatorUtil;
@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang.ArrayUtils;
 
@@ -304,10 +305,8 @@ public abstract class TestOrderHelper {
 		for (int i = 0; i < assetEntries.size(); i++) {
 			AssetEntry assetEntry = assetEntries.get(i);
 
-			AssetRenderer<?> assetRenderer =
-				assetRendererFactory.getAssetRenderer(assetEntry.getClassPK());
-
-			values[i] = getValue(assetRenderer);
+			values[i] = getValue(
+				assetRendererFactory.getAssetRenderer(assetEntry.getClassPK()));
 		}
 
 		return values;
@@ -422,10 +421,24 @@ public abstract class TestOrderHelper {
 	}
 
 	protected void testOrderByDDMTextField(String indexType) throws Exception {
+		String dummyText = "";
+
+		if (Objects.equals(indexType, "text")) {
+			while (dummyText.length() < 40000) {
+				dummyText += " word";
+			}
+		}
+
 		testOrderByDDMField(
-			new String[] {"a", "D", "c", "B"},
-			new String[] {"a", "B", "c", "D"}, FieldConstants.STRING, indexType,
-			DDMFormFieldType.TEXT);
+			new String[] {
+				"a" + dummyText, "D" + dummyText, "c" + dummyText,
+				"B" + dummyText
+			},
+			new String[] {
+				"a" + dummyText, "B" + dummyText, "c" + dummyText,
+				"D" + dummyText
+			},
+			FieldConstants.STRING, indexType, DDMFormFieldType.TEXT);
 	}
 
 	private String _dataType;

@@ -20,12 +20,22 @@ import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvide
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.test.util.DLTestUtil;
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructureManagerUtil;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.info.display.contributor.InfoDisplayField;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
+import com.liferay.info.type.WebImage;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
@@ -35,7 +45,7 @@ import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -44,20 +54,26 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.util.PropsValues;
 
 import java.text.Format;
 
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -85,28 +101,157 @@ public class FileEntryInfoDisplayContributorTest {
 	}
 
 	@Test
-	public void testDisplayPageURL() throws Exception {
-		_withAndWithoutAssetEntry(
-			fileEntry -> {
-				_addAssetDisplayPageEntry(fileEntry);
+	public void testDisplayPageURLCustomLocaleAlgorithm1() throws Exception {
+		int originalLocalePrependFriendlyURLStyle =
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE;
 
-				ThemeDisplay themeDisplay = new ThemeDisplay();
+		try {
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE = 1;
 
-				themeDisplay.setLocale(LocaleUtil.getDefault());
-				themeDisplay.setScopeGroupId(_group.getGroupId());
-				themeDisplay.setServerName("localhost");
-				themeDisplay.setSiteGroupId(_group.getGroupId());
+			_withAndWithoutAssetEntry(
+				fileEntry -> {
+					_addAssetDisplayPageEntry(fileEntry);
 
-				String expectedURL = StringBundler.concat(
-					"/web/", StringUtil.lowerCase(_group.getGroupKey()), "/d/",
-					fileEntry.getFileEntryId());
+					Locale locale = LocaleUtil.FRANCE;
 
-				Assert.assertEquals(
-					expectedURL,
-					_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
-						FileEntry.class.getName(), fileEntry.getFileEntryId(),
-						themeDisplay));
-			});
+					String expectedURL = StringBundler.concat(
+						"/", locale.getLanguage(), "/web/",
+						StringUtil.lowerCase(_group.getGroupKey()), "/d/",
+						fileEntry.getFileEntryId());
+
+					ThemeDisplay themeDisplay = new ThemeDisplay();
+
+					themeDisplay.setLocale(locale);
+					themeDisplay.setScopeGroupId(_group.getGroupId());
+					themeDisplay.setServerName("localhost");
+					themeDisplay.setSiteGroupId(_group.getGroupId());
+
+					Assert.assertEquals(
+						expectedURL,
+						_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
+							FileEntry.class.getName(),
+							fileEntry.getFileEntryId(), themeDisplay));
+				});
+		}
+		finally {
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE =
+				originalLocalePrependFriendlyURLStyle;
+		}
+	}
+
+	@Test
+	public void testDisplayPageURLCustomLocaleAlgorithm1DefaultLocale()
+		throws Exception {
+
+		int originalLocalePrependFriendlyURLStyle =
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE;
+
+		try {
+			_withAndWithoutAssetEntry(
+				fileEntry -> {
+					_addAssetDisplayPageEntry(fileEntry);
+
+					Locale locale = LocaleUtil.getDefault();
+
+					String expectedURL = StringBundler.concat(
+						"/web/", StringUtil.lowerCase(_group.getGroupKey()),
+						"/d/", fileEntry.getFileEntryId());
+
+					ThemeDisplay themeDisplay = new ThemeDisplay();
+
+					themeDisplay.setLocale(locale);
+					themeDisplay.setScopeGroupId(_group.getGroupId());
+					themeDisplay.setServerName("localhost");
+					themeDisplay.setSiteGroupId(_group.getGroupId());
+
+					Assert.assertEquals(
+						expectedURL,
+						_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
+							FileEntry.class.getName(),
+							fileEntry.getFileEntryId(), themeDisplay));
+				});
+		}
+		finally {
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE =
+				originalLocalePrependFriendlyURLStyle;
+		}
+	}
+
+	@Test
+	public void testDisplayPageURLCustomLocaleAlgorithm2() throws Exception {
+		int originalLocalePrependFriendlyURLStyle =
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE;
+
+		try {
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE = 2;
+
+			_withAndWithoutAssetEntry(
+				fileEntry -> {
+					_addAssetDisplayPageEntry(fileEntry);
+
+					Locale locale = LocaleUtil.getDefault();
+
+					String expectedURL = StringBundler.concat(
+						"/", locale.getLanguage(), "/web/",
+						StringUtil.lowerCase(_group.getGroupKey()), "/d/",
+						fileEntry.getFileEntryId());
+
+					ThemeDisplay themeDisplay = new ThemeDisplay();
+
+					themeDisplay.setLocale(locale);
+					themeDisplay.setScopeGroupId(_group.getGroupId());
+					themeDisplay.setServerName("localhost");
+					themeDisplay.setSiteGroupId(_group.getGroupId());
+
+					Assert.assertEquals(
+						expectedURL,
+						_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
+							FileEntry.class.getName(),
+							fileEntry.getFileEntryId(), themeDisplay));
+				});
+		}
+		finally {
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE =
+				originalLocalePrependFriendlyURLStyle;
+		}
+	}
+
+	@Test
+	public void testDisplayPageURLCustomLocaleAlgorithmDefault()
+		throws Exception {
+
+		int originalLocalePrependFriendlyURLStyle =
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE;
+
+		try {
+			_withAndWithoutAssetEntry(
+				fileEntry -> {
+					_addAssetDisplayPageEntry(fileEntry);
+
+					Locale locale = LocaleUtil.getDefault();
+
+					String expectedURL = StringBundler.concat(
+						"/web/", StringUtil.lowerCase(_group.getGroupKey()),
+						"/d/", fileEntry.getFileEntryId());
+
+					ThemeDisplay themeDisplay = new ThemeDisplay();
+
+					themeDisplay.setLocale(locale);
+					themeDisplay.setScopeGroupId(_group.getGroupId());
+					themeDisplay.setServerName("localhost");
+					themeDisplay.setSiteGroupId(_group.getGroupId());
+
+					Assert.assertEquals(
+						expectedURL,
+						_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
+							FileEntry.class.getName(),
+							fileEntry.getFileEntryId(), themeDisplay));
+				});
+		}
+		finally {
+			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE =
+				originalLocalePrependFriendlyURLStyle;
+		}
 	}
 
 	@Test
@@ -131,8 +276,7 @@ public class FileEntryInfoDisplayContributorTest {
 				Assert.assertEquals(
 					fileEntry.getUserName(),
 					infoDisplayFieldsValues.get("authorName"));
-				Assert.assertEquals(
-					StringPool.BLANK,
+				Assert.assertNull(
 					infoDisplayFieldsValues.get("authorProfileImage"));
 				Assert.assertEquals(
 					null, infoDisplayFieldsValues.get("categories"));
@@ -151,11 +295,10 @@ public class FileEntryInfoDisplayContributorTest {
 					fileEntry.getMimeType(),
 					infoDisplayFieldsValues.get("mimeType"));
 
-				JSONObject previewImageJSONObject =
-					(JSONObject)infoDisplayFieldsValues.get("previewImage");
+				WebImage previewWebImage =
+					(WebImage)infoDisplayFieldsValues.get("previewImage");
 
-				Assert.assertEquals(
-					StringPool.BLANK, previewImageJSONObject.getString("url"));
+				Assert.assertEquals(StringPool.BLANK, previewWebImage.getUrl());
 
 				Format dateFormatDateTime =
 					FastDateFormatFactoryUtil.getDateTime(
@@ -166,7 +309,7 @@ public class FileEntryInfoDisplayContributorTest {
 					infoDisplayFieldsValues.get("publishDate"));
 
 				Assert.assertEquals(
-					TextFormatter.formatStorageSize(
+					LanguageUtil.formatStorageSize(
 						fileEntry.getSize(), LocaleUtil.getDefault()),
 					infoDisplayFieldsValues.get("size"));
 				Assert.assertEquals(
@@ -180,10 +323,58 @@ public class FileEntryInfoDisplayContributorTest {
 	}
 
 	@Test
+	public void testFileEntryInfoDisplayContributorWithFileEntryType()
+		throws Exception {
+
+		_withAndWithoutAssetEntry(
+			fileEntry -> {
+				DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
+					fileEntry.getGroupId(),
+					DLFileEntryMetadata.class.getName());
+
+				ServiceContext serviceContext =
+					ServiceContextTestUtil.getServiceContext(
+						fileEntry.getGroupId(), TestPropsValues.getUserId());
+
+				DLFileEntryType dlFileEntryType =
+					DLFileEntryTypeLocalServiceUtil.addFileEntryType(
+						TestPropsValues.getUserId(), fileEntry.getGroupId(),
+						RandomTestUtil.randomString(),
+						RandomTestUtil.randomString(),
+						new long[] {ddmStructure.getStructureId()},
+						serviceContext);
+
+				DDMStructureManagerUtil.updateStructureKey(
+					ddmStructure.getStructureId(),
+					DLUtil.getDDMStructureKey(dlFileEntryType));
+
+				_dlFileEntryLocalService.updateFileEntryType(
+					TestPropsValues.getUserId(), fileEntry.getFileEntryId(),
+					dlFileEntryType.getFileEntryTypeId(), serviceContext);
+
+				Set<InfoDisplayField> infoDisplayFields =
+					_infoDisplayContributor.getInfoDisplayFields(
+						_dlAppLocalService.getFileEntry(
+							fileEntry.getFileEntryId()),
+						LocaleUtil.getDefault());
+
+				Stream<InfoDisplayField> stream = infoDisplayFields.stream();
+
+				Optional<InfoDisplayField> titleInfoDisplayFieldOptional =
+					stream.filter(
+						infoDisplayField -> Objects.equals(
+							infoDisplayField.getKey(), "name")
+					).findFirst();
+
+				Assert.assertTrue(titleInfoDisplayFieldOptional.isPresent());
+			});
+	}
+
+	@Test
 	public void testInfoDisplayObjectProvider() throws Exception {
 		_withAndWithoutAssetEntry(
 			fileEntry -> {
-				InfoDisplayObjectProvider infoDisplayObjectProvider =
+				InfoDisplayObjectProvider<?> infoDisplayObjectProvider =
 					_infoDisplayContributor.getInfoDisplayObjectProvider(
 						fileEntry.getFileEntryId());
 
@@ -257,7 +448,7 @@ public class FileEntryInfoDisplayContributorTest {
 	}
 
 	private void _withAndWithoutAssetEntry(
-			UnsafeConsumer<FileEntry, PortalException> testFunction)
+			UnsafeConsumer<FileEntry, Exception> testFunction)
 		throws Exception {
 
 		DLFolder dlFolder = DLTestUtil.addDLFolder(_group.getGroupId());
@@ -287,6 +478,9 @@ public class FileEntryInfoDisplayContributorTest {
 
 	@Inject
 	private DLAppLocalService _dlAppLocalService;
+
+	@Inject
+	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	@Inject
 	private DLURLHelper _dlurlHelper;

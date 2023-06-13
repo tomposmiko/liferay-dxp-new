@@ -35,6 +35,10 @@ public class CTProcessLocalServiceWrapper
 	/**
 	 * Adds the ct process to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTProcessLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param ctProcess the ct process
 	 * @return the ct process that was added
 	 */
@@ -67,7 +71,22 @@ public class CTProcessLocalServiceWrapper
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ctProcessLocalService.createPersistedModel(primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the ct process from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTProcessLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctProcess the ct process
 	 * @return the ct process that was removed
@@ -81,6 +100,10 @@ public class CTProcessLocalServiceWrapper
 
 	/**
 	 * Deletes the ct process with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTProcessLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctProcessId the primary key of the ct process
 	 * @return the ct process that was removed
@@ -103,6 +126,18 @@ public class CTProcessLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ctProcessLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _ctProcessLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _ctProcessLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -256,19 +291,6 @@ public class CTProcessLocalServiceWrapper
 		return _ctProcessLocalService.getCTProcesses(ctCollectionId);
 	}
 
-	@Override
-	public java.util.List<com.liferay.change.tracking.model.CTProcess>
-		getCTProcesses(
-			long companyId, long userId, String keywords, int status, int start,
-			int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.change.tracking.model.CTProcess>
-					orderByComparator) {
-
-		return _ctProcessLocalService.getCTProcesses(
-			companyId, userId, keywords, status, start, end, orderByComparator);
-	}
-
 	/**
 	 * Returns the number of ct processes.
 	 *
@@ -296,6 +318,9 @@ public class CTProcessLocalServiceWrapper
 		return _ctProcessLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -306,6 +331,10 @@ public class CTProcessLocalServiceWrapper
 
 	/**
 	 * Updates the ct process in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect CTProcessLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ctProcess the ct process
 	 * @return the ct process that was updated

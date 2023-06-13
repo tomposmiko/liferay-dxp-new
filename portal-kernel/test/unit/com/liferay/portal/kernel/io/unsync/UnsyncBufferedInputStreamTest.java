@@ -79,7 +79,8 @@ public class UnsyncBufferedInputStreamTest {
 			Assert.assertEquals(i, buffer[i - 10]);
 		}
 
-		Assert.assertEquals(_SIZE - size * 2, byteArrayInputStream.available());
+		Assert.assertEquals(
+			_SIZE - (size * 2), byteArrayInputStream.available());
 		Assert.assertEquals(_SIZE - 15, unsyncBufferedInputStream.available());
 
 		// Fill the buffer
@@ -94,7 +95,8 @@ public class UnsyncBufferedInputStreamTest {
 			Assert.assertEquals(i, buffer[i - 15]);
 		}
 
-		Assert.assertEquals(_SIZE - size * 3, byteArrayInputStream.available());
+		Assert.assertEquals(
+			_SIZE - (size * 3), byteArrayInputStream.available());
 		Assert.assertEquals(_SIZE - 25, unsyncBufferedInputStream.available());
 
 		// Leave 5 bytes
@@ -111,6 +113,7 @@ public class UnsyncBufferedInputStreamTest {
 		read = unsyncBufferedInputStream.read(buffer);
 
 		Assert.assertEquals(5, read);
+
 		Assert.assertEquals(-1, unsyncBufferedInputStream.read(buffer));
 
 		// Mark and EOF
@@ -280,7 +283,7 @@ public class UnsyncBufferedInputStreamTest {
 
 		Assert.assertEquals(bufferSize, unsyncBufferedInputStream.index);
 		Assert.assertEquals(
-			_SIZE - bufferSize * 2, unsyncBufferedInputStream.available());
+			_SIZE - (bufferSize * 2), unsyncBufferedInputStream.available());
 		Assert.assertEquals(-1, unsyncBufferedInputStream.markLimitIndex);
 
 		try {
@@ -361,7 +364,8 @@ public class UnsyncBufferedInputStreamTest {
 			Assert.assertEquals(i, unsyncBufferedInputStream.read());
 		}
 
-		Assert.assertEquals(_SIZE - size * 2, byteArrayInputStream.available());
+		Assert.assertEquals(
+			_SIZE - (size * 2), byteArrayInputStream.available());
 		Assert.assertEquals(
 			_SIZE - size - 1, unsyncBufferedInputStream.available());
 
@@ -436,7 +440,7 @@ public class UnsyncBufferedInputStreamTest {
 		// Clear out buffer
 
 		Assert.assertEquals(
-			size * 2 - 1, unsyncBufferedInputStream.skip(size * 2));
+			(size * 2) - 1, unsyncBufferedInputStream.skip(size * 2));
 
 		// Mark a large size for EOF
 

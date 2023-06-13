@@ -14,8 +14,8 @@
 
 package com.liferay.portlet.display.template.web.internal.exportimport.data.handler;
 
+import com.liferay.dynamic.data.mapping.constants.DDMTemplateConstants;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.dynamic.data.mapping.model.DDMTemplateConstants;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandlerRegistry;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -112,15 +111,18 @@ public class PortletDisplayTemplatePortletDataHandler
 
 		Element rootElement = addExportDataRootElement(portletDataContext);
 
-		ActionableDynamicQuery actionableDynamicQuery =
-			getDDMTemplateActionableDynamicQuery(
-				portletDataContext,
-				ArrayUtil.toArray(_templateHandlerRegistry.getClassNameIds()),
-				new StagedModelType(
-					_portal.getClassNameId(DDMTemplate.class),
-					StagedModelType.REFERRER_CLASS_NAME_ID_ALL));
+		List<Long> classNameIds = _getClassNameIds(portletDataContext);
 
-		actionableDynamicQuery.performActions();
+		if (!classNameIds.isEmpty()) {
+			ActionableDynamicQuery actionableDynamicQuery =
+				getDDMTemplateActionableDynamicQuery(
+					portletDataContext, classNameIds.toArray(new Long[0]),
+					new StagedModelType(
+						_portal.getClassNameId(DDMTemplate.class),
+						StagedModelType.REFERRER_CLASS_NAME_ID_ALL));
+
+			actionableDynamicQuery.performActions();
+		}
 
 		return getExportDataRootElementString(rootElement);
 	}
@@ -136,9 +138,16 @@ public class PortletDisplayTemplatePortletDataHandler
 
 		List<Element> ddmTemplateElements = ddmTemplatesElement.elements();
 
+		List<Long> classNameIds = _getClassNameIds(portletDataContext);
+
 		for (Element ddmTemplateElement : ddmTemplateElements) {
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, ddmTemplateElement);
+			long classNameId = _portal.getClassNameId(
+				ddmTemplateElement.attributeValue("attached-class-name"));
+
+			if (classNameIds.contains(classNameId)) {
+				StagedModelDataHandlerUtil.importStagedModel(
+					portletDataContext, ddmTemplateElement);
+			}
 		}
 
 		return null;
@@ -236,6 +245,31 @@ public class PortletDisplayTemplatePortletDataHandler
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
+	private List<Long> _getClassNameIds(PortletDataContext portletDataContext) {
+		List<Long> classNameIds = new ArrayList<>();
+
+		for (TemplateHandler templateHandler :
+				_templateHandlerRegistry.getTemplateHandlers()) {
+
+			ClassName className = _classNameLocalService.fetchClassName(
+				templateHandler.getClassName());
+
+			if (className == null) {
+				continue;
+			}
+
+			if (portletDataContext.getBooleanParameter(
+					NAMESPACE,
+					templateHandler.getName(LocaleUtil.getSiteDefault()))) {
+
+				classNameIds.add(
+					_portal.getClassNameId(templateHandler.getClassName()));
+			}
+		}
+
+		return classNameIds;
 	}
 
 	private PortletDataHandlerControl[] _getPortletDataHandlerControls() {

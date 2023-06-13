@@ -16,6 +16,7 @@ package com.liferay.portal.util.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
@@ -36,7 +37,6 @@ import com.liferay.portal.kernel.test.util.UserGroupTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -46,6 +46,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -227,6 +229,49 @@ public class PortalImplLocalizedFriendlyURLTest {
 			PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE =
 				originalLocalePrependFriendlyURLStyle;
 		}
+	}
+
+	@Test
+	public void testLocalizedSiteLayoutFriendlyURLWithVirtualHost()
+		throws Exception {
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		String layoutFriendlyURL = "/home";
+
+		mockHttpServletRequest.setPathInfo(layoutFriendlyURL);
+
+		Locale locale = LocaleUtil.SPAIN;
+
+		String i18nPathLanguageId = _portal.getI18nPathLanguageId(
+			locale, StringPool.BLANK);
+
+		String i18nPath = StringPool.SLASH + i18nPathLanguageId;
+
+		mockHttpServletRequest.setRequestURI(i18nPath + layoutFriendlyURL);
+
+		mockHttpServletRequest.setServerName(_VIRTUAL_HOSTNAME);
+
+		Assert.assertEquals(
+			i18nPath.concat("/inicio"),
+			_portal.getLocalizedFriendlyURL(
+				new HttpServletRequestWrapper(mockHttpServletRequest) {
+
+					@Override
+					public String getPathInfo() {
+						return _group.getFriendlyURL() + layoutFriendlyURL;
+					}
+
+					@Override
+					public String getRequestURI() {
+						return _PRIVATE_GROUP_SERVLET_MAPPING + getPathInfo();
+					}
+
+				},
+				LayoutTestUtil.addLayout(
+					_group.getGroupId(), false, _nameMap, _friendlyURLMap),
+				locale, LocaleUtil.US));
 	}
 
 	@Test
@@ -825,6 +870,8 @@ public class PortalImplLocalizedFriendlyURLTest {
 
 	private static final String _PUBLIC_GROUP_SERVLET_MAPPING =
 		PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING;
+
+	private static final String _VIRTUAL_HOSTNAME = "test.com";
 
 	private static Set<Locale> _availableLocales;
 	private static Locale _defaultLocale;

@@ -17,6 +17,18 @@
 <%@ include file="/html/portal/init.jsp" %>
 
 <%
+if (_log.isWarnEnabled()) {
+	String requestedSessionId = request.getRequestedSessionId();
+
+	if (Validator.isNotNull(requestedSessionId) && !StringUtil.equals(requestedSessionId, session.getId())) {
+		_log.warn("Unable to extend the HTTP session. Review the portal property \"session.timeout\" if this warning is displayed frequently.");
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("The requested session " + requestedSessionId + " is not the same as session " + session.getId());
+		}
+	}
+}
+
 for (String servletContextName : ServletContextPool.keySet()) {
 	ServletContext servletContext = ServletContextPool.get(servletContextName);
 
@@ -37,7 +49,7 @@ for (String servletContextName : ServletContextPool.keySet()) {
 			invokerPortletName = portletConfig.getPortletName();
 		}
 
-		String path = StringPool.SLASH.concat(invokerPortletName).concat("/invoke");
+		String path = StringBundler.concat(StringPool.SLASH, invokerPortletName, "/invoke");
 
 		RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(path);
 

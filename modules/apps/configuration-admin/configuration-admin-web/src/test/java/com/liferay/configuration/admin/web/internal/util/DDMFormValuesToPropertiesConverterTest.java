@@ -29,6 +29,7 @@ import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Dictionary;
 import java.util.Locale;
@@ -36,6 +37,8 @@ import java.util.Vector;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Matchers;
@@ -48,6 +51,11 @@ import org.osgi.service.cm.Configuration;
  * @author Marcellus Tavares
  */
 public class DDMFormValuesToPropertiesConverterTest extends Mockito {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -97,7 +105,7 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 		whenGetID(extendedAttributeDefinition, "Boolean");
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
-			extendedObjectClassDefinition, configuration, null, null, false);
+			null, null, configuration, extendedObjectClassDefinition, false);
 
 		DDMFormValuesToPropertiesConverter ddmFormValuesToPropertiesConverter =
 			new DDMFormValuesToPropertiesConverter(
@@ -110,9 +118,9 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 
 		Boolean[] booleanValues = (Boolean[])value;
 
-		Assert.assertEquals(true, booleanValues[0]);
-		Assert.assertEquals(false, booleanValues[1]);
-		Assert.assertEquals(true, booleanValues[2]);
+		Assert.assertTrue(booleanValues[0]);
+		Assert.assertFalse(booleanValues[1]);
+		Assert.assertTrue(booleanValues[2]);
 	}
 
 	@Test
@@ -152,7 +160,7 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 		whenGetID(extendedAttributeDefinition, "Boolean");
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
-			extendedObjectClassDefinition, configuration, null, null, false);
+			null, null, configuration, extendedObjectClassDefinition, false);
 
 		DDMFormValuesToPropertiesConverter ddmFormValuesToPropertiesConverter =
 			new DDMFormValuesToPropertiesConverter(
@@ -161,7 +169,7 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 		Dictionary<String, Object> properties =
 			ddmFormValuesToPropertiesConverter.getProperties();
 
-		Assert.assertEquals(true, properties.get("Boolean"));
+		Assert.assertTrue((boolean)properties.get("Boolean"));
 	}
 
 	@Test
@@ -201,7 +209,7 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 		whenGetID(extendedAttributeDefinition, "Integer");
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
-			extendedObjectClassDefinition, configuration, null, null, false);
+			null, null, configuration, extendedObjectClassDefinition, false);
 
 		DDMFormValuesToPropertiesConverter ddmFormValuesToPropertiesConverter =
 			new DDMFormValuesToPropertiesConverter(
@@ -250,7 +258,7 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 		whenGetID(extendedAttributeDefinition, "Integer");
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
-			extendedObjectClassDefinition, configuration, null, null, false);
+			null, null, configuration, extendedObjectClassDefinition, false);
 
 		DDMFormValuesToPropertiesConverter ddmFormValuesToPropertiesConverter =
 			new DDMFormValuesToPropertiesConverter(
@@ -299,7 +307,7 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 		whenGetID(extendedAttributeDefinition, "Select");
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
-			extendedObjectClassDefinition, configuration, null, null, false);
+			null, null, configuration, extendedObjectClassDefinition, false);
 
 		DDMFormValuesToPropertiesConverter ddmFormValuesToPropertiesConverter =
 			new DDMFormValuesToPropertiesConverter(
@@ -353,7 +361,7 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 		whenGetID(extendedAttributeDefinition, "Boolean");
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
-			extendedObjectClassDefinition, configuration, null, null, false);
+			null, null, configuration, extendedObjectClassDefinition, false);
 
 		DDMFormValuesToPropertiesConverter ddmFormValuesToPropertiesConverter =
 			new DDMFormValuesToPropertiesConverter(
@@ -366,9 +374,9 @@ public class DDMFormValuesToPropertiesConverterTest extends Mockito {
 
 		Vector<Boolean> booleanValues = (Vector<Boolean>)value;
 
-		Assert.assertEquals(true, booleanValues.get(0));
-		Assert.assertEquals(false, booleanValues.get(1));
-		Assert.assertEquals(true, booleanValues.get(2));
+		Assert.assertTrue(booleanValues.get(0));
+		Assert.assertFalse(booleanValues.get(1));
+		Assert.assertTrue(booleanValues.get(2));
 	}
 
 	protected DDMFormFieldValue createDDMFormFieldValue(

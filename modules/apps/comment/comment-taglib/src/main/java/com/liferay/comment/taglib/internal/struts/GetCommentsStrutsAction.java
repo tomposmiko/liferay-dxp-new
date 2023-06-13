@@ -49,9 +49,6 @@ public class GetCommentsStrutsAction implements StrutsAction {
 			new NamespaceServletRequest(
 				httpServletRequest, StringPool.BLANK, namespace);
 
-		namespacedHttpServletRequest.setAttribute(
-			"aui:form:portletNamespace", namespace);
-
 		String className = ParamUtil.getString(
 			namespacedHttpServletRequest, "className");
 
@@ -77,7 +74,7 @@ public class GetCommentsStrutsAction implements StrutsAction {
 			"liferay-comment:discussion:index", String.valueOf(index));
 
 		String portletId = ParamUtil.getString(
-			namespacedHttpServletRequest, "portletId");
+			namespacedHttpServletRequest, "p_p_id");
 
 		namespacedHttpServletRequest.setAttribute(
 			WebKeys.PORTLET_ID, portletId);

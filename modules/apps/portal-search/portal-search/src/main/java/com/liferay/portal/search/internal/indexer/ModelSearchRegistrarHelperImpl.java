@@ -105,6 +105,11 @@ public class ModelSearchRegistrarHelperImpl
 		}
 
 		@Override
+		public void setSearchEngineId(String searchEngineId) {
+			_modelSearchSettingsImpl.setSearchEngineId(searchEngineId);
+		}
+
+		@Override
 		public void setSearchResultPermissionFilterSuppressed(
 			boolean searchResultPermissionFilterSuppressed) {
 
@@ -115,6 +120,11 @@ public class ModelSearchRegistrarHelperImpl
 		@Override
 		public void setSelectAllLocales(boolean selectAllLocales) {
 			_modelSearchSettingsImpl.setSelectAllLocales(selectAllLocales);
+		}
+
+		@Override
+		public void setStagingAware(boolean stagingAware) {
+			_modelSearchSettingsImpl.setStagingAware(stagingAware);
 		}
 
 		private ModelIndexerWriterContributor<?> _modelIndexWriterContributor;

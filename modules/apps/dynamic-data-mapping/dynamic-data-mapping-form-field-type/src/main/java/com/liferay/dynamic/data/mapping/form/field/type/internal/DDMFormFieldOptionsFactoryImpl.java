@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -86,6 +87,16 @@ public class DDMFormFieldOptionsFactoryImpl
 				return ddmFormFieldOptions;
 			}
 
+			Map<String, Object> changedProperties =
+				(Map<String, Object>)ddmFormFieldRenderingContext.getProperty(
+					"changedProperties");
+
+			if (MapUtil.isNotEmpty(changedProperties) &&
+				changedProperties.containsKey("options")) {
+
+				return ddmFormFieldOptions;
+			}
+
 			return ddmFormField.getDDMFormFieldOptions();
 		}
 
@@ -93,6 +104,8 @@ public class DDMFormFieldOptionsFactoryImpl
 			ddmFormFieldOptions.addOptionLabel(
 				option.get("value"), ddmFormFieldRenderingContext.getLocale(),
 				option.get("label"));
+			ddmFormFieldOptions.addOptionReference(
+				option.get("value"), option.get("reference"));
 		}
 
 		return ddmFormFieldOptions;

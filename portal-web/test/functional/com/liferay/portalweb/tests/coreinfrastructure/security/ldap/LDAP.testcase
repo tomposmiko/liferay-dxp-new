@@ -32,8 +32,7 @@ definition {
 		property app.server.types = "tomcat";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "false";
-		property operating.system.types = "centos";
-		property portal.acceptance = "true";
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "LDAP#ImportLDAPUserWithBlankPassword";
 
 		PortalSettings.addLDAPServer(LDAPServerName = "ApacheDS Server");
@@ -56,14 +55,14 @@ definition {
 
 		// LRQA-46018
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Search");
 
 		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -82,6 +81,7 @@ definition {
 	test ResetFieldsValueForImportedLDAPUser {
 		property apacheds.enabled = "true";
 		property custom.properties = "field.enable.com.liferay.portal.kernel.model.Contact.male=true";
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "LDAP#ResetFieldsValueForImportedLDAPUser";
 
 		PortalSettings.addLDAPServer(LDAPServerName = "ApacheDS Server");
@@ -104,14 +104,14 @@ definition {
 
 		// LRQA-46018
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Search");
 
 		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
@@ -128,13 +128,19 @@ definition {
 			userGender = "Female",
 			userName = "ldapusergivenname ldapusersn");
 
+		Navigator.gotoBack();
+
 		User.editUserJobTitleCP(
 			userJobTitle = "QA",
 			userName = "ldapusergivenname ldapusersn");
 
+		Navigator.gotoBack();
+
 		User.editUserSuffixCP(
 			userName = "ldapusergivenname ldapusersn",
 			userSuffix = "Phd");
+
+		Navigator.gotoBack();
 
 		User.editPasswordCP(
 			userEmailAddress = "ldapuseremail@liferay.com",
@@ -166,7 +172,7 @@ definition {
 	test ViewHiddenSecurityCredential {
 		property test.name.skip.portal.instance = "LDAP#ViewHiddenSecurityCredential";
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "System Settings");
@@ -176,6 +182,8 @@ definition {
 			configurationName = "Servers",
 			configurationScope = "Virtual Instance Scope");
 
+		Button.clickAdd();
+
 		SystemSettings.editSecurityCredential(securityCredential = "123456");
 	}
 
@@ -183,7 +191,7 @@ definition {
 	test ViewLDAPInstanceSettingsDoNotAffectSystemSettings {
 		property test.name.skip.portal.instance = "LDAP#ViewInstanceSettingsEnableLDAPAuthNotAffectSystemSetting";
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "System Settings");
@@ -197,7 +205,7 @@ definition {
 
 		PortalSettings.configureLDAPSetting(enableSettingList = "enabled");
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "System Settings");

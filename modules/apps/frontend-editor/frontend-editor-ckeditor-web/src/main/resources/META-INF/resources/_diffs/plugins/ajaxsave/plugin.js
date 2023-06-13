@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	var pluginName = 'ajaxsave';
 
 	CKEDITOR.plugins.add(pluginName, {
@@ -21,7 +21,7 @@
 				canUndo: false,
 				exec(editor) {
 					editor.fire('saveContent');
-				}
+				},
 			});
 
 			if (editor.ui.addButton) {
@@ -30,9 +30,9 @@
 					icon:
 						Liferay.AUI.getPathCKEditor() +
 						'/ckeditor/plugins/ajaxsave/assets/save.png',
-					label: editor.lang.save.toolbar
+					label: editor.lang.save.toolbar,
 				});
 			}
-		}
+		},
 	});
 })();

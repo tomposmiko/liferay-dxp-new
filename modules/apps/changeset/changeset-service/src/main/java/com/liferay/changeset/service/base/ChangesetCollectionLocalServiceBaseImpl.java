@@ -16,8 +16,10 @@ package com.liferay.changeset.service.base;
 
 import com.liferay.changeset.model.ChangesetCollection;
 import com.liferay.changeset.service.ChangesetCollectionLocalService;
+import com.liferay.changeset.service.ChangesetCollectionLocalServiceUtil;
 import com.liferay.changeset.service.persistence.ChangesetCollectionPersistence;
 import com.liferay.changeset.service.persistence.ChangesetEntryPersistence;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -37,16 +39,20 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -68,11 +74,15 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>ChangesetCollectionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.changeset.service.ChangesetCollectionLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>ChangesetCollectionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>ChangesetCollectionLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the changeset collection to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ChangesetCollectionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param changesetCollection the changeset collection
 	 * @return the changeset collection that was added
@@ -104,6 +114,10 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 	/**
 	 * Deletes the changeset collection with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ChangesetCollectionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param changesetCollectionId the primary key of the changeset collection
 	 * @return the changeset collection that was removed
 	 * @throws PortalException if a changeset collection with the primary key could not be found
@@ -120,6 +134,10 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 	/**
 	 * Deletes the changeset collection from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ChangesetCollectionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param changesetCollection the changeset collection
 	 * @return the changeset collection that was removed
 	 */
@@ -129,6 +147,18 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 		ChangesetCollection changesetCollection) {
 
 		return changesetCollectionPersistence.remove(changesetCollection);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return changesetCollectionPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -294,6 +324,16 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return changesetCollectionPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -302,6 +342,13 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 			(ChangesetCollection)persistedModel);
 	}
 
+	public BasePersistence<ChangesetCollection> getBasePersistence() {
+		return changesetCollectionPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -340,6 +387,10 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 	/**
 	 * Updates the changeset collection in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect ChangesetCollectionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param changesetCollection the changeset collection
 	 * @return the changeset collection that was updated
 	 */
@@ -349,6 +400,11 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 		ChangesetCollection changesetCollection) {
 
 		return changesetCollectionPersistence.update(changesetCollection);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -363,6 +419,8 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		changesetCollectionLocalService =
 			(ChangesetCollectionLocalService)aopProxy;
+
+		_setLocalServiceUtilService(changesetCollectionLocalService);
 	}
 
 	/**
@@ -405,6 +463,23 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		ChangesetCollectionLocalService changesetCollectionLocalService) {
+
+		try {
+			Field field =
+				ChangesetCollectionLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, changesetCollectionLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

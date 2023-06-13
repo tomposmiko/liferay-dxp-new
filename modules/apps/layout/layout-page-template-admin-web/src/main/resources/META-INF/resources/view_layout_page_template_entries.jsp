@@ -46,11 +46,10 @@ LayoutPageTemplateManagementToolbarDisplayContext layoutPageTemplateManagementTo
 			<%
 			row.setCssClass("entry-card lfr-asset-item " + row.getCssClass());
 
-			Map<String, Object> rowData = new HashMap<>();
-
-			rowData.put("actions", layoutPageTemplateManagementToolbarDisplayContext.getAvailableActions(layoutPageTemplateEntry));
-
-			row.setData(rowData);
+			row.setData(
+				HashMapBuilder.<String, Object>put(
+					"actions", layoutPageTemplateManagementToolbarDisplayContext.getAvailableActions(layoutPageTemplateEntry)
+				).build());
 			%>
 
 			<liferay-ui:search-container-column-text>

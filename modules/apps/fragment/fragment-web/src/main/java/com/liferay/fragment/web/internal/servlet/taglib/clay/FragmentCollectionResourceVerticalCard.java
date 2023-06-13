@@ -119,7 +119,7 @@ public class FragmentCollectionResourceVerticalCard implements VerticalCard {
 			System.currentTimeMillis() - modifiedDate.getTime(), true);
 
 		return LanguageUtil.format(
-			httpServletRequest, "x-ago", modifiedDateDescription);
+			httpServletRequest, "modified-x-ago", modifiedDateDescription);
 	}
 
 	@Override

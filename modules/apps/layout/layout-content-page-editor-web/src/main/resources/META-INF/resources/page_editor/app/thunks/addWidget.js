@@ -12,40 +12,32 @@
  * details.
  */
 
-import addFragmentEntryLink from '../actions/addFragmentEntryLink';
+import addFragmentEntryLinks from '../actions/addFragmentEntryLinks';
 import WidgetService from '../services/WidgetService';
 
 export default function addWidget({
-	config,
 	parentItemId,
 	portletId,
+	portletItemId,
 	position,
-	store
+	store,
 }) {
-	return dispatch => {
+	return (dispatch) => {
 		const {segmentsExperienceId} = store;
 
 		WidgetService.addPortlet({
-			config,
 			onNetworkStatus: dispatch,
 			parentItemId,
 			portletId,
+			portletItemId,
 			position,
-			segmentsExperienceId
-		}).then(({fragmentEntryLink, layoutData}) => {
-			// TODO: This is a temporary "hack"
-			//       until the backend is consitent
-			//       between both "metal+soy" and "react" versions
-			fragmentEntryLink.content = {
-				value: {
-					content: fragmentEntryLink.content
-				}
-			};
-
+			segmentsExperienceId,
+		}).then(({addedItemId, fragmentEntryLink, layoutData}) => {
 			dispatch(
-				addFragmentEntryLink({
-					fragmentEntryLink,
-					layoutData
+				addFragmentEntryLinks({
+					addedItemId,
+					fragmentEntryLinks: [fragmentEntryLink],
+					layoutData,
 				})
 			);
 		});

@@ -1,5 +1,11 @@
 definition {
 
+	macro gotoAlertsAndAnnouncementsDelivery {
+		UserNavigator.gotoPreferences();
+
+		Navigator.gotoNavNested(navNested = "Alerts and Announcements Delivery");
+	}
+
 	macro gotoContact {
 		Navigator.gotoNavUnderline(navUnderline = "Contact");
 	}
@@ -30,6 +36,8 @@ definition {
 		UserNavigator.gotoGeneral();
 
 		Navigator.gotoNavNested(navNested = "Memberships");
+
+		WaitForLiferayEvent.initializeLiferayEventLog();
 	}
 
 	macro gotoOrganizations {
@@ -42,6 +50,14 @@ definition {
 		UserNavigator.gotoGeneral();
 
 		Navigator.gotoNavNested(navNested = "Password");
+	}
+
+	macro gotoPermissions {
+		Click.waitForMenuToggleJSClick(
+			key_rowEntry = "${rowEntry}",
+			locator1 = "Icon#TABLE_VERTICAL_ELLIPSIS");
+
+		MenuItem.click(menuItem = "Permissions");
 	}
 
 	macro gotoPreferences {
@@ -61,9 +77,8 @@ definition {
 	}
 
 	macro gotoUser {
-		var key_userScreenName = "${userScreenName}";
-
 		AssertClick(
+			key_userScreenName = "${userScreenName}",
 			locator1 = "UsersAndOrganizations#USER_TABLE_SCREEN_NAME",
 			value1 = "${userScreenName}");
 

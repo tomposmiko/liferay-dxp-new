@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.PostalAddressSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class PostalAddress {
+public class PostalAddress implements Cloneable, Serializable {
+
+	public static PostalAddress toDTO(String json) {
+		return PostalAddressSerDes.toDTO(json);
+	}
 
 	public String getAddressCountry() {
 		return addressCountry;
@@ -260,6 +266,11 @@ public class PostalAddress {
 	}
 
 	protected String streetAddressLine3;
+
+	@Override
+	public PostalAddress clone() throws CloneNotSupportedException {
+		return (PostalAddress)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

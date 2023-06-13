@@ -35,8 +35,9 @@ public abstract class BaseUserCard
 
 		super(baseModel, rowChecker);
 
-		user = (User)baseModel;
 		this.renderRequest = renderRequest;
+
+		user = (User)baseModel;
 
 		themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -59,7 +60,7 @@ public abstract class BaseUserCard
 
 	@Override
 	public String getName() {
-		return HtmlUtil.escape(user.getFullName());
+		return HtmlUtil.unescape(user.getFullName());
 	}
 
 	@Override

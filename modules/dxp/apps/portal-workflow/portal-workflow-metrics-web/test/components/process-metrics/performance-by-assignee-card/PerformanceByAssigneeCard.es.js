@@ -9,61 +9,65 @@
  * distribution rights of the Software.
  */
 
-import {
-	cleanup,
-	render,
-	findAllByTestId,
-	findByTestId
-} from '@testing-library/react';
+import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
 import PerformanceByAssigneeCard from '../../../../src/main/resources/META-INF/resources/js/components/process-metrics/performance-by-assignee-card/PerformanceByAssigneeCard.es';
+import {stringify} from '../../../../src/main/resources/META-INF/resources/js/shared/components/router/queryString.es';
 import {jsonSessionStorage} from '../../../../src/main/resources/META-INF/resources/js/shared/util/storage.es';
 import {MockRouter} from '../../../mock/MockRouter.es';
 
 import '@testing-library/jest-dom/extend-expect';
 
-const {processId, query} = {
+const {filters, processId} = {
+	filters: {
+		assigneeDateEnd: '2019-12-09T00:00:00Z',
+		assigneeDateStart: '2019-12-03T00:00:00Z',
+		assigneeTaskNames: ['update'],
+		assigneeTimeRange: ['7'],
+	},
 	processId: 12345,
-	query:
-		'?filters.assigneetaskKeys%5B0%5D=update&filters.assigneetimeRange%5B0%5D=7'
 };
-
 const items = [
 	{
+		assignee: {
+			image: 'path/to/image',
+			name: 'User Test First',
+		},
 		durationTaskAvg: 10800000,
-		image: 'path/to/image',
-		name: 'User Test First',
-		taskCount: 10
+		taskCount: 10,
 	},
 	{
+		assignee: {
+			image: 'path/to/image',
+			name: 'User Test Second',
+		},
 		durationTaskAvg: 475200000,
-		image: 'path/to/image',
-		name: 'User Test Second',
-		taskCount: 31
+		taskCount: 31,
 	},
 	{
+		assignee: {
+			name: 'User Test Third',
+		},
 		durationTaskAvg: 0,
-		name: 'User Test Third',
-		taskCount: 1
-	}
+		taskCount: 1,
+	},
 ];
 const data = {items, totalCount: items.length};
-
 const processStepsData = {
 	items: [
 		{
-			key: 'review',
-			name: 'Review'
+			label: 'Review',
+			name: 'review',
 		},
 		{
-			key: 'update',
-			name: 'Update'
-		}
+			label: 'Update',
+			name: 'update',
+		},
 	],
-	totalCount: 2
+	totalCount: 2,
 };
-
+const query = stringify({filters});
 const timeRangeData = {
 	items: [
 		{
@@ -71,21 +75,21 @@ const timeRangeData = {
 			dateStart: '2019-12-03T00:00:00Z',
 			defaultTimeRange: false,
 			id: 7,
-			name: 'Last 7 Days'
+			name: 'Last 7 Days',
 		},
 		{
 			dateEnd: '2019-12-09T00:00:00Z',
 			dateStart: '2019-11-10T00:00:00Z',
 			defaultTimeRange: true,
 			id: 30,
-			name: 'Last 30 Days'
-		}
+			name: 'Last 30 Days',
+		},
 	],
-	totalCount: 2
+	totalCount: 2,
 };
 
 describe('The performance by assignee card component should', () => {
-	let getByTestId;
+	let container, getByText;
 
 	beforeAll(() => {
 		jsonSessionStorage.set('timeRanges', timeRangeData);
@@ -96,10 +100,8 @@ describe('The performance by assignee card component should', () => {
 
 		beforeEach(() => {
 			const clientMock = {
-				get: jest
-					.fn()
-					.mockResolvedValueOnce({data: processStepsData})
-					.mockResolvedValue({data})
+				post: jest.fn().mockResolvedValue({data}),
+				request: jest.fn().mockResolvedValue({data: processStepsData}),
 			};
 
 			const wrapper = ({children}) => (
@@ -113,65 +115,43 @@ describe('The performance by assignee card component should', () => {
 				{wrapper}
 			);
 
-			getByTestId = renderResult.getByTestId;
+			container = renderResult.container;
+			getByText = renderResult.getByText;
 		});
 
 		test('Be rendered with "View All Assignees" button and total "(3)"', () => {
-			const viewAllAssignees = getByTestId('viewAllAssignees');
+			const viewAllAssignees = getByText('view-all-assignees (3)');
 
-			expect(viewAllAssignees).toHaveTextContent(
-				'view-all-assignees (3)'
-			);
+			expect(viewAllAssignees).toBeTruthy();
 			expect(viewAllAssignees.parentNode.getAttribute('href')).toContain(
-				'filters.dateEnd=2019-12-09&filters.dateStart=2019-12-03&filters.timeRange%5B0%5D=7&filters.taskKeys%5B0%5D=update'
+				'filters.dateEnd=2019-12-09T00%3A00%3A00Z&filters.dateStart=2019-12-03T00%3A00%3A00Z&filters.timeRange%5B0%5D=7&filters.taskNames%5B0%5D=update'
 			);
 		});
 
 		test('Be rendered with process step filter', async () => {
-			const processStepFilter = getByTestId('processStepFilter');
-
-			const filterItems = await findAllByTestId(
-				processStepFilter,
-				'filterItem'
-			);
-			const activeItem = filterItems.find(item =>
-				item.className.includes('active')
-			);
-			const activeItemName = await findByTestId(
-				activeItem,
-				'filterItemName'
-			);
+			const processStepFilter = getByText('all-steps');
+			const activeItem = container.querySelectorAll('.active')[0];
 
 			expect(processStepFilter).not.toBeNull();
-			expect(activeItemName).toHaveTextContent('Update');
+			expect(activeItem).toHaveTextContent('Update');
 		});
 
 		test('Be rendered with time range filter', async () => {
-			const timeRangeFilter = getByTestId('timeRangeFilter');
-			const filterItems = await findAllByTestId(
-				timeRangeFilter,
-				'filterItem'
-			);
-			const activeItem = filterItems.find(item =>
-				item.className.includes('active')
-			);
-			const activeItemName = await findByTestId(
-				activeItem,
-				'filterItemName'
-			);
+			const timeRangeFilter = getByText('Last 30 Days');
+			const activeItem = container.querySelectorAll('.active')[1];
 
 			expect(timeRangeFilter).not.toBeNull();
-			expect(activeItemName).toHaveTextContent('Last 7 Days');
+			expect(activeItem).toHaveTextContent('Last 7 Days');
 		});
 	});
 
 	describe('Be rendered without results', () => {
 		beforeAll(() => {
 			const clientMock = {
-				get: jest
+				post: jest
 					.fn()
-					.mockResolvedValueOnce({data: processStepsData})
-					.mockResolvedValue({data: {items: [], totalCount: 0}})
+					.mockResolvedValue({data: {items: [], totalCount: 0}}),
+				request: jest.fn().mockResolvedValue({data: processStepsData}),
 			};
 
 			const wrapper = ({children}) => (
@@ -180,20 +160,15 @@ describe('The performance by assignee card component should', () => {
 				</MockRouter>
 			);
 
-			const renderResult = render(
-				<PerformanceByAssigneeCard routeParams={{processId}} />,
-				{wrapper}
-			);
-
-			getByTestId = renderResult.getByTestId;
+			render(<PerformanceByAssigneeCard routeParams={{processId}} />, {
+				wrapper,
+			});
 		});
 
 		test('Be rendered with empty state view', () => {
-			const emptyStateDiv = getByTestId('emptyState');
+			const emptyStateMessage = getByText('no-results-were-found');
 
-			expect(emptyStateDiv.children[0].children[0]).toHaveTextContent(
-				'no-results-were-found'
-			);
+			expect(emptyStateMessage).toBeTruthy();
 		});
 	});
 });

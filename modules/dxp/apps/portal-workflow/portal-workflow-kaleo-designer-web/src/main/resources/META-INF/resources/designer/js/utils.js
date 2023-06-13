@@ -11,7 +11,7 @@
 
 AUI.add(
 	'liferay-kaleo-designer-utils',
-	A => {
+	(A) => {
 		var AArray = A.Array;
 		var isArray = Array.isArray;
 
@@ -19,193 +19,13 @@ AUI.add(
 
 		var STR_CDATA_OPEN = '<![CDATA[';
 
+		var STR_CHAR_CRLF = '\r\n';
+
+		var STR_CHAR_TAB = '\t';
+
 		var STR_ELLIPSIS = '...';
 
 		var KaleoDesignerUtils = {};
-
-		var PropertyListFormatter = {
-			assignmentsType(data) {
-				var value = data.value;
-
-				var assignmentType;
-
-				if (value && value.assignmentType) {
-					assignmentType = value.assignmentType[0];
-				}
-
-				return KaleoDesignerStrings[assignmentType || 'assetCreator'];
-			},
-
-			forms(data) {
-				var value = data.value;
-
-				var templateName;
-
-				if (value) {
-					templateName = value.templateName;
-				}
-
-				return AArray(templateName).join(', ');
-			},
-
-			names(data) {
-				var value = data.value;
-
-				var names;
-
-				if (value) {
-					names = value.name;
-				}
-
-				return AArray(names).join(', ');
-			},
-
-			script() {
-				return STR_ELLIPSIS;
-			}
-		};
-
-		KaleoDesignerUtils.PropertyListFormatter = PropertyListFormatter;
-
-		var cdata = function(value) {
-			value = value
-				.replace(STR_CDATA_OPEN, '')
-				.replace(STR_CDATA_CLOSE, '');
-
-			return STR_CDATA_OPEN + value + STR_CDATA_CLOSE;
-		};
-
-		KaleoDesignerUtils.cdata = cdata;
-
-		var jsonParse = function(val) {
-			var jsonObj = null;
-
-			try {
-				jsonObj = JSON.parse(val);
-			} catch (e) {}
-
-			return jsonObj;
-		};
-
-		KaleoDesignerUtils.jsonParse = jsonParse;
-
-		var jsonStringify = function(val) {
-			var jsonString = null;
-
-			try {
-				jsonString = JSON.stringify(val);
-			} catch (e) {}
-
-			return jsonString;
-		};
-
-		KaleoDesignerUtils.jsonStringify = jsonStringify;
-
-		var serializeForm = function(form) {
-			var data = {};
-
-			if (form) {
-				form.all(':input:not(:button)').each(item => {
-					var checked = item.get('checked');
-					var name = item.get('name');
-					var type = item.get('type');
-
-					var value = item.val();
-
-					if (name) {
-						if (!isArray(data[name])) {
-							data[name] = [];
-						}
-
-						if (type === 'checkbox') {
-							value = checked;
-						}
-
-						if (type === 'radio' && !checked) {
-							value = null;
-						}
-
-						if (type === 'select-multiple') {
-							value = [];
-
-							item.all('option:selected').each(option => {
-								value.push({
-									notificationType: option.val()
-								});
-							});
-						}
-
-						data[name].push(value);
-					}
-				});
-			}
-
-			return data;
-		};
-
-		KaleoDesignerUtils.serializeForm = serializeForm;
-
-		var uniformRandomInt = function(a, b) {
-			return parseInt(a + Math.random() * (b - a), 10) || 0;
-		};
-
-		KaleoDesignerUtils.uniformRandomInt = uniformRandomInt;
-
-		var previewBeforeRevert = function(_, renderUrl, actionUrl, title) {
-			var dialog = Liferay.Util.Window.getWindow({
-				dialog: {
-					destroyOnHide: true,
-					modal: true,
-					toolbars: {
-						footer: [
-							{
-								cssClass: 'btn btn-secondary',
-								discardDefaultButtonCssClasses: true,
-								label: Liferay.Language.get('cancel'),
-								on: {
-									click() {
-										dialog.destroy();
-									}
-								}
-							},
-							{
-								cssClass: 'btn btn-primary',
-								discardDefaultButtonCssClasses: true,
-								label: Liferay.Language.get('restore'),
-								on: {
-									click() {
-										window.location.assign(actionUrl);
-									}
-								}
-							}
-						],
-						header: [
-							{
-								cssClass: 'close',
-								discardDefaultButtonCssClasses: true,
-								labelHTML:
-									'<svg class="lexicon-icon" focusable="false"><use data-href="' +
-									Liferay.ThemeDisplay.getPathThemeImages() +
-									'/lexicon/icons.svg#times" /><title>' +
-									Liferay.Language.get('close') +
-									'</title></svg>',
-								on: {
-									click(event) {
-										dialog.destroy();
-
-										event.domEvent.stopPropagation();
-									}
-								}
-							}
-						]
-					}
-				},
-				title,
-				uri: renderUrl
-			});
-		};
-
-		KaleoDesignerUtils.previewBeforeRevert = previewBeforeRevert;
 
 		var KaleoDesignerStrings = {
 			action: Liferay.Language.get('action'),
@@ -228,6 +48,7 @@ AUI.add(
 			deleteNodesMessage: Liferay.Language.get(
 				'are-you-sure-you-want-to-delete-the-selected-nodes'
 			),
+			depot: Liferay.Language.get('depot'),
 			description: Liferay.Language.get('description'),
 			duration: Liferay.Language.get('duration'),
 			edit: Liferay.Language.get('edit'),
@@ -296,8 +117,203 @@ AUI.add(
 			userNotification: Liferay.Language.get('user-notification'),
 			velocity: Liferay.Language.get('velocity'),
 			week: Liferay.Language.get('week'),
-			year: Liferay.Language.get('year')
+			year: Liferay.Language.get('year'),
 		};
+
+		var PropertyListFormatter = {
+			assignmentsType(data) {
+				var value = data.value;
+
+				var assignmentType;
+
+				if (value && value.assignmentType) {
+					assignmentType = value.assignmentType[0];
+				}
+
+				return KaleoDesignerStrings[assignmentType || 'assetCreator'];
+			},
+
+			forms(data) {
+				var value = data.value;
+
+				var templateName;
+
+				if (value) {
+					templateName = value.templateName;
+				}
+
+				return AArray(templateName).join(', ');
+			},
+
+			names(data) {
+				var value = data.value;
+
+				var names;
+
+				if (value) {
+					names = value.name;
+				}
+
+				return AArray(names).join(', ');
+			},
+
+			script() {
+				return STR_ELLIPSIS;
+			},
+		};
+
+		KaleoDesignerUtils.PropertyListFormatter = PropertyListFormatter;
+
+		var cdata = function (value) {
+			value = value
+				.replace(STR_CDATA_OPEN, '')
+				.replace(STR_CDATA_CLOSE, '');
+
+			return (
+				STR_CHAR_CRLF +
+				STR_CDATA_OPEN +
+				value +
+				STR_CDATA_CLOSE +
+				STR_CHAR_CRLF
+			);
+		};
+
+		KaleoDesignerUtils.cdata = cdata;
+
+		var jsonParse = function (val) {
+			var jsonObj = null;
+
+			try {
+				jsonObj = JSON.parse(val);
+			}
+			catch (e) {}
+
+			return jsonObj;
+		};
+
+		KaleoDesignerUtils.jsonParse = jsonParse;
+
+		var jsonStringify = function (val) {
+			var jsonString = null;
+
+			try {
+				jsonString =
+					STR_CHAR_CRLF +
+					JSON.stringify(val, null, STR_CHAR_TAB) +
+					STR_CHAR_CRLF;
+			}
+			catch (e) {}
+
+			return jsonString;
+		};
+
+		KaleoDesignerUtils.jsonStringify = jsonStringify;
+
+		var serializeForm = function (form) {
+			var data = {};
+
+			if (form) {
+				form.all(':input:not(:button)').each((item) => {
+					var checked = item.get('checked');
+					var name = item.get('name');
+					var type = item.get('type');
+
+					var value = item.val();
+
+					if (name) {
+						if (!isArray(data[name])) {
+							data[name] = [];
+						}
+
+						if (type === 'checkbox') {
+							value = checked;
+						}
+
+						if (type === 'radio' && !checked) {
+							value = null;
+						}
+
+						if (type === 'select-multiple') {
+							value = [];
+
+							item.all('option:selected').each((option) => {
+								value.push({
+									notificationType: option.val(),
+								});
+							});
+						}
+
+						data[name].push(value);
+					}
+				});
+			}
+
+			return data;
+		};
+
+		KaleoDesignerUtils.serializeForm = serializeForm;
+
+		var uniformRandomInt = function (a, b) {
+			return parseInt(a + Math.random() * (b - a), 10) || 0;
+		};
+
+		KaleoDesignerUtils.uniformRandomInt = uniformRandomInt;
+
+		var previewBeforeRevert = function (_, renderUrl, actionUrl, title) {
+			var dialog = Liferay.Util.Window.getWindow({
+				dialog: {
+					destroyOnHide: true,
+					modal: true,
+					toolbars: {
+						footer: [
+							{
+								cssClass: 'btn btn-secondary',
+								discardDefaultButtonCssClasses: true,
+								label: Liferay.Language.get('cancel'),
+								on: {
+									click() {
+										dialog.destroy();
+									},
+								},
+							},
+							{
+								cssClass: 'btn btn-primary',
+								discardDefaultButtonCssClasses: true,
+								label: Liferay.Language.get('restore'),
+								on: {
+									click() {
+										window.location.assign(actionUrl);
+									},
+								},
+							},
+						],
+						header: [
+							{
+								cssClass: 'close',
+								discardDefaultButtonCssClasses: true,
+								labelHTML:
+									'<svg class="lexicon-icon" focusable="false"><use href="' +
+									Liferay.ThemeDisplay.getPathThemeImages() +
+									'/clay/icons.svg#times" /><title>' +
+									Liferay.Language.get('close') +
+									'</title></svg>',
+								on: {
+									click(event) {
+										dialog.destroy();
+
+										event.domEvent.stopPropagation();
+									},
+								},
+							},
+						],
+					},
+				},
+				title,
+				uri: renderUrl,
+			});
+		};
+
+		KaleoDesignerUtils.previewBeforeRevert = previewBeforeRevert;
 
 		Liferay.KaleoDesignerStrings = KaleoDesignerStrings;
 

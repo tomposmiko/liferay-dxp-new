@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.portal.kernel.service.GroupService;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -63,6 +63,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.preferences-owned-by-group=true",
+		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
@@ -162,7 +163,7 @@ public class FragmentPortlet extends MVCPortlet {
 				themeDisplay.getCompanyGroupId());
 
 		if (ListUtil.isNotEmpty(fragmentCollections)) {
-			Group group = _groupService.getGroup(
+			Group group = _groupLocalService.getGroup(
 				themeDisplay.getCompanyGroupId());
 
 			inheritedFragmentCollections.put(
@@ -193,7 +194,7 @@ public class FragmentPortlet extends MVCPortlet {
 	private FragmentRendererController _fragmentRendererController;
 
 	@Reference
-	private GroupService _groupService;
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private ItemSelector _itemSelector;

@@ -52,7 +52,6 @@ import java.io.InputStream;
 
 import java.lang.reflect.Field;
 
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -60,6 +59,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -173,6 +173,7 @@ public class PDFProcessorTest {
 		Assert.assertTrue(cleanUp.get());
 	}
 
+	@Ignore
 	@Test
 	public void testShouldCleanUpProcessorsOnUpdateAndCheckIn()
 		throws Exception {
@@ -364,6 +365,7 @@ public class PDFProcessorTest {
 		Assert.assertEquals(2, count.get());
 	}
 
+	@Ignore
 	@Test
 	public void testShouldCreateNewPreviewOnUpdateAndCheckInWithContent()
 		throws Exception {
@@ -485,14 +487,13 @@ public class PDFProcessorTest {
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		HashMap<String, Object> properties = HashMapBuilder.<String, Object>put(
-			"service.ranking", 1000
-		).put(
-			"type", DLProcessorConstants.PDF_PROCESSOR
-		).build();
-
 		_dlProcessorServiceRegistration = registry.registerService(
-			DLProcessor.class, cleanUpDLProcessor, properties);
+			DLProcessor.class, cleanUpDLProcessor,
+			HashMapBuilder.<String, Object>put(
+				"service.ranking", 1000
+			).put(
+				"type", DLProcessorConstants.PDF_PROCESSOR
+			).build());
 
 		return cleanUp;
 	}

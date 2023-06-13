@@ -21,12 +21,14 @@ import com.liferay.adaptive.media.image.internal.configuration.AMImageAttributeM
 import com.liferay.adaptive.media.image.internal.processor.AMImage;
 import com.liferay.adaptive.media.image.processor.AMImageProcessor;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Collections;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -34,22 +36,23 @@ import org.junit.Test;
  */
 public class AMAttributeDistanceComparatorTest {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
 	public void setUp() {
-		Map<AMAttribute<AMImageProcessor, ?>, AMImageQueryBuilder.SortOrder>
-			amAttributes =
-				HashMapBuilder.
-					<AMAttribute<AMImageProcessor, ?>,
-					 AMImageQueryBuilder.SortOrder>put(
-						AMAttribute.getContentLengthAMAttribute(),
-						AMImageQueryBuilder.SortOrder.ASC
-					).put(
-						AMAttribute.getFileNameAMAttribute(),
-						AMImageQueryBuilder.SortOrder.DESC
-					).build();
-
 		_multiAMAttributeDistanceComparator = new AMAttributeDistanceComparator(
-			amAttributes);
+			HashMapBuilder.
+				<AMAttribute<AMImageProcessor, ?>,
+				 AMImageQueryBuilder.SortOrder>put(
+					AMAttribute.getContentLengthAMAttribute(),
+					AMImageQueryBuilder.SortOrder.ASC
+				).put(
+					AMAttribute.getFileNameAMAttribute(),
+					AMImageQueryBuilder.SortOrder.DESC
+				).build());
 	}
 
 	@Test
@@ -140,14 +143,13 @@ public class AMAttributeDistanceComparatorTest {
 		AMAttribute<AMImageProcessor, S> amAttribute1, S value1,
 		AMAttribute<AMImageProcessor, T> amAttribute2, T value2) {
 
-		Map<String, String> properties = HashMapBuilder.put(
-			amAttribute1.getName(), String.valueOf(value1)
-		).put(
-			amAttribute2.getName(), String.valueOf(value2)
-		).build();
-
 		AMImageAttributeMapping amImageAttributeMapping =
-			AMImageAttributeMapping.fromProperties(properties);
+			AMImageAttributeMapping.fromProperties(
+				HashMapBuilder.put(
+					amAttribute1.getName(), String.valueOf(value1)
+				).put(
+					amAttribute2.getName(), String.valueOf(value2)
+				).build());
 
 		return new AMImage(() -> null, amImageAttributeMapping, null);
 	}

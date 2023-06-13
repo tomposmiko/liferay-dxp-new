@@ -9,7 +9,8 @@
  * distribution rights of the Software.
  */
 
-import {cleanup, render, waitForElement} from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
 import PerformanceByStepPage from '../../../src/main/resources/META-INF/resources/js/components/performance-by-step-page/PerformanceByStepPage.es';
@@ -21,20 +22,18 @@ const items = [
 		breachedInstanceCount: 4,
 		durationAvg: 10800000,
 		instanceCount: 4,
-		key: 'review',
-		name: 'Review',
+		node: {key: 'review', label: 'Review', name: 'Review'},
 		onTimeInstanceCount: 4,
-		overdueInstanceCount: 4
+		overdueInstanceCount: 4,
 	},
 	{
 		breachedInstanceCount: 2,
 		durationAvg: 475200000,
 		instanceCount: 2,
-		key: 'update',
-		name: 'Update',
+		node: {key: 'update', label: 'Update', name: 'Update'},
 		onTimeInstanceCount: 2,
-		overdueInstanceCount: 2
-	}
+		overdueInstanceCount: 2,
+	},
 ];
 
 const wrapper = ({children}) => (
@@ -46,28 +45,27 @@ const wrapper = ({children}) => (
 );
 
 describe('The performance by step page body should', () => {
-	let getAllByTestId;
+	let getAllByRole;
 
 	afterEach(cleanup);
 
 	beforeEach(() => {
 		const renderResult = render(
 			<PerformanceByStepPage.Body
-				data={{items, totalCount: items.length}}
-				page="1"
-				pageSize="5"
+				{...{items, totalCount: items.length}}
+				filtered={false}
 			/>,
 			{wrapper}
 		);
 
-		getAllByTestId = renderResult.getAllByTestId;
+		getAllByRole = renderResult.getAllByRole;
 	});
 
-	test('Be rendered with step names', async () => {
-		const stepName = await waitForElement(() => getAllByTestId('stepName'));
+	test('Be rendered with step names', () => {
+		const rows = getAllByRole('row');
 
-		expect(stepName[0].innerHTML).toEqual('Review');
-		expect(stepName[1].innerHTML).toEqual('Update');
+		expect(rows[1]).toHaveTextContent('Review');
+		expect(rows[2]).toHaveTextContent('Update');
 	});
 });
 
@@ -75,42 +73,22 @@ describe('The subcomponents from workload by assignee page body should', () => {
 	afterEach(cleanup);
 
 	test('Be rendered with empty view and no content message', async () => {
-		const {getByTestId} = render(<PerformanceByStepPage.Body.Empty />);
-
-		const emptyStateDiv = getByTestId('emptyState');
-
-		expect(emptyStateDiv.children[1].children[0].innerHTML).toBe(
-			'there-is-no-data-at-the-moment'
+		const {getByText} = render(
+			<PerformanceByStepPage.Body items={[]} totalCount={0} />
 		);
+
+		const emptyStateMessage = getByText('there-is-no-data-at-the-moment');
+
+		expect(emptyStateMessage).toBeTruthy();
 	});
 
 	test('Be rendered with empty view and no results message', async () => {
-		const {getByTestId} = render(
-			<PerformanceByStepPage.Body.Empty filtered={true} />
+		const {getByText} = render(
+			<PerformanceByStepPage.Body filtered items={[]} totalCount={0} />
 		);
 
-		const emptyStateDiv = getByTestId('emptyState');
+		const emptyStateMessage = getByText('no-results-were-found');
 
-		expect(emptyStateDiv.children[1].children[0].innerHTML).toBe(
-			'no-results-were-found'
-		);
-	});
-
-	test('Be rendered with error view and the expected message', () => {
-		const {getByTestId} = render(<PerformanceByStepPage.Body.Error />);
-
-		const emptyStateDiv = getByTestId('emptyState');
-
-		expect(emptyStateDiv.children[0].children[0].innerHTML).toBe(
-			'there-was-a-problem-retrieving-data-please-try-reloading-the-page'
-		);
-	});
-
-	test('Be rendered with loading view', async () => {
-		const {getByTestId} = render(<PerformanceByStepPage.Body.Loading />);
-
-		const loadingStateDiv = getByTestId('loadingState');
-
-		expect(loadingStateDiv).not.toBeNull();
+		expect(emptyStateMessage).toBeTruthy();
 	});
 });

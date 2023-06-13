@@ -17,7 +17,9 @@
 <%@ include file="/init.jsp" %>
 
 <liferay-frontend:fieldset-group>
-	<liferay-frontend:fieldset>
+	<liferay-frontend:fieldset
+		disabled="<%= editAssetListDisplayContext.isLiveGroup() %>"
+	>
 		<liferay-asset:asset-tags-error />
 
 		<liferay-ui:error exception="<%= DuplicateQueryRuleException.class %>">
@@ -44,31 +46,30 @@
 			<liferay-ui:message arguments="<%= messageArgument %>" key="only-one-rule-with-the-combination-x-is-supported" translateArguments="<%= false %>" />
 		</liferay-ui:error>
 
-		<p><liferay-ui:message key="displayed-assets-must-match-these-rules" /></p>
+		<p><liferay-ui:message key="displayed-items-must-match-these-rules" /></p>
 
 		<div id="<portlet:namespace />ConditionForm"></div>
 
 		<div>
-
-			<%
-			Map<String, Object> data = HashMapBuilder.<String, Object>put(
-				"categorySelectorURL", editAssetListDisplayContext.getCategorySelectorURL()
-			).put(
-				"groupIds", ListUtil.toList(editAssetListDisplayContext.getReferencedModelsGroupIds())
-			).put(
-				"namespace", liferayPortletResponse.getNamespace()
-			).put(
-				"rules", editAssetListDisplayContext.getAutoFieldRulesJSONArray()
-			).put(
-				"tagSelectorURL", editAssetListDisplayContext.getTagSelectorURL()
-			).put(
-				"vocabularyIds", editAssetListDisplayContext.getVocabularyIds()
-			).build();
-			%>
-
 			<react:component
-				data="<%= data %>"
 				module="auto_field/index"
+				props='<%=
+					HashMapBuilder.<String, Object>put(
+						"categorySelectorURL", editAssetListDisplayContext.getCategorySelectorURL()
+					).put(
+						"disabled", editAssetListDisplayContext.isLiveGroup()
+					).put(
+						"groupIds", ListUtil.toList(editAssetListDisplayContext.getReferencedModelsGroupIds())
+					).put(
+						"namespace", liferayPortletResponse.getNamespace()
+					).put(
+						"rules", editAssetListDisplayContext.getAutoFieldRulesJSONArray()
+					).put(
+						"tagSelectorURL", editAssetListDisplayContext.getTagSelectorURL()
+					).put(
+						"vocabularyIds", editAssetListDisplayContext.getVocabularyIds()
+					).build()
+				%>'
 			/>
 		</div>
 	</liferay-frontend:fieldset>

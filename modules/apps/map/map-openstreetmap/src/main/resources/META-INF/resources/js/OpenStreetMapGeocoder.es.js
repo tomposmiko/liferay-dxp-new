@@ -18,6 +18,7 @@ import State from 'metal-state';
  * OpenStreetMapGeocoder
  */
 class OpenStreetMapGeocoder extends State {
+
 	/**
 	 * Handles the server response of a successfull address forward
 	 * @param {Object} response Server response
@@ -39,7 +40,7 @@ class OpenStreetMapGeocoder extends State {
 	_handleReverseJSONP({display_name, error, lat, lon}, callback) {
 		const result = {
 			data: {},
-			err: error
+			err: error,
 		};
 
 		if (!result.err) {
@@ -47,8 +48,8 @@ class OpenStreetMapGeocoder extends State {
 				address: display_name,
 				location: {
 					lat: parseFloat(lat) || 0,
-					lng: parseFloat(lon) || 0
-				}
+					lng: parseFloat(lon) || 0,
+				},
 			};
 		}
 
@@ -62,7 +63,7 @@ class OpenStreetMapGeocoder extends State {
 	 * @review
 	 */
 	forward(query, callback) {
-		AUI().use('jsonp', A => {
+		AUI().use('jsonp', (A) => {
 			const forwardUrl = OpenStreetMapGeocoder.TPL_FORWARD_GEOCODING_URL.replace(
 				'{query}',
 				query
@@ -71,8 +72,8 @@ class OpenStreetMapGeocoder extends State {
 			A.jsonp(forwardUrl, {
 				context: this,
 				on: {
-					success: A.rbind('_handleForwardJSONP', this, callback)
-				}
+					success: A.rbind('_handleForwardJSONP', this, callback),
+				},
 			});
 		});
 	}
@@ -84,7 +85,7 @@ class OpenStreetMapGeocoder extends State {
 	 * @review
 	 */
 	reverse(location, callback) {
-		AUI().use('jsonp', A => {
+		AUI().use('jsonp', (A) => {
 			const reverseUrl = OpenStreetMapGeocoder.TPL_REVERSE_GEOCODING_URL.replace(
 				'{lat}',
 				location.lat
@@ -93,8 +94,8 @@ class OpenStreetMapGeocoder extends State {
 			A.jsonp(reverseUrl, {
 				context: this,
 				on: {
-					success: A.rbind('_handleReverseJSONP', this, callback)
-				}
+					success: A.rbind('_handleReverseJSONP', this, callback),
+				},
 			});
 		});
 	}

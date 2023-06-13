@@ -12,9 +12,12 @@
  * details.
  */
 
+/**
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
+ */
 AUI.add(
 	'liferay-toggler-interaction',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var NAME = 'togglerinteraction';
@@ -36,11 +39,11 @@ AUI.add(
 		var TogglerInteraction = A.Component.create({
 			ATTRS: {
 				children: {
-					validator: Lang.isString
+					validator: Lang.isString,
 				},
 
 				descendants: {
-					getter: '_getDescendants'
+					getter: '_getDescendants',
 				},
 
 				keys: {
@@ -48,13 +51,13 @@ AUI.add(
 					value: {
 						collapse: 'down:37',
 						next: 'down:40',
-						previous: 'down:38'
-					}
+						previous: 'down:38',
+					},
 				},
 
 				parents: {
-					validator: Lang.isString
-				}
+					validator: Lang.isString,
+				},
 			},
 
 			EXTENDS: Liferay.TogglerKeyFilter,
@@ -150,7 +153,7 @@ AUI.add(
 
 					container.plug(A.Plugin.NodeFocusManager, {
 						descendants: instance.get(STR_DESCENDANTS),
-						keys: instance.get(STR_KEYS)
+						keys: instance.get(STR_KEYS),
 					});
 
 					instance._eventHandles = [
@@ -165,12 +168,12 @@ AUI.add(
 							'toggler:expandedChange',
 							instance._onExpandedChange,
 							instance
-						)
+						),
 					];
 
 					instance._focusManager = container.focusManager;
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.TogglerInteraction = TogglerInteraction;
@@ -180,7 +183,7 @@ AUI.add(
 		requires: [
 			'event-key',
 			'liferay-toggler-key-filter',
-			'node-focusmanager'
-		]
+			'node-focusmanager',
+		],
 	}
 );

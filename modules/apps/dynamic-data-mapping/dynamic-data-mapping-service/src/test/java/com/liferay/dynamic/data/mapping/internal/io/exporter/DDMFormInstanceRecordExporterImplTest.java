@@ -41,6 +41,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -48,11 +49,10 @@ import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.FastDateFormatFactoryImpl;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +63,8 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -80,8 +82,14 @@ import org.powermock.api.mockito.PowerMockito;
 @RunWith(MockitoJUnitRunner.class)
 public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
 	public void setUp() throws Exception {
+		setUpFastDateFormatFactoryUtil();
 		setUpHtmlUtil();
 		setUpLanguageUtil();
 	}
@@ -230,41 +238,6 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 	}
 
 	@Test
-	public void testFormatDate() {
-		DDMFormInstanceRecordExporterImpl ddmFormInstanceRecordExporterImpl =
-			new DDMFormInstanceRecordExporterImpl();
-
-		DateTimeFormatter dateTimeFormatter =
-			ddmFormInstanceRecordExporterImpl.getDateTimeFormatter(
-				new Locale("pt", "BR"));
-
-		LocalDate localDate = LocalDate.of(2018, 2, 1);
-
-		Instant instant = Instant.from(
-			localDate.atStartOfDay(ZoneId.systemDefault()));
-
-		Date date = Date.from(instant);
-
-		String actual = ddmFormInstanceRecordExporterImpl.formatDate(
-			date, dateTimeFormatter);
-
-		Assert.assertEquals("01/02/18 00:00", actual);
-	}
-
-	@Test
-	public void testGetDateTimeFormatter() {
-		DDMFormInstanceRecordExporterImpl ddmFormInstanceRecordExporterImpl =
-			new DDMFormInstanceRecordExporterImpl();
-
-		DateTimeFormatter dateTimeFormatter =
-			ddmFormInstanceRecordExporterImpl.getDateTimeFormatter(
-				new Locale("pt", "BR"));
-
-		Assert.assertEquals(
-			"Localized(SHORT,SHORT)", dateTimeFormatter.toString());
-	}
-
-	@Test
 	public void testGetDDMFormFieldsLabel() {
 		DDMFormInstanceRecordExporterImpl ddmFormInstanceRecordExporterImpl =
 			new DDMFormInstanceRecordExporterImpl();
@@ -297,35 +270,37 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		localizedValue2.addString(locale, "Campo 2");
 
-		Map<String, DDMFormField> ddmFormFieldMap =
-			HashMapBuilder.<String, DDMFormField>put(
-				"field1",
-				() -> {
-					DDMFormField ddmFormField1 = new DDMFormField(
-						"field1", "text");
-
-					ddmFormField1.setLabel(localizedValue1);
-
-					return ddmFormField1;
-				}
-			).put(
-				"field2",
-				() -> {
-					DDMFormField ddmFormField2 = new DDMFormField(
-						"field2", "text");
-
-					ddmFormField2.setLabel(localizedValue2);
-
-					return ddmFormField2;
-				}
-			).build();
-
 		Map<String, String> ddmFormFieldsLabel =
 			ddmFormInstanceRecordExporterImpl.getDDMFormFieldsLabel(
-				ddmFormFieldMap, locale);
+				HashMapBuilder.<String, DDMFormField>put(
+					"field1",
+					() -> {
+						DDMFormField ddmFormField1 = new DDMFormField(
+							"field1", "text");
 
-		Assert.assertEquals("Campo 1", ddmFormFieldsLabel.get("field1"));
-		Assert.assertEquals("Campo 2", ddmFormFieldsLabel.get("field2"));
+						ddmFormField1.setFieldReference("reference1");
+
+						ddmFormField1.setLabel(localizedValue1);
+
+						return ddmFormField1;
+					}
+				).put(
+					"field2",
+					() -> {
+						DDMFormField ddmFormField2 = new DDMFormField(
+							"field2", "text");
+
+						ddmFormField2.setFieldReference("reference2");
+
+						ddmFormField2.setLabel(localizedValue2);
+
+						return ddmFormField2;
+					}
+				).build(),
+				locale);
+
+		Assert.assertEquals("Campo 1", ddmFormFieldsLabel.get("reference1"));
+		Assert.assertEquals("Campo 2", ddmFormFieldsLabel.get("reference2"));
 		Assert.assertEquals("Estado", ddmFormFieldsLabel.get("status"));
 		Assert.assertEquals(
 			"Data de Modificação", ddmFormFieldsLabel.get("modifiedDate"));
@@ -345,17 +320,19 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		DDMFormField ddmFormField = new DDMFormField("field1", "text");
 
+		ddmFormField.setFieldReference("reference1");
+
 		List<DDMFormFieldValue> ddmFormFieldValues = new ArrayList<>();
 
 		DDMFormFieldValue ddmFormFieldValue =
-			DDMFormValuesTestUtil.createDDMFormFieldValue(
-				"field1", new UnlocalizedValue("value1"));
+			DDMFormValuesTestUtil.createDDMFormFieldValueWithReference(
+				"field1", "reference1", new UnlocalizedValue("value1"));
 
 		ddmFormFieldValues.add(ddmFormFieldValue);
 
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValueMap =
 			HashMapBuilder.<String, List<DDMFormFieldValue>>put(
-				"field1", ddmFormFieldValues
+				"reference1", ddmFormFieldValues
 			).build();
 
 		Locale locale = new Locale("pt", "BR");
@@ -374,7 +351,7 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 		);
 
 		when(
-			_html.render("value1")
+			_html.unescape("value1")
 		).thenReturn(
 			"value1"
 		);
@@ -399,7 +376,7 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		Mockito.verify(
 			_html, Mockito.times(1)
-		).render(
+		).unescape(
 			"value1"
 		);
 	}
@@ -422,38 +399,34 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		DDMFormField ddmFormField1 = new DDMFormField("field1", "text");
 
+		ddmFormField1.setFieldReference("reference1");
+
 		ddmForm.addDDMFormField(ddmFormField1);
 
 		DDMFormField ddmFormField2 = new DDMFormField("field2", "text");
+
+		ddmFormField2.setFieldReference("reference2");
 
 		ddmForm.addDDMFormField(ddmFormField2);
 
 		Map<String, DDMFormField> ddmFormFields =
 			HashMapBuilder.<String, DDMFormField>put(
-				"field1", ddmFormField1
+				"reference1", ddmFormField1
 			).put(
-				"field2", ddmFormField2
+				"reference2", ddmFormField2
 			).build();
 
 		DDMFormValues ddmFormValues1 =
 			DDMFormValuesTestUtil.createDDMFormValues(ddmForm);
 
 		DDMFormFieldValue ddmFormFieldValue2 =
-			DDMFormValuesTestUtil.createDDMFormFieldValue(
-				"field2", new UnlocalizedValue("value2"));
+			DDMFormValuesTestUtil.createDDMFormFieldValueWithReference(
+				"field2", "reference2", new UnlocalizedValue("value2"));
 
 		ddmFormValues1.addDDMFormFieldValue(ddmFormFieldValue2);
 
 		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = mock(
 			DDMFormInstanceRecordVersion.class);
-
-		DateTimeFormatter dateTimeFormatter = mock(DateTimeFormatter.class);
-
-		when(
-			ddmFormInstanceRecordExporterImpl.getDateTimeFormatter(locale)
-		).thenReturn(
-			dateTimeFormatter
-		);
 
 		when(
 			ddmFormInstanceRecord.getDDMFormValues()
@@ -481,10 +454,12 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 			WorkflowConstants.STATUS_APPROVED
 		);
 
+		Date statusDate = new Date();
+
 		when(
 			ddmFormInstanceRecordVersion.getStatusDate()
 		).thenReturn(
-			new Date()
+			statusDate
 		);
 
 		when(
@@ -501,13 +476,6 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 		);
 
 		when(
-			ddmFormInstanceRecordExporterImpl.formatDate(
-				Matchers.any(Date.class), Matchers.any(DateTimeFormatter.class))
-		).thenReturn(
-			"01/02/2018 00:00"
-		);
-
-		when(
 			ddmFormInstanceRecordExporterImpl.getDDMFormFieldValues(
 				ddmFormFields, ddmFormInstanceRecords, locale)
 		).thenCallRealMethod();
@@ -518,21 +486,22 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		Map<String, String> valuesMap = ddmFormFieldValues.get(0);
 
-		Assert.assertEquals(StringPool.BLANK, valuesMap.get("field1"));
-		Assert.assertEquals("value", valuesMap.get("field2"));
-		Assert.assertEquals("aprovado", valuesMap.get("status"));
-		Assert.assertEquals("01/02/2018 00:00", valuesMap.get("modifiedDate"));
 		Assert.assertEquals("User Name", valuesMap.get("author"));
+		Assert.assertEquals(StringPool.BLANK, valuesMap.get("reference1"));
+		Assert.assertEquals("value", valuesMap.get("reference2"));
+
+		Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(
+			locale);
+
+		String modifiedDate = dateFormatDateTime.format(statusDate);
+
+		Assert.assertEquals(modifiedDate, valuesMap.get("modifiedDate"));
+
+		Assert.assertEquals("aprovado", valuesMap.get("status"));
 
 		InOrder inOrder = Mockito.inOrder(
 			ddmFormInstanceRecordExporterImpl, ddmFormInstanceRecord,
 			ddmFormInstanceRecordVersion);
-
-		inOrder.verify(
-			ddmFormInstanceRecordExporterImpl, Mockito.times(1)
-		).getDateTimeFormatter(
-			locale
-		);
 
 		inOrder.verify(
 			ddmFormInstanceRecord, Mockito.times(1)
@@ -562,12 +531,6 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 		inOrder.verify(
 			ddmFormInstanceRecordVersion, Mockito.times(1)
 		).getStatusDate();
-
-		inOrder.verify(
-			ddmFormInstanceRecordExporterImpl, Mockito.times(1)
-		).formatDate(
-			Matchers.any(Date.class), Matchers.any(DateTimeFormatter.class)
-		);
 	}
 
 	@Test
@@ -585,20 +548,22 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 		);
 
 		DDMFormField ddmFormField1 = new DDMFormField("field1", "text");
+
+		ddmFormField1.setFieldReference("reference1");
+
 		DDMFormField ddmFormField2 = new DDMFormField("field2", "text");
 
-		Map<String, DDMFormField> ddmFormFields =
-			LinkedHashMapBuilder.<String, DDMFormField>put(
-				"field1", ddmFormField1
-			).put(
-				"field2", ddmFormField2
-			).build();
+		ddmFormField2.setFieldReference("reference2");
 
 		when(
-			ddmFormInstanceRecordExporterImpl.getNontransientDDMFormFieldsMap(
-				ddmStructureVersion)
+			ddmFormInstanceRecordExporterImpl.
+				getNontransientDDMFormFieldsReferencesMap(ddmStructureVersion)
 		).thenReturn(
-			ddmFormFields
+			LinkedHashMapBuilder.<String, DDMFormField>put(
+				"reference1", ddmFormField1
+			).put(
+				"reference2", ddmFormField2
+			).build()
 		);
 
 		when(
@@ -608,8 +573,8 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 		Map<String, DDMFormField> distinctFields =
 			ddmFormInstanceRecordExporterImpl.getDistinctFields(1);
 
-		Assert.assertEquals(ddmFormField1, distinctFields.get("field1"));
-		Assert.assertEquals(ddmFormField2, distinctFields.get("field2"));
+		Assert.assertEquals(ddmFormField1, distinctFields.get("reference1"));
+		Assert.assertEquals(ddmFormField2, distinctFields.get("reference2"));
 
 		InOrder inOrder = Mockito.inOrder(ddmFormInstanceRecordExporterImpl);
 
@@ -621,13 +586,13 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		inOrder.verify(
 			ddmFormInstanceRecordExporterImpl, Mockito.times(1)
-		).getNontransientDDMFormFieldsMap(
+		).getNontransientDDMFormFieldsReferencesMap(
 			ddmStructureVersion
 		);
 	}
 
 	@Test
-	public void testGetNontransientDDMFormFieldsMap() {
+	public void testGetNontransientDDMFormFieldsReferencesMap() {
 		DDMFormInstanceRecordExporterImpl ddmFormInstanceRecordExporterImpl =
 			new DDMFormInstanceRecordExporterImpl();
 
@@ -642,8 +607,8 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 			ddmForm
 		);
 
-		ddmFormInstanceRecordExporterImpl.getNontransientDDMFormFieldsMap(
-			ddmStructureVersion);
+		ddmFormInstanceRecordExporterImpl.
+			getNontransientDDMFormFieldsReferencesMap(ddmStructureVersion);
 
 		InOrder inOrder = Mockito.inOrder(ddmStructureVersion, ddmForm);
 
@@ -653,7 +618,7 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		inOrder.verify(
 			ddmForm, Mockito.times(1)
-		).getNontransientDDMFormFieldsMap(
+		).getNontransientDDMFormFieldsReferencesMap(
 			true
 		);
 	}
@@ -783,6 +748,14 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 		).write(
 			Matchers.any(DDMFormInstanceRecordWriterRequest.class)
 		);
+	}
+
+	protected void setUpFastDateFormatFactoryUtil() {
+		FastDateFormatFactoryUtil fastDateFormatFactoryUtil =
+			new FastDateFormatFactoryUtil();
+
+		fastDateFormatFactoryUtil.setFastDateFormatFactory(
+			new FastDateFormatFactoryImpl());
 	}
 
 	protected void setUpHtmlUtil() {

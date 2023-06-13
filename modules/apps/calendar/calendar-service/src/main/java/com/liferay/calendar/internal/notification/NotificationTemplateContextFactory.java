@@ -22,6 +22,7 @@ import com.liferay.calendar.model.CalendarNotificationTemplate;
 import com.liferay.calendar.notification.NotificationTemplateContext;
 import com.liferay.calendar.notification.NotificationTemplateType;
 import com.liferay.calendar.notification.NotificationType;
+import com.liferay.calendar.service.CalendarBookingLocalService;
 import com.liferay.calendar.service.CalendarNotificationTemplateLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -36,7 +37,9 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -48,6 +51,7 @@ import java.io.Serializable;
 import java.text.Format;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import javax.portlet.WindowState;
@@ -103,12 +107,33 @@ public class NotificationTemplateContextFactory {
 
 		Map<String, Serializable> attributes =
 			HashMapBuilder.<String, Serializable>put(
+				"calendarBookingId", calendarBooking.getCalendarBookingId()
+			).put(
 				"calendarName", calendar.getName(user.getLocale(), true)
 			).put(
 				"endTime",
 				StringBundler.concat(
 					userDateTimeFormat.format(calendarBooking.getEndTime()),
 					StringPool.SPACE, userTimezoneDisplayName)
+			).put(
+				"icsFile",
+				() -> {
+					if (Objects.equals(
+							notificationTemplateContext.
+								getNotificationTemplateType(),
+							NotificationTemplateType.INVITE)) {
+
+						String calendarBookingString =
+							_calendarBookingLocalService.exportCalendarBooking(
+								calendarBooking.getCalendarBookingId(),
+								CalendarUtil.ICAL_EXTENSION);
+
+						return FileUtil.createTempFile(
+							calendarBookingString.getBytes());
+					}
+
+					return null;
+				}
 			).put(
 				"location", calendarBooking.getLocation()
 			).put(
@@ -190,6 +215,13 @@ public class NotificationTemplateContextFactory {
 	}
 
 	@Reference(unbind = "-")
+	protected void setCalendarBookingLocalService(
+		CalendarBookingLocalService calendarBookingLocalService) {
+
+		_calendarBookingLocalService = calendarBookingLocalService;
+	}
+
+	@Reference(unbind = "-")
 	protected void setCompanyLocalService(
 		CompanyLocalService companyLocalService) {
 
@@ -210,7 +242,7 @@ public class NotificationTemplateContextFactory {
 
 	private static String _getCalendarBookingURL(
 			User user, long calendarBookingId)
-		throws PortalException {
+		throws Exception {
 
 		Group group = _groupLocalService.getGroup(
 			user.getCompanyId(), GroupConstants.GUEST);
@@ -253,23 +285,24 @@ public class NotificationTemplateContextFactory {
 	private static Format _getUserDateTimeFormat(
 		CalendarBooking calendarBooking, User user) {
 
-		TimeZone userTimezone = user.getTimeZone();
+		TimeZone userTimeZone = user.getTimeZone();
 
 		if ((calendarBooking != null) && calendarBooking.isAllDay()) {
-			userTimezone = TimeZone.getTimeZone(StringPool.UTC);
+			userTimeZone = TimeZone.getTimeZone(StringPool.UTC);
 		}
 
 		return FastDateFormatFactoryUtil.getDateTime(
-			user.getLocale(), userTimezone);
+			user.getLocale(), userTimeZone);
 	}
 
 	private static String _getUserTimezoneDisplayName(User user) {
-		TimeZone userTimezone = user.getTimeZone();
+		TimeZone userTimeZone = user.getTimeZone();
 
-		return userTimezone.getDisplayName(
+		return userTimeZone.getDisplayName(
 			false, TimeZone.SHORT, user.getLocale());
 	}
 
+	private static CalendarBookingLocalService _calendarBookingLocalService;
 	private static CompanyLocalService _companyLocalService;
 	private static GroupLocalService _groupLocalService;
 	private static LayoutLocalService _layoutLocalService;

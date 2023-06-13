@@ -14,7 +14,10 @@
 
 package com.liferay.asset.entry.rel.service;
 
+import com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link AssetEntryAssetCategoryRelLocalService}.
@@ -38,31 +41,32 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	/**
 	 * Adds the asset entry asset category rel to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetEntryAssetCategoryRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetEntryAssetCategoryRel the asset entry asset category rel
 	 * @return the asset entry asset category rel that was added
 	 */
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-		addAssetEntryAssetCategoryRel(
-			com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-				assetEntryAssetCategoryRel) {
+	public AssetEntryAssetCategoryRel addAssetEntryAssetCategoryRel(
+		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			addAssetEntryAssetCategoryRel(assetEntryAssetCategoryRel);
 	}
 
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-		addAssetEntryAssetCategoryRel(long assetEntryId, long assetCategoryId) {
+	public AssetEntryAssetCategoryRel addAssetEntryAssetCategoryRel(
+		long assetEntryId, long assetCategoryId) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			addAssetEntryAssetCategoryRel(assetEntryId, assetCategoryId);
 	}
 
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-		addAssetEntryAssetCategoryRel(
-			long assetEntryId, long assetCategoryId, int priority) {
+	public AssetEntryAssetCategoryRel addAssetEntryAssetCategoryRel(
+		long assetEntryId, long assetCategoryId, int priority) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			addAssetEntryAssetCategoryRel(
@@ -76,24 +80,38 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	 * @return the new asset entry asset category rel
 	 */
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-		createAssetEntryAssetCategoryRel(long assetEntryAssetCategoryRelId) {
+	public AssetEntryAssetCategoryRel createAssetEntryAssetCategoryRel(
+		long assetEntryAssetCategoryRelId) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			createAssetEntryAssetCategoryRel(assetEntryAssetCategoryRelId);
 	}
 
 	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _assetEntryAssetCategoryRelLocalService.createPersistedModel(
+			primaryKeyObj);
+	}
+
+	/**
 	 * Deletes the asset entry asset category rel from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetEntryAssetCategoryRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param assetEntryAssetCategoryRel the asset entry asset category rel
 	 * @return the asset entry asset category rel that was removed
 	 */
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-		deleteAssetEntryAssetCategoryRel(
-			com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-				assetEntryAssetCategoryRel) {
+	public AssetEntryAssetCategoryRel deleteAssetEntryAssetCategoryRel(
+		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			deleteAssetEntryAssetCategoryRel(assetEntryAssetCategoryRel);
@@ -102,13 +120,17 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	/**
 	 * Deletes the asset entry asset category rel with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetEntryAssetCategoryRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetEntryAssetCategoryRelId the primary key of the asset entry asset category rel
 	 * @return the asset entry asset category rel that was removed
 	 * @throws PortalException if a asset entry asset category rel with the primary key could not be found
 	 */
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-			deleteAssetEntryAssetCategoryRel(long assetEntryAssetCategoryRelId)
+	public AssetEntryAssetCategoryRel deleteAssetEntryAssetCategoryRel(
+			long assetEntryAssetCategoryRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetEntryAssetCategoryRelLocalService.
@@ -149,6 +171,18 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 
 		return _assetEntryAssetCategoryRelLocalService.deletePersistedModel(
 			persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _assetEntryAssetCategoryRelLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _assetEntryAssetCategoryRelLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -245,17 +279,16 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-		fetchAssetEntryAssetCategoryRel(long assetEntryAssetCategoryRelId) {
+	public AssetEntryAssetCategoryRel fetchAssetEntryAssetCategoryRel(
+		long assetEntryAssetCategoryRelId) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			fetchAssetEntryAssetCategoryRel(assetEntryAssetCategoryRelId);
 	}
 
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-		fetchAssetEntryAssetCategoryRel(
-			long assetEntryId, long assetCategoryId) {
+	public AssetEntryAssetCategoryRel fetchAssetEntryAssetCategoryRel(
+		long assetEntryId, long assetCategoryId) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			fetchAssetEntryAssetCategoryRel(assetEntryId, assetCategoryId);
@@ -283,8 +316,8 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	 * @throws PortalException if a asset entry asset category rel with the primary key could not be found
 	 */
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-			getAssetEntryAssetCategoryRel(long assetEntryAssetCategoryRelId)
+	public AssetEntryAssetCategoryRel getAssetEntryAssetCategoryRel(
+			long assetEntryAssetCategoryRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetEntryAssetCategoryRelLocalService.
@@ -303,29 +336,25 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	 * @return the range of asset entry asset category rels
 	 */
 	@Override
-	public java.util.List
-		<com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel>
-			getAssetEntryAssetCategoryRels(int start, int end) {
+	public java.util.List<AssetEntryAssetCategoryRel>
+		getAssetEntryAssetCategoryRels(int start, int end) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			getAssetEntryAssetCategoryRels(start, end);
 	}
 
 	@Override
-	public java.util.List
-		<com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel>
-			getAssetEntryAssetCategoryRelsByAssetCategoryId(
-				long assetCategoryId) {
+	public java.util.List<AssetEntryAssetCategoryRel>
+		getAssetEntryAssetCategoryRelsByAssetCategoryId(long assetCategoryId) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			getAssetEntryAssetCategoryRelsByAssetCategoryId(assetCategoryId);
 	}
 
 	@Override
-	public java.util.List
-		<com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel>
-			getAssetEntryAssetCategoryRelsByAssetCategoryId(
-				long assetCategoryId, int start, int end) {
+	public java.util.List<AssetEntryAssetCategoryRel>
+		getAssetEntryAssetCategoryRelsByAssetCategoryId(
+			long assetCategoryId, int start, int end) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			getAssetEntryAssetCategoryRelsByAssetCategoryId(
@@ -333,13 +362,11 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List
-		<com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel>
-			getAssetEntryAssetCategoryRelsByAssetCategoryId(
-				long assetCategoryId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.asset.entry.rel.model.
-						AssetEntryAssetCategoryRel> orderByComparator) {
+	public java.util.List<AssetEntryAssetCategoryRel>
+		getAssetEntryAssetCategoryRelsByAssetCategoryId(
+			long assetCategoryId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<AssetEntryAssetCategoryRel> orderByComparator) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			getAssetEntryAssetCategoryRelsByAssetCategoryId(
@@ -347,19 +374,17 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List
-		<com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel>
-			getAssetEntryAssetCategoryRelsByAssetEntryId(long assetEntryId) {
+	public java.util.List<AssetEntryAssetCategoryRel>
+		getAssetEntryAssetCategoryRelsByAssetEntryId(long assetEntryId) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			getAssetEntryAssetCategoryRelsByAssetEntryId(assetEntryId);
 	}
 
 	@Override
-	public java.util.List
-		<com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel>
-			getAssetEntryAssetCategoryRelsByAssetEntryId(
-				long assetEntryId, int start, int end) {
+	public java.util.List<AssetEntryAssetCategoryRel>
+		getAssetEntryAssetCategoryRelsByAssetEntryId(
+			long assetEntryId, int start, int end) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			getAssetEntryAssetCategoryRelsByAssetEntryId(
@@ -367,13 +392,11 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List
-		<com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel>
-			getAssetEntryAssetCategoryRelsByAssetEntryId(
-				long assetEntryId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.asset.entry.rel.model.
-						AssetEntryAssetCategoryRel> orderByComparator) {
+	public java.util.List<AssetEntryAssetCategoryRel>
+		getAssetEntryAssetCategoryRelsByAssetEntryId(
+			long assetEntryId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<AssetEntryAssetCategoryRel> orderByComparator) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			getAssetEntryAssetCategoryRelsByAssetEntryId(
@@ -422,6 +445,9 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 			getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -434,17 +460,39 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	/**
 	 * Updates the asset entry asset category rel in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect AssetEntryAssetCategoryRelLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param assetEntryAssetCategoryRel the asset entry asset category rel
 	 * @return the asset entry asset category rel that was updated
 	 */
 	@Override
-	public com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-		updateAssetEntryAssetCategoryRel(
-			com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel
-				assetEntryAssetCategoryRel) {
+	public AssetEntryAssetCategoryRel updateAssetEntryAssetCategoryRel(
+		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
 
 		return _assetEntryAssetCategoryRelLocalService.
 			updateAssetEntryAssetCategoryRel(assetEntryAssetCategoryRel);
+	}
+
+	@Override
+	public CTPersistence<AssetEntryAssetCategoryRel> getCTPersistence() {
+		return _assetEntryAssetCategoryRelLocalService.getCTPersistence();
+	}
+
+	@Override
+	public Class<AssetEntryAssetCategoryRel> getModelClass() {
+		return _assetEntryAssetCategoryRelLocalService.getModelClass();
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<AssetEntryAssetCategoryRel>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return _assetEntryAssetCategoryRelLocalService.updateWithUnsafeFunction(
+			updateUnsafeFunction);
 	}
 
 	@Override

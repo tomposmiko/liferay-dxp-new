@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.language.LanguageImpl;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.wiki.configuration.WikiFileUploadConfiguration;
@@ -38,6 +39,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mock;
@@ -53,6 +56,11 @@ import org.skyscreamer.jsonassert.JSONAssert;
  */
 public class WikiAttachmentImageCreoleEditorConfigContributorTest
 	extends PowerMockito {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -98,7 +106,7 @@ public class WikiAttachmentImageCreoleEditorConfigContributorTest
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toJSONString());
+			originalJSONObject.toString());
 
 		WikiAttachmentImageCreoleEditorConfigContributor
 			wikiAttachmentImageCreoleEditorConfigContributor =
@@ -122,7 +130,7 @@ public class WikiAttachmentImageCreoleEditorConfigContributorTest
 		);
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
+			expectedJSONObject.toString(), jsonObject.toString(), true);
 	}
 
 	@Test
@@ -199,7 +207,7 @@ public class WikiAttachmentImageCreoleEditorConfigContributorTest
 		);
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
+			expectedJSONObject.toString(), jsonObject.toString(), true);
 	}
 
 	@Test
@@ -213,7 +221,7 @@ public class WikiAttachmentImageCreoleEditorConfigContributorTest
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toJSONString());
+			originalJSONObject.toString());
 
 		WikiAttachmentImageCreoleEditorConfigContributor
 			wikiAttachmentImageCreoleEditorConfigContributor =
@@ -227,12 +235,12 @@ public class WikiAttachmentImageCreoleEditorConfigContributorTest
 				jsonObject, _inputEditorTaglibAttributes, null, null);
 
 		JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toJSONString());
+			originalJSONObject.toString());
 
 		expectedJSONObject.put("removePlugins", "plugin1");
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
+			expectedJSONObject.toString(), jsonObject.toString(), true);
 	}
 
 	@Test
@@ -246,7 +254,7 @@ public class WikiAttachmentImageCreoleEditorConfigContributorTest
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toJSONString());
+			originalJSONObject.toString());
 
 		WikiAttachmentImageCreoleEditorConfigContributor
 			wikiAttachmentImageCreoleEditorConfigContributor =
@@ -260,12 +268,12 @@ public class WikiAttachmentImageCreoleEditorConfigContributorTest
 				jsonObject, _inputEditorTaglibAttributes, null, null);
 
 		JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toJSONString());
+			originalJSONObject.toString());
 
 		expectedJSONObject.put("removePlugins", "plugin1");
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
+			expectedJSONObject.toString(), jsonObject.toString(), true);
 	}
 
 	protected JSONObject getJSONObjectWithDefaultItemSelectorURL()
@@ -287,12 +295,11 @@ public class WikiAttachmentImageCreoleEditorConfigContributorTest
 	}
 
 	protected void setWikiPageResourcePrimKey(long primKey) {
-		Map<String, String> fileBrowserParamsMap = HashMapBuilder.put(
-			"wikiPageResourcePrimKey", String.valueOf(primKey)
-		).build();
-
 		_inputEditorTaglibAttributes.put(
-			"liferay-ui:input-editor:fileBrowserParams", fileBrowserParamsMap);
+			"liferay-ui:input-editor:fileBrowserParams",
+			HashMapBuilder.put(
+				"wikiPageResourcePrimKey", String.valueOf(primKey)
+			).build());
 	}
 
 	private final Map<String, Object> _inputEditorTaglibAttributes =

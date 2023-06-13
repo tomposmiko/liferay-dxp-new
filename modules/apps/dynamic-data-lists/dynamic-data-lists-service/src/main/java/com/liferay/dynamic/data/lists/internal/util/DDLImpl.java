@@ -15,8 +15,8 @@
 package com.liferay.dynamic.data.lists.internal.util;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.dynamic.data.lists.constants.DDLRecordConstants;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
-import com.liferay.dynamic.data.lists.model.DDLRecordConstants;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
 import com.liferay.dynamic.data.lists.service.DDLRecordLocalService;
@@ -135,10 +135,12 @@ public class DDLImpl implements DDL {
 
 				fieldValuesStream.forEach(
 					fieldValue -> {
-						JSONArray jsonArrayValue = getJSONArrayValue(
+						JSONArray valueJSONArray = getJSONArrayValue(
 							fieldValue);
 
-						fieldJSONArray.put(jsonArrayValue.get(0));
+						for (Object object : valueJSONArray) {
+							fieldJSONArray.put(object);
+						}
 					});
 
 				jsonObject.put(fieldName, fieldJSONArray);

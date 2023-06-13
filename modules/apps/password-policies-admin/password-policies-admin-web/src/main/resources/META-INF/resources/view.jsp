@@ -33,17 +33,10 @@ boolean passwordPolicyEnabled = LDAPSettingsUtil.isPasswordPolicyEnabled(company
 String description = LanguageUtil.get(request, "javax.portlet.description.com_liferay_password_policies_admin_web_portlet_PasswordPoliciesAdminPortlet") + " " + LanguageUtil.get(request, "when-no-password-policy-is-assigned-to-a-user,-either-explicitly-or-through-an-organization,-the-default-password-policy-is-used");
 
 portletDisplay.setDescription(description);
-%>
 
-<clay:navigation-bar
-	inverted="<%= true %>"
-	navigationItems="<%= passwordPolicyDisplayContext.getViewPasswordPoliciesNavigationItems() %>"
-/>
-
-<%
 ViewPasswordPoliciesManagementToolbarDisplayContext viewPasswordPoliciesManagementToolbarDisplayContext = new ViewPasswordPoliciesManagementToolbarDisplayContext(request, renderRequest, renderResponse, displayStyle);
 
-SearchContainer searchContainer = viewPasswordPoliciesManagementToolbarDisplayContext.getSearchContainer();
+SearchContainer<PasswordPolicy> searchContainer = viewPasswordPoliciesManagementToolbarDisplayContext.getSearchContainer();
 
 PortletURL portletURL = viewPasswordPoliciesManagementToolbarDisplayContext.getPortletURL();
 %>
@@ -64,7 +57,7 @@ PortletURL portletURL = viewPasswordPoliciesManagementToolbarDisplayContext.getP
 	viewTypeItems="<%= viewPasswordPoliciesManagementToolbarDisplayContext.getViewTypeItems() %>"
 />
 
-<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="get" name="fm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="get" name="fm">
 	<aui:input name="passwordPolicyIds" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 

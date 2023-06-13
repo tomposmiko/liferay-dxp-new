@@ -2,11 +2,13 @@
 <head>
 <title>StagingPublishToLive</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">StagingPublishToLive</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>SWITCH_TO_ADVANCED_PUBLICATION</td>
@@ -24,6 +26,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>STAGING_CONFIGURATION_CHECKBOX</td>
+	<td>//label[contains(.,'${key_checkboxName}')]/input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -32,6 +39,11 @@
 <tr>
 	<td>DATE_SCHEDULE_RADIO</td>
 	<td>//span[contains(@class,'custom-control-label-text') and contains(.,'Schedule')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATE_SCHEDULE_START_DATE</td>
+	<td>//input[contains(@name,'_schedulerStartDate') and @placeholder='mm/dd/yyyy']</td>
 	<td></td>
 </tr>
 <tr>

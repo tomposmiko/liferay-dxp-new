@@ -2,11 +2,13 @@
 <head>
 <title>WikiTable</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">WikiTable</td></tr>
 </thead>
+
 <tbody>
 <!--ALL_PAGES-->
 <tr>
@@ -89,7 +91,7 @@
 <!--NAVIGATION-->
 <tr>
 	<td>NAVIGATION_ACTIVE_TAB</td>
-	<td>//a[contains(@class,'active')]/span[contains(.,'${key_tabName}')]</td>
+	<td>//a[contains(@class,'active') and contains(.,'${key_tabName}')]</td>
 	<td></td>
 </tr>
 <tr>

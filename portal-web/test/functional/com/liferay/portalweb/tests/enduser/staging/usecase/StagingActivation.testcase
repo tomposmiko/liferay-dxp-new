@@ -37,8 +37,9 @@ definition {
 		Staging.activateStagingCP(siteName = "Site Name");
 
 		JSONLayout.addWidgetToPublicLayout(
-			groupName = "Site Name",
+			groupName = "Site Name-staging",
 			layoutName = "Staging Test Page",
+			site = "false",
 			widgetName = "Documents and Media");
 
 		Navigator.gotoStagedSitePage(
@@ -82,7 +83,9 @@ definition {
 
 		Staging.gotoPublishToLive();
 
-		Staging.publishToLive(publicationName = "summCheck");
+		Staging.publishToLive(
+			publicationName = "summCheck",
+			remoteStaging = "true");
 
 		Staging.openStagingAdmin(siteURLKey = "site-name");
 
@@ -109,7 +112,6 @@ definition {
 
 		ProductMenu.gotoPortlet(
 			category = "Recycle Bin",
-			panel = "Site Administration",
 			portlet = "Recycle Bin");
 
 		RecycleBin.viewDefaultCP(assetName = "Web Content Title");

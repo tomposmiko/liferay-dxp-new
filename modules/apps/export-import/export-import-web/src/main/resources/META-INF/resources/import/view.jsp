@@ -19,7 +19,16 @@
 <%
 boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout");
 
-String displayStyle = ParamUtil.getString(request, "displayStyle", "descriptive");
+String displayStyle = ParamUtil.getString(request, "displayStyle");
+
+if (Validator.isNotNull(displayStyle) && Validator.isNotNull(displayStyle)) {
+	portalPreferences.setValue(ExportImportPortletKeys.IMPORT, "displayStyle", displayStyle);
+	portalPreferences.setValue(ExportImportPortletKeys.IMPORT, "displayStyle", displayStyle);
+}
+else {
+	displayStyle = portalPreferences.getValue(ExportImportPortletKeys.IMPORT, "displayStyle", "descriptive");
+}
+
 String navigation = ParamUtil.getString(request, "navigation", "all");
 
 String orderByCol = ParamUtil.getString(request, "orderByCol");
@@ -93,10 +102,10 @@ GroupDisplayContextHelper groupDisplayContextHelper = new GroupDisplayContextHel
 		processesNode: '#importProcessesSearchContainer',
 		processesResourceURL:
 			'<%= HtmlUtil.escapeJS(importProcessesURL.toString()) %>',
-		timeZoneOffset: <%= timeZoneOffset %>
+		timeZoneOffset: <%= timeZoneOffset %>,
 	});
 
-	var destroyInstance = function(event) {
+	var destroyInstance = function (event) {
 		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
 			exportImport.destroy();
 

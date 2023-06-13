@@ -32,6 +32,7 @@ definition {
 	@priority = "5"
 	test PreviewAfterReplacingImage {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -96,6 +97,7 @@ definition {
 	@priority = "5"
 	test PreviewInheritedSEO {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -116,8 +118,8 @@ definition {
 			fieldLabel = "HTML Title",
 			text = "Page HTML Title");
 
-		PortletEntry.inputTextArea(
-			fieldId = "GroupPagesPortlet_description",
+		PortletEntry.inputText(
+			fieldLabel = "Description",
 			text = "Page Description");
 
 		Button.clickSave();
@@ -162,7 +164,11 @@ definition {
 	@description = "This ensures that the user can customize OG tags."
 	@priority = "5"
 	test Smoke {
+		property environment.acceptance = "true";
+		property portal.acceptance = "true";
+
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -177,6 +183,8 @@ definition {
 
 		Navigator.gotoNavTab(navTab = "Open Graph");
 
+		Pause(locator1 = "3000");
+
 		OpenGraph.configureOpenGraph(
 			customDescription = "Custom Description",
 			customImage = "true",
@@ -187,7 +195,7 @@ definition {
 
 		Page.viewPreview(
 			description = "Custom Description",
-			htmlTitle = "Custom Title - Test Site Name - ${siteName}",
+			htmlTitle = "Custom Title",
 			key_imageName = "Document_1.jpg",
 			openGraph = "true",
 			portalURL = "${portalURL}",
@@ -199,7 +207,7 @@ definition {
 
 		Page.viewPreview(
 			description = "Custom Description",
-			htmlTitle = "Custom Title - Test Site Name - ${siteName}",
+			htmlTitle = "Custom Title",
 			key_imageName = "Document_1.jpg",
 			openGraph = "true",
 			portalURL = "${portalURL}",
@@ -210,6 +218,7 @@ definition {
 	@priority = "3"
 	test ValidateEscapeCharacters {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -231,7 +240,7 @@ definition {
 
 		Page.viewPreview(
 			description = '''description@#$%^&amp;*()~`1234567890''',
-			htmlTitle = '''@#$%^&amp;*()~`1234567890title - ${siteName}''',
+			htmlTitle = '''@#$%^&amp;*()~`1234567890title''',
 			openGraph = "true",
 			pageName = "Test Page Name",
 			portalURL = "${portalURL}");
@@ -242,7 +251,7 @@ definition {
 
 		Page.viewPreview(
 			description = '''description@#$%^&amp;*()~`1234567890''',
-			htmlTitle = '''@#$%^&amp;*()~`1234567890title - ${siteName}''',
+			htmlTitle = '''@#$%^&amp;*()~`1234567890title''',
 			openGraph = "true",
 			pageName = "Test Page Name",
 			portalURL = "${portalURL}");
@@ -252,6 +261,7 @@ definition {
 	@priority = "5"
 	test ValidateLongInputs {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -274,7 +284,7 @@ definition {
 
 		Page.viewPreview(
 			description = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web ap…",
-			htmlTitle = "Liferay Portal provides an excellent platform for building web applications - Test Site Name - ${siteName}",
+			htmlTitle = "Liferay Portal provides an excellent platform for building web applications",
 			openGraph = "true",
 			portalURL = "${portalURL}",
 			siteNameURL = "test-site-name",
@@ -287,7 +297,7 @@ definition {
 
 		Page.viewPreview(
 			description = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web ap…",
-			htmlTitle = "Liferay Portal provides an excellent platform for building web applications - Test Site Name - ${siteName}",
+			htmlTitle = "Liferay Portal provides an excellent platform for building web applications",
 			openGraph = "true",
 			portalURL = "${portalURL}",
 			siteNameURL = "test-site-name",
@@ -299,6 +309,7 @@ definition {
 	@priority = "5"
 	test ValidateReturnToDefault {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -342,6 +353,7 @@ definition {
 	@priority = "4"
 	test ViewArabicTranslation {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -367,7 +379,7 @@ definition {
 
 		Page.viewPreview(
 			description = "وصف الاختبار",
-			htmlTitle = "عنوان الاختبار - Test Site Name - ${siteName}",
+			htmlTitle = "عنوان الاختبار",
 			locale = "ar-SA",
 			openGraph = "true",
 			portalURL = "${portalURL}",
@@ -378,17 +390,18 @@ definition {
 	@priority = "4"
 	test ViewSpecialImages {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
 			layoutName = "Test Page Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		Navigator.gotoSitePage(
+			pageName = "Test Page Name",
+			siteName = "Test Site Name");
 
-		SitePages.gotoPageMenuItem(
-			menuItem = "Configure",
-			pageName = "Test Page Name");
+		Click.pauseClickAt(locator1 = "ControlMenu#EDIT_COG");
 
 		Navigator.gotoNavTab(navTab = "Open Graph");
 
@@ -411,6 +424,7 @@ definition {
 	@priority = "5"
 	test ViewTranslatedLanguages {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -429,8 +443,8 @@ definition {
 			fieldLabel = "HTML Title",
 			text = "Page HTML Title");
 
-		PortletEntry.inputTextArea(
-			fieldId = "GroupPagesPortlet_description",
+		PortletEntry.inputText(
+			fieldLabel = "Description",
 			text = "Page Description");
 
 		OpenGraph.changeLocale(
@@ -441,8 +455,8 @@ definition {
 			fieldLabel = "HTML Title",
 			text = "Título de la Prueba");
 
-		PortletEntry.inputTextArea(
-			fieldId = "GroupPagesPortlet_description",
+		PortletEntry.inputText(
+			fieldLabel = "Description",
 			text = "Descripción de la Prueba");
 
 		Page.viewPreview(
@@ -462,8 +476,8 @@ definition {
 			fieldLabel = "HTML Title",
 			text = "テストhtmlタイトル");
 
-		PortletEntry.inputTextArea(
-			fieldId = "GroupPagesPortlet_description",
+		PortletEntry.inputText(
+			fieldLabel = "Description",
 			text = "テスト記述");
 
 		Page.viewPreview(
@@ -528,6 +542,7 @@ definition {
 	@priority = "5"
 	test ViewUntranslatedLanguage {
 		var portalURL = PropsUtil.get("portal.url");
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -546,8 +561,8 @@ definition {
 			fieldLabel = "HTML Title",
 			text = "Page HTML Title");
 
-		PortletEntry.inputTextArea(
-			fieldId = "GroupPagesPortlet_description",
+		PortletEntry.inputText(
+			fieldLabel = "Description",
 			text = "Page Description");
 
 		OpenGraph.changeLocale(
@@ -558,8 +573,8 @@ definition {
 			fieldLabel = "HTML Title",
 			text = "Tテストhtmlタイトル");
 
-		PortletEntry.inputTextArea(
-			fieldId = "GroupPagesPortlet_description",
+		PortletEntry.inputText(
+			fieldLabel = "Description",
 			text = "テスト記述");
 
 		Button.clickSave();

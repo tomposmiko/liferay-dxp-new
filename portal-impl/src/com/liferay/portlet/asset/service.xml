@@ -98,7 +98,6 @@
 		<reference entity="ClassName" package-path="com.liferay.portal" />
 		<reference entity="Resource" package-path="com.liferay.portal" />
 		<reference entity="User" package-path="com.liferay.portal" />
-		<reference entity="AssetEntry" package-path="com.liferay.portlet.asset" />
 		<reference entity="AssetVocabulary" package-path="com.liferay.portlet.asset" />
 	</entity>
 	<entity deprecated="true" local-service="true" name="AssetCategoryProperty" remote-service="true">
@@ -318,7 +317,7 @@
 		<!-- Other fields -->
 
 		<column accessor="true" name="name" type="String" />
-		<column name="assetCount" type="int" />
+		<column change-tracking-resolution-type="merge" name="assetCount" type="int" />
 		<column name="lastPublishDate" type="Date" />
 
 		<!-- Relationships -->
@@ -337,15 +336,15 @@
 			<finder-column arrayable-operator="OR" name="groupId" />
 		</finder>
 		<finder name="Name" return-type="Collection">
-			<finder-column arrayable-operator="OR" name="name" />
+			<finder-column arrayable-operator="OR" case-sensitive="false" name="name" />
 		</finder>
 		<finder name="G_N" return-type="AssetTag" unique="true">
 			<finder-column name="groupId" />
-			<finder-column name="name" />
+			<finder-column case-sensitive="false" name="name" />
 		</finder>
 		<finder name="G_LikeN" return-type="Collection">
 			<finder-column arrayable-operator="OR" name="groupId" />
-			<finder-column comparator="LIKE" name="name" />
+			<finder-column case-sensitive="false" comparator="LIKE" name="name" />
 		</finder>
 
 		<!-- References -->
@@ -379,6 +378,7 @@
 		<column localized="true" name="title" type="String" />
 		<column localized="true" name="description" type="String" />
 		<column name="settings" type="String" />
+		<column name="visibilityType" type="int" />
 		<column name="lastPublishDate" type="Date" />
 
 		<!-- Order -->
@@ -397,11 +397,15 @@
 		</finder>
 		<finder name="G_N" return-type="AssetVocabulary" unique="true">
 			<finder-column name="groupId" />
-			<finder-column name="name" />
+			<finder-column case-sensitive="false" name="name" />
 		</finder>
 		<finder name="G_LikeN" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column case-sensitive="false" comparator="LIKE" name="name" />
+		</finder>
+		<finder name="G_V" return-type="Collection">
+			<finder-column arrayable-operator="OR" name="groupId" />
+			<finder-column arrayable-operator="OR" name="visibilityType" />
 		</finder>
 
 		<!-- References -->

@@ -59,7 +59,6 @@ public abstract class SharingEntryFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -85,14 +84,5 @@ public abstract class SharingEntryFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SharingEntryFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(SharingPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

@@ -159,17 +159,15 @@ public class AssetCategoryLocalServiceImpl
 
 		Locale locale = LocaleUtil.getSiteDefault();
 
-		Map<Locale, String> titleMap = HashMapBuilder.put(
-			locale, title
-		).build();
-
-		Map<Locale, String> descriptionMap = HashMapBuilder.put(
-			locale, StringPool.BLANK
-		).build();
-
 		return assetCategoryLocalService.addCategory(
 			userId, groupId, AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
-			titleMap, descriptionMap, vocabularyId, null, serviceContext);
+			HashMapBuilder.put(
+				locale, title
+			).build(),
+			HashMapBuilder.put(
+				locale, StringPool.BLANK
+			).build(),
+			vocabularyId, null, serviceContext);
 	}
 
 	@Override
@@ -378,10 +376,10 @@ public class AssetCategoryLocalServiceImpl
 	@Override
 	public List<AssetCategory> getChildCategories(
 		long parentCategoryId, int start, int end,
-		OrderByComparator<AssetCategory> obc) {
+		OrderByComparator<AssetCategory> orderByComparator) {
 
 		return assetCategoryPersistence.findByParentCategoryId(
-			parentCategoryId, start, end, obc);
+			parentCategoryId, start, end, orderByComparator);
 	}
 
 	@Override
@@ -447,19 +445,19 @@ public class AssetCategoryLocalServiceImpl
 	@Override
 	public List<AssetCategory> getVocabularyCategories(
 		long vocabularyId, int start, int end,
-		OrderByComparator<AssetCategory> obc) {
+		OrderByComparator<AssetCategory> orderByComparator) {
 
 		return assetCategoryPersistence.findByVocabularyId(
-			vocabularyId, start, end, obc);
+			vocabularyId, start, end, orderByComparator);
 	}
 
 	@Override
 	public List<AssetCategory> getVocabularyCategories(
 		long parentCategoryId, long vocabularyId, int start, int end,
-		OrderByComparator<AssetCategory> obc) {
+		OrderByComparator<AssetCategory> orderByComparator) {
 
 		return assetCategoryPersistence.findByP_V(
-			parentCategoryId, vocabularyId, start, end, obc);
+			parentCategoryId, vocabularyId, start, end, orderByComparator);
 	}
 
 	@Override
@@ -470,11 +468,11 @@ public class AssetCategoryLocalServiceImpl
 	@Override
 	public List<AssetCategory> getVocabularyRootCategories(
 		long vocabularyId, int start, int end,
-		OrderByComparator<AssetCategory> obc) {
+		OrderByComparator<AssetCategory> orderByComparator) {
 
 		return getVocabularyCategories(
 			AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, vocabularyId,
-			start, end, obc);
+			start, end, orderByComparator);
 	}
 
 	@Override
@@ -526,9 +524,9 @@ public class AssetCategoryLocalServiceImpl
 		if (vocabularyId != category.getVocabularyId()) {
 			assetVocabularyPersistence.findByPrimaryKey(vocabularyId);
 
-			category.setVocabularyId(vocabularyId);
-
 			updateChildrenVocabularyId(category, vocabularyId);
+
+			category.setVocabularyId(vocabularyId);
 		}
 
 		if (parentCategoryId != category.getParentCategoryId()) {
@@ -661,16 +659,14 @@ public class AssetCategoryLocalServiceImpl
 
 		SearchContext searchContext = new SearchContext();
 
-		Map<String, Serializable> attributes =
+		searchContext.setAttributes(
 			HashMapBuilder.<String, Serializable>put(
 				Field.ASSET_PARENT_CATEGORY_IDS, parentCategoryIds
 			).put(
 				Field.ASSET_VOCABULARY_IDS, vocabularyIds
 			).put(
 				Field.TITLE, title
-			).build();
-
-		searchContext.setAttributes(attributes);
+			).build());
 
 		searchContext.setCompanyId(companyId);
 		searchContext.setEnd(end);
@@ -722,6 +718,10 @@ public class AssetCategoryLocalServiceImpl
 		AssetCategory category, long vocabularyId) {
 
 		for (AssetCategory childCategory : getDescendantCategories(category)) {
+			if (childCategory.getCategoryId() == category.getCategoryId()) {
+				continue;
+			}
+
 			childCategory.setVocabularyId(vocabularyId);
 
 			assetCategoryPersistence.update(childCategory);
@@ -783,6 +783,10 @@ public class AssetCategoryLocalServiceImpl
 			category);
 
 		for (AssetCategory childCategory : childrenCategories) {
+			if (childCategory.getCategoryId() == category.getCategoryId()) {
+				continue;
+			}
+
 			String childTreePath = childCategory.getTreePath();
 
 			childCategory.setTreePath(

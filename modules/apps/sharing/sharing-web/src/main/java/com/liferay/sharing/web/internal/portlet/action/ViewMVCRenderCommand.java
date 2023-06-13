@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sharing.constants.SharingPortletKeys;
 import com.liferay.sharing.web.internal.constants.SharingWebKeys;
 import com.liferay.sharing.web.internal.display.SharingEntryPermissionDisplayAction;
-import com.liferay.sharing.web.internal.util.SharingUtil;
+import com.liferay.sharing.web.internal.helper.SharingHelper;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
@@ -39,8 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + SharingPortletKeys.SHARING,
-		"mvc.command.name=/", "mvc.command.name=/sharing/share"
+		"javax.portlet.name=" + SharingPortletKeys.SHARING, "mvc.command.name=/"
 	},
 	service = MVCRenderCommand.class
 )
@@ -56,6 +55,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		renderRequest.setAttribute(
 			SharingWebKeys.SHARING_REACT_DATA,
 			HashMapBuilder.<String, Object>put(
+				"autocompleteUserURL", _getAutocompleteUserURL(renderResponse)
+			).put(
 				"classNameId", ParamUtil.getLong(renderRequest, "classNameId")
 			).put(
 				"classPK", ParamUtil.getLong(renderRequest, "classPK")
@@ -72,14 +73,11 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 				SharingEntryPermissionDisplayAction.VIEW.getActionId()
 			).put(
 				"sharingEntryPermissionDisplays",
-				_sharingUtil.getSharingEntryPermissionDisplays(
+				_sharingHelper.getSharingEntryPermissionDisplays(
 					themeDisplay.getPermissionChecker(),
 					ParamUtil.getLong(renderRequest, "classNameId"),
 					ParamUtil.getLong(renderRequest, "classPK"),
 					themeDisplay.getScopeGroupId(), themeDisplay.getLocale())
-			).put(
-				"sharingUserAutocompleteURL",
-				_getSharingUserAutocompleteURL(renderResponse)
 			).put(
 				"sharingVerifyEmailAddressURL",
 				_getSharingVerifyEmailAddressURL(renderResponse)
@@ -88,24 +86,21 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		return "/sharing/view.jsp";
 	}
 
+	private String _getAutocompleteUserURL(RenderResponse renderResponse) {
+		ResourceURL autocompleteUserURL = renderResponse.createResourceURL();
+
+		autocompleteUserURL.setResourceID("/sharing/autocomplete_user");
+
+		return autocompleteUserURL.toString();
+	}
+
 	private String _getShareActionURL(RenderResponse renderResponse) {
 		PortletURL shareActionURL = renderResponse.createActionURL();
 
 		shareActionURL.setParameter(
-			ActionRequest.ACTION_NAME, "/sharing/share");
+			ActionRequest.ACTION_NAME, "/sharing/share_entry");
 
 		return shareActionURL.toString();
-	}
-
-	private String _getSharingUserAutocompleteURL(
-		RenderResponse renderResponse) {
-
-		ResourceURL sharingUserAutocompleteURL =
-			renderResponse.createResourceURL();
-
-		sharingUserAutocompleteURL.setResourceID("/sharing/users");
-
-		return sharingUserAutocompleteURL.toString();
 	}
 
 	private String _getSharingVerifyEmailAddressURL(
@@ -121,6 +116,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	@Reference
-	private SharingUtil _sharingUtil;
+	private SharingHelper _sharingHelper;
 
 }

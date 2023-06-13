@@ -24,8 +24,10 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.layout.page.template.service.http.LayoutPageTemplateEntryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class LayoutPageTemplateEntrySoap implements Serializable {
 
 	public static LayoutPageTemplateEntrySoap toSoapModel(
@@ -35,6 +37,7 @@ public class LayoutPageTemplateEntrySoap implements Serializable {
 			new LayoutPageTemplateEntrySoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setCtCollectionId(model.getCtCollectionId());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setLayoutPageTemplateEntryId(
 			model.getLayoutPageTemplateEntryId());
@@ -46,6 +49,8 @@ public class LayoutPageTemplateEntrySoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setLayoutPageTemplateCollectionId(
 			model.getLayoutPageTemplateCollectionId());
+		soapModel.setLayoutPageTemplateEntryKey(
+			model.getLayoutPageTemplateEntryKey());
 		soapModel.setClassNameId(model.getClassNameId());
 		soapModel.setClassTypeId(model.getClassTypeId());
 		soapModel.setName(model.getName());
@@ -130,6 +135,14 @@ public class LayoutPageTemplateEntrySoap implements Serializable {
 		_mvccVersion = mvccVersion;
 	}
 
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	public void setCtCollectionId(long ctCollectionId) {
+		_ctCollectionId = ctCollectionId;
+	}
+
 	public String getUuid() {
 		return _uuid;
 	}
@@ -202,6 +215,16 @@ public class LayoutPageTemplateEntrySoap implements Serializable {
 		long layoutPageTemplateCollectionId) {
 
 		_layoutPageTemplateCollectionId = layoutPageTemplateCollectionId;
+	}
+
+	public String getLayoutPageTemplateEntryKey() {
+		return _layoutPageTemplateEntryKey;
+	}
+
+	public void setLayoutPageTemplateEntryKey(
+		String layoutPageTemplateEntryKey) {
+
+		_layoutPageTemplateEntryKey = layoutPageTemplateEntryKey;
 	}
 
 	public long getClassNameId() {
@@ -313,6 +336,7 @@ public class LayoutPageTemplateEntrySoap implements Serializable {
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
 	private long _layoutPageTemplateEntryId;
 	private long _groupId;
@@ -322,6 +346,7 @@ public class LayoutPageTemplateEntrySoap implements Serializable {
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _layoutPageTemplateCollectionId;
+	private String _layoutPageTemplateEntryKey;
 	private long _classNameId;
 	private long _classTypeId;
 	private String _name;

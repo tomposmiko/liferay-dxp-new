@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-staging-branch',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var StagingBar = Liferay.StagingBar;
@@ -32,9 +32,9 @@ AUI.add(
 						dialog: {
 							bodyContent: A.one(
 								'#' + namespace + 'addBranch'
-							).show()
+							).show(),
 						},
-						title: Liferay.Language.get('branch')
+						title: Liferay.Language.get('branch'),
 					});
 
 					instance._branchDialog = branchDialog;
@@ -53,11 +53,11 @@ AUI.add(
 				}
 
 				branchDialog.show();
-			}
+			},
 		});
 	},
 	'',
 	{
-		requires: ['liferay-staging']
+		requires: ['liferay-staging'],
 	}
 );

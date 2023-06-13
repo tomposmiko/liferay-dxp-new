@@ -17,7 +17,7 @@ import {
 	actionItemsValidator,
 	creationMenuItemsValidator,
 	filterItemsValidator,
-	filterLabelsValidator
+	filterLabelsValidator,
 } from 'clay-management-toolbar';
 import {EventEmitterProxy} from 'metal-events';
 import Soy from 'metal-soy';
@@ -29,6 +29,7 @@ import templates from './ManagementToolbar.soy';
  * Creates a Metal Management Toolbar component.
  */
 class ManagementToolbar extends ClayComponent {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -37,38 +38,40 @@ class ManagementToolbar extends ClayComponent {
 
 		new EventEmitterProxy(this.refs.managementToolbar, this);
 
-		Liferay.componentReady(this.searchContainerId).then(searchContainer => {
-			this._eventHandler = [
-				searchContainer.on(
-					'rowToggled',
-					this._handleSearchContainerRowToggled,
-					this
-				)
-			];
+		Liferay.componentReady(this.searchContainerId).then(
+			(searchContainer) => {
+				this._eventHandler = [
+					searchContainer.on(
+						'rowToggled',
+						this._handleSearchContainerRowToggled,
+						this
+					),
+				];
 
-			this._searchContainer = searchContainer;
+				this._searchContainer = searchContainer;
 
-			const select = searchContainer.select;
+				const select = searchContainer.select;
 
-			if (
-				select &&
-				select.getAllSelectedElements &&
-				select.getCurrentPageElements &&
-				select.getCurrentPageSelectedElements
-			) {
-				const bulkSelection =
-					this.supportsBulkActions && select.get('bulkSelection');
+				if (
+					select &&
+					select.getAllSelectedElements &&
+					select.getCurrentPageElements &&
+					select.getCurrentPageSelectedElements
+				) {
+					const bulkSelection =
+						this.supportsBulkActions && select.get('bulkSelection');
 
-				this._setActiveStatus(
-					{
-						allSelectedElements: select.getAllSelectedElements(),
-						currentPageElements: select.getCurrentPageElements(),
-						currentPageSelectedElements: select.getCurrentPageSelectedElements()
-					},
-					bulkSelection
-				);
+					this._setActiveStatus(
+						{
+							allSelectedElements: select.getAllSelectedElements(),
+							currentPageElements: select.getCurrentPageElements(),
+							currentPageSelectedElements: select.getCurrentPageSelectedElements(),
+						},
+						bulkSelection
+					);
+				}
 			}
-		});
+		);
 
 		if (this.infoPanelId) {
 			const sidenavToggle = this.refs.managementToolbar.refs.infoButton;
@@ -79,7 +82,7 @@ class ManagementToolbar extends ClayComponent {
 					position: 'right',
 					type: 'relative',
 					typeMobile: 'fixed',
-					width: '320px'
+					width: '320px',
 				});
 			}
 		}
@@ -100,7 +103,7 @@ class ManagementToolbar extends ClayComponent {
 		}
 
 		if (this._eventHandler) {
-			this._eventHandler.forEach(eventHandler => {
+			this._eventHandler.forEach((eventHandler) => {
 				eventHandler.detach();
 			});
 		}
@@ -132,34 +135,42 @@ class ManagementToolbar extends ClayComponent {
 		}
 	}
 
-	_handleCreationMenuMoreButtonClicked() {
-		const creationMenuPrimaryItemsCount = this.creationMenu.primaryItems
-			? this.creationMenu.primaryItems.length
-			: 0;
+	_handleCreationMenuMoreButtonClicked(event) {
+		const extendMenu = () => {
+			if (event.preventedDefault) {
+				return;
+			}
 
-		const creationMenuFavoriteItems =
-			this.creationMenu.secondaryItems &&
-			this.creationMenu.secondaryItems[0]
-				? this.creationMenu.secondaryItems[0].items
-				: [];
-		const creationMenuRestItems =
-			this.creationMenu.secondaryItems &&
-			this.creationMenu.secondaryItems[1]
-				? this.creationMenu.secondaryItems[1].items
-				: [];
+			const creationMenuPrimaryItemsCount = this.creationMenu.primaryItems
+				? this.creationMenu.primaryItems.length
+				: 0;
 
-		const creationMenuSecondaryItemsCount =
-			creationMenuFavoriteItems.length + creationMenuRestItems.length;
-		const creationMenuTotalItemsCount =
-			creationMenuPrimaryItemsCount + creationMenuSecondaryItemsCount;
+			const creationMenuFavoriteItems =
+				this.creationMenu.secondaryItems &&
+				this.creationMenu.secondaryItems[0]
+					? this.creationMenu.secondaryItems[0].items
+					: [];
+			const creationMenuRestItems =
+				this.creationMenu.secondaryItems &&
+				this.creationMenu.secondaryItems[1]
+					? this.creationMenu.secondaryItems[1].items
+					: [];
 
-		this.creationMenu.maxPrimaryItems = creationMenuPrimaryItemsCount;
-		this.creationMenu.maxSecondaryItems = creationMenuSecondaryItemsCount;
-		this.creationMenu.maxTotalItems = creationMenuTotalItemsCount;
+			const creationMenuSecondaryItemsCount =
+				creationMenuFavoriteItems.length + creationMenuRestItems.length;
+			const creationMenuTotalItemsCount =
+				creationMenuPrimaryItemsCount + creationMenuSecondaryItemsCount;
 
-		this.refs.managementToolbar.refs.creationMenuDropdown.maxPrimaryItems = creationMenuPrimaryItemsCount;
-		this.refs.managementToolbar.refs.creationMenuDropdown.maxSecondaryItems = creationMenuSecondaryItemsCount;
-		this.refs.managementToolbar.refs.creationMenuDropdown.maxTotalItems = creationMenuTotalItemsCount;
+			this.creationMenu.maxPrimaryItems = creationMenuPrimaryItemsCount;
+			this.creationMenu.maxSecondaryItems = creationMenuSecondaryItemsCount;
+			this.creationMenu.maxTotalItems = creationMenuTotalItemsCount;
+
+			this.refs.managementToolbar.refs.creationMenuDropdown.maxPrimaryItems = creationMenuPrimaryItemsCount;
+			this.refs.managementToolbar.refs.creationMenuDropdown.maxSecondaryItems = creationMenuSecondaryItemsCount;
+			this.refs.managementToolbar.refs.creationMenuDropdown.maxTotalItems = creationMenuTotalItemsCount;
+		};
+
+		setTimeout(extendMenu, 0);
 	}
 
 	_handleFilterLabelCloseClicked(event) {
@@ -183,7 +194,8 @@ class ManagementToolbar extends ClayComponent {
 
 			if (checkboxStatus) {
 				this._searchContainer.select.toggleAllRows(true);
-			} else {
+			}
+			else {
 				this._searchContainer.select.toggleAllRows(false);
 			}
 		}
@@ -217,12 +229,12 @@ class ManagementToolbar extends ClayComponent {
 		this._setActiveStatus(event.elements, bulkSelection);
 
 		if (this.actionItems) {
-			this.actionItems = this.actionItems.map(actionItem => {
+			this.actionItems = this.actionItems.map((actionItem) => {
 				return Object.assign(actionItem, {
 					disabled:
 						actions &&
 						actions.indexOf(actionItem.data.action) === -1 &&
-						(!bulkSelection || !actionItem.data.enableOnBulk)
+						(!bulkSelection || !actionItem.data.enableOnBulk),
 				});
 			});
 		}
@@ -251,7 +263,8 @@ class ManagementToolbar extends ClayComponent {
 			this.checkboxStatus = currentPageSelected
 				? 'checked'
 				: 'indeterminate';
-		} else {
+		}
+		else {
 			this.checkboxStatus = 'unchecked';
 		}
 
@@ -271,6 +284,7 @@ class ManagementToolbar extends ClayComponent {
  * @type {!Object}
  */
 ManagementToolbar.STATE = {
+
 	/**
 	 * List of items to display in the actions menu on active state.
 	 *
@@ -293,7 +307,7 @@ ManagementToolbar.STATE = {
 	checkboxStatus: Config.oneOf([
 		'checked',
 		'indeterminate',
-		'unchecked'
+		'unchecked',
 	]).value('unchecked'),
 
 	/**
@@ -357,7 +371,7 @@ ManagementToolbar.STATE = {
 		maxTotalItems: Config.number(),
 		primaryItems: creationMenuItemsValidator,
 		secondaryItems: creationMenuItemsValidator,
-		viewMoreURL: Config.string()
+		viewMoreURL: Config.string(),
 	}),
 
 	/**
@@ -667,9 +681,9 @@ ManagementToolbar.STATE = {
 			disabled: Config.bool().value(false),
 			href: Config.string(),
 			icon: Config.string().required(),
-			label: Config.string().required()
+			label: Config.string().required(),
 		})
-	)
+	),
 };
 
 Soy.register(ManagementToolbar, templates);

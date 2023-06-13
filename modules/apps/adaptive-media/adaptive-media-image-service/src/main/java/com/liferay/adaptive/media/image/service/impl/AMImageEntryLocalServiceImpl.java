@@ -209,6 +209,18 @@ public class AMImageEntryLocalServiceImpl
 	}
 
 	/**
+	 * Returns the list of adaptive media image entries generated for the
+	 * file version.
+	 *
+	 * @param  fileVersionId the primary key of the file version
+	 * @return the list of adaptive media image entries in the file version
+	 */
+	@Override
+	public List<AMImageEntry> getAMImageEntries(long fileVersionId) {
+		return amImageEntryPersistence.findByFileVersionId(fileVersionId);
+	}
+
+	/**
 	 * Returns the number of adaptive media image entries generated for the
 	 * configuration in the company.
 	 *
@@ -241,7 +253,7 @@ public class AMImageEntryLocalServiceImpl
 		AMImageConfigurationEntry amImageConfigurationEntry,
 		FileVersion fileVersion) {
 
-		return _imageStorage.getContentStream(
+		return _imageStorage.getContentInputStream(
 			fileVersion, amImageConfigurationEntry.getUUID());
 	}
 
@@ -259,9 +271,9 @@ public class AMImageEntryLocalServiceImpl
 		Collection<AMImageCounter> amImageCounters =
 			_serviceTrackerMap.values();
 
-		Stream<AMImageCounter> amImageCounterStream = amImageCounters.stream();
+		Stream<AMImageCounter> amImageCountersStream = amImageCounters.stream();
 
-		return amImageCounterStream.mapToInt(
+		return amImageCountersStream.mapToInt(
 			amImageCounter -> amImageCounter.countExpectedAMImageEntries(
 				companyId)
 		).sum();
@@ -303,7 +315,10 @@ public class AMImageEntryLocalServiceImpl
 	}
 
 	@Deactivate
+	@Override
 	protected void deactivate() {
+		super.deactivate();
+
 		_serviceTrackerMap.close();
 	}
 

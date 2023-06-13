@@ -13,7 +13,8 @@
  */
 
 module.exports = {
-	globals: {
-		require: true
-	}
+	rules: {
+		'@liferay/liferay/no-arrow': 'error',
+		'prefer-arrow-callback': 'off',
+	},
 };

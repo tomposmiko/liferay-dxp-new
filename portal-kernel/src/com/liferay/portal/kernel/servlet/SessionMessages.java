@@ -16,6 +16,8 @@ package com.liferay.portal.kernel.servlet;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletSession;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -108,6 +110,10 @@ public class SessionMessages {
 			return;
 		}
 
+		if (_log.isDebugEnabled()) {
+			_log.debug("Adding key " + key);
+		}
+
 		map.put(key, key);
 	}
 
@@ -116,6 +122,18 @@ public class SessionMessages {
 
 		if (map == null) {
 			return;
+		}
+
+		if (_log.isDebugEnabled()) {
+			Exception exception = null;
+
+			if (value instanceof Exception) {
+				exception = (Exception)value;
+			}
+
+			_log.debug(
+				StringBundler.concat("Adding key ", key, " with value ", value),
+				exception);
 		}
 
 		map.put(key, value);
@@ -138,6 +156,13 @@ public class SessionMessages {
 			return;
 		}
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Adding key ", key, " to portlet ",
+					portletRequest.getWindowID()));
+		}
+
 		map.put(key, key);
 	}
 
@@ -148,6 +173,20 @@ public class SessionMessages {
 
 		if (map == null) {
 			return;
+		}
+
+		if (_log.isDebugEnabled()) {
+			Exception exception = null;
+
+			if (value instanceof Exception) {
+				exception = (Exception)value;
+			}
+
+			_log.debug(
+				StringBundler.concat(
+					"Adding key ", key, " to portlet ",
+					portletRequest.getWindowID(), " with value ", value),
+				exception);
 		}
 
 		map.put(key, value);
@@ -180,6 +219,12 @@ public class SessionMessages {
 	}
 
 	public static boolean contains(
+		HttpServletRequest httpServletRequest, Class<?>[] classes) {
+
+		return contains(_getPortalSession(httpServletRequest), classes);
+	}
+
+	public static boolean contains(
 		HttpServletRequest httpServletRequest, String key) {
 
 		return contains(_getPortalSession(httpServletRequest), key);
@@ -187,6 +232,16 @@ public class SessionMessages {
 
 	public static boolean contains(HttpSession session, Class<?> clazz) {
 		return contains(session, clazz.getName());
+	}
+
+	public static boolean contains(HttpSession session, Class<?>[] classes) {
+		for (Class<?> clazz : classes) {
+			if (contains(session, clazz.getName())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static boolean contains(HttpSession session, String key) {
@@ -203,6 +258,18 @@ public class SessionMessages {
 		PortletRequest portletRequest, Class<?> clazz) {
 
 		return contains(portletRequest, clazz.getName());
+	}
+
+	public static boolean contains(
+		PortletRequest portletRequest, Class<?>[] classes) {
+
+		for (Class<?> clazz : classes) {
+			if (contains(portletRequest, clazz.getName())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static boolean contains(PortletRequest portletRequest, String key) {
@@ -342,19 +409,32 @@ public class SessionMessages {
 	}
 
 	public static void print(HttpSession session) {
-		Iterator<String> itr = iterator(session);
+		Iterator<String> iterator = iterator(session);
 
-		while (itr.hasNext()) {
-			System.out.println(itr.next());
+		while (iterator.hasNext()) {
+			System.out.println(iterator.next());
 		}
 	}
 
 	public static void print(PortletRequest portletRequest) {
-		Iterator<String> itr = iterator(portletRequest);
+		Iterator<String> iterator = iterator(portletRequest);
 
-		while (itr.hasNext()) {
-			System.out.println(itr.next());
+		while (iterator.hasNext()) {
+			System.out.println(iterator.next());
 		}
+	}
+
+	public static void remove(
+		HttpServletRequest httpServletRequest, Class<?> clazz) {
+
+		Map<String, Object> map = _getMap(
+			_getPortalSession(httpServletRequest), _CLASS_NAME, true);
+
+		if (map == null) {
+			return;
+		}
+
+		map.remove(clazz.getName());
 	}
 
 	public static int size(HttpServletRequest httpServletRequest) {
@@ -417,6 +497,9 @@ public class SessionMessages {
 			return map;
 		}
 		catch (IllegalStateException illegalStateException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(illegalStateException, illegalStateException);
+			}
 
 			// Session is already invalidated, just return a null map
 
@@ -449,6 +532,9 @@ public class SessionMessages {
 	}
 
 	private static final String _CLASS_NAME = SessionMessages.class.getName();
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SessionMessages.class);
 
 	private static class SessionMessagesMap extends HashMap<String, Object> {
 

@@ -2,22 +2,14 @@
 <head>
 <title>KnowledgeBaseConfiguration</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">KnowledgeBaseConfiguration</td></tr>
 </thead>
+
 <tbody>
-<tr>
-	<td>IFRAME</td>
-	<td>//iframe[contains(@id,'knowledge_base_web')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--NAVIGATION_TAB-->
 <tr>
 	<td>NAVIGATION_TAB_DISPLAY_SETTINGS</td>

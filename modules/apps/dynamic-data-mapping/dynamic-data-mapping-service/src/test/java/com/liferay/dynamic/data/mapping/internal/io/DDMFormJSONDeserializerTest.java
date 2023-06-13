@@ -34,17 +34,20 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.lang.reflect.Field;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -57,6 +60,11 @@ import org.mockito.stubbing.Answer;
 public class DDMFormJSONDeserializerTest
 	extends BaseDDMFormDeserializerTestCase {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
@@ -64,6 +72,16 @@ public class DDMFormJSONDeserializerTest
 
 		setUpDDMFormJSONDeserializer();
 		setUpPortalUtil();
+	}
+
+	@Test
+	public void testDDMFormDeserializationWithSchemaVersion() throws Exception {
+		DDMForm ddmForm = deserialize(
+			read(
+				"ddm-form-json-deserializer-with-definition-schema-" +
+					"version.json"));
+
+		Assert.assertEquals("2.0", ddmForm.getDefinitionSchemaVersion());
 	}
 
 	@Override
@@ -109,19 +127,17 @@ public class DDMFormJSONDeserializerTest
 			_defaultDDMFormFieldType
 		);
 
-		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
-			"ddm.form.field.type.icon", "my-icon"
-		).put(
-			"ddm.form.field.type.js.class.name", "myJavaScriptClass"
-		).put(
-			"ddm.form.field.type.js.module", "myJavaScriptModule"
-		).build();
-
 		when(
 			ddmFormFieldTypeServicesTracker.getDDMFormFieldTypeProperties(
 				Matchers.anyString())
 		).thenReturn(
-			properties
+			HashMapBuilder.<String, Object>put(
+				"ddm.form.field.type.icon", "my-icon"
+			).put(
+				"ddm.form.field.type.js.class.name", "myJavaScriptClass"
+			).put(
+				"ddm.form.field.type.js.module", "myJavaScriptModule"
+			).build()
 		);
 
 		return ddmFormFieldTypeServicesTracker;

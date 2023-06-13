@@ -15,6 +15,34 @@
 import EventEmitter from 'metal-events';
 
 /**
+ * Options
+ *
+ * @property {String|Number}  breakpoint   The window width that defines the desktop size.
+ * @property {String}         content      The class or ID of the content container.
+ * @property {String}         container    The class or ID of the sidenav container.
+ * @property {String|Number}  gutter       The space between the sidenav-slider and the sidenav-content.
+ * @property {String}         navigation   The class or ID of the navigation container.
+ * @property {String}         position     The position of the sidenav-slider. Possible values: left, right
+ * @property {String}         type         The type of sidenav in desktop. Possible values: relative, fixed, fixed-push
+ * @property {String}         typeMobile   The type of sidenav in mobile. Possible values: relative, fixed, fixed-push
+ * @property {String|Object}  url          The URL to fetch the content to inject into .sidebar-body
+ * @property {String|Number}  width        The width of the side navigation.
+ */
+const DEFAULTS = {
+	breakpoint: 768,
+	content: '.sidenav-content',
+	gutter: '0px',
+	loadingIndicatorTPL:
+		'<div class="loading-animation loading-animation-md"></div>',
+	navigation: '.sidenav-menu-slider',
+	position: 'left',
+	type: 'relative',
+	typeMobile: 'relative',
+	url: null,
+	width: '225px',
+};
+
+/**
  * Map from toggler DOM nodes to sidenav instances.
  */
 const INSTANCE_MAP = new WeakMap();
@@ -24,7 +52,9 @@ const INSTANCE_MAP = new WeakMap();
  * component wrappers from a DOM element.
  */
 function getElement(element) {
+
 	// Remove jQuery wrapper, if any.
+
 	if (element && element.jquery) {
 		if (element.length > 1) {
 			throw new Error(
@@ -35,6 +65,7 @@ function getElement(element) {
 	}
 
 	// Remove Metal wrapper, if any.
+
 	if (element && !(element instanceof HTMLElement)) {
 		element = element.element;
 	}
@@ -81,9 +112,10 @@ function getUniqueSelector(element) {
 
 	const attributes = Array.from(element.attributes)
 		.map(({name, value}) => {
-			const isIdentifying = IDENTITY_ATTRIBUTES.some(regExp => {
+			const isIdentifying = IDENTITY_ATTRIBUTES.some((regExp) => {
 				return regExp.test(name);
 			});
+
 			return isIdentifying ? `[${name}=${JSON.stringify(value)}]` : null;
 		})
 		.filter(Boolean)
@@ -92,19 +124,19 @@ function getUniqueSelector(element) {
 	return [
 		ancestorWithId ? `#${ancestorWithId.id} ` : '',
 		element.tagName.toLowerCase(),
-		...attributes
+		...attributes,
 	].join('');
 }
 
 function addClass(element, className) {
 	setClasses(element, {
-		[className]: true
+		[className]: true,
 	});
 }
 
 function removeClass(element, className) {
 	setClasses(element, {
-		[className]: false
+		[className]: false,
 	});
 }
 
@@ -112,15 +144,20 @@ function setClasses(element, classes) {
 	element = getElement(element);
 
 	if (element) {
+
 		// One at a time because IE 11: https://caniuse.com/#feat=classlist
+
 		Object.entries(classes).forEach(([className, present]) => {
+
 			// Some callers use multiple space-separated classNames for
 			// `openClass`/`data-open-class`. (Looking at you,
 			// product-navigation-simulation-web...)
-			className.split(/\s+/).forEach(name => {
+
+			className.split(/\s+/).forEach((name) => {
 				if (present) {
 					element.classList.add(name);
-				} else {
+				}
+				else {
 					element.classList.remove(name);
 				}
 			});
@@ -132,7 +169,8 @@ function hasClass(element, className) {
 	element = getElement(element);
 
 	// Again, product-navigation-simulation-web passes multiple classNames.
-	return className.split(/\s+/).every(name => {
+
+	return className.split(/\s+/).every((name) => {
 		return element.classList.contains(name);
 	});
 }
@@ -153,12 +191,14 @@ function setStyles(element, styles) {
 function px(dimension) {
 	if (typeof dimension === 'number') {
 		return dimension + 'px';
-	} else if (
+	}
+	else if (
 		typeof dimension === 'string' &&
 		dimension.match(/^\s*\d+\s*$/)
 	) {
 		return dimension.trim() + 'px';
-	} else {
+	}
+	else {
 		return dimension;
 	}
 }
@@ -183,17 +223,19 @@ function offsetLeft(element) {
 const eventNamesToSelectors = {};
 
 function handleEvent(eventName, event) {
-	Object.keys(eventNamesToSelectors[eventName]).forEach(selector => {
+	Object.keys(eventNamesToSelectors[eventName]).forEach((selector) => {
 		let matches = false;
 		let target = event.target;
 
 		while (target) {
+
 			// In IE11 SVG elements have no `parentElement`, only a
 			// `parentNode`, so we have to search up the DOM using
 			// the latter. This in turn requires us to check for the
 			// existence of `target.matches` before using it.
 			//
 			// See: https://stackoverflow.com/a/36270354/2103996
+
 			matches = target.matches && target.matches(selector);
 
 			if (matches) {
@@ -216,11 +258,13 @@ function handleEvent(eventName, event) {
  */
 function subscribe(elementOrSelector, eventName, handler) {
 	if (elementOrSelector) {
+
 		// Add only one listener per `eventName`.
+
 		if (!eventNamesToSelectors[eventName]) {
 			eventNamesToSelectors[eventName] = {};
 
-			document.body.addEventListener(eventName, event =>
+			document.body.addEventListener(eventName, (event) =>
 				handleEvent(eventName, event)
 			);
 		}
@@ -236,7 +280,7 @@ function subscribe(elementOrSelector, eventName, handler) {
 		}
 
 		const emitter = emitters[selector];
-		const subscription = emitter.on(eventName, event => {
+		const subscription = emitter.on(eventName, (event) => {
 			if (!event.defaultPrevented) {
 				handler(event);
 			}
@@ -245,7 +289,7 @@ function subscribe(elementOrSelector, eventName, handler) {
 		return {
 			dispose() {
 				subscription.dispose();
-			}
+			},
 		};
 	}
 
@@ -304,7 +348,8 @@ SideNavigation.prototype = {
 
 		if (desktop && type === 'fixed-push') {
 			return 'desktop-fixed-push';
-		} else if (!desktop && typeMobile === 'fixed-push') {
+		}
+		else if (!desktop && typeMobile === 'fixed-push') {
 			return 'mobile-fixed-push';
 		}
 
@@ -354,18 +399,20 @@ SideNavigation.prototype = {
 			instance._fetchPromise = Liferay.Util.fetch(url);
 
 			instance._fetchPromise
-				.then(response => {
+				.then((response) => {
 					if (!response.ok) {
 						throw new Error(`Failed to fetch ${url}`);
 					}
+
 					return response.text();
 				})
-				.then(text => {
+				.then((text) => {
 					const range = document.createRange();
 
 					range.selectNode(sidebar);
 
 					// Unlike `.innerHTML`, this will eval scripts.
+
 					const fragment = range.createContextualFragment(text);
 
 					sidebar.removeChild(loading);
@@ -374,7 +421,7 @@ SideNavigation.prototype = {
 
 					instance.setHeight();
 				})
-				.catch(err => {
+				.catch((err) => {
 					console.error(err);
 				});
 		}
@@ -394,17 +441,18 @@ SideNavigation.prototype = {
 
 		if (closed) {
 			setStyles(menu, {
-				width: px(width)
+				width: px(width),
 			});
 
 			if (sidenavRight) {
 				const positionDirection = options.rtl ? 'left' : 'right';
 
 				setStyles(menu, {
-					[positionDirection]: px(width)
+					[positionDirection]: px(width),
 				});
 			}
-		} else {
+		}
+		else {
 			instance.showSidenav();
 			instance.setHeight();
 		}
@@ -424,12 +472,12 @@ SideNavigation.prototype = {
 			if (mobile) {
 				setClasses(container, {
 					closed: true,
-					open: false
+					open: false,
 				});
 
 				setClasses(toggler, {
 					active: false,
-					open: false
+					open: false,
 				});
 			}
 
@@ -445,8 +493,9 @@ SideNavigation.prototype = {
 		}
 
 		// Force Reflow for IE11 Browser Bug
+
 		setStyles(container, {
-			display: ''
+			display: '',
 		});
 	},
 
@@ -507,10 +556,10 @@ SideNavigation.prototype = {
 			const navigation = container.querySelector(options.navigation);
 			const menu = container.querySelector('.sidenav-menu');
 
-			[content, navigation, menu].forEach(element => {
+			[content, navigation, menu].forEach((element) => {
 				setStyles(element, {
 					height: '',
-					'min-height': ''
+					'min-height': '',
 				});
 			});
 		}
@@ -537,7 +586,8 @@ SideNavigation.prototype = {
 
 		if (instance.useDataAttribute) {
 			instance.hideSimpleSidenav();
-		} else {
+		}
+		else {
 			instance.toggleNavigation(false);
 		}
 	},
@@ -565,16 +615,16 @@ SideNavigation.prototype = {
 
 			setStyles(content, {
 				[paddingDirection]: '',
-				[positionDirection]: ''
+				[positionDirection]: '',
 			});
 
 			setStyles(navigation, {
-				width: ''
+				width: '',
 			});
 
 			if (sidenavRight) {
 				setStyles(menu, {
-					[positionDirection]: px(instance._getSidenavWidth())
+					[positionDirection]: px(instance._getSidenavWidth()),
 				});
 			}
 		}
@@ -612,7 +662,7 @@ SideNavigation.prototype = {
 				setClasses(content, {
 					[closedClass]: true,
 					[openClass]: false,
-					'sidenav-transition': true
+					'sidenav-transition': true,
 				});
 			}
 
@@ -621,21 +671,21 @@ SideNavigation.prototype = {
 
 			setClasses(container, {
 				[closedClass]: true,
-				[openClass]: false
+				[openClass]: false,
 			});
 
 			const nodes = document.querySelectorAll(
 				`[data-target="${target}"], [href="${target}"]`
 			);
 
-			Array.from(nodes).forEach(node => {
+			Array.from(nodes).forEach((node) => {
 				setClasses(node, {
 					active: false,
-					[openClass]: false
+					[openClass]: false,
 				});
 				setClasses(node, {
 					active: false,
-					[openClass]: false
+					[openClass]: false,
 				});
 			});
 		}
@@ -652,7 +702,7 @@ SideNavigation.prototype = {
 		 */
 		const useDataAttribute = toggler.dataset.toggle === 'liferay-sidenav';
 
-		options = {...defaults, ...options};
+		options = {...DEFAULTS, ...options};
 
 		options.breakpoint = toInt(options.breakpoint);
 		options.container =
@@ -713,17 +763,17 @@ SideNavigation.prototype = {
 			const tallest = px(Math.max(contentHeight, navigationHeight));
 
 			setStyles(content, {
-				'min-height': tallest
+				'min-height': tallest,
 			});
 
 			setStyles(navigation, {
 				height: '100%',
-				'min-height': tallest
+				'min-height': tallest,
 			});
 
 			setStyles(menu, {
 				height: '100%',
-				'min-height': tallest
+				'min-height': tallest,
 			});
 		}
 	},
@@ -733,7 +783,8 @@ SideNavigation.prototype = {
 
 		if (instance.useDataAttribute) {
 			instance.showSimpleSidenav();
-		} else {
+		}
+		else {
 			instance.toggleNavigation(true);
 		}
 	},
@@ -760,11 +811,11 @@ SideNavigation.prototype = {
 		}
 
 		setStyles(navigation, {
-			width: px(width)
+			width: px(width),
 		});
 
 		setStyles(menu, {
-			width: px(width)
+			width: px(width),
 		});
 
 		let positionDirection = options.rtl ? 'right' : 'left';
@@ -799,7 +850,8 @@ SideNavigation.prototype = {
 				if (navigationStartX > contentStartX) {
 					padding = navigationStartX - contentStartX;
 				}
-			} else if (
+			}
+			else if (
 				(options.rtl && options.position === 'left') ||
 				(!options.rtl && sidenavRight)
 			) {
@@ -813,7 +865,7 @@ SideNavigation.prototype = {
 			}
 
 			setStyles(content, {
-				[pushContentCssProperty]: px(padding)
+				[pushContentCssProperty]: px(padding),
 			});
 		}
 	},
@@ -852,17 +904,17 @@ SideNavigation.prototype = {
 			setClasses(content, {
 				[closedClass]: false,
 				[openClass]: true,
-				'sidenav-transition': true
+				'sidenav-transition': true,
 			});
 			setClasses(container, {
 				[closedClass]: false,
 				[openClass]: true,
-				'sidenav-transition': true
+				'sidenav-transition': true,
 			});
 			setClasses(toggler, {
 				active: true,
 				[openClass]: true,
-				'sidenav-transition': true
+				'sidenav-transition': true,
 			});
 		}
 	},
@@ -872,7 +924,8 @@ SideNavigation.prototype = {
 
 		if (instance.useDataAttribute) {
 			instance.toggleSimpleSidenav();
-		} else {
+		}
+		else {
 			instance.toggleNavigation();
 		}
 	},
@@ -893,7 +946,8 @@ SideNavigation.prototype = {
 
 		if (closed) {
 			instance._emit('openStart.lexicon.sidenav');
-		} else {
+		}
+		else {
 			instance._emit('closedStart.lexicon.sidenav');
 		}
 
@@ -905,21 +959,24 @@ SideNavigation.prototype = {
 
 				setClasses(toggler, {
 					open: false,
-					'sidenav-transition': false
+					'sidenav-transition': false,
 				});
 
 				instance._emit('closed.lexicon.sidenav');
-			} else {
+			}
+			else {
 				setClasses(toggler, {
 					open: true,
-					'sidenav-transition': false
+					'sidenav-transition': false,
 				});
 
 				instance._emit('open.lexicon.sidenav');
 			}
 
 			if (instance.mobile) {
+
 				// ios 8 fixed element disappears when trying to scroll
+
 				menu.focus();
 			}
 		});
@@ -928,14 +985,14 @@ SideNavigation.prototype = {
 			instance.setHeight();
 
 			setStyles(menu, {
-				width: px(width)
+				width: px(width),
 			});
 
 			const positionDirection = options.rtl ? 'left' : 'right';
 
 			if (sidenavRight) {
 				setStyles(menu, {
-					[positionDirection]: ''
+					[positionDirection]: '',
 				});
 			}
 		}
@@ -945,18 +1002,19 @@ SideNavigation.prototype = {
 
 		if (closed) {
 			instance.showSidenav();
-		} else {
+		}
+		else {
 			instance.hideSidenav();
 		}
 
 		setClasses(container, {
 			closed: !closed,
-			open: closed
+			open: closed,
 		});
 
 		setClasses(toggler, {
 			active: closed,
-			open: closed
+			open: closed,
 		});
 	},
 
@@ -967,7 +1025,8 @@ SideNavigation.prototype = {
 
 		if (simpleSidenavClosed) {
 			instance.showSimpleSidenav();
-		} else {
+		}
+		else {
 			instance.hideSimpleSidenav();
 		}
 	},
@@ -979,7 +1038,8 @@ SideNavigation.prototype = {
 
 		if (instance.useDataAttribute) {
 			closed = instance._isSimpleSidenavClosed();
-		} else {
+		}
+		else {
 			const container = document.querySelector(
 				instance.options.container
 			);
@@ -990,7 +1050,7 @@ SideNavigation.prototype = {
 		}
 
 		return !closed;
-	}
+	},
 };
 
 SideNavigation.destroy = function destroy(element) {
@@ -1025,34 +1085,6 @@ SideNavigation.initialize = function initialize(toggler, options = {}) {
 
 SideNavigation.instance = getInstance;
 
-/**
- * Options
- *
- * @property {String|Number}  breakpoint   The window width that defines the desktop size.
- * @property {String}         content      The class or ID of the content container.
- * @property {String}         container    The class or ID of the sidenav container.
- * @property {String|Number}  gutter       The space between the sidenav-slider and the sidenav-content.
- * @property {String}         navigation   The class or ID of the navigation container.
- * @property {String}         position     The position of the sidenav-slider. Possible values: left, right
- * @property {String}         type         The type of sidenav in desktop. Possible values: relative, fixed, fixed-push
- * @property {String}         typeMobile   The type of sidenav in mobile. Possible values: relative, fixed, fixed-push
- * @property {String|Object}  url          The URL to fetch the content to inject into .sidebar-body
- * @property {String|Number}  width        The width of the side navigation.
- */
-const defaults = {
-	breakpoint: 768,
-	content: '.sidenav-content',
-	gutter: '15px',
-	loadingIndicatorTPL:
-		'<div class="loading-animation loading-animation-md"></div>',
-	navigation: '.sidenav-menu-slider',
-	position: 'left',
-	type: 'relative',
-	typeMobile: 'relative',
-	url: null,
-	width: '225px'
-};
-
 function onReady() {
 	const togglers = document.querySelectorAll(
 		'[data-toggle="liferay-sidenav"]'
@@ -1062,9 +1094,12 @@ function onReady() {
 }
 
 if (document.readyState !== 'loading') {
+
 	// readyState is "interactive" or "complete".
+
 	onReady();
-} else {
+}
+else {
 	document.addEventListener('DOMContentLoaded', () => {
 		onReady();
 	});

@@ -15,13 +15,13 @@
 /**
  * The Input Move Boxes Touch Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-input-move-boxes-touch
  */
 
 AUI.add(
 	'liferay-input-move-boxes-touch',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var STR_DOT = '.';
@@ -92,7 +92,7 @@ AUI.add(
 
 					instance._afterDropHitTask({
 						dropNode,
-						value
+						value,
 					});
 				},
 
@@ -181,7 +181,7 @@ AUI.add(
 					var instance = this;
 
 					var buttonTpl = Lang.sub(TPL_EDIT_SELECTION, [
-						Liferay.Language.get('edit')
+						Liferay.Language.get('edit'),
 					]);
 
 					instance._editSelection = A.Node.create(buttonTpl);
@@ -202,17 +202,17 @@ AUI.add(
 
 					var data = [];
 
-					options.each(item => {
+					options.each((item) => {
 						data.push({
 							name: item.html(),
 							selected: item.attr('data-selected') === STR_TRUE,
-							value: item.val()
+							value: item.val(),
 						});
 					});
 
 					TPL_MOVE_OPTION.render(
 						{
-							options: data
+							options: data,
 						},
 						sortableContainer
 					);
@@ -221,15 +221,15 @@ AUI.add(
 						container: sortableContainer,
 						handles: [sortableContainer.all('.handle')],
 						nodes: SELECTOR_MOVE_OPTION,
-						opacity: '0.2'
+						opacity: '0.2',
 					});
 
 					instance._sortable.delegate.dd
 						.plug(A.Plugin.DDConstrained, {
-							constrain: sortableContainer
+							constrain: sortableContainer,
 						})
 						.plug(A.Plugin.DDWinScroll, {
-							horizontal: false
+							horizontal: false,
 						});
 
 					instance._syncSelectedSortList();
@@ -287,7 +287,7 @@ AUI.add(
 
 					instance._contentBox.delegate(
 						STR_CLICK,
-						event => {
+						(event) => {
 							event.preventDefault();
 						},
 						SELECTOR_SORT_LIST_ACTIVE + ' ' + SELECTOR_TITLE
@@ -320,7 +320,7 @@ AUI.add(
 						50,
 						instance
 					);
-				}
+				},
 			},
 			true
 		);
@@ -333,7 +333,7 @@ AUI.add(
 			'dd-constrain',
 			'dd-scroll',
 			'liferay-input-move-boxes',
-			'sortable'
-		]
+			'sortable',
+		],
 	}
 );

@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.json;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -48,11 +49,13 @@ public interface JSONFactory {
 
 	public JSONObject createJSONObject();
 
+	public JSONObject createJSONObject(Map<?, ?> map);
+
 	public JSONObject createJSONObject(String json) throws JSONException;
 
 	public JSONSerializer createJSONSerializer();
 
-	public Object deserialize(JSONObject jsonObj);
+	public Object deserialize(JSONObject jsonObject);
 
 	public Object deserialize(String json);
 

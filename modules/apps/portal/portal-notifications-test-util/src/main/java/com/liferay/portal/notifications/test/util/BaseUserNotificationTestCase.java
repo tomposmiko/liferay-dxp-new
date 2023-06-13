@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.test.mail.MailServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 
@@ -174,7 +175,7 @@ public abstract class BaseUserNotificationTestCase {
 
 		subscribeToContainer();
 
-		BaseModel<?> updatedBasemodel = updateBaseModel(baseModel);
+		BaseModel<?> updatedBaseModel = updateBaseModel(baseModel);
 
 		Assert.assertEquals(1, MailServiceTestUtil.getInboxSize());
 
@@ -190,7 +191,7 @@ public abstract class BaseUserNotificationTestCase {
 
 			Assert.assertTrue(
 				isValidUserNotificationEventObject(
-					(Long)updatedBasemodel.getPrimaryKeyObj(),
+					(Long)updatedBaseModel.getPrimaryKeyObj(),
 					userNotificationEventsJSONObject));
 
 			Assert.assertEquals(
@@ -214,7 +215,7 @@ public abstract class BaseUserNotificationTestCase {
 
 		subscribeToContainer();
 
-		BaseModel<?> updatedBasemodel = updateBaseModel(baseModel);
+		BaseModel<?> updatedBaseModel = updateBaseModel(baseModel);
 
 		Assert.assertEquals(0, MailServiceTestUtil.getInboxSize());
 
@@ -230,7 +231,7 @@ public abstract class BaseUserNotificationTestCase {
 
 			Assert.assertTrue(
 				isValidUserNotificationEventObject(
-					(Long)updatedBasemodel.getPrimaryKeyObj(),
+					(Long)updatedBaseModel.getPrimaryKeyObj(),
 					userNotificationEventsJSONObject));
 
 			Assert.assertEquals(
@@ -358,31 +359,23 @@ public abstract class BaseUserNotificationTestCase {
 			long userId)
 		throws Exception {
 
-		List<UserNotificationDelivery> userNotificationDeliveries =
-			new ArrayList<>();
-
-		userNotificationDeliveries.add(
+		return ListUtil.fromArray(
 			_userNotificationDeliveryLocalService.getUserNotificationDelivery(
 				userId, getPortletId(), 0,
 				UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY,
-				UserNotificationDeliveryConstants.TYPE_EMAIL, true));
-		userNotificationDeliveries.add(
+				UserNotificationDeliveryConstants.TYPE_EMAIL, true),
 			_userNotificationDeliveryLocalService.getUserNotificationDelivery(
 				userId, getPortletId(), 0,
 				UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY,
-				UserNotificationDeliveryConstants.TYPE_WEBSITE, true));
-		userNotificationDeliveries.add(
+				UserNotificationDeliveryConstants.TYPE_WEBSITE, true),
 			_userNotificationDeliveryLocalService.getUserNotificationDelivery(
 				userId, getPortletId(), 0,
 				UserNotificationDefinition.NOTIFICATION_TYPE_UPDATE_ENTRY,
-				UserNotificationDeliveryConstants.TYPE_EMAIL, true));
-		userNotificationDeliveries.add(
+				UserNotificationDeliveryConstants.TYPE_EMAIL, true),
 			_userNotificationDeliveryLocalService.getUserNotificationDelivery(
 				userId, getPortletId(), 0,
 				UserNotificationDefinition.NOTIFICATION_TYPE_UPDATE_ENTRY,
 				UserNotificationDeliveryConstants.TYPE_WEBSITE, true));
-
-		return userNotificationDeliveries;
 	}
 
 	private void _updateUserNotificationDelivery(

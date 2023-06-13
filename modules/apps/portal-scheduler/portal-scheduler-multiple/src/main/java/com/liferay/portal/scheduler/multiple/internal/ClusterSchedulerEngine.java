@@ -14,7 +14,7 @@
 
 package com.liferay.portal.scheduler.multiple.internal;
 
-import com.liferay.petra.lang.SafeClosable;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cluster.BaseClusterMasterTokenTransitionListener;
@@ -361,8 +361,15 @@ public class ClusterSchedulerEngine
 										StringBundler.concat(
 											"Memory clustered job ",
 											getFullName(jobName, groupName),
-											" is not yet deployed on master"));
+											" is not deployed on master yet",
+											", notify master to add it"));
 								}
+
+								ClusterableContextThreadLocal.
+									putThreadLocalContext(
+										SchedulerEngine.
+											SCHEDULER_CLUSTER_INVOKING,
+										true);
 							}
 							else {
 								addMemoryClusteredJob(schedulerResponse);
@@ -568,11 +575,7 @@ public class ClusterSchedulerEngine
 	}
 
 	protected String getFullName(String jobName, String groupName) {
-		return groupName.concat(
-			StringPool.PERIOD
-		).concat(
-			jobName
-		);
+		return StringBundler.concat(groupName, StringPool.PERIOD, jobName);
 	}
 
 	protected void initMemoryClusteredJobs() {
@@ -662,11 +665,11 @@ public class ClusterSchedulerEngine
 		Iterator
 			<Map.Entry
 				<String, ObjectValuePair<SchedulerResponse, TriggerState>>>
-					itr = memoryClusteredJobs.iterator();
+					iterator = memoryClusteredJobs.iterator();
 
-		while (itr.hasNext()) {
+		while (iterator.hasNext()) {
 			Map.Entry<String, ObjectValuePair<SchedulerResponse, TriggerState>>
-				entry = itr.next();
+				entry = iterator.next();
 
 			ObjectValuePair<SchedulerResponse, TriggerState>
 				memoryClusteredJob = entry.getValue();
@@ -674,7 +677,7 @@ public class ClusterSchedulerEngine
 			SchedulerResponse schedulerResponse = memoryClusteredJob.getKey();
 
 			if (groupName.equals(schedulerResponse.getGroupName())) {
-				itr.remove();
+				iterator.remove();
 			}
 		}
 	}
@@ -833,8 +836,8 @@ public class ClusterSchedulerEngine
 
 			_clusterExecutor.execute(clusterRequest);
 		}
-		catch (Throwable t) {
-			_log.error("Unable to notify slave", t);
+		catch (Throwable throwable) {
+			_log.error("Unable to notify slave", throwable);
 		}
 	}
 
@@ -874,8 +877,8 @@ public class ClusterSchedulerEngine
 
 		@Override
 		protected void doMasterTokenAcquired() throws Exception {
-			try (SafeClosable safeClosable =
-					ProxyModeThreadLocal.setWithSafeClosable(true)) {
+			try (SafeCloseable safeCloseable =
+					ProxyModeThreadLocal.setWithSafeCloseable(true)) {
 
 				_writeLock.lock();
 

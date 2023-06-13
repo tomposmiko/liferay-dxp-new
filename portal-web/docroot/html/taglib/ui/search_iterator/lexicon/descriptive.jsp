@@ -36,24 +36,33 @@ for (ResultRowSplitterEntry resultRowSplitterEntry : resultRowSplitterEntries) {
 	List<com.liferay.portal.kernel.dao.search.ResultRow> curResultRows = resultRowSplitterEntry.getResultRows();
 %>
 
-	<c:if test="<%= Validator.isNotNull(resultRowSplitterEntry.getTitle()) %>">
-		<div class="list-group-header">
-			<div class="list-group-header-title">
-				<liferay-ui:message key="<%= resultRowSplitterEntry.getTitle() %>" />
-			</div>
-		</div>
-	</c:if>
+	<dl class="<%= searchResultCssClass %>">
+		<c:choose>
+			<c:when test="<%= Validator.isNotNull(resultRowSplitterEntry.getTitle()) || ((headerNames != null) && Validator.isNotNull(headerNames.get(0))) %>">
+				<c:if test="<%= Validator.isNotNull(resultRowSplitterEntry.getTitle()) %>">
+					<dt class="list-group-header">
+						<div class="list-group-header-title">
+							<liferay-ui:message key="<%= resultRowSplitterEntry.getTitle() %>" />
+						</div>
+					</dt>
+				</c:if>
 
-	<ul class="<%= searchResultCssClass %>">
-		<c:if test="<%= (headerNames != null) && Validator.isNotNull(headerNames.get(0)) %>">
-			<li class="list-group-heading"><liferay-ui:message key="<%= headerNames.get(0) %>" /></li>
-		</c:if>
+				<c:if test="<%= (headerNames != null) && Validator.isNotNull(headerNames.get(0)) %>">
+					<dt class="list-group-heading"><liferay-ui:message key="<%= headerNames.get(0) %>" /></dt>
+				</c:if>
+			</c:when>
+			<c:otherwise>
+				<dt class="sr-only">
+					<%= PortalUtil.getPortletTitle(portletRequest) %>
+				</dt>
+			</c:otherwise>
+		</c:choose>
 
 		<%
 		boolean allRowsIsChecked = true;
 
 		for (int i = 0; i < curResultRows.size(); i++) {
-			com.liferay.portal.kernel.dao.search.ResultRow row = (com.liferay.portal.kernel.dao.search.ResultRow)curResultRows.get(i);
+			com.liferay.portal.kernel.dao.search.ResultRow row = curResultRows.get(i);
 
 			primaryKeysJSONArray.put(row.getPrimaryKey());
 
@@ -96,7 +105,7 @@ for (ResultRowSplitterEntry resultRowSplitterEntry : resultRowSplitterEntries) {
 			}
 		%>
 
-			<li class="list-group-item list-group-item-flex <%= GetterUtil.getString(row.getClassName()) %> <%= row.getCssClass() %> <%= rowIsChecked ? "active" : StringPool.BLANK %> <%= Validator.isNotNull(row.getState()) ? "list-group-item-" + row.getState() : StringPool.BLANK %>" data-qa-id="row" <%= AUIUtil.buildData(data) %>>
+			<dd class="list-group-item list-group-item-flex <%= GetterUtil.getString(row.getClassName()) %> <%= row.getCssClass() %> <%= rowIsChecked ? "active" : StringPool.BLANK %> <%= Validator.isNotNull(row.getState()) ? "list-group-item-" + row.getState() : StringPool.BLANK %>" data-qa-id="row" <%= AUIUtil.buildData(data) %>>
 				<c:if test="<%= rowChecker != null %>">
 					<div class="autofit-col">
 						<div class="checkbox">
@@ -128,7 +137,7 @@ for (ResultRowSplitterEntry resultRowSplitterEntry : resultRowSplitterEntries) {
 				}
 				%>
 
-			</li>
+			</dd>
 
 		<%
 			request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
@@ -138,13 +147,13 @@ for (ResultRowSplitterEntry resultRowSplitterEntry : resultRowSplitterEntries) {
 		}
 		%>
 
-		<li class="lfr-template list-group-item"></li>
-	</ul>
+		<dd class="lfr-template list-group-item"></dd>
+	</dl>
 
 <%
 }
 
-String rowHtmlTag = "li";
+String rowHtmlTag = "dd";
 %>
 
 <%@ include file="/html/taglib/ui/search_iterator/lexicon/bottom.jspf" %>

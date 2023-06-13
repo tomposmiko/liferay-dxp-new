@@ -14,32 +14,37 @@
 
 package com.liferay.fragment.internal.processor;
 
+import com.liferay.fragment.contributor.PortletAliasRegistration;
+import com.liferay.fragment.internal.constants.PortletFragmentEntryProcessorWebKeys;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.PortletRegistry;
-import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
-import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletJSONUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +53,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -81,8 +89,7 @@ public class PortletRegistryImpl implements PortletRegistry {
 				continue;
 			}
 
-			String alias = StringUtil.replace(
-				tagName, "lfr-widget-", StringPool.BLANK);
+			String alias = StringUtil.removeSubstring(tagName, "lfr-widget-");
 
 			String portletName = getPortletName(alias);
 
@@ -103,9 +110,10 @@ public class PortletRegistryImpl implements PortletRegistry {
 				fragmentEntryLink.getEditableValues());
 
 			String portletId = jsonObject.getString("portletId");
-			String instanceId = jsonObject.getString("instanceId");
 
 			if (Validator.isNotNull(portletId)) {
+				String instanceId = jsonObject.getString("instanceId");
+
 				portletIds.add(PortletIdCodec.encode(portletId, instanceId));
 			}
 		}
@@ -133,33 +141,44 @@ public class PortletRegistryImpl implements PortletRegistry {
 			HttpServletResponse httpServletResponse)
 		throws PortalException {
 
-		long plid = fragmentEntryLink.getClassPK();
+		List<String> fragmentEntryLinkPortletIds =
+			getFragmentEntryLinkPortletIds(fragmentEntryLink);
 
-		if (fragmentEntryLink.getClassNameId() == _portal.getClassNameId(
-				LayoutPageTemplateEntry.class)) {
-
-			LayoutPageTemplateEntry layoutPageTemplateEntry =
-				_layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntry(
-					fragmentEntryLink.getClassPK());
-
-			plid = layoutPageTemplateEntry.getPlid();
+		if (ListUtil.isEmpty(fragmentEntryLinkPortletIds)) {
+			return;
 		}
 
-		List<PortletPreferences> portletPreferencesList =
-			_portletPreferencesLocalService.getPortletPreferences(
-				PortletKeys.PREFS_OWNER_ID_DEFAULT,
-				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid);
+		Stream<String> stream = fragmentEntryLinkPortletIds.stream();
 
-		for (PortletPreferences portletPreferences : portletPreferencesList) {
-			Portlet portlet = _portletLocalService.getPortletById(
-				fragmentEntryLink.getCompanyId(),
-				portletPreferences.getPortletId());
+		List<Portlet> portlets = stream.map(
+			fragmentEntryLinkPortletId -> _portletLocalService.getPortletById(
+				fragmentEntryLinkPortletId)
+		).filter(
+			portlet -> {
+				if (portlet == null) {
+					return false;
+				}
 
+				if (!portlet.isActive() || portlet.isUndeployedPortlet()) {
+					return false;
+				}
+
+				return true;
+			}
+		).distinct(
+		).collect(
+			Collectors.toList()
+		);
+
+		List<Portlet> allPortlets = _getAllPortlets(httpServletRequest);
+
+		for (Portlet portlet : portlets) {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 			try {
 				PortletJSONUtil.populatePortletJSONObject(
-					httpServletRequest, StringPool.BLANK, portlet, jsonObject);
+					httpServletRequest, StringPool.BLANK, portlet, allPortlets,
+					jsonObject);
 
 				PortletJSONUtil.writeHeaderPaths(
 					httpServletResponse, jsonObject);
@@ -189,6 +208,22 @@ public class PortletRegistryImpl implements PortletRegistry {
 			properties, "javax.portlet.name");
 
 		_portletNames.put(alias, portletName);
+
+		Bundle bundle = FrameworkUtil.getBundle(jxPortlet.getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		Dictionary<String, Object> aliasRegistrationProperties =
+			new HashMapDictionary<>();
+
+		aliasRegistrationProperties.put(
+			"com.liferay.fragment.entry.processor.portlet.alias", alias);
+
+		bundleContext.registerService(
+			PortletAliasRegistration.class,
+			new PortletAliasRegistration() {
+			},
+			aliasRegistrationProperties);
 	}
 
 	protected void unsetPortlet(
@@ -202,12 +237,34 @@ public class PortletRegistryImpl implements PortletRegistry {
 		_portletNames.remove(alias, portletName);
 	}
 
+	private List<Portlet> _getAllPortlets(
+		HttpServletRequest httpServletRequest) {
+
+		List<Portlet> allPortlets =
+			(List<Portlet>)httpServletRequest.getAttribute(
+				PortletFragmentEntryProcessorWebKeys.ALL_PORTLETS);
+
+		if (ListUtil.isNotEmpty(allPortlets)) {
+			return allPortlets;
+		}
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		LayoutTypePortlet layoutTypePortlet =
+			themeDisplay.getLayoutTypePortlet();
+
+		allPortlets = layoutTypePortlet.getAllPortlets();
+
+		httpServletRequest.setAttribute(
+			PortletFragmentEntryProcessorWebKeys.ALL_PORTLETS, allPortlets);
+
+		return allPortlets;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortletRegistryImpl.class);
-
-	@Reference
-	private LayoutPageTemplateEntryLocalService
-		_layoutPageTemplateEntryLocalService;
 
 	@Reference
 	private Portal _portal;
@@ -216,8 +273,5 @@ public class PortletRegistryImpl implements PortletRegistry {
 	private PortletLocalService _portletLocalService;
 
 	private final Map<String, String> _portletNames = new ConcurrentHashMap<>();
-
-	@Reference
-	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 }

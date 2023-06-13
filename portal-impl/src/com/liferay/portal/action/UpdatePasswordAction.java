@@ -65,10 +65,6 @@ public class UpdatePasswordAction implements Action {
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		Ticket ticket = getTicket(httpServletRequest);
 
 		if ((ticket != null) &&
@@ -103,6 +99,10 @@ public class UpdatePasswordAction implements Action {
 
 			return actionMapping.getActionForward("portal.update_password");
 		}
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		try {
 			updatePassword(
@@ -205,11 +205,12 @@ public class UpdatePasswordAction implements Action {
 		Map<String, String[]> parameterMap =
 			httpServletRequest.getParameterMap();
 
-		StringBundler sb = new StringBundler(7 + parameterMap.size() * 5);
+		StringBundler sb = new StringBundler(8 + (parameterMap.size() * 5));
 
 		sb.append("<html><body onload=\"document.fm.submit();\">");
 		sb.append("<form action=\"");
 		sb.append(PortalUtil.getPortalURL(httpServletRequest));
+		sb.append(PortalUtil.getPathContext());
 		sb.append("/c/portal/update_password\" method=\"post\" name=\"fm\">");
 
 		for (String name : parameterMap.keySet()) {
@@ -267,16 +268,20 @@ public class UpdatePasswordAction implements Action {
 			PwdToolkitUtilThreadLocal.setValidate(previousValidate);
 		}
 
-		if (ticket != null) {
-			TicketLocalServiceUtil.deleteTicket(ticket);
-
-			UserLocalServiceUtil.updatePasswordReset(userId, false);
-		}
-
 		User user = UserLocalServiceUtil.getUser(userId);
 
 		Company company = CompanyLocalServiceUtil.getCompanyById(
 			user.getCompanyId());
+
+		if (ticket != null) {
+			TicketLocalServiceUtil.deleteTicket(ticket);
+
+			UserLocalServiceUtil.updatePasswordReset(userId, false);
+
+			if (company.isStrangersVerify()) {
+				UserLocalServiceUtil.updateEmailAddressVerified(userId, true);
+			}
+		}
 
 		String login = null;
 

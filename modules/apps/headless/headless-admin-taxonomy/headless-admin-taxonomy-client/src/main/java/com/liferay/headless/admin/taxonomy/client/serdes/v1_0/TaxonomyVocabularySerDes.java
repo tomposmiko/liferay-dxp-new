@@ -61,7 +61,31 @@ public class TaxonomyVocabularySerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+			"yyyy-MM-dd'T'HH:mm:ssXX");
+
+		if (taxonomyVocabulary.getActions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(taxonomyVocabulary.getActions()));
+		}
+
+		if (taxonomyVocabulary.getAssetLibraryKey() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"assetLibraryKey\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(taxonomyVocabulary.getAssetLibraryKey()));
+
+			sb.append("\"");
+		}
 
 		if (taxonomyVocabulary.getAssetTypes() != null) {
 			if (sb.length() > 1) {
@@ -271,7 +295,23 @@ public class TaxonomyVocabularySerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+			"yyyy-MM-dd'T'HH:mm:ssXX");
+
+		if (taxonomyVocabulary.getActions() == null) {
+			map.put("actions", null);
+		}
+		else {
+			map.put("actions", String.valueOf(taxonomyVocabulary.getActions()));
+		}
+
+		if (taxonomyVocabulary.getAssetLibraryKey() == null) {
+			map.put("assetLibraryKey", null);
+		}
+		else {
+			map.put(
+				"assetLibraryKey",
+				String.valueOf(taxonomyVocabulary.getAssetLibraryKey()));
+		}
 
 		if (taxonomyVocabulary.getAssetTypes() == null) {
 			map.put("assetTypes", null);
@@ -298,15 +338,25 @@ public class TaxonomyVocabularySerDes {
 			map.put("creator", String.valueOf(taxonomyVocabulary.getCreator()));
 		}
 
-		map.put(
-			"dateCreated",
-			liferayToJSONDateFormat.format(
-				taxonomyVocabulary.getDateCreated()));
+		if (taxonomyVocabulary.getDateCreated() == null) {
+			map.put("dateCreated", null);
+		}
+		else {
+			map.put(
+				"dateCreated",
+				liferayToJSONDateFormat.format(
+					taxonomyVocabulary.getDateCreated()));
+		}
 
-		map.put(
-			"dateModified",
-			liferayToJSONDateFormat.format(
-				taxonomyVocabulary.getDateModified()));
+		if (taxonomyVocabulary.getDateModified() == null) {
+			map.put("dateModified", null);
+		}
+		else {
+			map.put(
+				"dateModified",
+				liferayToJSONDateFormat.format(
+					taxonomyVocabulary.getDateModified()));
+		}
 
 		if (taxonomyVocabulary.getDescription() == null) {
 			map.put("description", null);
@@ -395,7 +445,20 @@ public class TaxonomyVocabularySerDes {
 			TaxonomyVocabulary taxonomyVocabulary, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "assetTypes")) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
+				if (jsonParserFieldValue != null) {
+					taxonomyVocabulary.setActions(
+						(Map)TaxonomyVocabularySerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "assetLibraryKey")) {
+				if (jsonParserFieldValue != null) {
+					taxonomyVocabulary.setAssetLibraryKey(
+						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "assetTypes")) {
 				if (jsonParserFieldValue != null) {
 					taxonomyVocabulary.setAssetTypes(
 						Stream.of(
@@ -485,10 +548,6 @@ public class TaxonomyVocabularySerDes {
 							(String)jsonParserFieldValue));
 				}
 			}
-			else {
-				throw new IllegalArgumentException(
-					"Unsupported field name " + jsonParserFieldName);
-			}
 		}
 
 	}
@@ -517,7 +576,7 @@ public class TaxonomyVocabularySerDes {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
-			sb.append("\":");
+			sb.append("\": ");
 
 			Object value = entry.getValue();
 
@@ -543,14 +602,17 @@ public class TaxonomyVocabularySerDes {
 
 				sb.append("]");
 			}
-			else {
+			else if (value instanceof String) {
 				sb.append("\"");
 				sb.append(_escape(entry.getValue()));
 				sb.append("\"");
 			}
+			else {
+				sb.append(String.valueOf(entry.getValue()));
+			}
 
 			if (iterator.hasNext()) {
-				sb.append(",");
+				sb.append(", ");
 			}
 		}
 

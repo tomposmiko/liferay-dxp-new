@@ -20,7 +20,9 @@
 TokenConfiguration tokenConfiguration = ConfigurationProviderUtil.getConfiguration(TokenConfiguration.class, new ParameterMapSettingsLocator(request.getParameterMap(), PortalSettingsTokenConstants.FORM_PARAMETER_NAMESPACE, new CompanyServiceSettingsLocator(company.getCompanyId(), TokenConstants.SERVICE_NAME)));
 
 String[] authenticationCookies = tokenConfiguration.authenticationCookies();
+
 int[] authenticationCookiesIndexes = new int[authenticationCookies.length];
+
 boolean enabled = tokenConfiguration.enabled();
 boolean importFromLDAP = tokenConfiguration.importFromLDAP();
 String logoutRedirectURL = tokenConfiguration.logoutRedirectURL();
@@ -46,7 +48,7 @@ String userTokenName = tokenConfiguration.userTokenName();
 		</aui:select>
 	</aui:fieldset>
 
-	<aui:fieldset id='<%= renderResponse.getNamespace() + "authenticationCookies" %>'>
+	<aui:fieldset id='<%= liferayPortletResponse.getNamespace() + "authenticationCookies" %>'>
 
 		<%
 		if (authenticationCookies == null) {
@@ -76,11 +78,11 @@ String userTokenName = tokenConfiguration.userTokenName();
 	</aui:fieldset>
 </aui:fieldset>
 
-<aui:script use="liferay-auto-fields,liferay-dynamic-select">
+<aui:script use="liferay-auto-fields">
 	new Liferay.AutoFields({
 		contentBox: '#<portlet:namespace />authenticationCookies',
 		fieldIndexes:
 			'<portlet:namespace /><%= PortalSettingsTokenConstants.FORM_PARAMETER_NAMESPACE %>authenticationCookiesIndexes',
-		namespace: '<portlet:namespace />'
+		namespace: '<portlet:namespace />',
 	}).render();
 </aui:script>

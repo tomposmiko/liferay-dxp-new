@@ -29,14 +29,18 @@ long actionGroupId = GetterUtil.getLong(typeSettingsProperties.getProperty("grou
 	int count = 0;
 
 	for (Group group : GroupServiceUtil.getUserSitesGroups()) {
-		if (!group.isUser() && !group.isControlPanel()) {
-			count++;
 	%>
 
+		<c:if test="<%= !group.isUser() && !group.isControlPanel() %>">
+
+			<%
+			count++;
+			%>
+
 			<aui:option label="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>" selected="<%= group.getGroupId() == actionGroupId %>" value="<%= group.getGroupId() %>" />
+		</c:if>
 
 	<%
-		}
 	}
 	%>
 
@@ -61,7 +65,7 @@ long actionGroupId = GetterUtil.getLong(typeSettingsProperties.getProperty("grou
 			if (!(groupIdFieldName in rules)) {
 				rules[groupIdFieldName] = {
 					custom: false,
-					required: true
+					required: true,
 				};
 			}
 
@@ -70,7 +74,7 @@ long actionGroupId = GetterUtil.getLong(typeSettingsProperties.getProperty("grou
 			if (!(plidFieldName in rules)) {
 				rules[plidFieldName] = {
 					custom: false,
-					required: true
+					required: true,
 				};
 			}
 		}

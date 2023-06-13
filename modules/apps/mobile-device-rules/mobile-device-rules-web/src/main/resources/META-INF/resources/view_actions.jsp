@@ -64,7 +64,7 @@ MDRActionDisplayContext mdrActionDisplayContext = new MDRActionDisplayContext(re
 PortletURL portletURL = mdrActionDisplayContext.getPortletURL();
 %>
 
-<aui:form action="<%= deleteURL.toString() %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= deleteURL %>" cssClass="container-fluid-1280" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.DELETE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 
@@ -172,13 +172,13 @@ PortletURL portletURL = mdrActionDisplayContext.getPortletURL();
 </aui:form>
 
 <script>
-	(function() {
+	(function () {
 		var deleteActionsButton = document.getElementById(
 			'<portlet:namespace />deleteActions'
 		);
 
 		if (deleteActionsButton) {
-			deleteActionsButton.addEventListener('click', function() {
+			deleteActionsButton.addEventListener('click', function () {
 				if (
 					confirm(
 						'<%= UnicodeLanguageUtil.get(resourceBundle, "are-you-sure-you-want-to-delete-this") %>'

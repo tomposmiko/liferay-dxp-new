@@ -17,11 +17,11 @@ import ClayButton from '@clayui/button';
 import ClayModal, {useModal} from '@clayui/modal';
 import {fetch, navigate} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useState, useCallback, useRef} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 
 import DisplayPageModalForm from './DisplayPageModalForm.es';
 
-const DisplayPageModal = props => {
+const DisplayPageModal = (props) => {
 	const {formSubmitURL, onClose} = props;
 
 	const form = useRef();
@@ -30,7 +30,7 @@ const DisplayPageModal = props => {
 	const {observer} = useModal({onClose});
 
 	const validateForm = useCallback(
-		form => {
+		(form) => {
 			const {elements} = form;
 			const error = {};
 
@@ -60,13 +60,14 @@ const DisplayPageModal = props => {
 	);
 
 	const handleSubmit = useCallback(
-		event => {
+		(event) => {
 			event.preventDefault();
 
 			const error = validateForm(form.current);
 
 			if (Object.keys(error).length !== 0) {
 				setError(error);
+
 				return;
 			}
 
@@ -74,16 +75,17 @@ const DisplayPageModal = props => {
 
 			fetch(formSubmitURL, {
 				body: new FormData(form.current),
-				method: 'POST'
+				method: 'POST',
 			})
-				.then(response => response.json())
-				.then(responseContent => {
+				.then((response) => response.json())
+				.then((responseContent) => {
 					if (responseContent.error) {
 						setLoading(false);
 						setError(responseContent.error);
-					} else if (responseContent.redirectURL) {
+					}
+					else if (responseContent.redirectURL) {
 						navigate(responseContent.redirectURL, {
-							beforeScreenFlip: onClose
+							beforeScreenFlip: onClose,
 						});
 					}
 				})
@@ -91,7 +93,7 @@ const DisplayPageModal = props => {
 					setError({
 						other: Liferay.Language.get(
 							'an-unexpected-error-occurred-while-creating-the-display-page'
-						)
+						),
 					})
 				);
 		},
@@ -157,7 +159,7 @@ DisplayPageModal.propTypes = {
 	mappingTypes: PropTypes.array,
 	namespace: PropTypes.string.isRequired,
 	onClose: PropTypes.func.isRequired,
-	title: PropTypes.func.isRequired
+	title: PropTypes.func.isRequired,
 };
 
 export {DisplayPageModal};

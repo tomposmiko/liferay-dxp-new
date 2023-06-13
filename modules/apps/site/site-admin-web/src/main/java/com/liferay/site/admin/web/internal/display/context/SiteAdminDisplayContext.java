@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.model.MembershipRequestConstants;
 import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupServiceUtil;
@@ -44,13 +45,13 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.persistence.constants.UserGroupFinderConstants;
 import com.liferay.portlet.sitesadmin.search.SiteChecker;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
+import com.liferay.site.admin.web.internal.constants.SiteAdminPortletKeys;
 import com.liferay.site.admin.web.internal.servlet.taglib.util.SiteActionDropdownItemsProvider;
 import com.liferay.site.constants.SiteWebKeys;
 import com.liferay.site.util.GroupSearchProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.portlet.PortletURL;
@@ -147,8 +148,8 @@ public class SiteAdminDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle", "list");
+		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
+			_httpServletRequest, SiteAdminPortletKeys.SITE_ADMIN, "list");
 
 		return _displayStyle;
 	}
@@ -203,17 +204,15 @@ public class SiteAdminDisplayContext {
 
 		Company company = themeDisplay.getCompany();
 
-		LinkedHashMap<String, Object> organizationParams =
+		return OrganizationLocalServiceUtil.searchCount(
+			company.getCompanyId(),
+			OrganizationConstants.ANY_PARENT_ORGANIZATION_ID, null, null, null,
+			null,
 			LinkedHashMapBuilder.<String, Object>put(
 				"groupOrganization", group.getGroupId()
 			).put(
 				"organizationsGroups", group.getGroupId()
-			).build();
-
-		return OrganizationLocalServiceUtil.searchCount(
-			company.getCompanyId(),
-			OrganizationConstants.ANY_PARENT_ORGANIZATION_ID, null, null, null,
-			null, organizationParams);
+			).build());
 	}
 
 	public int getPendingRequestsCount(Group group) {
@@ -243,14 +242,12 @@ public class SiteAdminDisplayContext {
 
 		Company company = themeDisplay.getCompany();
 
-		LinkedHashMap<String, Object> userGroupParams =
+		return UserGroupLocalServiceUtil.searchCount(
+			company.getCompanyId(), null,
 			LinkedHashMapBuilder.<String, Object>put(
 				UserGroupFinderConstants.PARAM_KEY_USER_GROUPS_GROUPS,
 				group.getGroupId()
-			).build();
-
-		return UserGroupLocalServiceUtil.searchCount(
-			company.getCompanyId(), null, userGroupParams);
+			).build());
 	}
 
 	public int getUsersCount(Group group) {
@@ -260,16 +257,13 @@ public class SiteAdminDisplayContext {
 
 		Company company = themeDisplay.getCompany();
 
-		LinkedHashMap<String, Object> userParams =
+		return UserLocalServiceUtil.searchCount(
+			company.getCompanyId(), null, WorkflowConstants.STATUS_APPROVED,
 			LinkedHashMapBuilder.<String, Object>put(
 				"inherit", Boolean.TRUE
 			).put(
 				"usersGroups", group.getGroupId()
-			).build();
-
-		return UserLocalServiceUtil.searchCount(
-			company.getCompanyId(), null, WorkflowConstants.STATUS_APPROVED,
-			userParams);
+			).build());
 	}
 
 	public boolean hasAddChildSitePermission(Group group)

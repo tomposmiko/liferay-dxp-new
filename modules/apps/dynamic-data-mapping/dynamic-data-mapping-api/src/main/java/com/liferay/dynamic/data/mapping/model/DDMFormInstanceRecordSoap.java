@@ -24,8 +24,10 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.dynamic.data.mapping.service.http.DDMFormInstanceRecordServiceSoap}.
  *
  * @author Brian Wing Shun Chan
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class DDMFormInstanceRecordSoap implements Serializable {
 
 	public static DDMFormInstanceRecordSoap toSoapModel(
@@ -34,6 +36,7 @@ public class DDMFormInstanceRecordSoap implements Serializable {
 		DDMFormInstanceRecordSoap soapModel = new DDMFormInstanceRecordSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setCtCollectionId(model.getCtCollectionId());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setFormInstanceRecordId(model.getFormInstanceRecordId());
 		soapModel.setGroupId(model.getGroupId());
@@ -48,6 +51,7 @@ public class DDMFormInstanceRecordSoap implements Serializable {
 		soapModel.setFormInstanceVersion(model.getFormInstanceVersion());
 		soapModel.setStorageId(model.getStorageId());
 		soapModel.setVersion(model.getVersion());
+		soapModel.setIpAddress(model.getIpAddress());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
@@ -117,6 +121,14 @@ public class DDMFormInstanceRecordSoap implements Serializable {
 
 	public void setMvccVersion(long mvccVersion) {
 		_mvccVersion = mvccVersion;
+	}
+
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	public void setCtCollectionId(long ctCollectionId) {
+		_ctCollectionId = ctCollectionId;
 	}
 
 	public String getUuid() {
@@ -231,6 +243,14 @@ public class DDMFormInstanceRecordSoap implements Serializable {
 		_version = version;
 	}
 
+	public String getIpAddress() {
+		return _ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		_ipAddress = ipAddress;
+	}
+
 	public Date getLastPublishDate() {
 		return _lastPublishDate;
 	}
@@ -240,6 +260,7 @@ public class DDMFormInstanceRecordSoap implements Serializable {
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
 	private long _formInstanceRecordId;
 	private long _groupId;
@@ -254,6 +275,7 @@ public class DDMFormInstanceRecordSoap implements Serializable {
 	private String _formInstanceVersion;
 	private long _storageId;
 	private String _version;
+	private String _ipAddress;
 	private Date _lastPublishDate;
 
 }

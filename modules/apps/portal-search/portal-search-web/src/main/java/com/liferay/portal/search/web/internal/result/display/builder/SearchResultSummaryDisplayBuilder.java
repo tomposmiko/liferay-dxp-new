@@ -19,12 +19,14 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.util.AssetRendererFactoryLookup;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
@@ -32,6 +34,8 @@ import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatConstants;
@@ -101,7 +105,9 @@ public class SearchResultSummaryDisplayBuilder {
 			return build(className, classPK);
 		}
 		catch (Exception exception) {
-			_log.error(exception, exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 
 			return buildTemporarilyUnavailable();
 		}
@@ -155,6 +161,14 @@ public class SearchResultSummaryDisplayBuilder {
 		FastDateFormatFactory fastDateFormatFactory) {
 
 		_fastDateFormatFactory = fastDateFormatFactory;
+
+		return this;
+	}
+
+	public SearchResultSummaryDisplayBuilder setGroupLocalService(
+		GroupLocalService groupLocalService) {
+
+		_groupLocalService = groupLocalService;
 
 		return this;
 	}
@@ -278,6 +292,34 @@ public class SearchResultSummaryDisplayBuilder {
 		return this;
 	}
 
+	public SearchResultSummaryDisplayBuilder setUserLocalService(
+		UserLocalService userLocalService) {
+
+		_userLocalService = userLocalService;
+
+		return this;
+	}
+
+	protected String appendStagingLabel(
+		String title, AssetRenderer<?> assetRenderer) {
+
+		Group group = _groupLocalService.fetchGroup(assetRenderer.getGroupId());
+
+		if ((group != null) && group.isStagingGroup()) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(title);
+			sb.append(StringPool.SPACE);
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(_language.get(_httpServletRequest, "staged"));
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+
+			title = sb.toString();
+		}
+
+		return title;
+	}
+
 	protected SearchResultSummaryDisplayContext build(
 			String className, long classPK)
 		throws Exception {
@@ -305,11 +347,13 @@ public class SearchResultSummaryDisplayBuilder {
 			return null;
 		}
 
-		return build(summary, className, classPK, assetRenderer);
+		return build(
+			summary, className, classPK, assetRendererFactory, assetRenderer);
 	}
 
 	protected SearchResultSummaryDisplayContext build(
 			Summary summary, String className, long classPK,
+			AssetRendererFactory<?> assetRendererFactory,
 			AssetRenderer<?> assetRenderer)
 		throws PortalException, PortletException {
 
@@ -329,6 +373,11 @@ public class SearchResultSummaryDisplayBuilder {
 		searchResultSummaryDisplayContext.setPortletURL(
 			_portletURLFactory.getPortletURL());
 
+		if (assetRenderer != null) {
+			searchResultSummaryDisplayContext.setTitle(
+				assetRenderer.getTitle(summary.getLocale()));
+		}
+
 		if (_abridged) {
 			return searchResultSummaryDisplayContext;
 		}
@@ -344,7 +393,9 @@ public class SearchResultSummaryDisplayBuilder {
 		buildCreationDateString(searchResultSummaryDisplayContext);
 		buildCreatorUserName(searchResultSummaryDisplayContext);
 		buildDocumentForm(searchResultSummaryDisplayContext);
-		buildImage(searchResultSummaryDisplayContext, className, classPK);
+		buildImage(
+			searchResultSummaryDisplayContext, assetRendererFactory,
+			assetRenderer);
 		buildLocaleReminder(searchResultSummaryDisplayContext, summary);
 		buildModelResource(searchResultSummaryDisplayContext, className);
 		buildUserPortrait(
@@ -544,22 +595,48 @@ public class SearchResultSummaryDisplayBuilder {
 
 	protected void buildImage(
 		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext,
-		String className, long classPK) {
+		AssetRendererFactory<?> assetRendererFactory,
+		AssetRenderer<?> assetRenderer) {
 
 		if (!_imageRequested) {
 			return;
+		}
+
+		String iconCssClass = assetRendererFactory.getIconCssClass();
+
+		if (Validator.isNotNull(iconCssClass)) {
+			searchResultSummaryDisplayContext.setIconId(iconCssClass);
+			searchResultSummaryDisplayContext.setIconVisible(true);
+			searchResultSummaryDisplayContext.setPathThemeImages(
+				_themeDisplay.getPathThemeImages());
+		}
+
+		try {
+			String thumbnailURLString = assetRenderer.getThumbnailPath(
+				_renderRequest);
+
+			if (Validator.isNotNull(thumbnailURLString)) {
+				searchResultSummaryDisplayContext.setThumbnailURLString(
+					thumbnailURLString);
+				searchResultSummaryDisplayContext.setThumbnailVisible(true);
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		SearchResultImage searchResultImage = new SearchResultImage() {
 
 			@Override
 			public String getClassName() {
-				return className;
+				return assetRenderer.getClassName();
 			}
 
 			@Override
 			public long getClassPK() {
-				return classPK;
+				return assetRenderer.getClassPK();
 			}
 
 			@Override
@@ -637,9 +714,18 @@ public class SearchResultSummaryDisplayBuilder {
 		}
 
 		if (assetEntry != null) {
+			long assetEntryUserId = getAssetEntryUserId(assetEntry);
+
 			searchResultSummaryDisplayContext.setAssetEntryUserId(
-				getAssetEntryUserId(assetEntry));
-			searchResultSummaryDisplayContext.setUserPortraitVisible(true);
+				assetEntryUserId);
+
+			String portraitURLString = getPortraitURLString(assetEntryUserId);
+
+			if (portraitURLString != null) {
+				searchResultSummaryDisplayContext.setUserPortraitURLString(
+					portraitURLString);
+				searchResultSummaryDisplayContext.setUserPortraitVisible(true);
+			}
 		}
 	}
 
@@ -647,9 +733,8 @@ public class SearchResultSummaryDisplayBuilder {
 		String className, long classPK,
 		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext) {
 
-		String viewURL = getSearchResultViewURL(className, classPK);
-
-		searchResultSummaryDisplayContext.setViewURL(viewURL);
+		searchResultSummaryDisplayContext.setViewURL(
+			getSearchResultViewURL(className, classPK));
 	}
 
 	protected String formatCreationDate(Date date) {
@@ -744,11 +829,8 @@ public class SearchResultSummaryDisplayBuilder {
 			return fieldName;
 		}
 
-		String snippetFieldName = Field.SNIPPET.concat(
-			StringPool.UNDERLINE
-		).concat(
-			fieldName
-		);
+		String snippetFieldName = StringBundler.concat(
+			Field.SNIPPET, StringPool.UNDERLINE, fieldName);
 
 		if (isFieldPresent(snippetFieldName)) {
 			return snippetFieldName;
@@ -778,6 +860,23 @@ public class SearchResultSummaryDisplayBuilder {
 		}
 
 		return IndexerRegistryUtil.getIndexer(className);
+	}
+
+	protected String getPortraitURLString(long userId) {
+		User user = _userLocalService.fetchUser(userId);
+
+		try {
+			if ((user == null) || (user.getPortraitId() == 0)) {
+				return null;
+			}
+
+			return user.getPortraitURL(_themeDisplay);
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+
+			return null;
+		}
 	}
 
 	protected String getSearchResultViewURL(String className, long classPK) {
@@ -812,7 +911,14 @@ public class SearchResultSummaryDisplayBuilder {
 				summaryBuilder.setLocale(summary.getLocale());
 				summaryBuilder.setMaxContentLength(
 					summary.getMaxContentLength());
-				summaryBuilder.setTitle(summary.getTitle());
+
+				if (assetRenderer != null) {
+					summaryBuilder.setTitle(
+						appendStagingLabel(summary.getTitle(), assetRenderer));
+				}
+				else {
+					summaryBuilder.setTitle(summary.getTitle());
+				}
 
 				return summaryBuilder.build();
 			}
@@ -820,7 +926,9 @@ public class SearchResultSummaryDisplayBuilder {
 		else if (assetRenderer != null) {
 			summaryBuilder.setContent(assetRenderer.getSearchSummary(_locale));
 			summaryBuilder.setLocale(_locale);
-			summaryBuilder.setTitle(assetRenderer.getTitle(_locale));
+			summaryBuilder.setTitle(
+				appendStagingLabel(
+					assetRenderer.getTitle(_locale), assetRenderer));
 
 			return summaryBuilder.build();
 		}
@@ -906,6 +1014,7 @@ public class SearchResultSummaryDisplayBuilder {
 	private Document _document;
 	private DocumentBuilderFactory _documentBuilderFactory;
 	private FastDateFormatFactory _fastDateFormatFactory;
+	private GroupLocalService _groupLocalService;
 	private boolean _highlightEnabled;
 	private HttpServletRequest _httpServletRequest;
 	private boolean _imageRequested;
@@ -923,5 +1032,6 @@ public class SearchResultSummaryDisplayBuilder {
 	private SearchResultViewURLSupplier _searchResultViewURLSupplier;
 	private SummaryBuilderFactory _summaryBuilderFactory;
 	private ThemeDisplay _themeDisplay;
+	private UserLocalService _userLocalService;
 
 }

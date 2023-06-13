@@ -75,7 +75,7 @@
 		<liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + className + ListTypeConstants.WEBSITE %>" message="please-select-a-type" />
 		<liferay-ui:error exception="<%= WebsiteURLException.class %>" message="please-enter-a-valid-url" />
 
-		<aui:fieldset id='<%= renderResponse.getNamespace() + "websites" %>'>
+		<aui:fieldset id='<%= liferayPortletResponse.getNamespace() + "websites" %>'>
 
 			<%
 			for (int i = 0; i < websitesIndexes.length; i++) {
@@ -113,7 +113,7 @@
 			new Liferay.AutoFields({
 				contentBox: '#<portlet:namespace />websites',
 				fieldIndexes: '<portlet:namespace />websitesIndexes',
-				namespace: '<portlet:namespace />'
+				namespace: '<portlet:namespace />',
 			}).render();
 		</aui:script>
 	</c:when>

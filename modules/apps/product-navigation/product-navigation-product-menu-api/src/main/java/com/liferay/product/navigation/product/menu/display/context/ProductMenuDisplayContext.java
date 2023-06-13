@@ -22,15 +22,25 @@ import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.product.navigation.applications.menu.configuration.ApplicationsMenuInstanceConfiguration;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Julio Camarero
@@ -44,6 +54,7 @@ public class ProductMenuDisplayContext {
 		_portletRequest = portletRequest;
 		_portletResponse = portletResponse;
 
+		_httpServletRequest = PortalUtil.getHttpServletRequest(_portletRequest);
 		_panelAppRegistry = (PanelAppRegistry)_portletRequest.getAttribute(
 			ApplicationListWebKeys.PANEL_APP_REGISTRY);
 		_panelCategoryHelper =
@@ -64,6 +75,20 @@ public class ProductMenuDisplayContext {
 		_childPanelCategories = _panelCategoryRegistry.getChildPanelCategories(
 			PanelCategoryKeys.ROOT, _themeDisplay.getPermissionChecker(),
 			_themeDisplay.getScopeGroup());
+
+		if (_isEnableApplicationsMenu()) {
+			return _childPanelCategories;
+		}
+
+		List<PanelCategory> applicationsMenuChildPanelCategories =
+			_panelCategoryRegistry.getChildPanelCategories(
+				PanelCategoryKeys.APPLICATIONS_MENU,
+				_themeDisplay.getPermissionChecker(),
+				_themeDisplay.getScopeGroup());
+
+		Collections.reverse(applicationsMenuChildPanelCategories);
+
+		_childPanelCategories.addAll(0, applicationsMenuChildPanelCategories);
 
 		return _childPanelCategories;
 	}
@@ -108,6 +133,25 @@ public class ProductMenuDisplayContext {
 						return _rootPanelCategoryKey;
 					}
 				}
+
+				if (_isEnableApplicationsMenu()) {
+					return _rootPanelCategoryKey;
+				}
+
+				for (PanelCategory panelCategory :
+						_panelCategoryRegistry.getChildPanelCategories(
+							PanelCategoryKeys.APPLICATIONS_MENU)) {
+
+					if (panelCategoryHelper.containsPortlet(
+							_themeDisplay.getPpid(), panelCategory.getKey(),
+							_themeDisplay.getPermissionChecker(),
+							_themeDisplay.getScopeGroup())) {
+
+						_rootPanelCategoryKey = panelCategory.getKey();
+
+						return _rootPanelCategoryKey;
+					}
+				}
 			}
 		}
 
@@ -123,6 +167,29 @@ public class ProductMenuDisplayContext {
 			if (panelCategoryKey.equals(PanelCategoryKeys.USER)) {
 				return true;
 			}
+		}
+
+		return false;
+	}
+
+	public boolean isShowLayoutsTree() {
+		HttpServletRequest originalHttpServletRequest =
+			PortalUtil.getOriginalServletRequest(_httpServletRequest);
+
+		String ppid = ParamUtil.getString(originalHttpServletRequest, "p_p_id");
+		String mvcRenderCommandName = ParamUtil.getString(
+			originalHttpServletRequest,
+			PortalUtil.getPortletNamespace(_PORTLET_NAME) +
+				"mvcRenderCommandName");
+		String mvcPath = ParamUtil.getString(
+			originalHttpServletRequest, "mvcPath");
+
+		if (!ppid.equals(_PORTLET_NAME) ||
+			(ppid.equals(_PORTLET_NAME) &&
+			 Validator.isNotNull(mvcRenderCommandName)) ||
+			(ppid.equals(_PORTLET_NAME) && Validator.isNotNull(mvcPath))) {
+
+			return true;
 		}
 
 		return false;
@@ -144,7 +211,45 @@ public class ProductMenuDisplayContext {
 		return true;
 	}
 
+	private boolean _isEnableApplicationsMenu() {
+		if (_enableApplicationsMenu != null) {
+			return _enableApplicationsMenu;
+		}
+
+		_enableApplicationsMenu = false;
+
+		try {
+			ApplicationsMenuInstanceConfiguration
+				applicationsMenuInstanceConfiguration =
+					ConfigurationProviderUtil.getCompanyConfiguration(
+						ApplicationsMenuInstanceConfiguration.class,
+						_themeDisplay.getCompanyId());
+
+			_enableApplicationsMenu =
+				applicationsMenuInstanceConfiguration.enableApplicationsMenu();
+
+			return _enableApplicationsMenu;
+		}
+		catch (ConfigurationException configurationException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to get applications menu instance configuration",
+					configurationException);
+			}
+		}
+
+		return _enableApplicationsMenu;
+	}
+
+	private static final String _PORTLET_NAME =
+		"com_liferay_layout_admin_web_portlet_GroupPagesPortlet";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ProductMenuDisplayContext.class);
+
 	private List<PanelCategory> _childPanelCategories;
+	private Boolean _enableApplicationsMenu;
+	private final HttpServletRequest _httpServletRequest;
 	private final PanelAppRegistry _panelAppRegistry;
 	private final PanelCategoryHelper _panelCategoryHelper;
 	private final PanelCategoryRegistry _panelCategoryRegistry;

@@ -9,6 +9,7 @@
  * distribution rights of the Software.
  */
 
+import '@testing-library/jest-dom/extend-expect';
 import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
@@ -18,18 +19,17 @@ import {MockRouter} from '../../mock/MockRouter.es';
 
 const items = [
 	{
-		name: 'User 1',
+		assignee: {id: 1, name: 'User 1'},
 		onTimeTaskCount: 10,
 		overdueTaskCount: 5,
-		taskCount: 15
+		taskCount: 15,
 	},
 	{
-		image: 'path/to/image.jpg',
-		name: 'User 2',
+		assignee: {id: 2, image: 'path/to/image.jpg', name: 'User 2'},
 		onTimeTaskCount: 3,
 		overdueTaskCount: 7,
-		taskCount: 10
-	}
+		taskCount: 10,
+	},
 ];
 
 const wrapper = ({children}) => (
@@ -41,71 +41,27 @@ const wrapper = ({children}) => (
 );
 
 describe('The workload by assignee page body should', () => {
-	let getAllByTestId;
+	let getAllByRole;
 
 	afterEach(cleanup);
 
 	beforeEach(() => {
 		const renderResult = render(
 			<WorkloadByAssigneePage.Body
-				data={{items, totalCount: items.length}}
+				{...{items, totalCount: items.length}}
 				page="1"
 				pageSize="5"
 			/>,
 			{wrapper}
 		);
 
-		getAllByTestId = renderResult.getAllByTestId;
+		getAllByRole = renderResult.getAllByRole;
 	});
 
 	test('Be rendered with "User 1" and "User 2" names', () => {
-		const assigneeNames = getAllByTestId('assigneeName');
+		const rows = getAllByRole('row');
 
-		expect(assigneeNames[0].innerHTML).toBe('User 1');
-		expect(assigneeNames[1].innerHTML).toBe('User 2');
-	});
-});
-
-describe('The subcomponents from workload by assignee page body should', () => {
-	afterEach(cleanup);
-
-	test('Be rendered with empty view and no content message', async () => {
-		const {getByTestId} = render(<WorkloadByAssigneePage.Body.Empty />);
-
-		const emptyStateDiv = getByTestId('emptyState');
-
-		expect(emptyStateDiv.children[1].children[0].innerHTML).toBe(
-			'there-is-no-data-at-the-moment'
-		);
-	});
-
-	test('Be rendered with empty view and no results message', async () => {
-		const {getByTestId} = render(
-			<WorkloadByAssigneePage.Body.Empty filtered={true} />
-		);
-
-		const emptyStateDiv = getByTestId('emptyState');
-
-		expect(emptyStateDiv.children[1].children[0].innerHTML).toBe(
-			'no-results-were-found'
-		);
-	});
-
-	test('Be rendered with error view and the expected message', () => {
-		const {getByTestId} = render(<WorkloadByAssigneePage.Body.Error />);
-
-		const emptyStateDiv = getByTestId('emptyState');
-
-		expect(emptyStateDiv.children[0].children[0].innerHTML).toBe(
-			'there-was-a-problem-retrieving-data-please-try-reloading-the-page'
-		);
-	});
-
-	test('Be rendered with loading view', async () => {
-		const {getByTestId} = render(<WorkloadByAssigneePage.Body.Loading />);
-
-		const loadingStateDiv = getByTestId('loadingState');
-
-		expect(loadingStateDiv).not.toBeNull();
+		expect(rows[1]).toHaveTextContent('User 1');
+		expect(rows[2]).toHaveTextContent('User 2');
 	});
 });

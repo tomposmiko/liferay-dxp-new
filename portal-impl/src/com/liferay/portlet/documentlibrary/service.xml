@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.3.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_3_0.dtd">
 
-<service-builder api-package-path="com.liferay.document.library.kernel" auto-import-default-references="false" mvcc-enabled="true" package-path="com.liferay.portlet.documentlibrary">
+<service-builder api-package-path="com.liferay.document.library.kernel" auto-import-default-references="false" change-tracking-enabled="true" mvcc-enabled="true" package-path="com.liferay.portlet.documentlibrary">
 	<namespace>DL</namespace>
 	<entity local-service="true" name="DLApp" remote-service="true">
 
@@ -64,7 +64,7 @@
 		<column name="description" type="String" uad-nonanonymizable="true" />
 		<column name="extraSettings" type="String" />
 		<column name="fileEntryTypeId" type="long" />
-		<column name="version" type="String" />
+		<column change-tracking-resolution-type="merge" name="version" type="String" />
 		<column name="size" type="long" />
 		<column name="smallImageId" type="long" />
 		<column name="largeImageId" type="long" />
@@ -232,6 +232,7 @@
 
 		<!-- Other fields -->
 
+		<column name="dataDefinitionId" type="long" />
 		<column name="fileEntryTypeKey" type="String" />
 		<column localized="true" name="name" type="String" />
 		<column localized="true" name="description" type="String" />
@@ -245,6 +246,10 @@
 
 		<finder name="GroupId" return-type="Collection">
 			<finder-column arrayable-operator="OR" name="groupId" />
+		</finder>
+		<finder name="G_DDI" return-type="DLFileEntryType" unique="true">
+			<finder-column name="groupId" />
+			<finder-column name="dataDefinitionId" />
 		</finder>
 		<finder name="G_F" return-type="DLFileEntryType" unique="true">
 			<finder-column name="groupId" />
@@ -499,6 +504,11 @@
 			<finder-column name="parentFolderId" />
 			<finder-column name="name" />
 		</finder>
+		<finder db-index="false" name="GtF_C_P" return-type="Collection">
+			<finder-column comparator="&gt;" name="folderId" />
+			<finder-column name="companyId" />
+			<finder-column name="parentFolderId" />
+		</finder>
 		<finder name="G_M_P" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="mountPoint" />
@@ -540,9 +550,17 @@
 			<finder-column name="hidden" />
 			<finder-column name="status" />
 		</finder>
+		<finder db-index="false" name="G_M_LikeT_H_NotS" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="mountPoint" />
+			<finder-column comparator="LIKE" name="treePath" />
+			<finder-column name="hidden" />
+			<finder-column comparator="!=" name="status" />
+		</finder>
 
 		<!-- References -->
 
+		<reference entity="ClassName" package-path="com.liferay.portal" />
 		<reference entity="Group" package-path="com.liferay.portal" />
 		<reference entity="Repository" package-path="com.liferay.portal" />
 		<reference entity="Resource" package-path="com.liferay.portal" />
@@ -573,6 +591,7 @@
 		<exception>FileSize</exception>
 		<exception>FolderName</exception>
 		<exception>ImageSize</exception>
+		<exception>InvalidFile</exception>
 		<exception>InvalidFileEntryType</exception>
 		<exception>InvalidFileVersion</exception>
 		<exception>InvalidFolder</exception>

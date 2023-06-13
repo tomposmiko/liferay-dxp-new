@@ -15,12 +15,8 @@
 package com.liferay.layout.page.template.model.impl;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author Eudaldo Alonso
  */
 public class LayoutPageTemplateStructureRelImpl
 	extends LayoutPageTemplateStructureRelBaseImpl {
-
-	public LayoutPageTemplateStructureRelImpl() {
-	}
-
 }

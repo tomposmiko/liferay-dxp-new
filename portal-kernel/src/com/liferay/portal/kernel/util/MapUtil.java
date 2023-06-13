@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 /**
@@ -345,11 +346,13 @@ public class MapUtil {
 
 		V value = map.get(key);
 
-		if (value != null) {
-			return value;
+		if ((value == null) ||
+			((value instanceof String) && Validator.isBlank((String)value))) {
+
+			return map.get(fallbackKey);
 		}
 
-		return map.get(fallbackKey);
+		return value;
 	}
 
 	public static boolean isEmpty(Map<?, ?> map) {
@@ -362,6 +365,15 @@ public class MapUtil {
 
 	public static boolean isNotEmpty(Map<?, ?> map) {
 		return !isEmpty(map);
+	}
+
+	public static <K, V> void isNotEmptyForEach(
+		Map<? extends K, ? extends V> map,
+		BiConsumer<? super K, ? super V> biConsumer) {
+
+		if (!isEmpty(map)) {
+			map.forEach(biConsumer);
+		}
 	}
 
 	public static <K, V> void merge(
@@ -456,7 +468,7 @@ public class MapUtil {
 			return StringPool.OPEN_CURLY_BRACE + StringPool.CLOSE_CURLY_BRACE;
 		}
 
-		StringBundler sb = new StringBundler(map.size() * 4 + 1);
+		StringBundler sb = new StringBundler((map.size() * 4) + 1);
 
 		sb.append(StringPool.OPEN_CURLY_BRACE);
 
@@ -488,11 +500,9 @@ public class MapUtil {
 					(String[])value, StringPool.COMMA_AND_SPACE);
 
 				sb.append(
-					StringPool.OPEN_BRACKET.concat(
-						valueString
-					).concat(
-						StringPool.CLOSE_BRACKET
-					));
+					StringBundler.concat(
+						StringPool.OPEN_BRACKET, valueString,
+						StringPool.CLOSE_BRACKET));
 			}
 			else {
 				sb.append(value);

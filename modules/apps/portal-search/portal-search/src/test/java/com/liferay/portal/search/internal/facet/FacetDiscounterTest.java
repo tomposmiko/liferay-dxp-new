@@ -23,11 +23,14 @@ import com.liferay.portal.kernel.search.facet.SimpleFacet;
 import com.liferay.portal.kernel.search.facet.collector.DefaultTermCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -36,6 +39,11 @@ import org.mockito.Mockito;
  * @author André de Oliveira
  */
 public class FacetDiscounterTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testMultiValueFacet() {
@@ -102,12 +110,8 @@ public class FacetDiscounterTest {
 		_assertFrequencies(facet, "[public=1000]");
 	}
 
-	private static void _assertFrequencies(Facet facet, String expected) {
+	private void _assertFrequencies(Facet facet, String expected) {
 		FacetsAssert.assertFrequencies(_FIELD_NAME, facet, expected);
-	}
-
-	private static TermCollector _toTerm(String term, int frequency) {
-		return new DefaultTermCollector(term, frequency);
 	}
 
 	private Document _createDocument(String term) {
@@ -171,6 +175,10 @@ public class FacetDiscounterTest {
 		facet.setFieldName(_FIELD_NAME);
 
 		facet.setFacetCollector(_createFacetCollector(termCollectors));
+	}
+
+	private TermCollector _toTerm(String term, int frequency) {
+		return new DefaultTermCollector(term, frequency);
 	}
 
 	private static final String _FIELD_NAME = RandomTestUtil.randomString();

@@ -129,6 +129,14 @@ public class DDMExpressionImplTest extends PowerMockito {
 	}
 
 	@Test
+	public void testEquals2() throws Exception {
+		DDMExpressionImpl<Boolean> ddmExpressionImpl = createDDMExpression(
+			"2 == 2.0");
+
+		Assert.assertTrue(ddmExpressionImpl.evaluate());
+	}
+
+	@Test
 	public void testExpressionVariableNames() throws Exception {
 		DDMExpressionImpl<BigDecimal> ddmExpressionImpl = createDDMExpression(
 			"a - b");
@@ -409,6 +417,47 @@ public class DDMExpressionImplTest extends PowerMockito {
 	}
 
 	@Test
+	public void testNestedFunctions() throws Exception {
+		DDMExpressionImpl<BigDecimal> ddmExpressionImpl =
+			new DDMExpressionImpl<>("add(2, multiply(2,3,2))");
+
+		ddmExpressionImpl.setDDMExpressionFunctionTracker(
+			new DDMExpressionFunctionTracker() {
+
+				@Override
+				public Map<String, DDMExpressionFunctionFactory>
+					getDDMExpressionFunctionFactories(
+						Set<String> functionNames) {
+
+					return _createDDMExpressionFunctionFactory(
+						new AddFunction(), new MultiplyFunction());
+				}
+
+				@Override
+				public Map<String, DDMExpressionFunction>
+					getDDMExpressionFunctions(Set<String> functionNames) {
+
+					return HashMapBuilder.<String, DDMExpressionFunction>put(
+						"add", new AddFunction()
+					).put(
+						"multiply", new MultiplyFunction()
+					).build();
+				}
+
+				@Override
+				public void ungetDDMExpressionFunctions(
+					Map<String, DDMExpressionFunction>
+						ddmExpressionFunctionsMap) {
+				}
+
+			});
+
+		BigDecimal bigDecimal = ddmExpressionImpl.evaluate();
+
+		Assert.assertEquals(0, bigDecimal.compareTo(new BigDecimal("14")));
+	}
+
+	@Test
 	public void testNot() throws Exception {
 		DDMExpressionImpl<Boolean> ddmExpressionImpl = createDDMExpression(
 			"not(-1 != 1.0)");
@@ -429,7 +478,7 @@ public class DDMExpressionImplTest extends PowerMockito {
 		DDMExpressionImpl<Boolean> ddmExpressionImpl = createDDMExpression(
 			"2 != 2.0");
 
-		Assert.assertTrue(ddmExpressionImpl.evaluate());
+		Assert.assertFalse(ddmExpressionImpl.evaluate());
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -14,6 +14,7 @@
 
 package com.liferay.saml.persistence.service;
 
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -59,11 +60,15 @@ public interface SamlIdpSsoSessionLocalService
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link SamlIdpSsoSessionLocalServiceUtil} to access the saml idp sso session local service. Add custom service methods to <code>com.liferay.saml.persistence.service.impl.SamlIdpSsoSessionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.saml.persistence.service.impl.SamlIdpSsoSessionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the saml idp sso session local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link SamlIdpSsoSessionLocalServiceUtil} if injection and service tracking are not available.
 	 */
 
 	/**
 	 * Adds the saml idp sso session to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlIdpSsoSessionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param samlIdpSsoSession the saml idp sso session
 	 * @return the saml idp sso session that was added
@@ -74,6 +79,12 @@ public interface SamlIdpSsoSessionLocalService
 
 	public SamlIdpSsoSession addSamlIdpSsoSession(
 			String samlIdpSsoSessionKey, ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
 	/**
@@ -97,6 +108,10 @@ public interface SamlIdpSsoSessionLocalService
 	/**
 	 * Deletes the saml idp sso session with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlIdpSsoSessionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param samlIdpSsoSessionId the primary key of the saml idp sso session
 	 * @return the saml idp sso session that was removed
 	 * @throws PortalException if a saml idp sso session with the primary key could not be found
@@ -108,12 +123,22 @@ public interface SamlIdpSsoSessionLocalService
 	/**
 	 * Deletes the saml idp sso session from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlIdpSsoSessionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param samlIdpSsoSession the saml idp sso session
 	 * @return the saml idp sso session that was removed
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	public SamlIdpSsoSession deleteSamlIdpSsoSession(
 		SamlIdpSsoSession samlIdpSsoSession);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public <T> T dslQuery(DSLQuery dslQuery);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int dslQueryCount(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -200,6 +225,9 @@ public interface SamlIdpSsoSessionLocalService
 	 */
 	public String getOSGiServiceIdentifier();
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -247,6 +275,10 @@ public interface SamlIdpSsoSessionLocalService
 
 	/**
 	 * Updates the saml idp sso session in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SamlIdpSsoSessionLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param samlIdpSsoSession the saml idp sso session
 	 * @return the saml idp sso session that was updated

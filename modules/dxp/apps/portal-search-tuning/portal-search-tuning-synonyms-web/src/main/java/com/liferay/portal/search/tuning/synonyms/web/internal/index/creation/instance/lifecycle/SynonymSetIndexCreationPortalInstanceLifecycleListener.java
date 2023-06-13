@@ -20,19 +20,16 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.index.IndexNameBuilder;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexCreator;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexReader;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexName;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.synchronizer.FilterToIndexSynchronizer;
 
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Adam Brandizzi
@@ -49,16 +46,16 @@ public class SynonymSetIndexCreationPortalInstanceLifecycleListener
 			return;
 		}
 
-		String indexName = _indexNameBuilder.getIndexName(
-			company.getCompanyId());
+		long companyId = company.getCompanyId();
 
 		SynonymSetIndexName synonymSetIndexName =
-			_synonymSetIndexNameBuilder.getSynonymSetIndexName(indexName);
+			_synonymSetIndexNameBuilder.getSynonymSetIndexName(companyId);
 
 		if (!_synonymSetIndexReader.isExists(synonymSetIndexName)) {
 			_synonymSetIndexCreator.create(synonymSetIndexName);
 
-			_filterToIndexSynchronizer.copyToIndex(indexName);
+			_filterToIndexSynchronizer.copyToIndex(
+				_indexNameBuilder.getIndexName(companyId), synonymSetIndexName);
 		}
 	}
 
@@ -71,12 +68,8 @@ public class SynonymSetIndexCreationPortalInstanceLifecycleListener
 	@Reference
 	private IndexNameBuilder _indexNameBuilder;
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile SearchEngineInformation _searchEngineInformation;
+	@Reference
+	private SearchEngineInformation _searchEngineInformation;
 
 	@Reference
 	private SynonymSetIndexCreator _synonymSetIndexCreator;

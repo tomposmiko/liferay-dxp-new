@@ -29,26 +29,42 @@ definition {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "Blogs Page");
 
-		Navigator.gotoPage(pageName = "Blogs Page");
+		var browserType = PropsUtil.get("browser.type");
+
+		if ("${browserType}" == "safari") {
+			Navigator.openSpecificURL(url = "http://localhost:8080/web/guest/blogs-page");
+		}
+		else {
+			Navigator.gotoPage(pageName = "Blogs Page");
+		}
 
 		Portlet.addPG(portletName = "Blogs");
 
-		Navigator.gotoPage(pageName = "Blogs Page");
+		if ("${browserType}" == "safari") {
+			Navigator.openSpecificURL(url = "http://localhost:8080/web/guest/blogs-page");
+		}
+		else {
+			Navigator.gotoPage(pageName = "Blogs Page");
+		}
 
 		Blogs.viewControlsPG();
 
 		User.logoutPG();
 
-		Navigator.gotoPage(pageName = "Blogs Page");
+		if ("${browserType}" == "safari") {
+			Navigator.openSpecificURL(url = "http://localhost:8080/web/guest/blogs-page");
+		}
+		else {
+			Navigator.gotoPage(pageName = "Blogs Page");
+		}
 
 		var browserType = PropsUtil.get("browser.type");
 		var key_portletName = "Blogs";
@@ -65,13 +81,13 @@ definition {
 		property custom.properties = "virtual.hosts.default.site.name=Guest";
 		property test.assert.javascript.errors = "false";
 		property test.assert.warning.exceptions = "true";
+
 		var portalURL = PropsUtil.get("portal.url");
-		var url1 = "${portalURL}/testxxx/?p_p_id=com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet&amp;p_p_lifecycle=0&amp;p_p_state=maximized&amp;_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_mvcPath=%2Fedit_configuration.jsp&amp;_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_portletResource=com_liferay_users_admin_web_portlet_UsersAdminPortlet";
-		var url2 = "${portalURL}/testxxx/?p_p_id=com_liferay_users_admin_web_portlet_UsersAdminPortlet&amp;p_p_state=maximized";
+		var url1 = "${portalURL}/testxxx/?p_p_id=com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet&p_p_lifecycle=0&p_p_state=maximized&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_mvcPath=%2Fedit_configuration.jsp&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_portletResource=com_liferay_users_admin_web_portlet_UsersAdminPortlet";
+		var url2 = "${portalURL}/testxxx/?p_p_id=com_liferay_users_admin_web_portlet_UsersAdminPortlet&p_p_state=maximized";
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
-			panel = "Site Administration",
 			portlet = "Pages");
 
 		SitePages.addPublicPage(pageName = "testxxx");

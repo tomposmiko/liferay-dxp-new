@@ -50,19 +50,19 @@
 		var quickNotePad = A.one('#<portlet:namespace />pad');
 
 		if (quickNotePad) {
-			quickNotePad.all('.note-color').on('click', function(event) {
+			quickNotePad.all('.note-color').on('click', function (event) {
 				var box = event.currentTarget;
 
 				var bgColor = box.getStyle('backgroundColor');
 
 				quickNotePad.setStyle('backgroundColor', bgColor);
 
-				<portlet:actionURL name="save" var="saveURL" />
+				<portlet:actionURL name="/quick_note/save" var="saveURL" />
 
 				A.io.request('<%= saveURL %>', {
 					data: {
-						<portlet:namespace />color: bgColor
-					}
+						<portlet:namespace />color: bgColor,
+					},
 				});
 			});
 		}
@@ -71,7 +71,7 @@
 			inputType: 'textarea',
 			node: '#<portlet:namespace />note',
 			on: {
-				contentTextChange: function(event) {
+				contentTextChange: function (event) {
 					var instance = this;
 
 					if (!event.initial) {
@@ -81,12 +81,12 @@
 
 						A.io.request('<%= saveURL %>', {
 							data: {
-								<portlet:namespace />data: newValue
-							}
+								<portlet:namespace />data: newValue,
+							},
 						});
 					}
-				}
-			}
+				},
+			},
 		});
 	</aui:script>
 </c:if>

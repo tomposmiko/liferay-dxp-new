@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.buffer.IndexerRequestBufferExecutor;
 import com.liferay.portal.search.configuration.IndexerRegistryConfiguration;
 
 import java.util.Map;
@@ -79,19 +78,17 @@ public class IndexerRequestBufferExecutorWatcher {
 		IndexerRequestBufferExecutor indexerRequestBufferExecutor,
 		Map<String, Object> properties) {
 
-		String bufferedExecutionMode = _getBufferedExecutionMode(properties);
-
 		_indexerRequestBufferExecutors.put(
-			bufferedExecutionMode, indexerRequestBufferExecutor);
+			_getBufferedExecutionMode(properties),
+			indexerRequestBufferExecutor);
 	}
 
 	protected void removeIndexerRequestBufferExecutor(
 		IndexerRequestBufferExecutor indexerRequestBufferExecutor,
 		Map<String, Object> properties) {
 
-		String bufferedExecutionMode = _getBufferedExecutionMode(properties);
-
-		_indexerRequestBufferExecutors.remove(bufferedExecutionMode);
+		_indexerRequestBufferExecutors.remove(
+			_getBufferedExecutionMode(properties));
 	}
 
 	private String _getBufferedExecutionMode(Map<String, Object> properties) {

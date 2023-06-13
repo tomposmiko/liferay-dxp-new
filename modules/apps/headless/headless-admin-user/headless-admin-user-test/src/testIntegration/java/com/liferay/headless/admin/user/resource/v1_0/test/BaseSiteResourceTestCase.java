@@ -25,14 +25,14 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.liferay.headless.admin.user.client.dto.v1_0.Site;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
+import com.liferay.headless.admin.user.client.pagination.Pagination;
 import com.liferay.headless.admin.user.client.resource.v1_0.SiteResource;
 import com.liferay.headless.admin.user.client.serdes.v1_0.SiteSerDes;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -41,7 +41,9 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -53,6 +55,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +107,9 @@ public abstract class BaseSiteResourceTestCase {
 
 		SiteResource.Builder builder = SiteResource.builder();
 
-		siteResource = builder.locale(
+		siteResource = builder.authentication(
+			"test@liferay.com", "test"
+		).locale(
 			LocaleUtil.getDefault()
 		).build();
 	}
@@ -195,7 +200,65 @@ public abstract class BaseSiteResourceTestCase {
 
 	@Test
 	public void testGetMyUserAccountSitesPage() throws Exception {
-		Assert.assertTrue(false);
+		Page<Site> page = siteResource.getMyUserAccountSitesPage(
+			Pagination.of(1, 10));
+
+		long totalCount = page.getTotalCount();
+
+		Site site1 = testGetMyUserAccountSitesPage_addSite(randomSite());
+
+		Site site2 = testGetMyUserAccountSitesPage_addSite(randomSite());
+
+		page = siteResource.getMyUserAccountSitesPage(Pagination.of(1, 10));
+
+		Assert.assertEquals(totalCount + 2, page.getTotalCount());
+
+		assertContains(site1, (List<Site>)page.getItems());
+		assertContains(site2, (List<Site>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetMyUserAccountSitesPageWithPagination() throws Exception {
+		Page<Site> totalPage = siteResource.getMyUserAccountSitesPage(null);
+
+		int totalCount = GetterUtil.getInteger(totalPage.getTotalCount());
+
+		Site site1 = testGetMyUserAccountSitesPage_addSite(randomSite());
+
+		Site site2 = testGetMyUserAccountSitesPage_addSite(randomSite());
+
+		Site site3 = testGetMyUserAccountSitesPage_addSite(randomSite());
+
+		Page<Site> page1 = siteResource.getMyUserAccountSitesPage(
+			Pagination.of(1, totalCount + 2));
+
+		List<Site> sites1 = (List<Site>)page1.getItems();
+
+		Assert.assertEquals(sites1.toString(), totalCount + 2, sites1.size());
+
+		Page<Site> page2 = siteResource.getMyUserAccountSitesPage(
+			Pagination.of(2, totalCount + 2));
+
+		Assert.assertEquals(totalCount + 3, page2.getTotalCount());
+
+		List<Site> sites2 = (List<Site>)page2.getItems();
+
+		Assert.assertEquals(sites2.toString(), 1, sites2.size());
+
+		Page<Site> page3 = siteResource.getMyUserAccountSitesPage(
+			Pagination.of(1, totalCount + 3));
+
+		assertContains(site1, (List<Site>)page3.getItems());
+		assertContains(site2, (List<Site>)page3.getItems());
+		assertContains(site3, (List<Site>)page3.getItems());
+	}
+
+	protected Site testGetMyUserAccountSitesPage_addSite(Site site)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -216,29 +279,55 @@ public abstract class BaseSiteResourceTestCase {
 
 	@Test
 	public void testGraphQLGetSiteByFriendlyUrlPath() throws Exception {
-		Site site = testGraphQLSite_addSite();
-
-		List<GraphQLField> graphQLFields = getGraphQLFields();
-
-		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"byFriendlyUrlPath",
-				new HashMap<String, Object>() {
-					{
-						put("friendlyUrlPath", site.getFriendlyUrlPath());
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
+		Site site = testGraphQLGetSiteByFriendlyUrlPath_addSite();
 
 		Assert.assertTrue(
-			equalsJSONObject(
-				site, dataJSONObject.getJSONObject("byFriendlyUrlPath")));
+			equals(
+				site,
+				SiteSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"byFriendlyUrlPath",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"friendlyUrlPath",
+											"\"" + site.getFriendlyUrlPath() +
+												"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/byFriendlyUrlPath"))));
+	}
+
+	@Test
+	public void testGraphQLGetSiteByFriendlyUrlPathNotFound() throws Exception {
+		String irrelevantFriendlyUrlPath =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"byFriendlyUrlPath",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"friendlyUrlPath",
+									irrelevantFriendlyUrlPath);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected Site testGraphQLGetSiteByFriendlyUrlPath_addSite()
+		throws Exception {
+
+		return testGraphQLSite_addSite();
 	}
 
 	@Test
@@ -258,33 +347,66 @@ public abstract class BaseSiteResourceTestCase {
 
 	@Test
 	public void testGraphQLGetSite() throws Exception {
-		Site site = testGraphQLSite_addSite();
-
-		List<GraphQLField> graphQLFields = getGraphQLFields();
-
-		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"site",
-				new HashMap<String, Object>() {
-					{
-						put("siteId", site.getId());
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
+		Site site = testGraphQLGetSite_addSite();
 
 		Assert.assertTrue(
-			equalsJSONObject(site, dataJSONObject.getJSONObject("site")));
+			equals(
+				site,
+				SiteSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"site",
+								new HashMap<String, Object>() {
+									{
+										put("siteId", site.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/site"))));
+	}
+
+	@Test
+	public void testGraphQLGetSiteNotFound() throws Exception {
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"site",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"siteKey",
+									"\"" + irrelevantGroup.getGroupId() + "\"");
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected Site testGraphQLGetSite_addSite() throws Exception {
+		return testGraphQLSite_addSite();
 	}
 
 	protected Site testGraphQLSite_addSite() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	protected void assertContains(Site site, List<Site> sites) {
+		boolean contains = false;
+
+		for (Site item : sites) {
+			if (equals(site, item)) {
+				contains = true;
+
+				break;
+			}
+		}
+
+		Assert.assertTrue(sites + " does not contain " + site, contains);
 	}
 
 	protected void assertHttpResponseStatusCode(
@@ -331,26 +453,7 @@ public abstract class BaseSiteResourceTestCase {
 		}
 	}
 
-	protected void assertEqualsJSONArray(
-		List<Site> sites, JSONArray jsonArray) {
-
-		for (Site site : sites) {
-			boolean contains = false;
-
-			for (Object object : jsonArray) {
-				if (equalsJSONObject(site, (JSONObject)object)) {
-					contains = true;
-
-					break;
-				}
-			}
-
-			Assert.assertTrue(
-				jsonArray + " does not contain " + site, contains);
-		}
-	}
-
-	protected void assertValid(Site site) {
+	protected void assertValid(Site site) throws Exception {
 		boolean valid = true;
 
 		if (site.getId() == null) {
@@ -479,13 +582,50 @@ public abstract class BaseSiteResourceTestCase {
 		return new String[0];
 	}
 
-	protected List<GraphQLField> getGraphQLFields() {
+	protected List<GraphQLField> getGraphQLFields() throws Exception {
 		List<GraphQLField> graphQLFields = new ArrayList<>();
 
-		for (String additionalAssertFieldName :
-				getAdditionalAssertFieldNames()) {
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(
+					com.liferay.headless.admin.user.dto.v1_0.Site.class)) {
 
-			graphQLFields.add(new GraphQLField(additionalAssertFieldName));
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			graphQLFields.addAll(getGraphQLFields(field));
+		}
+
+		return graphQLFields;
+	}
+
+	protected List<GraphQLField> getGraphQLFields(
+			java.lang.reflect.Field... fields)
+		throws Exception {
+
+		List<GraphQLField> graphQLFields = new ArrayList<>();
+
+		for (java.lang.reflect.Field field : fields) {
+			com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+				vulcanGraphQLField = field.getAnnotation(
+					com.liferay.portal.vulcan.graphql.annotation.GraphQLField.
+						class);
+
+			if (vulcanGraphQLField != null) {
+				Class<?> clazz = field.getType();
+
+				if (clazz.isArray()) {
+					clazz = clazz.getComponentType();
+				}
+
+				List<GraphQLField> childrenGraphQLFields = getGraphQLFields(
+					getDeclaredFields(clazz));
+
+				graphQLFields.add(
+					new GraphQLField(field.getName(), childrenGraphQLFields));
+			}
 		}
 
 		return graphQLFields;
@@ -537,9 +677,9 @@ public abstract class BaseSiteResourceTestCase {
 			}
 
 			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						site1.getDescription_i18n(),
-						site2.getDescription_i18n())) {
+				if (!equals(
+						(Map)site1.getDescription_i18n(),
+						(Map)site2.getDescription_i18n())) {
 
 					return false;
 				}
@@ -593,8 +733,8 @@ public abstract class BaseSiteResourceTestCase {
 			}
 
 			if (Objects.equals("name_i18n", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						site1.getName_i18n(), site2.getName_i18n())) {
+				if (!equals(
+						(Map)site1.getName_i18n(), (Map)site2.getName_i18n())) {
 
 					return false;
 				}
@@ -628,87 +768,43 @@ public abstract class BaseSiteResourceTestCase {
 		return true;
 	}
 
-	protected boolean equalsJSONObject(Site site, JSONObject jsonObject) {
-		for (String fieldName : getAdditionalAssertFieldNames()) {
-			if (Objects.equals("description", fieldName)) {
-				if (!Objects.deepEquals(
-						site.getDescription(),
-						jsonObject.getString("description"))) {
+	protected boolean equals(
+		Map<String, Object> map1, Map<String, Object> map2) {
+
+		if (Objects.equals(map1.keySet(), map2.keySet())) {
+			for (Map.Entry<String, Object> entry : map1.entrySet()) {
+				if (entry.getValue() instanceof Map) {
+					if (!equals(
+							(Map)entry.getValue(),
+							(Map)map2.get(entry.getKey()))) {
+
+						return false;
+					}
+				}
+				else if (!Objects.deepEquals(
+							entry.getValue(), map2.get(entry.getKey()))) {
 
 					return false;
 				}
-
-				continue;
 			}
 
-			if (Objects.equals("friendlyUrlPath", fieldName)) {
-				if (!Objects.deepEquals(
-						site.getFriendlyUrlPath(),
-						jsonObject.getString("friendlyUrlPath"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("id", fieldName)) {
-				if (!Objects.deepEquals(
-						site.getId(), jsonObject.getLong("id"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("key", fieldName)) {
-				if (!Objects.deepEquals(
-						site.getKey(), jsonObject.getString("key"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("membershipType", fieldName)) {
-				if (!Objects.deepEquals(
-						site.getMembershipType(),
-						jsonObject.getString("membershipType"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("name", fieldName)) {
-				if (!Objects.deepEquals(
-						site.getName(), jsonObject.getString("name"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("parentSiteId", fieldName)) {
-				if (!Objects.deepEquals(
-						site.getParentSiteId(),
-						jsonObject.getLong("parentSiteId"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			throw new IllegalArgumentException(
-				"Invalid field name " + fieldName);
+			return true;
 		}
 
-		return true;
+		return false;
+	}
+
+	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
+		throws Exception {
+
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
+
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -857,15 +953,38 @@ public abstract class BaseSiteResourceTestCase {
 		return httpResponse.getContent();
 	}
 
+	protected JSONObject invokeGraphQLMutation(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField mutationGraphQLField = new GraphQLField(
+			"mutation", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(mutationGraphQLField.toString()));
+	}
+
+	protected JSONObject invokeGraphQLQuery(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField queryGraphQLField = new GraphQLField(
+			"query", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(queryGraphQLField.toString()));
+	}
+
 	protected Site randomSite() throws Exception {
 		return new Site() {
 			{
-				description = RandomTestUtil.randomString();
-				friendlyUrlPath = RandomTestUtil.randomString();
+				description = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				friendlyUrlPath = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
-				key = RandomTestUtil.randomString();
-				membershipType = RandomTestUtil.randomString();
-				name = RandomTestUtil.randomString();
+				key = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				membershipType = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				parentSiteId = RandomTestUtil.randomLong();
 			}
 		};
@@ -892,9 +1011,22 @@ public abstract class BaseSiteResourceTestCase {
 			this(key, new HashMap<>(), graphQLFields);
 		}
 
+		public GraphQLField(String key, List<GraphQLField> graphQLFields) {
+			this(key, new HashMap<>(), graphQLFields);
+		}
+
 		public GraphQLField(
 			String key, Map<String, Object> parameterMap,
 			GraphQLField... graphQLFields) {
+
+			_key = key;
+			_parameterMap = parameterMap;
+			_graphQLFields = Arrays.asList(graphQLFields);
+		}
+
+		public GraphQLField(
+			String key, Map<String, Object> parameterMap,
+			List<GraphQLField> graphQLFields) {
 
 			_key = key;
 			_parameterMap = parameterMap;
@@ -912,25 +1044,25 @@ public abstract class BaseSiteResourceTestCase {
 						_parameterMap.entrySet()) {
 
 					sb.append(entry.getKey());
-					sb.append(":");
+					sb.append(": ");
 					sb.append(entry.getValue());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append(")");
 			}
 
-			if (_graphQLFields.length > 0) {
+			if (!_graphQLFields.isEmpty()) {
 				sb.append("{");
 
 				for (GraphQLField graphQLField : _graphQLFields) {
 					sb.append(graphQLField.toString());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append("}");
 			}
@@ -938,14 +1070,14 @@ public abstract class BaseSiteResourceTestCase {
 			return sb.toString();
 		}
 
-		private final GraphQLField[] _graphQLFields;
+		private final List<GraphQLField> _graphQLFields;
 		private final String _key;
 		private final Map<String, Object> _parameterMap;
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseSiteResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseSiteResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

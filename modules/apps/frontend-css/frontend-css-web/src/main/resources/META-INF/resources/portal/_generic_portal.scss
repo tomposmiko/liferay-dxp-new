@@ -63,10 +63,6 @@ td {
 				vertical-align: top;
 				width: 1%;
 			}
-
-			&.line-numbers:before {
-				content: attr(data-line-number);
-			}
 		}
 	}
 }
@@ -169,12 +165,5 @@ img.icon {
 		dt {
 			float: none;
 		}
-	}
-}
-
-.ie6,
-.ie7 {
-	.lfr-code table tr td.line-numbers {
-		display: none;
 	}
 }

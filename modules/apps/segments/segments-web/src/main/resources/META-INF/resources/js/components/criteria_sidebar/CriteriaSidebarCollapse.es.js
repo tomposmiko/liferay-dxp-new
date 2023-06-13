@@ -38,19 +38,30 @@ function getDefaultValue(property) {
 
 	if (type === PROPERTY_TYPES.STRING && options && options.length) {
 		defaultValue = options[0].value;
-	} else if (type === PROPERTY_TYPES.DATE) {
+	}
+	else if (type === PROPERTY_TYPES.DATE) {
 		defaultValue = jsDatetoYYYYMMDD(new Date());
-	} else if (type === PROPERTY_TYPES.DATE_TIME) {
+	}
+	else if (type === PROPERTY_TYPES.DATE_TIME) {
 		const simpleDate = jsDatetoYYYYMMDD(new Date());
 
 		defaultValue = dateFns
 			.parse(simpleDate, INPUT_DATE_FORMAT)
 			.toISOString();
-	} else if (type === PROPERTY_TYPES.BOOLEAN) {
+	}
+	else if (type === PROPERTY_TYPES.BOOLEAN) {
 		defaultValue = 'true';
-	} else if (type === PROPERTY_TYPES.INTEGER) {
+	}
+	else if (type === PROPERTY_TYPES.INTEGER && options && options.length) {
+		defaultValue = options[0].value;
+	}
+	else if (type === PROPERTY_TYPES.INTEGER) {
 		defaultValue = 0;
-	} else if (type === PROPERTY_TYPES.DOUBLE) {
+	}
+	else if (type === PROPERTY_TYPES.DOUBLE && options && options.length) {
+		defaultValue = options[0].value;
+	}
+	else if (type === PROPERTY_TYPES.DOUBLE) {
 		defaultValue = '0.00';
 	}
 
@@ -61,7 +72,7 @@ function getDefaultValue(property) {
  * Filters properties by label
  */
 function filterProperties(properties, searchValue) {
-	return properties.filter(property => {
+	return properties.filter((property) => {
 		const propertyLabel = property.label.toLowerCase();
 
 		return propertyLabel.indexOf(searchValue.toLowerCase()) !== -1;
@@ -72,13 +83,13 @@ const CriteriaSidebarCollapse = ({
 	onCollapseClick,
 	propertyGroups,
 	propertyKey,
-	searchValue
+	searchValue,
 }) => {
 	const _handleClick = (key, editing) => () => onCollapseClick(key, editing);
 
 	return (
 		<ul className="list-unstyled sidebar-collapse-groups">
-			{propertyGroups.map(propertyGroup => {
+			{propertyGroups.map((propertyGroup) => {
 				const key = propertyGroup.propertyKey;
 
 				const active = key === propertyKey;
@@ -91,7 +102,7 @@ const CriteriaSidebarCollapse = ({
 					: properties;
 
 				const activeClasses = getCN({
-					active
+					active,
 				});
 
 				const propertyListClasses = getCN(
@@ -144,7 +155,7 @@ const CriteriaSidebarCollapse = ({
 											label,
 											name,
 											options,
-											type
+											type,
 										});
 
 										return (
@@ -172,7 +183,7 @@ CriteriaSidebarCollapse.propTypes = {
 	onCollapseClick: PropTypes.func,
 	propertyGroups: PropTypes.arrayOf(propertyGroupShape),
 	propertyKey: PropTypes.string,
-	searchValue: PropTypes.string
+	searchValue: PropTypes.string,
 };
 
 export default CriteriaSidebarCollapse;

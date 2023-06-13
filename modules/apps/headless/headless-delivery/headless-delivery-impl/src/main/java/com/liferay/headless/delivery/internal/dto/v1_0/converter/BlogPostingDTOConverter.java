@@ -25,11 +25,13 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.headless.delivery.dto.v1_0.BlogPosting;
 import com.liferay.headless.delivery.dto.v1_0.Image;
-import com.liferay.headless.delivery.dto.v1_0.TaxonomyCategory;
+import com.liferay.headless.delivery.dto.v1_0.TaxonomyCategoryBrief;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.AggregateRatingUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.ContentValueUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RelatedContentUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.TaxonomyCategoryBriefUtil;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -74,7 +76,8 @@ public class BlogPostingDTOConverter
 				alternativeHeadline = blogsEntry.getSubtitle();
 				articleBody = blogsEntry.getContent();
 				creator = CreatorUtil.toCreator(
-					_portal, _userLocalService.getUser(blogsEntry.getUserId()));
+					_portal, dtoConverterContext.getUriInfoOptional(),
+					_userLocalService.fetchUser(blogsEntry.getUserId()));
 				customFields = CustomFieldsUtil.toCustomFields(
 					dtoConverterContext.isAcceptAllLanguages(),
 					BlogsEntry.class.getName(), blogsEntry.getEntryId(),
@@ -87,7 +90,7 @@ public class BlogPostingDTOConverter
 				friendlyUrlPath = blogsEntry.getUrlTitle();
 				headline = blogsEntry.getTitle();
 				id = blogsEntry.getEntryId();
-				image = _getImage(blogsEntry);
+				image = _getImage(blogsEntry, dtoConverterContext);
 				keywords = ListUtil.toArray(
 					_assetTagLocalService.getTags(
 						BlogsEntry.class.getName(), blogsEntry.getEntryId()),
@@ -100,21 +103,21 @@ public class BlogPostingDTOConverter
 					blogsEntry.getModelClassName(), blogsEntry.getEntryId(),
 					dtoConverterContext.getLocale());
 				siteId = blogsEntry.getGroupId();
-				taxonomyCategories = TransformUtil.transformToArray(
+				taxonomyCategoryBriefs = TransformUtil.transformToArray(
 					_assetCategoryLocalService.getCategories(
 						BlogsEntry.class.getName(), blogsEntry.getEntryId()),
-					assetCategory -> new TaxonomyCategory() {
-						{
-							taxonomyCategoryId = assetCategory.getCategoryId();
-							taxonomyCategoryName = assetCategory.getName();
-						}
-					},
-					TaxonomyCategory.class);
+					assetCategory ->
+						TaxonomyCategoryBriefUtil.toTaxonomyCategoryBrief(
+							assetCategory, dtoConverterContext),
+					TaxonomyCategoryBrief.class);
 			}
 		};
 	}
 
-	private Image _getImage(BlogsEntry blogsEntry) throws Exception {
+	private Image _getImage(
+			BlogsEntry blogsEntry, DTOConverterContext dtoConverterContext)
+		throws Exception {
+
 		long coverImageFileEntryId = blogsEntry.getCoverImageFileEntryId();
 
 		if (coverImageFileEntryId == 0) {
@@ -129,6 +132,9 @@ public class BlogPostingDTOConverter
 				contentUrl = _dlURLHelper.getPreviewURL(
 					fileEntry, fileEntry.getFileVersion(), null, "", false,
 					false);
+				contentValue = ContentValueUtil.toContentValue(
+					"image.contentValue", fileEntry::getContentStream,
+					dtoConverterContext.getUriInfoOptional());
 				imageId = coverImageFileEntryId;
 			}
 		};

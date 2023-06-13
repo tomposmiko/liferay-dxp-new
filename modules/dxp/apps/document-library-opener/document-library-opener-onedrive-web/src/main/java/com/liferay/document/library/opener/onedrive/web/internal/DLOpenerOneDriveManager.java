@@ -148,9 +148,7 @@ public class DLOpenerOneDriveManager {
 			long userId, FileEntry fileEntry)
 		throws PortalException {
 
-		String oneDriveFileId = _getOneDriveFileId(fileEntry);
-
-		if (Validator.isNull(oneDriveFileId)) {
+		if (Validator.isNull(_getOneDriveFileId(fileEntry))) {
 			throw new IllegalArgumentException(
 				StringBundler.concat(
 					"File entry ", fileEntry.getFileEntryId(),
@@ -245,9 +243,7 @@ public class DLOpenerOneDriveManager {
 			long userId, FileEntry fileEntry)
 		throws PortalException {
 
-		String oneDriveFileId = _getOneDriveFileId(fileEntry);
-
-		if (Validator.isNull(oneDriveFileId)) {
+		if (Validator.isNull(_getOneDriveFileId(fileEntry))) {
 			throw new IllegalArgumentException(
 				StringBundler.concat(
 					"File entry ", fileEntry.getFileEntryId(),
@@ -319,8 +315,8 @@ public class DLOpenerOneDriveManager {
 				).content(
 				).buildRequest();
 
-			try (InputStream is = iDriveItemStreamRequest.get()) {
-				return FileUtil.createTempFile(is);
+			try (InputStream inputStream = iDriveItemStreamRequest.get()) {
+				return FileUtil.createTempFile(inputStream);
 			}
 		}
 		catch (GraphServiceException graphServiceException) {

@@ -75,10 +75,11 @@ public abstract class BaseUADMVCActionCommand extends BaseMVCActionCommand {
 					selectedUserId);
 
 			if (totalReviewableUADEntitiesCount == 0) {
-				mvcRenderCommandName = "/completed_data_erasure";
+				mvcRenderCommandName =
+					"/user_associated_data/completed_data_erasure";
 			}
 			else {
-				mvcRenderCommandName = "/review_uad_data";
+				mvcRenderCommandName = "/user_associated_data/review_uad_data";
 			}
 		}
 
@@ -117,10 +118,12 @@ public abstract class BaseUADMVCActionCommand extends BaseMVCActionCommand {
 					getTotalNonreviewableUADEntitiesCount(selectedUserId);
 
 			if (totalNonreviewableUADEntitiesCount == 0) {
-				mvcRenderCommandName = "/completed_data_erasure";
+				mvcRenderCommandName =
+					"/user_associated_data/completed_data_erasure";
 			}
 			else {
-				mvcRenderCommandName = "/anonymize_nonreviewable_uad_data";
+				mvcRenderCommandName =
+					"/user_associated_data/anonymize_nonreviewable_uad_data";
 			}
 		}
 
@@ -160,7 +163,7 @@ public abstract class BaseUADMVCActionCommand extends BaseMVCActionCommand {
 		for (String key : parameterMap.keySet()) {
 			if (key.startsWith("uadRegistryKey__")) {
 				entityTypes.add(
-					StringUtil.replace(key, "uadRegistryKey__", ""));
+					StringUtil.removeSubstring(key, "uadRegistryKey__"));
 			}
 		}
 
@@ -193,14 +196,14 @@ public abstract class BaseUADMVCActionCommand extends BaseMVCActionCommand {
 		return selectedUserHelper.getSelectedUserId(actionRequest);
 	}
 
-	protected UADAnonymizer getUADAnonymizer(
+	protected UADAnonymizer<?> getUADAnonymizer(
 		ActionRequest actionRequest, String entityType) {
 
 		return uadRegistry.getUADAnonymizer(
 			getUADRegistryKey(actionRequest, entityType));
 	}
 
-	protected UADDisplay getUADDisplay(
+	protected UADDisplay<?> getUADDisplay(
 		ActionRequest actionRequest, String entityType) {
 
 		return uadRegistry.getUADDisplay(

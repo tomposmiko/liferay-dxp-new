@@ -42,7 +42,6 @@ public abstract class DDMStructureLinkFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -65,14 +64,5 @@ public abstract class DDMStructureLinkFinderBaseImpl
 
 	@Reference
 	protected DDMStructureLinkPersistence ddmStructureLinkPersistence;
-
-	static {
-		try {
-			Class.forName(DDMPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

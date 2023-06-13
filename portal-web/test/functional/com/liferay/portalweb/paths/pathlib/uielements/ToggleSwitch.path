@@ -2,11 +2,13 @@
 <head>
 <title>ToggleSwitch</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">ToggleSwitch</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>ACCOUNT_STATUS</td>
@@ -26,6 +28,11 @@
 <tr>
 	<td>ANY_TOGGLE_SWITCH</td>
 	<td>//label[contains(.,'${key_toggleSwitchLabel}')]//input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_TOGGLE_SWITCH_IN_FIELDSET</td>
+	<td>//legend[normalize-space()='${key_fieldsetLabel}']//following-sibling::div//label[contains(.,'${key_fieldLabel}')]//input[contains(@type,'checkbox')]</td>
 	<td></td>
 </tr>
 <tr>

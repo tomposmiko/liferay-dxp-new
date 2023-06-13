@@ -3,11 +3,11 @@
 		{
 			"fields": [
 				{
-					"name": "itemSelector",
 					"label": "Content",
+					"name": "itemSelector",
 					"type": "itemSelector",
 					"typeOptions": {
-						"enableSelectTemplate":true
+						"enableSelectTemplate": true
 					}
 				}
 			]

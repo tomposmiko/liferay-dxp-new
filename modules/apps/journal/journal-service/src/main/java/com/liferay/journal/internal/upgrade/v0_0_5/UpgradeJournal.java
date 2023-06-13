@@ -15,6 +15,7 @@
 package com.liferay.journal.internal.upgrade.v0_0_5;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.service.DDMStorageLinkLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalService;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
@@ -151,8 +153,15 @@ public class UpgradeJournal extends UpgradeProcess {
 			long ddmStructureId = getDDMStructureId(
 				entry.getKey(), entry.getValue());
 
+			DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
+				ddmStructureId);
+
+			DDMStructureVersion ddmStructureVersion =
+				ddmStructure.getStructureVersion();
+
 			_ddmStorageLinkLocalService.addStorageLink(
-				journalArticleClassNameId, entry.getKey(), ddmStructureId,
+				journalArticleClassNameId, entry.getKey(),
+				ddmStructureVersion.getStructureVersionId(),
 				new ServiceContext());
 		}
 	}
@@ -210,19 +219,21 @@ public class UpgradeJournal extends UpgradeProcess {
 			long journalArticleClassNameId = PortalUtil.getClassNameId(
 				JournalArticle.class.getName());
 
-			StringBundler sb = new StringBundler(6);
+			StringBundler sb = new StringBundler(7);
 
 			sb.append("select DDMTemplate.templateId, JournalArticle.id_ ");
 			sb.append("from JournalArticle inner join DDMTemplate on (");
 			sb.append("DDMTemplate.groupId = JournalArticle.groupId and ");
 			sb.append("DDMTemplate.templateKey = ");
 			sb.append("JournalArticle.DDMTemplateKey and ");
-			sb.append("JournalArticle.classNameId != ?)");
+			sb.append("JournalArticle.classNameId != ? and ");
+			sb.append("DDMTemplate.classNameId = ?)");
 
 			try (PreparedStatement ps = connection.prepareStatement(
 					sb.toString())) {
 
 				ps.setLong(1, ddmStructureClassNameId);
+				ps.setLong(2, ddmStructureClassNameId);
 
 				try (ResultSet rs = ps.executeQuery()) {
 					while (rs.next()) {
@@ -443,8 +454,8 @@ public class UpgradeJournal extends UpgradeProcess {
 		throws Exception {
 
 		_resourceActions.read(
-			null, UpgradeJournal.class.getClassLoader(),
-			"/META-INF/resource-actions/journal_ddm_composite_models.xml");
+			UpgradeJournal.class.getClassLoader(),
+			"/resource-actions/journal_ddm_composite_models.xml");
 
 		List<String> modelNames = _resourceActions.getPortletModelResources(
 			JournalPortletKeys.JOURNAL);
@@ -475,9 +486,7 @@ public class UpgradeJournal extends UpgradeProcess {
 	protected void transformDateFieldValues(
 		List<Element> dynamicElementElements) {
 
-		if ((dynamicElementElements == null) ||
-			dynamicElementElements.isEmpty()) {
-
+		if (ListUtil.isEmpty(dynamicElementElements)) {
 			return;
 		}
 
@@ -584,11 +593,13 @@ public class UpgradeJournal extends UpgradeProcess {
 
 			while (rs.next()) {
 				long id = rs.getLong("id_");
-				long groupId = rs.getLong("groupId");
 				String content = rs.getString("content");
+
 				String ddmStructureKey = rs.getString("DDMStructureKey");
 
 				if (Validator.isNull(ddmStructureKey)) {
+					long groupId = rs.getLong("groupId");
+
 					content = convertStaticContentToDynamic(groupId, content);
 
 					updateJournalArticle(id, name, name, content);

@@ -21,10 +21,9 @@
 	clearResultsURL="<%= kaleoFormsAdminDisplayContext.getClearResultsURL() %>"
 	componentId="kaleoFormsManagementToolbar"
 	creationMenu="<%= kaleoFormsAdminDisplayContext.getCreationMenu() %>"
-	disabled="<%= kaleoFormsAdminDisplayContext.isDisabledManagementBar() %>"
 	filterDropdownItems="<%= kaleoFormsAdminDisplayContext.getFilterItemsDropdownItems() %>"
 	itemsTotal="<%= kaleoFormsAdminDisplayContext.getTotalItems() %>"
-	namespace="<%= renderResponse.getNamespace() %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	searchActionURL="<%= kaleoFormsAdminDisplayContext.getSearchActionURL() %>"
 	searchContainerId="<%= kaleoFormsAdminDisplayContext.getSearchContainerId() %>"
 	searchFormName="fm1"
@@ -33,7 +32,7 @@
 />
 
 <aui:script sandbox="<%= true %>">
-	var deleteKaleoProcess = function() {
+	var deleteKaleoProcess = function () {
 		if (
 			confirm(
 				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
@@ -55,19 +54,19 @@
 
 			submitForm(
 				form,
-				'<portlet:actionURL name="deleteKaleoProcess"><portlet:param name="mvcPath" value="/admin/view.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:actionURL>'
+				'<portlet:actionURL name="/kaleo_forms/delete_kaleo_process"><portlet:param name="mvcPath" value="/admin/view.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:actionURL>'
 			);
 		}
 	};
 
 	var ACTIONS = {
-		deleteKaleoProcess: deleteKaleoProcess
+		deleteKaleoProcess: deleteKaleoProcess,
 	};
 
-	Liferay.componentReady('kaleoFormsManagementToolbar').then(function(
+	Liferay.componentReady('kaleoFormsManagementToolbar').then(function (
 		managementToolbar
 	) {
-		managementToolbar.on(['actionItemClicked'], function(event) {
+		managementToolbar.on(['actionItemClicked'], function (event) {
 			var itemData = event.data.item.data;
 
 			if (itemData && itemData.action && ACTIONS[itemData.action]) {

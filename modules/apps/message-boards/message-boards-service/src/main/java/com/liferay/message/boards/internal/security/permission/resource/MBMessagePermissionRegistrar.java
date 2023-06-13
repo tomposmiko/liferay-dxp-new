@@ -27,6 +27,7 @@ import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBThreadLocalService;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.DynamicInheritancePermissionLogic;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
@@ -60,7 +61,8 @@ public class MBMessagePermissionRegistrar {
 		properties.put("model.class.name", MBMessage.class.getName());
 
 		_serviceRegistration = bundleContext.registerService(
-			ModelResourcePermission.class,
+			(Class<ModelResourcePermission<MBMessage>>)
+				(Class<?>)ModelResourcePermission.class,
 			ModelResourcePermissionFactory.create(
 				MBMessage.class, MBMessage::getMessageId,
 				(Long resourcePrimKey) -> {
@@ -82,6 +84,17 @@ public class MBMessagePermissionRegistrar {
 							if (_mbBanLocalService.hasBan(
 									message.getGroupId(),
 									permissionChecker.getUserId())) {
+
+								return false;
+							}
+
+							MBThread thread = message.getThread();
+
+							if (!message.isRoot() &&
+								!modelResourcePermission.contains(
+									permissionChecker,
+									thread.getRootMessageId(),
+									ActionKeys.VIEW)) {
 
 								return false;
 							}
@@ -157,7 +170,8 @@ public class MBMessagePermissionRegistrar {
 	@Reference(target = "(resource.name=" + MBConstants.RESOURCE_NAME + ")")
 	private PortletResourcePermission _portletResourcePermission;
 
-	private ServiceRegistration<ModelResourcePermission> _serviceRegistration;
+	private ServiceRegistration<ModelResourcePermission<MBMessage>>
+		_serviceRegistration;
 
 	@Reference
 	private StagingPermission _stagingPermission;

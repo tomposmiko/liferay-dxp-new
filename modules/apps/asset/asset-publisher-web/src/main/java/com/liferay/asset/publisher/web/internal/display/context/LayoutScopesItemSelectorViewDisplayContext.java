@@ -15,15 +15,14 @@
 package com.liferay.asset.publisher.web.internal.display.context;
 
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
+import com.liferay.item.selector.criteria.group.criterion.GroupItemSelectorCriterion;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
-import com.liferay.site.item.selector.criterion.SiteItemSelectorCriterion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +40,12 @@ public class LayoutScopesItemSelectorViewDisplayContext
 	public LayoutScopesItemSelectorViewDisplayContext(
 		HttpServletRequest httpServletRequest,
 		AssetPublisherHelper assetPublisherHelper,
-		SiteItemSelectorCriterion siteItemSelectorCriterion,
+		GroupItemSelectorCriterion groupItemSelectorCriterion,
 		String itemSelectedEventName, PortletURL portletURL) {
 
 		super(
-			httpServletRequest, assetPublisherHelper, siteItemSelectorCriterion,
-			itemSelectedEventName, portletURL);
+			httpServletRequest, assetPublisherHelper,
+			groupItemSelectorCriterion, itemSelectedEventName, portletURL);
 	}
 
 	@Override
@@ -116,8 +115,10 @@ public class LayoutScopesItemSelectorViewDisplayContext
 			return _privateLayout;
 		}
 
-		_privateLayout = ParamUtil.getBoolean(
-			httpServletRequest, "privateLayout");
+		GroupItemSelectorCriterion groupItemSelectorCriterion =
+			getGroupItemSelectorCriterion();
+
+		_privateLayout = groupItemSelectorCriterion.isPrivateLayout();
 
 		return _privateLayout;
 	}

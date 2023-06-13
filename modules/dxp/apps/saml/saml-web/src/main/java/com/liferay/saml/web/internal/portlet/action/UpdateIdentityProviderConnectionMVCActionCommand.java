@@ -21,9 +21,9 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.saml.constants.SamlPortletKeys;
 import com.liferay.saml.persistence.model.SamlSpIdpConnection;
 import com.liferay.saml.persistence.service.SamlSpIdpConnectionLocalService;
-import com.liferay.saml.web.internal.constants.SamlAdminPortletKeys;
 
 import java.io.InputStream;
 
@@ -39,8 +39,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + SamlAdminPortletKeys.SAML_ADMIN,
-		"mvc.command.name=/admin/updateIdentityProviderConnection"
+		"javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN,
+		"mvc.command.name=/admin/update_identity_provider_connection"
 	},
 	service = MVCActionCommand.class
 )
@@ -68,6 +68,8 @@ public class UpdateIdentityProviderConnectionMVCActionCommand
 			uploadPortletRequest, "forceAuthn");
 		boolean ldapImportEnabled = ParamUtil.getBoolean(
 			uploadPortletRequest, "ldapImportEnabled");
+		boolean unknownUsersAreStrangers = ParamUtil.getBoolean(
+			uploadPortletRequest, "unknownUsersAreStrangers");
 		String metadataUrl = ParamUtil.getString(
 			uploadPortletRequest, "metadataUrl");
 		InputStream metadataXmlInputStream =
@@ -88,15 +90,16 @@ public class UpdateIdentityProviderConnectionMVCActionCommand
 				samlIdpEntityId, assertionSignatureRequired, clockSkew, enabled,
 				forceAuthn, ldapImportEnabled, metadataUrl,
 				metadataXmlInputStream, name, nameIdFormat, signAuthnRequest,
-				userAttributeMappings, serviceContext);
+				unknownUsersAreStrangers, userAttributeMappings,
+				serviceContext);
 		}
 		else {
 			_samlSpIdpConnectionLocalService.updateSamlSpIdpConnection(
 				samlSpIdpConnectionId, samlIdpEntityId,
 				assertionSignatureRequired, clockSkew, enabled, forceAuthn,
 				ldapImportEnabled, metadataUrl, metadataXmlInputStream, name,
-				nameIdFormat, signAuthnRequest, userAttributeMappings,
-				serviceContext);
+				nameIdFormat, signAuthnRequest, unknownUsersAreStrangers,
+				userAttributeMappings, serviceContext);
 		}
 	}
 

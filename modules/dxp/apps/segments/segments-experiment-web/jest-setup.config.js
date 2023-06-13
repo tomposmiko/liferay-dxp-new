@@ -9,7 +9,7 @@
  * distribution rights of the Software.
  */
 
-window.Liferay.Util.sub = function(string = '', data) {
+window.Liferay.Util.sub = function (string = '', data) {
 	const REGEX_SUB = /(?<=-|^)x(?=-|\s)/g;
 
 	if (
@@ -30,7 +30,8 @@ window.Liferay.Util.sub = function(string = '', data) {
 
 				if (lastReplacement) {
 					return dataCopy.join('');
-				} else {
+				}
+				else {
 					return dataCopy.shift();
 				}
 		  })

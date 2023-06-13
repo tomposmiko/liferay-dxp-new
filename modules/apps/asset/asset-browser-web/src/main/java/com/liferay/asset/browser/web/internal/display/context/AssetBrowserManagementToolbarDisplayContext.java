@@ -14,24 +14,27 @@
 
 package com.liferay.asset.browser.web.internal.display.context;
 
-import com.liferay.asset.browser.web.internal.constants.AssetBrowserPortletKeys;
 import com.liferay.asset.constants.AssetWebKeys;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuUtil;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -39,7 +42,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
+import java.util.Objects;
 
+import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,10 +56,11 @@ public class AssetBrowserManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public AssetBrowserManagementToolbarDisplayContext(
-		HttpServletRequest httpServletRequest,
-		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
-		AssetBrowserDisplayContext assetBrowserDisplayContext) {
+			HttpServletRequest httpServletRequest,
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse,
+			AssetBrowserDisplayContext assetBrowserDisplayContext)
+		throws PortalException, PortletException {
 
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
@@ -64,8 +70,6 @@ public class AssetBrowserManagementToolbarDisplayContext
 
 		_assetHelper = (AssetHelper)httpServletRequest.getAttribute(
 			AssetWebKeys.ASSET_HELPER);
-		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
-			liferayPortletRequest);
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
@@ -75,6 +79,7 @@ public class AssetBrowserManagementToolbarDisplayContext
 		PortletURL clearResultsURL = getPortletURL();
 
 		clearResultsURL.setParameter("keywords", StringPool.BLANK);
+		clearResultsURL.setParameter("scope", StringPool.BLANK);
 
 		return clearResultsURL.toString();
 	}
@@ -96,13 +101,43 @@ public class AssetBrowserManagementToolbarDisplayContext
 			return null;
 		}
 
-		return CreationMenuUtil.addPrimaryDropdownItem(
+		return CreationMenuBuilder.addPrimaryDropdownItem(
 			dropdownItem -> {
 				dropdownItem.setHref(addButtonURL);
 				dropdownItem.setLabel(
 					LanguageUtil.format(
-						request, "add-x", _getAddButtonLabel(), false));
-			});
+						httpServletRequest, "add-x", _getAddButtonLabel(),
+						false));
+			}
+		).build();
+	}
+
+	@Override
+	public List<LabelItem> getFilterLabelItems() {
+		String scope = ParamUtil.getString(httpServletRequest, "scope");
+
+		if (Validator.isNull(scope) || scope.equals("current")) {
+			return null;
+		}
+
+		return LabelItemListBuilder.add(
+			labelItem -> {
+				PortletURL removeLabelURL = PortletURLUtil.clone(
+					getPortletURL(), liferayPortletResponse);
+
+				removeLabelURL.setParameter("scope", (String)null);
+
+				labelItem.putData("removeLabelURL", removeLabelURL.toString());
+
+				labelItem.setCloseable(true);
+
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(httpServletRequest, "scope"),
+					_getScopeLabel(scope));
+
+				labelItem.setLabel(label);
+			}
+		).build();
 	}
 
 	@Override
@@ -110,17 +145,33 @@ public class AssetBrowserManagementToolbarDisplayContext
 		long[] groupIds = _assetBrowserDisplayContext.getSelectedGroupIds();
 
 		if (groupIds.length <= 1) {
-			return null;
+			return DropdownItemListBuilder.add(
+				dropdownItem -> {
+					dropdownItem.setActive(_isEverywhereScopeFilter());
+					dropdownItem.setHref(
+						getPortletURL(), "scope", "everywhere");
+					dropdownItem.setLabel(
+						LanguageUtil.get(httpServletRequest, "everywhere"));
+				}
+			).add(
+				dropdownItem -> {
+					dropdownItem.setActive(!_isEverywhereScopeFilter());
+					dropdownItem.setHref(getPortletURL(), "scope", "current");
+					dropdownItem.setLabel(_getCurrentScopeLabel());
+				}
+			).build();
 		}
 
 		return new DropdownItemList() {
 			{
 				add(
 					dropdownItem -> {
-						dropdownItem.setActive(
-							_assetBrowserDisplayContext.getGroupId() == 0);
-						dropdownItem.setHref(getPortletURL(), "groupId", 0);
-						dropdownItem.setLabel(LanguageUtil.get(request, "all"));
+						dropdownItem.setActive(_isEverywhereScopeFilter());
+						dropdownItem.setHref(
+							getPortletURL(), "scope", "everywhere", "groupId",
+							null);
+						dropdownItem.setLabel(
+							LanguageUtil.get(httpServletRequest, "everywhere"));
 					});
 
 				for (long groupId : groupIds) {
@@ -136,7 +187,8 @@ public class AssetBrowserManagementToolbarDisplayContext
 								_assetBrowserDisplayContext.getGroupId() ==
 									groupId);
 							dropdownItem.setHref(
-								getPortletURL(), "groupId", groupId);
+								getPortletURL(), "groupId", groupId, "scope",
+								"current");
 							dropdownItem.setLabel(
 								HtmlUtil.escape(
 									group.getDescriptiveName(
@@ -170,71 +222,43 @@ public class AssetBrowserManagementToolbarDisplayContext
 	}
 
 	@Override
+	protected String getDisplayStyle() {
+		return _assetBrowserDisplayContext.getDisplayStyle();
+	}
+
+	@Override
 	protected String[] getDisplayViews() {
 		return new String[] {"list", "descriptive", "icon"};
 	}
 
 	@Override
 	protected String getFilterNavigationDropdownItemsLabel() {
-		return LanguageUtil.get(request, "sites");
+		return LanguageUtil.get(httpServletRequest, "sites-and-libraries");
 	}
 
 	@Override
 	protected String getOrderByCol() {
-		if (_orderByCol != null) {
-			return _orderByCol;
-		}
-
-		String orderByCol = ParamUtil.getString(
-			liferayPortletRequest, getOrderByColParam());
-
-		if (Validator.isNotNull(orderByCol)) {
-			_portalPreferences.setValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-col",
-				orderByCol);
-		}
-		else {
-			orderByCol = _portalPreferences.getValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-col",
-				"modified-date");
-		}
-
-		_orderByCol = orderByCol;
-
-		return _orderByCol;
+		return _assetBrowserDisplayContext.getOrderByCol();
 	}
 
 	@Override
 	protected String[] getOrderByKeys() {
-		return new String[] {"title", "modified-date"};
+		String[] orderColumns = {"title", "modified-date"};
+
+		if (_assetBrowserDisplayContext.isSearch()) {
+			orderColumns = ArrayUtil.append(orderColumns, "relevance");
+		}
+
+		return orderColumns;
 	}
 
 	@Override
 	protected String getOrderByType() {
-		if (_orderByType != null) {
-			return _orderByType;
-		}
-
-		String orderByType = ParamUtil.getString(
-			liferayPortletRequest, getOrderByTypeParam());
-
-		if (Validator.isNotNull(orderByType)) {
-			_portalPreferences.setValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-type",
-				orderByType);
-		}
-		else {
-			orderByType = _portalPreferences.getValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-type", "asc");
-		}
-
-		_orderByType = orderByType;
-
-		return _orderByType;
+		return _assetBrowserDisplayContext.getOrderByType();
 	}
 
 	private String _getAddButtonLabel() {
-		AssetRendererFactory assetRendererFactory =
+		AssetRendererFactory<?> assetRendererFactory =
 			_assetBrowserDisplayContext.getAssetRendererFactory();
 
 		if (assetRendererFactory.isSupportsClassTypes() &&
@@ -255,7 +279,7 @@ public class AssetBrowserManagementToolbarDisplayContext
 			groupId = _themeDisplay.getScopeGroupId();
 		}
 
-		AssetRendererFactory assetRendererFactory =
+		AssetRendererFactory<?> assetRendererFactory =
 			_assetBrowserDisplayContext.getAssetRendererFactory();
 
 		PortletURL addPortletURL = null;
@@ -291,11 +315,46 @@ public class AssetBrowserManagementToolbarDisplayContext
 			addPortletURL.toString(), "refererPlid", _themeDisplay.getPlid());
 	}
 
+	private String _getCurrentScopeLabel() {
+		Group group = _themeDisplay.getScopeGroup();
+
+		if (group.isSite()) {
+			return LanguageUtil.get(httpServletRequest, "current-site");
+		}
+
+		if (group.isOrganization()) {
+			return LanguageUtil.get(httpServletRequest, "current-organization");
+		}
+
+		if (group.isDepot()) {
+			return LanguageUtil.get(
+				httpServletRequest, "current-asset-library");
+		}
+
+		return LanguageUtil.get(httpServletRequest, "current-scope");
+	}
+
+	private String _getScopeLabel(String scope) {
+		if (scope.equals("everywhere")) {
+			return LanguageUtil.get(httpServletRequest, "everywhere");
+		}
+
+		return _getCurrentScopeLabel();
+	}
+
+	private boolean _isEverywhereScopeFilter() {
+		if (Objects.equals(
+				ParamUtil.getString(httpServletRequest, "scope"),
+				"everywhere")) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private final AssetBrowserDisplayContext _assetBrowserDisplayContext;
 	private final AssetHelper _assetHelper;
-	private String _orderByCol;
-	private String _orderByType;
-	private final PortalPreferences _portalPreferences;
 	private final ThemeDisplay _themeDisplay;
 
 }

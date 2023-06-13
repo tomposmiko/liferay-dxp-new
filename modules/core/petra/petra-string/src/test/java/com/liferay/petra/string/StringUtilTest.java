@@ -14,7 +14,9 @@
 
 package com.liferay.petra.string;
 
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +28,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -37,16 +40,19 @@ import org.junit.Test;
 public class StringUtilTest {
 
 	@ClassRule
-	public static final CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor() {
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new CodeCoverageAssertor() {
 
-			@Override
-			public void appendAssertClasses(List<Class<?>> assertClasses) {
-				assertClasses.add(CharPool.class);
-				assertClasses.add(StringPool.class);
-			}
+				@Override
+				public void appendAssertClasses(List<Class<?>> assertClasses) {
+					assertClasses.add(CharPool.class);
+					assertClasses.add(StringPool.class);
+				}
 
-		};
+			},
+			LiferayUnitTestRule.INSTANCE);
 
 	@Test
 	public void testConstructors() {
@@ -129,7 +135,7 @@ public class StringUtilTest {
 		Assert.assertEquals(
 			"5x",
 			StringUtil.merge(
-				new Object[] {5}, obj -> obj.toString() + "x", null));
+				new Object[] {5}, object -> object.toString() + "x", null));
 		Assert.assertEquals(
 			"a", StringUtil.merge(new ArrayList<>(Arrays.asList("a")), null));
 		Assert.assertEquals(
@@ -173,7 +179,7 @@ public class StringUtilTest {
 		Assert.assertEquals(
 			"5x,ax",
 			StringUtil.merge(
-				new Object[] {5, 'a'}, obj -> obj.toString() + "x",
+				new Object[] {5, 'a'}, object -> object.toString() + "x",
 				StringPool.COMMA));
 		Assert.assertEquals(
 			"a,b",

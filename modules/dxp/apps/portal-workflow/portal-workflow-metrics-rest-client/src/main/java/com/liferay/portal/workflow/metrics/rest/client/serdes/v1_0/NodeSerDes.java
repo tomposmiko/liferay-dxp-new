@@ -17,6 +17,9 @@ package com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Node;
 import com.liferay.portal.workflow.metrics.rest.client.json.BaseJSONParser;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -53,6 +56,37 @@ public class NodeSerDes {
 
 		sb.append("{");
 
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ssXX");
+
+		if (node.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateCreated\": ");
+
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(node.getDateCreated()));
+
+			sb.append("\"");
+		}
+
+		if (node.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\": ");
+
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(node.getDateModified()));
+
+			sb.append("\"");
+		}
+
 		if (node.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -73,6 +107,20 @@ public class NodeSerDes {
 			sb.append(node.getInitial());
 		}
 
+		if (node.getLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"label\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(node.getLabel()));
+
+			sb.append("\"");
+		}
+
 		if (node.getName() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -83,6 +131,30 @@ public class NodeSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(node.getName()));
+
+			sb.append("\"");
+		}
+
+		if (node.getProcessId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"processId\": ");
+
+			sb.append(node.getProcessId());
+		}
+
+		if (node.getProcessVersion() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"processVersion\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(node.getProcessVersion()));
 
 			sb.append("\"");
 		}
@@ -129,6 +201,27 @@ public class NodeSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ssXX");
+
+		if (node.getDateCreated() == null) {
+			map.put("dateCreated", null);
+		}
+		else {
+			map.put(
+				"dateCreated",
+				liferayToJSONDateFormat.format(node.getDateCreated()));
+		}
+
+		if (node.getDateModified() == null) {
+			map.put("dateModified", null);
+		}
+		else {
+			map.put(
+				"dateModified",
+				liferayToJSONDateFormat.format(node.getDateModified()));
+		}
+
 		if (node.getId() == null) {
 			map.put("id", null);
 		}
@@ -143,11 +236,32 @@ public class NodeSerDes {
 			map.put("initial", String.valueOf(node.getInitial()));
 		}
 
+		if (node.getLabel() == null) {
+			map.put("label", null);
+		}
+		else {
+			map.put("label", String.valueOf(node.getLabel()));
+		}
+
 		if (node.getName() == null) {
 			map.put("name", null);
 		}
 		else {
 			map.put("name", String.valueOf(node.getName()));
+		}
+
+		if (node.getProcessId() == null) {
+			map.put("processId", null);
+		}
+		else {
+			map.put("processId", String.valueOf(node.getProcessId()));
+		}
+
+		if (node.getProcessVersion() == null) {
+			map.put("processVersion", null);
+		}
+		else {
+			map.put("processVersion", String.valueOf(node.getProcessVersion()));
 		}
 
 		if (node.getTerminal() == null) {
@@ -184,7 +298,17 @@ public class NodeSerDes {
 			Node node, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "id")) {
+			if (Objects.equals(jsonParserFieldName, "dateCreated")) {
+				if (jsonParserFieldValue != null) {
+					node.setDateCreated(toDate((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
+				if (jsonParserFieldValue != null) {
+					node.setDateModified(toDate((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "id")) {
 				if (jsonParserFieldValue != null) {
 					node.setId(Long.valueOf((String)jsonParserFieldValue));
 				}
@@ -194,9 +318,25 @@ public class NodeSerDes {
 					node.setInitial((Boolean)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "label")) {
+				if (jsonParserFieldValue != null) {
+					node.setLabel((String)jsonParserFieldValue);
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					node.setName((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "processId")) {
+				if (jsonParserFieldValue != null) {
+					node.setProcessId(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "processVersion")) {
+				if (jsonParserFieldValue != null) {
+					node.setProcessVersion((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "terminal")) {
@@ -208,10 +348,6 @@ public class NodeSerDes {
 				if (jsonParserFieldValue != null) {
 					node.setType((String)jsonParserFieldValue);
 				}
-			}
-			else {
-				throw new IllegalArgumentException(
-					"Unsupported field name " + jsonParserFieldName);
 			}
 		}
 
@@ -241,7 +377,7 @@ public class NodeSerDes {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
-			sb.append("\":");
+			sb.append("\": ");
 
 			Object value = entry.getValue();
 
@@ -267,14 +403,17 @@ public class NodeSerDes {
 
 				sb.append("]");
 			}
-			else {
+			else if (value instanceof String) {
 				sb.append("\"");
 				sb.append(_escape(entry.getValue()));
 				sb.append("\"");
 			}
+			else {
+				sb.append(String.valueOf(entry.getValue()));
+			}
 
 			if (iterator.hasNext()) {
-				sb.append(",");
+				sb.append(", ");
 			}
 		}
 

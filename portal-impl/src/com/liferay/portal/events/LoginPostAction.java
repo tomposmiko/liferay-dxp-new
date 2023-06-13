@@ -61,14 +61,14 @@ public class LoginPostAction extends Action {
 				_log.debug("Running " + httpServletRequest.getRemoteUser());
 			}
 
-			HttpSession session = httpServletRequest.getSession();
+			HttpSession httpSession = httpServletRequest.getSession();
 
 			long companyId = PortalUtil.getCompanyId(httpServletRequest);
 			long userId = 0;
 
 			// Language
 
-			session.removeAttribute(WebKeys.LOCALE);
+			httpSession.removeAttribute(WebKeys.LOCALE);
 
 			// Live users
 
@@ -92,7 +92,7 @@ public class LoginPostAction extends Action {
 				).put(
 					"remoteHost", httpServletRequest.getRemoteHost()
 				).put(
-					"sessionId", session.getId()
+					"sessionId", httpSession.getId()
 				);
 
 				String userAgent = httpServletRequest.getHeader(
@@ -115,14 +115,28 @@ public class LoginPostAction extends Action {
 					userId = PortalUtil.getUserId(httpServletRequest);
 				}
 
-				UserLocalServiceUtil.addDefaultGroups(userId);
-				UserLocalServiceUtil.addDefaultRoles(userId);
-				UserLocalServiceUtil.addDefaultUserGroups(userId);
+				boolean reindex = false;
 
-				Indexer userIndexer = IndexerRegistryUtil.getIndexer(
-					User.class.getName());
+				User user = UserLocalServiceUtil.fetchUser(userId);
 
-				userIndexer.reindex(User.class.getName(), userId);
+				if (UserLocalServiceUtil.addDefaultGroups(user)) {
+					reindex = true;
+				}
+
+				if (UserLocalServiceUtil.addDefaultRoles(user)) {
+					reindex = true;
+				}
+
+				if (UserLocalServiceUtil.addDefaultUserGroups(user)) {
+					reindex = true;
+				}
+
+				if (reindex) {
+					Indexer<User> userIndexer = IndexerRegistryUtil.getIndexer(
+						User.class.getName());
+
+					userIndexer.reindex(User.class.getName(), userId);
+				}
 			}
 
 			User user = PortalUtil.getUser(httpServletRequest);
@@ -149,6 +163,12 @@ public class LoginPostAction extends Action {
 		Date now = new Date();
 
 		if (user.getPasswordModifiedDate() == null) {
+			HttpSession httpSession = httpServletRequest.getSession(false);
+
+			if (httpSession != null) {
+				now = new Date(httpSession.getCreationTime());
+			}
+
 			user.setPasswordModifiedDate(now);
 
 			UserLocalServiceUtil.updateUser(user);

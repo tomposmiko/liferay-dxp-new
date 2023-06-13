@@ -30,7 +30,6 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.StringEntityField;
 import com.liferay.portal.odata.filter.expression.BinaryExpression;
 import com.liferay.portal.odata.filter.expression.ExpressionVisitException;
-import com.liferay.portal.odata.filter.expression.ExpressionVisitor;
 import com.liferay.portal.odata.filter.expression.LambdaFunctionExpression;
 import com.liferay.portal.odata.filter.expression.LiteralExpression;
 import com.liferay.portal.odata.filter.expression.MemberExpression;
@@ -44,6 +43,7 @@ import com.liferay.portal.odata.internal.filter.expression.LambdaVariableExpress
 import com.liferay.portal.odata.internal.filter.expression.LiteralExpressionImpl;
 import com.liferay.portal.odata.internal.filter.expression.MemberExpressionImpl;
 import com.liferay.portal.odata.internal.filter.expression.PrimitivePropertyExpressionImpl;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.text.SimpleDateFormat;
 
@@ -59,12 +59,19 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Rubén Pulido
  */
 public class ExpressionVisitorImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testVisitBinaryExpressionOperationWithAndOperation() {
@@ -434,7 +441,7 @@ public class ExpressionVisitorImplTest {
 		CollectionEntityField collectionEntityField =
 			(CollectionEntityField)entityFieldsMap.get("keywords");
 
-		ExpressionVisitor expressionVisitor = new ExpressionVisitorImpl(
+		ExpressionVisitorImpl expressionVisitorImpl = new ExpressionVisitorImpl(
 			new SimpleDateFormat("yyyyMMddHHmmss"), LocaleUtil.getDefault(),
 			new EntityModel() {
 
@@ -452,7 +459,7 @@ public class ExpressionVisitorImplTest {
 			});
 
 		TermFilter termFilter =
-			(TermFilter)expressionVisitor.visitLambdaFunctionExpression(
+			(TermFilter)expressionVisitorImpl.visitLambdaFunctionExpression(
 				lambdaFunctionExpression.getType(),
 				lambdaFunctionExpression.getVariableName(),
 				lambdaFunctionExpression.getExpression());
@@ -529,7 +536,7 @@ public class ExpressionVisitorImplTest {
 
 		EntityField entityField1 = entityFieldsMap.get("keywords");
 
-		ExpressionVisitor expressionVisitor = new ExpressionVisitorImpl(
+		ExpressionVisitorImpl expressionVisitorImpl = new ExpressionVisitorImpl(
 			new SimpleDateFormat("yyyyMMddHHmmss"), LocaleUtil.getDefault(),
 			new EntityModel() {
 
@@ -549,7 +556,7 @@ public class ExpressionVisitorImplTest {
 			new LambdaVariableExpressionImpl("k"));
 
 		EntityField entityField2 =
-			(EntityField)expressionVisitor.visitMemberExpression(
+			(EntityField)expressionVisitorImpl.visitMemberExpression(
 				memberExpression);
 
 		Assert.assertNotNull(entityField2);

@@ -15,7 +15,9 @@
 package com.liferay.petra.io.unsync;
 
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.lang.reflect.Field;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -33,8 +36,10 @@ import org.junit.Test;
 public class UnsyncBufferedInputStreamTest extends BaseInputStreamTestCase {
 
 	@ClassRule
-	public static final CodeCoverageAssertor codeCoverageAssertor =
-		CodeCoverageAssertor.INSTANCE;
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@Test
 	public void testBlockRead() throws IOException {
@@ -86,7 +91,8 @@ public class UnsyncBufferedInputStreamTest extends BaseInputStreamTestCase {
 			Assert.assertEquals(i, buffer[i - 10]);
 		}
 
-		Assert.assertEquals(_SIZE - size * 2, byteArrayInputStream.available());
+		Assert.assertEquals(
+			_SIZE - (size * 2), byteArrayInputStream.available());
 		Assert.assertEquals(_SIZE - 15, unsyncBufferedInputStream.available());
 
 		// Fill the buffer
@@ -101,7 +107,8 @@ public class UnsyncBufferedInputStreamTest extends BaseInputStreamTestCase {
 			Assert.assertEquals(i, buffer[i - 15]);
 		}
 
-		Assert.assertEquals(_SIZE - size * 3, byteArrayInputStream.available());
+		Assert.assertEquals(
+			_SIZE - (size * 3), byteArrayInputStream.available());
 		Assert.assertEquals(_SIZE - 25, unsyncBufferedInputStream.available());
 
 		// Leave 5 bytes
@@ -118,6 +125,7 @@ public class UnsyncBufferedInputStreamTest extends BaseInputStreamTestCase {
 		read = unsyncBufferedInputStream.read(buffer);
 
 		Assert.assertEquals(5, read);
+
 		Assert.assertEquals(-1, unsyncBufferedInputStream.read(buffer));
 
 		// Mark and EOF
@@ -290,7 +298,7 @@ public class UnsyncBufferedInputStreamTest extends BaseInputStreamTestCase {
 			bufferSize, _indexField.getInt(unsyncBufferedInputStream));
 
 		Assert.assertEquals(
-			_SIZE - bufferSize * 2, unsyncBufferedInputStream.available());
+			_SIZE - (bufferSize * 2), unsyncBufferedInputStream.available());
 		Assert.assertEquals(
 			-1, _markLimitIndexField.getInt(unsyncBufferedInputStream));
 
@@ -377,7 +385,8 @@ public class UnsyncBufferedInputStreamTest extends BaseInputStreamTestCase {
 			Assert.assertEquals(i, unsyncBufferedInputStream.read());
 		}
 
-		Assert.assertEquals(_SIZE - size * 2, byteArrayInputStream.available());
+		Assert.assertEquals(
+			_SIZE - (size * 2), byteArrayInputStream.available());
 		Assert.assertEquals(
 			_SIZE - size - 1, unsyncBufferedInputStream.available());
 
@@ -452,7 +461,7 @@ public class UnsyncBufferedInputStreamTest extends BaseInputStreamTestCase {
 		// Clear out buffer
 
 		Assert.assertEquals(
-			size * 2 - 1, unsyncBufferedInputStream.skip(size * 2));
+			(size * 2) - 1, unsyncBufferedInputStream.skip(size * 2));
 
 		// Mark a large size for EOF
 

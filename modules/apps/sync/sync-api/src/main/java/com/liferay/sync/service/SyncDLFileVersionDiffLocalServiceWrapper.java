@@ -47,6 +47,10 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	/**
 	 * Adds the sync dl file version diff to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SyncDLFileVersionDiffLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param syncDLFileVersionDiff the sync dl file version diff
 	 * @return the sync dl file version diff that was added
 	 */
@@ -58,6 +62,18 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 
 		return _syncDLFileVersionDiffLocalService.addSyncDLFileVersionDiff(
 			syncDLFileVersionDiff);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _syncDLFileVersionDiffLocalService.createPersistedModel(
+			primaryKeyObj);
 	}
 
 	/**
@@ -97,6 +113,10 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 	/**
 	 * Deletes the sync dl file version diff with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SyncDLFileVersionDiffLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param syncDLFileVersionDiffId the primary key of the sync dl file version diff
 	 * @return the sync dl file version diff that was removed
 	 * @throws PortalException if a sync dl file version diff with the primary key could not be found
@@ -112,6 +132,10 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 
 	/**
 	 * Deletes the sync dl file version diff from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SyncDLFileVersionDiffLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param syncDLFileVersionDiff the sync dl file version diff
 	 * @return the sync dl file version diff that was removed
@@ -134,6 +158,18 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 
 		_syncDLFileVersionDiffLocalService.deleteSyncDLFileVersionDiffs(
 			fileEntryId);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _syncDLFileVersionDiffLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _syncDLFileVersionDiffLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -271,6 +307,9 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 		return _syncDLFileVersionDiffLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -336,6 +375,10 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 
 	/**
 	 * Updates the sync dl file version diff in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SyncDLFileVersionDiffLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param syncDLFileVersionDiff the sync dl file version diff
 	 * @return the sync dl file version diff that was updated

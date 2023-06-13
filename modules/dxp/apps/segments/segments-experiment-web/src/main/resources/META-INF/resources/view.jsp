@@ -22,7 +22,7 @@
 
 		<span><liferay-ui:message key="ab-test" /></span>
 
-		<aui:icon cssClass="icon-monospaced sidenav-close" image="times" markupView="lexicon" url="javascript:;" />
+		<aui:icon aria-label='<%= LanguageUtil.get(request, "close") %>' cssClass="icon-monospaced sidenav-close" image="times" markupView="lexicon" url="javascript:;" />
 	</div>
 
 	<div class="sidebar-body">
@@ -41,21 +41,21 @@
 		segmentsExperimentPanelToggle
 	);
 
-	sidenavInstance.on('open.lexicon.sidenav', function(event) {
+	sidenavInstance.on('open.lexicon.sidenav', function (event) {
 		Liferay.Util.Session.set(
 			'com.liferay.segments.experiment.web_panelState',
 			'open'
 		);
 	});
 
-	sidenavInstance.on('closed.lexicon.sidenav', function(event) {
+	sidenavInstance.on('closed.lexicon.sidenav', function (event) {
 		Liferay.Util.Session.set(
 			'com.liferay.segments.experiment.web_panelState',
 			'closed'
 		);
 	});
 
-	Liferay.once('screenLoad', function() {
+	Liferay.once('screenLoad', function () {
 		Liferay.SideNavigation.destroy(segmentsExperimentPanelToggle);
 	});
 </aui:script>

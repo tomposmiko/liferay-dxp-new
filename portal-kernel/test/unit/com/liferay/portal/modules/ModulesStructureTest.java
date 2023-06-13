@@ -15,13 +15,13 @@
 package com.liferay.portal.modules;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,6 +45,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -108,6 +110,55 @@ public class ModulesStructureTest {
 					_checkoutPrivateAppsDirs, StringUtil.split(dirs));
 			}
 		}
+	}
+
+	@Test
+	public void testScanArchivedProjects() throws IOException {
+		Path archivedPath = _modulesDirPath.resolve("apps/archived");
+
+		if (!Files.exists(archivedPath)) {
+			return;
+		}
+
+		Files.walkFileTree(
+			archivedPath, EnumSet.noneOf(FileVisitOption.class), 2,
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult visitFile(
+						Path path, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					if (Files.isDirectory(path)) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					String fileName = String.valueOf(path.getFileName());
+
+					if (!StringUtil.startsWith(fileName, ".lfrbuild-portal")) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					if (StringUtil.endsWith(fileName, "-deprecated")) {
+						return FileVisitResult.CONTINUE;
+					}
+
+					Files.move(
+						path,
+						path.resolveSibling(".lfrbuild-portal-deprecated"));
+
+					StringBundler sb = new StringBundler(3);
+
+					sb.append("Renamed archived module build marker to ");
+					sb.append("'.lfrbuild-portal-deprecated' ");
+					sb.append(path);
+
+					Assert.fail(sb.toString());
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
 	}
 
 	@Test
@@ -407,7 +458,9 @@ public class ModulesStructureTest {
 					}
 					else if (StringUtil.startsWith(
 								dirName, "frontend-theme-") &&
-							 Files.exists(dirPath.resolve("gulpfile.js"))) {
+							 Files.exists(dirPath.resolve("gulpfile.js")) &&
+							 !Files.exists(
+								 dirPath.resolve(".lfrbuild-releng-ignore"))) {
 
 						_testThemeIgnoreFiles(
 							dirPath, themeGitIgnoreTemplate,
@@ -463,10 +516,8 @@ public class ModulesStructureTest {
 
 							Assert.assertFalse(
 								StringBundler.concat(
-									"Please rename ", String.valueOf(path),
-									" to ",
-									String.valueOf(
-										path.resolveSibling(entry.getValue()))),
+									"Please rename ", path, " to ",
+									path.resolveSibling(entry.getValue())),
 								Files.exists(path));
 						}
 					}
@@ -623,7 +674,7 @@ public class ModulesStructureTest {
 		}
 
 		StringBundler sb = new StringBundler(
-			gitIgnoreLines.size() * 2 + pluginDirNames.size() * 14);
+			(gitIgnoreLines.size() * 2) + (pluginDirNames.size() * 14));
 
 		if (SetUtil.isNotEmpty(gitIgnoreLines)) {
 			for (String line : gitIgnoreLines) {
@@ -704,7 +755,7 @@ public class ModulesStructureTest {
 
 		if (!sortedBuildExtGradleFileNames.isEmpty()) {
 			StringBundler sb = new StringBundler(
-				4 * sortedBuildExtGradleFileNames.size() + 2);
+				(4 * sortedBuildExtGradleFileNames.size()) + 2);
 
 			sb.append(buildGradleTemplate);
 			sb.append(StringPool.NEW_LINE);
@@ -750,7 +801,7 @@ public class ModulesStructureTest {
 
 			});
 
-		StringBundler sb = new StringBundler(pluginNames.size() * 4 - 1);
+		StringBundler sb = new StringBundler((pluginNames.size() * 4) - 1);
 
 		int i = 0;
 
@@ -799,6 +850,25 @@ public class ModulesStructureTest {
 			projectPathPrefix, File.separatorChar, CharPool.COLON);
 
 		return ":" + projectPathPrefix;
+	}
+
+	private boolean _hasGitCommitMarkerFile(Path dirPath) {
+		while (dirPath != null) {
+			if (dirPath.equals(_modulesDirPath)) {
+				return false;
+			}
+
+			Path gitRepoPath = dirPath.resolve(
+				"git-commit-" + String.valueOf(dirPath.getFileName()));
+
+			if (Files.exists(gitRepoPath)) {
+				return true;
+			}
+
+			dirPath = dirPath.getParent();
+		}
+
+		return false;
 	}
 
 	private boolean _isEmptyGitRepo(Path dirPath) {
@@ -923,6 +993,7 @@ public class ModulesStructureTest {
 			name.equals("com.liferay.arquillian.extension.junit.bridge") ||
 			name.equals("com.liferay.gradle.plugins.defaults") ||
 			name.equals("com.liferay.portal.cache.test.util") ||
+			name.equals("com.liferay.poshi.core") ||
 			name.equals("com.liferay.whip") ||
 			!name.startsWith("com.liferay.")) {
 
@@ -931,7 +1002,7 @@ public class ModulesStructureTest {
 
 		if (_isInModulesRootDir(dirPath, "sdk", "third-party", "util") ||
 			Files.exists(dirPath.resolve(".lfrbuild-ci")) ||
-			_isInGitRepoReadOnly(dirPath) ||
+			_hasGitCommitMarkerFile(dirPath) || _isInGitRepoReadOnly(dirPath) ||
 			_isInPrivateModulesCheckoutDir(dirPath)) {
 
 			return false;
@@ -1012,8 +1083,7 @@ public class ModulesStructureTest {
 				String name = line.substring(2, end);
 
 				Assert.assertTrue(
-					StringBundler.concat(
-						"Incorrect \"", line, "\" in ", String.valueOf(path)),
+					StringBundler.concat("Incorrect \"", line, "\" in ", path),
 					Files.exists(dirPath.resolve(name)));
 			}
 		}
@@ -1036,6 +1106,13 @@ public class ModulesStructureTest {
 		Path gradlePropertiesPath = dirPath.resolve("gradle.properties");
 		Path settingsGradlePath = dirPath.resolve("settings.gradle");
 
+		if (!Files.exists(buildGradlePath) &&
+			!Files.exists(gradlePropertiesPath) &&
+			!Files.exists(settingsGradlePath)) {
+
+			return;
+		}
+
 		if (!dxpRepo && !privateRepo && !readOnlyRepo) {
 			String buildGradle = ModulesStructureTestUtil.read(buildGradlePath);
 
@@ -1045,165 +1122,9 @@ public class ModulesStructureTest {
 				buildGradle);
 		}
 
-		String gradleProperties = ModulesStructureTestUtil.read(
-			gradlePropertiesPath);
-
-		Assert.assertEquals(
-			"Forbidden leading or trailing whitespaces in " +
-				gradlePropertiesPath,
-			gradleProperties.trim(), gradleProperties);
-
-		String gradlePropertiesPrefix = StringUtil.replace(
-			String.valueOf(dirPath.getFileName()), CharPool.DASH,
-			CharPool.PERIOD);
-
-		gradlePropertiesPrefix = "com.liferay." + gradlePropertiesPrefix;
-
-		Pattern gradlePropertiesPattern = Pattern.compile(
-			StringUtil.replace(gradlePropertiesPrefix, CharPool.PERIOD, "\\.") +
-				"(\\.[a-z0-9]+)+");
-
-		String previousKey = null;
-		String projectGroup = null;
-		String projectPathPrefix = null;
-		String repositoryPrivatePassword = null;
-		String repositoryPrivateUrl = null;
-		String repositoryPrivateUsername = null;
-
-		String[] lines = StringUtil.split(gradleProperties, CharPool.NEW_LINE);
-
-		for (int i = 0; i < lines.length; i++) {
-			String line = lines[i];
-
-			Assert.assertEquals(
-				StringBundler.concat(
-					"Forbidden leading or trailing whitespaces in line ",
-					String.valueOf(i + 1), " of ",
-					String.valueOf(gradlePropertiesPath)),
-				line.trim(), line);
-
-			Assert.assertFalse(
-				"Forbidden empty line in " + gradlePropertiesPath,
-				Validator.isNull(line));
-
-			int pos = line.indexOf(CharPool.EQUAL);
-
-			Assert.assertTrue(
-				StringBundler.concat(
-					"Incorrect line \"", line, "\" in ",
-					String.valueOf(gradlePropertiesPath)),
-				pos != -1);
-
-			String key = line.substring(0, pos);
-			String value = line.substring(pos + 1);
-
-			Assert.assertTrue(
-				gradlePropertiesPath +
-					" contains duplicate lines or is not sorted",
-				(previousKey == null) || (key.compareTo(previousKey) > 0));
-
-			if (key.equals(_GIT_REPO_GRADLE_PROJECT_GROUP_KEY)) {
-				projectGroup = value;
-			}
-			else if (key.equals(_GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY)) {
-				projectPathPrefix = value;
-			}
-			else if ((dxpRepo || privateRepo) &&
-					 key.equals(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_PASSWORD)) {
-
-				repositoryPrivatePassword = value;
-			}
-			else if ((dxpRepo || privateRepo) &&
-					 key.equals(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_URL)) {
-
-				repositoryPrivateUrl = value;
-			}
-			else if ((dxpRepo || privateRepo) &&
-					 key.equals(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_USERNAME)) {
-
-				repositoryPrivateUsername = value;
-			}
-			else {
-				Matcher matcher = gradlePropertiesPattern.matcher(key);
-
-				StringBundler sb = new StringBundler(
-					(_gitRepoGradlePropertiesKeys.size() + 5) * 3 + 8);
-
-				sb.append("Incorrect key \"");
-				sb.append(key);
-				sb.append("\" in ");
-				sb.append(gradlePropertiesPath);
-				sb.append(". Allowed keys are: ");
-
-				List<String> allowedKeys = new ArrayList<>(
-					_gitRepoGradlePropertiesKeys);
-
-				allowedKeys.add(_GIT_REPO_GRADLE_PROJECT_GROUP_KEY);
-				allowedKeys.add(_GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY);
-
-				if (dxpRepo || privateRepo) {
-					allowedKeys.add(
-						_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_PASSWORD);
-					allowedKeys.add(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_URL);
-					allowedKeys.add(
-						_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_USERNAME);
-				}
-
-				Collections.sort(allowedKeys);
-
-				for (String allowedKey : allowedKeys) {
-					sb.append(CharPool.QUOTE);
-					sb.append(allowedKey);
-					sb.append("\", ");
-				}
-
-				sb.append(", keys ending with \".version\", and keys ");
-				sb.append("matching the pattern \"");
-				sb.append(gradlePropertiesPattern.pattern());
-				sb.append("\".");
-
-				Assert.assertFalse(
-					sb.toString(),
-					!_gitRepoGradlePropertiesKeys.contains(key) &&
-					!key.endsWith(".ignore.local") &&
-					!key.endsWith(".version") && !matcher.matches());
-			}
-
-			previousKey = key;
-		}
-
-		_testGitRepoProjectGroup(
-			StringBundler.concat(
-				"Property \"", _GIT_REPO_GRADLE_PROJECT_GROUP_KEY, "\" in ",
-				String.valueOf(gradlePropertiesPath)),
-			projectGroup);
-
-		// TODO Remove workaround for 7.1 after commerce is merged
-
-		String expectedProjectPathPrefix = _getProjectPathPrefix(dirPath);
-
-		if (!Objects.equals(expectedProjectPathPrefix, ":dxp:apps:commerce")) {
-			Assert.assertEquals(
-				StringBundler.concat(
-					"Incorrect \"", _GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY,
-					"\" in ", String.valueOf(gradlePropertiesPath)),
-				expectedProjectPathPrefix, projectPathPrefix);
-		}
-
-		// TODO Remove the check for 7.0 once osb-loop and osb-testray are fixed
-
-		if (!_branchName.startsWith("7.0") && (dxpRepo || privateRepo)) {
-			_testGradleBuildProperty(
-				gradlePropertiesPath,
-				_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_PASSWORD,
-				repositoryPrivatePassword, "build.repository.private.password");
-			_testGradleBuildProperty(
-				gradlePropertiesPath, _GIT_REPO_GRADLE_REPOSITORY_PRIVATE_URL,
-				repositoryPrivateUrl, "build.repository.private.url");
-			_testGradleBuildProperty(
-				gradlePropertiesPath,
-				_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_USERNAME,
-				repositoryPrivateUsername, "build.repository.private.username");
+		if (Files.exists(gradlePropertiesPath)) {
+			_testGradleBuildProperties(
+				dirPath, gradlePropertiesPath, dxpRepo, privateRepo);
 		}
 
 		if (Files.notExists(dirPath.resolve("settings-ext.gradle"))) {
@@ -1284,6 +1205,171 @@ public class ModulesStructureTest {
 			matcher.matches());
 	}
 
+	private void _testGradleBuildProperties(
+			Path dirPath, Path gradlePropertiesPath, boolean dxpRepo,
+			boolean privateRepo)
+		throws IOException {
+
+		String gradleProperties = ModulesStructureTestUtil.read(
+			gradlePropertiesPath);
+
+		Assert.assertEquals(
+			"Forbidden leading or trailing whitespaces in " +
+				gradlePropertiesPath,
+			gradleProperties.trim(), gradleProperties);
+
+		String gradlePropertiesPrefix = StringUtil.replace(
+			String.valueOf(dirPath.getFileName()), CharPool.DASH,
+			CharPool.PERIOD);
+
+		gradlePropertiesPrefix = "com.liferay." + gradlePropertiesPrefix;
+
+		Pattern gradlePropertiesPattern = Pattern.compile(
+			StringUtil.replace(gradlePropertiesPrefix, CharPool.PERIOD, "\\.") +
+				"(\\.[a-z0-9]+)+");
+
+		String previousKey = null;
+		String projectGroup = null;
+		String projectPathPrefix = null;
+		String repositoryPrivatePassword = null;
+		String repositoryPrivateUrl = null;
+		String repositoryPrivateUserName = null;
+
+		String[] lines = StringUtil.split(gradleProperties, CharPool.NEW_LINE);
+
+		for (int i = 0; i < lines.length; i++) {
+			String line = lines[i];
+
+			Assert.assertEquals(
+				StringBundler.concat(
+					"Forbidden leading or trailing whitespaces in line ", i + 1,
+					" of ", gradlePropertiesPath),
+				line.trim(), line);
+
+			Assert.assertFalse(
+				"Forbidden empty line in " + gradlePropertiesPath,
+				Validator.isNull(line));
+
+			int pos = line.indexOf(CharPool.EQUAL);
+
+			Assert.assertTrue(
+				StringBundler.concat(
+					"Incorrect line \"", line, "\" in ", gradlePropertiesPath),
+				pos != -1);
+
+			String key = line.substring(0, pos);
+			String value = line.substring(pos + 1);
+
+			Assert.assertTrue(
+				gradlePropertiesPath +
+					" contains duplicate lines or is not sorted",
+				(previousKey == null) || (key.compareTo(previousKey) > 0));
+
+			if (key.equals(_GIT_REPO_GRADLE_PROJECT_GROUP_KEY)) {
+				projectGroup = value;
+			}
+			else if (key.equals(_GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY)) {
+				projectPathPrefix = value;
+			}
+			else if ((dxpRepo || privateRepo) &&
+					 key.equals(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_PASSWORD)) {
+
+				repositoryPrivatePassword = value;
+			}
+			else if ((dxpRepo || privateRepo) &&
+					 key.equals(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_URL)) {
+
+				repositoryPrivateUrl = value;
+			}
+			else if ((dxpRepo || privateRepo) &&
+					 key.equals(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_USERNAME)) {
+
+				repositoryPrivateUserName = value;
+			}
+			else {
+				Matcher matcher = gradlePropertiesPattern.matcher(key);
+
+				StringBundler sb = new StringBundler(
+					((_gitRepoGradlePropertiesKeys.size() + 5) * 3) + 8);
+
+				sb.append("Incorrect key \"");
+				sb.append(key);
+				sb.append("\" in ");
+				sb.append(gradlePropertiesPath);
+				sb.append(". Allowed keys are: ");
+
+				List<String> allowedKeys = new ArrayList<>(
+					_gitRepoGradlePropertiesKeys);
+
+				allowedKeys.add(_GIT_REPO_GRADLE_PROJECT_GROUP_KEY);
+				allowedKeys.add(_GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY);
+
+				if (dxpRepo || privateRepo) {
+					allowedKeys.add(
+						_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_PASSWORD);
+					allowedKeys.add(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_URL);
+					allowedKeys.add(
+						_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_USERNAME);
+				}
+
+				Collections.sort(allowedKeys);
+
+				for (String allowedKey : allowedKeys) {
+					sb.append(CharPool.QUOTE);
+					sb.append(allowedKey);
+					sb.append("\", ");
+				}
+
+				sb.append(", keys ending with \".version\", and keys ");
+				sb.append("matching the pattern \"");
+				sb.append(gradlePropertiesPattern.pattern());
+				sb.append("\".");
+
+				Assert.assertFalse(
+					sb.toString(),
+					!_gitRepoGradlePropertiesKeys.contains(key) &&
+					!key.endsWith(".ignore.local") &&
+					!key.endsWith(".version") && !matcher.matches());
+			}
+
+			previousKey = key;
+		}
+
+		_testGitRepoProjectGroup(
+			StringBundler.concat(
+				"Property \"", _GIT_REPO_GRADLE_PROJECT_GROUP_KEY, "\" in ",
+				gradlePropertiesPath),
+			projectGroup);
+
+		// TODO Remove workaround for 7.1 after commerce is merged
+
+		String expectedProjectPathPrefix = _getProjectPathPrefix(dirPath);
+
+		if (!Objects.equals(expectedProjectPathPrefix, ":dxp:apps:commerce")) {
+			Assert.assertEquals(
+				StringBundler.concat(
+					"Incorrect \"", _GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY,
+					"\" in ", gradlePropertiesPath),
+				expectedProjectPathPrefix, projectPathPrefix);
+		}
+
+		// TODO Remove the check for 7.0 once osb-loop and osb-testray are fixed
+
+		if (!_branchName.startsWith("7.0") && (dxpRepo || privateRepo)) {
+			_testGradleBuildProperty(
+				gradlePropertiesPath,
+				_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_PASSWORD,
+				repositoryPrivatePassword, "build.repository.private.password");
+			_testGradleBuildProperty(
+				gradlePropertiesPath, _GIT_REPO_GRADLE_REPOSITORY_PRIVATE_URL,
+				repositoryPrivateUrl, "build.repository.private.url");
+			_testGradleBuildProperty(
+				gradlePropertiesPath,
+				_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_USERNAME,
+				repositoryPrivateUserName, "build.repository.private.username");
+		}
+	}
+
 	private void _testGradleBuildProperty(
 		Path gradlePropertiesPath, String key, String value,
 		String buildPropertyKey) {
@@ -1293,8 +1379,7 @@ public class ModulesStructureTest {
 		if (Validator.isNotNull(expectedValue) && Validator.isNotNull(value)) {
 			Assert.assertEquals(
 				StringBundler.concat(
-					"Incorrect \"", key, "\" in ",
-					String.valueOf(gradlePropertiesPath)),
+					"Incorrect \"", key, "\" in ", gradlePropertiesPath),
 				expectedValue, value);
 		}
 	}
@@ -1304,8 +1389,8 @@ public class ModulesStructureTest {
 
 		Assert.assertFalse(
 			StringBundler.concat(
-				"Incorrect repository URL in ", String.valueOf(path),
-				", please use ", _REPOSITORY_URL, " instead"),
+				"Incorrect repository URL in ", path, ", please use ",
+				_REPOSITORY_URL, " instead"),
 			content.contains("plugins.gradle.org/m2"));
 
 		Assert.assertFalse(
@@ -1399,7 +1484,7 @@ public class ModulesStructureTest {
 				}
 				else {
 					sb = new StringBundler(
-						allowedConfigurationsMap.size() * 4 + 4);
+						(allowedConfigurationsMap.size() * 4) + 4);
 
 					sb.append("Incorrect configuration of dependency {");
 					sb.append(gradleDependency);

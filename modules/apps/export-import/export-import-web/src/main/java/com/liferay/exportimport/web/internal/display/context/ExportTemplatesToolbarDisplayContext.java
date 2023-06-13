@@ -14,7 +14,7 @@
 
 package com.liferay.exportimport.web.internal.display.context;
 
-import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
+import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalServiceUtil;
 import com.liferay.exportimport.util.comparator.ExportImportConfigurationNameComparator;
@@ -22,6 +22,7 @@ import com.liferay.exportimport.web.internal.search.ExportImportConfigurationDis
 import com.liferay.exportimport.web.internal.search.ExportImportConfigurationSearchTerms;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.BaseManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -69,25 +70,22 @@ public class ExportTemplatesToolbarDisplayContext
 
 	@Override
 	public CreationMenu getCreationMenu() {
-		return new CreationMenu() {
-			{
+		return CreationMenuBuilder.addPrimaryDropdownItem(
+			dropdownItem -> {
 				GroupDisplayContextHelper groupDisplayContextHelper =
-					new GroupDisplayContextHelper(request);
+					new GroupDisplayContextHelper(httpServletRequest);
 
-				addPrimaryDropdownItem(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							getRenderURL(), "mvcRenderCommandName",
-							"editExportConfiguration", Constants.CMD,
-							Constants.ADD, "groupId",
-							groupDisplayContextHelper.getGroupId(),
-							"liveGroupId",
-							groupDisplayContextHelper.getLiveGroupId(),
-							"privateLayout", Boolean.FALSE.toString());
-						dropdownItem.setLabel(LanguageUtil.get(request, "new"));
-					});
+				dropdownItem.setHref(
+					getRenderURL(), "mvcRenderCommandName",
+					"editExportConfiguration", Constants.CMD, Constants.ADD,
+					"groupId", groupDisplayContextHelper.getGroupId(),
+					"liveGroupId", groupDisplayContextHelper.getLiveGroupId(),
+					"privateLayout", Boolean.FALSE.toString());
+
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "new"));
 			}
-		};
+		).build();
 	}
 
 	@Override
@@ -105,7 +103,7 @@ public class ExportTemplatesToolbarDisplayContext
 		return searchActionURL.toString();
 	}
 
-	public SearchContainer getSearchContainer() {
+	public SearchContainer<ExportImportConfiguration> getSearchContainer() {
 		return searchContainer;
 	}
 
@@ -113,21 +111,24 @@ public class ExportTemplatesToolbarDisplayContext
 		return liferayPortletResponse.createRenderURL();
 	}
 
-	protected SearchContainer searchContainer;
+	protected SearchContainer<ExportImportConfiguration> searchContainer;
 
-	private SearchContainer _createSearchContainer(
+	private SearchContainer<ExportImportConfiguration> _createSearchContainer(
 		long liveGroupId, Company company, PortletURL iteratorURL) {
 
 		ExportImportConfigurationSearchTerms
 			exportImportConfigurationSearchTerms =
 				new ExportImportConfigurationSearchTerms(liferayPortletRequest);
 
-		SearchContainer searchContainer = new SearchContainer(
-			liferayPortletRequest,
-			new ExportImportConfigurationDisplayTerms(liferayPortletRequest),
-			exportImportConfigurationSearchTerms,
-			SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA,
-			iteratorURL, null, "there-are-no-saved-export-templates");
+		SearchContainer<ExportImportConfiguration> searchContainer =
+			new SearchContainer(
+				liferayPortletRequest,
+				new ExportImportConfigurationDisplayTerms(
+					liferayPortletRequest),
+				exportImportConfigurationSearchTerms,
+				SearchContainer.DEFAULT_CUR_PARAM,
+				SearchContainer.DEFAULT_DELTA, iteratorURL, null,
+				"there-are-no-saved-export-templates");
 
 		searchContainer.setOrderByCol("name");
 		searchContainer.setOrderByComparator(

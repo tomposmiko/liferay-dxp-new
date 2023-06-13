@@ -17,6 +17,7 @@ package com.liferay.portal.reports.engine.console.service.impl;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.petra.memory.DeleteFileFinalizeAction;
 import com.liferay.petra.memory.FinalizeManager;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -43,7 +44,6 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.Validator;
@@ -122,12 +122,12 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		entry.setScheduleRequest(schedulerRequest);
 		entry.setStartDate(startDate);
 		entry.setEndDate(endDate);
-		entry.setReportParameters(reportParameters);
 		entry.setRepeating(repeating);
 		entry.setRecurrence(recurrence);
 		entry.setEmailNotifications(emailNotifications);
 		entry.setEmailDelivery(emailDelivery);
 		entry.setPortletId(portletId);
+		entry.setReportParameters(reportParameters);
 
 		StringBundler sb = new StringBundler(5);
 
@@ -318,7 +318,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 	public List<Entry> getEntries(
 		long groupId, String definitionName, String userName, Date createDateGT,
 		Date createDateLT, boolean andSearch, int start, int end,
-		OrderByComparator orderByComparator) {
+		OrderByComparator<Entry> orderByComparator) {
 
 		return entryFinder.findByG_CD_N_SN(
 			groupId, definitionName, userName, createDateGT, createDateLT,
@@ -420,8 +420,8 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		Entry entry = entryLocalService.getEntry(entryId);
 
-		entry.setStatus(status.getValue());
 		entry.setErrorMessage(errorMessage);
+		entry.setStatus(status.getValue());
 
 		entryPersistence.update(entry);
 	}
@@ -552,6 +552,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		Message message = new Message();
 
+		message.put("companyId", entry.getCompanyId());
 		message.put("entryId", entry.getEntryId());
 		message.put("reportName", reportName);
 

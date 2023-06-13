@@ -51,7 +51,7 @@ PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configurat
 	<aui:option label="view-in-context" selected="<%= assetPublisherDisplayContext.isAssetLinkBehaviorViewInPortlet() %>" value="viewInPortlet" />
 </aui:select>
 
-<aui:input helpMessage="number-of-items-to-display-help" label="number-of-items-to-display" name="preferences--delta--" type="text" value="<%= assetPublisherDisplayContext.getDelta() %>">
+<aui:input helpMessage='<%= LanguageUtil.format(request, "number-of-items-to-display-help", new Object[] {SearchContainer.MAX_DELTA}, false) %>' label="number-of-items-to-display" name="preferences--delta--" type="text" value="<%= assetPublisherDisplayContext.getDelta() %>">
 	<aui:validator name="digits" />
 </aui:input>
 
@@ -83,7 +83,7 @@ PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configurat
 
 		var hiddenFields = document.querySelectorAll('.hidden-field');
 
-		Array.prototype.forEach.call(hiddenFields, function(field) {
+		Array.prototype.forEach.call(hiddenFields, function (field) {
 			var fieldContainer = dom.closest(field, '.form-group');
 
 			if (fieldContainer) {
@@ -97,12 +97,14 @@ PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configurat
 						fieldClassList.contains('show-extra-info'))
 				) {
 					fieldContainerClassList.remove('hide');
-				} else if (
+				}
+				else if (
 					displayStyle === 'abstracts' &&
 					fieldClassList.contains('abstract-length')
 				) {
 					fieldContainerClassList.remove('hide');
-				} else {
+				}
+				else {
 					fieldContainerClassList.add('hide');
 				}
 			}

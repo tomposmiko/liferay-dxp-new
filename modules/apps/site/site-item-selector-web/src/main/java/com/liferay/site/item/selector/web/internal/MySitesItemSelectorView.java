@@ -73,8 +73,15 @@ public class MySitesItemSelectorView
 	}
 
 	@Override
-	public boolean isVisible(ThemeDisplay themeDisplay) {
-		return true;
+	public boolean isVisible(
+		SiteItemSelectorCriterion siteItemSelectorCriterion,
+		ThemeDisplay themeDisplay) {
+
+		if (siteItemSelectorCriterion.isIncludeMySites()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -84,20 +91,20 @@ public class MySitesItemSelectorView
 			PortletURL portletURL, String itemSelectedEventName, boolean search)
 		throws IOException, ServletException {
 
-		_myGroupItemSelectorViewRender.renderHTML(
+		_myGroupItemSelectorViewRenderer.renderHTML(
 			servletRequest, servletResponse, siteItemSelectorCriterion,
 			portletURL, itemSelectedEventName, search);
 	}
 
 	@Activate
 	protected void activate() {
-		_myGroupItemSelectorViewRender = new MyGroupItemSelectorViewRenderer(
+		_myGroupItemSelectorViewRenderer = new MyGroupItemSelectorViewRenderer(
 			_groupSearchProvider, _groupURLProvider, _servletContext);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_myGroupItemSelectorViewRender = null;
+		_myGroupItemSelectorViewRenderer = null;
 	}
 
 	private static final List<ItemSelectorReturnType>
@@ -113,7 +120,7 @@ public class MySitesItemSelectorView
 	@Reference
 	private GroupURLProvider _groupURLProvider;
 
-	private MyGroupItemSelectorViewRenderer _myGroupItemSelectorViewRender;
+	private MyGroupItemSelectorViewRenderer _myGroupItemSelectorViewRenderer;
 
 	@Reference
 	private Portal _portal;

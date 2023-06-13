@@ -11,7 +11,7 @@
 
 AUI.add(
 	'liferay-kaleo-designer-dialogs',
-	A => {
+	(A) => {
 		var KaleoDesignerDialogs = {
 			_duplicationDialog: null,
 			_forms: {},
@@ -29,7 +29,8 @@ AUI.add(
 
 				if (form && !instance._forms[randomId]) {
 					instance._forms[randomId] = form;
-				} else if (!form && instance._forms[randomId]) {
+				}
+				else if (!form && instance._forms[randomId]) {
 					form = instance._forms[randomId];
 				}
 
@@ -61,8 +62,8 @@ AUI.add(
 											}
 
 											dialog.hide();
-										}
-									}
+										},
+									},
 								},
 								{
 									cssClass: 'btn btn-primary',
@@ -75,18 +76,18 @@ AUI.add(
 											}
 
 											dialog.hide();
-										}
-									}
-								}
+										},
+									},
+								},
 							],
 							header: [
 								{
 									cssClass: 'close',
 									discardDefaultButtonCssClasses: true,
 									labelHTML:
-										'<svg class="lexicon-icon" focusable="false"><use data-href="' +
+										'<svg class="lexicon-icon" focusable="false"><use href="' +
 										Liferay.ThemeDisplay.getPathThemeImages() +
-										'/lexicon/icons.svg#times" /><title>' +
+										'/clay/icons.svg#times" /><title>' +
 										Liferay.Language.get('close') +
 										'</title></svg>',
 									on: {
@@ -96,21 +97,21 @@ AUI.add(
 											}
 
 											dialog.hide();
-										}
-									}
-								}
-							]
+										},
+									},
+								},
+							],
 						},
-						width: 500
+						width: 500,
 					},
-					title
+					title,
 				});
 
 				instance._duplicationDialog = dialog;
-			}
+			},
 		};
 
-		var openConfirmDeleteDialog = function(title, message, actionUrl) {
+		var openConfirmDeleteDialog = function (title, message, actionUrl) {
 			var dialog = Liferay.Util.Window.getWindow({
 				dialog: {
 					bodyContent: message,
@@ -120,14 +121,14 @@ AUI.add(
 					toolbars: {
 						footer: [
 							{
-								cssClass: 'btn btn-primary',
+								cssClass: 'btn btn-primary mr-2',
 								discardDefaultButtonCssClasses: true,
 								label: Liferay.Language.get('delete'),
 								on: {
 									click() {
 										window.location.assign(actionUrl);
-									}
-								}
+									},
+								},
 							},
 							{
 								cssClass: 'btn btn-secondary',
@@ -136,18 +137,18 @@ AUI.add(
 								on: {
 									click() {
 										dialog.destroy();
-									}
-								}
-							}
+									},
+								},
+							},
 						],
 						header: [
 							{
 								cssClass: 'close',
 								discardDefaultButtonCssClasses: true,
 								labelHTML:
-									'<svg class="lexicon-icon" focusable="false"><use data-href="' +
+									'<svg class="lexicon-icon" focusable="false"><use href="' +
 									Liferay.ThemeDisplay.getPathThemeImages() +
-									'/lexicon/icons.svg#times" /><title>' +
+									'/clay/icons.svg#times" /><title>' +
 									Liferay.Language.get('close') +
 									'</title></svg>',
 								on: {
@@ -155,50 +156,25 @@ AUI.add(
 										dialog.destroy();
 
 										event.domEvent.stopPropagation();
-									}
-								}
-							}
-						]
+									},
+								},
+							},
+						],
 					},
-					width: 600
+					width: 600,
 				},
-				title
+				title,
 			});
 		};
 
-		var showActionUndoneSuccessMessage = function() {
-			var instance = this;
-
-			var successMessage = Liferay.Language.get('action-undone');
-
-			var alert = instance._alert;
-
-			if (alert) {
-				alert.destroy();
-			}
-
-			alert = new Liferay.Alert({
-				closeable: true,
-				delay: {
-					hide: 5000,
-					show: 0
-				},
-				message: successMessage,
-				type: 'success'
+		var showActionUndoneSuccessMessage = function () {
+			Liferay.Util.openToast({
+				container: document.querySelector('.lfr-alert-container'),
+				message: Liferay.Language.get('action-undone'),
 			});
-
-			if (!alert.get('rendered')) {
-				alert.render('.portlet-column');
-			}
-
-			alert.show();
-
-			instance._alert = alert;
 		};
 
-		var showDefinitionImportSuccessMessage = function(namespace) {
-			var instance = this;
-
+		var showDefinitionImportSuccessMessage = function (namespace) {
 			var undo = Liferay.Language.get('undo');
 
 			var undoEvent = "'" + namespace + "undoDefinition'";
@@ -210,35 +186,16 @@ AUI.add(
 				undo +
 				'</a>';
 
-			var successMessage = Liferay.Language.get(
+			var message = Liferay.Language.get(
 				'definition-imported-sucessfully'
 			);
 
-			successMessage += undoLink;
+			message += undoLink;
 
-			var alert = instance._alert;
-
-			if (alert) {
-				alert.destroy();
-			}
-
-			alert = new Liferay.Alert({
-				closeable: true,
-				delay: {
-					hide: 10000,
-					show: 0
-				},
-				message: successMessage,
-				type: 'success'
+			Liferay.Util.openToast({
+				container: document.querySelector('.lfr-alert-container'),
+				message,
 			});
-
-			if (!alert.get('rendered')) {
-				alert.render('.portlet-column');
-			}
-
-			alert.show();
-
-			instance._alert = alert;
 		};
 
 		KaleoDesignerDialogs.openConfirmDeleteDialog = openConfirmDeleteDialog;
@@ -251,6 +208,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['liferay-util-window']
+		requires: ['liferay-util-window'],
 	}
 );

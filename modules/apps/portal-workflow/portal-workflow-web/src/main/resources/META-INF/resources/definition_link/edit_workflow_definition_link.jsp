@@ -17,8 +17,6 @@
 <%@ include file="/definition_link/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
 String randomNamespace = (String)row.getParameter("randomNamespace");
@@ -26,19 +24,18 @@ String randomNamespace = (String)row.getParameter("randomNamespace");
 WorkflowDefinitionLinkSearchEntry workflowDefinitionLinkSearchEntry = (WorkflowDefinitionLinkSearchEntry)row.getObject();
 
 String className = workflowDefinitionLinkSearchEntry.getClassName();
-String resource = workflowDefinitionLinkSearchEntry.getResource();
 %>
 
-<portlet:actionURL name="updateWorkflowDefinitionLink" var="updateWorkflowDefinitionLinkURL">
+<portlet:actionURL name="/portal_workflow/update_workflow_definition_link" var="updateWorkflowDefinitionLinkURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
-<div hidden="true" id="<%= randomNamespace %>formContainer">
+<div class="d-none" id="<%= randomNamespace %>formContainer">
 	<aui:form action="<%= updateWorkflowDefinitionLinkURL %>" cssClass="workflow-definition-form" method="post">
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="namespace" type="hidden" value="<%= randomNamespace %>" />
 		<aui:input name="groupId" type="hidden" value="<%= workflowDefinitionLinkDisplayContext.getGroupId() %>" />
-		<aui:input name="resource" type="hidden" value="<%= resource %>" />
+		<aui:input name="resource" type="hidden" value="<%= workflowDefinitionLinkSearchEntry.getResource() %>" />
 		<aui:input name="editMode" type="hidden" value="false" />
 
 		<%

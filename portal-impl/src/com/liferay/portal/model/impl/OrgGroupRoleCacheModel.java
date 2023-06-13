@@ -30,23 +30,25 @@ import java.io.ObjectOutput;
  * The cache model class for representing OrgGroupRole in entity cache.
  *
  * @author Brian Wing Shun Chan
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class OrgGroupRoleCacheModel
 	implements CacheModel<OrgGroupRole>, Externalizable, MVCCModel {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof OrgGroupRoleCacheModel)) {
+		if (!(object instanceof OrgGroupRoleCacheModel)) {
 			return false;
 		}
 
 		OrgGroupRoleCacheModel orgGroupRoleCacheModel =
-			(OrgGroupRoleCacheModel)obj;
+			(OrgGroupRoleCacheModel)object;
 
 		if (orgGroupRolePK.equals(orgGroupRoleCacheModel.orgGroupRolePK) &&
 			(mvccVersion == orgGroupRoleCacheModel.mvccVersion)) {

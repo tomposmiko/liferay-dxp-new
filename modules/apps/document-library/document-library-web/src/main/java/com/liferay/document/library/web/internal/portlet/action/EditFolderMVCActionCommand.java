@@ -48,7 +48,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -171,7 +170,7 @@ public class EditFolderMVCActionCommand extends BaseMVCActionCommand {
 				if (folder.isRepositoryCapabilityProvided(
 						TrashCapability.class)) {
 
-					_dlTrashService.moveFolderToTrash(deleteFolderId);
+					folder = _dlTrashService.moveFolderToTrash(deleteFolderId);
 
 					trashedModels.add((DLFolder)folder.getModel());
 				}
@@ -182,11 +181,11 @@ public class EditFolderMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		if (moveToTrash && (deleteFolderIds.length > 0)) {
-			Map<String, Object> data = HashMapBuilder.<String, Object>put(
-				"trashedModels", trashedModels
-			).build();
-
-			addDeleteSuccessData(actionRequest, data);
+			addDeleteSuccessData(
+				actionRequest,
+				HashMapBuilder.<String, Object>put(
+					"trashedModels", trashedModels
+				).build());
 		}
 	}
 

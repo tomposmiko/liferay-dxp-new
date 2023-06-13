@@ -335,18 +335,18 @@ public interface BatchEngineExportTaskModel
 	public void setStartTime(Date startTime);
 
 	/**
-	 * Returns the version of this batch engine export task.
+	 * Returns the task item delegate name of this batch engine export task.
 	 *
-	 * @return the version of this batch engine export task
+	 * @return the task item delegate name of this batch engine export task
 	 */
 	@AutoEscape
-	public String getVersion();
+	public String getTaskItemDelegateName();
 
 	/**
-	 * Sets the version of this batch engine export task.
+	 * Sets the task item delegate name of this batch engine export task.
 	 *
-	 * @param version the version of this batch engine export task
+	 * @param taskItemDelegateName the task item delegate name of this batch engine export task
 	 */
-	public void setVersion(String version);
+	public void setTaskItemDelegateName(String taskItemDelegateName);
 
 }

@@ -52,6 +52,7 @@ definition {
 	@priority = "4"
 	test AddSitePrivatePage {
 		property testray.component.names = "Site Pages Administration";
+
 		var portalURL = PropsUtil.get("portal.url");
 
 		SitePages.addPrivatePage(pageName = "Site Page");
@@ -63,6 +64,7 @@ definition {
 
 	@priority = "5"
 	test AddSitePublicChildPage {
+		property portal.acceptance = "true";
 		property testray.component.names = "Site Pages Administration";
 
 		SitePages.addPublicPage(pageName = "Site Page");

@@ -18,7 +18,7 @@ export const GeometryType = PropTypes.shape({
 	left: PropTypes.number.isRequired,
 	right: PropTypes.number.isRequired,
 	top: PropTypes.number.isRequired,
-	width: PropTypes.number.isRequired
+	width: PropTypes.number.isRequired,
 });
 
 /**
@@ -26,9 +26,12 @@ export const GeometryType = PropTypes.shape({
  */
 export function stopImmediatePropagation(event) {
 	if (event.nativeEvent) {
+
 		// This is a React synthetic event; must access nativeEvent instead.
+
 		event.nativeEvent.stopImmediatePropagation();
-	} else {
+	}
+	else {
 		event.stopImmediatePropagation();
 	}
 }
@@ -43,7 +46,8 @@ export function getTargetableElements(element) {
 	const elements = element.querySelectorAll('a, button');
 
 	// As first cut, only deal with items that have an id.
-	return Array.from(elements).filter(element => {
+
+	return Array.from(elements).filter((element) => {
 		return element.id && _isVisible(element);
 	});
 }
@@ -73,7 +77,7 @@ export function getRootElementGeometry(rootElement) {
 		left,
 		right,
 		top,
-		width
+		width,
 	} = rootElement.getBoundingClientRect();
 
 	return {
@@ -81,7 +85,7 @@ export function getRootElementGeometry(rootElement) {
 		left: left + TARGET_OFFSET / 2,
 		right: right - TARGET_OFFSET / 2,
 		top: top + TARGET_OFFSET / 2,
-		width: width + TARGET_OFFSET
+		width: width + TARGET_OFFSET,
 	};
 }
 
@@ -97,7 +101,7 @@ export function getElementGeometry(element) {
 		left,
 		right,
 		top,
-		width
+		width,
 	} = element.getBoundingClientRect();
 
 	return {
@@ -106,6 +110,6 @@ export function getElementGeometry(element) {
 		left,
 		right,
 		top,
-		width: width + TARGET_OFFSET
+		width: width + TARGET_OFFSET,
 	};
 }

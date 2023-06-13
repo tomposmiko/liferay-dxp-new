@@ -989,10 +989,6 @@ public class PortletContainerImpl implements PortletContainer {
 			}
 		}
 
-		PortletMode portletMode = PortletModeFactory.getPortletMode(
-			ParamUtil.getString(httpServletRequest, "p_p_mode"),
-			portletSpecMajorVersion);
-
 		PortletPreferencesIds portletPreferencesIds =
 			PortletPreferencesFactoryUtil.getPortletPreferencesIds(
 				httpServletRequest, portlet.getPortletId());
@@ -1047,6 +1043,10 @@ public class PortletContainerImpl implements PortletContainer {
 		LiferayResourceResponse liferayResourceResponse = null;
 
 		if (liferayResourceRequest == null) {
+			PortletMode portletMode = PortletModeFactory.getPortletMode(
+				ParamUtil.getString(httpServletRequest, "p_p_mode"),
+				portletSpecMajorVersion);
+
 			PortletPreferences portletPreferences =
 				PortletPreferencesLocalServiceUtil.getStrictPreferences(
 					portletPreferencesIds);
@@ -1110,7 +1110,7 @@ public class PortletContainerImpl implements PortletContainer {
 			(MutableRenderParametersImpl)
 				liferayStateAwareResponse.getRenderParameters();
 
-		Map<String, String[]> mutableRenderParametersMap =
+		Map<String, String[]> mutableRenderParameterMap =
 			mutableRenderParametersImpl.getParameterMap();
 
 		Map<String, QName> supportedPublicRenderParameterMap = new HashMap<>();
@@ -1130,7 +1130,7 @@ public class PortletContainerImpl implements PortletContainer {
 		Map<String, String[]> privateRenderParameterMap = new HashMap<>();
 
 		for (Map.Entry<String, String[]> entry :
-				mutableRenderParametersMap.entrySet()) {
+				mutableRenderParameterMap.entrySet()) {
 
 			String key = entry.getKey();
 

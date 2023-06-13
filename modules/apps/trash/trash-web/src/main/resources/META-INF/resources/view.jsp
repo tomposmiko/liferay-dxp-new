@@ -26,7 +26,10 @@ TrashManagementToolbarDisplayContext trashManagementToolbarDisplayContext = new 
 
 <liferay-util:include page="/restore_path.jsp" servletContext="<%= application %>" />
 
-<div class="closed container-fluid container-fluid-max-xl sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+<clay:container-fluid
+	cssClass="closed sidenav-container sidenav-right"
+	id='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
+>
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/trash/info_panel" var="sidebarPanelURL" />
 
 	<liferay-frontend:sidebar-panel
@@ -134,11 +137,10 @@ TrashManagementToolbarDisplayContext trashManagementToolbarDisplayContext = new 
 						viewContentURLString = viewContentURL.toString();
 					}
 
-					Map<String, Object> rowData = new HashMap<>();
-
-					rowData.put("actions", trashManagementToolbarDisplayContext.getAvailableActions(trashEntry));
-
-					row.setData(rowData);
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", trashManagementToolbarDisplayContext.getAvailableActions(trashEntry)
+						).build());
 					%>
 
 					<c:choose>
@@ -286,10 +288,11 @@ TrashManagementToolbarDisplayContext trashManagementToolbarDisplayContext = new 
 			</liferay-ui:search-container>
 		</aui:form>
 	</div>
-</div>
+</clay:container-fluid>
 
 <liferay-frontend:component
 	componentId="<%= trashManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	context="<%= trashManagementToolbarDisplayContext.getComponentContext() %>"
 	module="js/ManagementToolbarDefaultEventHandler.es"
 />
 

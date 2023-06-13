@@ -15,21 +15,27 @@
 package com.liferay.journal.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
-import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistry;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +56,9 @@ public class JournalArticleLocalServiceTreeTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -71,12 +79,10 @@ public class JournalArticleLocalServiceTreeTest {
 		JournalArticle article = JournalTestUtil.addArticle(
 			_group.getGroupId(), folderAA.getFolderId());
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
-
 		JournalFolderLocalServiceUtil.moveFolder(
 			folderAA.getFolderId(),
-			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, serviceContext);
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		article = JournalArticleLocalServiceUtil.getArticle(
 			_group.getGroupId(), article.getArticleId());
@@ -89,7 +95,7 @@ public class JournalArticleLocalServiceTreeTest {
 		List<JournalArticle> articles = createTree();
 
 		for (JournalArticle article : articles) {
-			article.setTreePath(null);
+			article.setTreePath("/0/");
 
 			JournalArticleLocalServiceUtil.updateJournalArticle(article);
 		}
@@ -103,6 +109,35 @@ public class JournalArticleLocalServiceTreeTest {
 
 			Assert.assertEquals(article.buildTreePath(), article.getTreePath());
 		}
+	}
+
+	@Test
+	public void testSearchTreePath() throws Exception {
+		JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		JournalFolder folderA = JournalTestUtil.addFolder(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Folder A");
+
+		JournalTestUtil.addArticle(_group.getGroupId(), folderA.getFolderId());
+
+		Indexer<JournalArticle> indexer = _indexerRegistry.getIndexer(
+			JournalArticle.class);
+
+		SearchContext searchContext = SearchContextTestUtil.getSearchContext(
+			_group.getGroupId());
+
+		Hits hits = indexer.search(searchContext);
+
+		Assert.assertEquals(hits.toString(), 2, hits.getLength());
+
+		searchContext.setFolderIds(new long[] {folderA.getFolderId()});
+
+		hits = indexer.search(searchContext);
+
+		Assert.assertEquals(hits.toString(), 1, hits.getLength());
 	}
 
 	protected List<JournalArticle> createTree() throws Exception {
@@ -124,6 +159,9 @@ public class JournalArticleLocalServiceTreeTest {
 
 		return articles;
 	}
+
+	@Inject
+	private static IndexerRegistry _indexerRegistry;
 
 	@DeleteAfterTestRun
 	private Group _group;

@@ -15,16 +15,16 @@
 /**
  * The Crop Region Utility
  *
- * @deprecated As of Athanasius(7.3.x), replaced by Liferay.Util.getCropRegion
+ * @deprecated As of Athanasius (7.3.x), replaced by Liferay.Util.getCropRegion
  * @module liferay-crop-region
  */
 
 AUI.add(
 	'liferay-crop-region',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
-		var CropRegion = function() {};
+		var CropRegion = function () {};
 
 		CropRegion.prototype = {
 			_getCropRegion(imagePreview, region) {
@@ -36,7 +36,8 @@ AUI.add(
 						imagePreview,
 						region
 					);
-				} else {
+				}
+				else {
 					var naturalSize = instance._getImgNaturalSize(imagePreview);
 
 					var scaleX = naturalSize.width / imagePreview.width();
@@ -56,7 +57,7 @@ AUI.add(
 						height: regionHeight,
 						width: regionWidth,
 						x: regionX,
-						y: regionY
+						y: regionY,
 					};
 				}
 
@@ -81,15 +82,15 @@ AUI.add(
 
 				return {
 					height: imageHeight,
-					width: imageWidth
+					width: imageWidth,
 				};
-			}
+			},
 		};
 
 		Liferay.CropRegion = CropRegion;
 	},
 	'',
 	{
-		requires: ['aui-base']
+		requires: ['aui-base'],
 	}
 );

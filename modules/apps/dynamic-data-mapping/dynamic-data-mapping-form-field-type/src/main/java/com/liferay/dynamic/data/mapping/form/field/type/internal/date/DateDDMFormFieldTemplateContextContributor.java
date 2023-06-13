@@ -15,14 +15,16 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.date;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
+import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
-import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.CalendarUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
+
+import java.time.DayOfWeek;
+import java.time.temporal.WeekFields;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,13 +55,16 @@ public class DateDDMFormFieldTemplateContextContributor
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		return HashMapBuilder.<String, Object>put(
+			"firstDayOfWeek", _getFirstDayOfWeek()
+		).put(
 			"months",
 			Arrays.asList(
 				CalendarUtil.getMonths(
 					LocaleThreadLocal.getThemeDisplayLocale()))
 		).put(
 			"predefinedValue",
-			_getPredefinedValue(ddmFormField, ddmFormFieldRenderingContext)
+			DDMFormFieldTypeUtil.getPredefinedValue(
+				ddmFormField, ddmFormFieldRenderingContext)
 		).put(
 			"weekdaysShort",
 			Stream.of(
@@ -75,19 +80,13 @@ public class DateDDMFormFieldTemplateContextContributor
 		).build();
 	}
 
-	private String _getPredefinedValue(
-		DDMFormField ddmFormField,
-		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+	private int _getFirstDayOfWeek() {
+		WeekFields weekFields = WeekFields.of(
+			LocaleThreadLocal.getThemeDisplayLocale());
 
-		LocalizedValue predefinedValue = ddmFormField.getPredefinedValue();
+		DayOfWeek dayOfWeek = weekFields.getFirstDayOfWeek();
 
-		if (predefinedValue == null) {
-			return null;
-		}
-
-		return GetterUtil.getString(
-			predefinedValue.getString(
-				ddmFormFieldRenderingContext.getLocale()));
+		return dayOfWeek.getValue() % 7;
 	}
 
 	private List<Integer> _getYears() {

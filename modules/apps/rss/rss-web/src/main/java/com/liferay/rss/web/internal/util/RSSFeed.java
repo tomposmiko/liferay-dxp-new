@@ -14,6 +14,7 @@
 
 package com.liferay.rss.web.internal.util;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Http;
@@ -45,11 +46,12 @@ public class RSSFeed {
 		SyndFeed syndFeed = getSyndFeed();
 
 		if (syndFeed == null) {
+			_title = title;
+
 			_baseURL = StringPool.BLANK;
 			_syndFeedImageLink = StringPool.BLANK;
 			_syndFeedImageURL = StringPool.BLANK;
 			_syndFeedLink = StringPool.BLANK;
-			_title = title;
 
 			return;
 		}
@@ -66,13 +68,9 @@ public class RSSFeed {
 		if (Validator.isNull(syndFeedLink) ||
 			!HttpUtil.hasDomain(syndFeedLink)) {
 
-			baseURL = HttpUtil.getProtocol(
-				_url
-			).concat(
-				Http.PROTOCOL_DELIMITER
-			).concat(
-				HttpUtil.getDomain(_url)
-			);
+			baseURL = StringBundler.concat(
+				HttpUtil.getProtocol(_url), Http.PROTOCOL_DELIMITER,
+				HttpUtil.getDomain(_url));
 
 			if (Validator.isNotNull(syndFeedLink)) {
 				syndFeedLink = baseURL.concat(syndFeedLink);
@@ -82,13 +80,9 @@ public class RSSFeed {
 			}
 		}
 		else {
-			baseURL = HttpUtil.getProtocol(
-				syndFeedLink
-			).concat(
-				Http.PROTOCOL_DELIMITER
-			).concat(
-				HttpUtil.getDomain(syndFeedLink)
-			);
+			baseURL = StringBundler.concat(
+				HttpUtil.getProtocol(syndFeedLink), Http.PROTOCOL_DELIMITER,
+				HttpUtil.getDomain(syndFeedLink));
 		}
 
 		SyndImage syndImage = syndFeed.getImage();
@@ -107,11 +101,12 @@ public class RSSFeed {
 			}
 		}
 
+		_title = title;
+
 		_baseURL = baseURL;
 		_syndFeedImageLink = syndFeedImageLink;
 		_syndFeedImageURL = syndFeedImageURL;
 		_syndFeedLink = syndFeedLink;
-		_title = title;
 	}
 
 	public String getBaseURL() {
@@ -146,10 +141,11 @@ public class RSSFeed {
 			return _syndFeed;
 		}
 
-		WebCacheItem wci = new RSSWebCacheItem(_rssWebCacheConfiguration, _url);
+		WebCacheItem webCacheItem = new RSSWebCacheItem(
+			_rssWebCacheConfiguration, _url);
 
 		_syndFeed = (SyndFeed)WebCachePoolUtil.get(
-			RSSFeed.class.getName() + StringPool.PERIOD + _url, wci);
+			RSSFeed.class.getName() + StringPool.PERIOD + _url, webCacheItem);
 
 		return _syndFeed;
 	}

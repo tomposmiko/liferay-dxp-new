@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"javax.portlet.name=" + WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW,
 		"javax.portlet.name=" + WorkflowPortletKeys.SITE_ADMINISTRATION_WORKFLOW,
-		"mvc.command.name=updateWorkflowDefinitionLink"
+		"mvc.command.name=/portal_workflow/update_workflow_definition_link"
 	},
 	service = MVCActionCommand.class
 )
@@ -120,10 +120,10 @@ public class UpdateWorkflowDefinitionLinkMVCActionCommand
 		String className = StringPool.BLANK;
 		String workflowDefinition = StringPool.BLANK;
 
-		Enumeration<String> enu = actionRequest.getParameterNames();
+		Enumeration<String> enumeration = actionRequest.getParameterNames();
 
-		while (enu.hasMoreElements()) {
-			String name = enu.nextElement();
+		while (enumeration.hasMoreElements()) {
+			String name = enumeration.nextElement();
 
 			if (!name.startsWith(_PREFIX)) {
 				continue;

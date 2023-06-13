@@ -23,7 +23,9 @@ import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.permission.LayoutPermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Html;
@@ -103,7 +105,8 @@ public class ManageLayoutProductNavigationControlMenuEntry
 			httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
 			PortletRequest.RENDER_PHASE);
 
-		editPageURL.setParameter("mvcRenderCommandName", "/layout/edit_layout");
+		editPageURL.setParameter(
+			"mvcRenderCommandName", "/layout_admin/edit_layout");
 
 		String currentURL = _portal.getCurrentURL(httpServletRequest);
 
@@ -191,6 +194,13 @@ public class ManageLayoutProductNavigationControlMenuEntry
 			return false;
 		}
 
+		if (layout.isSystem() && layout.isTypeContent()) {
+			layout = _layoutLocalService.getLayout(layout.getClassPK());
+
+			return _layoutPermission.contains(
+				themeDisplay.getPermissionChecker(), layout, ActionKeys.UPDATE);
+		}
+
 		return super.isShow(httpServletRequest);
 	}
 
@@ -221,8 +231,8 @@ public class ManageLayoutProductNavigationControlMenuEntry
 
 	private static final String _TMPL_CONTENT = StringUtil.read(
 		ManageLayoutProductNavigationControlMenuEntry.class,
-		"/META-INF/resources/control/menu/edit_layout_control_menu_entry_" +
-			"icon.tmpl");
+		"/META-INF/resources/control/menu" +
+			"/edit_layout_control_menu_entry_icon.tmpl");
 
 	@Reference
 	private Html _html;
@@ -236,6 +246,9 @@ public class ManageLayoutProductNavigationControlMenuEntry
 	@Reference
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
+
+	@Reference
+	private LayoutPermission _layoutPermission;
 
 	@Reference
 	private Portal _portal;

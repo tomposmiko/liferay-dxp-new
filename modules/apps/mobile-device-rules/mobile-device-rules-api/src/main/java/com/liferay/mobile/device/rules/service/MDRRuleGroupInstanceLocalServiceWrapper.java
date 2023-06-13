@@ -36,6 +36,10 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 	/**
 	 * Adds the mdr rule group instance to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRRuleGroupInstanceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param mdrRuleGroupInstance the mdr rule group instance
 	 * @return the mdr rule group instance that was added
 	 */
@@ -86,6 +90,18 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 			ruleGroupInstanceId);
 	}
 
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _mdrRuleGroupInstanceLocalService.createPersistedModel(
+			primaryKeyObj);
+	}
+
 	@Override
 	public void deleteGroupRuleGroupInstances(long groupId) {
 		_mdrRuleGroupInstanceLocalService.deleteGroupRuleGroupInstances(
@@ -94,6 +110,10 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 
 	/**
 	 * Deletes the mdr rule group instance with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRRuleGroupInstanceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param ruleGroupInstanceId the primary key of the mdr rule group instance
 	 * @return the mdr rule group instance that was removed
@@ -110,6 +130,10 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 
 	/**
 	 * Deletes the mdr rule group instance from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRRuleGroupInstanceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param mdrRuleGroupInstance the mdr rule group instance
 	 * @return the mdr rule group instance that was removed
@@ -154,6 +178,18 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 	@Override
 	public void deleteRuleGroupInstances(long ruleGroupId) {
 		_mdrRuleGroupInstanceLocalService.deleteRuleGroupInstances(ruleGroupId);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _mdrRuleGroupInstanceLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _mdrRuleGroupInstanceLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -428,6 +464,9 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 		return _mdrRuleGroupInstanceLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -510,6 +549,10 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 
 	/**
 	 * Updates the mdr rule group instance in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect MDRRuleGroupInstanceLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param mdrRuleGroupInstance the mdr rule group instance
 	 * @return the mdr rule group instance that was updated

@@ -12,13 +12,12 @@
  * details.
  */
 
-import React from 'react';
-
 const DEFAULT_CONFIG = {
-	toolbarId: 'pageEditorToolbar'
+	toolbarId: 'pageEditorToolbar',
 };
 
-export const ConfigContext = React.createContext(DEFAULT_CONFIG);
+/** @type {import('../../types/config').Config} */
+export let config = DEFAULT_CONFIG;
 
 /**
  * Extracts the immutable parts from the server data.
@@ -26,25 +25,29 @@ export const ConfigContext = React.createContext(DEFAULT_CONFIG);
  * Unlike data in the store, this config does not change over the lifetime of
  * the app, so we can safely store is as a variable.
  */
-export function getConfig(config) {
-	const {pluginsRootPath, portletNamespace, sidebarPanels} = config;
+export function initializeConfig(backendConfig) {
+	const {pluginsRootPath, portletNamespace, sidebarPanels} = backendConfig;
 	const toolbarId = `${portletNamespace}${DEFAULT_CONFIG.toolbarId}`;
 
 	// Special items requiring augmentation, creation, or transformation.
+
 	const augmentedPanels = augmentPanelData(pluginsRootPath, sidebarPanels);
 
 	const syntheticItems = {
+		marginOptions: [...backendConfig.paddingOptions],
 		panels: generatePanels(augmentedPanels),
 		sidebarPanels: partitionPanels(augmentedPanels),
 		toolbarId,
-		toolbarPlugins: getToolbarPlugins(pluginsRootPath, toolbarId)
+		toolbarPlugins: getToolbarPlugins(pluginsRootPath, toolbarId),
 	};
 
-	return {
+	config = {
 		...DEFAULT_CONFIG,
-		...config,
-		...syntheticItems
+		...backendConfig,
+		...syntheticItems,
 	};
+
+	return config;
 }
 
 /**
@@ -52,15 +55,11 @@ export function getConfig(config) {
  * of a plugin. Here we deal with the exceptions by mapping IDs to
  * plugin names.
  */
-const SIDEBAR_PANEL_IDS_TO_PLUGINS = {
-	elements: 'fragments',
-
-	lookAndFeel: 'look-and-feel'
-};
+const SIDEBAR_PANEL_IDS_TO_PLUGINS = {};
 
 function augmentPanelData(pluginsRootPath, sidebarPanels) {
-	return sidebarPanels.map(panel => {
-		if (isSeparator(panel)) {
+	return sidebarPanels.map((panel) => {
+		if (isSeparator(panel) || panel.isLink) {
 			return panel;
 		}
 
@@ -72,11 +71,10 @@ function augmentPanelData(pluginsRootPath, sidebarPanels) {
 			...panel,
 
 			// https://github.com/liferay/liferay-js-toolkit/issues/324
+
 			pluginEntryPoint: `${pluginsRootPath}/${sidebarPanelId}/index`,
 
-			rendersSidebarContent: rendersSidebarContent(sidebarPanelId),
-
-			sidebarPanelId
+			sidebarPanelId,
 		};
 	});
 }
@@ -86,9 +84,11 @@ function generatePanels(sidebarPanels) {
 		(groups, panel) => {
 			if (isSeparator(panel)) {
 				groups.push([]);
-			} else {
+			}
+			else {
 				groups[groups.length - 1].push(panel.sidebarPanelId);
 			}
+
 			return groups;
 		},
 		[[]]
@@ -117,8 +117,8 @@ function getToolbarPlugins(pluginsRootPath, toolbarId) {
 				</div>
 			`,
 			pluginEntryPoint: `${pluginsRootPath}/experience/index`,
-			toolbarPluginId: 'experience'
-		}
+			toolbarPluginId: 'experience',
+		},
 	];
 }
 
@@ -136,10 +136,7 @@ function partitionPanels(panels) {
 		if (!isSeparator(panel)) {
 			map[sidebarPanelId] = panel;
 		}
+
 		return map;
 	}, {});
-}
-
-function rendersSidebarContent(sidebarPanelId) {
-	return sidebarPanelId !== 'look-and-feel';
 }

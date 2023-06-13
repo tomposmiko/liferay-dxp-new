@@ -22,31 +22,38 @@ import com.liferay.portal.search.elasticsearch7.internal.ElasticsearchIndexingFi
 import com.liferay.portal.search.elasticsearch7.internal.LiferayElasticsearchIndexingFixtureFactory;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreationHelper;
-import com.liferay.portal.search.elasticsearch7.internal.index.LiferayTypeMappingsConstants;
 import com.liferay.portal.search.test.util.DocumentsAssert;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.IOException;
 
 import java.util.Arrays;
 
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.PutMappingRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author André de Oliveira
  */
 public class GeoLocationPointFieldTest extends BaseIndexingTestCase {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testCustomField() throws Exception {
@@ -93,7 +100,7 @@ public class GeoLocationPointFieldTest extends BaseIndexingTestCase {
 
 		elasticsearchIndexingFixture.setIndexCreationHelper(
 			new CustomFieldLiferayIndexCreationHelper(
-				elasticsearchIndexingFixture.getElasticsearchFixture()));
+				elasticsearchIndexingFixture.getElasticsearchClientResolver()));
 
 		return elasticsearchIndexingFixture;
 	}
@@ -138,9 +145,6 @@ public class GeoLocationPointFieldTest extends BaseIndexingTestCase {
 				"}, \"store\": true, \"type\": \"geo_point\" } } }");
 
 			putMappingRequest.source(source, XContentType.JSON);
-
-			putMappingRequest.type(
-				LiferayTypeMappingsConstants.LIFERAY_DOCUMENT_TYPE);
 
 			RestHighLevelClient restHighLevelClient =
 				_elasticsearchClientResolver.getRestHighLevelClient();

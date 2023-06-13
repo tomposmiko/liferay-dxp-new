@@ -38,15 +38,23 @@ definition {
 
 	@priority = "4"
 	test AddEventRepeatDaily {
-		Staging.addEventRepeatDaily(
+		Staging.addRepeatEvent(
+			frequency = "Daily",
 			scheduleTitleName = "Event Daily Name",
-			siteName = "Site Name");
+			siteName = "Site Name",
+			startOnTomorrow = "true");
+
+		Staging.viewRepeatingEventDetails(
+			endDate = "No End Date",
+			scheduleTitleName = "Event Daily Name",
+			siteName = "site-name-staging");
 	}
 
 	@priority = "5"
 	test AddPageVariation {
 		property portal.acceptance = "true";
 		property test.assert.warning.exceptions = "true";
+		property test.name.skip.portal.instance = "PGStagingWithVersioning#AddPageVariation";
 		property testray.component.names = "Training";
 
 		Staging.addPageVariationPG(pageVariationName = "Page Variation Name");
@@ -84,6 +92,8 @@ definition {
 
 	@priority = "5"
 	test AddPageWithPageVersioningEnabled {
+		property portal.acceptance = "true";
+
 		SitePages.openPagesAdmin(siteURLKey = "site-name-staging");
 
 		SitePages.addPublicPage(pageName = "Staging Page Versioning");
@@ -111,6 +121,8 @@ definition {
 
 	@priority = "5"
 	test AddSitePagesVariation {
+		property portal.acceptance = "true";
+
 		Staging.addSitePagesVariationPG(sitePagesVariationName = "Site Pages Variation Name");
 
 		Navigator.openStagingSiteURL(siteName = "Site Name");

@@ -47,8 +47,8 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	immediate = true,
 	property = {
-		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.TOOLS,
-		"product.navigation.control.menu.entry.order:Integer=200"
+		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.USER,
+		"product.navigation.control.menu.entry.order:Integer=100"
 	},
 	service = ProductNavigationControlMenuEntry.class
 )
@@ -81,6 +81,11 @@ public class ToggleControlsProductNavigationControlMenuEntry
 	}
 
 	@Override
+	public String getIconCssClass(HttpServletRequest httpServletRequest) {
+		return "icon-monospaced";
+	}
+
+	@Override
 	public String getLabel(Locale locale) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
@@ -90,7 +95,7 @@ public class ToggleControlsProductNavigationControlMenuEntry
 
 	@Override
 	public String getLinkCssClass(HttpServletRequest httpServletRequest) {
-		return "d-block d-sm-none toggle-controls";
+		return "d-block toggle-controls";
 	}
 
 	@Override
@@ -108,7 +113,9 @@ public class ToggleControlsProductNavigationControlMenuEntry
 
 		Layout layout = themeDisplay.getLayout();
 
-		if (layout.isTypeControlPanel()) {
+		if (layout.isTypeAssetDisplay() || layout.isTypeContent() ||
+			layout.isTypeControlPanel()) {
+
 			return false;
 		}
 

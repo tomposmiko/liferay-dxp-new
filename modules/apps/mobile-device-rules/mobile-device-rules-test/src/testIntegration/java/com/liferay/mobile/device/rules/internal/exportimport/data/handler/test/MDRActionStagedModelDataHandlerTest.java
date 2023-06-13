@@ -20,18 +20,16 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.mobile.device.rules.model.MDRAction;
 import com.liferay.mobile.device.rules.model.MDRRuleGroup;
 import com.liferay.mobile.device.rules.model.MDRRuleGroupInstance;
-import com.liferay.mobile.device.rules.service.MDRActionLocalServiceUtil;
-import com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalServiceUtil;
-import com.liferay.mobile.device.rules.service.MDRRuleGroupLocalServiceUtil;
+import com.liferay.mobile.device.rules.service.MDRActionLocalService;
+import com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService;
+import com.liferay.mobile.device.rules.service.MDRRuleGroupLocalService;
 import com.liferay.mobile.device.rules.util.test.MDRTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.StagedModel;
-import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.HashMap;
@@ -39,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -55,22 +54,12 @@ public class MDRActionStagedModelDataHandlerTest
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
+	@Before
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
 		_layout = LayoutTestUtil.addLayout(stagingGroup);
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setUuid(_layout.getUuid());
-
-		LayoutLocalServiceUtil.addLayout(
-			TestPropsValues.getUserId(), liveGroup.getGroupId(),
-			_layout.isPrivateLayout(), _layout.getParentLayoutId(),
-			_layout.getName(), _layout.getTitle(), _layout.getDescription(),
-			_layout.getType(), _layout.isHidden(), _layout.getFriendlyURL(),
-			serviceContext);
 	}
 
 	@Override
@@ -118,7 +107,7 @@ public class MDRActionStagedModelDataHandlerTest
 	protected StagedModel getStagedModel(String uuid, Group group)
 		throws PortalException {
 
-		return MDRActionLocalServiceUtil.getMDRActionByUuidAndGroupId(
+		return _mdrActionLocalService.getMDRActionByUuidAndGroupId(
 			uuid, group.getGroupId());
 	}
 
@@ -143,7 +132,7 @@ public class MDRActionStagedModelDataHandlerTest
 		MDRRuleGroup ruleGroup =
 			(MDRRuleGroup)ruleGroupDependentStagedModels.get(0);
 
-		MDRRuleGroupLocalServiceUtil.getMDRRuleGroupByUuidAndGroupId(
+		_mdrRuleGroupLocalService.getMDRRuleGroupByUuidAndGroupId(
 			ruleGroup.getUuid(), group.getGroupId());
 
 		List<StagedModel> ruleGroupInstanceDependentStagedModels =
@@ -157,7 +146,7 @@ public class MDRActionStagedModelDataHandlerTest
 		MDRRuleGroupInstance ruleGroupInstance =
 			(MDRRuleGroupInstance)ruleGroupInstanceDependentStagedModels.get(0);
 
-		MDRRuleGroupInstanceLocalServiceUtil.
+		_mdrRuleGroupInstanceLocalService.
 			getMDRRuleGroupInstanceByUuidAndGroupId(
 				ruleGroupInstance.getUuid(), group.getGroupId());
 	}
@@ -179,5 +168,14 @@ public class MDRActionStagedModelDataHandlerTest
 	}
 
 	private Layout _layout;
+
+	@Inject
+	private MDRActionLocalService _mdrActionLocalService;
+
+	@Inject
+	private MDRRuleGroupInstanceLocalService _mdrRuleGroupInstanceLocalService;
+
+	@Inject
+	private MDRRuleGroupLocalService _mdrRuleGroupLocalService;
 
 }

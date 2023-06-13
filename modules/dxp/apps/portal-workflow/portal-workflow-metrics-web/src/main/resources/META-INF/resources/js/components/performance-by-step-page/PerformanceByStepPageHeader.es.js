@@ -16,30 +16,29 @@ import ResultsBar from '../../shared/components/results-bar/ResultsBar.es';
 import SearchField from '../../shared/components/search-field/SearchField.es';
 import TimeRangeFilter from '../filter/TimeRangeFilter.es';
 
-const Header = ({dispatch, routeParams, totalCount}) => {
+const Header = ({filterKeys, routeParams, totalCount}) => {
 	return (
 		<>
-			<ClayManagementToolbar>
-				<ClayManagementToolbar.Item>
-					<strong className="ml-0 mr-0 navbar-text">
-						{Liferay.Language.get('filter-by')}
-					</strong>
-				</ClayManagementToolbar.Item>
+			<ClayManagementToolbar className="mb-0">
+				<ClayManagementToolbar.ItemList>
+					<ClayManagementToolbar.Item>
+						<strong className="ml-0 mr-0 navbar-text">
+							{Liferay.Language.get('filter-by')}
+						</strong>
+					</ClayManagementToolbar.Item>
+				</ClayManagementToolbar.ItemList>
 
-				<div className="navbar-form-autofit">
-					<SearchField
-						disabled={false}
-						placeholder={Liferay.Language.get(
-							'search-for-step-name'
-						)}
-					/>
-				</div>
-
-				<TimeRangeFilter
-					buttonClassName="btn-flat btn-sm"
-					dispatch={dispatch}
-					options={{position: 'right'}}
+				<SearchField
+					disabled={false}
+					placeholder={Liferay.Language.get('search-for-step-name')}
 				/>
+
+				<ClayManagementToolbar.ItemList>
+					<TimeRangeFilter
+						buttonClassName="btn-flat btn-sm"
+						options={{position: 'right'}}
+					/>
+				</ClayManagementToolbar.ItemList>
 			</ClayManagementToolbar>
 
 			{routeParams.search && (
@@ -50,7 +49,10 @@ const Header = ({dispatch, routeParams, totalCount}) => {
 							totalCount={totalCount}
 						/>
 
-						<ResultsBar.Clear {...routeParams} />
+						<ResultsBar.Clear
+							filterKeys={filterKeys}
+							{...routeParams}
+						/>
 					</>
 				</ResultsBar>
 			)}

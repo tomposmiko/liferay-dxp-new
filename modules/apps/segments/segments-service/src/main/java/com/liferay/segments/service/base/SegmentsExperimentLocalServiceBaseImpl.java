@@ -19,6 +19,8 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -41,11 +43,15 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.segments.model.SegmentsExperiment;
 import com.liferay.segments.service.SegmentsExperimentLocalService;
+import com.liferay.segments.service.SegmentsExperimentLocalServiceUtil;
 import com.liferay.segments.service.persistence.SegmentsEntryPersistence;
 import com.liferay.segments.service.persistence.SegmentsEntryRelPersistence;
 import com.liferay.segments.service.persistence.SegmentsEntryRolePersistence;
@@ -56,10 +62,13 @@ import com.liferay.segments.service.persistence.SegmentsExperimentRelPersistence
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -81,11 +90,15 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>SegmentsExperimentLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.segments.service.SegmentsExperimentLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>SegmentsExperimentLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>SegmentsExperimentLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the segments experiment to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SegmentsExperimentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param segmentsExperiment the segments experiment
 	 * @return the segments experiment that was added
@@ -117,6 +130,10 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 	/**
 	 * Deletes the segments experiment with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SegmentsExperimentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param segmentsExperimentId the primary key of the segments experiment
 	 * @return the segments experiment that was removed
 	 * @throws PortalException if a segments experiment with the primary key could not be found
@@ -133,6 +150,10 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 	/**
 	 * Deletes the segments experiment from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SegmentsExperimentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param segmentsExperiment the segments experiment
 	 * @return the segments experiment that was removed
 	 * @throws PortalException
@@ -144,6 +165,18 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 		throws PortalException {
 
 		return segmentsExperimentPersistence.remove(segmentsExperiment);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return segmentsExperimentPersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -412,6 +445,16 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return segmentsExperimentPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -420,6 +463,13 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 			(SegmentsExperiment)persistedModel);
 	}
 
+	public BasePersistence<SegmentsExperiment> getBasePersistence() {
+		return segmentsExperimentPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -505,6 +555,10 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 	/**
 	 * Updates the segments experiment in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect SegmentsExperimentLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param segmentsExperiment the segments experiment
 	 * @return the segments experiment that was updated
 	 */
@@ -516,11 +570,16 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 		return segmentsExperimentPersistence.update(segmentsExperiment);
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
+	}
+
 	@Override
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			SegmentsExperimentLocalService.class, IdentifiableOSGiService.class,
-			PersistedModelLocalService.class
+			CTService.class, PersistedModelLocalService.class
 		};
 	}
 
@@ -528,6 +587,8 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		segmentsExperimentLocalService =
 			(SegmentsExperimentLocalService)aopProxy;
+
+		_setLocalServiceUtilService(segmentsExperimentLocalService);
 	}
 
 	/**
@@ -540,8 +601,23 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 		return SegmentsExperimentLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<SegmentsExperiment> getCTPersistence() {
+		return segmentsExperimentPersistence;
+	}
+
+	@Override
+	public Class<SegmentsExperiment> getModelClass() {
 		return SegmentsExperiment.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<SegmentsExperiment>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(segmentsExperimentPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -570,6 +646,23 @@ public abstract class SegmentsExperimentLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		SegmentsExperimentLocalService segmentsExperimentLocalService) {
+
+		try {
+			Field field =
+				SegmentsExperimentLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, segmentsExperimentLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

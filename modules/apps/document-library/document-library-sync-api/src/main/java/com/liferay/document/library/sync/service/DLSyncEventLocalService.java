@@ -15,6 +15,7 @@
 package com.liferay.document.library.sync.service;
 
 import com.liferay.document.library.sync.model.DLSyncEvent;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -58,11 +59,15 @@ public interface DLSyncEventLocalService
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link DLSyncEventLocalServiceUtil} to access the dl sync event local service. Add custom service methods to <code>com.liferay.document.library.sync.service.impl.DLSyncEventLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.document.library.sync.service.impl.DLSyncEventLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the dl sync event local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link DLSyncEventLocalServiceUtil} if injection and service tracking are not available.
 	 */
 
 	/**
 	 * Adds the dl sync event to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLSyncEventLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param dlSyncEvent the dl sync event
 	 * @return the dl sync event that was added
@@ -82,7 +87,17 @@ public interface DLSyncEventLocalService
 	public DLSyncEvent createDLSyncEvent(long syncEventId);
 
 	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
+
+	/**
 	 * Deletes the dl sync event from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLSyncEventLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param dlSyncEvent the dl sync event
 	 * @return the dl sync event that was removed
@@ -92,6 +107,10 @@ public interface DLSyncEventLocalService
 
 	/**
 	 * Deletes the dl sync event with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLSyncEventLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param syncEventId the primary key of the dl sync event
 	 * @return the dl sync event that was removed
@@ -109,6 +128,12 @@ public interface DLSyncEventLocalService
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public <T> T dslQuery(DSLQuery dslQuery);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int dslQueryCount(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -230,6 +255,9 @@ public interface DLSyncEventLocalService
 	 */
 	public String getOSGiServiceIdentifier();
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -237,6 +265,10 @@ public interface DLSyncEventLocalService
 
 	/**
 	 * Updates the dl sync event in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect DLSyncEventLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param dlSyncEvent the dl sync event
 	 * @return the dl sync event that was updated

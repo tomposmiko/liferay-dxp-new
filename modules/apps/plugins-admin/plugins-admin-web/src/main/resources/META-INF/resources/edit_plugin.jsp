@@ -21,6 +21,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 String moduleId = ParamUtil.getString(request, "moduleId");
 String pluginId = ParamUtil.getString(request, "pluginId");
+
 String pluginType = ParamUtil.getString(request, "pluginType");
 
 String title = ParamUtil.getString(request, "title", pluginType);
@@ -49,7 +50,7 @@ renderResponse.setTitle(title);
 
 <portlet:actionURL name="/plugins_admin/edit_plugin" var="editPluginURL" />
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<aui:form action="<%= editPluginURL %>" method="post" name="fm">
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="pluginId" type="hidden" value="<%= pluginId %>" />
@@ -68,11 +69,12 @@ renderResponse.setTitle(title);
 						<aui:field-wrapper helpMessage="edit-plugin-permissions-help" label="permissions">
 
 							<%
-							List resourceActions = ResourceActionsUtil.getResourceActions(portlet.getPortletId(), null);
+							List<String> resourceActions = ResourceActionsUtil.getResourceActions(portlet.getPortletId(), null);
 
 							int maxNumberOfRolesChecked = 500;
 
 							List<Role> roles = RoleLocalServiceUtil.search(company.getCompanyId(), null, null, (Integer[])null, 0, maxNumberOfRolesChecked, new RoleRoleIdComparator(true));
+
 							int rolesCount = RoleLocalServiceUtil.searchCount(company.getCompanyId(), null, null, (Integer[])null);
 
 							List<Role> addToPageRoles = null;
@@ -228,7 +230,7 @@ renderResponse.setTitle(title);
 			<aui:button href="<%= redirect %>" type="cancel" />
 		</aui:button-row>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <%!
 private List<Role> _filterRoles(List<Role> roles, String portletId, String actionId) throws Exception {

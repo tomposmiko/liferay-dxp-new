@@ -1,5 +1,5 @@
 * [class*='ae-toolbar-'][role='toolbar'] {
-	z-index: 980;
+	z-index: 990;
 
 	@include media-breakpoint-down(sm) {
 		z-index: 1000;
@@ -8,6 +8,10 @@
 
 .alloy-editor-container {
 	position: relative;
+
+	.wrapper {
+		position: relative;
+	}
 
 	.alloy-editor-icon {
 		bottom: 8px;
@@ -25,22 +29,49 @@
 			left: 8px;
 		}
 
-		&.alloy-editor-placeholder {
-			&:before {
-				pointer-events: none;
-			}
+		~ .alloy-editor-placeholder {
+			display: none;
+		}
 
-			&.ae-placeholder:empty {
+		&.ae-placeholder {
+			~ .alloy-editor-placeholder {
+				background-color: transparent;
+				color: #2b4259;
+				display: block;
+				padding-left: 10px;
+				pointer-events: none;
+				position: absolute;
+				top: 0.25rem;
+			}
+			&.readonly ~ .alloy-editor-placeholder {
+				color: #ccc;
+			}
+			&:empty {
 				min-height: 1.5em;
 			}
+			&:not(:focus) {
+				~ .alloy-editor-placeholder {
+					border-left-color: #dbdde1;
+					color: #b0b4bb;
+				}
 
-			&.ae-placeholder:not(:focus):not(.form-control) {
-				border-left: 2px solid;
-				padding-left: 10px;
+				&:not(.form-control) ~ .alloy-editor-placeholder {
+					border-left: 2px solid;
+					padding-left: 10px;
+				}
+
+				.has-error & {
+					border-left-color: #c67;
+				}
 			}
-
-			&.ae-placeholder[data-required='true']:not(:focus):before {
-				content: attr(data-placeholder) ' *';
+			&:focus,
+			&.cke_focus {
+				~ .alloy-editor-placeholder {
+					display: none !important;
+				}
+			}
+			&:not(:focus):before {
+				content: '';
 			}
 		}
 
@@ -62,56 +93,6 @@
 			~ .alloy-editor-icon {
 				display: block;
 				max-width: 24px;
-			}
-		}
-
-		.cke_widget_embedurl {
-			.embed-help-message {
-				color: #fff;
-				font-weight: 600;
-				opacity: 0;
-				position: absolute;
-				text-align: center;
-				top: 50%;
-				transform: translateY(-50%);
-				transition: opacity 0.15s ease-in-out;
-				width: 100%;
-				z-index: 1;
-			}
-
-			.embed-responsive {
-				.embed-responsive-16by9 {
-					iframe {
-						@extend .embed-responsive-item !optional;
-					}
-				}
-			}
-
-			.cke_widget_mask {
-				background-color: #000;
-				cursor: pointer;
-				opacity: 0;
-				transition: opacity 0.15s ease-in-out;
-			}
-
-			&.cke_widget_wrapper {
-				&:hover,
-				&.cke_widget_focused {
-					.cke_widget_element {
-						outline: none;
-					}
-				}
-
-				&.cke_widget_selected {
-					.cke_widget_mask {
-						height: 100%;
-						opacity: 0.6;
-					}
-
-					.embed-help-message {
-						opacity: 1;
-					}
-				}
 			}
 		}
 

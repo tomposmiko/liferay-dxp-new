@@ -22,12 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -106,7 +106,9 @@ public abstract class BaseTimeRangeResourceTestCase {
 
 		TimeRangeResource.Builder builder = TimeRangeResource.builder();
 
-		timeRangeResource = builder.locale(
+		timeRangeResource = builder.authentication(
+			"test@liferay.com", "test"
+		).locale(
 			LocaleUtil.getDefault()
 		).build();
 	}
@@ -189,62 +191,97 @@ public abstract class BaseTimeRangeResourceTestCase {
 
 	@Test
 	public void testGetTimeRangesPage() throws Exception {
-		Assert.assertTrue(false);
+		Page<TimeRange> page = timeRangeResource.getTimeRangesPage();
+
+		long totalCount = page.getTotalCount();
+
+		TimeRange timeRange1 = testGetTimeRangesPage_addTimeRange(
+			randomTimeRange());
+
+		TimeRange timeRange2 = testGetTimeRangesPage_addTimeRange(
+			randomTimeRange());
+
+		page = timeRangeResource.getTimeRangesPage();
+
+		Assert.assertEquals(totalCount + 2, page.getTotalCount());
+
+		assertContains(timeRange1, (List<TimeRange>)page.getItems());
+		assertContains(timeRange2, (List<TimeRange>)page.getItems());
+		assertValid(page);
+	}
+
+	protected TimeRange testGetTimeRangesPage_addTimeRange(TimeRange timeRange)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
 	public void testGraphQLGetTimeRangesPage() throws Exception {
-		List<GraphQLField> graphQLFields = new ArrayList<>();
-
-		List<GraphQLField> itemsGraphQLFields = getGraphQLFields();
-
-		graphQLFields.add(
-			new GraphQLField(
-				"items", itemsGraphQLFields.toArray(new GraphQLField[0])));
-
-		graphQLFields.add(new GraphQLField("page"));
-		graphQLFields.add(new GraphQLField("totalCount"));
-
 		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"timeRanges",
-				new HashMap<String, Object>() {
-					{
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
+			"timeRanges",
+			new HashMap<String, Object>() {
+				{
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
+		JSONObject timeRangesJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/timeRanges");
 
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
+		long totalCount = timeRangesJSONObject.getLong("totalCount");
 
-		JSONObject timeRangesJSONObject = dataJSONObject.getJSONObject(
-			"timeRanges");
+		TimeRange timeRange1 = testGraphQLGetTimeRangesPage_addTimeRange();
+		TimeRange timeRange2 = testGraphQLGetTimeRangesPage_addTimeRange();
 
-		Assert.assertEquals(0, timeRangesJSONObject.get("totalCount"));
+		timeRangesJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/timeRanges");
 
-		TimeRange timeRange1 = testGraphQLTimeRange_addTimeRange();
-		TimeRange timeRange2 = testGraphQLTimeRange_addTimeRange();
+		Assert.assertEquals(
+			totalCount + 2, timeRangesJSONObject.getLong("totalCount"));
 
-		jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
+		assertContains(
+			timeRange1,
+			Arrays.asList(
+				TimeRangeSerDes.toDTOs(
+					timeRangesJSONObject.getString("items"))));
+		assertContains(
+			timeRange2,
+			Arrays.asList(
+				TimeRangeSerDes.toDTOs(
+					timeRangesJSONObject.getString("items"))));
+	}
 
-		dataJSONObject = jsonObject.getJSONObject("data");
+	protected TimeRange testGraphQLGetTimeRangesPage_addTimeRange()
+		throws Exception {
 
-		timeRangesJSONObject = dataJSONObject.getJSONObject("timeRanges");
-
-		Assert.assertEquals(2, timeRangesJSONObject.get("totalCount"));
-
-		assertEqualsJSONArray(
-			Arrays.asList(timeRange1, timeRange2),
-			timeRangesJSONObject.getJSONArray("items"));
+		return testGraphQLTimeRange_addTimeRange();
 	}
 
 	protected TimeRange testGraphQLTimeRange_addTimeRange() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	protected void assertContains(
+		TimeRange timeRange, List<TimeRange> timeRanges) {
+
+		boolean contains = false;
+
+		for (TimeRange item : timeRanges) {
+			if (equals(timeRange, item)) {
+				contains = true;
+
+				break;
+			}
+		}
+
+		Assert.assertTrue(
+			timeRanges + " does not contain " + timeRange, contains);
 	}
 
 	protected void assertHttpResponseStatusCode(
@@ -295,26 +332,7 @@ public abstract class BaseTimeRangeResourceTestCase {
 		}
 	}
 
-	protected void assertEqualsJSONArray(
-		List<TimeRange> timeRanges, JSONArray jsonArray) {
-
-		for (TimeRange timeRange : timeRanges) {
-			boolean contains = false;
-
-			for (Object object : jsonArray) {
-				if (equalsJSONObject(timeRange, (JSONObject)object)) {
-					contains = true;
-
-					break;
-				}
-			}
-
-			Assert.assertTrue(
-				jsonArray + " does not contain " + timeRange, contains);
-		}
-	}
-
-	protected void assertValid(TimeRange timeRange) {
+	protected void assertValid(TimeRange timeRange) throws Exception {
 		boolean valid = true;
 
 		if (timeRange.getId() == null) {
@@ -385,13 +403,51 @@ public abstract class BaseTimeRangeResourceTestCase {
 		return new String[0];
 	}
 
-	protected List<GraphQLField> getGraphQLFields() {
+	protected List<GraphQLField> getGraphQLFields() throws Exception {
 		List<GraphQLField> graphQLFields = new ArrayList<>();
 
-		for (String additionalAssertFieldName :
-				getAdditionalAssertFieldNames()) {
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(
+					com.liferay.portal.workflow.metrics.rest.dto.v1_0.TimeRange.
+						class)) {
 
-			graphQLFields.add(new GraphQLField(additionalAssertFieldName));
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			graphQLFields.addAll(getGraphQLFields(field));
+		}
+
+		return graphQLFields;
+	}
+
+	protected List<GraphQLField> getGraphQLFields(
+			java.lang.reflect.Field... fields)
+		throws Exception {
+
+		List<GraphQLField> graphQLFields = new ArrayList<>();
+
+		for (java.lang.reflect.Field field : fields) {
+			com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+				vulcanGraphQLField = field.getAnnotation(
+					com.liferay.portal.vulcan.graphql.annotation.GraphQLField.
+						class);
+
+			if (vulcanGraphQLField != null) {
+				Class<?> clazz = field.getType();
+
+				if (clazz.isArray()) {
+					clazz = clazz.getComponentType();
+				}
+
+				List<GraphQLField> childrenGraphQLFields = getGraphQLFields(
+					getDeclaredFields(clazz));
+
+				graphQLFields.add(
+					new GraphQLField(field.getName(), childrenGraphQLFields));
+			}
 		}
 
 		return graphQLFields;
@@ -468,46 +524,43 @@ public abstract class BaseTimeRangeResourceTestCase {
 		return true;
 	}
 
-	protected boolean equalsJSONObject(
-		TimeRange timeRange, JSONObject jsonObject) {
+	protected boolean equals(
+		Map<String, Object> map1, Map<String, Object> map2) {
 
-		for (String fieldName : getAdditionalAssertFieldNames()) {
-			if (Objects.equals("defaultTimeRange", fieldName)) {
-				if (!Objects.deepEquals(
-						timeRange.getDefaultTimeRange(),
-						jsonObject.getBoolean("defaultTimeRange"))) {
+		if (Objects.equals(map1.keySet(), map2.keySet())) {
+			for (Map.Entry<String, Object> entry : map1.entrySet()) {
+				if (entry.getValue() instanceof Map) {
+					if (!equals(
+							(Map)entry.getValue(),
+							(Map)map2.get(entry.getKey()))) {
+
+						return false;
+					}
+				}
+				else if (!Objects.deepEquals(
+							entry.getValue(), map2.get(entry.getKey()))) {
 
 					return false;
 				}
-
-				continue;
 			}
 
-			if (Objects.equals("id", fieldName)) {
-				if (!Objects.deepEquals(
-						timeRange.getId(), jsonObject.getInt("id"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("name", fieldName)) {
-				if (!Objects.deepEquals(
-						timeRange.getName(), jsonObject.getString("name"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			throw new IllegalArgumentException(
-				"Invalid field name " + fieldName);
+			return true;
 		}
 
-		return true;
+		return false;
+	}
+
+	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
+		throws Exception {
+
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
+
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -628,8 +681,9 @@ public abstract class BaseTimeRangeResourceTestCase {
 		}
 
 		if (entityFieldName.equals("id")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
+			sb.append(String.valueOf(timeRange.getId()));
+
+			return sb.toString();
 		}
 
 		if (entityFieldName.equals("name")) {
@@ -661,6 +715,26 @@ public abstract class BaseTimeRangeResourceTestCase {
 		return httpResponse.getContent();
 	}
 
+	protected JSONObject invokeGraphQLMutation(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField mutationGraphQLField = new GraphQLField(
+			"mutation", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(mutationGraphQLField.toString()));
+	}
+
+	protected JSONObject invokeGraphQLQuery(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField queryGraphQLField = new GraphQLField(
+			"query", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(queryGraphQLField.toString()));
+	}
+
 	protected TimeRange randomTimeRange() throws Exception {
 		return new TimeRange() {
 			{
@@ -668,7 +742,7 @@ public abstract class BaseTimeRangeResourceTestCase {
 				dateStart = RandomTestUtil.nextDate();
 				defaultTimeRange = RandomTestUtil.randomBoolean();
 				id = RandomTestUtil.randomInt();
-				name = RandomTestUtil.randomString();
+				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 			}
 		};
 	}
@@ -694,9 +768,22 @@ public abstract class BaseTimeRangeResourceTestCase {
 			this(key, new HashMap<>(), graphQLFields);
 		}
 
+		public GraphQLField(String key, List<GraphQLField> graphQLFields) {
+			this(key, new HashMap<>(), graphQLFields);
+		}
+
 		public GraphQLField(
 			String key, Map<String, Object> parameterMap,
 			GraphQLField... graphQLFields) {
+
+			_key = key;
+			_parameterMap = parameterMap;
+			_graphQLFields = Arrays.asList(graphQLFields);
+		}
+
+		public GraphQLField(
+			String key, Map<String, Object> parameterMap,
+			List<GraphQLField> graphQLFields) {
 
 			_key = key;
 			_parameterMap = parameterMap;
@@ -714,25 +801,25 @@ public abstract class BaseTimeRangeResourceTestCase {
 						_parameterMap.entrySet()) {
 
 					sb.append(entry.getKey());
-					sb.append(":");
+					sb.append(": ");
 					sb.append(entry.getValue());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append(")");
 			}
 
-			if (_graphQLFields.length > 0) {
+			if (!_graphQLFields.isEmpty()) {
 				sb.append("{");
 
 				for (GraphQLField graphQLField : _graphQLFields) {
 					sb.append(graphQLField.toString());
-					sb.append(",");
+					sb.append(", ");
 				}
 
-				sb.setLength(sb.length() - 1);
+				sb.setLength(sb.length() - 2);
 
 				sb.append("}");
 			}
@@ -740,14 +827,14 @@ public abstract class BaseTimeRangeResourceTestCase {
 			return sb.toString();
 		}
 
-		private final GraphQLField[] _graphQLFields;
+		private final List<GraphQLField> _graphQLFields;
 		private final String _key;
 		private final Map<String, Object> _parameterMap;
 
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseTimeRangeResourceTestCase.class);
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseTimeRangeResourceTestCase.class);
 
 	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
 

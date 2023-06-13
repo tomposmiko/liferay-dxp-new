@@ -16,7 +16,7 @@
 
 AUI.add(
 	'liferay-alloy-editor',
-	A => {
+	(A) => {
 		var Do = A.Do;
 		var Lang = A.Lang;
 
@@ -28,48 +28,53 @@ AUI.add(
 			ATTRS: {
 				contents: {
 					validator: Lang.isString,
-					value: ''
+					value: '',
 				},
 
 				editorConfig: {
 					validator: Lang.isObject,
-					value: {}
+					value: {},
+				},
+
+				editorPaths: {
+					validator: Lang.isArray,
+					value: [],
 				},
 
 				onBlurMethod: {
 					getter: '_getEditorMethod',
-					validator: '_validateEditorMethod'
+					validator: '_validateEditorMethod',
 				},
 
 				onChangeMethod: {
 					getter: '_getEditorMethod',
-					validator: '_validateEditorMethod'
+					validator: '_validateEditorMethod',
 				},
 
 				onFocusMethod: {
 					getter: '_getEditorMethod',
-					validator: '_validateEditorMethod'
+					validator: '_validateEditorMethod',
 				},
 
 				onInitMethod: {
 					getter: '_getEditorMethod',
-					validator: '_validateEditorMethod'
+					validator: '_validateEditorMethod',
 				},
 
 				portletId: {
 					validator: Lang.isString,
-					value: ''
+					value: '',
 				},
 
 				textMode: {
 					validator: Lang.isBoolean,
-					value: {}
+					value: {},
 				},
 
 				useCustomDataProcessor: {
 					validator: Lang.isBoolean,
-					value: false
-				}
+					value: false,
+				},
 			},
 
 			AUGMENTS: [Liferay.PortletBase],
@@ -99,12 +104,14 @@ AUI.add(
 							'Return ancestor parent form',
 							parentForm
 						);
-					} else if (attrName === 'name') {
+					}
+					else if (attrName === 'name') {
 						alterReturn = new Do.AlterReturn(
 							'Return editor namespace',
 							instance.get('namespace')
 						);
-					} else if (attrName === 'type') {
+					}
+					else if (attrName === 'type') {
 						alterReturn = new Do.AlterReturn(
 							'Return editor node name',
 							instance._srcNode.get('nodeName')
@@ -205,23 +212,17 @@ AUI.add(
 						instance._pendingData = null;
 
 						instance.getNativeEditor().setData(pendingData);
-					} else {
+					}
+					else {
 						instance._dataReady = true;
 					}
 				},
 
 				_onError(event) {
-					new Liferay.Notification({
-						closeable: true,
-						delay: {
-							hide: 5000,
-							show: 0
-						},
-						duration: 500,
+					Liferay.Util.openToast({
 						message: event.data,
-						title: Liferay.Language.get('error'),
-						type: 'danger'
-					}).render();
+						type: 'danger',
+					});
 				},
 
 				_onFocus(event) {
@@ -267,7 +268,7 @@ AUI.add(
 						editorNamespace,
 						window[editorNamespace],
 						{
-							portletId: instance.get('portletId')
+							portletId: instance.get('portletId'),
 						}
 					);
 
@@ -329,6 +330,21 @@ AUI.add(
 
 						doc.designMode = 'off';
 					}
+
+					// LPS-118801
+
+					instance.get('editorPaths').forEach((editorPath) => {
+						document
+							.querySelectorAll(
+								`link[href*="${editorPath}"],script[src*="${editorPath}"]`
+							)
+							.forEach((tag) => {
+								tag.setAttribute(
+									'data-senna-track',
+									'temporary'
+								);
+							});
+					});
 				},
 
 				_onKey(event) {
@@ -348,12 +364,13 @@ AUI.add(
 
 					var localeChange = {
 						dir: contentsLanguageDir,
-						lang: contentsLanguage
+						lang: contentsLanguage,
 					};
 
 					if (instance.instanceReady) {
 						instance._changeLocale(localeChange);
-					} else {
+					}
+					else {
 						instance._pendingLocaleChange = localeChange;
 					}
 				},
@@ -383,7 +400,7 @@ AUI.add(
 							instance._srcNode,
 							'val',
 							instance
-						)
+						),
 					];
 
 					// LPS-84186
@@ -474,7 +491,8 @@ AUI.add(
 
 					if (instance.instanceReady) {
 						instance.getNativeEditor().focus();
-					} else {
+					}
+					else {
 						instance.pendingFocus = true;
 					}
 				},
@@ -554,25 +572,22 @@ AUI.add(
 					if (instance.instanceReady) {
 						if (instance._dataReady) {
 							instance.getNativeEditor().setData(value);
-						} else {
+						}
+						else {
 							instance._pendingData = value;
 						}
-					} else {
+					}
+					else {
 						instance.set('contents', value);
 					}
-				}
-			}
+				},
+			},
 		});
 
 		A.LiferayAlloyEditor = LiferayAlloyEditor;
 	},
 	'',
 	{
-		requires: [
-			'aui-component',
-			'liferay-notification',
-			'liferay-portlet-base',
-			'timers'
-		]
+		requires: ['aui-component', 'liferay-portlet-base', 'timers'],
 	}
 );

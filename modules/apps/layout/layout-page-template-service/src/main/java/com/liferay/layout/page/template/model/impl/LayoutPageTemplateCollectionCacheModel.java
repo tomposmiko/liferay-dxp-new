@@ -38,18 +38,18 @@ public class LayoutPageTemplateCollectionCacheModel
 			   MVCCModel {
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof LayoutPageTemplateCollectionCacheModel)) {
+		if (!(object instanceof LayoutPageTemplateCollectionCacheModel)) {
 			return false;
 		}
 
 		LayoutPageTemplateCollectionCacheModel
 			layoutPageTemplateCollectionCacheModel =
-				(LayoutPageTemplateCollectionCacheModel)obj;
+				(LayoutPageTemplateCollectionCacheModel)object;
 
 		if ((layoutPageTemplateCollectionId ==
 				layoutPageTemplateCollectionCacheModel.
@@ -82,10 +82,12 @@ public class LayoutPageTemplateCollectionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", ctCollectionId=");
+		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", layoutPageTemplateCollectionId=");
@@ -102,6 +104,8 @@ public class LayoutPageTemplateCollectionCacheModel
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
+		sb.append(", layoutPageTemplateCollectionKey=");
+		sb.append(layoutPageTemplateCollectionKey);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", description=");
@@ -119,6 +123,7 @@ public class LayoutPageTemplateCollectionCacheModel
 			new LayoutPageTemplateCollectionImpl();
 
 		layoutPageTemplateCollectionImpl.setMvccVersion(mvccVersion);
+		layoutPageTemplateCollectionImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			layoutPageTemplateCollectionImpl.setUuid("");
@@ -156,6 +161,15 @@ public class LayoutPageTemplateCollectionCacheModel
 				new Date(modifiedDate));
 		}
 
+		if (layoutPageTemplateCollectionKey == null) {
+			layoutPageTemplateCollectionImpl.setLayoutPageTemplateCollectionKey(
+				"");
+		}
+		else {
+			layoutPageTemplateCollectionImpl.setLayoutPageTemplateCollectionKey(
+				layoutPageTemplateCollectionKey);
+		}
+
 		if (name == null) {
 			layoutPageTemplateCollectionImpl.setName("");
 		}
@@ -186,6 +200,8 @@ public class LayoutPageTemplateCollectionCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
+
+		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		layoutPageTemplateCollectionId = objectInput.readLong();
@@ -198,6 +214,7 @@ public class LayoutPageTemplateCollectionCacheModel
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
+		layoutPageTemplateCollectionKey = objectInput.readUTF();
 		name = objectInput.readUTF();
 		description = objectInput.readUTF();
 		lastPublishDate = objectInput.readLong();
@@ -206,6 +223,8 @@ public class LayoutPageTemplateCollectionCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
+
+		objectOutput.writeLong(ctCollectionId);
 
 		if (uuid == null) {
 			objectOutput.writeUTF("");
@@ -232,6 +251,13 @@ public class LayoutPageTemplateCollectionCacheModel
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 
+		if (layoutPageTemplateCollectionKey == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(layoutPageTemplateCollectionKey);
+		}
+
 		if (name == null) {
 			objectOutput.writeUTF("");
 		}
@@ -250,6 +276,7 @@ public class LayoutPageTemplateCollectionCacheModel
 	}
 
 	public long mvccVersion;
+	public long ctCollectionId;
 	public String uuid;
 	public long layoutPageTemplateCollectionId;
 	public long groupId;
@@ -258,6 +285,7 @@ public class LayoutPageTemplateCollectionCacheModel
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
+	public String layoutPageTemplateCollectionKey;
 	public String name;
 	public String description;
 	public long lastPublishDate;

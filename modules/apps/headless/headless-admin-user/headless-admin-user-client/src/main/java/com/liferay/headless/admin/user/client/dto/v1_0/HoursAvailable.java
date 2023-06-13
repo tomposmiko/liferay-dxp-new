@@ -17,6 +17,8 @@ package com.liferay.headless.admin.user.client.dto.v1_0;
 import com.liferay.headless.admin.user.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.user.client.serdes.v1_0.HoursAvailableSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class HoursAvailable {
+public class HoursAvailable implements Cloneable, Serializable {
+
+	public static HoursAvailable toDTO(String json) {
+		return HoursAvailableSerDes.toDTO(json);
+	}
 
 	public String getCloses() {
 		return closes;
@@ -90,6 +96,11 @@ public class HoursAvailable {
 	}
 
 	protected String opens;
+
+	@Override
+	public HoursAvailable clone() throws CloneNotSupportedException {
+		return (HoursAvailable)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

@@ -1,9 +1,9 @@
 @component-name = "portal-collaboration"
 definition {
 
+	property custom.properties = "default.layout.template.id=1_column${line.separator}jsonws.web.service.paths.excludes=";
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property custom.properties = "default.layout.template.id=1_column${line.separator}jsonws.web.service.paths.excludes=";
 	property testray.main.component.name = "Content Page Review";
 
 	setUp {
@@ -35,7 +35,17 @@ definition {
 				requireReset = "false",
 				userEmailAddress = "user2@liferay.com");
 
-			ProductMenu.gotoPortlet(
+			User.logoutPG();
+
+			User.firstLoginPG(
+				password = "test",
+				userEmailAddress = "user2@liferay.com");
+
+			User.logoutPG();
+
+			User.loginPG();
+
+			ApplicationsMenu.gotoPortlet(
 				category = "Users",
 				panel = "Control Panel",
 				portlet = "Users and Organizations");
@@ -82,8 +92,7 @@ definition {
 			content = "Lorem ipsum dolor sit amet",
 			fragmentClass = "header",
 			fragmentComment = "Comment by User 2",
-			fragmentName = "Title",
-			position = "1");
+			fragmentName = "Title");
 
 		User.logoutPG();
 
@@ -124,8 +133,7 @@ definition {
 			content = "Lorem ipsum dolor sit amet",
 			fragmentClass = "header",
 			fragmentComment = "Comment By User 1",
-			fragmentName = "Title",
-			position = "1");
+			fragmentName = "Title");
 
 		User.logoutPG();
 
@@ -142,7 +150,6 @@ definition {
 		Click(
 			key_content = "Lorem ipsum dolor sit amet",
 			key_fragmentClass = "header",
-			key_position = "1",
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.replyToComment(commentReply = "Reply from User 2");
@@ -162,7 +169,6 @@ definition {
 		Click(
 			key_content = "Lorem ipsum dolor sit amet",
 			key_fragmentClass = "header",
-			key_position = "1",
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.replyToComment(commentReply = "Reply from User Test");
@@ -208,8 +214,7 @@ definition {
 			content = "Lorem ipsum dolor sit amet",
 			fragmentClass = "header",
 			fragmentComment = "Comment By User 1",
-			fragmentName = "Title",
-			position = "1");
+			fragmentName = "Title");
 
 		User.logoutPG();
 
@@ -226,7 +231,6 @@ definition {
 		Click(
 			key_content = "Lorem ipsum dolor sit amet",
 			key_fragmentClass = "header",
-			key_position = "1",
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.replyToComment(commentReply = "Reply from User 2");
@@ -276,8 +280,7 @@ definition {
 			fragmentComment = "Comment by Test",
 			fragmentName = "Title",
 			mentionsUserFullName = "userfn userln",
-			mentionsUserScreenName = "user2",
-			position = "1");
+			mentionsUserScreenName = "user2");
 
 		User.logoutPG();
 

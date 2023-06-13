@@ -16,10 +16,12 @@ package com.liferay.journal.internal.exportimport.content.processor;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesTransformer;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
@@ -40,6 +42,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -55,9 +58,12 @@ import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,39 +97,65 @@ public class JournalArticleExportImportContentProcessor
 
 		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
-		if (fields != null) {
-			DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
-				ddmStructure, fields);
-
-			ddmFormValues =
-				_ddmFormValuesExportImportContentProcessor.
-					replaceExportContentReferences(
-						portletDataContext, stagedModel, ddmFormValues, true,
-						true);
-
-			DDMFormValuesTransformer ddmFormValuesTransformer =
-				new DDMFormValuesTransformer(ddmFormValues);
-
-			ImageExportDDMFormFieldValueTransformer
-				imageExportDDMFormFieldValueTransformer =
-					new ImageExportDDMFormFieldValueTransformer(
-						content, _dlAppService, exportReferencedContent,
-						portletDataContext, stagedModel);
-
-			ddmFormValuesTransformer.addTransformer(
-				imageExportDDMFormFieldValueTransformer);
-
-			ddmFormValuesTransformer.transform();
+		if (fields == null) {
+			return content;
 		}
 
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(stagedModel.getUuid());
+		sb.append(exportReferencedContent);
+		sb.append(escapeContent);
+
+		String processedContent = _journalArticleExportImportCache.get(
+			sb.toString());
+
+		String path = ExportImportPathUtil.getModelPath(stagedModel);
+
+		if (Validator.isNotNull(processedContent) &&
+			portletDataContext.hasPrimaryKey(String.class, path)) {
+
+			Element entityElement = portletDataContext.getExportDataElement(
+				stagedModel);
+
+			entityElement.addAttribute("cached", "true");
+
+			return processedContent;
+		}
+
+		DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
+			ddmStructure, fields);
+
+		ddmFormValues =
+			_ddmFormValuesExportImportContentProcessor.
+				replaceExportContentReferences(
+					portletDataContext, stagedModel, ddmFormValues, true, true);
+
+		DDMFormValuesTransformer ddmFormValuesTransformer =
+			new DDMFormValuesTransformer(ddmFormValues);
+
+		ImageExportDDMFormFieldValueTransformer
+			imageExportDDMFormFieldValueTransformer =
+				new ImageExportDDMFormFieldValueTransformer(
+					_dlAppService, exportReferencedContent, portletDataContext,
+					stagedModel);
+
+		ddmFormValuesTransformer.addTransformer(
+			imageExportDDMFormFieldValueTransformer);
+
+		ddmFormValuesTransformer.transform();
+
 		content = replaceExportJournalArticleReferences(
-			portletDataContext, stagedModel, content, exportReferencedContent);
+			portletDataContext, stagedModel, content, ddmStructure, fields,
+			exportReferencedContent);
 
 		content =
 			_defaultTextExportImportContentProcessor.
 				replaceExportContentReferences(
 					portletDataContext, stagedModel, content,
 					exportReferencedContent, escapeContent);
+
+		_journalArticleExportImportCache.put(sb.toString(), content);
 
 		return content;
 	}
@@ -136,60 +168,65 @@ public class JournalArticleExportImportContentProcessor
 
 		JournalArticle article = (JournalArticle)stagedModel;
 
-		content = replaceImportJournalArticleReferences(
-			portletDataContext, stagedModel, content);
-
 		DDMStructure ddmStructure = _fetchDDMStructure(
 			portletDataContext, article);
 
-		content = replaceImportJournalArticleReferences(
-			portletDataContext, stagedModel, content);
-
 		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
-		if (fields != null) {
-			DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
-				ddmStructure, fields);
-
-			List<String> originalContents = _fetchContentsFromDDMFormValues(
-				ddmFormValues.getDDMFormFieldValues());
-
-			ddmFormValues =
-				_ddmFormValuesExportImportContentProcessor.
-					replaceImportContentReferences(
-						portletDataContext, stagedModel, ddmFormValues);
-
-			List<String> modifiedContents = _fetchContentsFromDDMFormValues(
-				ddmFormValues.getDDMFormFieldValues());
-
-			for (int i = 0; i < originalContents.size(); i++) {
-				content = StringUtil.replace(
-					content, originalContents.get(i), modifiedContents.get(i));
-			}
-
-			DDMFormValuesTransformer ddmFormValuesTransformer =
-				new DDMFormValuesTransformer(ddmFormValues);
-
-			ImageImportDDMFormFieldValueTransformer
-				imageImportDDMFormFieldValueTransformer =
-					new ImageImportDDMFormFieldValueTransformer(
-						content, _dlAppService, portletDataContext,
-						stagedModel);
-
-			ddmFormValuesTransformer.addTransformer(
-				imageImportDDMFormFieldValueTransformer);
-
-			ddmFormValuesTransformer.transform();
-
-			content = imageImportDDMFormFieldValueTransformer.getContent();
+		if (fields == null) {
+			return content;
 		}
 
-		content =
-			_defaultTextExportImportContentProcessor.
-				replaceImportContentReferences(
-					portletDataContext, stagedModel, content);
+		Element entityElement = portletDataContext.getImportDataElement(
+			stagedModel);
 
-		return content;
+		if (GetterUtil.getBoolean(entityElement.attributeValue("cached"))) {
+			portletDataContext.removePrimaryKey(
+				ExportImportPathUtil.getModelPath(stagedModel));
+
+			return content;
+		}
+
+		content = replaceImportJournalArticleReferences(
+			ddmStructure, fields, portletDataContext, stagedModel);
+
+		DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
+			ddmStructure, fields);
+
+		List<String> originalContents = _fetchContentsFromDDMFormValues(
+			ddmFormValues.getDDMFormFieldValues());
+
+		ddmFormValues =
+			_ddmFormValuesExportImportContentProcessor.
+				replaceImportContentReferences(
+					portletDataContext, stagedModel, ddmFormValues);
+
+		List<String> modifiedContents = _fetchContentsFromDDMFormValues(
+			ddmFormValues.getDDMFormFieldValues());
+
+		for (int i = 0; i < originalContents.size(); i++) {
+			content = StringUtil.replace(
+				content, originalContents.get(i), modifiedContents.get(i));
+		}
+
+		DDMFormValuesTransformer ddmFormValuesTransformer =
+			new DDMFormValuesTransformer(ddmFormValues);
+
+		ImageImportDDMFormFieldValueTransformer
+			imageImportDDMFormFieldValueTransformer =
+				new ImageImportDDMFormFieldValueTransformer(
+					content, _dlAppService, portletDataContext, stagedModel);
+
+		ddmFormValuesTransformer.addTransformer(
+			imageImportDDMFormFieldValueTransformer);
+
+		ddmFormValuesTransformer.transform();
+
+		content = imageImportDDMFormFieldValueTransformer.getContent();
+
+		return _defaultTextExportImportContentProcessor.
+			replaceImportContentReferences(
+				portletDataContext, stagedModel, content);
 	}
 
 	@Override
@@ -243,7 +280,8 @@ public class JournalArticleExportImportContentProcessor
 
 	protected String replaceExportJournalArticleReferences(
 			PortletDataContext portletDataContext, StagedModel stagedModel,
-			String content, boolean exportReferencedContent)
+			String content, DDMStructure ddmStructure, Fields fields,
+			boolean exportReferencedContent)
 		throws Exception {
 
 		Group group = _groupLocalService.fetchGroup(
@@ -259,189 +297,92 @@ public class JournalArticleExportImportContentProcessor
 			return content;
 		}
 
-		Document document = null;
-
-		try {
-			document = SAXReaderUtil.read(content);
-		}
-		catch (DocumentException documentException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid content:\n" + content);
-			}
-
-			return content;
-		}
-
-		XPath xPath = SAXReaderUtil.createXPath(
-			"//dynamic-element[@type='ddm-journal-article']");
-
-		List<Node> ddmJournalArticleNodes = xPath.selectNodes(document);
-
-		for (Node ddmJournalArticleNode : ddmJournalArticleNodes) {
-			Element ddmJournalArticleElement = (Element)ddmJournalArticleNode;
-
-			List<Element> dynamicContentElements =
-				ddmJournalArticleElement.elements("dynamic-content");
-
-			for (Element dynamicContentElement : dynamicContentElements) {
-				String jsonData = dynamicContentElement.getStringValue();
-
-				JSONObject jsonObject = null;
-
-				try {
-					jsonObject = _jsonFactory.createJSONObject(jsonData);
-				}
-				catch (JSONException jsonException) {
-					if (_log.isDebugEnabled()) {
-						_log.debug("Unable to parse JSON", jsonException);
-					}
-
-					continue;
-				}
-
-				long classPK = GetterUtil.getLong(jsonObject.get("classPK"));
-
-				JournalArticle journalArticle =
-					_journalArticleLocalService.fetchLatestArticle(classPK);
-
-				if (journalArticle == null) {
-					if (_log.isInfoEnabled()) {
-						StringBundler messageSB = new StringBundler(7);
-
-						messageSB.append("Staged model with class name ");
-						messageSB.append(stagedModel.getModelClassName());
-						messageSB.append(" and primary key ");
-						messageSB.append(stagedModel.getPrimaryKeyObj());
-						messageSB.append(" references missing journal ");
-						messageSB.append("article with class primary key ");
-						messageSB.append(classPK);
-
-						_log.info(messageSB.toString());
-					}
-
-					continue;
-				}
-
-				String journalArticleReference =
-					"[$journal-article-reference=" +
-						journalArticle.getPrimaryKey() + "$]";
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						StringBundler.concat(
-							"Replacing ", jsonData, " with ",
-							journalArticleReference));
-				}
-
-				dynamicContentElement.clearContent();
-
-				dynamicContentElement.addCDATA(journalArticleReference);
-
-				if (exportReferencedContent) {
-					try {
-						StagedModelDataHandlerUtil.exportReferenceStagedModel(
-							portletDataContext, stagedModel, journalArticle,
-							PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
-					}
-					catch (Exception exception) {
-						if (_log.isDebugEnabled()) {
-							StringBundler messageSB = new StringBundler(10);
-
-							messageSB.append("Staged model with class name ");
-							messageSB.append(stagedModel.getModelClassName());
-							messageSB.append(" and primary key ");
-							messageSB.append(stagedModel.getPrimaryKeyObj());
-							messageSB.append(" references journal article ");
-							messageSB.append("with class primary key ");
-							messageSB.append(classPK);
-							messageSB.append(" that could not be exported ");
-							messageSB.append("due to ");
-							messageSB.append(exception);
-
-							String errorMessage = messageSB.toString();
-
-							if (Validator.isNotNull(exception.getMessage())) {
-								errorMessage = StringBundler.concat(
-									errorMessage, ": ", exception.getMessage());
-							}
-
-							_log.debug(errorMessage, exception);
-						}
-					}
-				}
-				else {
-					Element entityElement =
-						portletDataContext.getExportDataElement(stagedModel);
-
-					portletDataContext.addReferenceElement(
-						stagedModel, entityElement, journalArticle,
-						PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
-				}
-			}
-		}
-
-		return document.asXML();
-	}
-
-	protected String replaceImportJournalArticleReferences(
-			PortletDataContext portletDataContext, StagedModel stagedModel,
-			String content)
-		throws Exception {
-
-		List<Element> referenceElements =
-			portletDataContext.getReferenceElements(
-				stagedModel, JournalArticle.class);
-
-		for (Element referenceElement : referenceElements) {
-			JournalArticle journalArticle = null;
-
-			long classPK = GetterUtil.getLong(
-				referenceElement.attributeValue("class-pk"));
-
-			long articlePrimaryKey = GetterUtil.getLong(
-				portletDataContext.getNewPrimaryKey(
-					JournalArticle.class + ".primaryKey", classPK));
-
-			if (articlePrimaryKey != 0) {
-				journalArticle =
-					_journalArticleLocalService.fetchJournalArticle(
-						articlePrimaryKey);
-			}
-
-			if (journalArticle == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to get journal article with primary key " +
-							articlePrimaryKey);
-				}
-
-				portletDataContext.removePrimaryKey(
-					ExportImportPathUtil.getModelPath(stagedModel));
+		for (Field field : fields) {
+			if (!Objects.equals(
+					field.getType(), DDMFormFieldType.JOURNAL_ARTICLE)) {
 
 				continue;
 			}
 
-			String journalArticleReference =
-				"[$journal-article-reference=" + classPK + "$]";
+			for (Locale locale : field.getAvailableLocales()) {
+				Object fieldValue = field.getValue(locale);
 
-			JSONObject jsonObject = _jsonFactory.createJSONObject();
+				Class<?> fieldValueClass = fieldValue.getClass();
 
-			jsonObject.put(
-				"className", JournalArticle.class.getName()
-			).put(
-				"classPK", journalArticle.getResourcePrimKey()
-			).put(
-				"title",
-				journalArticle.getTitle(journalArticle.getDefaultLanguageId())
-			).put(
-				"titleMap", journalArticle.getTitleMap()
-			);
+				if (fieldValueClass.isArray()) {
+					List<String> jsonList = new ArrayList<>();
 
-			content = StringUtil.replace(
-				content, journalArticleReference, jsonObject.toString());
+					for (String json : (String[])fieldValue) {
+						json = _extractJournalArticleForExport(
+							json, stagedModel, portletDataContext,
+							exportReferencedContent);
+
+						if (Validator.isNotNull(json)) {
+							jsonList.add(json);
+						}
+					}
+
+					field.setValue(locale, jsonList.toArray(new String[0]));
+				}
+				else {
+					String json = _extractJournalArticleForExport(
+						String.valueOf(fieldValue), stagedModel,
+						portletDataContext, exportReferencedContent);
+
+					if (Validator.isNotNull(json)) {
+						field.setValue(locale, json);
+					}
+				}
+			}
 		}
 
-		return content;
+		return _journalConverter.getContent(ddmStructure, fields);
+	}
+
+	protected String replaceImportJournalArticleReferences(
+			DDMStructure ddmStructure, Fields fields,
+			PortletDataContext portletDataContext, StagedModel stagedModel)
+		throws Exception {
+
+		for (Field field : fields) {
+			if (!Objects.equals(
+					field.getType(), DDMFormFieldType.JOURNAL_ARTICLE)) {
+
+				continue;
+			}
+
+			for (Locale locale : field.getAvailableLocales()) {
+				Serializable serializable = field.getValue(locale);
+
+				Class<?> serializableClass = serializable.getClass();
+
+				if (serializableClass.isArray()) {
+					List<String> jsonList = new ArrayList<>();
+
+					for (String json : (String[])serializable) {
+						json = _extractJournalArticleForImport(
+							json, portletDataContext, stagedModel);
+
+						if (Validator.isNotNull(json)) {
+							jsonList.add(json);
+						}
+					}
+
+					field.setValue(locale, jsonList.toArray(new String[0]));
+				}
+				else {
+					String json = _extractJournalArticleForImport(
+						String.valueOf(serializable), portletDataContext,
+						stagedModel);
+
+					if (Validator.isNotNull(json)) {
+						field.setValue(locale, json);
+					}
+				}
+			}
+		}
+
+		return _journalConverter.getContent(ddmStructure, fields);
 	}
 
 	protected void validateJournalArticleReferences(String content)
@@ -484,37 +425,38 @@ public class JournalArticleExportImportContentProcessor
 					JournalArticle journalArticle =
 						_journalArticleLocalService.fetchLatestArticle(classPK);
 
-					if (journalArticle == null) {
-						if (ExportImportThreadLocal.isImportInProcess()) {
-							if (_log.isDebugEnabled()) {
-								StringBundler sb = new StringBundler(7);
+					if (journalArticle != null) {
+						continue;
+					}
 
-								sb.append("An invalid web content article ");
-								sb.append("was detected during import when ");
-								sb.append("validating the content below. ");
-								sb.append("This is not an error; it ");
-								sb.append("typically means the web content ");
-								sb.append("article was deleted.\n");
-								sb.append(content);
+					if (ExportImportThreadLocal.isImportInProcess()) {
+						if (_log.isDebugEnabled()) {
+							StringBundler sb = new StringBundler(6);
 
-								_log.debug(sb.toString());
-							}
+							sb.append("An invalid web content article was ");
+							sb.append("detected during import when ");
+							sb.append("validating the content below. This is ");
+							sb.append("not an error; it typically means the ");
+							sb.append("web content article was deleted.\n");
+							sb.append(content);
 
-							return;
+							_log.debug(sb.toString());
 						}
 
-						NoSuchArticleException noSuchArticleException =
-							new NoSuchArticleException(
-								StringBundler.concat(
-									"No JournalArticle exists with the key ",
-									"{resourcePrimKey=", classPK, "}"));
+						return;
+					}
 
-						if (throwable == null) {
-							throwable = noSuchArticleException;
-						}
-						else {
-							throwable.addSuppressed(noSuchArticleException);
-						}
+					NoSuchArticleException noSuchArticleException =
+						new NoSuchArticleException(
+							StringBundler.concat(
+								"No JournalArticle exists with the key ",
+								"{resourcePrimKey=", classPK, "}"));
+
+					if (throwable == null) {
+						throwable = noSuchArticleException;
+					}
+					else {
+						throwable.addSuppressed(noSuchArticleException);
 					}
 				}
 			}
@@ -550,6 +492,156 @@ public class JournalArticleExportImportContentProcessor
 		}
 
 		return content;
+	}
+
+	private String _extractJournalArticleForExport(
+		String json, StagedModel stagedModel,
+		PortletDataContext portletDataContext,
+		boolean exportReferencedContent) {
+
+		JSONObject jsonObject = null;
+
+		try {
+			jsonObject = _jsonFactory.createJSONObject(json);
+		}
+		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to parse JSON", jsonException);
+			}
+
+			return null;
+		}
+
+		long classPK = GetterUtil.getLong(jsonObject.get("classPK"));
+
+		JournalArticle journalArticle =
+			_journalArticleLocalService.fetchLatestArticle(classPK);
+
+		if (journalArticle == null) {
+			if (_log.isInfoEnabled()) {
+				StringBundler sb = new StringBundler(7);
+
+				sb.append("Staged model with class name ");
+				sb.append(stagedModel.getModelClassName());
+				sb.append(" and primary key ");
+				sb.append(stagedModel.getPrimaryKeyObj());
+				sb.append(" references missing journal article with ");
+				sb.append("class primary key ");
+				sb.append(classPK);
+
+				_log.info(sb.toString());
+			}
+
+			return null;
+		}
+
+		JSONObject newArticleJSONObject = JSONUtil.put(
+			"articlePrimaryKey", journalArticle.getPrimaryKey());
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Replacing ", json, " with ",
+					newArticleJSONObject.toString()));
+		}
+
+		if (exportReferencedContent) {
+			try {
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, stagedModel, journalArticle,
+					PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+			}
+			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					StringBundler sb = new StringBundler(9);
+
+					sb.append("Staged model with class name ");
+					sb.append(stagedModel.getModelClassName());
+					sb.append(" and primary key ");
+					sb.append(stagedModel.getPrimaryKeyObj());
+					sb.append(" references journal article with class ");
+					sb.append("primary key ");
+					sb.append(classPK);
+					sb.append(" that could not be exported due to ");
+					sb.append(exception);
+
+					String errorMessage = sb.toString();
+
+					if (Validator.isNotNull(exception.getMessage())) {
+						errorMessage = StringBundler.concat(
+							errorMessage, ": ", exception.getMessage());
+					}
+
+					_log.debug(errorMessage, exception);
+				}
+			}
+		}
+		else {
+			Element entityElement = portletDataContext.getExportDataElement(
+				stagedModel);
+
+			portletDataContext.addReferenceElement(
+				stagedModel, entityElement, journalArticle,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+		}
+
+		return newArticleJSONObject.toString();
+	}
+
+	private String _extractJournalArticleForImport(
+		String json, PortletDataContext portletDataContext,
+		StagedModel stagedModel) {
+
+		JSONObject jsonObject = null;
+
+		try {
+			jsonObject = _jsonFactory.createJSONObject(json);
+		}
+		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to parse JSON", jsonException);
+			}
+
+			return null;
+		}
+
+		JournalArticle journalArticle = null;
+
+		long articlePrimaryKey = GetterUtil.getLong(
+			portletDataContext.getNewPrimaryKey(
+				JournalArticle.class + ".primaryKey",
+				jsonObject.getLong("articlePrimaryKey")));
+
+		if (articlePrimaryKey != 0) {
+			journalArticle = _journalArticleLocalService.fetchJournalArticle(
+				articlePrimaryKey);
+		}
+
+		if (journalArticle == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to get journal article with primary key " +
+						articlePrimaryKey);
+			}
+
+			portletDataContext.removePrimaryKey(
+				ExportImportPathUtil.getModelPath(stagedModel));
+
+			return null;
+		}
+
+		JSONObject newArticleJSONObject = JSONUtil.put(
+			"className", JournalArticle.class.getName()
+		).put(
+			"classPK", journalArticle.getResourcePrimKey()
+		).put(
+			"title",
+			journalArticle.getTitle(journalArticle.getDefaultLanguageId())
+		).put(
+			"titleMap", journalArticle.getTitleMap()
+		);
+
+		return newArticleJSONObject.toString();
 	}
 
 	private List<String> _fetchContentsFromDDMFormValues(
@@ -599,7 +691,7 @@ public class JournalArticleExportImportContentProcessor
 	private Fields _getDDMStructureFields(
 		DDMStructure ddmStructure, String content) {
 
-		if (ddmStructure == null) {
+		if ((ddmStructure == null) || Validator.isNull(content)) {
 			return null;
 		}
 
@@ -619,8 +711,7 @@ public class JournalArticleExportImportContentProcessor
 		JournalArticleExportImportContentProcessor.class);
 
 	private static final Pattern _htmlCommentRegexPattern = Pattern.compile(
-		"\\<![ \\r\\n\\t]*(--([^\\-]|[\\r\\n]|-[^\\-])*--" +
-			"[ \\r\\n\\t]*)\\>");
+		"\\<!--([\\s\\S]*)--\\>");
 
 	@Reference(
 		target = "(model.class.name=com.liferay.dynamic.data.mapping.storage.DDMFormValues)"
@@ -637,6 +728,10 @@ public class JournalArticleExportImportContentProcessor
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private JournalArticleExportImportProcessorCache
+		_journalArticleExportImportCache;
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;

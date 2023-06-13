@@ -17,6 +17,8 @@ package com.liferay.headless.admin.workflow.client.dto.v1_0;
 import com.liferay.headless.admin.workflow.client.function.UnsafeSupplier;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowTaskAssignToMeSerDes;
 
+import java.io.Serializable;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class WorkflowTaskAssignToMe {
+public class WorkflowTaskAssignToMe implements Cloneable, Serializable {
+
+	public static WorkflowTaskAssignToMe toDTO(String json) {
+		return WorkflowTaskAssignToMeSerDes.toDTO(json);
+	}
 
 	public String getComment() {
 		return comment;
@@ -70,6 +76,32 @@ public class WorkflowTaskAssignToMe {
 	}
 
 	protected Date dueDate;
+
+	public Long getWorkflowTaskId() {
+		return workflowTaskId;
+	}
+
+	public void setWorkflowTaskId(Long workflowTaskId) {
+		this.workflowTaskId = workflowTaskId;
+	}
+
+	public void setWorkflowTaskId(
+		UnsafeSupplier<Long, Exception> workflowTaskIdUnsafeSupplier) {
+
+		try {
+			workflowTaskId = workflowTaskIdUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Long workflowTaskId;
+
+	@Override
+	public WorkflowTaskAssignToMe clone() throws CloneNotSupportedException {
+		return (WorkflowTaskAssignToMe)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

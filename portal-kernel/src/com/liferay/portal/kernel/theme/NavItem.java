@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.theme;
 
+import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -35,6 +35,7 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -123,16 +124,16 @@ public class NavItem implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object object) {
+		if (this == object) {
 			return true;
 		}
 
-		if (!(obj instanceof NavItem)) {
+		if (!(object instanceof NavItem)) {
 			return false;
 		}
 
-		NavItem navItem = (NavItem)obj;
+		NavItem navItem = (NavItem)object;
 
 		if (getLayoutId() == navItem.getLayoutId()) {
 			return true;
@@ -176,6 +177,18 @@ public class NavItem implements Serializable {
 		}
 
 		return _children;
+	}
+
+	public Map<String, Serializable> getExpandoAttributes() {
+		if (_layout != null) {
+			ExpandoBridge expandoBridge = _layout.getExpandoBridge();
+
+			if (expandoBridge != null) {
+				return expandoBridge.getAttributes();
+			}
+		}
+
+		return new HashMap<>();
 	}
 
 	/**
@@ -371,32 +384,12 @@ public class NavItem implements Serializable {
 			layout.getAncestorPlid());
 	}
 
-	private static List<NavItem> _fromLayouts(
-		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay,
-		List<Layout> layouts, Map<String, Object> contextObjects) {
-
-		if ((layouts == null) || layouts.isEmpty()) {
-			return Collections.emptyList();
-		}
-
-		List<NavItem> navItems = new ArrayList<>(layouts.size());
-
-		for (Layout layout : layouts) {
-			navItems.add(
-				new NavItem(
-					httpServletRequest, themeDisplay, layout, contextObjects));
-		}
-
-		return navItems;
-	}
-
 	private static boolean _isContentLayoutDraft(Layout layout) {
 		if (!layout.isTypeContent()) {
 			return false;
 		}
 
-		Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
-			PortalUtil.getClassNameId(Layout.class), layout.getPlid());
+		Layout draftLayout = layout.fetchDraftLayout();
 
 		if (draftLayout != null) {
 			boolean published = GetterUtil.getBoolean(
@@ -424,6 +417,25 @@ public class NavItem implements Serializable {
 
 		_children = _fromLayouts(
 			httpServletRequest, themeDisplay, childLayouts, contextObjects);
+	}
+
+	private List<NavItem> _fromLayouts(
+		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay,
+		List<Layout> layouts, Map<String, Object> contextObjects) {
+
+		if (ListUtil.isEmpty(layouts)) {
+			return Collections.emptyList();
+		}
+
+		List<NavItem> navItems = new ArrayList<>(layouts.size());
+
+		for (Layout layout : layouts) {
+			navItems.add(
+				new NavItem(
+					httpServletRequest, themeDisplay, layout, contextObjects));
+		}
+
+		return navItems;
 	}
 
 	private List<NavItem> _browsableChildren;

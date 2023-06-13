@@ -39,7 +39,7 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(userName);
 %>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<aui:fieldset-group markupView="lexicon">
 		<aui:fieldset>
 			<h4 class="text-default">
@@ -59,7 +59,7 @@ renderResponse.setTitle(userName);
 					</small>
 
 					<p>
-						<%= membershipRequest.getComments() %>
+						<%= HtmlUtil.escape(membershipRequest.getComments()) %>
 					</p>
 				</div>
 			</div>
@@ -103,7 +103,7 @@ renderResponse.setTitle(userName);
 					</small>
 
 					<p>
-						<%= membershipRequest.getReplyComments() %>
+						<%= HtmlUtil.escape(membershipRequest.getReplyComments()) %>
 					</p>
 				</div>
 			</div>
@@ -126,4 +126,4 @@ renderResponse.setTitle(userName);
 			</c:choose>
 		</aui:fieldset>
 	</aui:fieldset-group>
-</div>
+</clay:container-fluid>

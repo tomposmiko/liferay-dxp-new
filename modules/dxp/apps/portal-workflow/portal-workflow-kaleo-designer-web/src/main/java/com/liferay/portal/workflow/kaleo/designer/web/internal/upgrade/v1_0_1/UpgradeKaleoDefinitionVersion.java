@@ -14,19 +14,21 @@
 
 package com.liferay.portal.workflow.kaleo.designer.web.internal.upgrade.v1_0_1;
 
+import com.liferay.counter.kernel.service.CounterLocalService;
+import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.permission.ResourceActions;
-import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.workflow.kaleo.designer.web.constants.KaleoDesignerPortletKeys;
+import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
+import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalService;
 
 import java.sql.PreparedStatement;
@@ -34,23 +36,53 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import java.util.List;
-
 /**
  * @author Inácio Nery
  */
 public class UpgradeKaleoDefinitionVersion extends UpgradeProcess {
 
 	public UpgradeKaleoDefinitionVersion(
+		CounterLocalService counterLocalService,
+		KaleoDefinitionLocalService kaleoDefinitionLocalService,
 		KaleoDefinitionVersionLocalService kaleoDefinitionVersionLocalService,
-		ResourceActionLocalService resourceActionLocalService,
-		ResourceActions resourceActions, UserLocalService userLocalService) {
+		UserLocalService userLocalService) {
 
+		_counterLocalService = counterLocalService;
+		_kaleoDefinitionLocalService = kaleoDefinitionLocalService;
 		_kaleoDefinitionVersionLocalService =
 			kaleoDefinitionVersionLocalService;
-		_resourceActionLocalService = resourceActionLocalService;
-		_resourceActions = resourceActions;
 		_userLocalService = userLocalService;
+	}
+
+	protected KaleoDefinition addKaleoDefinition(
+			long groupId, long userId, Timestamp createDate,
+			Timestamp modifiedDate, String name, String title, String content,
+			int version)
+		throws PortalException {
+
+		long kaleoDefinitionId = _counterLocalService.increment();
+
+		KaleoDefinition kaleoDefinition =
+			_kaleoDefinitionLocalService.createKaleoDefinition(
+				kaleoDefinitionId);
+
+		kaleoDefinition.setGroupId(StagingUtil.getLiveGroupId(groupId));
+
+		User user = _userLocalService.getUser(userId);
+
+		kaleoDefinition.setCompanyId(user.getCompanyId());
+		kaleoDefinition.setUserId(user.getUserId());
+		kaleoDefinition.setUserName(user.getFullName());
+
+		kaleoDefinition.setCreateDate(createDate);
+		kaleoDefinition.setModifiedDate(modifiedDate);
+		kaleoDefinition.setName(name);
+		kaleoDefinition.setTitle(title);
+		kaleoDefinition.setContent(content);
+		kaleoDefinition.setVersion((version == 0) ? 1 : version);
+		kaleoDefinition.setActive(false);
+
+		return _kaleoDefinitionLocalService.addKaleoDefinition(kaleoDefinition);
 	}
 
 	protected void addKaleoDefinitionVersion(
@@ -78,15 +110,24 @@ public class UpgradeKaleoDefinitionVersion extends UpgradeProcess {
 		serviceContext.setScopeGroupId(groupId);
 		serviceContext.setUserId(_getValidUserId(companyId, userId));
 
+		KaleoDefinition kaleoDefinition =
+			_kaleoDefinitionLocalService.fetchKaleoDefinition(
+				name, serviceContext);
+
+		if (kaleoDefinition == null) {
+			kaleoDefinition = addKaleoDefinition(
+				groupId, userId, createDate, modifiedDate, name, title, content,
+				version);
+		}
+
 		_kaleoDefinitionVersionLocalService.addKaleoDefinitionVersion(
-			name, title, StringPool.BLANK, content,
-			getVersion(version, draftVersion), serviceContext);
+			kaleoDefinition.getKaleoDefinitionId(), name, title,
+			StringPool.BLANK, content, getVersion(version, draftVersion),
+			serviceContext);
 	}
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		initKaleoDesignerModelsResourceActions();
-
 		if (hasTable("KaleoDraftDefinition")) {
 			upgradeKaleoDefinitionVersion();
 		}
@@ -118,23 +159,6 @@ public class UpgradeKaleoDefinitionVersion extends UpgradeProcess {
 		}
 
 		return false;
-	}
-
-	protected void initKaleoDesignerModelsResourceActions() throws Exception {
-		_resourceActions.read(
-			null, UpgradeKaleoDefinitionVersion.class.getClassLoader(),
-			"/META-INF/resource-actions/default.xml");
-
-		List<String> modelNames = _resourceActions.getPortletModelResources(
-			KaleoDesignerPortletKeys.KALEO_DESIGNER);
-
-		for (String modelName : modelNames) {
-			List<String> modelActions =
-				_resourceActions.getModelResourceActions(modelName);
-
-			_resourceActionLocalService.checkResourceActions(
-				modelName, modelActions);
-		}
 	}
 
 	protected void removeDuplicatesKaleoDefinitionVersion(
@@ -203,10 +227,10 @@ public class UpgradeKaleoDefinitionVersion extends UpgradeProcess {
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeKaleoDefinitionVersion.class);
 
+	private final CounterLocalService _counterLocalService;
+	private final KaleoDefinitionLocalService _kaleoDefinitionLocalService;
 	private final KaleoDefinitionVersionLocalService
 		_kaleoDefinitionVersionLocalService;
-	private final ResourceActionLocalService _resourceActionLocalService;
-	private final ResourceActions _resourceActions;
 	private final UserLocalService _userLocalService;
 
 }

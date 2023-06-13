@@ -20,7 +20,6 @@ import com.liferay.knowledge.base.service.KBArticleLocalServiceUtil;
 import com.liferay.knowledge.base.util.KnowledgeBaseUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Subscription;
 import com.liferay.portal.kernel.model.User;
@@ -32,7 +31,6 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.SubscriptionSender;
-import com.liferay.portal.kernel.util.TextFormatter;
 
 import java.util.List;
 import java.util.Locale;
@@ -46,11 +44,11 @@ public class AdminSubscriptionSender extends SubscriptionSender {
 
 	public AdminSubscriptionSender(
 		KBArticle kbArticle,
-		ModelResourcePermission<KBArticle> modelResourcePermission,
+		ModelResourcePermission<KBArticle> kbArticleModelResourcePermission,
 		ServiceContext serviceContext) {
 
 		_kbArticle = kbArticle;
-		_kbArticleModelResourcePermission = modelResourcePermission;
+		_kbArticleModelResourcePermission = kbArticleModelResourcePermission;
 		_serviceContext = serviceContext;
 	}
 
@@ -126,7 +124,7 @@ public class AdminSubscriptionSender extends SubscriptionSender {
 	}
 
 	private Function<Locale, String> _getEmailKBArticleAttachmentsFunction()
-		throws PortalException {
+		throws Exception {
 
 		List<FileEntry> attachmentsFileEntries =
 			_kbArticle.getAttachmentsFileEntries();
@@ -143,7 +141,7 @@ public class AdminSubscriptionSender extends SubscriptionSender {
 				sb.append(fileEntry.getTitle());
 				sb.append(" (");
 				sb.append(
-					TextFormatter.formatStorageSize(
+					LanguageUtil.formatStorageSize(
 						fileEntry.getSize(), locale));
 				sb.append(")");
 				sb.append("<br />");

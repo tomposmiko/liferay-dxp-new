@@ -13,18 +13,17 @@ import ClayTable from '@clayui/table';
 import React from 'react';
 
 import ListHeadItem from '../../shared/components/list/ListHeadItem.es';
-import {ChildLink} from '../../shared/components/router/routerWrapper.es';
+import ChildLink from '../../shared/components/router/ChildLink.es';
 
 const Item = ({
-	id,
 	instanceCount,
 	onTimeInstanceCount,
 	overdueInstanceCount,
-	title
+	process: {id, title},
 }) => {
 	return (
 		<ClayTable.Row>
-			<ClayTable.Cell className="table-title" data-testid="processName">
+			<ClayTable.Cell className="table-title">
 				<ChildLink to={`/metrics/${id}`}>{title}</ChildLink>
 			</ClayTable.Cell>
 

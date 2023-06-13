@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.web.internal.facet.display.context;
 
+import com.liferay.portal.search.web.internal.type.facet.configuration.TypeFacetPortletInstanceConfiguration;
+
 import java.io.Serializable;
 
 import java.util.List;
@@ -22,6 +24,14 @@ import java.util.List;
  * @author Lino Alves
  */
 public class AssetEntriesSearchFacetDisplayContext implements Serializable {
+
+	public long getDisplayStyleGroupId() {
+		return _displayStyleGroupId;
+	}
+
+	public String getPaginationStartParameterName() {
+		return _paginationStartParameterName;
+	}
 
 	public String getParameterName() {
 		return _parameterName;
@@ -41,6 +51,12 @@ public class AssetEntriesSearchFacetDisplayContext implements Serializable {
 		return _assetEntriesSearchFacetTermDisplayContext;
 	}
 
+	public TypeFacetPortletInstanceConfiguration
+		getTypeFacetPortletInstanceConfiguration() {
+
+		return _typeFacetPortletInstanceConfiguration;
+	}
+
 	public boolean isNothingSelected() {
 		return _nothingSelected;
 	}
@@ -49,8 +65,18 @@ public class AssetEntriesSearchFacetDisplayContext implements Serializable {
 		return _renderNothing;
 	}
 
+	public void setDisplayStyleGroupId(long displayStyleGroupId) {
+		_displayStyleGroupId = displayStyleGroupId;
+	}
+
 	public void setNothingSelected(boolean nothingSelected) {
 		_nothingSelected = nothingSelected;
+	}
+
+	public void setPaginationStartParameterName(
+		String paginationStartParameterName) {
+
+		_paginationStartParameterName = paginationStartParameterName;
 	}
 
 	public void setParameterName(String parameterName) {
@@ -77,12 +103,24 @@ public class AssetEntriesSearchFacetDisplayContext implements Serializable {
 			assetEntriesSearchFacetFieldDisplayContext;
 	}
 
+	public void setTypeFacetPortletInstanceConfiguration(
+		TypeFacetPortletInstanceConfiguration
+			typeFacetPortletInstanceConfiguration) {
+
+		_typeFacetPortletInstanceConfiguration =
+			typeFacetPortletInstanceConfiguration;
+	}
+
 	private List<AssetEntriesSearchFacetTermDisplayContext>
 		_assetEntriesSearchFacetTermDisplayContext;
+	private long _displayStyleGroupId;
 	private boolean _nothingSelected;
+	private String _paginationStartParameterName;
 	private String _parameterName;
 	private String _parameterValue;
 	private List<String> _parameterValues;
 	private boolean _renderNothing;
+	private TypeFacetPortletInstanceConfiguration
+		_typeFacetPortletInstanceConfiguration;
 
 }

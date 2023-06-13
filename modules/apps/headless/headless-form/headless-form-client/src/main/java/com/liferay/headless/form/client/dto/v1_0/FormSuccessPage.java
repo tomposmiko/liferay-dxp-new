@@ -17,6 +17,8 @@ package com.liferay.headless.form.client.dto.v1_0;
 import com.liferay.headless.form.client.function.UnsafeSupplier;
 import com.liferay.headless.form.client.serdes.v1_0.FormSuccessPageSerDes;
 
+import java.io.Serializable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class FormSuccessPage {
+public class FormSuccessPage implements Cloneable, Serializable {
+
+	public static FormSuccessPage toDTO(String json) {
+		return FormSuccessPageSerDes.toDTO(json);
+	}
 
 	public String getDescription() {
 		return description;
@@ -133,6 +139,11 @@ public class FormSuccessPage {
 	}
 
 	protected Long id;
+
+	@Override
+	public FormSuccessPage clone() throws CloneNotSupportedException {
+		return (FormSuccessPage)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

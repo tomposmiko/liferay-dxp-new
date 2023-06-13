@@ -17,6 +17,8 @@ package com.liferay.portal.workflow.metrics.rest.client.dto.v1_0;
 import com.liferay.portal.workflow.metrics.rest.client.function.UnsafeSupplier;
 import com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0.HistogramSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Histogram {
+public class Histogram implements Cloneable, Serializable {
+
+	public static Histogram toDTO(String json) {
+		return HistogramSerDes.toDTO(json);
+	}
 
 	public String getKey() {
 		return key;
@@ -67,6 +73,11 @@ public class Histogram {
 	}
 
 	protected Double value;
+
+	@Override
+	public Histogram clone() throws CloneNotSupportedException {
+		return (Histogram)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

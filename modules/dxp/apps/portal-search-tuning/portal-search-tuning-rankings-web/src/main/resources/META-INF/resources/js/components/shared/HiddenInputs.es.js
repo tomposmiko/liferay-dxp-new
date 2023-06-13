@@ -17,7 +17,7 @@ import ThemeContext from '../../ThemeContext.es';
 const HiddenInputs = ({valueMap = {}}) => {
 	const {namespace} = useContext(ThemeContext);
 
-	return Object.keys(valueMap).map(key => (
+	return Object.keys(valueMap).map((key) => (
 		<input
 			id={`${namespace}${key}`}
 			key={key}
@@ -29,7 +29,7 @@ const HiddenInputs = ({valueMap = {}}) => {
 };
 
 HiddenInputs.propTypes = {
-	valueMap: PropTypes.object.isRequired
+	valueMap: PropTypes.object.isRequired,
 };
 
 export default HiddenInputs;

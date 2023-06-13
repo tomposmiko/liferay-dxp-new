@@ -14,15 +14,17 @@
 
 AUI.add(
 	'liferay-admin',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
+
+		var IN_PROGRESS_SELECTOR = '.background-task-status-in-progress';
 
 		var INTERVAL_RENDER_IDLE = 60000;
 
 		var INTERVAL_RENDER_IN_PROGRESS = 2000;
 
 		var MAP_DATA_PARAMS = {
-			classname: 'className'
+			classname: 'className',
 		};
 
 		var STR_CLICK = 'click';
@@ -35,28 +37,39 @@ AUI.add(
 
 		var Admin = A.Component.create({
 			ATTRS: {
+				controlMenuCategoryKey: {
+					validator: Lang.isString,
+					value: 'tools',
+				},
+
 				form: {
 					setter: A.one,
-					value: null
+					value: null,
+				},
+
+				indexActionWrapperSelector: {
+					validator: Lang.isString,
+					value: null,
 				},
 
 				indexActionsPanel: {
-					value: null
+					validator: Lang.isString,
+					value: null,
 				},
 
 				redirectUrl: {
 					validator: Lang.isString,
-					value: null
+					value: null,
 				},
 
 				submitButton: {
 					validator: Lang.isString,
-					value: null
+					value: null,
 				},
 
 				url: {
-					value: null
-				}
+					value: null,
+				},
 			},
 
 			AUGMENTS: [Liferay.PortletBase],
@@ -90,6 +103,28 @@ AUI.add(
 					form.append(inputsArray.join(''));
 				},
 
+				_getControlMenuReloadItem(element) {
+					let controlMenuReloadItem;
+
+					if (!element) {
+						return;
+					}
+
+					element
+						.querySelectorAll('.control-menu-nav-item')
+						.forEach((element) => {
+							if (
+								element.getElementsByClassName(
+									'lexicon-icon-reload'
+								).length
+							) {
+								controlMenuReloadItem = element;
+							}
+						});
+
+					return controlMenuReloadItem;
+				},
+
 				_isBackgroundTaskInProgress() {
 					var instance = this;
 
@@ -99,9 +134,7 @@ AUI.add(
 
 					return !!(
 						indexActionsNode &&
-						indexActionsNode.one(
-							'.background-task-status-in-progress'
-						)
+						indexActionsNode.one(IN_PROGRESS_SELECTOR)
 					);
 				},
 
@@ -114,7 +147,7 @@ AUI.add(
 					var redirect = instance.one('#redirect', form);
 
 					if (redirect) {
-						redirect.val(instance.get('redirectURL'));
+						redirect.val(instance.get('redirectUrl'));
 					}
 
 					instance._addInputsFromData(data);
@@ -125,82 +158,135 @@ AUI.add(
 				_updateIndexActions() {
 					var instance = this;
 
-					var renderInterval = INTERVAL_RENDER_IDLE;
-
-					if (instance._isBackgroundTaskInProgress()) {
-						renderInterval = INTERVAL_RENDER_IN_PROGRESS;
-					}
-
 					var currentAdminIndexPanel = A.one(
 						instance.get(STR_INDEX_ACTIONS_PANEL)
 					);
 
 					if (currentAdminIndexPanel) {
 						Liferay.Util.fetch(instance.get(STR_URL), {
-							method: 'POST'
+							method: 'POST',
 						})
-							.then(response => {
+							.then((response) => {
 								return response.text();
 							})
-							.then(response => {
+							.then((response) => {
 								var responseDataNode = A.Node.create(response);
+
+								// Replace each progress bar
 
 								var responseAdminIndexPanel = responseDataNode.one(
 									instance.get(STR_INDEX_ACTIONS_PANEL)
 								);
 
-								var responseAdminIndexNodeList = responseAdminIndexPanel.all(
-									'.index-action-wrapper'
-								);
+								if (
+									currentAdminIndexPanel &&
+									responseAdminIndexPanel
+								) {
+									var responseAdminIndexNodeList = responseAdminIndexPanel.all(
+										instance.get(
+											'indexActionWrapperSelector'
+										)
+									);
 
-								var currentAdminIndexNodeList = currentAdminIndexPanel.all(
-									'.index-action-wrapper'
-								);
+									var currentAdminIndexNodeList = currentAdminIndexPanel.all(
+										instance.get(
+											'indexActionWrapperSelector'
+										)
+									);
 
-								currentAdminIndexNodeList.each(
-									(item, index) => {
-										var inProgress = item.one('.progress');
-
-										var responseAdminIndexNode = responseAdminIndexNodeList.item(
-											index
-										);
-
-										if (!inProgress) {
-											inProgress = responseAdminIndexNode.one(
-												'.progress'
+									currentAdminIndexNodeList.each(
+										(currentNode, index) => {
+											var responseAdminIndexNode = responseAdminIndexNodeList.item(
+												index
 											);
-										}
 
-										if (inProgress) {
-											item.replace(
-												responseAdminIndexNode
-											);
+											var inProgress =
+												currentNode.one(
+													IN_PROGRESS_SELECTOR
+												) ||
+												responseAdminIndexNode.one(
+													IN_PROGRESS_SELECTOR
+												);
+
+											if (inProgress) {
+												currentNode.replace(
+													responseAdminIndexNode
+												);
+											}
 										}
-									}
+									);
+								}
+
+								// Add or remove the reload icon in the top
+								// control menu bar
+
+								const responseDocument = new DOMParser().parseFromString(
+									response,
+									'text/html'
 								);
 
-								var controlMenuId =
-									'#' + instance.ns('controlMenu');
+								const controlMenuId = instance.ns(
+									'controlMenu'
+								);
+								const controlMenuCategoryClassName = `${instance.get(
+									'controlMenuCategoryKey'
+								)}-control-group`;
 
-								var currentControlMenu = A.one(controlMenuId);
-
-								var responseControlMenu = responseDataNode.one(
+								const currentControlMenu = document.getElementById(
+									controlMenuId
+								);
+								const responseControlMenu = responseDocument.getElementById(
 									controlMenuId
 								);
 
 								if (currentControlMenu && responseControlMenu) {
-									currentControlMenu.replace(
-										responseControlMenu
+									const currentControlMenuCategory = currentControlMenu.getElementsByClassName(
+										controlMenuCategoryClassName
+									)[0];
+
+									const currentReloadItem = instance._getControlMenuReloadItem(
+										currentControlMenuCategory
 									);
+
+									const responseControlMenuCategory = responseControlMenu.getElementsByClassName(
+										controlMenuCategoryClassName
+									)[0];
+
+									const responseReloadItem = instance._getControlMenuReloadItem(
+										responseControlMenuCategory
+									);
+
+									if (
+										!currentReloadItem &&
+										responseReloadItem
+									) {
+										currentControlMenuCategory.appendChild(
+											responseReloadItem
+										);
+									}
+									else if (
+										currentReloadItem &&
+										!responseReloadItem
+									) {
+										currentReloadItem.remove();
+									}
 								}
+
+								// Start timeout for refreshing the data
+
+								var renderInterval = INTERVAL_RENDER_IDLE;
+
+								if (instance._isBackgroundTaskInProgress()) {
+									renderInterval = INTERVAL_RENDER_IN_PROGRESS;
+								}
+
+								instance._laterTimeout = A.later(
+									renderInterval,
+									instance,
+									'_updateIndexActions'
+								);
 							});
 					}
-
-					instance._laterTimeout = A.later(
-						renderInterval,
-						instance,
-						'_updateIndexActions'
-					);
 				},
 
 				bindUI() {
@@ -239,8 +325,8 @@ AUI.add(
 						instance,
 						'_updateIndexActions'
 					);
-				}
-			}
+				},
+			},
 		});
 
 		Liferay.Portlet.Admin = Admin;
@@ -250,7 +336,7 @@ AUI.add(
 		requires: [
 			'aui-io-plugin-deprecated',
 			'liferay-portlet-base',
-			'querystring-parse'
-		]
+			'querystring-parse',
+		],
 	}
 );

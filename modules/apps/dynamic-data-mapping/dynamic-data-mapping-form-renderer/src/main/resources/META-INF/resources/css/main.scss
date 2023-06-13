@@ -1,8 +1,9 @@
 @import 'atlas-variables';
 
-@import 'utilities';
 @import 'date-picker';
 @import 'field-type-checkbox-switch';
+@import 'image_picker';
+@import 'utilities';
 
 %flex-space-between {
 	align-items: center;
@@ -13,6 +14,10 @@
 %text-ellipsis {
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.ddm-btn-cancel {
+	margin-right: 7px;
 }
 
 .ddm-btn-full button {
@@ -33,7 +38,15 @@
 	pointer-events: none;
 }
 
+.input-group-inset-item {
+	height: auto;
+}
+
 body .ddm-user-view-content {
+	.ddm-field {
+		padding: 0 12px;
+	}
+
 	.liferay-ddm-form-renderer-wizard {
 		padding: 40px 34px 31px;
 	}
@@ -66,7 +79,9 @@ body .ddm-user-view-content {
 	font-weight: 500;
 }
 
-.lfr-ddm-form-field-container label {
+.lfr-ddm-form-field-container label,
+.lfr-ddm-form-field-container legend,
+.lfr-ddm-form-field-container p {
 	padding-right: 40px;
 }
 
@@ -142,7 +157,7 @@ body .ddm-user-view-content {
 
 	.lfr-ddm-form-page {
 		display: none;
-		padding: 25px 0;
+		padding: 0;
 
 		&.active {
 			display: block;
@@ -162,6 +177,8 @@ body .ddm-user-view-content {
 	}
 
 	.lfr-ddm-form-pagination-controls {
+		padding-left: 12px;
+		padding-right: 12px;
 		padding-top: 20px;
 
 		button {
@@ -206,11 +223,30 @@ body .ddm-user-view-content {
 	a {
 		display: inline-block;
 	}
+
+	.clear-button-upload {
+		border-bottom-left-radius: 0;
+		border-top-left-radius: 0;
+	}
+
+	.clear-button-upload-on {
+		border-bottom-right-radius: 0;
+		border-top-right-radius: 0;
+	}
+
+	.input-file {
+		height: 0.1px;
+		opacity: 0;
+		overflow: hidden;
+		position: absolute;
+		width: 0.1px;
+		z-index: -1;
+	}
 }
 
 .liferay-ddm-form-field-paragraph,
 .liferay-ddm-form-field-tip {
-	color: #869cad;
+	color: #5b7b86;
 	line-height: 16px;
 }
 
@@ -429,7 +465,7 @@ body .ddm-user-view-content {
 
 .lfr-ddm-form-page-description,
 .lfr-ddm-form-page-title {
-	padding-left: 32px;
+	padding-left: 8px;
 	padding-right: 32px;
 }
 
@@ -441,11 +477,29 @@ body .ddm-user-view-content {
 .lfr-ddm-form-field-repeatable-toolbar {
 	.ddm-form-field-repeatable-add-button,
 	.ddm-form-field-repeatable-delete-button {
+		border-radius: 10px !important;
+		height: 18px;
+		padding: 2px !important;
 		position: absolute;
-		top: 4px;
+		width: 18px;
+
+		.lexicon-icon {
+			height: 10px;
+			margin-bottom: 6px;
+			margin-top: 0;
+		}
+
+		.lexicon-icon-hr {
+			width: 8px;
+		}
+
+		.lexicon-icon-plus {
+			width: 10px;
+		}
 	}
 
 	.ddm-form-field-repeatable-delete-button {
+		margin-right: 4px !important;
 		right: 26px;
 	}
 
@@ -506,7 +560,9 @@ body .ddm-user-view-content {
 }
 
 .liferay-ddm-form-builder-sidebar-content {
-	label {
+	label,
+	legend,
+	p {
 		padding-right: 0;
 	}
 }
@@ -533,9 +589,29 @@ body .ddm-user-view-content {
 	}
 }
 
-.ddm-tooltip {
+.liferay-ddm-form-field-localizable-text {
+	.custom-dropdown-menu {
+		max-width: 340px !important;
+		width: 100% !important;
+	}
+
+	.custom-dropdown-item-row {
+		display: flex;
+	}
+}
+
+.ddm-empty {
 	display: inline-block;
-	padding-left: 8px;
+}
+
+.ddm-label-required {
+	padding-left: 4px;
+}
+
+.ddm-tooltip {
+	color: #a7a9bc;
+	display: inline-block;
+	padding-left: 4px;
 }
 
 div.ddm-tooltip-container {
@@ -547,4 +623,24 @@ div.ddm-tooltip-container {
 	&.clay-tooltip-bottom {
 		margin-left: 108px;
 	}
+}
+
+p.ddm-label {
+	color: #272833;
+	cursor: default;
+	display: inline-block;
+	font-size: 0.875rem;
+	font-weight: 600;
+	margin-bottom: 0.25rem;
+	max-width: 100%;
+	word-wrap: break-word;
+}
+
+legend .reference-mark,
+p .reference-mark {
+	color: #b95000;
+	font-size: 6px;
+	margin: 4px 0 32px;
+	padding-left: 8px;
+	padding-right: 4px;
 }

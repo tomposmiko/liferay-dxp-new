@@ -67,18 +67,16 @@ public class SharingPermissionImpl implements SharingPermission {
 				resourceName = className.getClassName();
 			}
 
-			Stream<SharingEntryAction> sharingEntryActionStream =
+			Stream<SharingEntryAction> sharingEntryActionsStream =
 				sharingEntryActions.stream();
-
-			String[] actionIds = sharingEntryActionStream.map(
-				SharingEntryAction::getActionId
-			).toArray(
-				String[]::new
-			);
 
 			throw new PrincipalException.MustHavePermission(
 				permissionChecker.getUserId(), resourceName, classPK,
-				actionIds);
+				sharingEntryActionsStream.map(
+					SharingEntryAction::getActionId
+				).toArray(
+					String[]::new
+				));
 		}
 	}
 
@@ -138,10 +136,10 @@ public class SharingPermissionImpl implements SharingPermission {
 			return true;
 		}
 
-		Stream<SharingEntryAction> sharingEntryActionStream =
+		Stream<SharingEntryAction> sharingEntryActionsStream =
 			sharingEntryActions.stream();
 
-		if (sharingEntryActionStream.allMatch(
+		if (sharingEntryActionsStream.allMatch(
 				sharingEntryAction ->
 					_sharingEntryLocalService.hasShareableSharingPermission(
 						permissionChecker.getUserId(), classNameId, classPK,

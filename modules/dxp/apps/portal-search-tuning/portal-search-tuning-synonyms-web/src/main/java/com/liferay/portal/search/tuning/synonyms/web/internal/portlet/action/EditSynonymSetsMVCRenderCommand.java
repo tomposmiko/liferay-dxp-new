@@ -17,10 +17,10 @@ package com.liferay.portal.search.tuning.synonyms.web.internal.portlet.action;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.index.IndexNameBuilder;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.constants.SynonymsPortletKeys;
 import com.liferay.portal.search.tuning.synonyms.web.internal.display.context.EditSynonymSetsDisplayBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexReader;
-import com.liferay.portal.search.tuning.synonyms.web.internal.index.name.SynonymSetIndexNameBuilder;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + SynonymsPortletKeys.SYNONYMS,
-		"mvc.command.name=editSynonymSet"
+		"mvc.command.name=/synonyms/edit_synonym_sets"
 	},
 	service = MVCRenderCommand.class
 )
@@ -49,9 +49,9 @@ public class EditSynonymSetsMVCRenderCommand implements MVCRenderCommand {
 
 		EditSynonymSetsDisplayBuilder editSynonymSetsDisplayBuilder =
 			new EditSynonymSetsDisplayBuilder(
-				_portal.getHttpServletRequest(renderRequest), _indexNameBuilder,
-				_portal, renderRequest, renderResponse,
-				_synonymSetIndexNameBuilder, _synonymSetIndexReader);
+				_portal.getHttpServletRequest(renderRequest), _portal,
+				renderRequest, renderResponse, _synonymSetIndexNameBuilder,
+				_synonymSetIndexReader);
 
 		renderRequest.setAttribute(
 			SynonymsPortletKeys.EDIT_SYNONYM_SET_DISPLAY_CONTEXT,

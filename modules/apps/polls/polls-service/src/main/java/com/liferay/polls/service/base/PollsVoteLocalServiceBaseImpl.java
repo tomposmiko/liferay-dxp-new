@@ -19,8 +19,10 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.polls.model.PollsVote;
 import com.liferay.polls.service.PollsVoteLocalService;
+import com.liferay.polls.service.PollsVoteLocalServiceUtil;
 import com.liferay.polls.service.persistence.PollsChoicePersistence;
 import com.liferay.polls.service.persistence.PollsQuestionFinder;
 import com.liferay.polls.service.persistence.PollsQuestionPersistence;
@@ -45,16 +47,20 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
+
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -75,11 +81,15 @@ public abstract class PollsVoteLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>PollsVoteLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.polls.service.PollsVoteLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>PollsVoteLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>PollsVoteLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the polls vote to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsVoteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param pollsVote the polls vote
 	 * @return the polls vote that was added
@@ -107,6 +117,10 @@ public abstract class PollsVoteLocalServiceBaseImpl
 	/**
 	 * Deletes the polls vote with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsVoteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param voteId the primary key of the polls vote
 	 * @return the polls vote that was removed
 	 * @throws PortalException if a polls vote with the primary key could not be found
@@ -120,6 +134,10 @@ public abstract class PollsVoteLocalServiceBaseImpl
 	/**
 	 * Deletes the polls vote from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsVoteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param pollsVote the polls vote
 	 * @return the polls vote that was removed
 	 */
@@ -127,6 +145,18 @@ public abstract class PollsVoteLocalServiceBaseImpl
 	@Override
 	public PollsVote deletePollsVote(PollsVote pollsVote) {
 		return pollsVotePersistence.remove(pollsVote);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return pollsVotePersistence.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(DSLQuery dslQuery) {
+		Long count = dslQuery(dslQuery);
+
+		return count.intValue();
 	}
 
 	@Override
@@ -358,6 +388,15 @@ public abstract class PollsVoteLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return pollsVotePersistence.create(((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -365,6 +404,13 @@ public abstract class PollsVoteLocalServiceBaseImpl
 		return pollsVoteLocalService.deletePollsVote((PollsVote)persistedModel);
 	}
 
+	public BasePersistence<PollsVote> getBasePersistence() {
+		return pollsVotePersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -449,6 +495,10 @@ public abstract class PollsVoteLocalServiceBaseImpl
 	/**
 	 * Updates the polls vote in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PollsVoteLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param pollsVote the polls vote
 	 * @return the polls vote that was updated
 	 */
@@ -456,6 +506,11 @@ public abstract class PollsVoteLocalServiceBaseImpl
 	@Override
 	public PollsVote updatePollsVote(PollsVote pollsVote) {
 		return pollsVotePersistence.update(pollsVote);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -469,6 +524,8 @@ public abstract class PollsVoteLocalServiceBaseImpl
 	@Override
 	public void setAopProxy(Object aopProxy) {
 		pollsVoteLocalService = (PollsVoteLocalService)aopProxy;
+
+		_setLocalServiceUtilService(pollsVoteLocalService);
 	}
 
 	/**
@@ -510,6 +567,22 @@ public abstract class PollsVoteLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		PollsVoteLocalService pollsVoteLocalService) {
+
+		try {
+			Field field = PollsVoteLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, pollsVoteLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

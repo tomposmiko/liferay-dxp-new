@@ -12,12 +12,14 @@
  * details.
  */
 
-(function() {
+(function () {
 	var A = AUI();
 
 	var AArray = A.Array;
 	var KeyMap = A.Event.KeyMap;
 	var Lang = A.Lang;
+
+	var BR_TAG = 'BR';
 
 	var CSS_LFR_AC_CONTENT = 'lfr-ac-content';
 
@@ -28,18 +30,18 @@
 	var TPL_REPLACE_HTML =
 		'<span class="' + CSS_LFR_AC_CONTENT + '">{html}</span>';
 
-	var AutoCompleteCKEditor = function() {};
+	var AutoCompleteCKEditor = function () {};
 
 	AutoCompleteCKEditor.ATTRS = {
 		editor: {
 			validator: Lang.isObject,
-			writeOnce: true
+			writeOnce: true,
 		},
 
 		inputNode: {
 			valueFn: '_getInputElement',
-			writeOnce: true
-		}
+			writeOnce: true,
+		},
 	};
 
 	AutoCompleteCKEditor.prototype = {
@@ -53,10 +55,10 @@
 			var editor = instance.get(STR_EDITOR);
 
 			instance._eventHandles = [
-				editor.on('key', A.bind('_onEditorKey', instance))
+				editor.on('key', A.bind('_onEditorKey', instance)),
 			];
 
-			editor.once('instanceReady', event => {
+			editor.once('instanceReady', (event) => {
 				var editorBody = A.one(event.editor.element.$);
 
 				instance._eventHandles.push(
@@ -71,9 +73,7 @@
 		_getACPositionBase() {
 			var instance = this;
 
-			var inline = this.get(STR_EDITOR)
-				.editable()
-				.isInline();
+			var inline = this.get(STR_EDITOR).editable().isInline();
 
 			if (!instance._contentsContainer) {
 				var inputElement = instance._getInputElement();
@@ -113,7 +113,7 @@
 
 			return {
 				end: range.endOffset,
-				start: range.startOffset
+				start: range.startOffset,
 			};
 		},
 
@@ -134,7 +134,7 @@
 
 			return {
 				x: bookmarkXY[0],
-				y: bookmarkXY[1]
+				y: bookmarkXY[1],
 			};
 		},
 
@@ -176,7 +176,7 @@
 
 			var triggers = instance._getTriggers();
 
-			AArray.each(triggers, item => {
+			AArray.each(triggers, (item) => {
 				var triggerPosition = query.lastIndexOf(item);
 
 				if (triggerPosition !== -1 && triggerPosition > triggerIndex) {
@@ -185,10 +185,31 @@
 				}
 			});
 
+			// What follows is an algorithm to properly select the query
+			// from the last detected trigger. Because of the HTML
+			// structure, it's not as straightforward as a text search.
+			//
+			// If triggerIndex === -1, the trigger is not in the current
+			// HTML node element. Thus, we walk the DOM tree upwards
+			// until we find it, constructing the query as we visit the
+			// nodes in the tree.
+			//
+			// If triggerIndex > 0, we found the trigger in a longer
+			// text sequence.  We check if the char before the trigger
+			// is a space (' ' or nbsp;) by checking that trimming
+			// the char returns false or a filler char (\u200b) for
+			// WebKit-based engines. If that's the case, we take the
+			// substring from triggerPosition forward and discard the
+			// rest of the text sequence.
+			//
+			// If triggerIndex === 0, the trigger is the first char in
+			// the sequence which means it's already the right query and
+			// has no additional characters.
+
 			if (triggerIndex === -1) {
 				var triggerWalker = instance._getWalker(triggerContainer);
 
-				triggerWalker.guard = function(node) {
+				triggerWalker.guard = function (node) {
 					var hasTrigger = false;
 
 					if (
@@ -197,7 +218,7 @@
 					) {
 						var nodeText = node.getText();
 
-						AArray.each(triggers, item => {
+						AArray.each(triggers, (item) => {
 							var triggerPosition = nodeText.lastIndexOf(item);
 
 							if (
@@ -215,7 +236,8 @@
 							query = nodeText.substring(triggerIndex) + query;
 
 							triggerContainer = node;
-						} else {
+						}
+						else {
 							query = node.getText() + query;
 						}
 					}
@@ -228,9 +250,11 @@
 				};
 
 				triggerWalker.checkBackward();
-			} else if (
+			}
+			else if (
 				triggerIndex > 0 &&
-				query.charAt(triggerIndex - 1) === STR_SPACE
+				(!query.charAt(triggerIndex - 1).trim() ||
+					query.charAt(triggerIndex - 1) === '\u200b')
 			) {
 				query = query.substring(triggerIndex);
 			}
@@ -239,7 +263,7 @@
 				container: triggerContainer,
 				index: triggerIndex,
 				query,
-				value: trigger
+				value: trigger,
 			};
 		},
 
@@ -249,6 +273,16 @@
 			var prevTriggerPosition = instance._getPrevTriggerPosition();
 
 			var query = prevTriggerPosition.query;
+
+			if (
+				query &&
+				prevTriggerPosition.container.$.lastElementChild &&
+				prevTriggerPosition.container.$.lastElementChild.nodeName ===
+					BR_TAG
+			) {
+				query = null;
+			}
+
 			var trigger = prevTriggerPosition.value;
 
 			var res = instance._getRegExp().exec(query);
@@ -307,12 +341,17 @@
 				keyCode: event.data.keyCode,
 				preventDefault: event.cancel,
 				stopPropagation: event.stop,
-				type: 'keydown'
+				type: 'keydown',
 			});
 		},
 
 		_onEditorKey(event) {
 			var instance = this;
+			var editor = instance.get(STR_EDITOR);
+
+			if (editor.mode !== 'wysiwyg') {
+				return;
+			}
 
 			if (instance._isEmptySelection()) {
 				event = instance._normalizeCKEditorKeyEvent(event);
@@ -323,16 +362,16 @@
 					acVisible &&
 					KeyMap.isKeyInSet(event.keyCode, 'down', 'enter', 'up')
 				) {
-					var editor = instance.get(STR_EDITOR);
-
 					var inlineEditor = editor.editable().isInline();
 
 					if (KeyMap.isKey(event.keyCode, 'enter') || !inlineEditor) {
 						instance._onInputKey(event);
 					}
-				} else if (event.keyCode === KeyMap.ESC) {
+				}
+				else if (event.keyCode === KeyMap.ESC) {
 					instance.hide();
-				} else {
+				}
+				else {
 					instance._processCaretTask();
 				}
 			}
@@ -356,7 +395,8 @@
 
 			if (
 				!replaceContainer ||
-				!replaceContainer.hasClass('lfr-ac-content')
+				!replaceContainer.hasClass('lfr-ac-content') ||
+				prevTriggerPosition.value
 			) {
 				replaceContainer = prevTriggerPosition.container.split(
 					prevTriggerPosition.index
@@ -365,13 +405,21 @@
 
 			var newElement = CKEDITOR.dom.element.createFromHtml(
 				Lang.sub(TPL_REPLACE_HTML, {
-					html: text
+					html: text,
 				})
 			);
 
 			newElement.replace(replaceContainer);
 
-			var nextElement = newElement.getNext();
+			var nextElement = newElement.getNext(function () {
+				return (
+					this.type !== CKEDITOR.NODE_TEXT || this.getText().trim()
+				);
+			});
+
+			if (nextElement && nextElement.$.nodeName === BR_TAG) {
+				nextElement = null;
+			}
 
 			if (nextElement) {
 				var containerAscendant = instance._getContainerAscendant(
@@ -396,7 +444,8 @@
 						node.setText(nodeText.substring(spaceIndex));
 
 						updateWalker.end();
-					} else {
+					}
+					else {
 						removeNodes.push(node);
 					}
 
@@ -417,7 +466,7 @@
 
 			return {
 				index: 1,
-				node: nextElement
+				node: nextElement,
 			};
 		},
 
@@ -456,7 +505,7 @@
 			var instance = this;
 
 			instance._bindUIACCKEditor();
-		}
+		},
 	};
 
 	AutoCompleteCKEditor.CONTAINER_ASCENDANT = {
@@ -468,7 +517,7 @@
 		h4: 1,
 		p: 1,
 		pre: 1,
-		span: 1
+		span: 1,
 	};
 
 	Liferay.AutoCompleteCKEditor = A.Base.create(
@@ -477,7 +526,7 @@
 		[Liferay.AutoCompleteInputBase, AutoCompleteCKEditor],
 		{},
 		{
-			CSS_PREFIX: A.ClassNameManager.getClassName('aclist')
+			CSS_PREFIX: A.ClassNameManager.getClassName('aclist'),
 		}
 	);
 })();

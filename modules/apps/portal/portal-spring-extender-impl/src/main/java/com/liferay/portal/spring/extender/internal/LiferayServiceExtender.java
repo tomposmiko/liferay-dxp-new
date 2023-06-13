@@ -18,6 +18,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.hibernate.SessionFactoryImpl;
 import com.liferay.portal.dao.orm.hibernate.VerifySessionFactoryWrapper;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
@@ -34,6 +35,7 @@ import com.liferay.portal.spring.transaction.TransactionManagerFactory;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 
 import javax.sql.DataSource;
 
@@ -177,8 +179,8 @@ public class LiferayServiceExtender
 						_extendeeBundle.getSymbolicName())));
 		}
 
-		private LiferayServiceExtension(Bundle bundle) {
-			_extendeeBundle = bundle;
+		private LiferayServiceExtension(Bundle extendeeBundle) {
+			_extendeeBundle = extendeeBundle;
 		}
 
 		private DefaultTransactionExecutor _getTransactionExecutor(
@@ -214,7 +216,22 @@ public class LiferayServiceExtender
 		_bundleTracker = new BundleTracker<>(
 			bundleContext, Bundle.ACTIVE | Bundle.STARTING, this);
 
-		_bundleTracker.open();
+		FutureTask<Void> futureTask = new FutureTask<>(
+			() -> {
+				_bundleTracker.open();
+
+				return null;
+			});
+
+		Thread bundleTrackerOpenerThread = new Thread(
+			futureTask,
+			LiferayServiceExtender.class.getName() + "-BundleTrackerOpener");
+
+		bundleTrackerOpenerThread.setDaemon(true);
+
+		bundleTrackerOpenerThread.start();
+
+		DependencyManagerSyncUtil.registerSyncFuture(futureTask);
 	}
 
 	@Deactivate

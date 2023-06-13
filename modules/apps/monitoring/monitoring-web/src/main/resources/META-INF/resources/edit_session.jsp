@@ -170,8 +170,11 @@ renderResponse.setTitle(LanguageUtil.format(request, "session-id-x", sessionId, 
 							userSessionAlive = true;
 
 							HttpSession userSession = PortalSessionContext.get(sessionId);
+							%>
 
-							if (userSession != null) {
+							<c:if test="<%= userSession != null %>">
+
+								<%
 								try {
 									Set<String> sortedAttrNames = new TreeSet<String>();
 
@@ -184,13 +187,13 @@ renderResponse.setTitle(LanguageUtil.format(request, "session-id-x", sessionId, 
 									}
 
 									for (String attrName : sortedAttrNames) {
-							%>
+								%>
 
 										<dt class="h4">
 											<%= HtmlUtil.escape(attrName) %>
 										</dt>
 
-							<%
+								<%
 									}
 								}
 								catch (Exception e) {
@@ -198,22 +201,23 @@ renderResponse.setTitle(LanguageUtil.format(request, "session-id-x", sessionId, 
 
 									_log.error(e, e);
 								}
-							}
-							%>
+								%>
 
+							</c:if>
 						</dl>
 					</liferay-ui:panel>
 				</liferay-ui:panel-container>
 			</aui:fieldset-group>
 
 			<aui:button-row>
-				<c:if test="<%= userSessionAlive && !session.getId().equals(sessionId) %>">
+				<c:if test="<%= userSessionAlive && !Objects.equals(session.getId(), sessionId) %>">
 					<aui:button type="submit" value="kill-session" />
 				</c:if>
 			</aui:button-row>
 		</c:otherwise>
 	</c:choose>
 </aui:form>
+
 <%!
-	private static Log _log = LogFactoryUtil.getLog("com_liferay_monitoring_web.edit_session_jsp");
+private static Log _log = LogFactoryUtil.getLog("com_liferay_monitoring_web.edit_session_jsp");
 %>

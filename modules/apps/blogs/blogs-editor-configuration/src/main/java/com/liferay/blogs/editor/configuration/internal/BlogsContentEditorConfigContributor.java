@@ -14,7 +14,6 @@
 
 package com.liferay.blogs.editor.configuration.internal;
 
-import com.liferay.blogs.configuration.BlogsFileUploadsConfiguration;
 import com.liferay.blogs.constants.BlogsPortletKeys;
 import com.liferay.blogs.item.selector.criterion.BlogsItemSelectorCriterion;
 import com.liferay.item.selector.ItemSelector;
@@ -22,28 +21,24 @@ import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
-import com.liferay.item.selector.criteria.upload.criterion.UploadItemSelectorCriterion;
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -70,12 +65,13 @@ public class BlogsContentEditorConfigContributor
 		StringBundler sb = new StringBundler(7);
 
 		sb.append("a[*](*); ");
-		sb.append(getAllowedContentText());
-		sb.append(" div[*](*); iframe[*](*); img[*](*){*}; ");
-		sb.append(getAllowedContentLists());
-		sb.append(" p {text-align}; ");
-		sb.append(getAllowedContentTable());
-		sb.append(" video[*](*);");
+		sb.append(_getAllowedContentText());
+		sb.append(
+			" div[*](*); figcaption; figure; iframe[*](*); img[*](*){*}; ");
+		sb.append(_getAllowedContentLists());
+		sb.append(" p[*](*){text-align}; ");
+		sb.append(_getAllowedContentTable());
+		sb.append(" source[*](*); video[*](*);");
 
 		jsonObject.put("allowedContent", sb.toString());
 
@@ -85,35 +81,44 @@ public class BlogsContentEditorConfigContributor
 		String name = GetterUtil.getString(
 			inputEditorTaglibAttributes.get("liferay-ui:input-editor:name"));
 
-		populateFileBrowserURL(
-			jsonObject, themeDisplay, requestBackedPortletURLFactory,
+		_populateFileBrowserURL(
+			jsonObject, requestBackedPortletURLFactory,
 			namespace + name + "selectItem");
 
 		_populateTwitterButton(jsonObject);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		if (Validator.isNotNull(portletDisplay.getId())) {
+			PortletURL portletURL =
+				requestBackedPortletURLFactory.createActionURL(
+					portletDisplay.getId());
+
+			portletURL.setParameter(
+				ActionRequest.ACTION_NAME, "/blogs/upload_temp_image");
+
+			jsonObject.put("uploadUrl", portletURL.toString());
+		}
 	}
 
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_blogsFileUploadsConfiguration = ConfigurableUtil.createConfigurable(
-			BlogsFileUploadsConfiguration.class, properties);
-	}
-
-	protected String getAllowedContentLists() {
+	private String _getAllowedContentLists() {
 		return "li ol ul;";
 	}
 
-	protected String getAllowedContentTable() {
-		return "table[border, cellpadding, cellspacing] {width}; tbody td " +
-			"th[scope]; thead tr[scope];";
+	private String _getAllowedContentTable() {
+		return StringBundler.concat(
+			"col[span]; colgroup[span]; table[border, cellpadding, ",
+			"cellspacing]{width}; tbody td[colspan, headers, rowspan]{*}; ",
+			"th[abbr, colspan, headers, rowspan, scope, sorted]{*}; thead tr;");
 	}
 
-	protected String getAllowedContentText() {
-		return "b blockquote code em h1 h2 h3 h4 h5 h6 hr i pre strong u;";
+	private String _getAllowedContentText() {
+		return "b blockquote code em h1 h2 h3 h4 h5 h6 hr i pre s strike " +
+			"strong u;";
 	}
 
-	protected void populateFileBrowserURL(
-		JSONObject jsonObject, ThemeDisplay themeDisplay,
+	private void _populateFileBrowserURL(
+		JSONObject jsonObject,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory,
 		String eventName) {
 
@@ -137,26 +142,10 @@ public class BlogsContentEditorConfigContributor
 		urlItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new URLItemSelectorReturnType());
 
-		PortletURL uploadURL = requestBackedPortletURLFactory.createActionURL(
-			PortletKeys.BLOGS);
-
-		uploadURL.setParameter(
-			ActionRequest.ACTION_NAME, "/blogs/upload_image");
-
-		ItemSelectorCriterion uploadItemSelectorCriterion =
-			new UploadItemSelectorCriterion(
-				PortletKeys.BLOGS, uploadURL.toString(),
-				LanguageUtil.get(themeDisplay.getLocale(), "blog-images"),
-				_blogsFileUploadsConfiguration.imageMaxSize(),
-				_blogsFileUploadsConfiguration.imageExtensions());
-
-		uploadItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			new FileEntryItemSelectorReturnType());
-
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
 			requestBackedPortletURLFactory, eventName,
 			blogsItemSelectorCriterion, imageItemSelectorCriterion,
-			urlItemSelectorCriterion, uploadItemSelectorCriterion);
+			urlItemSelectorCriterion);
 
 		jsonObject.put(
 			"filebrowserImageBrowseLinkUrl", itemSelectorURL.toString()
@@ -215,8 +204,6 @@ public class BlogsContentEditorConfigContributor
 			return;
 		}
 	}
-
-	private BlogsFileUploadsConfiguration _blogsFileUploadsConfiguration;
 
 	@Reference
 	private ItemSelector _itemSelector;

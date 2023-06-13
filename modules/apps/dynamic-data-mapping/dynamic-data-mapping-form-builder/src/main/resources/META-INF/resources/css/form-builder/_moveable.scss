@@ -3,7 +3,7 @@ $c: '.ddm-form-builder';
 #{$c} {
 	.moveable {
 		.ddm-field-container {
-			cursor: -webkit-grab;
+			cursor: grab;
 		}
 	}
 
@@ -14,7 +14,7 @@ $c: '.ddm-form-builder';
 
 	.ddm-drag {
 		background-color: #fff;
-		padding: 1rem 15px;
+		padding: 1rem 0;
 		width: 100%;
 
 		.form-group {
@@ -23,30 +23,31 @@ $c: '.ddm-form-builder';
 	}
 
 	.ddm-drag .form-control {
-		cursor: -webkit-grab;
+		cursor: grab;
 	}
 
 	.ddm-drag.dragging .form-control {
-		cursor: -webkit-grabbing;
+		cursor: grabbing;
 	}
 
 	.ddm-drag.dragging {
 		border-radius: 4px;
 		box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.2);
-		cursor: -webkit-grabbing;
+		cursor: grabbing;
 		opacity: 0.7;
 		position: absolute;
 		z-index: 10;
 	}
 
 	.ddm-drag-item {
-		cursor: -webkit-grab;
+		cursor: move;
+		cursor: grab;
 		position: inherit;
 	}
 
 	.ddm-drag-item.dragging {
 		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-		cursor: -webkit-grabbing;
+		cursor: grabbing;
 		z-index: 20;
 	}
 
@@ -61,8 +62,8 @@ $c: '.ddm-form-builder';
 	.col.col-empty {
 		.ddm-empty-page {
 			border-radius: 6px;
-			height: 80px;
-			line-height: 80px;
+			height: auto;
+			line-height: 32px;
 			text-align: center;
 
 			&.target-droppable {
@@ -81,7 +82,7 @@ $c: '.ddm-form-builder';
 				color: $strong-blue;
 
 				.ddm-empty-page-message {
-					display: none;
+					visibility: hidden;
 				}
 			}
 
@@ -93,6 +94,11 @@ $c: '.ddm-form-builder';
 				100% {
 					background-color: $dark-blue;
 				}
+			}
+
+			.ddm-empty-page-message {
+				margin-bottom: 0;
+				padding: 24px 0;
 			}
 		}
 

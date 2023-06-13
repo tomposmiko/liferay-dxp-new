@@ -14,6 +14,7 @@
 
 package com.liferay.site.navigation.taglib.internal.util;
 
+import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.theme.NavItem;
@@ -22,7 +23,11 @@ import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 import com.liferay.site.navigation.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.site.navigation.type.SiteNavigationMenuItemType;
 
+import java.io.Serializable;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,14 +42,13 @@ public class SiteNavigationMenuNavItem extends NavItem {
 
 		super(httpServletRequest, themeDisplay, themeDisplay.getLayout(), null);
 
-		SiteNavigationMenuItemType siteNavigationMenuItemType =
-			ServletContextUtil.getSiteNavigationMenuItemType(
-				siteNavigationMenuItem.getType());
-
 		_httpServletRequest = httpServletRequest;
 		_themeDisplay = themeDisplay;
 		_siteNavigationMenuItem = siteNavigationMenuItem;
-		_siteNavigationMenuItemType = siteNavigationMenuItemType;
+
+		_siteNavigationMenuItemType =
+			ServletContextUtil.getSiteNavigationMenuItemType(
+				siteNavigationMenuItem.getType());
 	}
 
 	@Override
@@ -65,6 +69,25 @@ public class SiteNavigationMenuNavItem extends NavItem {
 			_httpServletRequest,
 			_siteNavigationMenuItem.getSiteNavigationMenuId(),
 			_siteNavigationMenuItem.getSiteNavigationMenuItemId());
+	}
+
+	@Override
+	public Map<String, Serializable> getExpandoAttributes() {
+		Map<String, Serializable> expandoAttributes =
+			super.getExpandoAttributes();
+
+		if (expandoAttributes == null) {
+			expandoAttributes = Collections.emptyMap();
+		}
+
+		ExpandoBridge expandoBridge =
+			_siteNavigationMenuItem.getExpandoBridge();
+
+		if (expandoBridge != null) {
+			expandoAttributes.putAll(expandoBridge.getAttributes());
+		}
+
+		return expandoAttributes;
 	}
 
 	@Override

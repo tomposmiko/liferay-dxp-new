@@ -18,7 +18,6 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.taglib.internal.servlet.ServletContextUtil;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -26,10 +25,14 @@ import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.taglib.util.IncludeTag;
+
+import java.util.Objects;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -42,6 +45,15 @@ import javax.servlet.jsp.PageContext;
  * @author Eudaldo Alonso
  */
 public class JournalArticleTag extends IncludeTag {
+
+	@Override
+	public int doEndTag() throws JspException {
+		if (!_isShowArticle()) {
+			return SKIP_PAGE;
+		}
+
+		return super.doEndTag();
+	}
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -60,25 +72,30 @@ public class JournalArticleTag extends IncludeTag {
 				portletRequest, portletResponse);
 		}
 
-		_article = JournalArticleLocalServiceUtil.fetchLatestArticle(
-			_groupId, _articleId, WorkflowConstants.STATUS_APPROVED);
+		if (_article == null) {
+			_article = JournalArticleLocalServiceUtil.fetchLatestArticle(
+				_groupId, _articleId, WorkflowConstants.STATUS_APPROVED);
+		}
 
 		try {
 			_articleDisplay = JournalArticleLocalServiceUtil.getArticleDisplay(
-				_article.getGroupId(), _article.getArticleId(),
-				_article.getVersion(), _ddmTemplateKey, Constants.VIEW,
+				_article, _ddmTemplateKey,
+				ParamUtil.getString(request, "p_l_mode", Constants.VIEW),
 				getLanguageId(), 1, portletRequestModel, themeDisplay);
 		}
-		catch (PortalException portalException) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Unable to get journal article display", portalException);
+				_log.debug("Unable to get journal article display", exception);
 			}
 
 			return SKIP_BODY;
 		}
 
 		return super.doStartTag();
+	}
+
+	public JournalArticle getArticle() {
+		return _article;
 	}
 
 	public String getArticleId() {
@@ -95,6 +112,10 @@ public class JournalArticleTag extends IncludeTag {
 
 	public boolean isShowTitle() {
 		return _showTitle;
+	}
+
+	public void setArticle(JournalArticle article) {
+		_article = article;
 	}
 
 	public void setArticleId(String articleId) {
@@ -166,6 +187,8 @@ public class JournalArticleTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest httpServletRequest) {
 		httpServletRequest.setAttribute(
+			"liferay-journal:journal-article:article", _article);
+		httpServletRequest.setAttribute(
 			"liferay-journal:journal-article:articleDisplay", _articleDisplay);
 		httpServletRequest.setAttribute(
 			"liferay-journal:journal-article:showTitle",
@@ -173,6 +196,29 @@ public class JournalArticleTag extends IncludeTag {
 		httpServletRequest.setAttribute(
 			"liferay-journal:journal-article:wrapperCssClass",
 			_wrapperCssClass);
+	}
+
+	private boolean _isShowArticle() {
+		HttpServletRequest httpServletRequest = getRequest();
+
+		HttpServletRequest originalHttpServletRequest =
+			PortalUtil.getOriginalServletRequest(httpServletRequest);
+
+		String mode = ParamUtil.getString(
+			PortalUtil.getOriginalServletRequest(originalHttpServletRequest),
+			"p_l_mode", Constants.VIEW);
+
+		if (Objects.equals(Constants.EDIT, mode)) {
+			return true;
+		}
+
+		if ((_article == null) || (_articleDisplay == null) ||
+			_article.isExpired()) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private static final String _PAGE = "/journal_article/page.jsp";

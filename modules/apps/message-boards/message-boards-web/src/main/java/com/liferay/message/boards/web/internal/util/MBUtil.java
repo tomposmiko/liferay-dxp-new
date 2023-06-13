@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -60,8 +59,8 @@ public class MBUtil {
 		sb.append("[quote=");
 		sb.append(
 			StringUtil.replace(
-				parentAuthor, new String[] {"[", "]", "(", ")"},
-				new String[] {"&#91;", "&#93;", "&#40;", "&#41;"}));
+				parentAuthor, new String[] {"[", "]"},
+				new String[] {"&#91;", "&#93;"}));
 		sb.append("]\n");
 		sb.append(parentMessage.getBody(false));
 		sb.append("[/quote]\n\n\n");
@@ -94,10 +93,8 @@ public class MBUtil {
 			categoryId = category.getCategoryId();
 		}
 
-		categoryId = ParamUtil.getLong(
+		return ParamUtil.getLong(
 			httpServletRequest, "mbCategoryId", categoryId);
-
-		return categoryId;
 	}
 
 	public static long getCategoryId(
@@ -109,30 +106,28 @@ public class MBUtil {
 			categoryId = message.getCategoryId();
 		}
 
-		categoryId = ParamUtil.getLong(
+		return ParamUtil.getLong(
 			httpServletRequest, "mbCategoryId", categoryId);
+	}
 
-		return categoryId;
+	public static long getCategoryId(
+		PortletRequest portletRequest, MBCategory category) {
+
+		long categoryId = MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID;
+
+		if (category != null) {
+			categoryId = category.getCategoryId();
+		}
+
+		return ParamUtil.getLong(portletRequest, "mbCategoryId", categoryId);
 	}
 
 	public static String getEditorName(String messageFormat) {
-		String editorName = PropsUtil.get(
-			"editor.wysiwyg.portal-web.docroot.html.portlet.message_boards." +
-				"edit_message.html.jsp");
-
-		if (!messageFormat.equals("bbcode")) {
-			return editorName;
+		if (messageFormat.equals("bbcode")) {
+			return "ckeditor_bbcode";
 		}
 
-		String bbCodeEditorName = PropsUtil.get(
-			com.liferay.message.boards.util.MBUtil.
-				BB_CODE_EDITOR_WYSIWYG_IMPL_KEY);
-
-		if (!bbCodeEditorName.equals("bbcode")) {
-			return bbCodeEditorName;
-		}
-
-		return "alloyeditor_bbcode";
+		return "ckeditor_classic";
 	}
 
 	public static String getHtmlQuoteBody(
@@ -281,11 +276,12 @@ public class MBUtil {
 				continue;
 			}
 
-			String priorityName = priorityArray[0];
-			String priorityImage = priorityArray[1];
 			double priorityValue = GetterUtil.getDouble(priorityArray[2]);
 
 			if (value == priorityValue) {
+				String priorityName = priorityArray[0];
+				String priorityImage = priorityArray[1];
+
 				return new String[] {priorityName, priorityImage};
 			}
 		}

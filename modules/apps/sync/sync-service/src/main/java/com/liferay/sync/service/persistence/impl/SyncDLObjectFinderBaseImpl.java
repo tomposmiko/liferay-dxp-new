@@ -60,7 +60,6 @@ public abstract class SyncDLObjectFinderBaseImpl
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
-		super.setConfiguration(configuration);
 	}
 
 	@Override
@@ -86,14 +85,5 @@ public abstract class SyncDLObjectFinderBaseImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SyncDLObjectFinderBaseImpl.class);
-
-	static {
-		try {
-			Class.forName(SyncPersistenceConstants.class.getName());
-		}
-		catch (ClassNotFoundException classNotFoundException) {
-			throw new ExceptionInInitializerError(classNotFoundException);
-		}
-	}
 
 }

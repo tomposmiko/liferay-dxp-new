@@ -17,8 +17,8 @@
 <%@ include file="/asset_display/init.jsp" %>
 
 <%
-AssetRenderer<?> assetRenderer = (AssetRenderer<?>)request.getAttribute(WebKeys.ASSET_RENDERER);
 int abstractLength = GetterUtil.getInteger(request.getAttribute(WebKeys.ASSET_ENTRY_ABSTRACT_LENGTH));
+AssetRenderer<?> assetRenderer = (AssetRenderer<?>)request.getAttribute(WebKeys.ASSET_RENDERER);
 %>
 
 <div class="asset-summary">
@@ -28,7 +28,7 @@ int abstractLength = GetterUtil.getInteger(request.getAttribute(WebKeys.ASSET_EN
 	%>
 
 	<c:if test="<%= Validator.isNotNull(imagePreviewURL) %>">
-		<div class="aspect-ratio aspect-ratio-8-to-3 aspect-ratio-bg-cover cover-image mb-4" style="background-image: url(<%= imagePreviewURL %>)"></div>
+		<div class="aspect-ratio aspect-ratio-8-to-3 aspect-ratio-bg-cover cover-image mb-4" style="background-image: url(<%= imagePreviewURL %>);"></div>
 	</c:if>
 
 	<%

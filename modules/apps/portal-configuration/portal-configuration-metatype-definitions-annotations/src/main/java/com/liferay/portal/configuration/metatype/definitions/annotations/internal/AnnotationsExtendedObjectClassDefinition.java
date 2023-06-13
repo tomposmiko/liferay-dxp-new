@@ -127,8 +127,9 @@ public class AnnotationsExtendedObjectClassDefinition
 		URL url = bundle.getResource(resourcePath);
 
 		if (url != null) {
-			try (InputStream is = url.openStream()) {
-				return JSONFactoryUtil.createJSONObject(StringUtil.read(is));
+			try (InputStream inputStream = url.openStream()) {
+				return JSONFactoryUtil.createJSONObject(
+					StringUtil.read(inputStream));
 			}
 			catch (Exception exception) {
 				_log.error(
@@ -186,35 +187,37 @@ public class AnnotationsExtendedObjectClassDefinition
 			configurationBeanClass.getAnnotation(
 				ExtendedObjectClassDefinition.class);
 
-		if (extendedObjectClassDefinition != null) {
-			Map<String, String> attributes = HashMapBuilder.put(
-				"category", extendedObjectClassDefinition.category()
-			).put(
-				"description-arguments",
-				StringUtil.merge(
-					extendedObjectClassDefinition.descriptionArguments())
-			).put(
-				"factoryInstanceLabelAttribute",
-				extendedObjectClassDefinition.factoryInstanceLabelAttribute()
-			).put(
-				"generateUI",
-				Boolean.toString(extendedObjectClassDefinition.generateUI())
-			).put(
-				"name-arguments",
-				StringUtil.merge(extendedObjectClassDefinition.nameArguments())
-			).build();
-
-			ExtendedObjectClassDefinition.Scope scope =
-				extendedObjectClassDefinition.scope();
-
-			attributes.put("scope", scope.toString());
-
-			_extensionAttributes.put(
-				ExtendedObjectClassDefinition.XML_NAMESPACE, attributes);
+		if (extendedObjectClassDefinition == null) {
+			return;
 		}
+
+		Map<String, String> attributes = HashMapBuilder.put(
+			"category", extendedObjectClassDefinition.category()
+		).put(
+			"description-arguments",
+			StringUtil.merge(
+				extendedObjectClassDefinition.descriptionArguments())
+		).put(
+			"factoryInstanceLabelAttribute",
+			extendedObjectClassDefinition.factoryInstanceLabelAttribute()
+		).put(
+			"generateUI",
+			Boolean.toString(extendedObjectClassDefinition.generateUI())
+		).put(
+			"name-arguments",
+			StringUtil.merge(extendedObjectClassDefinition.nameArguments())
+		).build();
+
+		ExtendedObjectClassDefinition.Scope scope =
+			extendedObjectClassDefinition.scope();
+
+		attributes.put("scope", scope.toString());
+
+		_extensionAttributes.put(
+			ExtendedObjectClassDefinition.XML_NAMESPACE, attributes);
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		AnnotationsExtendedObjectClassDefinition.class);
 
 	private Class<?> _configurationBeanClass;

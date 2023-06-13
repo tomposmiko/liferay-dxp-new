@@ -65,7 +65,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param classPK the primary key of the DDM structure, if the primary key
 	 of the DDMStructure class is given as the
@@ -197,7 +197,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param classPK the primary key of the DDM structure, if the primary key
 	 of the DDMStructure class is given as the
@@ -414,6 +414,10 @@ public class JournalArticleLocalServiceWrapper
 	/**
 	 * Adds the journal article to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect JournalArticleLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param journalArticle the journal article
 	 * @return the journal article that was added
 	 */
@@ -521,6 +525,17 @@ public class JournalArticleLocalServiceWrapper
 	@Override
 	public JournalArticle createJournalArticle(long id) {
 		return _journalArticleLocalService.createJournalArticle(id);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _journalArticleLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -672,7 +687,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param className the DDMStructure class name if the web content article
 	 is related to a DDM structure, the primary key of the class name
 	 associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param classPK the primary key of the DDM structure, if the DDMStructure
 	 class name is given as the <code>className</code> parameter, the
@@ -690,6 +705,10 @@ public class JournalArticleLocalServiceWrapper
 	/**
 	 * Deletes the journal article from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect JournalArticleLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param journalArticle the journal article
 	 * @return the journal article that was removed
 	 */
@@ -700,6 +719,10 @@ public class JournalArticleLocalServiceWrapper
 
 	/**
 	 * Deletes the journal article with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect JournalArticleLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param id the primary key of the journal article
 	 * @return the journal article that was removed
@@ -735,6 +758,18 @@ public class JournalArticleLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _journalArticleLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _journalArticleLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -1119,7 +1154,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param className the DDMStructure class name if the web content article
 	 is related to a DDM structure, the primary key of the class name
 	 associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param classPK the primary key of the DDM structure, if the DDMStructure
 	 class name is given as the <code>className</code> parameter, the
@@ -1560,17 +1595,19 @@ public class JournalArticleLocalServiceWrapper
 	 return
 	 * @param end the upper bound of the range of web content articles to
 	 return (not inclusive)
-	 * @param obc the comparator to order the web content articles
+	 * @param orderByComparator the comparator to order the web content
+	 articles
 	 * @return the range of matching web content articles ordered by the
 	 comparator
 	 */
 	@Override
 	public java.util.List<JournalArticle> getArticles(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.getArticles(
-			groupId, start, end, obc);
+			groupId, start, end, orderByComparator);
 	}
 
 	/**
@@ -1739,49 +1776,56 @@ public class JournalArticleLocalServiceWrapper
 	public java.util.List<JournalArticle> getArticlesByStructureId(
 		long groupId, long classNameId, String ddmStructureKey, int status,
 		int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.getArticlesByStructureId(
-			groupId, classNameId, ddmStructureKey, status, start, end, obc);
+			groupId, classNameId, ddmStructureKey, status, start, end,
+			orderByComparator);
 	}
 
 	@Override
 	public java.util.List<JournalArticle> getArticlesByStructureId(
 		long groupId, long classNameId, String ddmStructureKey,
 		java.util.Locale locale, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.getArticlesByStructureId(
 			groupId, classNameId, ddmStructureKey, locale, status, start, end,
-			obc);
+			orderByComparator);
 	}
 
 	@Override
 	public java.util.List<JournalArticle> getArticlesByStructureId(
 		long groupId, String ddmStructureKey, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.getArticlesByStructureId(
-			groupId, ddmStructureKey, status, start, end, obc);
+			groupId, ddmStructureKey, status, start, end, orderByComparator);
 	}
 
 	@Override
 	public java.util.List<JournalArticle> getArticlesByStructureId(
 		long groupId, String ddmStructureKey, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.getArticlesByStructureId(
-			groupId, ddmStructureKey, start, end, obc);
+			groupId, ddmStructureKey, start, end, orderByComparator);
 	}
 
 	@Override
 	public java.util.List<JournalArticle> getArticlesByStructureId(
 		long groupId, String ddmStructureKey, java.util.Locale locale,
 		int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.getArticlesByStructureId(
-			groupId, ddmStructureKey, locale, status, start, end, obc);
+			groupId, ddmStructureKey, locale, status, start, end,
+			orderByComparator);
 	}
 
 	/**
@@ -2247,7 +2291,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param groupId the primary key of the web content article's group
 	 * @param className the DDMStructure class name if the web content article
 	 is related to a DDM structure, the class name associated with the
-	 article, or JournalArticleConstants.CLASSNAME_ID_DEFAULT in the
+	 article, or JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the
 	 journal-api module otherwise
 	 * @param classPK the primary key of the DDM structure, if the DDMStructure
 	 class name is given as the <code>className</code> parameter, the
@@ -2400,6 +2444,9 @@ public class JournalArticleLocalServiceWrapper
 		return _journalArticleLocalService.getPersistedModel(resourcePrimKey);
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -2460,17 +2507,19 @@ public class JournalArticleLocalServiceWrapper
 	 return
 	 * @param end the upper bound of the range of web content articles to
 	 return (not inclusive)
-	 * @param obc the comparator to order the web content articles
+	 * @param orderByComparator the comparator to order the web content
+	 articles
 	 * @return the range of matching web content articles ordered by the
 	 comparator
 	 */
 	@Override
 	public java.util.List<JournalArticle> getStructureArticles(
 		long groupId, String ddmStructureKey, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.getStructureArticles(
-			groupId, ddmStructureKey, start, end, obc);
+			groupId, ddmStructureKey, start, end, orderByComparator);
 	}
 
 	/**
@@ -2539,17 +2588,19 @@ public class JournalArticleLocalServiceWrapper
 	 return
 	 * @param end the upper bound of the range of web content articles to
 	 return (not inclusive)
-	 * @param obc the comparator to order the web content articles
+	 * @param orderByComparator the comparator to order the web content
+	 articles
 	 * @return the range of matching web content articles ordered by the
 	 comparator
 	 */
 	@Override
 	public java.util.List<JournalArticle> getTemplateArticles(
 		long groupId, String ddmTemplateKey, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.getTemplateArticles(
-			groupId, ddmTemplateKey, start, end, obc);
+			groupId, ddmTemplateKey, start, end, orderByComparator);
 	}
 
 	/**
@@ -2887,7 +2938,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param keywords the keywords (space separated), which may occur in the
 	 web content article ID, title, description, or content
@@ -2916,7 +2967,8 @@ public class JournalArticleLocalServiceWrapper
 	 return
 	 * @param end the upper bound of the range of web content articles to
 	 return (not inclusive)
-	 * @param obc the comparator to order the web content articles
+	 * @param orderByComparator the comparator to order the web content
+	 articles
 	 * @return the range of matching web content articles ordered by the
 	 comparator
 	 */
@@ -2927,12 +2979,13 @@ public class JournalArticleLocalServiceWrapper
 		String ddmStructureKey, String ddmTemplateKey,
 		java.util.Date displayDateGT, java.util.Date displayDateLT, int status,
 		java.util.Date reviewDate, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.search(
 			companyId, groupId, folderIds, classNameId, keywords, version,
 			ddmStructureKey, ddmTemplateKey, displayDateGT, displayDateLT,
-			status, reviewDate, start, end, obc);
+			status, reviewDate, start, end, orderByComparator);
 	}
 
 	/**
@@ -2961,7 +3014,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param articleId the article ID keywords (space separated, optionally
 	 <code>null</code>)
@@ -2996,7 +3049,8 @@ public class JournalArticleLocalServiceWrapper
 	 return
 	 * @param end the upper bound of the range of web content articles to
 	 return (not inclusive)
-	 * @param obc the comparator to order the web content articles
+	 * @param orderByComparator the comparator to order the web content
+	 articles
 	 * @return the range of matching web content articles ordered by the
 	 comparator
 	 */
@@ -3008,13 +3062,14 @@ public class JournalArticleLocalServiceWrapper
 		String ddmTemplateKey, java.util.Date displayDateGT,
 		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.search(
 			companyId, groupId, folderIds, classNameId, articleId, version,
 			title, description, content, ddmStructureKey, ddmTemplateKey,
 			displayDateGT, displayDateLT, status, reviewDate, andOperator,
-			start, end, obc);
+			start, end, orderByComparator);
 	}
 
 	/**
@@ -3040,7 +3095,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param articleId the article ID keywords (space separated, optionally
 	 <code>null</code>)
@@ -3077,7 +3132,8 @@ public class JournalArticleLocalServiceWrapper
 	 return
 	 * @param end the upper bound of the range of web content articles to
 	 return (not inclusive)
-	 * @param obc the comparator to order the web content articles
+	 * @param orderByComparator the comparator to order the web content
+	 articles
 	 * @return the range of matching web content articles ordered by the
 	 comparator
 	 */
@@ -3089,13 +3145,14 @@ public class JournalArticleLocalServiceWrapper
 		String[] ddmTemplateKeys, java.util.Date displayDateGT,
 		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
 
 		return _journalArticleLocalService.search(
 			companyId, groupId, folderIds, classNameId, articleId, version,
 			title, description, content, ddmStructureKeys, ddmTemplateKeys,
 			displayDateGT, displayDateLT, status, reviewDate, andOperator,
-			start, end, obc);
+			start, end, orderByComparator);
 	}
 
 	/**
@@ -3122,7 +3179,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param ddmStructureKey the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
@@ -3180,7 +3237,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param articleId the article ID keywords (space separated, optionally
 	 <code>null</code>)
@@ -3317,7 +3374,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param keywords the keywords (space separated), which may occur in the
 	 web content article ID, title, description, or content
@@ -3371,7 +3428,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param articleId the article ID keywords (space separated, optionally
 	 <code>null</code>)
@@ -3432,7 +3489,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param articleId the article ID keywords (space separated, optionally
 	 <code>null</code>)
@@ -3512,7 +3569,7 @@ public class JournalArticleLocalServiceWrapper
 	 (optionally {@link Collections#EMPTY_LIST})
 	 * @param classNameId the primary key of the DDMStructure class, the
 	 primary key of the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param ddmStructureKey the primary key of the web content article's DDM
 	 structure
@@ -3580,7 +3637,7 @@ public class JournalArticleLocalServiceWrapper
 	 (optionally {@link Collections#EMPTY_LIST})
 	 * @param classNameId the primary key of the DDMStructure class, the
 	 primary key of the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param articleId the article ID keywords (space separated, optionally
 	 <code>null</code>)
@@ -4198,7 +4255,7 @@ public class JournalArticleLocalServiceWrapper
 	 * @param classNameId the primary key of the DDMStructure class if the web
 	 content article is related to a DDM structure, the primary key of
 	 the class name associated with the article, or
-	 JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
 	 * @param oldDDMTemplateKey the primary key of the web content article's old
 	 DDM template
@@ -4216,6 +4273,10 @@ public class JournalArticleLocalServiceWrapper
 
 	/**
 	 * Updates the journal article in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect JournalArticleLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param journalArticle the journal article
 	 * @return the journal article that was updated

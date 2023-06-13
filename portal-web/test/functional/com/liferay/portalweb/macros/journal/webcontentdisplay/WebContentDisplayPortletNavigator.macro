@@ -13,7 +13,7 @@ definition {
 
 		Portlet.clickPortletPlusIconPG(portletName = "${portletName}");
 
-		if (!(contains("${structureName}", "{structureName}"))) {
+		if (isSet(structureName)) {
 			var structureName = "${structureName}";
 		}
 		else {
@@ -27,6 +27,10 @@ definition {
 			value1 = "${structureName}");
 
 		AssertVisible(locator1 = "TextInput#TITLE");
+
+		while (IsElementNotPresent(locator1 = "WCEditWebContent#SIDEBAR")) {
+			Pause(locator1 = "1000");
+		}
 	}
 
 	macro gotoArticleEllipsisMenu {

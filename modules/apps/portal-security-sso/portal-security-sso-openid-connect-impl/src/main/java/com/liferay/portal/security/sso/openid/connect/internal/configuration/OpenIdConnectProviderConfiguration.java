@@ -23,7 +23,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  */
 @ExtendedObjectClassDefinition(
 	category = "sso", factoryInstanceLabelAttribute = "providerName",
-	scope = ExtendedObjectClassDefinition.Scope.SYSTEM
+	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
 	factory = true,
@@ -103,6 +103,12 @@ public interface OpenIdConnectProviderConfiguration {
 		name = "token-endpoint", required = false
 	)
 	public String tokenEndPoint();
+
+	@Meta.AD(
+		deflt = "1000", description = "token-connection-timeout-help",
+		name = "token-connection-timeout", required = false
+	)
+	public int tokenConnectionTimeout();
 
 	@Meta.AD(
 		deflt = "", description = "user-info-endpoint-help",

@@ -17,6 +17,8 @@ package com.liferay.bulk.rest.client.dto.v1_0;
 import com.liferay.bulk.rest.client.function.UnsafeSupplier;
 import com.liferay.bulk.rest.client.serdes.v1_0.StatusSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class Status {
+public class Status implements Cloneable, Serializable {
+
+	public static Status toDTO(String json) {
+		return StatusSerDes.toDTO(json);
+	}
 
 	public Boolean getActionInProgress() {
 		return actionInProgress;
@@ -48,6 +54,11 @@ public class Status {
 	}
 
 	protected Boolean actionInProgress;
+
+	@Override
+	public Status clone() throws CloneNotSupportedException {
+		return (Status)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

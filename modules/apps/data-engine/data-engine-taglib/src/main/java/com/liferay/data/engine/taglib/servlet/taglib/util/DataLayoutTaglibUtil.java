@@ -14,14 +14,17 @@
 
 package com.liferay.data.engine.taglib.servlet.taglib.util;
 
+import com.liferay.data.engine.field.type.util.LocalizedValueUtil;
 import com.liferay.data.engine.renderer.DataLayoutRenderer;
 import com.liferay.data.engine.renderer.DataLayoutRendererContext;
-import com.liferay.data.engine.rest.client.dto.v2_0.DataDefinition;
-import com.liferay.data.engine.rest.client.dto.v2_0.DataLayout;
-import com.liferay.data.engine.rest.client.dto.v2_0.DataRecord;
-import com.liferay.data.engine.rest.client.resource.v2_0.DataDefinitionResource;
-import com.liferay.data.engine.rest.client.resource.v2_0.DataLayoutResource;
-import com.liferay.data.engine.rest.client.resource.v2_0.DataRecordResource;
+import com.liferay.data.engine.rest.dto.v2_0.DataDefinition;
+import com.liferay.data.engine.rest.dto.v2_0.DataLayout;
+import com.liferay.data.engine.rest.dto.v2_0.DataRecord;
+import com.liferay.data.engine.rest.dto.v2_0.DataRule;
+import com.liferay.data.engine.rest.resource.v2_0.DataDefinitionResource;
+import com.liferay.data.engine.rest.resource.v2_0.DataLayoutResource;
+import com.liferay.data.engine.rest.resource.v2_0.DataRecordResource;
+import com.liferay.data.engine.taglib.servlet.taglib.definition.DataLayoutBuilderDefinition;
 import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormBuilderContextFactory;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
@@ -29,8 +32,6 @@ import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
-import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
-import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializerDeserializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializerDeserializeResponse;
@@ -46,6 +47,7 @@ import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.spi.form.builder.settings.DDMFormBuilderSettingsRetrieverHelper;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
@@ -54,14 +56,15 @@ import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
-import com.liferay.portal.kernel.util.CookieKeys;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -70,13 +73,15 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -87,6 +92,9 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Gabriel Albuquerque
@@ -96,59 +104,117 @@ import org.osgi.service.component.annotations.Reference;
 public class DataLayoutTaglibUtil {
 
 	public static Set<Locale> getAvailableLocales(
-		long dataLayoutId, HttpServletRequest httpServletRequest) {
+		Long dataDefinitionId, Long dataLayoutId,
+		HttpServletRequest httpServletRequest) {
 
 		return _dataLayoutTaglibUtil._getAvailableLocales(
-			dataLayoutId, httpServletRequest);
+			dataDefinitionId, dataLayoutId, httpServletRequest);
 	}
 
-	public static long getDataDefinitionId(
-		long dataLayoutId, HttpServletRequest httpServletRequest) {
+	public static DataDefinition getDataDefinition(
+			long dataDefinitionId, HttpServletRequest httpServletRequest)
+		throws Exception {
 
-		try {
-			DataLayout dataLayout = _dataLayoutTaglibUtil._getDataLayout(
-				dataLayoutId, httpServletRequest);
+		return _dataLayoutTaglibUtil._getDataDefinition(
+			dataDefinitionId, httpServletRequest);
+	}
 
-			return dataLayout.getDataDefinitionId();
+	public static JSONObject getDataLayoutConfigJSONObject(
+		String contentType, Locale locale) {
+
+		DataLayoutBuilderDefinition dataLayoutBuilderDefinition =
+			_dataLayoutBuilderDefinitions.get(contentType);
+
+		if (dataLayoutBuilderDefinition == null) {
+			dataLayoutBuilderDefinition = _dataLayoutBuilderDefinitions.get(
+				"default");
 		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
+
+		JSONObject dataLayoutConfigJSONObject = JSONUtil.put(
+			"allowFieldSets", dataLayoutBuilderDefinition.allowFieldSets()
+		).put(
+			"allowMultiplePages",
+			dataLayoutBuilderDefinition.allowMultiplePages()
+		).put(
+			"allowNestedFields", dataLayoutBuilderDefinition.allowNestedFields()
+		).put(
+			"allowRules", dataLayoutBuilderDefinition.allowRules()
+		).put(
+			"allowSuccessPage", dataLayoutBuilderDefinition.allowSuccessPage()
+		).put(
+			"disabledProperties",
+			dataLayoutBuilderDefinition.getDisabledProperties()
+		).put(
+			"disabledTabs", dataLayoutBuilderDefinition.getDisabledTabs()
+		);
+
+		if (dataLayoutBuilderDefinition.allowRules()) {
+			try {
+				dataLayoutConfigJSONObject.put(
+					"ruleSettings",
+					JSONUtil.put(
+						"dataProviderInstanceParameterSettingsURL",
+						_dataLayoutTaglibUtil.
+							_getDDMDataProviderInstanceParameterSettingsURL()
+					).put(
+						"dataProviderInstancesURL",
+						_dataLayoutTaglibUtil._getDDMDataProviderInstancesURL()
+					).put(
+						"functionsMetadata",
+						_dataLayoutTaglibUtil._getFunctionsMetadataJSONObject(
+							locale)
+					).put(
+						"functionsURL", _dataLayoutTaglibUtil._getFunctionsURL()
+					));
 			}
-
-			exception.printStackTrace();
+			catch (JSONException jsonException) {
+				_log.error(jsonException, jsonException);
+			}
 		}
 
-		return 0L;
+		dataLayoutConfigJSONObject.put(
+			"unimplementedProperties",
+			dataLayoutBuilderDefinition.getUnimplementedProperties());
+
+		return dataLayoutConfigJSONObject;
 	}
 
 	public static JSONObject getDataLayoutJSONObject(
-		Set<Locale> availableLocales, Long dataLayoutId,
+		Set<Locale> availableLocales, Long dataDefinitionId, Long dataLayoutId,
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
 		return _dataLayoutTaglibUtil._getDataLayoutJSONObject(
-			availableLocales, dataLayoutId, httpServletRequest,
-			httpServletResponse);
+			availableLocales, dataDefinitionId, dataLayoutId,
+			httpServletRequest, httpServletResponse);
 	}
 
 	public static Map<String, Object> getDataRecordValues(
-			long dataRecordId, HttpServletRequest httpServletRequest)
+			Long dataRecordId, HttpServletRequest httpServletRequest)
 		throws Exception {
 
 		return _dataLayoutTaglibUtil._getDataRecordValues(
 			dataRecordId, httpServletRequest);
 	}
 
+	public static Long getDefaultDataLayoutId(
+			Long dataDefinitionId, HttpServletRequest httpServletRequest)
+		throws Exception {
+
+		return _dataLayoutTaglibUtil._getDefaultDataLayoutId(
+			dataDefinitionId, httpServletRequest);
+	}
+
 	public static JSONArray getFieldTypesJSONArray(
-		HttpServletRequest httpServletRequest, Set<String> scopes) {
+			HttpServletRequest httpServletRequest, Set<String> scopes)
+		throws Exception {
 
 		return _dataLayoutTaglibUtil._getFieldTypesJSONArray(
 			httpServletRequest, scopes);
 	}
 
 	public static String renderDataLayout(
-			long dataLayoutId,
+			Long dataLayoutId,
 			DataLayoutRendererContext dataLayoutRendererContext)
 		throws Exception {
 
@@ -169,28 +235,70 @@ public class DataLayoutTaglibUtil {
 		_dataLayoutTaglibUtil = this;
 	}
 
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addDataLayoutBuilderDefinition(
+		DataLayoutBuilderDefinition dataLayoutBuilderDefinition,
+		Map<String, Object> properties) {
+
+		String contentType = GetterUtil.getString(
+			properties.get("content.type"));
+
+		if (Validator.isNull(contentType)) {
+			return;
+		}
+
+		_dataLayoutBuilderDefinitions.put(
+			contentType, dataLayoutBuilderDefinition);
+	}
+
 	@Deactivate
 	protected void deactivate() {
 		_dataLayoutTaglibUtil = null;
 	}
 
-	private Set<Locale> _getAvailableLocales(
-		long dataLayoutId, HttpServletRequest httpServletRequest) {
+	protected void removeDataLayoutBuilderDefinition(
+		DataLayoutBuilderDefinition dataLayoutBuilderDefinition,
+		Map<String, Object> properties) {
 
-		if (dataLayoutId == 0) {
-			return new HashSet() {
-				{
-					add(LocaleThreadLocal.getDefaultLocale());
-				}
-			};
+		String contentType = GetterUtil.getString(
+			properties.get("content.type"));
+
+		if (Validator.isNull(contentType)) {
+			return;
+		}
+
+		_dataLayoutBuilderDefinitions.remove(contentType);
+	}
+
+	private Set<Locale> _getAvailableLocales(
+		Long dataDefinitionId, Long dataLayoutId,
+		HttpServletRequest httpServletRequest) {
+
+		if (Validator.isNull(dataDefinitionId) &&
+			Validator.isNull(dataLayoutId)) {
+
+			return SetUtil.fromArray(
+				new Locale[] {LocaleThreadLocal.getSiteDefaultLocale()});
 		}
 
 		try {
-			DataLayout dataLayout = _getDataLayout(
-				dataLayoutId, httpServletRequest);
+			DataDefinition dataDefinition = null;
 
-			DataDefinition dataDefinition = _getDataDefinition(
-				dataLayout.getDataDefinitionId(), httpServletRequest);
+			if (Validator.isNotNull(dataDefinitionId)) {
+				dataDefinition = _getDataDefinition(
+					dataDefinitionId, httpServletRequest);
+			}
+			else {
+				DataLayout dataLayout = _getDataLayout(
+					dataLayoutId, httpServletRequest);
+
+				dataDefinition = _getDataDefinition(
+					dataLayout.getDataDefinitionId(), httpServletRequest);
+			}
 
 			return Stream.of(
 				dataDefinition.getAvailableLanguageIds()
@@ -201,71 +309,72 @@ public class DataLayoutTaglibUtil {
 			);
 		}
 		catch (Exception exception) {
-			return new HashSet() {
-				{
-					add(LocaleThreadLocal.getDefaultLocale());
-				}
-			};
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
+
+		return SetUtil.fromArray(
+			new Locale[] {LocaleThreadLocal.getSiteDefaultLocale()});
 	}
 
 	private DataDefinition _getDataDefinition(
-			long dataDefinitionId, HttpServletRequest httpServletRequest)
+			Long dataDefinitionId, HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		String sessionId = CookieKeys.getCookie(
-			httpServletRequest, CookieKeys.JSESSIONID);
+		DataDefinitionResource.Builder dataDefinitionResourceBuilder =
+			_dataDefinitionResourceFactory.create();
 
 		DataDefinitionResource dataDefinitionResource =
-			DataDefinitionResource.builder(
-			).endpoint(
-				_portal.getHost(httpServletRequest),
-				httpServletRequest.getServerPort(),
-				httpServletRequest.getScheme()
-			).header(
-				"Cookie", "JSESSIONID=" + sessionId
-			).parameter(
-				"p_auth", AuthTokenUtil.getToken(httpServletRequest)
+			dataDefinitionResourceBuilder.httpServletRequest(
+				httpServletRequest
+			).user(
+				_portal.getUser(httpServletRequest)
 			).build();
 
 		return dataDefinitionResource.getDataDefinition(dataDefinitionId);
 	}
 
 	private DataLayout _getDataLayout(
-			long dataLayoutId, HttpServletRequest httpServletRequest)
+			Long dataLayoutId, HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		if (dataLayoutId <= 0) {
-			return new DataLayout();
-		}
+		DataLayoutResource.Builder dataLayoutResourceBuilder =
+			_dataLayoutResourceFactory.create();
 
-		DataLayoutResource dataLayoutResource = DataLayoutResource.builder(
-		).endpoint(
-			_portal.getHost(httpServletRequest),
-			httpServletRequest.getServerPort(), httpServletRequest.getScheme()
-		).header(
-			"Cookie",
-			"JSESSIONID=" +
-				CookieKeys.getCookie(httpServletRequest, CookieKeys.JSESSIONID)
-		).parameter(
-			"p_auth", AuthTokenUtil.getToken(httpServletRequest)
-		).build();
+		DataLayoutResource dataLayoutResource =
+			dataLayoutResourceBuilder.httpServletRequest(
+				httpServletRequest
+			).user(
+				_portal.getUser(httpServletRequest)
+			).build();
 
 		return dataLayoutResource.getDataLayout(dataLayoutId);
 	}
 
 	private JSONObject _getDataLayoutJSONObject(
-		Set<Locale> availableLocales, Long dataLayoutId,
+		Set<Locale> availableLocales, Long dataDefinitionId, Long dataLayoutId,
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
-		if (dataLayoutId == null) {
+		if (Validator.isNull(dataDefinitionId) &&
+			Validator.isNull(dataLayoutId)) {
+
 			return _jsonFactory.createJSONObject();
 		}
 
 		try {
-			DataLayout dataLayout = _getDataLayout(
-				dataLayoutId, httpServletRequest);
+			DataLayout dataLayout = null;
+
+			if (Validator.isNotNull(dataLayoutId)) {
+				dataLayout = _getDataLayout(dataLayoutId, httpServletRequest);
+			}
+			else {
+				DataDefinition dataDefinition = _getDataDefinition(
+					dataDefinitionId, httpServletRequest);
+
+				dataLayout = dataDefinition.getDefaultDataLayout();
+			}
 
 			DataLayoutDDMFormAdapter dataLayoutDDMFormAdapter =
 				new DataLayoutDDMFormAdapter(
@@ -284,23 +393,18 @@ public class DataLayoutTaglibUtil {
 	}
 
 	private Map<String, Object> _getDataRecordValues(
-			long dataRecordId, HttpServletRequest httpServletRequest)
+			Long dataRecordId, HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		if (dataRecordId == 0) {
+		if (Validator.isNull(dataRecordId)) {
 			return Collections.emptyMap();
 		}
 
-		DataRecordResource dataRecordResource = DataRecordResource.builder(
-		).endpoint(
-			_portal.getHost(httpServletRequest),
-			httpServletRequest.getServerPort(), httpServletRequest.getScheme()
-		).header(
-			"Cookie",
-			"JSESSIONID=" +
-				CookieKeys.getCookie(httpServletRequest, CookieKeys.JSESSIONID)
-		).parameter(
-			"p_auth", AuthTokenUtil.getToken(httpServletRequest)
+		DataRecordResource.Builder dataRecordResourceBuilder =
+			_dataRecordResourceFactory.create();
+
+		DataRecordResource dataRecordResource = dataRecordResourceBuilder.user(
+			_portal.getUser(httpServletRequest)
 		).build();
 
 		DataRecord dataRecord = dataRecordResource.getDataRecord(dataRecordId);
@@ -308,24 +412,50 @@ public class DataLayoutTaglibUtil {
 		return dataRecord.getDataRecordValues();
 	}
 
+	private String _getDDMDataProviderInstanceParameterSettingsURL() {
+		return _ddmFormBuilderSettingsRetrieverHelper.
+			getDDMDataProviderInstanceParameterSettingsURL();
+	}
+
+	private String _getDDMDataProviderInstancesURL() {
+		return _ddmFormBuilderSettingsRetrieverHelper.
+			getDDMDataProviderInstancesURL();
+	}
+
+	private Long _getDefaultDataLayoutId(
+			Long dataDefinitionId, HttpServletRequest httpServletRequest)
+		throws Exception {
+
+		DataDefinition dataDefinition = getDataDefinition(
+			dataDefinitionId, httpServletRequest);
+
+		if (dataDefinition == null) {
+			return 0L;
+		}
+
+		DataLayout dataLayout = dataDefinition.getDefaultDataLayout();
+
+		if (dataLayout == null) {
+			return 0L;
+		}
+
+		return dataLayout.getId();
+	}
+
 	private JSONArray _getFieldTypesJSONArray(
-		HttpServletRequest httpServletRequest, Set<String> scopes) {
+			HttpServletRequest httpServletRequest, Set<String> scopes)
+		throws Exception {
 
 		JSONArray fieldTypesJSONArray = _jsonFactory.createJSONArray();
 
-		String cookie = CookieKeys.getCookie(
-			httpServletRequest, CookieKeys.JSESSIONID);
+		DataDefinitionResource.Builder dataDefinitionResourceBuilder =
+			_dataDefinitionResourceFactory.create();
 
 		DataDefinitionResource dataDefinitionResource =
-			DataDefinitionResource.builder(
-			).endpoint(
-				_portal.getHost(httpServletRequest),
-				httpServletRequest.getServerPort(),
-				httpServletRequest.getScheme()
-			).header(
-				"Cookie", "JSESSIONID=" + cookie
-			).parameter(
-				"p_auth", AuthTokenUtil.getToken(httpServletRequest)
+			dataDefinitionResourceBuilder.httpServletRequest(
+				httpServletRequest
+			).user(
+				_portal.getUser(httpServletRequest)
 			).build();
 
 		try {
@@ -359,6 +489,18 @@ public class DataLayoutTaglibUtil {
 		}
 	}
 
+	private JSONObject _getFunctionsMetadataJSONObject(Locale locale)
+		throws JSONException {
+
+		return JSONFactoryUtil.createJSONObject(
+			_ddmFormBuilderSettingsRetrieverHelper.
+				getSerializedDDMExpressionFunctionsMetadata(locale));
+	}
+
+	private String _getFunctionsURL() {
+		return _ddmFormBuilderSettingsRetrieverHelper.getDDMFunctionsURL();
+	}
+
 	private boolean _hasJavascriptModule(String name) {
 		DDMFormFieldType ddmFormFieldType =
 			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name);
@@ -367,10 +509,8 @@ public class DataLayoutTaglibUtil {
 	}
 
 	private String _resolveFieldTypeModule(String name) {
-		DDMFormFieldType ddmFormFieldType =
-			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name);
-
-		return _resolveModuleName(ddmFormFieldType.getModuleName());
+		return _resolveModuleName(
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name));
 	}
 
 	private String _resolveFieldTypesModules() {
@@ -388,24 +528,43 @@ public class DataLayoutTaglibUtil {
 		);
 	}
 
-	private String _resolveModuleName(String moduleName) {
-		if (Validator.isNull(moduleName)) {
+	private String _resolveModuleName(DDMFormFieldType ddmFormFieldType) {
+		if (Validator.isNull(ddmFormFieldType.getModuleName())) {
 			return StringPool.BLANK;
 		}
 
-		return _npmResolver.resolveModuleName(moduleName);
+		if (ddmFormFieldType.isCustomDDMFormFieldType()) {
+			return ddmFormFieldType.getModuleName();
+		}
+
+		return _npmResolver.resolveModuleName(ddmFormFieldType.getModuleName());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DataLayoutTaglibUtil.class);
 
+	private static final Map<String, DataLayoutBuilderDefinition>
+		_dataLayoutBuilderDefinitions = new ConcurrentHashMap<>();
 	private static DataLayoutTaglibUtil _dataLayoutTaglibUtil;
+
+	@Reference
+	private DataDefinitionResource.Factory _dataDefinitionResourceFactory;
 
 	@Reference
 	private DataLayoutRenderer _dataLayoutRenderer;
 
 	@Reference
+	private DataLayoutResource.Factory _dataLayoutResourceFactory;
+
+	@Reference
+	private DataRecordResource.Factory _dataRecordResourceFactory;
+
+	@Reference
 	private DDMFormBuilderContextFactory _ddmFormBuilderContextFactory;
+
+	@Reference
+	private DDMFormBuilderSettingsRetrieverHelper
+		_ddmFormBuilderSettingsRetrieverHelper;
 
 	@Reference
 	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
@@ -471,6 +630,8 @@ public class DataLayoutTaglibUtil {
 
 			_populateDDMFormFieldSettingsContext(
 				ddmForm.getDDMFormFieldsMap(true), ddmFormTemplateContext);
+
+			ddmFormTemplateContext.put("rules", _getDataRulesJSONArray());
 
 			return _jsonFactory.createJSONObject(
 				_jsonFactory.looseSerializeDeep(ddmFormTemplateContext));
@@ -567,8 +728,16 @@ public class DataLayoutTaglibUtil {
 				return _createDDMFormFieldValue(
 					availableLocales, (DDMFormFieldOptions)propertyValue);
 			}
-			else if (Objects.equals(
-						ddmFormFieldTypeSetting.getType(), "validation")) {
+
+			if (Objects.equals(
+					ddmFormFieldTypeSetting.getName(), "requiredDescription") &&
+				(propertyValue == null)) {
+
+				return new UnlocalizedValue(Boolean.TRUE.toString());
+			}
+
+			if (Objects.equals(
+					ddmFormFieldTypeSetting.getType(), "validation")) {
 
 				return _createDDMFormFieldValue(
 					(DDMFormFieldValidation)propertyValue);
@@ -606,18 +775,6 @@ public class DataLayoutTaglibUtil {
 			return new UnlocalizedValue(jsonObject.toString());
 		}
 
-		private DDMForm _deserializeDDMForm(String content) {
-			DDMFormDeserializerDeserializeRequest.Builder builder =
-				DDMFormDeserializerDeserializeRequest.Builder.newBuilder(
-					content);
-
-			DDMFormDeserializerDeserializeResponse
-				ddmFormDeserializerDeserializeResponse =
-					_jsonDDMFormDeserializer.deserialize(builder.build());
-
-			return ddmFormDeserializerDeserializeResponse.getDDMForm();
-		}
-
 		private DDMFormLayout _deserializeDDMFormLayout(String content) {
 			DDMFormLayoutDeserializerDeserializeRequest.Builder builder =
 				DDMFormLayoutDeserializerDeserializeRequest.Builder.newBuilder(
@@ -629,6 +786,48 @@ public class DataLayoutTaglibUtil {
 
 			return ddmFormLayoutDeserializerDeserializeResponse.
 				getDDMFormLayout();
+		}
+
+		private JSONArray _getDataRulesJSONArray() {
+			JSONArray dataRulesJSONArray = _jsonFactory.createJSONArray();
+
+			for (DataRule dataRule : _dataLayout.getDataRules()) {
+				JSONObject dataRuleJSONObject = _jsonFactory.createJSONObject();
+
+				JSONArray jsonArray = _jsonFactory.createJSONArray();
+
+				for (Map<String, Object> action : dataRule.getActions()) {
+					JSONObject jsonObject = _jsonFactory.createJSONObject();
+
+					action.forEach(jsonObject::put);
+
+					jsonArray.put(jsonObject);
+				}
+
+				dataRuleJSONObject.put("actions", jsonArray);
+
+				jsonArray = _jsonFactory.createJSONArray();
+
+				for (Map<String, Object> condition : dataRule.getConditions()) {
+					JSONObject jsonObject = _jsonFactory.createJSONObject();
+
+					condition.forEach(jsonObject::put);
+
+					jsonArray.put(jsonObject);
+				}
+
+				dataRuleJSONObject.put(
+					"conditions", jsonArray
+				).put(
+					"logicalOperator", dataRule.getLogicalOperator()
+				).put(
+					"name", LocalizedValueUtil.toJSONObject(dataRule.getName())
+				);
+
+				dataRulesJSONArray.put(dataRuleJSONObject);
+			}
+
+			return dataRulesJSONArray;
 		}
 
 		private DDMForm _getDDMForm() throws Exception {
@@ -651,7 +850,9 @@ public class DataLayoutTaglibUtil {
 				"defaultLanguageId", ddmStructure.getDefaultLanguageId()
 			);
 
-			return _deserializeDDMForm(jsonObject.toJSONString());
+			ddmStructure.setDefinition(jsonObject.toString());
+
+			return ddmStructure.getDDMForm();
 		}
 
 		private DDMFormLayout _getDDMFormLayout() throws Exception {
@@ -668,7 +869,45 @@ public class DataLayoutTaglibUtil {
 					},
 					new String[] {"size", "columns", "pages", "rows"}));
 
-			return _deserializeDDMFormLayout(jsonObject.toJSONString());
+			return _deserializeDDMFormLayout(jsonObject.toString());
+		}
+
+		private List<Map<String, Object>> _getNestedFields(
+			Map<String, Object> field) {
+
+			List<Map<String, Object>> nestedFields =
+				(List<Map<String, Object>>)field.get("nestedFields");
+
+			if (nestedFields != null) {
+				Stream<Map<String, Object>> stream = nestedFields.stream();
+
+				return stream.flatMap(
+					this::_getNestedFieldsStream
+				).collect(
+					Collectors.toList()
+				);
+			}
+
+			return new ArrayList<>();
+		}
+
+		private Stream<Map<String, Object>> _getNestedFieldsStream(
+			Map<String, Object> field) {
+
+			List<Map<String, Object>> nestedFieldsList = new ArrayList<>(
+				Arrays.asList(field));
+
+			nestedFieldsList.addAll(_getNestedFields(field));
+
+			return nestedFieldsList.stream();
+		}
+
+		private boolean _isFieldSet(Map<String, Object> field) {
+			if (Objects.equals(field.get("type"), "fieldset")) {
+				return true;
+			}
+
+			return false;
 		}
 
 		private void _populateDDMFormFieldSettingsContext(
@@ -678,12 +917,16 @@ public class DataLayoutTaglibUtil {
 
 			UnsafeConsumer<Map<String, Object>, Exception> unsafeConsumer =
 				field -> {
-					String fieldName = MapUtil.getString(field, "fieldName");
+					DDMFormField ddmFormField = ddmFormFieldsMap.get(
+						MapUtil.getString(field, "fieldName"));
+
+					if (_isFieldSet(field)) {
+						ddmFormField.setProperty("rows", field.get("rows"));
+					}
 
 					field.put(
 						"settingsContext",
-						_createDDMFormFieldSettingContext(
-							ddmFormFieldsMap.get(fieldName)));
+						_createDDMFormFieldSettingContext(ddmFormField));
 				};
 
 			List<Map<String, Object>> pages =
@@ -703,6 +946,15 @@ public class DataLayoutTaglibUtil {
 
 						for (Map<String, Object> field : fields) {
 							unsafeConsumer.accept(field);
+
+							List<Map<String, Object>> nestedFields =
+								_getNestedFields(field);
+
+							for (Map<String, Object> nestedField :
+									nestedFields) {
+
+								unsafeConsumer.accept(nestedField);
+							}
 						}
 					}
 				}

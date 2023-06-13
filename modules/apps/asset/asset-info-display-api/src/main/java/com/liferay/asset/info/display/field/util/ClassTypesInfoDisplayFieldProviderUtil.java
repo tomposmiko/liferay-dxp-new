@@ -43,10 +43,8 @@ public class ClassTypesInfoDisplayFieldProviderUtil {
 
 		ClassTypeReader classTypeReader = _getClassTypeReader(className);
 
-		ClassType classType = classTypeReader.getClassType(classTypeId, locale);
-
 		return classTypesInfoDisplayFieldProvider.getClassTypeInfoDisplayFields(
-			classType, locale);
+			classTypeReader.getClassType(classTypeId, locale), locale);
 	}
 
 	public static List<ClassType> getClassTypes(
@@ -56,14 +54,12 @@ public class ClassTypesInfoDisplayFieldProviderUtil {
 		ClassTypesInfoDisplayFieldProvider classTypesInfoDisplayFieldProvider =
 			_serviceTracker.getService();
 
-		ClassTypeReader classTypeReader = _getClassTypeReader(className);
-
 		return classTypesInfoDisplayFieldProvider.getClassTypes(
-			groupId, classTypeReader, locale);
+			groupId, _getClassTypeReader(className), locale);
 	}
 
 	private static ClassTypeReader _getClassTypeReader(String className) {
-		AssetRendererFactory assetRendererFactory =
+		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 				className);
 

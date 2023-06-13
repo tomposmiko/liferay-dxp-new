@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	AUI().applyConfig({
 		groups: {
 			dl: {
@@ -20,13 +20,6 @@
 				combine: Liferay.AUI.getCombine(),
 				filter: Liferay.AUI.getFilterConfig(),
 				modules: {
-					'document-library-checkin': {
-						path: 'checkin.js',
-						requires: [
-							'liferay-document-library',
-							'liferay-util-window'
-						]
-					},
 					'document-library-upload': {
 						path: 'upload.js',
 						requires: [
@@ -41,20 +34,19 @@
 							'liferay-history-manager',
 							'liferay-search-container',
 							'querystring-parse-simple',
-							'uploader'
-						]
+							'uploader',
+						],
 					},
 					'liferay-document-library': {
 						path: 'main.js',
 						requires: [
 							'document-library-upload',
-							'liferay-message',
-							'liferay-portlet-base'
-						]
-					}
+							'liferay-portlet-base',
+						],
+					},
 				},
-				root: MODULE_PATH + '/document_library/js/legacy/'
-			}
-		}
+				root: MODULE_PATH + '/document_library/js/legacy/',
+			},
+		},
 	});
 })();

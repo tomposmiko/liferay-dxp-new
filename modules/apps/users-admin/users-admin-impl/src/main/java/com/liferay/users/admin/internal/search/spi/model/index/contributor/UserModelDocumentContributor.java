@@ -14,6 +14,7 @@
 
 package com.liferay.users.admin.internal.search.spi.model.index.contributor;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.NoSuchCountryException;
 import com.liferay.portal.kernel.exception.NoSuchRegionException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
@@ -33,6 +35,7 @@ import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.RegionService;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
@@ -63,13 +66,13 @@ public class UserModelDocumentContributor
 		try {
 			long[] organizationIds = user.getOrganizationIds();
 
+			long[] activeTransitiveGroupIds = getActiveTransitiveGroupIds(
+				user.getUserId());
+
 			document.addKeyword(Field.COMPANY_ID, user.getCompanyId());
-			document.addKeyword(
-				Field.GROUP_ID, getActiveTransitiveGroupIds(user.getUserId()));
+			document.addKeyword(Field.GROUP_ID, activeTransitiveGroupIds);
 			document.addDate(Field.MODIFIED_DATE, user.getModifiedDate());
-			document.addKeyword(
-				Field.SCOPE_GROUP_ID,
-				getActiveTransitiveGroupIds(user.getUserId()));
+			document.addKeyword(Field.SCOPE_GROUP_ID, activeTransitiveGroupIds);
 			document.addKeyword(Field.STATUS, user.getStatus());
 			document.addKeyword(Field.USER_ID, user.getUserId());
 			document.addKeyword(Field.USER_NAME, user.getFullName(), true);
@@ -78,7 +81,10 @@ public class UserModelDocumentContributor
 				getAncestorOrganizationIds(user.getOrganizationIds()));
 			document.addDate("birthDate", user.getBirthday());
 			document.addKeyword("defaultUser", user.isDefaultUser());
-			document.addText("emailAddress", user.getEmailAddress());
+			document.addKeyword("emailAddress", user.getEmailAddress());
+			document.addKeyword(
+				"emailAddressDomain",
+				_getEmailAddressDomain(user.getEmailAddress()));
 			document.addText("firstName", user.getFirstName());
 			document.addText("fullName", user.getFullName());
 			document.addKeyword("groupIds", user.getGroupIds());
@@ -92,6 +98,8 @@ public class UserModelDocumentContributor
 			document.addText("screenName", user.getScreenName());
 			document.addKeyword("teamIds", user.getTeamIds());
 			document.addKeyword("userGroupIds", user.getUserGroupIds());
+			document.addKeyword(
+				"userGroupRoleIds", getUserGroupRoleIds(user.getUserId()));
 
 			populateAddresses(document, user.getAddresses(), 0, 0);
 		}
@@ -156,6 +164,18 @@ public class UserModelDocumentContributor
 		}
 
 		return countryNames;
+	}
+
+	protected long[] getUserGroupRoleIds(long userId) {
+		Set<Long> userGroupRoleIds = new HashSet<>();
+
+		for (UserGroupRole userGroupRole :
+				userGroupRoleLocalService.getUserGroupRoles(userId)) {
+
+			userGroupRoleIds.add(userGroupRole.getRoleId());
+		}
+
+		return ArrayUtil.toLongArray(userGroupRoleIds);
 	}
 
 	protected void populateAddresses(
@@ -234,6 +254,13 @@ public class UserModelDocumentContributor
 
 	@Reference
 	protected RegionService regionService;
+
+	@Reference
+	protected UserGroupRoleLocalService userGroupRoleLocalService;
+
+	private String _getEmailAddressDomain(String emailAddress) {
+		return emailAddress.substring(emailAddress.indexOf(StringPool.AT) + 1);
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UserModelDocumentContributor.class);

@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistryUtil;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -40,12 +41,15 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.powwow.model.PowwowParticipant;
 import com.liferay.powwow.service.PowwowParticipantLocalService;
+import com.liferay.powwow.service.PowwowParticipantLocalServiceUtil;
 import com.liferay.powwow.service.persistence.PowwowMeetingFinder;
 import com.liferay.powwow.service.persistence.PowwowMeetingPersistence;
 import com.liferay.powwow.service.persistence.PowwowParticipantPersistence;
 import com.liferay.powwow.service.persistence.PowwowServerPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -69,11 +73,15 @@ public abstract class PowwowParticipantLocalServiceBaseImpl
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Use <code>PowwowParticipantLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.powwow.service.PowwowParticipantLocalServiceUtil</code>.
+	 * Never modify or reference this class directly. Use <code>PowwowParticipantLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>PowwowParticipantLocalServiceUtil</code>.
 	 */
 
 	/**
 	 * Adds the powwow participant to the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowParticipantLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowParticipant the powwow participant
 	 * @return the powwow participant that was added
@@ -103,6 +111,10 @@ public abstract class PowwowParticipantLocalServiceBaseImpl
 	/**
 	 * Deletes the powwow participant with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowParticipantLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param powwowParticipantId the primary key of the powwow participant
 	 * @return the powwow participant that was removed
 	 * @throws PortalException if a powwow participant with the primary key could not be found
@@ -117,6 +129,10 @@ public abstract class PowwowParticipantLocalServiceBaseImpl
 
 	/**
 	 * Deletes the powwow participant from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowParticipantLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowParticipant the powwow participant
 	 * @return the powwow participant that was removed
@@ -284,6 +300,16 @@ public abstract class PowwowParticipantLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException {
+
+		return powwowParticipantPersistence.create(
+			((Long)primaryKeyObj).longValue());
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
@@ -292,6 +318,13 @@ public abstract class PowwowParticipantLocalServiceBaseImpl
 			(PowwowParticipant)persistedModel);
 	}
 
+	public BasePersistence<PowwowParticipant> getBasePersistence() {
+		return powwowParticipantPersistence;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
@@ -327,6 +360,10 @@ public abstract class PowwowParticipantLocalServiceBaseImpl
 
 	/**
 	 * Updates the powwow participant in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowParticipantLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowParticipant the powwow participant
 	 * @return the powwow participant that was updated
@@ -618,11 +655,15 @@ public abstract class PowwowParticipantLocalServiceBaseImpl
 		PersistedModelLocalServiceRegistryUtil.register(
 			"com.liferay.powwow.model.PowwowParticipant",
 			powwowParticipantLocalService);
+
+		_setLocalServiceUtilService(powwowParticipantLocalService);
 	}
 
 	public void destroy() {
 		PersistedModelLocalServiceRegistryUtil.unregister(
 			"com.liferay.powwow.model.PowwowParticipant");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -665,6 +706,23 @@ public abstract class PowwowParticipantLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		PowwowParticipantLocalService powwowParticipantLocalService) {
+
+		try {
+			Field field =
+				PowwowParticipantLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, powwowParticipantLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

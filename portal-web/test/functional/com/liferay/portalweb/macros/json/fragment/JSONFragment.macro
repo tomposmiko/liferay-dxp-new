@@ -10,6 +10,7 @@ definition {
 			site = "${site}");
 
 		JSONFragmentAPI._addFragmentCollection(
+			description = "${description}",
 			groupId = "${groupId}",
 			name = "${name}");
 	}
@@ -27,17 +28,13 @@ definition {
 			collectionName = "${collectionName}",
 			groupId = "${groupId}");
 
-		var configuration = JSONFragmentSetter.setConfiguration(
-			configuration = "${configuration}");
+		var configuration = JSONFragmentSetter.setConfiguration(configuration = "${configuration}");
 
-		var html = JSONFragmentSetter.setHTML(
-			html = "${html}");
+		var html = JSONFragmentSetter.setHTML(html = "${html}");
 
-		var status = JSONFragmentSetter.setStatus(
-			status = "${status}");
+		var status = JSONFragmentSetter.setStatus(fragmentStatus = "${fragmentStatus}");
 
-		var type = JSONFragmentSetter.setType(
-			type = "${type}");
+		var type = JSONFragmentSetter.setType(type = "${type}");
 
 		JSONFragmentAPI._addSection(
 			collectionId = "${collectionId}",
@@ -60,10 +57,9 @@ definition {
 
 		var collectionNameResult = JSONFragmentAPI._getCollectionName(
 			collectionName = "${collectionName}",
-			groupId = "${groupId}"
-		);
+			groupId = "${groupId}");
 
-		if ("${collectionNameResult}" == "[]") {
+		if ("${collectionNameResult}" == "") {
 			fail("The collection ${collectionName} was not found.");
 		}
 	}
@@ -79,10 +75,9 @@ definition {
 
 		var collectionNameResult = JSONFragmentAPI._getCollectionName(
 			collectionName = "${collectionName}",
-			groupId = "${groupId}"
-		);
+			groupId = "${groupId}");
 
-		if ("${collectionNameResult}" != "[]") {
+		if ("${collectionNameResult}" != "") {
 			fail("The collection ${collectionName} was found.");
 		}
 	}
@@ -103,10 +98,9 @@ definition {
 		var fragmentNameResult = JSONFragmentAPI._getFragmentName(
 			fragmentCollectionId = "${fragmentCollectionId}",
 			fragmentName = "${fragmentName}",
-			groupId = "${groupId}"
-		);
+			groupId = "${groupId}");
 
-		if ("${fragmentNameResult}" == "[]") {
+		if ("${fragmentNameResult}" == "") {
 			fail("The fragment ${fragmentName} was not found.");
 		}
 	}
@@ -127,10 +121,9 @@ definition {
 		var fragmentNameResult = JSONFragmentAPI._getFragmentName(
 			fragmentCollectionId = "${fragmentCollectionId}",
 			fragmentName = "${fragmentName}",
-			groupId = "${groupId}"
-		);
+			groupId = "${groupId}");
 
-		if ("${fragmentNameResult}" != "[]") {
+		if ("${fragmentNameResult}" != "") {
 			fail("The fragment ${fragmentName} was found.");
 		}
 	}

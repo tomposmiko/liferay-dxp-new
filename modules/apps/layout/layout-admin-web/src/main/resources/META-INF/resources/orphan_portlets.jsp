@@ -34,7 +34,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "orphan-widgets"));
 	displayContext="<%= orphanPortletsManagementToolbarDisplayContext %>"
 />
 
-<portlet:actionURL name="/layout/delete_orphan_portlets" var="deleteOrphanPortletsURL">
+<portlet:actionURL name="/layout_admin/delete_orphan_portlets" var="deleteOrphanPortletsURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 	<portlet:param name="backURL" value="<%= orphanPortletsDisplayContext.getBackURL() %>" />
 	<portlet:param name="selPlid" value="<%= String.valueOf(orphanPortletsDisplayContext.getSelPlid()) %>" />
@@ -57,7 +57,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "orphan-widgets"));
 			</c:otherwise>
 		</c:choose>
 
-		<button aria-label="<%= LanguageUtil.get(request, "close") %>" class="close" data-dismiss="alert" type="button">
+		<button aria-label="<%= LanguageUtil.get(request, "close") %>" class="close" data-dismiss="liferay-alert" type="button">
 			<aui:icon image="times" markupView="lexicon" />
 		</button>
 	</div>

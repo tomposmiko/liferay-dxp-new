@@ -16,10 +16,6 @@
 
 <%@ include file="/admin/init.jsp" %>
 
-<%
-String currentTab = ParamUtil.getString(request, "currentTab", "forms");
-%>
-
 <clay:management-toolbar
 	actionDropdownItems="<%= ddmFormAdminDisplayContext.getActionItemsDropdownItems() %>"
 	clearResultsURL="<%= ddmFormAdminDisplayContext.getClearResultsURL() %>"
@@ -28,7 +24,7 @@ String currentTab = ParamUtil.getString(request, "currentTab", "forms");
 	disabled="<%= ddmFormAdminDisplayContext.isDisabledManagementBar() %>"
 	filterDropdownItems="<%= ddmFormAdminDisplayContext.getFilterItemsDropdownItems() %>"
 	itemsTotal="<%= ddmFormAdminDisplayContext.getTotalItems() %>"
-	namespace="<%= renderResponse.getNamespace() %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	searchActionURL="<%= ddmFormAdminDisplayContext.getSearchActionURL() %>"
 	searchContainerId="<%= ddmFormAdminDisplayContext.getSearchContainerId() %>"
 	searchFormName="fm1"
@@ -38,7 +34,7 @@ String currentTab = ParamUtil.getString(request, "currentTab", "forms");
 />
 
 <aui:script sandbox="<%= true %>">
-	var deleteFormInstances = function() {
+	var deleteFormInstances = function () {
 		if (
 			confirm(
 				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
@@ -56,22 +52,22 @@ String currentTab = ParamUtil.getString(request, "currentTab", "forms");
 							deleteFormInstanceIds: Liferay.Util.listCheckedExcept(
 								searchContainer,
 								'<portlet:namespace />allRowIds'
-							)
+							),
 						},
 
-						<portlet:actionURL name="deleteFormInstance" var="deleteFormInstanceURL">
+						<portlet:actionURL name="/dynamic_data_mapping_form/delete_form_instance" var="deleteFormInstanceURL">
 							<portlet:param name="mvcPath" value="/admin/view.jsp" />
 							<portlet:param name="redirect" value="<%= currentURL %>" />
 						</portlet:actionURL>
 
-						url: '<%= deleteFormInstanceURL %>'
+						url: '<%= deleteFormInstanceURL %>',
 					}
 				);
 			}
 		}
 	};
 
-	var deleteStructures = function() {
+	var deleteStructures = function () {
 		if (
 			confirm(
 				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
@@ -89,16 +85,16 @@ String currentTab = ParamUtil.getString(request, "currentTab", "forms");
 							deleteStructureIds: Liferay.Util.listCheckedExcept(
 								searchContainer,
 								'<portlet:namespace />allRowIds'
-							)
+							),
 						},
 
-						<portlet:actionURL name="deleteStructure" var="deleteStructureURL">
+						<portlet:actionURL name="/dynamic_data_mapping_form/delete_structure" var="deleteStructureURL">
 							<portlet:param name="mvcPath" value="/admin/view.jsp" />
 							<portlet:param name="currentTab" value="element-set" />
 							<portlet:param name="redirect" value="<%= currentURL %>" />
 						</portlet:actionURL>
 
-						url: '<%= deleteStructureURL %>'
+						url: '<%= deleteStructureURL %>',
 					}
 				);
 			}
@@ -107,13 +103,13 @@ String currentTab = ParamUtil.getString(request, "currentTab", "forms");
 
 	var ACTIONS = {
 		deleteFormInstances: deleteFormInstances,
-		deleteStructures: deleteStructures
+		deleteStructures: deleteStructures,
 	};
 
-	Liferay.componentReady('ddmFormManagementToolbar').then(function(
+	Liferay.componentReady('ddmFormManagementToolbar').then(function (
 		managementToolbar
 	) {
-		managementToolbar.on(['actionItemClicked'], function(event) {
+		managementToolbar.on(['actionItemClicked'], function (event) {
 			var itemData = event.data.item.data;
 
 			if (itemData && itemData.action && ACTIONS[itemData.action]) {

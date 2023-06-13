@@ -22,7 +22,6 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.BaseDDMStructureClassTypeReader;
 import com.liferay.asset.kernel.model.ClassType;
-import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.dynamic.data.mapping.info.display.field.DDMFormValuesInfoDisplayFieldProvider;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -35,6 +34,7 @@ import com.liferay.info.display.field.ClassTypesInfoDisplayFieldProvider;
 import com.liferay.info.display.field.ExpandoInfoDisplayFieldProvider;
 import com.liferay.info.display.field.InfoDisplayFieldProvider;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.util.JournalContent;
 import com.liferay.journal.util.JournalConverter;
@@ -43,9 +43,13 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 
 import java.util.HashMap;
@@ -56,6 +60,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -103,6 +109,15 @@ public class JournalArticleInfoDisplayContributor
 				locale, AssetEntry.class.getName(),
 				JournalArticle.class.getName());
 
+		infoDisplayFields.addAll(
+			expandoInfoDisplayFieldProvider.
+				getContributorExpandoInfoDisplayFields(
+					JournalArticle.class.getName(), locale));
+
+		if (classTypeId <= 0) {
+			return infoDisplayFields;
+		}
+
 		BaseDDMStructureClassTypeReader baseDDMStructureClassTypeReader =
 			new BaseDDMStructureClassTypeReader(JournalArticle.class.getName());
 
@@ -116,11 +131,6 @@ public class JournalArticleInfoDisplayContributor
 		}
 
 		infoDisplayFields.addAll(
-			expandoInfoDisplayFieldProvider.
-				getContributorExpandoInfoDisplayFields(
-					JournalArticle.class.getName(), locale));
-
-		infoDisplayFields.addAll(
 			_getDDMTemplateInfoDisplayFields(classTypeId, locale));
 
 		return infoDisplayFields;
@@ -131,30 +141,33 @@ public class JournalArticleInfoDisplayContributor
 			JournalArticle article, Locale locale)
 		throws PortalException {
 
-		Map<String, Object> infoDisplayFieldValues = new HashMap<>();
-
-		infoDisplayFieldValues.putAll(
+		return HashMapBuilder.<String, Object>putAll(
 			assetEntryInfoDisplayFieldProvider.
 				getAssetEntryInfoDisplayFieldsValues(
 					JournalArticle.class.getName(),
-					article.getResourcePrimKey(), locale));
-		infoDisplayFieldValues.putAll(
+					article.getResourcePrimKey(), locale)
+		).putAll(
 			infoDisplayFieldProvider.getContributorInfoDisplayFieldsValues(
-				JournalArticle.class.getName(), article, locale));
-		infoDisplayFieldValues.putAll(
-			_getClassTypeInfoDisplayFieldsValues(article, locale));
-		infoDisplayFieldValues.putAll(
+				JournalArticle.class.getName(), article, locale)
+		).putAll(
+			_getClassTypeInfoDisplayFieldsValues(article, locale)
+		).putAll(
 			expandoInfoDisplayFieldProvider.
 				getContributorExpandoInfoDisplayFieldsValues(
-					getClassName(), article, locale));
-		infoDisplayFieldValues.putAll(
-			_getDDMTemplateInfoDisplayFieldsValues(article, locale));
-
-		return infoDisplayFieldValues;
+					getClassName(), article, locale)
+		).putAll(
+			_getDDMTemplateInfoDisplayFieldsValues(article, locale)
+		).build();
 	}
 
 	@Override
-	public InfoDisplayObjectProvider getInfoDisplayObjectProvider(long classPK)
+	public long getInfoDisplayObjectClassPK(JournalArticle article) {
+		return article.getResourcePrimKey();
+	}
+
+	@Override
+	public InfoDisplayObjectProvider<JournalArticle>
+			getInfoDisplayObjectProvider(long classPK)
 		throws PortalException {
 
 		JournalArticle article = journalArticleLocalService.fetchLatestArticle(
@@ -189,23 +202,18 @@ public class JournalArticleInfoDisplayContributor
 	}
 
 	@Override
-	public InfoDisplayObjectProvider getPreviewInfoDisplayObjectProvider(
-			long classPK, int type)
+	public InfoDisplayObjectProvider<JournalArticle>
+			getPreviewInfoDisplayObjectProvider(long classPK, int type)
 		throws PortalException {
 
-		AssetEntry assetEntry = assetEntryLocalService.fetchAssetEntry(classPK);
-
-		if (assetEntry == null) {
-			return null;
-		}
-
-		AssetRendererFactory assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				JournalArticle.class.getName());
+		AssetRendererFactory<JournalArticle> assetRendererFactory =
+			(AssetRendererFactory<JournalArticle>)
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(
+						JournalArticle.class.getName());
 
 		AssetRenderer<JournalArticle> assetRenderer =
-			assetRendererFactory.getAssetRenderer(
-				assetEntry.getClassPK(), type);
+			assetRendererFactory.getAssetRenderer(classPK, type);
 
 		JournalArticle article = assetRenderer.getAssetObject();
 
@@ -221,9 +229,11 @@ public class JournalArticleInfoDisplayContributor
 			JournalArticle article, long versionClassPK, Locale locale)
 		throws PortalException {
 
-		AssetRendererFactory assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				JournalArticle.class.getName());
+		AssetRendererFactory<JournalArticle> assetRendererFactory =
+			(AssetRendererFactory<JournalArticle>)
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(
+						JournalArticle.class.getName());
 
 		AssetRenderer<JournalArticle> assetRenderer =
 			assetRendererFactory.getAssetRenderer(versionClassPK);
@@ -237,14 +247,11 @@ public class JournalArticleInfoDisplayContributor
 		assetEntryInfoDisplayFieldProvider;
 
 	@Reference
-	protected AssetEntryLocalService assetEntryLocalService;
-
-	@Reference
 	protected ClassTypesInfoDisplayFieldProvider
 		classTypesInfoDisplayFieldProvider;
 
 	@Reference
-	protected DDMFormValuesInfoDisplayFieldProvider
+	protected DDMFormValuesInfoDisplayFieldProvider<JournalArticle>
 		ddmFormValuesInfoDisplayFieldProvider;
 
 	@Reference
@@ -312,9 +319,7 @@ public class JournalArticleInfoDisplayContributor
 		infoDisplayFields.addAll(
 			stream.map(
 				ddmTemplate -> new InfoDisplayField(
-					_getTemplateKey(ddmTemplate),
-					ddmTemplate.getName(locale) + StringPool.SPACE +
-						StringPool.STAR,
+					_getTemplateKey(ddmTemplate), ddmTemplate.getName(locale),
 					"text")
 			).collect(
 				Collectors.toList()
@@ -349,6 +354,24 @@ public class JournalArticleInfoDisplayContributor
 			templateKey.replaceAll("\\W", "_");
 	}
 
+	private ThemeDisplay _getThemeDisplay() {
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			return null;
+		}
+
+		HttpServletRequest httpServletRequest = serviceContext.getRequest();
+
+		if (httpServletRequest == null) {
+			return null;
+		}
+
+		return (ThemeDisplay)httpServletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleInfoDisplayContributor.class);
 
@@ -364,10 +387,28 @@ public class JournalArticleInfoDisplayContributor
 		}
 
 		public String getContent() {
-			return journalContent.getContent(
-				_article.getGroupId(), _article.getArticleId(),
-				_ddmTemplate.getTemplateKey(), Constants.VIEW, _languageId,
-				(ThemeDisplay)null);
+			JournalArticleDisplay journalArticleDisplay =
+				journalContent.getDisplay(
+					_article, _ddmTemplate.getTemplateKey(), Constants.VIEW,
+					_languageId, 1, null, _getThemeDisplay());
+
+			if (journalArticleDisplay != null) {
+				return journalArticleDisplay.getContent();
+			}
+
+			try {
+				journalArticleDisplay =
+					journalArticleLocalService.getArticleDisplay(
+						_article, _ddmTemplate.getTemplateKey(), null,
+						_languageId, 1, null, _getThemeDisplay());
+
+				return journalArticleDisplay.getContent();
+			}
+			catch (Exception exception) {
+				_log.error("Unable to get journal article display", exception);
+			}
+
+			return StringPool.BLANK;
 		}
 
 		private final JournalArticle _article;

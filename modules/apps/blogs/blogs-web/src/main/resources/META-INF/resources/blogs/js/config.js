@@ -12,7 +12,7 @@
  * details.
  */
 
-(function() {
+(function () {
 	AUI().applyConfig({
 		groups: {
 			blogs: {
@@ -22,11 +22,11 @@
 				modules: {
 					'liferay-blogs': {
 						path: 'blogs.js',
-						requires: ['aui-base', 'liferay-form']
-					}
+						requires: ['aui-base', 'liferay-form'],
+					},
 				},
-				root: MODULE_PATH + '/blogs/js/'
-			}
-		}
+				root: MODULE_PATH + '/blogs/js/',
+			},
+		},
 	});
 })();

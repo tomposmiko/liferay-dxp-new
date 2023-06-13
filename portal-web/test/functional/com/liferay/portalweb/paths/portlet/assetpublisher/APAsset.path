@@ -2,25 +2,17 @@
 <head>
 <title>APAsset</title>
 </head>
+
 <body>
-<table cellpadding="1" cellspacing="1" border="1">
+<table border="1" cellpadding="1" cellspacing="1">
 <thead>
 <tr><td rowspan="1" colspan="3">APAsset</td></tr>
 </thead>
+
 <tbody>
 <tr>
 	<td>ASSET_BACK_TO_ICON</td>
 	<td>//span[@class='header-back-to']/a</td>
-	<td></td>
-</tr>
-<tr>
-	<td>ASSET_TITLE</td>
-	<td>//h4/*[contains(@class,'asset-title') and contains(.,'${key_assetTitle}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>ASSET_TITLE_HEADER</td>
-	<td>//h4/*[contains(@class,'asset-title')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -35,7 +27,7 @@
 </tr>
 <tr>
 	<td>ASSET_ROW_ENTRY_TITLE</td>
-	<td>//div[contains(@class,'asset-abstract')][${key_rowNumber}]//h4[@class='component-title']/a</td>
+	<td>xPath=(//a[contains(@class,'asset-title')])[${rowNumber}]</td>
 	<td></td>
 </tr>
 <tr>

@@ -20,6 +20,7 @@ import State from 'metal-state';
  * and adding the capability of adding targets to bubble events to them.
  */
 class CompatibilityEventProxy extends State {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -67,7 +68,7 @@ class CompatibilityEventProxy extends State {
 	 * @private
 	 */
 	emitCompatibleEvents_(eventName, event) {
-		this.eventTargets_.forEach(target => {
+		this.eventTargets_.forEach((target) => {
 			if (target.fire) {
 				const prefixedEventName = this.namespace
 					? this.namespace + ':' + eventName
@@ -77,8 +78,11 @@ class CompatibilityEventProxy extends State {
 				if (core.isObject(event)) {
 					try {
 						event.target = this.host;
-					} catch (e) {
+					}
+					catch (e) {
+
 						// Do nothing
+
 					}
 				}
 
@@ -114,7 +118,8 @@ class CompatibilityEventProxy extends State {
 			if (compatibleEvent !== eventFacade.type) {
 				eventFacade.type = compatibleEvent;
 				this.host.emit(compatibleEvent, event, eventFacade);
-			} else if (this.eventTargets_.length > 0) {
+			}
+			else if (this.eventTargets_.length > 0) {
 				this.emitCompatibleEvents_(compatibleEvent, event);
 			}
 		});
@@ -129,6 +134,7 @@ class CompatibilityEventProxy extends State {
  * @type {!Object}
  */
 CompatibilityEventProxy.STATE = {
+
 	/**
 	 * Replaces event names with adapted YUI names.
 	 *
@@ -139,8 +145,8 @@ CompatibilityEventProxy.STATE = {
 	adaptedEvents: {
 		value: {
 			match: /(.*)(Changed)$/,
-			replace: '$1Change'
-		}
+			replace: '$1Change',
+		},
 	},
 
 	/**
@@ -152,8 +158,8 @@ CompatibilityEventProxy.STATE = {
 	 * @type {String}
 	 */
 	emitFacade: {
-		value: false
-	}
+		value: false,
+	},
 };
 
 export default CompatibilityEventProxy;

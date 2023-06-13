@@ -13,66 +13,64 @@ import React, {useMemo} from 'react';
 
 import Filter from '../../shared/components/filter/Filter.es';
 import {useFilterFetch} from '../../shared/components/filter/hooks/useFilterFetch.es';
-import {useFilterName} from '../../shared/components/filter/hooks/useFilterName.es';
+import {useFilterNameWithLabel} from '../../shared/components/filter/hooks/useFilterName.es';
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
 
 const allStepsItem = {
 	dividerAfter: true,
-	key: 'allSteps',
-	name: Liferay.Language.get('all-steps')
+	label: Liferay.Language.get('all-steps'),
+	name: 'allSteps',
 };
 
 const ProcessStepFilter = ({
 	className,
-	dispatch,
+	disabled,
 	filterKey = filterConstants.processStep.key,
 	options = {},
 	prefixKey = '',
-	processId
+	processId,
 }) => {
-	const defaultOptions = {
+	options = {
 		hideControl: false,
 		multiple: true,
 		position: 'left',
+		requestUrl: `/processes/${processId}/tasks?page=0&pageSize=0`,
 		withAllSteps: false,
-		withSelectionTitle: false
+		withSelectionTitle: false,
+		withoutRouteParams: false,
+		...options,
 	};
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	options = useMemo(() => ({...defaultOptions, ...options}), [options]);
-
-	const staticItems = useMemo(
-		() => (options.withAllSteps ? [allStepsItem] : []),
-		[options.withAllSteps]
-	);
 
 	const {items, selectedItems} = useFilterFetch({
-		dispatch,
 		filterKey,
 		prefixKey,
-		requestUrl: `/processes/${processId}/tasks?page=0&pageSize=0`,
-		staticItems
+		propertyKey: 'name',
+		staticItems: options.withAllSteps ? [allStepsItem] : [],
+		...options,
 	});
 
 	const defaultItem = useMemo(() => items[0], [items]);
 
-	if (defaultItem && !selectedItems.length) {
+	if (defaultItem && options.withSelectionTitle && !selectedItems.length) {
 		selectedItems[0] = defaultItem;
 	}
 
-	const filterName = useFilterName(
-		options.multiple,
+	const filterName = useFilterNameWithLabel({
+		labelPropertyName: 'label',
 		selectedItems,
-		Liferay.Language.get('process-step'),
-		options.withSelectionTitle
-	);
+		title: Liferay.Language.get('process-step'),
+		withSelectionTitle: options.withSelectionTitle,
+		...options,
+	});
 
 	return (
 		<Filter
-			dataTestId="processStepFilter"
 			defaultItem={defaultItem}
+			disabled={disabled}
 			elementClasses={className}
 			filterKey={filterKey}
 			items={items}
+			labelPropertyName="label"
 			name={filterName}
 			prefixKey={prefixKey}
 			{...options}

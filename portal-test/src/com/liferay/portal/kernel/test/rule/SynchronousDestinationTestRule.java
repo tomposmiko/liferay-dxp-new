@@ -14,11 +14,13 @@
 
 package com.liferay.portal.kernel.test.rule;
 
-import com.liferay.petra.lang.SafeClosable;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.increment.BufferedIncrementThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseDestination;
@@ -30,6 +32,7 @@ import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
+import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule.SyncHandler;
@@ -39,11 +42,12 @@ import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.dependency.ServiceDependencyManager;
+import com.liferay.registry.ServiceTracker;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
@@ -79,6 +83,8 @@ public class SynchronousDestinationTestRule
 
 	@Override
 	public SyncHandler beforeClass(Description description) throws Throwable {
+		DependencyManagerSyncUtil.sync();
+
 		Class<?> testClass = description.getTestClass();
 
 		return _createSyncHandler(testClass.getAnnotation(Sync.class));
@@ -124,15 +130,16 @@ public class SynchronousDestinationTestRule
 		}
 
 		public void enableSync() {
-			ServiceDependencyManager serviceDependencyManager =
-				new ServiceDependencyManager();
-
+			Filter auditFilter = _registerDestinationFilter(
+				DestinationNames.AUDIT);
 			Filter asyncFilter = _registerDestinationFilter(
 				DestinationNames.ASYNC_SERVICE);
 			Filter backgroundTaskFilter = _registerDestinationFilter(
 				DestinationNames.BACKGROUND_TASK);
 			Filter backgroundTaskStatusFilter = _registerDestinationFilter(
 				DestinationNames.BACKGROUND_TASK_STATUS);
+			Filter ddmStructureReindexFilter = _registerDestinationFilter(
+				"liferay/ddm_structure_reindex");
 			Filter kaleoGraphWalkerFilter = _registerDestinationFilter(
 				"liferay/kaleo_graph_walker");
 			Filter mailFilter = _registerDestinationFilter(
@@ -141,22 +148,54 @@ public class SynchronousDestinationTestRule
 				DestinationNames.DOCUMENT_LIBRARY_PDF_PROCESSOR);
 			Filter rawMetaDataProcessorFilter = _registerDestinationFilter(
 				DestinationNames.DOCUMENT_LIBRARY_RAW_METADATA_PROCESSOR);
+			Filter segmentsEntryReindexFilter = _registerDestinationFilter(
+				"liferay/segments_entry_reindex");
 			Filter subscrpitionSenderFilter = _registerDestinationFilter(
 				DestinationNames.SUBSCRIPTION_SENDER);
+			Filter tensorflowModelDownloadFilter = _registerDestinationFilter(
+				"liferay/tensorflow_model_download");
 
-			serviceDependencyManager.registerDependencies(
-				asyncFilter, backgroundTaskFilter, backgroundTaskStatusFilter,
-				kaleoGraphWalkerFilter, mailFilter, pdfProcessorFilter,
-				rawMetaDataProcessorFilter, subscrpitionSenderFilter);
+			boolean solrEnabled = _isSolrEnabled();
 
-			serviceDependencyManager.waitForDependencies();
+			if (!solrEnabled) {
+				Filter commerceOrderFilter = _registerDestinationFilter(
+					"liferay/order_status");
+				Filter commercePaymentFilter = _registerDestinationFilter(
+					"liferay/payment_status");
+				Filter commerceShipmentFilter = _registerDestinationFilter(
+					"liferay/shipment_status");
+				Filter commerceStockFilter = _registerDestinationFilter(
+					"liferay/stock_quantity");
+				Filter commerceSubscriptionFilter = _registerDestinationFilter(
+					"liferay/subscription_status");
+
+				_waitForDependencies(
+					auditFilter, asyncFilter, backgroundTaskFilter,
+					backgroundTaskStatusFilter, commerceOrderFilter,
+					commercePaymentFilter, commerceShipmentFilter,
+					commerceStockFilter, commerceSubscriptionFilter,
+					ddmStructureReindexFilter, kaleoGraphWalkerFilter,
+					mailFilter, pdfProcessorFilter, rawMetaDataProcessorFilter,
+					segmentsEntryReindexFilter, subscrpitionSenderFilter);
+			}
+			else {
+				_waitForDependencies(
+					auditFilter, asyncFilter, backgroundTaskFilter,
+					backgroundTaskStatusFilter, ddmStructureReindexFilter,
+					kaleoGraphWalkerFilter, mailFilter, pdfProcessorFilter,
+					rawMetaDataProcessorFilter, segmentsEntryReindexFilter,
+					subscrpitionSenderFilter, tensorflowModelDownloadFilter);
+			}
 
 			_destinations = ReflectionTestUtil.getFieldValue(
 				MessageBusUtil.getMessageBus(), "_destinations");
 
-			_forceSyncSafeClosable = ProxyModeThreadLocal.setWithSafeClosable(
+			_bufferedIncrementForceSyncSafeCloseable =
+				BufferedIncrementThreadLocal.setWithSafeCloseable(true);
+			_forceSyncSafeCloseable = ProxyModeThreadLocal.setWithSafeCloseable(
 				true);
 
+			replaceDestination(DestinationNames.AUDIT);
 			replaceDestination(DestinationNames.ASYNC_SERVICE);
 			replaceDestination(DestinationNames.BACKGROUND_TASK);
 			replaceDestination(DestinationNames.BACKGROUND_TASK_STATUS);
@@ -170,9 +209,20 @@ public class SynchronousDestinationTestRule
 			replaceDestination(DestinationNames.SUBSCRIPTION_SENDER);
 			replaceDestination("liferay/adaptive_media_processor");
 			replaceDestination("liferay/asset_auto_tagger");
+			replaceDestination("liferay/ddm_structure_reindex");
 			replaceDestination("liferay/kaleo_graph_walker");
 			replaceDestination("liferay/report_request");
 			replaceDestination("liferay/reports_admin");
+			replaceDestination("liferay/segments_entry_reindex");
+
+			if (!solrEnabled) {
+				replaceDestination("liferay/order_status");
+				replaceDestination("liferay/payment_status");
+				replaceDestination("liferay/shipment_status");
+				replaceDestination("liferay/stock_quantity");
+				replaceDestination("liferay/subscription_status");
+				replaceDestination("liferay/tensorflow_model_download");
+			}
 
 			if (_sync != null) {
 				for (String name : _sync.destinationNames()) {
@@ -293,8 +343,12 @@ public class SynchronousDestinationTestRule
 		}
 
 		public void restorePreviousSync() {
-			if (_forceSyncSafeClosable != null) {
-				_forceSyncSafeClosable.close();
+			if (_bufferedIncrementForceSyncSafeCloseable != null) {
+				_bufferedIncrementForceSyncSafeCloseable.close();
+			}
+
+			if (_forceSyncSafeCloseable != null) {
+				_forceSyncSafeCloseable.close();
 			}
 
 			for (Destination destination : _asyncServiceDestinations) {
@@ -334,6 +388,13 @@ public class SynchronousDestinationTestRule
 			_sync = sync;
 		}
 
+		private boolean _isSolrEnabled() {
+			SearchEngine searchEngine = SearchEngineHelperUtil.getSearchEngine(
+				SearchEngineHelperUtil.getDefaultSearchEngineId());
+
+			return Objects.equals(searchEngine.getVendor(), "Solr");
+		}
+
 		private Filter _registerDestinationFilter(String destinationName) {
 			Registry registry = RegistryUtil.getRegistry();
 
@@ -343,11 +404,46 @@ public class SynchronousDestinationTestRule
 					Destination.class.getName(), "))"));
 		}
 
+		private void _waitForDependencies(Filter... filters) {
+			Registry registry = RegistryUtil.getRegistry();
+
+			for (Filter filter : filters) {
+				ServiceTracker<Object, Object> serviceTracker =
+					registry.trackServices(filter);
+
+				serviceTracker.open();
+
+				while (true) {
+					try {
+						Object service = serviceTracker.waitForService(2000);
+
+						if (service != null) {
+							serviceTracker.close();
+
+							break;
+						}
+
+						System.out.println(
+							"Waiting for destination " + filter.toString());
+					}
+					catch (InterruptedException interruptedException) {
+						System.out.println(
+							StringBundler.concat(
+								"Stopped waiting for destination ",
+								filter.toString(), " due to interruption"));
+
+						return;
+					}
+				}
+			}
+		}
+
 		private final List<String> _absentDestinationNames = new ArrayList<>();
 		private final List<Destination> _asyncServiceDestinations =
 			new ArrayList<>();
+		private SafeCloseable _bufferedIncrementForceSyncSafeCloseable;
 		private Map<String, Destination> _destinations;
-		private SafeClosable _forceSyncSafeClosable;
+		private SafeCloseable _forceSyncSafeCloseable;
 		private final List<InvokerMessageListener>
 			_schedulerInvokerMessageListeners = new ArrayList<>();
 		private Sync _sync;
@@ -420,8 +516,8 @@ public class SynchronousDestinationTestRule
 
 					});
 			}
-			catch (Throwable t) {
-				throw new RuntimeException(t);
+			catch (Throwable throwable) {
+				throw new RuntimeException(throwable);
 			}
 		}
 

@@ -16,41 +16,43 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import ClayDropDown, {Align} from '@clayui/drop-down';
 import ClayForm from '@clayui/form';
 import ClayIcon from '@clayui/icon';
+import ClayLayout from '@clayui/layout';
 import classNames from 'classnames';
 import {
 	DataLayoutBuilderActions,
 	SearchInput,
-	Sidebar
+	Sidebar,
 } from 'data-engine-taglib';
 import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useLayoutEffect,
 	useRef,
 	useState,
-	useEffect,
-	useContext,
-	useCallback,
-	useLayoutEffect
 } from 'react';
 
 import {useKeyDown} from '../../hooks/index.es';
 import isClickOutside from '../../utils/clickOutside.es';
 import CustomObjectFieldsList from './CustomObjectFieldsList.es';
+import DataLayoutBuilderContext from './DataLayoutBuilderInstanceContext.es';
 import FormViewContext from './FormViewContext.es';
 
 const DropDown = () => {
-	const [{fieldTypes}, dispatch] = useContext(FormViewContext);
+	const [
+		{
+			config: {allowNestedFields},
+			fieldTypes,
+		},
+		dispatch,
+	] = useContext(FormViewContext);
 	const [active, setActive] = useState(false);
-	const [showFieldTypes, setShowFieldTypes] = useState(false);
 
-	const onActiveChange = newVal => {
-		setActive(newVal);
-		setShowFieldTypes(false);
-	};
-
-	const onClickFieldType = fieldTypeName => {
+	const onClickFieldType = (fieldTypeName) => {
 		setActive(false);
 		dispatch({
 			payload: {fieldTypeName},
-			type: DataLayoutBuilderActions.ADD_CUSTOM_OBJECT_FIELD
+			type: DataLayoutBuilderActions.ADD_CUSTOM_OBJECT_FIELD,
 		});
 	};
 
@@ -64,9 +66,19 @@ const DropDown = () => {
 		}
 	}, [active]);
 
-	const filteredFieldTypes = fieldTypes.filter(
-		({group}) => group === 'basic'
-	);
+	const filteredFieldTypes = fieldTypes.filter(({name, scope}) => {
+		if (!scope.includes('app-builder')) {
+			return false;
+		}
+
+		// Remove fields group field from left sidebar
+
+		if (name === 'fieldset' && !allowNestedFields) {
+			return false;
+		}
+
+		return true;
+	});
 
 	filteredFieldTypes.sort(({displayOrder: a}, {displayOrder: b}) => a - b);
 
@@ -75,41 +87,40 @@ const DropDown = () => {
 			active={active}
 			alignmentPosition={Align.BottomRight}
 			className="custom-object-dropdown"
-			onActiveChange={onActiveChange}
+			hasLeftSymbols
+			onActiveChange={(newVal) => setActive(newVal)}
 			trigger={
 				<ClayButtonWithIcon displayType="unstyled" symbol="plus" />
 			}
 		>
 			<ClayDropDown.ItemList className="custom-object-dropdown-list">
-				{showFieldTypes ? (
-					filteredFieldTypes.map(({icon, label, name}) => (
-						<ClayDropDown.Item
-							key={name}
-							onClick={() => onClickFieldType(name)}
-							symbolLeft={icon}
-						>
-							{label}
-						</ClayDropDown.Item>
-					))
-				) : (
-					<>
-						<ClayDropDown.Item
-							key={'add'}
-							onClick={() => setShowFieldTypes(true)}
-						>
-							{Liferay.Language.get('add-field-to-object')}
-						</ClayDropDown.Item>
-						<ClayDropDown.Item key={'import'}>
-							{Liferay.Language.get(
-								'import-fields-from-spreadsheet'
-							)}
-						</ClayDropDown.Item>
-					</>
-				)}
+				{filteredFieldTypes.map(({icon, label, name}) => (
+					<ClayDropDown.Item
+						key={name}
+						onClick={() => onClickFieldType(name)}
+						symbolLeft={icon}
+					>
+						{label}
+					</ClayDropDown.Item>
+				))}
 			</ClayDropDown.ItemList>
 		</ClayDropDown>
 	);
 };
+
+const EmptyState = () => (
+	<div className="custom-object-sidebar-empty">
+		<ClayIcon symbol="custom-field" />
+
+		<h3>{Liferay.Language.get('there-are-no-fields-yet')}</h3>
+
+		<p>
+			{Liferay.Language.get(
+				'any-field-added-to-the-object-or-to-a-form-view-appears-here'
+			)}
+		</p>
+	</div>
+);
 
 const Header = ({onCloseSearch, onSearch, searchText}) => {
 	const [searchMode, setSearchMode] = useState(false);
@@ -138,62 +149,62 @@ const Header = ({onCloseSearch, onSearch, searchText}) => {
 
 	const [{dataDefinition}] = useContext(FormViewContext);
 	const {
-		name: {en_US: dataDefinitionName = ''}
+		name: {[dataDefinition.defaultLanguageId]: dataDefinitionName = ''},
 	} = dataDefinition;
 
 	return (
-		<ClayForm onSubmit={event => event.preventDefault()}>
+		<ClayForm onSubmit={(event) => event.preventDefault()}>
 			<div
 				className={classNames(
 					'custom-object-sidebar-header',
-					'mt-4',
-					'p-2',
-					{
-						'ml-4': !searchMode
-					}
+					'ml-4 mr-4 mt-4 pt-2 pb-2'
 				)}
 			>
-				<div className="autofit-row autofit-row-center">
+				<ClayLayout.ContentRow verticalAlign="center">
 					{searchMode ? (
 						<>
-							<div className="autofit-col autofit-col-expand">
+							<ClayLayout.ContentCol expand>
 								<SearchInput
 									clearButton={false}
-									onChange={searchText =>
+									onChange={(searchText) =>
 										onSearch(searchText)
 									}
 									ref={searchInputRef}
 									searchText={searchText}
 								/>
-							</div>
-							<div className="autofit-col ml-2" key="closeButton">
+							</ClayLayout.ContentCol>
+
+							<ClayLayout.ContentCol
+								className="ml-2"
+								key="closeButton"
+							>
 								<ClayButtonWithIcon
 									displayType="unstyled"
 									onClick={onClickClose}
 									symbol="times"
 								/>
-							</div>
+							</ClayLayout.ContentCol>
 						</>
 					) : (
 						<>
-							<div className="autofit-col autofit-col-expand">
+							<ClayLayout.ContentCol expand>
 								<h3>{dataDefinitionName}</h3>
-							</div>
+							</ClayLayout.ContentCol>
 
-							<div className="autofit-col" key="searchButton">
+							<ClayLayout.ContentCol key="searchButton">
 								<ClayButtonWithIcon
 									displayType="unstyled"
 									onClick={onClickSearch}
 									symbol="search"
 								/>
-							</div>
+							</ClayLayout.ContentCol>
 
-							<div className="autofit-col" key="dropdown">
+							<ClayLayout.ContentCol key="dropdown">
 								<DropDown />
-							</div>
+							</ClayLayout.ContentCol>
 						</>
 					)}
-				</div>
+				</ClayLayout.ContentRow>
 			</div>
 		</ClayForm>
 	);
@@ -202,12 +213,13 @@ const Header = ({onCloseSearch, onSearch, searchText}) => {
 export default () => {
 	const [
 		{
-			dataDefinition: {dataDefinitionFields},
-			focusedCustomObjectField
+			dataDefinition: {dataDefinitionFields, id},
+			focusedCustomObjectField,
 		},
-		dispatch
+		dispatch,
 	] = useContext(FormViewContext);
 	const [searchText, setSearchText] = useState('');
+	const [dataLayoutBuilder] = useContext(DataLayoutBuilderContext);
 	const sidebarRef = useRef();
 
 	useKeyDown(() => {
@@ -215,7 +227,7 @@ export default () => {
 			dispatch({
 				payload: {dataDefinitionField: {}},
 				type:
-					DataLayoutBuilderActions.UPDATE_FOCUSED_CUSTOM_OBJECT_FIELD
+					DataLayoutBuilderActions.UPDATE_FOCUSED_CUSTOM_OBJECT_FIELD,
 			});
 		}
 	}, 27);
@@ -225,22 +237,29 @@ export default () => {
 			if (
 				isClickOutside(
 					target,
-					'.data-layout-builder-sidebar',
-					'.dropdown-menu'
+					'.app-builder-upper-toolbar',
+					'button.close',
+					'.display-settings',
+					'.dropdown-menu',
+					'.modal.show',
+					'.nav-underline',
+					'#ddm-actionable-fields-container'
 				)
 			) {
 				dispatch({
 					payload: {dataDefinitionField: {}},
 					type:
-						DataLayoutBuilderActions.UPDATE_FOCUSED_CUSTOM_OBJECT_FIELD
+						DataLayoutBuilderActions.UPDATE_FOCUSED_CUSTOM_OBJECT_FIELD,
 				});
+
+				dataLayoutBuilder.dispatch('sidebarFieldBlurred');
 			}
 		};
 
 		window.addEventListener('click', eventHandler);
 
 		return () => window.removeEventListener('click', eventHandler);
-	}, [dispatch]);
+	}, [dataLayoutBuilder, dispatch]);
 
 	const empty = dataDefinitionFields.length === 0;
 
@@ -249,27 +268,13 @@ export default () => {
 			<>
 				<Header
 					onCloseSearch={() => setSearchText('')}
-					onSearch={searchText => setSearchText(searchText)}
+					onSearch={(searchText) => setSearchText(searchText)}
 					searchText={searchText}
 				/>
 
 				<Sidebar.Body className={classNames({empty})}>
-					{empty ? (
-						<div className="custom-object-sidebar-empty">
-							<ClayIcon symbol="custom-field" />
-
-							<h3>
-								{Liferay.Language.get(
-									'there-are-no-fields-yet'
-								)}
-							</h3>
-
-							<p>
-								{Liferay.Language.get(
-									'any-field-added-to-the-object-or-to-a-form-view-appears-here'
-								)}
-							</p>
-						</div>
+					{!!id && empty ? (
+						<EmptyState />
 					) : (
 						<CustomObjectFieldsList keywords={searchText} />
 					)}

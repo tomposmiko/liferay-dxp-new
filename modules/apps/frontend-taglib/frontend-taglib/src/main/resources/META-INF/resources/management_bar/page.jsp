@@ -18,7 +18,7 @@
 
 <div class="management-bar-container" data-qa-id="managementBar" id="<%= namespace %>managementBarContainerId">
 	<div class="management-bar management-bar-default">
-		<div class="container-fluid-1280">
+		<clay:container-fluid>
 			<div class="management-bar-header">
 				<c:if test="<%= includeCheckBox %>">
 					<div class="checkbox">
@@ -29,7 +29,7 @@
 				</c:if>
 
 				<c:if test="<%= Validator.isNotNull(filters) %>">
-					<a class="collapsed management-bar-toggle management-bar-toggle-link" data-toggle="collapse" href="#<%= namespace %>managementBarCollapse">
+					<a class="collapsed management-bar-toggle management-bar-toggle-link" data-toggle="liferay-collapse" href="#<%= namespace %>managementBarCollapse">
 						<span class="management-bar-item-title"><liferay-ui:message key="filter-order" /></span>
 
 						<aui:icon image="caret-double-l" markupView="lexicon" />
@@ -50,12 +50,12 @@
 					<%= buttons %>
 				</div>
 			</c:if>
-		</div>
+		</clay:container-fluid>
 	</div>
 
 	<c:if test="<%= Validator.isNotNull(actionButtons) || includeCheckBox %>">
 		<div class="management-bar management-bar-default management-bar-no-collapse management-bar-secondary-bar" id="<%= namespace %>actionButtons">
-			<div class="container-fluid-1280">
+			<clay:container-fluid>
 				<div class="management-bar-header">
 					<c:if test="<%= includeCheckBox %>">
 						<div class="checkbox">
@@ -81,7 +81,7 @@
 						<%= actionButtons %>
 					</c:if>
 				</div>
-			</div>
+			</clay:container-fluid>
 		</div>
 	</c:if>
 </div>
@@ -91,10 +91,10 @@
 		var managementBar = new Liferay.ManagementBar({
 			namespace: '<%= namespace %>',
 			searchContainerId: '<%= namespace + searchContainerId %>',
-			secondaryBar: '#actionButtons'
+			secondaryBar: '#actionButtons',
 		});
 
-		var clearManagementBarHandles = function(event) {
+		var clearManagementBarHandles = function (event) {
 			if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
 				managementBar.destroy();
 

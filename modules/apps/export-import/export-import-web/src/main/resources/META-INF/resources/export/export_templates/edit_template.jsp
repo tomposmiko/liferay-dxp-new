@@ -82,7 +82,7 @@ portletDisplay.setURLBack(portletURL.toString());
 renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(request, "new-export-template") : exportImportConfiguration.getName());
 %>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<portlet:actionURL name="editExportConfiguration" var="updateExportConfigurationURL">
 		<portlet:param name="mvcRenderCommandName" value="editExportConfiguration" />
 	</portlet:actionURL>
@@ -147,7 +147,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 			<aui:button href="<%= portletURL.toString() %>" type="cancel" />
 		</aui:button-row>
 	</aui:form>
-</div>
+</clay:container-fluid>
 
 <aui:script use="liferay-export-import-export-import">
 	var exportImport = new Liferay.ExportImport({
@@ -169,14 +169,14 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 		setupNode: '#<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>',
 		timeZoneOffset: <%= timeZoneOffset %>,
 		userPreferencesNode:
-			'#<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>'
+			'#<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>',
 	});
 
 	Liferay.component('<portlet:namespace />ExportImportComponent', exportImport);
 
 	var form = A.one('#<portlet:namespace />fm1');
 
-	form.on('submit', function(event) {
+	form.on('submit', function (event) {
 		event.halt();
 
 		var exportImport = Liferay.component(
@@ -187,7 +187,8 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 
 		if (dateChecker.validRange) {
 			submitForm(form, form.attr('action'), false);
-		} else {
+		}
+		else {
 			exportImport.showNotification(dateChecker);
 		}
 	});
@@ -207,7 +208,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeAll', '', [
 		'<portlet:namespace />startEndDate',
-		'<portlet:namespace />rangeLastInputs'
+		'<portlet:namespace />rangeLastInputs',
 	]);
 	Liferay.Util.toggleRadio(
 		'<portlet:namespace />rangeDateRange',

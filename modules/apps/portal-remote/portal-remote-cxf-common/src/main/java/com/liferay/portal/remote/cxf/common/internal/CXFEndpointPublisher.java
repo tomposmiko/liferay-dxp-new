@@ -143,9 +143,7 @@ public class CXFEndpointPublisher {
 		protected void start() {
 			Dictionary<String, Object> properties = new Hashtable<>();
 
-			Object contextPathObject = _properties.get("contextPath");
-
-			String contextPath = contextPathObject.toString();
+			String contextPath = String.valueOf(_properties.get("contextPath"));
 
 			String contextName = contextPath.substring(1);
 
@@ -192,6 +190,13 @@ public class CXFEndpointPublisher {
 				CXFNonSpringServlet.class.getName());
 			properties.put(
 				HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/*");
+
+			Object property = properties.get(
+				"servlet.init.hide-service-list-page");
+
+			if (property == null) {
+				properties.put("servlet.init.hide-service-list-page", "true");
+			}
 
 			cxfNonSpringServlet.setBus(bus);
 

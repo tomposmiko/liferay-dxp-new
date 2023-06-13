@@ -59,7 +59,7 @@ public interface PowwowServerLocalService
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link PowwowServerLocalServiceUtil} to access the powwow server local service. Add custom service methods to <code>com.liferay.powwow.service.impl.PowwowServerLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.powwow.service.impl.PowwowServerLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the powwow server local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link PowwowServerLocalServiceUtil} if injection and service tracking are not available.
 	 */
 	public PowwowServer addPowwowServer(
 			long userId, String name, String providerType, String url,
@@ -69,6 +69,10 @@ public interface PowwowServerLocalService
 	/**
 	 * Adds the powwow server to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowServerLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param powwowServer the powwow server
 	 * @return the powwow server that was added
 	 */
@@ -76,6 +80,12 @@ public interface PowwowServerLocalService
 	public PowwowServer addPowwowServer(PowwowServer powwowServer);
 
 	public void checkPowwowServers();
+
+	/**
+	 * @throws PortalException
+	 */
+	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
 
 	/**
 	 * Creates a new powwow server with the primary key. Does not add the powwow server to the database.
@@ -96,6 +106,10 @@ public interface PowwowServerLocalService
 	/**
 	 * Deletes the powwow server with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowServerLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param powwowServerId the primary key of the powwow server
 	 * @return the powwow server that was removed
 	 * @throws PortalException if a powwow server with the primary key could not be found
@@ -106,6 +120,10 @@ public interface PowwowServerLocalService
 
 	/**
 	 * Deletes the powwow server from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowServerLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowServer the powwow server
 	 * @return the powwow server that was removed
@@ -195,6 +213,9 @@ public interface PowwowServerLocalService
 	 */
 	public String getOSGiServiceIdentifier();
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
@@ -227,7 +248,7 @@ public interface PowwowServerLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<PowwowServer> getPowwowServers(
-		int start, int end, OrderByComparator obc);
+		int start, int end, OrderByComparator<PowwowServer> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<PowwowServer> getPowwowServers(
@@ -251,6 +272,10 @@ public interface PowwowServerLocalService
 
 	/**
 	 * Updates the powwow server in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect PowwowServerLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param powwowServer the powwow server
 	 * @return the powwow server that was updated

@@ -12,39 +12,38 @@
  * details.
  */
 
+import ClayForm, {ClayInput} from '@clayui/form';
+import {debounce} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useRef, useState} from 'react';
 
 let nextInputId = 0;
 
-export default function SearchForm({onChange, value}) {
+export default function SearchForm({onChange}) {
 	const id = `pageEditorSearchFormInput${nextInputId++}`;
+	const onChangeDebounce = useRef(debounce((value) => onChange(value), 100));
+	const [searchValue, setSearchValue] = useState('');
 
 	return (
-		<form className="mb-3" role="search">
-			<div className="input-group">
-				<div className="input-group-item">
-					<label className="sr-only" htmlFor={id}>
-						{Liferay.Language.get('search-form')}
-					</label>
-
-					<input
-						className="form-control form-control-sm input-group-inset"
-						id={id}
-						onChange={event => {
-							onChange(event.target.value);
-						}}
-						placeholder={`${Liferay.Language.get('search')}...`}
-						type="text"
-						value={value}
-					/>
-				</div>
-			</div>
-		</form>
+		<ClayForm.Group className="mb-3" role="search">
+			<label className="sr-only" htmlFor={id}>
+				{Liferay.Language.get('search-form')}
+			</label>
+			<ClayInput
+				id={id}
+				onChange={(event) => {
+					setSearchValue(event.target.value);
+					onChangeDebounce.current(event.target.value);
+				}}
+				placeholder={`${Liferay.Language.get('search')}...`}
+				sizing="sm"
+				type="search"
+				value={searchValue}
+			/>
+		</ClayForm.Group>
 	);
 }
 
 SearchForm.propTypes = {
 	onChange: PropTypes.func.isRequired,
-	value: PropTypes.string.isRequired
 };

@@ -17,6 +17,7 @@ package com.liferay.saml.opensaml.integration.internal.servlet.profile;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.saml.opensaml.integration.internal.BaseSamlTestCase;
 
 import org.joda.time.DateTime;
@@ -24,6 +25,8 @@ import org.joda.time.DateTimeZone;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -31,7 +34,13 @@ import org.junit.Test;
  */
 public class WebSsoProfileTest extends BaseSamlTestCase {
 
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
+
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 

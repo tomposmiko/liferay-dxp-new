@@ -12,9 +12,12 @@
  * details.
  */
 
+/**
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
+ */
 AUI.add(
 	'liferay-tree-view-icons',
-	A => {
+	(A) => {
 		var ICON_DEPRECATED_CLASSES = [
 			'glyphicon',
 			'glyphicon-check',
@@ -26,21 +29,21 @@ AUI.add(
 			'glyphicon-plus',
 			'icon-file',
 			'icon-minus',
-			'icon-plus'
+			'icon-plus',
 		];
 
-		var clearIconClasses = function(element) {
-			ICON_DEPRECATED_CLASSES.forEach(className =>
+		var clearIconClasses = function (element) {
+			ICON_DEPRECATED_CLASSES.forEach((className) =>
 				element.removeClass(className)
 			);
 		};
 
 		var originalSyncIconUIFn = A.TreeNode.prototype._syncIconUI;
 
-		A.TreeNode.prototype._syncIconUI = function(args) {
+		A.TreeNode.prototype._syncIconUI = function (args) {
 			originalSyncIconUIFn.call(this, args);
 
-			var hasChildren = this.childrenLength > 0;
+			var hasChildren = !this.get('leaf');
 			var expanded = this.get('expanded');
 			var hitAreaEl = this.get('hitAreaEl');
 			var iconEl = this.get('iconEl');
@@ -64,7 +67,7 @@ AUI.add(
 		var originalSyncIconCheckUIFn =
 			A.TreeNodeCheck.prototype._syncIconCheckUI;
 
-		A.TreeNodeCheck.prototype._syncIconCheckUI = function(args) {
+		A.TreeNodeCheck.prototype._syncIconCheckUI = function (args) {
 			originalSyncIconCheckUIFn.call(this, args);
 
 			var checked = this.isChecked();
@@ -81,6 +84,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-tree-view']
+		requires: ['aui-tree-view'],
 	}
 );

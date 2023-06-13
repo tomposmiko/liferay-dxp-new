@@ -120,40 +120,42 @@ public class NestedPortletsPortlet extends MVCPortlet {
 				_layoutTemplateLocalService.getLayoutTemplate(
 					layoutTemplateId, false, theme.getThemeId());
 
-			String content = layoutTemplate.getContent();
+			if (layoutTemplate != null) {
+				String content = layoutTemplate.getContent();
 
-			Matcher processColumnMatcher = _processColumnPattern.matcher(
-				content);
+				Matcher processColumnMatcher = _processColumnPattern.matcher(
+					content);
 
-			while (processColumnMatcher.find()) {
-				String columnId = processColumnMatcher.group(2);
+				while (processColumnMatcher.find()) {
+					String columnId = processColumnMatcher.group(2);
 
-				if (Validator.isNotNull(columnId)) {
-					columnIds.put(
-						columnId,
-						renderResponse.getNamespace() + StringPool.UNDERLINE +
-							columnId);
+					if (Validator.isNotNull(columnId)) {
+						columnIds.put(
+							columnId,
+							renderResponse.getNamespace() +
+								StringPool.UNDERLINE + columnId);
+					}
 				}
+
+				processColumnMatcher.reset();
+
+				StringBundler sb = new StringBundler(4);
+
+				sb.append(theme.getThemeId());
+				sb.append(LayoutTemplateConstants.CUSTOM_SEPARATOR);
+				sb.append(renderResponse.getNamespace());
+				sb.append(layoutTemplateId);
+
+				templateId = sb.toString();
+
+				content = processColumnMatcher.replaceAll(
+					"$1" + renderResponse.getNamespace() + "_$2$3");
+
+				Matcher columnIdMatcher = _columnIdPattern.matcher(content);
+
+				templateContent = columnIdMatcher.replaceAll(
+					"$1" + renderResponse.getNamespace() + "_$2$3");
 			}
-
-			processColumnMatcher.reset();
-
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(theme.getThemeId());
-			sb.append(LayoutTemplateConstants.CUSTOM_SEPARATOR);
-			sb.append(renderResponse.getNamespace());
-			sb.append(layoutTemplateId);
-
-			templateId = sb.toString();
-
-			content = processColumnMatcher.replaceAll(
-				"$1" + renderResponse.getNamespace() + "_$2$3");
-
-			Matcher columnIdMatcher = _columnIdPattern.matcher(content);
-
-			templateContent = columnIdMatcher.replaceAll(
-				"$1" + renderResponse.getNamespace() + "_$2$3");
 		}
 
 		checkLayout(themeDisplay.getLayout(), columnIds.values());
@@ -183,17 +185,18 @@ public class NestedPortletsPortlet extends MVCPortlet {
 	}
 
 	protected void checkLayout(Layout layout, Collection<String> columnIds) {
-		UnicodeProperties typeSettingsProperties =
+		UnicodeProperties typeSettingsUnicodeProperties =
 			layout.getTypeSettingsProperties();
 
 		String[] layoutColumnIds = StringUtil.split(
-			typeSettingsProperties.get(
+			typeSettingsUnicodeProperties.get(
 				LayoutTypePortletConstants.NESTED_COLUMN_IDS));
 
 		boolean updateColumnIds = false;
 
 		for (String columnId : columnIds) {
-			String portletIds = typeSettingsProperties.getProperty(columnId);
+			String portletIds = typeSettingsUnicodeProperties.getProperty(
+				columnId);
 
 			if (Validator.isNotNull(portletIds) &&
 				!ArrayUtil.contains(layoutColumnIds, columnId)) {
@@ -205,11 +208,11 @@ public class NestedPortletsPortlet extends MVCPortlet {
 		}
 
 		if (updateColumnIds) {
-			typeSettingsProperties.setProperty(
+			typeSettingsUnicodeProperties.setProperty(
 				LayoutTypePortletConstants.NESTED_COLUMN_IDS,
 				StringUtil.merge(layoutColumnIds));
 
-			layout.setTypeSettingsProperties(typeSettingsProperties);
+			layout.setTypeSettingsProperties(typeSettingsUnicodeProperties);
 
 			try {
 				_layoutLocalService.updateLayout(

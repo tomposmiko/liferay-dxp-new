@@ -17,6 +17,7 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
@@ -44,14 +45,16 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(LanguageUtil.get(request, "new-ranking"));
 %>
 
-<div class="result-rankings-alert-container sheet-lg">
+<clay:sheet
+	cssClass="result-rankings-alert-container"
+>
 	<liferay-ui:error exception="<%= DuplicateQueryStringException.class %>" message="ranking-with-that-search-query-already-exists" />
 	<liferay-ui:error exception="<%= Exception.class %>" message="an-unexpected-error-occurred" />
 
 	<liferay-ui:error-principal />
-</div>
+</clay:sheet>
 
-<portlet:actionURL name="/results_ranking/edit" var="addResultsRankingEntryURL" />
+<portlet:actionURL name="/result_rankings/edit_ranking" var="addResultsRankingEntryURL" />
 
 <liferay-frontend:edit-form
 	action="<%= addResultsRankingEntryURL %>"

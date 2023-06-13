@@ -77,7 +77,7 @@ treeId = treeId + privateLayout + layoutSetBranchId;
 
 PortletURL renderURL = renderResponse.createRenderURL();
 
-renderURL.setParameter("mvcRenderCommandName", "viewPublishConfigurations");
+renderURL.setParameter("mvcRenderCommandName", "/staging_processes/view_publish_configurations");
 renderURL.setParameter("groupId", String.valueOf(stagingGroupId));
 renderURL.setParameter("layoutSetBranchId", String.valueOf(layoutSetBranchId));
 renderURL.setParameter("layoutSetBranchName", layoutSetBranchName);
@@ -104,10 +104,10 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 	</c:if>
 </c:if>
 
-<div class="container-fluid-1280">
+<clay:container-fluid>
 	<div id="<portlet:namespace />customConfiguration">
-		<portlet:actionURL name="editPublishConfiguration" var="updatePublishConfigurationURL">
-			<portlet:param name="mvcRenderCommandName" value="editPublishConfiguration" />
+		<portlet:actionURL name="/staging_processes/edit_publish_configuration" var="updatePublishConfigurationURL">
+			<portlet:param name="mvcRenderCommandName" value="/staging_processes/edit_publish_configuration" />
 			<portlet:param name="groupId" value="<%= String.valueOf(stagingGroupId) %>" />
 		</portlet:actionURL>
 
@@ -144,7 +144,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 							exportImportConfigurationId="<%= exportImportConfigurationId %>"
 						/>
 
-						<c:if test="<%= !group.isCompany() %>">
+						<c:if test="<%= !group.isCompany() && GroupCapabilityUtil.isSupportsPages(group) %>">
 							<liferay-staging:select-pages
 								action="<%= Constants.PUBLISH %>"
 								exportImportConfigurationId="<%= exportImportConfigurationId %>"
@@ -188,7 +188,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 			</div>
 		</aui:form>
 	</div>
-</div>
+</clay:container-fluid>
 
 <aui:script>
 	function <portlet:namespace />publishPages() {
@@ -200,7 +200,8 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 
 		if (dateChecker.validRange) {
 			submitForm(document.<portlet:namespace />exportPagesFm);
-		} else {
+		}
+		else {
 			exportImport.showNotification();
 		}
 	}
@@ -227,7 +228,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 	);
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeAll', '', [
 		'<portlet:namespace />startEndDate',
-		'<portlet:namespace />rangeLastInputs'
+		'<portlet:namespace />rangeLastInputs',
 	]);
 	Liferay.Util.toggleRadio(
 		'<portlet:namespace />rangeDateRange',
@@ -236,7 +237,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 	);
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeLastPublish', '', [
 		'<portlet:namespace />startEndDate',
-		'<portlet:namespace />rangeLastInputs'
+		'<portlet:namespace />rangeLastInputs',
 	]);
 	Liferay.Util.toggleRadio(
 		'<portlet:namespace />rangeLast',
@@ -277,7 +278,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 		setupNode: '#<%= PortletDataHandlerKeys.PORTLET_SETUP_ALL %>',
 		timeZoneOffset: <%= timeZoneOffset %>,
 		userPreferencesNode:
-			'#<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>'
+			'#<%= PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL %>',
 	});
 
 	Liferay.component('<portlet:namespace />ExportImportComponent', exportImport);

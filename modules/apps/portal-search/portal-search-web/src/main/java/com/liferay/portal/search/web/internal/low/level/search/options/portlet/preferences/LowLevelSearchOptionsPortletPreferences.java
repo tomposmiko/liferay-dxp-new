@@ -14,12 +14,18 @@
 
 package com.liferay.portal.search.web.internal.low.level.search.options.portlet.preferences;
 
+import com.liferay.portal.kernel.json.JSONArray;
+
 import java.util.Optional;
 
 /**
  * @author Wade Cao
  */
 public interface LowLevelSearchOptionsPortletPreferences {
+
+	public static final String PREFERENCE_ATTRIBUTES = "attributes";
+
+	public static final String PREFERENCE_KEY_CONNECTION_ID = "connectionId";
 
 	public static final String PREFERENCE_KEY_CONTRIBUTORS_TO_EXCLUDE =
 		"contributorsToExclude";
@@ -34,6 +40,14 @@ public interface LowLevelSearchOptionsPortletPreferences {
 		"fieldsToReturn";
 
 	public static final String PREFERENCE_KEY_INDEXES = "indexes";
+
+	public JSONArray getAttributesJSONArray();
+
+	public String getAttributesString();
+
+	public Optional<String> getConnectionIdOptional();
+
+	public String getConnectionIdString();
 
 	public Optional<String> getContributorsToExcludeOptional();
 

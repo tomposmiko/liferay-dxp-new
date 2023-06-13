@@ -12,7 +12,7 @@ definition {
 
 		Smoke.viewWelcomePage();
 
-		ProductMenu.gotoPortlet(
+		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "Search");
@@ -38,6 +38,7 @@ definition {
 	@priority = "5"
 	test ViewLayoutArchive621015 {
 		property data.archive.type = "data-archive-pages-administration";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "6.2.10.15";
 
 		Navigator.openURL();
@@ -51,6 +52,7 @@ definition {
 	@priority = "5"
 	test ViewLayoutArchive621021 {
 		property data.archive.type = "data-archive-pages-administration";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "6.2.10.21";
 
 		Navigator.openURL();
@@ -102,6 +104,26 @@ definition {
 			totalPortletCount = "3");
 	}
 
+	@description = "This is a use case for LPS-123590."
+	@priority = "4"
+	test ViewSpecificDisplayPageTemplateArchive721 {
+		property data.archive.type = "data-archive-display-page-templates";
+		property database.types = "mariadb,mysql,postgresql";
+		property portal.version = "7.2.1";
+
+		Upgrade.viewSpecificDisplayPageTemplateViaAssetPublisher();
+	}
+
+	@description = "This is a use case for LPS-123590."
+	@priority = "4"
+	test ViewSpecificDisplayPageTemplateArchive72104 {
+		property data.archive.type = "data-archive-display-page-templates";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
+		property portal.version = "7.2.10.4";
+
+		Upgrade.viewSpecificDisplayPageTemplateViaAssetPublisher();
+	}
+
 	@priority = "5"
 	test ViewWebContentArchive625 {
 		property data.archive.type = "data-archive-web-content-draft";
@@ -116,6 +138,7 @@ definition {
 	@priority = "5"
 	test ViewWebContentArchive621015 {
 		property data.archive.type = "data-archive-web-content-draft";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "6.2.10.15";
 
 		Upgrade.addWCStructureAndTemplate();
@@ -126,11 +149,118 @@ definition {
 	@priority = "5"
 	test ViewWebContentArchive621021 {
 		property data.archive.type = "data-archive-web-content-draft";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "6.2.10.21";
 
 		Upgrade.addWCStructureAndTemplate();
 
 		Upgrade.publishWCDraft();
+	}
+
+	@description = "This is a use case for LRQA-62720. View web content with all fields and value after upgrade from 6.2."
+	@priority = "4"
+	test ViewWebContentWithAllFieldsArchive621021 {
+		property data.archive.type = "data-archive-web-content-with-all-fields";
+		property database.types = "db2,mysql,oracle,postgresql,sybase";
+		property portal.version = "6.2.10.21";
+
+		Upgrade.viewWebContentWithAllFields();
+	}
+
+	@description = "This is a use case for LPS-98619."
+	@priority = "3"
+	test ViewWebContentWithImageArchive704 {
+		property data.archive.type = "data-archive-web-content-with-image";
+		property database.types = "mariadb,mysql,postgresql";
+		property portal.version = "7.0.4";
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ProductMenu.gotoPortlet(
+			category = "Content & Data",
+			portlet = "Web Content",
+			site = "${siteName}");
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
+
+		AssertTextEquals(
+			locator1 = "TextInput#TITLE",
+			value1 = "WC WebContent Title");
+
+		AssertVisible(locator1 = "Button#PREVIEW");
+	}
+
+	@description = "This is a use case for LPS-98619."
+	@priority = "3"
+	test ViewWebContentWithImageArchive70106 {
+		property data.archive.type = "data-archive-web-content-with-image";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
+		property portal.version = "7.0.10.6";
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ProductMenu.gotoPortlet(
+			category = "Content & Data",
+			portlet = "Web Content",
+			site = "${siteName}");
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
+
+		AssertTextEquals(
+			locator1 = "TextInput#TITLE",
+			value1 = "WC WebContent Title");
+
+		AssertVisible(locator1 = "Button#PREVIEW");
+	}
+
+	@description = "This is a use case for LRQA-62830."
+	@priority = "4"
+	test ViewWebContentWithPredefinedValueInWebContentFieldArchive713 {
+		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
+		property database.types = "mariadb,mysql,postgresql";
+		property portal.version = "7.1.3";
+
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
+	}
+
+	@description = "This is a use case for LRQA-62834."
+	@priority = "4"
+	test ViewWebContentWithPredefinedValueInWebContentFieldArchive721 {
+		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
+		property database.types = "mariadb,mysql,postgresql";
+		property portal.version = "7.2.1";
+
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
+	}
+
+	@description = "This is a use case for LRQA-62830."
+	@priority = "4"
+	test ViewWebContentWithPredefinedValueInWebContentFieldArchive71103 {
+		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
+		property portal.version = "7.1.10.3";
+
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
+	}
+
+	@description = "This is a use case for LRQA-62834."
+	@priority = "4"
+	test ViewWebContentWithPredefinedValueInWebContentFieldArchive72101 {
+		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
+		property portal.version = "7.2.10.1";
+
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
+	}
+
+	@description = "This is a use case for LRQA-62801."
+	@priority = "4"
+	test ViewWebContentWithPredefinedValueInWebContentFieldArchive701014 {
+		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
+		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
+		property portal.version = "7.0.10.14";
+
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
 	}
 
 }

@@ -30,10 +30,6 @@ function renderExperiencesSection() {
 	);
 }
 
-function experiencesActivate() {
-	this.dispatch(this.Actions.loadReducer(ExperienceReducer, Experience.name));
-}
-
 /**
  * Entry-point for "Experience" (toolbar drop-down) functionality.
  */
@@ -46,7 +42,11 @@ export default class Experience {
 		this.toolbarId = app.config.toolbarId;
 		this.toolbarPluginId = toolbarPlugin.toolbarPluginId;
 
-		if (app.store.availableSegmentsExperiences !== null) {
+		if (
+			app.store.availableSegmentsExperiences !== undefined &&
+			app.store.availableSegmentsExperiences !== null &&
+			app.config.singleSegmentsExperienceMode !== true
+		) {
 			this.activate = experiencesActivate.bind(this);
 			this.renderToolbarSection = renderExperiencesSection.bind(this);
 		}
@@ -55,4 +55,8 @@ export default class Experience {
 	deactivate() {
 		this.dispatch(this.Actions.unloadReducer(Experience.name));
 	}
+}
+
+function experiencesActivate() {
+	this.dispatch(this.Actions.loadReducer(ExperienceReducer, Experience.name));
 }

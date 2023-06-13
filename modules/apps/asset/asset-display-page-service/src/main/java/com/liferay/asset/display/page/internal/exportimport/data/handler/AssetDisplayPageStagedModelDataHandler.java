@@ -15,6 +15,7 @@
 package com.liferay.asset.display.page.internal.exportimport.data.handler;
 
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
+import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -23,6 +24,8 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
@@ -106,31 +109,46 @@ public class AssetDisplayPageStagedModelDataHandler
 
 		importedAssetDisplayPageEntry.setGroupId(
 			portletDataContext.getScopeGroupId());
+		importedAssetDisplayPageEntry.setCompanyId(
+			portletDataContext.getCompanyId());
 		importedAssetDisplayPageEntry.setLayoutPageTemplateEntryId(
 			layoutPageTemplateEntryId);
 		importedAssetDisplayPageEntry.setPlid(plid);
 
+		Map<Long, Long> newClassPKsMap =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				importedAssetDisplayPageEntry.getClassName());
+
+		long existingClassPK = MapUtil.getLong(
+			newClassPKsMap, importedAssetDisplayPageEntry.getClassPK(),
+			importedAssetDisplayPageEntry.getClassPK());
+
 		AssetDisplayPageEntry existingAssetDisplayPageEntry =
-			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
-				assetDisplayPageEntry.getUuid(),
-				portletDataContext.getScopeGroupId());
+			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
+				portletDataContext.getScopeGroupId(),
+				importedAssetDisplayPageEntry.getClassNameId(),
+				existingClassPK);
 
 		if ((existingAssetDisplayPageEntry == null) ||
 			!portletDataContext.isDataStrategyMirror()) {
 
-			Map<Long, Long> newPrimaryKeysMap =
-				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-					importedAssetDisplayPageEntry.getClassName());
+			importedAssetDisplayPageEntry.setClassPK(existingClassPK);
 
-			importedAssetDisplayPageEntry.setClassPK(
-				MapUtil.getLong(
-					newPrimaryKeysMap,
-					importedAssetDisplayPageEntry.getClassPK(),
-					importedAssetDisplayPageEntry.getClassPK()));
+			try {
+				importedAssetDisplayPageEntry =
+					_stagedModelRepository.addStagedModel(
+						portletDataContext, importedAssetDisplayPageEntry);
+			}
+			catch (Exception exception) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to add asset display page", exception);
+				}
 
-			importedAssetDisplayPageEntry =
-				_stagedModelRepository.addStagedModel(
-					portletDataContext, importedAssetDisplayPageEntry);
+				portletDataContext.removePrimaryKey(
+					ExportImportPathUtil.getModelPath(assetDisplayPageEntry));
+
+				return;
+			}
 		}
 		else {
 			importedAssetDisplayPageEntry.setMvccVersion(
@@ -155,6 +173,13 @@ public class AssetDisplayPageStagedModelDataHandler
 
 		return _stagedModelRepository;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetDisplayPageStagedModelDataHandler.class);
+
+	@Reference
+	private AssetDisplayPageEntryLocalService
+		_assetDisplayPageEntryLocalService;
 
 	@Reference
 	private LayoutPageTemplateEntryLocalService

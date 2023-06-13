@@ -24,8 +24,10 @@ import java.util.List;
  * This class is used by SOAP remote services.
  *
  * @author Brian Wing Shun Chan
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  * @generated
  */
+@Deprecated
 public class LayoutClassedModelUsageSoap implements Serializable {
 
 	public static LayoutClassedModelUsageSoap toSoapModel(
@@ -35,10 +37,12 @@ public class LayoutClassedModelUsageSoap implements Serializable {
 			new LayoutClassedModelUsageSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setCtCollectionId(model.getCtCollectionId());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setLayoutClassedModelUsageId(
 			model.getLayoutClassedModelUsageId());
 		soapModel.setGroupId(model.getGroupId());
+		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setClassNameId(model.getClassNameId());
@@ -119,6 +123,14 @@ public class LayoutClassedModelUsageSoap implements Serializable {
 		_mvccVersion = mvccVersion;
 	}
 
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	public void setCtCollectionId(long ctCollectionId) {
+		_ctCollectionId = ctCollectionId;
+	}
+
 	public String getUuid() {
 		return _uuid;
 	}
@@ -141,6 +153,14 @@ public class LayoutClassedModelUsageSoap implements Serializable {
 
 	public void setGroupId(long groupId) {
 		_groupId = groupId;
+	}
+
+	public long getCompanyId() {
+		return _companyId;
+	}
+
+	public void setCompanyId(long companyId) {
+		_companyId = companyId;
 	}
 
 	public Date getCreateDate() {
@@ -216,9 +236,11 @@ public class LayoutClassedModelUsageSoap implements Serializable {
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
 	private long _layoutClassedModelUsageId;
 	private long _groupId;
+	private long _companyId;
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _classNameId;

@@ -12,46 +12,26 @@
  * details.
  */
 
-import {ItemSelectorDialog} from 'frontend-js-web';
+import {openSelectionModal} from 'frontend-js-web';
 
 export function openInfoItemSelector(
 	callback,
-	config,
+	eventName,
+	itemSelectorURL,
 	destroyedCallback = null
 ) {
-	const {infoItemSelectorURL, portletNamespace} = config;
+	openSelectionModal({
+		onClose: destroyedCallback,
+		onSelect: (selectedItem) => {
+			const infoItem = {
+				...JSON.parse(selectedItem.value),
+				type: selectedItem.returnType,
+			};
 
-	const itemSelectorDialog = new ItemSelectorDialog({
-		eventName: `${portletNamespace}selectInfoItem`,
-		singleSelect: true,
+			callback(infoItem);
+		},
+		selectEventName: eventName,
 		title: Liferay.Language.get('select'),
-		url: infoItemSelectorURL
+		url: itemSelectorURL,
 	});
-
-	itemSelectorDialog.on('selectedItemChange', event => {
-		const selectedItem = event.selectedItem;
-
-		if (selectedItem && selectedItem.value) {
-			const infoItem = JSON.parse(selectedItem.value);
-
-			callback({
-				className: infoItem.className,
-				classNameId: infoItem.classNameId,
-				classPK: infoItem.classPK,
-				title: infoItem.title
-			});
-		}
-	});
-
-	itemSelectorDialog.on('visibleChange', event => {
-		if (
-			!event.newVal &&
-			destroyedCallback &&
-			typeof destroyedCallback === 'function'
-		) {
-			destroyedCallback();
-		}
-	});
-
-	itemSelectorDialog.open();
 }

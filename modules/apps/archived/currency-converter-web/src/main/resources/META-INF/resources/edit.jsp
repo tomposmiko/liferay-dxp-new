@@ -16,20 +16,20 @@
 
 <%@ include file="/init.jsp" %>
 
-<portlet:actionURL name="edit" var="editCurrency" />
+<portlet:actionURL name="/currency_converter/edit_preferences" var="editPreferences" />
 
-<aui:form action="<%= editCurrency %>" method="post" name="fm">
+<aui:form action="<%= editPreferences %>" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="symbols" type="hidden" value="" />
 
 	<%
-	List leftList = new ArrayList();
+	List<KeyValuePair> leftList = new ArrayList<>();
 
 	for (int i = 0; i < symbols.length; i++) {
 		leftList.add(new KeyValuePair(symbols[i], LanguageUtil.get(request, "currency." + symbols[i])));
 	}
 
-	List rightList = new ArrayList();
+	List<KeyValuePair> rightList = new ArrayList<>();
 
 	Arrays.sort(symbols);
 
@@ -55,7 +55,7 @@
 		rightTitle="available"
 	/>
 
-	<aui:button onClick='<%= renderResponse.getNamespace() + "saveCurrency();" %>' primary="<%= true %>" value="save" />
+	<aui:button onClick='<%= liferayPortletResponse.getNamespace() + "saveCurrency();" %>' primary="<%= true %>" value="save" />
 </aui:form>
 
 <aui:script>

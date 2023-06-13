@@ -14,27 +14,34 @@
 
 package com.liferay.layout.content.page.editor.web.internal.display.context;
 
-import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
-import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.asset.kernel.model.ClassType;
-import com.liferay.asset.kernel.model.ClassTypeReader;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.renderer.FragmentRendererController;
-import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+import com.liferay.frontend.token.definition.FrontendTokenDefinitionRegistry;
+import com.liferay.info.item.InfoItemClassDetails;
+import com.liferay.info.item.InfoItemFormVariation;
+import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.provider.InfoItemDetailsProvider;
+import com.liferay.info.item.provider.InfoItemFormProvider;
+import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.layout.content.page.editor.sidebar.panel.ContentPageEditorSidebarPanel;
+import com.liferay.layout.content.page.editor.web.internal.configuration.FFLayoutContentPageEditorConfiguration;
+import com.liferay.layout.content.page.editor.web.internal.configuration.PageEditorConfiguration;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.CommentManager;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.template.soy.util.SoyContext;
-import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderResponse;
@@ -48,187 +55,185 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 	extends ContentPageEditorDisplayContext {
 
 	public ContentPageEditorLayoutPageTemplateDisplayContext(
-		HttpServletRequest httpServletRequest, RenderResponse renderResponse,
-		boolean pageIsDisplayPage, CommentManager commentManager,
+		CommentManager commentManager,
 		List<ContentPageEditorSidebarPanel> contentPageEditorSidebarPanels,
+		FFLayoutContentPageEditorConfiguration
+			ffLayoutContentPageEditorConfiguration,
+		FragmentCollectionContributorTracker
+			fragmentCollectionContributorTracker,
+		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
 		FragmentRendererController fragmentRendererController,
-		PortletRequest portletRequest) {
+		FragmentRendererTracker fragmentRendererTracker,
+		FrontendTokenDefinitionRegistry frontendTokenDefinitionRegistry,
+		HttpServletRequest httpServletRequest,
+		InfoItemServiceTracker infoItemServiceTracker,
+		ItemSelector itemSelector,
+		PageEditorConfiguration pageEditorConfiguration,
+		boolean pageIsDisplayPage, PortletRequest portletRequest,
+		RenderResponse renderResponse) {
 
 		super(
-			httpServletRequest, renderResponse, commentManager,
-			contentPageEditorSidebarPanels, fragmentRendererController,
-			portletRequest);
+			commentManager, contentPageEditorSidebarPanels,
+			ffLayoutContentPageEditorConfiguration,
+			fragmentCollectionContributorTracker,
+			fragmentEntryConfigurationParser, fragmentRendererController,
+			fragmentRendererTracker, frontendTokenDefinitionRegistry,
+			httpServletRequest, infoItemServiceTracker, itemSelector,
+			pageEditorConfiguration, portletRequest, renderResponse);
 
 		_pageIsDisplayPage = pageIsDisplayPage;
 	}
 
 	@Override
-	public SoyContext getEditorSoyContext() throws Exception {
-		if (_editorSoyContext != null) {
-			return _editorSoyContext;
+	public Map<String, Object> getEditorContext(String npmResolvedPackageName)
+		throws Exception {
+
+		Map<String, Object> editorContext = super.getEditorContext(
+			npmResolvedPackageName);
+
+		if (!_pageIsDisplayPage) {
+			return editorContext;
 		}
 
-		SoyContext soyContext = super.getEditorSoyContext();
+		Map<String, Object> configContext =
+			(Map<String, Object>)editorContext.get("config");
 
-		soyContext.put("lastSaveDate", StringPool.BLANK);
+		configContext.put("selectedMappingTypes", _getSelectedMappingTypes());
 
-		if (_pageIsDisplayPage) {
-			soyContext.put(
-				"mappingFieldsURL",
-				getFragmentEntryActionURL(
-					"/content_layout/get_mapping_fields"));
-		}
-
-		soyContext.put(
-			"publishURL",
-			getFragmentEntryActionURL(
-				"/content_layout/publish_layout_page_template_entry"));
-
-		if (_pageIsDisplayPage) {
-			soyContext.put("selectedMappingTypes", _getSelectedMappingTypes());
-		}
-
-		soyContext.put(
-			"sidebarPanels", getSidebarPanelSoyContexts(_pageIsDisplayPage));
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_getLayoutPageTemplateEntry();
-
-		if ((layoutPageTemplateEntry != null) &&
-			(layoutPageTemplateEntry.getStatus() !=
-				WorkflowConstants.STATUS_APPROVED)) {
-
-			String statusLabel = WorkflowConstants.getStatusLabel(
-				layoutPageTemplateEntry.getStatus());
-
-			soyContext.put(
-				"status", LanguageUtil.get(httpServletRequest, statusLabel));
-		}
-
-		soyContext.put("workflowEnabled", false);
-
-		_editorSoyContext = soyContext;
-
-		return _editorSoyContext;
+		return editorContext;
 	}
 
 	@Override
-	public SoyContext getFragmentsEditorToolbarSoyContext()
-		throws PortalException {
-
-		if (_fragmentsEditorToolbarSoyContext != null) {
-			return _fragmentsEditorToolbarSoyContext;
-		}
-
-		_fragmentsEditorToolbarSoyContext =
-			super.getFragmentsEditorToolbarSoyContext();
-
-		return _fragmentsEditorToolbarSoyContext;
+	public String getPublishURL() {
+		return getFragmentEntryActionURL(
+			"/content_layout/publish_layout_page_template_entry");
 	}
 
-	private LayoutPageTemplateEntry _getLayoutPageTemplateEntry()
-		throws PortalException {
+	@Override
+	public boolean isWorkflowEnabled() {
+		return false;
+	}
 
+	private LayoutPageTemplateEntry _getLayoutPageTemplateEntry() {
 		if (_layoutPageTemplateEntry != null) {
 			return _layoutPageTemplateEntry;
 		}
 
 		Layout draftLayout = themeDisplay.getLayout();
 
-		Layout layout = LayoutLocalServiceUtil.fetchLayout(
-			draftLayout.getClassPK());
-
-		if (layout == null) {
-			return null;
-		}
-
 		_layoutPageTemplateEntry =
 			LayoutPageTemplateEntryLocalServiceUtil.
-				fetchLayoutPageTemplateEntryByPlid(layout.getPlid());
+				fetchLayoutPageTemplateEntryByPlid(draftLayout.getClassPK());
 
 		return _layoutPageTemplateEntry;
 	}
 
-	private String _getMappingSubtypeLabel() throws PortalException {
+	private String _getMappingSubtypeLabel() {
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_getLayoutPageTemplateEntry();
 
-		AssetRendererFactory assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+		InfoItemFormVariationsProvider infoItemFormVariationsProvider =
+			infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFormVariationsProvider.class,
 				layoutPageTemplateEntry.getClassName());
 
-		if ((assetRendererFactory == null) ||
-			!assetRendererFactory.isSupportsClassTypes()) {
+		if (infoItemFormVariationsProvider != null) {
+			Collection<InfoItemFormVariation> infoItemFormVariations =
+				infoItemFormVariationsProvider.getInfoItemFormVariations(
+					layoutPageTemplateEntry.getGroupId());
 
-			return null;
+			for (InfoItemFormVariation infoItemFormVariation :
+					infoItemFormVariations) {
+
+				String key = infoItemFormVariation.getKey();
+
+				if (key.equals(
+						String.valueOf(
+							layoutPageTemplateEntry.getClassTypeId()))) {
+
+					return infoItemFormVariation.getLabel(
+						themeDisplay.getLocale());
+				}
+			}
 		}
 
-		ClassTypeReader classTypeReader =
-			assetRendererFactory.getClassTypeReader();
-
-		ClassType classType = classTypeReader.getClassType(
-			layoutPageTemplateEntry.getClassTypeId(), themeDisplay.getLocale());
-
-		return classType.getName();
+		return null;
 	}
 
-	private String _getMappingTypeLabel() throws PortalException {
+	private String _getMappingTypeLabel() {
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_getLayoutPageTemplateEntry();
 
-		InfoDisplayContributor infoDisplayContributor =
-			infoDisplayContributorTracker.getInfoDisplayContributor(
+		InfoItemFormProvider<?> infoItemFormProvider =
+			infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFormProvider.class,
 				layoutPageTemplateEntry.getClassName());
 
-		if (infoDisplayContributor == null) {
+		if (infoItemFormProvider == null) {
 			return null;
 		}
 
-		return infoDisplayContributor.getLabel(themeDisplay.getLocale());
+		InfoItemDetailsProvider<?> infoItemDetailsProvider =
+			infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemDetailsProvider.class,
+				layoutPageTemplateEntry.getClassName());
+
+		if (infoItemDetailsProvider == null) {
+			return null;
+		}
+
+		InfoItemClassDetails infoItemClassDetails =
+			infoItemDetailsProvider.getInfoItemClassDetails();
+
+		return infoItemClassDetails.getLabel(themeDisplay.getLocale());
 	}
 
-	private SoyContext _getSelectedMappingTypes() throws PortalException {
+	private Map<String, Object> _getSelectedMappingTypes() {
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_getLayoutPageTemplateEntry();
 
 		if ((layoutPageTemplateEntry == null) ||
 			(layoutPageTemplateEntry.getClassNameId() <= 0)) {
 
-			return SoyContextFactoryUtil.createSoyContext();
+			return Collections.emptyMap();
 		}
 
-		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
-
-		SoyContext typeSoyContext = SoyContextFactoryUtil.createSoyContext();
-
-		typeSoyContext.put(
-			"id", layoutPageTemplateEntry.getClassNameId()
+		return HashMapBuilder.<String, Object>put(
+			"mappingDescription",
+			LanguageUtil.get(
+				httpServletRequest,
+				"content-source-selected-for-this-display-page-template")
 		).put(
-			"label", _getMappingTypeLabel()
-		);
-
-		soyContext.put("type", typeSoyContext);
-
-		String subtypeLabel = _getMappingSubtypeLabel();
-
-		if (Validator.isNotNull(subtypeLabel)) {
-			SoyContext subtypeSoyContext =
-				SoyContextFactoryUtil.createSoyContext();
-
-			subtypeSoyContext.put(
-				"id", layoutPageTemplateEntry.getClassTypeId()
+			"type",
+			HashMapBuilder.<String, Object>put(
+				"groupTypeTitle",
+				LanguageUtil.get(httpServletRequest, "content-type")
 			).put(
-				"label", subtypeLabel
-			);
+				"id", layoutPageTemplateEntry.getClassNameId()
+			).put(
+				"label", _getMappingTypeLabel()
+			).build()
+		).put(
+			"subtype",
+			() -> {
+				String subtypeLabel = _getMappingSubtypeLabel();
 
-			soyContext.put("subtype", subtypeSoyContext);
-		}
+				if (Validator.isNull(subtypeLabel)) {
+					return StringPool.BLANK;
+				}
 
-		return soyContext;
+				return HashMapBuilder.<String, Object>put(
+					"groupSubtypeTitle",
+					LanguageUtil.get(httpServletRequest, "subtype")
+				).put(
+					"id", layoutPageTemplateEntry.getClassTypeId()
+				).put(
+					"label", subtypeLabel
+				).build();
+			}
+		).build();
 	}
 
-	private SoyContext _editorSoyContext;
-	private SoyContext _fragmentsEditorToolbarSoyContext;
 	private LayoutPageTemplateEntry _layoutPageTemplateEntry;
 	private final boolean _pageIsDisplayPage;
 

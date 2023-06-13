@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.web.internal.display.context;
 
+import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormBuilderContextFactory;
 import com.liferay.dynamic.data.mapping.form.builder.settings.DDMFormBuilderSettingsRetriever;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
@@ -32,13 +33,13 @@ import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureService;
+import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
 import com.liferay.dynamic.data.mapping.util.DDMFormLayoutFactory;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
 import com.liferay.dynamic.data.mapping.util.comparator.StructureCreateDateComparator;
@@ -46,8 +47,11 @@ import com.liferay.dynamic.data.mapping.util.comparator.StructureModifiedDateCom
 import com.liferay.dynamic.data.mapping.util.comparator.StructureNameComparator;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -75,6 +79,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.PageContext;
 
 /**
  * @author Leonardo Barros
@@ -100,6 +105,7 @@ public class DDMFormAdminFieldSetDisplayContext
 		DDMFormValuesFactory ddmFormValuesFactory,
 		DDMFormValuesMerger ddmFormValuesMerger,
 		DDMFormWebConfiguration ddmFormWebConfiguration,
+		DDMStorageAdapterTracker ddmStorageAdapterTracker,
 		DDMStructureLocalService ddmStructureLocalService,
 		DDMStructureService ddmStructureService, JSONFactory jsonFactory,
 		NPMResolver npmResolver, Portal portal) {
@@ -114,8 +120,8 @@ public class DDMFormAdminFieldSetDisplayContext
 			ddmFormInstanceVersionLocalService, ddmFormRenderer,
 			ddmFormTemplateContextFactory, ddmFormValuesFactory,
 			ddmFormValuesMerger, ddmFormWebConfiguration,
-			ddmStructureLocalService, ddmStructureService, jsonFactory,
-			npmResolver, portal);
+			ddmStorageAdapterTracker, ddmStructureLocalService,
+			ddmStructureService, jsonFactory, npmResolver, portal);
 
 		_fieldSetPermissionCheckerHelper = new FieldSetPermissionCheckerHelper(
 			formAdminRequestHelper);
@@ -123,19 +129,16 @@ public class DDMFormAdminFieldSetDisplayContext
 
 	@Override
 	public List<DropdownItem> getActionItemsDropdownItems() {
-		return new DropdownItemList() {
-			{
-				add(
-					dropdownItem -> {
-						dropdownItem.putData("action", "deleteStructures");
-						dropdownItem.setIcon("times-circle");
-						dropdownItem.setLabel(
-							LanguageUtil.get(
-								formAdminRequestHelper.getRequest(), "delete"));
-						dropdownItem.setQuickAction(true);
-					});
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.putData("action", "deleteStructures");
+				dropdownItem.setIcon("times-circle");
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						formAdminRequestHelper.getRequest(), "delete"));
+				dropdownItem.setQuickAction(true);
 			}
-		};
+		).build();
 	}
 
 	@Override
@@ -144,31 +147,9 @@ public class DDMFormAdminFieldSetDisplayContext
 			return null;
 		}
 
-		return new CreationMenu() {
-			{
-				HttpServletRequest httpServletRequest =
-					PortalUtil.getHttpServletRequest(renderRequest);
-
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)httpServletRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
-
-				addPrimaryDropdownItem(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							renderResponse.createRenderURL(),
-							"mvcRenderCommandName", "/admin/edit_element_set",
-							"redirect",
-							PortalUtil.getCurrentURL(httpServletRequest),
-							"groupId",
-							String.valueOf(themeDisplay.getScopeGroupId()));
-
-						dropdownItem.setLabel(
-							LanguageUtil.get(
-								httpServletRequest, "new-element-set"));
-					});
-			}
-		};
+		return CreationMenuBuilder.addPrimaryDropdownItem(
+			getAddElementSetDropdownItem()
+		).build();
 	}
 
 	@Override
@@ -193,6 +174,31 @@ public class DDMFormAdminFieldSetDisplayContext
 		}
 
 		return _structure;
+	}
+
+	@Override
+	public List<DropdownItem> getEmptyResultMessageActionItemsDropdownItems() {
+		if (!_fieldSetPermissionCheckerHelper.isShowAddButton() || isSearch()) {
+			return null;
+		}
+
+		return DropdownItemListBuilder.add(
+			getAddElementSetDropdownItem()
+		).build();
+	}
+
+	@Override
+	public String getEmptyResultMessageDescription() {
+		if (isSearch()) {
+			return StringPool.BLANK;
+		}
+
+		HttpServletRequest httpServletRequest =
+			formAdminRequestHelper.getRequest();
+
+		return LanguageUtil.get(
+			httpServletRequest,
+			"accelerate-form-creation-with-reusable-field-groupings");
 	}
 
 	@Override
@@ -229,8 +235,8 @@ public class DDMFormAdminFieldSetDisplayContext
 	}
 
 	@Override
-	public String getFormLocalizedName() {
-		DDMStructure structure = getDDMStructure();
+	public <T> String getFormLocalizedName(T object) {
+		DDMStructure structure = (DDMStructure)object;
 
 		JSONObject jsonObject = jsonFactory.createJSONObject();
 
@@ -358,7 +364,9 @@ public class DDMFormAdminFieldSetDisplayContext
 	}
 
 	@Override
-	public String serializeSettingsForm() throws PortalException {
+	public String serializeSettingsForm(PageContext pageContext)
+		throws PortalException {
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -369,7 +377,29 @@ public class DDMFormAdminFieldSetDisplayContext
 
 		return ddmFormRenderer.render(
 			createSettingsDDMForm(0L, themeDisplay), ddmFormLayout,
-			createDDMFormRenderingContext(renderRequest, renderResponse));
+			createDDMFormRenderingContext(pageContext, renderRequest));
+	}
+
+	protected UnsafeConsumer<DropdownItem, Exception>
+		getAddElementSetDropdownItem() {
+
+		return dropdownItem -> {
+			HttpServletRequest httpServletRequest =
+				PortalUtil.getHttpServletRequest(renderRequest);
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			dropdownItem.setHref(
+				renderResponse.createRenderURL(), "mvcRenderCommandName",
+				"/admin/edit_element_set", "redirect",
+				PortalUtil.getCurrentURL(httpServletRequest), "groupId",
+				String.valueOf(themeDisplay.getScopeGroupId()));
+
+			dropdownItem.setLabel(
+				LanguageUtil.get(httpServletRequest, "new-element-set"));
+		};
 	}
 
 	protected OrderByComparator<DDMStructure> getDDMStructureOrderByComparator(

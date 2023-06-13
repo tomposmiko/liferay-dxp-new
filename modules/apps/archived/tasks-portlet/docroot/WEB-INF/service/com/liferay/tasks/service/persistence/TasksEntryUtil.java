@@ -14,7 +14,6 @@
 
 package com.liferay.tasks.service.persistence;
 
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -3320,16 +3319,9 @@ public class TasksEntryUtil {
 	}
 
 	public static TasksEntryPersistence getPersistence() {
-		if (_persistence == null) {
-			_persistence = (TasksEntryPersistence)PortletBeanLocatorUtil.locate(
-				com.liferay.tasks.service.ServletContextUtil.
-					getServletContextName(),
-				TasksEntryPersistence.class.getName());
-		}
-
 		return _persistence;
 	}
 
-	private static TasksEntryPersistence _persistence;
+	private static volatile TasksEntryPersistence _persistence;
 
 }

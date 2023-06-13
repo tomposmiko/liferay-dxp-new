@@ -17,6 +17,8 @@ package com.liferay.headless.delivery.client.dto.v1_0;
 import com.liferay.headless.delivery.client.function.UnsafeSupplier;
 import com.liferay.headless.delivery.client.serdes.v1_0.RelatedContentSerDes;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -26,7 +28,11 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class RelatedContent {
+public class RelatedContent implements Cloneable, Serializable {
+
+	public static RelatedContent toDTO(String json) {
+		return RelatedContentSerDes.toDTO(json);
+	}
 
 	public String getContentType() {
 		return contentType;
@@ -88,6 +94,11 @@ public class RelatedContent {
 	}
 
 	protected String title;
+
+	@Override
+	public RelatedContent clone() throws CloneNotSupportedException {
+		return (RelatedContent)super.clone();
+	}
 
 	@Override
 	public boolean equals(Object object) {

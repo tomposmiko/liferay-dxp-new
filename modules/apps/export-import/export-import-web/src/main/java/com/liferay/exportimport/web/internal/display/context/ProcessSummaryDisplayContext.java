@@ -14,6 +14,7 @@
 
 package com.liferay.exportimport.web.internal.display.context;
 
+import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -29,12 +30,17 @@ import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,16 +62,46 @@ public class ProcessSummaryDisplayContext {
 
 		for (long selectedLayoutId : selectedLayoutIds) {
 			_addPageNames(
-				groupId, privateLayout, selectedLayoutId, pageNames,
-				languageId);
+				groupId, privateLayout, selectedLayoutIds, selectedLayoutId,
+				pageNames, languageId);
 		}
 
 		return new ArrayList<>(pageNames);
 	}
 
+	public long[] getSelectedLayoutIds(
+		Map<String, Serializable> exportImportConfigurationSettingsMap) {
+
+		long[] layoutIds = GetterUtil.getLongValues(
+			exportImportConfigurationSettingsMap.get("layoutIds"));
+
+		if ((layoutIds != null) && (layoutIds.length > 0)) {
+			return layoutIds;
+		}
+
+		Map<Long, Boolean> layoutIdMap =
+			(Map<Long, Boolean>)exportImportConfigurationSettingsMap.get(
+				"layoutIdMap");
+
+		try {
+			layoutIds = ExportImportHelperUtil.getLayoutIds(layoutIdMap);
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(portalException);
+			}
+		}
+
+		return layoutIds;
+	}
+
 	private void _addPageNames(
-		long groupId, boolean privateLayout, long selectedLayoutId,
-		Set<String> pageNames, String languageId) {
+		long groupId, boolean privateLayout, long[] selectedLayoutIds,
+		long selectedLayoutId, Set<String> pageNames, String languageId) {
+
+		if (!ArrayUtil.contains(selectedLayoutIds, selectedLayoutId)) {
+			return;
+		}
 
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(
 			groupId, privateLayout, selectedLayoutId);
@@ -89,10 +125,11 @@ public class ProcessSummaryDisplayContext {
 				layout = LayoutLocalServiceUtil.getParentLayout(layout);
 
 				_addPageNames(
-					groupId, privateLayout, layout.getLayoutId(), pageNames,
-					languageId);
+					groupId, privateLayout, selectedLayoutIds,
+					layout.getLayoutId(), pageNames, languageId);
 
-				sb.insert(0, layout.getName() + StringPool.FORWARD_SLASH);
+				sb.insert(
+					0, layout.getName(languageId) + StringPool.FORWARD_SLASH);
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {

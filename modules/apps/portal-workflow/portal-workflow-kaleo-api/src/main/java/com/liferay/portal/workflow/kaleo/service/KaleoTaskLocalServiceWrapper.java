@@ -35,6 +35,10 @@ public class KaleoTaskLocalServiceWrapper
 	/**
 	 * Adds the kaleo task to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTaskLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTask the kaleo task
 	 * @return the kaleo task that was added
 	 */
@@ -47,13 +51,15 @@ public class KaleoTaskLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.workflow.kaleo.model.KaleoTask addKaleoTask(
-			long kaleoDefinitionVersionId, long kaleoNodeId,
+			long kaleoDefinitionId, long kaleoDefinitionVersionId,
+			long kaleoNodeId,
 			com.liferay.portal.workflow.kaleo.definition.Task task,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskLocalService.addKaleoTask(
-			kaleoDefinitionVersionId, kaleoNodeId, task, serviceContext);
+			kaleoDefinitionId, kaleoDefinitionVersionId, kaleoNodeId, task,
+			serviceContext);
 	}
 
 	/**
@@ -67,6 +73,17 @@ public class KaleoTaskLocalServiceWrapper
 		long kaleoTaskId) {
 
 		return _kaleoTaskLocalService.createKaleoTask(kaleoTaskId);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	@Override
@@ -85,6 +102,10 @@ public class KaleoTaskLocalServiceWrapper
 	/**
 	 * Deletes the kaleo task from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTaskLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param kaleoTask the kaleo task
 	 * @return the kaleo task that was removed
 	 */
@@ -97,6 +118,10 @@ public class KaleoTaskLocalServiceWrapper
 
 	/**
 	 * Deletes the kaleo task with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTaskLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTaskId the primary key of the kaleo task
 	 * @return the kaleo task that was removed
@@ -119,6 +144,18 @@ public class KaleoTaskLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskLocalService.deletePersistedModel(persistedModel);
+	}
+
+	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _kaleoTaskLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
+	public int dslQueryCount(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return _kaleoTaskLocalService.dslQueryCount(dslQuery);
 	}
 
 	@Override
@@ -293,6 +330,9 @@ public class KaleoTaskLocalServiceWrapper
 		return _kaleoTaskLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -303,6 +343,10 @@ public class KaleoTaskLocalServiceWrapper
 
 	/**
 	 * Updates the kaleo task in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect KaleoTaskLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param kaleoTask the kaleo task
 	 * @return the kaleo task that was updated

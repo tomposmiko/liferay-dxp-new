@@ -38,7 +38,7 @@ import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.test.rule.AdviseWith;
-import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.lang.reflect.Field;
 
@@ -74,7 +74,7 @@ public class ClusterMasterExecutorImplTest extends BaseClusterTestCase {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			AspectJNewEnvTestRule.INSTANCE, CodeCoverageAssertor.INSTANCE);
+			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
 
 	@Test
 	public void testClusterMasterTokenClusterEventListener() throws Exception {
@@ -579,7 +579,6 @@ public class ClusterMasterExecutorImplTest extends BaseClusterTestCase {
 		Assert.assertFalse(clusterMasterExecutorImpl.isMaster());
 	}
 
-	@AdviseWith(adviceClasses = SPIUtilAdvice.class)
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testMisc() {
@@ -693,21 +692,6 @@ public class ClusterMasterExecutorImplTest extends BaseClusterTestCase {
 		private static final Exchanger<String> _clusterNodeIdExchanger =
 			new Exchanger<>();
 		private static volatile Semaphore _semaphore;
-
-	}
-
-	@Aspect
-	public static class SPIUtilAdvice {
-
-		@Around(
-			"execution(public static boolean com.liferay.portal.kernel." +
-				"resiliency.spi.SPIUtil.isSPI())"
-		)
-		public boolean isSPI(ProceedingJoinPoint proceedingJoinPoint)
-			throws Throwable {
-
-			return true;
-		}
 
 	}
 

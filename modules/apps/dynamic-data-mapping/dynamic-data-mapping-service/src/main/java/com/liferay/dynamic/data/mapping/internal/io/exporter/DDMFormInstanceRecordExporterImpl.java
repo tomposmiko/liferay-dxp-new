@@ -35,23 +35,22 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalServic
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.util.comparator.FormInstanceVersionVersionComparator;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -110,22 +109,6 @@ public class DDMFormInstanceRecordExporterImpl
 		return builder.build();
 	}
 
-	protected String formatDate(
-		Date date, DateTimeFormatter dateTimeFormatter) {
-
-		LocalDateTime localDateTime = LocalDateTime.ofInstant(
-			date.toInstant(), ZoneId.systemDefault());
-
-		return dateTimeFormatter.format(localDateTime);
-	}
-
-	protected DateTimeFormatter getDateTimeFormatter(Locale locale) {
-		DateTimeFormatter dateTimeFormatter =
-			DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
-
-		return dateTimeFormatter.withLocale(locale);
-	}
-
 	protected Map<String, String> getDDMFormFieldsLabel(
 		Map<String, DDMFormField> ddmFormFieldMap, Locale locale) {
 
@@ -140,7 +123,8 @@ public class DDMFormInstanceRecordExporterImpl
 				LocalizedValue localizedValue = field.getLabel();
 
 				ddmFormFieldsLabel.put(
-					field.getName(), localizedValue.getString(locale));
+					field.getFieldReference(),
+					localizedValue.getString(locale));
 			});
 
 		ddmFormFieldsLabel.put(_STATUS, LanguageUtil.get(locale, _STATUS));
@@ -157,7 +141,7 @@ public class DDMFormInstanceRecordExporterImpl
 		Locale locale) {
 
 		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValueMap.get(
-			ddmFormField.getName());
+			ddmFormField.getFieldReference());
 
 		DDMFormFieldValueRenderer ddmFormFieldValueRenderer =
 			ddmFormFieldTypeServicesTracker.getDDMFormFieldValueRenderer(
@@ -165,7 +149,7 @@ public class DDMFormInstanceRecordExporterImpl
 
 		Stream<DDMFormFieldValue> stream = ddmFormFieldValues.stream();
 
-		return HtmlUtil.render(
+		return HtmlUtil.unescape(
 			StringUtil.merge(
 				stream.map(
 					ddmForFieldValue -> ddmFormFieldValueRenderer.render(
@@ -183,9 +167,9 @@ public class DDMFormInstanceRecordExporterImpl
 			List<DDMFormInstanceRecord> ddmFormInstanceRecords, Locale locale)
 		throws Exception {
 
-		DateTimeFormatter dateTimeFormatter = getDateTimeFormatter(locale);
-
 		List<Map<String, String>> ddmFormFieldValues = new ArrayList<>();
+
+		Format dateTimeFormat = FastDateFormatFactoryUtil.getDateTime(locale);
 
 		for (DDMFormInstanceRecord ddmFormInstanceRecord :
 				ddmFormInstanceRecords) {
@@ -194,7 +178,7 @@ public class DDMFormInstanceRecordExporterImpl
 				ddmFormInstanceRecord.getDDMFormValues();
 
 			Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
-				ddmFormValues.getDDMFormFieldValuesMap();
+				ddmFormValues.getDDMFormFieldValuesReferencesMap(true);
 
 			Map<String, String> ddmFormFieldsValue = new LinkedHashMap<>();
 
@@ -208,7 +192,8 @@ public class DDMFormInstanceRecordExporterImpl
 					ddmFormFieldsValue.put(
 						entry.getKey(),
 						getDDMFormFieldValue(
-							entry.getValue(), ddmFormFieldValuesMap, locale));
+							entry.getValue(), ddmFormFieldValuesMap,
+							ddmFormValues.getDefaultLocale()));
 				}
 			}
 
@@ -222,9 +207,8 @@ public class DDMFormInstanceRecordExporterImpl
 
 			ddmFormFieldsValue.put(
 				_MODIFIED_DATE,
-				formatDate(
-					ddmFormInstanceRecordVersion.getStatusDate(),
-					dateTimeFormatter));
+				dateTimeFormat.format(
+					ddmFormInstanceRecordVersion.getStatusDate()));
 
 			ddmFormFieldsValue.put(
 				_AUTHOR, ddmFormInstanceRecordVersion.getUserName());
@@ -247,20 +231,23 @@ public class DDMFormInstanceRecordExporterImpl
 		Stream<DDMStructureVersion> stream = ddmStructureVersions.stream();
 
 		stream.map(
-			this::getNontransientDDMFormFieldsMap
+			this::getNontransientDDMFormFieldsReferencesMap
 		).forEach(
-			ddmFormFields::putAll
+			map -> map.forEach(
+				(key, ddmFormField) -> ddmFormFields.putIfAbsent(
+					key, ddmFormField))
 		);
 
 		return ddmFormFields;
 	}
 
-	protected Map<String, DDMFormField> getNontransientDDMFormFieldsMap(
-		DDMStructureVersion ddmStructureVersion) {
+	protected Map<String, DDMFormField>
+		getNontransientDDMFormFieldsReferencesMap(
+			DDMStructureVersion ddmStructureVersion) {
 
 		DDMForm ddmForm = ddmStructureVersion.getDDMForm();
 
-		return ddmForm.getNontransientDDMFormFieldsMap(true);
+		return ddmForm.getNontransientDDMFormFieldsReferencesMap(true);
 	}
 
 	protected String getStatusMessage(int status, Locale locale) {
@@ -275,6 +262,10 @@ public class DDMFormInstanceRecordExporterImpl
 		List<DDMFormInstanceVersion> ddmFormInstanceVersions =
 			ddmFormInstanceVersionLocalService.getFormInstanceVersions(
 				ddmFormInstanceId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		ddmFormInstanceVersions = ListUtil.sort(
+			ddmFormInstanceVersions,
+			new FormInstanceVersionVersionComparator());
 
 		List<DDMStructureVersion> ddmStructureVersions = new ArrayList<>();
 

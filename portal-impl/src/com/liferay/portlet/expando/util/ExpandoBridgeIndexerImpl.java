@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portlet.expando.model.impl.ExpandoValueImpl;
@@ -255,18 +256,18 @@ public class ExpandoBridgeIndexerImpl implements ExpandoBridgeIndexer {
 			ExpandoColumnLocalServiceUtil.getDefaultTableColumns(
 				expandoBridge.getCompanyId(), expandoBridge.getClassName());
 
-		if ((expandoColumns == null) || expandoColumns.isEmpty()) {
+		if (ListUtil.isEmpty(expandoColumns)) {
 			return;
 		}
 
 		List<ExpandoColumn> indexedColumns = new ArrayList<>();
 
 		for (ExpandoColumn expandoColumn : expandoColumns) {
-			UnicodeProperties properties =
+			UnicodeProperties unicodeProperties =
 				expandoColumn.getTypeSettingsProperties();
 
 			int indexType = GetterUtil.getInteger(
-				properties.get(ExpandoColumnConstants.INDEX_TYPE));
+				unicodeProperties.get(ExpandoColumnConstants.INDEX_TYPE));
 
 			if (indexType != ExpandoColumnConstants.INDEX_TYPE_NONE) {
 				indexedColumns.add(expandoColumn);

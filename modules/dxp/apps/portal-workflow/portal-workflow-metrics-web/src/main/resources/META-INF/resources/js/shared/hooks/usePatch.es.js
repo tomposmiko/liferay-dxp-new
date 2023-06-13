@@ -9,7 +9,7 @@
  * distribution rights of the Software.
  */
 
-import {useContext, useCallback} from 'react';
+import {useCallback, useContext} from 'react';
 
 import {AppContext} from '../../components/AppContext.es';
 
@@ -19,7 +19,7 @@ const usePatch = ({body = {}, admin = false, url}) => {
 	const client = getClient(admin);
 	const queryBodyStr = JSON.stringify(body);
 	const patchData = useCallback(
-		() => client.patch(url, body),
+		(patchBody) => client.patch(url, patchBody || body),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[queryBodyStr, url, admin]
 	);

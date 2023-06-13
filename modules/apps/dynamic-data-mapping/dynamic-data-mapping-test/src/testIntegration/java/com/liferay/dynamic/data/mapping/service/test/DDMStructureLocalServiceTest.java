@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.mapping.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.exception.InvalidParentStructureException;
 import com.liferay.dynamic.data.mapping.exception.RequiredStructureException;
 import com.liferay.dynamic.data.mapping.exception.StructureDefinitionException;
@@ -27,7 +28,6 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLinkLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLocalServiceUtil;
@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -263,7 +264,7 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 
 		actions.add(action);
 
-		DDMFormRule ddmFormRule = new DDMFormRule("TRUE", actions);
+		DDMFormRule ddmFormRule = new DDMFormRule(actions, "TRUE");
 
 		ddmForm.addDDMFormRule(ddmFormRule);
 
@@ -715,9 +716,7 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 			new StructureIdComparator(true));
 
-		Assert.assertEquals(structures.toString(), 1, structures.size());
-		Assert.assertEquals(
-			"Global Structure", getStructureName(structures.get(0)));
+		Assert.assertEquals(structures.toString(), 0, structures.size());
 
 		PermissionThreadLocal.setPermissionChecker(originalPermissionChecker);
 
@@ -824,7 +823,7 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 		actions.add(action1);
 		actions.add(action2);
 
-		DDMFormRule ddmFormRule1 = new DDMFormRule("TRUE", actions);
+		DDMFormRule ddmFormRule1 = new DDMFormRule(actions, "TRUE");
 
 		ddmForm.addDDMFormRule(ddmFormRule1);
 
@@ -832,7 +831,7 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 
 		actions.add(action1);
 
-		DDMFormRule ddmFormRule2 = new DDMFormRule("FALSE", actions);
+		DDMFormRule ddmFormRule2 = new DDMFormRule(actions, "FALSE");
 
 		ddmForm.addDDMFormRule(ddmFormRule2);
 
@@ -958,6 +957,9 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 
 		updateStructure(structure1);
 	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected DDMStructure copyStructure(DDMStructure structure)
 		throws Exception {

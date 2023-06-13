@@ -14,7 +14,7 @@
 
 import {
 	convertToFormData,
-	makeFetch
+	makeFetch,
 } from 'dynamic-data-mapping-form-renderer/js/util/fetch.es';
 import Component from 'metal-jsx';
 import {Config} from 'metal-state';
@@ -25,7 +25,7 @@ class AutoSave extends Component {
 		const currentState = this.getCurrentState();
 		const currentStateHash = this.getStateHash(currentState);
 
-		this._lastKownHash = currentStateHash;
+		this._lastKnownHash = currentStateHash;
 
 		this.start();
 	}
@@ -45,7 +45,7 @@ class AutoSave extends Component {
 	getStateHash(state) {
 		return objectHash(state, {
 			algorithm: 'md5',
-			unorderedObjects: true
+			unorderedObjects: true,
 		});
 	}
 
@@ -53,20 +53,20 @@ class AutoSave extends Component {
 		const currentState = this.getCurrentState();
 		const currentStateHash = this.getStateHash(currentState);
 
-		return this._lastKownHash !== currentStateHash;
+		return this._lastKnownHash !== currentStateHash;
 	}
 
-	save(saveAsDraft = this.props.saveAsDraft) {
+	save() {
 		const {stateSyncronizer} = this.props;
 		const currentState = this.getCurrentState();
 
 		stateSyncronizer.syncInputs();
 
 		this._pendingRequest = makeFetch({
-			body: this._getFormData(saveAsDraft),
-			url: this.props.url
+			body: this._getFormData(),
+			url: this.props.url,
 		})
-			.then(responseData => {
+			.then((responseData) => {
 				this._pendingRequest = null;
 
 				this._defineIds(responseData);
@@ -75,12 +75,11 @@ class AutoSave extends Component {
 
 				this.emit('autosaved', {
 					modifiedDate: responseData.modifiedDate,
-					savedAsDraft: saveAsDraft
 				});
 
 				return responseData;
 			})
-			.catch(reason => {
+			.catch((reason) => {
 				this._pendingRequest = null;
 
 				throw reason;
@@ -97,7 +96,8 @@ class AutoSave extends Component {
 				this._pendingRequest
 					.then(() => this.saveIfNeeded())
 					.catch(() => {});
-			} else if (
+			}
+			else if (
 				this.hasUnsavedChanges() &&
 				!stateSyncronizer.isEmpty()
 			) {
@@ -107,7 +107,7 @@ class AutoSave extends Component {
 	}
 
 	saveStateHash(state) {
-		this._lastKownHash = this.getStateHash(state);
+		this._lastKnownHash = this.getStateHash(state);
 	}
 
 	start() {
@@ -146,7 +146,7 @@ class AutoSave extends Component {
 		}
 	}
 
-	_getFormData(saveAsDraft) {
+	_getFormData() {
 		const {form, namespace} = this.props;
 
 		const formData = new FormData(form);
@@ -154,11 +154,7 @@ class AutoSave extends Component {
 		const state = this.getCurrentState();
 
 		formData.append(`${namespace}name`, JSON.stringify(state.name));
-		formData.append(
-			`${namespace}published`,
-			JSON.stringify(this.published)
-		);
-		formData.append(`${namespace}saveAsDraft`, saveAsDraft);
+		formData.append(`${namespace}saveAsDraft`, 'true');
 
 		return convertToFormData(formData);
 	}
@@ -171,9 +167,8 @@ class AutoSave extends Component {
 AutoSave.PROPS = {
 	form: Config.any(),
 	interval: Config.number().setter('_setInterval'),
-	saveAsDraft: Config.bool().value(true),
 	stateSyncronizer: Config.any(),
-	url: Config.string()
+	url: Config.string(),
 };
 
 export default AutoSave;

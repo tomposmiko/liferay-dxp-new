@@ -15,63 +15,46 @@
 package com.liferay.portal.cache.key;
 
 import com.liferay.petra.nio.CharsetEncoderUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.key.CacheKeyGenerator;
+import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
 import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @author Shuyang Zhou
  */
 public class MessageDigestCacheKeyGenerator extends BaseCacheKeyGenerator {
 
-	public MessageDigestCacheKeyGenerator(String algorithm)
-		throws NoSuchAlgorithmException {
-
+	public MessageDigestCacheKeyGenerator(String algorithm) {
 		this(algorithm, StringPool.UTF8);
 	}
 
-	public MessageDigestCacheKeyGenerator(String algorithm, String charsetName)
-		throws NoSuchAlgorithmException {
+	public MessageDigestCacheKeyGenerator(
+		String algorithm, String charsetName) {
 
-		_messageDigest = MessageDigest.getInstance(algorithm);
-		_charsetEncoder = CharsetEncoderUtil.getCharsetEncoder(charsetName);
+		_algorithm = algorithm;
+		_charsetName = charsetName;
 	}
 
 	@Override
 	public CacheKeyGenerator clone() {
-		Charset charset = _charsetEncoder.charset();
-
-		try {
-			return new MessageDigestCacheKeyGenerator(
-				_messageDigest.getAlgorithm(), charset.name());
-		}
-		catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-			throw new IllegalStateException(noSuchAlgorithmException);
-		}
+		return new MessageDigestCacheKeyGenerator(_algorithm, _charsetName);
 	}
 
 	@Override
 	public Serializable getCacheKey(String key) {
-		try {
-			_messageDigest.update(_charsetEncoder.encode(CharBuffer.wrap(key)));
-
-			return StringUtil.bytesToHexString(_messageDigest.digest());
-		}
-		catch (CharacterCodingException characterCodingException) {
-			throw new SystemException(characterCodingException);
-		}
+		return getCacheKey(new String[] {key}, 1);
 	}
 
 	@Override
@@ -84,28 +67,49 @@ public class MessageDigestCacheKeyGenerator extends BaseCacheKeyGenerator {
 		return getCacheKey(sb.getStrings(), sb.index());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getCacheKey(StringBundler)}
+	 */
+	@Deprecated
 	@Override
-	public boolean isCallingGetCacheKeyThreadSafe() {
-		return _CALLING_GET_CACHE_KEY_THREAD_SAFE;
+	public Serializable getCacheKey(
+		com.liferay.portal.kernel.util.StringBundler sb) {
+
+		return getCacheKey(sb.getStrings(), sb.index());
 	}
 
 	protected Serializable getCacheKey(String[] keys, int length) {
 		try {
-			for (int i = 0; i < length; i++) {
-				_messageDigest.update(
-					_charsetEncoder.encode(CharBuffer.wrap(keys[i])));
+			ThreadLocalCache<MessageDigest> threadLocalCache =
+				ThreadLocalCacheManager.getThreadLocalCache(
+					Lifecycle.ETERNAL,
+					MessageDigestCacheKeyGenerator.class.getName());
+
+			MessageDigest messageDigest = threadLocalCache.get(_algorithm);
+
+			if (messageDigest == null) {
+				messageDigest = MessageDigest.getInstance(_algorithm);
+
+				threadLocalCache.put(_algorithm, messageDigest);
 			}
 
-			return StringUtil.bytesToHexString(_messageDigest.digest());
+			CharsetEncoder charsetEncoder =
+				CharsetEncoderUtil.getCharsetEncoder(_charsetName);
+
+			for (int i = 0; i < length; i++) {
+				messageDigest.update(
+					charsetEncoder.encode(CharBuffer.wrap(keys[i])));
+			}
+
+			return StringUtil.bytesToHexString(messageDigest.digest());
 		}
-		catch (CharacterCodingException characterCodingException) {
-			throw new SystemException(characterCodingException);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
-	private static final boolean _CALLING_GET_CACHE_KEY_THREAD_SAFE = false;
-
-	private final CharsetEncoder _charsetEncoder;
-	private final MessageDigest _messageDigest;
+	private final String _algorithm;
+	private final String _charsetName;
 
 }

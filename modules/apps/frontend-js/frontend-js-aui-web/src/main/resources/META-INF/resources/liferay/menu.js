@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-menu',
-	A => {
+	(A) => {
 		var Util = Liferay.Util;
 
 		var ARIA_ATTR_ROLE = 'role';
@@ -35,6 +35,8 @@ AUI.add(
 
 		var EVENT_CLICK = 'click';
 
+		var EVENT_KEYDOWN = 'keydown';
+
 		var PARENT_NODE = 'parentNode';
 
 		var STR_BOTTOM = 'b';
@@ -51,32 +53,32 @@ AUI.add(
 
 		var MAP_ALIGN_HORIZONTAL_OVERLAY = {
 			left: STR_RIGHT,
-			right: STR_LEFT
+			right: STR_LEFT,
 		};
 
 		var MAP_ALIGN_HORIZONTAL_OVERLAY_RTL = {
 			left: STR_LEFT,
-			right: STR_RIGHT
+			right: STR_RIGHT,
 		};
 
 		var MAP_ALIGN_HORIZONTAL_TRIGGER = {
 			left: STR_LEFT,
-			right: STR_RIGHT
+			right: STR_RIGHT,
 		};
 
 		var MAP_ALIGN_HORIZONTAL_TRIGGER_RTL = {
 			left: STR_RIGHT,
-			right: STR_LEFT
+			right: STR_LEFT,
 		};
 
 		var MAP_ALIGN_VERTICAL_OVERLAY = {
 			down: STR_TOP,
-			up: STR_BOTTOM
+			up: STR_BOTTOM,
 		};
 
 		var MAP_ALIGN_VERTICAL_TRIGGER = {
 			down: STR_BOTTOM,
-			up: STR_TOP
+			up: STR_TOP,
 		};
 
 		var MAP_LIVE_SEARCH = {};
@@ -93,7 +95,7 @@ AUI.add(
 
 		var TPL_MENU = '<div class="open" />';
 
-		var Menu = function() {
+		var Menu = function () {
 			var instance = this;
 
 			instance._handles = [];
@@ -127,9 +129,14 @@ AUI.add(
 					instance._activeMenu = null;
 					instance._activeTrigger = null;
 
+					trigger.attr({
+						'aria-expanded': false,
+					});
+
 					if (trigger.hasClass(CSS_EXTENDED)) {
 						trigger.removeClass(CSS_BTN_PRIMARY);
-					} else {
+					}
+					else {
 						trigger.get(PARENT_NODE).removeClass(CSS_OPEN);
 
 						var portlet = trigger.ancestor(CSS_PORTLET);
@@ -141,7 +148,7 @@ AUI.add(
 				}
 			},
 
-			_getAlignPoints: A.cached(cssClass => {
+			_getAlignPoints: A.cached((cssClass) => {
 				var alignPoints = DEFAULT_ALIGN_POINTS;
 
 				var defaultOverlayHorizontalAlign = STR_RIGHT;
@@ -185,7 +192,7 @@ AUI.add(
 
 						alignPoints = [
 							overlayVertical + overlayHorizontal,
-							triggerVertical + triggerHorizontal
+							triggerVertical + triggerHorizontal,
 						];
 					}
 				}
@@ -207,25 +214,25 @@ AUI.add(
 							A.WidgetModality,
 							A.WidgetPositionAlign,
 							A.WidgetPositionConstrain,
-							A.WidgetStack
+							A.WidgetStack,
 						],
 
 						CSS_PREFIX: 'overlay',
 
 						EXTENDS: A.Widget,
 
-						NAME: 'overlay'
+						NAME: 'overlay',
 					});
 
 					overlay = new MenuOverlay({
 						align: {
 							node: trigger,
-							points: DEFAULT_ALIGN_POINTS
+							points: DEFAULT_ALIGN_POINTS,
 						},
 						constrain: true,
 						hideClass: false,
 						preventOverlap: true,
-						zIndex: Liferay.zIndex.MENU
+						zIndex: Liferay.zIndex.MENU,
 					}).render();
 
 					Liferay.once('beforeScreenFlip', () => {
@@ -235,7 +242,8 @@ AUI.add(
 					});
 
 					instance._overlay = overlay;
-				} else {
+				}
+				else {
 					overlay.set('align.node', trigger);
 				}
 
@@ -272,7 +280,7 @@ AUI.add(
 					if (trigger.hasClass('select')) {
 						listContainer.delegate(
 							'click',
-							event => {
+							(event) => {
 								var selectedListItem = event.currentTarget;
 
 								var selectedListItemIcon = selectedListItem.one(
@@ -400,7 +408,7 @@ AUI.add(
 						centered: false,
 						height: listNodeHeight,
 						modal: modalMask,
-						width: listNodeWidth
+						width: listNodeWidth,
 					});
 
 					if (!Util.isPhone() && !Util.isTablet()) {
@@ -415,7 +423,8 @@ AUI.add(
 
 					if (cssClass.indexOf(CSS_EXTENDED) > -1) {
 						trigger.addClass(CSS_BTN_PRIMARY);
-					} else {
+					}
+					else {
 						trigger.get(PARENT_NODE).addClass(CSS_OPEN);
 
 						var portlet = trigger.ancestor(CSS_PORTLET);
@@ -447,14 +456,13 @@ AUI.add(
 
 				trigger.attr({
 					'aria-haspopup': true,
-					role: 'button'
 				});
 
 				listNode.setAttribute('aria-labelledby', trigger.guid());
-			}
+			},
 		};
 
-		Menu.handleFocus = function(id) {
+		Menu.handleFocus = function (id) {
 			var node = A.one(id);
 
 			if (node) {
@@ -473,7 +481,7 @@ AUI.add(
 
 		var buffer = [];
 
-		Menu.register = function(id) {
+		Menu.register = function (id) {
 			var menuNode = document.getElementById(id);
 
 			if (menuNode) {
@@ -491,13 +499,16 @@ AUI.add(
 			if (buffer.length) {
 				var nodes = A.all(buffer);
 
-				nodes.on(EVENT_CLICK, A.bind('_registerMenu', Menu));
+				nodes.on(
+					[EVENT_CLICK, EVENT_KEYDOWN],
+					A.bind('_registerMenu', Menu)
+				);
 
 				buffer.length = 0;
 			}
 		}, 100);
 
-		Menu._targetLink = function(event, action) {
+		Menu._targetLink = function (event, action) {
 			var anchor = event.currentTarget.one(SELECTOR_ANCHOR);
 
 			if (anchor) {
@@ -522,8 +533,8 @@ AUI.add(
 						focusClass: 'focus',
 						keys: {
 							next: 'down:40',
-							previous: 'down:38'
-						}
+							previous: 'down:38',
+						},
 					});
 
 					bodyNode.on(
@@ -544,7 +555,7 @@ AUI.add(
 
 					bodyNode.delegate(
 						'mouseenter',
-						event => {
+						(event) => {
 							if (focusManager.get('focused')) {
 								focusManager.focus(
 									event.currentTarget.one(SELECTOR_ANCHOR)
@@ -554,7 +565,7 @@ AUI.add(
 						SELECTOR_LIST_ITEM
 					);
 
-					focusManager.after('activeDescendantChange', event => {
+					focusManager.after('activeDescendantChange', (event) => {
 						var descendants = focusManager.get('descendants');
 
 						var selectedItem = descendants.item(event.newVal);
@@ -593,23 +604,21 @@ AUI.add(
 
 					var results = [];
 
-					listNode.all('li').each(node => {
+					listNode.all('li').each((node) => {
 						results.push({
-							name: node
-								.one('.taglib-text-icon')
-								.text()
-								.trim(),
-							node
+							name: node.one('.taglib-text-icon').text().trim(),
+							node,
 						});
 					});
 
 					liveSearch = new Liferay.MenuFilter({
 						content: listNode,
+						menu: Menu._INSTANCE,
 						minQueryLength: 0,
 						queryDelay: 0,
 						resultFilters: 'phraseMatch',
 						resultTextLocator: 'name',
-						source: results
+						source: results,
 					});
 
 					liveSearch.get('inputNode').swallowEvent('click');
@@ -624,7 +633,16 @@ AUI.add(
 		Liferay.provide(
 			Menu,
 			'_registerMenu',
-			event => {
+			(event) => {
+				var key = event.key || event.keyCode;
+
+				if (
+					event.type === EVENT_KEYDOWN &&
+					key !== A.Event.KeyMap.SPACE
+				) {
+					return;
+				}
+
 				var menuInstance = Menu._INSTANCE;
 
 				var handles = menuInstance._handles;
@@ -644,9 +662,8 @@ AUI.add(
 						if (portlet) {
 							portlet.removeClass(CSS_OPEN);
 						}
-					} else {
-						menuInstance._closeActiveMenu();
-
+					}
+					else {
 						return;
 					}
 				}
@@ -656,6 +673,10 @@ AUI.add(
 
 					menuInstance._activeMenu = menu;
 					menuInstance._activeTrigger = trigger;
+
+					trigger.attr({
+						'aria-expanded': true,
+					});
 
 					if (!handles.length) {
 						var listContainer = trigger.getData(
@@ -680,14 +701,14 @@ AUI.add(
 							),
 							listContainer.on(
 								'touchendoutside',
-								event => {
+								(event) => {
 									event.preventDefault();
 
 									menuInstance._closeActiveMenu();
 								},
 								menuInstance
 							),
-							Liferay.on('dropdownShow', event => {
+							Liferay.on('dropdownShow', (event) => {
 								if (event.src !== 'LiferayMenu') {
 									menuInstance._closeActiveMenu();
 								}
@@ -710,7 +731,7 @@ AUI.add(
 					menuInstance._positionActiveMenu();
 
 					Liferay.fire('dropdownShow', {
-						src: 'LiferayMenu'
+						src: 'LiferayMenu',
 					});
 
 					event.halt();
@@ -726,7 +747,7 @@ AUI.add(
 				'widget-position-align',
 				'widget-position-constrain',
 				'widget-stack',
-				'widget-stdmod'
+				'widget-stdmod',
 			]
 		);
 
@@ -738,7 +759,7 @@ AUI.add(
 			'array-invoke',
 			'aui-debounce',
 			'aui-node',
-			'portal-available-languages'
-		]
+			'portal-available-languages',
+		],
 	}
 );

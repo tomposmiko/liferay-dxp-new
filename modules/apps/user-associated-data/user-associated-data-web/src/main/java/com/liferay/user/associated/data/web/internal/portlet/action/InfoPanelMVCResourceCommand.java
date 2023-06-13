@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
-		"mvc.command.name=/info_panel"
+		"mvc.command.name=/user_associated_data/info_panel"
 	},
 	service = MVCResourceCommand.class
 )
@@ -64,17 +64,18 @@ public class InfoPanelMVCResourceCommand extends BaseMVCResourceCommand {
 		for (String key : parameterMap.keySet()) {
 			if (key.startsWith("uadRegistryKey__")) {
 				entityTypes.add(
-					StringUtil.replace(key, "uadRegistryKey__", ""));
+					StringUtil.removeSubstring(key, "uadRegistryKey__"));
 			}
 		}
 
 		for (String entityType : entityTypes) {
-			List<UADEntity> uadEntities = new ArrayList<>();
+			List<UADEntity<Object>> uadEntities = new ArrayList<>();
 
 			String uadRegistryKey = ParamUtil.getString(
 				resourceRequest, "uadRegistryKey__" + entityType);
 
-			UADDisplay uadDisplay = _uadRegistry.getUADDisplay(uadRegistryKey);
+			UADDisplay<Object> uadDisplay =
+				(UADDisplay<Object>)_uadRegistry.getUADDisplay(uadRegistryKey);
 
 			String[] rowIds = ParamUtil.getStringValues(
 				resourceRequest, "rowIds" + entityType);
@@ -82,7 +83,7 @@ public class InfoPanelMVCResourceCommand extends BaseMVCResourceCommand {
 			for (String rowId : rowIds) {
 				Object entity = uadDisplay.get(rowId);
 
-				UADEntity uadEntity = new UADEntity(
+				UADEntity<Object> uadEntity = new UADEntity(
 					entity, uadDisplay.getPrimaryKey(entity), null, false,
 					uadDisplay.getTypeClass(), true, null);
 
@@ -125,7 +126,7 @@ public class InfoPanelMVCResourceCommand extends BaseMVCResourceCommand {
 			}
 
 			uadInfoPanelDisplay.setUADDisplay(
-				_uadRegistry.getUADDisplay(uadRegistryKey));
+				(UADDisplay<Object>)_uadRegistry.getUADDisplay(uadRegistryKey));
 		}
 
 		boolean hierarchyView = ParamUtil.getBoolean(

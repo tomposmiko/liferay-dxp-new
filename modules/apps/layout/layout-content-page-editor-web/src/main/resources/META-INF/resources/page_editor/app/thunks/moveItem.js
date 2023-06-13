@@ -12,28 +12,24 @@
  * details.
  */
 
-import updateLayoutData from '../actions/updateLayoutData';
+import moveItemAction from '../actions/moveItem';
 import LayoutService from '../services/LayoutService';
 
 export default function moveItem({
-	config,
 	itemId,
 	parentItemId,
 	position,
-	store
+	segmentsExperienceId,
 }) {
-	return dispatch => {
-		const {segmentsExperienceId} = store;
-
-		LayoutService.moveItem({
-			config,
+	return (dispatch) => {
+		return LayoutService.moveItem({
 			itemId,
 			onNetworkStatus: dispatch,
 			parentItemId,
 			position,
-			segmentsExperienceId
-		}).then(layoutData => {
-			dispatch(updateLayoutData({layoutData}));
+			segmentsExperienceId,
+		}).then((layoutData) => {
+			dispatch(moveItemAction({itemId, layoutData}));
 		});
 	};
 }

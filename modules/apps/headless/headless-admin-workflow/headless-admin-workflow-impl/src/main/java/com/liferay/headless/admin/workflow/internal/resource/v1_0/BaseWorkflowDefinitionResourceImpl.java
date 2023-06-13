@@ -17,22 +17,21 @@ package com.liferay.headless.admin.workflow.internal.resource.v1_0;
 import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionResource;
 import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupedModel;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.odata.filter.ExpressionConvert;
+import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
-
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,17 +42,6 @@ import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.validation.constraints.NotNull;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -61,7 +49,7 @@ import javax.ws.rs.core.UriInfo;
  * @generated
  */
 @Generated("")
-@Path("/v1.0")
+@javax.ws.rs.Path("/v1.0")
 public abstract class BaseWorkflowDefinitionResourceImpl
 	implements WorkflowDefinitionResource {
 
@@ -70,19 +58,29 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions'  -u 'test@liferay.com:test'
 	 */
-	@Override
-	@GET
-	@Parameters(
+	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
-			@Parameter(in = ParameterIn.QUERY, name = "page"),
-			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "page"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "pageSize"
+			)
 		}
 	)
-	@Path("/workflow-definitions")
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "WorkflowDefinition")})
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "WorkflowDefinition")
+		}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path("/workflow-definitions")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
 	public Page<WorkflowDefinition> getWorkflowDefinitionsPage(
-			@Context Pagination pagination)
+			@javax.ws.rs.core.Context Pagination pagination)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
@@ -93,14 +91,27 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/by-name/{name}'  -u 'test@liferay.com:test'
 	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "name"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "WorkflowDefinition")
+		}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path("/workflow-definitions/by-name/{name}")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	@GET
-	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "name")})
-	@Path("/workflow-definitions/by-name/{name}")
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "WorkflowDefinition")})
 	public WorkflowDefinition getWorkflowDefinitionByName(
-			@NotNull @Parameter(hidden = true) @PathParam("name") String name)
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull @javax.ws.rs.PathParam("name")
+			String name)
 		throws Exception {
 
 		return new WorkflowDefinition();
@@ -109,14 +120,18 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/deploy'  -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/deploy' -d $'{"active": ___, "content": ___, "name": ___, "title": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "WorkflowDefinition")
+		}
+	)
+	@javax.ws.rs.Consumes({"application/json", "application/xml"})
+	@javax.ws.rs.Path("/workflow-definitions/deploy")
+	@javax.ws.rs.POST
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	@Consumes({"application/json", "application/xml"})
-	@POST
-	@Path("/workflow-definitions/deploy")
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "WorkflowDefinition")})
 	public WorkflowDefinition postWorkflowDefinitionDeploy(
 			WorkflowDefinition workflowDefinition)
 		throws Exception {
@@ -127,14 +142,18 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/save'  -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/save' -d $'{"active": ___, "content": ___, "name": ___, "title": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "WorkflowDefinition")
+		}
+	)
+	@javax.ws.rs.Consumes({"application/json", "application/xml"})
+	@javax.ws.rs.Path("/workflow-definitions/save")
+	@javax.ws.rs.POST
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	@Consumes({"application/json", "application/xml"})
-	@POST
-	@Path("/workflow-definitions/save")
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "WorkflowDefinition")})
 	public WorkflowDefinition postWorkflowDefinitionSave(
 			WorkflowDefinition workflowDefinition)
 		throws Exception {
@@ -147,21 +166,36 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/undeploy'  -u 'test@liferay.com:test'
 	 */
-	@Override
-	@DELETE
-	@Parameters(
+	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
-			@Parameter(in = ParameterIn.QUERY, name = "name"),
-			@Parameter(in = ParameterIn.QUERY, name = "version")
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "name"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "version"
+			)
 		}
 	)
-	@Path("/workflow-definitions/undeploy")
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "WorkflowDefinition")})
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "WorkflowDefinition")
+		}
+	)
+	@javax.ws.rs.DELETE
+	@javax.ws.rs.Path("/workflow-definitions/undeploy")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
 	public void deleteWorkflowDefinitionUndeploy(
-			@NotNull @Parameter(hidden = true) @QueryParam("name") String name,
-			@NotNull @Parameter(hidden = true) @QueryParam("version") String
-				version)
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.QueryParam("name")
+			String name,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.QueryParam("version")
+			String version)
 		throws Exception {
 	}
 
@@ -170,52 +204,44 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/update-active'  -u 'test@liferay.com:test'
 	 */
-	@Override
-	@POST
-	@Parameters(
+	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
-			@Parameter(in = ParameterIn.QUERY, name = "active"),
-			@Parameter(in = ParameterIn.QUERY, name = "name"),
-			@Parameter(in = ParameterIn.QUERY, name = "version")
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "active"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "name"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "version"
+			)
 		}
 	)
-	@Path("/workflow-definitions/update-active")
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "WorkflowDefinition")})
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "WorkflowDefinition")
+		}
+	)
+	@javax.ws.rs.Path("/workflow-definitions/update-active")
+	@javax.ws.rs.POST
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
 	public WorkflowDefinition postWorkflowDefinitionUpdateActive(
-			@NotNull @Parameter(hidden = true) @QueryParam("active") Boolean
-				active,
-			@NotNull @Parameter(hidden = true) @QueryParam("name") String name,
-			@NotNull @Parameter(hidden = true) @QueryParam("version") String
-				version)
-		throws Exception {
-
-		return new WorkflowDefinition();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/update-title'  -u 'test@liferay.com:test'
-	 */
-	@Override
-	@POST
-	@Parameters(
-		value = {
-			@Parameter(in = ParameterIn.QUERY, name = "name"),
-			@Parameter(in = ParameterIn.QUERY, name = "title"),
-			@Parameter(in = ParameterIn.QUERY, name = "version")
-		}
-	)
-	@Path("/workflow-definitions/update-title")
-	@Produces({"application/json", "application/xml"})
-	@Tags(value = {@Tag(name = "WorkflowDefinition")})
-	public WorkflowDefinition postWorkflowDefinitionUpdateTitle(
-			@NotNull @Parameter(hidden = true) @QueryParam("name") String name,
-			@NotNull @Parameter(hidden = true) @QueryParam("title") String
-				title,
-			@NotNull @Parameter(hidden = true) @QueryParam("version") String
-				version)
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.QueryParam("active")
+			Boolean active,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.QueryParam("name")
+			String name,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.QueryParam("version")
+			String version)
 		throws Exception {
 
 		return new WorkflowDefinition();
@@ -253,6 +279,38 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 		this.contextUser = contextUser;
 	}
 
+	public void setExpressionConvert(
+		ExpressionConvert<Filter> expressionConvert) {
+
+		this.expressionConvert = expressionConvert;
+	}
+
+	public void setFilterParserProvider(
+		FilterParserProvider filterParserProvider) {
+
+		this.filterParserProvider = filterParserProvider;
+	}
+
+	public void setGroupLocalService(GroupLocalService groupLocalService) {
+		this.groupLocalService = groupLocalService;
+	}
+
+	public void setResourceActionLocalService(
+		ResourceActionLocalService resourceActionLocalService) {
+
+		this.resourceActionLocalService = resourceActionLocalService;
+	}
+
+	public void setResourcePermissionLocalService(
+		ResourcePermissionLocalService resourcePermissionLocalService) {
+
+		this.resourcePermissionLocalService = resourcePermissionLocalService;
+	}
+
+	public void setRoleLocalService(RoleLocalService roleLocalService) {
+		this.roleLocalService = roleLocalService;
+	}
+
 	protected Map<String, String> addAction(
 		String actionName, GroupedModel groupedModel, String methodName) {
 
@@ -262,12 +320,21 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	}
 
 	protected Map<String, String> addAction(
-		String actionName, Long id, String methodName, String permissionName,
-		Long siteId) {
+		String actionName, Long id, String methodName, Long ownerId,
+		String permissionName, Long siteId) {
 
 		return ActionUtil.addAction(
-			actionName, getClass(), id, methodName, permissionName,
-			contextScopeChecker, siteId, contextUriInfo);
+			actionName, getClass(), id, methodName, contextScopeChecker,
+			ownerId, permissionName, siteId, contextUriInfo);
+	}
+
+	protected Map<String, String> addAction(
+		String actionName, Long id, String methodName,
+		ModelResourcePermission modelResourcePermission) {
+
+		return ActionUtil.addAction(
+			actionName, getClass(), id, methodName, contextScopeChecker,
+			modelResourcePermission, contextUriInfo);
 	}
 
 	protected Map<String, String> addAction(
@@ -275,12 +342,7 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 		Long siteId) {
 
 		return addAction(
-			actionName, siteId, methodName, permissionName, siteId);
-	}
-
-	protected void preparePatch(
-		WorkflowDefinition workflowDefinition,
-		WorkflowDefinition existingWorkflowDefinition) {
+			actionName, siteId, methodName, null, permissionName, siteId);
 	}
 
 	protected <T, R> List<R> transform(
@@ -313,14 +375,19 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 
 	protected AcceptLanguage contextAcceptLanguage;
 	protected com.liferay.portal.kernel.model.Company contextCompany;
-	protected com.liferay.portal.kernel.model.User contextUser;
-	protected GroupLocalService groupLocalService;
 	protected HttpServletRequest contextHttpServletRequest;
 	protected HttpServletResponse contextHttpServletResponse;
+	protected Object contextScopeChecker;
+	protected UriInfo contextUriInfo;
+	protected com.liferay.portal.kernel.model.User contextUser;
+	protected ExpressionConvert<Filter> expressionConvert;
+	protected FilterParserProvider filterParserProvider;
+	protected GroupLocalService groupLocalService;
 	protected ResourceActionLocalService resourceActionLocalService;
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 	protected RoleLocalService roleLocalService;
-	protected Object contextScopeChecker;
-	protected UriInfo contextUriInfo;
+
+	private static final com.liferay.portal.kernel.log.Log _log =
+		LogFactoryUtil.getLog(BaseWorkflowDefinitionResourceImpl.class);
 
 }

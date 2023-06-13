@@ -15,11 +15,18 @@
 package com.liferay.portal.upgrade.internal.registry;
 
 import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBContext;
+import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
+import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
@@ -29,15 +36,18 @@ import com.liferay.portal.upgrade.internal.executor.UpgradeExecutor;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portal.util.PropsValues;
 
+import java.io.OutputStream;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
@@ -67,14 +77,16 @@ public class UpgradeStepRegistratorTracker {
 		_serviceTracker.close();
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		UpgradeStepRegistratorTracker.class);
+
 	private BundleContext _bundleContext;
 
 	@Reference
 	private ReleaseLocalService _releaseLocalService;
 
-	private ServiceTracker
-		<UpgradeStepRegistrator, Collection<ServiceRegistration<UpgradeStep>>>
-			_serviceTracker;
+	private ServiceTracker<UpgradeStepRegistrator, SafeCloseable>
+		_serviceTracker;
 
 	@Reference
 	private SwappedLogExecutor _swappedLogExecutor;
@@ -82,13 +94,63 @@ public class UpgradeStepRegistratorTracker {
 	@Reference
 	private UpgradeExecutor _upgradeExecutor;
 
-	private class UpgradeStepRegistratorServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer
-			<UpgradeStepRegistrator,
-			 Collection<ServiceRegistration<UpgradeStep>>> {
+	private class InitialReleaseServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<Release, Void> {
 
 		@Override
-		public Collection<ServiceRegistration<UpgradeStep>> addingService(
+		public Void addingService(ServiceReference<Release> serviceReference) {
+			DBProcessContext dbProcessContext = new DBProcessContext() {
+
+				@Override
+				public DBContext getDBContext() {
+					return new DBContext();
+				}
+
+				@Override
+				public OutputStream getOutputStream() {
+					return null;
+				}
+
+			};
+
+			for (UpgradeStep upgradeStep : _initialUpgradeSteps) {
+				try {
+					upgradeStep.upgrade(dbProcessContext);
+				}
+				catch (UpgradeException upgradeException) {
+					_log.error(upgradeException, upgradeException);
+				}
+			}
+
+			return null;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<Release> serviceReference, Void v) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<Release> serviceReference, Void v) {
+		}
+
+		private InitialReleaseServiceTrackerCustomizer(
+			List<UpgradeStep> initialUpgradeSteps) {
+
+			_initialUpgradeSteps = initialUpgradeSteps;
+		}
+
+		private final List<UpgradeStep> _initialUpgradeSteps;
+
+	}
+
+	private class UpgradeStepRegistratorServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer
+			<UpgradeStepRegistrator, SafeCloseable> {
+
+		@Override
+		public SafeCloseable addingService(
 			ServiceReference<UpgradeStepRegistrator> serviceReference) {
 
 			UpgradeStepRegistrator upgradeStepRegistrator =
@@ -125,16 +187,51 @@ public class UpgradeStepRegistratorTracker {
 
 			upgradeStepRegistrator.register(upgradeStepRegistry);
 
+			List<UpgradeStep> initialUpgradeSteps =
+				upgradeStepRegistry.getInitialUpgradeSteps();
+
+			ServiceTracker<Release, Void> releaseServiceTracker;
+
+			if (initialUpgradeSteps.isEmpty()) {
+				releaseServiceTracker = null;
+			}
+			else {
+				releaseServiceTracker = new ServiceTracker<>(
+					_bundleContext, _createFilter(bundleSymbolicName),
+					new InitialReleaseServiceTrackerCustomizer(
+						initialUpgradeSteps));
+
+				releaseServiceTracker.open();
+			}
+
 			List<UpgradeInfo> upgradeInfos =
 				upgradeStepRegistry.getUpgradeInfos();
+
+			if (PropsValues.UPGRADE_DATABASE_AUTO_RUN ||
+				(_releaseLocalService.fetchRelease(bundleSymbolicName) ==
+					null)) {
+
+				try {
+					_upgradeExecutor.execute(
+						bundleSymbolicName, upgradeInfos,
+						OutputStreamContainerConstants.FACTORY_NAME_DUMMY);
+				}
+				catch (Throwable throwable) {
+					_swappedLogExecutor.execute(
+						bundleSymbolicName,
+						() -> _log.error(
+							"Failed upgrade process for module ".concat(
+								bundleSymbolicName),
+							throwable),
+						null);
+				}
+			}
 
 			List<ServiceRegistration<UpgradeStep>> serviceRegistrations =
 				new ArrayList<>(upgradeInfos.size());
 
-			boolean enabled = UpgradeStepRegistratorThreadLocal.isEnabled();
-
-			try {
-				UpgradeStepRegistratorThreadLocal.setEnabled(false);
+			try (SafeCloseable safeCloseable =
+					UpgradeStepRegistratorThreadLocal.setEnabled(false)) {
 
 				for (UpgradeInfo upgradeInfo : upgradeInfos) {
 					Dictionary<String, Object> properties =
@@ -160,53 +257,46 @@ public class UpgradeStepRegistratorTracker {
 					serviceRegistrations.add(serviceRegistration);
 				}
 			}
-			finally {
-				UpgradeStepRegistratorThreadLocal.setEnabled(enabled);
-			}
 
-			if (PropsValues.UPGRADE_DATABASE_AUTO_RUN ||
-				(_releaseLocalService.fetchRelease(bundleSymbolicName) ==
-					null)) {
+			return () -> {
+				for (ServiceRegistration<UpgradeStep> serviceRegistration :
+						serviceRegistrations) {
 
-				try {
-					_upgradeExecutor.execute(
-						bundleSymbolicName, upgradeInfos,
-						OutputStreamContainerConstants.FACTORY_NAME_DUMMY);
+					serviceRegistration.unregister();
 				}
-				catch (Throwable t) {
-					_swappedLogExecutor.execute(
-						bundleSymbolicName,
-						() -> _log.error(
-							"Failed upgrade process for module ".concat(
-								bundleSymbolicName),
-							t),
-						null);
-				}
-			}
 
-			return serviceRegistrations;
+				if (releaseServiceTracker != null) {
+					releaseServiceTracker.close();
+				}
+			};
 		}
 
 		@Override
 		public void modifiedService(
 			ServiceReference<UpgradeStepRegistrator> serviceReference,
-			Collection<ServiceRegistration<UpgradeStep>> serviceRegistrations) {
+			SafeCloseable safeCloseable) {
 		}
 
 		@Override
 		public void removedService(
 			ServiceReference<UpgradeStepRegistrator> serviceReference,
-			Collection<ServiceRegistration<UpgradeStep>> serviceRegistrations) {
+			SafeCloseable safeCloseable) {
 
-			for (ServiceRegistration<UpgradeStep> serviceRegistration :
-					serviceRegistrations) {
-
-				serviceRegistration.unregister();
-			}
+			safeCloseable.close();
 		}
 
-		private final Log _log = LogFactoryUtil.getLog(
-			UpgradeStepRegistratorTracker.class);
+		private Filter _createFilter(String bundleSymbolicName) {
+			try {
+				return _bundleContext.createFilter(
+					StringBundler.concat(
+						"(&(objectClass=", Release.class.getName(),
+						")(release.bundle.symbolic.name=", bundleSymbolicName,
+						")(release.initial=true))"));
+			}
+			catch (InvalidSyntaxException invalidSyntaxException) {
+				return ReflectionUtil.throwException(invalidSyntaxException);
+			}
+		}
 
 	}
 

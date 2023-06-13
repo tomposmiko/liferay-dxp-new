@@ -131,7 +131,6 @@ public class UpgradeDDLFormPortletId extends BaseUpgradePortletId {
 
 				dynamicQuery.add(junction);
 			});
-		actionableDynamicQuery.setParallel(true);
 		actionableDynamicQuery.setPerformActionMethod(
 			(PortletPreferences portletPreference) -> updatePortletPreferences(
 				portletPreference, oldRootPortletId, newRootPortletId));
@@ -173,6 +172,15 @@ public class UpgradeDDLFormPortletId extends BaseUpgradePortletId {
 			portletPreferences.getPreferences(), "</portlet-preferences>",
 			"<preference><name>formView</name><value>true</value>" +
 				"</preference></portlet-preferences>");
+
+		newPreferences = StringUtil.replace(
+			newPreferences,
+			new String[] {
+				"#p_p_id_" + oldRootPortletId, "#portlet_" + oldRootPortletId
+			},
+			new String[] {
+				"#p_p_id_" + newRootPortletId, "#portlet_" + newRootPortletId
+			});
 
 		portletPreferences.setPreferences(newPreferences);
 

@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
-		"mvc.command.name=/anonymize_nonreviewable_uad_data"
+		"mvc.command.name=/user_associated_data/anonymize_nonreviewable_uad_data"
 	},
 	service = MVCActionCommand.class
 )
@@ -48,10 +48,10 @@ public class AnonymizeNonreviewableUADDataMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		Collection<UADAnonymizer> uadAnonymizers =
+		Collection<UADAnonymizer<?>> uadAnonymizers =
 			_uadRegistry.getNonreviewableUADAnonymizers();
 
-		for (UADAnonymizer uadAnonymizer : uadAnonymizers) {
+		for (UADAnonymizer<?> uadAnonymizer : uadAnonymizers) {
 			User selectedUser = getSelectedUser(actionRequest);
 
 			User anonymousUser = _uadAnonymizerHelper.getAnonymousUser(

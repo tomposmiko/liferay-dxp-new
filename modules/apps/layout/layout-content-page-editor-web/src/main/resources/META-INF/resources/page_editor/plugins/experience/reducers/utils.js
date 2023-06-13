@@ -39,8 +39,8 @@ function addExperience(state, experience) {
 		...state,
 		availableSegmentsExperiences: {
 			...state.availableSegmentsExperiences,
-			[experience.segmentsExperienceId]: experience
-		}
+			[experience.segmentsExperienceId]: experience,
+		},
 	};
 }
 
@@ -59,7 +59,7 @@ function setExperienceLock(state, experience) {
 
 	return {
 		...state,
-		lockedSegmentsExperience
+		lockedSegmentsExperience,
 	};
 }
 
@@ -78,7 +78,7 @@ function storeNewLayoutData(state, segmentsExperienceId, layoutData) {
 
 	nextState.layoutDataList.push({
 		layoutData,
-		segmentsExperienceId
+		segmentsExperienceId,
 	});
 
 	return nextState;
@@ -87,7 +87,7 @@ function storeNewLayoutData(state, segmentsExperienceId, layoutData) {
 function selectExperience(state, experienceId) {
 	return {
 		...state,
-		segmentsExperienceId: experienceId
+		segmentsExperienceId: experienceId,
 	};
 }
 
@@ -96,51 +96,26 @@ function switchLayoutData(state, {currentExperienceId, targetExperienceId}) {
 	const {layoutData: prevLayoutData, layoutDataList} = nextState;
 
 	const layoutDataItem = state.layoutDataList.find(
-		layoutDataItem =>
+		(layoutDataItem) =>
 			layoutDataItem.segmentsExperienceId === targetExperienceId
 	);
 
 	nextState = {
 		...nextState,
 		layoutData: layoutDataItem.layoutData,
-		layoutDataList: layoutDataList.map(layoutDataItem => {
+		layoutDataList: layoutDataList.map((layoutDataItem) => {
 			if (currentExperienceId === layoutDataItem.segmentsExperienceId) {
 				return {
 					...layoutDataItem,
-					layoutData: prevLayoutData
+					layoutData: prevLayoutData,
 				};
 			}
 
 			return layoutDataItem;
-		})
+		}),
 	};
 
 	return nextState;
-}
-
-/**
- * Updates the fragmentEntryLinks editableValues in State
- *
- * @param {object} state
- * @param {string} state.defaultSegmentsExperienceId
- * @param {object} state.fragmentEntryLinks
- * @param {string} fragmentEntryLinks
- * @returns {object}
- */
-function updateFragmentEntryLinksEditableValues(
-	state,
-	fragmentEntryLinks = {}
-) {
-	const updatedFragmentEntryLinks = state.fragmentEntryLinks;
-
-	Object.entries(fragmentEntryLinks).forEach(([id, editableValues]) => {
-		updatedFragmentEntryLinks[id].editableValues = editableValues;
-	});
-
-	return {
-		...state,
-		fragmentEntryLinks: updatedFragmentEntryLinks
-	};
 }
 
 function deleteExperienceById(state, segmentsExperienceId) {
@@ -150,7 +125,7 @@ function deleteExperienceById(state, segmentsExperienceId) {
 
 	return {
 		...state,
-		availableSegmentsExperiences: experiences
+		availableSegmentsExperiences: experiences,
 	};
 }
 
@@ -158,13 +133,13 @@ function removeLayoutDataItemById(state, segmentsExperienceId) {
 	const layoutDataList = state.layoutDataList;
 
 	const updatedLayoutDataList = layoutDataList.filter(
-		layoutDataItem =>
+		(layoutDataItem) =>
 			layoutDataItem.segmentsExperienceId !== segmentsExperienceId
 	);
 
 	return {
 		...state,
-		layoutDataList: updatedLayoutDataList
+		layoutDataList: updatedLayoutDataList,
 	};
 }
 
@@ -178,17 +153,18 @@ function removeLayoutDataItemById(state, segmentsExperienceId) {
 function updateUsedWidgets(widgets, portletIds) {
 	const filteredWidgets = [...widgets];
 
-	filteredWidgets.forEach(widgetCategory => {
+	filteredWidgets.forEach((widgetCategory) => {
 		const {categories = [], portlets = []} = widgetCategory;
 
 		widgetCategory.categories = updateUsedWidgets(categories, portletIds);
-		widgetCategory.portlets = portlets.map(portlet => {
+		widgetCategory.portlets = portlets.map((portlet) => {
 			if (
 				portletIds.indexOf(portlet.portletId) !== -1 &&
 				!portlet.instanceable
 			) {
 				portlet.used = true;
-			} else {
+			}
+			else {
 				portlet.used = false;
 			}
 
@@ -197,6 +173,18 @@ function updateUsedWidgets(widgets, portletIds) {
 	});
 
 	return filteredWidgets;
+}
+
+/**
+ * Attaches to the state a the experiment status of a experience
+ */
+function setExperimentStatus(state, experienceId) {
+	const selectedExperience = state.availableSegmentsExperiences[experienceId];
+
+	return {
+		...state,
+		segmentsExperimentStatus: selectedExperience.segmentsExperimentStatus,
+	};
 }
 
 /**
@@ -210,7 +198,7 @@ function setUsedWidgets(state, {portletIds}) {
 
 	return {
 		...state,
-		widgets: updatedWidgets
+		widgets: updatedWidgets,
 	};
 }
 
@@ -220,8 +208,8 @@ export {
 	removeLayoutDataItemById,
 	selectExperience,
 	setExperienceLock,
+	setExperimentStatus,
 	setUsedWidgets,
 	storeNewLayoutData,
 	switchLayoutData,
-	updateFragmentEntryLinksEditableValues
 };

@@ -17,6 +17,7 @@ package com.liferay.portal.util;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,6 +27,8 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -33,6 +36,11 @@ import org.junit.Test;
  * @author Neil Zhao Jin
  */
 public class HtmlImplTest {
+
+	@ClassRule
+	@Rule
+	public static final LiferayUnitTestRule liferayUnitTestRule =
+		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testBuildData() {
@@ -97,11 +105,11 @@ public class HtmlImplTest {
 			"javascript%3aalert(&#39;hello&#39;);",
 			_htmlImpl.escapeHREF("javascript:alert('hello');"));
 		Assert.assertEquals(
-			"data%3atext/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaX" +
-				"B0Pg",
+			"data%3atext/html;base64," +
+				"PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg",
 			_htmlImpl.escapeHREF(
-				"data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaX" +
-					"B0Pg"));
+				"data:text/html;base64," +
+					"PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"));
 		Assert.assertEquals(
 			"http://localhost:8080",
 			_htmlImpl.escapeHREF("http://localhost:8080"));
@@ -183,6 +191,10 @@ public class HtmlImplTest {
 		Assert.assertEquals(
 			"http://localhost:8080",
 			_htmlImpl.escapeJSLink("http://localhost:8080"));
+		Assert.assertEquals(
+			"javascript%3a//localhost:800/123%0aalert(document.domain)",
+			_htmlImpl.escapeJSLink(
+				"\tjavascript://localhost:800/123%0aalert(document.domain)"));
 	}
 
 	@Test
@@ -380,7 +392,15 @@ public class HtmlImplTest {
 	}
 
 	@Test
-	public void testStripHtmlWithScripTag() {
+	public void testStripHtmlWithNoscriptTag() {
+		Assert.assertEquals(
+			"Hello World!",
+			_htmlImpl.stripHtml(
+				"<body>Hello<noscript>No JavaScript</noscript> World!</body>"));
+	}
+
+	@Test
+	public void testStripHtmlWithScriptTag() {
 		Assert.assertEquals(
 			"Hello World!",
 			_htmlImpl.stripHtml(

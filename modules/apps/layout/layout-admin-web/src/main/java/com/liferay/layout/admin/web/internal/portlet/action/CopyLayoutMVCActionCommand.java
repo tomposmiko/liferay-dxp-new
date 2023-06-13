@@ -18,10 +18,7 @@ import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.admin.web.internal.handler.LayoutExceptionRequestHandler;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -61,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
-		"mvc.command.name=/layout/copy_layout"
+		"mvc.command.name=/layout_admin/copy_layout"
 	},
 	service = MVCActionCommand.class
 )
@@ -95,42 +92,47 @@ public class CopyLayoutMVCActionCommand extends BaseMVCActionCommand {
 			nameMap.put(LocaleUtil.getSiteDefault(), name);
 		}
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			Layout.class.getName(), actionRequest);
-
-		UnicodeProperties typeSettingsProperties =
+		UnicodeProperties typeSettingsUnicodeProperties =
 			PropertiesParamUtil.getProperties(
 				actionRequest, "TypeSettingsProperties--");
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+		Layout sourceLayout = _layoutLocalService.fetchLayout(sourcePlid);
+
+		UnicodeProperties sourceTypeSettingsUnicodeProperties =
+			sourceLayout.getTypeSettingsProperties();
+
+		sourceTypeSettingsUnicodeProperties.putAll(
+			typeSettingsUnicodeProperties);
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			Layout.class.getName(), actionRequest);
 
 		try {
-			Layout sourceLayout = _layoutLocalService.fetchLayout(sourcePlid);
-
-			UnicodeProperties sourceTypeSettingsProperties =
-				sourceLayout.getTypeSettingsProperties();
-
-			sourceTypeSettingsProperties.putAll(typeSettingsProperties);
-
 			Layout targetLayout = _layoutService.addLayout(
 				groupId, privateLayout, sourceLayout.getParentLayoutId(), 0, 0,
 				nameMap, sourceLayout.getTitleMap(),
 				sourceLayout.getDescriptionMap(), sourceLayout.getKeywordsMap(),
 				sourceLayout.getRobotsMap(), sourceLayout.getType(),
-				sourceTypeSettingsProperties.toString(), false, false,
-				new HashMap<>(), serviceContext);
-
-			Layout draftLayout = _layoutLocalService.fetchLayout(
-				_portal.getClassNameId(Layout.class), targetLayout.getPlid());
-
-			if (draftLayout != null) {
-				targetLayout = draftLayout;
-			}
+				sourceTypeSettingsUnicodeProperties.toString(), false, false,
+				new HashMap<>(), sourceLayout.getMasterLayoutPlid(),
+				serviceContext);
 
 			targetLayout = _layoutCopyHelper.copyLayout(
 				sourceLayout, targetLayout);
 
+			Layout draftLayout = targetLayout.fetchDraftLayout();
+
+			if (draftLayout != null) {
+				targetLayout = _layoutCopyHelper.copyLayout(
+					sourceLayout, draftLayout);
+			}
+
 			targetLayout.setNameMap(nameMap);
+
+			UnicodeProperties unicodeProperties =
+				targetLayout.getTypeSettingsProperties();
+
+			unicodeProperties.put("published", Boolean.FALSE.toString());
 
 			_layoutLocalService.updateLayout(targetLayout);
 
@@ -146,16 +148,11 @@ public class CopyLayoutMVCActionCommand extends BaseMVCActionCommand {
 			redirectURL.setParameter(
 				"privateLayout", String.valueOf(privateLayout));
 
-			jsonObject.put("redirectURL", redirectURL.toString());
-
 			JSONPortletResponseUtil.writeJSON(
-				actionRequest, actionResponse, jsonObject);
+				actionRequest, actionResponse,
+				JSONUtil.put("redirectURL", redirectURL.toString()));
 		}
 		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException, portalException);
-			}
-
 			SessionErrors.add(actionRequest, "layoutNameInvalid");
 
 			hideDefaultErrorMessage(actionRequest);
@@ -164,9 +161,6 @@ public class CopyLayoutMVCActionCommand extends BaseMVCActionCommand {
 				actionRequest, actionResponse, portalException);
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CopyLayoutMVCActionCommand.class);
 
 	@Reference
 	private LayoutCopyHelper _layoutCopyHelper;

@@ -49,6 +49,10 @@ public class TasksEntryLocalServiceWrapper
 	/**
 	 * Adds the tasks entry to the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TasksEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param tasksEntry the tasks entry
 	 * @return the tasks entry that was added
 	 */
@@ -57,6 +61,17 @@ public class TasksEntryLocalServiceWrapper
 		com.liferay.tasks.model.TasksEntry tasksEntry) {
 
 		return _tasksEntryLocalService.addTasksEntry(tasksEntry);
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public com.liferay.portal.kernel.model.PersistedModel createPersistedModel(
+			java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _tasksEntryLocalService.createPersistedModel(primaryKeyObj);
 	}
 
 	/**
@@ -86,6 +101,10 @@ public class TasksEntryLocalServiceWrapper
 	/**
 	 * Deletes the tasks entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TasksEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
+	 *
 	 * @param tasksEntryId the primary key of the tasks entry
 	 * @return the tasks entry that was removed
 	 * @throws PortalException if a tasks entry with the primary key could not be found
@@ -100,6 +119,10 @@ public class TasksEntryLocalServiceWrapper
 
 	/**
 	 * Deletes the tasks entry from the database. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TasksEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param tasksEntry the tasks entry
 	 * @return the tasks entry that was removed
@@ -297,6 +320,9 @@ public class TasksEntryLocalServiceWrapper
 		return _tasksEntryLocalService.getOSGiServiceIdentifier();
 	}
 
+	/**
+	 * @throws PortalException
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
@@ -433,6 +459,10 @@ public class TasksEntryLocalServiceWrapper
 
 	/**
 	 * Updates the tasks entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Inspect TasksEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
+	 * </p>
 	 *
 	 * @param tasksEntry the tasks entry
 	 * @return the tasks entry that was updated

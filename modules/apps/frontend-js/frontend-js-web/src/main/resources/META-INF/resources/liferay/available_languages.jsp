@@ -17,9 +17,7 @@
 <%@ include file="/liferay/init.jsp" %>
 
 <%
-String languageId = LanguageUtil.getLanguageId(request);
-
-Locale locale = LocaleUtil.fromLanguageId(languageId);
+Locale locale = LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(request));
 %>
 
 AUI.add(
@@ -34,7 +32,7 @@ AUI.add(
 			String selLanguageId = LocaleUtil.toLanguageId(curLocale);
 		%>
 
-			available['<%= selLanguageId %>'] = '<%= curLocale.getDisplayName(locale) %>';
+			available['<%= selLanguageId %>'] = '<%= HtmlUtil.escapeJS(curLocale.getDisplayName(locale)) %>';
 			direction['<%= selLanguageId %>'] = '<%= LanguageUtil.get(curLocale, "lang.dir") %>';
 
 		<%
@@ -46,6 +44,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['liferay-language']
+		requires: []
 	}
 );

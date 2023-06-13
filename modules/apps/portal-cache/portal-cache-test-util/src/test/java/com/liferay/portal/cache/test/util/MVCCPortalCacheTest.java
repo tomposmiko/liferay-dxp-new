@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.test.rule.AdviseWith;
-import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
+import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.Serializable;
 
@@ -48,7 +48,6 @@ public class MVCCPortalCacheTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			AspectJNewEnvTestRule.INSTANCE,
 			new CodeCoverageAssertor() {
 
 				@Override
@@ -56,7 +55,8 @@ public class MVCCPortalCacheTest {
 					assertClasses.add(MVCCPortalCache.class);
 				}
 
-			});
+			},
+			LiferayUnitTestRule.INSTANCE);
 
 	@Before
 	public void setUp() {
@@ -133,13 +133,13 @@ public class MVCCPortalCacheTest {
 		_assertVersion(_VERSION_1, _mvccPortalCache.get(_KEY_1));
 		Assert.assertNull(_mvccPortalCache.get(_KEY_2));
 
-		_testPortalCacheListener.assertActionsCount(1);
+		_testPortalCacheListener.assertActionsCount(2);
 		_testPortalCacheListener.assertPut(
 			_KEY_1, new MockMVCCModel(_VERSION_1));
 
 		_testPortalCacheListener.reset();
 
-		_testPortalCacheReplicator.assertActionsCount(1);
+		_testPortalCacheReplicator.assertActionsCount(2);
 		_testPortalCacheReplicator.assertPut(
 			_KEY_1, new MockMVCCModel(_VERSION_1));
 
@@ -185,7 +185,7 @@ public class MVCCPortalCacheTest {
 		_assertVersion(_VERSION_2, _mvccPortalCache.get(_KEY_1));
 		Assert.assertNull(_mvccPortalCache.get(_KEY_2));
 
-		_testPortalCacheListener.assertActionsCount(1);
+		_testPortalCacheListener.assertActionsCount(2);
 		_testPortalCacheListener.assertUpdated(
 			_KEY_1, new MockMVCCModel(_VERSION_2));
 
@@ -202,6 +202,25 @@ public class MVCCPortalCacheTest {
 	@Test
 	public void testMVCCCacheWithTTL() {
 		doTestMVCCCache(true);
+	}
+
+	@Test
+	public void testPutWithSameVersion() {
+		MVCCPortalCache<Serializable, MockMVCCModel> mvccPortalCache =
+			new MVCCPortalCache<>(new TestPortalCache<>(_PORTAL_CACHE_NAME));
+
+		Serializable key = _KEY_1;
+		MockMVCCModel mockMVCCModel1 = new MockMVCCModel(_VERSION_0);
+
+		mvccPortalCache.put(key, mockMVCCModel1);
+
+		Assert.assertSame(mockMVCCModel1, mvccPortalCache.get(key));
+
+		MockMVCCModel mockMVCCModel2 = new MockMVCCModel(_VERSION_0);
+
+		mvccPortalCache.put(key, mockMVCCModel2);
+
+		Assert.assertSame(mockMVCCModel2, mvccPortalCache.get(key));
 	}
 
 	@Aspect

@@ -9,16 +9,20 @@
 				<li class="list-group-item list-group-item-flex">
 					<#if !entry.isTemporarilyUnavailable()>
 						<div class="autofit-col">
-							<#if entry.isUserPortraitVisible()>
-								<@liferay_ui["user-portrait"] userId=entry.getAssetEntryUserId() />
-							</#if>
-
 							<#if entry.isThumbnailVisible()>
-								<img alt="${languageUtil.get(locale, "thumbnail")}" class="img-rounded search-result-thumbnail-img" src="${entry.getThumbnailURLString()}" />
-							</#if>
-
-							<#if entry.isIconVisible()>
-								<span class="search-asset-type-sticker sticker sticker-rounded sticker-secondary sticker-static">
+								<span class="sticker">
+									<span class="sticker-overlay">
+										<img
+											alt="${languageUtil.get(locale, "thumbnail")}"
+											class="sticker-img"
+											src="${entry.getThumbnailURLString()}"
+										/>
+									</span>
+								</span>
+							<#elseif entry.isUserPortraitVisible() && stringUtil.equals(entry.getClassName(), userClassName)>
+								<@liferay_ui["user-portrait"] userId=entry.getAssetEntryUserId() />
+							<#elseif entry.isIconVisible()>
+								<span class="sticker sticker-rounded sticker-secondary sticker-static">
 									<@clay.icon symbol="${entry.getIconId()}" />
 								</span>
 							</#if>
@@ -93,7 +97,7 @@
 									</#if>
 
 									<#if entry.isAssetCategoriesOrTagsVisible()>
-										<h6 class="search-document-tags text-default">
+										<div class="h6 search-document-tags text-default">
 											<@liferay_asset["asset-tags-summary"]
 												className=entry.getClassName()
 												classPK=entry.getClassPK()
@@ -107,17 +111,17 @@
 												paramName=entry.getFieldAssetCategoryIds()
 												portletURL=entry.getPortletURL()
 											/>
-										</h6>
+										</div>
 									</#if>
 
 									<#if entry.isDocumentFormVisible()>
-										<h6 class="expand-details text-default">
+										<div class="expand-details h6 text-default">
 											<span class="list-group-text" style="">
 												<a href="javascript:;">
 													<@liferay.language key="details" />...
 												</a>
 											</span>
-										</h6>
+										</div>
 
 										<div class="hide search-results-list table-details table-responsive">
 											<table class="table">
