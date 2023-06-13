@@ -4,14 +4,12 @@
 	</command>
 
 	<command name="_addItemPage">
-		<execute function="AssertClick" locator1="Button#ADD" value1="Add" />
-
 		<execute macro="IFrame#selectConfigurationFrame" />
 
 		<if>
 			<contains string="${privacy}" substring="{privacy}" />
 			<then>
-				<var name="privacy" value="Public" />
+				<var name="privacy" value="Public Pages" />
 			</then>
 		</if>
 

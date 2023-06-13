@@ -28,9 +28,11 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.staging.StagingConstants;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepositoryRegistryUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -38,7 +40,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.StagedModel;
+import com.liferay.portal.kernel.model.TypedModel;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
@@ -67,6 +71,36 @@ import org.osgi.service.component.annotations.Reference;
 public class ChangesetPortletDataHandler extends BasePortletDataHandler {
 
 	public static final String SCHEMA_VERSION = "1.0.0";
+
+	@Override
+	public String exportData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		Map<String, String[]> parameterMap =
+			portletDataContext.getParameterMap();
+
+		String[] stagedModelTypesStrings = parameterMap.get("stagedModelTypes");
+
+		if (ArrayUtil.isEmpty(stagedModelTypesStrings)) {
+			return super.exportData(
+				portletDataContext, portletId, portletPreferences);
+		}
+
+		StagedModelType[] stagedModelTypes =
+			new StagedModelType[stagedModelTypesStrings.length];
+
+		for (int i = 0; i < stagedModelTypesStrings.length; i++) {
+			stagedModelTypes[i] = StagedModelType.parse(
+				stagedModelTypesStrings[i]);
+		}
+
+		setDeletionSystemEventStagedModelTypes(stagedModelTypes);
+
+		return super.exportData(
+			portletDataContext, portletId, portletPreferences);
+	}
 
 	@Override
 	public String getSchemaVersion() {
@@ -222,23 +256,55 @@ public class ChangesetPortletDataHandler extends BasePortletDataHandler {
 			return false;
 		}
 
+		StagedModel stagedModel = stagedModelRepository.getStagedModel(
+			changesetEntry.getClassPK());
+
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();
 
-		boolean exportModel = MapUtil.getBoolean(
-			parameterMap, className.getValue());
+		boolean exportModel = _isExportModel(
+			portletDataContext, className.getValue());
 
 		if (!exportModel) {
-			return false;
-		}
+			if (!(stagedModel instanceof TypedModel)) {
+				return false;
+			}
 
-		StagedModel stagedModel = stagedModelRepository.getStagedModel(
-			changesetEntry.getClassPK());
+			TypedModel typedModel = (TypedModel)stagedModel;
+
+			String referrerClassName = typedModel.getClassName();
+
+			boolean exportTypedModel = MapUtil.getBoolean(
+				parameterMap,
+				className.getValue() + StringPool.POUND + referrerClassName);
+
+			if (!exportTypedModel) {
+				return false;
+			}
+		}
 
 		StagedModelDataHandlerUtil.exportStagedModel(
 			portletDataContext, stagedModel);
 
 		return true;
+	}
+
+	private boolean _isExportModel(
+		PortletDataContext portletDataContext, String className) {
+
+		Map<String, String[]> parameterMap =
+			portletDataContext.getParameterMap();
+
+		boolean exportModel = MapUtil.getBoolean(parameterMap, className);
+
+		if (exportModel) {
+			return true;
+		}
+
+		return MapUtil.getBoolean(
+			parameterMap,
+			className + StringPool.POUND +
+				StagedModelType.REFERRER_CLASS_NAME_ALL);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

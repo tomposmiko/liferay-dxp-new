@@ -116,6 +116,17 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Adds a portlet CSS/JavaScript resource dependency.
+	*
+	* @param portletDependency the portlet CSS/JavaScript resource dependency
+	*/
+	@Override
+	public void addPortletDependency(
+		com.liferay.portal.kernel.model.portlet.PortletDependency portletDependency) {
+		_portlet.addPortletDependency(portletDependency);
+	}
+
+	/**
 	* Adds a processing event.
 	*/
 	@Override
@@ -495,7 +506,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* Returns the Facebook integration method of the portlet.
 	*
 	* @return the Facebook integration method of the portlet
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson, with no direct replacement
 	*/
 	@Deprecated
 	@Override
@@ -1009,6 +1020,16 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public com.liferay.exportimport.kernel.lar.PortletDataHandler getPortletDataHandlerInstance() {
 		return _portlet.getPortletDataHandlerInstance();
+	}
+
+	/**
+	* Returns the portlet's CSS/JavaScript resource dependencies.
+	*
+	* @return the portlet's CSS/JavaScript resource dependencies
+	*/
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.portlet.PortletDependency> getPortletDependencies() {
+		return _portlet.getPortletDependencies();
 	}
 
 	/**
@@ -2042,6 +2063,22 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Returns <code>true</code> if the portlet's
+	* <code>serveResource(ResourceRequest,ResourceResponse)</code> method
+	* should be invoked during a partial action triggered by a different
+	* portlet on the same portal page.
+	*
+	* @return <code>true</code> if the portlet's
+	<code>serveResource(ResourceRequest,ResourceResponse)</code>
+	method should be invoked during a partial action triggered by a
+	different portlet on the same portal page
+	*/
+	@Override
+	public boolean isPartialActionServeResource() {
+		return _portlet.isPartialActionServeResource();
+	}
+
+	/**
 	* Returns <code>true</code> if the portlet goes into the pop up state when
 	* the user goes into the print mode.
 	*
@@ -2051,6 +2088,37 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean isPopUpPrint() {
 		return _portlet.isPopUpPrint();
+	}
+
+	/**
+	* Returns <code>true</code> if the CSS resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @return <code>true</code> if the specified CSS resource dependencies are
+	to be referenced in the page's header
+	*/
+	@Override
+	public boolean isPortletDependencyCssEnabled() {
+		return _portlet.isPortletDependencyCssEnabled();
+	}
+
+	/**
+	* Returns <code>true</code> if the JavaScript resource dependencies
+	* specified in <code>portlet.xml</code>, @{@link
+	* javax.portlet.annotations.Dependency}, {@link
+	* javax.portlet.HeaderResponse#addDependency(String, String, String)}, or
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String, String,
+	* String)} are to be referenced in the page's header.
+	*
+	* @return <code>true</code> if the specified JavaScript resource
+	dependencies are to be referenced in the page's header
+	*/
+	@Override
+	public boolean isPortletDependencyJavaScriptEnabled() {
+		return _portlet.isPortletDependencyJavaScriptEnabled();
 	}
 
 	/**
@@ -2538,7 +2606,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	*
 	* @param facebookIntegration the Facebook integration method of the
 	portlet
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson, with no direct replacement
 	*/
 	@Deprecated
 	@Override
@@ -2893,6 +2961,21 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Sets whether the portlet's serve resource should be invoked during a
+	* partial action triggered by a different portlet on the same portal page.
+	*
+	* @param partialActionServeResource whether the portlet's
+	<code>serveResource(ResourceRequest,ResourceResponse)</code>
+	method should be invoked during a partial action triggered by a
+	different portlet on the same portal page
+	*/
+	@Override
+	public void setPartialActionServeResource(
+		boolean partialActionServeResource) {
+		_portlet.setPartialActionServeResource(partialActionServeResource);
+	}
+
+	/**
 	* Sets the name of the permission propagator class of the portlet.
 	*/
 	@Override
@@ -2934,11 +3017,11 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
-	* Set to <code>true</code> if the portlet goes into the pop up state when
-	* the user goes into the print mode.
+	* Sets whether the portlet goes into the pop up state when the user goes
+	* into the print mode.
 	*
-	* @param popUpPrint boolean value for whether the portlet goes into the pop
-	up state when the user goes into the print mode
+	* @param popUpPrint whether the portlet goes into the pop up state when the
+	user goes into the print mode
 	*/
 	@Override
 	public void setPopUpPrint(boolean popUpPrint) {
@@ -2974,6 +3057,43 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public void setPortletDataHandlerClass(String portletDataHandlerClass) {
 		_portlet.setPortletDataHandlerClass(portletDataHandlerClass);
+	}
+
+	/**
+	* Sets whether the CSS resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @param portletDependencyCssEnabled whether the CSS resource dependencies
+	that are specified in <code>portlet.xml</code>,
+	*/
+	@Override
+	public void setPortletDependencyCssEnabled(
+		boolean portletDependencyCssEnabled) {
+		_portlet.setPortletDependencyCssEnabled(portletDependencyCssEnabled);
+	}
+
+	/**
+	* Sets whether the JavaScript resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @param portletDependencyJavaScriptEnabled whether the JavaScript resource
+	dependencies specified in <code>portlet.xml</code>, @{@link
+	javax.portlet.annotations.Dependency}, {@link
+	javax.portlet.HeaderResponse#addDependency(String, String,
+	String)}, or {@link
+	javax.portlet.HeaderResponse#addDependency(String, String, String,
+	String)} are to be referenced in the page's header
+	*/
+	@Override
+	public void setPortletDependencyJavaScriptEnabled(
+		boolean portletDependencyJavaScriptEnabled) {
+		_portlet.setPortletDependencyJavaScriptEnabled(portletDependencyJavaScriptEnabled);
 	}
 
 	/**

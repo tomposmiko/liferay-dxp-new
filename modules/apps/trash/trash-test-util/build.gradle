@@ -1,9 +1,9 @@
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.0"
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.test", version: "default"
-	compileOnly project(":apps:trash:trash-api")
-	compileOnly project(":core:petra:petra-string")
+	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.trash.api", version: "1.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.test", version: "5.0.0"
 }
 
 liferay {

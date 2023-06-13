@@ -38,8 +38,8 @@ import java.util.List;
 public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #addTeam(long, long, String,
-	 *             String, ServiceContext)}
+	 * @deprecated As of Wilberforce, replaced by {@link #addTeam(long, long,
+	 *             String, String, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -138,6 +138,11 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 	@Override
 	public List<Team> getGroupTeams(long groupId) {
 		return teamPersistence.findByGroupId(groupId);
+	}
+
+	@Override
+	public int getGroupTeamsCount(long groupId) {
+		return teamPersistence.countByGroupId(groupId);
 	}
 
 	@Override

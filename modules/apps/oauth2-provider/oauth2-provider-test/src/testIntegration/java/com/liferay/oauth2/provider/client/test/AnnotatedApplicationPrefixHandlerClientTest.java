@@ -33,14 +33,12 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@Ignore
 @RunAsClient
 @RunWith(Arquillian.class)
 public class AnnotatedApplicationPrefixHandlerClientTest
@@ -60,7 +58,7 @@ public class AnnotatedApplicationPrefixHandlerClientTest
 		Invocation.Builder builder = authorize(
 			webTarget.request(), getToken("oauthTestApplication"));
 
-		Assert.assertEquals("everything.readonly", builder.get(String.class));
+		Assert.assertEquals("everything.read", builder.get(String.class));
 	}
 
 	public static class

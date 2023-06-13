@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-
-<suppressions>
-	<source-check>
-		<suppress checks="JavaDiamondOperatorCheck" files="modules/third-party/org-gradle/.*" />
-	</source-check>
-</suppressions>

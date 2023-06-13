@@ -79,6 +79,14 @@ public interface Portlet extends PortletModel, PersistedModel {
 		com.liferay.portal.kernel.application.type.ApplicationType applicationType);
 
 	/**
+	* Adds a portlet CSS/JavaScript resource dependency.
+	*
+	* @param portletDependency the portlet CSS/JavaScript resource dependency
+	*/
+	public void addPortletDependency(
+		com.liferay.portal.kernel.model.portlet.PortletDependency portletDependency);
+
+	/**
 	* Adds a processing event.
 	*/
 	public void addProcessingEvent(
@@ -336,7 +344,7 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* Returns the Facebook integration method of the portlet.
 	*
 	* @return the Facebook integration method of the portlet
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson, with no direct replacement
 	*/
 	@Deprecated()
 	public String getFacebookIntegration();
@@ -693,6 +701,13 @@ public interface Portlet extends PortletModel, PersistedModel {
 	* @return the portlet data handler instance of the portlet
 	*/
 	public com.liferay.exportimport.kernel.lar.PortletDataHandler getPortletDataHandlerInstance();
+
+	/**
+	* Returns the portlet's CSS/JavaScript resource dependencies.
+	*
+	* @return the portlet's CSS/JavaScript resource dependencies
+	*/
+	public java.util.List<com.liferay.portal.kernel.model.portlet.PortletDependency> getPortletDependencies();
 
 	/**
 	* Returns the filters of the portlet.
@@ -1381,6 +1396,19 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public boolean isMaximizeHelp();
 
 	/**
+	* Returns <code>true</code> if the portlet's
+	* <code>serveResource(ResourceRequest,ResourceResponse)</code> method
+	* should be invoked during a partial action triggered by a different
+	* portlet on the same portal page.
+	*
+	* @return <code>true</code> if the portlet's
+	<code>serveResource(ResourceRequest,ResourceResponse)</code>
+	method should be invoked during a partial action triggered by a
+	different portlet on the same portal page
+	*/
+	public boolean isPartialActionServeResource();
+
+	/**
 	* Returns <code>true</code> if the portlet goes into the pop up state when
 	* the user goes into the print mode.
 	*
@@ -1388,6 +1416,31 @@ public interface Portlet extends PortletModel, PersistedModel {
 	the user goes into the print mode
 	*/
 	public boolean isPopUpPrint();
+
+	/**
+	* Returns <code>true</code> if the CSS resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @return <code>true</code> if the specified CSS resource dependencies are
+	to be referenced in the page's header
+	*/
+	public boolean isPortletDependencyCssEnabled();
+
+	/**
+	* Returns <code>true</code> if the JavaScript resource dependencies
+	* specified in <code>portlet.xml</code>, @{@link
+	* javax.portlet.annotations.Dependency}, {@link
+	* javax.portlet.HeaderResponse#addDependency(String, String, String)}, or
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String, String,
+	* String)} are to be referenced in the page's header.
+	*
+	* @return <code>true</code> if the specified JavaScript resource
+	dependencies are to be referenced in the page's header
+	*/
+	public boolean isPortletDependencyJavaScriptEnabled();
 
 	/**
 	* Returns <code>true</code> if preferences are shared across the entire
@@ -1715,7 +1768,7 @@ public interface Portlet extends PortletModel, PersistedModel {
 	*
 	* @param facebookIntegration the Facebook integration method of the
 	portlet
-	* @deprecated As of 7.0.0, with no direct replacement
+	* @deprecated As of Judson, with no direct replacement
 	*/
 	@Deprecated()
 	public void setFacebookIntegration(String facebookIntegration);
@@ -1961,6 +2014,18 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public void setParentStrutsPath(String parentStrutsPath);
 
 	/**
+	* Sets whether the portlet's serve resource should be invoked during a
+	* partial action triggered by a different portlet on the same portal page.
+	*
+	* @param partialActionServeResource whether the portlet's
+	<code>serveResource(ResourceRequest,ResourceResponse)</code>
+	method should be invoked during a partial action triggered by a
+	different portlet on the same portal page
+	*/
+	public void setPartialActionServeResource(
+		boolean partialActionServeResource);
+
+	/**
 	* Sets the name of the permission propagator class of the portlet.
 	*/
 	public void setPermissionPropagatorClass(String permissionPropagatorClass);
@@ -1990,11 +2055,11 @@ public interface Portlet extends PortletModel, PersistedModel {
 	public void setPopMessageListenerClass(String popMessageListenerClass);
 
 	/**
-	* Set to <code>true</code> if the portlet goes into the pop up state when
-	* the user goes into the print mode.
+	* Sets whether the portlet goes into the pop up state when the user goes
+	* into the print mode.
 	*
-	* @param popUpPrint boolean value for whether the portlet goes into the pop
-	up state when the user goes into the print mode
+	* @param popUpPrint whether the portlet goes into the pop up state when the
+	user goes into the print mode
 	*/
 	public void setPopUpPrint(boolean popUpPrint);
 
@@ -2019,6 +2084,37 @@ public interface Portlet extends PortletModel, PersistedModel {
 	the portlet
 	*/
 	public void setPortletDataHandlerClass(String portletDataHandlerClass);
+
+	/**
+	* Sets whether the CSS resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @param portletDependencyCssEnabled whether the CSS resource dependencies
+	that are specified in <code>portlet.xml</code>,
+	*/
+	public void setPortletDependencyCssEnabled(
+		boolean portletDependencyCssEnabled);
+
+	/**
+	* Sets whether the JavaScript resource dependencies specified in
+	* <code>portlet.xml</code>, @{@link javax.portlet.annotations.Dependency},
+	* {@link javax.portlet.HeaderResponse#addDependency(String, String,
+	* String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
+	* String, String, String)} are to be referenced in the page's header.
+	*
+	* @param portletDependencyJavaScriptEnabled whether the JavaScript resource
+	dependencies specified in <code>portlet.xml</code>, @{@link
+	javax.portlet.annotations.Dependency}, {@link
+	javax.portlet.HeaderResponse#addDependency(String, String,
+	String)}, or {@link
+	javax.portlet.HeaderResponse#addDependency(String, String, String,
+	String)} are to be referenced in the page's header
+	*/
+	public void setPortletDependencyJavaScriptEnabled(
+		boolean portletDependencyJavaScriptEnabled);
 
 	/**
 	* Sets the filters of the portlet.

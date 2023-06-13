@@ -44,7 +44,6 @@ import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactory
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -57,12 +56,12 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.template.soy.utils.SoyContext;
-import com.liferay.staging.StagingGroupHelper;
-import com.liferay.staging.StagingGroupHelperUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
@@ -95,8 +94,6 @@ public class FragmentsEditorDisplayContext {
 	}
 
 	public SoyContext getEditorContext() throws PortalException {
-		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
-
 		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
 
 		soyContext.put(
@@ -130,17 +127,8 @@ public class FragmentsEditorDisplayContext {
 
 		soyContext.put("classNameId", _classNameId);
 		soyContext.put("classPK", _classPK);
-
-		EditorConfiguration editorConfiguration =
-			EditorConfigurationFactoryUtil.getEditorConfiguration(
-				PortletIdCodec.decodePortletName(portletDisplay.getId()),
-				"fragmenEntryLinkEditor", StringPool.BLANK,
-				Collections.emptyMap(), _themeDisplay,
-				RequestBackedPortletURLFactoryUtil.create(_request));
-
 		soyContext.put(
-			"defaultEditorConfiguration", editorConfiguration.getData());
-
+			"defaultEditorConfigurations", _getDefaultConfigurations());
 		soyContext.put("defaultLanguageId", _themeDisplay.getLanguageId());
 		soyContext.put(
 			"deleteFragmentEntryLinkURL",
@@ -226,6 +214,32 @@ public class FragmentsEditorDisplayContext {
 				"/layout/update_layout_page_template_entry_asset_type"));
 
 		return soyContext;
+	}
+
+	private Map<String, Object> _getDefaultConfigurations() {
+		Map<String, Object> configurations = new HashMap<>();
+
+		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+
+		EditorConfiguration richTextEditorConfiguration =
+			EditorConfigurationFactoryUtil.getEditorConfiguration(
+				PortletIdCodec.decodePortletName(portletDisplay.getId()),
+				"fragmenEntryLinkRichTextEditor", StringPool.BLANK,
+				Collections.emptyMap(), _themeDisplay,
+				RequestBackedPortletURLFactoryUtil.create(_request));
+
+		configurations.put("rich-text", richTextEditorConfiguration.getData());
+
+		EditorConfiguration editorConfiguration =
+			EditorConfigurationFactoryUtil.getEditorConfiguration(
+				PortletIdCodec.decodePortletName(portletDisplay.getId()),
+				"fragmenEntryLinkEditor", StringPool.BLANK,
+				Collections.emptyMap(), _themeDisplay,
+				RequestBackedPortletURLFactoryUtil.create(_request));
+
+		configurations.put("text", editorConfiguration.getData());
+
+		return configurations;
 	}
 
 	private List<SoyContext> _getFragmentEntriesSoyContext(
@@ -414,24 +428,15 @@ public class FragmentsEditorDisplayContext {
 	private List<SoyContext> _getSoyContextFragmentCollections() {
 		List<SoyContext> soyContexts = new ArrayList<>();
 
-		long scopeGroupId = _themeDisplay.getScopeGroupId();
-
-		Group group = _themeDisplay.getScopeGroup();
-
-		StagingGroupHelper stagingGroupHelper =
-			StagingGroupHelperUtil.getStagingGroupHelper();
-
-		if (stagingGroupHelper.isLocalStagingGroup(group)) {
-			scopeGroupId = group.getLiveGroupId();
-		}
+		long groupId = _getGroupId();
 
 		List<FragmentCollection> fragmentCollections =
-			FragmentCollectionServiceUtil.getFragmentCollections(scopeGroupId);
+			FragmentCollectionServiceUtil.getFragmentCollections(groupId);
 
 		for (FragmentCollection fragmentCollection : fragmentCollections) {
 			List<FragmentEntry> fragmentEntries =
 				FragmentEntryServiceUtil.getFragmentEntries(
-					scopeGroupId, fragmentCollection.getFragmentCollectionId(),
+					groupId, fragmentCollection.getFragmentCollectionId(),
 					WorkflowConstants.STATUS_APPROVED);
 
 			if (ListUtil.isEmpty(fragmentEntries)) {

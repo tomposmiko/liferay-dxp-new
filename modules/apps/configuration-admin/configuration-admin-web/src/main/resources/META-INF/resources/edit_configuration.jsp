@@ -47,12 +47,9 @@ ConfigurationCategoryDisplay configurationCategoryDisplay = configurationCategor
 
 String categoryDisplayName = HtmlUtil.escape(configurationCategoryDisplay.getCategoryLabel(locale));
 
-PortletURL viewCategoryURL = renderResponse.createRenderURL();
+String viewCategoryHREF = ConfigurationCategoryUtil.getHREF(configurationCategoryMenuDisplay, liferayPortletResponse, renderRequest, renderResponse);
 
-viewCategoryURL.setParameter("mvcRenderCommandName", "/view_category");
-viewCategoryURL.setParameter("configurationCategory", configurationModel.getCategory());
-
-PortalUtil.addPortletBreadcrumbEntry(request, categoryDisplayName, viewCategoryURL.toString());
+PortalUtil.addPortletBreadcrumbEntry(request, categoryDisplayName, viewCategoryHREF);
 
 ResourceBundleLoaderProvider resourceBundleLoaderProvider = (ResourceBundleLoaderProvider)request.getAttribute(ConfigurationAdminWebKeys.RESOURCE_BUNDLE_LOADER_PROVIDER);
 
@@ -125,7 +122,7 @@ renderResponse.setTitle(categoryDisplayName);
 					%>
 
 					<h2>
-						<%= configurationTitle %>
+						<%= HtmlUtil.escape(configurationTitle) %>
 
 						<c:if test="<%= configurationModel.hasConfiguration() %>">
 							<liferay-ui:icon-menu
@@ -196,7 +193,7 @@ renderResponse.setTitle(categoryDisplayName);
 					<%
 					ConfigurationFormRenderer configurationFormRenderer = (ConfigurationFormRenderer)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_FORM_RENDERER);
 
-					configurationFormRenderer.render(request, response);
+					configurationFormRenderer.render(request, PipingServletResponse.createPipingServletResponse(pageContext));
 					%>
 
 					<aui:button-row>

@@ -34,14 +34,12 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@Ignore
 @RunAsClient
 @RunWith(Arquillian.class)
 public class AnnotationsAndHttpApplicationClientTest
@@ -68,7 +66,7 @@ public class AnnotationsAndHttpApplicationClientTest
 
 		builder = authorize(webTarget.request(), tokenString);
 
-		Assert.assertEquals("everything.readonly", builder.get(String.class));
+		Assert.assertEquals("everything.read", builder.get(String.class));
 	}
 
 	public static class AnnotationsAndHttpTestPreparatorBundleActivator
@@ -100,10 +98,10 @@ public class AnnotationsAndHttpApplicationClientTest
 			registerScopeMapper(
 				input -> {
 					if (input.equals("GET")) {
-						return Collections.singleton("everything.readonly");
+						return Collections.singleton("everything.read");
 					}
 					else if (input.equals("POST")) {
-						return Collections.singleton("everything.writeonly");
+						return Collections.singleton("everything.write");
 					}
 
 					return Collections.singleton(input);

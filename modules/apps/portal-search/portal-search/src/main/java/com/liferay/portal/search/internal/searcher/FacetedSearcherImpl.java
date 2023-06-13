@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.HitsImpl;
 import com.liferay.portal.kernel.search.IndexSearcherHelper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
@@ -29,15 +30,14 @@ import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.MatchAllQuery;
 import com.liferay.portal.kernel.search.generic.StringQuery;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.internal.expando.ExpandoQueryContributorHelper;
@@ -85,16 +85,14 @@ public class FacetedSearcherImpl
 	}
 
 	protected void addSearchKeywords(
-			BooleanQuery searchQuery, String keywords, boolean luceneSyntax,
+			BooleanQuery searchQuery, boolean luceneSyntax,
 			Map<String, Indexer<?>> entryClassNameIndexerMap,
 			SearchContext searchContext)
 		throws Exception {
 
-		if (Validator.isBlank(keywords) &&
-			!GetterUtil.getBoolean(
-				searchContext.getAttribute(
-					SearchContextAttributes.ATTRIBUTE_KEY_EMPTY_SEARCH))) {
+		String keywords = searchContext.getKeywords();
 
+		if (Validator.isBlank(keywords)) {
 			return;
 		}
 
@@ -124,8 +122,6 @@ public class FacetedSearcherImpl
 
 		BooleanQuery searchQuery = new BooleanQueryImpl();
 
-		String keywords = searchContext.getKeywords();
-
 		boolean luceneSyntax = GetterUtil.getBoolean(
 			searchContext.getAttribute(
 				SearchContextAttributes.ATTRIBUTE_KEY_LUCENE_SYNTAX));
@@ -136,8 +132,7 @@ public class FacetedSearcherImpl
 				searchContext.getSearchEngineId());
 
 		addSearchKeywords(
-			searchQuery, keywords, luceneSyntax, entryClassNameIndexerMap,
-			searchContext);
+			searchQuery, luceneSyntax, entryClassNameIndexerMap, searchContext);
 
 		_addSearchTerms(
 			searchQuery, fullQueryBooleanFilter, luceneSyntax,
@@ -146,26 +141,7 @@ public class FacetedSearcherImpl
 		_addPreFilters(
 			fullQueryBooleanFilter, entryClassNameIndexerMap, searchContext);
 
-		Map<String, Facet> facets = searchContext.getFacets();
-
-		BooleanFilter facetBooleanFilter = new BooleanFilter();
-
-		for (Facet facet : facets.values()) {
-			BooleanClause<Filter> facetClause =
-				facet.getFacetFilterBooleanClause();
-
-			if (facetClause != null) {
-				facetBooleanFilter.add(
-					facetClause.getClause(),
-					facetClause.getBooleanClauseOccur());
-			}
-		}
-
 		BooleanQuery fullQuery = new BooleanQueryImpl();
-
-		if (facetBooleanFilter.hasClauses()) {
-			fullQuery.setPostFilter(facetBooleanFilter);
-		}
 
 		if (fullQueryBooleanFilter.hasClauses()) {
 			fullQuery.setPreBooleanFilter(fullQueryBooleanFilter);
@@ -195,6 +171,16 @@ public class FacetedSearcherImpl
 	@Override
 	protected Hits doSearch(SearchContext searchContext)
 		throws SearchException {
+
+		String keywords = StringUtil.trim(searchContext.getKeywords());
+
+		if (Validator.isBlank(keywords) &&
+			!GetterUtil.getBoolean(
+				searchContext.getAttribute(
+					SearchContextAttributes.ATTRIBUTE_KEY_EMPTY_SEARCH))) {
+
+			return new HitsImpl();
+		}
 
 		try {
 			searchContext.setSearchEngineId(getSearchEngineId());

@@ -36,14 +36,12 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@Ignore
 @RunAsClient
 @RunWith(Arquillian.class)
 public class TokenExpeditionTest extends BaseClientTestCase {
@@ -125,7 +123,7 @@ public class TokenExpeditionTest extends BaseClientTestCase {
 		invocationBuilder = authorize(webTarget.request(), tokenString);
 
 		Assert.assertEquals(
-			"everything.readonly", invocationBuilder.get(String.class));
+			"everything.read", invocationBuilder.get(String.class));
 
 		invocationBuilder =
 			webTarget.request().header("Authorization", "Bearer ");

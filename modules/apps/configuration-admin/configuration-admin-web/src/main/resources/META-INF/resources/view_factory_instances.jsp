@@ -17,13 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
-PortletURL portletURL = renderResponse.createRenderURL();
-
-if (Validator.isNull(redirect)) {
-	redirect = portletURL.toString();
-}
+String redirect = ParamUtil.getString(request, "redirect", String.valueOf(renderResponse.createRenderURL()));
 
 ConfigurationModel configurationModel = (ConfigurationModel)request.getAttribute(ConfigurationAdminWebKeys.FACTORY_CONFIGURATION_MODEL);
 ConfigurationModelIterator configurationModelIterator = (ConfigurationModelIterator)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MODEL_ITERATOR);
@@ -36,12 +30,9 @@ ConfigurationCategoryDisplay configurationCategoryDisplay = configurationCategor
 
 String categoryDisplayName = HtmlUtil.escape(configurationCategoryDisplay.getCategoryLabel(locale));
 
-PortletURL viewCategoryURL = renderResponse.createRenderURL();
+String viewCategoryHREF = ConfigurationCategoryUtil.getHREF(configurationCategoryMenuDisplay, liferayPortletResponse, renderRequest, renderResponse);
 
-viewCategoryURL.setParameter("mvcRenderCommandName", "/view_category");
-viewCategoryURL.setParameter("configurationCategory", configurationModel.getCategory());
-
-PortalUtil.addPortletBreadcrumbEntry(request, categoryDisplayName, viewCategoryURL.toString());
+PortalUtil.addPortletBreadcrumbEntry(request, categoryDisplayName, viewCategoryHREF);
 
 ResourceBundleLoaderProvider resourceBundleLoaderProvider = (ResourceBundleLoaderProvider)request.getAttribute(ConfigurationAdminWebKeys.RESOURCE_BUNDLE_LOADER_PROVIDER);
 
@@ -54,7 +45,7 @@ String factoryConfigurationModelName = (componentResourceBundle != null) ? Langu
 PortalUtil.addPortletBreadcrumbEntry(request, factoryConfigurationModelName, null);
 
 portletDisplay.setShowBackIcon(true);
-portletDisplay.setURLBack(portletURL.toString());
+portletDisplay.setURLBack(redirect);
 
 renderResponse.setTitle(categoryDisplayName);
 %>
@@ -125,8 +116,16 @@ renderResponse.setTitle(categoryDisplayName);
 					</span>
 				</h3>
 
+				<%
+				PortletURL iteratorURL = renderResponse.createRenderURL();
+
+				iteratorURL.setParameter("mvcRenderCommandName", "/view_factory_instances");
+				iteratorURL.setParameter("factoryPid", configurationModel.getFactoryPid());
+				%>
+
 				<liferay-ui:search-container
 					emptyResultsMessage='<%= LanguageUtil.format(request, "no-entries-for-x-have-been-added-yet", factoryConfigurationModelName) %>'
+					iteratorURL="<%= iteratorURL %>"
 					total="<%= configurationModelIterator.getTotal() %>"
 				>
 					<liferay-ui:search-container-results
@@ -162,7 +161,7 @@ renderResponse.setTitle(categoryDisplayName);
 						<liferay-ui:search-container-column-text
 							name="<%= columnLabel %>"
 						>
-							<aui:a href="<%= editFactoryInstanceURL %>"><strong><%= curConfigurationModel.getLabel() %></strong></aui:a>
+							<aui:a href="<%= editFactoryInstanceURL %>"><strong><%= HtmlUtil.escape(curConfigurationModel.getLabel()) %></strong></aui:a>
 						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-text

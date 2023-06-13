@@ -2,16 +2,17 @@ dependencies {
 	compileInclude group: "org.jgrapht", name: "jgrapht-core", version: "0.9.1"
 
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
+	compileOnly group: "com.liferay", name: "com.liferay.osgi.felix.util", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "3.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.osgi.util", version: "4.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.petra.reflect", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.output.stream.container.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.upgrade.api", version: "2.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
 	compileOnly group: "org.apache.felix", name: "org.apache.felix.gogo.runtime", version: "0.10.0"
 	compileOnly group: "org.osgi", name: "org.osgi.core", version: "5.0.0"
-	compileOnly project(":apps:portal:portal-output-stream-container-api")
-	compileOnly project(":apps:portal:portal-upgrade-api")
-	compileOnly project(":apps:static:osgi:osgi-util")
-	compileOnly project(":apps:static:portal-configuration:portal-configuration-metatype-api")
-	compileOnly project(":core:osgi-felix-util")
-	compileOnly project(":core:osgi-service-tracker-collections")
-	compileOnly project(":core:petra:petra-string")
 
 	testCompile project(":core:petra:petra-lang")
 }

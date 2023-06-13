@@ -59,13 +59,17 @@ public interface BlogsEntry extends BlogsEntryModel, PersistedModel {
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
-	* @deprecated As of 1.1.0, replaced by {@link
+	* @deprecated As of Judson, replaced by {@link
 	#getSmallImageURL(ThemeDisplay)}
 	*/
 	@Deprecated()
 	public String getEntryImageURL(
 		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay);
 
+	/**
+	* @deprecated As of Judson, with no direct replacement
+	*/
+	@Deprecated()
 	public String getSmallImageType()
 		throws com.liferay.portal.kernel.exception.PortalException;
 

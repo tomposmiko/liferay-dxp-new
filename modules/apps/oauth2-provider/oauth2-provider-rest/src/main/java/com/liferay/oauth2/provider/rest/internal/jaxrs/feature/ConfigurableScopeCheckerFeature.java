@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.rest.internal.jaxrs.feature;
 
 import com.liferay.oauth2.provider.rest.internal.jaxrs.feature.configuration.ConfigurableScopeCheckerFeatureConfiguration;
+import com.liferay.oauth2.provider.rest.spi.scope.checker.container.request.filter.BaseScopeCheckerContainerRequestFilter;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.petra.string.StringPool;
@@ -49,7 +50,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
@@ -140,7 +140,8 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 			ContainerRequestFilter.class, Priorities.AUTHORIZATION - 8);
 
 		context.register(
-			new ConfigurableCheckerContainerRequestFilter(), contracts);
+			new ConfigurableContainerScopeCheckerContainerRequestFilter(),
+			contracts);
 
 		Configuration configuration = context.getConfiguration();
 
@@ -224,11 +225,13 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 
 	}
 
-	private class ConfigurableCheckerContainerRequestFilter
-		implements ContainerRequestFilter {
+	private class ConfigurableContainerScopeCheckerContainerRequestFilter
+		extends BaseScopeCheckerContainerRequestFilter {
 
 		@Override
-		public void filter(ContainerRequestContext containerRequestContext) {
+		public boolean isContainerRequestContextAllowed(
+			ContainerRequestContext containerRequestContext) {
+
 			boolean anyMatch = false;
 			String path = StringPool.SLASH + _uriInfo.getPath();
 			Request request = containerRequestContext.getRequest();
@@ -250,7 +253,7 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 								" was approved, does not require a scope");
 					}
 
-					return;
+					return true;
 				}
 
 				if (_scopeChecker.checkAllScopes(scopes)) {
@@ -262,40 +265,41 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 								StringUtil.merge(scopes)));
 					}
 
-					return;
+					return true;
 				}
 			}
 
-			if (!_allowUnmatched && !anyMatch) {
+			if (anyMatch) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						StringBundler.concat(
 							"Path ", path,
-							" was not allowed because it does not match any ",
-							"patterns"));
+							" was not allowed because it does not have ",
+							"required scopes"));
 				}
 
-				abortRequest(containerRequestContext);
+				return false;
 			}
 			else if (_allowUnmatched) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Path " + path +
-							" was approved, does not match any patterns");
+						StringBundler.concat(
+							"Path ", path,
+							" was approved, does not match any patterns"));
 				}
-			}
-			else {
-				abortRequest(containerRequestContext);
-			}
-		}
 
-		protected void abortRequest(
-			ContainerRequestContext containerRequestContext) {
+				return true;
+			}
 
-			containerRequestContext.abortWith(
-				Response.status(
-					403
-				).build());
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Path ", path,
+						" was not allowed because it does not match any ",
+						"patterns"));
+			}
+
+			return false;
 		}
 
 		protected boolean matches(
