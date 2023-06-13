@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -627,10 +628,12 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 
 		// Title
 
-		User user = UserLocalServiceUtil.getUser(calendarBooking.getUserId());
+		User user = UserLocalServiceUtil.fetchUser(calendarBooking.getUserId());
 
-		Summary summary = new Summary(
-			calendarBooking.getTitle(user.getLocale()));
+		Locale locale =
+			(user != null) ? user.getLocale() : LocaleUtil.getSiteDefault();
+
+		Summary summary = new Summary(calendarBooking.getTitle(locale));
 
 		propertyList.add(summary);
 
@@ -640,7 +643,7 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 			calendarBooking.getCompanyId());
 
 		String calendarBookingDescription = StringUtil.replace(
-			calendarBooking.getDescription(user.getLocale()),
+			calendarBooking.getDescription(locale),
 			new String[] {"href=\"/", "src=\"/"},
 			new String[] {
 				"href=\"" + company.getPortalURL(calendarBooking.getGroupId()) +
@@ -701,7 +704,7 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 
 		long firstReminder = calendarBooking.getFirstReminder();
 
-		if (firstReminder > 0) {
+		if ((firstReminder > 0) && (user != null)) {
 			VAlarm vAlarm = toICalAlarm(
 				calendarBooking.getFirstReminderNotificationType(),
 				firstReminder, user.getEmailAddress());
@@ -711,7 +714,7 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 
 		long secondReminder = calendarBooking.getSecondReminder();
 
-		if (secondReminder > 0) {
+		if ((secondReminder > 0) && (user != null)) {
 			VAlarm alarm = toICalAlarm(
 				calendarBooking.getSecondReminderNotificationType(),
 				secondReminder, user.getEmailAddress());

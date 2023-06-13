@@ -108,6 +108,9 @@ public class SearchResultSummaryDisplayBuilder {
 			if (_log.isDebugEnabled()) {
 				_log.debug(exception, exception);
 			}
+			else if (_log.isWarnEnabled()) {
+				_log.warn(exception.toString());
+			}
 
 			return buildTemporarilyUnavailable();
 		}
@@ -598,7 +601,7 @@ public class SearchResultSummaryDisplayBuilder {
 		AssetRendererFactory<?> assetRendererFactory,
 		AssetRenderer<?> assetRenderer) {
 
-		if (!_imageRequested) {
+		if (!_imageRequested || (assetRendererFactory == null)) {
 			return;
 		}
 

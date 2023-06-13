@@ -43,6 +43,8 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolverRegistryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.LayoutFriendlyURLEntryValidator;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
@@ -55,6 +57,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.comparator.LayoutPriorityComparator;
@@ -100,10 +103,24 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 
 		String originalFriendlyURL = friendlyURL;
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(
+			groupId, privateLayout, layoutId);
+
 		for (int i = 1;; i++) {
 			try {
 				validateFriendlyURL(
 					groupId, privateLayout, layoutId, friendlyURL, languageId);
+
+				if (_layoutFriendlyURLEntryValidator != null) {
+					long classPK = 0;
+
+					if (layout != null) {
+						classPK = layout.getPlid();
+					}
+
+					_layoutFriendlyURLEntryValidator.validateFriendlyURLEntry(
+						groupId, privateLayout, classPK, friendlyURL);
+				}
 
 				break;
 			}
@@ -695,6 +712,12 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutLocalServiceHelper.class);
 
+	private static volatile LayoutFriendlyURLEntryValidator
+		_layoutFriendlyURLEntryValidator =
+			ServiceProxyFactory.newServiceTrackedInstance(
+				LayoutFriendlyURLEntryValidator.class,
+				LayoutLocalServiceHelper.class,
+				"_layoutFriendlyURLEntryValidator", false, true);
 	private static final Pattern _urlSeparatorPattern = Pattern.compile(
 		"/[A-Za-z]");
 
