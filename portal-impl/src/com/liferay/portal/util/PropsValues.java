@@ -280,26 +280,6 @@ public class PropsValues {
 	public static final String AUTO_DEPLOY_TOMCAT_CONF_DIR = PropsUtil.get(
 		PropsKeys.AUTO_DEPLOY_TOMCAT_CONF_DIR);
 
-	public static final String
-		AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_INSTALL_OPTIONS =
-			PropsUtil.get(
-				PropsKeys.
-					AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_INSTALL_OPTIONS);
-
-	public static final String
-		AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_LIST_OPTIONS = PropsUtil.get(
-			PropsKeys.AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_LIST_OPTIONS);
-
-	public static final String AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_QUERY =
-		PropsUtil.get(
-			PropsKeys.AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_QUERY);
-
-	public static final String
-		AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_UPDATE_OPTIONS =
-			PropsUtil.get(
-				PropsKeys.
-					AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_UPDATE_OPTIONS);
-
 	public static final boolean AXIS_SERVLET_ENABLED = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.AXIS_SERVLET_ENABLED));
 
@@ -548,10 +528,6 @@ public class PropsValues {
 
 	public static final String CONTROL_PANEL_LAYOUT_REGULAR_THEME_ID =
 		PropsUtil.get(PropsKeys.CONTROL_PANEL_LAYOUT_REGULAR_THEME_ID);
-
-	public static final int CONTROL_PANEL_NAVIGATION_MAX_SITES =
-		GetterUtil.getInteger(
-			PropsUtil.get(PropsKeys.CONTROL_PANEL_NAVIGATION_MAX_SITES));
 
 	public static final boolean CORS_DISABLE_AUTHORIZATION_CONTEXT_CHECK =
 		GetterUtil.getBoolean(
@@ -1153,10 +1129,6 @@ public class PropsValues {
 	public static final String INDEX_DATE_FORMAT_PATTERN = PropsUtil.get(
 		PropsKeys.INDEX_DATE_FORMAT_PATTERN);
 
-	public static final boolean INDEX_DUMP_COMPRESSION_ENABLED =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.INDEX_DUMP_COMPRESSION_ENABLED));
-
 	public static boolean INDEX_ON_STARTUP = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.INDEX_ON_STARTUP));
 
@@ -1207,9 +1179,6 @@ public class PropsValues {
 		GetterUtil.getInteger(
 			PropsUtil.get(
 				PropsKeys.INDEX_SEARCH_QUERY_SUGGESTION_SCORES_THRESHOLD));
-
-	public static final boolean INDEX_WITH_THREAD = GetterUtil.getBoolean(
-		PropsUtil.get(PropsKeys.INDEX_WITH_THREAD));
 
 	public static final boolean JAVASCRIPT_BAREBONE_ENABLED =
 		GetterUtil.getBoolean(
@@ -2118,10 +2087,6 @@ public class PropsValues {
 	public static final boolean POP_SERVER_NOTIFICATIONS_ENABLED =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.POP_SERVER_NOTIFICATIONS_ENABLED));
-
-	public static final int POP_SERVER_NOTIFICATIONS_INTERVAL =
-		GetterUtil.getInteger(
-			PropsUtil.get(PropsKeys.POP_SERVER_NOTIFICATIONS_INTERVAL));
 
 	public static final String POP_SERVER_SUBDOMAIN = PropsUtil.get(
 		PropsKeys.POP_SERVER_SUBDOMAIN);

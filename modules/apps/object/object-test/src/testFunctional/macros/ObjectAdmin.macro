@@ -243,6 +243,8 @@ definition {
 	macro addObjectStringFieldEntryViaUI {
 		LexiconEntry.gotoAdd();
 
+		WaitForSPARefresh();
+
 		Type(
 			locator1 = "ObjectAdmin#ENTRY_STRING_VALUE_FIELD",
 			value1 = "${entryValue}");
@@ -974,6 +976,12 @@ definition {
 		AssertElementPresent(locator1 = "ObjectAdmin#FIELD_SEARCHABLE_LANGUAGE_LABEL");
 
 		AssertElementPresent(locator1 = "ObjectAdmin#FIELD_SEARCHABLE_LANGUAGE_OPTION");
+	}
+
+	macro viewFieldValueDisabled {
+		AssertElementPresent(
+			key_fieldValue = "${fieldValue}",
+			locator1 = "ObjectAdmin#VIEW_FIELD_VALUE_DISABLED");
 	}
 
 	macro viewObjectPresentOnSite {

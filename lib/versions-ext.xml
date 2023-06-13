@@ -1110,21 +1110,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/closure-compiler.jar</file-name>
-				<version>v20131014</version>
-				<project-name>Closure Compiler</project-name>
-				<project-url>https://code.google.com/p/closure-compiler</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-				<comments>
-					Removed META-INF/beans.xml to prevent CDI autowiring.
-				</comments>
-			</library>
-			<library>
 				<file-name>lib/portal/commons-beanutils.jar</file-name>
 				<version>1.9.4</version>
 				<project-name>Commons Beanutils</project-name>
@@ -1217,19 +1202,6 @@
 					<license>
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/commons-discovery.jar</file-name>
-				<version>0.4</version>
-				<project-name>Commons Discovery.jar</project-name>
-				<project-url>http://commons.apache.org/discovery</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2002-2006 The Apache Software Foundation</copyright-notice>
 					</license>
 				</licenses>
 			</library>
@@ -1629,18 +1601,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/jazzy.jar</file-name>
-				<version>0.5.2-rtext-1.4.1-2</version>
-				<project-name>Jazzy</project-name>
-				<project-url>http://jazzy.sourceforge.net</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/jbig2-imageio.jar</file-name>
 				<version>3.0.3</version>
 				<project-name>PDFBox JBIG2 ImageIO Plugin</project-name>
@@ -1827,23 +1787,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/liferay-icu4j.jar</file-name>
-				<version>54.1.1.LIFERAY-PATCHED-2</version>
-				<project-name>ICU4J</project-name>
-				<project-url>http://www.icu-project.org</project-url>
-				<licenses>
-					<license>
-						<license-name>ICU License</license-name>
-						<license-url>http://www.icu-project.org/repos/icu/icu/trunk/license.html</license-url>
-						<copyright-notice>Copyright (c) 1995-2006 International Business Machines Corporation and others</copyright-notice>
-					</license>
-				</licenses>
-				<comments>
-					See LPS-1907, LPS-36663, LPS-54422, and
-					modules/third-party/com-ibm-icu/build.xml.
-				</comments>
-			</library>
-			<library>
 				<file-name>lib/portal/log4j-1.2-api.jar</file-name>
 				<version>2.17.1</version>
 				<project-name>Log4j 1.x Compatibility API</project-name>
@@ -1944,18 +1887,6 @@
 				<version>1.9.41.2.LIFERAY-PATCHED-2</version>
 				<project-name>ISO Parser</project-name>
 				<project-url>https://github.com/tballison/mp4parser</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/nekohtml.jar</file-name>
-				<version>1.9.22</version>
-				<project-name>CyberNeko HTML Parser</project-name>
-				<project-url>http://sourceforge.net/projects/nekohtml</project-url>
 				<licenses>
 					<license>
 						<license-name>Apache License 2.0</license-name>

@@ -37,10 +37,13 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.text.Format;
 
 import java.util.List;
 
@@ -155,8 +158,16 @@ public class ExportCommerceOrderReportMVCResourceCommand
 			"purchaseOrderNumber", commerceOrder.getPurchaseOrderNumber()
 		).put(
 			"requestedDeliveryDate",
-			(commerceOrder.getRequestedDeliveryDate() == null) ? null :
-				commerceOrder.getRequestedDeliveryDate()
+			() -> {
+				if (commerceOrder.getRequestedDeliveryDate() == null) {
+					return null;
+				}
+
+				Format format = FastDateFormatFactoryUtil.getDate(
+					themeDisplay.getLocale(), themeDisplay.getTimeZone());
+
+				return format.format(commerceOrder.getRequestedDeliveryDate());
+			}
 		);
 
 		if (shippingAddress != null) {

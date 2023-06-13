@@ -32,7 +32,7 @@ export type Tasks = {
 
 export type Subtask = {
 	assignee: any;
-	erro: string;
+	error: string;
 	name: string;
 	score: number;
 	status: string;
@@ -66,6 +66,12 @@ const generateItems = <T>(item: T, total = 20): T[] => {
 	return [...new Array(total)].map(() => item);
 };
 
+const getRandom = (max = 50) => Math.ceil(Math.random() * max);
+
+export function getRandomMaximumValue(count: number, max: number) {
+	return [...new Array(count)].map(() => getRandom(max));
+}
+
 const assigned = generateItems<Assigned>(
 	{
 		name: 'John Doe',
@@ -94,7 +100,7 @@ export const tasks = generateItems<Tasks>(
 export const subtask = generateItems<Subtask>(
 	{
 		assignee,
-		erro: "java.lang.Exception: No results for path: $['users'][0]['id']",
+		error: "java.lang.Exception: No results for path: $['users'][0]['id']",
 		name: 'ST-1',
 		score: 10,
 		status: 'in analisys',
@@ -267,4 +273,12 @@ export const runs = [
 		passed: 0,
 		test_fix: 0,
 	},
+];
+
+export const TotalTestCases = [
+	['PASSED', 30529],
+	['FAILED', 5374],
+	['BLOCKED', 0],
+	['TEST FIX', 0],
+	['INCOMPLETE', 21],
 ];

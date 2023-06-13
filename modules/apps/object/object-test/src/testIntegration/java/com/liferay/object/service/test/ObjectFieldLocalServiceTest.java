@@ -17,6 +17,7 @@ package com.liferay.object.service.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.exception.ObjectFieldBusinessTypeException;
 import com.liferay.object.exception.ObjectFieldDBTypeException;
 import com.liferay.object.exception.ObjectFieldLabelException;
 import com.liferay.object.exception.ObjectFieldNameException;
@@ -83,6 +84,36 @@ public class ObjectFieldLocalServiceTest {
 				objectFieldDBTypeException.getMessage());
 		}
 
+		// Business types
+
+		String[] businessTypes = {
+			"Boolean", "Date", "Decimal", "Integer", "LargeFile", "LongInteger",
+			"LongText", "Picklist", "PrecisionDecimal", "Relationship", "Text"
+		};
+
+		for (String businessType : businessTypes) {
+			_testAddSystemObjectField(
+				ObjectFieldUtil.createObjectField(
+					businessType, "", "Able", "able"));
+		}
+
+		String businessType = RandomTestUtil.randomString();
+
+		try {
+			_testAddSystemObjectField(
+				ObjectFieldUtil.createObjectField(
+					businessType, "", "Able", "able"));
+
+			Assert.fail();
+		}
+		catch (ObjectFieldBusinessTypeException
+					objectFieldBusinessTypeException) {
+
+			Assert.assertEquals(
+				"Invalid business type " + businessType,
+				objectFieldBusinessTypeException.getMessage());
+		}
+
 		// DB types
 
 		String[] dbTypes = {
@@ -92,8 +123,7 @@ public class ObjectFieldLocalServiceTest {
 
 		for (String dbType : dbTypes) {
 			_testAddSystemObjectField(
-				ObjectFieldUtil.createObjectField(
-					"Text", dbType, "Able", "able"));
+				ObjectFieldUtil.createObjectField("", dbType, "Able", "able"));
 		}
 
 		try {
@@ -252,9 +282,10 @@ public class ObjectFieldLocalServiceTest {
 		// Reserved name
 
 		String[] reservedNames = {
-			"companyId", "createDate", "groupId", "id", "lastPublishDate",
-			"modifiedDate", "status", "statusByUserId", "statusByUserName",
-			"statusDate", "userId", "userName"
+			"actions", "companyId", "createDate", "creator", "dateCreated",
+			"dateModified", "externalReferenceCode", "groupId", "id",
+			"lastPublishDate", "modifiedDate", "status", "statusByUserId",
+			"statusByUserName", "statusDate", "userId", "userName"
 		};
 
 		for (String reservedName : reservedNames) {

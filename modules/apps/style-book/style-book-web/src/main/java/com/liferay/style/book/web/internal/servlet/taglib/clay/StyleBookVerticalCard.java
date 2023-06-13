@@ -82,7 +82,8 @@ public class StyleBookVerticalCard
 		if (!StyleBookPermission.contains(
 				_themeDisplay.getPermissionChecker(),
 				_themeDisplay.getScopeGroupId(),
-				StyleBookActionKeys.MANAGE_STYLE_BOOK_ENTRIES)) {
+				StyleBookActionKeys.MANAGE_STYLE_BOOK_ENTRIES) ||
+			(_styleBookEntry.getStyleBookEntryId() <= 0)) {
 
 			return null;
 		}
@@ -150,6 +151,15 @@ public class StyleBookVerticalCard
 	@Override
 	public String getTitle() {
 		return _styleBookEntry.getName();
+	}
+
+	@Override
+	public boolean isSelectable() {
+		if (_styleBookEntry.getStyleBookEntryId() > 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private final RenderRequest _renderRequest;

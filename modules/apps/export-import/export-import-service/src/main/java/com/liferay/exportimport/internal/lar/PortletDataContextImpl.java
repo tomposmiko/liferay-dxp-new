@@ -341,7 +341,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 						role.getDescriptiveName());
 				}
 				catch (PortalException portalException) {
-					_log.error(portalException, portalException);
+					_log.error(portalException);
 				}
 			}
 
@@ -1533,7 +1533,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
+				_log.debug(exception);
 			}
 		}
 
@@ -1974,7 +1974,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception, exception);
+					_log.debug(exception);
 				}
 			}
 		}
@@ -2194,7 +2194,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return getUserId(auditedModel.getUserUuid());
 		}
 		catch (SystemException systemException) {
-			_log.error(systemException, systemException);
+			_log.error(systemException);
 		}
 
 		return 0;

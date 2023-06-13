@@ -12,6 +12,7 @@
 
 import {isObject, isObjectEmpty} from '../util/utils';
 import {
+	DEFAULT_LANGUAGE,
 	STR_CDATA_CLOSE,
 	STR_CDATA_OPEN,
 	STR_CHAR_CRLF,
@@ -68,10 +69,7 @@ function appendXMLActions(
 	}
 
 	if (hasAction) {
-		const description = actions.description;
-		const executionType = actions.executionType;
-		const language = actions.scriptLanguage;
-		const script = actions.script;
+		const {description, executionType, priority, script} = actions;
 
 		const xmlAction = XMLUtil.createObj(actionNodeName || 'action');
 
@@ -86,8 +84,10 @@ function appendXMLActions(
 				buffer.push(XMLUtil.create('script', cdata(script[index])));
 			}
 
-			if (isValidValue(language, index)) {
-				buffer.push(XMLUtil.create('scriptLanguage', language[index]));
+			buffer.push(XMLUtil.create('scriptLanguage', DEFAULT_LANGUAGE));
+
+			if (isValidValue(priority, index)) {
+				buffer.push(XMLUtil.create('priority', priority[index]));
 			}
 
 			if (isValidValue(executionType, index)) {
@@ -346,17 +346,17 @@ function appendXMLNotifications(buffer, notifications, nodeName) {
 				recipientsAttrs.receptionType = recipients[index].receptionType;
 			}
 
-			if (
-				isObject(recipients[index]) &&
-				!isObjectEmpty(recipients[index])
-			) {
-				appendXMLAssignments(
-					buffer,
-					recipients[index],
-					'recipients',
-					recipientsAttrs
-				);
-			}
+			// if (
+			// 	isObject(recipients[index]) &&
+			// 	!isObjectEmpty(recipients[index])
+			// ) {
+			// 	appendXMLAssignments(
+			// 		buffer,
+			// 		recipients[index],
+			// 		'recipients',
+			// 		recipientsAttrs
+			// 	);
+			// }
 
 			if (executionType) {
 				buffer.push(
@@ -544,14 +544,20 @@ function serializeDefinition(
 
 		buffer.push(XMLUtil.create('metadata', cdata(jsonStringify(metadata))));
 
-		if (initial) {
-			buffer.push(XMLUtil.create('initial', initial));
+		if (item.data.actions) {
+			appendXMLActions(buffer, item.data.actions);
 		}
-
-		appendXMLActions(buffer, item.data.actions, item.data.notifications);
 
 		if (item.data.assignments) {
 			appendXMLAssignments(buffer, item.data.assignments);
+		}
+
+		if (item.data.notifications) {
+			appendXMLNotifications(buffer, item.data.notifications);
+		}
+
+		if (initial) {
+			buffer.push(XMLUtil.create('initial', initial));
 		}
 
 		const xmlLabels = XMLUtil.createObj('labels');

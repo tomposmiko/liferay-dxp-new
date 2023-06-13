@@ -51,8 +51,6 @@ if (commercePaymentMethodKey != null) {
 }
 
 String commerceShippingOptionName = commerceOrder.getShippingOptionName();
-
-Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = orderSummaryCheckoutStepDisplayContext.getCommerceOrderValidatorResults();
 %>
 
 <div class="commerce-order-summary">
@@ -128,10 +126,14 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 
 								<div class="list-group-subtitle"><%= HtmlUtil.escape(stringJoiner.toString()) %></div>
 
-								<c:if test="<%= !commerceOrderValidatorResultMap.isEmpty() %>">
+								<%
+								Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap = orderSummaryCheckoutStepDisplayContext.getCommerceOrderValidatorResultsMap();
+								%>
+
+								<c:if test="<%= !commerceOrderValidatorResultsMap.isEmpty() %>">
 
 									<%
-									List<CommerceOrderValidatorResult> commerceOrderValidatorResults = commerceOrderValidatorResultMap.get(commerceOrderItem.getCommerceOrderItemId());
+									List<CommerceOrderValidatorResult> commerceOrderValidatorResults = commerceOrderValidatorResultsMap.get(commerceOrderItem.getCommerceOrderItemId());
 
 									for (CommerceOrderValidatorResult commerceOrderValidatorResult : commerceOrderValidatorResults) {
 									%>
@@ -483,6 +485,22 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 
 					<div class="shipping-description">
 						<%= HtmlUtil.escape(commercePaymentMethodName) %>
+					</div>
+				</div>
+			</c:if>
+
+			<%
+			String paymentTermEntryName = orderSummaryCheckoutStepDisplayContext.getPaymentTermEntryName(locale);
+			%>
+
+			<c:if test="<%= Validator.isNotNull(paymentTermEntryName) %>">
+				<div class="panel-body payment-method">
+					<h5>
+						<liferay-ui:message key="payment-terms" />
+					</h5>
+
+					<div class="shipping-description">
+						<%= HtmlUtil.escape(paymentTermEntryName) %>
 					</div>
 				</div>
 			</c:if>

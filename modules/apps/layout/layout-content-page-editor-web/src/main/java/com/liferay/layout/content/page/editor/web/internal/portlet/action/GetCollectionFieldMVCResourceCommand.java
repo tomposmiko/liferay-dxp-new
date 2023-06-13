@@ -75,6 +75,8 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.segments.SegmentsEntryRetriever;
+import com.liferay.segments.context.RequestContextMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -260,6 +262,15 @@ public class GetCollectionFieldMVCResourceCommand
 
 				defaultLayoutListRetrieverContext.setPagination(
 					Pagination.of(end, start));
+
+				long[] segmentsEntryIds =
+					_segmentsEntryRetriever.getSegmentsEntryIds(
+						_portal.getScopeGroupId(httpServletRequest),
+						_portal.getUserId(httpServletRequest),
+						_requestContextMapper.map(httpServletRequest));
+
+				defaultLayoutListRetrieverContext.setSegmentsEntryIds(
+					segmentsEntryIds);
 
 				// LPS-111037
 
@@ -532,7 +543,7 @@ public class GetCollectionFieldMVCResourceCommand
 		}
 		catch (NoSuchInfoItemException noSuchInfoItemException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchInfoItemException, noSuchInfoItemException);
+				_log.debug(noSuchInfoItemException);
 			}
 		}
 
@@ -579,5 +590,11 @@ public class GetCollectionFieldMVCResourceCommand
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private RequestContextMapper _requestContextMapper;
+
+	@Reference
+	private SegmentsEntryRetriever _segmentsEntryRetriever;
 
 }
