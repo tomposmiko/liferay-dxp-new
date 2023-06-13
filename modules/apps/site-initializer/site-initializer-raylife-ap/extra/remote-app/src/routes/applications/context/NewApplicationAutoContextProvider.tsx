@@ -32,12 +32,14 @@ type ContactInfoFormTypes = {
 
 type CoverageFormTypes = {
 	bodilyInjury: string;
-	collision: string;
-	comprehensive: string;
 	medical: string;
 	propertyDamage: string;
 	uninsuredOrUnderinsuredMBI: string;
 	uninsuredOrUnderinsuredMPD: string;
+	vehicles: {
+		collision: string;
+		comprehensive: string;
+	}[];
 };
 
 type AccidentCitationTypes = {
@@ -133,12 +135,16 @@ const initialState: InitialStateTypes = {
 		coverage: {
 			form: {
 				bodilyInjury: '',
-				collision: '',
-				comprehensive: '',
 				medical: '',
 				propertyDamage: '',
 				uninsuredOrUnderinsuredMBI: '',
 				uninsuredOrUnderinsuredMPD: '',
+				vehicles: [
+					{
+						collision: '',
+						comprehensive: '',
+					},
+				],
 			},
 			index: 3,
 			name: 'Coverage',
@@ -503,17 +509,13 @@ const reducer = (state: InitialStateTypes, action: ApplicationActions) => {
 		}
 
 		case ACTIONS.SET_NEW_VEHICLE: {
-			const payload = state.steps.vehicleInfo.form;
-
-			payload.push(action.payload);
-
 			return {
 				...state,
 				steps: {
 					...state.steps,
 					vehicleInfo: {
 						...state.steps.vehicleInfo,
-						form: payload,
+						form: [...state.steps.vehicleInfo.form, action.payload],
 					},
 				},
 			};
@@ -523,12 +525,21 @@ const reducer = (state: InitialStateTypes, action: ApplicationActions) => {
 			const id = action.payload.id;
 			const forms = state.steps.vehicleInfo.form;
 
-			const payload = forms.filter((form) => form.id !== id);
+			const payload = forms.filter((_, index) => id !== index);
 
 			return {
 				...state,
 				steps: {
 					...state.steps,
+					coverage: {
+						...state.steps.coverage,
+						form: {
+							...state.steps.coverage.form,
+							vehicles: state.steps.coverage.form.vehicles.filter(
+								(_, index) => index !== id
+							),
+						},
+					},
 					vehicleInfo: {
 						...state.steps.vehicleInfo,
 						form: payload,

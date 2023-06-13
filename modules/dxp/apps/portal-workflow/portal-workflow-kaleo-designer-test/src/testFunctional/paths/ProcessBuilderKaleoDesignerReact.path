@@ -104,6 +104,16 @@
 	<td>//tr//td[contains(text(),'${key_language}')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>SEARCH_BAR_INPUT</td>
+	<td>//input[contains(@class, 'input-group')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_NAME_RESULT</td>
+	<td>//td[contains(@class,'table-cell-expand') and contains(.,'${key_result}')]</td>
+	<td></td>
+</tr>
 
 <!-- DIAGRAM_VIEW_PATHS -->
 
@@ -233,7 +243,7 @@
 </tr>
 <tr>
 	<td>SIDEBAR_PROPERTY</td>
-	<td>//span[contains(., '${key_propertyName}')]/../..//div[@class='panel-body']/..//span[contains(.,'${key_propertyValue}')]</td>
+	<td>//span[contains(., '${key_propertyName}')]/../..//div[@class='panel-body']/..//span[contains(.,'${key_propertyValue}')] | //span[contains(., '${key_propertyName}')]/../..//div[@class='panel-body']//*[contains(@class,'d-flex') and contains(., '${key_propertyValue}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -357,8 +367,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ROLE_NAME_FIELD</td>
+	<td>//input[contains(@id,'role-name')]/..//input[@type='text' and @value ='${key_roleName}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>NOTIFICATIONS_TYPE_DROPDOWN</td>
 	<td>//label[contains(., 'Notification Types')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REVISION_HISTORY_VERSION</td>
+	<td>//div[contains(@class,'version-row')and contains(.,'Version ${key_number}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CURRENT_VERSION_FIELD</td>
+	<td>//div[@class='info-group']//label[contains(text() ,'Current Version') and contains(.,'${key_number}')]</td>
 	<td></td>
 </tr>
 <tr>
