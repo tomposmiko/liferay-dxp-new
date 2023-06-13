@@ -19,7 +19,6 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItem;
-import com.liferay.content.dashboard.web.internal.item.selector.criteria.content.dashboard.file.extension.criterion.ContentDashboardFileExtensionItemSelectorCriterion;
 import com.liferay.content.dashboard.web.internal.item.selector.criteria.content.dashboard.type.criterion.ContentDashboardItemSubtypeItemSelectorCriterion;
 import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtypeFactoryTracker;
 import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtypeUtil;
@@ -32,7 +31,6 @@ import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
 import com.liferay.item.selector.criteria.group.criterion.GroupItemSelectorCriterion;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
-import com.liferay.petra.portlet.url.builder.ResourceURLBuilder;
 import com.liferay.petra.reflect.GenericUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -44,6 +42,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.portlet.url.builder.ResourceURLBuilder;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -312,39 +311,6 @@ public class ContentDashboardAdminDisplayContext {
 
 		return _contentDashboardDropdownItemsProvider.getDropdownItems(
 			contentDashboardItem);
-	}
-
-	public String getFileExtensionItemSelectorURL() {
-		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
-			RequestBackedPortletURLFactoryUtil.create(_liferayPortletRequest);
-
-		ContentDashboardFileExtensionItemSelectorCriterion
-			contentDashboardFileExtensionItemSelectorCriterion =
-				new ContentDashboardFileExtensionItemSelectorCriterion();
-
-		contentDashboardFileExtensionItemSelectorCriterion.
-			setDesiredItemSelectorReturnTypes(
-				Collections.singletonList(new UUIDItemSelectorReturnType()));
-
-		return PortletURLBuilder.create(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory,
-				_liferayPortletResponse.getNamespace() +
-					"selectedFileExtension",
-				contentDashboardFileExtensionItemSelectorCriterion)
-		).setParameter(
-			"checkedFileExtensions",
-			() -> {
-				List<String> fileExtensions = getFileExtensions();
-
-				return fileExtensions.toArray(new String[0]);
-			}
-		).buildString();
-	}
-
-	public List<String> getFileExtensions() {
-		return Arrays.asList(
-			ParamUtil.getStringValues(_liferayPortletRequest, "fileExtension"));
 	}
 
 	public String getOnClickConfiguration() throws WindowStateException {

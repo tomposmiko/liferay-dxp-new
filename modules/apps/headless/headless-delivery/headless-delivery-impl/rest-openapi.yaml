@@ -2919,6 +2919,13 @@ components:
                         A flag that indicates whether this thread is locked.
                     readOnly: true
                     type: boolean
+                messageBoardRootMessageId:
+                    # @review
+                    description:
+                        The ID of the thread's message.
+                    format: int64
+                    readOnly: true
+                    type: integer
                 messageBoardSectionId:
                     # @review
                     description:
@@ -3099,6 +3106,11 @@ components:
                         type: string
                     readOnly: true
                     type: array
+                contentURL:
+                    # @review
+                    description:
+                        The navigation menu item's content API REST URL.
+                    type: string
                 creator:
                     allOf:
                         - $ref: "#/components/schemas/Creator"

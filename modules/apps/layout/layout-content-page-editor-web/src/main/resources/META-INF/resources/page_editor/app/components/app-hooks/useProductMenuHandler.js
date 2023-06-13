@@ -16,13 +16,15 @@ import {useEffect, useRef} from 'react';
 
 import {switchSidebarPanel} from '../../actions/index';
 import {useDispatch, useSelector} from '../../contexts/StoreContext';
+import selectSidebarIsOpened from '../../selectors/selectSidebarIsOpened';
 import hideProductMenuIfPresent from '../../utils/hideProductMenuIfPresent';
 
 export default function useProductMenuHandler() {
 	const dispatch = useDispatch();
 	const lastSidebarStateRef = useRef(true);
 
-	const sidebarOpen = useSelector((state) => state.sidebar.open);
+	const sidebarOpen = useSelector(selectSidebarIsOpened);
+	const sidebarHidden = useSelector((state) => state.sidebar.hidden);
 
 	useEffect(() => {
 		if (Liferay.FeatureFlags['LPS-153452']) {
@@ -33,7 +35,13 @@ export default function useProductMenuHandler() {
 			});
 		}
 		else {
-			dispatch(switchSidebarPanel({sidebarOpen: true}));
+			const sideNavigation = Liferay.SideNavigation?.instance(
+				document.querySelector('.product-menu-toggle')
+			);
+
+			if (!sideNavigation?.visible()) {
+				dispatch(switchSidebarPanel({sidebarOpen: true}));
+			}
 		}
 	}, [dispatch]);
 
@@ -43,6 +51,10 @@ export default function useProductMenuHandler() {
 		);
 
 		const onProductMenuChange = ({open}) => {
+			if (sidebarHidden) {
+				return;
+			}
+
 			if (open) {
 				lastSidebarStateRef.current = sidebarOpen;
 
@@ -76,5 +88,5 @@ export default function useProductMenuHandler() {
 			closeSideNavigationListener?.removeListener();
 			openSideNavigationListener?.removeListener();
 		};
-	}, [dispatch, sidebarOpen]);
+	}, [dispatch, sidebarOpen, sidebarHidden]);
 }

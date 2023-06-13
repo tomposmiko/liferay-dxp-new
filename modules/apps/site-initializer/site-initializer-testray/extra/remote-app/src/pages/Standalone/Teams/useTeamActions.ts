@@ -27,14 +27,15 @@ const useTeamActions = () => {
 	const formModal = useFormModal();
 	const modal = formModal.modal;
 
-	const actions: Action[] = [
+	const actions: Action<TestrayTeam>[] = [
 		{
-			action: (item: TestrayTeam) => modal.open(item),
+			action: (team) => modal.open(team),
+			icon: 'pencil',
 			name: i18n.translate('edit'),
 			permission: 'UPDATE',
 		},
 		{
-			action: ({id}: TestrayTeam, mutate) => {
+			action: ({id}, mutate) => {
 				getTeamsComponentsQuery(id)
 					.then((response) => {
 						if (response?.items?.length) {
@@ -51,7 +52,7 @@ const useTeamActions = () => {
 					})
 					.catch(modal.onError);
 			},
-
+			icon: 'trash',
 			name: i18n.translate('delete'),
 			permission: 'DELETE',
 		},

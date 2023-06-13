@@ -13,14 +13,7 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import {debounce} from 'frontend-js-web';
-import React, {
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	useState,
-} from 'react';
+import React, {useMemo, useState} from 'react';
 
 import {FRAGMENTS_DISPLAY_STYLES} from '../../../app/config/constants/fragmentsDisplayStyles';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../app/config/constants/layoutDataItemTypes';
@@ -28,7 +21,6 @@ import {config} from '../../../app/config/index';
 import {useSelector} from '../../../app/contexts/StoreContext';
 import {useWidgets} from '../../../app/contexts/WidgetsContext';
 import SearchForm from '../../../common/components/SearchForm';
-import SidebarPanelContent from '../../../common/components/SidebarPanelContent';
 import SidebarPanelHeader from '../../../common/components/SidebarPanelHeader';
 import {useSessionState} from '../../../core/hooks/useSessionState';
 import SearchResultsPanel from './SearchResultsPanel';
@@ -134,7 +126,6 @@ const normalizeFragmentEntry = (fragmentEntry) => ({
 export default function FragmentsSidebar() {
 	const fragments = useSelector((state) => state.fragments);
 	const widgets = useWidgets();
-	const wrapperElementRef = useRef(null);
 
 	const [
 		activeTabId,
@@ -151,18 +142,6 @@ export default function FragmentsSidebar() {
 	);
 
 	const [searchValue, setSearchValue] = useState('');
-
-	const [
-		scrollPosition,
-		setScrollPosition,
-	] = useSessionState(
-		`${config.portletNamespace}_fragments-sidebar_tab_${activeTabId}_scroll-position`,
-		0,
-		{persistEnabled: Liferay.FeatureFlags['LPS-153452']}
-	);
-
-	const scrollPositionRef = useRef(scrollPosition);
-	scrollPositionRef.current = scrollPosition;
 
 	const tabs = useMemo(
 		() => [
@@ -207,49 +186,14 @@ export default function FragmentsSidebar() {
 	const displayStyleButtonDisabled =
 		searchValue || activeTabId === COLLECTION_IDS.widgets;
 
-	useLayoutEffect(() => {
-		const wrapperElement = wrapperElementRef.current;
-		const initialScrollPosition = scrollPositionRef.current;
-
-		if (!wrapperElement || !initialScrollPosition) {
-			return;
-		}
-
-		wrapperElement.scrollBy({
-			behavior: 'auto',
-			left: 0,
-			top: initialScrollPosition,
-		});
-	}, []);
-
-	useEffect(() => {
-		const wrapperElement = wrapperElementRef.current;
-
-		if (!wrapperElement) {
-			return;
-		}
-
-		const handleScroll = debounce(() => {
-			setScrollPosition(wrapperElement.scrollTop);
-		}, 300);
-
-		wrapperElement.addEventListener('scroll', handleScroll, {
-			passive: true,
-		});
-
-		return () => {
-			wrapperElement.removeEventListener('scroll', handleScroll);
-		};
-	}, [setScrollPosition]);
-
 	return (
-		<div className="h-100 overflow-auto" ref={wrapperElementRef}>
+		<>
 			<SidebarPanelHeader>
 				{Liferay.Language.get('fragments-and-widgets')}
 			</SidebarPanelHeader>
 
-			<SidebarPanelContent className="page-editor__sidebar__fragments-widgets-panel">
-				<div className="align-items-center d-flex justify-content-between mb-3">
+			<div className="d-flex flex-column page-editor__sidebar__fragments-widgets-panel">
+				<div className="align-items-center d-flex flex-shrink-0 justify-content-between mb-3 px-3">
 					<SearchForm
 						className="flex-grow-1 mb-0"
 						onChange={setSearchValue}
@@ -294,7 +238,7 @@ export default function FragmentsSidebar() {
 						tabs={tabs}
 					/>
 				)}
-			</SidebarPanelContent>
-		</div>
+			</div>
+		</>
 	);
 }
