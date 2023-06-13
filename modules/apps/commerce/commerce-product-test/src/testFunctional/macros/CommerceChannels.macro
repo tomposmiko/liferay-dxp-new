@@ -64,30 +64,6 @@ definition {
 		Button.clickSave();
 	}
 
-	macro addProductDisplayPage {
-		Button.click(button = "Choose");
-
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
-
-		if ("${pageType}" == "Private") {
-			CommerceEntry.gotoMenuTab(menuTab = "Private Pages");
-		}
-
-		CommerceNavigator.searchEntry(entryName = "${pageName}");
-
-		LexiconCard.clickCard(card = "${pageName}");
-
-		SelectFrame.selectFrameTop();
-
-		Button.clickDone();
-
-		Button.clickSave();
-
-		AssertElementPresent(locator1 = "Message#SUCCESS");
-
-		CommerceEntry.assertDefaultProductDisplayPage(pageName = "${pageName}");
-	}
-
 	macro assertMercanetConfigurationEnvironment {
 		CommerceEntry.clickTableEntryEditButton(
 			entryName = "${paymentMethod}",
@@ -114,6 +90,30 @@ definition {
 			locator1 = "CommerceEntry#SELECT_ASSERT_SELECTED_VALUE");
 
 		Click(locator1 = "Icon#CLOSE");
+	}
+
+	macro chooseDefaultDisplayPage {
+		Button.click(button = "Choose");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+		if ("${pageType}" == "Private") {
+			CommerceEntry.gotoMenuTab(menuTab = "Private Pages");
+		}
+
+		CommerceNavigator.searchEntry(entryName = "${pageName}");
+
+		LexiconCard.clickCard(card = "${pageName}");
+
+		SelectFrame.selectFrameTop();
+
+		if (IsElementPresent(locator1 = "Button#DONE")) {
+			Button.clickDone();
+		}
+
+		Button.clickSave();
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
 	}
 
 	macro configurationPaypal {
@@ -193,11 +193,11 @@ definition {
 
 	macro openChannelsAdmin {
 		Navigator.openWithAppendToBaseURL(
-			baseUrl = "${baseUrl}",
+			baseURL = "${baseURL}",
 			urlAppend = "group/guest/~/control_panel/manage?p_p_id=com_liferay_commerce_channel_web_internal_portlet_CommerceChannelsPortlet");
 	}
 
-	macro removeProductDisplayPage {
+	macro removeDefaultDisplayPage {
 		Click(locator1 = "CommerceEntry#DISPLAY_PAGE_ITEM_REMOVE");
 
 		Button.clickSave();

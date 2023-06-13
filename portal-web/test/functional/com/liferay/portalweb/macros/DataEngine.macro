@@ -764,8 +764,8 @@ definition {
 	}
 
 	macro deleteFieldsetFromSideBar {
-		if (isSet(siteUrlKey)) {
-			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
+		if (isSet(siteURLKey)) {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 		}
 
 		NavItem.gotoStructures();
@@ -1686,9 +1686,14 @@ definition {
 	}
 
 	macro waitForAutoSave {
-		Pause(locator1 = "1000");
+		Pause(locator1 = "3000");
 
-		Button.clickSave();
+		if (IsElementPresent(locator1 = "Button#PUBLISH")) {
+			Button.clickPublish();
+		}
+		else if (IsElementPresent(locator1 = "Button#SAVE")) {
+			Button.clickSave();
+		}
 	}
 
 }
