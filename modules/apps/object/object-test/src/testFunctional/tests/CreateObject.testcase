@@ -3185,8 +3185,6 @@ definition {
 	@description = "LPS-139803 - Verify it is possible to search for the Object Entry Title on the Relationship field"
 	@priority = "4"
 	test CanSearchObjectEntryTitleOnRelationshipField {
-		property portal.upstream = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 79",
 			objectName = "CustomObject79",
@@ -3681,8 +3679,6 @@ definition {
 	@description = "LPS-135635 - Verify it is possible to update the Searchable section before the Object is published"
 	@priority = "4"
 	test CanUpdateFieldSearchableSectionBeforePublished {
-		property portal.upstream = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 91",
 			objectName = "CustomObject91",
@@ -6343,8 +6339,6 @@ definition {
 	@description = "LPS-135549 - Verify that the field with String type has the option Language when the Text option is selected under the Searchable section"
 	@priority = "4"
 	test LanguageDisplayedForTextOption {
-		property portal.upstream = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 138",
 			objectName = "CustomObject138",

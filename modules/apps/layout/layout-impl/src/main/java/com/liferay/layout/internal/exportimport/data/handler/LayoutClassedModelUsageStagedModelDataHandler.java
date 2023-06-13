@@ -49,7 +49,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
-	immediate = true,
 	service = {
 		LayoutClassedModelUsageStagedModelDataHandler.class,
 		StagedModelDataHandler.class
@@ -192,9 +191,6 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 			layoutClassedModelUsage.getPlid());
 
 		importedLayoutClassedModelUsage.setPlid(plid);
-
-		importedLayoutClassedModelUsage.setClassNameId(
-			layoutClassedModelUsage.getClassNameId());
 
 		Map<Long, Long> classPKs =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(

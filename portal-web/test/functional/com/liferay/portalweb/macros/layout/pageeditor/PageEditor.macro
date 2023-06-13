@@ -482,7 +482,7 @@ definition {
 
 			DragAndDrop.javaScriptDragAndDropToObject(
 				key_collectionName = "${collectionName}",
-				key_element = "//div[contains(@class,'page-editor__root page-editor__topper')]",
+				key_element = "//div[contains(@class,'page-editor__root')]",
 				key_fragmentName = "${fragmentName}",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_CARD_ITEM",
 				locator2 = "Fragment#DROPDOWN_FRAGMENT_MENU_CONTENT");
@@ -493,7 +493,7 @@ definition {
 
 			DragAndDrop.javaScriptDragAndDropToObject(
 				key_collectionName = "${collectionName}",
-				key_element = "//div[contains(@class,'page-editor__root page-editor__topper')]",
+				key_element = "//div[contains(@class,'page-editor__root')]",
 				key_fragmentName = "${fragmentName}",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT",
 				locator2 = "Fragment#DROPDOWN_FRAGMENT_MENU_CONTENT");
@@ -505,7 +505,7 @@ definition {
 				value1 = "${portletName}");
 
 			DragAndDrop.javaScriptDragAndDropToObject(
-				key_element = "//div[contains(@class,'page-editor__root page-editor__topper')]",
+				key_element = "//div[contains(@class,'page-editor__root')]",
 				key_indexItem = "${indexItem}",
 				key_portletName = "${portletName}",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_WIDGET",
@@ -1094,9 +1094,7 @@ definition {
 	macro changeExperience {
 		var key_experienceName = "${newExperience}";
 
-		Click(
-			ariaLabel = "Experience",
-			locator1 = "Button#ANY_WITH_ARIA_LABEL");
+		PageEditor.openExperienceMenu();
 
 		Click(locator1 = "PageEditor#EXPERIENCE_SELECT_ITEM");
 
@@ -2364,6 +2362,25 @@ definition {
 					text = "${assetTitle}");
 			}
 
+			if (isSet(knowledgeBase)) {
+				Click(
+					key_kbArticleTitle = "${entryTitle}",
+					locator1 = "KnowledgeBaseSelectParent#SELECTOR_FIELD");
+
+				SelectFrameTop();
+
+				PageEditor.viewItemSelectorText(
+					fieldLabel = "Item",
+					text = "${entryTitle}");
+
+				if (isSet(entryContent)) {
+					ContentPages.viewFragmentText(
+						assetType = "widget-content",
+						fragmentName = "Content Display",
+						text = "${entryContent}");
+				}
+			}
+
 			if (isSet(webcontent)) {
 				NavItem.click(navItem = "Web Content");
 
@@ -2929,9 +2946,9 @@ definition {
 	}
 
 	macro editKBArticleNavigationMaxNestingLevel {
-		var key_fragmentName = "Knowledge Base Article Navigation";
+		var key_fragmentName = "Knowledge Base Navigation";
 
-		PageEditor.clickConfigurableField(fragmentName = "Knowledge Base Article Navigation");
+		PageEditor.clickConfigurableField(fragmentName = "Knowledge Base Navigation");
 
 		AssertVisible(
 			key_sidebarButton = "Browser",
@@ -4811,7 +4828,7 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 	}
 
-	macro viewExperienceActive {
+	macro viewExperienceActiveInEditMode {
 		PageEditor.openExperienceMenu();
 
 		AssertElementPresent(
@@ -4819,12 +4836,46 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 			locator1 = "PageEditor#EXPERIENCE_ACTIVE_LABEL");
 	}
 
-	macro viewExperienceNotActive {
+	macro viewExperienceActiveInViewModeControlMenu {
+		ContentPages.openExperienceMenu();
+
+		AssertElementPresent(
+			key_experienceName = "${experienceName}",
+			locator1 = "PageEditor#EXPERIENCE_ACTIVE_LABEL_VIEW_CONTROL_MENU");
+	}
+
+	macro viewExperienceActiveInViewModeDropdown {
+		ContentPages.openExperienceMenu();
+
+		AssertTextEquals(
+			key_experienceName = "${experienceName}",
+			locator1 = "PageEditor#EXPERIENCE_ACTIVE_LABEL_VIEW_DROPDOWN",
+			value1 = "Active");
+	}
+
+	macro viewExperienceNotActiveInEditMode {
 		PageEditor.openExperienceMenu();
 
-		AssertElementNotPresent(
+		AssertElementPresent(
 			key_experienceName = "${experienceName}",
-			locator1 = "PageEditor#EXPERIENCE_ACTIVE_LABEL");
+			locator1 = "PageEditor#EXPERIENCE_INACTIVE_LABEL");
+	}
+
+	macro viewExperienceNotActiveInViewModeControlMenu {
+		ContentPages.openExperienceMenu();
+
+		AssertElementPresent(
+			key_experienceName = "${experienceName}",
+			locator1 = "PageEditor#EXPERIENCE_INACTIVE_LABEL_VIEW_CONTROL_MENU");
+	}
+
+	macro viewExperienceNotActiveInViewModeDropdown {
+		ContentPages.openExperienceMenu();
+
+		AssertTextEquals(
+			key_experienceName = "${experienceName}",
+			locator1 = "PageEditor#EXPERIENCE_INACTIVE_LABEL_VIEW_DROPDOWN",
+			value1 = "Inactive");
 	}
 
 	macro viewExperienceValues {

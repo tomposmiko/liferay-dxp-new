@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUti
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
@@ -308,8 +307,8 @@ public class BatchPlannerPlanHelper {
 				continue;
 			}
 
-			String suffix = StringUtil.extractLast(
-				parameterName, StringPool.UNDERLINE);
+			String suffix = parameterName.substring(
+				"externalFieldName_".length());
 
 			String internalFieldName = ParamUtil.getString(
 				portletRequest, "internalFieldName_" + suffix);
@@ -356,7 +355,7 @@ public class BatchPlannerPlanHelper {
 			return taskItemDelegateName;
 		}
 
-		return internalClassName.substring(index + 3);
+		return internalClassName.substring(index + 1);
 	}
 
 	private BatchPlannerPlan _updateBatchPlannerPlan(

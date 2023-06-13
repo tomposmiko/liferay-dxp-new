@@ -32,11 +32,11 @@ import com.liferay.headless.commerce.machine.learning.dto.v1_0.Product;
 import com.liferay.headless.commerce.machine.learning.dto.v1_0.ProductOption;
 import com.liferay.headless.commerce.machine.learning.dto.v1_0.ProductSpecification;
 import com.liferay.headless.commerce.machine.learning.dto.v1_0.Sku;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,7 +45,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Ferrari
  */
 @Component(
-	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.product.model.CPDefinition",
 	service = {DTOConverter.class, ProductDTOConverter.class}
 )

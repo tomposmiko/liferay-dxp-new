@@ -1,8 +1,8 @@
 {
 	"dependencies": {
-		"@clayui/form": "3.77.0",
+		"@clayui/form": "3.78.3",
 		"@clayui/icon": "3.56.0",
-		"@clayui/tooltip": "3.77.0",
+		"@clayui/tooltip": "3.78.3",
 		"@liferay/frontend-data-set-web": "*",
 		"@liferay/object-js-components-web": "*",
 		"@types/codemirror": "^5.60.5",
@@ -18,5 +18,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "1.0.120"
+	"version": "1.0.122"
 }

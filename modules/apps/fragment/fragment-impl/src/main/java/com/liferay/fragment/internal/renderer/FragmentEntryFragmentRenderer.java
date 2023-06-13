@@ -30,11 +30,11 @@ import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.info.form.InfoForm;
+import com.liferay.info.item.InfoItemReference;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -346,21 +346,18 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		FragmentEntryLink fragmentEntryLink = _getFragmentEntryLink(
 			fragmentRendererContext);
 
-		StringBundler cacheKeySB = new StringBundler(5);
+		StringBundler portalCacheKeySB = new StringBundler(5);
 
-		cacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
-		cacheKeySB.append(StringPool.DASH);
-		cacheKeySB.append(fragmentRendererContext.getLocale());
-		cacheKeySB.append(StringPool.DASH);
-		cacheKeySB.append(
-			StringUtil.merge(
-				fragmentRendererContext.getSegmentsEntryIds(),
-				StringPool.SEMICOLON));
+		portalCacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
+		portalCacheKeySB.append(StringPool.DASH);
+		portalCacheKeySB.append(fragmentRendererContext.getLocale());
+		portalCacheKeySB.append(StringPool.DASH);
+		portalCacheKeySB.append(fragmentEntryLink.getSegmentsExperienceId());
 
 		String content = StringPool.BLANK;
 
 		if (_isCacheable(fragmentEntryLink, fragmentRendererContext)) {
-			content = portalCache.get(cacheKeySB.toString());
+			content = portalCache.get(portalCacheKeySB.toString());
 
 			if (Validator.isNotNull(content)) {
 				return content;
@@ -374,11 +371,11 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 					fragmentRendererContext.getMode(),
 					fragmentRendererContext.getLocale());
 
-		Optional<Object> displayObjectOptional =
-			fragmentRendererContext.getDisplayObjectOptional();
+		Optional<InfoItemReference> contextInfoItemReferenceOptional =
+			fragmentRendererContext.getContextInfoItemReferenceOptional();
 
-		defaultFragmentEntryProcessorContext.setDisplayObject(
-			displayObjectOptional.orElse(null));
+		defaultFragmentEntryProcessorContext.setContextInfoItemReference(
+			contextInfoItemReferenceOptional.orElse(null));
 
 		defaultFragmentEntryProcessorContext.setFragmentElementId(
 			fragmentRendererContext.getFragmentElementId());
@@ -440,7 +437,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			html, httpServletRequest);
 
 		if (_isCacheable(fragmentEntryLink, fragmentRendererContext)) {
-			portalCache.put(cacheKeySB.toString(), content);
+			portalCache.put(portalCacheKeySB.toString(), content);
 		}
 
 		return content;

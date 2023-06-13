@@ -322,12 +322,12 @@
 </tr>
 <tr>
 	<td>FRAGMENT_DROP_TARGET</td>
-	<td>//div[contains(@class,'page-editor__root page-editor__topper')]</td>
+	<td>//div[contains(@class,'page-editor__root')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FRAGMENT_WITH_DROP_TARGET</td>
-	<td>xpath=(//div[contains(@class,'page-editor__root page-editor__topper')])[${key_index}]</td>
+	<td>xpath=(//div[contains(@class,'page-editor__root')])[${key_index}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -346,6 +346,16 @@
 <tr>
 	<td>EXPERIENCE_ACTIVE_LABEL</td>
 	<td>//*[contains(@class, 'text-truncate-inline')]//*[contains(text(),'${key_experienceName}')]/parent::span//span[contains(text(),'Active')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXPERIENCE_ACTIVE_LABEL_VIEW_CONTROL_MENU</td>
+	<td>//*[contains(@class, 'align-items-center')]//*[contains(text(),'${key_experienceName}')]/parent::span//span[contains(text(),'Active')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXPERIENCE_ACTIVE_LABEL_VIEW_DROPDOWN</td>
+	<td>//*[contains(@class, 'dropdown-item')][contains(.,'${key_experienceName}')]//span[contains(@class,'label-item')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -386,6 +396,21 @@
 <tr>
 	<td>EXPERIENCE_EDIT_BUTTON</td>
 	<td>//div[contains(@class,'toolbar-experience')]//button[@*[contains(.,'Edit Experience')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXPERIENCE_INACTIVE_LABEL</td>
+	<td>//*[contains(@class, 'text-truncate-inline')]//*[contains(text(),'${key_experienceName}')]/parent::span//span[contains(text(),'Inactive')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXPERIENCE_INACTIVE_LABEL_VIEW_CONTROL_MENU</td>
+	<td>//*[contains(@class, 'align-items-center')]//*[contains(text(),'${key_experienceName}')]/parent::span//span[contains(text(),'Inactive')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXPERIENCE_INACTIVE_LABEL_VIEW_DROPDOWN</td>
+	<td>//*[contains(@class, 'dropdown-item')][contains(.,'${key_experienceName}')]//span[contains(@class,'label-item')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -554,7 +579,7 @@
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COMMENT_SECTION_NAME</td>
-	<td>//header[contains(@class,'page-editor__sidebar__panel-header')]//h1[contains(.,'${key_fragmentName}')]</td>
+	<td>//header[contains(@class,'page-editor__sidebar__panel-header')]//h2[contains(.,'${key_fragmentName}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -36,6 +36,10 @@ export {cancelDebounce, debounce} from './liferay/debounce/debounce.es';
 
 export {default as delegate} from './liferay/delegate/delegate.es';
 
+// DynamicInlineScroll
+
+export {default as DynamicInlineScroll} from './liferay/DynamicInlineScroll.es';
+
 // Form API
 
 export {default as objectToFormData} from './liferay/util/form/object_to_form_data.es';
@@ -57,7 +61,12 @@ export {default as PortletBase} from './liferay/PortletBase.es';
 
 // Modal API
 
-export {openModal, openSelectionModal} from './liferay/modal/Modal';
+export {
+	openModal,
+	openPortletModal,
+	openPortletWindow,
+	openSelectionModal,
+} from './liferay/modal/Modal';
 
 export {default as openAlertModal} from './liferay/modal/commands/open_alert_modal';
 export {default as openConfirmModal} from './liferay/modal/commands/open_confirm_modal';

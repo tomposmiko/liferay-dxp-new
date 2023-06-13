@@ -17,9 +17,9 @@ import PRMForm from '../../../../common/components/PRMForm';
 import PRMFormik from '../../../../common/components/PRMFormik';
 import PRMFormikPageProps from '../../../../common/components/PRMFormik/interfaces/prmFormikPageProps';
 import {LiferayPicklistName} from '../../../../common/enums/liferayPicklistName';
+import useCompanyOptions from '../../../../common/hooks/useCompanyOptions';
 import DealRegistration from '../../../../common/interfaces/dealRegistration';
-import useCompanyOptions from '../../../MDFRequestForm/steps/Goals/hooks/useCompanyOptions';
-import getPicklistOptions from '../../../MDFRequestForm/utils/getPicklistOptions';
+import getPicklistOptions from '../../../../common/utils/getPicklistOptions';
 import {StepType} from '../../enums/stepType';
 import useDynamicFieldEntries from '../../hooks/useDynamicFieldEntries';
 import DealRegistrationStepProps from '../../interfaces/dealRegistrationStepProps';
@@ -27,7 +27,8 @@ import DealRegistrationStepProps from '../../interfaces/dealRegistrationStepProp
 const General = ({
 	onCancel,
 	onContinue,
-}: PRMFormikPageProps & DealRegistrationStepProps<DealRegistration>) => {
+	onSaveAsDraft,
+}: PRMFormikPageProps & DealRegistrationStepProps) => {
 	const {
 		isSubmitting,
 		setFieldValue,
@@ -41,8 +42,7 @@ const General = ({
 		companiesEntries,
 		useCallback(
 			(country, company) => {
-				setFieldValue('partnerAccountName', company);
-				setFieldValue('prospect.country', country);
+				setFieldValue('partnerAccount', company);
 			},
 			[setFieldValue]
 		)
@@ -69,7 +69,7 @@ const General = ({
 		options: departmentOptions,
 	} = getPicklistOptions(
 		fieldEntries[LiferayPicklistName.DEPARTMENTS],
-		(selected) => setFieldValue('prospect.department', selected)
+		(selected) => setFieldValue('primaryProspect.department', selected)
 	);
 
 	const {
@@ -77,7 +77,15 @@ const General = ({
 		options: jobRoleOptions,
 	} = getPicklistOptions(
 		fieldEntries[LiferayPicklistName.JOB_ROLES],
-		(selected) => setFieldValue('prospect.jobRole', selected)
+		(selected) => setFieldValue('primaryProspect.jobRole', selected)
+	);
+
+	const {
+		onSelected: onStateSelected,
+		options: stateOptions,
+	} = getPicklistOptions(
+		fieldEntries[LiferayPicklistName.STATES],
+		(selected) => setFieldValue('prospect.state', selected)
 	);
 
 	return (
@@ -87,9 +95,10 @@ const General = ({
 					<PRMFormik.Field
 						component={PRMForm.Select}
 						label="Partner Account Name"
-						name="partnerAccountName"
+						name="partnerAccount"
 						onChange={onCompanySelected}
 						options={companyOptions}
+						required
 					/>
 
 					<PRMFormik.Field
@@ -105,6 +114,7 @@ const General = ({
 					component={PRMForm.InputText}
 					label="Account Name"
 					name="prospect.accountName"
+					required
 				/>
 
 				<PRMFormik.Field
@@ -113,12 +123,14 @@ const General = ({
 					name="prospect.industry"
 					onChange={onIndustrySelected}
 					options={industryOptions}
+					required
 				/>
 
 				<PRMFormik.Field
 					component={PRMForm.InputText}
 					label="Address"
 					name="prospect.address"
+					required
 				/>
 
 				<PRMForm.Group>
@@ -126,12 +138,14 @@ const General = ({
 						component={PRMForm.InputText}
 						label="City"
 						name="prospect.city"
+						required
 					/>
 
 					<PRMFormik.Field
 						component={PRMForm.InputText}
 						label="Postal Code"
 						name="prospect.postalCode"
+						required
 					/>
 				</PRMForm.Group>
 
@@ -142,13 +156,17 @@ const General = ({
 						name="prospect.country"
 						onChange={onCountrySelected}
 						options={countryOptions}
+						required
 					/>
 
-					{values.prospect?.country?.name === 'US' && (
+					{values.prospect?.country.name === 'US' && (
 						<PRMFormik.Field
 							component={PRMForm.Select}
 							label="State"
 							name="prospect.state"
+							onChange={onStateSelected}
+							options={stateOptions}
+							required
 						/>
 					)}
 				</PRMForm.Group>
@@ -159,12 +177,14 @@ const General = ({
 							component={PRMForm.InputText}
 							label="First Name"
 							name="primaryProspect.firstName"
+							required
 						/>
 
 						<PRMFormik.Field
 							component={PRMForm.InputText}
 							label="Last Name"
 							name="primaryProspect.lastName"
+							required
 						/>
 					</PRMForm.Group>
 
@@ -172,18 +192,21 @@ const General = ({
 						component={PRMForm.InputText}
 						label="Email Address"
 						name="primaryProspect.emailAddress"
+						required
 					/>
 
 					<PRMFormik.Field
 						component={PRMForm.InputText}
 						label="Phone"
 						name="primaryProspect.phone"
+						required
 					/>
 
 					<PRMFormik.Field
 						component={PRMForm.InputText}
 						label="Business Unit"
 						name="primaryProspect.businessUnit"
+						required
 					/>
 
 					<PRMFormik.Field
@@ -192,6 +215,7 @@ const General = ({
 						name="primaryProspect.department"
 						onChange={onDepartmentSelected}
 						options={departmentOptions}
+						required
 					/>
 
 					<PRMFormik.Field
@@ -200,6 +224,7 @@ const General = ({
 						name="primaryProspect.jobRole"
 						onChange={onJobRoleSelected}
 						options={jobRoleOptions}
+						required
 					/>
 				</PRMForm.Section>
 
@@ -243,16 +268,17 @@ const General = ({
 						}
 						label="Project Need (Select all that apply)"
 						name="projectNeed"
+						required
 					/>
-				</PRMForm.Section>
 
-				<PRMForm.Section title="Project Solution Categories (Select all that apply)">
 					<PRMFormik.Field
 						component={PRMForm.CheckboxGroup}
 						items={
 							fieldEntries[LiferayPicklistName.PROJECT_CATEGORIES]
 						}
-						name="categories"
+						label="Project Solution Categories (Select all that apply)"
+						name="projectCategories"
+						required
 					/>
 				</PRMForm.Section>
 
@@ -261,13 +287,18 @@ const General = ({
 						component={PRMForm.InputText}
 						label="Project Timeline"
 						name="projectTimeline"
+						required
 					/>
 				</PRMForm.Section>
 			</PRMForm.Section>
 
 			<PRMForm.Footer>
 				<div className="d-flex mr-auto">
-					<Button disabled={isSubmitting} displayType={null}>
+					<Button
+						disabled={isSubmitting}
+						displayType={null}
+						onClick={() => onSaveAsDraft?.(values, formikHelpers)}
+					>
 						Save as Draft
 					</Button>
 

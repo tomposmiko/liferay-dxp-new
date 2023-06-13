@@ -9,13 +9,50 @@
  * distribution rights of the Software.
  */
 
+import {FormikHelpers, setNestedObjectValues} from 'formik';
 import {useState} from 'react';
 
 import PRMFormik from '../../common/components/PRMFormik';
+import {PRMPageRoute} from '../../common/enums/prmPageRoute';
+import {RequestStatus} from '../../common/enums/requestStatus';
+import useLiferayNavigate from '../../common/hooks/useLiferayNavigate';
 import DealRegistration from '../../common/interfaces/dealRegistration';
+import {Liferay} from '../../common/services/liferay';
+import isObjectEmpty from '../../common/utils/isObjectEmpty';
 import {StepType} from './enums/stepType';
 import General from './steps/General';
+import generalSchema from './steps/General/schema/yup';
 import Review from './steps/Review';
+import submitForm from './utils/submitForm';
+
+const initialFormValues: DealRegistration = {
+	additionalContact: {emailAddress: '', firstName: '', lastName: ''},
+	additionalInformationAboutTheOpportunity: '',
+	mdfActivityAssociated: {},
+	partnerAccount: {},
+	primaryProspect: {
+		businessUnit: '',
+		department: {},
+		emailAddress: '',
+		firstName: '',
+		jobRole: {},
+		lastName: '',
+		phone: '',
+	},
+	projectCategories: [],
+	projectNeed: [],
+	projectTimeline: '',
+	prospect: {
+		accountName: '',
+		address: '',
+		city: '',
+		country: {},
+		industry: {},
+		postalCode: '',
+		state: {},
+	},
+	registrationStatus: RequestStatus.PENDING,
+};
 
 type StepComponent = {
 	[key in StepType]?: JSX.Element;
@@ -23,32 +60,82 @@ type StepComponent = {
 
 const DealRegistrationForm = () => {
 	const [step, setStep] = useState<StepType>(StepType.GENERAL);
-
-	const onSubmit = () => {};
+	const siteURL = useLiferayNavigate();
 
 	const onCancel = () => {
-		setStep(StepType.GENERAL);
+		Liferay.Util.navigate(
+			`${siteURL}/${PRMPageRoute.DEAL_REGISTRATION_LISTING}`
+		);
 	};
-	const onSaveAsDraft = () => {};
-	const onContinue = () => {
-		setStep(StepType.REVIEW);
+
+	const onContinue = async (
+		formikHelpers: Omit<FormikHelpers<DealRegistration>, 'setFieldValue'>,
+		nextStep: StepType
+	) => {
+		const validationErrors = await formikHelpers.validateForm();
+
+		if (isObjectEmpty(validationErrors)) {
+			setStep(nextStep);
+
+			return;
+		}
+
+		formikHelpers.setTouched(setNestedObjectValues(validationErrors, true));
 	};
+
+	const onPrevious = (previousStep: StepType) => setStep(previousStep);
 
 	const StepFormComponent: StepComponent = {
 		[StepType.GENERAL]: (
 			<General
 				onCancel={onCancel}
 				onContinue={onContinue}
-				onSaveAsDraft={onSaveAsDraft}
+				onSaveAsDraft={(
+					values: DealRegistration,
+					formikHelpers: Omit<
+						FormikHelpers<DealRegistration>,
+						'setFieldValue'
+					>
+				) =>
+					submitForm(
+						values,
+						formikHelpers,
+						siteURL,
+						RequestStatus.DRAFT
+					)
+				}
+				validationSchema={generalSchema}
 			/>
 		),
 		[StepType.REVIEW]: (
-			<Review onCancel={onCancel} onSaveAsDraft={onSaveAsDraft} />
+			<Review
+				onCancel={onCancel}
+				onPrevious={onPrevious}
+				onSaveAsDraft={(
+					values: DealRegistration,
+					formikHelpers: Omit<
+						FormikHelpers<DealRegistration>,
+						'setFieldValue'
+					>
+				) =>
+					submitForm(
+						values,
+						formikHelpers,
+						siteURL,
+						RequestStatus.DRAFT
+					)
+				}
+			/>
 		),
 	};
 
 	return (
-		<PRMFormik initialValues={{} as DealRegistration} onSubmit={onSubmit}>
+		<PRMFormik
+			initialValues={initialFormValues}
+			onSubmit={(values, formikHelpers) =>
+				submitForm(values, formikHelpers, siteURL)
+			}
+		>
 			{StepFormComponent[step]}
 		</PRMFormik>
 	);

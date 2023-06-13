@@ -16,6 +16,7 @@ package com.liferay.fragment.entry.processor.internal.util;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
+import com.liferay.info.exception.NoSuchInfoItemException;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.formatter.InfoCollectionTextFormatter;
 import com.liferay.info.formatter.InfoTextFormatter;
@@ -26,6 +27,7 @@ import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
+import com.liferay.info.search.InfoSearchClassMapperTracker;
 import com.liferay.info.type.Labeled;
 import com.liferay.info.type.WebImage;
 import com.liferay.petra.string.StringPool;
@@ -35,7 +37,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
@@ -128,6 +129,15 @@ public class FragmentEntryProcessorHelperImpl
 
 	@Override
 	public long getFileEntryId(
+		InfoItemReference infoItemReference, String fieldName, Locale locale) {
+
+		return _getFileEntryId(
+			infoItemReference.getClassName(), _getInfoItem(infoItemReference),
+			fieldName, locale);
+	}
+
+	@Override
+	public long getFileEntryId(
 			long classNameId, long classPK, String fieldName, Locale locale)
 		throws PortalException {
 
@@ -155,22 +165,6 @@ public class FragmentEntryProcessorHelperImpl
 
 		return _getFileEntryId(
 			_portal.getClassName(classNameId), object, fieldName, locale);
-	}
-
-	@Override
-	public long getFileEntryId(
-		Object displayObject, String fieldName, Locale locale) {
-
-		if (Validator.isNull(fieldName) ||
-			!(displayObject instanceof ClassedModel)) {
-
-			return 0;
-		}
-
-		ClassedModel classedModel = (ClassedModel)displayObject;
-
-		return _getFileEntryId(
-			classedModel.getModelClassName(), displayObject, fieldName, locale);
 	}
 
 	@Override
@@ -210,32 +204,21 @@ public class FragmentEntryProcessorHelperImpl
 
 	@Override
 	public Object getMappedCollectionValue(
-		Optional<Object> displayObjectOptional, JSONObject jsonObject,
-		Locale locale) {
+		Optional<InfoItemReference> infoItemReferenceOptional,
+		JSONObject jsonObject, Locale locale) {
 
 		if (!isMappedCollection(jsonObject)) {
 			return _jsonFactory.createJSONObject();
 		}
 
-		if (!displayObjectOptional.isPresent()) {
+		if (!infoItemReferenceOptional.isPresent()) {
 			return null;
 		}
 
-		Object displayObject = displayObjectOptional.get();
+		InfoItemReference infoItemReference = infoItemReferenceOptional.get();
 
-		if (!(displayObject instanceof ClassedModel)) {
-			return null;
-		}
-
-		ClassedModel classedModel = (ClassedModel)displayObject;
-
-		// LPS-111037
-
-		String className = classedModel.getModelClassName();
-
-		if (classedModel instanceof FileEntry) {
-			className = FileEntry.class.getName();
-		}
+		String className = _infoSearchClassMapperTracker.getClassName(
+			infoItemReference.getClassName());
 
 		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
 			_infoItemServiceTracker.getFirstInfoItemService(
@@ -253,7 +236,8 @@ public class FragmentEntryProcessorHelperImpl
 
 		return getMappedInfoItemFieldValue(
 			jsonObject.getString("collectionFieldId"),
-			infoItemFieldValuesProvider, locale, displayObjectOptional.get());
+			infoItemFieldValuesProvider, locale,
+			_getInfoItem(infoItemReference));
 	}
 
 	@Override
@@ -335,19 +319,6 @@ public class FragmentEntryProcessorHelperImpl
 		return getMappedInfoItemFieldValue(
 			jsonObject.getString("fieldId"), infoItemFieldValuesProvider,
 			locale, object);
-	}
-
-	@Override
-	public Object getMappedInfoItemFieldValue(
-			JSONObject jsonObject,
-			Map<Long, InfoItemFieldValues> infoDisplaysFieldValues, String mode,
-			Locale locale, long previewClassPK, long previewClassNameId,
-			int previewType)
-		throws PortalException {
-
-		return getMappedInfoItemFieldValue(
-			jsonObject, infoDisplaysFieldValues, locale, mode, previewClassPK,
-			StringPool.BLANK);
 	}
 
 	@Override
@@ -492,6 +463,31 @@ public class FragmentEntryProcessorHelperImpl
 		return infoCollectionTextFormatter;
 	}
 
+	private Object _getInfoItem(InfoItemReference infoItemReference) {
+		if (infoItemReference == null) {
+			return null;
+		}
+
+		InfoItemIdentifier infoItemIdentifier =
+			infoItemReference.getInfoItemIdentifier();
+
+		InfoItemObjectProvider<Object> infoItemObjectProvider =
+			_infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemObjectProvider.class, infoItemReference.getClassName(),
+				infoItemIdentifier.getInfoItemServiceFilter());
+
+		try {
+			return infoItemObjectProvider.getInfoItem(infoItemIdentifier);
+		}
+		catch (NoSuchInfoItemException noSuchInfoItemException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(noSuchInfoItemException);
+			}
+		}
+
+		return null;
+	}
+
 	private static final InfoCollectionTextFormatter<Object>
 		_INFO_COLLECTION_TEXT_FORMATTER =
 			new CommaSeparatedInfoCollectionTextFormatter();
@@ -501,6 +497,9 @@ public class FragmentEntryProcessorHelperImpl
 
 	@Reference
 	private InfoItemServiceTracker _infoItemServiceTracker;
+
+	@Reference
+	private InfoSearchClassMapperTracker _infoSearchClassMapperTracker;
 
 	@Reference
 	private JSONFactory _jsonFactory;

@@ -16,7 +16,6 @@ package com.liferay.search.experiences.internal.ml.sentence.embedding;
 
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -26,16 +25,14 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.search.experiences.configuration.SentenceTransformerConfiguration;
+import com.liferay.search.experiences.configuration.SemanticSearchConfiguration;
 
 import java.io.IOException;
 
 import java.net.HttpURLConnection;
 
 import java.util.List;
-import java.util.Map;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -43,7 +40,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "com.liferay.search.experiences.configuration.SentenceTransformerConfiguration",
 	enabled = false, immediate = true,
 	property = "search.experiences.sentence.transformer.name=huggingFace",
 	service = SentenceTransformer.class
@@ -51,22 +47,18 @@ import org.osgi.service.component.annotations.Reference;
 public class HuggingFaceSentenceTransformer
 	extends BaseSentenceTransformer implements SentenceTransformer {
 
-	public Double[] getSentenceEmbedding(String text) {
+	public Double[] getSentenceEmbedding(
+		SemanticSearchConfiguration semanticSearchConfiguration, String text) {
+
 		String input = getInput(
-			_sentenceTransformerConfiguration.maxCharacterCount(), text,
-			_sentenceTransformerConfiguration.textTruncationStrategy());
+			semanticSearchConfiguration.maxCharacterCount(), text,
+			semanticSearchConfiguration.textTruncationStrategy());
 
 		if (Validator.isBlank(input)) {
 			return new Double[0];
 		}
 
-		return _getSentenceEmbedding(input);
-	}
-
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_sentenceTransformerConfiguration = ConfigurableUtil.createConfigurable(
-			SentenceTransformerConfiguration.class, properties);
+		return _getSentenceEmbedding(semanticSearchConfiguration, input);
 	}
 
 	private JSONArray _getJSONArray(JSONArray jsonArray1) {
@@ -79,19 +71,21 @@ public class HuggingFaceSentenceTransformer
 		return jsonArray1;
 	}
 
-	private String _getResponseJSON(Http.Options options, String text)
+	private String _getResponseJSON(
+			Http.Options options,
+			SemanticSearchConfiguration semanticSearchConfiguration,
+			String text)
 		throws IOException {
 
 		JSONObject jsonObject = JSONUtil.put("inputs", text);
 
 		options.addHeader(
 			HttpHeaders.AUTHORIZATION,
-			"Bearer " +
-				_sentenceTransformerConfiguration.huggingFaceAccessToken());
+			"Bearer " + semanticSearchConfiguration.huggingFaceAccessToken());
 		options.addHeader(
 			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 
-		if (_sentenceTransformerConfiguration.enableGPU()) {
+		if (semanticSearchConfiguration.enableGPU()) {
 			options.addHeader("x-use-gpu", "true");
 		}
 
@@ -100,17 +94,20 @@ public class HuggingFaceSentenceTransformer
 			StringPool.UTF8);
 		options.setLocation(
 			"https://api-inference.huggingface.co/models/" +
-				_sentenceTransformerConfiguration.model());
+				semanticSearchConfiguration.model());
 		options.setPost(true);
 
 		return _http.URLtoString(options);
 	}
 
-	private Double[] _getSentenceEmbedding(String text) {
+	private Double[] _getSentenceEmbedding(
+		SemanticSearchConfiguration semanticSearchConfiguration, String text) {
+
 		try {
 			Http.Options options = new Http.Options();
 
-			String responseJSON = _getResponseJSON(options, text);
+			String responseJSON = _getResponseJSON(
+				options, semanticSearchConfiguration, text);
 
 			Http.Response response = options.getResponse();
 
@@ -119,9 +116,10 @@ public class HuggingFaceSentenceTransformer
 
 				options.addHeader("x-wait-for-model", "true");
 				options.setTimeout(
-					_sentenceTransformerConfiguration.modelTimeout() * 1000);
+					semanticSearchConfiguration.modelTimeout() * 1000);
 
-				responseJSON = _getResponseJSON(options, text);
+				responseJSON = _getResponseJSON(
+					options, semanticSearchConfiguration, text);
 			}
 
 			if (_isJSONArray(responseJSON)) {
@@ -151,8 +149,5 @@ public class HuggingFaceSentenceTransformer
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	private volatile SentenceTransformerConfiguration
-		_sentenceTransformerConfiguration;
 
 }

@@ -24,6 +24,6 @@ export enum LiferayPicklistName {
 	INDUSTRIES = 'Industries',
 	DEPARTMENTS = 'Departments',
 	JOB_ROLES = 'Job Roles',
-	STATE = 'State',
+	STATES = 'States',
 	TYPE_OF_ACTIVITY = 'Type Of Activity',
 }

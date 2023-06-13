@@ -37,6 +37,13 @@ definition {
 				groupName = "${groupName}",
 				siteURLKey = "${siteURLKey}");
 		}
+		else if ("${assetType}" == "Knowledge Base") {
+			KBArticle.openToEditKBArticleInSite(
+				groupName = "${groupName}",
+				kbArticleTitle = "${entryTitle}",
+				kbChildArticleTitle = "${kbChildArticleTitle}",
+				siteURLKey = "${siteURLKey}");
+		}
 		else if ("${assetType}" == "Web Content") {
 			WebContentNavigator.openToEditWCInSite(
 				groupName = "${groupName}",
@@ -44,7 +51,7 @@ definition {
 				webContentTitle = "${entryTitle}");
 		}
 
-		WebContent.editDisplayPage(pageName = "Display Page Template Name");
+		WebContent.editDisplayPage(pageName = "${pageName}");
 
 		PortletEntry.publish();
 	}

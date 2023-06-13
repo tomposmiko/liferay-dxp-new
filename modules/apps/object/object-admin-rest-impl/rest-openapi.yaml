@@ -144,7 +144,7 @@ components:
                     readOnly: true
                     type: object
                 businessType:
-                    enum: [Aggregation, Attachment, Boolean, Date, Decimal, Integer, LongInteger, LongText, Picklist, PrecisionDecimal, Relationship, RichText, Text]
+                    enum: [Aggregation, Attachment, Boolean, Date, Decimal, Formula, Integer, LongInteger, LongText, MultiselectPicklist, Picklist, PrecisionDecimal, Relationship, RichText, Text]
                     type: string
                 defaultValue:
                     type: string
@@ -164,6 +164,8 @@ components:
                     additionalProperties:
                         type: string
                     type: object
+                listTypeDefinitionExternalReferenceCode:
+                    type: string
                 listTypeDefinitionId:
                     format: int64
                     type: integer

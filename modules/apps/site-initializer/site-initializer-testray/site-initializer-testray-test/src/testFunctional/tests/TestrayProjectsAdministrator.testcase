@@ -129,12 +129,23 @@ definition {
 	}
 
 	@description = "This is a test for LPS-160541. Verify if as an Administrator I should not be able to add a duplicate Project"
-	@ignore = "Test Stub"
-	@priority = "3"
+	@priority = "5"
 	test AdminCanNotAddDuplicateProject {
+		task ("Go to Testray, Create Project duplicate") {
+			ApplicationsMenu.gotoSite(site = "Testray 2");
 
-		// TODO LPS-160541 AdminCanNotAddDuplicateProject pending implementation
+			Testray.createProjectTestray(
+				description = "Projects_1 Description",
+				key_name = "Projects_1 Project");
 
+			Testray.createProjectTestray(
+				description = "Projects_1 Description",
+				key_name = "Projects_1 Project");
+		}
+
+		task ("Then an error message is displayed") {
+			Alert.viewErrorMessage(errorMessage = "The Project name already exists");
+		}
 	}
 
 	@description = "This is a test for LPS-164076 Verify that the user can not create a project if all the required fields are not filled in"
@@ -148,7 +159,7 @@ definition {
 				key_name = "");
 		}
 
-		task ("Assert Error Message appears") {
+		task ("Assert a warning message is displayed") {
 			Testray.viewErrorMessage(
 				fieldLabel = "Name",
 				warningMessage = "name is a required field");
@@ -215,11 +226,24 @@ definition {
 			Testray.assertItemName(key_name = "Routines_1 Routine");
 		}
 
-		task ("Go to routine page and add a new build") {
+		task ("Go to routine page and add a new build with enviroments") {
+			TestrayContextMenu.clickContextMenuProjects(name = "Routines_1 Routine");
+
+			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Select Default Environment Factors");
+
+			TestrayBuild.selectDefaultEnvironmentFactors(
+				label = "Application Server",
+				label1 = "Browser",
+				listCategory = "Application Server,Browser",
+				listOption = "Tomcat 6.0",
+				listOption1 = "Chrome 57");
+
 			TestrayRoutines.goToRoutine(routineName = "Routines_1 Routine");
 
 			TestrayBuild.createBuild(
+				addVersion = "1.2",
 				description = "Builds_1 Project Description",
+				dropdownItem = "New Build",
 				fieldName = "Builds_1 Project",
 				gitHash = "12345",
 				productVersion = "1.0",
@@ -228,10 +252,10 @@ definition {
 			Testray.assertItemName(key_name = "Builds_1 Project");
 		}
 
-		task ("Delete project and assert which Error Message appears") {
+		task ("Delete project and assert a warning message is displayed") {
 			Testray.deleteProject(nameProject = "Projects_1 Project");
 
-			Alert.viewErrorMessage(errorMessage = "An unexpected error ocurred");
+			Alert.viewErrorMessage(errorMessage = "The Project cannot be deleted because it has associated builds");
 		}
 	}
 

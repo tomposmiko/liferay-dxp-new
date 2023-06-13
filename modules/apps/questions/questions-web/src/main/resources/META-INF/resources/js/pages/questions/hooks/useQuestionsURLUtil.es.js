@@ -20,15 +20,16 @@ const useQuestionsURLUtil = ({context, history, params}) => {
 
 	const {creatorId, sectionTitle, tag} = params;
 
-	function buildURL({
-		filterBy = '',
-		page,
-		pageSize,
-		search,
-		sortBy = '',
-		taggedWith = '',
-		selectedTags = [],
-	}) {
+	function buildURL(params) {
+		const {
+			filterBy = '',
+			page,
+			pageSize,
+			search,
+			sortBy = '',
+			taggedWith = '',
+			selectedTags = [],
+		} = params;
 		const searchParams = new URLSearchParams();
 
 		let url = '/questions';

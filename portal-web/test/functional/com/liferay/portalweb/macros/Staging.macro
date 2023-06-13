@@ -383,8 +383,8 @@ definition {
 			ContentConfiguration.checkContentNameList(checkContentNameList = "${checkContentNameList}");
 		}
 
-		if (isSet(uncheckChildPages)) {
-			ContentConfiguration.uncheckChildPages(uncheckChildPagesNameList = "${uncheckChildPagesNameList}");
+		if (isSet(uncheckChildPagesNameList)) {
+			ContentConfiguration.uncheckChildPagesNameList(uncheckChildPagesNameList = "${uncheckChildPagesNameList}");
 		}
 
 		if (isSet(uncheckContentNameList)) {
@@ -995,9 +995,7 @@ definition {
 
 		var key_contentName = "${contentName}";
 
-		Uncheck(locator1 = "Staging#STAGING_CONTENT_CHECKBOX");
-
-		AssertNotChecked(locator1 = "Staging#STAGING_CONTENT_CHECKBOX");
+		AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Staging#STAGING_CONTENT_CHECKBOX");
 
 		AssertClickNoError(
 			locator1 = "Staging#STAGING_PUBLISH_TO_REMOTE_LIVE_BUTTON",
@@ -1299,7 +1297,7 @@ definition {
 		for (var configurationName : list "${configurationNameList}") {
 			var key_checkboxName = "${configurationName}";
 
-			AssertChecked(locator1 = "StagingPublishToLive#STAGING_CONFIGURATION_CHECKBOX");
+			AssertChecked.assertCheckedNotVisible(locator1 = "StagingPublishToLive#STAGING_CONFIGURATION_CHECKBOX");
 		}
 	}
 
@@ -1546,7 +1544,7 @@ definition {
 				value1 = "${publishTemplateName}");
 
 			for (var contentName : list "${uncheckContentNameList}") {
-				AssertNotChecked(
+				AssertNotChecked.assertNotCheckedNotVisible(
 					key_contentName = "${contentName}",
 					locator1 = "PagesConfiguration#CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX");
 			}
@@ -1634,7 +1632,7 @@ definition {
 		LexiconEntry.gotoHeaderMenuItem(menuItem = "Staging Configuration");
 
 		for (var contentName : list "${uncheckContentNameList}") {
-			AssertNotChecked(
+			AssertNotChecked.assertNotCheckedNotVisible(
 				key_contentName = "${contentName}",
 				locator1 = "PagesConfiguration#CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX");
 		}

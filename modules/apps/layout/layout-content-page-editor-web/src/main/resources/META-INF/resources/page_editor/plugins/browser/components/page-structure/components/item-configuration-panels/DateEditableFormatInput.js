@@ -12,7 +12,8 @@
  * details.
  */
 
-import React, {useState} from 'react';
+import classnames from 'classnames';
+import React, {useEffect, useState} from 'react';
 
 import {SelectField} from '../../../../../../app/components/fragment-configuration-fields/SelectField';
 import {TextField} from '../../../../../../app/components/fragment-configuration-fields/TextField';
@@ -22,15 +23,20 @@ import {
 	useSelector,
 } from '../../../../../../app/contexts/StoreContext';
 import selectLanguageId from '../../../../../../app/selectors/selectLanguageId';
-import selectSegmentsExperienceId from '../../../../../../app/selectors/selectSegmentsExperienceId';
 import updateEditableValues from '../../../../../../app/thunks/updateEditableValues';
-import {setIn} from '../../../../../../app/utils/setIn';
+import {getEditableLocalizedValue} from '../../../../../../app/utils/getEditableLocalizedValue';
+import {updateIn} from '../../../../../../app/utils/updateIn';
+import CurrentLanguageFlag from '../../../../../../common/components/CurrentLanguageFlag';
 
 const DATE_EDITABLE_FORMAT_OPTIONS = {
 	custom: 'custom',
 };
 
 const DATE_FORMAT_OPTIONS = [
+	{
+		label: Liferay.Language.get('default'),
+		value: '',
+	},
 	{
 		label: 'MM/DD/YY',
 		value: 'MM/dd/yy',
@@ -60,23 +66,42 @@ export default function DateEditableFormatInput({
 	fragmentEntryLinkId,
 }) {
 	const dispatch = useDispatch();
-	const editableValue = editableValues[editableValueNamespace][editableId];
+
 	const languageId = useSelector(selectLanguageId);
-	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
+
+	const editableValue = editableValues[editableValueNamespace][editableId];
+
+	const dateFormat = getEditableLocalizedValue(
+		editableValue.config?.dateFormat,
+		languageId
+	);
+
 	const [selectedOption, setSelectedOption] = useState(() =>
-		!editableValue.config.dateFormat
-			? DATE_FORMAT_OPTIONS[0].value
-			: getSelectedOption(editableValue.config.dateFormat)
+		getSelectedOption(dateFormat)
 	);
 	const [enableCustomInput, setEnableCustomInput] = useState(
 		() => selectedOption === DATE_EDITABLE_FORMAT_OPTIONS.custom
 	);
 
+	useEffect(() => {
+		if (dateFormat) {
+			if (
+				getSelectedOption(dateFormat) !==
+				DATE_EDITABLE_FORMAT_OPTIONS.custom
+			) {
+				setEnableCustomInput(false);
+			}
+			else {
+				setEnableCustomInput(true);
+			}
+		}
+	}, [languageId, dateFormat]);
+
 	const onValueSelectHandler = (name, value) => {
 		setSelectedOption(getSelectedOption(value));
 		dispatch(
 			updateEditableValues({
-				editableValues: setIn(
+				editableValues: updateIn(
 					editableValues,
 					[
 						EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
@@ -84,36 +109,40 @@ export default function DateEditableFormatInput({
 						'config',
 						name,
 					],
-					value
+					(nextValue) => ({...nextValue, [languageId]: value})
 				),
 				fragmentEntryLinkId,
-				languageId,
-				segmentsExperienceId,
 			})
 		);
 	};
 
 	return (
 		<>
-			<SelectField
-				field={{
-					label: Liferay.Language.get('date-format'),
-					name: 'dateFormat',
-					typeOptions: {
-						validValues: DATE_FORMAT_OPTIONS,
-					},
-				}}
-				onValueSelect={(name, value) => {
-					if (value === DATE_EDITABLE_FORMAT_OPTIONS.custom) {
-						setEnableCustomInput(true);
-					}
-					else {
-						setEnableCustomInput(false);
-						onValueSelectHandler(name, value);
-					}
-				}}
-				value={selectedOption}
-			/>
+			<div className={classnames('autofit-row align-items-end mb-3')}>
+				<div className={classnames('autofit-col autofit-col-expand')}>
+					<SelectField
+						field={{
+							label: Liferay.Language.get('date-format'),
+							name: 'dateFormat',
+							typeOptions: {
+								validValues: DATE_FORMAT_OPTIONS,
+							},
+						}}
+						onValueSelect={(name, value) => {
+							if (value === DATE_EDITABLE_FORMAT_OPTIONS.custom) {
+								setEnableCustomInput(true);
+							}
+							else {
+								setEnableCustomInput(false);
+								onValueSelectHandler(name, value);
+							}
+						}}
+						value={getSelectedOption(dateFormat)}
+					/>
+				</div>
+
+				<CurrentLanguageFlag />
+			</div>
 			{enableCustomInput && (
 				<TextField
 					field={{
@@ -121,13 +150,17 @@ export default function DateEditableFormatInput({
 						name: 'dateFormat',
 					}}
 					onValueSelect={onValueSelectHandler}
-					value={editableValue.config.dateFormat}
+					value={dateFormat ?? DATE_FORMAT_OPTIONS[0].value}
 				/>
 			)}
 		</>
 	);
 
 	function getSelectedOption(value) {
+		if (!value) {
+			return DATE_FORMAT_OPTIONS[0].value;
+		}
+
 		const selectedOption = DATE_FORMAT_OPTIONS.find(
 			(option) => value === option.value
 		);

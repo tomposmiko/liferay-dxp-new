@@ -75,7 +75,7 @@ renderResponse.setTitle(accountEntryDisplay.getName());
 
 				AccountUserActionDropdownItemsProvider accountUserActionDropdownItemsProvider = new AccountUserActionDropdownItemsProvider(accountEntryDisplay, accountUser, permissionChecker, renderRequest, renderResponse);
 
-				if (AccountUserPermission.hasEditUserPermission(permissionChecker, portletName, accountEntryDisplay.getAccountEntry(), accountUser.getUser())) {
+				if (AccountUserPermission.hasEditUserPermission(permissionChecker, portletName, accountEntryDisplay, accountUser.getUser())) {
 					rowURL = accountUserActionDropdownItemsProvider.getEditAccountUserURL();
 				}
 				%>
@@ -110,6 +110,7 @@ renderResponse.setTitle(accountEntryDisplay.getName());
 
 				<liferay-ui:search-container-column-text>
 					<clay:dropdown-actions
+						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 						dropdownItems="<%= accountUserActionDropdownItemsProvider.getActionDropdownItems() %>"
 						propsTransformer="account_entries_admin/js/AccountUserDropdownDefaultPropsTransformer"
 					/>

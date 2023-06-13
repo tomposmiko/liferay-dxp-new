@@ -82,6 +82,7 @@ import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -436,6 +437,63 @@ public class DDMFormDisplayContext {
 			"formInstanceRecordId");
 	}
 
+	public Map<String, String> getLimitToOneSubmissionPerUserMap()
+		throws PortalException {
+
+		DDMFormInstance ddmFormInstance = getFormInstance();
+
+		if (ddmFormInstance == null) {
+			return HashMapBuilder.put(
+				"limitToOneSubmissionPerUserBody", StringPool.BLANK
+			).put(
+				"limitToOneSubmissionPerUserHeader", StringPool.BLANK
+			).build();
+		}
+
+		DDMFormInstanceSettings ddmFormInstanceSettings =
+			ddmFormInstance.getSettingsModel();
+
+		JSONObject limitToOneSubmissionPerUserBodyJSONObject =
+			_jsonFactory.createJSONObject(
+				ddmFormInstanceSettings.limitToOneSubmissionPerUserBody());
+
+		String limitToOneSubmissionPerUserBody =
+			limitToOneSubmissionPerUserBodyJSONObject.getString(
+				getDefaultLanguageId());
+
+		JSONObject limitToOneSubmissionPerUserHeaderJSONObject =
+			_jsonFactory.createJSONObject(
+				ddmFormInstanceSettings.limitToOneSubmissionPerUserHeader());
+
+		String limitToOneSubmissionPerUserHeader =
+			limitToOneSubmissionPerUserHeaderJSONObject.getString(
+				getDefaultLanguageId());
+
+		if (Validator.isNotNull(limitToOneSubmissionPerUserBody) &&
+			Validator.isNotNull(limitToOneSubmissionPerUserHeader)) {
+
+			return HashMapBuilder.put(
+				"limitToOneSubmissionPerUserBody",
+				limitToOneSubmissionPerUserBody
+			).put(
+				"limitToOneSubmissionPerUserHeader",
+				limitToOneSubmissionPerUserHeader
+			).build();
+		}
+
+		return HashMapBuilder.put(
+			"limitToOneSubmissionPerUserBody",
+			LanguageUtil.get(
+				_getHttpServletRequest(),
+				"you-can-fill-out-this-form-only-once.-contact-the-owner-of-" +
+					"the-form-if-you-think-this-is-a-mistake")
+		).put(
+			"limitToOneSubmissionPerUserHeader",
+			LanguageUtil.get(
+				_getHttpServletRequest(), "you-have-already-responded")
+		).build();
+	}
+
 	public String getRedirectURL() throws PortalException {
 		DDMFormInstance ddmFormInstance = getFormInstance();
 
@@ -589,13 +647,13 @@ public class DDMFormDisplayContext {
 			_autosaveEnabled = Boolean.FALSE;
 		}
 		else {
-			DDMFormInstance formInstance = getFormInstance();
+			DDMFormInstance ddmFormInstance = getFormInstance();
 
-			DDMFormInstanceSettings formInstanceSettings =
-				formInstance.getSettingsModel();
+			DDMFormInstanceSettings ddmFormInstanceSettings =
+				ddmFormInstance.getSettingsModel();
 
 			_autosaveEnabled =
-				formInstanceSettings.autosaveEnabled() &&
+				ddmFormInstanceSettings.autosaveEnabled() &&
 				(getAutosaveInterval() > 0);
 		}
 

@@ -19,6 +19,7 @@ import ClayLink from '@clayui/link';
 import ClaySticker from '@clayui/sticker';
 import ClayTabs from '@clayui/tabs';
 import classNames from 'classnames';
+import {sub} from 'frontend-js-web';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {LAYOUT_TYPES} from '../../../app/config/constants/layoutTypes';
@@ -175,9 +176,12 @@ export default function PageDesignOptionsSidebar() {
 				className="overflow-auto px-3"
 				fade
 			>
-				{tabs.map(({icon, options, type}, index) => (
+				{tabs.map(({icon, label, options, type}, index) => (
 					<ClayTabs.TabPane
-						aria-labelledby={getTabId(index)}
+						aria-label={sub(
+							Liferay.Language.get('select-x'),
+							label
+						)}
 						id={getTabPanelId(index)}
 						key={index}
 					>
@@ -223,7 +227,14 @@ const OptionList = ({options = [], icon, type}) => {
 									onClick();
 								}
 							}}
+							onKeyDown={(event) => {
+								if (event.key === 'Enter' && !isActive) {
+									onClick();
+								}
+							}}
+							role="button"
 							selectable
+							tabindex="0"
 						>
 							<ClayCard.AspectRatio
 								className="card-item-first"

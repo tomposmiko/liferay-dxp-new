@@ -74,7 +74,6 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  * @author Michael C. Han
  */
 @Component(
-	immediate = true,
 	property = {"index.on.startup=false", "system.index=true"},
 	service = {ConfigurationModelIndexer.class, Indexer.class}
 )
@@ -361,8 +360,7 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			CompanyConstants.SYSTEM, getDocument(configurationModel),
-			isCommitImmediately());
+			CompanyConstants.SYSTEM, getDocument(configurationModel));
 	}
 
 	@Override

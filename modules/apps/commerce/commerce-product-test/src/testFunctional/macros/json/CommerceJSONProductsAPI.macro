@@ -140,7 +140,7 @@ definition {
 		}
 
 		if (!(isSet(sku))) {
-			var sku = "default";
+			var sku = "${productName}_default";
 		}
 
 		var productSpecifications = "";
@@ -238,6 +238,9 @@ definition {
 						"multipleOrderQuantity": ${multipleOrderQuantity}
 					},
 					"productSpecifications": [${productSpecifications}],
+					"shippingConfiguration": {
+                        "freeShipping": false
+                     },
 					"skus": [
 				    {
 				      "cost": "${cost}",
@@ -268,6 +271,16 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+		if (isSet(price)) {
+			var price = "${price}";
+			var priceListName = "${catalogName} Base Price List";
+
+			CommerceJSONPriceListsAndPromotionsAPI._addPriceListEntry(
+				entryPrice = "${price}",
+				priceListName = "${priceListName}",
+				productSKU = "${sku}");
+		}
 	}
 
 	macro _addCommerceProductImage {
@@ -787,6 +800,77 @@ definition {
 					"minStockQuantity": ${minStockQuantity},
 					"multipleOrderQuantity": ${multipleOrderQuantity}
 				}'
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.patch("${curl}");
+	}
+
+	macro _patchCommerceProductImageUsingERC {
+		Variables.assertDefined(parameterList = "${productERC}");
+
+		var baseURL = PropsUtil.get("portal.url");
+
+		if (!(isSet(cdnEnabled))) {
+			var cdnEnabled = "false";
+		}
+
+		if (!(isSet(imageTitle))) {
+			var imageTitle = "Simple Image Title API";
+		}
+
+		if (!(isSet(cdnURL))) {
+			var cdnURL = "";
+		}
+
+		if (!(isSet(contentType))) {
+			var contentType = "";
+		}
+		else {
+			var contentType = '''"contentType": "${contentType}",''';
+		}
+
+		if (!(isSet(attachment))) {
+			var attachment = "";
+		}
+
+		if (!(isSet(displayDate))) {
+			var displayDate = "";
+		}
+
+		if (!(isSet(neverExpire))) {
+			var neverExpire = "true";
+		}
+
+		if (!(isSet(priority))) {
+			var priority = "0.0";
+		}
+
+		if (!(isSet(externalReferenceCode))) {
+			var externalReferenceCode = "";
+		}
+
+		var curl = '''
+			${baseURL}/o/headless-commerce-admin-catalog/v1.0/products/by-externalReferenceCode/${productERC} \
+			-u test@liferay.com:test \
+			-H 'accept: application/json' \
+  			-H 'Content-Type: application/json' \
+  			-d '{
+      			    "images": [
+    				{
+						"attachment": "${attachment}",
+      					"cdnEnabled": "${cdnEnabled}",
+      					"cdnURL": "${cdnURL}",
+						${contentType} 
+						"displayDate": "${displayDate}",  
+						"externalReferenceCode": "${externalReferenceCode}",
+      					"neverExpire": "${neverExpire}",
+      					"priority": "${priority}",
+						"title": {
+       						"en_US": "${imageTitle}"
+      					}  
+    				}
+  					]
+   				}'
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.patch("${curl}");

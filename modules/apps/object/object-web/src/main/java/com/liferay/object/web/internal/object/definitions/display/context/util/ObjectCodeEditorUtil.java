@@ -16,12 +16,12 @@ package com.liferay.object.web.internal.object.definitions.display.context.util;
 
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -52,8 +51,7 @@ public class ObjectCodeEditorUtil {
 					ListUtil.filter(
 						_objectFieldLocalService.getObjectFields(
 							objectDefinitionId),
-						objectField -> !Objects.equals(
-							objectField.getBusinessType(),
+						objectField -> !objectField.compareBusinessType(
 							ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)),
 					objectField -> HashMapBuilder.put(
 						"content",

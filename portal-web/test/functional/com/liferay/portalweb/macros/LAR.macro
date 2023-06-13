@@ -71,6 +71,10 @@ definition {
 	macro _export {
 		SelectFrame(locator1 = "IFrame#CONFIGURATION_DIALOG");
 
+		if (isSet(contentLastRange)) {
+			Click(locator1 = "Radio#CHOOSE_CONTENT_LAST_CHANGE");
+		}
+
 		if (isSet(portletName)) {
 			if (IsNotChecked(locator1 = "ExportImport#CONTENT")) {
 				Check(locator1 = "ExportImport#CONTENT");
@@ -84,11 +88,11 @@ definition {
 		}
 
 		if ("${exportIndividualDeletions}" == "true") {
-			Check(locator1 = "Checkbox#DELETIONS");
+			Check.checkNotVisibleNoErrors(locator1 = "Checkbox#DELETIONS");
 		}
 
 		if ("${exportPermissions}" == "true") {
-			Check.checkNotVisible(locator1 = "Checkbox#PERMISSIONS");
+			Check.checkNotVisibleNoErrors(locator1 = "Checkbox#PERMISSIONS");
 		}
 
 		AssertClick(
@@ -262,7 +266,7 @@ definition {
 			}
 
 			if ("${importDeletions}" == "true") {
-				Check(locator1 = "Checkbox#DELETIONS");
+				Check.checkNotVisibleNoErrors(locator1 = "Checkbox#DELETIONS");
 			}
 
 			if (isSet(portletName)) {
@@ -497,6 +501,7 @@ definition {
 		AssertElementPresent(locator1 = "IFrame#MODAL_BODY");
 
 		LAR._export(
+			contentLastRange = "${contentLastRange}",
 			exportIndividualDeletions = "${exportIndividualDeletions}",
 			exportPermissions = "${exportPermissions}",
 			larFileName = "${larFileName}",
