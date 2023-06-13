@@ -36,7 +36,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Michael C. Han
@@ -77,8 +76,6 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 			_noticeableThreadPoolExecutor.getCorePoolSize());
 		destinationStatistics.setPendingMessageCount(
 			_noticeableThreadPoolExecutor.getPendingTaskCount());
-		destinationStatistics.setRejectedMessageCount(
-			_rejectedTaskCounter.get());
 		destinationStatistics.setSentMessageCount(
 			_noticeableThreadPoolExecutor.getCompletedTaskCount());
 
@@ -107,9 +104,6 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 
 		if (_rejectedExecutionHandler == null) {
 			_rejectedExecutionHandler = _createRejectionExecutionHandler();
-		}
-		else {
-			_rejectedTaskCounter.set(0);
 		}
 
 		NoticeableThreadPoolExecutor noticeableThreadPoolExecutor =
@@ -190,12 +184,7 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 	public void setRejectedExecutionHandler(
 		RejectedExecutionHandler rejectedExecutionHandler) {
 
-		_rejectedExecutionHandler = (runnable, threadPoolExecutor) -> {
-			_rejectedTaskCounter.incrementAndGet();
-
-			rejectedExecutionHandler.rejectedExecution(
-				runnable, threadPoolExecutor);
-		};
+		_rejectedExecutionHandler = rejectedExecutionHandler;
 	}
 
 	public void setUserLocalService(UserLocalService userLocalService) {
@@ -267,8 +256,6 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 			public void rejectedExecution(
 				Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
 
-				_rejectedTaskCounter.incrementAndGet();
-
 				if (!_log.isWarnEnabled()) {
 					return;
 				}
@@ -296,7 +283,6 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 	private NoticeableThreadPoolExecutor _noticeableThreadPoolExecutor;
 	private PortalExecutorManager _portalExecutorManager;
 	private RejectedExecutionHandler _rejectedExecutionHandler;
-	private final AtomicLong _rejectedTaskCounter = new AtomicLong();
 	private int _workersCoreSize = _WORKERS_CORE_SIZE;
 	private int _workersMaxSize = _WORKERS_MAX_SIZE;
 

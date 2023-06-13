@@ -14,12 +14,12 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.aggregation;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.search.aggregation.Aggregation;
 import com.liferay.portal.search.aggregation.AggregationResult;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.elasticsearch.search.aggregations.Aggregations;
 
@@ -43,12 +43,17 @@ public class ElasticsearchAggregationResultsTranslator {
 		_pipelineAggregationLookup = pipelineAggregationLookup;
 	}
 
-	public List<AggregationResult> translate(
+	public Stream<AggregationResult> translate(
 		Aggregations elasticsearchAggregations) {
 
-		return TransformUtil.transform(
-			elasticsearchAggregations.asList(),
-			aggregation -> translate(aggregation));
+		Stream<org.elasticsearch.search.aggregations.Aggregation> stream =
+			getElasticsearchAggregations(elasticsearchAggregations);
+
+		return stream.map(
+			this::translate
+		).filter(
+			aggregationResult -> aggregationResult != null
+		);
 	}
 
 	public interface AggregationLookup {
@@ -61,6 +66,15 @@ public class ElasticsearchAggregationResultsTranslator {
 
 		public PipelineAggregation lookup(String name);
 
+	}
+
+	protected Stream<org.elasticsearch.search.aggregations.Aggregation>
+		getElasticsearchAggregations(Aggregations aggregations) {
+
+		List<org.elasticsearch.search.aggregations.Aggregation> list =
+			aggregations.asList();
+
+		return list.stream();
 	}
 
 	protected AggregationResult translate(

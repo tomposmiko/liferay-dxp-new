@@ -61,7 +61,7 @@ public class ElasticsearchConnection {
 			_preConnectElasticsearchConnectionConsumer.accept(this);
 		}
 
-		_restHighLevelClient = _createRestHighLevelClient();
+		_restHighLevelClient = createRestHighLevelClient();
 	}
 
 	public String getConnectionId() {
@@ -98,14 +98,6 @@ public class ElasticsearchConnection {
 
 	public void setHttpSSLEnabled(boolean httpSSLEnabled) {
 		_httpSSLEnabled = httpSSLEnabled;
-	}
-
-	public void setMaxConnections(int maxConnections) {
-		_maxConnections = maxConnections;
-	}
-
-	public void setMaxConnectionsPerRoute(int maxConnectionsPerRoute) {
-		_maxConnectionsPerRoute = maxConnectionsPerRoute;
 	}
 
 	public void setNetworkHostAddresses(String[] networkHostAddresses) {
@@ -148,16 +140,12 @@ public class ElasticsearchConnection {
 		_userName = userName;
 	}
 
-	private RestHighLevelClient _createRestHighLevelClient() {
+	protected RestHighLevelClient createRestHighLevelClient() {
 		return RestHighLevelClientFactory.builder(
 		).authenticationEnabled(
 			_authenticationEnabled
 		).httpSSLEnabled(
 			_httpSSLEnabled
-		).maxConnections(
-			_maxConnections
-		).maxConnectionsPerRoute(
-			_maxConnectionsPerRoute
 		).networkHostAddresses(
 			_networkHostAddresses
 		).password(
@@ -183,8 +171,6 @@ public class ElasticsearchConnection {
 	private boolean _authenticationEnabled;
 	private String _connectionId;
 	private boolean _httpSSLEnabled;
-	private int _maxConnections;
-	private int _maxConnectionsPerRoute;
 	private String[] _networkHostAddresses;
 	private String _password;
 	private Runnable _postCloseRunnable;

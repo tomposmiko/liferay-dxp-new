@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -41,12 +42,10 @@ import com.liferay.portal.security.audit.storage.model.AuditEventTable;
 import com.liferay.portal.security.audit.storage.model.impl.AuditEventImpl;
 import com.liferay.portal.security.audit.storage.model.impl.AuditEventModelImpl;
 import com.liferay.portal.security.audit.storage.service.persistence.AuditEventPersistence;
-import com.liferay.portal.security.audit.storage.service.persistence.AuditEventUtil;
 import com.liferay.portal.security.audit.storage.service.persistence.impl.constants.AuditPersistenceConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -71,7 +70,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = AuditEventPersistence.class)
+@Component(service = {AuditEventPersistence.class, BasePersistence.class})
 public class AuditEventPersistenceImpl
 	extends BasePersistenceImpl<AuditEvent> implements AuditEventPersistence {
 
@@ -190,7 +189,7 @@ public class AuditEventPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<AuditEvent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AuditEvent auditEvent : list) {
@@ -548,7 +547,7 @@ public class AuditEventPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -977,7 +976,7 @@ public class AuditEventPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<AuditEvent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1047,7 +1046,7 @@ public class AuditEventPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1130,30 +1129,11 @@ public class AuditEventPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
-
-		_setAuditEventUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setAuditEventUtilPersistence(null);
-
 		entityCache.removeCache(AuditEventImpl.class.getName());
-	}
-
-	private void _setAuditEventUtilPersistence(
-		AuditEventPersistence auditEventPersistence) {
-
-		try {
-			Field field = AuditEventUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, auditEventPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -1215,5 +1195,8 @@ public class AuditEventPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private AuditEventModelArgumentsResolver _auditEventModelArgumentsResolver;
 
 }

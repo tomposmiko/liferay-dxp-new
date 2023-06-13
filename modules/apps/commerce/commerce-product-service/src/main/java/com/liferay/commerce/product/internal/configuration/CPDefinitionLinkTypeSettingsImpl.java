@@ -15,45 +15,75 @@
 package com.liferay.commerce.product.internal.configuration;
 
 import com.liferay.commerce.product.configuration.CPDefinitionLinkTypeSettings;
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CPDefinitionLinkTypeSettings.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CPDefinitionLinkTypeSettings.class
+)
 public class CPDefinitionLinkTypeSettingsImpl
 	implements CPDefinitionLinkTypeSettings {
 
 	@Override
 	public String[] getTypes() {
-		return ArrayUtil.toStringArray(_serviceTrackerMap.keySet());
+		return ArrayUtil.toStringArray(
+			_cpDefinitionLinkTypeConfigurationWrappers.keySet());
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, CPDefinitionLinkTypeConfigurationWrapper.class, null,
-			ServiceReferenceMapperFactory.create(
-				bundleContext,
-				(cpDefinitionLinkTypeConfigurationWrapper, emitter) ->
-					emitter.emit(
-						cpDefinitionLinkTypeConfigurationWrapper.getType())));
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addCPDefinitionLinkTypeConfigurationWrapper(
+		CPDefinitionLinkTypeConfigurationWrapper
+			cpDefinitionLinkTypeConfigurationWrapper) {
+
+		_cpDefinitionLinkTypeConfigurationWrappers.put(
+			cpDefinitionLinkTypeConfigurationWrapper.getType(),
+			cpDefinitionLinkTypeConfigurationWrapper);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
+	protected CPDefinitionLinkTypeConfigurationWrapper
+		getCPDefinitionLinkTypeConfigurationWrapper(String type) {
+
+		CPDefinitionLinkTypeConfigurationWrapper
+			cpDefinitionLinkTypeConfigurationWrapper =
+				_cpDefinitionLinkTypeConfigurationWrappers.get(type);
+
+		if (cpDefinitionLinkTypeConfigurationWrapper == null) {
+			_log.error("Unable to get cpDefinitionLink type: " + type);
+		}
+
+		return cpDefinitionLinkTypeConfigurationWrapper;
 	}
 
-	private ServiceTrackerMap<String, CPDefinitionLinkTypeConfigurationWrapper>
-		_serviceTrackerMap;
+	protected void removeCPDefinitionLinkTypeConfigurationWrapper(
+		CPDefinitionLinkTypeConfigurationWrapper
+			cpDefinitionLinkTypeConfigurationWrapper) {
+
+		_cpDefinitionLinkTypeConfigurationWrappers.remove(
+			cpDefinitionLinkTypeConfigurationWrapper.getType());
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CPDefinitionLinkTypeSettingsImpl.class);
+
+	private final Map<String, CPDefinitionLinkTypeConfigurationWrapper>
+		_cpDefinitionLinkTypeConfigurationWrappers = new ConcurrentHashMap<>();
 
 }

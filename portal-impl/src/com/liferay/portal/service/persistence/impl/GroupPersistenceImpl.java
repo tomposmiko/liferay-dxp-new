@@ -32,10 +32,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.GroupPersistence;
-import com.liferay.portal.kernel.service.persistence.GroupUtil;
 import com.liferay.portal.kernel.service.persistence.OrganizationPersistence;
 import com.liferay.portal.kernel.service.persistence.RolePersistence;
 import com.liferay.portal.kernel.service.persistence.UserGroupPersistence;
@@ -60,12 +57,10 @@ import com.liferay.portal.model.impl.GroupModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -202,7 +197,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -591,8 +586,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -727,7 +721,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof Group) {
@@ -847,8 +841,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1019,7 +1012,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -1438,8 +1431,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1601,7 +1593,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -1965,8 +1957,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2078,7 +2069,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByLiveGroupId, finderArgs, this);
+				_finderPathFetchByLiveGroupId, finderArgs);
 		}
 
 		if (result instanceof Group) {
@@ -2192,8 +2183,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {liveGroupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2341,7 +2331,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -2738,8 +2728,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, classNameId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2895,7 +2884,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -3292,8 +3281,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, parentGroupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3343,236 +3331,8 @@ public class GroupPersistenceImpl
 	private static final String _FINDER_COLUMN_C_P_PARENTGROUPID_2 =
 		"group_.parentGroupId = ?";
 
-	private FinderPath _finderPathWithPaginationFindByC_GK;
-	private FinderPath _finderPathWithoutPaginationFindByC_GK;
 	private FinderPath _finderPathFetchByC_GK;
 	private FinderPath _finderPathCountByC_GK;
-	private FinderPath _finderPathWithPaginationCountByC_GK;
-
-	/**
-	 * Returns all the groups where companyId = &#63; and groupKey = any &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>GroupModelImpl</code>.
-	 * </p>
-	 *
-	 * @param companyId the company ID
-	 * @param groupKeys the group keys
-	 * @return the matching groups
-	 */
-	@Override
-	public List<Group> findByC_GK(long companyId, String[] groupKeys) {
-		return findByC_GK(
-			companyId, groupKeys, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-	}
-
-	/**
-	 * Returns a range of all the groups where companyId = &#63; and groupKey = any &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>GroupModelImpl</code>.
-	 * </p>
-	 *
-	 * @param companyId the company ID
-	 * @param groupKeys the group keys
-	 * @param start the lower bound of the range of groups
-	 * @param end the upper bound of the range of groups (not inclusive)
-	 * @return the range of matching groups
-	 */
-	@Override
-	public List<Group> findByC_GK(
-		long companyId, String[] groupKeys, int start, int end) {
-
-		return findByC_GK(companyId, groupKeys, start, end, null);
-	}
-
-	/**
-	 * Returns an ordered range of all the groups where companyId = &#63; and groupKey = any &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>GroupModelImpl</code>.
-	 * </p>
-	 *
-	 * @param companyId the company ID
-	 * @param groupKeys the group keys
-	 * @param start the lower bound of the range of groups
-	 * @param end the upper bound of the range of groups (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching groups
-	 */
-	@Override
-	public List<Group> findByC_GK(
-		long companyId, String[] groupKeys, int start, int end,
-		OrderByComparator<Group> orderByComparator) {
-
-		return findByC_GK(
-			companyId, groupKeys, start, end, orderByComparator, true);
-	}
-
-	/**
-	 * Returns an ordered range of all the groups where companyId = &#63; and groupKey = &#63;, optionally using the finder cache.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>GroupModelImpl</code>.
-	 * </p>
-	 *
-	 * @param companyId the company ID
-	 * @param groupKeys the group keys
-	 * @param start the lower bound of the range of groups
-	 * @param end the upper bound of the range of groups (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching groups
-	 */
-	@Override
-	public List<Group> findByC_GK(
-		long companyId, String[] groupKeys, int start, int end,
-		OrderByComparator<Group> orderByComparator, boolean useFinderCache) {
-
-		if (groupKeys == null) {
-			groupKeys = new String[0];
-		}
-		else if (groupKeys.length > 1) {
-			for (int i = 0; i < groupKeys.length; i++) {
-				groupKeys[i] = Objects.toString(groupKeys[i], "");
-			}
-
-			groupKeys = ArrayUtil.sortedUnique(groupKeys);
-		}
-
-		if (groupKeys.length == 1) {
-			Group group = fetchByC_GK(companyId, groupKeys[0]);
-
-			if (group == null) {
-				return Collections.emptyList();
-			}
-			else {
-				List<Group> list = new ArrayList<Group>(1);
-
-				list.add(group);
-
-				return list;
-			}
-		}
-
-		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
-			Group.class);
-
-		Object[] finderArgs = null;
-
-		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
-			if (useFinderCache && productionMode) {
-				finderArgs = new Object[] {
-					companyId, StringUtil.merge(groupKeys)
-				};
-			}
-		}
-		else if (useFinderCache && productionMode) {
-			finderArgs = new Object[] {
-				companyId, StringUtil.merge(groupKeys), start, end,
-				orderByComparator
-			};
-		}
-
-		List<Group> list = null;
-
-		if (useFinderCache && productionMode) {
-			list = (List<Group>)FinderCacheUtil.getResult(
-				_finderPathWithPaginationFindByC_GK, finderArgs, this);
-
-			if ((list != null) && !list.isEmpty()) {
-				for (Group group : list) {
-					if ((companyId != group.getCompanyId()) ||
-						!ArrayUtil.contains(groupKeys, group.getGroupKey())) {
-
-						list = null;
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (list == null) {
-			StringBundler sb = new StringBundler();
-
-			sb.append(_SQL_SELECT_GROUP__WHERE);
-
-			sb.append(_FINDER_COLUMN_C_GK_COMPANYID_2);
-
-			if (groupKeys.length > 0) {
-				sb.append("(");
-
-				for (int i = 0; i < groupKeys.length; i++) {
-					String groupKey = groupKeys[i];
-
-					if (groupKey.isEmpty()) {
-						sb.append(_FINDER_COLUMN_C_GK_GROUPKEY_3);
-					}
-					else {
-						sb.append(_FINDER_COLUMN_C_GK_GROUPKEY_2);
-					}
-
-					if ((i + 1) < groupKeys.length) {
-						sb.append(WHERE_OR);
-					}
-				}
-
-				sb.append(")");
-			}
-
-			sb.setStringAt(
-				removeConjunction(sb.stringAt(sb.index() - 1)), sb.index() - 1);
-
-			if (orderByComparator != null) {
-				appendOrderByComparator(
-					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
-			}
-			else {
-				sb.append(GroupModelImpl.ORDER_BY_JPQL);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(companyId);
-
-				for (String groupKey : groupKeys) {
-					if ((groupKey != null) && !groupKey.isEmpty()) {
-						queryPos.add(groupKey);
-					}
-				}
-
-				list = (List<Group>)QueryUtil.list(
-					query, getDialect(), start, end);
-
-				cacheResult(list);
-
-				if (useFinderCache && productionMode) {
-					FinderCacheUtil.putResult(
-						_finderPathWithPaginationFindByC_GK, finderArgs, list);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return list;
-	}
 
 	/**
 	 * Returns the group where companyId = &#63; and groupKey = &#63; or throws a <code>NoSuchGroupException</code> if it could not be found.
@@ -3650,7 +3410,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_GK, finderArgs, this);
+				_finderPathFetchByC_GK, finderArgs);
 		}
 
 		if (result instanceof Group) {
@@ -3770,8 +3530,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, groupKey};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3813,109 +3572,6 @@ public class GroupPersistenceImpl
 
 				if (productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, count);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	/**
-	 * Returns the number of groups where companyId = &#63; and groupKey = any &#63;.
-	 *
-	 * @param companyId the company ID
-	 * @param groupKeys the group keys
-	 * @return the number of matching groups
-	 */
-	@Override
-	public int countByC_GK(long companyId, String[] groupKeys) {
-		if (groupKeys == null) {
-			groupKeys = new String[0];
-		}
-		else if (groupKeys.length > 1) {
-			for (int i = 0; i < groupKeys.length; i++) {
-				groupKeys[i] = Objects.toString(groupKeys[i], "");
-			}
-
-			groupKeys = ArrayUtil.sortedUnique(groupKeys);
-		}
-
-		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
-			Group.class);
-
-		Object[] finderArgs = null;
-
-		Long count = null;
-
-		if (productionMode) {
-			finderArgs = new Object[] {companyId, StringUtil.merge(groupKeys)};
-
-			count = (Long)FinderCacheUtil.getResult(
-				_finderPathWithPaginationCountByC_GK, finderArgs, this);
-		}
-
-		if (count == null) {
-			StringBundler sb = new StringBundler();
-
-			sb.append(_SQL_COUNT_GROUP__WHERE);
-
-			sb.append(_FINDER_COLUMN_C_GK_COMPANYID_2);
-
-			if (groupKeys.length > 0) {
-				sb.append("(");
-
-				for (int i = 0; i < groupKeys.length; i++) {
-					String groupKey = groupKeys[i];
-
-					if (groupKey.isEmpty()) {
-						sb.append(_FINDER_COLUMN_C_GK_GROUPKEY_3);
-					}
-					else {
-						sb.append(_FINDER_COLUMN_C_GK_GROUPKEY_2);
-					}
-
-					if ((i + 1) < groupKeys.length) {
-						sb.append(WHERE_OR);
-					}
-				}
-
-				sb.append(")");
-			}
-
-			sb.setStringAt(
-				removeConjunction(sb.stringAt(sb.index() - 1)), sb.index() - 1);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(companyId);
-
-				for (String groupKey : groupKeys) {
-					if ((groupKey != null) && !groupKey.isEmpty()) {
-						queryPos.add(groupKey);
-					}
-				}
-
-				count = (Long)query.uniqueResult();
-
-				if (productionMode) {
-					FinderCacheUtil.putResult(
-						_finderPathWithPaginationCountByC_GK, finderArgs,
-						count);
 				}
 			}
 			catch (Exception exception) {
@@ -4017,7 +3673,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_F, finderArgs, this);
+				_finderPathFetchByC_F, finderArgs);
 		}
 
 		if (result instanceof Group) {
@@ -4137,8 +3793,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, friendlyURL};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4306,7 +3961,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -4698,8 +4353,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, site};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4853,7 +4507,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -5246,8 +4900,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, active};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5402,7 +5055,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -5797,8 +5450,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5950,7 +5602,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -6339,8 +5991,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {type, active};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -6493,7 +6144,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -6755,8 +6406,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {groupId, companyId, parentGroupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -6897,7 +6547,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_C_C, finderArgs, this);
+				_finderPathFetchByC_C_C, finderArgs);
 		}
 
 		if (result instanceof Group) {
@@ -7011,8 +6661,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, classNameId, classPK};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -7188,7 +6837,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -7613,8 +7262,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, classNameId, parentGroupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -7783,7 +7431,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -8203,8 +7851,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, classNameId, site};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -8373,7 +8020,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -8796,8 +8443,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, parentGroupId, site};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -8941,7 +8587,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_L_GK, finderArgs, this);
+				_finderPathFetchByC_L_GK, finderArgs);
 		}
 
 		if (result instanceof Group) {
@@ -9071,8 +8717,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, liveGroupId, groupKey};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -9246,7 +8891,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -9696,8 +9341,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, treePath, site};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -9870,7 +9514,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -10315,8 +9959,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, name, site};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -10499,7 +10142,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -10919,8 +10562,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, site, active};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11087,7 +10729,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -11370,8 +11012,7 @@ public class GroupPersistenceImpl
 				groupId, companyId, classNameId, parentGroupId
 			};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11545,7 +11186,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -11824,8 +11465,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {groupId, companyId, parentGroupId, site};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11988,7 +11628,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_C_L_GK, finderArgs, this);
+				_finderPathFetchByC_C_L_GK, finderArgs);
 		}
 
 		if (result instanceof Group) {
@@ -12128,8 +11768,7 @@ public class GroupPersistenceImpl
 				companyId, classNameId, liveGroupId, groupKey
 			};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -12318,7 +11957,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -12792,8 +12431,7 @@ public class GroupPersistenceImpl
 
 			finderArgs = new Object[] {companyId, parentGroupId, name, site};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -12996,7 +12634,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Group group : list) {
@@ -13449,8 +13087,7 @@ public class GroupPersistenceImpl
 				companyId, parentGroupId, site, inheritContent
 			};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -13861,20 +13498,6 @@ public class GroupPersistenceImpl
 			group.setUuid(uuid);
 		}
 
-		if (!groupModelImpl.hasSetModifiedDate()) {
-			ServiceContext serviceContext =
-				ServiceContextThreadLocal.getServiceContext();
-
-			Date date = new Date();
-
-			if (serviceContext == null) {
-				group.setModifiedDate(date);
-			}
-			else {
-				group.setModifiedDate(serviceContext.getModifiedDate(date));
-			}
-		}
-
 		Session session = null;
 
 		try {
@@ -13966,7 +13589,7 @@ public class GroupPersistenceImpl
 	 */
 	@Override
 	public Group fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(Group.class, primaryKey)) {
+		if (CTPersistenceHelperUtil.isProductionMode(Group.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -14180,7 +13803,7 @@ public class GroupPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Group>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -14256,7 +13879,7 @@ public class GroupPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -15601,7 +15224,6 @@ public class GroupPersistenceImpl
 
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
-		Set<String> ctIgnoreColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -15609,7 +15231,6 @@ public class GroupPersistenceImpl
 		ctStrictColumnNames.add("uuid_");
 		ctStrictColumnNames.add("companyId");
 		ctStrictColumnNames.add("creatorUserId");
-		ctIgnoreColumnNames.add("modifiedDate");
 		ctStrictColumnNames.add("classNameId");
 		ctStrictColumnNames.add("classPK");
 		ctStrictColumnNames.add("parentGroupId");
@@ -15634,8 +15255,6 @@ public class GroupPersistenceImpl
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
-		_ctColumnNamesMap.put(
-			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK, Collections.singleton("groupId"));
 		_ctColumnNamesMap.put(
@@ -15812,20 +15431,6 @@ public class GroupPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "parentGroupId"}, false);
 
-		_finderPathWithPaginationFindByC_GK = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_GK",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			},
-			new String[] {"companyId", "groupKey"}, true);
-
-		_finderPathWithoutPaginationFindByC_GK = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_GK",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "groupKey"}, true);
-
 		_finderPathFetchByC_GK = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_GK",
 			new String[] {Long.class.getName(), String.class.getName()},
@@ -15833,11 +15438,6 @@ public class GroupPersistenceImpl
 
 		_finderPathCountByC_GK = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_GK",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "groupKey"}, false);
-
-		_finderPathWithPaginationCountByC_GK = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_GK",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "groupKey"}, false);
 
@@ -16223,32 +15823,15 @@ public class GroupPersistenceImpl
 				"companyId", "parentGroupId", "site", "inheritContent"
 			},
 			false);
-
-		_setGroupUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setGroupUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(GroupImpl.class.getName());
 
 		TableMapperFactory.removeTableMapper("Groups_Orgs");
 		TableMapperFactory.removeTableMapper("Groups_Roles");
 		TableMapperFactory.removeTableMapper("Groups_UserGroups");
 		TableMapperFactory.removeTableMapper("Users_Groups");
-	}
-
-	private void _setGroupUtilPersistence(GroupPersistence groupPersistence) {
-		try {
-			Field field = GroupUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, groupPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@BeanReference(type = OrganizationPersistence.class)

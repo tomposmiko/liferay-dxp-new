@@ -411,11 +411,6 @@ public class PortletItemWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected PortletItemWrapper wrap(PortletItem portletItem) {
 		return new PortletItemWrapper(portletItem);
 	}

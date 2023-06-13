@@ -17,7 +17,7 @@ package com.liferay.portlet.configuration.css.web.internal.portlet;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
@@ -54,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.icon=/icons/portlet_css.png",
@@ -67,8 +68,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + PortletConfigurationCSSPortletKeys.PORTLET_CONFIGURATION_CSS,
-		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.version=3.0"
+		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class
 )
@@ -98,7 +98,7 @@ public class PortletConfigurationCSSPortlet extends MVCPortlet {
 		PortletPreferences portletSetup =
 			themeDisplay.getStrictLayoutPortletSetup(layout, portletId);
 
-		String css = _getCSS(actionRequest);
+		String css = getCSS(actionRequest);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Updating css " + css);
@@ -106,12 +106,12 @@ public class PortletConfigurationCSSPortlet extends MVCPortlet {
 
 		String portletDecoratorId = ParamUtil.getString(
 			actionRequest, "portletDecoratorId");
-		Map<Locale, String> customTitleMap = _localization.getLocalizationMap(
-			actionRequest, "customTitle");
+		Map<Locale, String> customTitleMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "customTitle");
 		boolean useCustomTitle = ParamUtil.getBoolean(
 			actionRequest, "useCustomTitle");
 
-		Set<Locale> locales = _language.getAvailableLocales(
+		Set<Locale> locales = LanguageUtil.getAvailableLocales(
 			themeDisplay.getSiteGroupId());
 
 		for (Locale locale : locales) {
@@ -160,7 +160,9 @@ public class PortletConfigurationCSSPortlet extends MVCPortlet {
 			portletId);
 	}
 
-	private JSONObject _getAdvancedDataJSONObject(ActionRequest actionRequest) {
+	protected JSONObject getAdvancedDataJSONObject(
+		ActionRequest actionRequest) {
+
 		return JSONUtil.put(
 			"customCSS", ParamUtil.getString(actionRequest, "customCSS")
 		).put(
@@ -169,7 +171,7 @@ public class PortletConfigurationCSSPortlet extends MVCPortlet {
 		);
 	}
 
-	private JSONObject _getBgDataJSONObject(ActionRequest actionRequest) {
+	protected JSONObject getBgDataJSONObject(ActionRequest actionRequest) {
 		return JSONUtil.put(
 			"backgroundColor",
 			ParamUtil.getString(actionRequest, "backgroundColor")
@@ -199,7 +201,7 @@ public class PortletConfigurationCSSPortlet extends MVCPortlet {
 		);
 	}
 
-	private JSONObject _getBorderDataJSONObject(ActionRequest actionRequest) {
+	protected JSONObject getBorderDataJSONObject(ActionRequest actionRequest) {
 		return JSONUtil.put(
 			"borderColor",
 			JSONUtil.put(
@@ -275,21 +277,21 @@ public class PortletConfigurationCSSPortlet extends MVCPortlet {
 		);
 	}
 
-	private String _getCSS(ActionRequest actionRequest) {
+	protected String getCSS(ActionRequest actionRequest) {
 		return JSONUtil.put(
-			"advancedData", _getAdvancedDataJSONObject(actionRequest)
+			"advancedData", getAdvancedDataJSONObject(actionRequest)
 		).put(
-			"bgData", _getBgDataJSONObject(actionRequest)
+			"bgData", getBgDataJSONObject(actionRequest)
 		).put(
-			"borderData", _getBorderDataJSONObject(actionRequest)
+			"borderData", getBorderDataJSONObject(actionRequest)
 		).put(
-			"spacingData", _getSpacingDataJSONObject(actionRequest)
+			"spacingData", getSpacingDataJSONObject(actionRequest)
 		).put(
-			"textData", _getTextDataJSONObject(actionRequest)
+			"textData", getTextDataJSONObject(actionRequest)
 		).toString();
 	}
 
-	private JSONObject _getSpacingDataJSONObject(ActionRequest actionRequest) {
+	protected JSONObject getSpacingDataJSONObject(ActionRequest actionRequest) {
 		return JSONUtil.put(
 			"margin",
 			JSONUtil.put(
@@ -366,7 +368,7 @@ public class PortletConfigurationCSSPortlet extends MVCPortlet {
 		);
 	}
 
-	private JSONObject _getTextDataJSONObject(ActionRequest actionRequest) {
+	protected JSONObject getTextDataJSONObject(ActionRequest actionRequest) {
 		String fontStyle = StringPool.BLANK;
 
 		if (ParamUtil.getBoolean(actionRequest, "fontItalic")) {
@@ -403,21 +405,17 @@ public class PortletConfigurationCSSPortlet extends MVCPortlet {
 		);
 	}
 
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.portlet.configuration.css.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortletConfigurationCSSPortlet.class);
 
 	@Reference
-	private Language _language;
-
-	@Reference
-	private Localization _localization;
-
-	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.portlet.configuration.css.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
-	)
-	private Release _release;
 
 }

@@ -69,7 +69,7 @@ boolean emailFileEntryAnyEventEnabled = dlGroupServiceSettings.isEmailFileEntryA
 					</portlet:actionURL>
 
 					<liferay-ui:icon
-						icon="bell-off"
+						icon="star"
 						linkCssClass="icon-monospaced"
 						markupView="lexicon"
 						message="unsubscribe"
@@ -78,7 +78,7 @@ boolean emailFileEntryAnyEventEnabled = dlGroupServiceSettings.isEmailFileEntryA
 				</c:when>
 				<c:otherwise>
 					<liferay-ui:icon
-						icon="bell-off"
+						icon="star"
 						linkCssClass="icon-monospaced"
 						markupView="lexicon"
 						message="subscribed-to-a-parent-folder"
@@ -102,7 +102,7 @@ boolean emailFileEntryAnyEventEnabled = dlGroupServiceSettings.isEmailFileEntryA
 			</portlet:actionURL>
 
 			<liferay-ui:icon
-				icon="bell-on"
+				icon="star-o"
 				linkCssClass="icon-monospaced"
 				markupView="lexicon"
 				message="subscribe"

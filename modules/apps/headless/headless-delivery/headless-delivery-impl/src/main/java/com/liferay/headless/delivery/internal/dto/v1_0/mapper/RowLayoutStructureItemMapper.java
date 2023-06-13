@@ -18,7 +18,6 @@ import com.liferay.headless.delivery.dto.v1_0.PageElement;
 import com.liferay.headless.delivery.dto.v1_0.PageRowDefinition;
 import com.liferay.headless.delivery.dto.v1_0.RowViewport;
 import com.liferay.headless.delivery.dto.v1_0.RowViewportDefinition;
-import com.liferay.headless.delivery.internal.dto.v1_0.mapper.util.StyledLayoutStructureItemUtil;
 import com.liferay.layout.responsive.ViewportSize;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.layout.util.structure.RowStyledLayoutStructureItem;
@@ -55,16 +54,7 @@ public class RowLayoutStructureItemMapper
 			{
 				definition = new PageRowDefinition() {
 					{
-						cssClasses =
-							StyledLayoutStructureItemUtil.getCssClasses(
-								rowStyledLayoutStructureItem);
-						customCSS = StyledLayoutStructureItemUtil.getCustomCSS(
-							rowStyledLayoutStructureItem);
-						customCSSViewports =
-							StyledLayoutStructureItemUtil.getCustomCSSViewports(
-								rowStyledLayoutStructureItem);
 						gutters = rowStyledLayoutStructureItem.isGutters();
-						indexed = rowStyledLayoutStructureItem.isIndexed();
 						modulesPerRow =
 							rowStyledLayoutStructureItem.getModulesPerRow();
 						numberOfColumns =
@@ -86,19 +76,23 @@ public class RowLayoutStructureItemMapper
 									saveMappingConfiguration);
 							});
 						setFragmentViewports(
-							() -> getFragmentViewPorts(
-								rowStyledLayoutStructureItem.
-									getItemConfigJSONObject()));
-						setName(rowStyledLayoutStructureItem::getName);
+							() -> {
+								JSONObject itemConfigJSONObject =
+									rowStyledLayoutStructureItem.
+										getItemConfigJSONObject();
+
+								return getFragmentViewPorts(
+									itemConfigJSONObject);
+							});
 						setRowViewports(
 							() -> {
 								Map<String, JSONObject>
-									rowViewportConfigurationJSONObjects =
+									rowViewportConfigurations =
 										rowStyledLayoutStructureItem.
-											getViewportConfigurationJSONObjects();
+											getViewportConfigurations();
 
 								if (MapUtil.isEmpty(
-										rowViewportConfigurationJSONObjects)) {
+										rowViewportConfigurations)) {
 
 									return null;
 								}
@@ -108,17 +102,17 @@ public class RowLayoutStructureItemMapper
 										{
 											add(
 												_toRowViewport(
-													rowViewportConfigurationJSONObjects,
+													rowViewportConfigurations,
 													ViewportSize.
 														MOBILE_LANDSCAPE));
 											add(
 												_toRowViewport(
-													rowViewportConfigurationJSONObjects,
+													rowViewportConfigurations,
 													ViewportSize.
 														PORTRAIT_MOBILE));
 											add(
 												_toRowViewport(
-													rowViewportConfigurationJSONObjects,
+													rowViewportConfigurations,
 													ViewportSize.TABLET));
 										}
 									};
@@ -133,29 +127,29 @@ public class RowLayoutStructureItemMapper
 	}
 
 	private RowViewport _toRowViewport(
-		Map<String, JSONObject> rowViewportConfigurationJSONObjects,
+		Map<String, JSONObject> rowViewportConfigurationsMap,
 		ViewportSize viewportSize) {
 
 		return new RowViewport() {
 			{
 				id = viewportSize.getViewportSizeId();
 				rowViewportDefinition = _toRowViewportDefinition(
-					rowViewportConfigurationJSONObjects, viewportSize);
+					rowViewportConfigurationsMap, viewportSize);
 			}
 		};
 	}
 
 	private RowViewportDefinition _toRowViewportDefinition(
-		Map<String, JSONObject> rowViewportConfigurationJSONObjects,
+		Map<String, JSONObject> rowViewportConfigurations,
 		ViewportSize viewportSize) {
 
-		if (!rowViewportConfigurationJSONObjects.containsKey(
+		if (!rowViewportConfigurations.containsKey(
 				viewportSize.getViewportSizeId())) {
 
 			return null;
 		}
 
-		JSONObject jsonObject = rowViewportConfigurationJSONObjects.get(
+		JSONObject jsonObject = rowViewportConfigurations.get(
 			viewportSize.getViewportSizeId());
 
 		return new RowViewportDefinition() {

@@ -27,7 +27,7 @@ import com.liferay.portal.search.elasticsearch7.internal.configuration.Elasticse
 import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.configuration.OperationModeResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.constants.ConnectionConstants;
-import com.liferay.portal.search.elasticsearch7.internal.helper.SearchLogHelperUtil;
+import com.liferay.portal.search.elasticsearch7.internal.util.SearchLogHelperUtil;
 
 import java.net.InetAddress;
 
@@ -43,13 +43,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	service = {
 		ElasticsearchClientResolver.class, ElasticsearchConnectionManager.class
 	}
@@ -209,15 +209,11 @@ public class ElasticsearchConnectionManager
 	}
 
 	public boolean isCrossClusterReplicationEnabled() {
-		CrossClusterReplicationConfigurationHelper
-			currentCrossClusterReplicationConfigurationHelper =
-				crossClusterReplicationConfigurationHelper;
-
-		if (currentCrossClusterReplicationConfigurationHelper == null) {
+		if (crossClusterReplicationConfigurationHelper == null) {
 			return false;
 		}
 
-		return currentCrossClusterReplicationConfigurationHelper.
+		return crossClusterReplicationConfigurationHelper.
 			isCrossClusterReplicationEnabled();
 	}
 
@@ -356,12 +352,16 @@ public class ElasticsearchConnectionManager
 		return getElasticsearchConnection(remoteClusterConnectionId);
 	}
 
+	@Reference(unbind = "-")
+	protected void setClusterExecutor(ClusterExecutor clusterExecutor) {
+		_clusterExecutor = clusterExecutor;
+	}
+
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	protected volatile CrossClusterReplicationConfigurationHelper
+	protected CrossClusterReplicationConfigurationHelper
 		crossClusterReplicationConfigurationHelper;
 
 	@Reference
@@ -386,10 +386,6 @@ public class ElasticsearchConnectionManager
 			ConnectionConstants.REMOTE_CONNECTION_ID
 		).httpSSLEnabled(
 			elasticsearchConfigurationWrapper.httpSSLEnabled()
-		).maxConnections(
-			elasticsearchConfigurationWrapper.maxConnections()
-		).maxConnectionsPerRoute(
-			elasticsearchConfigurationWrapper.maxConnectionsPerRoute()
 		).networkHostAddresses(
 			elasticsearchConfigurationWrapper.networkHostAddresses()
 		).password(
@@ -424,9 +420,7 @@ public class ElasticsearchConnectionManager
 	private static final Log _log = LogFactoryUtil.getLog(
 		ElasticsearchConnectionManager.class);
 
-	@Reference
 	private ClusterExecutor _clusterExecutor;
-
 	private final Map<String, ElasticsearchConnection>
 		_elasticsearchConnections = new ConcurrentHashMap<>();
 

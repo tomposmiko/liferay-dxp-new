@@ -16,7 +16,7 @@ package com.liferay.portlet.configuration.sharing.web.internal.portlet.configura
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
@@ -29,8 +29,11 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.configuration.sharing.web.internal.constants.PortletConfigurationSharingPortletKeys;
+
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -42,13 +45,21 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = PortletConfigurationIcon.class)
+@Component(immediate = true, service = PortletConfigurationIcon.class)
 public class NetvibesPortletConfigurationIcon
 	extends BasePortletConfigurationIcon {
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "add-to-netvibes");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getLocale(portletRequest), getClass());
+
+		return LanguageUtil.get(resourceBundle, "add-to-netvibes");
+	}
+
+	@Override
+	public String getMethod() {
+		return "get";
 	}
 
 	@Override
@@ -69,7 +80,7 @@ public class NetvibesPortletConfigurationIcon
 			return portletURL.toString();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return StringPool.BLANK;
 		}
@@ -78,6 +89,11 @@ public class NetvibesPortletConfigurationIcon
 	@Override
 	public double getWeight() {
 		return 2.0;
+	}
+
+	@Override
+	public boolean isLabel() {
+		return true;
 	}
 
 	@Override
@@ -119,9 +135,6 @@ public class NetvibesPortletConfigurationIcon
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		NetvibesPortletConfigurationIcon.class);
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

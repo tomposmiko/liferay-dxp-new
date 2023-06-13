@@ -20,7 +20,6 @@ import com.liferay.fragment.model.FragmentCompositionTable;
 import com.liferay.fragment.model.impl.FragmentCompositionImpl;
 import com.liferay.fragment.model.impl.FragmentCompositionModelImpl;
 import com.liferay.fragment.service.persistence.FragmentCompositionPersistence;
-import com.liferay.fragment.service.persistence.FragmentCompositionUtil;
 import com.liferay.fragment.service.persistence.impl.constants.FragmentPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,11 +48,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -84,7 +83,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = FragmentCompositionPersistence.class)
+@Component(
+	service = {FragmentCompositionPersistence.class, BasePersistence.class}
+)
 public class FragmentCompositionPersistenceImpl
 	extends BasePersistenceImpl<FragmentComposition>
 	implements FragmentCompositionPersistence {
@@ -206,7 +207,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentComposition fragmentComposition : list) {
@@ -603,7 +604,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -739,7 +740,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof FragmentComposition) {
@@ -860,7 +861,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1032,7 +1033,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentComposition fragmentComposition : list) {
@@ -1459,7 +1460,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1622,7 +1623,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentComposition fragmentComposition : list) {
@@ -1997,7 +1998,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2146,7 +2147,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentComposition fragmentComposition : list) {
@@ -2529,7 +2530,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {fragmentCollectionId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2683,7 +2684,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentComposition fragmentComposition : list) {
@@ -3085,7 +3086,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3217,8 +3218,7 @@ public class FragmentCompositionPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_FCK, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_FCK, finderArgs);
 		}
 
 		if (result instanceof FragmentComposition) {
@@ -3343,7 +3343,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCompositionKey};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3514,7 +3514,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentComposition fragmentComposition : list) {
@@ -3972,7 +3972,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionId, name};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4163,7 +4163,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentComposition fragmentComposition : list) {
@@ -4593,7 +4593,7 @@ public class FragmentCompositionPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4764,7 +4764,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentComposition fragmentComposition : list) {
@@ -5248,7 +5248,7 @@ public class FragmentCompositionPersistenceImpl
 				groupId, fragmentCollectionId, name, status
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5484,7 +5484,7 @@ public class FragmentCompositionPersistenceImpl
 		fragmentComposition.setNew(true);
 		fragmentComposition.setPrimaryKey(fragmentCompositionId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		fragmentComposition.setUuid(uuid);
 
@@ -5611,7 +5611,7 @@ public class FragmentCompositionPersistenceImpl
 			(FragmentCompositionModelImpl)fragmentComposition;
 
 		if (Validator.isNull(fragmentComposition.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			fragmentComposition.setUuid(uuid);
 		}
@@ -5739,9 +5739,7 @@ public class FragmentCompositionPersistenceImpl
 	 */
 	@Override
 	public FragmentComposition fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				FragmentComposition.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(FragmentComposition.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -5964,7 +5962,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentComposition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -6040,7 +6038,7 @@ public class FragmentCompositionPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -6362,31 +6360,11 @@ public class FragmentCompositionPersistenceImpl
 			},
 			new String[] {"groupId", "fragmentCollectionId", "name", "status"},
 			false);
-
-		_setFragmentCompositionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setFragmentCompositionUtilPersistence(null);
-
 		entityCache.removeCache(FragmentCompositionImpl.class.getName());
-	}
-
-	private void _setFragmentCompositionUtilPersistence(
-		FragmentCompositionPersistence fragmentCompositionPersistence) {
-
-		try {
-			Field field = FragmentCompositionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, fragmentCompositionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -6456,6 +6434,7 @@ public class FragmentCompositionPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private FragmentCompositionModelArgumentsResolver
+		_fragmentCompositionModelArgumentsResolver;
 
 }

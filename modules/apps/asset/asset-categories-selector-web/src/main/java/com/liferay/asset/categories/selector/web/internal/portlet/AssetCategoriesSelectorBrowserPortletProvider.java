@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Antonio Pol
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.asset.kernel.model.AssetCategory",
 	service = BrowsePortletProvider.class
 )

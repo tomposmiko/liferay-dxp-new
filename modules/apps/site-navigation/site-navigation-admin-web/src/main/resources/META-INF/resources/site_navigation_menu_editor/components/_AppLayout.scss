@@ -24,7 +24,6 @@ $sidebarWidth: 320px;
 
 	&-content {
 		padding-right: 0;
-		position: relative;
 		transition: padding-right ease 0.5s;
 		will-change: padding-right;
 
@@ -61,6 +60,8 @@ $sidebarWidth: 320px;
 		}
 
 		.rtl & {
+			transform: translateX(-$sidebarWidth);
+
 			&--visible {
 				transform: translateX(0);
 			}

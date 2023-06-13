@@ -16,10 +16,8 @@ package com.liferay.change.tracking.web.internal.display.context;
 
 import com.liferay.change.tracking.constants.CTActionKeys;
 import com.liferay.change.tracking.constants.CTConstants;
-import com.liferay.change.tracking.mapping.CTMappingTableInfo;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTPreferences;
-import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTCollectionService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
@@ -29,6 +27,7 @@ import com.liferay.change.tracking.web.internal.security.permission.resource.CTC
 import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
@@ -37,11 +36,11 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -64,7 +63,6 @@ import javax.servlet.http.HttpServletRequest;
 public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 
 	public PublicationsDisplayContext(
-		CTCollectionLocalService ctCollectionLocalService,
 		CTCollectionService ctCollectionService,
 		CTDisplayRendererRegistry ctDisplayRendererRegistry,
 		CTEntryLocalService ctEntryLocalService,
@@ -74,16 +72,15 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 
 		super(httpServletRequest);
 
-		_ctCollectionLocalService = ctCollectionLocalService;
 		_ctCollectionService = ctCollectionService;
 		_ctDisplayRendererRegistry = ctDisplayRendererRegistry;
 		_ctEntryLocalService = ctEntryLocalService;
 		_httpServletRequest = httpServletRequest;
 		_language = language;
-		_renderRequest = renderRequest;
-		_renderResponse = renderResponse;
 
-		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		_renderRequest = renderRequest;
+
+		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		CTPreferences ctPreferences =
@@ -96,10 +93,12 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 		else {
 			_ctCollectionId = ctPreferences.getCtCollectionId();
 		}
+
+		_renderResponse = renderResponse;
 	}
 
 	public Map<String, Object> getCollaboratorsReactData(
-			long ctCollectionId, boolean publicationTemplate)
+			CTCollection ctCollection)
 		throws PortalException {
 
 		return HashMapBuilder.<String, Object>put(
@@ -110,12 +109,10 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 
 				autocompleteUserURL.setResourceID(
 					"/change_tracking/autocomplete_user");
+
 				autocompleteUserURL.setParameter(
 					"ctCollectionId",
-					String.valueOf(
-						publicationTemplate ?
-							CTConstants.CT_COLLECTION_ID_PRODUCTION :
-								ctCollectionId));
+					String.valueOf(ctCollection.getCtCollectionId()));
 
 				return autocompleteUserURL.toString();
 			}
@@ -127,12 +124,10 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 
 				getCollaboratorsURL.setResourceID(
 					"/change_tracking/get_collaborators");
+
 				getCollaboratorsURL.setParameter(
 					"ctCollectionId",
-					String.valueOf(
-						publicationTemplate ?
-							CTConstants.CT_COLLECTION_ID_PRODUCTION :
-								ctCollectionId));
+					String.valueOf(ctCollection.getCtCollectionId()));
 
 				return getCollaboratorsURL.toString();
 			}
@@ -143,12 +138,10 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 					_renderResponse.createResourceURL();
 
 				inviteUsersURL.setResourceID("/change_tracking/invite_users");
+
 				inviteUsersURL.setParameter(
 					"ctCollectionId",
-					String.valueOf(
-						publicationTemplate ?
-							CTConstants.CT_COLLECTION_ID_PRODUCTION :
-								ctCollectionId));
+					String.valueOf(ctCollection.getCtCollectionId()));
 
 				return inviteUsersURL.toString();
 			}
@@ -156,30 +149,9 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 			"namespace", _renderResponse.getNamespace()
 		).put(
 			"readOnly",
-			() -> {
-				if ((ctCollectionId ==
-						CTConstants.CT_COLLECTION_ID_PRODUCTION) ||
-					publicationTemplate) {
-
-					return false;
-				}
-
-				CTCollection ctCollection =
-					_ctCollectionLocalService.fetchCTCollection(ctCollectionId);
-
-				if ((ctCollection == null) ||
-					(ctCollection.getStatus() ==
-						WorkflowConstants.STATUS_APPROVED) ||
-					(ctCollection.getStatus() ==
-						WorkflowConstants.STATUS_EXPIRED)) {
-
-					return true;
-				}
-
-				return !CTCollectionPermission.contains(
-					_themeDisplay.getPermissionChecker(), ctCollectionId,
-					ActionKeys.PERMISSIONS);
-			}
+			!CTCollectionPermission.contains(
+				_themeDisplay.getPermissionChecker(), ctCollection,
+				ActionKeys.PERMISSIONS)
 		).put(
 			"roles",
 			JSONUtil.putAll(
@@ -253,24 +225,24 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 					"label",
 					_language.get(
 						_httpServletRequest,
-						PublicationRoleConstants.LABEL_ADMIN)
+						PublicationRoleConstants.LABEL_INVITER)
 				).put(
 					"longDescription",
 					_language.get(
 						_httpServletRequest,
-						"admins-can-view,-edit,-publish,-and-invite-other-" +
+						"inviters-can-view,-edit,-publish,-and-invite-other-" +
 							"users")
 				).put(
 					"shortDescription",
 					_language.get(
 						_httpServletRequest,
-						"admins-can-view,-edit,-publish,-and-invite-other-" +
+						"inviters-can-view,-edit,-publish,-and-invite-other-" +
 							"users")
 				).put(
-					"value", PublicationRoleConstants.ROLE_ADMIN
+					"value", PublicationRoleConstants.ROLE_INVITER
 				))
 		).put(
-			"spritemap", _themeDisplay.getPathThemeSpritemap()
+			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
 			"verifyEmailAddressURL",
 			() -> {
@@ -279,12 +251,10 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 
 				sharingVerifyEmailAddressURL.setResourceID(
 					"/change_tracking/verify_email_address");
+
 				sharingVerifyEmailAddressURL.setParameter(
 					"ctCollectionId",
-					String.valueOf(
-						publicationTemplate ?
-							CTConstants.CT_COLLECTION_ID_PRODUCTION :
-								ctCollectionId));
+					String.valueOf(ctCollection.getCtCollectionId()));
 
 				return sharingVerifyEmailAddressURL.toString();
 			}
@@ -303,8 +273,7 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 			CTCollection ctCollection, PermissionChecker permissionChecker)
 		throws Exception {
 
-		Map<String, Object> data = getCollaboratorsReactData(
-			ctCollection.getCtCollectionId(), false);
+		Map<String, Object> data = getCollaboratorsReactData(ctCollection);
 
 		if ((ctCollection.getStatus() != WorkflowConstants.STATUS_EXPIRED) &&
 			CTCollectionPermission.contains(
@@ -416,34 +385,35 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 
 		String keywords = displayTerms.getKeywords();
 
-		searchContainer.setResultsAndTotal(
-			() -> {
-				String column = searchContainer.getOrderByCol();
-
-				if (column.equals("modified-date")) {
-					column = "modifiedDate";
-				}
-
-				return _ctCollectionService.getCTCollections(
-					_themeDisplay.getCompanyId(),
-					new int[] {
-						WorkflowConstants.STATUS_DRAFT,
-						WorkflowConstants.STATUS_EXPIRED
-					},
-					keywords, searchContainer.getStart(),
-					searchContainer.getEnd(),
-					OrderByComparatorFactoryUtil.create(
-						"CTCollection", column,
-						Objects.equals(
-							searchContainer.getOrderByType(), "asc")));
+		int count = _ctCollectionService.getCTCollectionsCount(
+			_themeDisplay.getCompanyId(),
+			new int[] {
+				WorkflowConstants.STATUS_DRAFT, WorkflowConstants.STATUS_EXPIRED
 			},
-			_ctCollectionService.getCTCollectionsCount(
-				_themeDisplay.getCompanyId(),
-				new int[] {
-					WorkflowConstants.STATUS_DRAFT,
-					WorkflowConstants.STATUS_EXPIRED
-				},
-				keywords));
+			keywords);
+
+		searchContainer.setTotal(count);
+
+		String column = searchContainer.getOrderByCol();
+
+		if (column.equals("modified-date")) {
+			column = "modifiedDate";
+		}
+
+		OrderByComparator<CTCollection> orderByComparator =
+			OrderByComparatorFactoryUtil.create(
+				"CTCollection", column,
+				Objects.equals(searchContainer.getOrderByType(), "asc"));
+
+		List<CTCollection> results = _ctCollectionService.getCTCollections(
+			_themeDisplay.getCompanyId(),
+			new int[] {
+				WorkflowConstants.STATUS_DRAFT, WorkflowConstants.STATUS_EXPIRED
+			},
+			keywords, searchContainer.getStart(), searchContainer.getEnd(),
+			orderByComparator);
+
+		searchContainer.setResults(results);
 
 		_searchContainer = searchContainer;
 
@@ -516,13 +486,6 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 			return true;
 		}
 
-		List<CTMappingTableInfo> mappingTableInfos =
-			_ctCollectionLocalService.getCTMappingTableInfos(ctCollectionId);
-
-		if (!mappingTableInfos.isEmpty()) {
-			return true;
-		}
-
 		return false;
 	}
 
@@ -537,7 +500,6 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 	}
 
 	private final long _ctCollectionId;
-	private final CTCollectionLocalService _ctCollectionLocalService;
 	private final CTCollectionService _ctCollectionService;
 	private final CTDisplayRendererRegistry _ctDisplayRendererRegistry;
 	private final CTEntryLocalService _ctEntryLocalService;

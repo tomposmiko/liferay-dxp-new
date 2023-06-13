@@ -51,17 +51,12 @@ public class UpgradePortalPreferences extends PortalPreferencesUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_populatePreferenceNamesMap();
+		populatePreferenceNamesMap();
 
 		super.doUpgrade();
 	}
 
-	@Override
-	protected Map<String, String> getPreferenceNamesMap() {
-		return _preferenceNamesMap;
-	}
-
-	private String _getNewPreferenceName(String preferenceName) {
+	protected String getNewPreferenceName(String preferenceName) {
 		for (Pattern pattern : _oldPreferencePatterns) {
 			Matcher matcher = pattern.matcher(preferenceName);
 
@@ -85,7 +80,12 @@ public class UpgradePortalPreferences extends PortalPreferencesUpgradeProcess {
 		return null;
 	}
 
-	private void _populatePreferenceNamesMap() throws Exception {
+	@Override
+	protected Map<String, String> getPreferenceNamesMap() {
+		return _preferenceNamesMap;
+	}
+
+	protected void populatePreferenceNamesMap() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement = connection.prepareStatement(
 				StringBundler.concat(
@@ -101,7 +101,7 @@ public class UpgradePortalPreferences extends PortalPreferencesUpgradeProcess {
 				String newPreferenceName = null;
 
 				if (!_preferenceNamesMap.containsKey(preferenceName)) {
-					newPreferenceName = _getNewPreferenceName(preferenceName);
+					newPreferenceName = getNewPreferenceName(preferenceName);
 				}
 
 				if (newPreferenceName != null) {

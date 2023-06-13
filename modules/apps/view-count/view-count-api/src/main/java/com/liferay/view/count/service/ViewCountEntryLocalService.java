@@ -14,7 +14,6 @@
 
 package com.liferay.view.count.service;
 
-import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -268,9 +267,6 @@ public interface ViewCountEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ViewCountEntry getViewCountEntry(ViewCountEntryPK viewCountEntryPK)
 		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Table<?> getViewCountEntryTable();
 
 	@BufferedIncrement(incrementClass = NumberIncrement.class)
 	@Retry(

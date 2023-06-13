@@ -38,7 +38,7 @@
 			</h6>
 
 			<h6 class="text-default">
-				<liferay-ui:message key="<%= role.getTypeLabel() %>" />
+				<%= LanguageUtil.get(request, role.getTypeLabel()) %>
 			</h6>
 		</liferay-ui:search-container-column-text>
 	</c:when>

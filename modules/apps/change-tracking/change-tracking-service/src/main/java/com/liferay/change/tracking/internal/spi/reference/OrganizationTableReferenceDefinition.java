@@ -20,7 +20,6 @@ import com.liferay.change.tracking.spi.reference.builder.ParentTableReferenceInf
 import com.liferay.portal.kernel.model.ClassNameTable;
 import com.liferay.portal.kernel.model.CompanyTable;
 import com.liferay.portal.kernel.model.CountryTable;
-import com.liferay.portal.kernel.model.EmailAddressTable;
 import com.liferay.portal.kernel.model.GroupTable;
 import com.liferay.portal.kernel.model.ImageTable;
 import com.liferay.portal.kernel.model.ListTypeConstants;
@@ -67,27 +66,11 @@ public class OrganizationTableReferenceDefinition
 				ListTypeTable.INSTANCE
 			).innerJoinON(
 				OrganizationTable.INSTANCE,
-				OrganizationTable.INSTANCE.statusListTypeId.eq(
+				OrganizationTable.INSTANCE.statusId.eq(
 					ListTypeTable.INSTANCE.listTypeId
 				).and(
 					ListTypeTable.INSTANCE.type.eq(
 						ListTypeConstants.ORGANIZATION_STATUS)
-				)
-			)
-		).referenceInnerJoin(
-			fromStep -> fromStep.from(
-				EmailAddressTable.INSTANCE
-			).innerJoinON(
-				OrganizationTable.INSTANCE,
-				OrganizationTable.INSTANCE.organizationId.eq(
-					EmailAddressTable.INSTANCE.classPK)
-			).innerJoinON(
-				ClassNameTable.INSTANCE,
-				ClassNameTable.INSTANCE.classNameId.eq(
-					EmailAddressTable.INSTANCE.classNameId
-				).and(
-					ClassNameTable.INSTANCE.value.eq(
-						Organization.class.getName())
 				)
 			)
 		).singleColumnReference(

@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -76,15 +77,18 @@ public class UserModelListenerTest {
 
 	@Test
 	public void testDeletingUserSharedDeletesSharingEntries() throws Exception {
+		long classNameId = _classNameLocalService.getClassNameId(
+			Group.class.getName());
 		long classPK = _group.getGroupId();
 
-		_sharingEntryLocalService.addSharingEntry(
-			_user.getUserId(), _groupUser.getUserId(),
-			_classNameLocalService.getClassNameId(Group.class.getName()),
-			classPK, _group.getGroupId(), true,
-			Arrays.asList(SharingEntryAction.VIEW), null,
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), _user.getUserId()));
+				_group.getGroupId(), _user.getUserId());
+
+		_sharingEntryLocalService.addSharingEntry(
+			_user.getUserId(), _groupUser.getUserId(), classNameId, classPK,
+			_group.getGroupId(), true, Arrays.asList(SharingEntryAction.VIEW),
+			null, serviceContext);
 
 		List<SharingEntry> toUserSharingEntries =
 			_sharingEntryLocalService.getToUserSharingEntries(
@@ -107,15 +111,18 @@ public class UserModelListenerTest {
 	public void testDeletingUserSharingDoesNotDeleteSharingEntries()
 		throws Exception {
 
+		long classNameId = _classNameLocalService.getClassNameId(
+			Group.class.getName());
 		long classPK = _group.getGroupId();
 
-		_sharingEntryLocalService.addSharingEntry(
-			_user.getUserId(), _groupUser.getUserId(),
-			_classNameLocalService.getClassNameId(Group.class.getName()),
-			classPK, _group.getGroupId(), true,
-			Arrays.asList(SharingEntryAction.VIEW), null,
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), _user.getUserId()));
+				_group.getGroupId(), _user.getUserId());
+
+		_sharingEntryLocalService.addSharingEntry(
+			_user.getUserId(), _groupUser.getUserId(), classNameId, classPK,
+			_group.getGroupId(), true, Arrays.asList(SharingEntryAction.VIEW),
+			null, serviceContext);
 
 		List<SharingEntry> toUserSharingEntries =
 			_sharingEntryLocalService.getToUserSharingEntries(

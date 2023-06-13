@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -25,24 +23,19 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-		else {
-			JSONGroup.deleteGroupByName(groupName = "Site Name");
-		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8356 | Test Summary: 180 Days time period filter in Path Analysis"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test CanTimeFilterUse180DaysPathAnalysis {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: Need past data
 		// AC Refactor ticket: LRAC-8874
@@ -52,7 +45,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to Pages tab in Sites") {
@@ -73,9 +66,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8358 | Test Summary: Custom Range time period filter in Path Analysis"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test CanTimeFilterUseCustomRangeInPathAnalysis {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: Need past data
 		// AC Refactor ticket: LRAC-8878
@@ -85,7 +78,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to Pages tab in Sites") {
@@ -98,21 +91,21 @@ definition {
 
 		task ("Assert custom time filter") {
 			ACTimeFilter.setCustomRange(
-				endDay = 13,
+				endDay = "13",
 				endMonth = "July",
-				endYear = 2020,
-				startDay = 1,
+				endYear = "2020",
+				startDay = "1",
 				startMonth = "July",
-				startYear = 2020);
+				startYear = "2020");
 
 			ACTimeFilter.assertCurrentTimeFilterRange(timeFilterRange = "Jul 1, 2020 - Jul 13, 2020");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8357 | Test Summary: Last Year time period filter in Path Analysis"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test CanTimeFilterUseLastYearPathAnalysis {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: Need past data
 		// AC Refactor ticket: LRAC-8875
@@ -122,7 +115,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to Pages tab in Sites") {
@@ -139,62 +132,6 @@ definition {
 			ACTimeFilter.setLastYear();
 
 			ACTimeFilter.assertCurrentTimeFilterRange(timeFilterRange = "Last Year");
-		}
-	}
-
-	@description = "Bug: LRAC-8988 | Automation ID: LRAC-11059 | Test Summary: Create the page name with special characters makes the correct name appear in the path part of AC pages"
-	@priority = 3
-	test CreatePageNameWithSpecialCharactersMakeCorrectNameAppearInPath {
-		property analytics.cloud.upstream = "false";
-
-		task ("Create a site and a blog and add to a page") {
-			ACUtils.addSiteAndPage();
-
-			ACUtils.createBlogsAndAddToPage(entryTitle = "Snúið Vinsælar þú");
-		}
-
-		task ("Connect AC to DXP") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
-		}
-
-		task ("Visit the page, then close the sessions") {
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Snúið Vinsælar þú",
-				pageName = "AC Page",
-				siteName = "Site Name");
-
-			ACUtils.closeAllSessionsAndWait();
-		}
-
-		task ("Switch to new property in AC") {
-			ACUtils.launchAC();
-
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
-		}
-
-		task ("Go to Pages tab, change time filter to last 24 hours and select the page") {
-			ACNavigation.goToSites();
-
-			ACNavigation.switchTab(tabName = "Pages");
-
-			ACTimeFilter.clickTimeFilterButton();
-
-			ACTimeFilter.setLast24Hours();
-
-			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, " ");
-
-			ACNavigation.openItem(itemName = "Snúið Vinsælar þú - Site Name - ${dataSourceName}");
-		}
-
-		task ("Go to the Path tab") {
-			ACNavigation.switchTab(tabName = "Path");
-		}
-
-		task ("Check if the page name is displayed correctly") {
-			AssertElementPresent(
-				key_pageName = "Snúið Vinsælar þú - Site Name - ${dataSourceName}",
-				locator1 = "ACSites#SITE_PATH");
 		}
 	}
 

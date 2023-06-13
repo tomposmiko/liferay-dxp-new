@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Tina Tian
  */
-@Component(service = JSPTaglibHelper.class)
+@Component(immediate = true, service = JSPTaglibHelper.class)
 public class JSPTaglibHelperImpl implements JSPTaglibHelper {
 
 	@Override

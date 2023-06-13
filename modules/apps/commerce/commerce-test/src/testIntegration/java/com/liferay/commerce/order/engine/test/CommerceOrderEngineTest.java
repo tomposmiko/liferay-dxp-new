@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.order.engine.test;
 
-import com.liferay.account.model.AccountEntry;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceShipmentConstants;
@@ -53,6 +53,7 @@ import com.liferay.commerce.test.util.order.status.Test2CommerceOrderStatusImpl;
 import com.liferay.commerce.test.util.order.status.Test3CommerceOrderStatusImpl;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.RandomUtil;
@@ -64,11 +65,11 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -77,12 +78,15 @@ import java.math.BigDecimal;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.frutilla.FrutillaRule;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -106,11 +110,17 @@ public class CommerceOrderEngineTest {
 		new LiferayIntegrationTestRule(),
 		PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		PrincipalThreadLocal.setName(_user.getUserId());
 
@@ -128,7 +138,7 @@ public class CommerceOrderEngineTest {
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
 			_commerceCurrency.getCode(), _serviceContext);
 
-		_accountEntry = CommerceAccountTestUtil.addBusinessAccountEntry(
+		_commerceAccount = CommerceAccountTestUtil.addBusinessCommerceAccount(
 			_user.getUserId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString() + "@liferay.com",
 			RandomTestUtil.randomString(), new long[] {_user.getUserId()}, null,
@@ -136,7 +146,7 @@ public class CommerceOrderEngineTest {
 
 		_commerceOrder = CommerceTestUtil.addB2BCommerceOrder(
 			_group.getGroupId(), _user.getUserId(),
-			_accountEntry.getAccountEntryId(),
+			_commerceAccount.getCommerceAccountId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		_commerceOrder = CommerceTestUtil.addCheckoutDetailsToCommerceOrder(
@@ -148,8 +158,8 @@ public class CommerceOrderEngineTest {
 			_commerceOrder.getCommerceOrderId(), _serviceContext);
 
 		_commerceContext = new TestCommerceContext(
-			_commerceOrder.getAccountEntry(), _commerceCurrency,
-			_commerceChannel, _user, _group, _commerceOrder);
+			_commerceCurrency, _commerceChannel, _user, _group,
+			_commerceOrder.getCommerceAccount(), _commerceOrder);
 	}
 
 	@After
@@ -202,10 +212,10 @@ public class CommerceOrderEngineTest {
 			commerceInventoryWarehouses.get(0);
 
 		_commerceShipmentItemLocalService.addCommerceShipmentItem(
-			null, _commerceShipment1.getCommerceShipmentId(),
+			_commerceShipment1.getCommerceShipmentId(),
 			commerceOrderItem.getCommerceOrderItemId(),
 			commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-			commerceOrderItem.getQuantity(), true, _serviceContext);
+			commerceOrderItem.getQuantity(), _serviceContext);
 
 		_commerceShipment1 = _commerceShipmentLocalService.updateStatus(
 			_commerceShipment1.getCommerceShipmentId(),
@@ -281,10 +291,10 @@ public class CommerceOrderEngineTest {
 			commerceInventoryWarehouses.get(0);
 
 		_commerceShipmentItemLocalService.addCommerceShipmentItem(
-			null, _commerceShipment1.getCommerceShipmentId(),
+			_commerceShipment1.getCommerceShipmentId(),
 			commerceOrderItem.getCommerceOrderItemId(),
 			commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-			commerceOrderItem.getQuantity() / 2, true, _serviceContext);
+			commerceOrderItem.getQuantity() / 2, _serviceContext);
 
 		_commerceShipment1 = _commerceShipmentLocalService.updateStatus(
 			_commerceShipment1.getCommerceShipmentId(),
@@ -346,10 +356,10 @@ public class CommerceOrderEngineTest {
 			commerceInventoryWarehouses.get(0);
 
 		_commerceShipmentItemLocalService.addCommerceShipmentItem(
-			null, _commerceShipment1.getCommerceShipmentId(),
+			_commerceShipment1.getCommerceShipmentId(),
 			commerceOrderItem.getCommerceOrderItemId(),
 			commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-			commerceOrderItem.getQuantity(), true, _serviceContext);
+			commerceOrderItem.getQuantity(), _serviceContext);
 
 		_commerceShipment1 = _commerceShipmentLocalService.updateStatus(
 			_commerceShipment1.getCommerceShipmentId(),
@@ -504,12 +514,17 @@ public class CommerceOrderEngineTest {
 			openCommerceOrderStatus.getKey(), OpenCommerceOrderStatusImpl.KEY);
 		Assert.assertTrue(openCommerceOrderStatus.isComplete(_commerceOrder));
 
+		List<CommerceOrderStatus> nextCommerceOrderStatuses =
+			_commerceOrderEngine.getNextCommerceOrderStatuses(_commerceOrder);
+
+		Stream<CommerceOrderStatus> stream = nextCommerceOrderStatuses.stream();
+
 		List<CommerceOrderStatus> inProgressCommerceOrderStatuses =
-			ListUtil.filter(
-				_commerceOrderEngine.getNextCommerceOrderStatuses(
-					_commerceOrder),
-				entry ->
-					entry.getKey() == InProgressCommerceOrderStatusImpl.KEY);
+			stream.filter(
+				entry -> entry.getKey() == InProgressCommerceOrderStatusImpl.KEY
+			).collect(
+				Collectors.toList()
+			);
 
 		Assert.assertEquals(
 			inProgressCommerceOrderStatuses.toString(), 1,
@@ -661,9 +676,6 @@ public class CommerceOrderEngineTest {
 					_commerceOrder.getCommerceOrderId(), 0, null,
 					BigDecimal.ZERO, _commerceContext);
 
-			_commerceOrder = _commerceOrderLocalService.recalculatePrice(
-				_commerceOrder.getCommerceOrderId(), _commerceContext);
-
 			_commerceOrderEngine.checkoutCommerceOrder(
 				_commerceOrder, _user.getUserId());
 		}
@@ -798,10 +810,10 @@ public class CommerceOrderEngineTest {
 			commerceInventoryWarehouses.get(0);
 
 		_commerceShipmentItemLocalService.addCommerceShipmentItem(
-			null, _commerceShipment1.getCommerceShipmentId(),
+			_commerceShipment1.getCommerceShipmentId(),
 			commerceOrderItem.getCommerceOrderItemId(),
 			commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-			commerceOrderItem.getQuantity() / 2, true, _serviceContext);
+			commerceOrderItem.getQuantity() / 2, _serviceContext);
 
 		_commerceShipment1 = _commerceShipmentLocalService.updateStatus(
 			_commerceShipment1.getCommerceShipmentId(),
@@ -819,10 +831,10 @@ public class CommerceOrderEngineTest {
 				commerceOrderItem.getShippedQuantity();
 
 		_commerceShipmentItemLocalService.addCommerceShipmentItem(
-			null, _commerceShipment2.getCommerceShipmentId(),
+			_commerceShipment2.getCommerceShipmentId(),
 			commerceOrderItem.getCommerceOrderItemId(),
 			commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-			remainingQuantity, true, _serviceContext);
+			remainingQuantity, _serviceContext);
 
 		_commerceShipment2 = _commerceShipmentLocalService.updateStatus(
 			_commerceShipment2.getCommerceShipmentId(),
@@ -910,10 +922,10 @@ public class CommerceOrderEngineTest {
 			commerceInventoryWarehouses.get(0);
 
 		_commerceShipmentItemLocalService.addCommerceShipmentItem(
-			null, _commerceShipment1.getCommerceShipmentId(),
+			_commerceShipment1.getCommerceShipmentId(),
 			commerceOrderItem.getCommerceOrderItemId(),
 			commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-			commerceOrderItem.getQuantity() / 2, true, _serviceContext);
+			commerceOrderItem.getQuantity() / 2, _serviceContext);
 
 		_commerceShipment1 = _commerceShipmentLocalService.updateStatus(
 			_commerceShipment1.getCommerceShipmentId(),
@@ -931,10 +943,10 @@ public class CommerceOrderEngineTest {
 				commerceOrderItem.getShippedQuantity();
 
 		_commerceShipmentItemLocalService.addCommerceShipmentItem(
-			null, _commerceShipment2.getCommerceShipmentId(),
+			_commerceShipment2.getCommerceShipmentId(),
 			commerceOrderItem.getCommerceOrderItemId(),
 			commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-			remainingQuantity, true, _serviceContext);
+			remainingQuantity, _serviceContext);
 
 		_commerceShipment2 = _commerceShipmentLocalService.updateStatus(
 			_commerceShipment2.getCommerceShipmentId(),
@@ -999,12 +1011,19 @@ public class CommerceOrderEngineTest {
 			PendingCommerceOrderStatusImpl.KEY,
 			_commerceOrder.getOrderStatus());
 
-		Assert.assertTrue(
-			ListUtil.exists(
-				_commerceOrderEngine.getNextCommerceOrderStatuses(
-					_commerceOrder),
-				commerceOrderStatus ->
-					commerceOrderStatus.getPriority() == -1));
+		List<CommerceOrderStatus> nextCommerceOrderStatuses =
+			_commerceOrderEngine.getNextCommerceOrderStatuses(_commerceOrder);
+
+		Stream<CommerceOrderStatus> stream = nextCommerceOrderStatuses.stream();
+
+		List<CommerceOrderStatus> inProgressCommerceOrderStatuses =
+			stream.filter(
+				entry -> entry.getPriority() == -1
+			).collect(
+				Collectors.toList()
+			);
+
+		Assert.assertFalse(inProgressCommerceOrderStatuses.isEmpty());
 	}
 
 	@Test
@@ -1031,12 +1050,19 @@ public class CommerceOrderEngineTest {
 		Assert.assertEquals(
 			openCommerceOrderStatus.getKey(), OpenCommerceOrderStatusImpl.KEY);
 
-		for (CommerceOrderStatus commerceOrderStatus :
-				_commerceOrderEngine.getNextCommerceOrderStatuses(
-					_commerceOrder)) {
+		List<CommerceOrderStatus> nextCommerceOrderStatuses =
+			_commerceOrderEngine.getNextCommerceOrderStatuses(_commerceOrder);
 
-			Assert.assertNotEquals(-1, commerceOrderStatus.getPriority());
-		}
+		Stream<CommerceOrderStatus> stream = nextCommerceOrderStatuses.stream();
+
+		List<CommerceOrderStatus> inProgressCommerceOrderStatuses =
+			stream.filter(
+				entry -> entry.getPriority() == -1
+			).collect(
+				Collectors.toList()
+			);
+
+		Assert.assertTrue(inProgressCommerceOrderStatuses.isEmpty());
 	}
 
 	@Test
@@ -1054,9 +1080,6 @@ public class CommerceOrderEngineTest {
 			"If we remove the order from being on hold, the order status " +
 				"should be processing"
 		);
-
-		_commerceOrder = _commerceOrderEngine.checkoutCommerceOrder(
-			_commerceOrder, _user.getUserId());
 
 		_commerceOrder = _commerceOrderEngine.transitionCommerceOrder(
 			_commerceOrder, CommerceOrderConstants.ORDER_STATUS_ON_HOLD,
@@ -1077,9 +1100,10 @@ public class CommerceOrderEngineTest {
 	@Rule
 	public FrutillaRule frutillaRule = new FrutillaRule();
 
+	private static Company _company;
 	private static User _user;
 
-	private AccountEntry _accountEntry;
+	private CommerceAccount _commerceAccount;
 
 	@DeleteAfterTestRun
 	private CommerceChannel _commerceChannel;

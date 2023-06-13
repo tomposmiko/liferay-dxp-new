@@ -40,14 +40,12 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
  * @author Preston Crary
  */
-@Ignore
 @RunWith(Arquillian.class)
 public class DLFileVersionTableReferenceDefinitionTest
 	extends BaseTableReferenceDefinitionTestCase {
@@ -72,8 +70,7 @@ public class DLFileVersionTableReferenceDefinitionTest
 			null, group.getCreatorUserId(), group.getGroupId(),
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK,
+			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
 			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT, null,
 			null, inputStream, bytes.length, null, null,
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
@@ -88,8 +85,8 @@ public class DLFileVersionTableReferenceDefinitionTest
 		_dlFileEntry = _dlFileEntryLocalService.updateFileEntry(
 			group.getCreatorUserId(), _dlFileEntry.getFileEntryId(),
 			StringUtil.randomString(), ContentTypes.TEXT_PLAIN,
-			StringUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK, DLVersionNumberIncrease.MAJOR,
+			StringUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.MAJOR,
 			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT,
 			Collections.emptyMap(), null, inputStream, 0, null, null,
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));

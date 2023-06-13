@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class WebsiteLocalServiceWrapper
 	implements ServiceWrapper<WebsiteLocalService>, WebsiteLocalService {
 
-	public WebsiteLocalServiceWrapper() {
-		this(null);
-	}
-
 	public WebsiteLocalServiceWrapper(WebsiteLocalService websiteLocalService) {
 		_websiteLocalService = websiteLocalService;
 	}
@@ -35,13 +31,12 @@ public class WebsiteLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.Website addWebsite(
 			long userId, java.lang.String className, long classPK,
-			java.lang.String url, long listTypeId, boolean primary,
+			java.lang.String url, long typeId, boolean primary,
 			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _websiteLocalService.addWebsite(
-			userId, className, classPK, url, listTypeId, primary,
-			serviceContext);
+			userId, className, classPK, url, typeId, primary, serviceContext);
 	}
 
 	/**
@@ -381,12 +376,11 @@ public class WebsiteLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Website updateWebsite(
-			long websiteId, java.lang.String url, long listTypeId,
-			boolean primary)
+			long websiteId, java.lang.String url, long typeId, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _websiteLocalService.updateWebsite(
-			websiteId, url, listTypeId, primary);
+			websiteId, url, typeId, primary);
 	}
 
 	/**

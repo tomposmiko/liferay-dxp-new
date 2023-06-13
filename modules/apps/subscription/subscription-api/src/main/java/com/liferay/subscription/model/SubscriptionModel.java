@@ -283,8 +283,4 @@ public interface SubscriptionModel
 	@Override
 	public Subscription cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

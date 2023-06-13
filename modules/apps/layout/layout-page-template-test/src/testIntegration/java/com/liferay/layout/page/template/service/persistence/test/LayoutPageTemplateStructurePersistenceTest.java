@@ -152,7 +152,10 @@ public class LayoutPageTemplateStructurePersistenceTest {
 		newLayoutPageTemplateStructure.setModifiedDate(
 			RandomTestUtil.nextDate());
 
-		newLayoutPageTemplateStructure.setPlid(RandomTestUtil.nextLong());
+		newLayoutPageTemplateStructure.setClassNameId(
+			RandomTestUtil.nextLong());
+
+		newLayoutPageTemplateStructure.setClassPK(RandomTestUtil.nextLong());
 
 		_layoutPageTemplateStructures.add(
 			_persistence.update(newLayoutPageTemplateStructure));
@@ -197,8 +200,11 @@ public class LayoutPageTemplateStructurePersistenceTest {
 			Time.getShortTimestamp(
 				newLayoutPageTemplateStructure.getModifiedDate()));
 		Assert.assertEquals(
-			existingLayoutPageTemplateStructure.getPlid(),
-			newLayoutPageTemplateStructure.getPlid());
+			existingLayoutPageTemplateStructure.getClassNameId(),
+			newLayoutPageTemplateStructure.getClassNameId());
+		Assert.assertEquals(
+			existingLayoutPageTemplateStructure.getClassPK(),
+			newLayoutPageTemplateStructure.getClassPK());
 	}
 
 	@Test
@@ -236,11 +242,12 @@ public class LayoutPageTemplateStructurePersistenceTest {
 	}
 
 	@Test
-	public void testCountByG_P() throws Exception {
-		_persistence.countByG_P(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+	public void testCountByG_C_C() throws Exception {
+		_persistence.countByG_C_C(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong());
 
-		_persistence.countByG_P(0L, 0L);
+		_persistence.countByG_C_C(0L, 0L, 0L);
 	}
 
 	@Test
@@ -278,7 +285,7 @@ public class LayoutPageTemplateStructurePersistenceTest {
 			"ctCollectionId", true, "uuid", true,
 			"layoutPageTemplateStructureId", true, "groupId", true, "companyId",
 			true, "userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "plid", true);
+			"modifiedDate", true, "classNameId", true, "classPK", true);
 	}
 
 	@Test
@@ -603,10 +610,15 @@ public class LayoutPageTemplateStructurePersistenceTest {
 				layoutPageTemplateStructure, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "groupId"));
 		Assert.assertEquals(
-			Long.valueOf(layoutPageTemplateStructure.getPlid()),
+			Long.valueOf(layoutPageTemplateStructure.getClassNameId()),
 			ReflectionTestUtil.<Long>invoke(
 				layoutPageTemplateStructure, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "plid"));
+				new Class<?>[] {String.class}, "classNameId"));
+		Assert.assertEquals(
+			Long.valueOf(layoutPageTemplateStructure.getClassPK()),
+			ReflectionTestUtil.<Long>invoke(
+				layoutPageTemplateStructure, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "classPK"));
 	}
 
 	protected LayoutPageTemplateStructure addLayoutPageTemplateStructure()
@@ -636,7 +648,9 @@ public class LayoutPageTemplateStructurePersistenceTest {
 
 		layoutPageTemplateStructure.setModifiedDate(RandomTestUtil.nextDate());
 
-		layoutPageTemplateStructure.setPlid(RandomTestUtil.nextLong());
+		layoutPageTemplateStructure.setClassNameId(RandomTestUtil.nextLong());
+
+		layoutPageTemplateStructure.setClassPK(RandomTestUtil.nextLong());
 
 		_layoutPageTemplateStructures.add(
 			_persistence.update(layoutPageTemplateStructure));

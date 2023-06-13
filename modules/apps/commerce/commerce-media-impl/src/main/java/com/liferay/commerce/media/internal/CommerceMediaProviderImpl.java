@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alec Sloan
  */
-@Component(service = CommerceMediaProvider.class)
+@Component(enabled = false, service = CommerceMediaProvider.class)
 public class CommerceMediaProviderImpl implements CommerceMediaProvider {
 
 	@Override
@@ -56,7 +56,7 @@ public class CommerceMediaProviderImpl implements CommerceMediaProvider {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			Company company = _companyLocalService.getCompany(companyId);

@@ -71,10 +71,6 @@ public interface CPCompareContentHelper {
 			CPDataSourceResult cpDataSourceResult)
 		throws PortalException;
 
-	public String getDefaultImageFileURL(
-			long commerceAccountId, long cpDefinitionId)
-		throws PortalException;
-
 	public String getDeleteCompareProductURL(
 		long cpDefinitionId, RenderRequest renderRequest,
 		RenderResponse renderResponse);

@@ -1,4 +1,0 @@
-Bundle-Name: Liferay Learn API
-Bundle-SymbolicName: com.liferay.learn.api
-Bundle-Version: 3.0.1
-Export-Package: com.liferay.learn

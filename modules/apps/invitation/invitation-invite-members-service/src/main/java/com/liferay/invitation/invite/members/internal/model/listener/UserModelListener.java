@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Norbert Kocsis
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class UserModelListener extends BaseModelListener<User> {
 
 	@Override
@@ -55,14 +55,13 @@ public class UserModelListener extends BaseModelListener<User> {
 
 			String refererURL = headers.get(WebKeys.REFERER);
 
-			String portletId = HttpComponentsUtil.getParameter(
-				refererURL, "p_p_id", false);
+			String portletId = _http.getParameter(refererURL, "p_p_id", false);
 
-			String redirectURL = HttpComponentsUtil.getParameter(
+			String redirectURL = _http.getParameter(
 				refererURL,
 				_portal.getPortletNamespace(portletId) + "redirectURL", false);
 
-			String key = HttpComponentsUtil.getParameter(
+			String key = _http.getParameter(
 				redirectURL, _portal.getPortletNamespace(portletId) + "key",
 				false);
 
@@ -76,10 +75,22 @@ public class UserModelListener extends BaseModelListener<User> {
 		}
 	}
 
-	@Reference
-	private MemberRequestLocalService _memberRequestLocalService;
+	@Reference(unbind = "-")
+	protected void setMemberRequestLocalService(
+		MemberRequestLocalService memberRequestLocalService) {
+
+		_memberRequestLocalService = memberRequestLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		_portal = portal;
+	}
 
 	@Reference
+	private Http _http;
+
+	private MemberRequestLocalService _memberRequestLocalService;
 	private Portal _portal;
 
 }

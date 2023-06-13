@@ -30,6 +30,8 @@ import java.io.IOException;
 
 import java.net.SocketException;
 
+import java.util.Optional;
+
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Cristina González
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.http.whiteboard.servlet.name=com.liferay.document.library.opener.onedrive.web.internal.servlet.OneDriveOAuth2Servlet",
 		"osgi.http.whiteboard.servlet.pattern=/document_library/onedrive/oauth2",
@@ -57,13 +60,13 @@ public class OneDriveOAuth2Servlet extends HttpServlet {
 			HttpServletResponse httpServletResponse)
 		throws IOException {
 
-		OAuth2State oAuth2State = OAuth2StateUtil.getOAuth2State(
-			_portal.getOriginalServletRequest(httpServletRequest));
+		Optional<OAuth2State> oAuth2StateOptional =
+			OAuth2StateUtil.getOAuth2StateOptional(
+				_portal.getOriginalServletRequest(httpServletRequest));
 
-		if (oAuth2State == null) {
-			throw new IllegalStateException(
-				"Authorization state is not initialized");
-		}
+		OAuth2State oAuth2State = oAuth2StateOptional.orElseThrow(
+			() -> new IllegalStateException(
+				"Authorization state is not initialized"));
 
 		if (!OAuth2StateUtil.isValid(oAuth2State, httpServletRequest)) {
 			OAuth2StateUtil.cleanUp(httpServletRequest);
@@ -109,7 +112,7 @@ public class OneDriveOAuth2Servlet extends HttpServlet {
 				httpServletResponse.sendRedirect(oAuth2State.getSuccessURL());
 			}
 			catch (OAuth2AccessTokenErrorResponse | SocketException exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				OAuth2StateUtil.cleanUp(httpServletRequest);
 
@@ -118,7 +121,7 @@ public class OneDriveOAuth2Servlet extends HttpServlet {
 				httpServletResponse.sendRedirect(oAuth2State.getFailureURL());
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				OAuth2StateUtil.cleanUp(httpServletRequest);
 

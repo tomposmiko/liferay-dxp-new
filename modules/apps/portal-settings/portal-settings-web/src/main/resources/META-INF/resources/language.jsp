@@ -42,9 +42,9 @@
 	<aui:select label="default-language" name="languageId">
 
 		<%
-		User guestUser = company.getGuestUser();
+		User defaultUser = company.getDefaultUser();
 
-		String languageId = ParamUtil.getString(request, "languageId", guestUser.getLanguageId());
+		String languageId = ParamUtil.getString(request, "languageId", defaultUser.getLanguageId());
 
 		Locale companyLocale = LocaleUtil.fromLanguageId(languageId);
 
@@ -87,7 +87,7 @@
 
 		for (String propsValuesLanguageId : SetUtil.fromArray(PropsValues.LOCALES)) {
 			if (!ArrayUtil.contains(availableLanguageIds, propsValuesLanguageId)) {
-				Locale propsValuesLocale = LocaleUtil.fromLanguageId(propsValuesLanguageId, false);
+				Locale propsValuesLocale = LocaleUtil.fromLanguageId(propsValuesLanguageId, true, false);
 
 				if (propsValuesLocale != null) {
 					rightList.add(new KeyValuePair(propsValuesLanguageId, propsValuesLocale.getDisplayName(locale)));
@@ -137,7 +137,7 @@
 
 		if (currentLanguageIdsElement) {
 			Liferay.Util.setFormValues(form, {
-				<%= PropsKeys.LOCALES %>: Liferay.Util.getSelectedOptionValues(
+				<%= PropsKeys.LOCALES %>: Liferay.Util.listSelect(
 					currentLanguageIdsElement
 				),
 			});

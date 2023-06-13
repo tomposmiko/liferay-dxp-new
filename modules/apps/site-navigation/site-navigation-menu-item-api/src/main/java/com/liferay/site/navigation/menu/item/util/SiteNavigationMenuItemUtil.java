@@ -35,11 +35,12 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.navigation.menu.item.layout.constants.SiteNavigationMenuItemTypeConstants;
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 
@@ -149,18 +150,20 @@ public class SiteNavigationMenuItemUtil {
 			}
 		}
 
-		Map<String, String> map = new HashMap<>();
+		Stream<Locale> stream = availableLocales.stream();
 
-		for (Locale locale : availableLocales) {
-			String languageId = LocaleUtil.toLanguageId(locale);
-
-			String value = typeSettingsUnicodeProperties.getProperty(
-				name + "_" + languageId);
-
-			if (Validator.isNotNull(value)) {
-				map.put(languageId, value);
-			}
-		}
+		Map<String, String> map = stream.map(
+			locale -> LocaleUtil.toLanguageId(locale)
+		).filter(
+			languageId -> Validator.isNotNull(
+				typeSettingsUnicodeProperties.getProperty(
+					name + "_" + languageId))
+		).collect(
+			Collectors.toMap(
+				languageId -> languageId,
+				languageId -> typeSettingsUnicodeProperties.getProperty(
+					name + "_" + languageId))
+		);
 
 		if (MapUtil.isEmpty(map)) {
 			String defaultLanguageId =

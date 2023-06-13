@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dylan Rebelak
  */
-@Component(service = StateClusterRequestExecutor.class)
+@Component(immediate = true, service = StateClusterRequestExecutor.class)
 public class StateClusterRequestExecutorImpl
 	implements StateClusterRequestExecutor {
 
@@ -65,7 +65,13 @@ public class StateClusterRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

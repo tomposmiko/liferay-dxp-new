@@ -15,6 +15,8 @@
 package com.liferay.dynamic.data.mapping.form.taglib.servlet.taglib;
 
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
+import com.liferay.dynamic.data.mapping.form.taglib.internal.security.permission.DDMFormInstancePermission;
+import com.liferay.dynamic.data.mapping.form.taglib.internal.servlet.taglib.util.DDMFormTaglibUtil;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
@@ -26,32 +28,27 @@ import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceRecordImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceRecordVersionImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceVersionImpl;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderResponse;
+
+import java.lang.reflect.Field;
 
 import java.util.LinkedHashSet;
 import java.util.Locale;
@@ -62,20 +59,19 @@ import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.MockedStatic;
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -83,38 +79,12 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Pedro Queiroz
  */
-public class DDMFormRendererTagTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		Mockito.when(
-			FrameworkUtil.getBundle(Mockito.any())
-		).thenReturn(
-			bundleContext.getBundle()
-		);
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		_ddmFormInstanceLocalServiceUtilMockedStatic.close();
-
-		_ddmFormInstanceRecordLocalServiceUtilMockedStatic.close();
-
-		_ddmFormInstanceRecordVersionLocalServiceUtilMockedStatic.close();
-
-		_ddmFormInstanceVersionLocalServiceUtilMockedStatic.close();
-
-		_ddmFormValuesFactoryServiceRegistration.unregister();
-
-		_frameworkUtilMockedStatic.close();
-	}
+@PrepareForTest(
+	{DDMFormInstancePermission.class, DDMFormTaglibUtil.class, LocaleUtil.class}
+)
+@RunWith(PowerMockRunner.class)
+@SuppressStaticInitializationFor("com.liferay.taglib.util.IncludeTag")
+public class DDMFormRendererTagTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
@@ -126,6 +96,7 @@ public class DDMFormRendererTagTest {
 		setUpDDMFormValuesFactory();
 		setUpHttpServletRequest();
 		setUpLanguageUtil();
+		setUpLocaleUtil();
 		setUpPortalUtil();
 	}
 
@@ -160,9 +131,10 @@ public class DDMFormRendererTagTest {
 
 		ddmForm.setDefaultLocale(LocaleUtil.BRAZIL);
 
-		Assert.assertEquals(
-			LocaleUtil.BRAZIL,
-			_ddmFormRendererTag.getLocale(_httpServletRequest, ddmForm));
+		Locale locale = _ddmFormRendererTag.getLocale(
+			_httpServletRequest, ddmForm);
+
+		Assert.assertEquals(LocaleUtil.BRAZIL, locale);
 	}
 
 	@Test
@@ -237,9 +209,10 @@ public class DDMFormRendererTagTest {
 
 	@Test
 	public void testGetLocaleFromRequestWhenDDMFormIsNull() {
-		Assert.assertEquals(
-			LocaleUtil.US,
-			_ddmFormRendererTag.getLocale(_httpServletRequest, null));
+		Locale locale = _ddmFormRendererTag.getLocale(
+			_httpServletRequest, null);
+
+		Assert.assertEquals(LocaleUtil.US, locale);
 	}
 
 	@Test
@@ -250,9 +223,10 @@ public class DDMFormRendererTagTest {
 		ddmForm.setAvailableLocales(
 			createAvailableLocales(LocaleUtil.BRAZIL, LocaleUtil.US));
 
-		Assert.assertEquals(
-			LocaleUtil.US,
-			_ddmFormRendererTag.getLocale(_httpServletRequest, ddmForm));
+		Locale locale = _ddmFormRendererTag.getLocale(
+			_httpServletRequest, ddmForm);
+
+		Assert.assertEquals(LocaleUtil.US, locale);
 	}
 
 	@Test
@@ -279,8 +253,8 @@ public class DDMFormRendererTagTest {
 		ddmFormInstanceImpl.setFormInstanceId(ddmFormInstanceId);
 
 		Mockito.when(
-			DDMFormInstanceLocalServiceUtil.fetchFormInstance(
-				Mockito.eq(ddmFormInstanceId))
+			_ddmFormInstanceLocalService.fetchFormInstance(
+				Matchers.eq(ddmFormInstanceId))
 		).thenReturn(
 			ddmFormInstanceImpl
 		);
@@ -314,40 +288,27 @@ public class DDMFormRendererTagTest {
 	protected void setUpDDMFormInstanceLocalService() throws Exception {
 		_ddmFormInstance = new DDMFormInstanceImpl();
 
-		Mockito.when(
-			DDMFormInstanceLocalServiceUtil.getService()
-		).thenReturn(
-			Mockito.mock(DDMFormInstanceLocalService.class)
-		);
+		Field field = ReflectionUtil.getDeclaredField(
+			DDMFormTaglibUtil.class, "_ddmFormInstanceLocalService");
 
 		mockDDMFormInstance(1L);
 		mockDDMFormInstance(2L);
 		mockDDMFormInstance(3L);
 		mockDDMFormInstance(4L);
+
+		field.set(_ddmFormTaglibUtil, _ddmFormInstanceLocalService);
 	}
 
 	protected void setUpDDMFormInstancePermission() throws PortalException {
-		ModelResourcePermission<DDMFormInstance>
-			ddmFormInstanceModelResourcePermission = Mockito.mock(
-				ModelResourcePermission.class);
+		mockStatic(DDMFormInstancePermission.class);
 
-		Mockito.when(
-			ddmFormInstanceModelResourcePermission.contains(
-				Mockito.nullable(PermissionChecker.class),
-				Mockito.nullable(DDMFormInstance.class),
-				Mockito.nullable(String.class))
+		when(
+			DDMFormInstancePermission.contains(
+				Mockito.any(PermissionChecker.class),
+				Mockito.any(DDMFormInstance.class), Mockito.anyString())
 		).thenReturn(
 			true
 		);
-
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		bundleContext.registerService(
-			ModelResourcePermission.class,
-			ddmFormInstanceModelResourcePermission,
-			MapUtil.singletonDictionary(
-				"model.class.name",
-				"com.liferay.dynamic.data.mapping.model.DDMFormInstance"));
 	}
 
 	protected void setUpDDMFormInstanceRecordLocalService() throws Exception {
@@ -355,18 +316,17 @@ public class DDMFormRendererTagTest {
 
 		_ddmFormInstanceRecord.setFormInstanceId(2L);
 
-		Mockito.when(
-			DDMFormInstanceRecordLocalServiceUtil.getService()
-		).thenReturn(
-			Mockito.mock(DDMFormInstanceRecordLocalService.class)
-		);
+		Field field = ReflectionUtil.getDeclaredField(
+			DDMFormTaglibUtil.class, "_ddmFormInstanceRecordLocalService");
 
 		Mockito.when(
-			DDMFormInstanceRecordLocalServiceUtil.fetchDDMFormInstanceRecord(
+			_ddmFormInstanceRecordLocalService.fetchDDMFormInstanceRecord(
 				Mockito.anyLong())
 		).thenReturn(
 			_ddmFormInstanceRecord
 		);
+
+		field.set(_ddmFormTaglibUtil, _ddmFormInstanceRecordLocalService);
 	}
 
 	protected void setUpDDMFormInstanceRecordVersionLocalService()
@@ -376,18 +336,19 @@ public class DDMFormRendererTagTest {
 
 		_ddmFormInstanceRecordVersion.setFormInstanceId(3L);
 
-		Mockito.when(
-			DDMFormInstanceRecordVersionLocalServiceUtil.getService()
-		).thenReturn(
-			Mockito.mock(DDMFormInstanceRecordVersionLocalService.class)
-		);
+		Field field = ReflectionUtil.getDeclaredField(
+			DDMFormTaglibUtil.class,
+			"_ddmFormInstanceRecordVersionLocalService");
 
 		Mockito.when(
-			DDMFormInstanceRecordVersionLocalServiceUtil.
+			_ddmFormInstanceRecordVersionLocalService.
 				fetchDDMFormInstanceRecordVersion(Mockito.anyLong())
 		).thenReturn(
 			_ddmFormInstanceRecordVersion
 		);
+
+		field.set(
+			_ddmFormTaglibUtil, _ddmFormInstanceRecordVersionLocalService);
 	}
 
 	protected void setUpDDMFormInstanceVersionLocalService() throws Exception {
@@ -395,29 +356,25 @@ public class DDMFormRendererTagTest {
 
 		_ddmFormInstanceVersion.setFormInstanceId(4L);
 
-		Mockito.when(
-			DDMFormInstanceVersionLocalServiceUtil.getService()
-		).thenReturn(
-			Mockito.mock(DDMFormInstanceVersionLocalService.class)
-		);
+		Field field = ReflectionUtil.getDeclaredField(
+			DDMFormTaglibUtil.class, "_ddmFormInstanceVersionLocalService");
 
 		Mockito.when(
-			DDMFormInstanceVersionLocalServiceUtil.fetchDDMFormInstanceVersion(
+			_ddmFormInstanceVersionLocalService.fetchDDMFormInstanceVersion(
 				Mockito.anyLong())
 		).thenReturn(
 			_ddmFormInstanceVersion
 		);
+
+		field.set(_ddmFormTaglibUtil, _ddmFormInstanceVersionLocalService);
 	}
 
 	protected void setUpDDMFormValuesFactory() throws Exception {
 		_ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
 			new DDMForm());
 
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		_ddmFormValuesFactoryServiceRegistration =
-			bundleContext.registerService(
-				DDMFormValuesFactory.class, _ddmFormValuesFactory, null);
+		Field field = ReflectionUtil.getDeclaredField(
+			DDMFormTaglibUtil.class, "_ddmFormValuesFactory");
 
 		Mockito.when(
 			_ddmFormValuesFactory.create(
@@ -426,6 +383,8 @@ public class DDMFormRendererTagTest {
 		).thenReturn(
 			_ddmFormValues
 		);
+
+		field.set(_ddmFormTaglibUtil, _ddmFormValuesFactory);
 	}
 
 	protected void setUpHttpServletRequest() throws IllegalAccessException {
@@ -439,8 +398,8 @@ public class DDMFormRendererTagTest {
 	}
 
 	protected void setUpLanguageUtil() {
-		Mockito.when(
-			_language.getLanguageId(Mockito.eq(_httpServletRequest))
+		when(
+			_language.getLanguageId(Matchers.eq(_httpServletRequest))
 		).thenReturn(
 			"en_US"
 		);
@@ -450,57 +409,73 @@ public class DDMFormRendererTagTest {
 		languageUtil.setLanguage(_language);
 	}
 
+	protected void setUpLocaleUtil() {
+		mockStatic(LocaleUtil.class);
+
+		when(
+			LocaleUtil.fromLanguageId("en_US")
+		).thenReturn(
+			LocaleUtil.US
+		);
+	}
+
 	protected void setUpPortalUtil() {
 		PortalUtil portalUtil = new PortalUtil();
 
-		Portal portal = Mockito.mock(Portal.class);
+		portalUtil.setPortal(mock(Portal.class));
 
-		portalUtil.setPortal(portal);
-
-		Mockito.when(
-			portal.getHttpServletRequest(Mockito.any(RenderRequest.class))
+		when(
+			PortalUtil.getHttpServletRequest(Matchers.any(RenderRequest.class))
 		).thenReturn(
 			_httpServletRequest
 		);
 
-		Mockito.when(
-			portal.getHttpServletResponse(Mockito.any(RenderResponse.class))
+		when(
+			PortalUtil.getHttpServletResponse(
+				Matchers.any(RenderResponse.class))
 		).thenReturn(
 			new MockHttpServletResponse()
 		);
 	}
 
-	private static final MockedStatic<DDMFormInstanceLocalServiceUtil>
-		_ddmFormInstanceLocalServiceUtilMockedStatic = Mockito.mockStatic(
-			DDMFormInstanceLocalServiceUtil.class);
-	private static final MockedStatic<DDMFormInstanceRecordLocalServiceUtil>
-		_ddmFormInstanceRecordLocalServiceUtilMockedStatic = Mockito.mockStatic(
-			DDMFormInstanceRecordLocalServiceUtil.class);
-	private static final MockedStatic
-		<DDMFormInstanceRecordVersionLocalServiceUtil>
-			_ddmFormInstanceRecordVersionLocalServiceUtilMockedStatic =
-				Mockito.mockStatic(
-					DDMFormInstanceRecordVersionLocalServiceUtil.class);
-	private static final MockedStatic<DDMFormInstanceVersionLocalServiceUtil>
-		_ddmFormInstanceVersionLocalServiceUtilMockedStatic =
-			Mockito.mockStatic(DDMFormInstanceVersionLocalServiceUtil.class);
-	private static ServiceRegistration<DDMFormValuesFactory>
-		_ddmFormValuesFactoryServiceRegistration;
-	private static final MockedStatic<FrameworkUtil>
-		_frameworkUtilMockedStatic = Mockito.mockStatic(FrameworkUtil.class);
-
 	private DDMFormInstance _ddmFormInstance;
+
+	@Mock
+	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
+
 	private DDMFormInstanceRecord _ddmFormInstanceRecord;
-	private DDMFormInstanceRecordVersion _ddmFormInstanceRecordVersion =
-		Mockito.mock(DDMFormInstanceRecordVersion.class);
+
+	@Mock
+	private DDMFormInstanceRecordLocalService
+		_ddmFormInstanceRecordLocalService;
+
+	private DDMFormInstanceRecordVersion _ddmFormInstanceRecordVersion;
+
+	@Mock
+	private DDMFormInstanceRecordVersionLocalService
+		_ddmFormInstanceRecordVersionLocalService;
+
 	private DDMFormInstanceVersion _ddmFormInstanceVersion;
+
+	@Mock
+	private DDMFormInstanceVersionLocalService
+		_ddmFormInstanceVersionLocalService;
+
 	private final DDMFormRendererTag _ddmFormRendererTag =
 		new DDMFormRendererTag();
+
+	@Mock
+	private DDMFormTaglibUtil _ddmFormTaglibUtil;
+
 	private DDMFormValues _ddmFormValues;
-	private final DDMFormValuesFactory _ddmFormValuesFactory = Mockito.mock(
-		DDMFormValuesFactory.class);
+
+	@Mock
+	private DDMFormValuesFactory _ddmFormValuesFactory;
+
 	private final HttpServletRequest _httpServletRequest =
 		new MockHttpServletRequest();
-	private final Language _language = Mockito.mock(Language.class);
+
+	@Mock
+	private Language _language;
 
 }

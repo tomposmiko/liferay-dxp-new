@@ -49,8 +49,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.configuration.DefaultSearchResultPermissionFilterConfiguration;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.searcher.SearchRequestBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,7 +69,6 @@ public class DefaultSearchResultPermissionFilter
 		PermissionChecker permissionChecker, Props props,
 		RelatedEntryIndexerRegistry relatedEntryIndexerRegistry,
 		Function<SearchContext, Hits> searchFunction,
-		SearchRequestBuilderFactory searchRequestBuilderFactory,
 		DefaultSearchResultPermissionFilterConfiguration
 			defaultSearchResultPermissionFilterConfiguration) {
 
@@ -80,7 +77,6 @@ public class DefaultSearchResultPermissionFilter
 		_permissionChecker = permissionChecker;
 		_relatedEntryIndexerRegistry = relatedEntryIndexerRegistry;
 		_searchFunction = searchFunction;
-		_searchRequestBuilderFactory = searchRequestBuilderFactory;
 
 		_permissionFilteredSearchResultAccurateCountThreshold =
 			defaultSearchResultPermissionFilterConfiguration.
@@ -89,7 +85,7 @@ public class DefaultSearchResultPermissionFilter
 			defaultSearchResultPermissionFilterConfiguration.
 				searchQueryResultWindowLimit();
 
-		_setProps(props);
+		setProps(props);
 	}
 
 	@Override
@@ -98,17 +94,17 @@ public class DefaultSearchResultPermissionFilter
 
 		if (!queryConfig.isAllFieldsSelected()) {
 			queryConfig.setSelectedFieldNames(
-				_getSelectedFieldNames(queryConfig.getSelectedFieldNames()));
+				getSelectedFieldNames(queryConfig.getSelectedFieldNames()));
 		}
 
 		int end = searchContext.getEnd();
 		int start = searchContext.getStart();
 
 		if ((end == QueryUtil.ALL_POS) && (start == QueryUtil.ALL_POS)) {
-			Hits hits = _getHits(searchContext);
+			Hits hits = getHits(searchContext);
 
-			if (!_isGroupAdmin(searchContext)) {
-				_filterHits(hits, searchContext);
+			if (!isGroupAdmin(searchContext)) {
+				filterHits(hits, searchContext);
 			}
 
 			return hits;
@@ -118,8 +114,8 @@ public class DefaultSearchResultPermissionFilter
 			return new HitsImpl();
 		}
 
-		if (_isGroupAdmin(searchContext)) {
-			return _getHits(searchContext);
+		if (isGroupAdmin(searchContext)) {
+			return getHits(searchContext);
 		}
 
 		SlidingWindowSearcher slidingWindowSearcher =
@@ -128,7 +124,7 @@ public class DefaultSearchResultPermissionFilter
 		return slidingWindowSearcher.search(start, end, searchContext);
 	}
 
-	private void _filterHits(Hits hits, SearchContext searchContext) {
+	protected void filterHits(Hits hits, SearchContext searchContext) {
 		Map<String, Boolean> companyScopeViewPermissions = new HashMap<>();
 		List<Document> docs = new ArrayList<>();
 		List<Document> excludeDocs = new ArrayList<>();
@@ -171,7 +167,7 @@ public class DefaultSearchResultPermissionFilter
 		hits.setLength(hits.getLength() - excludeDocs.size());
 	}
 
-	private Hits _getHits(SearchContext searchContext) {
+	protected Hits getHits(SearchContext searchContext) {
 		if ((searchContext != null) &&
 			(searchContext.getEnd() != QueryUtil.ALL_POS)) {
 
@@ -197,12 +193,31 @@ public class DefaultSearchResultPermissionFilter
 		return _searchFunction.apply(searchContext);
 	}
 
-	private String[] _getSelectedFieldNames(String[] selectedFieldNames) {
+	protected String[] getSelectedFieldNames(String[] selectedFieldNames) {
 		Set<String> set = SetUtil.fromArray(selectedFieldNames);
 
 		Collections.addAll(set, _PERMISSION_SELECTED_FIELD_NAMES);
 
 		return set.toArray(new String[0]);
+	}
+
+	protected boolean isGroupAdmin(SearchContext searchContext) {
+		long groupId = GetterUtil.getLong(
+			searchContext.getAttribute(Field.GROUP_ID));
+
+		if ((groupId == 0) || !_permissionChecker.isGroupAdmin(groupId)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	protected void setProps(Props props) {
+		_props = props;
+
+		_indexPermissionFilterSearchAmplificationFactor = GetterUtil.getDouble(
+			_props.get(
+				PropsKeys.INDEX_PERMISSION_FILTER_SEARCH_AMPLIFICATION_FACTOR));
 	}
 
 	private Boolean _hasCompanyScopeViewPermission(String className) {
@@ -240,21 +255,10 @@ public class DefaultSearchResultPermissionFilter
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return false;
-	}
-
-	private boolean _isGroupAdmin(SearchContext searchContext) {
-		long groupId = GetterUtil.getLong(
-			searchContext.getAttribute(Field.GROUP_ID));
-
-		if ((groupId == 0) || !_permissionChecker.isGroupAdmin(groupId)) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private boolean _isIncludeDocument(
@@ -317,19 +321,11 @@ public class DefaultSearchResultPermissionFilter
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return false;
-	}
-
-	private void _setProps(Props props) {
-		_props = props;
-
-		_indexPermissionFilterSearchAmplificationFactor = GetterUtil.getDouble(
-			_props.get(
-				PropsKeys.INDEX_PERMISSION_FILTER_SEARCH_AMPLIFICATION_FACTOR));
 	}
 
 	private static final String[] _PERMISSION_SELECTED_FIELD_NAMES = {
@@ -348,7 +344,6 @@ public class DefaultSearchResultPermissionFilter
 	private final RelatedEntryIndexerRegistry _relatedEntryIndexerRegistry;
 	private final Function<SearchContext, Hits> _searchFunction;
 	private final int _searchQueryResultWindowLimit;
-	private final SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 	private class SlidingWindowSearcher {
 
@@ -382,9 +377,7 @@ public class DefaultSearchResultPermissionFilter
 
 				searchContext.setStart(offset);
 
-				_setSearchRequestFromAndSize(searchContext);
-
-				Hits hits = _getHits(searchContext);
+				Hits hits = getHits(searchContext);
 
 				if (startTime == 0) {
 					hitsSize = hits.getLength();
@@ -393,7 +386,7 @@ public class DefaultSearchResultPermissionFilter
 
 				Document[] oldDocs = hits.getDocs();
 
-				_filterHits(hits, searchContext);
+				filterHits(hits, searchContext);
 
 				Document[] newDocs = hits.getDocs();
 
@@ -522,15 +515,6 @@ public class DefaultSearchResultPermissionFilter
 			return Math.min(
 				1.0 / (totalViewable / total),
 				_indexPermissionFilterSearchAmplificationFactor);
-		}
-
-		private void _setSearchRequestFromAndSize(SearchContext searchContext) {
-			SearchRequestBuilder searchRequestBuilder =
-				_searchRequestBuilderFactory.builder(searchContext);
-
-			searchRequestBuilder.from(searchContext.getStart());
-			searchRequestBuilder.size(
-				searchContext.getEnd() - searchContext.getStart());
 		}
 
 	}

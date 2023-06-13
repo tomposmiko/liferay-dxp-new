@@ -107,11 +107,8 @@ public class DepotEntryLocalServiceUtil {
 	 *
 	 * @param depotEntry the depot entry
 	 * @return the depot entry that was removed
-	 * @throws PortalException
 	 */
-	public static DepotEntry deleteDepotEntry(DepotEntry depotEntry)
-		throws PortalException {
-
+	public static DepotEntry deleteDepotEntry(DepotEntry depotEntry) {
 		return getService().deleteDepotEntry(depotEntry);
 	}
 

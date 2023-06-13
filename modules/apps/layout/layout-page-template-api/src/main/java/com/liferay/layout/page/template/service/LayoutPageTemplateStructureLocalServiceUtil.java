@@ -62,14 +62,29 @@ public class LayoutPageTemplateStructureLocalServiceUtil {
 			layoutPageTemplateStructure);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addLayoutPageTemplateStructure(long, long, long, long,
+	 String, ServiceContext)}
+	 */
+	@Deprecated
 	public static LayoutPageTemplateStructure addLayoutPageTemplateStructure(
-			long userId, long groupId, long plid, long segmentsExperienceId,
+			long userId, long groupId, long classNameId, long classPK,
 			String data,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addLayoutPageTemplateStructure(
-			userId, groupId, plid, segmentsExperienceId, data, serviceContext);
+			userId, groupId, classNameId, classPK, data, serviceContext);
+	}
+
+	public static LayoutPageTemplateStructure addLayoutPageTemplateStructure(
+			long userId, long groupId, long plid, String data,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addLayoutPageTemplateStructure(
+			userId, groupId, plid, data, serviceContext);
 	}
 
 	/**
@@ -136,6 +151,19 @@ public class LayoutPageTemplateStructureLocalServiceUtil {
 		throws PortalException {
 
 		return getService().deleteLayoutPageTemplateStructure(groupId, plid);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #deleteLayoutPageTemplateStructure(long, long)}
+	 */
+	@Deprecated
+	public static LayoutPageTemplateStructure deleteLayoutPageTemplateStructure(
+			long groupId, long classNameId, long classPK)
+		throws PortalException {
+
+		return getService().deleteLayoutPageTemplateStructure(
+			groupId, classNameId, classPK);
 	}
 
 	/**
@@ -252,6 +280,32 @@ public class LayoutPageTemplateStructureLocalServiceUtil {
 
 		return getService().fetchLayoutPageTemplateStructure(
 			groupId, plid, rebuildStructure);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #fetchLayoutPageTemplateStructure(long, long)}
+	 */
+	@Deprecated
+	public static LayoutPageTemplateStructure fetchLayoutPageTemplateStructure(
+		long groupId, long classNameId, long classPK) {
+
+		return getService().fetchLayoutPageTemplateStructure(
+			groupId, classNameId, classPK);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #fetchLayoutPageTemplateStructure(long, long, boolean)}
+	 */
+	@Deprecated
+	public static LayoutPageTemplateStructure fetchLayoutPageTemplateStructure(
+			long groupId, long classNameId, long classPK,
+			boolean rebuildStructure)
+		throws PortalException {
+
+		return getService().fetchLayoutPageTemplateStructure(
+			groupId, classNameId, classPK, rebuildStructure);
 	}
 
 	/**
@@ -408,6 +462,20 @@ public class LayoutPageTemplateStructureLocalServiceUtil {
 	}
 
 	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #rebuildLayoutPageTemplateStructure(long, long)}
+	 */
+	@Deprecated
+	public static LayoutPageTemplateStructure
+			rebuildLayoutPageTemplateStructure(
+				long groupId, long classNameId, long classPK)
+		throws PortalException {
+
+		return getService().rebuildLayoutPageTemplateStructure(
+			groupId, classNameId, classPK);
+	}
+
+	/**
 	 * Updates the layout page template structure in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
 	 * <p>
@@ -422,6 +490,34 @@ public class LayoutPageTemplateStructureLocalServiceUtil {
 
 		return getService().updateLayoutPageTemplateStructure(
 			layoutPageTemplateStructure);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateLayoutPageTemplateStructureData(long, long, long,
+	 String)}
+	 */
+	@Deprecated
+	public static LayoutPageTemplateStructure updateLayoutPageTemplateStructure(
+			long groupId, long classNameId, long classPK,
+			long segmentsExperienceId, String data)
+		throws PortalException {
+
+		return getService().updateLayoutPageTemplateStructure(
+			groupId, classNameId, classPK, segmentsExperienceId, data);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateLayoutPageTemplateStructureData(long, long, String)}
+	 */
+	@Deprecated
+	public static LayoutPageTemplateStructure updateLayoutPageTemplateStructure(
+			long groupId, long classNameId, long classPK, String data)
+		throws PortalException {
+
+		return getService().updateLayoutPageTemplateStructure(
+			groupId, classNameId, classPK, data);
 	}
 
 	public static LayoutPageTemplateStructure

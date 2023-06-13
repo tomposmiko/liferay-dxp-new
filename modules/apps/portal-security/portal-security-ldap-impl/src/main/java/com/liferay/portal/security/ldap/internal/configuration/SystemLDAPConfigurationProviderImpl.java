@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = "factoryPid=com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration",
 	service = ConfigurationProvider.class
 )
@@ -38,11 +39,11 @@ public class SystemLDAPConfigurationProviderImpl
 	}
 
 	@Override
-	protected ConfigurationAdmin getConfigurationAdmin() {
-		return _configurationAdmin;
-	}
+	@Reference(unbind = "-")
+	protected void setConfigurationAdmin(
+		ConfigurationAdmin configurationAdmin) {
 
-	@Reference
-	private ConfigurationAdmin _configurationAdmin;
+		super.configurationAdmin = configurationAdmin;
+	}
 
 }

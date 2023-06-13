@@ -15,7 +15,6 @@
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.index;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.engine.adapter.index.UpdateIndexSettingsIndexRequest;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -69,14 +68,12 @@ public class UpdateIndexSettingsIndexRequestExecutorTest {
 
 		UpdateIndexSettingsIndexRequestExecutorImpl
 			updateIndexSettingsIndexRequestExecutorImpl =
-				new UpdateIndexSettingsIndexRequestExecutorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			updateIndexSettingsIndexRequestExecutorImpl,
-			"_elasticsearchClientResolver", _elasticsearchFixture);
-		ReflectionTestUtil.setFieldValue(
-			updateIndexSettingsIndexRequestExecutorImpl,
-			"_indicesOptionsTranslator", _indicesOptionsTranslator);
+				new UpdateIndexSettingsIndexRequestExecutorImpl() {
+					{
+						setElasticsearchClientResolver(_elasticsearchFixture);
+						setIndicesOptionsTranslator(_indicesOptionsTranslator);
+					}
+				};
 
 		UpdateSettingsRequest updateSettingsRequest =
 			updateIndexSettingsIndexRequestExecutorImpl.

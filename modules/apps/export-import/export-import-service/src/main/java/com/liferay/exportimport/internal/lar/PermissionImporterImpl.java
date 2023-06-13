@@ -36,7 +36,7 @@ import com.liferay.portal.kernel.service.TeamLocalService;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -63,7 +63,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Zsigmond Rab
  * @author Douglas Wong
  */
-@Component(enabled = true, service = PermissionImporter.class)
+@Component(enabled = true, immediate = true, service = PermissionImporter.class)
 public class PermissionImporterImpl implements PermissionImporter {
 
 	@Override
@@ -184,7 +184,7 @@ public class PermissionImporterImpl implements PermissionImporter {
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchTeamException);
+					_log.debug(noSuchTeamException, noSuchTeamException);
 				}
 
 				team = _teamLocalService.addTeam(
@@ -210,12 +210,13 @@ public class PermissionImporterImpl implements PermissionImporter {
 
 		String title = roleElement.attributeValue("title");
 
-		Map<Locale, String> titleMap = _localization.getLocalizationMap(title);
+		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
+			title);
 
 		String description = roleElement.attributeValue("description");
 
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			description);
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(description);
 
 		int type = GetterUtil.getInteger(roleElement.attributeValue("type"));
 		String subtype = roleElement.attributeValue("subtype");
@@ -297,9 +298,6 @@ public class PermissionImporterImpl implements PermissionImporter {
 	private GroupLocalService _groupLocalService;
 
 	private CentralizedThreadLocal<LayoutCache> _layoutCacheThreadLocal;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private RoleLocalService _roleLocalService;

@@ -15,6 +15,7 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.upgrade.v7_0_0.util.PhoneTable;
 
 /**
  * @author Brian Wing Shun Chan
@@ -23,7 +24,7 @@ public class UpgradePhone extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("Phone", "typeId", "LONG");
+		alter(PhoneTable.class, new AlterColumnType("typeId", "LONG"));
 	}
 
 }

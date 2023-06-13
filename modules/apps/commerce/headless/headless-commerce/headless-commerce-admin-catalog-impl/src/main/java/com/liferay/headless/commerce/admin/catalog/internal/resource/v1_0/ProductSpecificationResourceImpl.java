@@ -20,16 +20,14 @@ import com.liferay.commerce.product.service.CPDefinitionSpecificationOptionValue
 import com.liferay.commerce.product.service.CPSpecificationOptionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductSpecification;
-import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.constants.DTOConverterConstants;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.ProductSpecificationDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.helper.v1_0.ProductSpecificationHelper;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.ProductSpecificationUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductSpecificationResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
@@ -45,26 +43,13 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/product-specification.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, ProductSpecificationResource.class}
 )
-@CTAware
 public class ProductSpecificationResourceImpl
 	extends BaseProductSpecificationResourceImpl implements NestedFieldSupport {
-
-	@Override
-	public void deleteProductSpecification(Long id) throws Exception {
-		CPDefinitionSpecificationOptionValue
-			cpDefinitionSpecificationOptionValue =
-				_cpDefinitionSpecificationOptionValueService.
-					getCPDefinitionSpecificationOptionValue(id);
-
-		_cpDefinitionSpecificationOptionValueService.
-			deleteCPDefinitionSpecificationOptionValue(
-				cpDefinitionSpecificationOptionValue.
-					getCPDefinitionSpecificationOptionValueId());
-	}
 
 	@NestedField(parentClass = Product.class, value = "productSpecifications")
 	@Override
@@ -74,34 +59,6 @@ public class ProductSpecificationResourceImpl
 
 		return _productSpecificationHelper.getProductSpecificationsPage(
 			id, contextAcceptLanguage.getPreferredLocale(), pagination);
-	}
-
-	@Override
-	public ProductSpecification getProductSpecification(Long id)
-		throws Exception {
-
-		CPDefinitionSpecificationOptionValue
-			cpDefinitionSpecificationOptionValue =
-				_cpDefinitionSpecificationOptionValueService.
-					getCPDefinitionSpecificationOptionValue(id);
-
-		return _toProductSpecification(
-			cpDefinitionSpecificationOptionValue.
-				getCPDefinitionSpecificationOptionValueId());
-	}
-
-	@Override
-	public ProductSpecification patchProductSpecification(
-			Long id, ProductSpecification productSpecification)
-		throws Exception {
-
-		CPDefinitionSpecificationOptionValue
-			cpDefinitionSpecificationOptionValue = _updateProductSpecification(
-				id, productSpecification);
-
-		return _toProductSpecification(
-			cpDefinitionSpecificationOptionValue.
-				getCPDefinitionSpecificationOptionValueId());
 	}
 
 	@Override
@@ -176,8 +133,7 @@ public class ProductSpecificationResourceImpl
 		return ProductSpecificationUtil.
 			updateCPDefinitionSpecificationOptionValue(
 				_cpDefinitionSpecificationOptionValueService,
-				cpDefinitionSpecificationOptionValue,
-				_cpSpecificationOptionService, productSpecification,
+				cpDefinitionSpecificationOptionValue, productSpecification,
 				_serviceContextHelper.getServiceContext());
 	}
 
@@ -191,12 +147,8 @@ public class ProductSpecificationResourceImpl
 	@Reference
 	private CPSpecificationOptionService _cpSpecificationOptionService;
 
-	@Reference(
-		target = DTOConverterConstants.PRODUCT_SPECIFICATION_DTO_CONVERTER
-	)
-	private DTOConverter
-		<CPDefinitionSpecificationOptionValue, ProductSpecification>
-			_productSpecificationDTOConverter;
+	@Reference
+	private ProductSpecificationDTOConverter _productSpecificationDTOConverter;
 
 	@Reference
 	private ProductSpecificationHelper _productSpecificationHelper;

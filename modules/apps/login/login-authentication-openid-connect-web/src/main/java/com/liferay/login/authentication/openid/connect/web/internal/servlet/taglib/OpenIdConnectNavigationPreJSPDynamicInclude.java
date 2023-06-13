@@ -14,8 +14,6 @@
 
 package com.liferay.login.authentication.openid.connect.web.internal.servlet.taglib;
 
-import com.liferay.oauth.client.persistence.model.OAuthClientEntry;
-import com.liferay.oauth.client.persistence.service.OAuthClientEntryLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.taglib.BaseJSPDynamicInclude;
@@ -25,11 +23,12 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnect;
+import com.liferay.portal.security.sso.openid.connect.OpenIdConnectProviderRegistry;
 import com.liferay.portal.security.sso.openid.connect.constants.OpenIdConnectWebKeys;
 
 import java.io.IOException;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -45,14 +44,9 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Michael C. Han
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class OpenIdConnectNavigationPreJSPDynamicInclude
 	extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void include(
@@ -60,13 +54,11 @@ public class OpenIdConnectNavigationPreJSPDynamicInclude
 			HttpServletResponse httpServletResponse, String key)
 		throws IOException {
 
-		List<OAuthClientEntry> oAuthClientEntries =
-			_oAuthClientEntryLocalService.
-				getAuthServerWellKnownURISuffixOAuthClientEntries(
-					_portal.getCompanyId(httpServletRequest),
-					"openid-configuration");
+		Collection<String> openIdConnectProviderNames =
+			_openIdConnectProviderRegistry.getOpenIdConnectProviderNames(
+				_portal.getCompanyId(httpServletRequest));
 
-		if (oAuthClientEntries.isEmpty()) {
+		if (openIdConnectProviderNames.isEmpty()) {
 			return;
 		}
 
@@ -106,21 +98,25 @@ public class OpenIdConnectNavigationPreJSPDynamicInclude
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.login.authentication.openid.connect.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		OpenIdConnectNavigationPreJSPDynamicInclude.class);
-
-	@Reference
-	private OAuthClientEntryLocalService _oAuthClientEntryLocalService;
 
 	@Reference
 	private OpenIdConnect _openIdConnect;
 
 	@Reference
-	private Portal _portal;
+	private OpenIdConnectProviderRegistry<?, ?> _openIdConnectProviderRegistry;
 
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.login.authentication.openid.connect.web)"
-	)
-	private ServletContext _servletContext;
+	@Reference
+	private Portal _portal;
 
 }

@@ -36,7 +36,7 @@ public class ServiceBuilderWebsiteUtil {
 			GetterUtil.getLong(webUrl.getId()));
 
 		website.setUrl(url);
-		website.setListTypeId(
+		website.setTypeId(
 			ServiceBuilderListTypeUtil.toServiceBuilderListTypeId(
 				"public", webUrl.getUrlType(), type));
 		website.setPrimary(GetterUtil.getBoolean(webUrl.getPrimary()));

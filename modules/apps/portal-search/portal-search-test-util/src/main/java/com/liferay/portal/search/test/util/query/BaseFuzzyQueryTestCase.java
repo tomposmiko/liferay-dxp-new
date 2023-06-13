@@ -38,11 +38,15 @@ public abstract class BaseFuzzyQueryTestCase extends BaseIndexingTestCase {
 
 	@Test
 	public void testFuzzyQuery() {
-		addDocuments(
-			value -> DocumentCreationHelpers.singleText(_FIELD_NAME, value),
-			"eclipse", "java", "liferay", "language");
+		addDocuments("eclipse", "java", "liferay", "language");
 
 		assertSearch("eclipsee", Arrays.asList("eclipse"));
+	}
+
+	protected void addDocuments(String... values) {
+		addDocuments(
+			value -> DocumentCreationHelpers.singleText(_FIELD_NAME, value),
+			Arrays.asList(values));
 	}
 
 	protected void assertSearch(String value, List<String> expectedValues) {
@@ -53,8 +57,7 @@ public abstract class BaseFuzzyQueryTestCase extends BaseIndexingTestCase {
 				SearchSearchRequest searchSearchRequest =
 					new SearchSearchRequest();
 
-				searchSearchRequest.setIndexNames(
-					String.valueOf(getCompanyId()));
+				searchSearchRequest.setIndexNames("_all");
 				searchSearchRequest.setQuery(fuzzyQuery);
 
 				SearchEngineAdapter searchEngineAdapter =

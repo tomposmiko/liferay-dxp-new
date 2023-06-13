@@ -14,12 +14,8 @@
 
 package com.liferay.segments.web.internal.portlet.action;
 
-import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.segments.configuration.provider.SegmentsConfigurationProvider;
 import com.liferay.segments.constants.SegmentsPortletKeys;
 import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributorRegistry;
 import com.liferay.segments.provider.SegmentsEntryProviderRegistry;
@@ -39,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS,
 		"mvc.command.name=/segments/edit_segments_entry"
@@ -57,32 +54,21 @@ public class EditSegmentsEntryMVCRenderCommand implements MVCRenderCommand {
 		portletSession.removeAttribute(
 			SegmentsWebKeys.PREVIEW_SEGMENTS_ENTRY_CRITERIA);
 
-		renderRequest.setAttribute(
-			EditSegmentsEntryDisplayContext.class.getName(),
+		EditSegmentsEntryDisplayContext editSegmentsEntryDisplayContext =
 			new EditSegmentsEntryDisplayContext(
-				_companyLocalService, _groupLocalService,
-				_portal.getHttpServletRequest(renderRequest), _itemSelector,
-				renderRequest, renderResponse, _segmentsConfigurationProvider,
-				_segmentsCriteriaContributorRegistry,
-				_segmentsEntryProviderRegistry, _segmentsEntryService));
+				_portal.getHttpServletRequest(renderRequest), renderRequest,
+				renderResponse, _segmentsCriteriaContributorRegistry,
+				_segmentsEntryProviderRegistry, _segmentsEntryService);
+
+		renderRequest.setAttribute(
+			SegmentsWebKeys.EDIT_SEGMENTS_ENTRY_DISPLAY_CONTEXT,
+			editSegmentsEntryDisplayContext);
 
 		return "/edit_segments_entry.jsp";
 	}
 
 	@Reference
-	private CompanyLocalService _companyLocalService;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private ItemSelector _itemSelector;
-
-	@Reference
 	private Portal _portal;
-
-	@Reference
-	private SegmentsConfigurationProvider _segmentsConfigurationProvider;
 
 	@Reference
 	private SegmentsCriteriaContributorRegistry

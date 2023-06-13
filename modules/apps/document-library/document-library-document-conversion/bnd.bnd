@@ -1,8 +1,9 @@
 Bundle-Name: Liferay Document Library Document Conversion
 Bundle-SymbolicName: com.liferay.document.library.document.conversion
-Bundle-Version: 4.0.24
+Bundle-Version: 4.0.10
 Import-Package:\
 	!com.google.common.collect.*,\
+	!com.google.gson.*,\
 	\
 	!com.sun.star.lib.unoloader,\
 	\
@@ -10,12 +11,16 @@ Import-Package:\
 	\
 	!org.apache.http.*,\
 	\
+	!org.joda.time.*,\
+	\
 	*
 Require-Capability:\
 	osgi.extender;\
 		filter := "(&(osgi.extender=osgi.configurator)(version>=1.0)(!(version>=2.0)))"
 -includeresource:\
 	OSGI-INF/configurator=configurator,\
+	@com.liferay.petra.apache.http.components-[0-9.]*.jar,\
 	@google-collections-[0-9.]*.jar,\
+	@gson-[0-9.]*.jar,\
 	@joda-time-[0-9.]*.jar,\
 	@jsontoken-[0-9.]*.jar

@@ -31,7 +31,10 @@ public class DDMFormRuleJSONDeserializer {
 		List<DDMFormRule> ddmFormRules = new ArrayList<>();
 
 		for (int i = 0; i < jsonArray.length(); i++) {
-			ddmFormRules.add(_getDDMFormRule(jsonArray.getJSONObject(i)));
+			DDMFormRule ddmFormRule = _getDDMFormRule(
+				jsonArray.getJSONObject(i));
+
+			ddmFormRules.add(ddmFormRule);
 		}
 
 		return ddmFormRules;

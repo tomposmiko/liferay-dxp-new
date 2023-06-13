@@ -50,22 +50,25 @@ public class LayoutTypeUpgradeProcess extends UpgradeProcess {
 			journalArticleResourceLocalService;
 	}
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		_updateLayouts();
-	}
-
-	private void _addPortletPreferences(
+	protected void addPortletPreferences(
 			long companyId, long groupId, long plid, String portletId,
 			String journalArticleId)
 		throws Exception {
 
+		String portletPreferences = getPortletPreferences(
+			groupId, journalArticleId);
+
 		PortletPreferencesLocalServiceUtil.addPortletPreferences(
 			companyId, 0, PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portletId,
-			null, _getPortletPreferences(groupId, journalArticleId));
+			null, portletPreferences);
 	}
 
-	private long _getAssetEntryId(long resourcePrimKey) throws Exception {
+	@Override
+	protected void doUpgrade() throws Exception {
+		updateLayouts();
+	}
+
+	protected long getAssetEntryId(long resourcePrimKey) throws Exception {
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
 			_CLASS_NAME, resourcePrimKey);
 
@@ -78,7 +81,7 @@ public class LayoutTypeUpgradeProcess extends UpgradeProcess {
 		return assetEntry.getEntryId();
 	}
 
-	private String _getJournalArticleId(String typeSettings) throws Exception {
+	protected String getJournalArticleId(String typeSettings) throws Exception {
 		UnicodeProperties typeSettingsUnicodeProperties =
 			UnicodePropertiesBuilder.create(
 				true
@@ -89,11 +92,12 @@ public class LayoutTypeUpgradeProcess extends UpgradeProcess {
 		return typeSettingsUnicodeProperties.getProperty("article-id");
 	}
 
-	private String _getPortletId() {
+	protected String getPortletId() {
 		return PortletIdCodec.encode(_PORTLET_ID_JOURNAL_CONTENT);
 	}
 
-	private String _getPortletPreferences(long groupId, String journalArticleId)
+	protected String getPortletPreferences(
+			long groupId, String journalArticleId)
 		throws Exception {
 
 		if (Validator.isNull(journalArticleId)) {
@@ -118,32 +122,32 @@ public class LayoutTypeUpgradeProcess extends UpgradeProcess {
 			}
 		}
 		else {
+			long assetEntryId = getAssetEntryId(
+				journalArticleResource.getResourcePrimKey());
+
 			portletPreferences.setValue(
-				"assetEntryId",
-				String.valueOf(
-					_getAssetEntryId(
-						journalArticleResource.getResourcePrimKey())));
+				"assetEntryId", String.valueOf(assetEntryId));
 		}
 
 		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
 	}
 
-	private String _getTypeSettings(String portletId) {
+	protected String getTypeSettings(String portletId) {
 		return UnicodePropertiesBuilder.create(
 			true
 		).put(
-			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, "1_column"
-		).put(
 			"column-1", portletId
+		).put(
+			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, "1_column"
 		).buildString();
 	}
 
-	private void _updateLayout(long plid, String portletId) throws Exception {
+	protected void updateLayout(long plid, String portletId) throws Exception {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"update Layout set typeSettings = ?, type_ = ? where plid = " +
 					"?")) {
 
-			preparedStatement.setString(1, _getTypeSettings(portletId));
+			preparedStatement.setString(1, getTypeSettings(portletId));
 			preparedStatement.setString(2, "portlet");
 			preparedStatement.setLong(3, plid);
 
@@ -151,7 +155,7 @@ public class LayoutTypeUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateLayouts() throws Exception {
+	protected void updateLayouts() throws Exception {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select plid, groupId, companyId, typeSettings from Layout " +
 					"where type_ = ?")) {
@@ -166,13 +170,13 @@ public class LayoutTypeUpgradeProcess extends UpgradeProcess {
 
 					String typeSettings = resultSet.getString("typeSettings");
 
-					String portletId = _getPortletId();
+					String portletId = getPortletId();
 
-					_addPortletPreferences(
+					addPortletPreferences(
 						companyId, groupId, plid, portletId,
-						_getJournalArticleId(typeSettings));
+						getJournalArticleId(typeSettings));
 
-					_updateLayout(plid, portletId);
+					updateLayout(plid, portletId);
 				}
 			}
 		}

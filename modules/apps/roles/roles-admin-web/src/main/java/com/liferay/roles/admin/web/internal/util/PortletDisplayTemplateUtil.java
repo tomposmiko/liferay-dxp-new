@@ -14,26 +14,37 @@
 
 package com.liferay.roles.admin.web.internal.util;
 
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Lance Ji
  */
+@Component(immediate = true, service = {})
 public class PortletDisplayTemplateUtil {
 
 	public static List<TemplateHandler> getPortletDisplayTemplateHandlers() {
-		PortletDisplayTemplate portletDisplayTemplate =
-			_portletDisplayTemplateSnapshot.get();
-
-		return portletDisplayTemplate.getPortletDisplayTemplateHandlers();
+		return _portletDisplayTemplate.getPortletDisplayTemplateHandlers();
 	}
 
-	private static final Snapshot<PortletDisplayTemplate>
-		_portletDisplayTemplateSnapshot = new Snapshot<>(
-			PortletDisplayTemplateUtil.class, PortletDisplayTemplate.class);
+	@Deactivate
+	protected void deactivate() {
+		_portletDisplayTemplate = null;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortletDisplayTemplate(
+		PortletDisplayTemplate portletDisplayTemplate) {
+
+		_portletDisplayTemplate = portletDisplayTemplate;
+	}
+
+	private static PortletDisplayTemplate _portletDisplayTemplate;
 
 }

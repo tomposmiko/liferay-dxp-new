@@ -1767,11 +1767,6 @@ public class LayoutRevisionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected LayoutRevisionWrapper wrap(LayoutRevision layoutRevision) {
 		return new LayoutRevisionWrapper(layoutRevision);
 	}

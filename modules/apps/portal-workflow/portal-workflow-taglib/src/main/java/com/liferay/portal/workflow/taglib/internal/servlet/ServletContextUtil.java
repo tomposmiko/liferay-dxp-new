@@ -14,22 +14,29 @@
 
 package com.liferay.portal.workflow.taglib.internal.servlet;
 
-import com.liferay.osgi.util.service.Snapshot;
-
 import javax.servlet.ServletContext;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Feliphe Marinho
  */
+@Component(immediate = true, service = {})
 public class ServletContextUtil {
 
 	public static ServletContext getServletContext() {
-		return _servletContextSnapshot.get();
+		return _servletContext;
 	}
 
-	private static final Snapshot<ServletContext> _servletContextSnapshot =
-		new Snapshot<>(
-			ServletContextUtil.class, ServletContext.class,
-			"(osgi.web.symbolicname=com.liferay.portal.workflow.taglib)");
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.portal.workflow.taglib)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
+	private static ServletContext _servletContext;
 
 }

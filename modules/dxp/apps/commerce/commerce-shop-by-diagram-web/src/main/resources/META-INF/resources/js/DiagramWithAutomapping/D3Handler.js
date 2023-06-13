@@ -17,12 +17,11 @@ import DiagramZoomHandler from '../utilities/DiagramZoomHandler';
 class D3Handler extends DiagramZoomHandler {
 	constructor(
 		diagramWrapper,
+		zoomWrapper,
 		imageURL,
-		isAdmin,
 		pinsCSSSelectors,
 		updateLabels,
-		updateZoomState,
-		zoomWrapper
+		updateZoomState
 	) {
 		super();
 
@@ -31,10 +30,8 @@ class D3Handler extends DiagramZoomHandler {
 		this._d3diagramWrapper = d3select(diagramWrapper);
 		this._d3zoomWrapper = d3select(zoomWrapper);
 		this._imageURL = imageURL;
-		this._isAdmin = isAdmin;
 		this._updateLabels = updateLabels;
 		this._pinBackground = null;
-		this._pinsCSSSelectors = pinsCSSSelectors;
 		this._updateZoomState = updateZoomState;
 		this._zoomWrapper = zoomWrapper;
 		this._handleZoom = this._handleZoom.bind(this);
@@ -42,9 +39,15 @@ class D3Handler extends DiagramZoomHandler {
 
 		this._printSVGImage().then(() => {
 			this.rendered = true;
+			this._texts = Array.from(
+				this._diagramWrapper.querySelectorAll(
+					pinsCSSSelectors.join(',')
+				)
+			);
 
-			this._addZoom();
 			this._updatePinsState();
+			this._addZoom();
+			this._updateLabels(this._texts);
 		});
 	}
 
@@ -61,53 +64,22 @@ class D3Handler extends DiagramZoomHandler {
 	}
 
 	_updatePinsState() {
-		const sequences = new Set(
-			this._pins ? this._pins.map((pin) => pin.sequence) : []
-		);
+		if (this._pins) {
+			const sequences = new Set(this._pins.map((pin) => pin.sequence));
 
-		const imagePosition = this._image.node().getBoundingClientRect();
-
-		const labels = Array.from(
-			this._diagramWrapper.querySelectorAll(
-				this._pinsCSSSelectors.join(',')
-			)
-		).filter((text) => {
-			const pinSaved = sequences.has(text.textContent);
-
-			const isPin = this._isAdmin || pinSaved;
-
-			if (this._isAdmin || pinSaved) {
+			this._texts.forEach((text) => {
 				text.classList.add('pin');
 
-				const textPosition = text.getBoundingClientRect();
-
-				text.__data__ = {
-					distanceFromCenterX:
-						(textPosition.x +
-							textPosition.width / 2 -
-							(imagePosition.x + imagePosition.width / 2)) *
-						-1,
-					distanceFromCenterY:
-						(textPosition.y +
-							textPosition.height / 2 -
-							(imagePosition.y + imagePosition.height / 2)) *
-						-1,
-				};
-			}
-
-			if (pinSaved) {
-				text.classList.add('mapped');
-				text._mapped = true;
-			}
-			else {
-				text.classList.remove('mapped');
-				text._mapped = false;
-			}
-
-			return isPin;
-		});
-
-		this._updateLabels(labels);
+				if (sequences.has(text.textContent)) {
+					text.classList.add('mapped');
+					text._mapped = true;
+				}
+				else {
+					text.classList.remove('mapped');
+					text._mapped = false;
+				}
+			});
+		}
 	}
 
 	updatePins(pins) {
@@ -118,13 +90,36 @@ class D3Handler extends DiagramZoomHandler {
 		}
 	}
 
-	async recenterOnPin(node) {
-		return super._recenterViewport(
-			node.__data__.distanceFromCenterX,
-			node.__data__.distanceFromCenterY,
-			800,
-			1
-		);
+	updateZoom(scale) {
+		this._currentScale = scale;
+
+		this._animateZoom();
+	}
+
+	recenterOnPin(node) {
+		const {
+			height: imageHeight,
+			width: imageWidth,
+			x: imageX,
+			y: imageY,
+		} = this._image.node().getBoundingClientRect();
+
+		const k = this._currentScale;
+
+		const {
+			height: nodeHeight,
+			width: nodeWidth,
+			x: nodeX,
+			y: nodeY,
+		} = node.getBoundingClientRect();
+
+		const positionX = nodeX - imageX + nodeWidth / 2;
+		const positionY = nodeY - imageY + nodeHeight / 2;
+
+		const x = -positionX * k + imageWidth / 2;
+		const y = -positionY * k + imageHeight / 2;
+
+		return super._recenterViewport(x, y, 1000);
 	}
 }
 

@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.EmailAddressValidator;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -37,7 +36,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.EmailAddressValidatorFactory;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -51,7 +49,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceNotificationHelper.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceNotificationHelper.class
+)
 public class CommerceNotificationHelperImpl
 	implements CommerceNotificationHelper {
 
@@ -79,33 +80,136 @@ public class CommerceNotificationHelperImpl
 		for (CommerceNotificationTemplate commerceNotificationTemplate :
 				commerceNotificationTemplates) {
 
-			_sendNotification(
+			sendNotification(
 				userId, commerceNotificationTemplate, commerceNotificationType,
 				object);
 		}
 	}
 
-	private void _addNotificationQueueEntry(
-			long groupId, CommerceNotificationType commerceNotificationType,
-			CommerceNotificationTemplate commerceNotificationTemplate,
-			String fromName, String toEmailAddress, String toFullName,
-			String subject, String body, Object object)
+	protected String formatString(
+			CommerceNotificationType commerceNotificationType, int fieldType,
+			String content, Object object, Locale locale)
 		throws PortalException {
 
-		User user = _userLocalService.getGuestUser(
-			CompanyThreadLocal.getCompanyId());
+		if (Validator.isNull(content)) {
+			return StringPool.BLANK;
+		}
 
-		_commerceNotificationQueueEntryLocalService.
-			addCommerceNotificationQueueEntry(
-				user.getUserId(), groupId,
-				commerceNotificationType.getClassName(object),
-				commerceNotificationType.getClassPK(object),
-				commerceNotificationTemplate.
-					getCommerceNotificationTemplateId(),
-				commerceNotificationTemplate.getFrom(), fromName,
-				toEmailAddress, toFullName,
-				commerceNotificationTemplate.getCc(),
-				commerceNotificationTemplate.getBcc(), subject, body, 0);
+		Set<String> placeholders = new HashSet<>();
+
+		Matcher matcher = _placeholderPattern.matcher(content);
+
+		while (matcher.find()) {
+			placeholders.add(matcher.group());
+		}
+
+		List<CommerceDefinitionTermContributor> definitionTermContributors;
+
+		if (fieldType == _TOFIELD) {
+			definitionTermContributors =
+				_commerceDefinitionTermContributorRegistry.
+					getDefinitionTermContributorsByContributorKey(
+						CommerceDefinitionTermConstants.
+							RECIPIENT_DEFINITION_TERMS_CONTRIBUTOR);
+		}
+		else {
+			definitionTermContributors =
+				_commerceDefinitionTermContributorRegistry.
+					getDefinitionTermContributorsByNotificationTypeKey(
+						commerceNotificationType.getKey());
+		}
+
+		for (CommerceDefinitionTermContributor definitionTermContributor :
+				definitionTermContributors) {
+
+			for (String placeholder : placeholders) {
+				content = StringUtil.replace(
+					content, placeholder,
+					definitionTermContributor.getFilledTerm(
+						placeholder, object, locale));
+			}
+		}
+
+		return content;
+	}
+
+	protected void sendNotification(
+			long userId,
+			CommerceNotificationTemplate commerceNotificationTemplate,
+			CommerceNotificationType commerceNotificationType, Object object)
+		throws PortalException {
+
+		long groupId = commerceNotificationTemplate.getGroupId();
+
+		User user = _userLocalService.getUser(userId);
+
+		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(groupId);
+		Locale userLocale = user.getLocale();
+
+		String fromName = commerceNotificationTemplate.getFromName(
+			user.getLanguageId());
+
+		String subject = formatString(
+			commerceNotificationType, _SUBJECTFIELD,
+			commerceNotificationTemplate.getSubject(userLocale), object,
+			userLocale);
+		String body = formatString(
+			commerceNotificationType, _BODYFIELD,
+			commerceNotificationTemplate.getBody(userLocale), object,
+			userLocale);
+
+		if (Validator.isNull(fromName)) {
+			fromName = commerceNotificationTemplate.getFromName(
+				_portal.getSiteDefaultLocale(groupId));
+		}
+
+		if (Validator.isNull(subject)) {
+			subject = formatString(
+				commerceNotificationType, _SUBJECTFIELD,
+				commerceNotificationTemplate.getSubject(siteDefaultLocale),
+				object, siteDefaultLocale);
+		}
+
+		if (Validator.isNull(body)) {
+			formatString(
+				commerceNotificationType, _BODYFIELD,
+				commerceNotificationTemplate.getBody(siteDefaultLocale), object,
+				siteDefaultLocale);
+		}
+
+		String to = formatString(
+			commerceNotificationType, _TOFIELD,
+			commerceNotificationTemplate.getTo(), object, userLocale);
+
+		EmailAddressValidator emailAddressValidator =
+			EmailAddressValidatorFactory.getInstance();
+
+		String[] toUserStrings = StringUtil.split(to);
+
+		for (String toUserString : toUserStrings) {
+			User toUser = _userLocalService.fetchUser(
+				GetterUtil.getLong(toUserString));
+
+			if ((toUser == null) &&
+				emailAddressValidator.validate(
+					user.getCompanyId(), toUserString)) {
+
+				toUser = _userLocalService.fetchUserByEmailAddress(
+					user.getCompanyId(), toUserString);
+			}
+
+			if (toUser == null) {
+				if (_log.isInfoEnabled()) {
+					_log.info("No User found with key: " + toUserString);
+				}
+
+				continue;
+			}
+
+			_addNotificationQueueEntry(
+				groupId, commerceNotificationType, commerceNotificationTemplate,
+				fromName, toUser, subject, body, object);
+		}
 	}
 
 	private void _addNotificationQueueEntry(
@@ -126,143 +230,6 @@ public class CommerceNotificationHelperImpl
 				toUser.getEmailAddress(), toUser.getFullName(),
 				commerceNotificationTemplate.getCc(),
 				commerceNotificationTemplate.getBcc(), subject, body, 0);
-	}
-
-	private String _formatString(
-			CommerceNotificationType commerceNotificationType, int fieldType,
-			String content, Object object, Locale locale)
-		throws PortalException {
-
-		if (Validator.isNull(content)) {
-			return StringPool.BLANK;
-		}
-
-		Set<String> placeholders = new HashSet<>();
-
-		Matcher matcher = _placeholderPattern.matcher(content);
-
-		while (matcher.find()) {
-			placeholders.add(matcher.group());
-		}
-
-		List<CommerceDefinitionTermContributor> definitionTermContributors =
-			new ArrayList<>();
-
-		if (fieldType == _TOFIELD) {
-			definitionTermContributors.addAll(
-				_commerceDefinitionTermContributorRegistry.
-					getDefinitionTermContributorsByContributorKey(
-						CommerceDefinitionTermConstants.
-							RECIPIENT_DEFINITION_TERMS_CONTRIBUTOR));
-		}
-
-		definitionTermContributors.addAll(
-			_commerceDefinitionTermContributorRegistry.
-				getDefinitionTermContributorsByNotificationTypeKey(
-					commerceNotificationType.getKey()));
-
-		for (CommerceDefinitionTermContributor definitionTermContributor :
-				definitionTermContributors) {
-
-			for (String placeholder : placeholders) {
-				content = StringUtil.replace(
-					content, placeholder,
-					definitionTermContributor.getFilledTerm(
-						placeholder, object, locale));
-			}
-		}
-
-		return content;
-	}
-
-	private void _sendNotification(
-			long userId,
-			CommerceNotificationTemplate commerceNotificationTemplate,
-			CommerceNotificationType commerceNotificationType, Object object)
-		throws PortalException {
-
-		long groupId = commerceNotificationTemplate.getGroupId();
-
-		User user = _userLocalService.getUser(userId);
-
-		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(groupId);
-		Locale userLocale = user.getLocale();
-
-		String fromName = commerceNotificationTemplate.getFromName(
-			user.getLanguageId());
-
-		String subject = _formatString(
-			commerceNotificationType, _SUBJECTFIELD,
-			commerceNotificationTemplate.getSubject(userLocale), object,
-			userLocale);
-		String body = _formatString(
-			commerceNotificationType, _BODYFIELD,
-			commerceNotificationTemplate.getBody(userLocale), object,
-			userLocale);
-
-		if (Validator.isNull(fromName)) {
-			fromName = commerceNotificationTemplate.getFromName(
-				_portal.getSiteDefaultLocale(groupId));
-		}
-
-		if (Validator.isNull(subject)) {
-			subject = _formatString(
-				commerceNotificationType, _SUBJECTFIELD,
-				commerceNotificationTemplate.getSubject(siteDefaultLocale),
-				object, siteDefaultLocale);
-		}
-
-		if (Validator.isNull(body)) {
-			_formatString(
-				commerceNotificationType, _BODYFIELD,
-				commerceNotificationTemplate.getBody(siteDefaultLocale), object,
-				siteDefaultLocale);
-		}
-
-		String to = _formatString(
-			commerceNotificationType, _TOFIELD,
-			commerceNotificationTemplate.getTo(), object, userLocale);
-
-		EmailAddressValidator emailAddressValidator =
-			EmailAddressValidatorFactory.getInstance();
-
-		String[] toUserStrings = StringUtil.split(to);
-
-		for (String toUserString : toUserStrings) {
-			User toUser = _userLocalService.fetchUser(
-				GetterUtil.getLong(toUserString));
-
-			if ((toUser == null) &&
-				emailAddressValidator.validate(
-					user.getCompanyId(), toUserString)) {
-
-				toUser = _userLocalService.fetchUserByEmailAddress(
-					user.getCompanyId(), toUserString);
-
-				if (toUser == null) {
-					if (_log.isInfoEnabled()) {
-						_log.info("No User found with key: " + toUserString);
-					}
-
-					_addNotificationQueueEntry(
-						groupId, commerceNotificationType,
-						commerceNotificationTemplate, fromName, toUserString,
-						toUserString, subject, body, object);
-				}
-				else {
-					_addNotificationQueueEntry(
-						groupId, commerceNotificationType,
-						commerceNotificationTemplate, fromName, toUser, subject,
-						body, object);
-				}
-			}
-			else {
-				_addNotificationQueueEntry(
-					groupId, commerceNotificationType,
-					commerceNotificationTemplate, fromName, toUser, subject,
-					body, object);
-			}
-		}
 	}
 
 	private static final int _BODYFIELD = 2;

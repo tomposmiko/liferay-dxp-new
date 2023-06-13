@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = DocumentContributor.class)
+@Component(immediate = true, service = DocumentContributor.class)
 public class AuditedModelDocumentContributor
 	implements DocumentContributor<AuditedModel> {
 
@@ -45,11 +45,11 @@ public class AuditedModelDocumentContributor
 		document.addDate(Field.CREATE_DATE, auditedModel.getCreateDate());
 		document.addDate(Field.MODIFIED_DATE, auditedModel.getModifiedDate());
 		document.addKeyword(Field.USER_ID, auditedModel.getUserId());
-		document.addKeyword(
-			Field.USER_NAME,
-			portal.getUserName(
-				auditedModel.getUserId(), auditedModel.getUserName()),
-			true);
+
+		String userName = portal.getUserName(
+			auditedModel.getUserId(), auditedModel.getUserName());
+
+		document.addKeyword(Field.USER_NAME, userName, true);
 	}
 
 	@Reference

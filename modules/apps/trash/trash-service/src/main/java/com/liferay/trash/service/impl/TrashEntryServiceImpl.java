@@ -14,6 +14,7 @@
 
 package com.liferay.trash.service.impl;
 
+import com.liferay.petra.model.adapter.util.ModelAdapterUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -32,14 +33,13 @@ import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.adapter.ModelAdapterUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.trash.TrashHelper;
 import com.liferay.trash.constants.TrashActionKeys;
 import com.liferay.trash.constants.TrashEntryConstants;
 import com.liferay.trash.exception.RestoreEntryException;
 import com.liferay.trash.model.TrashEntry;
 import com.liferay.trash.model.TrashEntryList;
+import com.liferay.trash.model.TrashEntrySoap;
 import com.liferay.trash.model.impl.TrashEntryImpl;
 import com.liferay.trash.service.base.TrashEntryServiceBaseImpl;
 
@@ -100,20 +100,21 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 					continue;
 				}
 
-				_deleteEntry(entry);
+				deleteEntry(entry);
 			}
 			catch (TrashPermissionException trashPermissionException) {
 
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(trashPermissionException);
+					_log.debug(
+						trashPermissionException, trashPermissionException);
 				}
 
 				throwTrashPermissionException = true;
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -142,7 +143,8 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(trashPermissionException);
+					_log.debug(
+						trashPermissionException, trashPermissionException);
 				}
 
 				throwTrashPermissionException = true;
@@ -170,7 +172,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	public void deleteEntry(long entryId) throws PortalException {
 		TrashEntry entry = trashEntryPersistence.findByPrimaryKey(entryId);
 
-		_deleteEntry(entry);
+		deleteEntry(entry);
 	}
 
 	/**
@@ -199,7 +201,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 			entry.setClassPK(classPK);
 		}
 
-		_deleteEntry(entry);
+		deleteEntry(entry);
 	}
 
 	/**
@@ -241,7 +243,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		List<TrashEntry> entries = trashEntryPersistence.findByG_C(
 			groupId, _classNameLocalService.getClassNameId(className));
 
-		return _filterEntries(entries);
+		return filterEntries(entries);
 	}
 
 	/**
@@ -288,7 +290,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 				orderByComparator);
 		}
 
-		List<TrashEntry> filteredEntries = _filterEntries(entries);
+		List<TrashEntry> filteredEntries = filterEntries(entries);
 
 		int total = filteredEntries.size();
 
@@ -304,6 +306,8 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		end = startAndEnd[1];
 
 		filteredEntries = filteredEntries.subList(start, end);
+
+		trashEntriesList.setArray(TrashEntrySoap.toSoapModels(filteredEntries));
 
 		trashEntriesList.setCount(total);
 		trashEntriesList.setOriginalTrashEntries(filteredEntries);
@@ -377,8 +381,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		}
 
 		TrashEntry trashEntry = ModelAdapterUtil.adapt(
-			TrashEntry.class,
-			_trashHelper.getTrashEntry(trashHandler.getTrashedModel(classPK)));
+			TrashEntry.class, trashHandler.getTrashEntry(classPK));
 
 		if (trashEntry.isTrashEntry(className, classPK)) {
 			trashHandler.checkRestorableEntry(
@@ -520,7 +523,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		return null;
 	}
 
-	private void _deleteEntry(TrashEntry entry) throws PortalException {
+	protected void deleteEntry(TrashEntry entry) throws PortalException {
 		PermissionChecker permissionChecker = getPermissionChecker();
 
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
@@ -535,7 +538,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		trashHandler.deleteTrashEntry(entry.getClassPK());
 	}
 
-	private List<TrashEntry> _filterEntries(List<TrashEntry> entries)
+	protected List<TrashEntry> filterEntries(List<TrashEntry> entries)
 		throws PrincipalException {
 
 		List<TrashEntry> filteredEntries = new ArrayList<>();
@@ -557,7 +560,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 				}
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -569,8 +572,5 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private TrashHelper _trashHelper;
 
 }

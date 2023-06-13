@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,16 +30,17 @@ import javax.servlet.http.HttpServletResponse;
 public class DDMFormBuilderContextRequest {
 
 	public static DDMFormBuilderContextRequest with(
-		DDMStructure ddmStructure, HttpServletRequest httpServletRequest,
+		Optional<DDMStructure> ddmStructureOptional,
+		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, Locale locale,
 		boolean readOnly) {
 
 		DDMFormBuilderContextRequest ddmFormBuilderContextRequest =
 			new DDMFormBuilderContextRequest();
 
-		if (ddmStructure != null) {
+		if (ddmStructureOptional.isPresent()) {
 			ddmFormBuilderContextRequest.addProperty(
-				"ddmStructure", ddmStructure);
+				"ddmStructure", ddmStructureOptional.get());
 		}
 
 		ddmFormBuilderContextRequest.setHttpServletRequest(httpServletRequest);

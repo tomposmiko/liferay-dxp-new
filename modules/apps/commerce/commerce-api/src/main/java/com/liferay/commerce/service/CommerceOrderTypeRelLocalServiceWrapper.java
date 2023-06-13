@@ -27,10 +27,6 @@ public class CommerceOrderTypeRelLocalServiceWrapper
 	implements CommerceOrderTypeRelLocalService,
 			   ServiceWrapper<CommerceOrderTypeRelLocalService> {
 
-	public CommerceOrderTypeRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceOrderTypeRelLocalServiceWrapper(
 		CommerceOrderTypeRelLocalService commerceOrderTypeRelLocalService) {
 
@@ -276,30 +272,35 @@ public class CommerceOrderTypeRelLocalServiceWrapper
 			commerceOrderTypeRelId);
 	}
 
-	@Override
-	public com.liferay.commerce.model.CommerceOrderTypeRel
-		fetchCommerceOrderTypeRelByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return _commerceOrderTypeRelLocalService.
-			fetchCommerceOrderTypeRelByExternalReferenceCode(
-				externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the commerce order type rel with the matching UUID and company.
+	 * Returns the commerce order type rel with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce order type rel's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order type rel's external reference code
 	 * @return the matching commerce order type rel, or <code>null</code> if a matching commerce order type rel could not be found
 	 */
 	@Override
 	public com.liferay.commerce.model.CommerceOrderTypeRel
-		fetchCommerceOrderTypeRelByUuidAndCompanyId(
-			String uuid, long companyId) {
+		fetchCommerceOrderTypeRelByExternalReferenceCode(
+			long companyId, String externalReferenceCode) {
 
 		return _commerceOrderTypeRelLocalService.
-			fetchCommerceOrderTypeRelByUuidAndCompanyId(uuid, companyId);
+			fetchCommerceOrderTypeRelByExternalReferenceCode(
+				companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceOrderTypeRelByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.commerce.model.CommerceOrderTypeRel
+		fetchCommerceOrderTypeRelByReferenceCode(
+			long companyId, String externalReferenceCode) {
+
+		return _commerceOrderTypeRelLocalService.
+			fetchCommerceOrderTypeRelByReferenceCode(
+				companyId, externalReferenceCode);
 	}
 
 	@Override
@@ -346,33 +347,23 @@ public class CommerceOrderTypeRelLocalServiceWrapper
 			commerceOrderTypeRelId);
 	}
 
-	@Override
-	public com.liferay.commerce.model.CommerceOrderTypeRel
-			getCommerceOrderTypeRelByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceOrderTypeRelLocalService.
-			getCommerceOrderTypeRelByExternalReferenceCode(
-				externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the commerce order type rel with the matching UUID and company.
+	 * Returns the commerce order type rel with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce order type rel's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order type rel's external reference code
 	 * @return the matching commerce order type rel
 	 * @throws PortalException if a matching commerce order type rel could not be found
 	 */
 	@Override
 	public com.liferay.commerce.model.CommerceOrderTypeRel
-			getCommerceOrderTypeRelByUuidAndCompanyId(
-				String uuid, long companyId)
+			getCommerceOrderTypeRelByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceOrderTypeRelLocalService.
-			getCommerceOrderTypeRelByUuidAndCompanyId(uuid, companyId);
+			getCommerceOrderTypeRelByExternalReferenceCode(
+				companyId, externalReferenceCode);
 	}
 
 	/**
@@ -421,16 +412,6 @@ public class CommerceOrderTypeRelLocalServiceWrapper
 	public int getCommerceOrderTypeRelsCount(String className, long classPK) {
 		return _commerceOrderTypeRelLocalService.getCommerceOrderTypeRelsCount(
 			className, classPK);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionableDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return _commerceOrderTypeRelLocalService.
-			getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	@Override

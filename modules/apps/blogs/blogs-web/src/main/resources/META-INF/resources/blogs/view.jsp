@@ -17,11 +17,18 @@
 <%@ include file="/blogs/init.jsp" %>
 
 <%
-BlogsViewDisplayContext blogsViewDisplayContext = new BlogsViewDisplayContext(request, renderRequest, renderResponse);
+String mvcRenderCommandName = ParamUtil.getString(request, "mvcRenderCommandName");
 
-BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = blogsViewDisplayContext.getBlogsPortletInstanceConfiguration();
+long assetCategoryId = ParamUtil.getLong(request, "categoryId");
+String assetTagName = ParamUtil.getString(request, "tag");
 
-SearchContainer<?> searchContainer = blogsViewDisplayContext.getSearchContainer();
+boolean useAssetEntryQuery = (assetCategoryId > 0) || Validator.isNotNull(assetTagName);
+
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/blogs/view"
+).buildPortletURL();
 %>
 
 <liferay-ui:success key='<%= portletDisplay.getId() + "requestProcessed" %>' message="your-request-completed-successfully" />
@@ -37,9 +44,69 @@ SearchContainer<?> searchContainer = blogsViewDisplayContext.getSearchContainer(
 
 <aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
-<c:if test="<%= blogsViewDisplayContext.getUnpublishedEntriesCount() > 0 %>">
+<%
+BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortletInstanceConfigurationUtil.getBlogsPortletInstanceConfiguration(themeDisplay);
+
+int pageDelta = GetterUtil.getInteger(blogsPortletInstanceConfiguration.pageDelta());
+
+SearchContainer<BaseModel<?>> searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, pageDelta, currentURLObj, null, null);
+
+searchContainer.setDelta(pageDelta);
+searchContainer.setDeltaConfigurable(false);
+
+int total = 0;
+List<BaseModel<?>> results = new ArrayList<>();
+
+int notPublishedEntriesCount = BlogsEntryServiceUtil.getGroupUserEntriesCount(scopeGroupId, themeDisplay.getUserId(), new int[] {WorkflowConstants.STATUS_DRAFT, WorkflowConstants.STATUS_PENDING, WorkflowConstants.STATUS_SCHEDULED});
+
+if (useAssetEntryQuery) {
+	SearchContainerResults<AssetEntry> searchContainerResults = BlogsUtil.getSearchContainerResults(searchContainer);
+
+	searchContainer.setTotal(searchContainerResults.getTotal());
+
+	results.addAll(searchContainerResults.getResults());
+}
+else if ((notPublishedEntriesCount > 0) && mvcRenderCommandName.equals("/blogs/view_not_published_entries")) {
+	total = notPublishedEntriesCount;
+
+	searchContainer.setTotal(total);
+
+	results.addAll(BlogsEntryServiceUtil.getGroupUserEntries(scopeGroupId, themeDisplay.getUserId(), new int[] {WorkflowConstants.STATUS_DRAFT, WorkflowConstants.STATUS_PENDING, WorkflowConstants.STATUS_SCHEDULED}, searchContainer.getStart(), searchContainer.getEnd(), new EntryModifiedDateComparator()));
+}
+else {
+	int status = WorkflowConstants.STATUS_APPROVED;
+
+	total = BlogsEntryServiceUtil.getGroupEntriesCount(scopeGroupId, status);
+
+	searchContainer.setTotal(total);
+
+	results.addAll(BlogsEntryServiceUtil.getGroupEntries(scopeGroupId, status, searchContainer.getStart(), searchContainer.getEnd()));
+}
+
+searchContainer.setResults(results);
+%>
+
+<c:if test="<%= notPublishedEntriesCount > 0 %>">
 	<clay:navigation-bar
-		navigationItems="<%= blogsViewDisplayContext.getNavigationItems() %>"
+		navigationItems='<%=
+			new JSPNavigationItemList(pageContext) {
+				{
+					add(
+						navigationItem -> {
+							navigationItem.setActive(!mvcRenderCommandName.equals("/blogs/view_not_published_entries"));
+							navigationItem.setHref(portletURL);
+							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "published"));
+						});
+
+					add(
+						navigationItem -> {
+							navigationItem.setActive(mvcRenderCommandName.equals("/blogs/view_not_published_entries"));
+							navigationItem.setHref(renderResponse.createRenderURL(), "mvcRenderCommandName", "/blogs/view_not_published_entries");
+							navigationItem.setLabel(LanguageUtil.format(httpServletRequest, "not-published-x", notPublishedEntriesCount, false));
+						});
+				}
+			}
+		%>'
 	/>
 </c:if>
 

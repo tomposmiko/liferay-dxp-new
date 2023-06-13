@@ -19,7 +19,7 @@ let promise = Promise.resolve();
 
 export default function undo({store}) {
 	return (dispatch) => {
-		if (!store.undoHistory || !store.undoHistory.length) {
+		if (!store.undoHistory || store.undoHistory.length === 0) {
 			return;
 		}
 

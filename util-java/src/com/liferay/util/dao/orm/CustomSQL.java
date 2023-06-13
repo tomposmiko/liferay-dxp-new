@@ -462,7 +462,7 @@ public class CustomSQL {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		try {
@@ -481,7 +481,7 @@ public class CustomSQL {
 			_sqlPool = sqlPool;
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -787,9 +787,10 @@ public class CustomSQL {
 		else if (wildcardMode == WildcardMode.TRAILING) {
 			return keyword.concat(StringPool.PERCENT);
 		}
-
-		throw new IllegalArgumentException(
-			"Invalid wildcard mode " + wildcardMode);
+		else {
+			throw new IllegalArgumentException(
+				"Invalid wildcard mode " + wildcardMode);
+		}
 	}
 
 	protected String transform(String sql) {
@@ -818,7 +819,7 @@ public class CustomSQL {
 		}
 		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
+				_log.debug(ioException, ioException);
 			}
 
 			return sql;

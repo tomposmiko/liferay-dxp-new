@@ -17,5 +17,27 @@ package com.liferay.portal.kernel.workflow;
 /**
  * @author Feliphe Marinho
  */
-public class DefaultWorkflowNode extends BaseWorkflowNode {
+public class DefaultWorkflowNode implements WorkflowNode {
+
+	@Override
+	public String getName() {
+		return _name;
+	}
+
+	@Override
+	public Type getType() {
+		return _type;
+	}
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	public void setType(Type type) {
+		_type = type;
+	}
+
+	private String _name;
+	private Type _type;
+
 }

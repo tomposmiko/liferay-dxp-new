@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.SearchException;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,7 +42,7 @@ public class FolderTitleLookupImpl implements FolderTitleLookup {
 
 	@Override
 	public String getFolderTitle(long curFolderId) {
-		Hits results = _searchFolder(curFolderId);
+		Hits results = searchFolder(curFolderId);
 
 		if (results.getLength() == 0) {
 			return null;
@@ -50,20 +52,23 @@ public class FolderTitleLookupImpl implements FolderTitleLookup {
 
 		Map<String, Field> fieldsMap = document.getFields();
 
-		for (Map.Entry<String, Field> entry : fieldsMap.entrySet()) {
-			if (!_isTitleFieldEntry(entry)) {
-				continue;
-			}
+		Set<Map.Entry<String, Field>> fieldsMapEntrySet = fieldsMap.entrySet();
 
-			Field field = entry.getValue();
+		Stream<Map.Entry<String, Field>> stream = fieldsMapEntrySet.stream();
 
-			return field.getValue();
-		}
-
-		return null;
+		return stream.filter(
+			this::isTitleFieldEntry
+		).findAny(
+		).map(
+			Map.Entry::getValue
+		).map(
+			Field::getValue
+		).orElse(
+			null
+		);
 	}
 
-	private SearchContext _getSearchContext(long curFolderId) {
+	protected SearchContext getSearchContext(long curFolderId) {
 		SearchContext searchContext = SearchContextFactory.getInstance(
 			_httpServletRequest);
 
@@ -74,7 +79,7 @@ public class FolderTitleLookupImpl implements FolderTitleLookup {
 		return searchContext;
 	}
 
-	private boolean _isTitleFieldEntry(Map.Entry<String, Field> entry) {
+	protected boolean isTitleFieldEntry(Map.Entry<String, Field> entry) {
 		String key = entry.getKey();
 
 		if (!key.startsWith(Field.TITLE) || key.endsWith("_sortable")) {
@@ -84,9 +89,9 @@ public class FolderTitleLookupImpl implements FolderTitleLookup {
 		return true;
 	}
 
-	private Hits _searchFolder(long curFolderId) {
+	protected Hits searchFolder(long curFolderId) {
 		try {
-			return _folderSearcher.search(_getSearchContext(curFolderId));
+			return _folderSearcher.search(getSearchContext(curFolderId));
 		}
 		catch (SearchException searchException) {
 			throw new RuntimeException(searchException);

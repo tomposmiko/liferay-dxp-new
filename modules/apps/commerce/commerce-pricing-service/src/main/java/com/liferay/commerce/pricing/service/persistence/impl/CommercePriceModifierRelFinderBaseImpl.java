@@ -16,53 +16,45 @@ package com.liferay.commerce.pricing.service.persistence.impl;
 
 import com.liferay.commerce.pricing.model.CommercePriceModifierRel;
 import com.liferay.commerce.pricing.service.persistence.CommercePriceModifierRelPersistence;
-import com.liferay.commerce.pricing.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
-
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Riccardo Alberti
  * @generated
  */
-public abstract class CommercePriceModifierRelFinderBaseImpl
+public class CommercePriceModifierRelFinderBaseImpl
 	extends BasePersistenceImpl<CommercePriceModifierRel> {
 
 	public CommercePriceModifierRelFinderBaseImpl() {
 		setModelClass(CommercePriceModifierRel.class);
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce price modifier rel persistence.
+	 *
+	 * @return the commerce price modifier rel persistence
+	 */
+	public CommercePriceModifierRelPersistence
+		getCommercePriceModifierRelPersistence() {
+
+		return commercePriceModifierRelPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce price modifier rel persistence.
+	 *
+	 * @param commercePriceModifierRelPersistence the commerce price modifier rel persistence
+	 */
+	public void setCommercePriceModifierRelPersistence(
+		CommercePriceModifierRelPersistence
+			commercePriceModifierRelPersistence) {
+
+		this.commercePriceModifierRelPersistence =
+			commercePriceModifierRelPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommercePriceModifierRelPersistence.class)
 	protected CommercePriceModifierRelPersistence
 		commercePriceModifierRelPersistence;
 

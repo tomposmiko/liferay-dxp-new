@@ -55,16 +55,6 @@ public class MessageBoardAttachmentSerDes {
 
 		sb.append("{");
 
-		if (messageBoardAttachment.getActions() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"actions\": ");
-
-			sb.append(_toJSON(messageBoardAttachment.getActions()));
-		}
-
 		if (messageBoardAttachment.getContentUrl() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -103,21 +93,6 @@ public class MessageBoardAttachmentSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(messageBoardAttachment.getEncodingFormat()));
-
-			sb.append("\"");
-		}
-
-		if (messageBoardAttachment.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(
-				_escape(messageBoardAttachment.getExternalReferenceCode()));
 
 			sb.append("\"");
 		}
@@ -191,14 +166,6 @@ public class MessageBoardAttachmentSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (messageBoardAttachment.getActions() == null) {
-			map.put("actions", null);
-		}
-		else {
-			map.put(
-				"actions", String.valueOf(messageBoardAttachment.getActions()));
-		}
-
 		if (messageBoardAttachment.getContentUrl() == null) {
 			map.put("contentUrl", null);
 		}
@@ -224,16 +191,6 @@ public class MessageBoardAttachmentSerDes {
 			map.put(
 				"encodingFormat",
 				String.valueOf(messageBoardAttachment.getEncodingFormat()));
-		}
-
-		if (messageBoardAttachment.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(
-					messageBoardAttachment.getExternalReferenceCode()));
 		}
 
 		if (messageBoardAttachment.getFileExtension() == null) {
@@ -289,14 +246,7 @@ public class MessageBoardAttachmentSerDes {
 			MessageBoardAttachment messageBoardAttachment,
 			String jsonParserFieldName, Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "actions")) {
-				if (jsonParserFieldValue != null) {
-					messageBoardAttachment.setActions(
-						(Map)MessageBoardAttachmentSerDes.toMap(
-							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "contentUrl")) {
+			if (Objects.equals(jsonParserFieldName, "contentUrl")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardAttachment.setContentUrl(
 						(String)jsonParserFieldValue);
@@ -311,14 +261,6 @@ public class MessageBoardAttachmentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "encodingFormat")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardAttachment.setEncodingFormat(
-						(String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					messageBoardAttachment.setExternalReferenceCode(
 						(String)jsonParserFieldValue);
 				}
 			}

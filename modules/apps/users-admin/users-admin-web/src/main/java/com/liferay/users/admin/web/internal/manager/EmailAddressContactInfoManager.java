@@ -51,8 +51,7 @@ public class EmailAddressContactInfoManager
 
 		String address = ParamUtil.getString(
 			actionRequest, "emailAddressAddress");
-		long listTypeId = ParamUtil.getLong(
-			actionRequest, "emailAddressTypeId");
+		long typeId = ParamUtil.getLong(actionRequest, "emailAddressTypeId");
 		boolean primary = ParamUtil.getBoolean(
 			actionRequest, "emailAddressPrimary");
 
@@ -60,7 +59,7 @@ public class EmailAddressContactInfoManager
 			_emailAddressLocalService.createEmailAddress(emailAddressId);
 
 		emailAddress.setAddress(address);
-		emailAddress.setListTypeId(listTypeId);
+		emailAddress.setTypeId(typeId);
 		emailAddress.setPrimary(primary);
 
 		return emailAddress;
@@ -70,7 +69,7 @@ public class EmailAddressContactInfoManager
 	protected EmailAddress doAdd(EmailAddress emailAddress) throws Exception {
 		return _emailAddressService.addEmailAddress(
 			_className, _classPK, emailAddress.getAddress(),
-			emailAddress.getListTypeId(), emailAddress.isPrimary(),
+			emailAddress.getTypeId(), emailAddress.isPrimary(),
 			new ServiceContext());
 	}
 
@@ -83,7 +82,7 @@ public class EmailAddressContactInfoManager
 	protected void doUpdate(EmailAddress emailAddress) throws Exception {
 		_emailAddressService.updateEmailAddress(
 			emailAddress.getEmailAddressId(), emailAddress.getAddress(),
-			emailAddress.getListTypeId(), emailAddress.isPrimary());
+			emailAddress.getTypeId(), emailAddress.isPrimary());
 	}
 
 	@Override

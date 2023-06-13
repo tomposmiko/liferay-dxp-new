@@ -20,17 +20,17 @@
 long assetCategoryId = ParamUtil.getLong(request, "categoryId");
 String assetTagName = ParamUtil.getString(request, "tag");
 
-BlogsViewEntriesDisplayContext blogsViewEntriesDisplayContext = (BlogsViewEntriesDisplayContext)request.getAttribute(BlogsViewEntriesDisplayContext.class.getName());
+BlogEntriesDisplayContext blogEntriesDisplayContext = (BlogEntriesDisplayContext)request.getAttribute(BlogsWebKeys.BLOG_ENTRIES_DISPLAY_CONTEXT);
 
-String displayStyle = blogsViewEntriesDisplayContext.getDisplayStyle();
+String displayStyle = blogEntriesDisplayContext.getDisplayStyle();
 
-SearchContainer<BlogsEntry> entriesSearchContainer = blogsViewEntriesDisplayContext.getSearchContainer();
+SearchContainer<BlogsEntry> entriesSearchContainer = blogEntriesDisplayContext.getSearchContainer();
 
 PortletURL portletURL = entriesSearchContainer.getIteratorURL();
 %>
 
 <clay:management-toolbar
-	managementToolbarDisplayContext="<%= new BlogsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, entriesSearchContainer, trashHelper, displayStyle) %>"
+	managementToolbarDisplayContext="<%= new BlogEntriesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, entriesSearchContainer, trashHelper, displayStyle) %>"
 	propsTransformer="blogs_admin/js/BlogEntriesManagementToolbarPropsTransformer"
 	searchContainerId="blogEntries"
 />
@@ -44,7 +44,7 @@ PortletURL portletURL = entriesSearchContainer.getIteratorURL();
 />
 
 <clay:container-fluid>
-	<aui:form action="<%= portletURL %>" method="get" name="fm">
+	<aui:form action="<%= portletURL.toString() %>" method="get" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="deleteEntryIds" type="hidden" />
@@ -76,7 +76,7 @@ PortletURL portletURL = entriesSearchContainer.getIteratorURL();
 				<%
 				row.setData(
 					HashMapBuilder.<String, Object>put(
-						"actions", StringUtil.merge(blogsViewEntriesDisplayContext.getAvailableActions(entry))
+						"actions", StringUtil.merge(blogEntriesDisplayContext.getAvailableActions(entry))
 					).build());
 				%>
 
@@ -93,6 +93,6 @@ PortletURL portletURL = entriesSearchContainer.getIteratorURL();
 
 <liferay-frontend:component
 	componentId="<%= BlogsWebConstants.BLOGS_ELEMENTS_DEFAULT_EVENT_HANDLER %>"
-	context="<%= blogsViewEntriesDisplayContext.getComponentContext() %>"
+	context="<%= blogEntriesDisplayContext.getComponentContext() %>"
 	module="blogs_admin/js/ElementsDefaultEventHandler.es"
 />

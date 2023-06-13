@@ -14,16 +14,13 @@
 
 package com.liferay.search.experiences.internal.blueprint.parameter;
 
-import com.liferay.asset.kernel.service.AssetCategoryLocalService;
-import com.liferay.asset.kernel.service.AssetTagLocalService;
-import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
-import com.liferay.expando.kernel.service.ExpandoValueLocalService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
@@ -31,47 +28,41 @@ import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.search.experiences.blueprint.parameter.DateSXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.DoubleSXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.FloatSXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.IntegerArraySXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.IntegerSXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.LongArraySXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.LongSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
-import com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition;
-import com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinitionProvider;
-import com.liferay.search.experiences.configuration.SemanticSearchConfigurationProvider;
+import com.liferay.search.experiences.blueprint.parameter.StringArraySXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.StringSXPParameter;
+import com.liferay.search.experiences.internal.blueprint.parameter.contributor.CommerceSXPParameterContributor;
 import com.liferay.search.experiences.internal.blueprint.parameter.contributor.ContextSXPParameterContributor;
 import com.liferay.search.experiences.internal.blueprint.parameter.contributor.IpstackSXPParameterContributor;
-import com.liferay.search.experiences.internal.blueprint.parameter.contributor.MLSXPParameterContributor;
 import com.liferay.search.experiences.internal.blueprint.parameter.contributor.OpenWeatherMapSXPParameterContributor;
 import com.liferay.search.experiences.internal.blueprint.parameter.contributor.SXPParameterContributor;
+import com.liferay.search.experiences.internal.blueprint.parameter.contributor.SystemSXPParameterContributor;
 import com.liferay.search.experiences.internal.blueprint.parameter.contributor.TimeSXPParameterContributor;
 import com.liferay.search.experiences.internal.blueprint.parameter.contributor.UserSXPParameterContributor;
-import com.liferay.search.experiences.ml.embedding.text.TextEmbeddingRetriever;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
 import com.liferay.search.experiences.rest.dto.v1_0.Parameter;
-import com.liferay.search.experiences.rest.dto.v1_0.ParameterConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 import com.liferay.segments.SegmentsEntryRetriever;
-
-import java.beans.ExceptionListener;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-
-import org.apache.commons.lang.StringUtils;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -80,90 +71,59 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Petteri Karttunen
  */
-@Component(
-	enabled = false,
-	service = {
-		SXPParameterContributorDefinitionProvider.class,
-		SXPParameterDataCreator.class
-	}
-)
-public class SXPParameterDataCreator
-	implements SXPParameterContributorDefinitionProvider {
+@Component(immediate = true, service = SXPParameterDataCreator.class)
+public class SXPParameterDataCreator {
 
 	public SXPParameterData create(
-		ExceptionListener exceptionListener, SearchContext searchContext,
-		SXPBlueprint sxpBlueprint) {
+		SearchContext searchContext, SXPBlueprint sxpBlueprint) {
 
-		Map<String, SXPParameter> sxpParameters = new LinkedHashMap<>();
+		Set<SXPParameter> sxpParameters = new LinkedHashSet<>();
 
 		String keywords = _addKeywordsSXPParameters(
 			searchContext, sxpParameters);
 
 		Configuration configuration = sxpBlueprint.getConfiguration();
 
-		if (configuration != null) {
-			_addSXPParameters(
-				configuration.getParameterConfiguration(), searchContext,
-				sxpParameters);
+		Map<String, Parameter> parameters = configuration.getParameters();
+
+		if (!MapUtil.isEmpty(parameters)) {
+			_addSXPParameter(
+				"page", parameters.get("page"), searchContext, sxpParameters);
+			_addSXPParameter(
+				"size", parameters.get("size"), searchContext, sxpParameters);
+
+			_addSXPParameters(parameters, searchContext, sxpParameters);
 		}
 
-		_contribute(
-			exceptionListener, searchContext, sxpBlueprint, sxpParameters);
+		_contribute(searchContext, sxpBlueprint, sxpParameters);
 
 		return new SXPParameterData(keywords, sxpParameters);
-	}
-
-	@Override
-	public List<SXPParameterContributorDefinition>
-		getSXPParameterContributorDefinitions(long companyId, Locale locale) {
-
-		if (ArrayUtil.isEmpty(_sxpParameterContributors)) {
-			return Collections.emptyList();
-		}
-
-		List<SXPParameterContributorDefinition>
-			sxpParameterContributorDefinitions = new ArrayList<>();
-
-		for (SXPParameterContributor sxpParameterContributor :
-				_sxpParameterContributors) {
-
-			sxpParameterContributorDefinitions.addAll(
-				sxpParameterContributor.getSXPParameterContributorDefinitions(
-					companyId, locale));
-		}
-
-		return sxpParameterContributorDefinitions;
 	}
 
 	@Activate
 	protected void activate() {
 		_sxpParameterContributors = new SXPParameterContributor[] {
-			new ContextSXPParameterContributor(_groupLocalService, _language),
+			new CommerceSXPParameterContributor(),
+			new ContextSXPParameterContributor(
+				_groupLocalService, _language, _layoutLocalService),
 			new IpstackSXPParameterContributor(_configurationProvider),
-			new MLSXPParameterContributor(
-				_language, _semanticSearchConfigurationProvider,
-				_textEmbeddingRetriever),
 			new OpenWeatherMapSXPParameterContributor(_configurationProvider),
-			new TimeSXPParameterContributor(),
+			new SystemSXPParameterContributor(),
+			new TimeSXPParameterContributor(_language, _userLocalService),
 			new UserSXPParameterContributor(
-				_assetCategoryLocalService, _assetTagLocalService,
-				_expandoColumnLocalService, _expandoValueLocalService,
-				_language, _portal, _roleLocalService, _segmentsEntryRetriever,
+				_language, _roleLocalService, _segmentsEntryRetriever,
 				_userGroupGroupRoleLocalService, _userGroupLocalService,
 				_userGroupRoleLocalService, _userLocalService)
 		};
 	}
 
-	private void _add(
-		SXPParameter sxpParameter, Map<String, SXPParameter> sxpParameters) {
-
-		sxpParameters.put(sxpParameter.getName(), sxpParameter);
-	}
-
 	private String _addKeywordsSXPParameters(
-		SearchContext searchContext, Map<String, SXPParameter> sxpParameters) {
+		SearchContext searchContext, Set<SXPParameter> sxpParameters) {
 
 		String keywords = GetterUtil.getString(searchContext.getKeywords());
+
+		sxpParameters.add(
+			new StringSXPParameter("keywords.raw", true, keywords));
 
 		if ((StringUtil.count(keywords, CharPool.QUOTE) % 2) != 0) {
 			keywords = StringUtil.replace(
@@ -171,47 +131,19 @@ public class SXPParameterDataCreator
 		}
 
 		keywords = keywords.replaceAll("/", "&#8725;");
-		keywords = keywords.replaceAll("\"", "&#34;");
-		keywords = keywords.replaceAll("\\$", "&#36;");
+		keywords = keywords.replaceAll("\"", "\\\\\"");
 		keywords = keywords.replaceAll("\\[", "&#91;");
 		keywords = keywords.replaceAll("\\\\", "&#92;");
 		keywords = keywords.replaceAll("\\]", "&#93;");
 
-		_add(new StringSXPParameter("keywords", true, keywords), sxpParameters);
+		sxpParameters.add(new StringSXPParameter("keywords", true, keywords));
 
 		return keywords;
 	}
 
 	private void _addSXPParameter(
-		SearchContext searchContext,
-		SXPParameterContributorDefinition sxpParameterContributorDefinition,
-		Map<String, SXPParameter> sxpParameters) {
-
-		String name = StringUtils.substringBetween(
-			sxpParameterContributorDefinition.getTemplateVariable(),
-			StringPool.DOLLAR_AND_OPEN_CURLY_BRACE,
-			StringPool.CLOSE_CURLY_BRACE);
-
-		Object object = searchContext.getAttribute(name);
-
-		if (object == null) {
-			return;
-		}
-
-		SXPParameter sxpParameter = _getSXPParameter(
-			name, object, new Parameter(), searchContext,
-			_getType(sxpParameterContributorDefinition));
-
-		if (sxpParameter == null) {
-			return;
-		}
-
-		_add(sxpParameter, sxpParameters);
-	}
-
-	private void _addSXPParameter(
 		String name, Parameter parameter, SearchContext searchContext,
-		Map<String, SXPParameter> sxpParameters) {
+		Set<SXPParameter> sxpParameters) {
 
 		Object object = searchContext.getAttribute(name);
 
@@ -220,32 +152,27 @@ public class SXPParameterDataCreator
 		}
 
 		SXPParameter sxpParameter = _getSXPParameter(
-			name, object, parameter, searchContext, parameter.getType());
+			name, object, parameter, searchContext);
 
 		if (sxpParameter == null) {
 			return;
 		}
 
-		_add(sxpParameter, sxpParameters);
+		sxpParameters.add(sxpParameter);
 	}
 
 	private void _addSXPParameters(
-		ParameterConfiguration parameterConfiguration,
-		SearchContext searchContext, Map<String, SXPParameter> sxpParameters) {
+		Map<String, Parameter> parameters, SearchContext searchContext,
+		Set<SXPParameter> sxpParameters) {
 
-		if (parameterConfiguration == null) {
-			return;
-		}
-
-		MapUtil.isNotEmptyForEach(
-			parameterConfiguration.getParameters(),
+		parameters.forEach(
 			(name, parameter) -> _addSXPParameter(
 				name, parameter, searchContext, sxpParameters));
 	}
 
 	private void _contribute(
-		ExceptionListener exceptionListener, SearchContext searchContext,
-		SXPBlueprint sxpBlueprint, Map<String, SXPParameter> sxpParameters) {
+		SearchContext searchContext, SXPBlueprint sxpBlueprint,
+		Set<SXPParameter> sxpParameters) {
 
 		if (ArrayUtil.isEmpty(_sxpParameterContributors)) {
 			return;
@@ -254,32 +181,8 @@ public class SXPParameterDataCreator
 		for (SXPParameterContributor sxpParameterContributor :
 				_sxpParameterContributors) {
 
-			Set<SXPParameter> set = new LinkedHashSet<>();
-
 			sxpParameterContributor.contribute(
-				exceptionListener, searchContext, sxpBlueprint, set);
-
-			for (SXPParameter sxpParameter : set) {
-				_add(sxpParameter, sxpParameters);
-			}
-
-			List<SXPParameterContributorDefinition>
-				sxpParameterContributorDefinitions =
-					sxpParameterContributor.
-						getSXPParameterContributorDefinitions(
-							searchContext.getCompanyId(),
-							searchContext.getLocale());
-
-			if (ListUtil.isNotEmpty(sxpParameterContributorDefinitions)) {
-				for (SXPParameterContributorDefinition
-						sxpParameterContributorDefinition :
-							sxpParameterContributorDefinitions) {
-
-					_addSXPParameter(
-						searchContext, sxpParameterContributorDefinition,
-						sxpParameters);
-				}
-			}
+				searchContext, sxpBlueprint, sxpParameters);
 		}
 	}
 
@@ -331,33 +234,8 @@ public class SXPParameterDataCreator
 		return value;
 	}
 
-	private Boolean _getBoolean(Boolean defaultValue, Object object) {
-		if (object != null) {
-			return GetterUtil.getBoolean(object);
-		}
-
-		if (defaultValue != null) {
-			return defaultValue;
-		}
-
-		return null;
-	}
-
-	private SXPParameter _getBooleanSXPParameter(
-		String name, Object object, Parameter parameter) {
-
-		Boolean value = _getBoolean(
-			(Boolean)parameter.getDefaultValue(), object);
-
-		if (value == null) {
-			return null;
-		}
-
-		return new BooleanSXPParameter(name, true, value);
-	}
-
 	private SXPParameter _getDateSXPParameter(
-		String name, Object object, TimeZone timeZone, Parameter parameter) {
+		String name, Object object, Parameter parameter, TimeZone timeZone) {
 
 		String value = _getString(null, object);
 
@@ -366,7 +244,7 @@ public class SXPParameterDataCreator
 		}
 
 		LocalDate localDate = LocalDate.parse(
-			value, DateTimeFormatter.ofPattern(parameter.getFormat()));
+			value, DateTimeFormatter.ofPattern(parameter.getDateFormat()));
 
 		Calendar calendar = GregorianCalendar.from(
 			localDate.atStartOfDay(timeZone.toZoneId()));
@@ -395,7 +273,7 @@ public class SXPParameterDataCreator
 	private SXPParameter _getDoubleSXPParameter(
 		String name, Object object, Parameter parameter) {
 
-		Double value = _getDouble((Double)parameter.getDefaultValue(), object);
+		Double value = _getDouble(parameter.getDefaultValueDouble(), object);
 
 		if (value == null) {
 			return null;
@@ -404,7 +282,8 @@ public class SXPParameterDataCreator
 		return new DoubleSXPParameter(
 			name, true,
 			_fit(
-				(Double)parameter.getMax(), (Double)parameter.getMin(), value));
+				parameter.getMaxValueDouble(), parameter.getMinValueDouble(),
+				value));
 	}
 
 	private Float _getFloat(Float defaultValue, Object object) {
@@ -422,7 +301,7 @@ public class SXPParameterDataCreator
 	private SXPParameter _getFloatSXPParameter(
 		String name, Object object, Parameter parameter) {
 
-		Float value = _getFloat((Float)parameter.getDefaultValue(), object);
+		Float value = _getFloat(parameter.getDefaultValueFloat(), object);
 
 		if (value == null) {
 			return null;
@@ -430,7 +309,9 @@ public class SXPParameterDataCreator
 
 		return new FloatSXPParameter(
 			name, true,
-			_fit((Float)parameter.getMax(), (Float)parameter.getMin(), value));
+			_fit(
+				parameter.getMaxValueFloat(), parameter.getMinValueFloat(),
+				value));
 	}
 
 	private Integer _getInteger(Integer defaultValue, Object object) {
@@ -446,11 +327,6 @@ public class SXPParameterDataCreator
 	}
 
 	private Integer[] _getIntegerArray(Integer[] defaultValue, Object object) {
-		if (object instanceof String) {
-			return ArrayUtil.toArray(
-				GetterUtil.getIntegerValues(StringUtil.split((String)object)));
-		}
-
 		if (object != null) {
 			return ArrayUtil.toArray(GetterUtil.getIntegerValues(object));
 		}
@@ -466,7 +342,7 @@ public class SXPParameterDataCreator
 		String name, Object object, Parameter parameter) {
 
 		Integer[] value = _getIntegerArray(
-			(Integer[])parameter.getDefaultValue(), object);
+			parameter.getDefaultValuesIntegerArray(), object);
 
 		if (ArrayUtil.isEmpty(value)) {
 			return null;
@@ -478,8 +354,7 @@ public class SXPParameterDataCreator
 	private SXPParameter _getIntegerSXPParameter(
 		String name, Object object, Parameter parameter) {
 
-		Integer value = _getInteger(
-			(Integer)parameter.getDefaultValue(), object);
+		Integer value = _getInteger(parameter.getDefaultValueInteger(), object);
 
 		if (value == null) {
 			return null;
@@ -488,7 +363,7 @@ public class SXPParameterDataCreator
 		return new IntegerSXPParameter(
 			name, true,
 			_fit(
-				(Integer)parameter.getMax(), (Integer)parameter.getMin(),
+				parameter.getMaxValueInteger(), parameter.getMinValueInteger(),
 				value));
 	}
 
@@ -505,11 +380,6 @@ public class SXPParameterDataCreator
 	}
 
 	private Long[] _getLongArray(Long[] defaultValue, Object object) {
-		if (object instanceof String) {
-			return ArrayUtil.toArray(
-				GetterUtil.getLongValues(StringUtil.split((String)object)));
-		}
-
 		if (object != null) {
 			return ArrayUtil.toArray(GetterUtil.getLongValues(object));
 		}
@@ -525,7 +395,7 @@ public class SXPParameterDataCreator
 		String name, Object object, Parameter parameter) {
 
 		Long[] value = _getLongArray(
-			(Long[])parameter.getDefaultValue(), object);
+			parameter.getDefaultValuesLongArray(), object);
 
 		if (ArrayUtil.isEmpty(value)) {
 			return null;
@@ -537,7 +407,7 @@ public class SXPParameterDataCreator
 	private SXPParameter _getLongSXPParameter(
 		String name, Object object, Parameter parameter) {
 
-		Long value = _getLong((Long)parameter.getDefaultValue(), object);
+		Long value = _getLong(parameter.getDefaultValueLong(), object);
 
 		if (value == null) {
 			return null;
@@ -545,7 +415,9 @@ public class SXPParameterDataCreator
 
 		return new LongSXPParameter(
 			name, true,
-			_fit((Long)parameter.getMax(), (Long)parameter.getMin(), value));
+			_fit(
+				parameter.getMaxValueLong(), parameter.getMinValueLong(),
+				value));
 	}
 
 	private String _getString(String defaultValue, Object object) {
@@ -576,7 +448,7 @@ public class SXPParameterDataCreator
 		String name, Object object, Parameter parameter) {
 
 		String[] value = _getStringArray(
-			(String[])parameter.getDefaultValue(), object);
+			parameter.getDefaultValuesStringArray(), object);
 
 		if (ArrayUtil.isEmpty(value)) {
 			return null;
@@ -588,7 +460,7 @@ public class SXPParameterDataCreator
 	private SXPParameter _getStringSXPParameter(
 		String name, Object object, Parameter parameter) {
 
-		String value = _getString((String)parameter.getDefaultValue(), object);
+		String value = _getString(parameter.getDefaultValueString(), object);
 
 		if (value == null) {
 			return null;
@@ -599,40 +471,39 @@ public class SXPParameterDataCreator
 
 	private SXPParameter _getSXPParameter(
 		String name, Object object, Parameter parameter,
-		SearchContext searchContext, Parameter.Type type) {
+		SearchContext searchContext) {
 
-		if (type.equals(Parameter.Type.BOOLEAN)) {
-			return _getBooleanSXPParameter(name, object, parameter);
-		}
-		else if (type.equals(Parameter.Type.DATE)) {
+		Parameter.ParameterType parameterType = parameter.getParameterType();
+
+		if (parameterType.equals(Parameter.ParameterType.DATE)) {
 			return _getDateSXPParameter(
-				name, object, searchContext.getTimeZone(), parameter);
+				name, object, parameter, searchContext.getTimeZone());
 		}
-		else if (type.equals(Parameter.Type.DOUBLE)) {
+		else if (parameterType.equals(Parameter.ParameterType.DOUBLE)) {
 			return _getDoubleSXPParameter(name, object, parameter);
 		}
-		else if (type.equals(Parameter.Type.FLOAT)) {
+		else if (parameterType.equals(Parameter.ParameterType.FLOAT)) {
 			return _getFloatSXPParameter(name, object, parameter);
 		}
-		else if (type.equals(Parameter.Type.INTEGER)) {
+		else if (parameterType.equals(Parameter.ParameterType.INTEGER)) {
 			return _getIntegerSXPParameter(name, object, parameter);
 		}
-		else if (type.equals(Parameter.Type.INTEGER_ARRAY)) {
+		else if (parameterType.equals(Parameter.ParameterType.INTEGER_ARRAY)) {
 			return _getIntegerArraySXPParameter(name, object, parameter);
 		}
-		else if (type.equals(Parameter.Type.LONG)) {
+		else if (parameterType.equals(Parameter.ParameterType.LONG)) {
 			return _getLongSXPParameter(name, object, parameter);
 		}
-		else if (type.equals(Parameter.Type.LONG_ARRAY)) {
+		else if (parameterType.equals(Parameter.ParameterType.LONG_ARRAY)) {
 			return _getLongArraySXPParameter(name, object, parameter);
 		}
-		else if (type.equals(Parameter.Type.STRING)) {
+		else if (parameterType.equals(Parameter.ParameterType.STRING)) {
 			return _getStringSXPParameter(name, object, parameter);
 		}
-		else if (type.equals(Parameter.Type.STRING_ARRAY)) {
+		else if (parameterType.equals(Parameter.ParameterType.STRING_ARRAY)) {
 			return _getStringArraySXPParameter(name, object, parameter);
 		}
-		else if (type.equals(Parameter.Type.TIME_RANGE)) {
+		else if (parameterType.equals(Parameter.ParameterType.TIME_RANGE)) {
 			return _getTimeRangeSXPParameter(name, object);
 		}
 
@@ -667,59 +538,8 @@ public class SXPParameterDataCreator
 		return new DateSXPParameter(name, true, calendar.getTime());
 	}
 
-	private Parameter.Type _getType(
-		SXPParameterContributorDefinition sxpParameterContributorDefinition) {
-
-		String className = sxpParameterContributorDefinition.getClassName();
-
-		if (className.equals(BooleanSXPParameter.class.getName())) {
-			return Parameter.Type.BOOLEAN;
-		}
-		else if (className.equals(DateSXPParameter.class.getName())) {
-			return Parameter.Type.DATE;
-		}
-		else if (className.equals(DoubleSXPParameter.class.getName())) {
-			return Parameter.Type.DOUBLE;
-		}
-		else if (className.equals(FloatSXPParameter.class.getName())) {
-			return Parameter.Type.FLOAT;
-		}
-		else if (className.equals(IntegerSXPParameter.class.getName())) {
-			return Parameter.Type.INTEGER;
-		}
-		else if (className.equals(IntegerArraySXPParameter.class.getName())) {
-			return Parameter.Type.INTEGER_ARRAY;
-		}
-		else if (className.equals(LongSXPParameter.class.getName())) {
-			return Parameter.Type.LONG;
-		}
-		else if (className.equals(LongArraySXPParameter.class.getName())) {
-			return Parameter.Type.LONG_ARRAY;
-		}
-		else if (className.equals(StringSXPParameter.class.getName())) {
-			return Parameter.Type.STRING;
-		}
-		else if (className.equals(StringArraySXPParameter.class.getName())) {
-			return Parameter.Type.STRING_ARRAY;
-		}
-
-		throw new IllegalArgumentException();
-	}
-
-	@Reference
-	private AssetCategoryLocalService _assetCategoryLocalService;
-
-	@Reference
-	private AssetTagLocalService _assetTagLocalService;
-
 	@Reference
 	private ConfigurationProvider _configurationProvider;
-
-	@Reference
-	private ExpandoColumnLocalService _expandoColumnLocalService;
-
-	@Reference
-	private ExpandoValueLocalService _expandoValueLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
@@ -728,7 +548,7 @@ public class SXPParameterDataCreator
 	private Language _language;
 
 	@Reference
-	private Portal _portal;
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private RoleLocalService _roleLocalService;
@@ -736,14 +556,7 @@ public class SXPParameterDataCreator
 	@Reference
 	private SegmentsEntryRetriever _segmentsEntryRetriever;
 
-	@Reference
-	private SemanticSearchConfigurationProvider
-		_semanticSearchConfigurationProvider;
-
 	private SXPParameterContributor[] _sxpParameterContributors;
-
-	@Reference
-	private TextEmbeddingRetriever _textEmbeddingRetriever;
 
 	@Reference
 	private UserGroupGroupRoleLocalService _userGroupGroupRoleLocalService;

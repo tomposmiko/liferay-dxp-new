@@ -43,7 +43,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "model.class.name=com.liferay.journal.model.JournalFeed",
-	service = ExportImportContentProcessor.class
+	service = {
+		ExportImportContentProcessor.class,
+		JournalFeedExportImportContentProcessor.class
+	}
 )
 public class JournalFeedExportImportContentProcessor
 	implements ExportImportContentProcessor<String> {
@@ -201,6 +204,18 @@ public class JournalFeedExportImportContentProcessor
 			groupId, content);
 	}
 
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
 	private static final String _DATA_HANDLER_GROUP_FRIENDLY_URL =
 		"@data_handler_group_friendly_url@";
 
@@ -211,10 +226,7 @@ public class JournalFeedExportImportContentProcessor
 	private ExportImportContentProcessor<String>
 		_defaultTextExportImportContentProcessor;
 
-	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference

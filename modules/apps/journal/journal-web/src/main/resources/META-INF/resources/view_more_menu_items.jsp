@@ -35,6 +35,10 @@ JournalViewMoreMenuItemsDisplayContext journalViewMoreMenuItemsDisplayContext = 
 	/>
 </c:if>
 
+<clay:navigation-bar
+	navigationItems="<%= journalViewMoreMenuItemsDisplayContext.getNavigationItems() %>"
+/>
+
 <clay:management-toolbar
 	managementToolbarDisplayContext="<%= new JournalViewMoreMenuItemsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, journalViewMoreMenuItemsDisplayContext) %>"
 />
@@ -55,12 +59,12 @@ JournalViewMoreMenuItemsDisplayContext journalViewMoreMenuItemsDisplayContext = 
 					cssClass="selector-button"
 					data='<%=
 						HashMapBuilder.<String, Object>put(
-							"ddmStructureId", ddmStructure.getStructureId()
+							"ddmStructureKey", ddmStructure.getStructureKey()
 						).build()
 					%>'
-					href="javascript:void(0);"
+					href="javascript:;"
 				>
-					<%= ddmStructure.getName(locale) %>
+					<%= ddmStructure.getUnambiguousName(journalViewMoreMenuItemsDisplayContext.getDDMStructures(), themeDisplay.getScopeGroupId(), locale) %>
 				</aui:a>
 			</liferay-ui:search-container-column-text>
 

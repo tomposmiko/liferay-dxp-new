@@ -33,11 +33,10 @@ const PreviewSeo = ({
 	const titleUrl = [
 		<div className="preview-seo-title text-truncate" key="title">
 			{title}
-
 			{titleSuffix && ` - ${titleSuffix}`}
 		</div>,
 		<div className="preview-seo-url text-truncate" key="url">
-			{decodeURIComponent(url)}
+			{url}
 		</div>,
 	];
 
@@ -55,9 +54,7 @@ const PreviewSeo = ({
 					/>
 				</div>
 			)}
-
 			{displayType === 'og' ? titleUrl.reverse() : titleUrl}
-
 			<div className="preview-seo-description">
 				{description.length < MAX_LENGTH_DESCIPTION
 					? description

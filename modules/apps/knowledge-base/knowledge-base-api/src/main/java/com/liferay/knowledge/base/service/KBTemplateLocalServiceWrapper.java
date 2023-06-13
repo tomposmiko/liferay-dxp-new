@@ -14,10 +14,7 @@
 
 package com.liferay.knowledge.base.service;
 
-import com.liferay.knowledge.base.model.KBTemplate;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link KBTemplateLocalService}.
@@ -28,10 +25,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
  */
 public class KBTemplateLocalServiceWrapper
 	implements KBTemplateLocalService, ServiceWrapper<KBTemplateLocalService> {
-
-	public KBTemplateLocalServiceWrapper() {
-		this(null);
-	}
 
 	public KBTemplateLocalServiceWrapper(
 		KBTemplateLocalService kbTemplateLocalService) {
@@ -50,12 +43,14 @@ public class KBTemplateLocalServiceWrapper
 	 * @return the kb template that was added
 	 */
 	@Override
-	public KBTemplate addKBTemplate(KBTemplate kbTemplate) {
+	public com.liferay.knowledge.base.model.KBTemplate addKBTemplate(
+		com.liferay.knowledge.base.model.KBTemplate kbTemplate) {
+
 		return _kbTemplateLocalService.addKBTemplate(kbTemplate);
 	}
 
 	@Override
-	public KBTemplate addKBTemplate(
+	public com.liferay.knowledge.base.model.KBTemplate addKBTemplate(
 			long userId, String title, String content,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -71,7 +66,9 @@ public class KBTemplateLocalServiceWrapper
 	 * @return the new kb template
 	 */
 	@Override
-	public KBTemplate createKBTemplate(long kbTemplateId) {
+	public com.liferay.knowledge.base.model.KBTemplate createKBTemplate(
+		long kbTemplateId) {
+
 		return _kbTemplateLocalService.createKBTemplate(kbTemplateId);
 	}
 
@@ -105,7 +102,8 @@ public class KBTemplateLocalServiceWrapper
 	 * @throws PortalException
 	 */
 	@Override
-	public KBTemplate deleteKBTemplate(KBTemplate kbTemplate)
+	public com.liferay.knowledge.base.model.KBTemplate deleteKBTemplate(
+			com.liferay.knowledge.base.model.KBTemplate kbTemplate)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kbTemplateLocalService.deleteKBTemplate(kbTemplate);
@@ -123,7 +121,8 @@ public class KBTemplateLocalServiceWrapper
 	 * @throws PortalException if a kb template with the primary key could not be found
 	 */
 	@Override
-	public KBTemplate deleteKBTemplate(long kbTemplateId)
+	public com.liferay.knowledge.base.model.KBTemplate deleteKBTemplate(
+			long kbTemplateId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kbTemplateLocalService.deleteKBTemplate(kbTemplateId);
@@ -250,7 +249,9 @@ public class KBTemplateLocalServiceWrapper
 	}
 
 	@Override
-	public KBTemplate fetchKBTemplate(long kbTemplateId) {
+	public com.liferay.knowledge.base.model.KBTemplate fetchKBTemplate(
+		long kbTemplateId) {
+
 		return _kbTemplateLocalService.fetchKBTemplate(kbTemplateId);
 	}
 
@@ -262,8 +263,8 @@ public class KBTemplateLocalServiceWrapper
 	 * @return the matching kb template, or <code>null</code> if a matching kb template could not be found
 	 */
 	@Override
-	public KBTemplate fetchKBTemplateByUuidAndGroupId(
-		String uuid, long groupId) {
+	public com.liferay.knowledge.base.model.KBTemplate
+		fetchKBTemplateByUuidAndGroupId(String uuid, long groupId) {
 
 		return _kbTemplateLocalService.fetchKBTemplateByUuidAndGroupId(
 			uuid, groupId);
@@ -287,10 +288,12 @@ public class KBTemplateLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<KBTemplate> getGroupKBTemplates(
-		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<KBTemplate>
-			orderByComparator) {
+	public java.util.List<com.liferay.knowledge.base.model.KBTemplate>
+		getGroupKBTemplates(
+			long groupId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.knowledge.base.model.KBTemplate>
+					orderByComparator) {
 
 		return _kbTemplateLocalService.getGroupKBTemplates(
 			groupId, start, end, orderByComparator);
@@ -316,7 +319,8 @@ public class KBTemplateLocalServiceWrapper
 	 * @throws PortalException if a kb template with the primary key could not be found
 	 */
 	@Override
-	public KBTemplate getKBTemplate(long kbTemplateId)
+	public com.liferay.knowledge.base.model.KBTemplate getKBTemplate(
+			long kbTemplateId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kbTemplateLocalService.getKBTemplate(kbTemplateId);
@@ -331,7 +335,8 @@ public class KBTemplateLocalServiceWrapper
 	 * @throws PortalException if a matching kb template could not be found
 	 */
 	@Override
-	public KBTemplate getKBTemplateByUuidAndGroupId(String uuid, long groupId)
+	public com.liferay.knowledge.base.model.KBTemplate
+			getKBTemplateByUuidAndGroupId(String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kbTemplateLocalService.getKBTemplateByUuidAndGroupId(
@@ -350,7 +355,9 @@ public class KBTemplateLocalServiceWrapper
 	 * @return the range of kb templates
 	 */
 	@Override
-	public java.util.List<KBTemplate> getKBTemplates(int start, int end) {
+	public java.util.List<com.liferay.knowledge.base.model.KBTemplate>
+		getKBTemplates(int start, int end) {
+
 		return _kbTemplateLocalService.getKBTemplates(start, end);
 	}
 
@@ -362,8 +369,8 @@ public class KBTemplateLocalServiceWrapper
 	 * @return the matching kb templates, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<KBTemplate> getKBTemplatesByUuidAndCompanyId(
-		String uuid, long companyId) {
+	public java.util.List<com.liferay.knowledge.base.model.KBTemplate>
+		getKBTemplatesByUuidAndCompanyId(String uuid, long companyId) {
 
 		return _kbTemplateLocalService.getKBTemplatesByUuidAndCompanyId(
 			uuid, companyId);
@@ -380,10 +387,12 @@ public class KBTemplateLocalServiceWrapper
 	 * @return the range of matching kb templates, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<KBTemplate> getKBTemplatesByUuidAndCompanyId(
-		String uuid, long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<KBTemplate>
-			orderByComparator) {
+	public java.util.List<com.liferay.knowledge.base.model.KBTemplate>
+		getKBTemplatesByUuidAndCompanyId(
+			String uuid, long companyId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.knowledge.base.model.KBTemplate>
+					orderByComparator) {
 
 		return _kbTemplateLocalService.getKBTemplatesByUuidAndCompanyId(
 			uuid, companyId, start, end, orderByComparator);
@@ -421,11 +430,11 @@ public class KBTemplateLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<KBTemplate> search(
+	public java.util.List<com.liferay.knowledge.base.model.KBTemplate> search(
 		long groupId, String title, String content, java.util.Date startDate,
 		java.util.Date endDate, boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<KBTemplate>
-			orderByComparator) {
+		com.liferay.portal.kernel.util.OrderByComparator
+			<com.liferay.knowledge.base.model.KBTemplate> orderByComparator) {
 
 		return _kbTemplateLocalService.search(
 			groupId, title, content, startDate, endDate, andOperator, start,
@@ -443,12 +452,14 @@ public class KBTemplateLocalServiceWrapper
 	 * @return the kb template that was updated
 	 */
 	@Override
-	public KBTemplate updateKBTemplate(KBTemplate kbTemplate) {
+	public com.liferay.knowledge.base.model.KBTemplate updateKBTemplate(
+		com.liferay.knowledge.base.model.KBTemplate kbTemplate) {
+
 		return _kbTemplateLocalService.updateKBTemplate(kbTemplate);
 	}
 
 	@Override
-	public KBTemplate updateKBTemplate(
+	public com.liferay.knowledge.base.model.KBTemplate updateKBTemplate(
 			long kbTemplateId, String title, String content,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -459,32 +470,12 @@ public class KBTemplateLocalServiceWrapper
 
 	@Override
 	public void updateKBTemplateResources(
-			KBTemplate kbTemplate, String[] groupPermissions,
-			String[] guestPermissions)
+			com.liferay.knowledge.base.model.KBTemplate kbTemplate,
+			String[] groupPermissions, String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_kbTemplateLocalService.updateKBTemplateResources(
 			kbTemplate, groupPermissions, guestPermissions);
-	}
-
-	@Override
-	public CTPersistence<KBTemplate> getCTPersistence() {
-		return _kbTemplateLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<KBTemplate> getModelClass() {
-		return _kbTemplateLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<KBTemplate>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _kbTemplateLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

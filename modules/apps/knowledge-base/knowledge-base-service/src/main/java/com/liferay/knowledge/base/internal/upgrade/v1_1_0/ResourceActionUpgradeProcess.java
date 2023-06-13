@@ -26,16 +26,16 @@ public class ResourceActionUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		if (_hasResourceAction("com.liferay.knowledgebase.model.Article")) {
-			_updateKBArticleResourceActions();
+		if (hasResourceAction("com.liferay.knowledgebase.model.Article")) {
+			updateKBArticleResourceActions();
 		}
 
-		if (_hasResourceAction("com.liferay.knowledgebase.model.Template")) {
-			_updateKBTemplateResourceActions();
+		if (hasResourceAction("com.liferay.knowledgebase.model.Template")) {
+			updateKBTemplateResourceActions();
 		}
 	}
 
-	private boolean _hasResourceAction(String name) throws Exception {
+	protected boolean hasResourceAction(String name) throws Exception {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select count(*) from ResourceAction where name = ?")) {
 
@@ -55,7 +55,7 @@ public class ResourceActionUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateKBArticleResourceActions() throws Exception {
+	protected void updateKBArticleResourceActions() throws Exception {
 		runSQL(
 			"delete from ResourceAction where name = " +
 				"'com.liferay.knowledgebase.model.KBArticle'");
@@ -71,7 +71,7 @@ public class ResourceActionUpgradeProcess extends UpgradeProcess {
 					"actionId = 'MOVE'");
 	}
 
-	private void _updateKBTemplateResourceActions() throws Exception {
+	protected void updateKBTemplateResourceActions() throws Exception {
 		runSQL(
 			"delete from ResourceAction where name = " +
 				"'com.liferay.knowledgebase.model.KBTemplate'");

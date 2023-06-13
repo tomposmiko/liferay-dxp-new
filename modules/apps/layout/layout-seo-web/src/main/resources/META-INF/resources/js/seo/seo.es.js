@@ -17,33 +17,24 @@ import {toggleDisabled} from 'frontend-js-web';
 import {previewSeoFireChange} from './PreviewSeoEvents.es';
 
 export default function ({namespace}) {
-	const canonicalURLEnabledCheck = document.getElementById(
+	var canonicalURLEnabledCheck = document.getElementById(
 		`${namespace}canonicalURLEnabled`
 	);
-	const canonicalURLField = document.getElementById(
-		`${namespace}canonicalURL`
-	);
-	const canonicalURLFieldDefaultLocale = document.getElementById(
+	var canonicalURLField = document.getElementById(`${namespace}canonicalURL`);
+	var canonicalURLFieldDefaultLocale = document.getElementById(
 		`${namespace}canonicalURL_${Liferay.ThemeDisplay.getLanguageId()}`
 	);
-	const canonicalURLAlert = document.getElementById(
+	var canonicalURLAlert = document.getElementById(
 		`${namespace}canonicalURLAlert`
-	);
-	const canonicalURLSettings = document.getElementById(
-		`${namespace}customCanonicalURLSettings`
 	);
 
 	canonicalURLEnabledCheck.addEventListener('click', (event) => {
-		const disabled = !event.target.checked;
+		var disabled = !event.target.checked;
 
 		canonicalURLAlert.classList.toggle('hide');
 
-		const label = canonicalURLSettings.querySelector('label');
-
-		toggleDisabled(
-			[canonicalURLField, canonicalURLFieldDefaultLocale, label],
-			disabled
-		);
+		toggleDisabled(canonicalURLField, disabled);
+		toggleDisabled(canonicalURLFieldDefaultLocale, disabled);
 
 		if (!canonicalURLField.value && canonicalURLField.placeholder) {
 			canonicalURLField.value = canonicalURLField.placeholder;

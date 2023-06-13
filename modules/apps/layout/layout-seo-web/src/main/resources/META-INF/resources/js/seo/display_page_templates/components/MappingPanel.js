@@ -86,7 +86,6 @@ function MappingPanel({
 				symbol="bolt"
 				title={Liferay.Language.get('map')}
 			/>
-
 			{isPanelOpen && (
 				<div
 					className="dpt-mapping-panel popover popover-scrollable"
@@ -97,21 +96,18 @@ function MappingPanel({
 							<label htmlFor={`${name}_mappingSelectorSource`}>
 								{Liferay.Language.get('source')}
 							</label>
-
 							<ClayInput
 								id={`${name}_mappingSelectorSource`}
 								readOnly
 								value={source.initialValue}
 							/>
 						</ClayForm.Group>
-
 						<ClayForm.Group small>
 							<label
 								htmlFor={`${name}_mappingSelectorFieldSelect`}
 							>
 								{Liferay.Language.get('field')}
 							</label>
-
 							<ClaySelectWithOption
 								id={`${name}_mappingSelectorFieldSelect`}
 								onChange={handleChangeField}

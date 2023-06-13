@@ -59,7 +59,7 @@ public class ItemSelectorReturnTypeResolverHandlerImpl
 			ItemSelectorView<?> itemSelectorView, Class<?> modelClass) {
 
 		ItemSelectorReturnType itemSelectorReturnType =
-			_getFirstAvailableItemSelectorReturnType(
+			getFirstAvailableItemSelectorReturnType(
 				itemSelectorCriterion.getDesiredItemSelectorReturnTypes(),
 				_itemSelectorViewReturnTypeProviderHandler.
 					getSupportedItemSelectorReturnTypes(itemSelectorView));
@@ -77,6 +77,15 @@ public class ItemSelectorReturnTypeResolverHandlerImpl
 			_getKey(itemSelectorReturnTypeClassName, modelClassName));
 	}
 
+	@Reference(unbind = "-")
+	public void setItemSelectorViewReturnTypeProviderHandler(
+		ItemSelectorViewReturnTypeProviderHandler
+			itemSelectorViewReturnTypeProviderHandler) {
+
+		_itemSelectorViewReturnTypeProviderHandler =
+			itemSelectorViewReturnTypeProviderHandler;
+	}
+
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
@@ -88,7 +97,7 @@ public class ItemSelectorReturnTypeResolverHandlerImpl
 				bundleContext));
 	}
 
-	private ItemSelectorReturnType _getFirstAvailableItemSelectorReturnType(
+	protected ItemSelectorReturnType getFirstAvailableItemSelectorReturnType(
 		List<ItemSelectorReturnType> desiredItemSelectorReturnTypes,
 		List<ItemSelectorReturnType> supportedItemSelectorReturnTypes) {
 
@@ -129,10 +138,8 @@ public class ItemSelectorReturnTypeResolverHandlerImpl
 			itemSelectorResolverModelClassName;
 	}
 
-	@Reference
 	private ItemSelectorViewReturnTypeProviderHandler
 		_itemSelectorViewReturnTypeProviderHandler;
-
 	private ServiceTrackerMap<String, ItemSelectorReturnTypeResolver<?, ?>>
 		_serviceTrackerMap;
 

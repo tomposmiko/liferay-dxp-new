@@ -3,25 +3,20 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.component.names = "Web Content Administration";
 	property testray.main.component.name = "Web Content Administration";
 
 	setUp {
-		task ("Set up instance and sign in") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			User.firstLoginPG();
-		}
+		User.firstLoginPG();
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
-		}
+		JSONGroup.addGroup(groupName = "Test Site Name");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,119 +24,85 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-77387. Add a structure when URL has locale."
-	@priority = 4
-	test AddStructureWhenURLHasLocale {
-		task ("Given a Web Content admin inserts locale to URL") {
-			var portalURL = PropsUtil.get("portal.url");
+	@description = "This is a use case for LPS-77387."
+	@priority = "4"
+	test AddStructureViaLocaleURL {
+		property test.name.skip.portal.instance = "WebContentStructures#AddStructureViaLocaleURL";
 
-			Navigator.openSpecificURL(url = "${portalURL}/en/");
+		var portalURL = PropsUtil.get("portal.url");
 
-			WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "test-site-name");
-		}
+		Navigator.openSpecificURL(url = "${portalURL}/en/");
 
-		task ("When the Web Content admin adds a new structure") {
-			LexiconEntry.gotoAdd();
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-			WaitForElementPresent(locator1 = "Sidebar#FORM_BUILDER");
+		NavItem.gotoStructures();
 
-			Navigator.ensureLocaleURL(locale = "en");
+		LexiconEntry.gotoAdd();
 
-			WebContentStructures.addName(structureName = "WC Structure Name");
+		Pause(locator1 = "3000");
 
-			Navigator.gotoSidebarTab(tabName = "Properties");
+		Navigator.ensureLocaleURL(locale = "en");
 
-			PortletEntry.inputDescriptionTextInput(description = "WC Structure Description");
+		WebContentStructures.addName(structureName = "WC Structure Name");
 
-			SelectFrame(value1 = "relative=top");
+		Navigator.gotoSidebarTab(tabName = "Properties");
 
-			DataEngine.addField(
-				fieldFieldLabel = "Text",
-				fieldName = "Text");
+		PortletEntry.inputDescriptionTextInput(description = "WC Structure Description");
 
-			WebContentStructures.saveCP();
-		}
+		SelectFrame(value1 = "relative=top");
 
-		task ("Then the Web Content admin should see only one structure created") {
-			WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "test-site-name");
+		DataEngine.addField(
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
 
-			WebContentStructures.viewCP(
-				structureDescription = "WC Structure Description",
-				structureName = "WC Structure Name");
+		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-			AssertElementNotPresent(
-				key_ddlDataDefinitionName = "WC Structure Name",
-				locator1 = "DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME_2");
-		}
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+		NavItem.gotoStructures();
+
+		AssertElementNotPresent(
+			key_ddlDataDefinitionName = "WC Structure Name",
+			locator1 = "DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME_2");
 	}
 
-	@description = "This is a use case for LPS-82208 and LPS-89641. The user can not delete a strcuture that is used as reference on a Display Page Template."
-	@priority = 5
+	@description = "This is a use case for LPS-82208."
+	@priority = "5"
 	test CannotDeleteStructureReferencedByDisplayPage {
-		property portal.acceptance = "true";
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-		task ("Given a Web Content admin has a structure referenced by a display page template") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		NavItem.gotoStructures();
 
-			NavItem.gotoStructures();
+		WebContentStructures.addCP(
+			structureDescription = "WC Structure Description",
+			structureName = "WC Structure Name");
 
-			WebContentStructures.addCP(
-				structureDescription = "WC Structure Description",
-				structureName = "WC Structure Name");
+		DataEngine.addField(
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
 
-			DataEngine.addField(
-				fieldFieldLabel = "Text",
-				fieldName = "Text");
+		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-			WebContentStructures.saveCP();
+		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+		DisplayPageTemplatesAdmin.addDisplayPage(
+			contentType = "Web Content Article",
+			displayPageName = "Display Page Name",
+			subType = "WC Structure Name");
 
-			DisplayPageTemplatesAdmin.addDisplayPage(
-				contentType = "Web Content Article",
-				displayPageName = "Display Page Name",
-				subType = "WC Structure Name");
-		}
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-		task ("When the Web Content admin tries to delete the structure") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentStructures.deleteCP(
+			structureName = "WC Structure Name",
+			webContentHasReference = "true");
 
-			WebContentStructures.deleteCP(
-				structureName = "WC Structure Name",
-				webContentHasReference = "true");
-		}
-
-		task ("Then the Web Content admin should see an error message") {
-			AssertTextEquals.assertPartialText(
-				locator1 = "Message#ERROR",
-				value1 = "Error:The structure cannot be deleted because it is required by one or more structure links.");
-
-			WebContentStructures.viewCP(
-				structureDescription = "WC Structure Description",
-				structureName = "WC Structure Name");
-		}
-
-		task ("When the Web Content admin makes a copy of new structure") {
-			LexiconEntry.gotoEntryMenuItem(
-				menuItem = "Copy",
-				rowEntry = "WC Structure Name");
-
-			PortletEntry.inputName(name = "WC Structure Name Copy");
-
-			AssertClick(
-				locator1 = "Button#COPY",
-				value1 = "Copy");
-		}
-
-		task ("Then the Web Content admin should see both structures") {
-			LexiconEntry.viewEntryName(rowEntry = "WC Structure Name");
-
-			LexiconEntry.viewEntryName(rowEntry = "WC Structure Name Copy");
-		}
+		WebContentStructures.viewCP(
+			structureDescription = "WC Structure Description",
+			structureName = "WC Structure Name");
 	}
 
 	@description = "This is a use case for LPS-126248. Edit field reference of field options in structure editor."
-	@priority = 4
+	@priority = "4"
 	test EditFieldReferenceOfFieldOption {
 		task ("Add a web content structure with a Select from List field") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -156,26 +117,26 @@ definition {
 		}
 
 		task ("Add two field options for Select from List") {
-			var index = 1;
+			var index = "1";
 
 			for (var optionValue : list "Option 1,Option 2") {
 				DataEngine.addFieldOption(
 					fieldFieldLabel = "Select from List",
-					index = ${index},
-					optionValue = ${optionValue});
+					index = "${index}",
+					optionValue = "${optionValue}");
 
 				var index = ${index} + 1;
 			}
 		}
 
 		task ("Edit field reference of field options") {
-			var index = 1;
+			var index = "1";
 
 			for (var fieldReferenceOfFieldOption : list "Value1,Value2") {
 				DataEngine.editFieldReferenceOfFieldOption(
 					fieldFieldLabel = "Select from List",
-					fieldReferenceOfFieldOption = ${fieldReferenceOfFieldOption},
-					index = ${index});
+					fieldReferenceOfFieldOption = "${fieldReferenceOfFieldOption}",
+					index = "${index}");
 
 				var index = ${index} + 1;
 			}
@@ -188,13 +149,13 @@ definition {
 
 			Navigator.gotoNavTab(navTab = "Basic");
 
-			var index = 1;
+			var index = "1";
 
 			for (var fieldReferenceOfFieldOption : list "Value1,Value2") {
 				AssertTextEquals(
-					index = ${index},
+					index = "${index}",
 					locator1 = "Sidebar#OPTION_WITHOUT_LABEL_FIELD_REFERENCE_INPUT",
-					value1 = ${fieldReferenceOfFieldOption});
+					value1 = "${fieldReferenceOfFieldOption}");
 
 				var index = ${index} + 1;
 			}
@@ -211,223 +172,161 @@ definition {
 
 			Navigator.gotoNavTab(navTab = "Basic");
 
-			var index = 1;
+			var index = "1";
 
 			for (var fieldReferenceOfFieldOption : list "Value1,Value2") {
 				AssertTextEquals(
-					index = ${index},
+					index = "${index}",
 					locator1 = "Sidebar#OPTION_WITHOUT_LABEL_FIELD_REFERENCE_INPUT",
-					value1 = ${fieldReferenceOfFieldOption});
+					value1 = "${fieldReferenceOfFieldOption}");
 
 				var index = ${index} + 1;
 			}
 		}
 	}
 
-	@description = "The user can edit the default values for a structure with fieldsets"
-	@priority = 4
-	test EditStructureDefaultValuesBasedOnFieldset {
-		task ("Given a Web Content admin has a structure based on a fieldset") {
-			WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "test-site-name");
+	@priority = "4"
+	test EditStructureDefaultValuesForFieldsets {
+		property testray.component.names = "Web Content Administration";
 
-			WebContentStructures.addCP(
-				structureDescription = "WC Structure Description",
-				structureName = "WC Structure 1");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-			DataEngine.addFields(fieldNameList = "Text,Rich Text,Image,Upload");
+		NavItem.gotoStructures();
 
-			WebContentStructures.saveCP();
+		WebContentStructures.addCP(
+			structureDescription = "WC Structure Description",
+			structureName = "WC Structure 1");
 
-			WebContentStructures.addCP(
-				structureDescription = "WC Structure Description",
-				structureName = "WC Structure 2");
+		DataEngine.addFields(fieldNameList = "Text,Rich Text,Image,Upload");
 
-			DataEngine.addFieldsetToBuilder(fieldsetName = "WC Structure 1");
+		WebContentStructures.saveCP(structureName = "WC Structure 1");
 
-			DataEngine.addField(
-				fieldFieldLabel = "Numeric",
-				fieldName = "Numeric");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-			WebContentStructures.saveCP();
-		}
+		NavItem.gotoStructures();
 
-		task ("When the Web Content admin defines the default values of structure") {
-			WebContentStructures.editStructureDefaultValuesCP(structureName = "WC Structure 2");
+		LexiconEntry.gotoAdd();
 
-			WebContent.addWithStructureCP(webContentText = "Edited Text Field");
+		WebContentStructures.addName(structureName = "WC Structure 2");
 
-			PortletEntry.save();
-		}
+		Navigator.gotoSidebarTab(tabName = "Properties");
 
-		task ("Then the default values of structure should be persisted") {
-			WebContentStructures.editStructureDefaultValuesCP(structureName = "WC Structure 2");
+		PortletEntry.inputDescriptionTextInput(description = "WC Structure Description");
 
-			WebContent.viewWithStructureCP(
-				predefinedValue = "true",
-				webContentText = "Edited Text Field");
-		}
-	}
+		DataEngine.addFieldsetToBuilder(fieldsetName = "WC Structure 1");
 
-	@description = "This is a test for LPS-156908. The web content designer could define an expiration date when edit default values for a new structure."
-	@priority = 5
-	test PredefineExpirationDateInCustomStructure {
-		property custom.properties = "feature.flag.LPS-156908=true";
+		DataEngine.addField(
+			fieldFieldLabel = "Numeric",
+			fieldName = "Numeric");
 
-		task ("Given the web content designer has a custom structure") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentStructures.saveCP(structureName = "WC Structure 1");
 
-			NavItem.gotoStructures();
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-			WebContentStructures.addCP(structureName = "WC Structure Name");
+		NavItem.gotoStructures();
 
-			DataEngine.addField(
-				fieldFieldLabel = "Text",
-				fieldName = "Text");
+		WebContentStructures.editStructureDefaultValuesCP(structureName = "WC Structure 2");
 
-			WebContentStructures.saveCP();
-		}
+		WebContent.addWithStructureCP(webContentText = "Edited Text Field");
 
-		task ("When the web content designer define an expiration date as default values") {
-			WebContentStructures.editStructureDefaultValuesCP(structureName = "WC Structure Name");
-
-			WebContent.addExpirationDateCP(expirationDate = "01/02/3000");
-
-			PortletEntry.save();
-		}
-
-		task ("Then the web content designer could see the predefined expiration date in web content editor") {
-			NavItem.click(navItem = "Web Content");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-			WaitForVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-			WebContent.viewExpirationDateCP(expirationDate = "01/02/3000");
-		}
-	}
-
-	@description = "This is a test for LPS-156908. The web content designer could define an expiration date when edit default values for the ootb Basic Web Content structure."
-	@priority = 4
-	test PredefineExpirationDateInDefaultStructure {
-		property custom.properties = "feature.flag.LPS-156908=true";
-
-		task ("Given the web content designer accesses to Web Content admin in global site") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "global");
-
-			NavItem.gotoStructures();
-		}
-
-		task ("When the web content designer define an expiration date as default values for Basic Web Content") {
-			WebContentStructures.editStructureDefaultValuesCP(structureName = "Basic Web Content");
-
-			WebContent.addExpirationDateCP(expirationDate = "01/02/3000");
-
-			PortletEntry.save();
-		}
-
-		task ("Then the web content designer could see the predefined expiration date in web content editor") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			WebContentNavigator.gotoAddCP();
-
-			WebContent.viewExpirationDateCP(expirationDate = "01/02/3000");
-
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "global");
-
-			NavItem.gotoStructures();
-
-			WebContentStructures.editStructureDefaultValuesCP(structureName = "Basic Web Content");
-
-			WebContentStructures.resetStructureDefaultValuesCP();
-
-			PortletEntry.save();
-		}
+		PortletEntry.save();
 	}
 
 	@description = "This is a use case for LRQA-61632. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectContentPageInLinkToPageField {
+	@priority = "4"
+	test SelectDifferentTypePagesInLinkToPageField {
+		task ("Add a widget page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page");
+		}
+
 		task ("Add a page based on Blank") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			ContentPages.addPage(pageName = "Test Content Page");
+
+			PageEditor.clickPublish();
+		}
+
+		task ("Add a page based on Search") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			SitePages.addPublicPage(
+				collectionName = "Global Templates",
+				pageName = "Test Search",
+				pageTemplateName = "Search");
+		}
+
+		task ("Add a page based on Full Page Application") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			SitePages.addPublicPage(
+				pageName = "Test Full Page Application",
+				sitePageType = "Full Page Application");
+		}
+
+		task ("Add a page based on Page Set") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			SitePages.addPublicPage(
+				pageName = "Test Page Set",
+				sitePageType = "Page Set");
+
 			JSONLayout.addPublicLayout(
 				groupName = "Test Site Name",
-				layoutName = "Test Content Page",
-				type = "content");
-
-			JSONLayout.publishLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Content Page");
+				layoutName = "Test Child Page",
+				parentLayoutName = "Test Page Set");
 		}
 
-		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			NavItem.gotoStructures();
-
-			WebContentStructures.addCP(structureName = "WC Structure Name");
-
-			DataEngine.addField(
-				fieldFieldLabel = "Content Page",
-				fieldName = "Link to Page");
-
-			WebContentStructures.saveCP(structureName = "WC Structure Name");
-		}
-
-		task ("Add a web content based on new structure") {
-			NavItem.click(navItem = "Web Content");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-			PortletEntry.inputTitle(title = "Web Content Title");
-
-			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Content Page",
-				webContentLinkToPageFieldLabel = "Content Page");
-
-			PortletEntry.publish();
-		}
-
-		task ("Add a Web Content Display to another page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
-
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
-
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Content Page",
-				pageName = "Test Content Page",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
-	@description = "This is a use case for LRQA-61632. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectEmbeddedPageInLinkToPageField {
 		task ("Add a page based on Embedded") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			PagesAdmin.addPage(
+			SitePages.addPublicPage(
 				pageName = "Test Embedded",
 				pageTypeURL = "https://www.liferay.com",
 				sitePageType = "Embedded");
 		}
 
-		task ("Add a structure with Link to Page field") {
+		task ("Add a page based on Link to a Page of This Site") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			SitePages.addPublicPage(
+				linkPageName = "Test Content Page",
+				pageName = "Test Link To A Page Of This Site",
+				sitePageType = "Link to a Page of This Site");
+		}
+
+		task ("Add a page based on Panel") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			SitePages.addPublicPage(
+				componentName = "Collaboration",
+				pageName = "Test Panel",
+				sitePageType = "Panel");
+		}
+
+		task ("Add a page based on Link to URL") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			SitePages.addPublicPage(
+				pageName = "Test Link To URL",
+				pageTypeURL = "https://www.liferay.com",
+				sitePageType = "Link to URL");
+		}
+
+		task ("Add a structure with 9 Link to Page fields") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
 			NavItem.gotoStructures();
 
 			WebContentStructures.addCP(structureName = "WC Structure Name");
 
-			DataEngine.addField(
-				fieldFieldLabel = "Embedded",
-				fieldName = "Link to Page");
+			for (var fieldLabel : list "Widget Page,Content Page,Search,Full Page Application,Page Set,Embedded,Link To A Page Of This Site,Panel,Link To URL") {
+				DataEngine.addField(
+					fieldFieldLabel = "${fieldLabel}",
+					fieldName = "Link to Page");
+			}
 
 			WebContentStructures.saveCP(structureName = "WC Structure Name");
 		}
@@ -436,97 +335,84 @@ definition {
 			NavItem.click(navItem = "Web Content");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
+		}
 
+		task ("Select the relevant page in each field") {
 			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
 
 			PortletEntry.inputTitle(title = "Web Content Title");
 
+			for (var fieldLabel : list "Widget Page,Content Page,Search,Full Page Application,Embedded,Link To A Page Of This Site,Panel,Link To URL") {
+				WebContent.addWithStructureCP(
+					webContentLinkToPage = "Test ${fieldLabel}",
+					webContentLinkToPageFieldLabel = "${fieldLabel}");
+			}
+
 			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Embedded",
-				webContentLinkToPageFieldLabel = "Embedded");
+				webContentLinkToPage = "Test Child Page",
+				webContentLinkToPageFieldLabel = "Page Set");
 
 			PortletEntry.publish();
 		}
 
-		task ("Add a Web Content Display to another page") {
-			JSONLayout.addPublicLayout(
+		task ("Add a Web Content Display to Test Widget Page") {
+			JSONLayout.addWidgetToPublicLayout(
 				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
+				layoutName = "Test Widget Page",
+				widgetName = "Web Content Display");
+		}
 
+		task ("Select the web content article") {
 			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
+				pageName = "Test Widget Page",
 				siteName = "Test Site Name");
 
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
-
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Embedded",
-				pageName = "Test Embedded",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
-	@description = "This is a use case for LRQA-61632. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectFullPageApplicationPageInLinkToPageField {
-		task ("Add a page based on Full Page Application") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-			PagesAdmin.addPage(
-				pageName = "Test Full Page Application",
-				sitePageType = "Full Page Application");
+			WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
 		}
 
-		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		task ("Assert access to given pages via Web Content Display") {
+			for (var fieldLabel : list "Widget Page,Content Page,Search,Full Page Application,Embedded,Panel") {
+				Click(
+					key_contentText = "${fieldLabel}",
+					locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
 
-			NavItem.gotoStructures();
+				ControlMenu.viewHeaderTitle(headerTitle = "Test ${fieldLabel}");
 
-			WebContentStructures.addCP(structureName = "WC Structure Name");
+				Navigator.gotoSitePage(
+					pageName = "Test Widget Page",
+					siteName = "Test Site Name");
+			}
 
-			DataEngine.addField(
-				fieldFieldLabel = "Full Page Application",
-				fieldName = "Link to Page");
+			Click(
+				key_contentText = "Link To A Page Of This Site",
+				locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
 
-			WebContentStructures.saveCP(structureName = "WC Structure Name");
-		}
-
-		task ("Add a web content based on new structure") {
-			NavItem.click(navItem = "Web Content");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-			PortletEntry.inputTitle(title = "Web Content Title");
-
-			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Full Page Application",
-				webContentLinkToPageFieldLabel = "Full Page Application");
-
-			PortletEntry.publish();
-		}
-
-		task ("Add a Web Content Display to another page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
+			ControlMenu.viewHeaderTitle(headerTitle = "Test Content Page");
 
 			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
+				pageName = "Test Widget Page",
 				siteName = "Test Site Name");
 
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
+			Click(
+				key_contentText = "Page Set",
+				locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
 
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Full Page Application",
-				pageName = "Test Full Page Application",
-				webContentTitle = "Web Content Title");
+			ControlMenu.viewHeaderTitle(headerTitle = "Test Child Page");
+
+			Navigator.gotoSitePage(
+				pageName = "Test Widget Page",
+				siteName = "Test Site Name");
+
+			Click(
+				key_contentText = "Link To URL",
+				locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
+
+			AssertLocation.assertPartialLocation(value1 = "https://www.liferay.com");
 		}
 	}
 
 	@description = "This is a use case for LRQA-61632. Can select a great grand child page in Link to Page field."
-	@priority = 4
+	@priority = "4"
 	test SelectGreatGrandChildPageInLinkToPageField {
 		task ("Add a parent page") {
 			JSONLayout.addPublicLayout(
@@ -582,6 +468,8 @@ definition {
 				webContentLinkToPage = "Test Great Grand Child Page",
 				webContentTitle = "Web Content Title");
 
+			Pause(locator1 = "3000");
+
 			WebContent.viewWithStructureCP(
 				predefinedValue = "true",
 				webContentLinkToPage = "Test Great Grand Child Page");
@@ -604,16 +492,23 @@ definition {
 			WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
 		}
 
+		task ("Click the link in Web Content Display") {
+			WebContent.viewPGViaWCD(
+				linkName = "Link to Page",
+				linkToPage = "true");
+
+			Click(
+				key_contentText = "Link to Page",
+				locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
+		}
+
 		task ("Assert the page redirects to the great grand child page") {
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Link to Page",
-				pageName = "Test Great Grand Child Page",
-				webContentTitle = "Web Content Title");
+			ControlMenu.viewHeaderTitle(headerTitle = "Test Great Grand Child Page");
 		}
 	}
 
 	@description = "This is a use case for LRQA-61632. Can select the image from Documents and Media in Image field."
-	@priority = 4
+	@priority = "4"
 	test SelectImageFromDocumentsAndMediaInImageField {
 		task ("Add a document with an image") {
 			JSONDocument.addFileWithUploadedFile(
@@ -676,450 +571,63 @@ definition {
 		}
 
 		task ("Assert the image is shown in Web Content Display") {
-			WebContentDisplayPortlet.viewContent(
-				imageFileName = "Document_1.jpg",
-				webContentTitle = "Web Content Title");
+			WebContent.viewPGViaWCD(
+				image = "true",
+				key_image = "Document_1.jpg");
 		}
 	}
 
-	@description = "This is a use case for LRQA-61632. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectLinkToAPageOfThisSitePageInLinkToPageField {
-		task ("Add a page based on Link to a Page of This Site") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Content Page",
-				type = "content");
+	@priority = "4"
+	test ValidateDDMNavigation {
+		property test.name.skip.portal.instance = "WebContentStructures#ValidateDDMNavigation";
+		property testray.component.names = "Web Content Administration";
 
-			JSONLayout.publishLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Content Page");
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
 
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
 
-			PagesAdmin.addPage(
-				linkPageName = "Test Content Page",
-				pageName = "Test Link To A Page Of This Site",
-				sitePageType = "Link to a Page of This Site");
-		}
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "global");
 
-		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		NavItem.gotoStructures();
 
-			NavItem.gotoStructures();
+		WebContentNavigator.gotoManageTemplatesViaStructures(structureName = "Basic Web Content");
 
-			WebContentStructures.addCP(structureName = "WC Structure Name");
+		WebContentTemplates.addCP(
+			templateDescription = "Test WC Template Description",
+			templateName = "Test WC Template");
 
-			DataEngine.addField(
-				fieldFieldLabel = "Link To A Page Of This Site",
-				fieldName = "Link to Page");
+		WebContentTemplates.gotoTemplateEllipsisItem(
+			item = "Edit",
+			templateName = "Test WC Template");
 
-			WebContentStructures.saveCP(structureName = "WC Structure Name");
-		}
+		Navigator.gotoBack();
 
-		task ("Add a web content based on new structure") {
-			NavItem.click(navItem = "Web Content");
+		SiteAdmin.viewPortletTitle(portletTitle = "Templates for Structure: Basic Web Content");
 
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
-			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
+		WebContentTemplates.viewTableEntryCP(
+			templateDescription = "Test WC Template Description",
+			templateName = "Test WC Template");
 
-			PortletEntry.inputTitle(title = "Web Content Title");
+		WebContentTemplates.viewTableEntryCP(
+			templateDescription = "",
+			templateName = "Basic Web Content");
 
-			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Link To A Page Of This Site",
-				webContentLinkToPageFieldLabel = "Link To A Page Of This Site");
+		NavItem.gotoStructures();
 
-			PortletEntry.publish();
-		}
+		SiteAdmin.viewPortletTitle(portletTitle = "Web Content");
 
-		task ("Add a Web Content Display to another page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
-
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
-
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Link To A Page Of This Site",
-				pageName = "Test Content Page",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
-	@description = "This is a use case for LRQA-61632 and LPS-76981. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectLinkToURLPageInLinkToPageField {
-		property custom.properties = "redirect.url.ips.allowed=";
-
-		task ("Add a page based on Link to URL") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
-
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-			PagesAdmin.addPage(
-				pageName = "Test Link To URL",
-				pageTypeURL = "https://www.liferay.com",
-				sitePageType = "Link to URL");
-		}
-
-		task ("Assert cancel edit a Link to URL type page will not redirect to the URL") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Configure",
-				pageName = "Test Link To URL");
-
-			PortletEntry.inputName(name = "Edit Link to URL Page");
-
-			AssertClick(
-				locator1 = "Button#CANCEL",
-				value1 = "Cancel");
-
-			AssertLocation.assertPartialLocation(value1 = "com_liferay_layout_admin_web_portlet_GroupPagesPortlet");
-		}
-
-		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			NavItem.gotoStructures();
-
-			WebContentStructures.addCP(structureName = "WC Structure Name");
-
-			DataEngine.addField(
-				fieldFieldLabel = "Link To URL",
-				fieldName = "Link to Page");
-
-			WebContentStructures.saveCP(structureName = "WC Structure Name");
-		}
-
-		task ("Add a web content based on new structure") {
-			NavItem.click(navItem = "Web Content");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-			PortletEntry.inputTitle(title = "Web Content Title");
-
-			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Link To URL",
-				webContentLinkToPageFieldLabel = "Link To URL");
-
-			PortletEntry.publish();
-		}
-
-		task ("Add a Web Content Display to another page") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
-
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Link To URL",
-				url = "https://www.liferay.com",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
-	@description = "This is a use case for LRQA-61632. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectPageSetPageInLinkToPageField {
-		task ("Add a page based on Page Set") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
-
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-			PagesAdmin.addPage(
-				pageName = "Test Page Set",
-				sitePageType = "Page Set");
-
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Child Page",
-				parentLayoutName = "Test Page Set");
-		}
-
-		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			NavItem.gotoStructures();
-
-			WebContentStructures.addCP(structureName = "WC Structure Name");
-
-			DataEngine.addField(
-				fieldFieldLabel = "Page Set",
-				fieldName = "Link to Page");
-
-			WebContentStructures.saveCP(structureName = "WC Structure Name");
-		}
-
-		task ("Add a web content based on new structure") {
-			NavItem.click(navItem = "Web Content");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-			PortletEntry.inputTitle(title = "Web Content Title");
-
-			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Child Page",
-				webContentLinkToPageFieldLabel = "Page Set");
-
-			PortletEntry.publish();
-		}
-
-		task ("Add a Web Content Display to another page") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
-
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Page Set",
-				pageName = "Test Child Page",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
-	@description = "This is a use case for LRQA-61632. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectPanelPageInLinkToPageField {
-		task ("Add a page based on Panel") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-			PagesAdmin.addPage(
-				componentName = "Collaboration",
-				pageName = "Test Panel",
-				sitePageType = "Panel");
-		}
-
-		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			NavItem.gotoStructures();
-
-			WebContentStructures.addCP(structureName = "WC Structure Name");
-
-			DataEngine.addField(
-				fieldFieldLabel = "Panel",
-				fieldName = "Link to Page");
-
-			WebContentStructures.saveCP(structureName = "WC Structure Name");
-		}
-
-		task ("Add a web content based on new structure") {
-			NavItem.click(navItem = "Web Content");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-			PortletEntry.inputTitle(title = "Web Content Title");
-
-			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Panel",
-				webContentLinkToPageFieldLabel = "Panel");
-
-			PortletEntry.publish();
-		}
-
-		task ("Add a Web Content Display to another page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
-
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
-
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Panel",
-				pageName = "Test Panel",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
-	@description = "This is a use case for LRQA-61632. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectSearchPageInLinkToPageField {
-		task ("Add a page based on Search") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-			PagesAdmin.addPage(
-				collectionName = "Global Templates",
-				pageName = "Test Search",
-				pageTemplateName = "Search");
-		}
-
-		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			NavItem.gotoStructures();
-
-			WebContentStructures.addCP(structureName = "WC Structure Name");
-
-			DataEngine.addField(
-				fieldFieldLabel = "Search",
-				fieldName = "Link to Page");
-
-			WebContentStructures.saveCP(structureName = "WC Structure Name");
-		}
-
-		task ("Add a web content based on new structure") {
-			NavItem.click(navItem = "Web Content");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-			PortletEntry.inputTitle(title = "Web Content Title");
-
-			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Search",
-				webContentLinkToPageFieldLabel = "Search");
-
-			PortletEntry.publish();
-		}
-
-		task ("Add a Web Content Display to another page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
-
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
-
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Search",
-				pageName = "Test Search",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
-	@description = "This is a use case for LRQA-61632. Can select different type pages in Link to Page field."
-	@priority = 4
-	test SelectWidgetPageInLinkToPageField {
-		task ("Add a widget page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Widget Page");
-		}
-
-		task ("Add a structure with Link to Page field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			NavItem.gotoStructures();
-
-			WebContentStructures.addCP(structureName = "WC Structure Name");
-
-			DataEngine.addField(
-				fieldFieldLabel = "Widget Page",
-				fieldName = "Link to Page");
-
-			WebContentStructures.saveCP(structureName = "WC Structure Name");
-		}
-
-		task ("Add a web content based on new structure") {
-			NavItem.click(navItem = "Web Content");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-			PortletEntry.inputTitle(title = "Web Content Title");
-
-			WebContent.addWithStructureCP(
-				webContentLinkToPage = "Test Widget Page",
-				webContentLinkToPageFieldLabel = "Widget Page");
-
-			PortletEntry.publish();
-		}
-
-		task ("Add a Web Content Display to another page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
-
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			WidgetPages.addRecentContentWithoutSearch(assetTitle = "Web Content Title");
-
-			WebContentDisplayPortlet.viewContent(
-				displayText = "Widget Page",
-				pageName = "Test Widget Page",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
-	@description = "Validate global structure and template."
-	@priority = 4
-	test ValidateGlobalTemplatesForBasicWebContent {
-		task ("Given a Web Content admin has a new template for Basic Web Content in global site") {
-			WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "global");
-
-			WebContentNavigator.gotoManageTemplatesViaStructures(structureName = "Basic Web Content");
-
-			WebContentTemplates.addCP(
-				templateDescription = "Global WC Template Description",
-				templateName = "Global WC Template");
-
-			WebContentTemplates.gotoTemplateEllipsisItem(
-				item = "Edit",
-				templateName = "Global WC Template");
-
-			Navigator.gotoBack();
-		}
-
-		task ("When the Web Content admin changes the display style to table") {
-			LexiconEntry.changeDisplayStyle(displayStyle = "table");
-		}
-
-		task ("Then the templates are shown as table entry") {
-			ControlMenu.viewHeaderTitle(headerTitle = "Templates for Structure: Basic Web Content");
-
-			WebContentTemplates.viewTableEntryCP(
-				templateDescription = "Global WC Template Description",
-				templateName = "Global WC Template");
-
-			WebContentTemplates.viewTableEntryCP(
-				templateDescription = "",
-				templateName = "Basic Web Content");
-		}
-
-		task ("When the Web Content admin navigates to Structures tab") {
-			NavItem.gotoStructures();
-		}
-
-		task ("Then the Web Content admin should see the Basic Web Content structure") {
-			ControlMenu.viewHeaderTitle(headerTitle = "Web Content");
-
-			WebContentStructures.viewTableEntryCP(
-				structureDescription = "Basic Web Content",
-				structureName = "Basic Web Content");
-		}
+		WebContentStructures.viewTableEntryCP(
+			structureDescription = "Basic Web Content",
+			structureName = "Basic Web Content");
 	}
 
 	@description = "This is a test for LPS-125933. Create, read, update and delete a Structure with all possible fields."
-	@priority = 5
+	@priority = "5"
 	test ViewAndEditAsWellAsDeleteStructureWithAllFields {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training,Web Content Administration";
@@ -1132,14 +640,16 @@ definition {
 			structureDescription = "WC Structure Description",
 			structureName = "WC Structure Name");
 
-		DataEngine.addFieldsWithDefaultReference(fieldNameList = "Text,Select from List,Single Selection,Multiple Selection,Grid,Date,Numeric,Image,Rich Text,Upload,Color,Web Content,Geolocation,Link to Page,Separator");
+		DataEngine.addFields(fieldNameList = "Text,Select from List,Single Selection,Multiple Selection,Grid,Date,Numeric,Image,Rich Text,Upload,Color,Web Content,Geolocation,Link to Page,Separator");
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
 		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
 		for (var fieldFieldLabel : list "Text,Select from List,Single Selection,Multiple Selection,Grid,Date,Numeric,Image,Rich Text,Upload,Color,Web Content,Geolocation,Link to Page,Separator") {
-			DataEngine.viewFieldLabel(fieldFieldLabel = ${fieldFieldLabel});
+			DataEngine.viewField(
+				fieldFieldLabel = "${fieldFieldLabel}",
+				fieldName = "${fieldFieldLabel}");
 		}
 
 		task ("Edit structure name") {
@@ -1149,7 +659,7 @@ definition {
 		task ("Edit field labels") {
 			for (var fieldFieldLabel : list "Text,Select from List,Single Selection,Multiple Selection,Grid,Date,Numeric,Image,Rich Text,Upload,Color,Web Content,Geolocation,Link to Page,Separator") {
 				DataEngine.editFieldLabel(
-					fieldFieldLabel = ${fieldFieldLabel},
+					fieldFieldLabel = "${fieldFieldLabel}",
 					fieldFieldLabelEdit = "${fieldFieldLabel} Edit");
 			}
 
@@ -1171,50 +681,49 @@ definition {
 		}
 	}
 
-	@description = "The user can add a favorite structure in web content admin."
-	@priority = 4
-	test ViewFavoriteStructureInWebContentAdmin {
-		task ("Given a Web Content admin has multiple structures") {
-			WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "test-site-name");
+	@priority = "4"
+	test ViewFavoriteStructure {
+		property testray.component.names = "Web Content Administration";
 
-			for (var n : list "1,2,3,4,5,6,7") {
-				WebContentStructures.addCP(structureName = "WC Structure Name ${n}");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-				DataEngine.addField(
-					fieldFieldLabel = "Text",
-					fieldName = "Text");
+		NavItem.gotoStructures();
 
-				WebContentStructures.saveCP();
-			}
+		var n = "0";
+
+		while ("${n}" != "15") {
+			WebContentStructures.addCP(
+				structureDescription = "WC Structure Description",
+				structureName = "WC Structure Name ${n}");
+
+			DataEngine.addField(
+				fieldFieldLabel = "Text",
+				fieldName = "Text");
+
+			WebContentStructures.saveCP(structureName = "${structureName}");
+
+			var n = ${n} + 1;
 		}
 
-		task ("When the Web Content admin navigates to more modal via plus icon in web content admin") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-			WebContentNavigator.gotoMoreStructuresViaPlusButton(pageMod = "8 of 9");
+		WebContentNavigator.gotoMoreStructuresViaPlusButton(pageMod = "8 of 17");
+
+		for (var structureName : list "Basic Web Content,WC Structure Name 0,WC Structure Name 1,WC Structure Name 2,WC Structure Name 3,WC Structure Name 4,WC Structure Name 5,WC Structure Name 6,WC Structure Name 7,WC Structure Name 8,WC Structure Name 9,WC Structure Name 10,WC Structure Name 11,WC Structure Name 12,WC Structure Name 13,WC Structure Name 14") {
+			WebContentStructures.viewStructuresViaMoreIFrame(structureName = "${structureName}");
 		}
 
-		task ("Then the Web Content admin should see the structures in more modal") {
-			for (var structureName : list "Basic Web Content,WC Structure Name 1,WC Structure Name 2,WC Structure Name 3,WC Structure Name 4,WC Structure Name 5,WC Structure Name 6,WC Structure Name 7") {
-				WebContentStructures.viewStructuresViaMoreIFrame(structureName = ${structureName});
-			}
+		WebContentStructures.viewNoFavoriteStructure();
 
-			WebContentStructures.viewNoFavoriteStructure();
-		}
+		WebContentStructures.addFavoriteStructure(structureName = "WC Structure Name 9");
 
-		task ("When the Web Content admin adds a structure to favorties") {
-			WebContentStructures.addFavoriteStructure(structureName = "WC Structure Name 5");
-		}
+		WebContentStructures.viewFavoriteStructureViaIFrame(
+			indexNumber = "1",
+			structureName = "WC Structure Name 9");
 
-		task ("Then the Web Content admin should see the favorite structure in more modal and plus icon in web content admin") {
-			WebContentStructures.viewFavoriteStructureViaIFrame(
-				indexNumber = 1,
-				structureName = "WC Structure Name 5");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			WebContentStructures.viewFavoriteStructureViaPlusButton(structureName = "WC Structure Name 5");
-		}
+		WebContentStructures.viewFavoriteStructureViaPlusButton(structureName = "WC Structure Name 9");
 	}
 
 }

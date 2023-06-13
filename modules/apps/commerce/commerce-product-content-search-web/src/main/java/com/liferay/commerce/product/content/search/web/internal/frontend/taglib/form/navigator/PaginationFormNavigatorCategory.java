@@ -16,20 +16,19 @@ package com.liferay.commerce.product.content.search.web.internal.frontend.taglib
 
 import com.liferay.commerce.product.content.search.web.internal.constants.CPSearchResultsConstants;
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "form.navigator.category.order:Integer=50",
+	enabled = false, property = "form.navigator.category.order:Integer=50",
 	service = FormNavigatorCategory.class
 )
 public class PaginationFormNavigatorCategory implements FormNavigatorCategory {
@@ -49,10 +48,7 @@ public class PaginationFormNavigatorCategory implements FormNavigatorCategory {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "pagination");
+		return LanguageUtil.get(resourceBundle, "pagination");
 	}
-
-	@Reference
-	private Language _language;
 
 }

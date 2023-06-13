@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.servlet.PortletSessionListenerManager;
 import com.liferay.portal.kernel.servlet.SerializableSessionAttributeListener;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.servlet.AxisServlet;
 import com.liferay.portal.servlet.PortalSessionListener;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.web.internal.session.replication.SessionReplicationFilter;
@@ -38,7 +39,6 @@ import java.util.Set;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
-import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
@@ -205,24 +205,6 @@ public class PortalWebShieldedContainerInitializer
 						initParamElement -> dynamic.setInitParameter(
 							_getChildText(initParamElement, "param-name"),
 							_getChildText(initParamElement, "param-value")));
-					_forEachChildElement(
-						servletElement, "multipart-config",
-						multipartConfigElement -> dynamic.setMultipartConfig(
-							new MultipartConfigElement(
-								_getChildText(
-									multipartConfigElement, "location"),
-								GetterUtil.getLong(
-									_getChildText(
-										multipartConfigElement,
-										"max-file-size")),
-								GetterUtil.getLong(
-									_getChildText(
-										multipartConfigElement,
-										"max-request-size")),
-								GetterUtil.getInteger(
-									_getChildText(
-										multipartConfigElement,
-										"file-size-threshold")))));
 
 					List<String> urlPatterns = servletMappingMap.get(
 						servletName);
@@ -231,6 +213,16 @@ public class PortalWebShieldedContainerInitializer
 						dynamic.addMapping(urlPatterns.toArray(new String[0]));
 					}
 				});
+
+			if (PropsValues.AXIS_SERVLET_ENABLED) {
+				ServletRegistration.Dynamic dynamic = servletContext.addServlet(
+					"Axis Servlet", new AxisServlet());
+
+				dynamic.addMapping(PropsValues.AXIS_SERVLET_MAPPING);
+
+				dynamic.setAsyncSupported(true);
+				dynamic.setLoadOnStartup(1);
+			}
 		}
 		catch (Exception exception) {
 			throw new ServletException(exception);

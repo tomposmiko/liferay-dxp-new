@@ -51,6 +51,8 @@ public interface Indexer<T> {
 
 	public String[] getSearchClassNames();
 
+	public String getSearchEngineId();
+
 	/**
 	 * @deprecated As of Judson (7.1.x), replaced by {@link
 	 *             com.liferay.portal.sort.SortFieldBuilder}
@@ -126,6 +128,9 @@ public interface Indexer<T> {
 			BooleanQuery searchQuery, SearchContext searchContext)
 		throws Exception;
 
+	public void registerIndexerPostProcessor(
+		IndexerPostProcessor indexerPostProcessor);
+
 	@Bufferable
 	public void reindex(Collection<T> objects) throws SearchException;
 
@@ -137,12 +142,6 @@ public interface Indexer<T> {
 	@Bufferable
 	public void reindex(T object) throws SearchException;
 
-	public default void reindex(T object, boolean notify)
-		throws SearchException {
-
-		reindex(object);
-	}
-
 	public Hits search(SearchContext searchContext) throws SearchException;
 
 	public Hits search(
@@ -152,5 +151,8 @@ public interface Indexer<T> {
 	public long searchCount(SearchContext searchContext) throws SearchException;
 
 	public void setIndexerEnabled(boolean indexerEnabled);
+
+	public void unregisterIndexerPostProcessor(
+		IndexerPostProcessor indexerPostProcessor);
 
 }

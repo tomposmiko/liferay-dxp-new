@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import objectToFormData from '../../../../src/main/resources/META-INF/resources/liferay/util/form/object_to_form_data.es';
 
 describe('Liferay.Util.objectToFormData', () => {

@@ -15,7 +15,7 @@
 package com.liferay.fragment.entry.processor.editable.internal.parser;
 
 import com.liferay.fragment.entry.processor.editable.parser.EditableElementParser;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -24,12 +24,14 @@ import java.util.ResourceBundle;
 import org.jsoup.nodes.Element;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
-@Component(property = "type=rich-text", service = EditableElementParser.class)
+@Component(
+	immediate = true, property = "type=rich-text",
+	service = EditableElementParser.class
+)
 public class RichTextEditableElementParser extends TextEditableElementParser {
 
 	@Override
@@ -40,7 +42,7 @@ public class RichTextEditableElementParser extends TextEditableElementParser {
 			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 				"content.Language", getClass());
 
-			return _language.get(resourceBundle, "example-rich-text");
+			return LanguageUtil.get(resourceBundle, "example-rich-text");
 		}
 
 		return html;
@@ -50,8 +52,5 @@ public class RichTextEditableElementParser extends TextEditableElementParser {
 	protected String getEditableElementType() {
 		return "rich-text";
 	}
-
-	@Reference
-	private Language _language;
 
 }

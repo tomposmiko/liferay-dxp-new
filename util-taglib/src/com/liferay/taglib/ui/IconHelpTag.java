@@ -33,10 +33,11 @@ public class IconHelpTag extends IconTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest httpServletRequest) {
-		setCssClass("ml-1 taglib-icon-help");
+		setCssClass("taglib-icon-help");
 		setIcon("question-circle-full");
 		setId(StringUtil.randomId());
 		setLocalizeMessage(false);
+		setMarkupView("lexicon");
 
 		setMessage(
 			LanguageUtil.get(

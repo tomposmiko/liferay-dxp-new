@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = "type=" + TemplateContextContributor.TYPE_THEME,
 	service = TemplateContextContributor.class
 )
@@ -65,10 +66,9 @@ public class UsersTemplateContextContributor
 			contextObjects.put("user_birthday", contact.getBirthday());
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
-		contextObjects.put("is_guest_user", user1.isGuestUser());
 		contextObjects.put("is_setup_complete", user1.isSetupComplete());
 		contextObjects.put("language", themeDisplay.getLanguageId());
 		contextObjects.put("language_id", user1.getLanguageId());
@@ -94,7 +94,7 @@ public class UsersTemplateContextContributor
 				contextObjects.put("user2", user2);
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -103,10 +103,14 @@ public class UsersTemplateContextContributor
 			LocaleUtil.toW3cLanguageId(themeDisplay.getLanguageId()));
 	}
 
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		UsersTemplateContextContributor.class);
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

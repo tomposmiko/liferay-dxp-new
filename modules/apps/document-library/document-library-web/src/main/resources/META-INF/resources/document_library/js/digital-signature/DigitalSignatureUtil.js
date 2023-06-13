@@ -19,7 +19,6 @@ import {
 	navigate,
 	objectToFormData,
 	openModal,
-	sub,
 } from 'frontend-js-web';
 
 const MAXIMUM_SELECTED_FILES = 10;
@@ -28,21 +27,21 @@ const translatedKeys = {
 	cancel: Liferay.Language.get('cancel'),
 	continue: Liferay.Language.get('continue'),
 	deselected: Liferay.Language.get('deselected'),
-	maximum_files_message: sub(
+	maximum_files_message: Liferay.Util.sub(
 		Liferay.Language.get('maximum-of-x-files-per-envelope'),
 		MAXIMUM_SELECTED_FILES
 	),
 };
 
 const _invalidFileExtensionContent = (invalidFileExtensions) =>
-	`${sub(
+	`${Liferay.Util.sub(
 		Liferay.Language.get(
 			'these-file-extensions-are-not-supported-by-docusign-and-have-been-x'
 		),
 		_translatedStrongKeys(translatedKeys.deselected)
 	)}
 
-	<p class="mt-2">${sub(
+	<p class="mt-2">${Liferay.Util.sub(
 		Liferay.Language.get('please-x-or-x-to-choose-new-documents'),
 		_translatedStrongKeys(translatedKeys.continue),
 		_translatedStrongKeys(translatedKeys.cancel)
@@ -59,7 +58,7 @@ const _invalidFileExtensionContent = (invalidFileExtensions) =>
 const _invalidFileCountContent = (
 	extendedMessage
 ) => `<div class="alert alert-warning">
-		${sub(
+		${Liferay.Util.sub(
 			Liferay.Language.get(
 				'you-have-exceeded-the-maximum-amount-of-x-files-allowed-per-envelope'
 			),
@@ -68,7 +67,7 @@ const _invalidFileCountContent = (
 
 		${
 			extendedMessage
-				? `<div class="mt-2">${sub(
+				? `<div class="mt-2">${Liferay.Util.sub(
 						Liferay.Language.get(
 							'please-x-or-x-to-remove-files-in-your-envelope'
 						),
@@ -83,7 +82,9 @@ const _composeBodyHTML = (crossedFileCountLimit, invalidFileExtensions) => {
 	let bodyHTML = '';
 
 	if (crossedFileCountLimit) {
-		bodyHTML += _invalidFileCountContent(!invalidFileExtensions.length);
+		bodyHTML += _invalidFileCountContent(
+			invalidFileExtensions.length === 0
+		);
 	}
 
 	if (invalidFileExtensions.length) {
@@ -135,18 +136,19 @@ const _showWarningModal = ({
 			},
 		],
 		status: 'warning',
-		title: !invalidFileExtensions.length
-			? sub(
-					Liferay.Language.get('maximum-of-x-files-per-envelope'),
-					MAXIMUM_SELECTED_FILES
-			  )
-			: Liferay.Language.get('file-extensions-not-supported'),
+		title:
+			invalidFileExtensions.length === 0
+				? Liferay.Util.sub(
+						Liferay.Language.get('maximum-of-x-files-per-envelope'),
+						MAXIMUM_SELECTED_FILES
+				  )
+				: Liferay.Language.get('file-extensions-not-supported'),
 	});
 
-export async function collectDigitalSignature(
+export const collectDigitalSignature = async (
 	fileEntryIds,
 	digitalSignaturePortlet
-) {
+) => {
 	const response = await fetch(
 		createResourceURL(themeDisplay.getLayoutRelativeControlPanelURL(), {
 			p_p_id: digitalSignaturePortlet,
@@ -187,4 +189,4 @@ export async function collectDigitalSignature(
 		digitalSignaturePortlet,
 		fileEntryIds.length > 1 ? fileEntryIds.join(',') : fileEntryIds[0]
 	);
-}
+};

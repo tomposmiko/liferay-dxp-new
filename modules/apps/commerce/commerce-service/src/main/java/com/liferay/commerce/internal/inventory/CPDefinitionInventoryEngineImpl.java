@@ -24,7 +24,7 @@ import com.liferay.commerce.service.CPDAvailabilityEstimateLocalService;
 import com.liferay.commerce.service.CPDefinitionInventoryLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.Locale;
@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"cp.definition.inventory.engine.key=" + CPDefinitionInventoryEngineImpl.KEY,
 		"cp.definition.inventory.engine.priority:Integer=1"
@@ -94,7 +95,7 @@ public class CPDefinitionInventoryEngineImpl
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, KEY);
+		return LanguageUtil.get(locale, KEY);
 	}
 
 	@Override
@@ -217,8 +218,5 @@ public class CPDefinitionInventoryEngineImpl
 	@Reference
 	private CPDefinitionInventoryLocalService
 		_cpDefinitionInventoryLocalService;
-
-	@Reference
-	private Language _language;
 
 }

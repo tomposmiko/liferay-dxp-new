@@ -1,12 +1,9 @@
-@default = "addSelection"
-definition {
+<definition default="addSelection">
+	<command name="addSelection">
+		<execute selenium="waitForVisible" />
 
-	function addSelection {
-		selenium.waitForVisible();
+		<execute selenium="mouseOver" />
 
-		selenium.mouseOver();
-
-		selenium.addSelection();
-	}
-
-}
+		<execute selenium="addSelection" />
+	</command>
+</definition>

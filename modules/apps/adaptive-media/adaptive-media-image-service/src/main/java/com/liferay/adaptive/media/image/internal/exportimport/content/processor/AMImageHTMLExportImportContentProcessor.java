@@ -16,13 +16,10 @@ package com.liferay.adaptive.media.image.internal.exportimport.content.processor
 
 import com.liferay.adaptive.media.image.html.AMImageHTMLTagFactory;
 import com.liferay.adaptive.media.image.html.constants.AMImageHTMLConstants;
-import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
-import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -85,27 +82,11 @@ public class AMImageHTMLExportImportContentProcessor
 			"[" + AMImageHTMLConstants.ATTRIBUTE_NAME_FILE_ENTRY_ID + "]";
 
 		for (Element element : document.select(elementSelector)) {
-			try {
-				long fileEntryId = GetterUtil.getLong(
-					element.attr(
-						AMImageHTMLConstants.ATTRIBUTE_NAME_FILE_ENTRY_ID));
+			long fileEntryId = Long.valueOf(
+				element.attr(
+					AMImageHTMLConstants.ATTRIBUTE_NAME_FILE_ENTRY_ID));
 
-				_dlAppLocalService.getFileEntry(fileEntryId);
-			}
-			catch (NoSuchFileEntryException noSuchFileEntryException) {
-				if (!ExportImportThreadLocal.isImportInProcess()) {
-					throw noSuchFileEntryException;
-				}
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						StringBundler.concat(
-							"An invalid file entry was detected during import ",
-							"when validating the content below. This is not ",
-							"an error. It typically means the file entry was ",
-							"deleted.\n", content));
-				}
-			}
+			_dlAppLocalService.getFileEntry(fileEntryId);
 		}
 	}
 
@@ -115,7 +96,7 @@ public class AMImageHTMLExportImportContentProcessor
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 
 			return null;
@@ -224,8 +205,11 @@ public class AMImageHTMLExportImportContentProcessor
 					ExportImportPathUtil.getModelPath(fileEntry));
 			}
 			catch (PortalException portalException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+				if (_log.isDebugEnabled()) {
+					_log.debug(portalException, portalException);
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn(portalException.getMessage());
 				}
 			}
 		}

@@ -22,6 +22,8 @@ import com.liferay.user.associated.data.web.internal.configuration.AnonymousUser
 
 import java.io.IOException;
 
+import java.util.Optional;
+
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.component.annotations.Component;
@@ -30,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Drew Brokke
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class UserModelListener extends BaseModelListener<User> {
 
 	@Override
@@ -47,12 +49,14 @@ public class UserModelListener extends BaseModelListener<User> {
 	private void _deleteAnonymousUserConfiguration(long companyId, long userId)
 		throws InvalidSyntaxException, IOException {
 
-		Configuration configuration = _anonymousUserConfigurationRetriever.get(
-			companyId, userId);
+		Optional<Configuration> configurationOptional =
+			_anonymousUserConfigurationRetriever.getOptional(companyId, userId);
 
-		if (configuration == null) {
+		if (!configurationOptional.isPresent()) {
 			return;
 		}
+
+		Configuration configuration = configurationOptional.get();
 
 		configuration.delete();
 	}

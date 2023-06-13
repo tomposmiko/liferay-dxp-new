@@ -37,11 +37,9 @@ import com.liferay.portal.tools.service.builder.test.model.CacheFieldEntryTable;
 import com.liferay.portal.tools.service.builder.test.model.impl.CacheFieldEntryImpl;
 import com.liferay.portal.tools.service.builder.test.model.impl.CacheFieldEntryModelImpl;
 import com.liferay.portal.tools.service.builder.test.service.persistence.CacheFieldEntryPersistence;
-import com.liferay.portal.tools.service.builder.test.service.persistence.CacheFieldEntryUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.List;
@@ -175,7 +173,7 @@ public class CacheFieldEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CacheFieldEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CacheFieldEntry cacheFieldEntry : list) {
@@ -535,7 +533,7 @@ public class CacheFieldEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -969,7 +967,7 @@ public class CacheFieldEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CacheFieldEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1039,7 +1037,7 @@ public class CacheFieldEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1121,30 +1119,10 @@ public class CacheFieldEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
-
-		_setCacheFieldEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setCacheFieldEntryUtilPersistence(null);
-
 		entityCache.removeCache(CacheFieldEntryImpl.class.getName());
-	}
-
-	private void _setCacheFieldEntryUtilPersistence(
-		CacheFieldEntryPersistence cacheFieldEntryPersistence) {
-
-		try {
-			Field field = CacheFieldEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cacheFieldEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@ServiceReference(type = EntityCache.class)

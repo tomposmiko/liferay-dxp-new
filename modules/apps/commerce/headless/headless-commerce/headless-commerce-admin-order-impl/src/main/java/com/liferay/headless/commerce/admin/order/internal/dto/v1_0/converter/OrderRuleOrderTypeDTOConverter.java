@@ -31,8 +31,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.order.rule.model.COREntryRel-OrderType",
-	service = DTOConverter.class
+	service = {DTOConverter.class, OrderRuleOrderTypeDTOConverter.class}
 )
 public class OrderRuleOrderTypeDTOConverter
 	implements DTOConverter<COREntryRel, OrderRuleOrderType> {

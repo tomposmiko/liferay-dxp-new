@@ -224,6 +224,7 @@ public class DDMFormTestUtil {
 			ddmFormField.getDDMFormFieldOptions();
 
 		ddmFormField.setProperty("columns", ddmFormFieldOptions);
+
 		ddmFormField.setProperty("rows", ddmFormFieldOptions);
 
 		return ddmFormField;

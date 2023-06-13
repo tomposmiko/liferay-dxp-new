@@ -13,7 +13,6 @@
  */
 
 import ClayButton from '@clayui/button';
-import {createPortletURL, openSelectionModal} from 'frontend-js-web';
 import React, {useContext} from 'react';
 
 import {AppContext} from '../../AppContext';
@@ -26,14 +25,15 @@ const getDocumentLibrarySelectorURL = (portletNamespace) => {
 
 	const documentLibrarySelectorParameters = {
 		'0_json': JSON.stringify(criterionJSON),
-		'criteria': 'file',
-		'itemSelectedEventName': `${portletNamespace}selectDocumentLibrary`,
-		'p_p_id': Liferay.PortletKeys.ITEM_SELECTOR,
-		'p_p_state': 'pop_up',
-		'refererGroupId': Liferay.ThemeDisplay.getSiteGroupId(),
+		criteria:
+			'com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion',
+		itemSelectedEventName: `${portletNamespace}selectDocumentLibrary`,
+		p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
+		p_p_state: 'pop_up',
+		refererGroupId: Liferay.ThemeDisplay.getSiteGroupId(),
 	};
 
-	const documentLibrarySelectorURL = createPortletURL(
+	const documentLibrarySelectorURL = Liferay.Util.PortletURL.createPortletURL(
 		themeDisplay.getLayoutRelativeControlPanelURL(),
 		documentLibrarySelectorParameters
 	);
@@ -51,7 +51,7 @@ const FileSelector = ({disabled, onChange}) => {
 	};
 
 	const handleSelectButtonClicked = () => {
-		openSelectionModal({
+		Liferay.Util.openSelectionModal({
 			onSelect: handleFieldChanged,
 			selectEventName: `${portletNamespace}selectDocumentLibrary`,
 			title: Liferay.Language.get('select-document'),

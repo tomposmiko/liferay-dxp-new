@@ -29,10 +29,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class DLContentLocalServiceWrapper
 	implements DLContentLocalService, ServiceWrapper<DLContentLocalService> {
 
-	public DLContentLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DLContentLocalServiceWrapper(
 		DLContentLocalService dlContentLocalService) {
 

@@ -75,7 +75,7 @@ public interface JournalFeedLocalService
 	 */
 	public JournalFeed addFeed(
 			long userId, long groupId, String feedId, boolean autoFeedId,
-			String name, String description, long ddmStructureId,
+			String name, String description, String ddmStructureKey,
 			String ddmTemplateKey, String ddmRendererTemplateKey, int delta,
 			String orderByCol, String orderByType,
 			String targetLayoutFriendlyUrl, String targetPortletId,
@@ -390,7 +390,7 @@ public interface JournalFeedLocalService
 
 	public JournalFeed updateFeed(
 			long groupId, String feedId, String name, String description,
-			long ddmStructureId, String ddmTemplateKey,
+			String ddmStructureKey, String ddmTemplateKey,
 			String ddmRendererTemplateKey, int delta, String orderByCol,
 			String orderByType, String targetLayoutFriendlyUrl,
 			String targetPortletId, String contentField, String feedFormat,

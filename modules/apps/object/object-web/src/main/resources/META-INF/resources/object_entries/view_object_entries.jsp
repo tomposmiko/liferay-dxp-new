@@ -18,33 +18,17 @@
 
 <%
 ViewObjectEntriesDisplayContext viewObjectEntriesDisplayContext = (ViewObjectEntriesDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
-
-ObjectDefinition objectDefinition = viewObjectEntriesDisplayContext.getObjectDefinition();
 %>
 
-<c:choose>
-	<c:when test="<%= objectDefinition.isPortlet() || Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTROL_PANEL) %>">
-		<frontend-data-set:headless-display
-			apiURL="<%= viewObjectEntriesDisplayContext.getAPIURL() %>"
-			creationMenu="<%= viewObjectEntriesDisplayContext.getCreationMenu() %>"
-			fdsActionDropdownItems="<%= viewObjectEntriesDisplayContext.getFDSActionDropdownItems() %>"
-			fdsFilters="<%= viewObjectEntriesDisplayContext.getFDSFilters() %>"
-			fdsSortItemList="<%= viewObjectEntriesDisplayContext.getFDSSortItemList() %>"
-			formName="fm"
-			id="<%= viewObjectEntriesDisplayContext.getFDSId() %>"
-			itemsPerPage="<%= 20 %>"
-			namespace="<%= liferayPortletResponse.getNamespace() %>"
-			pageNumber="<%= 1 %>"
-			portletURL="<%= liferayPortletResponse.createRenderURL() %>"
-			propsTransformer="js/components/FDSPropsTransformer/MultiselectPicklistFDSPropsTransformer"
-			style="fluid"
-		/>
-	</c:when>
-	<c:otherwise>
-		<clay:alert
-			displayType="warning"
-			message="this-object-is-not-available"
-			title="Warning"
-		/>
-	</c:otherwise>
-</c:choose>
+<clay:headless-data-set-display
+	apiURL="<%= viewObjectEntriesDisplayContext.getAPIURL() %>"
+	clayDataSetActionDropdownItems="<%= viewObjectEntriesDisplayContext.getClayDataSetActionDropdownItems() %>"
+	creationMenu="<%= viewObjectEntriesDisplayContext.getCreationMenu() %>"
+	formId="fm"
+	id="<%= viewObjectEntriesDisplayContext.getClayHeadlessDataSetDisplayId() %>"
+	itemsPerPage="<%= 20 %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
+	pageNumber="<%= 1 %>"
+	portletURL="<%= liferayPortletResponse.createRenderURL() %>"
+	style="fluid"
+/>

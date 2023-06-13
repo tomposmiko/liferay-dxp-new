@@ -396,13 +396,13 @@ public class SocialRelationLocalServiceImpl
 
 		User user1 = _userPersistence.fetchByPrimaryKey(userId1);
 
-		if ((user1 == null) || user1.isGuestUser()) {
+		if ((user1 == null) || user1.isDefaultUser()) {
 			return false;
 		}
 
 		User user2 = _userPersistence.fetchByPrimaryKey(userId2);
 
-		if ((user2 == null) || user2.isGuestUser()) {
+		if ((user2 == null) || user2.isDefaultUser()) {
 			return false;
 		}
 

@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import {debounce, fetch} from 'frontend-js-web';
 import Component from 'metal-component';
 import Soy, {Config} from 'metal-soy';

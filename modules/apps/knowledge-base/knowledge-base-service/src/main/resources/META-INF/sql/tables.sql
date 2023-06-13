@@ -1,8 +1,7 @@
 create table KBArticle (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	kbArticleId LONG not null,
+	kbArticleId LONG not null primary key,
 	resourcePrimKey LONG,
 	groupId LONG,
 	companyId LONG,
@@ -25,21 +24,17 @@ create table KBArticle (
 	latest BOOLEAN,
 	main BOOLEAN,
 	sourceURL STRING null,
-	expirationDate DATE null,
-	reviewDate DATE null,
 	lastPublishDate DATE null,
 	status INTEGER,
 	statusByUserId LONG,
 	statusByUserName VARCHAR(75) null,
-	statusDate DATE null,
-	primary key (kbArticleId, ctCollectionId)
+	statusDate DATE null
 );
 
 create table KBComment (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	kbCommentId LONG not null,
+	kbCommentId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -51,16 +46,14 @@ create table KBComment (
 	content STRING null,
 	userRating INTEGER,
 	lastPublishDate DATE null,
-	status INTEGER,
-	primary key (kbCommentId, ctCollectionId)
+	status INTEGER
 );
 
 create table KBFolder (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
-	kbFolderId LONG not null,
+	kbFolderId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -71,15 +64,13 @@ create table KBFolder (
 	name VARCHAR(75) null,
 	urlTitle VARCHAR(75) null,
 	description STRING null,
-	lastPublishDate DATE null,
-	primary key (kbFolderId, ctCollectionId)
+	lastPublishDate DATE null
 );
 
 create table KBTemplate (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	kbTemplateId LONG not null,
+	kbTemplateId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -88,6 +79,5 @@ create table KBTemplate (
 	modifiedDate DATE null,
 	title STRING null,
 	content TEXT null,
-	lastPublishDate DATE null,
-	primary key (kbTemplateId, ctCollectionId)
+	lastPublishDate DATE null
 );

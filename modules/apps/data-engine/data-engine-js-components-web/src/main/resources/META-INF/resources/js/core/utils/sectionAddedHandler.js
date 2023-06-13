@@ -51,24 +51,7 @@ const handleSectionAdded = (props, state, event) => {
 	const {fieldName, parentFieldName} = data;
 	const {pages} = state;
 
-	const {
-		defaultLanguageId,
-		editingLanguageId,
-		fieldNameGenerator,
-		portletNamespace,
-	} = props;
-	const {fieldType, skipFieldNameGeneration, useFieldName} = event;
-	const newField =
-		event.newField ??
-		createField({
-			defaultLanguageId,
-			editingLanguageId,
-			fieldNameGenerator,
-			fieldType,
-			portletNamespace,
-			skipFieldNameGeneration,
-			useFieldName,
-		});
+	const newField = event.newField ?? createField(props, event);
 	const existingField = findFieldByFieldName(pages, fieldName);
 	const fieldSetField = createFieldSet(props, event, [
 		existingField,
@@ -79,27 +62,13 @@ const handleSectionAdded = (props, state, event) => {
 
 	let newPages;
 
-	if (existingField.type === FIELD_TYPE_FIELDSET) {
-		newPages = addFieldToPage({
-			...props,
-			indexes: {
-				columnIndex: 0,
-				pageIndex: 0,
-				rowIndex: existingField.rows.length,
-			},
-			newField,
-			pages,
-			parentFieldName: existingField.fieldName,
-		});
-	}
-	else if (parentFieldName) {
+	if (parentFieldName) {
 		newPages = visitor.mapFields(
 			(field) => {
 				if (field.fieldName === parentFieldName) {
 					const updatedParentField = findFieldByFieldName(
 						handleFieldDeleted(props, state, {
 							fieldName,
-							removeEmptyRows: false,
 						}).pages,
 						parentFieldName
 					);
@@ -120,6 +89,15 @@ const handleSectionAdded = (props, state, event) => {
 			false,
 			true
 		);
+	}
+	else if (existingField.type === FIELD_TYPE_FIELDSET) {
+		newPages = addFieldToPage({
+			...props,
+			indexes,
+			newField,
+			pages,
+			parentFieldName: existingField.fieldName,
+		});
 	}
 	else {
 		newPages = visitor.mapFields((field) => {

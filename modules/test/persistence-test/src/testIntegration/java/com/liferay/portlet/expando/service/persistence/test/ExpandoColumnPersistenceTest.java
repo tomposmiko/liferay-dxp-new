@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
@@ -129,8 +128,6 @@ public class ExpandoColumnPersistenceTest {
 
 		newExpandoColumn.setCompanyId(RandomTestUtil.nextLong());
 
-		newExpandoColumn.setModifiedDate(RandomTestUtil.nextDate());
-
 		newExpandoColumn.setTableId(RandomTestUtil.nextLong());
 
 		newExpandoColumn.setName(RandomTestUtil.randomString());
@@ -158,9 +155,6 @@ public class ExpandoColumnPersistenceTest {
 		Assert.assertEquals(
 			existingExpandoColumn.getCompanyId(),
 			newExpandoColumn.getCompanyId());
-		Assert.assertEquals(
-			Time.getShortTimestamp(existingExpandoColumn.getModifiedDate()),
-			Time.getShortTimestamp(newExpandoColumn.getModifiedDate()));
 		Assert.assertEquals(
 			existingExpandoColumn.getTableId(), newExpandoColumn.getTableId());
 		Assert.assertEquals(
@@ -226,8 +220,8 @@ public class ExpandoColumnPersistenceTest {
 	protected OrderByComparator<ExpandoColumn> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
 			"ExpandoColumn", "mvccVersion", true, "ctCollectionId", true,
-			"columnId", true, "companyId", true, "modifiedDate", true,
-			"tableId", true, "name", true, "type", true);
+			"columnId", true, "companyId", true, "tableId", true, "name", true,
+			"type", true);
 	}
 
 	@Test
@@ -512,8 +506,6 @@ public class ExpandoColumnPersistenceTest {
 		expandoColumn.setCtCollectionId(RandomTestUtil.nextLong());
 
 		expandoColumn.setCompanyId(RandomTestUtil.nextLong());
-
-		expandoColumn.setModifiedDate(RandomTestUtil.nextDate());
 
 		expandoColumn.setTableId(RandomTestUtil.nextLong());
 

@@ -57,12 +57,12 @@ public class ColumnLayoutStructureItemMapper
 						setColumnViewports(
 							() -> {
 								Map<String, JSONObject>
-									columnViewportConfigurationJSONObjects =
+									columnViewportConfigurations =
 										columnLayoutStructureItem.
-											getViewportConfigurationJSONObjects();
+											getViewportConfigurations();
 
 								if (MapUtil.isEmpty(
-										columnViewportConfigurationJSONObjects)) {
+										columnViewportConfigurations)) {
 
 									return null;
 								}
@@ -71,13 +71,13 @@ public class ColumnLayoutStructureItemMapper
 									new ColumnViewport[3];
 
 								columnViewports[0] = _toColumnViewport(
-									columnViewportConfigurationJSONObjects,
+									columnViewportConfigurations,
 									ViewportSize.MOBILE_LANDSCAPE);
 								columnViewports[1] = _toColumnViewport(
-									columnViewportConfigurationJSONObjects,
+									columnViewportConfigurations,
 									ViewportSize.PORTRAIT_MOBILE);
 								columnViewports[2] = _toColumnViewport(
-									columnViewportConfigurationJSONObjects,
+									columnViewportConfigurations,
 									ViewportSize.TABLET);
 
 								return columnViewports;
@@ -90,30 +90,30 @@ public class ColumnLayoutStructureItemMapper
 	}
 
 	private ColumnViewport _toColumnViewport(
-		Map<String, JSONObject> columnViewportConfigurationJSONObjects,
+		Map<String, JSONObject> columnViewportConfigurationsMap,
 		ViewportSize viewportSize) {
 
 		return new ColumnViewport() {
 			{
 				columnViewportDefinition =
 					_toColumnViewportColumnViewportDefinition(
-						columnViewportConfigurationJSONObjects, viewportSize);
+						columnViewportConfigurationsMap, viewportSize);
 				id = viewportSize.getViewportSizeId();
 			}
 		};
 	}
 
 	private ColumnViewportDefinition _toColumnViewportColumnViewportDefinition(
-		Map<String, JSONObject> columnViewportConfigurationJSONObjects,
+		Map<String, JSONObject> columnViewportConfigurationsMap,
 		ViewportSize viewportSize) {
 
-		if (!columnViewportConfigurationJSONObjects.containsKey(
+		if (!columnViewportConfigurationsMap.containsKey(
 				viewportSize.getViewportSizeId())) {
 
 			return null;
 		}
 
-		JSONObject jsonObject = columnViewportConfigurationJSONObjects.get(
+		JSONObject jsonObject = columnViewportConfigurationsMap.get(
 			viewportSize.getViewportSizeId());
 
 		return new ColumnViewportDefinition() {

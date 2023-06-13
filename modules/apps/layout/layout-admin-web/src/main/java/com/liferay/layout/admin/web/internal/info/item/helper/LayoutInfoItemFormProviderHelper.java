@@ -22,7 +22,6 @@ import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.layout.admin.web.internal.info.item.LayoutInfoItemFields;
 import com.liferay.layout.admin.web.internal.util.InfoFieldUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.segments.service.SegmentsExperienceLocalServiceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,17 +47,6 @@ public class LayoutInfoItemFormProviderHelper {
 	public InfoForm getInfoForm(Layout layout, long segmentsExperienceId) {
 		if (!layout.isTypeContent()) {
 			return getInfoForm();
-		}
-
-		long defaultSegmentsExperienceId =
-			SegmentsExperienceLocalServiceUtil.fetchDefaultSegmentsExperienceId(
-				layout.getPlid());
-
-		if (segmentsExperienceId != defaultSegmentsExperienceId) {
-			return InfoForm.builder(
-			).infoFieldSetEntry(
-				_getLayoutInfoFieldSet(layout, segmentsExperienceId)
-			).build();
 		}
 
 		return InfoForm.builder(

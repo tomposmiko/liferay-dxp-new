@@ -1,12 +1,31 @@
 {
 	"dependencies": {
-		"@clayui/loading-indicator": "3.60.0",
-		"@liferay/cookies-banner-web": "*",
-		"@liferay/frontend-data-set-web": "*",
+		"@clayui/alert": "3.37.0",
+		"@clayui/autocomplete": "3.37.0",
+		"@clayui/badge": "3.37.0",
+		"@clayui/button": "3.37.0",
+		"@clayui/card": "3.37.0",
+		"@clayui/drop-down": "3.37.0",
+		"@clayui/form": "3.37.0",
+		"@clayui/icon": "3.37.0",
+		"@clayui/label": "3.37.0",
+		"@clayui/layout": "3.37.0",
+		"@clayui/link": "3.37.0",
+		"@clayui/list": "3.37.0",
+		"@clayui/loading-indicator": "3.37.0",
+		"@clayui/modal": "3.37.0",
+		"@clayui/multi-select": "3.37.0",
+		"@clayui/pagination-bar": "3.37.0",
+		"@clayui/panel": "3.37.0",
+		"@clayui/shared": "3.37.0",
+		"@clayui/sticker": "3.37.0",
+		"@clayui/table": "3.37.0",
+		"@clayui/tooltip": "3.37.0",
 		"@liferay/frontend-js-react-web": "*",
-		"@liferay/frontend-js-state-web": "*",
+		"classnames": "2.3.1",
 		"frontend-js-web": "*",
-		"react": "16.12.0"
+		"prop-types": "15.7.2",
+		"react-dom": "16.12.0"
 	},
 	"devDependencies": {
 		"clay-css": "^2.16.2",
@@ -21,9 +40,11 @@
 			"!<rootDir>/src/**/constants.js",
 			"!<rootDir>/src/**/entry.js"
 		],
+		"moduleNameMapper": {
+			"^frontend-taglib-clay/(.*)": "<rootDir>../../frontend-taglib/frontend-taglib-clay/src/main/resources/META-INF/resources/$1"
+		},
 		"testPathIgnorePatterns": [
-			"<rootDir>/test/components/MiniCart",
-			"<rootDir>/test/tests_utilities/"
+			"<rootDir>/test/utils/"
 		]
 	},
 	"main": "index.js",
@@ -37,5 +58,5 @@
 		"test": "liferay-npm-scripts test",
 		"watch": "liferay-npm-scripts webpack --watch"
 	},
-	"version": "4.0.84"
+	"version": "4.0.20"
 }

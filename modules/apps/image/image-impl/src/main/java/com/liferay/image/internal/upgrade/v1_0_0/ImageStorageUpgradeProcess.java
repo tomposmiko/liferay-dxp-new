@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portlet.documentlibrary.store.StoreFactory;
 
 import java.io.InputStream;
 
@@ -33,14 +34,16 @@ import java.io.InputStream;
 public class ImageStorageUpgradeProcess extends UpgradeProcess {
 
 	public ImageStorageUpgradeProcess(
-		ImageLocalService imageLocalService, Store store) {
+		ImageLocalService imageLocalService, StoreFactory storeFactory) {
 
 		_imageLocalService = imageLocalService;
-		_store = store;
+		_storeFactory = storeFactory;
 	}
 
 	@Override
 	protected void doUpgrade() throws PortalException {
+		Store store = _storeFactory.getStore();
+
 		ActionableDynamicQuery actionableDynamicQuery =
 			_imageLocalService.getActionableDynamicQuery();
 
@@ -48,27 +51,27 @@ public class ImageStorageUpgradeProcess extends UpgradeProcess {
 			(Image image) -> {
 				String fileName = _getFileName(image);
 
-				if (!_store.hasFile(
+				if (!store.hasFile(
 						CompanyConstants.SYSTEM, _REPOSITORY_ID, fileName,
 						StringPool.BLANK)) {
 
 					return;
 				}
 
-				try (InputStream inputStream = _store.getFileAsStream(
+				try (InputStream inputStream = store.getFileAsStream(
 						CompanyConstants.SYSTEM, _REPOSITORY_ID, fileName,
 						StringPool.BLANK)) {
 
-					_store.addFile(
+					store.addFile(
 						image.getCompanyId(), _REPOSITORY_ID, fileName,
 						Store.VERSION_DEFAULT, inputStream);
 
-					_store.deleteFile(
+					store.deleteFile(
 						CompanyConstants.SYSTEM, _REPOSITORY_ID, fileName,
 						Store.VERSION_DEFAULT);
 				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 			});
 
@@ -85,6 +88,6 @@ public class ImageStorageUpgradeProcess extends UpgradeProcess {
 		ImageStorageUpgradeProcess.class);
 
 	private final ImageLocalService _imageLocalService;
-	private final Store _store;
+	private final StoreFactory _storeFactory;
 
 }

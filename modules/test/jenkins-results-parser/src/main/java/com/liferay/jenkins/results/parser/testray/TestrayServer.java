@@ -14,8 +14,7 @@
 
 package com.liferay.jenkins.results.parser.testray;
 
-import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.TopLevelBuild;
+import com.liferay.jenkins.results.parser.JenkinsMaster;
 
 import java.net.URL;
 
@@ -26,11 +25,7 @@ import java.util.List;
  */
 public interface TestrayServer {
 
-	public JenkinsResultsParserUtil.HTTPAuthorization getHTTPAuthorization();
-
-	public TestrayCaseType getTestrayCaseType(String testrayCaseTypeName);
-
-	public TestrayProject getTestrayProjectByID(long projectID);
+	public TestrayProject getTestrayProjectByID(int projectID);
 
 	public TestrayProject getTestrayProjectByName(String projectName);
 
@@ -38,10 +33,7 @@ public interface TestrayServer {
 
 	public URL getURL();
 
-	public void importCaseResults(TopLevelBuild topLevelBuild);
-
-	public void setHTTPAuthorization(
-		JenkinsResultsParserUtil.HTTPAuthorization httpAuthorization);
+	public void importCaseResults(JenkinsMaster jenkinsMaster);
 
 	public void writeCaseResult(String fileName, String fileContent);
 

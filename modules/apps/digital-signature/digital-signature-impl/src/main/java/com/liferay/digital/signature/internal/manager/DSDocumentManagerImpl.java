@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = DSDocumentManager.class)
+@Component(immediate = true, service = DSDocumentManager.class)
 public class DSDocumentManagerImpl implements DSDocumentManager {
 
 	@Override

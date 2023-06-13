@@ -51,8 +51,6 @@ function openSimpleInputModalImplementation({
 	idFieldValue,
 	mainFieldLabel,
 	mainFieldName,
-	mainFieldValue,
-	method,
 	namespace,
 	onFormSuccess,
 	placeholder,
@@ -73,8 +71,6 @@ function openSimpleInputModalImplementation({
 			initialVisible="true"
 			mainFieldLabel={mainFieldLabel}
 			mainFieldName={mainFieldName}
-			mainFieldValue={mainFieldValue}
-			method={method}
 			namespace={namespace}
 			onFormSuccess={onFormSuccess}
 			placeholder={placeholder}

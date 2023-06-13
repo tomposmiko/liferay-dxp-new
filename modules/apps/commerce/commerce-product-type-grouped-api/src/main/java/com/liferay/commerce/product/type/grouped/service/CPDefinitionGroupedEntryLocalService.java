@@ -64,7 +64,17 @@ public interface CPDefinitionGroupedEntryLocalService
 	 *
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.commerce.product.type.grouped.service.impl.CPDefinitionGroupedEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the cp definition grouped entry local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link CPDefinitionGroupedEntryLocalServiceUtil} if injection and service tracking are not available.
 	 */
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	public void addCPDefinitionGroupedEntries(
+			long cpDefinitionId, long[] entryCPDefinitionIds,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public void addCPDefinitionGroupedEntriesByEntryCProductIds(
 			long cpDefinitionId, long[] entryCProductIds,
 			ServiceContext serviceContext)
 		throws PortalException;
@@ -83,9 +93,19 @@ public interface CPDefinitionGroupedEntryLocalService
 	public CPDefinitionGroupedEntry addCPDefinitionGroupedEntry(
 		CPDefinitionGroupedEntry cpDefinitionGroupedEntry);
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	public CPDefinitionGroupedEntry addCPDefinitionGroupedEntry(
-			long cpDefinitionId, long entryCProductId, double priority,
+			long cpDefinitionId, long entryCPDefinitionId, double priority,
 			int quantity, ServiceContext serviceContext)
+		throws PortalException;
+
+	public CPDefinitionGroupedEntry
+			addCPDefinitionGroupedEntryByEntryCProductId(
+				long cpDefinitionId, long entryCProductId, double priority,
+				int quantity, ServiceContext serviceContext)
 		throws PortalException;
 
 	public void cloneCPDefinitionGroupedEntries(
@@ -227,6 +247,14 @@ public interface CPDefinitionGroupedEntryLocalService
 		long cpDefinitionId, long entryCProductId);
 
 	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public CPDefinitionGroupedEntry fetchCPDefinitionGroupedEntryByC_E(
+		long cpDefinitionId, long entryCPDefinitionId);
+
+	/**
 	 * Returns the cp definition grouped entry matching the UUID and group.
 	 *
 	 * @param uuid the cp definition grouped entry's UUID
@@ -331,13 +359,6 @@ public interface CPDefinitionGroupedEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPDefinitionGroupedEntry getCPDefinitionGroupedEntryByUuidAndGroupId(
 			String uuid, long groupId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CPDefinitionGroupedEntry>
-			getEntryCProductCPDefinitionGroupedEntries(
-				long entryCProductId, int start, int end,
-				OrderByComparator<CPDefinitionGroupedEntry> orderByComparator)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

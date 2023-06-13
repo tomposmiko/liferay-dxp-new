@@ -25,9 +25,9 @@ import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -65,6 +65,10 @@ public class InputEditorTag extends BaseValidatorTagSupport {
 
 	public static Editor getEditor(
 		HttpServletRequest httpServletRequest, String editorName) {
+
+		if (!BrowserSnifferUtil.isRtf(httpServletRequest)) {
+			return _serviceTrackerMap.getService("simple");
+		}
 
 		if (Validator.isNull(editorName) ||
 			!_serviceTrackerMap.containsKey(editorName)) {
@@ -352,8 +356,12 @@ public class InputEditorTag extends BaseValidatorTagSupport {
 	protected Map<String, Object> getData() {
 		HttpServletRequest httpServletRequest = getRequest();
 
-		String portletId = GetterUtil.getString(
-			(String)httpServletRequest.getAttribute(WebKeys.PORTLET_ID));
+		String portletId = (String)httpServletRequest.getAttribute(
+			WebKeys.PORTLET_ID);
+
+		if (portletId == null) {
+			return _data;
+		}
 
 		Map<String, Object> attributes = new HashMap<>();
 

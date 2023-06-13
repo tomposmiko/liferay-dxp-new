@@ -10,13 +10,13 @@ definition {
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Test Site Name");
+		JSONGroup.addGroup(groupName = "Test Site Name");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-106212. Can not export multiple selected page templates if one of them is widget page template."
-	@priority = 4
+	@priority = "4"
 	test CannotExportMultipleWhenOneOfSelectedIsWidgetPageTemplate {
 		task ("Add a content page template") {
 			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
@@ -53,7 +53,7 @@ definition {
 				collectionName = "Basic Components",
 				fragmentName = "Heading");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a widget page template") {
@@ -72,22 +72,20 @@ definition {
 
 			for (var entry : list "Page Template Name,Widget Page Template Name") {
 				PageTemplatesAdmin.viewEntryWorkflowStatus(
-					entry = ${entry},
+					entry = "${entry}",
 					workflowStatus = "Approved");
 
-				PageTemplatesAdmin.selectPageTemplate(pageTemplateName = ${entry});
+				PageTemplatesAdmin.selectPageTemplate(pageTemplateName = "${entry}");
 			}
 		}
 
 		task ("Assert Export button is disabled") {
-			AssertElementPresent(
-				key_text = "upload",
-				locator1 = "Icon#ANY_DISABLED");
+			AssertElementPresent(locator1 = "Icon#EXPORT_DISABLED");
 		}
 	}
 
 	@description = "This is a use case for LPS-106212. Can not export multiple selected content page templates when one of them doesn't has published version."
-	@priority = 4
+	@priority = "4"
 	test CannotExportMultipleWhenOneOfSelectedWithoutPublishedVersion {
 		task ("Add a content page template") {
 			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
@@ -115,7 +113,7 @@ definition {
 				collectionName = "Basic Components",
 				fragmentName = "Heading");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a second content page template but not publish") {
@@ -153,19 +151,17 @@ definition {
 				workflowStatus = "Draft");
 
 			for (var entry : list "Page Template Name,Second Page Template Name") {
-				PageTemplatesAdmin.selectPageTemplate(pageTemplateName = ${entry});
+				PageTemplatesAdmin.selectPageTemplate(pageTemplateName = "${entry}");
 			}
 		}
 
 		task ("Assert Export button is disabled") {
-			AssertElementPresent(
-				key_text = "upload",
-				locator1 = "Icon#ANY_DISABLED");
+			AssertElementPresent(locator1 = "Icon#EXPORT_DISABLED");
 		}
 	}
 
 	@description = "This is a use case for LPS-106212. Can export a content page template based on custom master and import."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test ExportImportContentPageTemplateBasedOnCustomMaster {
 		task ("Add a custom master with Heading then Publish") {
@@ -179,7 +175,9 @@ definition {
 				fragmentName = "Heading",
 				scope = "Master");
 
-			MastersPageTemplates.publishMaster();
+			Button.click(button = "Publish Master");
+
+			Alert.viewSuccessMessage();
 		}
 
 		task ("Add a content page template based on custom master") {
@@ -207,7 +205,7 @@ definition {
 				key_fragmentName = "heading",
 				locator1 = "PageEditor#FRAGMENT_INHERITED_FROM_CUSTOM_MASTERS");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export content page template") {
@@ -227,7 +225,7 @@ definition {
 		}
 
 		task ("Add a custom master have the same name in a new site") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			JSONGroup.addGroup(groupName = "Site Name");
 
 			JSONLayoutpagetemplate.addMasterPageTemplateEntry(
 				groupName = "Site Name",
@@ -245,7 +243,9 @@ definition {
 				fragmentName = "Button",
 				scope = "Master");
 
-			MastersPageTemplates.publishMaster();
+			Button.click(button = "Publish Master");
+
+			Alert.viewSuccessMessage();
 		}
 
 		task ("Import content page template in new site") {
@@ -271,16 +271,15 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Design");
-
 			AssertTextEquals(
-				locator1 = "PagesAdmin#MASTER_LAYOUT_NAME",
+				key_masterLayoutName = "Custom Masters Page Template",
+				locator1 = "SitePagesEditPage#MASTER_LAYOUT_NAME",
 				value1 = "Custom Masters Page Template");
 		}
 	}
 
 	@description = "This is a use case for LPS-107748. Can export a content page template with custom fragments and import."
-	@priority = 4
+	@priority = "4"
 	test ExportImportContentPageTemplateWithCustomFragment {
 		task ("Add a fragment collection via JSON") {
 			JSONFragment.addFragmentCollection(
@@ -292,7 +291,7 @@ definition {
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				groupName = "Test Site Name",
-				name = "Title");
+				name = "Fragment Name");
 		}
 
 		task ("Edit content of new fragment") {
@@ -301,7 +300,7 @@ definition {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
 			FragmentsAdminNavigator.gotoEntryEllipsisItem(
-				entry = "Title",
+				entry = "Fragment Name",
 				item = "Edit");
 
 			FragmentsEditor.typeFileContent(fileName = "fragment_title.html");
@@ -335,14 +334,15 @@ definition {
 		task ("Add the new fragment to content page template") {
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
-				fragmentName = "Title");
+				fragmentName = "Fragment Name");
 
 			PageEditor.viewFragmentEditableText(
 				contributed = "false",
 				editableText = "Lorem ipsum dolor sit amet",
-				fragmentName = "Title");
+				fragmentName = "Fragment Name",
+				id = "title");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export content page template") {
@@ -368,7 +368,7 @@ definition {
 		}
 
 		task ("Import new fragment to a new site") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			JSONGroup.addGroup(groupName = "Site Name");
 
 			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "site-name");
 
@@ -378,7 +378,7 @@ definition {
 
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
-			FragmentsAdmin.viewEntryPresent(entry = "Title");
+			FragmentsAdmin.viewEntryPresent(entry = "Fragment Name");
 		}
 
 		task ("Import content page template to the new site") {
@@ -397,12 +397,13 @@ definition {
 			PageEditor.viewFragmentEditableText(
 				contributed = "false",
 				editableText = "Lorem ipsum dolor sit amet",
-				fragmentName = "Title");
+				fragmentName = "Fragment Name",
+				id = "title");
 		}
 	}
 
 	@description = "This is a use case for LPS-106212. Can export a content page template with the custom Look and Feel and import."
-	@priority = 4
+	@priority = "4"
 	test ExportImportContentPageTemplateWithCustomLookAndFeel {
 		task ("Add a content page template") {
 			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
@@ -430,8 +431,6 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Design");
-
 			Theme.configureLookAndFeelSpecificLook();
 
 			Theme.configureLookAndFeelShowFooter(showFooter = "false");
@@ -450,7 +449,7 @@ definition {
 
 			PageEditor.assertFragmentSidebarLoaded();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export content page template") {
@@ -470,7 +469,7 @@ definition {
 		}
 
 		task ("Import content page template in a new site") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			JSONGroup.addGroup(groupName = "Site Name");
 
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "site-name");
 
@@ -486,9 +485,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			WaitForPageLoad();
-
-			Navigator.gotoNavTab(navTab = "Design");
+			Pause(locator1 = "3000");
 
 			AssertChecked.assertCheckedNotVisible(locator1 = "Radio#SPECIFIC_LOOK");
 
@@ -515,7 +512,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-106815. The Team Role permission settings of widgets will be exported and imported with content page template."
-	@priority = 4
+	@priority = "4"
 	test ExportImportContentPageTemplateWithTeamRolePermissionSettingsOfWidgets {
 		task ("Add a Team in site") {
 			Site.openSiteTeamsAdmin(siteURLKey = "test-site-name");
@@ -575,7 +572,7 @@ definition {
 
 			Click(locator1 = "Icon#CLOSE");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export content page template") {
@@ -593,15 +590,15 @@ definition {
 		task ("Export Team") {
 			Site.openSiteTeamsAdmin(siteURLKey = "test-site-name");
 
-			LAR.exportTeam(larFileName = "Site_Team_Name.lar");
+			LAR.exportTeam(larFileName = "Site Team Name");
 		}
 
 		task ("Import Team in a new site") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			JSONGroup.addGroup(groupName = "Site Name");
 
 			Site.openSiteTeamsAdmin(siteURLKey = "site-name");
 
-			LAR.importTeam(larFileName = "Site_Team_Name.lar");
+			LAR.importTeam(larFileName = "Site Team Name");
 		}
 
 		task ("Import content page template") {
@@ -614,8 +611,6 @@ definition {
 			PageTemplatesAdmin.viewPageTemplatePresent(pageTemplateName = "Page Template Name");
 
 			PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
-
-			PageEditor.assertFragmentSidebarLoaded();
 
 			WaitForLiferayEvent.initializeLiferayEventLog();
 
@@ -631,12 +626,12 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertChecked.assertCheckedNotVisible(locator1 = "//tr[contains(.,'Site Team Name')]/td//input[contains(@id,'ACTION_VIEW')]");
+			AssertChecked(locator1 = "//tr[contains(.,'Site Team Name')]/td/input[contains(@id,'ACTION_VIEW')]");
 		}
 	}
 
 	@description = "This is a test for LPS-128399. Selected Stylebook is exported when exporting a page template."
-	@priority = 4
+	@priority = "4"
 	test ExportImportPageTemplateWithStylebook {
 		task ("Add a style book") {
 			StyleBooksAdmin.openStyleBooksAdmin(siteURLKey = "test-site-name");
@@ -670,7 +665,7 @@ definition {
 
 			StyleBooks.selectStyleBookViaPageDesignOptions(styleBookName = "Test Style Book Name");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export content page template") {
@@ -688,7 +683,7 @@ definition {
 		task ("Delete the page template collection") {
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
-			PageTemplatesAdmin.deletePageTemplateSet(setName = "Page Template Collection");
+			Collection.deleteCollection(collectionName = "Page Template Collection");
 		}
 
 		task ("Import the previously exported page template") {
@@ -704,7 +699,7 @@ definition {
 
 			UploadTempFile(
 				locator1 = "TextInput#FILE",
-				value1 = ${pageTemplateZipFileName});
+				value1 = "${pageTemplateZipFileName}");
 
 			Button.clickImport();
 
@@ -729,7 +724,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-107748. Can export a content page template with custom fragments and import."
-	@priority = 4
+	@priority = "4"
 	test IgnoreFragmentNotExistInSiteWhenImportContentPageTemplate {
 		task ("Add a fragment collection via JSON") {
 			JSONFragment.addFragmentCollection(
@@ -741,7 +736,7 @@ definition {
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
 				groupName = "Test Site Name",
-				name = "Title");
+				name = "Fragment Name");
 		}
 
 		task ("Edit content of new fragment") {
@@ -750,7 +745,7 @@ definition {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
 			FragmentsAdminNavigator.gotoEntryEllipsisItem(
-				entry = "Title",
+				entry = "Fragment Name",
 				item = "Edit");
 
 			FragmentsEditor.typeFileContent(fileName = "fragment_title.html");
@@ -784,14 +779,15 @@ definition {
 		task ("Add the new fragment to content page template") {
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
-				fragmentName = "Title");
+				fragmentName = "Fragment Name");
 
 			PageEditor.viewFragmentEditableText(
 				contributed = "false",
 				editableText = "Lorem ipsum dolor sit amet",
-				fragmentName = "Title");
+				fragmentName = "Fragment Name",
+				id = "title");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export content page template") {
@@ -817,7 +813,7 @@ definition {
 		}
 
 		task ("Import content page template to the new site") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			JSONGroup.addGroup(groupName = "Site Name");
 
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "site-name");
 
@@ -831,7 +827,7 @@ definition {
 
 			UploadTempFile(
 				locator1 = "TextInput#FILE",
-				value1 = ${pageTemplateZipFileName});
+				value1 = "${pageTemplateZipFileName}");
 
 			Button.clickImport();
 
@@ -841,7 +837,9 @@ definition {
 		task ("Assert specific warning message is shown in Import popup") {
 			Alert.viewWarningSpecific(warningMessage = "Some page templates were imported with warnings.");
 
-			Alert.viewWarningSpecific(warningMessage = "Fragment with key Title was ignored because it does not exist.");
+			AssertElementPresent(
+				key_warningInfo = "Fragment with key fragment-name was ignored because it does not exist.",
+				locator1 = "Message#WARNING_INFO");
 		}
 
 		task ("Assert new fragment is not shown in content page template") {
@@ -853,7 +851,9 @@ definition {
 
 			PageEditor.assertFragmentSidebarLoaded();
 
-			PageEditor.viewFragmentNotPresent(fragmentName = "Title");
+			AssertElementNotPresent(
+				key_fragmentName = "Fragment Name",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 		}
 
 		task ("Import new fragment to a new site") {
@@ -865,7 +865,7 @@ definition {
 
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
-			FragmentsAdmin.viewEntryPresent(entry = "Title");
+			FragmentsAdmin.viewEntryPresent(entry = "Fragment Name");
 		}
 
 		task ("Assert new fragment is not shown in content page template") {
@@ -875,12 +875,14 @@ definition {
 
 			PageEditor.assertFragmentSidebarLoaded();
 
-			PageEditor.viewFragmentNotPresent(fragmentName = "Title");
+			AssertElementNotPresent(
+				key_fragmentName = "Fragment Name",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 		}
 	}
 
 	@description = "This is a use case for LPS-129107 Unable to import a page template that includes a deleted fragment."
-	@priority = 4
+	@priority = "4"
 	test ImportContentPageTemplateThatIncludesDeletedFragment {
 		task ("Create a new test fragment.") {
 			JSONFragment.addFragmentCollection(
@@ -923,7 +925,7 @@ definition {
 				fragmentName = "Heading",
 				targetFragmentName = "Fragment Name");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export the template.") {
@@ -940,17 +942,13 @@ definition {
 
 		task ("Delete the template.") {
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
-
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
-
 			PageTemplatesAdmin.deletePageTemplate(pageTemplateName = "Page Template Name");
 		}
 
 		task ("Delete the test page fragment.") {
 			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
-
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
-
 			FragmentsAdmin.deleteEntry(entry = "Fragment Name");
 		}
 
@@ -967,7 +965,7 @@ definition {
 
 			UploadTempFile(
 				locator1 = "TextInput#FILE",
-				value1 = ${pageTemplateZipFileName});
+				value1 = "${pageTemplateZipFileName}");
 
 			Button.clickImport();
 
@@ -983,14 +981,18 @@ definition {
 
 			PageEditor.assertFragmentSidebarLoaded();
 
-			PageEditor.viewFragmentNotPresent(fragmentName = "Fragment Name");
+			AssertElementNotPresent(
+				key_fragmentName = "Fragment Name",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			PageEditor.viewFragment(fragmentName = "Heading");
+			AssertElementPresent(
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 		}
 	}
 
 	@description = "This is a use case for LPS-106212. Can export a content page template in draft status when it has published version and only the published version is exported."
-	@priority = 4
+	@priority = "4"
 	test OnlyPublishedVersionIsExported {
 		task ("Add a content page template") {
 			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
@@ -1023,7 +1025,7 @@ definition {
 				id = "element-text",
 				text = "New editable fragment text");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert content page template has Approved label") {
@@ -1064,7 +1066,7 @@ definition {
 		}
 
 		task ("Import content page template in a new site") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			JSONGroup.addGroup(groupName = "Site Name");
 
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "site-name");
 
@@ -1084,7 +1086,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-106815. The specific message will be shown when import content page template where the widget has permission settings for a Role if it doesn't exist in site."
-	@priority = 4
+	@priority = "4"
 	test ShowSpecificWarningMessageWhenImportContentPageTemplateWithPermissionSettingsOfWidgetsToSiteWhereTheSpecificRoleNotExist {
 		task ("Add a organization and organization site") {
 			JSONOrganization.addOrganization(
@@ -1130,7 +1132,7 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			Check.checkNotVisible(
+			Check(
 				key_roleTitle = "account-manager",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -1142,7 +1144,7 @@ definition {
 
 			Click(locator1 = "Icon#CLOSE");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export content page template") {
@@ -1170,7 +1172,7 @@ definition {
 
 			UploadTempFile(
 				locator1 = "TextInput#FILE",
-				value1 = ${pageTemplateZipFileName});
+				value1 = "${pageTemplateZipFileName}");
 
 			Button.clickImport();
 
@@ -1180,7 +1182,9 @@ definition {
 		task ("Assert specific warning message is shown in Import popup") {
 			Alert.viewWarningSpecific(warningMessage = "Some page templates were imported with warnings.");
 
-			Alert.viewWarningSpecific(warningMessage = "Role with key Account Manager was ignored because it does not exist.");
+			AssertElementPresent(
+				key_warningInfo = "Role with key Account Manager was ignored because it does not exist.",
+				locator1 = "Message#WARNING_INFO");
 		}
 
 		task ("Assert Account Manager is not shown in permissions panel of RSS Publisher") {

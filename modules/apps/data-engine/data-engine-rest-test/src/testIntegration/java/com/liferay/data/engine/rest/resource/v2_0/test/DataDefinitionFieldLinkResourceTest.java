@@ -87,7 +87,7 @@ public class DataDefinitionFieldLinkResourceTest
 
 	@Override
 	protected DataDefinitionFieldLink
-			testGetDataDefinitionDataDefinitionFieldLinksPage_addDataDefinitionFieldLink(
+			testGetDataDefinitionDataDefinitionFieldLinkPage_addDataDefinitionFieldLink(
 				Long dataDefinitionId,
 				DataDefinitionFieldLink dataDefinitionFieldLink)
 		throws Exception {
@@ -100,7 +100,7 @@ public class DataDefinitionFieldLinkResourceTest
 
 	@Override
 	protected Long
-			testGetDataDefinitionDataDefinitionFieldLinksPage_getDataDefinitionId()
+			testGetDataDefinitionDataDefinitionFieldLinkPage_getDataDefinitionId()
 		throws Exception {
 
 		return _dataDefinition.getId();

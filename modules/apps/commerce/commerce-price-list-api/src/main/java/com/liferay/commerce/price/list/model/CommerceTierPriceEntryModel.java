@@ -16,11 +16,9 @@ package com.liferay.commerce.price.list.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedAuditedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.math.BigDecimal;
 
@@ -41,8 +39,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CommerceTierPriceEntryModel
-	extends BaseModel<CommerceTierPriceEntry>, CTModel<CommerceTierPriceEntry>,
-			MVCCModel, ShardedModel, StagedAuditedModel, WorkflowedModel {
+	extends BaseModel<CommerceTierPriceEntry>, ShardedModel, StagedAuditedModel,
+			WorkflowedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -55,7 +53,6 @@ public interface CommerceTierPriceEntryModel
 	 *
 	 * @return the primary key of this commerce tier price entry
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -63,40 +60,7 @@ public interface CommerceTierPriceEntryModel
 	 *
 	 * @param primaryKey the primary key of this commerce tier price entry
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this commerce tier price entry.
-	 *
-	 * @return the mvcc version of this commerce tier price entry
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this commerce tier price entry.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce tier price entry
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this commerce tier price entry.
-	 *
-	 * @return the ct collection ID of this commerce tier price entry
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this commerce tier price entry.
-	 *
-	 * @param ctCollectionId the ct collection ID of this commerce tier price entry
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this commerce tier price entry.
@@ -563,9 +527,5 @@ public interface CommerceTierPriceEntryModel
 
 	@Override
 	public CommerceTierPriceEntry cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

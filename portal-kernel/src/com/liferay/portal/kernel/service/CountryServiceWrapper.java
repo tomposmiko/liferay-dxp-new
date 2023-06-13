@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class CountryServiceWrapper
 	implements CountryService, ServiceWrapper<CountryService> {
 
-	public CountryServiceWrapper() {
-		this(null);
-	}
-
 	public CountryServiceWrapper(CountryService countryService) {
 		_countryService = countryService;
 	}

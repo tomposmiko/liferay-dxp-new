@@ -84,15 +84,15 @@ public class DLFolderLocalServiceUtil {
 	}
 
 	public static DLFolder addFolder(
-			String externalReferenceCode, long userId, long groupId,
-			long repositoryId, boolean mountPoint, long parentFolderId,
-			String name, String description, boolean hidden,
+			long userId, long groupId, long repositoryId, boolean mountPoint,
+			long parentFolderId, String name, String description,
+			boolean hidden,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addFolder(
-			externalReferenceCode, userId, groupId, repositoryId, mountPoint,
-			parentFolderId, name, description, hidden, serviceContext);
+			userId, groupId, repositoryId, mountPoint, parentFolderId, name,
+			description, hidden, serviceContext);
 	}
 
 	public static void clearDLFileEntryTypeDLFolders(long fileEntryTypeId) {
@@ -315,13 +315,6 @@ public class DLFolderLocalServiceUtil {
 		return getService().fetchDLFolder(folderId);
 	}
 
-	public static DLFolder fetchDLFolderByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
-
-		return getService().fetchDLFolderByExternalReferenceCode(
-			externalReferenceCode, groupId);
-	}
-
 	/**
 	 * Returns the document library folder matching the UUID and group.
 	 *
@@ -409,14 +402,6 @@ public class DLFolderLocalServiceUtil {
 	 */
 	public static DLFolder getDLFolder(long folderId) throws PortalException {
 		return getService().getDLFolder(folderId);
-	}
-
-	public static DLFolder getDLFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException {
-
-		return getService().getDLFolderByExternalReferenceCode(
-			externalReferenceCode, groupId);
 	}
 
 	/**
@@ -528,12 +513,6 @@ public class DLFolderLocalServiceUtil {
 		return getService().getFolderId(companyId, folderId);
 	}
 
-	public static List<DLFolder> getFolders(
-		long groupId, boolean mountPoint, String treePath, boolean hidden) {
-
-		return getService().getFolders(groupId, mountPoint, treePath, hidden);
-	}
-
 	public static List<DLFolder> getFolders(long groupId, long parentFolderId) {
 		return getService().getFolders(groupId, parentFolderId);
 	}
@@ -564,16 +543,28 @@ public class DLFolderLocalServiceUtil {
 			orderByComparator);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getFolders(long, long, boolean, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
+	public static List<DLFolder> getFolders(
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders, int start, int end,
+		OrderByComparator<DLFolder> orderByComparator) {
+
+		return getService().getFolders(
+			groupId, parentFolderId, status, includeMountfolders, start, end,
+			orderByComparator);
+	}
+
 	public static List<DLFolder> getFolders(
 		long groupId, long parentFolderId, int start, int end,
 		OrderByComparator<DLFolder> orderByComparator) {
 
 		return getService().getFolders(
 			groupId, parentFolderId, start, end, orderByComparator);
-	}
-
-	public static List<DLFolder> getFolders(long classNameId, String treePath) {
-		return getService().getFolders(classNameId, treePath);
 	}
 
 	public static List<Object> getFoldersAndFileEntriesAndFileShortcuts(
@@ -665,13 +656,6 @@ public class DLFolderLocalServiceUtil {
 
 	public static List<DLFolder> getNoAssetFolders() {
 		return getService().getNoAssetFolders();
-	}
-
-	public static List<DLFolder> getNotInTrashFolders(
-		long groupId, boolean mountPoint, String treePath, boolean hidden) {
-
-		return getService().getNotInTrashFolders(
-			groupId, mountPoint, treePath, hidden);
 	}
 
 	/**

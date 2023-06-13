@@ -45,20 +45,19 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.math.BigDecimal;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Riccardo Alberti
- * @author Alessio Antonio Rendina
  */
 @RunWith(Arquillian.class)
 public class ShippingAddressResourceTest
 	extends BaseShippingAddressResourceTestCase {
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -93,23 +92,13 @@ public class ShippingAddressResourceTest
 		_commerceShipment =
 			CommerceShipmentLocalServiceUtil.addCommerceShipment(
 				_commerceOrder.getCommerceOrderId(), _serviceContext);
-
-		_commerceShipmentWithExternalReferenceCode =
-			CommerceShipmentLocalServiceUtil.addCommerceShipment(
-				RandomTestUtil.randomString(), _commerceOrder.getGroupId(),
-				_commerceOrder.getCommerceAccountId(),
-				_commerceOrder.getShippingAddressId(),
-				_commerceOrder.getCommerceShippingMethodId(),
-				_commerceOrder.getShippingOptionName(), _serviceContext);
 	}
 
 	@Override
 	@Test
-	public void testGetShipmentByExternalReferenceCodeShippingAddress()
-		throws Exception {
-
+	public void testGetShipmentShippingAddress() throws Exception {
 		ShippingAddress shippingAddress = _toShippingAddress(
-			_commerceShipmentWithExternalReferenceCode.fetchCommerceAddress());
+			_commerceShipment.fetchCommerceAddress());
 
 		ShippingAddress getShippingAddress =
 			shippingAddressResource.getShipmentShippingAddress(
@@ -121,51 +110,24 @@ public class ShippingAddressResourceTest
 
 	@Override
 	@Test
-	public void testGraphQLGetShipmentByExternalReferenceCodeShippingAddress()
-		throws Exception {
+	public void testGraphQLGetShipmentShippingAddress() throws Exception {
+		ShippingAddress shippingAddress = _toShippingAddress(
+			_commerceShipment.fetchCommerceAddress());
 
-		String externalReferenceCode =
-			"\"" + _commerceShipment.getExternalReferenceCode() + "\"";
-
-		assertEquals(
-			testGraphQLGetShipmentByExternalReferenceCodeShippingAddress_addShippingAddress(),
-			ShippingAddressSerDes.toDTO(
-				JSONUtil.getValueAsString(
-					invokeGraphQLQuery(
-						new GraphQLField(
-							"shipmentByExternalReferenceCodeShippingAddress",
-							HashMapBuilder.<String, Object>put(
-								"externalReferenceCode", externalReferenceCode
-							).build(),
-							getGraphQLFields())),
-					"JSONObject/data",
-					"Object/shipmentByExternalReferenceCodeShippingAddress")));
-	}
-
-	@Override
-	@Test
-	public void testPatchShipmentByExternalReferenceCodeShippingAddress()
-		throws Exception {
-
-		ShippingAddress randomPatchShippingAddress =
-			randomPatchShippingAddress();
-
-		shippingAddressResource.patchShipmentShippingAddress(
-			_commerceShipment.getCommerceShipmentId(),
-			randomPatchShippingAddress);
-
-		ShippingAddress expectedPatchShippingAddress =
-			randomPatchShippingAddress.clone();
-
-		BeanPropertiesUtil.copyProperties(
-			expectedPatchShippingAddress, randomPatchShippingAddress);
-
-		ShippingAddress getShippingAddress =
-			shippingAddressResource.getShipmentShippingAddress(
-				_commerceShipment.getCommerceShipmentId());
-
-		assertEquals(expectedPatchShippingAddress, getShippingAddress);
-		assertValid(getShippingAddress);
+		Assert.assertTrue(
+			equals(
+				shippingAddress,
+				ShippingAddressSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"shipmentShippingAddress",
+								HashMapBuilder.<String, Object>put(
+									"shipmentId",
+									_commerceShipment.getCommerceShipmentId()
+								).build(),
+								getGraphQLFields())),
+						"JSONObject/data", "Object/shipmentShippingAddress"))));
 	}
 
 	@Override
@@ -222,35 +184,6 @@ public class ShippingAddressResourceTest
 		};
 	}
 
-	@Override
-	protected ShippingAddress
-			testGetShipmentShippingAddress_addShippingAddress()
-		throws Exception {
-
-		return _toShippingAddress(_commerceShipment.fetchCommerceAddress());
-	}
-
-	@Override
-	protected Long testGetShipmentShippingAddress_getShipmentId()
-		throws Exception {
-
-		return _commerceShipment.getCommerceShipmentId();
-	}
-
-	@Override
-	protected Long testGraphQLGetShipmentShippingAddress_getShipmentId()
-		throws Exception {
-
-		return _commerceShipment.getCommerceShipmentId();
-	}
-
-	@Override
-	protected ShippingAddress testGraphQLShippingAddress_addShippingAddress()
-		throws Exception {
-
-		return _toShippingAddress(_commerceShipment.fetchCommerceAddress());
-	}
-
 	private String _getRegionISOCode(CommerceAddress commerceAddress)
 		throws Exception {
 
@@ -300,9 +233,6 @@ public class ShippingAddressResourceTest
 
 	@DeleteAfterTestRun
 	private CommerceShipment _commerceShipment;
-
-	@DeleteAfterTestRun
-	private CommerceShipment _commerceShipmentWithExternalReferenceCode;
 
 	@DeleteAfterTestRun
 	private Country _country;

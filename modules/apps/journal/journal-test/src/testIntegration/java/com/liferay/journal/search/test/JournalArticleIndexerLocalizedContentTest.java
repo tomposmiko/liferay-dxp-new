@@ -15,7 +15,6 @@
 package com.liferay.journal.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.search.JournalArticleBlueprint;
@@ -35,23 +34,21 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.IndexerFixture;
 import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -75,11 +72,10 @@ public class JournalArticleIndexerLocalizedContentTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_indexerFixture = new IndexerFixture<>(
-			JournalArticle.class, _searchRequestBuilderFactory);
+		_indexerFixture = new IndexerFixture<>(JournalArticle.class);
 
 		_journalArticleSearchFixture = new JournalArticleSearchFixture(
-			_ddmStructureLocalService, _journalArticleLocalService, _portal);
+			_journalArticleLocalService);
 
 		_journalArticleSearchFixture.setUp();
 
@@ -161,18 +157,17 @@ public class JournalArticleIndexerLocalizedContentTest {
 
 		String searchTerm = "nev";
 
-		SearchResponse searchResponse =
-			_indexerFixture.searchOnlyOneSearchResponse(
-				searchTerm, LocaleUtil.HUNGARY);
+		Document document = _indexerFixture.searchOnlyOne(
+			searchTerm, LocaleUtil.HUNGARY);
 
 		FieldValuesAssert.assertFieldValues(
-			titleStrings, name -> name.startsWith("title_"), searchResponse);
+			titleStrings, "title", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			contentStrings, name -> name.startsWith("content_"),
-			searchResponse);
+			contentStrings, "content", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			localizedTitleStrings, name -> name.startsWith("localized_title"),
-			searchResponse);
+			localizedTitleStrings, "localized_title", document, searchTerm);
 	}
 
 	@Test
@@ -200,10 +195,10 @@ public class JournalArticleIndexerLocalizedContentTest {
 			});
 
 		assertSearchOneDocumentOneField(
-			"alpha", LocaleUtil.HUNGARY, "content_", "content_en_US");
+			"alpha", LocaleUtil.HUNGARY, "content", "content_en_US");
 
 		assertSearchOneDocumentOneField(
-			"gamma", LocaleUtil.HUNGARY, "title_", "title_en_US");
+			"gamma", LocaleUtil.HUNGARY, "title", "title_en_US");
 	}
 
 	@Test
@@ -260,20 +255,20 @@ public class JournalArticleIndexerLocalizedContentTest {
 
 		String searchTerm = articleId;
 
-		SearchResponse searchResponse =
-			_indexerFixture.searchOnlyOneSearchResponse(
-				searchTerm, LocaleUtil.BRAZIL);
+		Document document = _indexerFixture.searchOnlyOne(
+			searchTerm, LocaleUtil.BRAZIL);
 
 		FieldValuesAssert.assertFieldValues(
-			titleStrings, name -> name.startsWith("title"), searchResponse);
+			titleStrings, "title", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			contentStrings, name -> name.startsWith("content"), searchResponse);
+			contentStrings, "content", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			localizedTitleStrings, name -> name.startsWith("localized_title"),
-			searchResponse);
+			localizedTitleStrings, "localized_title", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			ddmContentStrings, name -> name.startsWith("ddm__text"),
-			searchResponse);
+			ddmContentStrings, "ddm__text", document, searchTerm);
 	}
 
 	@Test
@@ -328,21 +323,29 @@ public class JournalArticleIndexerLocalizedContentTest {
 
 		localizedTitleStrings.put("localized_title", title);
 
-		for (String searchTerm : Arrays.asList("新規", "作成", "新", "作")) {
-			SearchResponse searchResponse =
-				_indexerFixture.searchOnlyOneSearchResponse(
+		String word1 = "新規";
+		String word2 = "作成";
+		String prefix1 = "新";
+		String prefix2 = "作";
+
+		Stream.of(
+			word1, word2, prefix1, prefix2
+		).forEach(
+			searchTerm -> {
+				Document document = _indexerFixture.searchOnlyOne(
 					searchTerm, LocaleUtil.JAPAN);
 
-			FieldValuesAssert.assertFieldValues(
-				titleStrings, name -> name.startsWith("title_"),
-				searchResponse);
-			FieldValuesAssert.assertFieldValues(
-				contentStrings, name -> name.startsWith("content_"),
-				searchResponse);
-			FieldValuesAssert.assertFieldValues(
-				localizedTitleStrings,
-				name -> name.startsWith("localized_title"), searchResponse);
-		}
+				FieldValuesAssert.assertFieldValues(
+					titleStrings, "title", document, searchTerm);
+
+				FieldValuesAssert.assertFieldValues(
+					contentStrings, "content", document, searchTerm);
+
+				FieldValuesAssert.assertFieldValues(
+					localizedTitleStrings, "localized_title", document,
+					searchTerm);
+			}
+		);
 	}
 
 	@Test
@@ -351,9 +354,13 @@ public class JournalArticleIndexerLocalizedContentTest {
 			"title_ja_JP",
 			() -> {
 				String full = "新規作成";
+				String partial1 = "新大阪";
+				String partial2 = "作戦大成功";
 
-				for (String title : Arrays.asList(full, "新大阪", "作戦大成功")) {
-					_journalArticleSearchFixture.addArticle(
+				Stream.of(
+					full, partial1, partial2
+				).forEach(
+					title -> _journalArticleSearchFixture.addArticle(
 						new JournalArticleBlueprint() {
 							{
 								setGroupId(_group.getGroupId());
@@ -375,19 +382,27 @@ public class JournalArticleIndexerLocalizedContentTest {
 										}
 									});
 							}
-						});
-				}
+						})
+				);
 
 				return full;
 			}
 		).build();
 
-		for (String searchTerm : Arrays.asList("新規", "作成")) {
-			FieldValuesAssert.assertFieldValues(
-				titleStrings, "title_",
-				_indexerFixture.searchOnlyOne(searchTerm, LocaleUtil.JAPAN),
-				searchTerm);
-		}
+		String word1 = "新規";
+		String word2 = "作成";
+
+		Stream.of(
+			word1, word2
+		).forEach(
+			searchTerm -> {
+				Document document = _indexerFixture.searchOnlyOne(
+					searchTerm, LocaleUtil.JAPAN);
+
+				FieldValuesAssert.assertFieldValues(
+					titleStrings, "title", document, searchTerm);
+			}
+		);
 	}
 
 	@Rule
@@ -405,27 +420,22 @@ public class JournalArticleIndexerLocalizedContentTest {
 	}
 
 	private Map<String, String> _withSortableValues(Map<String, String> map) {
-		Map<String, String> values = new HashMap<>();
+		Set<Map.Entry<String, String>> entrySet = map.entrySet();
 
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			values.put(
-				entry.getKey() + "_sortable",
-				StringUtil.toLowerCase(entry.getValue()));
-		}
+		Stream<Map.Entry<String, String>> entries = entrySet.stream();
 
-		values.putAll(map);
+		Map<String, String> map2 = entries.collect(
+			Collectors.toMap(
+				entry -> entry.getKey() + "_sortable",
+				entry -> StringUtil.toLowerCase(entry.getValue())));
 
-		return values;
+		map2.putAll(map);
+
+		return map2;
 	}
 
 	@Inject
-	private static DDMStructureLocalService _ddmStructureLocalService;
-
-	@Inject
 	private static JournalArticleLocalService _journalArticleLocalService;
-
-	@Inject
-	private static Portal _portal;
 
 	@DeleteAfterTestRun
 	private Group _group;
@@ -436,8 +446,5 @@ public class JournalArticleIndexerLocalizedContentTest {
 	private List<JournalArticle> _journalArticles;
 
 	private JournalArticleSearchFixture _journalArticleSearchFixture;
-
-	@Inject
-	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 }

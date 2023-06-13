@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Shuyang Zhou
  */
 @Component(
+	immediate = true,
 	property = {
 		"login.web.navigation.position=pre", "service.ranking:Integer=200"
 	},
@@ -80,7 +81,6 @@ public class AnonymousNavigationPrePageInclude implements PageInclude {
 
 		IconTag iconTag = new IconTag();
 
-		iconTag.setCssClass("text-4");
 		iconTag.setMessage("guest");
 		iconTag.setUrl(anonymousURL);
 

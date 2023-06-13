@@ -51,9 +51,11 @@ public class DLFileEntryMetadataLocalServiceImpl
 
 		// Dynamic data mapping structure link
 
+		long classNameId = _classNameLocalService.getClassNameId(
+			DLFileEntryMetadata.class);
+
 		DDMStructureLinkManagerUtil.deleteStructureLinks(
-			_classNameLocalService.getClassNameId(DLFileEntryMetadata.class),
-			fileEntryMetadata.getFileEntryMetadataId());
+			classNameId, fileEntryMetadata.getFileEntryMetadataId());
 	}
 
 	@Override
@@ -197,10 +199,12 @@ public class DLFileEntryMetadataLocalServiceImpl
 			fileEntryMetadata = dlFileEntryMetadataPersistence.create(
 				fileEntryMetadataId);
 
-			fileEntryMetadata.setDDMStorageId(
-				StorageEngineManagerUtil.create(
-					companyId, ddmStructure.getStructureId(), ddmFormValues,
-					serviceContext));
+			long ddmStorageId = StorageEngineManagerUtil.create(
+				companyId, ddmStructure.getStructureId(), ddmFormValues,
+				serviceContext);
+
+			fileEntryMetadata.setDDMStorageId(ddmStorageId);
+
 			fileEntryMetadata.setDDMStructureId(ddmStructure.getStructureId());
 			fileEntryMetadata.setFileEntryId(fileEntryId);
 			fileEntryMetadata.setFileVersionId(fileVersionId);
@@ -210,10 +214,11 @@ public class DLFileEntryMetadataLocalServiceImpl
 
 			// Dynamic data mapping structure link
 
+			long classNameId = _classNameLocalService.getClassNameId(
+				DLFileEntryMetadata.class);
+
 			DDMStructureLinkManagerUtil.addStructureLink(
-				_classNameLocalService.getClassNameId(
-					DLFileEntryMetadata.class),
-				fileEntryMetadata.getFileEntryMetadataId(),
+				classNameId, fileEntryMetadata.getFileEntryMetadataId(),
 				ddmStructure.getStructureId());
 		}
 	}

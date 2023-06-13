@@ -14,12 +14,11 @@
 
 package com.liferay.segments.experiment.web.internal.portlet.action;
 
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -53,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sarai Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS_EXPERIMENT,
 		"mvc.command.name=/segments_experiment/run_segments_experiment"
@@ -85,7 +85,7 @@ public class RunSegmentsExperimentMVCActionCommand
 
 			jsonObject = JSONUtil.put(
 				"error",
-				_language.get(
+				LanguageUtil.get(
 					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
 		}
 
@@ -98,6 +98,9 @@ public class RunSegmentsExperimentMVCActionCommand
 	private JSONObject _runSegmentsExperiment(ActionRequest actionRequest)
 		throws PortalException {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		long segmentsExperimentId = ParamUtil.getLong(
 			actionRequest, "segmentsExperimentId");
 
@@ -105,7 +108,7 @@ public class RunSegmentsExperimentMVCActionCommand
 			actionRequest, "segmentsExperimentRels");
 
 		JSONObject segmentsExperimentRelsJSONObject =
-			_jsonFactory.createJSONObject(segmentsExperimentRels);
+			JSONFactoryUtil.createJSONObject(segmentsExperimentRels);
 
 		Iterator<String> iterator = segmentsExperimentRelsJSONObject.keys();
 
@@ -131,16 +134,8 @@ public class RunSegmentsExperimentMVCActionCommand
 
 		return JSONUtil.put(
 			"segmentsExperiment",
-			() -> {
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)actionRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
-
-				return SegmentsExperimentUtil.toSegmentsExperimentJSONObject(
-					_analyticsSettingsManager.getAnalyticsConfiguration(
-						themeDisplay.getCompanyId()),
-					themeDisplay.getLocale(), segmentsExperiment);
-			}
+			SegmentsExperimentUtil.toSegmentsExperimentJSONObject(
+				themeDisplay.getLocale(), segmentsExperiment)
 		).put(
 			"segmentsExperimentRels", segmentsExperimentRelsJSONObject
 		);
@@ -148,15 +143,6 @@ public class RunSegmentsExperimentMVCActionCommand
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		RunSegmentsExperimentMVCActionCommand.class);
-
-	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

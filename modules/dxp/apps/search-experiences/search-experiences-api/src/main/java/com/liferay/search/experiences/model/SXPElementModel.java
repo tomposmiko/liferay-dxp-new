@@ -98,21 +98,6 @@ public interface SXPElementModel
 	public void setUuid(String uuid);
 
 	/**
-	 * Returns the external reference code of this sxp element.
-	 *
-	 * @return the external reference code of this sxp element
-	 */
-	@AutoEscape
-	public String getExternalReferenceCode();
-
-	/**
-	 * Sets the external reference code of this sxp element.
-	 *
-	 * @param externalReferenceCode the external reference code of this sxp element
-	 */
-	public void setExternalReferenceCode(String externalReferenceCode);
-
-	/**
 	 * Returns the sxp element ID of this sxp element.
 	 *
 	 * @return the sxp element ID of this sxp element
@@ -382,21 +367,6 @@ public interface SXPElementModel
 	public void setReadOnly(boolean readOnly);
 
 	/**
-	 * Returns the schema version of this sxp element.
-	 *
-	 * @return the schema version of this sxp element
-	 */
-	@AutoEscape
-	public String getSchemaVersion();
-
-	/**
-	 * Sets the schema version of this sxp element.
-	 *
-	 * @param schemaVersion the schema version of this sxp element
-	 */
-	public void setSchemaVersion(String schemaVersion);
-
-	/**
 	 * Returns the title of this sxp element.
 	 *
 	 * @return the title of this sxp element
@@ -510,21 +480,6 @@ public interface SXPElementModel
 	public void setType(int type);
 
 	/**
-	 * Returns the version of this sxp element.
-	 *
-	 * @return the version of this sxp element
-	 */
-	@AutoEscape
-	public String getVersion();
-
-	/**
-	 * Sets the version of this sxp element.
-	 *
-	 * @param version the version of this sxp element
-	 */
-	public void setVersion(String version);
-
-	/**
 	 * Returns the status of this sxp element.
 	 *
 	 * @return the status of this sxp element
@@ -553,9 +508,5 @@ public interface SXPElementModel
 
 	@Override
 	public SXPElement cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

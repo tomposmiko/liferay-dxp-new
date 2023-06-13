@@ -32,7 +32,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 <liferay-ui:membership-policy-error />
 
 <clay:content-row
-	containerElement="div"
+	containerElement="h3"
 	cssClass="sheet-subtitle"
 >
 	<clay:content-col
@@ -43,29 +43,27 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 	<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
 		<clay:content-col>
-			<clay:button
-				aria-label='<%= LanguageUtil.format(request, "select-x", "sites") %>'
-				cssClass="heading-end modify-link"
-				displayType="secondary"
-				id='<%= liferayPortletResponse.getNamespace() + "selectSiteLink" %>'
-				label='<%= LanguageUtil.get(request, "select") %>'
-				small="<%= true %>"
-			/>
+			<span class="heading-end">
+				<liferay-ui:icon
+					cssClass="modify-link"
+					id="selectSiteLink"
+					label="<%= true %>"
+					linkCssClass="btn btn-secondary btn-sm"
+					message="select"
+					url="javascript:;"
+				/>
+			</span>
 		</clay:content-col>
 	</c:if>
 </clay:content-row>
 
 <liferay-util:buffer
-	var="removeButtonSites"
+	var="removeGroupIcon"
 >
-	<clay:button
-		aria-label="TOKEN_ARIA_LABEL"
-		cssClass="lfr-portal-tooltip modify-link"
-		data-rowId="TOKEN_DATA_ROW_ID"
-		displayType="unstyled"
+	<liferay-ui:icon
 		icon="times-circle"
-		small="<%= true %>"
-		title="TOKEN_TITLE"
+		markupView="lexicon"
+		message="remove"
 	/>
 </liferay-util:buffer>
 
@@ -82,8 +80,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 	total="<%= siteGroups.size() %>"
 >
 	<liferay-ui:search-container-results
-		calculateStartAndEnd="<%= true %>"
-		results="<%= siteGroups %>"
+		results="<%= siteGroups.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
 	/>
 
 	<liferay-ui:search-container-row
@@ -121,17 +118,8 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 		<c:if test="<%= !portletName.equals(myAccountPortletId) && (selUser != null) && !SiteMembershipPolicyUtil.isMembershipRequired(selUser.getUserId(), group.getGroupId()) && !SiteMembershipPolicyUtil.isMembershipProtected(permissionChecker, selUser.getUserId(), group.getGroupId()) %>">
 			<liferay-ui:search-container-column-text>
 				<c:if test="<%= group.isManualMembership() %>">
-					<clay:button
-						aria-label='<%= LanguageUtil.format(request, "remove-x", HtmlUtil.escape(group.getDescriptiveName(locale))) %>'
-						cssClass="lfr-portal-tooltip modify-link"
-						data-rowId="<%= group.getGroupId() %>"
-						displayType="unstyled"
-						icon="times-circle"
-						small="<%= true %>"
-						title='<%= LanguageUtil.format(request, "remove-x", HtmlUtil.escape(group.getDescriptiveName(locale))) %>'
-					/>
-				</c:if
-			>
+					<a class="modify-link" data-rowId="<%= group.getGroupId() %>" href="javascript:;"><%= removeGroupIcon %></a>
+				</c:if>
 			</liferay-ui:search-container-column-text>
 		</c:if>
 	</liferay-ui:search-container-row>
@@ -171,24 +159,16 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 					onSelect: (selectedItem) => {
 						if (selectedItem) {
 							const entityId = selectedItem.entityid;
-							const entityName = A.Escape.html(selectedItem.entityname);
-							const label = Liferay.Util.sub(
-								'<liferay-ui:message key="remove-x" />',
-								entityName
-							);
+
 							const rowColumns = [];
 
-							let removeButton =
-								'<%= UnicodeFormatter.toString(removeButtonSites) %>';
-
-							removeButton = removeButton
-								.replace('TOKEN_ARIA_LABEL', label)
-								.replace('TOKEN_DATA_ROW_ID', entityId)
-								.replace('TOKEN_TITLE', label);
-
-							rowColumns.push(entityName);
+							rowColumns.push(selectedItem.entityname);
 							rowColumns.push('');
-							rowColumns.push(removeButton);
+							rowColumns.push(
+								'<a class="modify-link" data-rowId="' +
+									entityId +
+									'" href="javascript:;"><%= UnicodeFormatter.toString(removeGroupIcon) %></a>'
+							);
 
 							searchContainer.addRow(rowColumns, entityId);
 
@@ -310,8 +290,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 		total="<%= inheritedSiteGroups.size() %>"
 	>
 		<liferay-ui:search-container-results
-			calculateStartAndEnd="<%= true %>"
-			results="<%= inheritedSiteGroups %>"
+			results="<%= inheritedSiteGroups.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
 		/>
 
 		<liferay-ui:search-container-row

@@ -42,11 +42,12 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import java.io.InputStream;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -103,7 +104,7 @@ public class AMImageRequestHandlerTest {
 			_fileVersion, amImageConfigurationEntry);
 
 		Mockito.when(
-			_amImageFinder.getAdaptiveMedias(Mockito.any(Function.class))
+			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenThrow(
 			AMException.class
 		);
@@ -121,7 +122,7 @@ public class AMImageRequestHandlerTest {
 			_fileVersion, getConfigurationEntryFilter);
 
 		Mockito.when(
-			_amImageFinder.getAdaptiveMedias(Mockito.any(Function.class))
+			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenThrow(
 			PortalException.class
 		);
@@ -134,16 +135,16 @@ public class AMImageRequestHandlerTest {
 		Mockito.when(
 			_pathInterpreter.interpretPath(Mockito.anyString())
 		).thenReturn(
-			null
+			Optional.empty()
 		);
 
 		HttpServletRequest httpServletRequest = Mockito.mock(
 			HttpServletRequest.class);
 
-		AdaptiveMedia<AMImageProcessor> adaptiveMedia =
+		Optional<AdaptiveMedia<AMImageProcessor>> adaptiveMediaOptional =
 			_amImageRequestHandler.handleRequest(httpServletRequest);
 
-		Assert.assertNull(adaptiveMedia);
+		Assert.assertFalse(adaptiveMediaOptional.isPresent());
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -162,10 +163,10 @@ public class AMImageRequestHandlerTest {
 		HttpServletRequest httpServletRequest = Mockito.mock(
 			HttpServletRequest.class);
 
-		AdaptiveMedia<AMImageProcessor> adaptiveMedia =
+		Optional<AdaptiveMedia<AMImageProcessor>> adaptiveMediaOptional =
 			_amImageRequestHandler.handleRequest(httpServletRequest);
 
-		Assert.assertNull(adaptiveMedia);
+		Assert.assertFalse(adaptiveMediaOptional.isPresent());
 	}
 
 	@Test
@@ -210,7 +211,7 @@ public class AMImageRequestHandlerTest {
 			_fileVersion, getConfigurationEntryFilter);
 
 		Assert.assertEquals(
-			closestAdaptiveMedia,
+			Optional.of(closestAdaptiveMedia),
 			_amImageRequestHandler.handleRequest(httpServletRequest));
 
 		Mockito.verify(
@@ -237,7 +238,7 @@ public class AMImageRequestHandlerTest {
 			_fileVersion, amImageConfigurationEntry);
 
 		Assert.assertEquals(
-			adaptiveMedia,
+			Optional.of(adaptiveMedia),
 			_amImageRequestHandler.handleRequest(httpServletRequest));
 
 		Mockito.verify(
@@ -259,28 +260,38 @@ public class AMImageRequestHandlerTest {
 			_fileVersion, amImageConfigurationEntry);
 
 		Mockito.when(
-			_amImageFinder.getAdaptiveMedias(Mockito.any(Function.class))
+			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenAnswer(
-			invocation -> Collections.emptyList()
+			invocation -> Stream.empty()
 		);
 
-		AdaptiveMedia<AMImageProcessor> adaptiveMedia =
+		Optional<AdaptiveMedia<AMImageProcessor>> adaptiveMediaOptional =
 			_amImageRequestHandler.handleRequest(httpServletRequest);
 
-		Assert.assertNotNull(adaptiveMedia);
+		Assert.assertTrue(adaptiveMediaOptional.isPresent());
+
+		AdaptiveMedia<AMImageProcessor> adaptiveMedia =
+			adaptiveMediaOptional.get();
+
 		Assert.assertEquals(
 			_fileVersion.getContentStream(false),
 			adaptiveMedia.getInputStream());
+
 		Assert.assertEquals(
-			_fileVersion.getFileName(),
-			adaptiveMedia.getValue(AMAttribute.getFileNameAMAttribute()));
+			Optional.of(_fileVersion.getFileName()),
+			adaptiveMedia.getValueOptional(
+				AMAttribute.getFileNameAMAttribute()));
+
 		Assert.assertEquals(
-			_fileVersion.getMimeType(),
-			adaptiveMedia.getValue(AMAttribute.getContentTypeAMAttribute()));
+			Optional.of(_fileVersion.getMimeType()),
+			adaptiveMedia.getValueOptional(
+				AMAttribute.getContentTypeAMAttribute()));
+
+		Optional<Long> contentLengthOptional = adaptiveMedia.getValueOptional(
+			AMAttribute.getContentLengthAMAttribute());
+
 		Assert.assertEquals(
-			_fileVersion.getSize(),
-			(long)adaptiveMedia.<Long>getValue(
-				AMAttribute.getContentLengthAMAttribute()));
+			_fileVersion.getSize(), (long)contentLengthOptional.get());
 
 		Mockito.verify(
 			_amAsyncProcessor
@@ -369,7 +380,7 @@ public class AMImageRequestHandlerTest {
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				companyId, amImageConfigurationEntryImpl.getUUID())
 		).thenReturn(
-			amImageConfigurationEntryImpl
+			Optional.of(amImageConfigurationEntryImpl)
 		);
 
 		return amImageConfigurationEntryImpl;
@@ -391,11 +402,13 @@ public class AMImageRequestHandlerTest {
 		Mockito.when(
 			_pathInterpreter.interpretPath(httpServletRequest.getPathInfo())
 		).thenReturn(
-			Tuple.of(
-				fileVersion,
-				HashMapBuilder.put(
-					"configuration-uuid", amImageConfigurationEntry.getUUID()
-				).build())
+			Optional.of(
+				Tuple.of(
+					fileVersion,
+					HashMapBuilder.put(
+						"configuration-uuid",
+						amImageConfigurationEntry.getUUID()
+					).build()))
 		);
 
 		return httpServletRequest;
@@ -444,11 +457,11 @@ public class AMImageRequestHandlerTest {
 		throws Exception {
 
 		Mockito.when(
-			_amImageFinder.getAdaptiveMedias(Mockito.any(Function.class))
+			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenAnswer(
 			invocation -> {
 				Function<AMImageQueryBuilder, AMQuery<?, ?>>
-					amImageQueryBuilderFunction = invocation.getArgument(
+					amImageQueryBuilderFunction = invocation.getArgumentAt(
 						0, Function.class);
 
 				AMImageQueryBuilderImpl amImageQueryBuilderImpl =
@@ -482,10 +495,10 @@ public class AMImageRequestHandlerTest {
 					queryBuilderWidth.equals(configurationWidth) &&
 					queryBuilderHeight.equals(configurationHeight)) {
 
-					return adaptiveMedias;
+					return adaptiveMedias.stream();
 				}
 
-				return Collections.emptyList();
+				return Stream.empty();
 			}
 		);
 	}
@@ -497,11 +510,11 @@ public class AMImageRequestHandlerTest {
 		throws Exception {
 
 		Mockito.when(
-			_amImageFinder.getAdaptiveMedias(Mockito.any(Function.class))
+			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenAnswer(
 			invocation -> {
 				Function<AMImageQueryBuilder, AMQuery<?, ?>>
-					amImageQueryBuilderFunction = invocation.getArgument(
+					amImageQueryBuilderFunction = invocation.getArgumentAt(
 						0, Function.class);
 
 				AMImageQueryBuilderImpl amImageQueryBuilderImpl =
@@ -511,7 +524,7 @@ public class AMImageRequestHandlerTest {
 					amImageQueryBuilderImpl);
 
 				if (!AMImageQueryBuilderImpl.AM_QUERY.equals(amQuery)) {
-					return Collections.emptyList();
+					return Stream.empty();
 				}
 
 				if (fileVersion.equals(
@@ -525,11 +538,11 @@ public class AMImageRequestHandlerTest {
 					if (amImageConfigurationEntryFilter.test(
 							amImageConfigurationEntry)) {
 
-						return Arrays.asList(adaptiveMedia);
+						return Stream.of(adaptiveMedia);
 					}
 				}
 
-				return Collections.emptyList();
+				return Stream.empty();
 			}
 		);
 	}

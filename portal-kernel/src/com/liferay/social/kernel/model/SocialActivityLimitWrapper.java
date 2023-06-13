@@ -429,11 +429,6 @@ public class SocialActivityLimitWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<SocialActivityLimit, Object>>
 		getAttributeGetterFunctions() {
 

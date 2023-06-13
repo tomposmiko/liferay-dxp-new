@@ -14,9 +14,6 @@
 
 package com.liferay.portal.workflow.kaleo.definition.internal.export.builder;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -37,16 +34,13 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTransitionLocalService;
 
 import java.util.List;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
  */
-@Component(service = DefinitionBuilder.class)
+@Component(immediate = true, service = DefinitionBuilder.class)
 public class DefaultDefinitionBuilder implements DefinitionBuilder {
 
 	@Override
@@ -56,7 +50,7 @@ public class DefaultDefinitionBuilder implements DefinitionBuilder {
 		KaleoDefinition kaleoDefinition =
 			_kaleoDefinitionLocalService.getKaleoDefinition(kaleoDefinitionId);
 
-		return _buildDefinition(
+		return doBuildDefinition(
 			_kaleoDefinitionVersionLocalService.getKaleoDefinitionVersion(
 				kaleoDefinition.getCompanyId(), kaleoDefinition.getName(),
 				StringBundler.concat(
@@ -67,29 +61,13 @@ public class DefaultDefinitionBuilder implements DefinitionBuilder {
 	public Definition buildDefinition(long companyId, String name, int version)
 		throws PortalException {
 
-		return _buildDefinition(
+		return doBuildDefinition(
 			_kaleoDefinitionVersionLocalService.getKaleoDefinitionVersion(
 				companyId, name,
 				StringBundler.concat(version, CharPool.PERIOD, 0)));
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext,
-			(Class<NodeBuilder<Node>>)(Class<?>)NodeBuilder.class, null,
-			ServiceReferenceMapperFactory.create(
-				bundleContext,
-				(nodeBuilder, emitter) -> emitter.emit(
-					String.valueOf(nodeBuilder.getNodeType()))));
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
-	}
-
-	private Definition _buildDefinition(
+	protected Definition doBuildDefinition(
 			KaleoDefinitionVersion kaleoDefinitionVersion)
 		throws PortalException {
 
@@ -104,7 +82,7 @@ public class DefaultDefinitionBuilder implements DefinitionBuilder {
 				kaleoDefinitionVersion.getKaleoDefinitionVersionId());
 
 		for (KaleoNode kaleoNode : kaleoNodes) {
-			NodeBuilder<Node> nodeBuilder = _serviceTrackerMap.getService(
+			NodeBuilder nodeBuilder = _nodeBuilderRegistry.getNodeBuilder(
 				kaleoNode.getType());
 
 			Node node = nodeBuilder.buildNode(kaleoNode);
@@ -127,9 +105,8 @@ public class DefaultDefinitionBuilder implements DefinitionBuilder {
 			Node targetNode = definition.getNode(targetNodeName);
 
 			Transition transition = new Transition(
-				kaleoTransition.isDefaultTransition(),
-				kaleoTransition.getLabelMap(), kaleoTransition.getName(),
-				sourceNode, targetNode);
+				kaleoTransition.getName(), sourceNode, targetNode,
+				kaleoTransition.isDefaultTransition());
 
 			sourceNode.addOutgoingTransition(transition);
 
@@ -158,6 +135,7 @@ public class DefaultDefinitionBuilder implements DefinitionBuilder {
 	@Reference
 	private KaleoTransitionLocalService _kaleoTransitionLocalService;
 
-	private ServiceTrackerMap<String, NodeBuilder<Node>> _serviceTrackerMap;
+	@Reference
+	private NodeBuilderRegistry _nodeBuilderRegistry;
 
 }

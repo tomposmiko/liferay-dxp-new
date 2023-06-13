@@ -20,10 +20,9 @@ import com.liferay.fragment.web.internal.security.permission.resource.FragmentPe
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -66,19 +65,9 @@ public class ContributedFragmentCompositionActionDropdownItemsProvider {
 	private UnsafeConsumer<DropdownItem, Exception>
 		_getCopyToFragmentCompositionActionUnsafeConsumer() {
 
-		LiferayPortletURL addFragmentCollectionURL =
-			(LiferayPortletURL)_renderResponse.createResourceURL();
-
-		addFragmentCollectionURL.setCopyCurrentRenderParameters(false);
-		addFragmentCollectionURL.setResourceID(
-			"/fragment/add_fragment_collection");
-
 		return dropdownItem -> {
 			dropdownItem.putData(
 				"action", "copyContributedEntryToFragmentCollection");
-			dropdownItem.putData(
-				"addFragmentCollectionURL",
-				addFragmentCollectionURL.toString());
 			dropdownItem.putData(
 				"contributedEntryKey",
 				_fragmentComposition.getFragmentCompositionKey());
@@ -87,7 +76,7 @@ public class ContributedFragmentCompositionActionDropdownItemsProvider {
 				PortletURLBuilder.createActionURL(
 					_renderResponse
 				).setActionName(
-					"/fragment/copy_fragment_entry"
+					"/fragment/copy_contributed_entry"
 				).setRedirect(
 					_themeDisplay.getURLCurrent()
 				).buildString());

@@ -15,10 +15,10 @@
 package com.liferay.dynamic.data.mapping.form.web.internal.portlet;
 
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.BasePortletProvider;
 import com.liferay.portal.kernel.portlet.BrowsePortletProvider;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletURL;
@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"model.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstance",
 		"service.ranking:Integer=" + (Integer.MAX_VALUE - 1000)
@@ -58,8 +59,10 @@ public class DDMFormBrowsePortletProvider
 	}
 
 	@Reference(
-		target = "(javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_BROWSER + ")"
+		target = "(javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_BROWSER + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	protected void setPortlet(Portlet portlet) {
+	}
 
 }

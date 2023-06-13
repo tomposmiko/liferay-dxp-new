@@ -107,7 +107,7 @@ public class OAuth2Manager {
 		try {
 			DLGoogleDriveCompanyConfiguration
 				dlGoogleDriveCompanyConfiguration =
-					_getDLGoogleDriveCompanyConfiguration(companyId);
+					_getDlGoogleDriveCompanyConfiguration(companyId);
 
 			if (Validator.isNotNull(
 					dlGoogleDriveCompanyConfiguration.clientId()) &&
@@ -121,7 +121,7 @@ public class OAuth2Manager {
 		}
 		catch (ConfigurationException configurationException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(configurationException);
+				_log.debug(configurationException, configurationException);
 			}
 
 			return false;
@@ -197,7 +197,7 @@ public class OAuth2Manager {
 	}
 
 	private DLGoogleDriveCompanyConfiguration
-			_getDLGoogleDriveCompanyConfiguration(long companyId)
+			_getDlGoogleDriveCompanyConfiguration(long companyId)
 		throws ConfigurationException {
 
 		return _configurationProvider.getCompanyConfiguration(
@@ -215,7 +215,7 @@ public class OAuth2Manager {
 		try {
 			DLGoogleDriveCompanyConfiguration
 				dlGoogleDriveCompanyConfiguration =
-					_getDLGoogleDriveCompanyConfiguration(companyId);
+					_getDlGoogleDriveCompanyConfiguration(companyId);
 
 			if (_googleAuthorizationCodeFlows.containsKey(companyId)) {
 				GoogleAuthorizationCodeFlow googleAuthorizationCodeFlow =

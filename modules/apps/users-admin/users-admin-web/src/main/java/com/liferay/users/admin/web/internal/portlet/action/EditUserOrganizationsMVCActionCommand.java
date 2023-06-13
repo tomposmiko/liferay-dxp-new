@@ -14,10 +14,7 @@
 
 package com.liferay.users.admin.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.exception.ContactNameException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
-import com.liferay.portal.kernel.exception.UserEmailAddressException;
-import com.liferay.portal.kernel.exception.UserScreenNameException;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -32,6 +29,7 @@ import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 import com.liferay.users.admin.kernel.util.UsersAdmin;
+import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.Calendar;
 
@@ -45,10 +43,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ACCOUNT,
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
-		"javax.portlet.name=" + UsersAdminPortletKeys.SERVICE_ACCOUNTS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/users_admin/edit_user_organizations"
 	},
@@ -71,7 +69,7 @@ public class EditUserOrganizationsMVCActionCommand
 
 			birthdayCal.setTime(user.getBirthday());
 
-			long[] organizationIds = _usersAdmin.getOrganizationIds(
+			long[] organizationIds = UsersAdminUtil.getOrganizationIds(
 				actionRequest);
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
@@ -86,22 +84,18 @@ public class EditUserOrganizationsMVCActionCommand
 				user.getEmailAddress(), user.getLanguageId(),
 				user.getTimeZoneId(), user.getGreeting(), user.getComments(),
 				user.getFirstName(), user.getMiddleName(), user.getLastName(),
-				contact.getPrefixListTypeId(), contact.getSuffixListTypeId(),
-				user.isMale(), birthdayCal.get(Calendar.MONTH),
-				birthdayCal.get(Calendar.DATE), birthdayCal.get(Calendar.YEAR),
-				contact.getSmsSn(), contact.getFacebookSn(),
-				contact.getJabberSn(), contact.getSkypeSn(),
-				contact.getTwitterSn(), user.getJobTitle(), user.getGroupIds(),
-				organizationIds, user.getRoleIds(),
-				_usersAdmin.getUserGroupRoles(actionRequest),
+				contact.getPrefixId(), contact.getSuffixId(), user.isMale(),
+				birthdayCal.get(Calendar.MONTH), birthdayCal.get(Calendar.DATE),
+				birthdayCal.get(Calendar.YEAR), contact.getSmsSn(),
+				contact.getFacebookSn(), contact.getJabberSn(),
+				contact.getSkypeSn(), contact.getTwitterSn(),
+				user.getJobTitle(), user.getGroupIds(), organizationIds,
+				user.getRoleIds(), _usersAdmin.getUserGroupRoles(actionRequest),
 				user.getUserGroupIds(), serviceContext);
 		}
 		catch (Exception exception) {
-			if (exception instanceof ContactNameException ||
-				exception instanceof NoSuchUserException ||
-				exception instanceof PrincipalException ||
-				exception instanceof UserEmailAddressException ||
-				exception instanceof UserScreenNameException) {
+			if (exception instanceof NoSuchUserException ||
+				exception instanceof PrincipalException) {
 
 				SessionErrors.add(actionRequest, exception.getClass());
 

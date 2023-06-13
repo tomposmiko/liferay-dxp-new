@@ -21,13 +21,12 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.JavaImportsFormatter;
 import com.liferay.portal.tools.ToolsUtil;
-import com.liferay.source.formatter.check.util.JavaSourceUtil;
-import com.liferay.source.formatter.check.util.SourceUtil;
+import com.liferay.source.formatter.checks.util.JavaSourceUtil;
+import com.liferay.source.formatter.checks.util.SourceUtil;
 
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -41,13 +40,6 @@ public class JavaClassParser {
 	public static List<JavaClass> parseAnonymousClasses(String content)
 		throws IOException, ParseException {
 
-		return parseAnonymousClasses(content, null, Collections.emptyList());
-	}
-
-	public static List<JavaClass> parseAnonymousClasses(
-			String content, String packageName, List<String> importNames)
-		throws IOException, ParseException {
-
 		List<JavaClass> anonymousClasses = new ArrayList<>();
 
 		Matcher matcher = _anonymousClassPattern.matcher(content);
@@ -57,15 +49,16 @@ public class JavaClassParser {
 				content, matcher.start() + 1,
 				StringUtil.equals(matcher.group(1), "<"));
 
-			if (anonymousClassContent != null) {
-				anonymousClasses.add(
-					_parseJavaClass(
-						StringPool.BLANK, packageName, importNames,
-						anonymousClassContent,
-						SourceUtil.getLineNumber(content, matcher.start()),
-						JavaTerm.ACCESS_MODIFIER_PRIVATE, false, false, false,
-						false, false, true));
+			if (anonymousClassContent == null) {
+				continue;
 			}
+
+			anonymousClasses.add(
+				_parseJavaClass(
+					StringPool.BLANK, anonymousClassContent,
+					SourceUtil.getLineNumber(content, matcher.start()),
+					JavaTerm.ACCESS_MODIFIER_PRIVATE, false, false, false,
+					false, false, true));
 		}
 
 		return anonymousClasses;
@@ -135,22 +128,22 @@ public class JavaClassParser {
 			}
 		}
 
-		List<String> importNames = new ArrayList<>();
+		JavaClass javaClass = _parseJavaClass(
+			className, classContent, lineNumber,
+			JavaTerm.ACCESS_MODIFIER_PUBLIC, isAbstract, isFinal, false, isEnum,
+			isInterface, false);
+
+		javaClass.setPackageName(JavaSourceUtil.getPackageName(content));
 
 		String[] importLines = StringUtil.splitLines(
 			JavaImportsFormatter.getImports(content));
 
 		for (String importLine : importLines) {
 			if (Validator.isNotNull(importLine)) {
-				importNames.add(
+				javaClass.addImport(
 					importLine.substring(7, importLine.length() - 1));
 			}
 		}
-
-		JavaClass javaClass = _parseJavaClass(
-			className, JavaSourceUtil.getPackageName(content), importNames,
-			classContent, lineNumber, JavaTerm.ACCESS_MODIFIER_PUBLIC,
-			isAbstract, isFinal, false, isEnum, isInterface, false);
 
 		return _parseExtendsImplements(
 			javaClass, StringUtil.trim(matcher.group(5)));
@@ -266,17 +259,16 @@ public class JavaClassParser {
 	}
 
 	private static JavaTerm _getJavaTerm(
-			String packageName, List<String> importNames, String metadata,
-			String javaTermContent, int lineNumber)
+			String metadata, String javaTermContent, int lineNumber)
 		throws IOException, ParseException {
 
-		Matcher matcher1 = _javaTermStartLinePattern.matcher(javaTermContent);
+		Matcher matcher = _javaTermStartLinePattern.matcher(javaTermContent);
 
-		if (!matcher1.find()) {
+		if (!matcher.find()) {
 			return null;
 		}
 
-		String startLine = StringUtil.trim(matcher1.group());
+		String startLine = StringUtil.trim(matcher.group());
 
 		int x = startLine.indexOf(CharPool.OPEN_PARENTHESIS);
 
@@ -319,24 +311,10 @@ public class JavaClassParser {
 			SourceUtil.containsUnquoted(startLine, " enum ") ||
 			SourceUtil.containsUnquoted(startLine, " interface ")) {
 
-			JavaClass javaClass = _parseJavaClass(
-				_getClassName(startLine), packageName, importNames,
-				javaTermContent, lineNumber, accessModifier, isAbstract,
-				isFinal, isStatic, isEnum, isInterface, false);
-
-			Pattern pattern = Pattern.compile(
-				StringBundler.concat(
-					"\\s(class|enum|interface)\\s+", javaClass.getName(),
-					"([<|\\s][^\\{]*)\\{"));
-
-			Matcher matcher2 = pattern.matcher(javaTermContent);
-
-			if (matcher2.find()) {
-				javaClass = _parseExtendsImplements(
-					javaClass, matcher2.group(2));
-			}
-
-			return javaClass;
+			return _parseJavaClass(
+				_getClassName(startLine), javaTermContent, lineNumber,
+				accessModifier, isAbstract, isFinal, isStatic, isEnum,
+				isInterface, false);
 		}
 
 		if (((y > 0) && ((x == -1) || (x > y))) ||
@@ -473,8 +451,6 @@ public class JavaClassParser {
 			s = StringUtil.trim(s.substring(0, matcher.start()));
 		}
 
-		s = StringUtil.trim(s);
-
 		if (s.startsWith("extends")) {
 			javaClass.addExtendedClassNames(StringUtil.split(s.substring(7)));
 		}
@@ -483,16 +459,15 @@ public class JavaClassParser {
 	}
 
 	private static JavaClass _parseJavaClass(
-			String className, String packageName, List<String> importNames,
-			String classContent, int classLineNumber, String accessModifier,
-			boolean isAbstract, boolean isFinal, boolean isStatic,
-			boolean isEnum, boolean isInterface, boolean anonymous)
+			String className, String classContent, int classLineNumber,
+			String accessModifier, boolean isAbstract, boolean isFinal,
+			boolean isStatic, boolean isEnum, boolean isInterface,
+			boolean anonymous)
 		throws IOException, ParseException {
 
 		JavaClass javaClass = new JavaClass(
-			className, packageName, importNames, classContent, accessModifier,
-			classLineNumber, isAbstract, isFinal, isStatic, isInterface,
-			anonymous);
+			className, classContent, accessModifier, classLineNumber,
+			isAbstract, isFinal, isStatic, isInterface, anonymous);
 
 		int lineNumber = 0;
 
@@ -597,7 +572,7 @@ public class JavaClassParser {
 				String javaTermContent = classContent.substring(y, z);
 
 				JavaTerm javaTerm = _getJavaTerm(
-					packageName, importNames, metadata, javaTermContent,
+					metadata, javaTermContent,
 					classLineNumber + javaTermLineNumber - 1);
 
 				if (javaTerm == null) {

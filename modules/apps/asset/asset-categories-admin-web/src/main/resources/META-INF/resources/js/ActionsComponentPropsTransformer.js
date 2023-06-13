@@ -12,14 +12,7 @@
  * details.
  */
 
-import {
-	fetch,
-	navigate,
-	objectToFormData,
-	openSelectionModal,
-} from 'frontend-js-web';
-
-import openDeleteVocabularyModal from './openDeleteVocabularyModal';
+import {openSelectionModal} from 'frontend-js-web';
 
 const ACTIONS = {
 	deleteVocabularies({
@@ -27,24 +20,31 @@ const ACTIONS = {
 		portletNamespace,
 		viewVocabulariesURL,
 	}) {
+		const vocabulariesForm = document.createElement('form');
+
+		vocabulariesForm.setAttribute('method', 'post');
+
 		openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('delete'),
 			multiple: true,
 			onSelect: (selectedItems) => {
 				if (selectedItems.length) {
-					openDeleteVocabularyModal({
-						multiple: true,
-						onDelete: () => {
-							fetch(deleteVocabulariesURL, {
-								body: objectToFormData({
-									[`${portletNamespace}rowIds`]: selectedItems
-										.map((item) => item.value)
-										.join(','),
-								}),
-								method: 'POST',
-							}).then((response) => navigate(response.url));
-						},
-					});
+					if (
+						confirm(
+							Liferay.Language.get(
+								'are-you-sure-you-want-to-delete-the-selected-entries'
+							)
+						)
+					) {
+						const input = document.createElement('input');
+
+						input.name = `${portletNamespace}rowIds`;
+						input.value = selectedItems.map((item) => item.value);
+
+						vocabulariesForm.appendChild(input);
+
+						submitForm(vocabulariesForm, deleteVocabulariesURL);
+					}
 				}
 			},
 			title: Liferay.Language.get('delete-vocabulary'),

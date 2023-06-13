@@ -45,7 +45,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(enabled = false, service = ClusterMasterExecutor.class)
+@Component(
+	enabled = false, immediate = true, service = ClusterMasterExecutor.class
+)
 public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 
 	@Override
@@ -232,6 +234,13 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setClusterExecutorImpl(
+		ClusterExecutorImpl clusterExecutorImpl) {
+
+		_clusterExecutorImpl = clusterExecutorImpl;
+	}
+
 	protected void setClusterMasterTokenTransitionListeners(
 		Set<ClusterMasterTokenTransitionListener>
 			clusterMasterTokenTransitionListeners) {
@@ -246,10 +255,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 	private static volatile boolean _master;
 
 	private ClusterEventListener _clusterEventListener;
-
-	@Reference
 	private ClusterExecutorImpl _clusterExecutorImpl;
-
 	private final Set<ClusterMasterTokenTransitionListener>
 		_clusterMasterTokenTransitionListeners = new HashSet<>();
 	private boolean _enabled;

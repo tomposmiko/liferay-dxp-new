@@ -50,7 +50,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = FrequentPatternCommerceMLRecommendationManager.class)
+@Component(
+	enabled = false, immediate = true,
+	service = FrequentPatternCommerceMLRecommendationManager.class
+)
 public class FrequentPatternCommerceMLRecommendationManagerImpl
 	extends BaseCommerceMLRecommendationServiceImpl
 		<FrequentPatternCommerceMLRecommendation>

@@ -59,41 +59,40 @@ public class ExportTaskResourceImpl extends BaseExportTaskResourceImpl {
 	}
 
 	@Override
-	public ExportTask getExportTaskByExternalReferenceCode(
-			String externalReferenceCode)
-		throws Exception {
-
-		return _toExportTask(
-			_batchEngineExportTaskLocalService.
-				getBatchEngineExportTaskByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId()));
-	}
-
-	@Override
-	public Response getExportTaskByExternalReferenceCodeContent(
-			String externalReferenceCode)
-		throws Exception {
-
-		BatchEngineExportTask batchEngineExportTask =
-			_batchEngineExportTaskLocalService.
-				getBatchEngineExportTaskByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId());
-
-		return _getExportTaskContent(batchEngineExportTask);
-	}
-
-	@Override
 	public Response getExportTaskContent(Long exportTaskId) throws Exception {
-		return _getExportTaskContent(
+		BatchEngineExportTask batchEngineExportTask =
 			_batchEngineExportTaskLocalService.getBatchEngineExportTask(
-				exportTaskId));
+				exportTaskId);
+
+		BatchEngineTaskExecuteStatus batchEngineTaskExecuteStatus =
+			BatchEngineTaskExecuteStatus.valueOf(
+				batchEngineExportTask.getExecuteStatus());
+
+		if (batchEngineTaskExecuteStatus ==
+				BatchEngineTaskExecuteStatus.COMPLETED) {
+
+			StreamingOutput streamingOutput =
+				outputStream -> StreamUtil.transfer(
+					_batchEngineExportTaskLocalService.openContentInputStream(
+						exportTaskId),
+					outputStream);
+
+			return Response.ok(
+				streamingOutput
+			).header(
+				"content-disposition", "attachment; filename=export.zip"
+			).build();
+		}
+
+		return Response.status(
+			Response.Status.NOT_FOUND
+		).build();
 	}
 
 	@Override
 	public ExportTask postExportTask(
 			String className, String contentType, String callbackURL,
-			String externalReferenceCode, String fieldNames,
-			String taskItemDelegateName)
+			String fieldNames, String taskItemDelegateName)
 		throws Exception {
 
 		Class<?> clazz = _itemClassRegistry.getItemClass(className);
@@ -109,9 +108,8 @@ public class ExportTaskResourceImpl extends BaseExportTaskResourceImpl {
 
 		BatchEngineExportTask batchEngineExportTask =
 			_batchEngineExportTaskLocalService.addBatchEngineExportTask(
-				externalReferenceCode, contextCompany.getCompanyId(),
-				contextUser.getUserId(), callbackURL, className,
-				StringUtil.upperCase(contentType),
+				contextCompany.getCompanyId(), contextUser.getUserId(),
+				callbackURL, className, StringUtil.upperCase(contentType),
 				BatchEngineTaskExecuteStatus.INITIAL.name(),
 				_toList(fieldNames),
 				ParametersUtil.toParameters(contextUriInfo, _ignoredParameters),
@@ -122,35 +120,6 @@ public class ExportTaskResourceImpl extends BaseExportTaskResourceImpl {
 				batchEngineExportTask));
 
 		return _toExportTask(batchEngineExportTask);
-	}
-
-	private Response _getExportTaskContent(
-		BatchEngineExportTask batchEngineExportTask) {
-
-		BatchEngineTaskExecuteStatus batchEngineTaskExecuteStatus =
-			BatchEngineTaskExecuteStatus.valueOf(
-				batchEngineExportTask.getExecuteStatus());
-
-		if (batchEngineTaskExecuteStatus ==
-				BatchEngineTaskExecuteStatus.COMPLETED) {
-
-			StreamingOutput streamingOutput =
-				outputStream -> StreamUtil.transfer(
-					_batchEngineExportTaskLocalService.openContentInputStream(
-						batchEngineExportTask.getBatchEngineExportTaskId()),
-					outputStream);
-
-			return Response.ok(
-				streamingOutput
-			).header(
-				"content-disposition",
-				"attachment; filename=" + StringUtil.randomString() + ".zip"
-			).build();
-		}
-
-		return Response.status(
-			Response.Status.NOT_FOUND
-		).build();
 	}
 
 	private ExportTask _toExportTask(
@@ -164,8 +133,6 @@ public class ExportTaskResourceImpl extends BaseExportTaskResourceImpl {
 				errorMessage = batchEngineExportTask.getErrorMessage();
 				executeStatus = ExportTask.ExecuteStatus.create(
 					batchEngineExportTask.getExecuteStatus());
-				externalReferenceCode =
-					batchEngineExportTask.getExternalReferenceCode();
 				id = batchEngineExportTask.getBatchEngineExportTaskId();
 				processedItemsCount =
 					batchEngineExportTask.getProcessedItemsCount();

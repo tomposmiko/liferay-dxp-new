@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.account.internal.verify;
 
-import com.liferay.account.service.AccountGroupLocalService;
+import com.liferay.commerce.account.service.CommerceAccountGroupLocalService;
 import com.liferay.commerce.account.util.CommerceAccountRoleHelper;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.LoggingTimer;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.verify.VerifyProcess;
 
 import org.osgi.service.component.annotations.Component;
@@ -35,18 +35,29 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(property = "initial.deployment=true", service = VerifyProcess.class)
+@Component(
+	enabled = false, immediate = true,
+	property = "verify.process.name=com.liferay.commerce.account.service",
+	service = {CommerceAccountServiceVerifyProcess.class, VerifyProcess.class}
+)
 public class CommerceAccountServiceVerifyProcess extends VerifyProcess {
 
-	public void verifyAccountGroup() throws Exception {
+	@Override
+	protected void doVerify() throws Exception {
+		verifyAccountRoles();
+		verifyAccountGroup();
+	}
+
+	protected void verifyAccountGroup() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			_companyLocalService.forEachCompanyId(
-				companyId -> _accountGroupLocalService.checkGuestAccountGroup(
-					companyId));
+				companyId ->
+					_commerceAccountGroupLocalService.
+						checkGuestCommerceAccountGroup(companyId));
 		}
 	}
 
-	public void verifyAccountRoles() throws Exception {
+	protected void verifyAccountRoles() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			_companyLocalService.forEachCompanyId(
 				companyId -> {
@@ -54,18 +65,12 @@ public class CommerceAccountServiceVerifyProcess extends VerifyProcess {
 
 					serviceContext.setCompanyId(companyId);
 					serviceContext.setUserId(_getAdminUserId(companyId));
-					serviceContext.setUuid(_portalUUID.generate());
+					serviceContext.setUuid(PortalUUIDUtil.generate());
 
 					_commerceAccountRoleHelper.checkCommerceAccountRoles(
 						serviceContext);
 				});
 		}
-	}
-
-	@Override
-	protected void doVerify() throws Exception {
-		verifyAccountRoles();
-		verifyAccountGroup();
 	}
 
 	private long _getAdminUserId(long companyId) throws PortalException {
@@ -85,16 +90,13 @@ public class CommerceAccountServiceVerifyProcess extends VerifyProcess {
 	}
 
 	@Reference
-	private AccountGroupLocalService _accountGroupLocalService;
+	private CommerceAccountGroupLocalService _commerceAccountGroupLocalService;
 
 	@Reference
 	private CommerceAccountRoleHelper _commerceAccountRoleHelper;
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
-
-	@Reference
-	private PortalUUID _portalUUID;
 
 	@Reference
 	private RoleLocalService _roleLocalService;

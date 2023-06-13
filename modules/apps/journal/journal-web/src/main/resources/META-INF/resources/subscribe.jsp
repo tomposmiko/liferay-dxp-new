@@ -26,7 +26,17 @@ if (folder != null) {
 	folderId = folder.getFolderId();
 }
 
-long ddmStructureId = ParamUtil.getLong(request, "ddmStructureId");
+String ddmStructureKey = ParamUtil.getString(request, "ddmStructureKey");
+
+long ddmStructureId = 0;
+
+if (Validator.isNotNull(ddmStructureKey)) {
+	DDMStructure ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(themeDisplay.getSiteGroupId(), PortalUtil.getClassNameId(JournalArticle.class), ddmStructureKey, true);
+
+	if (ddmStructure != null) {
+		ddmStructureId = ddmStructure.getStructureId();
+	}
+}
 
 String subscribeActionName = StringPool.BLANK;
 String unsubscribeActionName = StringPool.BLANK;
@@ -39,13 +49,13 @@ String unsubscribeActionName = StringPool.BLANK;
 		boolean subscribed = false;
 		boolean unsubscribable = true;
 
-		if (ddmStructureId > 0) {
+		if (Validator.isNotNull(ddmStructureKey)) {
 			subscribed = JournalUtil.isSubscribedToStructure(themeDisplay.getCompanyId(), scopeGroupId, user.getUserId(), ddmStructureId);
 
 			subscribeActionName = "/journal/subscribe_ddm_structure";
 			unsubscribeActionName = "/journal/unsubscribe_ddm_structure";
 		}
-		else if ((ddmStructureId > 0) && (article != null)) {
+		else if (Validator.isNull(ddmStructureKey) && (article != null)) {
 			subscribed = JournalUtil.isSubscribedToArticle(themeDisplay.getCompanyId(), scopeGroupId, user.getUserId(), article.getResourcePrimKey());
 
 			subscribeActionName = "/journal/subscribe_article";
@@ -71,10 +81,10 @@ String unsubscribeActionName = StringPool.BLANK;
 							<portlet:param name="redirect" value="<%= currentURL %>" />
 
 							<c:choose>
-								<c:when test="<%= ddmStructureId > 0 %>">
+								<c:when test="<%= Validator.isNotNull(ddmStructureKey) %>">
 									<portlet:param name="ddmStructureId" value="<%= String.valueOf(ddmStructureId) %>" />
 								</c:when>
-								<c:when test="<%= (ddmStructureId <= 0) && (article != null) %>">
+								<c:when test="<%= Validator.isNull(ddmStructureKey) && (article != null) %>">
 									<portlet:param name="articleId" value="<%= String.valueOf(article.getResourcePrimKey()) %>" />
 								</c:when>
 								<c:otherwise>
@@ -83,23 +93,21 @@ String unsubscribeActionName = StringPool.BLANK;
 							</c:choose>
 						</portlet:actionURL>
 
-						<clay:link
-							aria-label='<%= LanguageUtil.get(request, "unsubscribe") %>'
-							cssClass="align-items-center d-flex icon-monospaced lfr-portal-tooltip"
-							href="<%= unsubscribeURL %>"
-							icon="bell-off"
-							title='<%= LanguageUtil.get(request, "unsubscribe") %>'
+						<liferay-ui:icon
+							icon="star"
+							linkCssClass="icon-monospaced"
+							markupView="lexicon"
+							message="unsubscribe"
+							url="<%= unsubscribeURL %>"
 						/>
 					</c:when>
 					<c:otherwise>
-						<span class="align-items-center lfr-portal-tooltip" title="<%= LanguageUtil.get(request, "subscribed-to-a-parent-folder") %>">
-							<clay:icon
-								aria-label='<%= LanguageUtil.get(request, "subscribed-to-a-parent-folder") %>'
-								cssClass="icon-monospaced mt-0"
-								symbol="bell-off"
-								title='<%= LanguageUtil.get(request, "subscribed-to-a-parent-folder") %>'
-							/>
-						</span>
+						<liferay-ui:icon
+							icon="star"
+							linkCssClass="icon-monospaced"
+							markupView="lexicon"
+							message="subscribed-to-a-parent-folder"
+						/>
 					</c:otherwise>
 				</c:choose>
 			</c:when>
@@ -108,10 +116,10 @@ String unsubscribeActionName = StringPool.BLANK;
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 
 					<c:choose>
-						<c:when test="<%= ddmStructureId > 0 %>">
+						<c:when test="<%= Validator.isNotNull(ddmStructureKey) %>">
 							<portlet:param name="ddmStructureId" value="<%= String.valueOf(ddmStructureId) %>" />
 						</c:when>
-						<c:when test="<%= (ddmStructureId <= 0) && (article != null) %>">
+						<c:when test="<%= Validator.isNull(ddmStructureKey) && (article != null) %>">
 							<portlet:param name="articleId" value="<%= String.valueOf(article.getResourcePrimKey()) %>" />
 						</c:when>
 						<c:otherwise>
@@ -120,12 +128,12 @@ String unsubscribeActionName = StringPool.BLANK;
 					</c:choose>
 				</portlet:actionURL>
 
-				<clay:link
-					aria-label='<%= LanguageUtil.get(request, "subscribe") %>'
-					cssClass="align-items-center d-flex icon-monospaced lfr-portal-tooltip mt-1"
-					href="<%= subscribeURL %>"
-					icon="bell-on"
-					title='<%= LanguageUtil.get(request, "subscribe") %>'
+				<liferay-ui:icon
+					icon="star-o"
+					linkCssClass="icon-monospaced"
+					markupView="lexicon"
+					message="subscribe"
+					url="<%= subscribeURL %>"
 				/>
 			</c:otherwise>
 		</c:choose>

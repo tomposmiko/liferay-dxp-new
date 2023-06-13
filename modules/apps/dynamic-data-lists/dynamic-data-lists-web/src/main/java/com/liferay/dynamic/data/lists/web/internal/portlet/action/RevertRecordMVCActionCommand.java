@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS,
 		"javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS_DISPLAY,
@@ -57,7 +58,11 @@ public class RevertRecordMVCActionCommand extends BaseMVCActionCommand {
 		_ddlRecordService.revertRecord(recordId, version, serviceContext);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDLRecordService(DDLRecordService ddlRecordService) {
+		_ddlRecordService = ddlRecordService;
+	}
+
 	private DDLRecordService _ddlRecordService;
 
 }

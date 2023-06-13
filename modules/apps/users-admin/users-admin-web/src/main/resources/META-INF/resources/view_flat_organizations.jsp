@@ -56,8 +56,6 @@ if (filterManageableOrganizations) {
 }
 %>
 
-<liferay-ui:success key="userAdded" message="the-user-was-created-successfully" />
-
 <c:choose>
 	<c:when test="<%= showList %>">
 
@@ -73,7 +71,6 @@ if (filterManageableOrganizations) {
 			creationMenu="<%= viewOrganizationsManagementToolbarDisplayContext.getCreationMenu() %>"
 			filterDropdownItems="<%= viewOrganizationsManagementToolbarDisplayContext.getFilterDropdownItems() %>"
 			itemsTotal="<%= searchContainer.getTotal() %>"
-			propsTransformer="js/ViewFlatOrganizationsAndUsersManagementToolbarPropsTransformer"
 			searchActionURL="<%= viewOrganizationsManagementToolbarDisplayContext.getSearchActionURL() %>"
 			searchContainerId="organizations"
 			searchFormName="searchFm"
@@ -85,7 +82,7 @@ if (filterManageableOrganizations) {
 			viewTypeItems="<%= viewOrganizationsManagementToolbarDisplayContext.getViewTypeItems() %>"
 		/>
 
-		<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "search();" %>'>
+		<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "search();" %>'>
 			<liferay-portlet:renderURLParams varImpl="portletURL" />
 			<aui:input name="<%= Constants.CMD %>" type="hidden" />
 			<aui:input name="toolbarItem" type="hidden" value="<%= toolbarItem %>" />
@@ -102,8 +99,11 @@ if (filterManageableOrganizations) {
 
 				<c:if test="<%= usersListView.equals(UserConstants.LIST_VIEW_FLAT_ORGANIZATIONS) %>">
 					<div id="breadcrumb">
-						<liferay-site-navigation:breadcrumb
-							breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, true, true) %>"
+						<liferay-ui:breadcrumb
+							showCurrentGroup="<%= false %>"
+							showGuestGroup="<%= false %>"
+							showLayout="<%= false %>"
+							showPortletBreadcrumb="<%= true %>"
 						/>
 					</div>
 				</c:if>
@@ -126,8 +126,6 @@ if (filterManageableOrganizations) {
 					if (!OrganizationPermissionUtil.contains(permissionChecker, organization, ActionKeys.VIEW)) {
 						rowURL = null;
 					}
-
-					OrganizationActionDropdownItems organizationActionDropdownItems = new OrganizationActionDropdownItems(organization, renderRequest, renderResponse);
 					%>
 
 					<%@ include file="/organization/search_columns.jspf" %>

@@ -26,4 +26,4 @@
 	/>
 </div>
 
-<liferay-layout:layout-common />
+<liferay-ui:layout-common />

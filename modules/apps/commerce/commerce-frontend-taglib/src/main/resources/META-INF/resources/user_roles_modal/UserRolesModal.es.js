@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import Component from 'metal-component';
 import Soy, {Config} from 'metal-soy';
 
@@ -22,8 +24,6 @@ import 'clay-modal';
 import './RoleInputItem.es';
 
 import './RoleListItem.es';
-
-import '../css/main.scss';
 
 class UserRolesModal extends Component {
 	syncSelectedRoles() {

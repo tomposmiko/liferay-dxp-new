@@ -34,6 +34,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -42,41 +43,29 @@ import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
-import com.liferay.portal.kernel.search.BooleanClause;
-import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.SortFactoryUtil;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
-import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.hits.SearchHit;
-import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.query.Queries;
-import com.liferay.portal.search.searcher.SearchResponse;
-import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
@@ -106,7 +95,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = AssetHelper.class)
+@Component(immediate = true, service = AssetHelper.class)
 public class AssetHelperImpl implements AssetHelper {
 
 	@Override
@@ -154,9 +143,10 @@ public class AssetHelperImpl implements AssetHelper {
 		}
 
 		if (groupId > 0) {
+			Group group = _groupLocalService.fetchGroup(groupId);
+
 			liferayPortletRequest.setAttribute(
-				WebKeys.ASSET_RENDERER_FACTORY_GROUP,
-				_groupLocalService.fetchGroup(groupId));
+				WebKeys.ASSET_RENDERER_FACTORY_GROUP, group);
 		}
 
 		PortletURL addPortletURL = assetRendererFactory.getURLAdd(
@@ -259,7 +249,7 @@ public class AssetHelperImpl implements AssetHelper {
 			return liferayPortletURL.toString();
 		}
 
-		return HttpComponentsUtil.addParameter(
+		return _http.addParameter(
 			addPortletURL.toString(), "refererPlid", plid);
 	}
 
@@ -288,63 +278,16 @@ public class AssetHelperImpl implements AssetHelper {
 		return assetEntries;
 	}
 
-	public List<AssetEntry> getAssetEntries(SearchHits searchHits) {
-		if (searchHits.getTotalHits() <= 0) {
-			return Collections.emptyList();
-		}
-
-		List<AssetEntry> assetEntries = new ArrayList<>();
-
-		for (SearchHit searchHit : searchHits.getSearchHits()) {
-			com.liferay.portal.search.document.Document document =
-				searchHit.getDocument();
-
-			String className = GetterUtil.getString(
-				document.getString(Field.ENTRY_CLASS_NAME));
-			long classPK = GetterUtil.getLong(
-				document.getString(Field.ENTRY_CLASS_PK));
-
-			AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
-				className, classPK);
-
-			if (assetEntry != null) {
-				assetEntries.add(assetEntry);
-			}
-		}
-
-		return assetEntries;
-	}
-
 	@Override
 	public String getAssetKeywords(String className, long classPK) {
-		List<String> keywords = new ArrayList<>();
+		String[] tagNames = _assetTagLocalService.getTagNames(
+			className, classPK);
+		String[] categoryNames = _assetCategoryLocalService.getCategoryNames(
+			className, classPK);
 
-		keywords.addAll(
-			ListUtil.toList(
-				_assetTagLocalService.getTags(className, classPK),
-				AssetTag.NAME_ACCESSOR));
-		keywords.addAll(
-			ListUtil.toList(
-				_assetCategoryLocalService.getCategories(className, classPK),
-				AssetCategory.NAME_ACCESSOR));
+		String[] keywords = new String[tagNames.length + categoryNames.length];
 
-		return StringUtil.merge(keywords);
-	}
-
-	@Override
-	public String getAssetKeywords(
-		String className, long classPK, Locale locale) {
-
-		List<String> keywords = new ArrayList<>();
-
-		keywords.addAll(
-			ListUtil.toList(
-				_assetTagLocalService.getTags(className, classPK),
-				AssetTag.NAME_ACCESSOR));
-		keywords.addAll(
-			ListUtil.toList(
-				_assetCategoryLocalService.getCategories(className, classPK),
-				assetCategory -> assetCategory.getTitle(locale)));
+		ArrayUtil.combine(tagNames, categoryNames, keywords);
 
 		return StringUtil.merge(keywords);
 	}
@@ -497,36 +440,10 @@ public class AssetHelperImpl implements AssetHelper {
 			int start, int end)
 		throws Exception {
 
-		_prepareSearchContext(searchContext, assetEntryQuery, start, end);
-
-		AssetSearcher assetSearcher = _getAssetSearcher(assetEntryQuery);
+		AssetSearcher assetSearcher = _getAssetSearcher(
+			searchContext, assetEntryQuery, start, end);
 
 		return assetSearcher.search(searchContext);
-	}
-
-	@Override
-	public SearchHits search(
-			SearchContext searchContext,
-			List<AssetEntryQuery> assetEntryQueries, int start, int end)
-		throws Exception {
-
-		_prepareSearchContext(assetEntryQueries, end, searchContext, start);
-
-		SearchResponse searchResponse = _searcher.search(
-			_searchRequestBuilderFactory.builder(
-				searchContext
-			).emptySearchEnabled(
-				true
-			).fields(
-				Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK, Field.UID
-			).highlightEnabled(
-				false
-			).sorts(
-				_getSearchSorts(
-					assetEntryQueries.get(0), searchContext.getLocale())
-			).build());
-
-		return searchResponse.getSearchHits();
 	}
 
 	@Override
@@ -563,9 +480,8 @@ public class AssetHelperImpl implements AssetHelper {
 			int start, int end)
 		throws Exception {
 
-		_prepareSearchContext(searchContext, assetEntryQuery, start, end);
-
-		AssetSearcher assetSearcher = _getAssetSearcher(assetEntryQuery);
+		AssetSearcher assetSearcher = _getAssetSearcher(
+			searchContext, assetEntryQuery, start, end);
 
 		Hits hits = assetSearcher.search(searchContext);
 
@@ -578,44 +494,75 @@ public class AssetHelperImpl implements AssetHelper {
 			SearchContext searchContext, AssetEntryQuery assetEntryQuery)
 		throws Exception {
 
-		_prepareSearchContext(
+		AssetSearcher assetSearcher = _getAssetSearcher(
 			searchContext, assetEntryQuery, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS);
-
-		AssetSearcher assetSearcher = _getAssetSearcher(assetEntryQuery);
 
 		return assetSearcher.searchCount(searchContext);
 	}
 
-	@Override
-	public long searchCount(
-			SearchContext searchContext,
-			List<AssetEntryQuery> assetEntryQueries, int start, int end)
+	private AssetSearcher _getAssetSearcher(
+			SearchContext searchContext, AssetEntryQuery assetEntryQuery,
+			int start, int end)
 		throws Exception {
 
-		_prepareSearchContext(assetEntryQueries, end, searchContext, start);
-
-		SearchResponse searchResponse = _searcher.search(
-			_searchRequestBuilderFactory.builder(
-				searchContext
-			).emptySearchEnabled(
-				true
-			).highlightEnabled(
-				false
-			).sorts(
-				_getSearchSorts(
-					assetEntryQueries.get(0), searchContext.getLocale())
-			).build());
-
-		return searchResponse.getCount();
-	}
-
-	private AssetSearcher _getAssetSearcher(AssetEntryQuery assetEntryQuery) {
 		Indexer<?> searcher = AssetSearcher.getInstance();
 
 		AssetSearcher assetSearcher = (AssetSearcher)searcher;
 
 		assetSearcher.setAssetEntryQuery(assetEntryQuery);
+
+		Layout layout = assetEntryQuery.getLayout();
+
+		if (layout != null) {
+			searchContext.setAttribute(Field.LAYOUT_UUID, layout.getUuid());
+		}
+
+		String ddmStructureFieldName = (String)assetEntryQuery.getAttribute(
+			"ddmStructureFieldName");
+		Serializable ddmStructureFieldValue = assetEntryQuery.getAttribute(
+			"ddmStructureFieldValue");
+
+		if (Validator.isNotNull(ddmStructureFieldName) &&
+			Validator.isNotNull(ddmStructureFieldValue)) {
+
+			searchContext.setAttribute(
+				"ddmStructureFieldName", ddmStructureFieldName);
+			searchContext.setAttribute(
+				"ddmStructureFieldValue", ddmStructureFieldValue);
+		}
+
+		String paginationType = GetterUtil.getString(
+			assetEntryQuery.getPaginationType(), "more");
+
+		if (!paginationType.equals("none") &&
+			!paginationType.equals("simple")) {
+
+			searchContext.setAttribute("paginationType", paginationType);
+		}
+
+		searchContext.setClassTypeIds(assetEntryQuery.getClassTypeIds());
+		searchContext.setEnd(end);
+		searchContext.setGroupIds(
+			ArrayUtil.clone(assetEntryQuery.getGroupIds()));
+		searchContext.setIncludeInternalAssetCategories(true);
+
+		if (Validator.isNull(assetEntryQuery.getKeywords())) {
+			QueryConfig queryConfig = searchContext.getQueryConfig();
+
+			queryConfig.setScoreEnabled(false);
+		}
+		else {
+			searchContext.setLike(true);
+		}
+
+		_searchRequestBuilderFactory.builder(
+			searchContext
+		).sorts(
+			_getSearchSorts(assetEntryQuery, searchContext.getLocale())
+		);
+
+		searchContext.setStart(start);
 
 		return assetSearcher;
 	}
@@ -696,125 +643,6 @@ public class AssetHelperImpl implements AssetHelper {
 		return sortType;
 	}
 
-	private void _prepareSearchContext(
-			List<AssetEntryQuery> assetEntryQueries, int end,
-			SearchContext searchContext, int start)
-		throws Exception {
-
-		for (AssetEntryQuery assetEntryQuery : assetEntryQueries) {
-			SearchContext assetEntryQuerySearchContext = new SearchContext();
-
-			_prepareSearchContext(
-				assetEntryQuerySearchContext, assetEntryQuery, start, end);
-
-			long[] groupIds = searchContext.getGroupIds();
-
-			if (ArrayUtil.isEmpty(groupIds)) {
-				groupIds = new long[0];
-			}
-
-			searchContext.setGroupIds(
-				ArrayUtil.append(
-					groupIds, assetEntryQuerySearchContext.getGroupIds()));
-
-			AssetSearcher assetSearcher = _getAssetSearcher(assetEntryQuery);
-
-			BooleanQuery booleanQuery = assetSearcher.getFullQuery(
-				assetEntryQuerySearchContext);
-
-			BooleanClause<Query>[] booleanClauses =
-				searchContext.getBooleanClauses();
-
-			if (booleanClauses == null) {
-				searchContext.setBooleanClauses(
-					new BooleanClause[] {
-						BooleanClauseFactoryUtil.create(
-							booleanQuery, BooleanClauseOccur.SHOULD.getName())
-					});
-			}
-			else {
-				searchContext.setBooleanClauses(
-					ArrayUtil.append(
-						booleanClauses,
-						BooleanClauseFactoryUtil.create(
-							booleanQuery,
-							BooleanClauseOccur.SHOULD.getName())));
-			}
-		}
-	}
-
-	private void _prepareSearchContext(
-			SearchContext searchContext, AssetEntryQuery assetEntryQuery,
-			int start, int end)
-		throws Exception {
-
-		Layout layout = assetEntryQuery.getLayout();
-
-		if (layout != null) {
-			searchContext.setAttribute(Field.LAYOUT_UUID, layout.getUuid());
-		}
-
-		String ddmStructureFieldName = (String)assetEntryQuery.getAttribute(
-			"ddmStructureFieldName");
-		Serializable ddmStructureFieldValue = assetEntryQuery.getAttribute(
-			"ddmStructureFieldValue");
-
-		if (Validator.isNotNull(ddmStructureFieldName) &&
-			Validator.isNotNull(ddmStructureFieldValue)) {
-
-			searchContext.setAttribute(
-				"ddmStructureFieldName", ddmStructureFieldName);
-			searchContext.setAttribute(
-				"ddmStructureFieldValue", ddmStructureFieldValue);
-		}
-
-		if (GetterUtil.getBoolean(
-				assetEntryQuery.getAttribute("headOrShowNonindexable"))) {
-
-			searchContext.setAttribute("headOrShowNonindexable", Boolean.TRUE);
-		}
-
-		String paginationType = GetterUtil.getString(
-			assetEntryQuery.getPaginationType(), "more");
-
-		if (!paginationType.equals("none") &&
-			!paginationType.equals("simple")) {
-
-			searchContext.setAttribute("paginationType", paginationType);
-		}
-
-		if (GetterUtil.getBoolean(
-				assetEntryQuery.getAttribute("showNonindexable"))) {
-
-			searchContext.setAttribute("showNonindexable", Boolean.TRUE);
-		}
-
-		searchContext.setClassTypeIds(assetEntryQuery.getClassTypeIds());
-		searchContext.setEnd(end);
-		searchContext.setGroupIds(
-			ArrayUtil.clone(assetEntryQuery.getGroupIds()));
-		searchContext.setIncludeInternalAssetCategories(true);
-
-		if (Validator.isNull(assetEntryQuery.getKeywords())) {
-			QueryConfig queryConfig = searchContext.getQueryConfig();
-
-			queryConfig.setScoreEnabled(false);
-		}
-		else {
-			searchContext.setLike(true);
-		}
-
-		_searchRequestBuilderFactory.builder(
-			searchContext
-		).emptySearchEnabled(
-			true
-		).sorts(
-			_getSearchSorts(assetEntryQuery, searchContext.getLocale())
-		);
-
-		searchContext.setStart(start);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetHelperImpl.class);
 
@@ -828,25 +656,19 @@ public class AssetHelperImpl implements AssetHelper {
 	private AssetTagLocalService _assetTagLocalService;
 
 	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
 	private DDMIndexer _ddmIndexer;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference
+	private Http _http;
+
+	@Reference
 	private Portal _portal;
 
 	@Reference
 	private PortletLocalService _portletLocalService;
-
-	@Reference
-	private Queries _queries;
-
-	@Reference
-	private Searcher _searcher;
 
 	@Reference
 	private SearchRequestBuilderFactory _searchRequestBuilderFactory;

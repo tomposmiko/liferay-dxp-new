@@ -17,10 +17,10 @@ package com.liferay.adaptive.media.image.internal.configuration;
 import com.liferay.adaptive.media.AMAttribute;
 import com.liferay.adaptive.media.image.processor.AMImageAttribute;
 import com.liferay.adaptive.media.image.processor.AMImageProcessor;
-import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Gives convenient access to a set of media attributes. It offers a type-safe
@@ -31,20 +31,6 @@ import java.util.Map;
  * @author Adolfo Pérez
  */
 public class AMImageAttributeMapping {
-
-	public static AMImageAttributeMapping fromFileVersion(
-		FileVersion fileVersion) {
-
-		return new AMImageAttributeMapping(
-			HashMapBuilder.<AMAttribute<AMImageProcessor, ?>, Object>put(
-				AMAttribute.getContentLengthAMAttribute(), fileVersion.getSize()
-			).put(
-				AMAttribute.getContentTypeAMAttribute(),
-				fileVersion.getMimeType()
-			).put(
-				AMAttribute.getFileNameAMAttribute(), fileVersion.getFileName()
-			).build());
-	}
 
 	/**
 	 * Returns an {@link AMImageAttributeMapping} that uses the map as the
@@ -62,64 +48,71 @@ public class AMImageAttributeMapping {
 		}
 
 		return new AMImageAttributeMapping(
-			HashMapBuilder.<AMAttribute<AMImageProcessor, ?>, Object>put(
+			HashMapBuilder.<AMAttribute<AMImageProcessor, ?>, Optional<?>>put(
 				AMAttribute.getConfigurationUuidAMAttribute(),
-				_getValue(
+				_getValueOptional(
 					properties, AMAttribute.getConfigurationUuidAMAttribute())
 			).put(
 				AMAttribute.getContentLengthAMAttribute(),
-				_getValue(properties, AMAttribute.getContentLengthAMAttribute())
+				_getValueOptional(
+					properties, AMAttribute.getContentLengthAMAttribute())
 			).put(
 				AMAttribute.getContentTypeAMAttribute(),
-				_getValue(properties, AMAttribute.getContentTypeAMAttribute())
+				_getValueOptional(
+					properties, AMAttribute.getContentTypeAMAttribute())
 			).put(
 				AMAttribute.getFileNameAMAttribute(),
-				_getValue(properties, AMAttribute.getFileNameAMAttribute())
+				_getValueOptional(
+					properties, AMAttribute.getFileNameAMAttribute())
 			).put(
 				AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT,
-				_getValue(
+				_getValueOptional(
 					properties, AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT)
 			).put(
 				AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH,
-				_getValue(properties, AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH)
+				_getValueOptional(
+					properties, AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH)
 			).build());
 	}
 
 	/**
-	 * Returns an instance that contains the value of the
+	 * Returns an {@link Optional} instance that contains the value of the
 	 * attribute (if any) in this mapping.
 	 *
 	 * @param  amAttribute a non <code>null</code> attribute
-	 * @return an instance that contains the value (if any)
+	 * @return a non-<code>null</code> optional that contains the
+	 *         (non-<code>null</code>) value (if any)
 	 */
-	public <V> V getValue(AMAttribute<AMImageProcessor, V> amAttribute) {
+	public <V> Optional<V> getValueOptional(
+		AMAttribute<AMImageProcessor, V> amAttribute) {
+
 		if (amAttribute == null) {
 			throw new IllegalArgumentException(
 				"Adaptive media attribute is null");
 		}
 
-		return (V)_values.get(amAttribute);
+		return (Optional<V>)_optionals.get(amAttribute);
 	}
 
 	protected AMImageAttributeMapping(
-		Map<AMAttribute<AMImageProcessor, ?>, Object> values) {
+		Map<AMAttribute<AMImageProcessor, ?>, Optional<?>> optionals) {
 
-		_values = values;
+		_optionals = optionals;
 	}
 
-	private static <V> V _getValue(
+	private static <V> Optional<V> _getValueOptional(
 		Map<String, String> properties,
 		AMAttribute<AMImageProcessor, V> amAttribute) {
 
 		String value = properties.get(amAttribute.getName());
 
 		if (value == null) {
-			return null;
+			return Optional.empty();
 		}
 
-		return amAttribute.convert(value);
+		return Optional.of(amAttribute.convert(value));
 	}
 
-	private final Map<AMAttribute<AMImageProcessor, ?>, Object> _values;
+	private final Map<AMAttribute<AMImageProcessor, ?>, Optional<?>> _optionals;
 
 }

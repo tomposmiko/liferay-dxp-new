@@ -13,7 +13,6 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClaySticker from '@clayui/sticker';
 import classnames from 'classnames';
-import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext} from 'react';
 
@@ -36,8 +35,7 @@ function Author({author: {authorId, name, url}}) {
 					<ClayIcon symbol="user" />
 				)}
 			</ClaySticker>
-
-			{sub(Liferay.Language.get('authored-by-x'), name)}
+			{Liferay.Util.sub(Liferay.Language.get('authored-by-x'), name)}
 		</div>
 	);
 }
@@ -75,7 +73,6 @@ function BasicInformation({
 						</ClayLayout.ContentRow>
 					</div>
 				</ClayLayout.ContentCol>
-
 				<ClayLayout.ContentCol expand>
 					<ClayLayout.ContentRow>
 						<span className="font-weight-semi-bold text-truncate-inline">
@@ -104,7 +101,7 @@ function BasicInformation({
 			<ClayLayout.ContentRow className="mb-2">
 				<ClayLayout.ContentCol expand>
 					<span className="text-secondary">
-						{sub(
+						{Liferay.Util.sub(
 							Liferay.Language.get('published-on-x'),
 							formattedPublishDate
 						)}

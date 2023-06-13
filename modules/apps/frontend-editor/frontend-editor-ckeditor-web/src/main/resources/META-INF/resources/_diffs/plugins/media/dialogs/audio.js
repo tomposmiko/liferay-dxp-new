@@ -12,34 +12,33 @@
  * details.
  */
 
-/* eslint-disable @liferay/no-get-data-attribute */
-
-import {addParams} from 'frontend-js-web';
-
 CKEDITOR.dialog.add('audio', (editor) => {
-	const TPL_SCRIPT =
+	var TPL_SCRIPT =
 		'boundingBox: "#" + mediaId,' + 'oggUrl: "{oggUrl}",' + 'url: "{url}"';
 
 	function commitValue(audioNode) {
-		const instance = this;
+		var instance = this;
 
-		const id = instance.id;
-		const value = instance.getValue();
+		var id = instance.id;
+		var value = instance.getValue();
 
-		let scriptTPL = null;
-		let textScript = null;
+		var scriptTPL = null;
+		var textScript = null;
 
-		let audioOggUrl = audioNode.getAttribute('data-audio-ogg-url');
-		let audioUrl = audioNode.getAttribute('data-audio-url');
+		var audioOggUrl = audioNode.getAttribute('data-audio-ogg-url');
+		var audioUrl = audioNode.getAttribute('data-audio-url');
 
 		if (id === 'url') {
 			audioNode.setAttribute('data-document-url', value);
 
-			audioUrl = addParams('audioPreview=1&type=mp3', value);
+			audioUrl = Liferay.Util.addParams('audioPreview=1&type=mp3', value);
 
 			audioNode.setAttribute('data-audio-url', audioUrl);
 
-			audioOggUrl = addParams('audioPreview=1&type=ogg', value);
+			audioOggUrl = Liferay.Util.addParams(
+				'audioPreview=1&type=ogg',
+				value
+			);
 
 			audioNode.setAttribute('data-audio-ogg-url', audioOggUrl);
 
@@ -59,12 +58,12 @@ CKEDITOR.dialog.add('audio', (editor) => {
 	}
 
 	function loadValue(audioNode) {
-		const instance = this;
+		var instance = this;
 
-		const id = instance.id;
+		var id = instance.id;
 
 		if (audioNode) {
-			let value = null;
+			var value = null;
 
 			if (id === 'url') {
 				value = audioNode.getAttribute('data-document-url');
@@ -115,13 +114,13 @@ CKEDITOR.dialog.add('audio', (editor) => {
 		minWidth: 400,
 
 		onOk() {
-			const instance = this;
+			var instance = this;
 
 			editor.plugins.media.onOkCallback(instance, editor, 'audio');
 		},
 
 		onShow() {
-			const instance = this;
+			var instance = this;
 
 			editor.plugins.media.onShowCallback(instance, editor, 'audio');
 		},

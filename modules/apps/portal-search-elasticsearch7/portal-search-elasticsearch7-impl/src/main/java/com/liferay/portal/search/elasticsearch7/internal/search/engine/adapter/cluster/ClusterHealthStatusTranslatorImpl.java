@@ -21,7 +21,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = ClusterHealthStatusTranslator.class)
+@Component(immediate = true, service = ClusterHealthStatusTranslator.class)
 public class ClusterHealthStatusTranslatorImpl
 	implements ClusterHealthStatusTranslator {
 

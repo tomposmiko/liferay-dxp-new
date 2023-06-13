@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portlet.rolesadmin.search.RoleSearch;
 import com.liferay.portlet.rolesadmin.search.RoleSearchTerms;
@@ -140,30 +141,36 @@ public abstract class BaseRoleItemSelectorView<T extends ItemSelectorCriterion>
 			renderRequest, currentURL);
 
 		searchContainer.setEmptyResultsMessage("no-roles-were-found");
-		searchContainer.setOrderByComparator(
+
+		OrderByComparator<Role> orderByComparator =
 			usersAdmin.getRoleOrderByComparator(
 				searchContainer.getOrderByCol(),
-				searchContainer.getOrderByType()));
+				searchContainer.getOrderByType());
+
+		searchContainer.setOrderByComparator(orderByComparator);
+
+		searchContainer.setRowChecker(
+			new RoleItemSelectorChecker(
+				renderResponse, checkedRoleIds, excludedRoleNames));
 
 		RoleSearchTerms searchTerms =
 			(RoleSearchTerms)searchContainer.getSearchTerms();
 
 		searchTerms.setType(type);
 
-		searchContainer.setResultsAndTotal(
-			() -> roleService.search(
-				CompanyThreadLocal.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getTypesObj(), new LinkedHashMap<String, Object>(),
-				searchContainer.getStart(), searchContainer.getEnd(),
-				searchContainer.getOrderByComparator()),
-			roleService.searchCount(
-				CompanyThreadLocal.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getTypesObj(),
-				new LinkedHashMap<String, Object>()));
+		List<Role> results = roleService.search(
+			CompanyThreadLocal.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getTypesObj(), new LinkedHashMap<String, Object>(),
+			searchContainer.getStart(), searchContainer.getEnd(),
+			searchContainer.getOrderByComparator());
 
-		searchContainer.setRowChecker(
-			new RoleItemSelectorChecker(
-				renderResponse, checkedRoleIds, excludedRoleNames));
+		int total = roleService.searchCount(
+			CompanyThreadLocal.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getTypesObj(), new LinkedHashMap<String, Object>());
+
+		searchContainer.setTotal(total);
+
+		searchContainer.setResults(results);
 
 		return searchContainer;
 	}

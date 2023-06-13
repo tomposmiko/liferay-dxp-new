@@ -51,12 +51,12 @@ renderResponse.setTitle((accountEntryAddressId == 0) ? LanguageUtil.get(request,
 
 		<aui:input name="description" type="textarea" />
 
-		<aui:select label="type" name="addressListTypeId">
+		<aui:select label="type" name="addressTypeId">
 
 			<%
 			String[] types = null;
 
-			if (Objects.equals(defaultType, "billing") || Objects.equals(defaultType, "shipping")) {
+			if (Objects.equals("billing", defaultType) || Objects.equals("shipping", defaultType)) {
 				types = new String[] {defaultType, AccountListTypeConstants.ACCOUNT_ENTRY_ADDRESS_TYPE_BILLING_AND_SHIPPING};
 			}
 			else {
@@ -66,7 +66,7 @@ renderResponse.setTitle((accountEntryAddressId == 0) ? LanguageUtil.get(request,
 			ListType addressListType = null;
 
 			if (address != null) {
-				addressListType = address.getListType();
+				addressListType = address.getType();
 			}
 
 			for (String type : types) {
@@ -81,18 +81,6 @@ renderResponse.setTitle((accountEntryAddressId == 0) ? LanguageUtil.get(request,
 
 		</aui:select>
 
-		<aui:select label="country" name="addressCountryId" required="<%= true %>">
-			<aui:validator errorMessage='<%= LanguageUtil.get(request, "this-field-is-required") %>' name="custom">
-				function(val) {
-					if (Number(val) !== 0) {
-						return true;
-					}
-
-					return false;
-				}
-			</aui:validator>
-		</aui:select>
-
 		<aui:input name="street1" required="<%= true %>" />
 
 		<aui:input name="street2" />
@@ -105,21 +93,7 @@ renderResponse.setTitle((accountEntryAddressId == 0) ? LanguageUtil.get(request,
 			</div>
 
 			<div class="form-group-item">
-				<aui:select label="region" name="addressRegionId">
-					<aui:validator errorMessage='<%= LanguageUtil.get(request, "this-field-is-required") %>' name="custom">
-						function(val, fieldNode) {
-							if (fieldNode.length === 1) {
-								return true;
-							}
-
-							if (Number(val) !== 0) {
-								return true;
-							}
-
-							return false;
-						}
-					</aui:validator>
-				</aui:select>
+				<aui:select label="region" name="addressRegionId" />
 			</div>
 		</div>
 
@@ -129,30 +103,36 @@ renderResponse.setTitle((accountEntryAddressId == 0) ? LanguageUtil.get(request,
 			</div>
 
 			<div class="form-group-item">
-				<aui:input maxlength='<%= ModelHintsUtil.getMaxLength(Phone.class.getName(), "number") %>' name="phoneNumber" type="text" />
+				<aui:select label="country" name="addressCountryId" required="<%= true %>" />
 			</div>
 		</div>
+
+		<aui:input maxlength='<%= ModelHintsUtil.getMaxLength(Phone.class.getName(), "number") %>' name="phoneNumber" type="text" />
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons
-			redirect="<%= backURL %>"
-		/>
+		<aui:button type="submit" />
+
+		<aui:button href="<%= backURL %>" type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
-<liferay-frontend:component
-	componentId="CountryRegionDynamicSelect"
-	context='<%=
-		HashMapBuilder.<String, Object>put(
-			"countrySelect", portletDisplay.getNamespace() + "addressCountryId"
-		).put(
-			"countrySelectVal", (address == null) ? 0L : address.getCountryId()
-		).put(
-			"regionSelect", portletDisplay.getNamespace() + "addressRegionId"
-		).put(
-			"regionSelectVal", (address == null) ? 0L : address.getRegionId()
-		).build()
-		%>'
-	module="account_entries_admin/js/CountryRegionDynamicSelect"
-/>
+<script>
+	new Liferay.DynamicSelect([
+		{
+			select: '<portlet:namespace />addressCountryId',
+			selectData: Liferay.Address.getCountries,
+			selectDesc: 'nameCurrentValue',
+			selectId: 'countryId',
+			selectSort: '<%= true %>',
+			selectVal: '<%= (address == null) ? 0L : address.getCountryId() %>',
+		},
+		{
+			select: '<portlet:namespace />addressRegionId',
+			selectData: Liferay.Address.getRegions,
+			selectDesc: 'name',
+			selectId: 'regionId',
+			selectVal: '<%= (address == null) ? 0L : address.getRegionId() %>',
+		},
+	]);
+</script>

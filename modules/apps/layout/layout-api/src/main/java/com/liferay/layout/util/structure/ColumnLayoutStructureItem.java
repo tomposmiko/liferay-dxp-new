@@ -58,23 +58,20 @@ public class ColumnLayoutStructureItem extends LayoutStructureItem {
 	public JSONObject getItemConfigJSONObject() {
 		JSONObject jsonObject = JSONUtil.put("size", _size);
 
-		for (ViewportSize viewportSize : _viewportSizes) {
+		for (ViewportSize viewportSize : ViewportSize.values()) {
 			if (viewportSize.equals(ViewportSize.DESKTOP)) {
 				continue;
 			}
 
+			JSONObject viewportConfigurationJSONObject =
+				_viewportConfigurations.getOrDefault(
+					viewportSize.getViewportSizeId(),
+					JSONFactoryUtil.createJSONObject());
+
 			jsonObject.put(
 				viewportSize.getViewportSizeId(),
 				JSONUtil.put(
-					"size",
-					() -> {
-						JSONObject viewportConfigurationJSONObject =
-							_viewportConfigurationJSONObjects.getOrDefault(
-								viewportSize.getViewportSizeId(),
-								JSONFactoryUtil.createJSONObject());
-
-						return viewportConfigurationJSONObject.get("size");
-					}));
+					"size", viewportConfigurationJSONObject.get("size")));
 		}
 
 		return jsonObject;
@@ -89,8 +86,17 @@ public class ColumnLayoutStructureItem extends LayoutStructureItem {
 		return _size;
 	}
 
-	public Map<String, JSONObject> getViewportConfigurationJSONObjects() {
-		return _viewportConfigurationJSONObjects;
+	public Map<String, JSONObject> getViewportConfigurations() {
+		return _viewportConfigurations;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getViewportConfigurations()}
+	 */
+	@Deprecated
+	public Map<String, JSONObject> getViewportSizeConfigurations() {
+		return getViewportConfigurations();
 	}
 
 	@Override
@@ -105,20 +111,28 @@ public class ColumnLayoutStructureItem extends LayoutStructureItem {
 	public void setViewportConfiguration(
 		String viewportSizeId, JSONObject configurationJSONObject) {
 
-		_viewportConfigurationJSONObjects.put(
-			viewportSizeId,
-			_viewportConfigurationJSONObjects.getOrDefault(
-				viewportSizeId, JSONFactoryUtil.createJSONObject()
-			).put(
-				"size",
-				() -> {
-					if (configurationJSONObject.has("size")) {
-						return configurationJSONObject.getInt("size");
-					}
+		JSONObject currentConfigurationJSONObject =
+			_viewportConfigurations.getOrDefault(
+				viewportSizeId, JSONFactoryUtil.createJSONObject());
 
-					return null;
-				}
-			));
+		if (configurationJSONObject.has("size")) {
+			currentConfigurationJSONObject.put(
+				"size", configurationJSONObject.getInt("size"));
+		}
+
+		_viewportConfigurations.put(
+			viewportSizeId, currentConfigurationJSONObject);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #setViewportConfiguration(String, JSONObject)}
+	 */
+	@Deprecated
+	public void setViewportSizeConfiguration(
+		String viewportSizeId, JSONObject configurationJSONObject) {
+
+		setViewportConfiguration(viewportSizeId, configurationJSONObject);
 	}
 
 	@Override
@@ -127,7 +141,7 @@ public class ColumnLayoutStructureItem extends LayoutStructureItem {
 			setSize(itemConfigJSONObject.getInt("size"));
 		}
 
-		for (ViewportSize viewportSize : _viewportSizes) {
+		for (ViewportSize viewportSize : ViewportSize.values()) {
 			if (viewportSize.equals(ViewportSize.DESKTOP)) {
 				continue;
 			}
@@ -141,10 +155,8 @@ public class ColumnLayoutStructureItem extends LayoutStructureItem {
 		}
 	}
 
-	private static final ViewportSize[] _viewportSizes = ViewportSize.values();
-
 	private int _size;
-	private final Map<String, JSONObject> _viewportConfigurationJSONObjects =
+	private final Map<String, JSONObject> _viewportConfigurations =
 		new HashMap<>();
 
 }

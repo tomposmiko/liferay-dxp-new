@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + FolderFacetPortletKeys.FOLDER_FACET,
 	service = PortletSharedSearchContributor.class
 )
@@ -49,23 +50,20 @@ public class FolderFacetPortletSharedSearchContributor
 
 		folderFacetSearchContributor.contribute(
 			portletSharedSearchSettings.getSearchRequestBuilder(),
-			folderFacetBuilder -> folderFacetBuilder.aggregationName(
+			siteFacetBuilder -> siteFacetBuilder.aggregationName(
 				portletSharedSearchSettings.getPortletId()
 			).frequencyThreshold(
 				folderFacetPortletPreferences.getFrequencyThreshold()
 			).maxTerms(
 				folderFacetPortletPreferences.getMaxTerms()
 			).selectedFolderIds(
-				_toLongArray(
+				toLongArray(
 					portletSharedSearchSettings.getParameterValues(
 						folderFacetPortletPreferences.getParameterName()))
 			));
 	}
 
-	@Reference
-	protected FolderFacetSearchContributor folderFacetSearchContributor;
-
-	private long[] _toLongArray(String[] parameterValues) {
+	protected static long[] toLongArray(String[] parameterValues) {
 		if (!ArrayUtil.isEmpty(parameterValues)) {
 			return ListUtil.toLongArray(
 				Arrays.asList(parameterValues), GetterUtil::getLong);
@@ -73,5 +71,8 @@ public class FolderFacetPortletSharedSearchContributor
 
 		return new long[0];
 	}
+
+	@Reference
+	protected FolderFacetSearchContributor folderFacetSearchContributor;
 
 }

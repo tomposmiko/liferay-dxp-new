@@ -40,8 +40,10 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -95,10 +97,11 @@ public class SearchLocalizationHelperTest {
 
 	@Test
 	public void testGetLocalesFromCompany() throws Exception {
+		SearchContext searchContext = getSearchContext(
+			addCompany(LocaleUtil.BRAZIL, LocaleUtil.JAPAN));
+
 		assertSameValues(
-			searchLocalizationHelper.getLocales(
-				getSearchContext(
-					addCompany(LocaleUtil.BRAZIL, LocaleUtil.JAPAN))),
+			searchLocalizationHelper.getLocales(searchContext),
 			LocaleUtil.BRAZIL, LocaleUtil.JAPAN);
 	}
 
@@ -108,19 +111,22 @@ public class SearchLocalizationHelperTest {
 			LocaleUtil.BRAZIL, LocaleUtil.JAPAN, LocaleUtil.GERMANY,
 			LocaleUtil.SPAIN);
 
+		SearchContext searchContext = getSearchContext(
+			company, addGroup(company, LocaleUtil.GERMANY),
+			addGroup(company, LocaleUtil.SPAIN));
+
 		assertSameValues(
-			searchLocalizationHelper.getLocales(
-				getSearchContext(
-					company, addGroup(company, LocaleUtil.GERMANY),
-					addGroup(company, LocaleUtil.SPAIN))),
+			searchLocalizationHelper.getLocales(searchContext),
 			LocaleUtil.GERMANY, LocaleUtil.SPAIN);
 	}
 
 	@Test
 	public void testGetLocalizedFieldNamesFromCompany() throws Exception {
+		SearchContext searchContext = getSearchContext(
+			addCompany(LocaleUtil.BRAZIL, LocaleUtil.JAPAN));
+
 		String[] locales = searchLocalizationHelper.getLocalizedFieldNames(
-			new String[] {"test", "example"},
-			getSearchContext(addCompany(LocaleUtil.BRAZIL, LocaleUtil.JAPAN)));
+			new String[] {"test", "example"}, searchContext);
 
 		assertSameValues(
 			locales, "test_pt_BR", "test_ja_JP", "example_pt_BR",
@@ -133,11 +139,12 @@ public class SearchLocalizationHelperTest {
 			LocaleUtil.BRAZIL, LocaleUtil.JAPAN, LocaleUtil.GERMANY,
 			LocaleUtil.SPAIN);
 
+		SearchContext searchContext = getSearchContext(
+			company, addGroup(company, LocaleUtil.GERMANY),
+			addGroup(company, LocaleUtil.SPAIN));
+
 		String[] locales = searchLocalizationHelper.getLocalizedFieldNames(
-			new String[] {"test", "example"},
-			getSearchContext(
-				company, addGroup(company, LocaleUtil.GERMANY),
-				addGroup(company, LocaleUtil.SPAIN)));
+			new String[] {"test", "example"}, searchContext);
 
 		assertSameValues(
 			locales, "test_de_DE", "test_es_ES", "example_de_DE",
@@ -189,13 +196,11 @@ public class SearchLocalizationHelperTest {
 
 		searchContext.setCompanyId(company.getCompanyId());
 
-		long[] groupIds = new long[groups.length];
+		Stream<Group> stream = Arrays.stream(groups);
 
-		for (int i = 0; i < groups.length; i++) {
-			Group group = groups[i];
-
-			groupIds[i] = group.getGroupId();
-		}
+		long[] groupIds = stream.mapToLong(
+			Group::getGroupId
+		).toArray();
 
 		searchContext.setGroupIds(groupIds);
 

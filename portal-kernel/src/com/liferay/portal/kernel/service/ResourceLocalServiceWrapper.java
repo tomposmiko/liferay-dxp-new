@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class ResourceLocalServiceWrapper
 	implements ResourceLocalService, ServiceWrapper<ResourceLocalService> {
 
-	public ResourceLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ResourceLocalServiceWrapper(
 		ResourceLocalService resourceLocalService) {
 
@@ -193,17 +189,6 @@ public class ResourceLocalServiceWrapper
 			addGroupPermissions, addGuestPermissions);
 	}
 
-	@Override
-	public void addResources(
-			long companyId, long groupId, long userId, java.lang.String name,
-			long primKey, boolean portletActions, ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_resourceLocalService.addResources(
-			companyId, groupId, userId, name, primKey, portletActions,
-			serviceContext);
-	}
-
 	/**
 	 * Adds resources for the entity with the name and primary key string,
 	 * always creating a resource at the individual scope and only creating
@@ -257,12 +242,12 @@ public class ResourceLocalServiceWrapper
 
 	@Override
 	public void copyModelResources(
-			long companyId, java.lang.String name, long sourcePrimKey,
-			long targetPrimKey)
+			long companyId, java.lang.String name, long oldPrimKey,
+			long newPrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceLocalService.copyModelResources(
-			companyId, name, sourcePrimKey, targetPrimKey);
+			companyId, name, oldPrimKey, newPrimKey);
 	}
 
 	/**

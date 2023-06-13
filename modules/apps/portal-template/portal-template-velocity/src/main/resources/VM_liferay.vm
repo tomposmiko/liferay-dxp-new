@@ -3,9 +3,9 @@
 #set ($js_main_file = "")
 
 #if ($themeDisplay)
-	#set ($css_main_file = $htmlUtil.escape($themeDisplay.getMainCSSURL()))
+	#set ($css_main_file = $htmlUtil.escape($portalUtil.getStaticResourceURL($request, "$themeDisplay.getPathThemeCss()/main.css")))
 	#set ($is_signed_in = $themeDisplay.isSignedIn())
-	#set ($js_main_file = $htmlUtil.escape($themeDisplay.getClayCSSURL()))
+	#set ($js_main_file = $htmlUtil.escape($portalUtil.getStaticResourceURL($request, "$themeDisplay.getPathThemeCss()/main.js")))
 #end
 
 #set ($is_setup_complete = false)

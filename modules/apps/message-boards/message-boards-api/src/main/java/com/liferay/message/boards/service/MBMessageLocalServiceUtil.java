@@ -56,15 +56,15 @@ public class MBMessageLocalServiceUtil {
 	}
 
 	public static MBMessage addDiscussionMessage(
-			String externalReferenceCode, long userId, String userName,
-			long groupId, String className, long classPK, long threadId,
-			long parentMessageId, String subject, String body,
+			long userId, String userName, long groupId, String className,
+			long classPK, long threadId, long parentMessageId, String subject,
+			String body,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addDiscussionMessage(
-			externalReferenceCode, userId, userName, groupId, className,
-			classPK, threadId, parentMessageId, subject, body, serviceContext);
+			userId, userName, groupId, className, classPK, threadId,
+			parentMessageId, subject, body, serviceContext);
 	}
 
 	/**
@@ -452,11 +452,29 @@ public class MBMessageLocalServiceUtil {
 		return getService().fetchMBMessage(messageId);
 	}
 
+	/**
+	 * Returns the message-boards message with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the message-boards message's external reference code
+	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 */
 	public static MBMessage fetchMBMessageByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long groupId, String externalReferenceCode) {
 
 		return getService().fetchMBMessageByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchMBMessageByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static MBMessage fetchMBMessageByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return getService().fetchMBMessageByReferenceCode(
+			groupId, externalReferenceCode);
 	}
 
 	public static MBMessage fetchMBMessageByUrlSubject(
@@ -672,12 +690,20 @@ public class MBMessageLocalServiceUtil {
 		return getService().getMBMessage(messageId);
 	}
 
+	/**
+	 * Returns the message-boards message with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the message-boards message's external reference code
+	 * @return the matching message-boards message
+	 * @throws PortalException if a matching message-boards message could not be found
+	 */
 	public static MBMessage getMBMessageByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getMBMessageByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -957,18 +983,18 @@ public class MBMessageLocalServiceUtil {
 		getService().unsubscribeMessage(userId, messageId);
 	}
 
-	public static MBMessage updateAnswer(
+	public static void updateAnswer(
 			long messageId, boolean answer, boolean cascade)
 		throws PortalException {
 
-		return getService().updateAnswer(messageId, answer, cascade);
+		getService().updateAnswer(messageId, answer, cascade);
 	}
 
-	public static MBMessage updateAnswer(
+	public static void updateAnswer(
 			MBMessage message, boolean answer, boolean cascade)
 		throws PortalException {
 
-		return getService().updateAnswer(message, answer, cascade);
+		getService().updateAnswer(message, answer, cascade);
 	}
 
 	public static void updateAsset(

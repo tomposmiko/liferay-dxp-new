@@ -14,9 +14,8 @@
 
 package com.liferay.fragment.internal.renderer;
 
-import com.liferay.frontend.taglib.clay.servlet.taglib.IconTag;
 import com.liferay.info.item.renderer.InfoItemRenderer;
-import com.liferay.info.item.renderer.InfoItemRendererRegistry;
+import com.liferay.info.item.renderer.InfoItemRendererTracker;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -26,7 +25,6 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -37,7 +35,6 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
 
 /**
  * @author Eudaldo Alonso
@@ -45,24 +42,14 @@ import javax.servlet.jsp.JspException;
 public class FragmentRendererUtil {
 
 	public static List<InfoItemRenderer<?>> getInfoItemRenderers(
-		String className, Class<?> clazz,
-		InfoItemRendererRegistry infoItemRendererRegistry) {
-
-		if (Validator.isNotNull(className)) {
-			List<InfoItemRenderer<?>> infoItemRenderers =
-				infoItemRendererRegistry.getInfoItemRenderers(className);
-
-			if (!infoItemRenderers.isEmpty()) {
-				return infoItemRenderers;
-			}
-		}
+		Class<?> clazz, InfoItemRendererTracker infoItemRendererTracker) {
 
 		Class<?>[] interfaces = clazz.getInterfaces();
 
 		if (interfaces.length != 0) {
 			for (Class<?> anInterface : interfaces) {
 				List<InfoItemRenderer<?>> infoItemRenderers =
-					infoItemRendererRegistry.getInfoItemRenderers(
+					infoItemRendererTracker.getInfoItemRenderers(
 						anInterface.getName());
 
 				if (!infoItemRenderers.isEmpty()) {
@@ -74,8 +61,7 @@ public class FragmentRendererUtil {
 		Class<?> superClass = clazz.getSuperclass();
 
 		if (superClass != null) {
-			return getInfoItemRenderers(
-				className, superClass, infoItemRendererRegistry);
+			return getInfoItemRenderers(superClass, infoItemRendererTracker);
 		}
 
 		return null;
@@ -122,43 +108,7 @@ public class FragmentRendererUtil {
 		}
 		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
-			}
-		}
-	}
-
-	public static void printRestrictedContentMessage(
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse) {
-
-		try {
-			PrintWriter printWriter = httpServletResponse.getWriter();
-
-			printWriter.write(
-				"<div class=\"alert alert-secondary align-items-baseline " +
-					"bg-light d-flex\"><span class=\"alert-indicator " +
-						"flex-shrink-0 mr-2\">");
-
-			IconTag iconTag = new IconTag();
-
-			iconTag.setCssClass("lexicon-icon lexicon-icon-password-policies");
-
-			iconTag.setSymbol("password-policies");
-
-			printWriter.write(
-				iconTag.doTagAsString(httpServletRequest, httpServletResponse));
-
-			printWriter.write("</span>");
-			printWriter.write(
-				LanguageUtil.get(
-					httpServletRequest,
-					"this-content-cannot-be-displayed-due-to-permission-" +
-						"restrictions"));
-			printWriter.write("</div>");
-		}
-		catch (IOException | JspException exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(ioException, ioException);
 			}
 		}
 	}

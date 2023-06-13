@@ -14,22 +14,32 @@
 
 package com.liferay.rss.taglib.internal.servlet;
 
-import com.liferay.osgi.util.service.Snapshot;
-
 import javax.servlet.ServletContext;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Sergio González
  */
+@Component(immediate = true, service = {})
 public class ServletContextUtil {
 
-	public static ServletContext getServletContext() {
-		return _servletContextSnapshot.get();
+	public static String getContextPath() {
+		return _servletContext.getContextPath();
 	}
 
-	private static final Snapshot<ServletContext> _servletContextSnapshot =
-		new Snapshot<>(
-			ServletContextUtil.class, ServletContext.class,
-			"(osgi.web.symbolicname=com.liferay.rss.taglib)");
+	public static ServletContext getServletContext() {
+		return _servletContext;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.rss.taglib)", unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
+	private static ServletContext _servletContext;
 
 }

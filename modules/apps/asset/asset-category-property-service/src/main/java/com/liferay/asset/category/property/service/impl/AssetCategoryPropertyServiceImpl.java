@@ -96,7 +96,7 @@ public class AssetCategoryPropertyServiceImpl
 	public List<AssetCategoryProperty> getCategoryPropertyValues(
 		long companyId, String key) {
 
-		return _filterAssetCategoryProperties(
+		return filterAssetCategoryProperties(
 			assetCategoryPropertyLocalService.getCategoryPropertyValues(
 				companyId, key));
 	}
@@ -126,7 +126,7 @@ public class AssetCategoryPropertyServiceImpl
 		return updateCategoryProperty(0, categoryPropertyId, key, value);
 	}
 
-	private List<AssetCategoryProperty> _filterAssetCategoryProperties(
+	protected List<AssetCategoryProperty> filterAssetCategoryProperties(
 		List<AssetCategoryProperty> assetCategoryProperties) {
 
 		List<AssetCategoryProperty> filteredAssetCategoryProperties =
@@ -149,7 +149,7 @@ public class AssetCategoryPropertyServiceImpl
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}

@@ -14,11 +14,16 @@ definition {
 
 		AssertLocation(value1 = "${portalURL}/web/guest?SM_USER=test@liferay.com");
 
-		SearchAdministration.executeReindex();
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
+
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
 	}
 
 	@description = "This is a use case for LRQA-61632."
-	@priority = 3
+	@priority = "3"
 	test AddWCWithFirstComplexStructure {
 		property data.archive.type = "data-archive-web-content-first-complex-fields";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -85,37 +90,38 @@ definition {
 
 			for (var fieldName : list "Logo,Beneficio,Companhia,JeitoIdentificar,Destino,DescricaoOpPar,CompanhiaOperadora") {
 				FormFields.addRepeatableField(
-					key_fieldName = ${fieldName},
-					key_repeatableFieldNumber = 1);
+					key_fieldName = "${fieldName}",
+					key_repeatableFieldNumber = "1");
 			}
 
 			for (var fieldName : list "Logo,Beneficio,Companhia,JeitoIdentificar,Destino,DescricaoOpPar,CompanhiaOperadora") {
 				DataEngine.assertFieldRepeated(
-					fieldName = ${fieldName},
-					index = 1);
+					fieldName = "${fieldName}",
+					index = "1");
 
 				DataEngine.assertFieldRepeated(
-					fieldName = ${fieldName},
-					index = 2);
+					fieldName = "${fieldName}",
+					index = "2");
 			}
 		}
 
 		task ("Duplicate fields and then remove duplicates") {
-			for (var fieldName : list "Logo,Beneficio,Companhia,JeitoIdentificar,CompanhiaOperadora") {
+			for (var fieldName : list "Logo,Beneficio,Companhia,JeitoIdentificar") {
 				Click(
-					key_fieldName = ${fieldName},
+					key_fieldName = "${fieldName}",
 					locator1 = "DDMField#REMOVE_REPEATED_FIELD");
 			}
+			Click(locator1 = "xpath=(//div[contains(@data-field-name,'CompanhiaOperadora')]/..//button[@*='Remove'])[3]");
 
 			for (var fieldName : list "Destino,DescricaoOpPar") {
 				Click(
-					key_fieldName = ${fieldName},
+					key_fieldName = "${fieldName}",
 					locator1 = "DDMField#REMOVE_REPEATED_FIELD");
 			}
 
 			for (var fieldName : list "Logo,Beneficio,Companhia,JeitoIdentificar,CompanhiaOperadora,DescricaoOpPar,Destino") {
 				AssertElementNotPresent(
-					key_fieldName = ${fieldName},
+					key_fieldName = "${fieldName}",
 					locator1 = "DDMField#REMOVE_REPEATED_FIELD");
 			}
 		}
@@ -147,11 +153,11 @@ definition {
 
 			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-			var i = 1;
+			var i = "1";
 
-			while (${i} != 31) {
+			while (!("${i}" == "31")) {
 				AssertTextEquals.assertPartialText(
-					locator1 = "//div[@class='portlet-body']/div[contains(@class,'container-fluid-max')]",
+					locator1 = "//div[@class='portlet-body']/div[contains(@class,'mt-2')]",
 					value1 = "text${i}");
 
 				var i = ${i} + 1;
@@ -159,8 +165,8 @@ definition {
 
 			for (var fieldValue : list "Link Pagina Origem,Link Pagina Atual") {
 				AssertTextEquals.assertPartialText(
-					locator1 = "//div[@class='portlet-body']/div[contains(@class,'container-fluid-max')]",
-					value1 = ${fieldValue});
+					locator1 = "//div[@class='portlet-body']/div[contains(@class,'mt-2')]",
+					value1 = "${fieldValue}");
 			}
 
 			for (var i : list "1,2,3,4") {
@@ -179,21 +185,18 @@ definition {
 
 			IFrame.closeFrame();
 
-			var i = 1;
+			var i = "1";
 
-			while (${i} != 31) {
-				WebContentDisplayPortlet.viewContent(
-					webContentContent = "text${i}",
-					webContentTitle = "Web Content Complex Title 1");
+			while (!("${i}" == "31")) {
+				WebContent.viewPGViaWCD(webContentContent = "text${i}");
 
 				var i = ${i} + 1;
 			}
 
-			for (var displayText : list "Link Pagina Origem,Link Pagina Atual") {
+			for (var contentText : list "Link Pagina Origem,Link Pagina Atual") {
 				AssertElementPresent(
-					key_displayText = ${displayText},
-					key_webContentTitle = "Web Content Complex Title 1",
-					locator1 = "WCD#WEB_CONTENT_LINK");
+					key_contentText = "${contentText}",
+					locator1 = "WCD#WEB_CONTENT_TEXT_LINK_URL");
 			}
 
 			for (var i : list "1,2,3,4") {
@@ -209,7 +212,7 @@ definition {
 			NavItem.gotoStructures();
 
 			WebContentStructures.copyCP(
-				locale = "en-US",
+				locale = "en_US",
 				structureCopyLocalName = "WC Structure Copy En-US Name",
 				structureCopyName = "WC Structure Copy Name",
 				structureName = "WC Structure Name");
@@ -235,9 +238,7 @@ definition {
 
 				MouseOver(locator1 = "//div[contains(@data-field-name,'CompanhiaOperadoraFieldSet')]//div[contains(@class,'placeholder')]");
 
-				Click.clickNoWaitForVisible(locator1 = "//div[contains(@data-field-name,'CompanhiaOperadoraFieldSet')]//div[contains(@class,'dropdown-action')]//button[contains(@class,'dropdown-toggle')]");
-
-				MenuItem.clickNoError(menuItem = "Duplicate");
+				LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "Duplicate");
 			}
 
 			WebContentStructures.saveCP();
@@ -253,7 +254,7 @@ definition {
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
 			for (var nestedFieldLabel : list "Imagem Aba 01,Descricao Aba 01") {
-				DataEngine.moveNestedField(nestedFieldLabel = ${nestedFieldLabel});
+				DataEngine.moveNestedField(nestedFieldLabel = "${nestedFieldLabel}");
 			}
 
 			for (var nestedFieldLabel : list "Imagem Aba 01,Descricao Aba 01") {
@@ -270,7 +271,7 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			PortletEntry.changeLocale(locale = "en-US");
+			PortletEntry.changeLocale(locale = "en_US");
 
 			DataEngine.editFieldLabel(
 				fieldFieldLabel = "PaginaOrigem",
@@ -284,7 +285,7 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			PortletEntry.changeLocale(locale = "en-US");
+			PortletEntry.changeLocale(locale = "en_US");
 
 			WebContent.assertFieldOnWebContent(fieldFieldLabel = "HomePage");
 
@@ -325,9 +326,15 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			WebContentStructures.addLocalization(
-				locale = "zh-CN",
-				localization1Name = "");
+			PortletEntry.changeLocale(locale = "zh-CN");
+
+			Click(locator1 = "TextInput#NAME");
+
+			RobotType.robotTypeShortcut(locator1 = "Ctrl + a");
+
+			KeyPress(
+				locator1 = "TextInput#NAME",
+				value1 = "\BACK_SPACE");
 
 			WebContentStructures.saveCP();
 
@@ -342,7 +349,7 @@ definition {
 			AssertTextEquals(
 				key_localizedLanguage = "zh-CN",
 				locator1 = "Translation#TRANSLATION_STATUS_TITLE",
-				value1 = "Not Translated");
+				value1 = "Untranslated");
 		}
 
 		task ("View Translation while Editing article") {
@@ -376,39 +383,39 @@ definition {
 
 			AssertAttributeValue(
 				attribute1 = "value",
-				index = 1,
+				index = "1",
 				key_fieldFieldLabel = "PaginaOrigem",
 				locator1 = "WCEditWebContent#ANY_TEXT_INPUT",
 				value1 = "text1");
 
 			AssertAttributeValue(
 				attribute1 = "value",
-				index = 1,
+				index = "1",
 				key_fieldFieldLabel = "Pagina Atual",
 				locator1 = "WCEditWebContent#ANY_TEXT_INPUT",
 				value1 = "text2");
 
 			WebContent.viewWithStructureCP(
-				skipGotoEditCp = "true",
+				skipGotoEditCP = "true",
 				webContentLinkToPage = "Page1",
 				webContentLinkToPageFieldLabel = "Link Pagina Origem",
 				webContentTitle = "Web Content Complex Title 1");
 
 			WebContent.viewWithStructureCP(
-				skipGotoEditCp = "true",
+				skipGotoEditCP = "true",
 				webContentLinkToPage = "Page2",
 				webContentLinkToPageFieldLabel = "Link Pagina Atual",
 				webContentTitle = "Web Content Complex Title 1");
 
 			WebContent.viewWithStructureCP(
-				skipGotoEditCp = "true",
+				skipGotoEditCP = "true",
 				webContentImage = "Document_1.jpg",
 				webContentImageDescription = "image1",
 				webContentImageFieldLabel = "Imagem Aba 01",
 				webContentTitle = "Web Content Complex Title 1");
 
 			WebContent.viewWithStructureCP(
-				skipGotoEditCp = "true",
+				skipGotoEditCP = "true",
 				webContentImage = "Document_2.jpg",
 				webContentImageDescription = "image2",
 				webContentImageFieldLabel = "Logo",
@@ -419,7 +426,7 @@ definition {
 	}
 
 	@description = "This is a use case for LRQA-61632."
-	@priority = 3
+	@priority = "3"
 	test AddWCWithSecondComplexStructure {
 		property data.archive.type = "data-archive-web-content-second-complex-fields";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -486,16 +493,16 @@ definition {
 
 			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Complex Title 1");
 
-			for (var fieldName : list "ItemUFComunicado,ItemDoParagrafoBanner,ListaDDI,ItensDeGenero,Estado,ItemPais") {
+			for (var fieldName : list "ItemUFComunicado,ItemDoParagrafoBanner,ListaDDI,ItensDeGenero,ItemPais,Estado") {
 				FormFields.addRepeatableField(
-					fieldName = ${fieldName},
-					index = 1,
-					key_fieldName = ${fieldName},
-					key_repeatableFieldNumber = 1);
+					fieldName = "${fieldName}",
+					index = "1",
+					key_fieldName = "${fieldName}",
+					key_repeatableFieldNumber = "1");
 
 				DataEngine.assertFieldRepeated(
-					fieldName = ${fieldName},
-					index = 2);
+					fieldName = "${fieldName}",
+					index = "2");
 			}
 
 			PortletEntry.publish();
@@ -506,21 +513,15 @@ definition {
 
 			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Complex Title 1");
 
-			Click(
-				key_fieldName = "ItemPais",
-				key_index = 4,
-				locator1 = "DDMField#REMOVE_REPEATED_FIELD_N");
-
-			for (var fieldName : list "ItemUFComunicado,ItemDoParagrafoBanner,ListaDDI,ItensDeGenero,Estado") {
+			for (var fieldName : list "ItemUFComunicado,ItemDoParagrafoBanner,ListaDDI,ItensDeGenero,Estado,ItemPais") {
 				Click(
-					key_fieldName = ${fieldName},
-					key_index = 2,
-					locator1 = "DDMField#REMOVE_REPEATED_FIELD_N");
+					key_fieldName = "${fieldName}",
+					locator1 = "DDMField#REMOVE_REPEATED_FIELD");
 			}
 
 			for (var fieldName : list "ItemUFComunicado,ItemDoParagrafoBanner,ListaDDI,ItensDeGenero,Estado,ItemPais") {
 				AssertElementNotPresent(
-					key_fieldName = ${fieldName},
+					key_fieldName = "${fieldName}",
 					locator1 = "DDMField#REMOVE_REPEATED_FIELD");
 			}
 
@@ -554,11 +555,11 @@ definition {
 
 			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-			var i = 1;
+			var i = "1";
 
-			while (${i} != 121) {
+			while (!("${i}" == "121")) {
 				AssertTextEquals.assertPartialText(
-					locator1 = "//div[@class='portlet-body']/div[contains(@class,'container-fluid-max')]",
+					locator1 = "//div[@class='portlet-body']/div[contains(@class,'mt-2')]",
 					value1 = "text${i}");
 
 				var i = ${i} + 1;
@@ -578,12 +579,10 @@ definition {
 
 			IFrame.closeFrame();
 
-			var i = 1;
+			var i = "1";
 
-			while (${i} != 121) {
-				WebContentDisplayPortlet.viewContent(
-					webContentContent = "text${i}",
-					webContentTitle = "Web Content Complex Title 1");
+			while (!("${i}" == "121")) {
+				WebContent.viewPGViaWCD(webContentContent = "text${i}");
 
 				var i = ${i} + 1;
 			}
@@ -627,9 +626,7 @@ definition {
 
 				MouseOver(locator1 = "//div[contains(@data-field-name,'ListaDePaisesFieldSet')]//div[contains(@class,'placeholder')]");
 
-				Click.clickNoWaitForVisible(locator1 = "//div[contains(@data-field-name,'ListaDePaisesFieldSet')]//div[contains(@class,'dropdown-action')]//button[contains(@class,'dropdown-toggle')]");
-
-				MenuItem.clickNoError(menuItem = "Duplicate");
+				LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "Duplicate");
 			}
 
 			WebContentStructures.saveCP();
@@ -699,7 +696,7 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			PortletEntry.changeLocale(locale = "en-US");
+			PortletEntry.changeLocale(locale = "en_US");
 
 			DataEngine.editFieldLabel(
 				fieldFieldLabel = "Label UF Comunicado",
@@ -717,7 +714,7 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			PortletEntry.changeLocale(locale = "en-US");
+			PortletEntry.changeLocale(locale = "en_US");
 
 			WebContent.assertFieldOnWebContent(fieldFieldLabel = "Label UF Release");
 
@@ -758,9 +755,15 @@ definition {
 
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Name");
 
-			WebContentStructures.addLocalization(
-				locale = "zh-CN",
-				localization1Name = "");
+			PortletEntry.changeLocale(locale = "zh-CN");
+
+			Click(locator1 = "TextInput#NAME");
+
+			RobotType.robotTypeShortcut(locator1 = "Ctrl + a");
+
+			KeyPress(
+				locator1 = "TextInput#NAME",
+				value1 = "\BACK_SPACE");
 
 			WebContentStructures.saveCP();
 
@@ -775,7 +778,7 @@ definition {
 			AssertTextEquals(
 				key_localizedLanguage = "zh-CN",
 				locator1 = "Translation#TRANSLATION_STATUS_TITLE",
-				value1 = "Not Translated");
+				value1 = "Untranslated");
 		}
 
 		task ("View Translation while Editing article") {
@@ -859,7 +862,7 @@ definition {
 			WebContentNavigator.gotoEditStructure(structureName = "WC Structure Copy Name");
 
 			for (var fieldName : list "Label UF Comunicado,Lista UF Comunicado,Mensagem de erro de timeout,Titulo Mobile,Titulo,Informe Titulo,Informativo Formulario Cadastro,Titulo Programa Milhas,Texo Box Programa Amigo,Informe Programa Milhas,Footer Cadastro,Botao Cadastrar,Footer Cadastro Mobile,Botao Cadastrar Mobile,Informe Programa Amigo,Botao Quero Participar,Botao Quero Participar Mobile,Nacionalidade,Rotulo - Primeiro Nome,Título do banner,Rótulo - Nome do meio,Rótulo - Sobrenome,Rótulo - Email,Rótulo - Confirmação Email,Rótulo - Senha,Rótulo - Confirmação Senha,DDI,CPF,Passaporte,Celular,Data de Nascimento,Gênero,País de residência,UF,CEP,Cidade,Bairro,Endereço,Número,Complemento,Texto Box Amigo,País") {
-				DataEngine.editFieldRequired(fieldFieldLabel = ${fieldName});
+				DataEngine.editFieldRequired(fieldFieldLabel = "${fieldName}");
 			}
 
 			WebContentStructures.saveCP();
@@ -876,7 +879,7 @@ definition {
 
 			for (var fieldName : list "Label UF Comunicado,Lista UF Comunicado,Mensagem de erro de timeout,Titulo Mobile,Titulo,Informativo Formulario Cadastro,Titulo Programa Milhas,Texo Box Programa Amigo,Informe Programa Milhas,Footer Cadastro,Botao Cadastrar,Footer Cadastro Mobile,Botao Cadastrar Mobile,Informe Programa Amigo,Botao Quero Participar,Botao Quero Participar Mobile,Nacionalidade,Rotulo - Primeiro Nome,Título do banner,Rótulo - Nome do meio,Rótulo - Sobrenome,Rótulo - Email,Rótulo - Confirmação Email,Rótulo - Senha,Rótulo - Confirmação Senha,DDI,CPF,Passaporte,Celular,Data de Nascimento,Gênero,País de residência,UF,CEP,Cidade,Bairro,Endereço,Número,Complemento,Texto Box Amigo,País") {
 				AssertTextEquals(
-					key_fieldFieldLabel = ${fieldName},
+					key_fieldFieldLabel = "${fieldName}",
 					locator1 = "WCEditWebContent#FIELD_REQUIRED_ALERT",
 					value1 = "Este campo é obrigatório.");
 			}
@@ -896,19 +899,19 @@ definition {
 			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Complex Title 1");
 
 			WebContent.viewWithStructureCP(
-				skipGotoEditCp = "true",
+				skipGotoEditCP = "true",
 				webContentText = "text1",
 				webContentTextFieldLabel = "Label UF Comunicado",
 				webContentTitle = "Web Content Complex Title 1");
 
 			WebContent.viewWithStructureCP(
-				skipGotoEditCp = "true",
+				skipGotoEditCP = "true",
 				webContentText = "text2",
 				webContentTextFieldLabel = "Lista UF Comunicado",
 				webContentTitle = "Web Content Complex Title 1");
 
 			WebContent.viewWithStructureCP(
-				skipGotoEditCp = "true",
+				skipGotoEditCP = "true",
 				webContentImage = "Document_1.jpg",
 				webContentImageDescription = "image1",
 				webContentImageFieldLabel = "Url imagem",
@@ -918,335 +921,247 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-126653. Upgrade 7.0.4 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher704 {
+	@description = "This is a test for LPS-126653. Upgrade 7.0 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
+	@priority = "5"
+	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher704 {
 		property data.archive.type = "data-archive-web-content-with-fields";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.0.4";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher704";
 
-		ValidateWebContentUpgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher(webContentColor = "false");
+		Upgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher(webContentColor = "false");
+
+		Upgrade.EditWebContentAndViewInWCDandAssetPublisher();
+
+		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher(webContentColor = "false");
 	}
 
-	@description = "This is a test for LPS-126654. Upgrade 7.1.3 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher713 {
+	@description = "This is a test for LPS-126654. Upgrade 7.1 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
+	@priority = "5"
+	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher713 {
 		property data.archive.type = "data-archive-web-content-with-fields";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.1.3";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher713";
 
-		ValidateWebContentUpgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
+		Upgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
+
+		Upgrade.EditWebContentAndViewInWCDandAssetPublisher();
+
+		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
 	}
 
-	@description = "This is a test for LPS-126655. Upgrade 7.2.1 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher721 {
+	@description = "This is a test for LPS-126655. Upgrade 7.2 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
+	@priority = "5"
+	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher721 {
 		property data.archive.type = "data-archive-web-content-with-fields";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.2.1";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher721";
 
-		ValidateWebContentUpgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
+		Upgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
+
+		Upgrade.EditWebContentAndViewInWCDandAssetPublisher();
+
+		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
 	}
 
-	@description = "This is a test for LPS-126656. Upgrade 7.3.5 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher735 {
+	@description = "This is a test for LPS-126656. Upgrade 7.3 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
+	@priority = "5"
+	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher735 {
 		property data.archive.type = "data-archive-web-content-with-fields";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.3.5";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher735";
 
-		ValidateWebContentUpgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
+		Upgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
+
+		Upgrade.EditWebContentAndViewInWCDandAssetPublisher();
+
+		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
 	}
 
-	@description = "This is a test for LPS-126656. Upgrade 7.3.10 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher7310 {
+	@description = "This is a test for LPS-126656. Upgrade 7.3 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
+	@priority = "5"
+	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher7310 {
 		property data.archive.type = "data-archive-web-content-with-fields";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "7.3.10";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher7310";
 
-		ValidateWebContentUpgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
+		Upgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
+
+		Upgrade.EditWebContentAndViewInWCDandAssetPublisher();
+
+		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
 	}
 
-	@description = "This is a test for LPS-126654. Upgrade 7.1.10.3 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher71103 {
+	@description = "This is a test for LPS-126654. Upgrade 7.1 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
+	@priority = "5"
+	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher71103 {
 		property data.archive.type = "data-archive-web-content-with-fields";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "7.1.10.3";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher71103";
 
-		ValidateWebContentUpgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
+		Upgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
+
+		Upgrade.EditWebContentAndViewInWCDandAssetPublisher();
+
+		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
 	}
 
-	@description = "This is a test for LPS-126655. Upgrade 7.2.10.1 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher72101 {
+	@description = "This is a test for LPS-126655. Upgrade 7.2 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
+	@priority = "5"
+	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher72101 {
 		property data.archive.type = "data-archive-web-content-with-fields";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.2.10.1";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher72101";
 
-		ValidateWebContentUpgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
+		Upgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
+
+		Upgrade.EditWebContentAndViewInWCDandAssetPublisher();
+
+		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher();
 	}
 
-	@description = "This is a test for LPS-126653. Upgrade 7.0.10.14 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher701014 {
+	@description = "This is a test for LPS-126653. Upgrade 7.0 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
+	@priority = "5"
+	test ViewAndEditWebContentWCStructureWCTemplateWCDAndAssetPublisher701014 {
 		property data.archive.type = "data-archive-web-content-with-fields";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "7.0.10.14";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWCStructureWCTemplateAndViewInWCDAndAssetPublisher701014";
 
-		ValidateWebContentUpgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher(webContentColor = "false");
+		Upgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher(webContentColor = "false");
+
+		Upgrade.EditWebContentAndViewInWCDandAssetPublisher();
+
+		Upgrade.EditWCStructureAndTemplateAndViewInWCDandAssetPublisher(webContentColor = "false");
 	}
 
-	@description = "This is a test for LPS-126653. Upgrade 7.0.4 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWebContentAndViewInWCDAndAssetPublisher704 {
-		property data.archive.type = "data-archive-web-content-with-fields";
+	@description = "This is a use case for LPS-75561."
+	@priority = "5"
+	test ViewLayoutArchive625 {
+		property data.archive.type = "data-archive-pages-administration";
 		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.0.4";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWebContentAndViewInWCDAndAssetPublisher704";
+		property portal.version = "6.2.5";
 
-		ValidateWebContentUpgrade.EditWebContentAndViewInWCDandAssetPublisher();
+		Navigator.openURL();
+
+		Portlet.addPG(portletName = "Web Content Display");
+
+		AssertTextNotPresent(value1 = "There was an unexpected error. Please refresh the current page.");
 	}
 
-	@description = "This is a test for LPS-126654. Upgrade 7.1.3 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWebContentAndViewInWCDAndAssetPublisher713 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.1.3";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWebContentAndViewInWCDAndAssetPublisher713";
-
-		ValidateWebContentUpgrade.EditWebContentAndViewInWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126655. Upgrade 7.2.1 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWebContentAndViewInWCDAndAssetPublisher721 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.2.1";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWebContentAndViewInWCDAndAssetPublisher721";
-
-		ValidateWebContentUpgrade.EditWebContentAndViewInWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126656. Upgrade 7.3.5 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWebContentAndViewInWCDAndAssetPublisher735 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.3.5";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWebContentAndViewInWCDAndAssetPublisher735";
-
-		ValidateWebContentUpgrade.EditWebContentAndViewInWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126656. Upgrade 7.3.10 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWebContentAndViewInWCDAndAssetPublisher7310 {
-		property data.archive.type = "data-archive-web-content-with-fields";
+	@description = "This is a use case for LPS-75561."
+	@priority = "5"
+	test ViewLayoutArchive621015 {
+		property data.archive.type = "data-archive-pages-administration";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "7.3.10";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWebContentAndViewInWCDAndAssetPublisher7310";
+		property portal.version = "6.2.10.15";
 
-		ValidateWebContentUpgrade.EditWebContentAndViewInWCDandAssetPublisher();
+		Navigator.openURL();
+
+		Portlet.addPG(portletName = "Web Content Display");
+
+		AssertTextNotPresent(value1 = "There was an unexpected error. Please refresh the current page.");
 	}
 
-	@description = "This is a test for LPS-126654. Upgrade 7.1.10.3 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWebContentAndViewInWCDAndAssetPublisher71103 {
-		property data.archive.type = "data-archive-web-content-with-fields";
+	@description = "This is a use case for LPS-75561."
+	@priority = "5"
+	test ViewLayoutArchive621021 {
+		property data.archive.type = "data-archive-pages-administration";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "7.1.10.3";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWebContentAndViewInWCDAndAssetPublisher71103";
+		property portal.version = "6.2.10.21";
 
-		ValidateWebContentUpgrade.EditWebContentAndViewInWCDandAssetPublisher();
+		Navigator.openURL();
+
+		Portlet.addPG(portletName = "Web Content Display");
+
+		AssertTextNotPresent(value1 = "There was an unexpected error. Please refresh the current page.");
 	}
 
-	@description = "This is a test for LPS-126655. Upgrade 7.2.10.1 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWebContentAndViewInWCDAndAssetPublisher72101 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.2.10.1";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWebContentAndViewInWCDAndAssetPublisher72101";
+	@description = "This is a use case for LPS-71487."
+	@priority = "5"
+	test ViewMultiWCDArchive625 {
+		property data.archive.type = "data-archive-multi-wcd-portlet";
+		property database.types = "mysql";
+		property portal.version = "6.2.5";
 
-		ValidateWebContentUpgrade.EditWebContentAndViewInWCDandAssetPublisher();
+		Navigator.gotoPage(pageName = "Web Content Display Page");
+
+		Portlet.viewDuplicatePG(
+			portletName = "Web Content Display",
+			totalPortletCount = "3");
 	}
 
-	@description = "This is a test for LPS-126653. Upgrade 7.0.10.14 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test EditWebContentAndViewInWCDAndAssetPublisher701014 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "7.0.10.14";
-		property test.name.skip.portal.instance = "WebContentUpgrade#EditWebContentAndViewInWCDAndAssetPublisher701014";
+	@description = "This is a use case for LPS-71487."
+	@priority = "5"
+	test ViewMultiWCDArchive621015 {
+		property data.archive.type = "data-archive-multi-wcd-portlet";
+		property database.types = "db2,mysql,oracle,sybase";
+		property portal.version = "6.2.10.15";
 
-		ValidateWebContentUpgrade.EditWebContentAndViewInWCDandAssetPublisher();
+		Navigator.gotoPage(pageName = "Web Content Display Page");
+
+		Portlet.viewDuplicatePG(
+			portletName = "Web Content Display",
+			totalPortletCount = "3");
 	}
 
-	@priority = 5
-	test PublishDraftWebContentAfterUpgrade625 {
+	@description = "This is a use case for LPS-71487."
+	@priority = "5"
+	test ViewMultiWCDArchive621021 {
+		property data.archive.type = "data-archive-multi-wcd-portlet";
+		property database.types = "db2,mysql,oracle,postgresql,sybase";
+		property portal.version = "6.2.10.21";
+
+		Navigator.gotoPage(pageName = "Web Content Display Page");
+
+		Portlet.viewDuplicatePG(
+			portletName = "Web Content Display",
+			totalPortletCount = "3");
+	}
+
+	@priority = "5"
+	test ViewWebContentArchive625 {
 		property data.archive.type = "data-archive-web-content-draft";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "6.2.5";
 
-		ValidateWebContentUpgrade.addWCStructureAndTemplate();
+		Upgrade.addWCStructureAndTemplate();
 
-		ValidateWebContentUpgrade.publishWCDraft();
+		Upgrade.publishWCDraft();
 	}
 
-	@priority = 5
-	test PublishDraftWebContentAfterUpgrade621015 {
+	@priority = "5"
+	test ViewWebContentArchive621015 {
 		property data.archive.type = "data-archive-web-content-draft";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "6.2.10.15";
 
-		ValidateWebContentUpgrade.addWCStructureAndTemplate();
+		Upgrade.addWCStructureAndTemplate();
 
-		ValidateWebContentUpgrade.publishWCDraft();
+		Upgrade.publishWCDraft();
 	}
 
-	@priority = 5
-	test PublishDraftWebContentAfterUpgrade621021 {
+	@priority = "5"
+	test ViewWebContentArchive621021 {
 		property data.archive.type = "data-archive-web-content-draft";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
 		property portal.version = "6.2.10.21";
 
-		ValidateWebContentUpgrade.addWCStructureAndTemplate();
+		Upgrade.addWCStructureAndTemplate();
 
-		ValidateWebContentUpgrade.publishWCDraft();
-	}
-
-	@description = "This is a use case for LPS-123590."
-	@priority = 4
-	test ViewSpecificDisplayPageTemplateArchive721 {
-		property data.archive.type = "data-archive-display-page-templates";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.2.1";
-
-		ValidateWebContentUpgrade.viewSpecificDisplayPageTemplateViaAssetPublisher();
-	}
-
-	@description = "This is a use case for LPS-123590."
-	@priority = 4
-	test ViewSpecificDisplayPageTemplateArchive72104 {
-		property data.archive.type = "data-archive-display-page-templates";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property portal.version = "7.2.10.4";
-
-		ValidateWebContentUpgrade.viewSpecificDisplayPageTemplateViaAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126653. Upgrade 7.0.4 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher704 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.0.4";
-		property test.name.skip.portal.instance = "WebContentUpgrade#ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher704";
-
-		ValidateWebContentUpgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher(webContentColor = "false");
-	}
-
-	@description = "This is a test for LPS-126654. Upgrade 7.1.3 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher713 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.1.3";
-		property test.name.skip.portal.instance = "WebContentUpgrade#ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher713";
-
-		ValidateWebContentUpgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126655. Upgrade 7.2.1 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher721 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.2.1";
-		property test.name.skip.portal.instance = "WebContentUpgrade#ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher721";
-
-		ValidateWebContentUpgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126656. Upgrade 7.3.5 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher735 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.3.5";
-		property test.name.skip.portal.instance = "WebContentUpgrade#ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher735";
-
-		ValidateWebContentUpgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126656. Upgrade 7.3.10 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher7310 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "7.3.10";
-		property test.name.skip.portal.instance = "WebContentUpgrade#ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher7310";
-
-		ValidateWebContentUpgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126654. Upgrade 7.1.10.3 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher71103 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "7.1.10.3";
-		property test.name.skip.portal.instance = "WebContentUpgrade#ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher71103";
-
-		ValidateWebContentUpgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126655. Upgrade 7.2.10.1 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher72101 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.2.10.1";
-		property test.name.skip.portal.instance = "WebContentUpgrade#ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher72101";
-
-		ValidateWebContentUpgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher();
-	}
-
-	@description = "This is a test for LPS-126653. Upgrade 7.0.10.14 to Master with a Web Content, a Structure, a WC Template and a page with Web Content Display and Asset Publisher"
-	@priority = 5
-	test ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher701014 {
-		property data.archive.type = "data-archive-web-content-with-fields";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
-		property portal.version = "7.0.10.14";
-		property test.name.skip.portal.instance = "WebContentUpgrade#ViewWebContentWCStructureWCTemplateWCDAndAssetPublisher701014";
-
-		ValidateWebContentUpgrade.ViewWebContentWCStructureWCTemplateWCDandAssetPublisher(webContentColor = "false");
+		Upgrade.publishWCDraft();
 	}
 
 	@description = "This is a use case for LRQA-62720. View web content with all fields and value after upgrade from 6.2."
-	@priority = 4
+	@priority = "4"
 	test ViewWebContentWithAllFieldsArchive621021 {
 		property data.archive.type = "data-archive-web-content-with-all-fields";
 		property database.types = "mysql,oracle,postgresql,sybase";
 		property portal.version = "6.2.10.21";
 
-		ValidateWebContentUpgrade.viewWebContentWithAllFields();
+		Upgrade.viewWebContentWithAllFields();
 	}
 
 	@description = "This is a use case for LPS-98619."
-	@priority = 3
+	@priority = "3"
 	test ViewWebContentWithImageArchive704 {
 		property data.archive.type = "data-archive-web-content-with-image";
 		property database.types = "mariadb,mysql,postgresql";
@@ -1255,32 +1170,16 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Web Content");
 
-		ValidateWebContentUpgrade.viewWithStructureCP(
+		WebContentUpgrade.viewWithStructureCP(
 			webContentImage = "Document_1.jpg",
 			webContentTitle = "WC WebContent Title");
 	}
 
-	@description = "This is a use case for LPS-147234. View web content with image field after upgrade from 7.1.10 GA1."
-	@priority = 4
-	test ViewWebContentWithImageArchive7110 {
-		property data.archive.type = "data-archive-web-content-with-image";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property portal.version = "7.1.10";
-
-		task ("View image is shown in field after upgrade") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			ValidateWebContentUpgrade.viewWithStructureCP(
-				webContentImage = "Document_2.png",
-				webContentTitle = "Web Content Title");
-		}
-	}
-
 	@description = "This is a use case for LPS-98619."
-	@priority = 3
+	@priority = "3"
 	test ViewWebContentWithImageArchive70106 {
 		property data.archive.type = "data-archive-web-content-with-image";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -1290,106 +1189,106 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Web Content");
 
-		ValidateWebContentUpgrade.viewWithStructureCP(
+		WebContentUpgrade.viewWithStructureCP(
 			webContentImage = "Document_1.jpg",
 			webContentTitle = "WC WebContent Title");
 	}
 
 	@description = "This is a use case for LPS-130915."
-	@priority = 5
+	@priority = "5"
 	test ViewWebContentWithNoDisplayPageTemplateArchive735 {
 		property data.archive.type = "data-archive-web-content-with-no-display-page-template";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.3.5";
 
-		ValidateWebContentUpgrade.viewWebContentWithNoDisplayPageTemplate();
+		Upgrade.viewWebContentWithNoDisplayPageTemplate();
 	}
 
 	@description = "This is a use case for LPS-130915."
-	@priority = 5
+	@priority = "5"
 	test ViewWebContentWithNoDisplayPageTemplateArchive73101 {
 		property data.archive.type = "data-archive-web-content-with-no-display-page-template";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property portal.version = "7.3.10.1";
 
-		ValidateWebContentUpgrade.viewWebContentWithNoDisplayPageTemplate();
+		Upgrade.viewWebContentWithNoDisplayPageTemplate();
 	}
 
 	@description = "This is a use case for LRQA-62830."
-	@priority = 4
+	@priority = "4"
 	test ViewWebContentWithPredefinedValueInWebContentFieldArchive713 {
 		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.1.3";
 
-		ValidateWebContentUpgrade.viewWebContentWithPredefinedValueInWebContentField();
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
 	}
 
 	@description = "This is a use case for LRQA-62834."
-	@priority = 4
+	@priority = "4"
 	test ViewWebContentWithPredefinedValueInWebContentFieldArchive721 {
 		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.2.1";
 
-		ValidateWebContentUpgrade.viewWebContentWithPredefinedValueInWebContentField();
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
 	}
 
 	@description = "This is a use case for LRQA-62836."
-	@priority = 4
+	@priority = "4"
 	test ViewWebContentWithPredefinedValueInWebContentFieldArchive730 {
 		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
 		property database.types = "mariadb,mysql,postgresql";
 		property portal.version = "7.3.0";
 
-		ValidateWebContentUpgrade.viewWebContentWithPredefinedValueInWebContentField();
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
 	}
 
 	@description = "This is a use case for LRQA-62830."
-	@priority = 4
+	@priority = "4"
 	test ViewWebContentWithPredefinedValueInWebContentFieldArchive71103 {
 		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property portal.version = "7.1.10.3";
 		property test.run.environment = "EE";
 
-		ValidateWebContentUpgrade.viewWebContentWithPredefinedValueInWebContentField();
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
 	}
 
 	@description = "This is a use case for LRQA-62834."
-	@priority = 4
+	@priority = "4"
 	test ViewWebContentWithPredefinedValueInWebContentFieldArchive72101 {
 		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property portal.version = "7.2.10.1";
 		property test.run.environment = "EE";
 
-		ValidateWebContentUpgrade.viewWebContentWithPredefinedValueInWebContentField();
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
 	}
 
 	@description = "This is a use case for LRQA-62836."
-	@priority = 4
+	@priority = "4"
 	test ViewWebContentWithPredefinedValueInWebContentFieldArchive73101 {
 		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property portal.version = "7.3.10.1";
 		property test.run.environment = "EE";
 
-		ValidateWebContentUpgrade.viewWebContentWithPredefinedValueInWebContentField();
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
 	}
 
 	@description = "This is a use case for LRQA-62801."
-	@priority = 4
+	@priority = "4"
 	test ViewWebContentWithPredefinedValueInWebContentFieldArchive701014 {
 		property data.archive.type = "data-archive-web-content-with-predefined-value-in-web-content-field";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property portal.version = "7.0.10.14";
 		property test.run.environment = "EE";
 
-		ValidateWebContentUpgrade.viewWebContentWithPredefinedValueInWebContentField();
+		Upgrade.viewWebContentWithPredefinedValueInWebContentField();
 	}
 
 }

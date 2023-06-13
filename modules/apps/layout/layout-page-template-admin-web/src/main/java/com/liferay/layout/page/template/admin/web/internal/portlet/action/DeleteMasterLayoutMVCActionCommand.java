@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
 		"mvc.command.name=/layout_page_template_admin/delete_master_layout"
@@ -107,7 +108,7 @@ public class DeleteMasterLayoutMVCActionCommand extends BaseMVCActionCommand {
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 
 				SessionErrors.add(actionRequest, PortalException.class);

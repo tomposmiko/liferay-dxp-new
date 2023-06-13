@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the message boards thread service. This utility wraps <code>com.liferay.message.boards.service.persistence.impl.MBThreadPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1183,7 +1187,7 @@ public class MBThreadUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2831,7 +2835,7 @@ public class MBThreadUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
@@ -3299,7 +3303,7 @@ public class MBThreadUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
@@ -4127,9 +4131,23 @@ public class MBThreadUtil {
 	}
 
 	public static MBThreadPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile MBThreadPersistence _persistence;
+	private static ServiceTracker<MBThreadPersistence, MBThreadPersistence>
+		_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MBThreadPersistence.class);
+
+		ServiceTracker<MBThreadPersistence, MBThreadPersistence>
+			serviceTracker =
+				new ServiceTracker<MBThreadPersistence, MBThreadPersistence>(
+					bundle.getBundleContext(), MBThreadPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

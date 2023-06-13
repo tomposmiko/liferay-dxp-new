@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.lpkg;
 
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
-import com.liferay.portal.kernel.util.SystemProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,7 @@ public class StaticLPKGResolver {
 	private static final List<String> _staticLPKGFileNames;
 
 	static {
-		String staticLPKGBundleSymbolicNames = SystemProperties.get(
+		String staticLPKGBundleSymbolicNames = System.getProperty(
 			"static.lpkg.bundle.symbolic.names");
 
 		List<String> staticLPKGBundleSymbolicNameList = StringUtil.split(

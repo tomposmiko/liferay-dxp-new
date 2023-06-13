@@ -22,9 +22,10 @@ import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Javier Gamarra
@@ -35,14 +36,13 @@ public class PostalAddressUtil {
 		boolean acceptAllLanguages, Address address, long companyId,
 		Locale locale) {
 
-		ListType listType = address.getListType();
+		ListType listType = address.getType();
 
 		return new PostalAddress() {
 			{
 				addressLocality = address.getCity();
 				addressType = listType.getName();
 				id = address.getAddressId();
-				name = address.getName();
 				postalCode = address.getZip();
 				primary = address.isPrimary();
 				streetAddressLine1 = address.getStreet1();
@@ -65,20 +65,17 @@ public class PostalAddressUtil {
 							return null;
 						}
 
-						Map<String, String> countryNames = new HashMap<>();
+						Set<Locale> locales =
+							LanguageUtil.getCompanyAvailableLocales(companyId);
+
+						Stream<Locale> localesStream = locales.stream();
 
 						Country country = address.getCountry();
 
-						for (Locale locale :
-								LanguageUtil.getCompanyAvailableLocales(
-									companyId)) {
-
-							countryNames.put(
-								LocaleUtil.toBCP47LanguageId(locale),
-								country.getName());
-						}
-
-						return countryNames;
+						return localesStream.collect(
+							Collectors.toMap(
+								LocaleUtil::toBCP47LanguageId,
+								country::getName));
 					});
 				setAddressRegion(
 					() -> {

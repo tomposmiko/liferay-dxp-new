@@ -18,7 +18,7 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.order.status.CommerceOrderStatus;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.order.status.key=" + Test1CommerceOrderStatusImpl.KEY,
 		"commerce.order.status.priority:Integer=" + Test1CommerceOrderStatusImpl.PRIORITY
@@ -59,7 +60,7 @@ public class Test1CommerceOrderStatusImpl implements CommerceOrderStatus {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "test");
+		return LanguageUtil.get(locale, "test");
 	}
 
 	@Override
@@ -72,8 +73,5 @@ public class Test1CommerceOrderStatusImpl implements CommerceOrderStatus {
 		policyOption = ReferencePolicyOption.GREEDY
 	)
 	private volatile CommerceOrderService _commerceOrderService;
-
-	@Reference
-	private Language _language;
 
 }

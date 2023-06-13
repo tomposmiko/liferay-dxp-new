@@ -42,10 +42,8 @@ if (searchFolderId > 0) {
 String keywords = ParamUtil.getString(request, "keywords");
 
 DLAdminDisplayContext dlAdminDisplayContext = (DLAdminDisplayContext)request.getAttribute(DLAdminDisplayContext.class.getName());
-DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(dlRequestHelper);
-DLViewEntriesDisplayContext dlViewEntriesDisplayContext = new DLViewEntriesDisplayContext(liferayPortletRequest, liferayPortletResponse);
 
-EntriesChecker entriesChecker = new EntriesChecker(liferayPortletResponse);
+EntriesChecker entriesChecker = new EntriesChecker(liferayPortletRequest, liferayPortletResponse);
 
 entriesChecker.setCssClass("entry-selector");
 entriesChecker.setRememberCheckBoxStateURLRegex("^(?!.*" + liferayPortletResponse.getNamespace() + "redirect).*(folderId=" + String.valueOf(folderId) + ")");
@@ -95,10 +93,6 @@ entriesChecker.setRememberCheckBoxStateURLRegex("^(?!.*" + liferayPortletRespons
 
 						String thumbnailSrc = DLURLHelperUtil.getThumbnailSrc(fileEntry, latestFileVersion, themeDisplay);
 
-						row.setData(
-							HashMapBuilder.<String, Object>put(
-								"actions", StringUtil.merge(dlViewEntriesDisplayContext.getAvailableActions(fileEntry))
-							).build());
 						row.setPrimaryKey(String.valueOf(fileEntry.getFileEntryId()));
 						%>
 
@@ -129,11 +123,9 @@ entriesChecker.setRememberCheckBoxStateURLRegex("^(?!.*" + liferayPortletRespons
 							path="/document_library/view_file_entry_descriptive.jsp"
 						/>
 
-						<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
-							<liferay-ui:search-container-column-jsp
-								path="/document_library/file_entry_action.jsp"
-							/>
-						</c:if>
+						<liferay-ui:search-container-column-jsp
+							path="/document_library/file_entry_action.jsp"
+						/>
 					</c:when>
 					<c:when test="<%= (curFolder != null) && DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.VIEW) %>">
 
@@ -155,11 +147,9 @@ entriesChecker.setRememberCheckBoxStateURLRegex("^(?!.*" + liferayPortletRespons
 							path="/document_library/view_folder_descriptive.jsp"
 						/>
 
-						<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
-							<liferay-ui:search-container-column-jsp
-								path="/document_library/folder_action.jsp"
-							/>
-						</c:if>
+						<liferay-ui:search-container-column-jsp
+							path="/document_library/folder_action.jsp"
+						/>
 					</c:when>
 					<c:otherwise>
 						<liferay-ui:search-container-column-icon
@@ -178,7 +168,7 @@ entriesChecker.setRememberCheckBoxStateURLRegex("^(?!.*" + liferayPortletRespons
 	</div>
 </liferay-util:buffer>
 
-<div class="repository-search-results" data-repositoryId="<%= searchRepositoryId %>" id="<portlet:namespace />searchResultsContainer<%= searchRepositoryId %>">
+<div class="repository-search-results" data-repositoryId="<%= searchRepositoryId %>" id="<%= liferayPortletResponse.getNamespace() + "searchResultsContainer" + searchRepositoryId %>">
 	<%= searchResults %>
 </div>
 

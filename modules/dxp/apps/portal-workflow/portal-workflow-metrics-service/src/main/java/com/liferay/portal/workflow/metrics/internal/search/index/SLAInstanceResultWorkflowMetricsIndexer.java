@@ -14,7 +14,7 @@
 
 package com.liferay.portal.workflow.metrics.internal.search.index;
 
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.document.Document;
@@ -32,28 +32,11 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(service = SLAInstanceResultWorkflowMetricsIndexer.class)
+@Component(
+	immediate = true, service = SLAInstanceResultWorkflowMetricsIndexer.class
+)
 public class SLAInstanceResultWorkflowMetricsIndexer
 	extends BaseSLAWorkflowMetricsIndexer {
-
-	public void blockDocuments(
-		long companyId, long processId, long slaDefinitionId) {
-
-		BooleanQuery booleanQuery = queries.booleanQuery();
-
-		booleanQuery.addMustNotQueryClauses(
-			queries.term("instanceCompleted", Boolean.TRUE));
-
-		updateDocuments(
-			companyId,
-			HashMapBuilder.<String, Object>put(
-				"blocked", Boolean.TRUE
-			).build(),
-			booleanQuery.addMustQueryClauses(
-				queries.term("companyId", companyId),
-				queries.term("processId", processId),
-				queries.term("slaDefinitionId", slaDefinitionId)));
-	}
 
 	public Document creatDefaultDocument(long companyId, long processId) {
 		WorkflowMetricsSLAInstanceResult workflowMetricsSLAInstanceResult =
@@ -70,13 +53,8 @@ public class SLAInstanceResultWorkflowMetricsIndexer
 
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
-		documentBuilder.setValue(
-			"active", true
-		).setValue(
-			"blocked", false
-		).setLong(
-			"companyId", workflowMetricsSLAInstanceResult.getCompanyId()
-		);
+		documentBuilder.setLong(
+			"companyId", workflowMetricsSLAInstanceResult.getCompanyId());
 
 		if (workflowMetricsSLAInstanceResult.getCompletionLocalDateTime() !=
 				null) {
@@ -155,10 +133,6 @@ public class SLAInstanceResultWorkflowMetricsIndexer
 	public void deleteDocuments(
 		long companyId, long processId, long slaDefinitionId) {
 
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
-			return;
-		}
-
 		super.deleteDocuments(companyId, processId, slaDefinitionId);
 
 		BooleanQuery booleanQuery = queries.booleanQuery();
@@ -215,6 +189,9 @@ public class SLAInstanceResultWorkflowMetricsIndexer
 
 	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
 	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
+
+	@Reference
+	private JSONFactory _jsonFactory;
 
 	@Reference(
 		target = "(workflow.metrics.index.entity.name=sla-instance-result)"

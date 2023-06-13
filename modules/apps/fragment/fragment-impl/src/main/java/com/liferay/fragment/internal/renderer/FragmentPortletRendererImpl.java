@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Pavel Savinov
  */
-@Component(service = FragmentPortletRenderer.class)
+@Component(immediate = true, service = FragmentPortletRenderer.class)
 public class FragmentPortletRendererImpl implements FragmentPortletRenderer {
 
 	@Override

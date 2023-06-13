@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Shuyang Zhou
  */
 @Component(
+	immediate = true,
 	property = {
 		"login.web.navigation.position=post", "service.ranking:Integer=200"
 	},
@@ -79,7 +80,6 @@ public class CreateAccountNavigationPostPageInclude implements PageInclude {
 
 		IconTag iconTag = new IconTag();
 
-		iconTag.setCssClass("text-4");
 		iconTag.setMessage("create-account");
 
 		try {

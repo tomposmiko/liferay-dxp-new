@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pedro Queiroz
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.GRID,
 	service = {
 		DDMFormFieldValueAccessor.class, GridDDMFormFieldValueAccessor.class
@@ -47,8 +50,8 @@ public class GridDDMFormFieldValueAccessor
 	implements DDMFormFieldValueAccessor<JSONObject> {
 
 	@Override
-	public JSONObject[] getArrayGenericType() {
-		return new JSONObject[0];
+	public IntFunction<JSONObject[]> getArrayGeneratorIntFunction() {
+		return JSONObject[]::new;
 	}
 
 	@Override
@@ -71,18 +74,14 @@ public class GridDDMFormFieldValueAccessor
 	public boolean isEmpty(DDMFormFieldValue ddmFormFieldValue, Locale locale) {
 		JSONObject jsonObject = getValue(ddmFormFieldValue, locale);
 
-		Set<String> keys = _getUniqueKeys(jsonObject);
+		Set<String> keys = getUniqueKeys(jsonObject);
 
-		for (String rowValue :
-				_getDDMFormFieldRowValues(
-					ddmFormFieldValue.getDDMFormField())) {
+		Set<String> rowValues = getDDMFormFieldRowValues(
+			ddmFormFieldValue.getDDMFormField());
 
-			if (!keys.contains(rowValue)) {
-				return true;
-			}
-		}
+		Stream<String> stream = rowValues.stream();
 
-		return false;
+		return stream.anyMatch(rowValue -> !keys.contains(rowValue));
 	}
 
 	protected JSONObject createJSONObject(String json) {
@@ -98,17 +97,14 @@ public class GridDDMFormFieldValueAccessor
 		}
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private Set<String> _getDDMFormFieldRowValues(DDMFormField ddmFormField) {
+	protected Set<String> getDDMFormFieldRowValues(DDMFormField ddmFormField) {
 		DDMFormFieldOptions ddmFormFieldOptions =
 			(DDMFormFieldOptions)ddmFormField.getProperty("rows");
 
 		return ddmFormFieldOptions.getOptionsValues();
 	}
 
-	private Set<String> _getUniqueKeys(JSONObject jsonObject) {
+	protected Set<String> getUniqueKeys(JSONObject jsonObject) {
 		Set<String> uniqueKeys = new HashSet<>();
 
 		Iterator<String> iterator = jsonObject.keys();
@@ -119,6 +115,9 @@ public class GridDDMFormFieldValueAccessor
 
 		return uniqueKeys;
 	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		GridDDMFormFieldValueAccessor.class);

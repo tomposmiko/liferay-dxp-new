@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Marco Leo
+ * @see CPDisplayLayoutServiceSoap
  * @generated
  */
 public class CPDisplayLayoutServiceHttp {
@@ -53,8 +54,7 @@ public class CPDisplayLayoutServiceHttp {
 	public static com.liferay.commerce.product.model.CPDisplayLayout
 			addCPDisplayLayout(
 				HttpPrincipal httpPrincipal, long groupId, Class<?> clazz,
-				long classPK, String layoutPageTemplateEntryUuid,
-				String layoutUuid)
+				long classPK, String layoutUuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -63,8 +63,7 @@ public class CPDisplayLayoutServiceHttp {
 				_addCPDisplayLayoutParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, groupId, clazz, classPK, layoutPageTemplateEntryUuid,
-				layoutUuid);
+				methodKey, groupId, clazz, classPK, layoutUuid);
 
 			Object returnObj = null;
 
@@ -177,8 +176,8 @@ public class CPDisplayLayoutServiceHttp {
 		<com.liferay.commerce.product.model.CPDisplayLayout>
 				searchCPDisplayLayout(
 					HttpPrincipal httpPrincipal, long companyId, long groupId,
-					String className, Integer type, String keywords, int start,
-					int end, com.liferay.portal.kernel.search.Sort sort)
+					String className, String keywords, int start, int end,
+					com.liferay.portal.kernel.search.Sort sort)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -187,8 +186,8 @@ public class CPDisplayLayoutServiceHttp {
 				_searchCPDisplayLayoutParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, groupId, className, type, keywords, start,
-				end, sort);
+				methodKey, companyId, groupId, className, keywords, start, end,
+				sort);
 
 			Object returnObj = null;
 
@@ -222,8 +221,7 @@ public class CPDisplayLayoutServiceHttp {
 	public static com.liferay.commerce.product.model.CPDisplayLayout
 			updateCPDisplayLayout(
 				HttpPrincipal httpPrincipal, long cpDisplayLayoutId,
-				long classPK, String layoutPageTemplateEntryUuid,
-				String layoutUuid)
+				long classPK, String layoutUuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -232,8 +230,7 @@ public class CPDisplayLayoutServiceHttp {
 				_updateCPDisplayLayoutParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, cpDisplayLayoutId, classPK,
-				layoutPageTemplateEntryUuid, layoutUuid);
+				methodKey, cpDisplayLayoutId, classPK, layoutUuid);
 
 			Object returnObj = null;
 
@@ -268,19 +265,17 @@ public class CPDisplayLayoutServiceHttp {
 		CPDisplayLayoutServiceHttp.class);
 
 	private static final Class<?>[] _addCPDisplayLayoutParameterTypes0 =
-		new Class[] {
-			long.class, Class.class, long.class, String.class, String.class
-		};
+		new Class[] {long.class, Class.class, long.class, String.class};
 	private static final Class<?>[] _deleteCPDisplayLayoutParameterTypes1 =
 		new Class[] {long.class};
 	private static final Class<?>[] _fetchCPDisplayLayoutParameterTypes2 =
 		new Class[] {long.class};
 	private static final Class<?>[] _searchCPDisplayLayoutParameterTypes3 =
 		new Class[] {
-			long.class, long.class, String.class, Integer.class, String.class,
-			int.class, int.class, com.liferay.portal.kernel.search.Sort.class
+			long.class, long.class, String.class, String.class, int.class,
+			int.class, com.liferay.portal.kernel.search.Sort.class
 		};
 	private static final Class<?>[] _updateCPDisplayLayoutParameterTypes4 =
-		new Class[] {long.class, long.class, String.class, String.class};
+		new Class[] {long.class, long.class, String.class};
 
 }

@@ -28,6 +28,7 @@ import {
 import {
 	ChartDispatchContext,
 	ChartStateContext,
+	useDateTitle,
 	useIsPreviousPeriodButtonDisabled,
 } from '../context/ChartStateContext';
 import ConnectionContext from '../context/ConnectionContext';
@@ -36,6 +37,7 @@ import {generateDateFormatters as dateFormat} from '../utils/dateFormat';
 import {numberFormat} from '../utils/numberFormat';
 import {ActiveDot as CustomActiveDot, Dot as CustomDot} from './CustomDots';
 import CustomTooltip from './CustomTooltip';
+import TimeSpanSelector from './TimeSpanSelector';
 
 const CHART_COLORS = {
 	analyticsReportsHistoricalReads: '#50D2A0',
@@ -114,11 +116,9 @@ function legendFormatterGenerator(
 						backgroundColor: keyToHexColor(value),
 					}}
 				></span>
-
 				<span className="text-secondary">
 					{keyToTranslatedLabelValue(value)}
 				</span>
-
 				<span className="font-weight-bold inline-item-after">
 					{validAnalyticsConnection &&
 					preformattedNumber !== null &&
@@ -131,7 +131,11 @@ function legendFormatterGenerator(
 	};
 }
 
-export default function Chart({dataProviders = [], publishDate}) {
+export default function Chart({
+	dataProviders = [],
+	publishDate,
+	timeSpanOptions,
+}) {
 	const {validAnalyticsConnection} = useContext(ConnectionContext);
 
 	const storeDispatch = useContext(StoreDispatchContext);
@@ -142,17 +146,21 @@ export default function Chart({dataProviders = [], publishDate}) {
 
 	const {
 		dataSet,
-		lineChartLoading,
+		loading,
 		timeRange,
 		timeSpanKey,
 		timeSpanOffset,
 	} = useContext(ChartStateContext);
+
+	const {firstDate, lastDate} = useDateTitle();
 
 	const isPreviousPeriodButtonDisabled = useIsPreviousPeriodButtonDisabled();
 
 	const dateFormatters = useMemo(() => dateFormat(languageTag), [
 		languageTag,
 	]);
+
+	const title = dateFormatters.formatChartTitle([firstDate, lastDate]);
 
 	const isMounted = useIsMounted();
 
@@ -180,9 +188,9 @@ export default function Chart({dataProviders = [], publishDate}) {
 					return;
 				}
 
-				let dataSetItems = {};
+				var dataSetItems = {};
 
-				for (let i = 0; i < data.length; i++) {
+				for (var i = 0; i < data.length; i++) {
 					if (data[i].status === 'fulfilled') {
 						dataSetItems = {
 							...dataSetItems,
@@ -247,19 +255,34 @@ export default function Chart({dataProviders = [], publishDate}) {
 			: dateFormatters.formatNumericDay;
 
 	const lineChartWrapperClasses = className('line-chart-wrapper', {
-		'line-chart-wrapper--loading': lineChartLoading,
+		'line-chart-wrapper--loading': loading,
 	});
 
 	return (
 		<>
+			{!!timeSpanOptions.length && (
+				<div className="c-mb-3 c-mt-4">
+					<TimeSpanSelector
+						disabledNextTimeSpan={timeSpanOffset === 0}
+						disabledPreviousPeriodButton={
+							isPreviousPeriodButtonDisabled
+						}
+						timeSpanKey={timeSpanKey}
+						timeSpanOptions={timeSpanOptions}
+					/>
+				</div>
+			)}
+
 			{dataSet ? (
 				<div className={lineChartWrapperClasses}>
-					{lineChartLoading && (
+					{loading && (
 						<ClayLoadingIndicator
 							className="chart-loading-indicator"
 							small
 						/>
 					)}
+
+					{title && <h5 className="mb-3">{title}</h5>}
 
 					<div className="line-chart">
 						<LineChart
@@ -294,7 +317,7 @@ export default function Chart({dataProviders = [], publishDate}) {
 								dataKey="label"
 								domain={
 									!validAnalyticsConnection ||
-									!histogram.length
+									histogram.length === 0
 										? [
 												new Date(
 													timeRange.startDate
@@ -324,7 +347,7 @@ export default function Chart({dataProviders = [], publishDate}) {
 
 							{!validAnalyticsConnection ||
 							publishedToday ||
-							!histogram.length ? (
+							histogram.length === 0 ? (
 								<YAxis
 									axisLine={{
 										stroke: CHART_COLORS.cartesianGrid,

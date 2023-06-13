@@ -19,34 +19,17 @@
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
-String samlIdPRedirectMessage = GetterUtil.getString(request.getAttribute("SAML_IDP_REDIRECT_MESSAGE"));
+JSONObject samlSsoLoginContext = (JSONObject)request.getAttribute("SAML_SSO_LOGIN_CONTEXT");
 
-JSONObject samlSsoLoginContextJSONObject = (JSONObject)request.getAttribute("SAML_SSO_LOGIN_CONTEXT");
-
-JSONArray relevantIdpConnectionsJSONArray = samlSsoLoginContextJSONObject.getJSONArray("relevantIdpConnections");
+JSONArray relevantIdpConnectionsJSONArray = samlSsoLoginContext.getJSONArray("relevantIdpConnections");
 %>
 
-<aui:form action='<%= PortalUtil.getPortalURL(request) + PortalUtil.getPathMain() + "/portal/login" %>' method="get" name="fm" style="padding: 1rem;">
+<aui:form action='<%= PortalUtil.getPortalURL(request) + "/c/portal/login" %>' method="get" name="fm" style="padding: 1rem;">
 	<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 
 	<c:choose>
-		<c:when test="<%= relevantIdpConnectionsJSONArray.length() == 1 %>">
-			<p><%= samlIdPRedirectMessage %></p>
-
-			<%
-			JSONObject relevantIdpConnectionJSONObject = relevantIdpConnectionsJSONArray.getJSONObject(0);
-			%>
-
-			<aui:input name="idpEntityId" type="hidden" value='<%= HtmlUtil.escapeAttribute(relevantIdpConnectionJSONObject.getString("entityId")) %>' />
-
-			<aui:script sandbox="<%= true %>">
-				window.addEventListener("load", (event) => {
-					window.fm.submit();
-				});
-			</aui:script>
-		</c:when>
-		<c:when test="<%= relevantIdpConnectionsJSONArray.length() > 1 %>">
+		<c:when test="<%= relevantIdpConnectionsJSONArray.length() > 0 %>">
 			<p><liferay-ui:message key="please-select-your-identity-provider" /></p>
 
 			<aui:select label="identity-provider" name="idpEntityId">
@@ -78,17 +61,3 @@ JSONArray relevantIdpConnectionsJSONArray = samlSsoLoginContextJSONObject.getJSO
 		</c:otherwise>
 	</c:choose>
 </aui:form>
-
-<c:if test="<%= Validator.isNotNull(redirect) %>">
-	<aui:script sandbox="<%= true %>">
-		var form = document.getElementById('<portlet:namespace />fm');
-
-		var redirect = form.querySelector('#<portlet:namespace />redirect');
-
-		if (redirect) {
-			var redirectVal = redirect.getAttribute('value');
-
-			redirect.setAttribute('value', redirectVal + window.location.hash);
-		}
-	</aui:script>
-</c:if>

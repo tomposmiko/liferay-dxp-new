@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Modified;
  * @author Daniel Sanz
  */
 @Component(
-	property = "wiki.format.name=creole",
+	immediate = true, property = "wiki.format.name=creole",
 	service = WikiPageRenameContentProcessor.class
 )
 public class WikiPageRenameCreoleContentProcessor

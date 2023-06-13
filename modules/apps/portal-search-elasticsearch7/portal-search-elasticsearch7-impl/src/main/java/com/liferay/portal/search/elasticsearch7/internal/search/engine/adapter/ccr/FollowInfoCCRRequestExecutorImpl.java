@@ -43,10 +43,10 @@ public class FollowInfoCCRRequestExecutorImpl
 	public FollowInfoCCRResponse execute(
 		FollowInfoCCRRequest followInfoCCRRequest) {
 
-		FollowInfoRequest followInfoRequest = _createFollowInfoRequest(
+		FollowInfoRequest followInfoRequest = createFollowInfoRequest(
 			followInfoCCRRequest);
 
-		FollowInfoResponse followInfoResponse = _getFollowInfoResponse(
+		FollowInfoResponse followInfoResponse = getFollowInfoResponse(
 			followInfoRequest, followInfoCCRRequest);
 
 		List<FollowInfoResponse.FollowerInfo> followerInfos =
@@ -63,13 +63,13 @@ public class FollowInfoCCRRequestExecutorImpl
 		return new FollowInfoCCRResponse(FollowInfoStatus.PAUSED);
 	}
 
-	private FollowInfoRequest _createFollowInfoRequest(
+	protected FollowInfoRequest createFollowInfoRequest(
 		FollowInfoCCRRequest followInfoCCRRequest) {
 
 		return new FollowInfoRequest(followInfoCCRRequest.getIndexName());
 	}
 
-	private FollowInfoResponse _getFollowInfoResponse(
+	protected FollowInfoResponse getFollowInfoResponse(
 		FollowInfoRequest followInfoRequest,
 		FollowInfoCCRRequest followInfoCCRRequest) {
 
@@ -89,7 +89,13 @@ public class FollowInfoCCRRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

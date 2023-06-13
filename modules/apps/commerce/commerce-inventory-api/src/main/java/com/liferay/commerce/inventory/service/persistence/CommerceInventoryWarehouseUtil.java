@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the commerce inventory warehouse service. This utility wraps <code>com.liferay.commerce.inventory.service.persistence.impl.CommerceInventoryWarehousePersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -123,531 +127,6 @@ public class CommerceInventoryWarehouseUtil {
 
 		return getPersistence().update(
 			commerceInventoryWarehouse, serviceContext);
-	}
-
-	/**
-	 * Returns all the commerce inventory warehouses where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the matching commerce inventory warehouses
-	 */
-	public static List<CommerceInventoryWarehouse> findByUuid(String uuid) {
-		return getPersistence().findByUuid(uuid);
-	}
-
-	/**
-	 * Returns a range of all the commerce inventory warehouses where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @return the range of matching commerce inventory warehouses
-	 */
-	public static List<CommerceInventoryWarehouse> findByUuid(
-		String uuid, int start, int end) {
-
-		return getPersistence().findByUuid(uuid, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce inventory warehouses where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching commerce inventory warehouses
-	 */
-	public static List<CommerceInventoryWarehouse> findByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator) {
-
-		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce inventory warehouses where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching commerce inventory warehouses
-	 */
-	public static List<CommerceInventoryWarehouse> findByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator,
-		boolean useFinderCache) {
-
-		return getPersistence().findByUuid(
-			uuid, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first commerce inventory warehouse in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce inventory warehouse
-	 * @throws NoSuchInventoryWarehouseException if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse findByUuid_First(
-			String uuid,
-			OrderByComparator<CommerceInventoryWarehouse> orderByComparator)
-		throws com.liferay.commerce.inventory.exception.
-			NoSuchInventoryWarehouseException {
-
-		return getPersistence().findByUuid_First(uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns the first commerce inventory warehouse in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse fetchByUuid_First(
-		String uuid,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator) {
-
-		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns the last commerce inventory warehouse in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce inventory warehouse
-	 * @throws NoSuchInventoryWarehouseException if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse findByUuid_Last(
-			String uuid,
-			OrderByComparator<CommerceInventoryWarehouse> orderByComparator)
-		throws com.liferay.commerce.inventory.exception.
-			NoSuchInventoryWarehouseException {
-
-		return getPersistence().findByUuid_Last(uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns the last commerce inventory warehouse in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse fetchByUuid_Last(
-		String uuid,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator) {
-
-		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns the commerce inventory warehouses before and after the current commerce inventory warehouse in the ordered set where uuid = &#63;.
-	 *
-	 * @param commerceInventoryWarehouseId the primary key of the current commerce inventory warehouse
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next commerce inventory warehouse
-	 * @throws NoSuchInventoryWarehouseException if a commerce inventory warehouse with the primary key could not be found
-	 */
-	public static CommerceInventoryWarehouse[] findByUuid_PrevAndNext(
-			long commerceInventoryWarehouseId, String uuid,
-			OrderByComparator<CommerceInventoryWarehouse> orderByComparator)
-		throws com.liferay.commerce.inventory.exception.
-			NoSuchInventoryWarehouseException {
-
-		return getPersistence().findByUuid_PrevAndNext(
-			commerceInventoryWarehouseId, uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns all the commerce inventory warehouses that the user has permission to view where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the matching commerce inventory warehouses that the user has permission to view
-	 */
-	public static List<CommerceInventoryWarehouse> filterFindByUuid(
-		String uuid) {
-
-		return getPersistence().filterFindByUuid(uuid);
-	}
-
-	/**
-	 * Returns a range of all the commerce inventory warehouses that the user has permission to view where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @return the range of matching commerce inventory warehouses that the user has permission to view
-	 */
-	public static List<CommerceInventoryWarehouse> filterFindByUuid(
-		String uuid, int start, int end) {
-
-		return getPersistence().filterFindByUuid(uuid, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce inventory warehouses that the user has permissions to view where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching commerce inventory warehouses that the user has permission to view
-	 */
-	public static List<CommerceInventoryWarehouse> filterFindByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator) {
-
-		return getPersistence().filterFindByUuid(
-			uuid, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns the commerce inventory warehouses before and after the current commerce inventory warehouse in the ordered set of commerce inventory warehouses that the user has permission to view where uuid = &#63;.
-	 *
-	 * @param commerceInventoryWarehouseId the primary key of the current commerce inventory warehouse
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next commerce inventory warehouse
-	 * @throws NoSuchInventoryWarehouseException if a commerce inventory warehouse with the primary key could not be found
-	 */
-	public static CommerceInventoryWarehouse[] filterFindByUuid_PrevAndNext(
-			long commerceInventoryWarehouseId, String uuid,
-			OrderByComparator<CommerceInventoryWarehouse> orderByComparator)
-		throws com.liferay.commerce.inventory.exception.
-			NoSuchInventoryWarehouseException {
-
-		return getPersistence().filterFindByUuid_PrevAndNext(
-			commerceInventoryWarehouseId, uuid, orderByComparator);
-	}
-
-	/**
-	 * Removes all the commerce inventory warehouses where uuid = &#63; from the database.
-	 *
-	 * @param uuid the uuid
-	 */
-	public static void removeByUuid(String uuid) {
-		getPersistence().removeByUuid(uuid);
-	}
-
-	/**
-	 * Returns the number of commerce inventory warehouses where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the number of matching commerce inventory warehouses
-	 */
-	public static int countByUuid(String uuid) {
-		return getPersistence().countByUuid(uuid);
-	}
-
-	/**
-	 * Returns the number of commerce inventory warehouses that the user has permission to view where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the number of matching commerce inventory warehouses that the user has permission to view
-	 */
-	public static int filterCountByUuid(String uuid) {
-		return getPersistence().filterCountByUuid(uuid);
-	}
-
-	/**
-	 * Returns all the commerce inventory warehouses where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the matching commerce inventory warehouses
-	 */
-	public static List<CommerceInventoryWarehouse> findByUuid_C(
-		String uuid, long companyId) {
-
-		return getPersistence().findByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns a range of all the commerce inventory warehouses where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @return the range of matching commerce inventory warehouses
-	 */
-	public static List<CommerceInventoryWarehouse> findByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
-		return getPersistence().findByUuid_C(uuid, companyId, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce inventory warehouses where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching commerce inventory warehouses
-	 */
-	public static List<CommerceInventoryWarehouse> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator) {
-
-		return getPersistence().findByUuid_C(
-			uuid, companyId, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce inventory warehouses where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching commerce inventory warehouses
-	 */
-	public static List<CommerceInventoryWarehouse> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator,
-		boolean useFinderCache) {
-
-		return getPersistence().findByUuid_C(
-			uuid, companyId, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first commerce inventory warehouse in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce inventory warehouse
-	 * @throws NoSuchInventoryWarehouseException if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse findByUuid_C_First(
-			String uuid, long companyId,
-			OrderByComparator<CommerceInventoryWarehouse> orderByComparator)
-		throws com.liferay.commerce.inventory.exception.
-			NoSuchInventoryWarehouseException {
-
-		return getPersistence().findByUuid_C_First(
-			uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns the first commerce inventory warehouse in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse fetchByUuid_C_First(
-		String uuid, long companyId,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator) {
-
-		return getPersistence().fetchByUuid_C_First(
-			uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last commerce inventory warehouse in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce inventory warehouse
-	 * @throws NoSuchInventoryWarehouseException if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse findByUuid_C_Last(
-			String uuid, long companyId,
-			OrderByComparator<CommerceInventoryWarehouse> orderByComparator)
-		throws com.liferay.commerce.inventory.exception.
-			NoSuchInventoryWarehouseException {
-
-		return getPersistence().findByUuid_C_Last(
-			uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last commerce inventory warehouse in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse fetchByUuid_C_Last(
-		String uuid, long companyId,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator) {
-
-		return getPersistence().fetchByUuid_C_Last(
-			uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns the commerce inventory warehouses before and after the current commerce inventory warehouse in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param commerceInventoryWarehouseId the primary key of the current commerce inventory warehouse
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next commerce inventory warehouse
-	 * @throws NoSuchInventoryWarehouseException if a commerce inventory warehouse with the primary key could not be found
-	 */
-	public static CommerceInventoryWarehouse[] findByUuid_C_PrevAndNext(
-			long commerceInventoryWarehouseId, String uuid, long companyId,
-			OrderByComparator<CommerceInventoryWarehouse> orderByComparator)
-		throws com.liferay.commerce.inventory.exception.
-			NoSuchInventoryWarehouseException {
-
-		return getPersistence().findByUuid_C_PrevAndNext(
-			commerceInventoryWarehouseId, uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns all the commerce inventory warehouses that the user has permission to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the matching commerce inventory warehouses that the user has permission to view
-	 */
-	public static List<CommerceInventoryWarehouse> filterFindByUuid_C(
-		String uuid, long companyId) {
-
-		return getPersistence().filterFindByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns a range of all the commerce inventory warehouses that the user has permission to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @return the range of matching commerce inventory warehouses that the user has permission to view
-	 */
-	public static List<CommerceInventoryWarehouse> filterFindByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
-		return getPersistence().filterFindByUuid_C(uuid, companyId, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce inventory warehouses that the user has permissions to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceInventoryWarehouseModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of commerce inventory warehouses
-	 * @param end the upper bound of the range of commerce inventory warehouses (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching commerce inventory warehouses that the user has permission to view
-	 */
-	public static List<CommerceInventoryWarehouse> filterFindByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator) {
-
-		return getPersistence().filterFindByUuid_C(
-			uuid, companyId, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns the commerce inventory warehouses before and after the current commerce inventory warehouse in the ordered set of commerce inventory warehouses that the user has permission to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param commerceInventoryWarehouseId the primary key of the current commerce inventory warehouse
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next commerce inventory warehouse
-	 * @throws NoSuchInventoryWarehouseException if a commerce inventory warehouse with the primary key could not be found
-	 */
-	public static CommerceInventoryWarehouse[] filterFindByUuid_C_PrevAndNext(
-			long commerceInventoryWarehouseId, String uuid, long companyId,
-			OrderByComparator<CommerceInventoryWarehouse> orderByComparator)
-		throws com.liferay.commerce.inventory.exception.
-			NoSuchInventoryWarehouseException {
-
-		return getPersistence().filterFindByUuid_C_PrevAndNext(
-			commerceInventoryWarehouseId, uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Removes all the commerce inventory warehouses where uuid = &#63; and companyId = &#63; from the database.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 */
-	public static void removeByUuid_C(String uuid, long companyId) {
-		getPersistence().removeByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns the number of commerce inventory warehouses where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the number of matching commerce inventory warehouses
-	 */
-	public static int countByUuid_C(String uuid, long companyId) {
-		return getPersistence().countByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns the number of commerce inventory warehouses that the user has permission to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the number of matching commerce inventory warehouses that the user has permission to view
-	 */
-	public static int filterCountByUuid_C(String uuid, long companyId) {
-		return getPersistence().filterCountByUuid_C(uuid, companyId);
 	}
 
 	/**
@@ -1788,75 +1267,75 @@ public class CommerceInventoryWarehouseUtil {
 	}
 
 	/**
-	 * Returns the commerce inventory warehouse where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchInventoryWarehouseException</code> if it could not be found.
+	 * Returns the commerce inventory warehouse where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchInventoryWarehouseException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching commerce inventory warehouse
 	 * @throws NoSuchInventoryWarehouseException if a matching commerce inventory warehouse could not be found
 	 */
-	public static CommerceInventoryWarehouse findByERC_C(
-			String externalReferenceCode, long companyId)
+	public static CommerceInventoryWarehouse findByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.commerce.inventory.exception.
 			NoSuchInventoryWarehouseException {
 
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
+		return getPersistence().findByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the commerce inventory warehouse where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the commerce inventory warehouse where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
 	 */
-	public static CommerceInventoryWarehouse fetchByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static CommerceInventoryWarehouse fetchByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
+		return getPersistence().fetchByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the commerce inventory warehouse where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the commerce inventory warehouse where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
 	 */
-	public static CommerceInventoryWarehouse fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
+	public static CommerceInventoryWarehouse fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
+		return getPersistence().fetchByC_ERC(
+			companyId, externalReferenceCode, useFinderCache);
 	}
 
 	/**
-	 * Removes the commerce inventory warehouse where externalReferenceCode = &#63; and companyId = &#63; from the database.
+	 * Removes the commerce inventory warehouse where companyId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the commerce inventory warehouse that was removed
 	 */
-	public static CommerceInventoryWarehouse removeByERC_C(
-			String externalReferenceCode, long companyId)
+	public static CommerceInventoryWarehouse removeByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.commerce.inventory.exception.
 			NoSuchInventoryWarehouseException {
 
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
+		return getPersistence().removeByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the number of commerce inventory warehouses where externalReferenceCode = &#63; and companyId = &#63;.
+	 * Returns the number of commerce inventory warehouses where companyId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching commerce inventory warehouses
 	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static int countByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
+		return getPersistence().countByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
@@ -2023,9 +1502,29 @@ public class CommerceInventoryWarehouseUtil {
 	}
 
 	public static CommerceInventoryWarehousePersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile CommerceInventoryWarehousePersistence _persistence;
+	private static ServiceTracker
+		<CommerceInventoryWarehousePersistence,
+		 CommerceInventoryWarehousePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			CommerceInventoryWarehousePersistence.class);
+
+		ServiceTracker
+			<CommerceInventoryWarehousePersistence,
+			 CommerceInventoryWarehousePersistence> serviceTracker =
+				new ServiceTracker
+					<CommerceInventoryWarehousePersistence,
+					 CommerceInventoryWarehousePersistence>(
+						 bundle.getBundleContext(),
+						 CommerceInventoryWarehousePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

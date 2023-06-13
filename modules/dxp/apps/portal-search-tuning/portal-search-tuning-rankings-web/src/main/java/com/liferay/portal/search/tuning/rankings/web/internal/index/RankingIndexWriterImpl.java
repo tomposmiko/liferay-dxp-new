@@ -63,10 +63,21 @@ public class RankingIndexWriterImpl implements RankingIndexWriter {
 		_searchEngineAdapter.execute(indexDocumentRequest);
 	}
 
-	@Reference
-	private RankingToDocumentTranslator _rankingToDocumentTranslator;
+	@Reference(unbind = "-")
+	protected void setRankingToDocumentTranslator(
+		RankingToDocumentTranslator rankingToDocumentTranslator) {
 
-	@Reference
+		_rankingToDocumentTranslator = rankingToDocumentTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchEngineAdapter(
+		SearchEngineAdapter searchEngineAdapter) {
+
+		_searchEngineAdapter = searchEngineAdapter;
+	}
+
+	private RankingToDocumentTranslator _rankingToDocumentTranslator;
 	private SearchEngineAdapter _searchEngineAdapter;
 
 }

@@ -35,27 +35,39 @@ function Price({
 		adaptLegacyPriceModel(price)
 	);
 
+	const {
+		discountPercentage,
+		finalPriceFormatted,
+		priceFormatted,
+		promoPrice,
+		promoPriceFormatted,
+	} = activePrice;
+
 	const discountLevels = displayDiscountLevels
 		? collectDiscountLevels(activePrice)
 		: [];
 
-	const hasDiscount = isNonnull(
-		activePrice.discountPercentage,
-		...discountLevels
-	);
-	const hasPromo = isNonnull(activePrice.promoPrice);
+	const hasDiscount = isNonnull(discountPercentage, ...discountLevels);
+	const hasPromo = isNonnull(promoPrice);
 
 	const updatePrice = ({cpInstance}) =>
 		setActivePrice((currentPrice) => ({
 			...currentPrice,
-			...adaptLegacyPriceModel(cpInstance.price),
+			...adaptLegacyPriceModel(cpInstance.prices),
 		}));
 
 	useEffect(() => {
-		Liferay.on(`${namespace}${CP_INSTANCE_CHANGED}`, updatePrice);
+		if (namespace) {
+			Liferay.on(`${namespace}${CP_INSTANCE_CHANGED}`, updatePrice);
+		}
 
 		return () => {
-			Liferay.detach(`${namespace}${CP_INSTANCE_CHANGED}`, updatePrice);
+			if (namespace) {
+				Liferay.detach(
+					`${namespace}${CP_INSTANCE_CHANGED}`,
+					updatePrice
+				);
+			}
 		};
 	}, [namespace]);
 
@@ -74,13 +86,13 @@ function Price({
 					'price-value-inactive': hasPromo || hasDiscount,
 				})}
 			>
-				{activePrice.priceFormatted}
+				{priceFormatted}
 			</span>
 
 			{hasPromo && (
 				<>
 					<span className="price-label">
-						{Liferay.Language.get('promotion-price')}
+						{Liferay.Language.get('sale-price')}
 					</span>
 					<span
 						className={classnames(
@@ -88,7 +100,7 @@ function Price({
 							hasDiscount && 'price-value-inactive'
 						)}
 					>
-						{activePrice.promoPriceFormatted}
+						{promoPriceFormatted}
 					</span>
 				</>
 			)}
@@ -112,7 +124,7 @@ function Price({
 							))
 						) : (
 							<span className="price-value-percentage">
-								&ndash;{activePrice.discountPercentage}%
+								&ndash;{discountPercentage}%
 							</span>
 						)}
 					</span>
@@ -122,7 +134,7 @@ function Price({
 							: Liferay.Language.get('gross-price')}
 					</span>
 					<span className="price-value price-value-final">
-						{activePrice.finalPriceFormatted}
+						{finalPriceFormatted}
 					</span>
 				</>
 			)}

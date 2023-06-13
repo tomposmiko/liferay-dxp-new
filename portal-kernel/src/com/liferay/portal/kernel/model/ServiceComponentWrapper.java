@@ -255,11 +255,6 @@ public class ServiceComponentWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected ServiceComponentWrapper wrap(ServiceComponent serviceComponent) {
 		return new ServiceComponentWrapper(serviceComponent);
 	}

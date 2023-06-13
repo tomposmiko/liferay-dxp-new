@@ -273,8 +273,4 @@ public interface MemberRequestModel
 	@Override
 	public MemberRequest cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

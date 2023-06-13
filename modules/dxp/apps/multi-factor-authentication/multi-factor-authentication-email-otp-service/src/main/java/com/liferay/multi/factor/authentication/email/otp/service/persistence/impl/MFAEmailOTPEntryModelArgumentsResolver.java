@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.multi.factor.authentication.email.otp.model.impl.MFAEmailOTPEntryImpl",
-		"table.name=MFAEmailOTPEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		MFAEmailOTPEntryModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class MFAEmailOTPEntryModelArgumentsResolver
 	implements ArgumentsResolver {

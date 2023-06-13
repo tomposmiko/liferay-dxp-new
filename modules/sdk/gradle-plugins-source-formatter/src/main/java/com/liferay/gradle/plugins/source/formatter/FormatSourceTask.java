@@ -125,16 +125,20 @@ public class FormatSourceTask extends JavaExec {
 		return _sourceFormatterArgs.isIncludeSubrepositories();
 	}
 
-	public boolean isJavaParserEnabled() {
-		return _sourceFormatterArgs.isJavaParserEnabled();
-	}
-
 	public boolean isPrintErrors() {
 		return _sourceFormatterArgs.isPrintErrors();
 	}
 
 	public boolean isShowDebugInformation() {
 		return _sourceFormatterArgs.isShowDebugInformation();
+	}
+
+	public boolean isShowDocumentation() {
+		return _sourceFormatterArgs.isShowDocumentation();
+	}
+
+	public boolean isShowStatusUpdates() {
+		return _sourceFormatterArgs.isShowStatusUpdates();
 	}
 
 	public boolean isValidateCommitMessages() {
@@ -214,10 +218,6 @@ public class FormatSourceTask extends JavaExec {
 		_sourceFormatterArgs.setIncludeSubrepositories(includeSubrepositories);
 	}
 
-	public void setJavaParserEnabled(boolean javaParserEnabled) {
-		_sourceFormatterArgs.setJavaParserEnabled(javaParserEnabled);
-	}
-
 	public void setMaxLineLength(int maxLineLength) {
 		_sourceFormatterArgs.setMaxLineLength(maxLineLength);
 	}
@@ -234,6 +234,14 @@ public class FormatSourceTask extends JavaExec {
 		_sourceFormatterArgs.setShowDebugInformation(showDebugInformation);
 	}
 
+	public void setShowDocumentation(boolean showDocumentation) {
+		_sourceFormatterArgs.setShowDocumentation(showDocumentation);
+	}
+
+	public void setShowStatusUpdates(boolean showStatusUpdates) {
+		_sourceFormatterArgs.setShowStatusUpdates(showStatusUpdates);
+	}
+
 	public void setValidateCommitMessages(boolean validateCommitMessages) {
 		_sourceFormatterArgs.setValidateCommitMessages(validateCommitMessages);
 	}
@@ -246,10 +254,11 @@ public class FormatSourceTask extends JavaExec {
 		args.add("format.local.changes=" + isFormatLocalChanges());
 		args.add("git.working.branch.name=" + getGitWorkingBranchName());
 		args.add("include.subrepositories=" + isIncludeSubrepositories());
-		args.add("java.parser.enabled=" + isJavaParserEnabled());
 		args.add("max.line.length=" + getMaxLineLength());
 		args.add("processor.thread.count=" + getProcessorThreadCount());
 		args.add("show.debug.information=" + isShowDebugInformation());
+		args.add("show.documentation=" + isShowDocumentation());
+		args.add("show.status.updates=" + isShowStatusUpdates());
 		args.add("source.auto.fix=" + isAutoFix());
 		args.add(
 			"source.check.category.names=" +

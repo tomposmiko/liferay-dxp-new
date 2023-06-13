@@ -14,6 +14,5 @@
 
 import {updateIn} from './updateIn';
 
-export function setIn(objectOrArray, keyPathOrKey, value) {
-	return updateIn(objectOrArray, keyPathOrKey, () => value);
-}
+export const setIn = (objectOrArray, keyPathOrKey, value) =>
+	updateIn(objectOrArray, keyPathOrKey, () => value);

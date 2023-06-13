@@ -20,7 +20,13 @@ import React, {useState} from 'react';
 import {showErrorNotification} from '../../utilities/notifications';
 import LegacyWishListResource from './util/LegacyWishListResource';
 
-function AddToWishList({iconOnly, isInWishList, large, ...productInfo}) {
+function AddToWishList({
+	iconOnly,
+	isInWishList,
+	large,
+	spritemap,
+	...productInfo
+}) {
 	const [isAdded, setIsAdded] = useState(isInWishList);
 
 	const toggleInWishList = () =>
@@ -49,7 +55,10 @@ function AddToWishList({iconOnly, isInWishList, large, ...productInfo}) {
 			)}
 
 			<span className="wish-list-icon">
-				<ClayIcon symbol={`heart${isAdded ? '-full' : ''}`} />
+				<ClayIcon
+					spritemap={spritemap}
+					symbol={`heart${isAdded ? '-full' : ''}`}
+				/>
 			</span>
 		</ClayButton>
 	);
@@ -66,6 +75,7 @@ AddToWishList.propTypes = {
 	isInWishList: PropTypes.bool,
 	large: PropTypes.bool,
 	skuId: PropTypes.number,
+	spritemap: PropTypes.string,
 };
 
 export default AddToWishList;

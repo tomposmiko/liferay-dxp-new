@@ -12,7 +12,7 @@
  * details.
  */
 
-import {fetch, getPortletId} from 'frontend-js-web';
+import {fetch} from 'frontend-js-web';
 
 import formatFieldValue from '../../utils/formatFieldValue.es';
 import setDataRecord from '../../utils/setDataRecord.es';
@@ -84,9 +84,7 @@ export default function pageLanguageUpdate({
 		});
 
 		fetch(
-			`/o/data-engine/v2.0/data-layouts/${ddmStructureLayoutId}/context?p_p_id=${getPortletId(
-				portletNamespace
-			)}`,
+			`/o/data-engine/v2.0/data-layouts/${ddmStructureLayoutId}/context`,
 			{
 				body: JSON.stringify({
 					dataRecordValues,
@@ -97,10 +95,7 @@ export default function pageLanguageUpdate({
 					siteGroupId: themeDisplay.getSiteGroupId(),
 				}),
 				headers: {
-					'Accept-Language': nextEditingLanguageId.replaceAll(
-						'_',
-						'-'
-					),
+					'Accept-Language': nextEditingLanguageId.replace('_', '-'),
 					'Content-Type': 'application/json',
 				},
 				method: 'POST',

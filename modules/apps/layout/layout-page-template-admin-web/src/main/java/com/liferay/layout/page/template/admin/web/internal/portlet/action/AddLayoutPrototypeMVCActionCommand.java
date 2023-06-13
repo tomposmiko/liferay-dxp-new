@@ -22,7 +22,7 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServ
 import com.liferay.portal.kernel.exception.LayoutNameException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -38,7 +38,7 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -60,6 +60,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
 		"mvc.command.name=/layout_page_template_admin/add_layout_prototype"
@@ -107,9 +108,12 @@ public class AddLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 			return layoutPrototype;
 		}
 
+		long layoutPageTemplateCollectionId = ParamUtil.getLong(
+			actionRequest, "layoutPageTemplateCollectionId");
+
 		layoutPageTemplateEntry.setGroupId(themeDisplay.getScopeGroupId());
 		layoutPageTemplateEntry.setLayoutPageTemplateCollectionId(
-			ParamUtil.getLong(actionRequest, "layoutPageTemplateCollectionId"));
+			layoutPageTemplateCollectionId);
 
 		_layoutPageTemplateEntryLocalService.updateLayoutPageTemplateEntry(
 			layoutPageTemplateEntry);
@@ -140,7 +144,7 @@ public class AddLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 			String backURL = ParamUtil.getString(actionRequest, "backURL");
 
 			if (Validator.isNotNull(backURL)) {
-				redirectURL = HttpComponentsUtil.setParameter(
+				redirectURL = _http.setParameter(
 					redirectURL, "p_l_back_url", backURL);
 			}
 
@@ -158,7 +162,7 @@ public class AddLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 					actionRequest, actionResponse,
 					JSONUtil.put(
 						"error",
-						_language.get(
+						LanguageUtil.get(
 							themeDisplay.getRequest(),
 							"please-enter-a-valid-name")));
 			}
@@ -179,7 +183,7 @@ public class AddLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 					actionRequest, actionResponse,
 					JSONUtil.put(
 						"error",
-						_language.get(
+						LanguageUtil.get(
 							themeDisplay.getRequest(),
 							"an-unexpected-error-occurred")));
 			}
@@ -194,7 +198,7 @@ public class AddLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 			Propagation.REQUIRED, new Class<?>[] {Exception.class});
 
 	@Reference
-	private Language _language;
+	private Http _http;
 
 	@Reference
 	private LayoutPageTemplateEntryExceptionRequestHandler

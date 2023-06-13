@@ -19,8 +19,7 @@ import React, {useRef, useState} from 'react';
 
 import MappingPanel from './MappingPanel';
 
-const sanitizeLabel = (label) => label.replace(/}|[\r\n]+/gm, '');
-const fieldTemplate = (key, label) => ` $\{${key}:${sanitizeLabel(label)}} `;
+const fieldTemplate = (key) => ` $\{${key}} `;
 
 function MappingInput({
 	component,
@@ -34,7 +33,7 @@ function MappingInput({
 }) {
 	const [source, setSource] = useState(selectedSource);
 	const [value, setValue] = useState(initialValue || '');
-	const inputElRef = useRef(null);
+	const inputEl = useRef(null);
 	const isMounted = useIsMounted();
 
 	const isActive = !!value.trim();
@@ -48,22 +47,23 @@ function MappingInput({
 		addNewVar(field);
 	};
 
-	const addNewVar = ({key, label}) => {
-		const selectionStart = inputElRef.current.selectionStart;
-		const selectionEnd = inputElRef.current.selectionEnd;
-		const fieldVariable = fieldTemplate(key, label);
+	const addNewVar = ({key}) => {
+		const selectionStart = inputEl.current.selectionStart;
+		const selectionEnd = inputEl.current.selectionEnd;
+		const fieldVariable = fieldTemplate(key);
 
-		setValue((value) =>
-			`${value.slice(0, selectionStart)}${fieldVariable}${value.slice(
-				selectionEnd
-			)}`.trim()
+		setValue(
+			(value) =>
+				`${value.slice(0, selectionStart)}${fieldVariable}${value.slice(
+					selectionEnd
+				)}`
 		);
 
 		setTimeout(() => {
 			if (isMounted()) {
-				inputElRef.current.selectionStart = inputElRef.current.selectionEnd =
+				inputEl.current.selectionStart = inputEl.current.selectionEnd =
 					selectionStart + fieldVariable.length;
-				inputElRef.current.focus();
+				inputEl.current.focus();
 			}
 		}, 100);
 	};
@@ -73,7 +73,6 @@ function MappingInput({
 			<label className="control-label" htmlFor={name}>
 				{label}
 			</label>
-
 			<ClayInput.Group>
 				<ClayInput.GroupItem>
 					<ClayInput
@@ -83,11 +82,10 @@ function MappingInput({
 						onChange={(event) => {
 							setValue(event.target.value);
 						}}
-						ref={inputElRef}
+						ref={inputEl}
 						value={value}
 					/>
 				</ClayInput.GroupItem>
-
 				<ClayInput.GroupItem shrink>
 					<MappingPanel
 						clearSelectionOnClose
@@ -103,7 +101,6 @@ function MappingInput({
 					/>
 				</ClayInput.GroupItem>
 			</ClayInput.Group>
-
 			{helpMessage && <ClayForm.Text>{helpMessage}</ClayForm.Text>}
 		</ClayForm.Group>
 	);

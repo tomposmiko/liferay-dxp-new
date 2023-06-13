@@ -17,8 +17,6 @@ package com.liferay.jenkins.results.parser;
 import java.util.Collections;
 import java.util.Set;
 
-import org.json.JSONObject;
-
 /**
  * @author Michael Hashimoto
  */
@@ -29,12 +27,8 @@ public class SimpleJob extends BaseJob {
 		return Collections.emptySet();
 	}
 
-	protected SimpleJob(BuildProfile buildProfile, String jobName) {
-		super(buildProfile, jobName);
-	}
-
-	protected SimpleJob(JSONObject jsonObject) {
-		super(jsonObject);
+	protected SimpleJob(String jobName, BuildProfile buildProfile) {
+		super(jobName, buildProfile);
 	}
 
 	@Override

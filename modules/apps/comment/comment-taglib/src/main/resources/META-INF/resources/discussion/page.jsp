@@ -56,7 +56,7 @@ StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHe
 				<%
 				String contentURL = PortalUtil.getCanonicalURL(discussionTaglibHelper.getRedirect(), themeDisplay, layout);
 
-				contentURL = HttpComponentsUtil.removeParameter(contentURL, namespace + "skipEditorLoading");
+				contentURL = HttpUtil.removeParameter(contentURL, namespace + "skipEditorLoading");
 				%>
 
 				<input name="contentURL" type="hidden" value="<%= contentURL %>" />
@@ -157,7 +157,7 @@ StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHe
 												<aui:input name="postReplyBody0" type="hidden" />
 
 												<aui:button-row>
-													<aui:button cssClass="btn-comment btn-sm" disabled="<%= true %>" id="postReplyButton0" onClick='<%= randomNamespace + "postReply(0);" %>' primary="<%= true %>" value='<%= themeDisplay.isSignedIn() ? "reply" : "reply-as" %>' />
+													<aui:button cssClass="btn-comment btn-primary btn-sm" disabled="<%= true %>" id="postReplyButton0" onClick='<%= randomNamespace + "postReply(0);" %>' value='<%= themeDisplay.isSignedIn() ? "reply" : "reply-as" %>' />
 												</aui:button-row>
 											</clay:content-col>
 										</clay:content-row>
@@ -169,7 +169,7 @@ StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHe
 											<div class="alert alert-info">
 												<span class="alert-indicator">
 													<svg class="lexicon-icon lexicon-icon-info-circle" focusable="false" role="presentation">
-														<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#info-circle" />
+														<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#info-circle" />
 													</svg>
 												</span>
 
@@ -255,11 +255,11 @@ StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHe
 
 		String editorURL = GetterUtil.getString(request.getAttribute("liferay-comment:discussion:editorURL"));
 
-		editorURL = HttpComponentsUtil.addParameter(editorURL, "namespace", namespace);
+		editorURL = HttpUtil.addParameter(editorURL, "namespace", namespace);
 
-		String paginationURL = HttpComponentsUtil.addParameter(discussionTaglibHelper.getPaginationURL(), "namespace", namespace);
+		String paginationURL = HttpUtil.addParameter(discussionTaglibHelper.getPaginationURL(), "namespace", namespace);
 
-		paginationURL = HttpComponentsUtil.addParameter(paginationURL, "skipEditorLoading", "true");
+		paginationURL = HttpUtil.addParameter(paginationURL, "skipEditorLoading", "true");
 		%>
 
 		<liferay-frontend:component

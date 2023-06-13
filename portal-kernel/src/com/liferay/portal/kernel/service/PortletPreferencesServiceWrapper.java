@@ -27,10 +27,6 @@ public class PortletPreferencesServiceWrapper
 	implements PortletPreferencesService,
 			   ServiceWrapper<PortletPreferencesService> {
 
-	public PortletPreferencesServiceWrapper() {
-		this(null);
-	}
-
 	public PortletPreferencesServiceWrapper(
 		PortletPreferencesService portletPreferencesService) {
 

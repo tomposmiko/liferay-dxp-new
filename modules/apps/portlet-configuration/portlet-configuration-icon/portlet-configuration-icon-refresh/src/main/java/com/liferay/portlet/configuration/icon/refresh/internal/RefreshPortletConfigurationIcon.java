@@ -14,52 +14,61 @@
 
 package com.liferay.portlet.configuration.icon.refresh.internal;
 
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.portlet.configuration.icon.BaseJSPPortletConfigurationIcon;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Map;
-
 import javax.portlet.PortletRequest;
-
-import javax.servlet.ServletContext;
+import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = PortletConfigurationIcon.class)
+@Component(immediate = true, service = PortletConfigurationIcon.class)
 public class RefreshPortletConfigurationIcon
-	extends BaseJSPPortletConfigurationIcon {
+	extends BasePortletConfigurationIcon {
 
 	@Override
-	public Map<String, Object> getContext(PortletRequest portletRequest) {
-		return HashMapBuilder.<String, Object>put(
-			"action", getNamespace(portletRequest) + "refresh"
-		).put(
-			"globalAction", true
-		).build();
-	}
-
-	@Override
-	public String getIconCssClass() {
+	public String getCssClass() {
 		return "portlet-refresh portlet-refresh-icon";
 	}
 
 	@Override
-	public String getJspPath() {
-		return "/configuration/icon/refresh.jsp";
+	public String getMessage(PortletRequest portletRequest) {
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), "refresh");
 	}
 
 	@Override
-	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "refresh");
+	public String getOnClick(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		return StringBundler.concat(
+			"Liferay.Portlet.refresh('#p_p_id_", portletDisplay.getId(),
+			"_'); return false;");
+	}
+
+	@Override
+	public String getURL(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		return portletDisplay.getURLRefresh();
 	}
 
 	@Override
@@ -78,16 +87,8 @@ public class RefreshPortletConfigurationIcon
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	public boolean isToolTip() {
+		return false;
 	}
-
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.portlet.configuration.icon.refresh)"
-	)
-	private ServletContext _servletContext;
 
 }

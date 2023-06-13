@@ -15,27 +15,27 @@
 package com.liferay.asset.list.web.internal.display.context;
 
 import com.liferay.asset.list.constants.AssetListEntryUsageConstants;
-import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.model.AssetListEntryUsage;
 import com.liferay.asset.list.service.AssetListEntryUsageLocalServiceUtil;
 import com.liferay.asset.list.util.comparator.AssetListEntryUsageModifiedDateComparator;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.portlet.PortletURL;
@@ -53,7 +53,7 @@ public class AssetListEntryUsagesDisplayContext {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
-		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -203,8 +203,6 @@ public class AssetListEntryUsagesDisplayContext {
 				_renderRequest, _renderResponse.createRenderURL(), null,
 				"there-are-no-collection-usages");
 
-		assetListEntryUsagesSearchContainer.setOrderByCol(_getOrderByCol());
-
 		boolean orderByAsc = false;
 
 		String orderByType = _getOrderByType();
@@ -213,65 +211,72 @@ public class AssetListEntryUsagesDisplayContext {
 			orderByAsc = true;
 		}
 
+		OrderByComparator<AssetListEntryUsage> orderByComparator =
+			new AssetListEntryUsageModifiedDateComparator(orderByAsc);
+
+		assetListEntryUsagesSearchContainer.setOrderByCol(_getOrderByCol());
 		assetListEntryUsagesSearchContainer.setOrderByComparator(
-			new AssetListEntryUsageModifiedDateComparator(orderByAsc));
-		assetListEntryUsagesSearchContainer.setOrderByType(orderByType);
+			orderByComparator);
+		assetListEntryUsagesSearchContainer.setOrderByType(_getOrderByType());
+
+		List<AssetListEntryUsage> assetListEntryUsages = null;
+
+		int assetListEntryUsagesCount = 0;
 
 		if (Objects.equals(getNavigation(), "pages")) {
-			assetListEntryUsagesSearchContainer.setResultsAndTotal(
-				() ->
-					AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsages(
-						_themeDisplay.getScopeGroupId(),
-						PortalUtil.getClassNameId(AssetListEntry.class),
-						String.valueOf(getAssetListEntryId()),
-						AssetListEntryUsageConstants.TYPE_LAYOUT,
-						assetListEntryUsagesSearchContainer.getStart(),
-						assetListEntryUsagesSearchContainer.getEnd(),
-						assetListEntryUsagesSearchContainer.
-							getOrderByComparator()),
-				getPagesUsageCount());
+			assetListEntryUsages =
+				AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsages(
+					_themeDisplay.getScopeGroupId(),
+					PortalUtil.getClassNameId(AssetListEntry.class),
+					String.valueOf(getAssetListEntryId()),
+					AssetListEntryUsageConstants.TYPE_LAYOUT,
+					assetListEntryUsagesSearchContainer.getStart(),
+					assetListEntryUsagesSearchContainer.getEnd(),
+					orderByComparator);
+
+			assetListEntryUsagesCount = getPagesUsageCount();
 		}
 		else if (Objects.equals(getNavigation(), "page-templates")) {
-			assetListEntryUsagesSearchContainer.setResultsAndTotal(
-				() ->
-					AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsages(
-						_themeDisplay.getScopeGroupId(),
-						PortalUtil.getClassNameId(AssetListEntry.class),
-						String.valueOf(getAssetListEntryId()),
-						AssetListEntryUsageConstants.TYPE_PAGE_TEMPLATE,
-						assetListEntryUsagesSearchContainer.getStart(),
-						assetListEntryUsagesSearchContainer.getEnd(),
-						assetListEntryUsagesSearchContainer.
-							getOrderByComparator()),
-				getDisplayPagesUsageCount());
+			assetListEntryUsages =
+				AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsages(
+					_themeDisplay.getScopeGroupId(),
+					PortalUtil.getClassNameId(AssetListEntry.class),
+					String.valueOf(getAssetListEntryId()),
+					AssetListEntryUsageConstants.TYPE_PAGE_TEMPLATE,
+					assetListEntryUsagesSearchContainer.getStart(),
+					assetListEntryUsagesSearchContainer.getEnd(),
+					orderByComparator);
+
+			assetListEntryUsagesCount = getDisplayPagesUsageCount();
 		}
 		else if (Objects.equals(getNavigation(), "display-page-templates")) {
-			assetListEntryUsagesSearchContainer.setResultsAndTotal(
-				() ->
-					AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsages(
-						_themeDisplay.getScopeGroupId(),
-						PortalUtil.getClassNameId(AssetListEntry.class),
-						String.valueOf(getAssetListEntryId()),
-						AssetListEntryUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE,
-						assetListEntryUsagesSearchContainer.getStart(),
-						assetListEntryUsagesSearchContainer.getEnd(),
-						assetListEntryUsagesSearchContainer.
-							getOrderByComparator()),
-				getDisplayPagesUsageCount());
+			assetListEntryUsages =
+				AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsages(
+					_themeDisplay.getScopeGroupId(),
+					PortalUtil.getClassNameId(AssetListEntry.class),
+					String.valueOf(getAssetListEntryId()),
+					AssetListEntryUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE,
+					assetListEntryUsagesSearchContainer.getStart(),
+					assetListEntryUsagesSearchContainer.getEnd(),
+					orderByComparator);
+
+			assetListEntryUsagesCount = getDisplayPagesUsageCount();
 		}
 		else {
-			assetListEntryUsagesSearchContainer.setResultsAndTotal(
-				() ->
-					AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsages(
-						_themeDisplay.getScopeGroupId(),
-						PortalUtil.getClassNameId(AssetListEntry.class),
-						String.valueOf(getAssetListEntryId()),
-						assetListEntryUsagesSearchContainer.getStart(),
-						assetListEntryUsagesSearchContainer.getEnd(),
-						assetListEntryUsagesSearchContainer.
-							getOrderByComparator()),
-				getAllUsageCount());
+			assetListEntryUsages =
+				AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsages(
+					_themeDisplay.getScopeGroupId(),
+					PortalUtil.getClassNameId(AssetListEntry.class),
+					String.valueOf(getAssetListEntryId()),
+					assetListEntryUsagesSearchContainer.getStart(),
+					assetListEntryUsagesSearchContainer.getEnd(),
+					orderByComparator);
+
+			assetListEntryUsagesCount = getAllUsageCount();
 		}
+
+		assetListEntryUsagesSearchContainer.setResults(assetListEntryUsages);
+		assetListEntryUsagesSearchContainer.setTotal(assetListEntryUsagesCount);
 
 		_searchContainer = assetListEntryUsagesSearchContainer;
 
@@ -289,9 +294,8 @@ public class AssetListEntryUsagesDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_renderRequest, AssetListPortletKeys.ASSET_LIST,
-			"entry-usages-order-by-col", "modified-date");
+		_orderByCol = ParamUtil.getString(
+			_renderRequest, "orderByCol", "modified-date");
 
 		return _orderByCol;
 	}
@@ -301,9 +305,8 @@ public class AssetListEntryUsagesDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_renderRequest, AssetListPortletKeys.ASSET_LIST,
-			"entry-usages-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_renderRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}

@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class EntryServiceWrapper
 	implements EntryService, ServiceWrapper<EntryService> {
 
-	public EntryServiceWrapper() {
-		this(null);
-	}
-
 	public EntryServiceWrapper(EntryService entryService) {
 		_entryService = entryService;
 	}

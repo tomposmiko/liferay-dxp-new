@@ -78,6 +78,7 @@ public class EmbedVideoMVCRenderCommand implements MVCRenderCommand {
 						DLVideoWebKeys.PREVIEW_FILE_URLS,
 						_getPreviewFileURLs(
 							fileVersion, videoPosterURL, renderRequest));
+
 					renderRequest.setAttribute(
 						DLVideoWebKeys.VIDEO_POSTER_URL, videoPosterURL);
 
@@ -86,12 +87,13 @@ public class EmbedVideoMVCRenderCommand implements MVCRenderCommand {
 				else if (_isPreviewFailure(fileVersion)) {
 					return "/embed/error.jsp";
 				}
-
-				return "/embed/generating.jsp";
+				else {
+					return "/embed/generating.jsp";
+				}
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return "/embed/error.jsp";

@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Andrew Betts
  */
-@Component(service = BackgroundTaskDisplayFactory.class)
+@Component(immediate = true, service = BackgroundTaskDisplayFactory.class)
 public class BackgroundTaskDisplayFactoryImpl
 	implements BackgroundTaskDisplayFactory {
 
@@ -50,14 +50,27 @@ public class BackgroundTaskDisplayFactoryImpl
 	public BackgroundTaskDisplay getBackgroundTaskDisplay(
 		long backgroundTaskId) {
 
-		return getBackgroundTaskDisplay(
-			_backgroundTaskManager.fetchBackgroundTask(backgroundTaskId));
+		BackgroundTask backgroundTask =
+			_backgroundTaskManager.fetchBackgroundTask(backgroundTaskId);
+
+		return getBackgroundTaskDisplay(backgroundTask);
 	}
 
-	@Reference
-	private BackgroundTaskExecutorRegistry _backgroundTaskExecutorRegistry;
+	@Reference(unbind = "-")
+	protected void setBackgroundTaskExecutorRegistry(
+		BackgroundTaskExecutorRegistry backgroundTaskExecutorRegistry) {
 
-	@Reference
+		_backgroundTaskExecutorRegistry = backgroundTaskExecutorRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setBackgroundTaskManager(
+		BackgroundTaskManager backgroundTaskManager) {
+
+		_backgroundTaskManager = backgroundTaskManager;
+	}
+
+	private BackgroundTaskExecutorRegistry _backgroundTaskExecutorRegistry;
 	private BackgroundTaskManager _backgroundTaskManager;
 
 }

@@ -14,6 +14,7 @@
 
 package com.liferay.account.internal.retriever;
 
+import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.internal.search.searcher.UserSearchRequestBuilder;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountRole;
@@ -21,7 +22,6 @@ import com.liferay.account.retriever.AccountUserRetriever;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.account.service.AccountRoleLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -38,6 +39,7 @@ import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
@@ -107,20 +109,51 @@ public class AccountUserRetrieverImpl implements AccountUserRetriever {
 
 	@Override
 	public BaseModelSearchResult<User> searchAccountUsers(
-			long[] accountEntryIds, String keywords,
-			LinkedHashMap<String, Serializable> params, int status, int cur,
+			long accountEntryId, String keywords, int status, int cur,
 			int delta, String sortField, boolean reverse)
 		throws PortalException {
 
-		if (params == null) {
-			params = new LinkedHashMap<>();
-		}
+		return searchAccountUsers(
+			new long[] {accountEntryId}, keywords, status, cur, delta,
+			sortField, reverse);
+	}
 
-		params.put("accountEntryIds", accountEntryIds);
+	@Override
+	public BaseModelSearchResult<User> searchAccountUsers(
+			long accountEntryId, String[] emailAddressDomains, String keywords,
+			int status, int cur, int delta, String sortField, boolean reverse)
+		throws PortalException {
 
 		return _getUserBaseModelSearchResult(
 			_getSearchResponse(
-				params, cur, delta, keywords, reverse, sortField, status));
+				HashMapBuilder.<String, Serializable>put(
+					"accountEntryIds", new long[] {accountEntryId}
+				).put(
+					"emailAddressDomains", emailAddressDomains
+				).build(),
+				cur, delta, keywords, reverse, sortField, status));
+	}
+
+	@Override
+	public BaseModelSearchResult<User> searchAccountUsers(
+			long[] accountEntryIds, String keywords, int status, int cur,
+			int delta, String sortField, boolean reverse)
+		throws PortalException {
+
+		for (long accountEntryId : accountEntryIds) {
+			if ((accountEntryId != AccountConstants.ACCOUNT_ENTRY_ID_ANY) &&
+				(accountEntryId != AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT)) {
+
+				_accountEntryLocalService.getAccountEntry(accountEntryId);
+			}
+		}
+
+		return _getUserBaseModelSearchResult(
+			_getSearchResponse(
+				HashMapBuilder.<String, Serializable>put(
+					"accountEntryIds", accountEntryIds
+				).build(),
+				cur, delta, keywords, reverse, sortField, status));
 	}
 
 	private SearchResponse _getSearchResponse(

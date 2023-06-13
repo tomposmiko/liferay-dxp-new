@@ -21,6 +21,8 @@ import java.net.URL;
  */
 public interface TestrayAttachment {
 
+	public boolean exists();
+
 	public String getKey();
 
 	public String getName();

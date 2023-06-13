@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.NUMERIC,
 	service = DDMFormFieldValueRenderer.class
 )
@@ -71,7 +72,7 @@ public class NumericDDMFormFieldValueRenderer
 			}
 			catch (ParseException parseException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(parseException);
+					_log.debug(parseException, parseException);
 				}
 			}
 		}

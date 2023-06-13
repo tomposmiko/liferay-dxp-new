@@ -48,12 +48,7 @@ public class ArticleSystemEventsUpgradeProcess extends UpgradeProcess {
 		_systemEventLocalService = systemEventLocalService;
 	}
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		_deleteJournalArticleSystemEvents();
-	}
-
-	private void _deleteJournalArticleSystemEvents() throws Exception {
+	protected void deleteJournalArticleSystemEvents() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			DynamicQuery dynamicQuery = _systemEventLocalService.dynamicQuery();
 
@@ -143,6 +138,11 @@ public class ArticleSystemEventsUpgradeProcess extends UpgradeProcess {
 					"Delete system events verified for journal articles");
 			}
 		}
+	}
+
+	@Override
+	protected void doUpgrade() throws Exception {
+		deleteJournalArticleSystemEvents();
 	}
 
 	private static final String _CLASS_NAME =

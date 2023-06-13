@@ -48,12 +48,12 @@ public class UpgradePortletPreferences
 			"searchScope",
 			SearchScopePreference.LET_THE_USER_CHOOSE.getPreferenceString());
 
-		_upgradeSearchConfiguration(portletPreferences);
+		upgradeSearchConfiguration(portletPreferences);
 
 		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
 	}
 
-	private void _upgradeSearchConfiguration(
+	protected void upgradeSearchConfiguration(
 			PortletPreferences portletPreferences)
 		throws Exception {
 

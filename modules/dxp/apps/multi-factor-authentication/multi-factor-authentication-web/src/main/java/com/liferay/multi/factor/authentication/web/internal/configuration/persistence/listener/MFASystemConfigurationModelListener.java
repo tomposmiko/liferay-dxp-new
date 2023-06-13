@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marta Medio
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.multi.factor.authentication.web.internal.system.configuration.MFASystemConfiguration",
 	service = ConfigurationModelListener.class
 )

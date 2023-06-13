@@ -14,7 +14,6 @@
 
 package com.liferay.portal.lpkg.deployer.controller;
 
-import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.lpkg.deployer.test.util.LPKGTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -39,7 +38,7 @@ public class LPKGControllerTest {
 
 	@Test
 	public void testLPKGControllerDeploy() throws Exception {
-		String liferayHome = SystemProperties.get("liferay.home");
+		String liferayHome = System.getProperty("liferay.home");
 
 		Assert.assertNotNull(
 			"Missing system property \"liferay.home\"", liferayHome);

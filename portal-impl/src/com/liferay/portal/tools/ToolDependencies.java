@@ -38,11 +38,10 @@ import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.model.DefaultModelHintsImpl;
@@ -52,7 +51,9 @@ import com.liferay.portal.service.permission.PortletPermissionImpl;
 import com.liferay.portal.util.DigesterImpl;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
 import com.liferay.portal.util.FileImpl;
+import com.liferay.portal.util.FriendlyURLNormalizerImpl;
 import com.liferay.portal.util.HtmlImpl;
+import com.liferay.portal.util.HttpImpl;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.xml.SAXReaderImpl;
@@ -110,14 +111,15 @@ public class ToolDependencies {
 			new FriendlyURLNormalizerUtil();
 
 		friendlyURLNormalizerUtil.setFriendlyURLNormalizer(
-			(FriendlyURLNormalizer)ProxyUtil.newProxyInstance(
-				ToolDependencies.class.getClassLoader(),
-				new Class<?>[] {FriendlyURLNormalizer.class},
-				(proxy, method, args) -> null));
+			new FriendlyURLNormalizerImpl());
 
 		HtmlUtil htmlUtil = new HtmlUtil();
 
 		htmlUtil.setHtml(new HtmlImpl());
+
+		HttpUtil httpUtil = new HttpUtil();
+
+		httpUtil.setHttp(new HttpImpl());
 
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
@@ -207,9 +209,14 @@ public class ToolDependencies {
 			return _portalCacheManager.getPortalCache(portalCacheName);
 		}
 
+		/**
+		 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+		 *             #getPortalCache(String)}
+		 */
+		@Deprecated
 		@Override
 		public PortalCache<? extends Serializable, ? extends Serializable>
-			getPortalCache(String portalCacheName, boolean mvcc) {
+			getPortalCache(String portalCacheName, boolean blocking) {
 
 			return getPortalCache(portalCacheName);
 		}
@@ -217,7 +224,7 @@ public class ToolDependencies {
 		@Override
 		public PortalCache<? extends Serializable, ? extends Serializable>
 			getPortalCache(
-				String portalCacheName, boolean mvcc, boolean sharded) {
+				String portalCacheName, boolean blocking, boolean mvcc) {
 
 			return getPortalCache(portalCacheName);
 		}
@@ -272,12 +279,16 @@ public class ToolDependencies {
 			return _portalCacheName;
 		}
 
-		public boolean isMVCC() {
+		/**
+		 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+		 */
+		@Deprecated
+		@Override
+		public boolean isBlocking() {
 			return false;
 		}
 
-		@Override
-		public boolean isSharded() {
+		public boolean isMVCC() {
 			return false;
 		}
 
@@ -392,20 +403,25 @@ public class ToolDependencies {
 		public PortalCache<K, V> getPortalCache(String portalCacheName)
 			throws PortalCacheException {
 
-			return getPortalCache(portalCacheName, false);
+			return getPortalCache(portalCacheName, false, false);
 		}
 
+		/**
+		 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+		 *             #getPortalCache(String)}
+		 */
+		@Deprecated
 		@Override
 		public PortalCache<K, V> getPortalCache(
-				String portalCacheName, boolean mvcc)
+				String portalCacheName, boolean blocking)
 			throws PortalCacheException {
 
-			return getPortalCache(portalCacheName, mvcc, false);
+			return getPortalCache(portalCacheName);
 		}
 
 		@Override
 		public PortalCache<K, V> getPortalCache(
-				String portalCacheName, boolean mvcc, boolean sharded)
+				String portalCacheName, boolean blocking, boolean mvcc)
 			throws PortalCacheException {
 
 			PortalCache<K, V> portalCache = _portalCaches.get(portalCacheName);
@@ -439,6 +455,20 @@ public class ToolDependencies {
 		}
 
 		@Override
+		public boolean isClusterAware() {
+			return false;
+		}
+
+		/**
+		 * @deprecated As of Mueller (7.2.x), replaced by {@link
+		 *             #reconfigurePortalCaches(URL, ClassLoader)}
+		 */
+		@Deprecated
+		@Override
+		public void reconfigurePortalCaches(URL configurationURL) {
+		}
+
+		@Override
 		public void reconfigurePortalCaches(
 			URL configurationURL, ClassLoader classLoader) {
 		}
@@ -453,10 +483,6 @@ public class ToolDependencies {
 		@Override
 		public void removePortalCache(String portalCacheName) {
 			_portalCaches.remove(portalCacheName);
-		}
-
-		@Override
-		public void removePortalCaches(long companyId) {
 		}
 
 		@Override
@@ -492,6 +518,18 @@ public class ToolDependencies {
 			String portalCacheName) {
 
 			return _portalCacheManager.getPortalCache(portalCacheName);
+		}
+
+		/**
+		 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+		 *             #getPortalCache(String)}
+		 */
+		@Deprecated
+		@Override
+		public PortalCache<? extends Serializable, ?> getPortalCache(
+			String portalCacheName, boolean blocking) {
+
+			return getPortalCache(portalCacheName);
 		}
 
 		@Override

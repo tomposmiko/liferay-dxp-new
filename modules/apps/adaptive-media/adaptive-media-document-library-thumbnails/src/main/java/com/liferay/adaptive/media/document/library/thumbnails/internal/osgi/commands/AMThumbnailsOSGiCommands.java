@@ -27,7 +27,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.image.ImageBag;
-import com.liferay.portal.kernel.image.ImageTool;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -46,6 +46,7 @@ import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -56,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.command.function=check", "osgi.command.function=cleanUp",
 		"osgi.command.function=migrate", "osgi.command.scope=thumbnails"
@@ -181,7 +183,7 @@ public class AMThumbnailsOSGiCommands {
 			return fileVersion;
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}
@@ -266,15 +268,16 @@ public class AMThumbnailsOSGiCommands {
 				for (ThumbnailConfiguration thumbnailConfiguration :
 						_getThumbnailConfigurations()) {
 
-					AMImageConfigurationEntry amImageConfigurationEntry =
-						thumbnailConfiguration.selectMatchingConfigurationEntry(
-							amImageConfigurationEntries);
+					Optional<AMImageConfigurationEntry>
+						amImageConfigurationEntryOptional =
+							thumbnailConfiguration.
+								selectMatchingConfigurationEntry(
+									amImageConfigurationEntries);
 
-					if (amImageConfigurationEntry != null) {
-						_migrate(
+					amImageConfigurationEntryOptional.ifPresent(
+						amImageConfigurationEntry -> _migrate(
 							actualFileName, amImageConfigurationEntry,
-							thumbnailConfiguration);
-					}
+							thumbnailConfiguration));
 				}
 			}
 		}
@@ -308,7 +311,7 @@ public class AMThumbnailsOSGiCommands {
 				fileVersion.getCompanyId(),
 				DLPreviewableProcessor.REPOSITORY_ID, fileName);
 
-			ImageBag imageBag = _imageTool.read(bytes);
+			ImageBag imageBag = ImageToolUtil.read(bytes);
 
 			RenderedImage renderedImage = imageBag.getRenderedImage();
 
@@ -318,7 +321,7 @@ public class AMThumbnailsOSGiCommands {
 				new UnsyncByteArrayInputStream(bytes), bytes.length);
 		}
 		catch (IOException | PortalException exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -349,8 +352,5 @@ public class AMThumbnailsOSGiCommands {
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
-	private ImageTool _imageTool;
 
 }

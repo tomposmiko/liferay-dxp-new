@@ -57,20 +57,6 @@ function getDimensions(element) {
 	return positions;
 }
 
-function isPartiallyInViewport(element) {
-	const {bottom, left, right, top} = element.getBoundingClientRect();
-
-	const innerHeight =
-		window.innerHeight || document.documentElement.clientHeight;
-	const innerWidth =
-		window.innerWidth || document.documentElement.clientWidth;
-
-	const verticallyInViewport = top <= innerHeight && bottom >= 0;
-	const horizontallyInViewport = left <= innerWidth && right >= 0;
-
-	return verticallyInViewport && horizontallyInViewport;
-}
-
 class ScrollTracker {
 	constructor(steps = 4) {
 		this.steps = steps;
@@ -135,4 +121,4 @@ class ScrollTracker {
 	}
 }
 
-export {isPartiallyInViewport, ScrollTracker};
+export {ScrollTracker};

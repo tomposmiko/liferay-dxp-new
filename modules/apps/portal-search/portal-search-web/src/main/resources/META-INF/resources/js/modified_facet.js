@@ -15,13 +15,13 @@
 AUI.add(
 	'liferay-search-modified-facet',
 	(A) => {
-		const DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
+		var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
-		const FacetUtil = Liferay.Search.FacetUtil;
-		const Util = Liferay.Util;
+		var FacetUtil = Liferay.Search.FacetUtil;
+		var Util = Liferay.Util;
 
-		const ModifiedFacetFilter = function (config) {
-			const instance = this;
+		var ModifiedFacetFilter = function (config) {
+			var instance = this;
 
 			instance.form = config.form;
 			instance.fromInputDatePicker = config.fromInputDatePicker;
@@ -42,15 +42,23 @@ AUI.add(
 					A.bind(instance.filter, instance)
 				);
 			}
+
+			if (instance.fromInput) {
+				instance.fromInput.on('keydown', instance._onDateInputKeyDown);
+			}
+
+			if (instance.toInput) {
+				instance.toInput.on('keydown', instance._onDateInputKeyDown);
+			}
 		};
 
-		const ModifiedFacetFilterUtil = {
+		var ModifiedFacetFilterUtil = {
 			clearSelections() {
-				const param = this.getParameterName();
-				const paramFrom = param + 'From';
-				const paramTo = param + 'To';
+				var param = this.getParameterName();
+				var paramFrom = param + 'From';
+				var paramTo = param + 'To';
 
-				let parameterArray = document.location.search
+				var parameterArray = document.location.search
 					.substr(1)
 					.split('&');
 
@@ -86,7 +94,7 @@ AUI.add(
 			 * @returns {String} The date string.
 			 */
 			toLocaleDateStringFormatted(date) {
-				const localDate = new Date(date);
+				var localDate = new Date(date);
 
 				localDate.setMinutes(
 					date.getMinutes() - date.getTimezoneOffset()
@@ -98,9 +106,9 @@ AUI.add(
 
 		A.mix(ModifiedFacetFilter.prototype, {
 			_initializeFormValidator() {
-				const instance = this;
+				var instance = this;
 
-				const dateRangeRuleName = instance.namespace + 'dateRange';
+				var dateRangeRuleName = instance.namespace + 'dateRange';
 
 				A.mix(
 					DEFAULTS_FORM_VALIDATOR.STRINGS,
@@ -125,7 +133,7 @@ AUI.add(
 					true
 				);
 
-				const customRangeValidator = new A.FormValidator({
+				var customRangeValidator = new A.FormValidator({
 					boundingBox: instance.form,
 					fieldContainer: 'div',
 					on: {
@@ -152,7 +160,7 @@ AUI.add(
 					},
 				});
 
-				const onRangeSelectionChange = function () {
+				var onRangeSelectionChange = function () {
 					customRangeValidator.validate();
 				};
 
@@ -171,26 +179,32 @@ AUI.add(
 				}
 			},
 
+			_onDateInputKeyDown(event) {
+				if (!event.isKey('TAB')) {
+					event.preventDefault();
+				}
+			},
+
 			filter() {
-				const instance = this;
+				var instance = this;
 
-				const fromDate = instance.fromInputDatePicker.getDate();
+				var fromDate = instance.fromInputDatePicker.getDate();
 
-				const toDate = instance.toInputDatePicker.getDate();
+				var toDate = instance.toInputDatePicker.getDate();
 
-				const modifiedFromParameter = ModifiedFacetFilterUtil.toLocaleDateStringFormatted(
+				var modifiedFromParameter = ModifiedFacetFilterUtil.toLocaleDateStringFormatted(
 					fromDate
 				);
 
-				const modifiedToParameter = ModifiedFacetFilterUtil.toLocaleDateStringFormatted(
+				var modifiedToParameter = ModifiedFacetFilterUtil.toLocaleDateStringFormatted(
 					toDate
 				);
 
-				const param = ModifiedFacetFilterUtil.getParameterName();
-				const paramFrom = param + 'From';
-				const paramTo = param + 'To';
+				var param = ModifiedFacetFilterUtil.getParameterName();
+				var paramFrom = param + 'From';
+				var paramTo = param + 'To';
 
-				let parameterArray = document.location.search
+				var parameterArray = document.location.search
 					.substr(1)
 					.split('&');
 
@@ -209,7 +223,7 @@ AUI.add(
 					parameterArray
 				);
 
-				const startParameterNameElement = document.getElementById(
+				var startParameterNameElement = document.getElementById(
 					instance.namespace + 'start-parameter-name'
 				);
 

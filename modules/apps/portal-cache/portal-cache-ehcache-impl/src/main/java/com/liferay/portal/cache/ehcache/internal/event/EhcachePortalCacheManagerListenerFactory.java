@@ -15,7 +15,7 @@
 package com.liferay.portal.cache.ehcache.internal.event;
 
 import com.liferay.portal.cache.PortalCacheManagerListenerFactory;
-import com.liferay.portal.cache.ehcache.internal.BaseEhcachePortalCacheManager;
+import com.liferay.portal.cache.ehcache.internal.EhcachePortalCacheManager;
 import com.liferay.portal.cache.ehcache.internal.constants.EhcacheConstants;
 import com.liferay.portal.kernel.cache.PortalCacheManagerListener;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -31,14 +31,14 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Tina Tian
  */
-@Component(service = PortalCacheManagerListenerFactory.class)
+@Component(immediate = true, service = PortalCacheManagerListenerFactory.class)
 public class EhcachePortalCacheManagerListenerFactory
 	implements PortalCacheManagerListenerFactory
-		<BaseEhcachePortalCacheManager<?, ?>> {
+		<EhcachePortalCacheManager<?, ?>> {
 
 	@Override
 	public PortalCacheManagerListener create(
-		BaseEhcachePortalCacheManager<?, ?> baseEhcachePortalCacheManager,
+		EhcachePortalCacheManager<?, ?> ehcachePortalCacheManager,
 		Properties properties) {
 
 		String className = (String)properties.remove(
@@ -65,7 +65,7 @@ public class EhcachePortalCacheManagerListenerFactory
 			return new EhcachePortalCacheManagerListenerAdapter(
 				cacheManagerEventListenerFactory.
 					createCacheManagerEventListener(
-						baseEhcachePortalCacheManager.getEhcacheManager(),
+						ehcachePortalCacheManager.getEhcacheManager(),
 						properties));
 		}
 		catch (Exception exception) {

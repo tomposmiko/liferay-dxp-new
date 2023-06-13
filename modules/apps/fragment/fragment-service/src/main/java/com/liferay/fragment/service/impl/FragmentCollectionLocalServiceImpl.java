@@ -87,7 +87,7 @@ public class FragmentCollectionLocalServiceImpl
 			serviceContext = new ServiceContext();
 		}
 
-		_validate(name);
+		validate(name);
 
 		if (Validator.isNull(fragmentCollectionKey)) {
 			fragmentCollectionKey = generateFragmentCollectionKey(
@@ -97,7 +97,7 @@ public class FragmentCollectionLocalServiceImpl
 		fragmentCollectionKey = _getFragmentCollectionKey(
 			fragmentCollectionKey);
 
-		_validateFragmentCollectionKey(groupId, fragmentCollectionKey);
+		validateFragmentCollectionKey(groupId, fragmentCollectionKey);
 
 		long fragmentCollectionId = counterLocalService.increment();
 
@@ -126,7 +126,7 @@ public class FragmentCollectionLocalServiceImpl
 			FragmentCollection fragmentCollection)
 		throws PortalException {
 
-		// Fragment collection
+		/// Fragment collection
 
 		fragmentCollectionPersistence.remove(fragmentCollection);
 
@@ -264,7 +264,7 @@ public class FragmentCollectionLocalServiceImpl
 			fragmentCollectionPersistence.findByPrimaryKey(
 				fragmentCollectionId);
 
-		_validate(name);
+		validate(name);
 
 		fragmentCollection.setModifiedDate(new Date());
 		fragmentCollection.setName(name);
@@ -273,17 +273,7 @@ public class FragmentCollectionLocalServiceImpl
 		return fragmentCollectionPersistence.update(fragmentCollection);
 	}
 
-	private String _getFragmentCollectionKey(String fragmentCollectionKey) {
-		if (fragmentCollectionKey != null) {
-			fragmentCollectionKey = fragmentCollectionKey.trim();
-
-			return StringUtil.toLowerCase(fragmentCollectionKey);
-		}
-
-		return StringPool.BLANK;
-	}
-
-	private void _validate(String name) throws PortalException {
+	protected void validate(String name) throws PortalException {
 		if (Validator.isNull(name)) {
 			throw new FragmentCollectionNameException("Name must not be null");
 		}
@@ -296,7 +286,7 @@ public class FragmentCollectionLocalServiceImpl
 		}
 	}
 
-	private void _validateFragmentCollectionKey(
+	protected void validateFragmentCollectionKey(
 			long groupId, String fragmentCollectionKey)
 		throws PortalException {
 
@@ -310,6 +300,16 @@ public class FragmentCollectionLocalServiceImpl
 		if (fragmentCollection != null) {
 			throw new DuplicateFragmentCollectionKeyException();
 		}
+	}
+
+	private String _getFragmentCollectionKey(String fragmentCollectionKey) {
+		if (fragmentCollectionKey != null) {
+			fragmentCollectionKey = fragmentCollectionKey.trim();
+
+			return StringUtil.toLowerCase(fragmentCollectionKey);
+		}
+
+		return StringPool.BLANK;
 	}
 
 	@Reference

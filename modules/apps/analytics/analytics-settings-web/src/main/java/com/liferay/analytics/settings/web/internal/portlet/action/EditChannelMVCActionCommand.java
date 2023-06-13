@@ -16,13 +16,12 @@ package com.liferay.analytics.settings.web.internal.portlet.action;
 
 import com.liferay.analytics.settings.web.internal.util.AnalyticsSettingsUtil;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -35,15 +34,17 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 
@@ -107,13 +108,13 @@ public class EditChannelMVCActionCommand extends BaseAnalyticsMVCActionCommand {
 				"name", group.getDescriptiveName(themeDisplay.getLocale()));
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 				"content.Language", themeDisplay.getLocale(), getClass());
 
 			return groupJSONObject.put(
-				"name", _language.get(resourceBundle, "unknown"));
+				"name", LanguageUtil.get(resourceBundle, "unknown"));
 		}
 	}
 
@@ -173,6 +174,8 @@ public class EditChannelMVCActionCommand extends BaseAnalyticsMVCActionCommand {
 			return Collections.emptyList();
 		}
 
+		Stream<String> stream = Arrays.stream(selectedGroupIds);
+
 		HttpResponse httpResponse = AnalyticsSettingsUtil.doPatch(
 			JSONUtil.put(
 				"dataSourceId",
@@ -181,10 +184,15 @@ public class EditChannelMVCActionCommand extends BaseAnalyticsMVCActionCommand {
 			).put(
 				"groups",
 				JSONUtil.toJSONArray(
-					TransformUtil.transformToList(
-						selectedGroupIds,
-						selectedGroupId -> groupLocalService.fetchGroup(
-							Long.valueOf(selectedGroupId))),
+					stream.map(
+						Long::valueOf
+					).map(
+						groupLocalService::fetchGroup
+					).filter(
+						Objects::nonNull
+					).collect(
+						Collectors.toList()
+					),
 					group -> _buildGroupJSONObject(group, themeDisplay))
 			),
 			themeDisplay.getCompanyId(), "api/1.0/channels/" + channelId);
@@ -215,14 +223,14 @@ public class EditChannelMVCActionCommand extends BaseAnalyticsMVCActionCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+
+		unicodeProperties.setProperty(
+			"liferayAnalyticsGroupIds",
+			StringUtil.merge(liferayAnalyticsGroupIds, StringPool.COMMA));
+
 		_companyService.updatePreferences(
-			themeDisplay.getCompanyId(),
-			UnicodePropertiesBuilder.create(
-				true
-			).put(
-				"liferayAnalyticsGroupIds",
-				StringUtil.merge(liferayAnalyticsGroupIds, StringPool.COMMA)
-			).build());
+			themeDisplay.getCompanyId(), unicodeProperties);
 
 		return liferayAnalyticsGroupIds;
 	}
@@ -231,7 +239,7 @@ public class EditChannelMVCActionCommand extends BaseAnalyticsMVCActionCommand {
 			String channelId, String json, String[] selectedGroupIds)
 		throws Exception {
 
-		JSONObject responseJSONObject = _jsonFactory.createJSONObject(json);
+		JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(json);
 
 		String[] removedGroupIds = JSONUtil.toStringArray(
 			responseJSONObject.getJSONArray("removedGroupIds"));
@@ -260,11 +268,5 @@ public class EditChannelMVCActionCommand extends BaseAnalyticsMVCActionCommand {
 
 	@Reference
 	private CompanyService _companyService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 }

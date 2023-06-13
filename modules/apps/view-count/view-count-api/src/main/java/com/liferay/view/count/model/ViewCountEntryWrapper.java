@@ -207,11 +207,6 @@ public class ViewCountEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected ViewCountEntryWrapper wrap(ViewCountEntry viewCountEntry) {
 		return new ViewCountEntryWrapper(viewCountEntry);
 	}

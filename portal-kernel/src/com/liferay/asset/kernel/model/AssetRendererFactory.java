@@ -15,7 +15,6 @@
 package com.liferay.asset.kernel.model;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -61,18 +60,19 @@ public interface AssetRendererFactory<T> {
 
 	public long getClassNameId();
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	public default String getClassSimpleName() {
+		Class<?> clazz = getClass();
+
+		return clazz.getSimpleName();
+	}
+
 	public ClassTypeReader getClassTypeReader();
 
 	public String getIconCssClass();
-
-	public default PortletURL getItemSelectorURL(
-		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse, long classTypeId,
-		String eventName, Group group, boolean multiSelection,
-		long refererAssetEntryId) {
-
-		return null;
-	}
 
 	public String getPortletId();
 

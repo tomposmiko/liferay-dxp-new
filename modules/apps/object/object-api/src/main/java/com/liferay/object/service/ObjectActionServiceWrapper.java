@@ -26,30 +26,21 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class ObjectActionServiceWrapper
 	implements ObjectActionService, ServiceWrapper<ObjectActionService> {
 
-	public ObjectActionServiceWrapper() {
-		this(null);
-	}
-
 	public ObjectActionServiceWrapper(ObjectActionService objectActionService) {
 		_objectActionService = objectActionService;
 	}
 
 	@Override
 	public com.liferay.object.model.ObjectAction addObjectAction(
-			String externalReferenceCode, long objectDefinitionId,
-			boolean active, String conditionExpression, String description,
-			java.util.Map<java.util.Locale, String> errorMessageMap,
-			java.util.Map<java.util.Locale, String> labelMap, String name,
+			long objectDefinitionId, boolean active, String name,
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				parametersUnicodeProperties)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectActionService.addObjectAction(
-			externalReferenceCode, objectDefinitionId, active,
-			conditionExpression, description, errorMessageMap, labelMap, name,
-			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties);
+			objectDefinitionId, active, name, objectActionExecutorKey,
+			objectActionTriggerKey, parametersUnicodeProperties);
 	}
 
 	@Override
@@ -80,20 +71,13 @@ public class ObjectActionServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectAction updateObjectAction(
-			String externalReferenceCode, long objectActionId, boolean active,
-			String conditionExpression, String description,
-			java.util.Map<java.util.Locale, String> errorMessageMap,
-			java.util.Map<java.util.Locale, String> labelMap, String name,
-			String objectActionExecutorKey, String objectActionTriggerKey,
+			long objectActionId, boolean active, String name,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				parametersUnicodeProperties)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectActionService.updateObjectAction(
-			externalReferenceCode, objectActionId, active, conditionExpression,
-			description, errorMessageMap, labelMap, name,
-			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties);
+			objectActionId, active, name, parametersUnicodeProperties);
 	}
 
 	@Override

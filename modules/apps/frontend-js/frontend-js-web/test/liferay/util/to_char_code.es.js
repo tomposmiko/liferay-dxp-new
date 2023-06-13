@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import toCharCode from '../../../src/main/resources/META-INF/resources/liferay/util/to_char_code.es';
 
 describe('Liferay.Util.toCharCode', () => {

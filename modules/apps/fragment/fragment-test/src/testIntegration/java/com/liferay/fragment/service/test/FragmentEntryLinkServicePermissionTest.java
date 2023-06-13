@@ -46,7 +46,6 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -73,17 +72,13 @@ public class FragmentEntryLinkServicePermissionTest {
 
 		_user = UserTestUtil.addGroupUser(_group, RoleConstants.POWER_USER);
 
-		FragmentCollection fragmentCollection =
-			FragmentTestUtil.addFragmentCollection(_group.getGroupId());
+		_fragmentCollection = FragmentTestUtil.addFragmentCollection(
+			_group.getGroupId());
 
 		_fragmentEntry = FragmentEntryTestUtil.addFragmentEntry(
-			fragmentCollection.getFragmentCollectionId());
+			_fragmentCollection.getFragmentCollectionId());
 
-		_layout = LayoutTestUtil.addTypeContentLayout(_group);
-
-		_defaultSegmentsExperienceId =
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				_layout.getPlid());
+		_layout = LayoutTestUtil.addLayout(_group);
 	}
 
 	@Test
@@ -93,11 +88,10 @@ public class FragmentEntryLinkServicePermissionTest {
 		UserTestUtil.setUser(_user);
 
 		_fragmentEntryLinkService.addFragmentEntryLink(
-			_group.getGroupId(), 0, _fragmentEntry.getFragmentEntryId(),
-			_defaultSegmentsExperienceId, _layout.getPlid(), StringPool.BLANK,
-			"<div>test</div>", StringPool.BLANK, "{fieldSets: []}",
-			StringPool.BLANK, StringPool.BLANK, 0, null,
-			_fragmentEntry.getType(),
+			_group.getGroupId(), 0, _fragmentEntry.getFragmentEntryId(), 0,
+			_layout.getPlid(), StringPool.BLANK, "<div>test</div>",
+			StringPool.BLANK, "{fieldSets: []}", StringPool.BLANK,
+			StringPool.BLANK, 0, null,
 			ServiceContextTestUtil.getServiceContext(
 				_group, _user.getUserId()));
 	}
@@ -110,12 +104,11 @@ public class FragmentEntryLinkServicePermissionTest {
 		UserTestUtil.setUser(_user);
 
 		_fragmentEntryLinkService.addFragmentEntryLink(
-			_group.getGroupId(), 0, _fragmentEntry.getFragmentEntryId(),
-			_defaultSegmentsExperienceId, _layout.getPlid(),
-			_fragmentEntry.getCss(), _fragmentEntry.getHtml(),
-			_fragmentEntry.getJs(), _fragmentEntry.getConfiguration(),
-			StringPool.BLANK, StringPool.BLANK, 0, null,
-			_fragmentEntry.getType(), serviceContext);
+			_group.getGroupId(), 0, _fragmentEntry.getFragmentEntryId(), 0,
+			_layout.getPlid(), _fragmentEntry.getCss(),
+			_fragmentEntry.getHtml(), _fragmentEntry.getJs(),
+			_fragmentEntry.getConfiguration(), StringPool.BLANK,
+			StringPool.BLANK, 0, null, serviceContext);
 	}
 
 	@Test
@@ -161,6 +154,50 @@ public class FragmentEntryLinkServicePermissionTest {
 			_createEditableValues());
 	}
 
+	@Test
+	public void testUpdateFragmentEntryLinks() throws Exception {
+		FragmentEntry fragmentEntry = FragmentEntryTestUtil.addFragmentEntry(
+			_fragmentCollection.getFragmentCollectionId());
+
+		FragmentTestUtil.addFragmentEntryLink(fragmentEntry, _layout.getPlid());
+
+		_addSiteMemberUpdatePermission();
+
+		UserTestUtil.setUser(_user);
+
+		_fragmentEntryLinkService.updateFragmentEntryLinks(
+			_group.getGroupId(), _layout.getPlid(),
+			new long[] {
+				_fragmentEntry.getFragmentEntryId(),
+				fragmentEntry.getFragmentEntryId()
+			},
+			_createEditableValues(),
+			ServiceContextTestUtil.getServiceContext(
+				_group, _user.getUserId()));
+	}
+
+	@Test(expected = PrincipalException.MustHavePermission.class)
+	public void testUpdateFragmentEntryLinksWithoutPermissions()
+		throws Exception {
+
+		FragmentEntry fragmentEntry = FragmentEntryTestUtil.addFragmentEntry(
+			_fragmentCollection.getFragmentCollectionId());
+
+		FragmentTestUtil.addFragmentEntryLink(fragmentEntry, _layout.getPlid());
+
+		UserTestUtil.setUser(_user);
+
+		_fragmentEntryLinkService.updateFragmentEntryLinks(
+			_group.getGroupId(), _layout.getPlid(),
+			new long[] {
+				_fragmentEntry.getFragmentEntryId(),
+				fragmentEntry.getFragmentEntryId()
+			},
+			_createEditableValues(),
+			ServiceContextTestUtil.getServiceContext(
+				_group, _user.getUserId()));
+	}
+
 	@Test(expected = PrincipalException.MustHavePermission.class)
 	public void testUpdateFragmentEntryLinkWithoutPermissions()
 		throws Exception {
@@ -194,7 +231,7 @@ public class FragmentEntryLinkServicePermissionTest {
 		return jsonObject.toString();
 	}
 
-	private long _defaultSegmentsExperienceId;
+	private FragmentCollection _fragmentCollection;
 	private FragmentEntry _fragmentEntry;
 
 	@Inject
@@ -207,9 +244,6 @@ public class FragmentEntryLinkServicePermissionTest {
 
 	@Inject
 	private RoleLocalService _roleLocalService;
-
-	@Inject
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	@DeleteAfterTestRun
 	private User _user;

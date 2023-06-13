@@ -15,8 +15,8 @@
 package com.liferay.portal.scripting.groovy.context;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
-import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 
@@ -45,7 +45,7 @@ class GroovyDDMStructure {
 		}
 
 		ddmStructure = DDMStructureLocalServiceUtil.addStructure(
-			scriptingContext.getGuestUserId(), groovySite.group.getGroupId(),
+			scriptingContext.getDefaultUserId(), groovySite.group.getGroupId(),
 			0, ClassNameLocalServiceUtil.getClassNameId(DDLRecordSet.class),
 			null, GroovyScriptingContext.getLocalizationMap(name),
 			GroovyScriptingContext.getLocalizationMap(description), xsd, "xml",

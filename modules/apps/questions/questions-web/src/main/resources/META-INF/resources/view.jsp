@@ -18,7 +18,7 @@
 
 <portlet:renderURL var="basePortletURL" />
 
-<div id="<%= liferayPortletResponse.getNamespace() %>-questions-root">
+<div id="<%= liferayPortletResponse.getNamespace() + "-questions-root" %>">
 
 	<%
 	QuestionsConfiguration questionsConfiguration = portletDisplay.getPortletInstanceConfiguration(QuestionsConfiguration.class);
@@ -28,11 +28,7 @@
 		module="js/index.es"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
-				"companyName", renderRequest.getAttribute(QuestionsWebKeys.COMPANY_NAME)
-			).put(
 				"defaultRank", renderRequest.getAttribute(QuestionsWebKeys.DEFAULT_RANK)
-			).put(
-				"flagsProperties", renderRequest.getAttribute(QuestionsWebKeys.FLAGS_PROPERTIES)
 			).put(
 				"historyRouterBasePath", questionsConfiguration.historyRouterBasePath()
 			).put(

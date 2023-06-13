@@ -73,6 +73,22 @@ public interface InfoLocalizedValue<T> {
 
 	public static class Builder<T> {
 
+		/**
+		 * @deprecated As of Athanasius (7.3.x)
+		 */
+		@Deprecated
+		public Builder<T> addValue(Locale locale, T value) {
+			return value(locale, value);
+		}
+
+		/**
+		 * @deprecated As of Athanasius (7.3.x)
+		 */
+		@Deprecated
+		public Builder<T> addValues(Map<Locale, T> values) {
+			return values(values);
+		}
+
 		public InfoLocalizedValue<T> build() {
 			return new BuilderInfoLocalizedValue<>(this);
 		}
@@ -149,7 +165,7 @@ public interface InfoLocalizedValue<T> {
 		@Override
 		public Locale getDefaultLocale() {
 			if (_builder._defaultLocale == null) {
-				return LocaleUtil.getSiteDefault();
+				return LocaleUtil.getDefault();
 			}
 
 			return _builder._defaultLocale;

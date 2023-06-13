@@ -102,10 +102,21 @@ public class OpenIndexRequestExecutorImpl implements OpenIndexRequestExecutor {
 		}
 	}
 
-	@Reference
-	private ElasticsearchClientResolver _elasticsearchClientResolver;
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
-	@Reference
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
+	@Reference(unbind = "-")
+	protected void setIndicesOptionsTranslator(
+		IndicesOptionsTranslator indicesOptionsTranslator) {
+
+		_indicesOptionsTranslator = indicesOptionsTranslator;
+	}
+
+	private ElasticsearchClientResolver _elasticsearchClientResolver;
 	private IndicesOptionsTranslator _indicesOptionsTranslator;
 
 }

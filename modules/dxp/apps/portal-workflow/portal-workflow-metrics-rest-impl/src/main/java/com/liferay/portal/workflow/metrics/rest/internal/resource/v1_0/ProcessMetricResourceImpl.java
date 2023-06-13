@@ -47,6 +47,7 @@ import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.ProcessMetric;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.ProcessUtil;
@@ -63,6 +64,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -77,7 +79,8 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/process-metric.properties",
 	scope = ServiceScope.PROTOTYPE, service = ProcessMetricResource.class
 )
-public class ProcessMetricResourceImpl extends BaseProcessMetricResourceImpl {
+public class ProcessMetricResourceImpl
+	extends BaseProcessMetricResourceImpl implements EntityModelResource {
 
 	@Override
 	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
@@ -91,31 +94,35 @@ public class ProcessMetricResourceImpl extends BaseProcessMetricResourceImpl {
 			Long processId, Boolean completed, Date dateEnd, Date dateStart)
 		throws Exception {
 
-		SearchSearchResponse searchSearchResponse =
-			_getProcessMetricsSearchSearchResponse(null, null, processId, null);
+		return Stream.of(
+			_getProcessMetricsSearchSearchResponse(null, null, processId, null)
+		).map(
+			SearchSearchResponse::getSearchHits
+		).map(
+			SearchHits::getSearchHits
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).findFirst(
+		).map(
+			document -> {
+				ProcessMetric processMetric = _createProcessMetric(document);
 
-		SearchHits searchHits = searchSearchResponse.getSearchHits();
+				Bucket bucket = _getProcessBucket(
+					GetterUtil.getBoolean(completed), dateEnd, dateStart,
+					processId);
 
-		List<SearchHit> searchHitsList = searchHits.getSearchHits();
+				_populateProcessWithSLAMetrics(bucket, processMetric);
+				_setInstanceCount(bucket, processMetric);
 
-		if (searchHitsList.isEmpty()) {
-			return new ProcessMetric();
-		}
+				_setUntrackedInstanceCount(processMetric);
 
-		SearchHit searchHit = searchHitsList.get(0);
-
-		ProcessMetric processMetric = _createProcessMetric(
-			searchHit.getDocument());
-
-		Bucket bucket = _getProcessBucket(
-			GetterUtil.getBoolean(completed), dateEnd, dateStart, processId);
-
-		_populateProcessWithSLAMetrics(bucket, processMetric);
-		_setInstanceCount(bucket, processMetric);
-
-		_setUntrackedInstanceCount(processMetric);
-
-		return processMetric;
+				return processMetric;
+			}
+		).orElseGet(
+			ProcessMetric::new
+		);
 	}
 
 	@Override
@@ -227,7 +234,6 @@ public class ProcessMetricResourceImpl extends BaseProcessMetricResourceImpl {
 		}
 
 		return booleanQuery.addMustQueryClauses(
-			_queries.term("active", Boolean.TRUE),
 			_queries.term("companyId", contextCompany.getCompanyId()),
 			_queries.term("deleted", Boolean.FALSE),
 			_createBooleanQuery(completed),
@@ -256,8 +262,14 @@ public class ProcessMetricResourceImpl extends BaseProcessMetricResourceImpl {
 	private TermsQuery _createProcessIdTermsQuery(Set<Long> processIds) {
 		TermsQuery termsQuery = _queries.terms("processId");
 
+		Stream<Long> stream = processIds.stream();
+
 		termsQuery.addValues(
-			transformToArray(processIds, String::valueOf, Object.class));
+			stream.map(
+				String::valueOf
+			).toArray(
+				Object[]::new
+			));
 
 		return termsQuery;
 	}
@@ -299,8 +311,6 @@ public class ProcessMetricResourceImpl extends BaseProcessMetricResourceImpl {
 		}
 
 		return booleanQuery.addMustQueryClauses(
-			_queries.term("active", Boolean.TRUE),
-			_queries.term("blocked", Boolean.FALSE),
 			_queries.term("companyId", contextCompany.getCompanyId()),
 			_queries.term("deleted", Boolean.FALSE),
 			_createProcessIdTermsQuery(processIds));
@@ -425,16 +435,23 @@ public class ProcessMetricResourceImpl extends BaseProcessMetricResourceImpl {
 
 		List<ProcessMetric> processMetrics = new LinkedList<>();
 
-		Map<Long, ProcessMetric> processMetricsMap = new LinkedHashMap<>();
+		Map<Long, ProcessMetric> processMetricsMap = Stream.of(
+			searchHits.getSearchHits()
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).map(
+			this::_createProcessMetric
+		).collect(
+			LinkedHashMap::new,
+			(map, processMetric) -> {
+				Process process = processMetric.getProcess();
 
-		for (SearchHit searchHit : searchHits.getSearchHits()) {
-			ProcessMetric processMetric = _createProcessMetric(
-				searchHit.getDocument());
-
-			Process process = processMetric.getProcess();
-
-			processMetricsMap.put(process.getId(), processMetric);
-		}
+				map.put(process.getId(), processMetric);
+			},
+			Map::putAll
+		);
 
 		TermsAggregationResult instanceTermsAggregationResult =
 			_getInstanceTermsAggregationResult(

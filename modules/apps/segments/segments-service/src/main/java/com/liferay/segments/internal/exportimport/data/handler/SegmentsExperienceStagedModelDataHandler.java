@@ -23,16 +23,13 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.constants.SegmentsPortletKeys;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsEntryLocalService;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.util.Map;
 
@@ -42,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo García
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class SegmentsExperienceStagedModelDataHandler
 	extends BaseStagedModelDataHandler<SegmentsExperience> {
 
@@ -142,15 +139,15 @@ public class SegmentsExperienceStagedModelDataHandler
 
 		long segmentsEntryId = MapUtil.getLong(
 			segmentsEntryIds, segmentsExperience.getSegmentsEntryId(),
-			SegmentsEntryConstants.ID_DEFAULT);
+			segmentsExperience.getSegmentsEntryId());
 
 		Map<Long, Long> referenceClassPKs =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				Layout.class.getName());
+				segmentsExperience.getClassName());
 
 		long referenceClassPK = MapUtil.getLong(
-			referenceClassPKs, segmentsExperience.getPlid(),
-			segmentsExperience.getPlid());
+			referenceClassPKs, segmentsExperience.getClassPK(),
+			segmentsExperience.getClassPK());
 
 		SegmentsExperience importedSegmentsExperience =
 			(SegmentsExperience)segmentsExperience.clone();
@@ -160,20 +157,12 @@ public class SegmentsExperienceStagedModelDataHandler
 		importedSegmentsExperience.setCompanyId(
 			portletDataContext.getCompanyId());
 		importedSegmentsExperience.setSegmentsEntryId(segmentsEntryId);
-		importedSegmentsExperience.setPlid(referenceClassPK);
+		importedSegmentsExperience.setClassPK(referenceClassPK);
 
 		SegmentsExperience existingSegmentsExperience =
 			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
 				segmentsExperience.getUuid(),
 				portletDataContext.getScopeGroupId());
-
-		if (existingSegmentsExperience == null) {
-			existingSegmentsExperience =
-				_segmentsExperienceLocalService.fetchSegmentsExperience(
-					portletDataContext.getScopeGroupId(),
-					importedSegmentsExperience.getSegmentsExperienceKey(),
-					importedSegmentsExperience.getPlid());
-		}
 
 		if ((existingSegmentsExperience == null) ||
 			!portletDataContext.isDataStrategyMirror()) {
@@ -186,8 +175,6 @@ public class SegmentsExperienceStagedModelDataHandler
 				existingSegmentsExperience.getMvccVersion());
 			importedSegmentsExperience.setSegmentsExperienceId(
 				existingSegmentsExperience.getSegmentsExperienceId());
-			importedSegmentsExperience.setSegmentsExperienceKey(
-				existingSegmentsExperience.getSegmentsExperienceKey());
 
 			importedSegmentsExperience =
 				_stagedModelRepository.updateStagedModel(
@@ -210,9 +197,6 @@ public class SegmentsExperienceStagedModelDataHandler
 
 	@Reference
 	private SegmentsEntryLocalService _segmentsEntryLocalService;
-
-	@Reference
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.segments.model.SegmentsExperience)",

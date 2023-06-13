@@ -34,19 +34,24 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleResource;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalArticleResourceLocalService;
+import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portlet.PortletPreferencesImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -61,6 +66,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + JournalContentPortletKeys.JOURNAL_CONTENT,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -77,11 +83,6 @@ public class JournalContentExportImportPortletPreferencesProcessor
 	public List<Capability> getImportCapabilities() {
 		return ListUtil.fromArray(
 			_journalContentMetadataExporterImporterCapability, _capability);
-	}
-
-	@Override
-	public boolean isPublishDisplayedContent() {
-		return false;
 	}
 
 	@Override
@@ -352,6 +353,28 @@ public class JournalContentExportImportPortletPreferencesProcessor
 								String.valueOf(assetEntry.getEntryId()));
 						}
 					}
+
+					int prefOwnerType = -1;
+
+					if (portletPreferences instanceof PortletPreferencesImpl) {
+						PortletPreferencesImpl portletPreferencesImpl =
+							(PortletPreferencesImpl)portletPreferences;
+
+						prefOwnerType = portletPreferencesImpl.getOwnerType();
+					}
+
+					if ((portletDataContext.getPlid() > 0) &&
+						(prefOwnerType !=
+							PortletKeys.PREFS_OWNER_TYPE_ARCHIVED)) {
+
+						Layout layout = _layoutLocalService.fetchLayout(
+							portletDataContext.getPlid());
+
+						_journalContentSearchLocalService.updateContentSearch(
+							layout.getGroupId(), layout.isPrivateLayout(),
+							layout.getLayoutId(),
+							portletDataContext.getPortletId(), articleId, true);
+					}
 				}
 			}
 
@@ -369,6 +392,17 @@ public class JournalContentExportImportPortletPreferencesProcessor
 
 				portletPreferences.setValue("ddmTemplateKey", ddmTemplateKey);
 			}
+		}
+		catch (PortalException portalException) {
+			PortletDataException portletDataException =
+				new PortletDataException(portalException);
+
+			portletDataException.setPortletId(
+				JournalContentPortletKeys.JOURNAL_CONTENT);
+			portletDataException.setType(
+				PortletDataException.UPDATE_JOURNAL_CONTENT_SEARCH_DATA);
+
+			throw portletDataException;
 		}
 		catch (ReadOnlyException readOnlyException) {
 			PortletDataException portletDataException =
@@ -409,10 +443,15 @@ public class JournalContentExportImportPortletPreferencesProcessor
 	private JournalArticleResourceLocalService
 		_journalArticleResourceLocalService;
 
-	@Reference(
-		target = "(component.name=com.liferay.journal.content.web.internal.exportimport.portlet.preferences.processor.JournalContentMetadataExporterImporterCapability)"
-	)
-	private Capability _journalContentMetadataExporterImporterCapability;
+	@Reference
+	private JournalContentMetadataExporterImporterCapability
+		_journalContentMetadataExporterImporterCapability;
+
+	@Reference(unbind = "-")
+	private JournalContentSearchLocalService _journalContentSearchLocalService;
+
+	@Reference(unbind = "-")
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private Portal _portal;

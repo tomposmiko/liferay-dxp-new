@@ -12,7 +12,8 @@
  * details.
  */
 
-import {getFields, useFormState} from 'data-engine-js-components-web';
+import {useFormState} from 'data-engine-js-components-web';
+import {getFields} from 'data-engine-js-components-web/js/utils/fields.es';
 import React, {useEffect, useMemo} from 'react';
 
 const getFielProperty = (fields, fieldName) => {

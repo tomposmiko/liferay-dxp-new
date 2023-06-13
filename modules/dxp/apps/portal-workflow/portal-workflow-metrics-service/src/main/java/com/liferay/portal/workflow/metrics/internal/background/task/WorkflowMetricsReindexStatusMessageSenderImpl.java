@@ -27,7 +27,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(service = WorkflowMetricsReindexStatusMessageSender.class)
+@Component(
+	immediate = true, service = WorkflowMetricsReindexStatusMessageSender.class
+)
 public class WorkflowMetricsReindexStatusMessageSenderImpl
 	implements WorkflowMetricsReindexStatusMessageSender {
 

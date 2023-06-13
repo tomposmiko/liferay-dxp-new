@@ -15,9 +15,11 @@
 package com.liferay.text.localizer.taglib.internal.address.util;
 
 import com.liferay.portal.kernel.model.Address;
-import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.Region;
-import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.Validator;
+
+import java.util.Optional;
 
 /**
  * @author Pei-Jung Lan
@@ -25,32 +27,50 @@ import com.liferay.portal.kernel.util.LocaleThreadLocal;
  */
 public class AddressUtil {
 
-	public static String getCountryName(Address address) {
-		if (address == null) {
-			return null;
-		}
+	public static Optional<String> getCountryNameOptional(Address address) {
+		return Optional.ofNullable(
+			address
+		).map(
+			Address::getCountry
+		).filter(
+			country -> {
+				if (country.getCountryId() > 0) {
+					return true;
+				}
 
-		Country country = address.getCountry();
-
-		if ((country == null) || country.isNew()) {
-			return null;
-		}
-
-		return country.getTitle(LocaleThreadLocal.getThemeDisplayLocale());
+				return false;
+			}
+		).map(
+			country -> Optional.ofNullable(
+				ServiceContextThreadLocal.getServiceContext()
+			).map(
+				serviceContext -> country.getName(serviceContext.getLocale())
+			).orElseGet(
+				country::getName
+			)
+		).filter(
+			Validator::isNotNull
+		);
 	}
 
-	public static String getRegionName(Address address) {
-		if (address == null) {
-			return null;
-		}
+	public static Optional<String> getRegionNameOptional(Address address) {
+		return Optional.ofNullable(
+			address
+		).map(
+			Address::getRegion
+		).filter(
+			region -> {
+				if (region.getRegionId() > 0) {
+					return true;
+				}
 
-		Region region = address.getRegion();
-
-		if ((region == null) || region.isNew()) {
-			return null;
-		}
-
-		return region.getName();
+				return false;
+			}
+		).map(
+			Region::getName
+		).filter(
+			Validator::isNotNull
+		);
 	}
 
 }

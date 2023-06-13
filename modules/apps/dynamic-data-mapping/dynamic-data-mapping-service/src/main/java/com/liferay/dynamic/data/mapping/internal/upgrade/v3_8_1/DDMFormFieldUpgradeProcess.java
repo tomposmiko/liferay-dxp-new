@@ -129,7 +129,7 @@ public class DDMFormFieldUpgradeProcess extends UpgradeProcess {
 
 		_upgradeFields(jsonObject.getJSONArray("fields"));
 
-		return jsonObject.toString();
+		return jsonObject.toJSONString();
 	}
 
 	private void _upgradeFields(JSONArray fieldsJSONArray) {

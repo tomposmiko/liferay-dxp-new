@@ -12,9 +12,9 @@
 AUI.add(
 	'liferay-kaleo-designer-templates',
 	(A) => {
-		const Template = A.Template;
+		var Template = A.Template;
 
-		const TPL_SELECT_MULTIPLE = [
+		var TPL_SELECT_MULTIPLE = [
 			'<tpl if="values.label !== undefined">',
 			'<label class="{[A.TplSnippets.getClassName(values.auiLabelCssClass, values.labelCssClass)]}" for="{id}" id="{labelId}" name="{labelName}" style="{labelStyle}">{label}</label>',
 			'</tpl>',

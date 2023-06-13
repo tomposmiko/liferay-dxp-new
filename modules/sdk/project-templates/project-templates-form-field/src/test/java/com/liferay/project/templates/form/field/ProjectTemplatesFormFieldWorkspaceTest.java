@@ -18,7 +18,6 @@ import com.liferay.maven.executor.MavenExecutor;
 import com.liferay.project.templates.BaseProjectTemplatesTestCase;
 import com.liferay.project.templates.extensions.util.ProjectTemplatesUtil;
 import com.liferay.project.templates.extensions.util.Validator;
-import com.liferay.project.templates.extensions.util.VersionUtil;
 import com.liferay.project.templates.util.FileTestUtil;
 
 import java.io.File;
@@ -52,12 +51,10 @@ public class ProjectTemplatesFormFieldWorkspaceTest
 	@ClassRule
 	public static final MavenExecutor mavenExecutor = new MavenExecutor();
 
-	@Parameterized.Parameters(name = "Testcase-{index}: testing {1} {0}")
+	@Parameterized.Parameters(name = "Testcase-{index}: testing {0}")
 	public static Iterable<Object[]> data() {
 		return Arrays.asList(
-			new Object[][] {
-				{"dxp", "7.2.10.7"}, {"portal", "7.3.7"}, {"portal", "7.4.3.36"}
-			});
+			new Object[][] {{"7.2.1-1"}, {"7.3.7"}, {"7.4.1-1"}});
 	}
 
 	@BeforeClass
@@ -76,59 +73,8 @@ public class ProjectTemplatesFormFieldWorkspaceTest
 		_gradleDistribution = URI.create(gradleDistribution);
 	}
 
-	public ProjectTemplatesFormFieldWorkspaceTest(
-		String liferayProduct, String liferayVersion) {
-
-		_liferayProduct = liferayProduct;
+	public ProjectTemplatesFormFieldWorkspaceTest(String liferayVersion) {
 		_liferayVersion = liferayVersion;
-	}
-
-	@Test
-	public void testBuildTemplateFormFieldNpm() throws Exception {
-		String name = "foobar";
-		String template = "form-field";
-
-		File gradleWorkspaceDir = buildWorkspace(
-			temporaryFolder, "gradle", "gradleWS", _liferayVersion,
-			mavenExecutor);
-
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			_liferayVersion);
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				gradleWorkspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
-		writeGradlePropertiesInWorkspace(
-			gradleWorkspaceDir, "liferay.workspace.node.package.manager=npm");
-
-		File gradleProjectDir = buildTemplateWithGradle(
-			new File(gradleWorkspaceDir, "modules"), template, name,
-			"--liferay-product", _liferayProduct, "--liferay-version",
-			_liferayVersion);
-
-		testContains(
-			gradleProjectDir, "package.json",
-			"--soyDeps \\\"./node_modules/clay-*/src/**/*.soy\\\"",
-			"\\\"./node_modules" +
-				"/com.liferay.dynamic.data.mapping.form.field.type/META-INF/");
-
-		if (isBuildProjects()) {
-			executeGradle(
-				gradleWorkspaceDir, _gradleDistribution,
-				":modules:" + name + GRADLE_TASK_PATH_BUILD);
-
-			File gradleOutputDir = new File(gradleProjectDir, "build/libs");
-
-			Path gradleOutputPath = FileTestUtil.getFile(
-				gradleOutputDir.toPath(), OUTPUT_FILE_NAME_GLOB_REGEX, 1);
-
-			Assert.assertNotNull(gradleOutputPath);
-
-			Assert.assertTrue(Files.exists(gradleOutputPath));
-		}
 	}
 
 	@Test
@@ -140,44 +86,22 @@ public class ProjectTemplatesFormFieldWorkspaceTest
 			temporaryFolder, "gradle", "gradleWS", _liferayVersion,
 			mavenExecutor);
 
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			_liferayVersion);
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				workspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
 		File gradleProjectDir = buildTemplateWithGradle(
 			new File(workspaceDir, "modules"), template, name,
-			"--liferay-product", _liferayProduct, "--liferay-version",
-			_liferayVersion);
+			"--liferay-version", _liferayVersion);
 
 		testContains(
 			gradleProjectDir, "bnd.bnd", "Provide-Capability:", "soy;",
 			"type:String=\"LiferayFormField\"");
 		testContains(
-			gradleProjectDir, "package.json", "\"@babel/cli\": \"^7.2.3\"",
-			"\"@liferay/portal-" + _liferayVersion.substring(0, 3) +
-				"\": \"*\"",
-			"\"metal-tools-soy\": \"4.3.2\"");
-
-		testContains(
 			gradleProjectDir, "build.gradle",
+			"compileOnly group: \"com.liferay\", name: " +
+				"\"com.liferay.dynamic.data.mapping.api\"",
+			"compileOnly group: \"com.liferay\", name: " +
+				"\"com.liferay.frontend.js.loader.modules.extender.api\"",
 			"jsCompile group: \"com.liferay\", name: " +
-				"\"com.liferay.dynamic.data.mapping.form.field.type\"");
-
-		if (VersionUtil.getMinorVersion(_liferayVersion) < 3) {
-			testContains(
-				gradleProjectDir, "build.gradle", DEPENDENCY_RELEASE_DXP_API);
-		}
-		else {
-			testContains(
-				gradleProjectDir, "build.gradle",
-				DEPENDENCY_RELEASE_PORTAL_API);
-		}
-
+				"\"com.liferay.dynamic.data.mapping.form.field.type\"",
+			DEPENDENCY_PORTAL_KERNEL);
 		testContains(
 			gradleProjectDir,
 			"src/main/java/foobar/form/field/FoobarDDMFormFieldType.java",
@@ -250,7 +174,6 @@ public class ProjectTemplatesFormFieldWorkspaceTest
 			completeArgs.add("-Dauthor=" + System.getProperty("user.name"));
 			completeArgs.add("-DclassName=FooBar");
 			completeArgs.add("-DgroupId=" + groupId);
-			completeArgs.add("-DliferayProduct=" + _liferayProduct);
 			completeArgs.add("-DliferayVersion=" + _liferayVersion);
 
 			String mavenOutput = executeMaven(
@@ -265,148 +188,11 @@ public class ProjectTemplatesFormFieldWorkspaceTest
 		}
 	}
 
-	@Test
-	public void testBuildTemplateFormFieldYarn() throws Exception {
-		String name = "foobar";
-		String template = "form-field";
-
-		File gradleWorkspaceDir = buildWorkspace(
-			temporaryFolder, "gradle", "gradleWS", _liferayVersion,
-			mavenExecutor);
-
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			_liferayVersion);
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				gradleWorkspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
-		File gradleProjectDir = buildTemplateWithGradle(
-			new File(gradleWorkspaceDir, "modules"), template, name,
-			"--liferay-product", _liferayProduct, "--liferay-version",
-			_liferayVersion);
-
-		testContains(
-			gradleProjectDir, "package.json",
-			"--soyDeps \\\"../../node_modules/clay-*/src/**/*.soy\\\"",
-			"\\\"../../node_modules" +
-				"/com.liferay.dynamic.data.mapping.form.field.type/META-INF/");
-
-		if (isBuildProjects()) {
-			executeGradle(
-				gradleWorkspaceDir, _gradleDistribution,
-				":modules:" + name + GRADLE_TASK_PATH_BUILD);
-
-			File gradleOutputDir = new File(gradleProjectDir, "build/libs");
-
-			Path gradleOutputPath = FileTestUtil.getFile(
-				gradleOutputDir.toPath(), OUTPUT_FILE_NAME_GLOB_REGEX, 1);
-
-			Assert.assertNotNull(gradleOutputPath);
-			Assert.assertTrue(Files.exists(gradleOutputPath));
-		}
-	}
-
-	@Test
-	public void testBuildTemplateFormFieldYarnCustomModules() throws Exception {
-		String name = "foobar";
-		String template = "form-field";
-
-		File gradleWorkspaceDir = buildWorkspace(
-			temporaryFolder, "gradle", "gradleWS", _liferayVersion,
-			mavenExecutor);
-
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			_liferayVersion);
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				gradleWorkspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
-		File gradleProjectDir = buildTemplateWithGradle(
-			new File(gradleWorkspaceDir, "modules/test"), template, name,
-			"--liferay-product", _liferayProduct, "--liferay-version",
-			_liferayVersion);
-
-		testContains(
-			gradleProjectDir, "package.json",
-			"--soyDeps \\\"../../../node_modules/clay-*/src/**/*.soy\\\"",
-			"\\\"../../../node_modules" +
-				"/com.liferay.dynamic.data.mapping.form.field.type/META-INF/");
-
-		if (isBuildProjects()) {
-			executeGradle(
-				gradleWorkspaceDir, _gradleDistribution,
-				":modules:test:" + name + GRADLE_TASK_PATH_BUILD);
-
-			File gradleOutputDir = new File(gradleProjectDir, "build/libs");
-
-			Path gradleOutputPath = FileTestUtil.getFile(
-				gradleOutputDir.toPath(), OUTPUT_FILE_NAME_GLOB_REGEX, 1);
-
-			Assert.assertNotNull(gradleOutputPath);
-			Assert.assertTrue(Files.exists(gradleOutputPath));
-		}
-	}
-
-	@Test
-	public void testBuildTemplateFormFieldYarnUnsetModulesDir()
-		throws Exception {
-
-		String name = "foobar";
-		String template = "form-field";
-
-		File gradleWorkspaceDir = buildWorkspace(
-			temporaryFolder, "gradle", "gradleWS", _liferayVersion,
-			mavenExecutor);
-
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			_liferayVersion);
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				gradleWorkspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
-		File gradleProjectDir = buildTemplateWithGradle(
-			gradleWorkspaceDir, template, name, "--liferay-version",
-			_liferayVersion, "--liferay-product", _liferayProduct);
-
-		removeGradlePropertiesInWorkspace(
-			gradleWorkspaceDir, "liferay.workspace.modules.dir=modules");
-
-		testContains(
-			gradleProjectDir, "package.json",
-			"--soyDeps \\\"../node_modules/clay-*/src/**/*.soy\\\"",
-			"\\\"../node_modules" +
-				"/com.liferay.dynamic.data.mapping.form.field.type/META-INF/");
-
-		if (isBuildProjects()) {
-			executeGradle(
-				gradleWorkspaceDir, _gradleDistribution,
-				":" + name + GRADLE_TASK_PATH_BUILD);
-
-			File gradleOutputDir = new File(gradleProjectDir, "build/libs");
-
-			Path gradleOutputPath = FileTestUtil.getFile(
-				gradleOutputDir.toPath(), OUTPUT_FILE_NAME_GLOB_REGEX, 1);
-
-			Assert.assertNotNull(gradleOutputPath);
-			Assert.assertTrue(Files.exists(gradleOutputPath));
-		}
-	}
-
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	private static URI _gradleDistribution;
 
-	private final String _liferayProduct;
 	private final String _liferayVersion;
 
 }

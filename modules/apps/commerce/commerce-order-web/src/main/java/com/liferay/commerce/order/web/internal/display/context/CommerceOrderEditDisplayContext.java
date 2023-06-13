@@ -14,9 +14,7 @@
 
 package com.liferay.commerce.order.web.internal.display.context;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.commerce.configuration.CommerceOrderItemDecimalQuantityConfiguration;
-import com.liferay.commerce.constants.CommerceOrderActionKeys;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.frontend.model.HeaderActionModel;
 import com.liferay.commerce.frontend.model.StepModel;
@@ -31,35 +29,27 @@ import com.liferay.commerce.notification.service.CommerceNotificationQueueEntryL
 import com.liferay.commerce.order.engine.CommerceOrderEngine;
 import com.liferay.commerce.order.status.CommerceOrderStatus;
 import com.liferay.commerce.order.status.CommerceOrderStatusRegistry;
-import com.liferay.commerce.order.web.internal.constants.CommerceOrderScreenNavigationConstants;
-import com.liferay.commerce.order.web.internal.display.context.helper.CommerceOrderRequestHelper;
+import com.liferay.commerce.order.web.internal.display.context.util.CommerceOrderRequestHelper;
+import com.liferay.commerce.order.web.internal.servlet.taglib.ui.constants.CommerceOrderScreenNavigationConstants;
 import com.liferay.commerce.payment.model.CommercePaymentMethodGroupRel;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelLocalService;
-import com.liferay.commerce.product.model.CPMeasurementUnit;
 import com.liferay.commerce.product.model.CommerceChannel;
-import com.liferay.commerce.product.service.CPMeasurementUnitService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceOrderNoteService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.commerce.service.CommerceShipmentService;
-import com.liferay.commerce.term.constants.CommerceTermEntryConstants;
-import com.liferay.commerce.term.model.CommerceTermEntry;
-import com.liferay.commerce.term.service.CommerceTermEntryLocalService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
-import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
@@ -68,8 +58,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-
-import java.math.BigDecimal;
 
 import java.text.DateFormat;
 import java.text.Format;
@@ -95,19 +83,14 @@ public class CommerceOrderEditDisplayContext {
 			CommerceNotificationQueueEntryLocalService
 				commerceNotificationQueueEntryLocalService,
 			CommerceOrderEngine commerceOrderEngine,
-			CommerceOrderItemDecimalQuantityConfiguration
-				commerceOrderItemDecimalQuantityConfiguration,
 			CommerceOrderItemService commerceOrderItemService,
 			CommerceOrderNoteService commerceOrderNoteService,
-			PortletResourcePermission commerceOrderPortletResourcePermission,
 			CommerceOrderService commerceOrderService,
 			CommerceOrderStatusRegistry commerceOrderStatusRegistry,
 			CommerceOrderTypeService commerceOrderTypeService,
 			CommercePaymentMethodGroupRelLocalService
 				commercePaymentMethodGroupRelLocalService,
 			CommerceShipmentService commerceShipmentService,
-			CommerceTermEntryLocalService commerceTermEntryLocalService,
-			CPMeasurementUnitService cpMeasurementUnitService,
 			RenderRequest renderRequest)
 		throws PortalException {
 
@@ -115,26 +98,20 @@ public class CommerceOrderEditDisplayContext {
 		_commerceNotificationQueueEntryLocalService =
 			commerceNotificationQueueEntryLocalService;
 		_commerceOrderEngine = commerceOrderEngine;
-		_commerceOrderItemDecimalQuantityConfiguration =
-			commerceOrderItemDecimalQuantityConfiguration;
 		_commerceOrderItemService = commerceOrderItemService;
 		_commerceOrderNoteService = commerceOrderNoteService;
-		_commerceOrderPortletResourcePermission =
-			commerceOrderPortletResourcePermission;
 		_commerceOrderService = commerceOrderService;
 		_commerceOrderStatusRegistry = commerceOrderStatusRegistry;
 		_commerceOrderTypeService = commerceOrderTypeService;
 		_commercePaymentMethodGroupRelLocalService =
 			commercePaymentMethodGroupRelLocalService;
 		_commerceShipmentService = commerceShipmentService;
-		_commerceTermEntryLocalService = commerceTermEntryLocalService;
-		_cpMeasurementUnitService = cpMeasurementUnitService;
 
 		long commerceOrderId = ParamUtil.getLong(
 			renderRequest, "commerceOrderId");
 
 		if (commerceOrderId > 0) {
-			_commerceOrder = commerceOrderService.getCommerceOrder(
+			_commerceOrder = _commerceOrderService.getCommerceOrder(
 				commerceOrderId);
 		}
 		else {
@@ -158,7 +135,7 @@ public class CommerceOrderEditDisplayContext {
 			return StringPool.BLANK;
 		}
 
-		AccountEntry accountEntry = _commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = _commerceOrder.getCommerceAccount();
 
 		ThemeDisplay themeDisplay =
 			_commerceOrderRequestHelper.getThemeDisplay();
@@ -167,12 +144,13 @@ public class CommerceOrderEditDisplayContext {
 
 		sb.append(themeDisplay.getPathImage());
 		sb.append("/organization_logo?img_id=");
-		sb.append(accountEntry.getLogoId());
+		sb.append(commerceAccount.getLogoId());
 
-		if (accountEntry.getLogoId() > 0) {
+		if (commerceAccount.getLogoId() > 0) {
 			sb.append("&t=");
 			sb.append(
-				WebServerServletTokenUtil.getToken(accountEntry.getLogoId()));
+				WebServerServletTokenUtil.getToken(
+					commerceAccount.getLogoId()));
 		}
 
 		return sb.toString();
@@ -450,76 +428,42 @@ public class CommerceOrderEditDisplayContext {
 		).buildPortletURL();
 	}
 
-	public List<CPMeasurementUnit> getCPMeasurementUnits()
+	public String getDescriptiveCommerceAddress(CommerceAddress commerceAddress)
 		throws PortalException {
 
-		return _cpMeasurementUnitService.getCPMeasurementUnits(
-			_commerceOrderRequestHelper.getCompanyId(), QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
-	}
-
-	public BigDecimal getDecimalQuantity(CommerceOrderItem commerceOrderItem) {
-		BigDecimal decimalQuantity = commerceOrderItem.getDecimalQuantity();
-
-		if ((decimalQuantity == null) ||
-			decimalQuantity.equals(BigDecimal.ZERO)) {
-
-			decimalQuantity = BigDecimal.valueOf(
-				commerceOrderItem.getQuantity());
+		if (commerceAddress == null) {
+			return StringPool.BLANK;
 		}
 
-		return decimalQuantity.setScale(
-			_commerceOrderItemDecimalQuantityConfiguration.
-				maximumFractionDigits(),
-			_commerceOrderItemDecimalQuantityConfiguration.roundingMode());
-	}
+		Region region = commerceAddress.getRegion();
 
-	public List<CommerceTermEntry> getDeliveryTermsEntries() {
-		return _commerceTermEntryLocalService.getCommerceTermEntries(
-			_commerceOrder.getCompanyId(),
-			CommerceTermEntryConstants.TYPE_DELIVERY_TERMS);
-	}
-
-	public String getDescriptiveAddress(CommerceAddress commerceAddress) {
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(commerceAddress.getCity());
-		sb.append(StringPool.COMMA_AND_SPACE);
-
-		try {
-			Region region = commerceAddress.getRegion();
-
-			if (region != null) {
-				sb.append(region.getName());
-				sb.append(StringPool.COMMA_AND_SPACE);
-			}
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-		}
-
-		sb.append(commerceAddress.getZip());
-
-		return sb.toString();
-	}
-
-	public String getDescriptiveStreetAddress(CommerceAddress commerceAddress) {
-		StringBundler sb = new StringBundler(6);
+		StringBundler sb = new StringBundler((region == null) ? 6 : 8);
 
 		sb.append(commerceAddress.getStreet1());
-		sb.append(StringPool.COMMA_AND_SPACE);
+		sb.append(StringPool.COMMA);
+		sb.append(StringPool.SPACE);
 
 		if (!Validator.isBlank(commerceAddress.getStreet2())) {
 			sb.append(commerceAddress.getStreet2());
-			sb.append(StringPool.COMMA_AND_SPACE);
+			sb.append(StringPool.COMMA);
+			sb.append(StringPool.SPACE);
 		}
 
 		if (!Validator.isBlank(commerceAddress.getStreet3())) {
 			sb.append(commerceAddress.getStreet3());
-			sb.append(StringPool.COMMA_AND_SPACE);
+			sb.append(StringPool.COMMA);
+			sb.append(StringPool.SPACE);
 		}
+
+		sb.append(commerceAddress.getCity());
+		sb.append(StringPool.NEW_LINE);
+
+		if (region != null) {
+			sb.append(region.getRegionCode());
+			sb.append(StringPool.SPACE);
+		}
+
+		sb.append(commerceAddress.getZip());
 
 		return sb.toString();
 	}
@@ -542,19 +486,10 @@ public class CommerceOrderEditDisplayContext {
 			return headerActionModels;
 		}
 
-		PortletURL portletURL = getTransitionOrderPortletURL();
-
-		if (currentCommerceOrderStatus.getKey() ==
-				CommerceOrderConstants.ORDER_STATUS_PARTIALLY_SHIPPED) {
-
-			headerActionModels.add(
-				new HeaderActionModel(
-					"btn-primary", null, portletURL.toString(), null,
-					"create-shipment"));
-		}
-
 		List<CommerceOrderStatus> commerceOrderStatuses =
 			_commerceOrderEngine.getNextCommerceOrderStatuses(_commerceOrder);
+
+		PortletURL portletURL = getTransitionOrderPortletURL();
 
 		for (CommerceOrderStatus commerceOrderStatus : commerceOrderStatuses) {
 			if ((commerceOrderStatus.getKey() ==
@@ -703,12 +638,6 @@ public class CommerceOrderEditDisplayContext {
 		return steps;
 	}
 
-	public List<CommerceTermEntry> getPaymentTermsEntries() {
-		return _commerceTermEntryLocalService.getCommerceTermEntries(
-			_commerceOrder.getCompanyId(),
-			CommerceTermEntryConstants.TYPE_PAYMENT_TERMS);
-	}
-
 	public PortletURL getTransitionOrderPortletURL() {
 		return PortletURLBuilder.createActionURL(
 			_commerceOrderRequestHelper.getLiferayPortletResponse()
@@ -721,33 +650,6 @@ public class CommerceOrderEditDisplayContext {
 		).setParameter(
 			"commerceOrderId", _commerceOrder.getCommerceOrderId()
 		).buildPortletURL();
-	}
-
-	public boolean hasManageCommerceOrderDeliveryTermsPermission() {
-		ThemeDisplay themeDisplay =
-			_commerceOrderRequestHelper.getThemeDisplay();
-
-		return _commerceOrderPortletResourcePermission.contains(
-			themeDisplay.getPermissionChecker(), null,
-			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_DELIVERY_TERMS);
-	}
-
-	public boolean hasManageCommerceOrderPaymentMethodsPermission() {
-		ThemeDisplay themeDisplay =
-			_commerceOrderRequestHelper.getThemeDisplay();
-
-		return _commerceOrderPortletResourcePermission.contains(
-			themeDisplay.getPermissionChecker(), null,
-			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_METHODS);
-	}
-
-	public boolean hasManageCommerceOrderPaymentTermsPermission() {
-		ThemeDisplay themeDisplay =
-			_commerceOrderRequestHelper.getThemeDisplay();
-
-		return _commerceOrderPortletResourcePermission.contains(
-			themeDisplay.getPermissionChecker(), null,
-			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_TERMS);
 	}
 
 	private List<StepModel> _getWorkflowSteps() {
@@ -786,9 +688,6 @@ public class CommerceOrderEditDisplayContext {
 		return steps;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceOrderEditDisplayContext.class);
-
 	private final CommerceChannelLocalService _commerceChannelLocalService;
 	private final CommerceNotificationQueueEntryLocalService
 		_commerceNotificationQueueEntryLocalService;
@@ -796,12 +695,8 @@ public class CommerceOrderEditDisplayContext {
 	private final Format _commerceOrderDateFormatDateTime;
 	private final CommerceOrderEngine _commerceOrderEngine;
 	private CommerceOrderItem _commerceOrderItem;
-	private final CommerceOrderItemDecimalQuantityConfiguration
-		_commerceOrderItemDecimalQuantityConfiguration;
 	private final CommerceOrderItemService _commerceOrderItemService;
 	private final CommerceOrderNoteService _commerceOrderNoteService;
-	private final PortletResourcePermission
-		_commerceOrderPortletResourcePermission;
 	private final CommerceOrderRequestHelper _commerceOrderRequestHelper;
 	private final CommerceOrderService _commerceOrderService;
 	private final CommerceOrderStatusRegistry _commerceOrderStatusRegistry;
@@ -810,7 +705,5 @@ public class CommerceOrderEditDisplayContext {
 		_commercePaymentMethodGroupRelLocalService;
 	private CommerceShipment _commerceShipment;
 	private final CommerceShipmentService _commerceShipmentService;
-	private final CommerceTermEntryLocalService _commerceTermEntryLocalService;
-	private final CPMeasurementUnitService _cpMeasurementUnitService;
 
 }

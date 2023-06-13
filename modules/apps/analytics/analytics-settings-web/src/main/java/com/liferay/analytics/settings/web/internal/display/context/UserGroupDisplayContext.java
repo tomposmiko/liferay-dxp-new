@@ -18,8 +18,8 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWebKeys;
 import com.liferay.analytics.settings.web.internal.search.UserGroupChecker;
 import com.liferay.analytics.settings.web.internal.search.UserGroupSearch;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.UserGroupServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.util.comparator.UserGroupNameComparator;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
 
 import javax.portlet.PortletURL;
@@ -57,9 +58,8 @@ public class UserGroupDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_renderRequest, AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION,
-			"user-group-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_renderRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -78,18 +78,24 @@ public class UserGroupDisplayContext {
 
 		userGroupSearch.setOrderByCol(_getOrderByCol());
 		userGroupSearch.setOrderByType(getOrderByType());
-		userGroupSearch.setResultsAndTotal(
-			() -> UserGroupServiceUtil.search(
-				_getCompanyId(), _getKeywords(), _getUserGroupParams(),
-				userGroupSearch.getStart(), userGroupSearch.getEnd(),
-				new UserGroupNameComparator(_isOrderByAscending())),
-			UserGroupServiceUtil.searchCount(
-				_getCompanyId(), _getKeywords(), _getUserGroupParams()));
+
+		List<UserGroup> userGroups = UserGroupServiceUtil.search(
+			_getCompanyId(), _getKeywords(), _getUserGroupParams(),
+			userGroupSearch.getStart(), userGroupSearch.getEnd(),
+			new UserGroupNameComparator(_isOrderByAscending()));
+
+		userGroupSearch.setResults(userGroups);
+
 		userGroupSearch.setRowChecker(
 			new UserGroupChecker(
 				_renderResponse,
 				SetUtil.fromArray(
 					_analyticsConfiguration.syncedUserGroupIds())));
+
+		int total = UserGroupServiceUtil.searchCount(
+			_getCompanyId(), _getKeywords(), _getUserGroupParams());
+
+		userGroupSearch.setTotal(total);
 
 		return userGroupSearch;
 	}
@@ -116,9 +122,8 @@ public class UserGroupDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_renderRequest, AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION,
-			"user-group-order-by-col", "user-group-name");
+		_orderByCol = ParamUtil.getString(
+			_renderRequest, "orderByCol", "user-group-name");
 
 		return _orderByCol;
 	}
@@ -130,7 +135,7 @@ public class UserGroupDisplayContext {
 	}
 
 	private boolean _isOrderByAscending() {
-		if (Objects.equals(getOrderByType(), "asc")) {
+		if (Objects.equals("asc", getOrderByType())) {
 			return true;
 		}
 

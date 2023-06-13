@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -211,9 +212,10 @@ public class EntryServiceTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext();
 
-		serviceContext.setModelPermissions(
-			ModelPermissionsFactory.create(
-				_ENTRY_GROUP_PERMISSIONS, null, Entry.class.getName()));
+		ModelPermissions modelPermissions = ModelPermissionsFactory.create(
+			_ENTRY_GROUP_PERMISSIONS, null, Entry.class.getName());
+
+		serviceContext.setModelPermissions(modelPermissions);
 
 		for (int i = 0; i < 5; i++) {
 			EntryLocalServiceUtil.addEntry(
@@ -225,10 +227,11 @@ public class EntryServiceTest {
 				serviceContext);
 		}
 
-		serviceContext.setModelPermissions(
-			ModelPermissionsFactory.create(
-				_ENTRY_GROUP_PERMISSIONS, new String[] {"VIEW"},
-				Entry.class.getName()));
+		modelPermissions = ModelPermissionsFactory.create(
+			_ENTRY_GROUP_PERMISSIONS, new String[] {"VIEW"},
+			Entry.class.getName());
+
+		serviceContext.setModelPermissions(modelPermissions);
 
 		for (int i = 0; i < 5; i++) {
 			EntryLocalServiceUtil.addEntry(

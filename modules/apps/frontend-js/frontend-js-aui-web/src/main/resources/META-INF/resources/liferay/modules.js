@@ -16,26 +16,26 @@
  * @deprecated As of Athanasius (7.3.x), with no direct replacement
  */
 (function () {
-	const LiferayAUI = Liferay.AUI;
+	var LiferayAUI = Liferay.AUI;
 
-	const COMBINE = LiferayAUI.getCombine();
+	var COMBINE = LiferayAUI.getCombine();
 
-	const CORE_MODULES = YUI.Env.core;
+	var CORE_MODULES = YUI.Env.core;
 
-	const INPUT_EL = document.createElement('input');
+	var INPUT_EL = document.createElement('input');
 
-	const PATH_EDITOR_CKEDITOR = LiferayAUI.getEditorCKEditorPath();
+	var PATH_EDITOR_CKEDITOR = LiferayAUI.getEditorCKEditorPath();
 
-	const PATH_JAVASCRIPT = '/o/frontend-js-aui-web';
+	var PATH_JAVASCRIPT = '/o/frontend-js-aui-web';
 
-	const SUPPORTS_INPUT_SELECTION =
+	var SUPPORTS_INPUT_SELECTION =
 		typeof INPUT_EL.selectionStart === 'number' &&
 		typeof INPUT_EL.selectionEnd === 'number';
 
-	const testHistory = function (A) {
-		const WIN = A.config.win;
+	var testHistory = function (A) {
+		var WIN = A.config.win;
 
-		const HISTORY = WIN.history;
+		var HISTORY = WIN.history;
 
 		return (
 			HISTORY &&
@@ -46,11 +46,7 @@
 	};
 
 	window.YUI_config = {
-		base:
-			Liferay.ThemeDisplay.getCDNBaseURL() +
-			Liferay.ThemeDisplay.getPathContext() +
-			PATH_JAVASCRIPT +
-			'/aui/',
+		base: Liferay.ThemeDisplay.getCDNBaseURL() + PATH_JAVASCRIPT + '/aui/',
 		combine: COMBINE,
 		comboBase: LiferayAUI.getComboPath(),
 		filter: process.env.NODE_ENV === 'development' ? 'raw' : 'min',
@@ -69,7 +65,6 @@
 			liferay: {
 				base:
 					Liferay.ThemeDisplay.getCDNBaseURL() +
-					Liferay.ThemeDisplay.getPathContext() +
 					PATH_JAVASCRIPT +
 					'/liferay/',
 				combine: COMBINE,
@@ -87,6 +82,33 @@
 							'event-mouseenter',
 							'liferay-portlet-base',
 							'timers',
+						],
+					},
+					'liferay-asset-addon-entry-selector': {
+						path: 'asset_addon_entry_selector.js',
+						requires: [
+							'aui-component',
+							'liferay-portlet-base',
+							'liferay-util-window',
+						],
+					},
+					'liferay-asset-categories-selector': {
+						path: 'asset_categories_selector.js',
+						requires: ['aui-tree', 'liferay-asset-tags-selector'],
+					},
+					'liferay-asset-tags-selector': {
+						path: 'asset_tags_selector.js',
+						requires: [
+							'array-extras',
+							'async-queue',
+							'aui-autocomplete-deprecated',
+							'aui-io-plugin-deprecated',
+							'aui-live-search-deprecated',
+							'aui-modal',
+							'aui-template-deprecated',
+							'aui-textboxlist-deprecated',
+							'datasource-cache',
+							'liferay-service-datasource',
 						],
 					},
 					'liferay-auto-fields': {
@@ -274,6 +296,36 @@
 							'sortable',
 						],
 					},
+					'liferay-item-selector-dialog': {
+						path: 'item_selector_dialog.js',
+						requires: ['aui-component'],
+					},
+					'liferay-item-selector-repository-entry-browser': {
+						path: 'item_selector_repository_entry_browser.js',
+						requires: [
+							'liferay-item-selector-uploader',
+							'liferay-item-viewer',
+							'liferay-notice',
+							'liferay-portlet-base',
+						],
+					},
+					'liferay-item-selector-uploader': {
+						path: 'item_selector_uploader.js',
+						requires: [
+							'aui-base',
+							'aui-progressbar',
+							'liferay-portlet-base',
+							'uploader',
+						],
+					},
+					'liferay-item-selector-url': {
+						path: 'item_selector_url.js',
+						requires: [
+							'aui-event-input',
+							'liferay-item-viewer',
+							'liferay-portlet-base',
+						],
+					},
 					'liferay-item-viewer': {
 						path: 'item_viewer.js',
 						requires: [
@@ -382,6 +434,10 @@
 					'liferay-panel-search': {
 						path: 'panel_search.js',
 						requires: ['aui-base', 'liferay-search-filter'],
+					},
+					'liferay-poller': {
+						path: 'poller.js',
+						requires: ['aui-base', 'json'],
 					},
 					'liferay-portlet-base': {
 						path: 'portlet_base.js',

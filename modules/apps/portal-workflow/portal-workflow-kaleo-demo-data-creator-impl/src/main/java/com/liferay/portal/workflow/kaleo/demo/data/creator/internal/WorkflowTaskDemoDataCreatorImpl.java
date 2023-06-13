@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.workflow.kaleo.demo.data.creator.WorkflowTaskDemoDataCreator;
 import com.liferay.portal.workflow.kaleo.demo.data.creator.internal.util.WorkflowDemoDataCreatorUtil;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
+import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
 
 import java.io.Serializable;
@@ -82,7 +83,8 @@ public class WorkflowTaskDemoDataCreatorImpl
 			long companyId, long workflowTaskId)
 		throws WorkflowException {
 
-		return _workflowTaskManager.getNextTransitionNames(0L, workflowTaskId);
+		return _workflowTaskManager.getNextTransitionNames(
+			companyId, 0L, workflowTaskId);
 	}
 
 	@Override
@@ -147,7 +149,7 @@ public class WorkflowTaskDemoDataCreatorImpl
 		throws PortalException {
 
 		WorkflowTask workflowTask = _workflowTaskManager.getWorkflowTask(
-			workflowTaskId);
+			companyId, workflowTaskId);
 
 		WorkflowInstance workflowInstance =
 			_workflowInstanceManager.getWorkflowInstance(
@@ -163,16 +165,19 @@ public class WorkflowTaskDemoDataCreatorImpl
 	}
 
 	@Reference
+	private KaleoInstanceLocalService _kaleoInstanceLocalService;
+
+	@Reference
 	private KaleoTaskInstanceTokenLocalService
 		_kaleoTaskInstanceTokenLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
 
-	@Reference
+	@Reference(target = "(proxy.bean=false)")
 	private WorkflowInstanceManager _workflowInstanceManager;
 
-	@Reference
+	@Reference(target = "(proxy.bean=false)")
 	private WorkflowTaskManager _workflowTaskManager;
 
 }

@@ -43,8 +43,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcela Cunha
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.GEOLOCATION,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		GeolocationDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class GeolocationDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -61,7 +65,7 @@ public class GeolocationDDMFormFieldTemplateContextContributor
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		Group group = _getGroup(httpServletRequest, themeDisplay);
+		Group group = getGroup(httpServletRequest, themeDisplay);
 
 		String mapProviderKey = GetterUtil.getString(
 			MapProviderHelperUtil.getMapProviderKey(
@@ -70,7 +74,7 @@ public class GeolocationDDMFormFieldTemplateContextContributor
 			"OpenStreetMap");
 
 		return HashMapBuilder.<String, Object>put(
-			"googleMapsAPIKey", _getGoogleMapsAPIKey(group, themeDisplay)
+			"googleMapsAPIKey", getGoogleMapsAPIKey(group, themeDisplay)
 		).put(
 			"mapProviderKey", mapProviderKey
 		).put(
@@ -90,17 +94,7 @@ public class GeolocationDDMFormFieldTemplateContextContributor
 		).build();
 	}
 
-	protected String getModuleName(String mapProviderKey) {
-		if (StringUtil.equals(mapProviderKey, "GoogleMaps")) {
-			return _npmResolver.resolveModuleName(
-				"@liferay/map-google-maps/js/MapGoogleMaps");
-		}
-
-		return _npmResolver.resolveModuleName(
-			"@liferay/map-openstreetmap/js/MapOpenStreetMap");
-	}
-
-	private String _getGoogleMapsAPIKey(
+	protected String getGoogleMapsAPIKey(
 		Group group, ThemeDisplay themeDisplay) {
 
 		PortletPreferences companyPortletPreferences =
@@ -115,7 +109,7 @@ public class GeolocationDDMFormFieldTemplateContextContributor
 			companyPortletPreferences.getValue("googleMapsAPIKey", null));
 	}
 
-	private Group _getGroup(
+	protected Group getGroup(
 		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay) {
 
 		Group group = (Group)httpServletRequest.getAttribute("site.liveGroup");
@@ -131,6 +125,16 @@ public class GeolocationDDMFormFieldTemplateContextContributor
 		}
 
 		return null;
+	}
+
+	protected String getModuleName(String mapProviderKey) {
+		if (StringUtil.equals(mapProviderKey, "GoogleMaps")) {
+			return _npmResolver.resolveModuleName(
+				"@liferay/map-google-maps/js/MapGoogleMaps.es");
+		}
+
+		return _npmResolver.resolveModuleName(
+			"@liferay/map-openstreetmap/js/MapOpenStreetMap.es");
 	}
 
 	@Reference

@@ -19,7 +19,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRenderer;
-import com.liferay.info.list.renderer.InfoListRendererRegistry;
+import com.liferay.info.list.renderer.InfoListRendererTracker;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -32,15 +32,12 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderResponse;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -57,7 +54,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.hamcrest.CoreMatchers;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -106,37 +102,24 @@ public class AssetInfoListRendererTest {
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
 		_infoListRenderer =
 			(InfoListRenderer<AssetEntry>)
-				_infoListRendererRegistry.getInfoListRenderer(
+				_infoListRendererTracker.getInfoListRenderer(
 					"com.liferay.asset.info.internal.list.renderer." +
 						"UnstyledAssetEntryBasicInfoListRenderer");
-		_layout = LayoutTestUtil.addTypePortletLayout(_group);
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				_company.getGroupId(), TestPropsValues.getUserId());
-
-		serviceContext.setRequest(_getHttpServletRequest());
-
-		ServiceContextThreadLocal.pushServiceContext(serviceContext);
-	}
-
-	@After
-	public void tearDown() {
-		ServiceContextThreadLocal.popServiceContext();
+		_layout = LayoutTestUtil.addLayout(_group);
 	}
 
 	@Test
 	public void testAssetInfoListRendererAbstract() throws Exception {
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
-		MockHttpServletResponse mockHttpServletResponse =
+		MockHttpServletResponse httpServletResponse =
 			new MockHttpServletResponse();
 
 		DefaultInfoListRendererContext defaultInfoListRendererContext =
 			new DefaultInfoListRendererContext(
 				_getHttpServletRequest(),
 				new PipingServletResponse(
-					mockHttpServletResponse, unsyncStringWriter));
+					httpServletResponse, unsyncStringWriter));
 
 		defaultInfoListRendererContext.setListItemRendererKey(
 			"com.liferay.asset.internal.info.renderer." +
@@ -151,14 +134,14 @@ public class AssetInfoListRendererTest {
 	public void testAssetInfoListRendererFullContent() throws Exception {
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
-		MockHttpServletResponse mockHttpServletResponse =
+		MockHttpServletResponse httpServletResponse =
 			new MockHttpServletResponse();
 
 		DefaultInfoListRendererContext defaultInfoListRendererContext =
 			new DefaultInfoListRendererContext(
 				_getHttpServletRequest(),
 				new PipingServletResponse(
-					mockHttpServletResponse, unsyncStringWriter));
+					httpServletResponse, unsyncStringWriter));
 
 		defaultInfoListRendererContext.setListItemRendererKey(
 			"com.liferay.asset.internal.info.renderer." +
@@ -173,14 +156,14 @@ public class AssetInfoListRendererTest {
 	public void testAssetInfoListRendererTitle() throws Exception {
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
-		MockHttpServletResponse mockHttpServletResponse =
+		MockHttpServletResponse httpServletResponse =
 			new MockHttpServletResponse();
 
 		DefaultInfoListRendererContext defaultInfoListRendererContext =
 			new DefaultInfoListRendererContext(
 				_getHttpServletRequest(),
 				new PipingServletResponse(
-					mockHttpServletResponse, unsyncStringWriter));
+					httpServletResponse, unsyncStringWriter));
 
 		defaultInfoListRendererContext.setListItemRendererKey(
 			"com.liferay.asset.info.internal.item.renderer." +
@@ -225,10 +208,10 @@ public class AssetInfoListRendererTest {
 	}
 
 	private HttpServletRequest _getHttpServletRequest() throws Exception {
-		MockHttpServletRequest mockHttpServletRequest =
+		MockHttpServletRequest httpServletRequest =
 			new MockHttpServletRequest();
 
-		mockHttpServletRequest.setAttribute(
+		httpServletRequest.setAttribute(
 			JavaConstants.JAVAX_PORTLET_RESPONSE,
 			new MockLiferayPortletRenderResponse());
 
@@ -244,17 +227,16 @@ public class AssetInfoListRendererTest {
 			layoutSet.getTheme(), layoutSet.getColorScheme());
 
 		themeDisplay.setRealUser(TestPropsValues.getUser());
-		themeDisplay.setRequest(mockHttpServletRequest);
+		themeDisplay.setRequest(httpServletRequest);
 		themeDisplay.setResponse(new MockHttpServletResponse());
-		themeDisplay.setScopeGroupId(_group.getGroupId());
 		themeDisplay.setUser(TestPropsValues.getUser());
+		themeDisplay.setScopeGroupId(_group.getGroupId());
 
-		mockHttpServletRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, themeDisplay);
+		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
 
-		mockHttpServletRequest.setMethod(HttpMethods.GET);
+		httpServletRequest.setMethod(HttpMethods.GET);
 
-		return mockHttpServletRequest;
+		return httpServletRequest;
 	}
 
 	private final List<AssetEntry> _assetEntries = new ArrayList<>();
@@ -273,7 +255,7 @@ public class AssetInfoListRendererTest {
 	private InfoListRenderer<AssetEntry> _infoListRenderer;
 
 	@Inject
-	private InfoListRendererRegistry _infoListRendererRegistry;
+	private InfoListRendererTracker _infoListRendererTracker;
 
 	@Inject
 	private JournalArticleLocalService _journalArticleLocalService;

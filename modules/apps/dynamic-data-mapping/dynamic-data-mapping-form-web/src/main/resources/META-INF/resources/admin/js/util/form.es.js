@@ -12,6 +12,9 @@
  * details.
  */
 
-export function createFormURL(path = '', {formInstanceId, sharedFormURL} = {}) {
+export const createFormURL = (
+	path = '',
+	{formInstanceId, sharedFormURL} = {}
+) => {
 	return sharedFormURL + formInstanceId + path;
-}
+};

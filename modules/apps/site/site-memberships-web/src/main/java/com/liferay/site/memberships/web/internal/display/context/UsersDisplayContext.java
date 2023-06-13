@@ -14,6 +14,7 @@
 
 package com.liferay.site.memberships.web.internal.display.context;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -23,8 +24,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -42,6 +41,7 @@ import com.liferay.site.memberships.web.internal.util.GroupUtil;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -63,7 +63,7 @@ public class UsersDisplayContext {
 		_renderResponse = renderResponse;
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
-			httpServletRequest);
+			_httpServletRequest);
 	}
 
 	public String getDisplayStyle() {
@@ -117,27 +117,43 @@ public class UsersDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
+		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN,
-			"order-by-col-users", "modified-date");
+		_orderByCol = ParamUtil.getString(_httpServletRequest, "orderByCol");
+
+		if (Validator.isNull(_orderByCol)) {
+			_orderByCol = _portalPreferences.getValue(
+				SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN,
+				"order-by-col", "modified-date");
+		}
+		else {
+			_portalPreferences.setValue(
+				SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN,
+				"order-by-col", _orderByCol);
+		}
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
+		if (_orderByType != null) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN,
-			"order-by-type-users", "asc");
+		_orderByType = ParamUtil.getString(_httpServletRequest, "orderByType");
+
+		if (Validator.isNull(_orderByType)) {
+			_orderByType = _portalPreferences.getValue(
+				SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN,
+				"order-by-type", "asc");
+		}
+		else {
+			_portalPreferences.setValue(
+				SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN,
+				"order-by-type", _orderByType);
+		}
 
 		return _orderByType;
 	}
@@ -261,8 +277,10 @@ public class UsersDisplayContext {
 					GroupUtil.getGroupTypeLabel(
 						_groupId, themeDisplay.getLocale())),
 				false));
+
 		userSearch.setOrderByCol(getOrderByCol());
 		userSearch.setOrderByType(getOrderByType());
+		userSearch.setRowChecker(new EmptyOnClickRowChecker(_renderResponse));
 
 		UserSearchTerms searchTerms =
 			(UserSearchTerms)userSearch.getSearchTerms();
@@ -288,24 +306,25 @@ public class UsersDisplayContext {
 				}
 			).build();
 
+		int usersCount = 0;
+		List<User> users = Collections.emptyList();
+
 		if (GroupPermissionUtil.contains(
 				themeDisplay.getPermissionChecker(), getGroupId(),
 				ActionKeys.VIEW_MEMBERS)) {
 
-			userSearch.setResultsAndTotal(
-				() -> UserLocalServiceUtil.search(
-					themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-					searchTerms.getStatus(), userParams, userSearch.getStart(),
-					userSearch.getEnd(), userSearch.getOrderByComparator()),
-				UserLocalServiceUtil.searchCount(
-					themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-					searchTerms.getStatus(), userParams));
-		}
-		else {
-			userSearch.setResultsAndTotal(Collections::emptyList, 0);
+			usersCount = UserLocalServiceUtil.searchCount(
+				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+				searchTerms.getStatus(), userParams);
+
+			users = UserLocalServiceUtil.search(
+				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+				searchTerms.getStatus(), userParams, userSearch.getStart(),
+				userSearch.getEnd(), userSearch.getOrderByComparator());
 		}
 
-		userSearch.setRowChecker(new EmptyOnClickRowChecker(_renderResponse));
+		userSearch.setResults(users);
+		userSearch.setTotal(usersCount);
 
 		_userSearch = userSearch;
 

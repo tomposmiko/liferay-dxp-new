@@ -14,6 +14,8 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib;
 
+import com.liferay.frontend.taglib.clay.servlet.taglib.soy.FileCard;
+
 import javax.servlet.jsp.JspException;
 
 /**

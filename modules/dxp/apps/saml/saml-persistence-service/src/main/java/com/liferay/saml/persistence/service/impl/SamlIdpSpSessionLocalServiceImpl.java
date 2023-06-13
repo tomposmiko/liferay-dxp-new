@@ -19,18 +19,17 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.saml.persistence.exception.DuplicateSamlIdpSpSessionException;
 import com.liferay.saml.persistence.exception.NoSuchIdpSpSessionException;
 import com.liferay.saml.persistence.model.SamlIdpSpSession;
 import com.liferay.saml.persistence.model.SamlPeerBinding;
 import com.liferay.saml.persistence.service.SamlPeerBindingLocalService;
 import com.liferay.saml.persistence.service.base.SamlIdpSpSessionLocalServiceBaseImpl;
-import com.liferay.saml.persistence.service.persistence.SamlPeerBindingPersistence;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -63,12 +62,12 @@ public class SamlIdpSpSessionLocalServiceImpl
 					" for ", samlSpEntityId));
 		}
 
-		User user = _userLocalService.getUserById(serviceContext.getUserId());
+		User user = userLocalService.getUserById(serviceContext.getUserId());
 
 		SamlPeerBinding samlPeerBinding =
-			_samlPeerBindingLocalService.fetchSamlPeerBinding(
+			samlPeerBindingPersistence.fetchByC_D_SNIF_SNINQ_SNIV_SPEI_First(
 				user.getCompanyId(), false, nameIdFormat, null, nameIdValue,
-				samlSpEntityId);
+				samlSpEntityId, null);
 
 		if (samlPeerBinding == null) {
 			samlPeerBinding = _samlPeerBindingLocalService.addSamlPeerBinding(
@@ -135,32 +134,24 @@ public class SamlIdpSpSessionLocalServiceImpl
 			samlIdpSpSessionPersistence.findBySamlIdpSsoSessionId(
 				samlIdpSsoSessionId);
 
-		if (samlIdpSsoSessions.isEmpty()) {
-			return null;
-		}
+		Stream<SamlIdpSpSession> stream = samlIdpSsoSessions.stream();
 
-		for (SamlIdpSpSession samlIdpSsoSession : samlIdpSsoSessions) {
-			SamlPeerBinding samlPeerBinding =
-				_samlPeerBindingLocalService.fetchSamlPeerBinding(
-					samlIdpSsoSession.getSamlPeerBindingId());
+		return stream.filter(
+			samlIdpSsoSession -> {
+				SamlPeerBinding samlPeerBinding =
+					_samlPeerBindingLocalService.fetchSamlPeerBinding(
+						samlIdpSsoSession.getSamlPeerBindingId());
 
-			if (Objects.equals(
-					samlSpEntityId, samlPeerBinding.getSamlPeerEntityId())) {
-
-				return samlIdpSsoSession;
+				return Objects.equals(
+					samlSpEntityId, samlPeerBinding.getSamlPeerEntityId());
 			}
-		}
-
-		return null;
+		).findFirst(
+		).orElse(
+			null
+		);
 	}
 
 	@Reference
 	private SamlPeerBindingLocalService _samlPeerBindingLocalService;
-
-	@Reference
-	private SamlPeerBindingPersistence _samlPeerBindingPersistence;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

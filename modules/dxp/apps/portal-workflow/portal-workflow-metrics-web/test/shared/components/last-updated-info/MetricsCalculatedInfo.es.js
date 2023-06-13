@@ -17,23 +17,24 @@ import moment from '../../../../src/main/resources/META-INF/resources/js/shared/
 import {MockRouter} from '../../../../test/mock/MockRouter.es';
 
 describe('MetricsCalculatedInfo', () => {
-	test.skip('will be correctly rendered', async () => {
+	test('will be correctly rendered', () => {
 		const date = moment
 			.utc(new Date())
 			.format(Liferay.Language.get('mmm-dd-hh-mm-a'));
 
-		fetch.mockResolvedValueOnce({
-			json: () => Promise.resolve(date),
-			ok: true,
-		});
+		const requestMock = {
+			get: jest.fn().mockResolvedValue(date),
+		};
 
-		const {getByText} = render(
-			<MockRouter>
-				<MetricsCalculatedInfo dateModified={new Date()} />
+		const {findByText} = render(
+			<MockRouter client={requestMock}>
+				<MetricsCalculatedInfo date={date} />
 			</MockRouter>
 		);
 
-		const labelText = await getByText(/metrics-calculated/);
+		const labelText = findByText(
+			Liferay.Language.get('metrics-calculated')
+		);
 
 		expect(labelText).toBeTruthy();
 	});

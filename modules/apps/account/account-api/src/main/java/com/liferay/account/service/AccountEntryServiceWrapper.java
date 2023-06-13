@@ -26,27 +26,43 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class AccountEntryServiceWrapper
 	implements AccountEntryService, ServiceWrapper<AccountEntryService> {
 
-	public AccountEntryServiceWrapper() {
-		this(null);
-	}
-
 	public AccountEntryServiceWrapper(AccountEntryService accountEntryService) {
 		_accountEntryService = accountEntryService;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addAccountEntry(long, long, String, String, String[],
+	 byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
-	public void activateAccountEntries(long[] accountEntryIds)
+	public com.liferay.account.model.AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes, int status)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		_accountEntryService.activateAccountEntries(accountEntryIds);
+		return _accountEntryService.addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			status);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addAccountEntry(long, long, String, String, String[],
+	 byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
-	public com.liferay.account.model.AccountEntry activateAccountEntry(
-			long accountEntryId)
+	public com.liferay.account.model.AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _accountEntryService.activateAccountEntry(accountEntryId);
+		return _accountEntryService.addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			status, serviceContext);
 	}
 
 	@Override
@@ -63,68 +79,6 @@ public class AccountEntryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.account.model.AccountEntry addOrUpdateAccountEntry(
-			String externalReferenceCode, long userId,
-			long parentAccountEntryId, String name, String description,
-			String[] domains, String emailAddress, byte[] logoBytes,
-			String taxIdNumber, String type, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.addOrUpdateAccountEntry(
-			externalReferenceCode, userId, parentAccountEntryId, name,
-			description, domains, emailAddress, logoBytes, taxIdNumber, type,
-			status, serviceContext);
-	}
-
-	@Override
-	public void deactivateAccountEntries(long[] accountEntryIds)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_accountEntryService.deactivateAccountEntries(accountEntryIds);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry deactivateAccountEntry(
-			long accountEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.deactivateAccountEntry(accountEntryId);
-	}
-
-	@Override
-	public void deleteAccountEntries(long[] accountEntryIds)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_accountEntryService.deleteAccountEntries(accountEntryIds);
-	}
-
-	@Override
-	public void deleteAccountEntry(long accountEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_accountEntryService.deleteAccountEntry(accountEntryId);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry fetchAccountEntry(
-			long accountEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.fetchAccountEntry(accountEntryId);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry
-			fetchAccountEntryByExternalReferenceCode(
-				long companyId, String externalReferenceCode)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.fetchAccountEntryByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	@Override
 	public java.util.List<com.liferay.account.model.AccountEntry>
 			getAccountEntries(
 				long companyId, int status, int start, int end,
@@ -134,14 +88,6 @@ public class AccountEntryServiceWrapper
 
 		return _accountEntryService.getAccountEntries(
 			companyId, status, start, end, orderByComparator);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry getAccountEntry(
-			long accountEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.getAccountEntry(accountEntryId);
 	}
 
 	/**
@@ -157,61 +103,11 @@ public class AccountEntryServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult
 		<com.liferay.account.model.AccountEntry> searchAccountEntries(
-				String keywords, java.util.LinkedHashMap<String, Object> params,
-				int cur, int delta, String orderByField, boolean reverse)
-			throws com.liferay.portal.kernel.exception.PortalException {
+			String keywords, java.util.LinkedHashMap<String, Object> params,
+			int cur, int delta, String orderByField, boolean reverse) {
 
 		return _accountEntryService.searchAccountEntries(
 			keywords, params, cur, delta, orderByField, reverse);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry updateAccountEntry(
-			com.liferay.account.model.AccountEntry accountEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.updateAccountEntry(accountEntry);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry updateAccountEntry(
-			long accountEntryId, long parentAccountEntryId, String name,
-			String description, boolean deleteLogo, String[] domains,
-			String emailAddress, byte[] logoBytes, String taxIdNumber,
-			int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.updateAccountEntry(
-			accountEntryId, parentAccountEntryId, name, description, deleteLogo,
-			domains, emailAddress, logoBytes, taxIdNumber, status,
-			serviceContext);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry updateDomains(
-			long accountEntryId, String[] domains)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.updateDomains(accountEntryId, domains);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry updateExternalReferenceCode(
-			long accountEntryId, String externalReferenceCode)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.updateExternalReferenceCode(
-			accountEntryId, externalReferenceCode);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry updateRestrictMembership(
-			long accountEntryId, boolean restrictMembership)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryService.updateRestrictMembership(
-			accountEntryId, restrictMembership);
 	}
 
 	@Override

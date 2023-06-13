@@ -28,12 +28,14 @@ import com.liferay.portal.workflow.kaleo.runtime.notification.NotificationRecipi
 import com.liferay.portal.workflow.kaleo.runtime.notification.NotificationSender;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.osgi.service.component.annotations.Component;
@@ -43,19 +45,16 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = {
 		"fromAddress=no-reply@liferay.com",
-		"fromName=Liferay Portal Workflow Notifications"
+		"fromName=Liferay Portal Workflow Notifications",
+		"notification.type=email"
 	},
 	service = NotificationSender.class
 )
 public class EmailNotificationSender
 	extends BaseNotificationSender implements NotificationSender {
-
-	@Override
-	public String getNotificationType() {
-		return "email";
-	}
 
 	protected void activate(Map<String, Object> properties) {
 		_fromAddress = (String)properties.get("fromAddress");
@@ -114,17 +113,17 @@ public class EmailNotificationSender
 			from, subject, notificationMessage, true);
 
 		mailMessage.setTo(
-			_getInternetAddresses(
+			getInternetAddresses(
 				getDeliverableNotificationRecipients(
 					notificationRecipients.get(NotificationReceptionType.TO),
 					UserNotificationDeliveryConstants.TYPE_EMAIL)));
 		mailMessage.setCC(
-			_getInternetAddresses(
+			getInternetAddresses(
 				getDeliverableNotificationRecipients(
 					notificationRecipients.get(NotificationReceptionType.CC),
 					UserNotificationDeliveryConstants.TYPE_EMAIL)));
 		mailMessage.setBCC(
-			_getInternetAddresses(
+			getInternetAddresses(
 				getDeliverableNotificationRecipients(
 					notificationRecipients.get(NotificationReceptionType.BCC),
 					UserNotificationDeliveryConstants.TYPE_EMAIL)));
@@ -132,9 +131,9 @@ public class EmailNotificationSender
 		_mailService.sendEmail(mailMessage);
 	}
 
-	private InternetAddress[] _getInternetAddresses(
+	protected InternetAddress[] getInternetAddresses(
 			Set<NotificationRecipient> notificationRecipients)
-		throws Exception {
+		throws AddressException, UnsupportedEncodingException {
 
 		if (notificationRecipients == null) {
 			return new InternetAddress[0];

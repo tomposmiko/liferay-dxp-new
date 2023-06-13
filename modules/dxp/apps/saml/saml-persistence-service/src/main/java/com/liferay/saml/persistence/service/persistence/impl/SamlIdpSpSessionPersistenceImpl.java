@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -41,12 +42,10 @@ import com.liferay.saml.persistence.model.SamlIdpSpSessionTable;
 import com.liferay.saml.persistence.model.impl.SamlIdpSpSessionImpl;
 import com.liferay.saml.persistence.model.impl.SamlIdpSpSessionModelImpl;
 import com.liferay.saml.persistence.service.persistence.SamlIdpSpSessionPersistence;
-import com.liferay.saml.persistence.service.persistence.SamlIdpSpSessionUtil;
 import com.liferay.saml.persistence.service.persistence.impl.constants.SamlPersistenceConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -73,7 +72,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  * @generated
  */
-@Component(service = SamlIdpSpSessionPersistence.class)
+@Component(service = {SamlIdpSpSessionPersistence.class, BasePersistence.class})
 public class SamlIdpSpSessionPersistenceImpl
 	extends BasePersistenceImpl<SamlIdpSpSession>
 	implements SamlIdpSpSessionPersistence {
@@ -183,7 +182,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SamlIdpSpSession>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SamlIdpSpSession samlIdpSpSession : list) {
@@ -573,7 +572,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {_getTime(createDate)};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -729,7 +728,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SamlIdpSpSession>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SamlIdpSpSession samlIdpSpSession : list) {
@@ -1100,7 +1099,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {samlIdpSsoSessionId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1552,7 +1551,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SamlIdpSpSession>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1622,7 +1621,7 @@ public class SamlIdpSpSessionPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1718,31 +1717,11 @@ public class SamlIdpSpSessionPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countBySamlIdpSsoSessionId", new String[] {Long.class.getName()},
 			new String[] {"samlIdpSsoSessionId"}, false);
-
-		_setSamlIdpSpSessionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSamlIdpSpSessionUtilPersistence(null);
-
 		entityCache.removeCache(SamlIdpSpSessionImpl.class.getName());
-	}
-
-	private void _setSamlIdpSpSessionUtilPersistence(
-		SamlIdpSpSessionPersistence samlIdpSpSessionPersistence) {
-
-		try {
-			Field field = SamlIdpSpSessionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, samlIdpSpSessionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -1812,5 +1791,9 @@ public class SamlIdpSpSessionPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private SamlIdpSpSessionModelArgumentsResolver
+		_samlIdpSpSessionModelArgumentsResolver;
 
 }

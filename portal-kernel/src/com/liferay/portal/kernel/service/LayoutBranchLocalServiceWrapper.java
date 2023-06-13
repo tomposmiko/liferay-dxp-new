@@ -25,10 +25,6 @@ public class LayoutBranchLocalServiceWrapper
 	implements LayoutBranchLocalService,
 			   ServiceWrapper<LayoutBranchLocalService> {
 
-	public LayoutBranchLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutBranchLocalServiceWrapper(
 		LayoutBranchLocalService layoutBranchLocalService) {
 
@@ -132,13 +128,6 @@ public class LayoutBranchLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutBranchLocalService.deleteLayoutBranch(layoutBranchId);
-	}
-
-	@Override
-	public void deleteLayoutBranchesByPlid(long plid)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_layoutBranchLocalService.deleteLayoutBranchesByPlid(plid);
 	}
 
 	@Override

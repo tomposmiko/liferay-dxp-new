@@ -16,9 +16,9 @@ package com.liferay.analytics.reports.web.internal.portlet.action;
 
 import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPortletKeys;
 import com.liferay.analytics.reports.web.internal.data.provider.AnalyticsReportsDataProvider;
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -31,6 +31,8 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.ResourceBundle;
+
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -41,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sarai Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AnalyticsReportsPortletKeys.ANALYTICS_REPORTS,
 		"mvc.command.name=/analytics_reports/get_total_views"
@@ -55,8 +58,7 @@ public class GetTotalViewsMVCResourceCommand extends BaseMVCResourceCommand {
 		throws Exception {
 
 		AnalyticsReportsDataProvider analyticsReportsDataProvider =
-			new AnalyticsReportsDataProvider(_analyticsSettingsManager, _http);
-
+			new AnalyticsReportsDataProvider(_http);
 		String canonicalURL = ParamUtil.getString(
 			resourceRequest, "canonicalURL");
 
@@ -71,23 +73,22 @@ public class GetTotalViewsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 		catch (Exception exception) {
 			if (_log.isInfoEnabled()) {
-				_log.info(exception);
+				_log.info(exception, exception);
 			}
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)resourceRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+				themeDisplay.getLocale(), getClass());
 
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,
 				JSONUtil.put(
 					"error",
-					() -> {
-						ThemeDisplay themeDisplay =
-							(ThemeDisplay)resourceRequest.getAttribute(
-								WebKeys.THEME_DISPLAY);
-
-						return ResourceBundleUtil.getString(
-							ResourceBundleUtil.getBundle(
-								themeDisplay.getLocale(), getClass()),
-							"an-unexpected-error-occurred");
-					}));
+					ResourceBundleUtil.getString(
+						resourceBundle, "an-unexpected-error-occurred")));
 		}
 	}
 
@@ -95,10 +96,10 @@ public class GetTotalViewsMVCResourceCommand extends BaseMVCResourceCommand {
 		GetTotalViewsMVCResourceCommand.class);
 
 	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
+	private Http _http;
 
 	@Reference
-	private Http _http;
+	private Language _language;
 
 	@Reference
 	private Portal _portal;

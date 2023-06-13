@@ -15,7 +15,6 @@
 package com.liferay.portal.configuration.cluster.internal;
 
 import com.liferay.portal.configuration.cluster.internal.constants.ConfigurationClusterDestinationNames;
-import com.liferay.portal.configuration.persistence.InMemoryOnlyConfigurationThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterLink;
 import com.liferay.portal.kernel.cluster.Priority;
 import com.liferay.portal.kernel.messaging.Destination;
@@ -30,15 +29,16 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Raymond Augé
  */
-@Component(enabled = false, service = SynchronousConfigurationListener.class)
+@Component(
+	enabled = false, immediate = true,
+	service = SynchronousConfigurationListener.class
+)
 public class ConfigurationSynchronousConfigurationListener
 	implements SynchronousConfigurationListener {
 
 	@Override
 	public void configurationEvent(ConfigurationEvent configurationEvent) {
-		if (ConfigurationThreadLocal.isLocalUpdate() ||
-			InMemoryOnlyConfigurationThreadLocal.isInMemoryOnly()) {
-
+		if (ConfigurationThreadLocal.isLocalUpdate()) {
 			return;
 		}
 
@@ -54,12 +54,18 @@ public class ConfigurationSynchronousConfigurationListener
 		_clusterLink.sendMulticastMessage(message, Priority.LEVEL10);
 	}
 
-	@Reference
-	private ClusterLink _clusterLink;
+	@Reference(unbind = "-")
+	protected void setClusterLink(ClusterLink clusterLink) {
+		_clusterLink = clusterLink;
+	}
 
 	@Reference(
-		target = "(destination.name=" + ConfigurationClusterDestinationNames.CONFIGURATION + ")"
+		target = "(destination.name=" + ConfigurationClusterDestinationNames.CONFIGURATION + ")",
+		unbind = "-"
 	)
-	private Destination _destination;
+	protected void setDestination(Destination destination) {
+	}
+
+	private ClusterLink _clusterLink;
 
 }

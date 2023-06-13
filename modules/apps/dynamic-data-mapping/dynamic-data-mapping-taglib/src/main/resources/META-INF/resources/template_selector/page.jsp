@@ -88,7 +88,7 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 				label="<%= true %>"
 				markupView="lexicon"
 				message='<%= LanguageUtil.get(request, "manage-templates") %>'
-				url="javascript:void(0);"
+				url="javascript:;"
 			/>
 		</clay:content-col>
 	</c:if>

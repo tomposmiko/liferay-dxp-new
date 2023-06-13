@@ -14,8 +14,7 @@
 
 package com.liferay.portlet.internal;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
@@ -51,8 +50,10 @@ import javax.portlet.filter.RenderFilter;
 import javax.portlet.filter.ResourceFilter;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
@@ -71,134 +72,16 @@ public class InvokerFilterContainerImpl
 
 		String rootPortletId = portlet.getRootPortletId();
 
-		_portletFilterServiceTrackerMap =
-			ServiceTrackerMapFactory.openMultiValueMap(
-				_bundleContext, PortletFilter.class,
-				"(javax.portlet.name=" + rootPortletId + ")",
-				(serviceReference, emitter) -> {
-					PortletFilter portletFilter = _bundleContext.getService(
-						serviceReference);
+		Filter filter = SystemBundleUtil.createFilter(
+			StringBundler.concat(
+				"(&(javax.portlet.name=", rootPortletId, ")(objectClass=",
+				PortletFilter.class.getName(), "))"));
 
-					Set<String> lifecycles =
-						(Set<String>)serviceReference.getProperty(
-							"filter.lifecycles");
+		_serviceTracker = new ServiceTracker<>(
+			_bundleContext, filter,
+			new PortletFilterServiceTrackerCustomizer(portletContext));
 
-					if ((portletFilter instanceof ActionFilter) &&
-						_isDeclaredLifecycle(
-							PortletRequest.ACTION_PHASE, lifecycles)) {
-
-						emitter.emit(ActionFilter.class);
-					}
-
-					if ((portletFilter instanceof EventFilter) &&
-						_isDeclaredLifecycle(
-							PortletRequest.EVENT_PHASE, lifecycles)) {
-
-						emitter.emit(EventFilter.class);
-					}
-
-					if ((portletFilter instanceof HeaderFilter) &&
-						_isDeclaredLifecycle(
-							PortletRequest.HEADER_PHASE, lifecycles)) {
-
-						emitter.emit(HeaderFilter.class);
-					}
-
-					if ((portletFilter instanceof RenderFilter) &&
-						_isDeclaredLifecycle(
-							PortletRequest.RENDER_PHASE, lifecycles)) {
-
-						emitter.emit(RenderFilter.class);
-					}
-
-					if ((portletFilter instanceof ResourceFilter) &&
-						_isDeclaredLifecycle(
-							PortletRequest.RESOURCE_PHASE, lifecycles)) {
-
-						emitter.emit(ResourceFilter.class);
-					}
-
-					_bundleContext.ungetService(serviceReference);
-				},
-				new ServiceTrackerCustomizer<PortletFilter, PortletFilter>() {
-
-					@Override
-					public PortletFilter addingService(
-						ServiceReference<PortletFilter> serviceReference) {
-
-						PortletFilter portletFilter = _bundleContext.getService(
-							serviceReference);
-
-						boolean preinitializedFilter = GetterUtil.getBoolean(
-							serviceReference.getProperty(
-								"preinitialized.filter"));
-
-						if (!preinitializedFilter) {
-							String filterName = GetterUtil.getString(
-								serviceReference.getProperty("service.id"),
-								ClassUtil.getClassName(portletFilter));
-
-							Map<String, String> params = new HashMap<>();
-
-							for (String key :
-									serviceReference.getPropertyKeys()) {
-
-								if (!key.startsWith(
-										"javax.portlet.init-param.")) {
-
-									continue;
-								}
-
-								params.put(
-									key.substring(
-										"javax.portlet.init-param.".length()),
-									GetterUtil.getString(
-										serviceReference.getProperty(key)));
-							}
-
-							FilterConfig filterConfig = new FilterConfigImpl(
-								filterName, portletContext, params);
-
-							try {
-								portletFilter.init(filterConfig);
-							}
-							catch (PortletException portletException) {
-								_log.error(portletException);
-
-								_bundleContext.ungetService(serviceReference);
-
-								return null;
-							}
-						}
-
-						return portletFilter;
-					}
-
-					@Override
-					public void modifiedService(
-						ServiceReference<PortletFilter> serviceReference,
-						PortletFilter portletFilter) {
-					}
-
-					@Override
-					public void removedService(
-						ServiceReference<PortletFilter> serviceReference,
-						PortletFilter portletFilter) {
-
-						_bundleContext.ungetService(serviceReference);
-
-						boolean preinitializedFilter = GetterUtil.getBoolean(
-							serviceReference.getProperty(
-								"preinitialized.filter"));
-
-						if (preinitializedFilter) {
-							return;
-						}
-
-						portletFilter.destroy();
-					}
-
-				});
+		_serviceTracker.open();
 
 		Dictionary<String, Object> properties =
 			HashMapDictionaryBuilder.<String, Object>put(
@@ -286,67 +169,58 @@ public class InvokerFilterContainerImpl
 
 		_serviceRegistrationTuples.clear();
 
-		_portletFilterServiceTrackerMap.close();
+		_serviceTracker.close();
+
+		_actionFilters.clear();
+		_eventFilters.clear();
+		_headerFilters.clear();
+		_renderFilters.clear();
+		_resourceFilters.clear();
 	}
 
 	@Override
 	public List<ActionFilter> getActionFilters() {
-		return _getPortletFilters(ActionFilter.class);
+		return _actionFilters;
 	}
 
 	@Override
 	public List<EventFilter> getEventFilters() {
-		return _getPortletFilters(EventFilter.class);
+		return _eventFilters;
 	}
 
 	@Override
 	public List<HeaderFilter> getHeaderFilters() {
-		return _getPortletFilters(HeaderFilter.class);
+		return _headerFilters;
 	}
 
 	@Override
 	public List<RenderFilter> getRenderFilters() {
-		return _getPortletFilters(RenderFilter.class);
+		return _renderFilters;
 	}
 
 	@Override
 	public List<ResourceFilter> getResourceFilters() {
-		return _getPortletFilters(ResourceFilter.class);
-	}
-
-	private <T extends PortletFilter> List<T> _getPortletFilters(
-		Class<T> clazz) {
-
-		List<PortletFilter> portletFilters =
-			_portletFilterServiceTrackerMap.getService(clazz);
-
-		if (portletFilters == null) {
-			return Collections.emptyList();
-		}
-
-		return (List<T>)portletFilters;
-	}
-
-	private boolean _isDeclaredLifecycle(
-		String lifecycle, Set<String> lifecycles) {
-
-		if ((lifecycles == null) || lifecycles.isEmpty()) {
-			return true;
-		}
-
-		return lifecycles.contains(lifecycle);
+		return _resourceFilters;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		InvokerFilterContainerImpl.class);
 
+	private final List<ActionFilter> _actionFilters =
+		new CopyOnWriteArrayList<>();
 	private final BundleContext _bundleContext =
 		SystemBundleUtil.getBundleContext();
-	private final ServiceTrackerMap
-		<Class<? extends PortletFilter>, List<PortletFilter>>
-			_portletFilterServiceTrackerMap;
+	private final List<EventFilter> _eventFilters =
+		new CopyOnWriteArrayList<>();
+	private final List<HeaderFilter> _headerFilters =
+		new CopyOnWriteArrayList<>();
+	private final List<RenderFilter> _renderFilters =
+		new CopyOnWriteArrayList<>();
+	private final List<ResourceFilter> _resourceFilters =
+		new CopyOnWriteArrayList<>();
 	private final List<ServiceRegistrationTuple> _serviceRegistrationTuples =
 		new CopyOnWriteArrayList<>();
+	private final ServiceTracker<PortletFilter, PortletFilter> _serviceTracker;
 
 	private static class EmptyInvokerFilterContainer
 		implements Closeable, InvokerFilterContainer {
@@ -405,6 +279,138 @@ public class InvokerFilterContainerImpl
 		private final com.liferay.portal.kernel.model.PortletFilter
 			_portletFilterModel;
 		private final ServiceRegistration<PortletFilter> _serviceRegistration;
+
+	}
+
+	private class PortletFilterServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<PortletFilter, PortletFilter> {
+
+		public PortletFilterServiceTrackerCustomizer(
+			PortletContext portletContext) {
+
+			_portletContext = portletContext;
+		}
+
+		@Override
+		public PortletFilter addingService(
+			ServiceReference<PortletFilter> serviceReference) {
+
+			PortletFilter portletFilter = _bundleContext.getService(
+				serviceReference);
+
+			boolean preinitializedFilter = GetterUtil.getBoolean(
+				serviceReference.getProperty("preinitialized.filter"));
+
+			if (!preinitializedFilter) {
+				String filterName = GetterUtil.getString(
+					serviceReference.getProperty("service.id"),
+					ClassUtil.getClassName(portletFilter));
+
+				Map<String, String> params = new HashMap<>();
+
+				for (String key : serviceReference.getPropertyKeys()) {
+					if (!key.startsWith("javax.portlet.init-param.")) {
+						continue;
+					}
+
+					params.put(
+						key.substring("javax.portlet.init-param.".length()),
+						GetterUtil.getString(
+							serviceReference.getProperty(key)));
+				}
+
+				FilterConfig filterConfig = new FilterConfigImpl(
+					filterName, _portletContext, params);
+
+				try {
+					portletFilter.init(filterConfig);
+				}
+				catch (PortletException portletException) {
+					_log.error(portletException, portletException);
+
+					_bundleContext.ungetService(serviceReference);
+
+					return null;
+				}
+			}
+
+			Set<String> lifecycles = (Set<String>)serviceReference.getProperty(
+				"filter.lifecycles");
+
+			if ((portletFilter instanceof ActionFilter) &&
+				_isDeclaredLifecycle(PortletRequest.ACTION_PHASE, lifecycles)) {
+
+				_actionFilters.add((ActionFilter)portletFilter);
+			}
+
+			if ((portletFilter instanceof EventFilter) &&
+				_isDeclaredLifecycle(PortletRequest.EVENT_PHASE, lifecycles)) {
+
+				_eventFilters.add((EventFilter)portletFilter);
+			}
+
+			if ((portletFilter instanceof HeaderFilter) &&
+				_isDeclaredLifecycle(PortletRequest.HEADER_PHASE, lifecycles)) {
+
+				_headerFilters.add((HeaderFilter)portletFilter);
+			}
+
+			if ((portletFilter instanceof RenderFilter) &&
+				_isDeclaredLifecycle(PortletRequest.RENDER_PHASE, lifecycles)) {
+
+				_renderFilters.add((RenderFilter)portletFilter);
+			}
+
+			if ((portletFilter instanceof ResourceFilter) &&
+				_isDeclaredLifecycle(
+					PortletRequest.RESOURCE_PHASE, lifecycles)) {
+
+				_resourceFilters.add((ResourceFilter)portletFilter);
+			}
+
+			return portletFilter;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<PortletFilter> serviceReference,
+			PortletFilter portletFilter) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<PortletFilter> serviceReference,
+			PortletFilter portletFilter) {
+
+			_bundleContext.ungetService(serviceReference);
+
+			_actionFilters.remove(portletFilter);
+			_eventFilters.remove(portletFilter);
+			_headerFilters.remove(portletFilter);
+			_renderFilters.remove(portletFilter);
+			_resourceFilters.remove(portletFilter);
+
+			boolean preinitializedFilter = GetterUtil.getBoolean(
+				serviceReference.getProperty("preinitialized.filter"));
+
+			if (preinitializedFilter) {
+				return;
+			}
+
+			portletFilter.destroy();
+		}
+
+		private boolean _isDeclaredLifecycle(
+			String lifecycle, Set<String> lifecycles) {
+
+			if ((lifecycles == null) || lifecycles.isEmpty()) {
+				return true;
+			}
+
+			return lifecycles.contains(lifecycle);
+		}
+
+		private final PortletContext _portletContext;
 
 	}
 

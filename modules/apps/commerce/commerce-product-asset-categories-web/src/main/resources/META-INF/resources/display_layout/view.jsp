@@ -24,7 +24,7 @@ String layoutBreadcrumb = StringPool.BLANK;
 Layout selLayout = categoryCPDisplayLayoutDisplayContext.getDefaultAssetCategoryLayout();
 
 if (selLayout != null) {
-	layoutBreadcrumb = selLayout.getBreadcrumb(locale);
+	layoutBreadcrumb = categoryCPDisplayLayoutDisplayContext.getLayoutBreadcrumb(selLayout);
 }
 %>
 
@@ -79,15 +79,18 @@ if (selLayout != null) {
 	bodyClasses="p-0"
 	title='<%= LanguageUtil.get(request, "override-default-category-display-page") %>'
 >
-	<frontend-data-set:classic-display
+	<clay:data-set-display
 		contextParams='<%=
 			HashMapBuilder.<String, String>put(
 				"commerceChannelId", String.valueOf(categoryCPDisplayLayoutDisplayContext.getCommerceChannelId())
 			).build()
 		%>'
 		creationMenu="<%= categoryCPDisplayLayoutDisplayContext.getCreationMenu() %>"
-		dataProviderKey="<%= CommerceProductAssetCategoriesFDSNames.CATEGORY_DISPLAY_PAGES %>"
-		id="<%= CommerceProductAssetCategoriesFDSNames.CATEGORY_DISPLAY_PAGES %>"
+		dataProviderKey="<%= CommerceCategoryDisplayPageClayTable.NAME %>"
+		id="<%= CommerceCategoryDisplayPageClayTable.NAME %>"
 		itemsPerPage="<%= 10 %>"
+		namespace="<%= liferayPortletResponse.getNamespace() %>"
+		pageNumber="<%= 1 %>"
+		portletURL="<%= categoryCPDisplayLayoutDisplayContext.getPortletURL() %>"
 	/>
 </commerce-ui:panel>

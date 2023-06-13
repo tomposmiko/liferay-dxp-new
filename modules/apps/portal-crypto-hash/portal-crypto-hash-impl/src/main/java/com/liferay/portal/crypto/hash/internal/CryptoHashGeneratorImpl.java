@@ -21,13 +21,17 @@ import com.liferay.portal.crypto.hash.exception.CryptoHashException;
 import com.liferay.portal.crypto.hash.spi.CryptoHashProvider;
 import com.liferay.portal.crypto.hash.spi.CryptoHashProviderResponse;
 
+import java.security.NoSuchAlgorithmException;
+
 /**
  * @author Arthur Chan
  * @author Carlos Sierra Andrés
  */
 public class CryptoHashGeneratorImpl implements CryptoHashGenerator {
 
-	public CryptoHashGeneratorImpl(CryptoHashProvider cryptoHashProvider) {
+	public CryptoHashGeneratorImpl(CryptoHashProvider cryptoHashProvider)
+		throws NoSuchAlgorithmException {
+
 		_cryptoHashProvider = cryptoHashProvider;
 	}
 

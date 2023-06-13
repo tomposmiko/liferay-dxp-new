@@ -12,44 +12,147 @@
  * details.
  */
 
-import {ClayModalProvider, useModal} from '@clayui/modal';
-import {Observer} from '@clayui/modal/lib/types';
+import ClayAlert from '@clayui/alert';
+import ClayButton from '@clayui/button';
+import ClayForm, {ClayInput} from '@clayui/form';
+import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
 import React, {useEffect, useState} from 'react';
 
-import ModalBasicWithFieldName from './ModalBasicWithFieldName';
+import RequiredMask from './form/RequiredMask';
+
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
-	observer: Observer;
-	onClose: () => void;
 }
 
-const ModalWithProvider: React.FC<IProps> = ({apiURL}) => {
+type TFormState = {
+	name: {
+		[key: string]: string;
+	};
+};
+
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
+
+const ModalAddListTypeDefinition: React.FC<IProps> = ({apiURL}) => {
 	const [visibleModal, setVisibleModal] = useState<boolean>(false);
+	const [formState, setFormState] = useState<TFormState>({
+		name: {
+			[defaultLanguageId]: '',
+		},
+	});
+	const [error, setError] = useState<string>('');
+
 	const {observer, onClose} = useModal({
 		onClose: () => setVisibleModal(false),
 	});
 
-	useEffect(() => {
-		const openModal = () => setVisibleModal(true);
+	const handleSaveListTypeDefinition = async () => {
+		const {name} = formState;
 
-		Liferay.on('addObjectLayout', openModal);
+		const response = await Liferay.Util.fetch(apiURL, {
+			body: JSON.stringify({
+				name,
+			}),
+			headers: new Headers({
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			}),
+			method: 'POST',
+		});
+
+		if (response.status === 401) {
+			window.location.reload();
+		}
+		else if (response.ok) {
+			onClose();
+
+			window.location.reload();
+		}
+		else {
+			const {
+				title = Liferay.Language.get('an-error-occurred'),
+			} = await response.json();
+
+			setError(title);
+		}
+	};
+
+	const handleOpenObjectLayoutModal = () => setVisibleModal(true);
+
+	useEffect(() => {
+		Liferay.on('addObjectLayout', handleOpenObjectLayoutModal);
 
 		return () => {
-			Liferay.detach('addObjectLayout', openModal);
+			Liferay.detach('addObjectLayout', handleOpenObjectLayoutModal);
 		};
 	}, []);
 
 	return (
-		<ClayModalProvider>
+		<>
 			{visibleModal && (
-				<ModalBasicWithFieldName
-					apiURL={apiURL}
-					inputId="listObjectLayoutName"
-					label={Liferay.Language.get('new-layout')}
-					observer={observer}
-					onClose={onClose}
-				/>
+				<ClayModal observer={observer}>
+					<ClayModal.Header>
+						{Liferay.Language.get('new-layout')}
+					</ClayModal.Header>
+					<ClayModal.Body>
+						{error && (
+							<ClayAlert displayType="danger">{error}</ClayAlert>
+						)}
+
+						<ClayForm.Group>
+							<label htmlFor="listObjectLayoutName">
+								{Liferay.Language.get('name')}
+
+								<RequiredMask />
+							</label>
+
+							<ClayInput
+								id="listObjectLayoutName"
+								onChange={({target: {value}}) => {
+									setFormState({
+										...formState,
+										name: {
+											[defaultLanguageId]: value,
+										},
+									});
+
+									error && setError('');
+								}}
+								type="text"
+								value={formState.name[defaultLanguageId]}
+							/>
+						</ClayForm.Group>
+					</ClayModal.Body>
+					<ClayModal.Footer
+						last={
+							<ClayButton.Group key={1} spaced>
+								<ClayButton
+									displayType="secondary"
+									onClick={() => onClose()}
+								>
+									{Liferay.Language.get('cancel')}
+								</ClayButton>
+
+								<ClayButton
+									displayType="primary"
+									onClick={() =>
+										handleSaveListTypeDefinition()
+									}
+								>
+									{Liferay.Language.get('save')}
+								</ClayButton>
+							</ClayButton.Group>
+						}
+					/>
+				</ClayModal>
 			)}
+		</>
+	);
+};
+
+const ModalWithProvider: React.FC<IProps> = ({apiURL}) => {
+	return (
+		<ClayModalProvider>
+			<ModalAddListTypeDefinition apiURL={apiURL} />
 		</ClayModalProvider>
 	);
 };

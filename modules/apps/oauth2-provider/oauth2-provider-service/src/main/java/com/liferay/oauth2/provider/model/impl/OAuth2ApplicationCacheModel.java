@@ -64,13 +64,9 @@ public class OAuth2ApplicationCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(53);
+		StringBundler sb = new StringBundler(45);
 
-		sb.append("{uuid=");
-		sb.append(uuid);
-		sb.append(", externalReferenceCode=");
-		sb.append(externalReferenceCode);
-		sb.append(", oAuth2ApplicationId=");
+		sb.append("{oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
 		sb.append(", companyId=");
 		sb.append(companyId);
@@ -86,8 +82,6 @@ public class OAuth2ApplicationCacheModel
 		sb.append(oAuth2ApplicationScopeAliasesId);
 		sb.append(", allowedGrantTypes=");
 		sb.append(allowedGrantTypes);
-		sb.append(", clientAuthenticationMethod=");
-		sb.append(clientAuthenticationMethod);
 		sb.append(", clientCredentialUserId=");
 		sb.append(clientCredentialUserId);
 		sb.append(", clientCredentialUserName=");
@@ -106,8 +100,6 @@ public class OAuth2ApplicationCacheModel
 		sb.append(homePageURL);
 		sb.append(", iconFileEntryId=");
 		sb.append(iconFileEntryId);
-		sb.append(", jwks=");
-		sb.append(jwks);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", privacyPolicyURL=");
@@ -127,21 +119,6 @@ public class OAuth2ApplicationCacheModel
 	public OAuth2Application toEntityModel() {
 		OAuth2ApplicationImpl oAuth2ApplicationImpl =
 			new OAuth2ApplicationImpl();
-
-		if (uuid == null) {
-			oAuth2ApplicationImpl.setUuid("");
-		}
-		else {
-			oAuth2ApplicationImpl.setUuid(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			oAuth2ApplicationImpl.setExternalReferenceCode("");
-		}
-		else {
-			oAuth2ApplicationImpl.setExternalReferenceCode(
-				externalReferenceCode);
-		}
 
 		oAuth2ApplicationImpl.setOAuth2ApplicationId(oAuth2ApplicationId);
 		oAuth2ApplicationImpl.setCompanyId(companyId);
@@ -176,14 +153,6 @@ public class OAuth2ApplicationCacheModel
 		}
 		else {
 			oAuth2ApplicationImpl.setAllowedGrantTypes(allowedGrantTypes);
-		}
-
-		if (clientAuthenticationMethod == null) {
-			oAuth2ApplicationImpl.setClientAuthenticationMethod("");
-		}
-		else {
-			oAuth2ApplicationImpl.setClientAuthenticationMethod(
-				clientAuthenticationMethod);
 		}
 
 		oAuth2ApplicationImpl.setClientCredentialUserId(clientCredentialUserId);
@@ -235,13 +204,6 @@ public class OAuth2ApplicationCacheModel
 
 		oAuth2ApplicationImpl.setIconFileEntryId(iconFileEntryId);
 
-		if (jwks == null) {
-			oAuth2ApplicationImpl.setJwks("");
-		}
-		else {
-			oAuth2ApplicationImpl.setJwks(jwks);
-		}
-
 		if (name == null) {
 			oAuth2ApplicationImpl.setName("");
 		}
@@ -273,9 +235,6 @@ public class OAuth2ApplicationCacheModel
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
-		uuid = objectInput.readUTF();
-		externalReferenceCode = objectInput.readUTF();
-
 		oAuth2ApplicationId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
@@ -287,7 +246,6 @@ public class OAuth2ApplicationCacheModel
 
 		oAuth2ApplicationScopeAliasesId = objectInput.readLong();
 		allowedGrantTypes = objectInput.readUTF();
-		clientAuthenticationMethod = objectInput.readUTF();
 
 		clientCredentialUserId = objectInput.readLong();
 		clientCredentialUserName = objectInput.readUTF();
@@ -300,7 +258,6 @@ public class OAuth2ApplicationCacheModel
 		homePageURL = objectInput.readUTF();
 
 		iconFileEntryId = objectInput.readLong();
-		jwks = objectInput.readUTF();
 		name = objectInput.readUTF();
 		privacyPolicyURL = objectInput.readUTF();
 		redirectURIs = objectInput.readUTF();
@@ -312,20 +269,6 @@ public class OAuth2ApplicationCacheModel
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
-		if (uuid == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(externalReferenceCode);
-		}
-
 		objectOutput.writeLong(oAuth2ApplicationId);
 
 		objectOutput.writeLong(companyId);
@@ -349,13 +292,6 @@ public class OAuth2ApplicationCacheModel
 		}
 		else {
 			objectOutput.writeUTF(allowedGrantTypes);
-		}
-
-		if (clientAuthenticationMethod == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(clientAuthenticationMethod);
 		}
 
 		objectOutput.writeLong(clientCredentialUserId);
@@ -406,13 +342,6 @@ public class OAuth2ApplicationCacheModel
 
 		objectOutput.writeLong(iconFileEntryId);
 
-		if (jwks == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(jwks);
-		}
-
 		if (name == null) {
 			objectOutput.writeUTF("");
 		}
@@ -439,8 +368,6 @@ public class OAuth2ApplicationCacheModel
 		objectOutput.writeBoolean(trustedApplication);
 	}
 
-	public String uuid;
-	public String externalReferenceCode;
 	public long oAuth2ApplicationId;
 	public long companyId;
 	public long userId;
@@ -449,7 +376,6 @@ public class OAuth2ApplicationCacheModel
 	public long modifiedDate;
 	public long oAuth2ApplicationScopeAliasesId;
 	public String allowedGrantTypes;
-	public String clientAuthenticationMethod;
 	public long clientCredentialUserId;
 	public String clientCredentialUserName;
 	public String clientId;
@@ -459,7 +385,6 @@ public class OAuth2ApplicationCacheModel
 	public String features;
 	public String homePageURL;
 	public long iconFileEntryId;
-	public String jwks;
 	public String name;
 	public String privacyPolicyURL;
 	public String redirectURIs;

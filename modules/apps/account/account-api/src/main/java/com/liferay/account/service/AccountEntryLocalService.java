@@ -15,11 +15,9 @@
 package com.liferay.account.service;
 
 import com.liferay.account.model.AccountEntry;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -42,7 +40,6 @@ import java.io.Serializable;
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -72,11 +69,10 @@ public interface AccountEntryLocalService
 	public void activateAccountEntries(long[] accountEntryIds)
 		throws PortalException;
 
-	public AccountEntry activateAccountEntry(AccountEntry accountEntry)
-		throws PortalException;
+	public AccountEntry activateAccountEntry(AccountEntry accountEntry);
 
 	public AccountEntry activateAccountEntry(long accountEntryId)
-		throws PortalException;
+		throws Exception;
 
 	/**
 	 * Adds the account entry to the database. Also notifies the appropriate model listeners.
@@ -90,6 +86,40 @@ public interface AccountEntryLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public AccountEntry addAccountEntry(AccountEntry accountEntry);
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addAccountEntry(long, long, String, String, String[],
+	 byte[], String, String, int, ServiceContext)}
+	 */
+	@Deprecated
+	public AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes, int status)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addAccountEntry(long, long, String, String, String[],
+	 byte[], String, String, int, ServiceContext)}
+	 */
+	@Deprecated
+	public AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes, int status,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
+	public AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes,
+			String taxIdNumber, String type, int status,
+			ServiceContext serviceContext)
+		throws PortalException;
 
 	public AccountEntry addAccountEntry(
 			long userId, long parentAccountEntryId, String name,
@@ -124,11 +154,10 @@ public interface AccountEntryLocalService
 	public void deactivateAccountEntries(long[] accountEntryIds)
 		throws PortalException;
 
-	public AccountEntry deactivateAccountEntry(AccountEntry accountEntry)
-		throws PortalException;
+	public AccountEntry deactivateAccountEntry(AccountEntry accountEntry);
 
 	public AccountEntry deactivateAccountEntry(long accountEntryId)
-		throws PortalException;
+		throws Exception;
 
 	public void deleteAccountEntries(long[] accountEntryIds)
 		throws PortalException;
@@ -248,20 +277,24 @@ public interface AccountEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AccountEntry fetchAccountEntry(long accountEntryId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AccountEntry fetchAccountEntryByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
 	/**
-	 * Returns the account entry with the matching UUID and company.
+	 * Returns the account entry with the matching external reference code and company.
 	 *
-	 * @param uuid the account entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account entry's external reference code
 	 * @return the matching account entry, or <code>null</code> if a matching account entry could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AccountEntry fetchAccountEntryByUuidAndCompanyId(
-		String uuid, long companyId);
+	public AccountEntry fetchAccountEntryByExternalReferenceCode(
+		long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AccountEntry fetchAccountEntryByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AccountEntry fetchPersonAccountEntry(long userId);
@@ -310,30 +343,21 @@ public interface AccountEntryLocalService
 	public AccountEntry getAccountEntry(long accountEntryId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AccountEntry getAccountEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException;
-
 	/**
-	 * Returns the account entry with the matching UUID and company.
+	 * Returns the account entry with the matching external reference code and company.
 	 *
-	 * @param uuid the account entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account entry's external reference code
 	 * @return the matching account entry
 	 * @throws PortalException if a matching account entry could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AccountEntry getAccountEntryByUuidAndCompanyId(
-			String uuid, long companyId)
+	public AccountEntry getAccountEntryByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AccountEntry getGuestAccountEntry(long companyId)
@@ -406,8 +430,43 @@ public interface AccountEntryLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public AccountEntry updateAccountEntry(AccountEntry accountEntry);
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateAccountEntry(Long, long, String, String, boolean,
+	 String[], byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
 	public AccountEntry updateAccountEntry(
-			long accountEntryId, long parentAccountEntryId, String name,
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			byte[] logoBytes, int status)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateAccountEntry(Long, long, String, String, boolean,
+	 String[], byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
+	public AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			byte[] logoBytes, int status, ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
+	public AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			byte[] logoBytes, String taxIdNumber, int status,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
 			String description, boolean deleteLogo, String[] domains,
 			String emailAddress, byte[] logoBytes, String taxIdNumber,
 			int status, ServiceContext serviceContext)
@@ -424,10 +483,6 @@ public interface AccountEntryLocalService
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
-	public AccountEntry updateDomains(long accountEntryId, String[] domains)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
 	public AccountEntry updateExternalReferenceCode(
 			AccountEntry accountEntry, String externalReferenceCode)
 		throws PortalException;
@@ -437,23 +492,11 @@ public interface AccountEntryLocalService
 			long accountEntryId, String externalReferenceCode)
 		throws PortalException;
 
-	public AccountEntry updateRestrictMembership(
-			long accountEntryId, boolean restrictMembership)
-		throws PortalException;
-
 	@Indexable(type = IndexableType.REINDEX)
-	public AccountEntry updateStatus(AccountEntry accountEntry, int status)
-		throws PortalException;
+	public AccountEntry updateStatus(AccountEntry accountEntry, int status);
 
 	@Indexable(type = IndexableType.REINDEX)
 	public AccountEntry updateStatus(long accountEntryId, int status)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public AccountEntry updateStatus(
-			long userId, long accountEntryId, int status,
-			ServiceContext serviceContext,
-			Map<String, Serializable> workflowContext)
 		throws PortalException;
 
 }

@@ -131,7 +131,7 @@ public class BeanPortletRegistrarImpl implements BeanPortletRegistrar {
 					displayDescriptorURL);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -147,7 +147,7 @@ public class BeanPortletRegistrarImpl implements BeanPortletRegistrar {
 					liferayDescriptorURL);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -190,7 +190,7 @@ public class BeanPortletRegistrarImpl implements BeanPortletRegistrar {
 					portletDescriptorURL, preferencesValidatorFunction);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -326,7 +326,7 @@ public class BeanPortletRegistrarImpl implements BeanPortletRegistrar {
 			}
 			catch (IllegalStateException illegalStateException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(illegalStateException);
+					_log.debug(illegalStateException, illegalStateException);
 				}
 
 				// Ignore since the service has been unregistered
@@ -668,7 +668,7 @@ public class BeanPortletRegistrarImpl implements BeanPortletRegistrar {
 			configuredPortletName);
 
 		LiferayPortletConfiguration liferayPortletConfiguration =
-			_getLiferayPortletConfiguration(
+			_getAnnotatedLiferayConfiguration(
 				discoveredClasses, configuredPortletName);
 
 		String[] propertyNames = null;
@@ -1029,7 +1029,7 @@ public class BeanPortletRegistrarImpl implements BeanPortletRegistrar {
 		}
 
 		for (String portletName : portletNames) {
-			if (Objects.equals(portletName, "*")) {
+			if (Objects.equals("*", portletName)) {
 				continue;
 			}
 
@@ -1170,7 +1170,7 @@ public class BeanPortletRegistrarImpl implements BeanPortletRegistrar {
 			portletName, defaultPreferencesValidator);
 	}
 
-	private LiferayPortletConfiguration _getLiferayPortletConfiguration(
+	private LiferayPortletConfiguration _getAnnotatedLiferayConfiguration(
 		Set<Class<?>> discoveredClasses, String portletName) {
 
 		for (Class<?> discoveredClass : discoveredClasses) {

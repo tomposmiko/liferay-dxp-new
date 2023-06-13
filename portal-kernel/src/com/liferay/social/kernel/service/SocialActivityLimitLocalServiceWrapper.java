@@ -30,10 +30,6 @@ public class SocialActivityLimitLocalServiceWrapper
 	implements ServiceWrapper<SocialActivityLimitLocalService>,
 			   SocialActivityLimitLocalService {
 
-	public SocialActivityLimitLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SocialActivityLimitLocalServiceWrapper(
 		SocialActivityLimitLocalService socialActivityLimitLocalService) {
 

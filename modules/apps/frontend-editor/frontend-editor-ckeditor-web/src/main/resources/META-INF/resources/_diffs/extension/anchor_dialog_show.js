@@ -13,13 +13,13 @@
  */
 
 ckEditor.on('dialogShow', (event) => {
-	const dialog = event.data.definition.dialog;
+	var dialog = event.data.definition.dialog;
 
 	if (dialog.getName() === 'anchor') {
-		const originalFn = dialog.getValueOf.bind(dialog);
+		var originalFn = dialog.getValueOf.bind(dialog);
 
 		dialog.getValueOf = function (pageId, elementId) {
-			let value = originalFn(pageId, elementId);
+			var value = originalFn(pageId, elementId);
 
 			if (pageId === 'info' && elementId === 'txtName') {
 				value = value.replace(/ /g, '_');

@@ -18,7 +18,7 @@ import React, {useState} from 'react';
 
 import {useDispatch} from '../../../app/contexts/StoreContext';
 import addFragmentComment from '../../../app/thunks/addFragmentComment';
-import {useId} from '../../../common/hooks/useId';
+import {useId} from '../../../app/utils/useId';
 import CommentForm from './CommentForm';
 
 export default function AddCommentForm({fragmentEntryLinkId}) {
@@ -70,7 +70,7 @@ export default function AddCommentForm({fragmentEntryLinkId}) {
 	};
 
 	return (
-		<div className="page-editor__fragment-comment__form pt-2 px-3">
+		<div className="px-3">
 			<CommentForm
 				id={pageEditorCommentEditorId}
 				loading={addingComment}

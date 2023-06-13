@@ -17,8 +17,6 @@ package com.liferay.frontend.taglib.clay.servlet.taglib.util;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeSupplier;
 
-import java.util.List;
-
 /**
  * @author Hugo Huijser
  */
@@ -60,15 +58,6 @@ public class DropdownItemListBuilder {
 		return dropdownItemListWrapper.add(unsafeSupplier, unsafeConsumer);
 	}
 
-	public static DropdownItemListWrapper addAll(
-		List<DropdownItem> dropdownItems) {
-
-		DropdownItemListWrapper dropdownItemListWrapper =
-			new DropdownItemListWrapper();
-
-		return dropdownItemListWrapper.addAll(dropdownItems);
-	}
-
 	public static DropdownItemListWrapper addCheckbox(
 		UnsafeConsumer<DropdownCheckboxItem, Exception> unsafeConsumer) {
 
@@ -86,26 +75,6 @@ public class DropdownItemListBuilder {
 			new DropdownItemListWrapper();
 
 		return dropdownItemListWrapper.addCheckbox(
-			unsafeSupplier, unsafeConsumer);
-	}
-
-	public static DropdownItemListWrapper addContext(
-		UnsafeConsumer<DropdownContextItem, Exception> unsafeConsumer) {
-
-		DropdownItemListWrapper dropdownItemListWrapper =
-			new DropdownItemListWrapper();
-
-		return dropdownItemListWrapper.addContext(unsafeConsumer);
-	}
-
-	public static DropdownItemListWrapper addContext(
-		UnsafeSupplier<Boolean, Exception> unsafeSupplier,
-		UnsafeConsumer<DropdownContextItem, Exception> unsafeConsumer) {
-
-		DropdownItemListWrapper dropdownItemListWrapper =
-			new DropdownItemListWrapper();
-
-		return dropdownItemListWrapper.addContext(
 			unsafeSupplier, unsafeConsumer);
 	}
 
@@ -215,18 +184,6 @@ public class DropdownItemListBuilder {
 			return this;
 		}
 
-		public DropdownItemListWrapper addAll(
-			List<DropdownItem> dropdownItems) {
-
-			for (DropdownItem dropdownItem : dropdownItems) {
-				if (dropdownItem != null) {
-					_dropdownItemList.add(dropdownItem);
-				}
-			}
-
-			return this;
-		}
-
 		public DropdownItemListWrapper addCheckbox(
 			UnsafeConsumer<DropdownCheckboxItem, Exception> unsafeConsumer) {
 
@@ -242,30 +199,6 @@ public class DropdownItemListBuilder {
 			try {
 				if (unsafeSupplier.get()) {
 					_dropdownItemList.addCheckbox(unsafeConsumer);
-				}
-			}
-			catch (Exception exception) {
-				throw new RuntimeException(exception);
-			}
-
-			return this;
-		}
-
-		public DropdownItemListWrapper addContext(
-			UnsafeConsumer<DropdownContextItem, Exception> unsafeConsumer) {
-
-			_dropdownItemList.addContext(unsafeConsumer);
-
-			return this;
-		}
-
-		public DropdownItemListWrapper addContext(
-			UnsafeSupplier<Boolean, Exception> unsafeSupplier,
-			UnsafeConsumer<DropdownContextItem, Exception> unsafeConsumer) {
-
-			try {
-				if (unsafeSupplier.get()) {
-					_dropdownItemList.addContext(unsafeConsumer);
 				}
 			}
 			catch (Exception exception) {

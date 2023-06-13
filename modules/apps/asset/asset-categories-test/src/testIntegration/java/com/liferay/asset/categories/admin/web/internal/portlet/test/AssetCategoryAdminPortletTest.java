@@ -25,11 +25,9 @@ import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -53,6 +51,8 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -108,7 +108,7 @@ public class AssetCategoryAdminPortletTest {
 
 		AssetCategory childAssetCategory1 =
 			_assetCategoryLocalService.addCategory(
-				null, TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(),
 				parentAssetCategory.getCategoryId(),
 				HashMapBuilder.put(
 					LocaleUtil.US, RandomTestUtil.randomString()
@@ -119,7 +119,7 @@ public class AssetCategoryAdminPortletTest {
 
 		AssetCategory childAssetCategory2 =
 			_assetCategoryLocalService.addCategory(
-				null, TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(),
 				parentAssetCategory.getCategoryId(),
 				HashMapBuilder.put(
 					LocaleUtil.US, RandomTestUtil.randomString()
@@ -175,20 +175,29 @@ public class AssetCategoryAdminPortletTest {
 				0, 0, 0, WorkflowConstants.STATUS_APPROVED,
 				new ServiceContext());
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"assetDisplayPageId",
 			String.valueOf(
 				layoutPageTemplateEntry.getLayoutPageTemplateEntryId()));
-		mockLiferayPortletActionRequest.addParameter(
+
+		Stream<AssetCategory> stream = assetCategories.stream();
+
+		List<String> categoryIds = stream.map(
+			AssetCategory::getCategoryId
+		).map(
+			String::valueOf
+		).collect(
+			Collectors.toList()
+		);
+
+		actionRequest.addParameter(
 			"categoryIds",
-			TransformUtil.transformToArray(
-				assetCategories,
-				assetCategory -> String.valueOf(assetCategory.getCategoryId()),
-				String.class));
-		mockLiferayPortletActionRequest.addParameter(
+			categoryIds.toArray(categoryIds.toArray(new String[0])));
+
+		actionRequest.addParameter(
 			"displayPageType",
 			String.valueOf(AssetDisplayPageConstants.TYPE_SPECIFIC));
 
@@ -198,14 +207,12 @@ public class AssetCategoryAdminPortletTest {
 		themeDisplay.setScopeGroupId(_group.getGroupId());
 		themeDisplay.setUser(_user);
 
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
 
 		ReflectionTestUtil.invoke(
-			_mvcActionCommand, "doProcessAction",
+			_portlet, "setCategoryDisplayPageTemplate",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			mockLiferayPortletActionRequest,
-			new MockLiferayPortletActionResponse());
+			actionRequest, new MockLiferayPortletActionResponse());
 
 		long classNameId = _portal.getClassNameId(
 			AssetCategory.class.getName());
@@ -246,11 +253,6 @@ public class AssetCategoryAdminPortletTest {
 	@Inject
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
-
-	@Inject(
-		filter = "mvc.command.name=/asset_categories_admin/set_asset_category_display_page_template"
-	)
-	private MVCActionCommand _mvcActionCommand;
 
 	@Inject
 	private Portal _portal;

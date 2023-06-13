@@ -15,8 +15,6 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
@@ -233,7 +231,6 @@ public class CountryServiceImpl extends CountryServiceBaseImpl {
 		return countryLocalService.getCountryByNumber(companyId, number);
 	}
 
-	@JSONWebService(mode = JSONWebServiceMode.IGNORE)
 	@Override
 	public BaseModelSearchResult<Country> searchCountries(
 			long companyId, Boolean active, String keywords, int start, int end,

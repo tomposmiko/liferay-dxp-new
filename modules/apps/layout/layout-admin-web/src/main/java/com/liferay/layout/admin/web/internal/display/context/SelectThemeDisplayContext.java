@@ -16,23 +16,21 @@ package com.liferay.layout.admin.web.internal.display.context;
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.admin.web.internal.util.comparator.ThemeNameComparator;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.ThemeLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.site.display.context.GroupDisplayContextHelper;
+import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 
 import java.util.List;
-import java.util.Objects;
 
 import javax.portlet.PortletURL;
 
@@ -82,9 +80,8 @@ public class SelectThemeDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
-			"select-order-by-col", "name");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "name");
 
 		return _orderByCol;
 	}
@@ -94,9 +91,8 @@ public class SelectThemeDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
-			"select-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -186,20 +182,24 @@ public class SelectThemeDisplayContext {
 		GroupDisplayContextHelper groupDisplayContextHelper =
 			new GroupDisplayContextHelper(_httpServletRequest);
 
+		List<Theme> themes = ThemeLocalServiceUtil.getPageThemes(
+			themeDisplay.getCompanyId(),
+			groupDisplayContextHelper.getLiveGroupId(),
+			themeDisplay.getUserId());
+
+		themesSearchContainer.setTotal(themes.size());
+
 		boolean orderByAsc = false;
 
-		if (Objects.equals(getOrderByType(), "asc")) {
+		String orderByType = getOrderByType();
+
+		if (orderByType.equals("asc")) {
 			orderByAsc = true;
 		}
 
-		List<Theme> themes = ListUtil.sort(
-			ThemeLocalServiceUtil.getPageThemes(
-				themeDisplay.getCompanyId(),
-				groupDisplayContextHelper.getLiveGroupId(),
-				themeDisplay.getUserId()),
-			new ThemeNameComparator(orderByAsc));
+		themes = ListUtil.sort(themes, new ThemeNameComparator(orderByAsc));
 
-		themesSearchContainer.setResultsAndTotal(() -> themes, themes.size());
+		themesSearchContainer.setResults(themes);
 
 		_themesSearchContainer = themesSearchContainer;
 

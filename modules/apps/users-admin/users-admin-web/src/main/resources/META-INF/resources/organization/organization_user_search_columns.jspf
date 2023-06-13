@@ -46,23 +46,26 @@
 					</h5>
 
 					<h6 class="text-default">
-						<liferay-ui:message key="<%= curOrganization.getType() %>" />
+						<%= LanguageUtil.get(request, curOrganization.getType()) %>
 					</h6>
 				</liferay-ui:search-container-column-text>
 
-				<liferay-ui:search-container-column-text>
-					<clay:dropdown-actions
-						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-						dropdownItems="<%= organizationActionDropdownItems.getActionDropdownItems() %>"
-						propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-					/>
-				</liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-jsp
+					cssClass="entry-action-column"
+					path="/organization_action.jsp"
+				/>
 			</c:when>
 			<c:when test='<%= displayStyle.equals("icon") %>'>
 				<liferay-ui:search-container-column-text>
-					<clay:vertical-card
-						propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-						verticalCard="<%= new OrganizationVerticalCard(organizationActionDropdownItems.getActionDropdownItems(), curOrganization, renderRequest, organizationUserSearchContainer.getRowChecker(), rowURL) %>"
+					<liferay-frontend:icon-vertical-card
+						actionJsp="/organization_action.jsp"
+						actionJspServletContext="<%= application %>"
+						icon="organizations"
+						resultRow="<%= row %>"
+						rowChecker="<%= organizationUserSearchContainer.getRowChecker() %>"
+						subtitle="<%= LanguageUtil.get(request, curOrganization.getType()) %>"
+						title="<%= curOrganization.getName() %>"
+						url="<%= String.valueOf(rowURL) %>"
 					/>
 				</liferay-ui:search-container-column-text>
 			</c:when>
@@ -88,13 +91,9 @@
 					value=""
 				/>
 
-				<liferay-ui:search-container-column-text>
-					<clay:dropdown-actions
-						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-						dropdownItems="<%= organizationActionDropdownItems.getActionDropdownItems() %>"
-						propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-					/>
-				</liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-jsp
+					path="/organization_action.jsp"
+				/>
 			</c:otherwise>
 		</c:choose>
 	</c:when>
@@ -131,31 +130,30 @@
 					</h5>
 
 					<h6 class="text-default">
-						<liferay-ui:message key="user" />
+						<%= LanguageUtil.get(request, "user") %>
 					</h6>
 
 					<h6 class="text-default">
-						<liferay-ui:message key="<%= userStatus %>" />
+						<%= LanguageUtil.get(request, userStatus) %>
 					</h6>
 				</liferay-ui:search-container-column-text>
 
-				<%
-				UserActionDropdownItems userActionDropdownItems = new UserActionDropdownItems(renderRequest, renderResponse, user2);
-				%>
-
-				<liferay-ui:search-container-column-text>
-					<clay:dropdown-actions
-						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-						dropdownItems="<%= userActionDropdownItems.getActionDropdownItems() %>"
-						propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-					/>
-				</liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-jsp
+					cssClass="entry-action-column"
+					path="/user_action.jsp"
+				/>
 			</c:when>
 			<c:when test='<%= displayStyle.equals("icon") %>'>
 				<liferay-ui:search-container-column-text>
-					<clay:user-card
-						propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-						userCard="<%= new UserVerticalCard(renderRequest, renderResponse, organizationUserSearchContainer.getRowChecker(), true, user2) %>"
+					<liferay-frontend:user-vertical-card
+						actionJsp="/user_action.jsp"
+						actionJspServletContext="<%= application %>"
+						resultRow="<%= row %>"
+						rowChecker="<%= organizationUserSearchContainer.getRowChecker() %>"
+						subtitle='<%= LanguageUtil.get(request, "user") %>'
+						title="<%= user2.getFullName() %>"
+						url="<%= String.valueOf(rowURL) %>"
+						userId="<%= user2.getUserId() %>"
 					/>
 				</liferay-ui:search-container-column-text>
 			</c:when>
@@ -182,17 +180,10 @@
 					value="<%= LanguageUtil.get(request, userStatus) %>"
 				/>
 
-				<%
-				UserActionDropdownItems userActionDropdownItems = new UserActionDropdownItems(renderRequest, renderResponse, user2);
-				%>
-
-				<liferay-ui:search-container-column-text>
-					<clay:dropdown-actions
-						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-						dropdownItems="<%= userActionDropdownItems.getActionDropdownItems() %>"
-						propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-					/>
-				</liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-jsp
+					cssClass="entry-action-column"
+					path="/user_action.jsp"
+				/>
 			</c:otherwise>
 		</c:choose>
 	</c:otherwise>

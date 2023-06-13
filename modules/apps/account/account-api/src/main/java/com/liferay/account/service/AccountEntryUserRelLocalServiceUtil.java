@@ -72,15 +72,12 @@ public class AccountEntryUserRelLocalServiceUtil {
 	public static AccountEntryUserRel addAccountEntryUserRel(
 			long accountEntryId, long creatorUserId, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, String jobTitle,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			String middleName, String lastName, long prefixId, long suffixId)
 		throws PortalException {
 
 		return getService().addAccountEntryUserRel(
 			accountEntryId, creatorUserId, screenName, emailAddress, locale,
-			firstName, middleName, lastName, prefixListTypeId, suffixListTypeId,
-			jobTitle, serviceContext);
+			firstName, middleName, lastName, prefixId, suffixId);
 	}
 
 	public static AccountEntryUserRel addAccountEntryUserRelByEmailAddress(
@@ -104,15 +101,12 @@ public class AccountEntryUserRelLocalServiceUtil {
 	public static AccountEntryUserRel addPersonTypeAccountEntryUserRel(
 			long accountEntryId, long creatorUserId, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, String jobTitle,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			String middleName, String lastName, long prefixId, long suffixId)
 		throws PortalException {
 
 		return getService().addPersonTypeAccountEntryUserRel(
 			accountEntryId, creatorUserId, screenName, emailAddress, locale,
-			firstName, middleName, lastName, prefixListTypeId, suffixListTypeId,
-			jobTitle, serviceContext);
+			firstName, middleName, lastName, prefixId, suffixId);
 	}
 
 	/**
@@ -418,21 +412,6 @@ public class AccountEntryUserRelLocalServiceUtil {
 		long accountEntryId, long userId) {
 
 		return getService().hasAccountEntryUserRel(accountEntryId, userId);
-	}
-
-	public static void inviteUser(
-			long accountEntryId, long[] accountRoleIds, String emailAddress,
-			com.liferay.portal.kernel.model.User inviter,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		getService().inviteUser(
-			accountEntryId, accountRoleIds, emailAddress, inviter,
-			serviceContext);
-	}
-
-	public static boolean isAccountEntryUser(long userId) {
-		return getService().isAccountEntryUser(userId);
 	}
 
 	public static void setPersonTypeAccountEntryUser(

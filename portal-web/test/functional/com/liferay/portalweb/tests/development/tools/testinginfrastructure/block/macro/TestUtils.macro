@@ -1,101 +1,28 @@
 definition {
 
-	macro assertElementFocused {
-		var javascript = '''
-var e = document.evaluate("${element}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-var aE = document.activeElement;
-
-return	aE.isEqualNode(e).toString();
-		''';
-
-		var focused = selenium.getEval(${javascript});
-
-		if (${focused} != "true") {
-			TestUtils.fail(message = "FAILED: Element is not focused");
-		}
-	}
-
-	macro assertElementNotFocused {
-		var javascript = '''
-var e = document.evaluate("${element}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-var aE = document.activeElement;
-
-return	aE.isEqualNode(e).toString();
-		''';
-
-		var focused = selenium.getEval(${javascript});
-
-		if (${focused} != "false") {
-			TestUtils.fail(message = "FAILED: Element is focused");
-		}
-	}
-
 	macro assertEquals {
-		echo(${expected});
+		echo("${expected}");
 
-		echo(${actual});
+		echo("${actual}");
 
-		if (${expected} == ${actual}) {
+		if ("${expected}" == "${actual}") {
 			echo("PASSED");
 		}
 		else {
-			TestUtils.fail(message = "FAILED: expected '${expected}', actual was '${actual}'");
+			TestUtils.fail(message = "FAILED: expected &apos;${expected}&apos;, actual was &apos;${actual}&apos;");
 		}
 	}
 
 	macro assertNotEquals {
-		echo(${expected});
+		echo("${expected}");
 
-		echo(${actual});
+		echo("${actual}");
 
-		if (${expected} != ${actual}) {
+		if ("${expected}" != "${actual}") {
 			echo("PASSED");
 		}
 		else {
-			TestUtils.fail(message = "FAILED: '${expected}' equals '${actual}'");
-		}
-	}
-
-	macro assertPartialAttributeValue {
-		var attributeValue = selenium.getAttribute("${element}@${attribute}");
-
-		if (contains(${attributeValue}, ${value})) {
-			echo("PASSED");
-		}
-		else {
-			TestUtils.fail(message = "FAILED: Expected text '${value}' does not match actual text '${attributeValue}'");
-		}
-	}
-
-	macro assertPartialEquals {
-		echo(${expected});
-
-		echo(${actual});
-
-		if (contains(${actual}, ${expected})) {
-			echo("PASSED");
-		}
-		else {
-			TestUtils.fail(message = "FAILED: Expected text '${expected}' does not match actual text '${actual}'");
-		}
-	}
-
-	macro assertTruncatedText {
-		WaitForSPARefresh();
-
-		var javascript = '''
-var element = document.evaluate("${element}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-return (element.offsetWidth < element.scrollWidth).toString();
-
-		''';
-
-		var isTruncated = selenium.getEval(${javascript});
-
-		if (${isTruncated} != "true") {
-			TestUtils.fail(message = "FAILED: The text is not truncated");
+			TestUtils.fail(message = "FAILED: &apos;${expected}&apos; equals &apos;${actual}&apos;");
 		}
 	}
 
@@ -104,11 +31,9 @@ return (element.offsetWidth < element.scrollWidth).toString();
 			var message = "FAIL";
 		}
 
-		echo(${message});
+		echo("${message}");
 
-		takeScreenshot();
-
-		fail(${message});
+		fail("${message}");
 	}
 
 	macro getElementTextContent {
@@ -120,67 +45,35 @@ var element = document.evaluate("${element}", document, null, XPathResult.FIRST_
 return element.textContent;
 		''';
 
-		var textContent = selenium.getEval(${javascript});
+		var textContent = selenium.getEval("${javascript}");
 
-		return ${textContent};
-	}
-
-	macro getScreenHeight {
-		WaitForSPARefresh();
-
-		var screenHeight = selenium.getEval("return	screen.height.toString();");
-
-		return ${screenHeight};
-	}
-
-	macro getScreenWidth {
-		WaitForSPARefresh();
-
-		var screenWidth = selenium.getEval("return screen.width.toString();");
-
-		return ${screenWidth};
+		return "${textContent}";
 	}
 
 	macro hardRefresh {
 		var mac = OSDetector.isApple();
 
-		if (${mac} == "true") {
+		if ("${mac}" == "true") {
 			RobotType.robotTypeShortcut(locator1 = "Shift + Command + r");
 		}
+
 		else {
 			RobotType.robotTypeShortcut(locator1 = "Ctrl + Shift + r");
 		}
-
-		WaitForPageLoad();
 	}
 
 	macro isGreaterThan {
-		echo(${expected});
+		echo("${expected}");
 
-		echo(${actual});
+		echo("${actual}");
 
-		var result = MathUtil.isGreaterThan(${actual}, ${expected});
+		var result = MathUtil.isGreaterThan("${actual}", "${expected}");
 
-		if (${result} == "true") {
+		if ("${result}" == "true") {
 			echo("PASSED");
 		}
 		else {
-			TestUtils.fail(message = "FAILED: actual '${actual}' is less than or equals to expected '${expected}'");
-		}
-	}
-
-	macro isLessThan {
-		echo(${expected});
-
-		echo(${actual});
-
-		var result = MathUtil.isLessThan(${actual}, ${expected});
-
-		if (${result} == "true") {
-			echo("PASSED");
-		}
-		else {
-			TestUtils.fail(message = "FAILED: actual '${actual}' is greater than or equals to expected '${expected}'");
+			TestUtils.fail(message = "FAILED: actual &apos;${actual}&apos; is less than or equals to expected &apos;${expected}&apos;");
 		}
 	}
 
@@ -189,7 +82,7 @@ return element.textContent;
 			var message = "PASS";
 		}
 
-		echo(${message});
+		echo("${message}");
 	}
 
 	macro typeIntoField {
@@ -199,7 +92,7 @@ return element.textContent;
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Test Page Name");
+		SitePages.addPublicPage(pageName = "Test Page Name");
 	}
 
 }

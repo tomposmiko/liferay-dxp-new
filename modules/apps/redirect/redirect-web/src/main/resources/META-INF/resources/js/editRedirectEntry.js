@@ -12,7 +12,7 @@
  * details.
  */
 
-import {createResourceURL, fetch, openToast, postForm} from 'frontend-js-web';
+import {openToast} from 'frontend-js-web';
 
 export default function ({
 	getRedirectEntryChainCauseURL,
@@ -58,11 +58,14 @@ export default function ({
 			destinationURL.blur();
 		}
 		else {
-			fetch(
-				createResourceURL(getRedirectEntryChainCauseURL, {
-					destinationURL: destinationURL.value,
-					sourceURL: sourceURL.value,
-				})
+			Liferay.Util.fetch(
+				Liferay.Util.PortletURL.createResourceURL(
+					getRedirectEntryChainCauseURL,
+					{
+						destinationURL: destinationURL.value,
+						sourceURL: sourceURL.value,
+					}
+				)
 			)
 				.then((response) => {
 					return response.json();
@@ -92,7 +95,7 @@ export default function ({
 				ChainedRedirections.open(
 					redirectEntryChainCause,
 					(updateChainedRedirectEntries) => {
-						postForm(form, {
+						Liferay.Util.postForm(form, {
 							data: {
 								updateChainedRedirectEntries,
 							},

@@ -26,6 +26,18 @@ import java.sql.ResultSet;
  */
 public class DDMFormInstanceRecordVersionUpgradeProcess extends UpgradeProcess {
 
+	protected void deleteDDLRecordVersion(long recordVersionId)
+		throws Exception {
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"delete from DDLRecordVersion where recordVersionId = ?")) {
+
+			preparedStatement.setLong(1, recordVersionId);
+
+			preparedStatement.executeUpdate();
+		}
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
@@ -77,24 +89,12 @@ public class DDMFormInstanceRecordVersionUpgradeProcess extends UpgradeProcess {
 				preparedStatement2.setLong(
 					15, resultSet.getLong("DDMStorageId"));
 
-				_deleteDDLRecordVersion(recordVersionId);
+				deleteDDLRecordVersion(recordVersionId);
 
 				preparedStatement2.addBatch();
 			}
 
 			preparedStatement2.executeBatch();
-		}
-	}
-
-	private void _deleteDDLRecordVersion(long recordVersionId)
-		throws Exception {
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				"delete from DDLRecordVersion where recordVersionId = ?")) {
-
-			preparedStatement.setLong(1, recordVersionId);
-
-			preparedStatement.executeUpdate();
 		}
 	}
 

@@ -32,15 +32,17 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @Component(
-	property = "javax.portlet.name=" + RSSPortletKeys.RSS,
+	immediate = true, property = "javax.portlet.name=" + RSSPortletKeys.RSS,
 	service = ConfigurationAction.class
 )
 public class RSSConfigurationAction extends DefaultConfigurationAction {
@@ -56,16 +58,24 @@ public class RSSConfigurationAction extends DefaultConfigurationAction {
 			ActionResponse actionResponse)
 		throws Exception {
 
-		_updateSubscriptions(actionRequest);
+		updateSubscriptions(actionRequest);
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	private void _updateSubscriptions(ActionRequest actionRequest)
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.rss.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected void updateSubscriptions(ActionRequest actionRequest)
 		throws Exception {
 
 		UnicodeProperties unicodeProperties = PropertiesParamUtil.getProperties(
-			actionRequest, "preferences--");
+			actionRequest, _PARAMETER_NAME_PREFIX);
 
 		long entriesPerFeed = GetterUtil.getLong(
 			unicodeProperties.getProperty("entriesPerFeed"));
@@ -110,5 +120,7 @@ public class RSSConfigurationAction extends DefaultConfigurationAction {
 		setPreference(actionRequest, "urls", urls);
 		setPreference(actionRequest, "titles", titles);
 	}
+
+	private static final String _PARAMETER_NAME_PREFIX = "preferences--";
 
 }

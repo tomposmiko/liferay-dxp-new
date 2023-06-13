@@ -14,15 +14,21 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.io.File;
+import com.liferay.jenkins.results.parser.testray.TestrayBuild;
+import com.liferay.jenkins.results.parser.testray.TestrayRoutine;
+
 import java.io.IOException;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,12 +36,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -56,78 +61,31 @@ public class CISystemStatusReportUtil {
 	}
 
 	public static void writeTestrayDataJavaScriptFile(
-			String filePath, String jobName, final String testSuiteName)
+			String filePath, TestrayRoutine testrayRoutine, String nameFilter)
 		throws IOException {
 
-		List<Callable<File>> callables = new ArrayList<>();
+		List<Callable<String>> callables = new ArrayList<>();
 
-		List<File> jenkinsConsoleGzFiles = _getJenkinsConsoleGzFiles(jobName);
+		for (LocalDate localDate : _recentTestrayBuilds.keySet()) {
+			List<TestrayBuild> builds = testrayRoutine.getTestrayBuilds(
+				200, localDate.toString(), nameFilter);
 
-		for (final File jenkinsConsoleGzFile : jenkinsConsoleGzFiles) {
-			callables.add(
-				new Callable<File>() {
+			_recentTestrayBuilds.put(localDate, builds);
 
-					@Override
-					public File call() throws Exception {
-						long start =
-							JenkinsResultsParserUtil.getCurrentTimeMillis();
+			for (final TestrayBuild testrayBuild : builds) {
+				callables.add(
+					new Callable<String>() {
 
-						try {
-							TopLevelBuildReport topLevelBuildReport =
-								BuildReportFactory.newTopLevelBuildReport(
-									jenkinsConsoleGzFile);
-
-							if ((topLevelBuildReport == null) ||
-								!Objects.equals(
-									testSuiteName,
-									topLevelBuildReport.getTestSuiteName())) {
-
-								return null;
-							}
-
-							LocalDate localDate =
-								JenkinsResultsParserUtil.getLocalDate(
-									topLevelBuildReport.getStartDate());
-
-							if (!_results.containsKey(localDate)) {
-								return null;
-							}
-
-							List<Result> results = _results.get(localDate);
-
-							results.add(new Result(topLevelBuildReport));
-
-							return jenkinsConsoleGzFile;
+						@Override
+						public String call() throws Exception {
+							return testrayBuild.getResult();
 						}
-						catch (Exception exception) {
-							RuntimeException runtimeException =
-								new RuntimeException(
-									JenkinsResultsParserUtil.getCanonicalPath(
-										jenkinsConsoleGzFile),
-									exception);
 
-							runtimeException.printStackTrace();
-
-							return null;
-						}
-						finally {
-							long end =
-								JenkinsResultsParserUtil.getCurrentTimeMillis();
-
-							System.out.println(
-								JenkinsResultsParserUtil.combine(
-									JenkinsResultsParserUtil.getCanonicalPath(
-										jenkinsConsoleGzFile),
-									" processed in ",
-									JenkinsResultsParserUtil.toDurationString(
-										end - start)));
-						}
-					}
-
-				});
+					});
+			}
 		}
 
-		ParallelExecutor<File> parallelExecutor = new ParallelExecutor<>(
+		ParallelExecutor<String> parallelExecutor = new ParallelExecutor<>(
 			callables, _executorService);
 
 		parallelExecutor.execute();
@@ -175,21 +133,36 @@ public class CISystemStatusReportUtil {
 		JSONArray datesJSONArray = new JSONArray();
 		JSONArray durationsJSONArray = new JSONArray();
 
-		List<LocalDate> localDates = new ArrayList<>(_results.keySet());
+		List<LocalDate> dates = new ArrayList<>(_recentTestrayBuilds.keySet());
 
-		Collections.sort(localDates);
+		Collections.sort(dates);
 
-		for (LocalDate localDate : localDates) {
+		for (LocalDate date : dates) {
 			List<Long> durations = new ArrayList<>();
 
-			for (Result result : _results.get(localDate)) {
-				durations.addAll(result.getDownstreamDuration());
+			for (TestrayBuild testrayBuild : _recentTestrayBuilds.get(date)) {
+				List<Long> downstreamDurations =
+					testrayBuild.getDownstreamBuildDurations();
+
+				if (downstreamDurations == null) {
+					continue;
+				}
+
+				for (Long downstreamDuration : downstreamDurations) {
+					if ((downstreamDuration == null) ||
+						(downstreamDuration < 0)) {
+
+						continue;
+					}
+
+					durations.add(downstreamDuration);
+				}
 			}
 
 			durations.removeAll(Collections.singleton(null));
 
 			if (durations.isEmpty()) {
-				datesJSONArray.put(localDate.toString());
+				datesJSONArray.put(date.toString());
 			}
 			else {
 				String meanDuration = JenkinsResultsParserUtil.combine(
@@ -198,7 +171,7 @@ public class CISystemStatusReportUtil {
 						JenkinsResultsParserUtil.getAverage(durations)));
 
 				datesJSONArray.put(
-					new String[] {localDate.toString(), meanDuration});
+					new String[] {date.toString(), meanDuration});
 			}
 
 			Collections.sort(durations);
@@ -206,71 +179,10 @@ public class CISystemStatusReportUtil {
 			durationsJSONArray.put(durations);
 		}
 
-		datesDurationsJSONObject.put(
-			"dates", datesJSONArray
-		).put(
-			"durations", durationsJSONArray
-		);
+		datesDurationsJSONObject.put("dates", datesJSONArray);
+		datesDurationsJSONObject.put("durations", durationsJSONArray);
 
 		return datesDurationsJSONObject;
-	}
-
-	private static List<File> _getJenkinsConsoleGzFiles(String jobName) {
-		List<File> jenkinsConsoleGzFiles = new ArrayList<>();
-
-		for (String dateString : _dateStrings) {
-			File testrayLogsDateDir = new File(_TESTRAY_LOGS_DIR, dateString);
-
-			if (!testrayLogsDateDir.exists()) {
-				continue;
-			}
-
-			Process process;
-
-			try {
-				process = JenkinsResultsParserUtil.executeBashCommands(
-					true, _TESTRAY_LOGS_DIR, 1000 * 60 * 60,
-					JenkinsResultsParserUtil.combine(
-						"find ", dateString, "/*/",
-						JenkinsResultsParserUtil.escapeForBash(jobName),
-						"/*/jenkins-console.txt.gz"));
-			}
-			catch (IOException | TimeoutException exception) {
-				continue;
-			}
-
-			int exitValue = process.exitValue();
-
-			if (exitValue != 0) {
-				continue;
-			}
-
-			String output = null;
-
-			try {
-				output = JenkinsResultsParserUtil.readInputStream(
-					process.getInputStream());
-
-				output = output.replace(
-					"Finished executing Bash commands.\n", "");
-
-				output = output.trim();
-			}
-			catch (IOException ioException) {
-				continue;
-			}
-
-			if (JenkinsResultsParserUtil.isNullOrEmpty(output)) {
-				continue;
-			}
-
-			for (String jenkinsConsoleGzFilePath : output.split("\n")) {
-				jenkinsConsoleGzFiles.add(
-					new File(_TESTRAY_LOGS_DIR, jenkinsConsoleGzFilePath));
-			}
-		}
-
-		return jenkinsConsoleGzFiles;
 	}
 
 	private static JSONObject _getRelevantSuiteBuildDataJSONObject() {
@@ -281,50 +193,47 @@ public class CISystemStatusReportUtil {
 		JSONArray passedBuildsJSONArray = new JSONArray();
 		JSONArray unstableBuildsJSONArray = new JSONArray();
 
-		List<LocalDate> localDates = new ArrayList<>(_results.keySet());
+		List<LocalDate> dates = new ArrayList<>(_recentTestrayBuilds.keySet());
 
-		Collections.sort(localDates);
+		Collections.sort(dates);
 
-		for (LocalDate localDate : localDates) {
+		for (LocalDate date : dates) {
 			int failedBuilds = 0;
 			int passedBuilds = 0;
 			int unstableBuilds = 0;
 
-			for (Result result : _results.get(localDate)) {
-				String topLevelResult = result.getTopLevelResult();
+			for (TestrayBuild testrayBuild : _recentTestrayBuilds.get(date)) {
+				String result = testrayBuild.getResult();
 
-				if (topLevelResult.equals("FAILURE")) {
+				if (result.equals("FAILURE")) {
 					failedBuilds++;
 
 					continue;
 				}
 
-				if (topLevelResult.equals("SUCCESS")) {
+				if (result.equals("SUCCESS")) {
 					passedBuilds++;
 
 					continue;
 				}
 
-				if (topLevelResult.equals("APPROVED")) {
+				if (result.equals("APPROVED")) {
 					unstableBuilds++;
 				}
 			}
 
-			datesJSONArray.put(localDate.toString());
-			failedBuildsJSONArray.put(failedBuilds);
+			datesJSONArray.put(date.toString());
 			passedBuildsJSONArray.put(passedBuilds);
+			failedBuildsJSONArray.put(failedBuilds);
 			unstableBuildsJSONArray.put(unstableBuilds);
 		}
 
+		relevantSuiteBuildDataJSONObject.put("dates", datesJSONArray);
+		relevantSuiteBuildDataJSONObject.put("failed", failedBuildsJSONArray);
 		relevantSuiteBuildDataJSONObject.put(
-			"dates", datesJSONArray
-		).put(
-			"failed", failedBuildsJSONArray
-		).put(
-			"succeeded", passedBuildsJSONArray
-		).put(
-			"unstable", unstableBuildsJSONArray
-		);
+			"succeeded", passedBuildsJSONArray);
+		relevantSuiteBuildDataJSONObject.put(
+			"unstable", unstableBuildsJSONArray);
 
 		return relevantSuiteBuildDataJSONObject;
 	}
@@ -385,10 +294,32 @@ public class CISystemStatusReportUtil {
 		int unstableBuilds = 0;
 
 		for (LocalDate localDate : localDates) {
-			for (Result result : _results.get(localDate)) {
-				LocalDateTime localDateTime =
-					JenkinsResultsParserUtil.getLocalDateTime(
-						result.getTopLevelStartDate());
+			for (TestrayBuild testrayBuild :
+					_recentTestrayBuilds.get(localDate)) {
+
+				String testrayBuildName = testrayBuild.getName();
+
+				Matcher matcher = _dateTimePattern.matcher(testrayBuildName);
+
+				if (!matcher.find()) {
+					continue;
+				}
+
+				Date date;
+
+				try {
+					date = _simpleDateFormat.parse(matcher.group("date"));
+				}
+				catch (ParseException parseException) {
+					throw new RuntimeException(parseException);
+				}
+
+				Instant instant = Instant.ofEpochMilli(date.getTime());
+
+				ZonedDateTime zonedDateTime = instant.atZone(
+					ZoneId.systemDefault());
+
+				LocalDateTime localDateTime = zonedDateTime.toLocalDateTime();
 
 				if ((startLocalDateTime.compareTo(localDateTime) >= 0) ||
 					(endLocalDateTime.compareTo(localDateTime) <= 0)) {
@@ -396,21 +327,21 @@ public class CISystemStatusReportUtil {
 					continue;
 				}
 
-				String topLevelResult = result.getTopLevelResult();
+				String testrayBuildResult = testrayBuild.getResult();
 
-				if (topLevelResult.equals("FAILURE")) {
+				if (testrayBuildResult.equals("FAILURE")) {
 					failedBuilds++;
 
 					continue;
 				}
 
-				if (topLevelResult.equals("SUCCESS")) {
+				if (testrayBuildResult.equals("SUCCESS")) {
 					passedBuilds++;
 
 					continue;
 				}
 
-				if (topLevelResult.equals("APPROVED")) {
+				if (testrayBuildResult.equals("APPROVED")) {
 					unstableBuilds++;
 				}
 			}
@@ -435,17 +366,17 @@ public class CISystemStatusReportUtil {
 		JSONArray datesJSONArray = new JSONArray();
 		JSONArray durationsJSONArray = new JSONArray();
 
-		List<LocalDate> dates = new ArrayList<>(_results.keySet());
+		List<LocalDate> dates = new ArrayList<>(_recentTestrayBuilds.keySet());
 
 		Collections.sort(dates);
 
 		for (LocalDate date : dates) {
 			List<Long> durations = new ArrayList<>();
 
-			for (Result result : _results.get(date)) {
-				long duration = result.getTopLevelActiveDuration();
+			for (TestrayBuild testrayBuild : _recentTestrayBuilds.get(date)) {
+				Long duration = testrayBuild.getTopLevelActiveBuildDuration();
 
-				if (duration < 0) {
+				if ((duration == null) || (duration < 0)) {
 					continue;
 				}
 
@@ -472,11 +403,8 @@ public class CISystemStatusReportUtil {
 			durationsJSONArray.put(durations);
 		}
 
-		jsonObject.put(
-			"dates", datesJSONArray
-		).put(
-			"durations", durationsJSONArray
-		);
+		jsonObject.put("dates", datesJSONArray);
+		jsonObject.put("durations", durationsJSONArray);
 
 		return jsonObject;
 	}
@@ -487,17 +415,17 @@ public class CISystemStatusReportUtil {
 		JSONArray datesJSONArray = new JSONArray();
 		JSONArray durationsJSONArray = new JSONArray();
 
-		List<LocalDate> dates = new ArrayList<>(_results.keySet());
+		List<LocalDate> dates = new ArrayList<>(_recentTestrayBuilds.keySet());
 
 		Collections.sort(dates);
 
 		for (LocalDate date : dates) {
 			List<Long> durations = new ArrayList<>();
 
-			for (Result result : _results.get(date)) {
-				long duration = result.getTopLevelDuration();
+			for (TestrayBuild testrayBuild : _recentTestrayBuilds.get(date)) {
+				Long duration = testrayBuild.getTopLevelBuildDuration();
 
-				if (duration < 0) {
+				if ((duration == null) || (duration < 0)) {
 					continue;
 				}
 
@@ -524,111 +452,33 @@ public class CISystemStatusReportUtil {
 			durationsJSONArray.put(durations);
 		}
 
-		jsonObject.put(
-			"dates", datesJSONArray
-		).put(
-			"durations", durationsJSONArray
-		);
+		jsonObject.put("dates", datesJSONArray);
+		jsonObject.put("durations", durationsJSONArray);
 
 		return jsonObject;
 	}
 
 	private static final int _DAYS_PER_WEEK = 7;
 
-	private static final File _TESTRAY_LOGS_DIR;
-
-	private static final Properties _buildProperties;
-	private static final List<String> _dateStrings = new ArrayList<>();
+	private static final Pattern _dateTimePattern = Pattern.compile(
+		".*(?<date>\\d{4}-\\d{2}-\\d{2}\\[\\d{2}:\\d{2}:\\d{2}\\]).*");
 	private static final ExecutorService _executorService =
 		JenkinsResultsParserUtil.getNewThreadPoolExecutor(25, true);
-	private static final HashMap<LocalDate, List<Result>> _results;
-
-	private static class Result {
-
-		public List<Long> getDownstreamDuration() {
-			return _downstreamDurations;
-		}
-
-		public Long getTopLevelActiveDuration() {
-			return _topLevelActiveDuration;
-		}
-
-		public Long getTopLevelDuration() {
-			return _topLevelDuration;
-		}
-
-		public String getTopLevelResult() {
-			return _topLevelResult;
-		}
-
-		public Date getTopLevelStartDate() {
-			return _topLevelStartDate;
-		}
-
-		private Result(TopLevelBuildReport topLevelBuildReport) {
-			_topLevelActiveDuration =
-				topLevelBuildReport.getTopLevelActiveDuration();
-			_topLevelDuration = topLevelBuildReport.getDuration();
-			_topLevelResult = topLevelBuildReport.getResult();
-			_topLevelStartDate = topLevelBuildReport.getStartDate();
-
-			for (DownstreamBuildReport downstreamBuildReport :
-					topLevelBuildReport.getDownstreamBuildReports()) {
-
-				long downstreamDuration = downstreamBuildReport.getDuration();
-
-				if (downstreamDuration <= 0L) {
-					continue;
-				}
-
-				_downstreamDurations.add(downstreamDuration);
-			}
-		}
-
-		private final List<Long> _downstreamDurations = new ArrayList<>();
-		private final Long _topLevelActiveDuration;
-		private final Long _topLevelDuration;
-		private final String _topLevelResult;
-		private final Date _topLevelStartDate;
-
-	}
+	private static final HashMap<LocalDate, List<TestrayBuild>>
+		_recentTestrayBuilds;
+	private static final SimpleDateFormat _simpleDateFormat =
+		new SimpleDateFormat("yyyy-MM-dd[HH:mm:ss]");
 
 	static {
-		_results = new HashMap<LocalDate, List<Result>>() {
+		_recentTestrayBuilds = new HashMap<LocalDate, List<TestrayBuild>>() {
 			{
 				LocalDate localDate = LocalDate.now(ZoneOffset.UTC);
 
 				for (int i = 0; i <= (_DAYS_PER_WEEK * 2); i++) {
-					put(localDate.minusDays(i), new ArrayList<Result>());
+					put(localDate.minusDays(i), new ArrayList<TestrayBuild>());
 				}
 			}
 		};
-
-		for (LocalDate localDate : _results.keySet()) {
-			String dateString = localDate.format(
-				DateTimeFormatter.ofPattern("yyyy-MM"));
-
-			if (_dateStrings.contains(dateString)) {
-				continue;
-			}
-
-			_dateStrings.add(dateString);
-		}
-
-		_buildProperties = new Properties() {
-			{
-				try {
-					putAll(JenkinsResultsParserUtil.getBuildProperties());
-				}
-				catch (IOException ioException) {
-					throw new RuntimeException(ioException);
-				}
-			}
-		};
-
-		_TESTRAY_LOGS_DIR = new File(
-			_buildProperties.getProperty("jenkins.testray.results.dir"),
-			"production/logs");
 	}
 
 }

@@ -36,10 +36,9 @@ jest.mock('react-flow-renderer', () => ({
 }));
 
 describe('The CurrentNodes component should', () => {
-	let container;
-	let getByText;
+	let container, getByText;
 
-	beforeEach(() => {
+	beforeAll(() => {
 		const result = render(
 			<CurrentNodes
 				nodesNames={['create', 'review', 'update', 'forward', 'finish']}

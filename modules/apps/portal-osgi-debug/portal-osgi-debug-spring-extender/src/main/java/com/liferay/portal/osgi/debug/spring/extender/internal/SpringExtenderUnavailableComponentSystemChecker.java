@@ -21,7 +21,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Tina Tian
  */
-@Component(service = SystemChecker.class)
+@Component(immediate = true, service = SystemChecker.class)
 public class SpringExtenderUnavailableComponentSystemChecker
 	implements SystemChecker {
 

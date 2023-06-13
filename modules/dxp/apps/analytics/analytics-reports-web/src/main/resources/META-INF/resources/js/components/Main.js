@@ -9,20 +9,11 @@
  * distribution rights of the Software.
  */
 
-import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useContext, useMemo} from 'react';
+import React from 'react';
 
-import {
-	ChartStateContext,
-	useDateTitle,
-	useIsPreviousPeriodButtonDisabled,
-} from '../context/ChartStateContext';
-import {StoreStateContext} from '../context/StoreContext';
-import {generateDateFormatters as dateFormat} from '../utils/dateFormat';
 import BasicInformation from './BasicInformation';
 import Chart from './Chart';
-import TimeSpanSelector from './TimeSpanSelector';
 import TotalCount from './TotalCount';
 import TrafficSources from './TrafficSources';
 
@@ -30,7 +21,6 @@ export default function Main({
 	author,
 	canonicalURL,
 	chartDataProviders,
-	className,
 	onSelectedLanguageClick,
 	onTrafficSourceClick,
 	pagePublishDate,
@@ -41,21 +31,8 @@ export default function Main({
 	trafficSourcesDataProvider,
 	viewURLs,
 }) {
-	const {timeSpanKey, timeSpanOffset} = useContext(ChartStateContext);
-	const {languageTag} = useContext(StoreStateContext);
-
-	const isPreviousPeriodButtonDisabled = useIsPreviousPeriodButtonDisabled();
-
-	const {firstDate, lastDate} = useDateTitle();
-
-	const dateFormatters = useMemo(() => dateFormat(languageTag), [
-		languageTag,
-	]);
-
-	const title = dateFormatters.formatChartTitle([firstDate, lastDate]);
-
 	return (
-		<div className={`analytics-reports-app-main pb-3 px-3 ${className}`}>
+		<div className="pb-3 px-3">
 			<BasicInformation
 				author={author}
 				canonicalURL={canonicalURL}
@@ -65,21 +42,6 @@ export default function Main({
 				viewURLs={viewURLs}
 			/>
 
-			{!!timeSpanOptions.length && (
-				<div className="c-mb-2 c-mt-4">
-					<TimeSpanSelector
-						disabledNextTimeSpan={timeSpanOffset === 0}
-						disabledPreviousPeriodButton={
-							isPreviousPeriodButtonDisabled
-						}
-						timeSpanKey={timeSpanKey}
-						timeSpanOptions={timeSpanOptions}
-					/>
-				</div>
-			)}
-
-			{title && <h5 className="c-mb-4">{title}</h5>}
-
 			<h5 className="mt-3 sheet-subtitle">
 				{Liferay.Language.get('engagement')}
 			</h5>
@@ -87,7 +49,7 @@ export default function Main({
 			<TotalCount
 				className="mb-2"
 				dataProvider={totalViewsDataProvider}
-				label={sub(Liferay.Language.get('total-views'))}
+				label={Liferay.Util.sub(Liferay.Language.get('total-views'))}
 				popoverHeader={Liferay.Language.get('total-views')}
 				popoverMessage={Liferay.Language.get(
 					'this-number-refers-to-the-total-number-of-views-since-the-content-was-published'
@@ -96,9 +58,10 @@ export default function Main({
 
 			{totalReadsDataProvider && (
 				<TotalCount
-					className="mb-2"
 					dataProvider={totalReadsDataProvider}
-					label={sub(Liferay.Language.get('total-reads'))}
+					label={Liferay.Util.sub(
+						Liferay.Language.get('total-reads')
+					)}
 					popoverHeader={Liferay.Language.get('total-reads')}
 					popoverMessage={Liferay.Language.get(
 						'this-number-refers-to-the-total-number-of-reads-since-the-content-was-published'
@@ -120,17 +83,10 @@ export default function Main({
 	);
 }
 
-Main.defaultProps = {
-	author: null,
-	className: '',
-	totalReadsDataProvider: null,
-};
-
 Main.propTypes = {
-	author: PropTypes.object,
+	author: PropTypes.object.isRequired,
 	canonicalURL: PropTypes.string.isRequired,
 	chartDataProviders: PropTypes.arrayOf(PropTypes.func.isRequired).isRequired,
-	className: PropTypes.string,
 	onSelectedLanguageClick: PropTypes.func.isRequired,
 	onTrafficSourceClick: PropTypes.func.isRequired,
 	pagePublishDate: PropTypes.string.isRequired,
@@ -141,7 +97,7 @@ Main.propTypes = {
 			label: PropTypes.string,
 		})
 	).isRequired,
-	totalReadsDataProvider: PropTypes.func,
+	totalReadsDataProvider: PropTypes.func.isRequired,
 	totalViewsDataProvider: PropTypes.func.isRequired,
 	trafficSourcesDataProvider: PropTypes.func.isRequired,
 	viewURLs: PropTypes.arrayOf(

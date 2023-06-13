@@ -18,6 +18,8 @@ import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunction;
 
 import java.math.BigDecimal;
 
+import java.util.stream.Stream;
+
 /**
  * @author Rafael Praxedes
  */
@@ -26,13 +28,13 @@ public class MultiplyFunction
 
 	@Override
 	public BigDecimal apply(Object[] numbers) {
-		BigDecimal result = BigDecimal.ONE;
-
-		for (Object object : numbers) {
-			result = result.multiply(new BigDecimal(object.toString()));
-		}
-
-		return result;
+		return Stream.of(
+			numbers
+		).map(
+			number -> new BigDecimal(number.toString())
+		).reduce(
+			BigDecimal.ONE, (n1, n2) -> n1.multiply(n2)
+		);
 	}
 
 	@Override

@@ -18,28 +18,42 @@
 
 <%
 String ppid = ParamUtil.getString(request, "p_p_id");
+
+RenderContentLayoutDisplayContext renderContentLayoutDisplayContext = new RenderContentLayoutDisplayContext(request, response);
 %>
+
+<liferay-util:html-top>
+	<%= renderContentLayoutDisplayContext.getPortletHeaderPaths() %>
+</liferay-util:html-top>
 
 <liferay-ui:success key="layoutPublished" message="the-page-was-published-successfully" />
 
-<liferay-ui:success key="variantSaved" message="the-variant-was-saved-successfully" />
-
 <c:choose>
-	<c:when test="<%= (themeDisplay.isStatePopUp() || themeDisplay.isWidget()) && Validator.isNotNull(ppid) %>">
+	<c:when test="<%= (themeDisplay.isStatePopUp() || themeDisplay.isWidget() || layoutTypePortlet.hasStateMax()) && Validator.isNotNull(ppid) %>">
 
 		<%
-		String templateContent = LayoutTemplateLocalServiceUtil.getContent("pop_up", true, theme.getThemeId());
+		String templateId = null;
+		String templateContent = null;
+		String langType = null;
+
+		if (themeDisplay.isStatePopUp() || themeDisplay.isWidget()) {
+			templateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "pop_up";
+			templateContent = LayoutTemplateLocalServiceUtil.getContent("pop_up", true, theme.getThemeId());
+			langType = LayoutTemplateLocalServiceUtil.getLangType("pop_up", true, theme.getThemeId());
+		}
+		else {
+			ppid = StringUtil.split(layoutTypePortlet.getStateMax())[0];
+
+			templateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "max";
+			templateContent = LayoutTemplateLocalServiceUtil.getContent("max", true, theme.getThemeId());
+			langType = LayoutTemplateLocalServiceUtil.getLangType("max", true, theme.getThemeId());
+		}
 
 		if (Validator.isNotNull(templateContent)) {
-			String templateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "pop_up";
-
-			RuntimePageUtil.processTemplate(request, response, ppid, templateId, templateContent, LayoutTemplateLocalServiceUtil.getLangType("pop_up", true, theme.getThemeId()));
+			RuntimePageUtil.processTemplate(request, response, ppid, new StringTemplateResource(templateId, templateContent), langType);
 		}
 		%>
 
-	</c:when>
-	<c:when test="<%= layoutTypePortlet.hasStateMax() && Validator.isNotNull(ppid) %>">
-		<liferay-layout:render-state-max-layout-structure />
 	</c:when>
 	<c:otherwise>
 		<div class="layout-content portlet-layout" id="main-content" role="main">
@@ -50,4 +64,8 @@ String ppid = ParamUtil.getString(request, "p_p_id");
 	</c:otherwise>
 </c:choose>
 
-<liferay-layout:layout-common />
+<liferay-ui:layout-common />
+
+<liferay-util:html-bottom>
+	<%= renderContentLayoutDisplayContext.getPortletFooterPaths() %>
+</liferay-util:html-bottom>

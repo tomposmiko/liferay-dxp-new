@@ -13,14 +13,12 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import {FocusTrap} from '@clayui/core';
 import {ClayInput} from '@clayui/form';
-import {ManagementToolbar} from 'frontend-js-components-web';
-import React, {useEffect, useRef} from 'react';
+import ClayManagementToolbar from '@clayui/management-toolbar';
+import React from 'react';
 
 const SearchControls = ({
 	disabled,
-	onCloseSearchMobile,
 	searchActionURL,
 	searchData,
 	searchFormMethod,
@@ -29,112 +27,76 @@ const SearchControls = ({
 	searchInputName,
 	searchMobile,
 	searchValue,
+	setSearchMobile,
 }) => {
-	const searchInputRef = useRef();
-
-	useEffect(() => {
-		if (searchMobile) {
-			searchInputRef.current.focus();
-		}
-	}, [searchMobile]);
-
 	return (
 		<>
-			<ManagementToolbar.Search
+			<ClayManagementToolbar.Search
 				action={searchActionURL}
 				method={searchFormMethod}
 				name={searchFormName}
 				showMobile={searchMobile}
 			>
-				<FocusTrap active={searchMobile}>
-					<ClayInput.Group
-						onKeyDown={(event) => {
-							if (searchMobile && event.key === 'Escape') {
-								onCloseSearchMobile();
-							}
-						}}
-					>
-						<ClayInput.GroupItem>
-							<ClayInput
-								aria-label={`${Liferay.Language.get(
-									'search'
-								)}:`}
-								autoFocus={searchInputAutoFocus}
-								className="form-control input-group-inset input-group-inset-after"
-								defaultValue={searchValue}
-								disabled={disabled}
-								name={searchInputName}
-								placeholder={Liferay.Language.get('search-for')}
-								ref={searchInputRef}
-								type="search"
-							/>
+				<ClayInput.Group>
+					<ClayInput.GroupItem>
+						<ClayInput
+							autoFocus={searchInputAutoFocus}
+							className="form-control input-group-inset input-group-inset-after"
+							defaultValue={searchValue}
+							disabled={disabled}
+							name={searchInputName}
+							placeholder={Liferay.Language.get('search-for')}
+							type="text"
+						/>
 
-							<ClayInput.GroupInsetItem after tag="span">
-								<ClayButtonWithIcon
-									aria-label={Liferay.Language.get('search')}
-									disabled={disabled}
-									displayType="unstyled"
-									symbol="search"
-									title={Liferay.Language.get('search-for')}
-									type="submit"
-								/>
-							</ClayInput.GroupInsetItem>
-						</ClayInput.GroupItem>
-
-						<ClayInput.GroupItem
-							className="navbar-breakpoint-d-none"
-							shrink
-						>
+						<ClayInput.GroupInsetItem after tag="span">
 							<ClayButtonWithIcon
-								aria-label={Liferay.Language.get(
-									'close-search'
-								)}
+								className="navbar-breakpoint-d-none"
 								disabled={disabled}
 								displayType="unstyled"
-								onClick={onCloseSearchMobile}
-								size="sm"
+								onClick={() => setSearchMobile(false)}
 								symbol="times"
-								title={Liferay.Language.get('close-search')}
 							/>
-						</ClayInput.GroupItem>
-					</ClayInput.Group>
-				</FocusTrap>
+
+							<ClayButtonWithIcon
+								disabled={disabled}
+								displayType="unstyled"
+								symbol="search"
+								type="submit"
+							/>
+						</ClayInput.GroupInsetItem>
+					</ClayInput.GroupItem>
+				</ClayInput.Group>
 
 				{searchData &&
 					Object.keys(searchData).map((key) =>
-						searchData[key].map((value, index) => (
+						searchData[key].map((value) => (
 							<ClayInput
-								key={`${key}${index}`}
+								key={key}
 								name={key}
 								type="hidden"
 								value={value}
 							/>
 						))
 					)}
-			</ManagementToolbar.Search>
+			</ClayManagementToolbar.Search>
 		</>
 	);
 };
 
-const ShowMobileButton = React.forwardRef(
-	({disabled, setSearchMobile}, ref) => {
-		return (
-			<ManagementToolbar.Item className="navbar-breakpoint-d-none">
-				<ClayButtonWithIcon
-					aria-haspopup="true"
-					aria-label={Liferay.Language.get('open-search')}
-					className="nav-link nav-link-monospaced"
-					disabled={disabled}
-					displayType="unstyled"
-					onClick={() => setSearchMobile(true)}
-					ref={ref}
-					symbol="search"
-					title={Liferay.Language.get('open-search')}
-				/>
-			</ManagementToolbar.Item>
-		);
-	}
-);
+const ShowMobileButton = ({disabled, setSearchMobile}) => {
+	return (
+		<ClayManagementToolbar.Item className="navbar-breakpoint-d-none">
+			<ClayButtonWithIcon
+				className="nav-link nav-link-monospaced"
+				disabled={disabled}
+				displayType="unstyled"
+				onClick={() => setSearchMobile(true)}
+				symbol="search"
+			/>
+		</ClayManagementToolbar.Item>
+	);
+};
 
 SearchControls.ShowMobileButton = ShowMobileButton;
 

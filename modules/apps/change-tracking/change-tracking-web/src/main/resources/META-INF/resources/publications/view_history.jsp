@@ -34,14 +34,14 @@ SearchContainer<CTProcess> searchContainer = viewHistoryDisplayContext.getSearch
 	<div class="container-view">
 		<c:choose>
 			<c:when test="<%= !searchContainer.hasResults() && viewHistoryDisplayContext.isSearch() %>">
-				<liferay-frontend:empty-result-message
-					animationType="<%= EmptyResultMessageKeys.AnimationType.SEARCH %>"
-					title='<%= LanguageUtil.get(resourceBundle, "no-publication-has-been-published-yet") %>'
+				<liferay-ui:empty-result-message
+					message="no-publication-has-been-published-yet"
+					search="<%= true %>"
 				/>
 			</c:when>
 			<c:when test="<%= !searchContainer.hasResults() %>">
-				<liferay-frontend:empty-result-message
-					title='<%= LanguageUtil.get(resourceBundle, "no-publication-has-been-published-yet") %>'
+				<liferay-ui:empty-result-message
+					message="no-publication-has-been-published-yet"
 				/>
 			</c:when>
 			<c:otherwise>
@@ -49,7 +49,7 @@ SearchContainer<CTProcess> searchContainer = viewHistoryDisplayContext.getSearch
 					<span aria-hidden="true" class="loading-animation"></span>
 
 					<react:component
-						module="publications/js/views/PublicationsHistoryView"
+						module="publications/js/PublicationsHistoryView"
 						props="<%= viewHistoryDisplayContext.getReactProps() %>"
 					/>
 				</div>

@@ -19,13 +19,17 @@ import com.liferay.commerce.product.item.selector.web.internal.search.CPInstance
 import com.liferay.commerce.product.item.selector.web.internal.util.CPItemSelectorViewUtil;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPInstanceService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -55,9 +59,9 @@ public class CPInstanceItemSelectorViewDisplayContext
 		return PortletURLBuilder.create(
 			super.getPortletURL()
 		).setParameter(
-			"checkedCPInstanceIds", _getCheckedCPInstanceIds()
+			"checkedCPInstanceIds", getCheckedCPInstanceIds()
 		).setParameter(
-			"commerceCatalogGroupId", _getGroupId()
+			"commerceCatalogGroupId", getGroupId()
 		).buildPortletURL();
 	}
 
@@ -70,24 +74,32 @@ public class CPInstanceItemSelectorViewDisplayContext
 		}
 
 		searchContainer = new SearchContainer<>(
-			liferayPortletRequest, getPortletURL(), null, "no-skus-were-found");
+			liferayPortletRequest, getPortletURL(), null, null);
+
+		searchContainer.setEmptyResultsMessage("no-skus-were-found");
+
+		OrderByComparator<CPInstance> orderByComparator =
+			CPItemSelectorViewUtil.getCPInstanceOrderByComparator(
+				getOrderByCol(), getOrderByType());
+
+		RowChecker rowChecker = new CPInstanceItemSelectorChecker(
+			cpRequestHelper.getRenderResponse(), getCheckedCPInstanceIds());
 
 		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
-			CPItemSelectorViewUtil.getCPInstanceOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+		searchContainer.setOrderByComparator(orderByComparator);
 		searchContainer.setOrderByType(getOrderByType());
+		searchContainer.setRowChecker(rowChecker);
 
 		Sort sort = CPItemSelectorViewUtil.getCPInstanceSort(
 			getOrderByCol(), getOrderByType());
 
 		BaseModelSearchResult<CPInstance> cpInstanceBaseModelSearchResult;
 
-		if (_getGroupId() > 0) {
+		if (getGroupId() > 0) {
 			cpInstanceBaseModelSearchResult =
 				_cpInstanceService.searchCPInstances(
-					cpRequestHelper.getCompanyId(), _getGroupId(),
-					getKeywords(), WorkflowConstants.STATUS_APPROVED,
+					cpRequestHelper.getCompanyId(), getGroupId(), getKeywords(),
+					WorkflowConstants.STATUS_APPROVED,
 					searchContainer.getStart(), searchContainer.getEnd(), sort);
 		}
 		else {
@@ -98,21 +110,22 @@ public class CPInstanceItemSelectorViewDisplayContext
 					searchContainer.getStart(), searchContainer.getEnd(), sort);
 		}
 
-		searchContainer.setResultsAndTotal(cpInstanceBaseModelSearchResult);
-		searchContainer.setRowChecker(
-			new CPInstanceItemSelectorChecker(
-				cpRequestHelper.getRenderResponse(),
-				_getCheckedCPInstanceIds()));
+		List<CPInstance> cpInstances =
+			cpInstanceBaseModelSearchResult.getBaseModels();
+		int totalCPInstances = cpInstanceBaseModelSearchResult.getLength();
+
+		searchContainer.setResults(cpInstances);
+		searchContainer.setTotal(totalCPInstances);
 
 		return searchContainer;
 	}
 
-	private long[] _getCheckedCPInstanceIds() {
+	protected long[] getCheckedCPInstanceIds() {
 		return ParamUtil.getLongValues(
 			httpServletRequest, "checkedCPInstanceIds");
 	}
 
-	private long _getGroupId() {
+	protected long getGroupId() {
 		return ParamUtil.getLong(httpServletRequest, "commerceCatalogGroupId");
 	}
 

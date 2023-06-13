@@ -14,8 +14,6 @@
 
 package com.liferay.portal.vulcan.internal.jaxrs.exception.mapper;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
@@ -34,14 +32,9 @@ public class NotAcceptableExceptionMapper
 	protected Problem getProblem(
 		NotAcceptableException notAcceptableException) {
 
-		_log.error(notAcceptableException);
-
 		return new Problem(
 			Response.Status.NOT_ACCEPTABLE,
 			notAcceptableException.getMessage());
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		NotAcceptableExceptionMapper.class);
 
 }

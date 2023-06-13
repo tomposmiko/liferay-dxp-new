@@ -57,6 +57,8 @@ public abstract class BaseBuildRunner<T extends BuildData>
 		_buildData = buildData;
 
 		_job = JobFactory.newJob(_buildData);
+
+		_job.readJobProperties();
 	}
 
 	protected void cleanUpHostServices() {
@@ -139,7 +141,7 @@ public abstract class BaseBuildRunner<T extends BuildData>
 				retries++;
 
 				String command = JenkinsResultsParserUtil.combine(
-					"time timeout 1200 rsync -Ipqrs --chmod=go=rx ",
+					"time rsync -Ipqrs --chmod=go=rx --timeout=1200 ",
 					JenkinsResultsParserUtil.getCanonicalPath(file), " ",
 					_buildData.getTopLevelMasterHostname(), "::usercontent/",
 					userContentRelativePath);

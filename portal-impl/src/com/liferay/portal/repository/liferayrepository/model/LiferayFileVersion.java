@@ -110,7 +110,7 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 				incrementCounter);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return inputStream;
@@ -119,10 +119,6 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 	@Override
 	public Date getCreateDate() {
 		return _dlFileVersion.getCreateDate();
-	}
-
-	public long getCTCollectionId() {
-		return _dlFileVersion.getCtCollectionId();
 	}
 
 	@Override

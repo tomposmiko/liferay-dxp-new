@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class COREntryRelServiceWrapper
 	implements COREntryRelService, ServiceWrapper<COREntryRelService> {
 
-	public COREntryRelServiceWrapper() {
-		this(null);
-	}
-
 	public COREntryRelServiceWrapper(COREntryRelService corEntryRelService) {
 		_corEntryRelService = corEntryRelService;
 	}

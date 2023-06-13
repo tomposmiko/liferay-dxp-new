@@ -111,13 +111,13 @@ public class TOCTOUTest extends BaseClientTestCase {
 		// Try again with a fresh narrowed down token for "everything.read".
 		// It should still fail (admin TOCTOU protection when narrowing down).
 
-		webTarget2InvocationBuilder = authorize(
-			webTarget2.request(),
-			getToken(
-				"oauthTestApplicationCode", null,
-				getAuthorizationCodeBiFunction(
-					"test@liferay.com", "test", null, "everything.read"),
-				this::parseTokenString));
+		token = getToken(
+			"oauthTestApplicationCode", null,
+			getAuthorizationCodeBiFunction(
+				"test@liferay.com", "test", null, "everything.read"),
+			this::parseTokenString);
+
+		webTarget2InvocationBuilder = authorize(webTarget2.request(), token);
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				"portal_web.docroot.errors.code_jsp", LoggerTestUtil.WARN)) {
@@ -159,13 +159,12 @@ public class TOCTOUTest extends BaseClientTestCase {
 		// Try again with a fresh token (implicitly for "everything.read"). It
 		// should succeed.
 
-		webTarget2InvocationBuilder = authorize(
-			webTarget2.request(),
-			getToken(
-				"oauthTestApplicationCode", null,
-				getAuthorizationCodeBiFunction(
-					"test@liferay.com", "test", null),
-				this::parseTokenString));
+		token = getToken(
+			"oauthTestApplicationCode", null,
+			getAuthorizationCodeBiFunction("test@liferay.com", "test", null),
+			this::parseTokenString);
+
+		webTarget2InvocationBuilder = authorize(webTarget2.request(), token);
 
 		Assert.assertEquals(
 			"everything.read", webTarget2InvocationBuilder.get(String.class));

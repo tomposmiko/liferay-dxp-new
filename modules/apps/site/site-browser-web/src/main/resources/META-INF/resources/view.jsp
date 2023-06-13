@@ -63,7 +63,7 @@
 						<h5>
 							<c:choose>
 								<c:when test="<%= siteBrowserDisplayContext.isShowLink(group) %>">
-									<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:void(0);">
+									<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
 										<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>
 									</aui:a>
 								</c:when>
@@ -74,7 +74,7 @@
 						</h5>
 
 						<h6 class="text-default">
-							<span><liferay-ui:message key="<%= group.getScopeLabel(themeDisplay) %>" /></span>
+							<span><%= LanguageUtil.get(request, group.getScopeLabel(themeDisplay)) %></span>
 						</h6>
 					</liferay-ui:search-container-column-text>
 				</c:when>
@@ -92,7 +92,7 @@
 					>
 						<c:choose>
 							<c:when test="<%= siteBrowserDisplayContext.isShowLink(group) %>">
-								<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:void(0);">
+								<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
 									<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>
 								</aui:a>
 							</c:when>

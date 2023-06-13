@@ -32,7 +32,8 @@ import org.osgi.service.component.annotations.Component;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	property = "reportDataSourceType=jdbc", service = ReportFillManager.class
+	immediate = true, property = "reportDataSourceType=jdbc",
+	service = ReportFillManager.class
 )
 public class JdbcReportFillManager extends BaseReportFillManager {
 
@@ -45,16 +46,16 @@ public class JdbcReportFillManager extends BaseReportFillManager {
 		ReportRequestContext reportRequestContext =
 			reportRequest.getReportRequestContext();
 
-		_setProperty(
+		setProperty(
 			properties, "driverClassName", reportRequestContext,
 			ReportRequestContext.JDBC_DRIVER_CLASS);
-		_setProperty(
+		setProperty(
 			properties, "password", reportRequestContext,
 			ReportRequestContext.JDBC_PASSWORD);
-		_setProperty(
+		setProperty(
 			properties, "url", reportRequestContext,
 			ReportRequestContext.JDBC_URL);
-		_setProperty(
+		setProperty(
 			properties, "username", reportRequestContext,
 			ReportRequestContext.JDBC_USER_NAME);
 
@@ -64,7 +65,7 @@ public class JdbcReportFillManager extends BaseReportFillManager {
 		return dataSource.getConnection();
 	}
 
-	private void _setProperty(
+	protected void setProperty(
 		Properties properties, String propertyKey,
 		ReportRequestContext reportRequestContext, String attributeKey) {
 

@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Juan Fernández
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"webdav.storage.token=journal"
@@ -78,16 +79,16 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			String[] pathArray = webDAVRequest.getPathArray();
 
 			if (pathArray.length == 2) {
-				return _getFolders(webDAVRequest);
+				return getFolders(webDAVRequest);
 			}
 			else if (pathArray.length == 3) {
 				String type = pathArray[2];
 
 				if (type.equals(DDMWebDAV.TYPE_STRUCTURES)) {
-					return _getStructures(webDAVRequest);
+					return getStructures(webDAVRequest);
 				}
 				else if (type.equals(DDMWebDAV.TYPE_TEMPLATES)) {
-					return _getTemplates(webDAVRequest);
+					return getTemplates(webDAVRequest);
 				}
 			}
 
@@ -105,7 +106,7 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			_portal.getClassNameId(JournalArticle.class));
 	}
 
-	private List<Resource> _getFolders(WebDAVRequest webDAVRequest)
+	protected List<Resource> getFolders(WebDAVRequest webDAVRequest)
 		throws Exception {
 
 		return ListUtil.fromArray(
@@ -115,7 +116,7 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 				webDAVRequest, DDMWebDAV.TYPE_TEMPLATES, getRootPath(), true));
 	}
 
-	private List<Resource> _getStructures(WebDAVRequest webDAVRequest)
+	protected List<Resource> getStructures(WebDAVRequest webDAVRequest)
 		throws Exception {
 
 		List<Resource> resources = new ArrayList<>();
@@ -136,7 +137,7 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		return resources;
 	}
 
-	private List<Resource> _getTemplates(WebDAVRequest webDAVRequest)
+	protected List<Resource> getTemplates(WebDAVRequest webDAVRequest)
 		throws Exception {
 
 		List<Resource> resources = new ArrayList<>();
@@ -158,13 +159,27 @@ public class JournalWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 		return resources;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDMTemplateLocalService(
+		DDMTemplateLocalService ddmTemplateLocalService) {
+
+		_ddmTemplateLocalService = ddmTemplateLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMWebDAV(DDMWebDAV ddmWebDAV) {
+		_ddmWebDAV = ddmWebDAV;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJournalFolderService(
+		JournalFolderService journalFolderService) {
+
+		_journalFolderService = journalFolderService;
+	}
+
 	private DDMTemplateLocalService _ddmTemplateLocalService;
-
-	@Reference
 	private DDMWebDAV _ddmWebDAV;
-
-	@Reference
 	private JournalFolderService _journalFolderService;
 
 	@Reference

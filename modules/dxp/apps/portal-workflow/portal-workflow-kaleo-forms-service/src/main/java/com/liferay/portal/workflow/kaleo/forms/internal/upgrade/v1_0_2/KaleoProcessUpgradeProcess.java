@@ -67,6 +67,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 
 			while (resultSet.next()) {
 				String uuid = resultSet.getString("uuid_");
+				long kaleoProcessId = resultSet.getLong("kaleoProcessId");
 				long groupId = resultSet.getLong("groupId");
 				long companyId = resultSet.getLong("companyId");
 				long userId = resultSet.getLong("userId");
@@ -76,7 +77,6 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 
 				if (Validator.isNull(uuid)) {
 					uuid = PortalUUIDUtil.generate();
-					long kaleoProcessId = resultSet.getLong("kaleoProcessId");
 
 					runSQL(
 						StringBundler.concat(
@@ -84,14 +84,14 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 							"' where kaleoProcessId = ", kaleoProcessId));
 				}
 
-				_updateAssetEntry(
-					groupId, companyId, userId, createDate, modifiedDate, uuid,
-					ddlRecordSetId);
+				updateAssetEntry(
+					groupId, companyId, userId, createDate, modifiedDate,
+					kaleoProcessId, uuid, ddlRecordSetId);
 			}
 		}
 	}
 
-	private String _getAssetEntryTitle(long companyId, long ddlRecordSetId)
+	protected String getAssetEntryTitle(long companyId, long ddlRecordSetId)
 		throws PortalException {
 
 		DDLRecordSet ddlRecordSet = _ddlRecordSetLocalService.getDDLRecordSet(
@@ -99,7 +99,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 
 		DDMStructure ddmStructure = ddlRecordSet.getDDMStructure();
 
-		Locale locale = _getDefaultLocale(companyId);
+		Locale locale = getDefaultLocale(companyId);
 
 		return LanguageUtil.format(
 			locale, "new-x-for-list-x",
@@ -109,7 +109,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 			false);
 	}
 
-	private Locale _getDefaultLocale(long companyId) {
+	protected Locale getDefaultLocale(long companyId) {
 		String locale = null;
 
 		try {
@@ -126,12 +126,13 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 		return LocaleUtil.fromLanguageId(locale);
 	}
 
-	private void _updateAssetEntry(
+	protected void updateAssetEntry(
 			long groupId, long companyId, long userId, Timestamp createDate,
-			Timestamp modifiedDate, String uuid, long ddlRecordSetId)
+			Timestamp modifiedDate, long kaleoProcessId, String uuid,
+			long ddlRecordSetId)
 		throws PortalException {
 
-		String title = _getAssetEntryTitle(companyId, ddlRecordSetId);
+		String title = getAssetEntryTitle(companyId, ddlRecordSetId);
 
 		ActionableDynamicQuery actionableDynamicQuery =
 			_ddlRecordLocalService.getActionableDynamicQuery();

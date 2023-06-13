@@ -19,13 +19,15 @@ import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.item.InfoItemDetails;
 import com.liferay.info.item.renderer.InfoItemRenderer;
-import com.liferay.info.item.renderer.InfoItemRendererRegistry;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.info.item.renderer.InfoItemRendererTracker;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,7 +53,10 @@ public class LayoutDisplayObjectFragmentRenderer implements FragmentRenderer {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "display-page-content");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return LanguageUtil.get(resourceBundle, "display-page-content");
 	}
 
 	@Override
@@ -110,7 +115,7 @@ public class LayoutDisplayObjectFragmentRenderer implements FragmentRenderer {
 		String displayObjectClassName) {
 
 		List<InfoItemRenderer<?>> infoItemRenderers =
-			_infoItemRendererRegistry.getInfoItemRenderers(
+			_infoItemRendererTracker.getInfoItemRenderers(
 				displayObjectClassName);
 
 		if (infoItemRenderers == null) {
@@ -121,9 +126,6 @@ public class LayoutDisplayObjectFragmentRenderer implements FragmentRenderer {
 	}
 
 	@Reference
-	private InfoItemRendererRegistry _infoItemRendererRegistry;
-
-	@Reference
-	private Language _language;
+	private InfoItemRendererTracker _infoItemRendererTracker;
 
 }

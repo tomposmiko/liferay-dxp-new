@@ -13,7 +13,6 @@
  */
 
 import BackgroundImageProcessor from './BackgroundImageProcessor';
-import DateTimeProcessor from './DateTimeProcessor';
 import FallbackProcessor from './FallbackProcessor';
 import HTMLProcessor from './HTMLProcessor';
 import ImageProcessor from './ImageProcessor';
@@ -23,11 +22,10 @@ import TextProcessor from './TextProcessor';
 
 export default {
 	'background-image': BackgroundImageProcessor,
-	'date-time': DateTimeProcessor,
-	'fallback': FallbackProcessor,
-	'html': HTMLProcessor,
-	'image': ImageProcessor,
-	'link': LinkProcessor,
+	fallback: FallbackProcessor,
+	html: HTMLProcessor,
+	image: ImageProcessor,
+	link: LinkProcessor,
 	'rich-text': RichTextProcessor,
-	'text': TextProcessor,
+	text: TextProcessor,
 };

@@ -62,11 +62,6 @@ public class MBCommentImpl implements WorkflowableComment {
 	}
 
 	@Override
-	public String getExternalReferenceCode() {
-		return _message.getExternalReferenceCode();
-	}
-
-	@Override
 	public long getGroupId() {
 		return _message.getGroupId();
 	}

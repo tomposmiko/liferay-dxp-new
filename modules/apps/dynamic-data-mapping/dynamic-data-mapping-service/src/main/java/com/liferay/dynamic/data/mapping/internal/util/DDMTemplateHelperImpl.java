@@ -37,7 +37,7 @@ import com.liferay.portal.kernel.template.TemplateVariableGroup;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.template.engine.TemplateContextHelper;
+import com.liferay.portal.template.TemplateContextHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Juan Fernández
  * @author Jorge Ferrer
  */
-@Component(service = DDMTemplateHelper.class)
+@Component(immediate = true, service = DDMTemplateHelper.class)
 public class DDMTemplateHelperImpl implements DDMTemplateHelper {
 
 	@Override
@@ -73,7 +73,7 @@ public class DDMTemplateHelperImpl implements DDMTemplateHelper {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -91,7 +91,7 @@ public class DDMTemplateHelperImpl implements DDMTemplateHelper {
 		JSONObject variablesJSONObject = _jsonFactory.createJSONObject();
 
 		for (TemplateVariableDefinition templateVariableDefinition :
-				_getAutocompleteTemplateVariableDefinitions(
+				getAutocompleteTemplateVariableDefinitions(
 					httpServletRequest, language)) {
 
 			Class<?> clazz = templateVariableDefinition.getClazz();
@@ -103,13 +103,12 @@ public class DDMTemplateHelperImpl implements DDMTemplateHelper {
 			else {
 				if (!typesJSONObject.has(clazz.getName())) {
 					typesJSONObject.put(
-						clazz.getName(),
-						_getAutocompleteClassJSONObject(clazz));
+						clazz.getName(), getAutocompleteClassJSONObject(clazz));
 				}
 
 				variablesJSONObject.put(
 					templateVariableDefinition.getName(),
-					_getAutocompleteVariableJSONObject(clazz));
+					getAutocompleteVariableJSONObject(clazz));
 			}
 		}
 
@@ -133,11 +132,11 @@ public class DDMTemplateHelperImpl implements DDMTemplateHelper {
 		return false;
 	}
 
-	private JSONObject _getAutocompleteClassJSONObject(Class<?> clazz) {
+	protected JSONObject getAutocompleteClassJSONObject(Class<?> clazz) {
 		JSONObject typeJSONObject = _jsonFactory.createJSONObject();
 
 		for (Field field : clazz.getFields()) {
-			JSONObject fieldJSONObject = _getAutocompleteVariableJSONObject(
+			JSONObject fieldJSONObject = getAutocompleteVariableJSONObject(
 				field.getType());
 
 			typeJSONObject.put(field.getName(), fieldJSONObject);
@@ -170,8 +169,8 @@ public class DDMTemplateHelperImpl implements DDMTemplateHelper {
 		return typeJSONObject;
 	}
 
-	private List<TemplateVariableDefinition>
-			_getAutocompleteTemplateVariableDefinitions(
+	protected List<TemplateVariableDefinition>
+			getAutocompleteTemplateVariableDefinitions(
 				HttpServletRequest httpServletRequest, String language)
 		throws Exception {
 
@@ -246,12 +245,31 @@ public class DDMTemplateHelperImpl implements DDMTemplateHelper {
 		return new ArrayList<>(templateVariableDefinitions);
 	}
 
-	private JSONObject _getAutocompleteVariableJSONObject(Class<?> clazz) {
+	protected JSONObject getAutocompleteVariableJSONObject(Class<?> clazz) {
 		JSONObject jsonObject = _jsonFactory.createJSONObject();
 
 		jsonObject.put("type", clazz.getName());
 
 		return jsonObject;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureLocalService(
+		DDMStructureLocalService ddmStructureLocalService) {
+
+		_ddmStructureLocalService = ddmStructureLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureService(
+		DDMStructureService ddmStructureService) {
+
+		_ddmStructureService = ddmStructureService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJSONFactory(JSONFactory jsonFactory) {
+		_jsonFactory = jsonFactory;
 	}
 
 	private static final String _TEMPLATE_CONTENT = "# Placeholder";
@@ -261,13 +279,8 @@ public class DDMTemplateHelperImpl implements DDMTemplateHelper {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMTemplateHelperImpl.class);
 
-	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
 	private DDMStructureService _ddmStructureService;
-
-	@Reference
 	private JSONFactory _jsonFactory;
 
 	@Reference

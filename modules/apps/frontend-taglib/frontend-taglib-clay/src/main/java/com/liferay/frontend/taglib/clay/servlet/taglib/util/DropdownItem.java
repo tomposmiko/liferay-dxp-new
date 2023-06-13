@@ -27,10 +27,6 @@ public class DropdownItem extends NavigationItem {
 		put("icon", icon);
 	}
 
-	public void setKey(String key) {
-		put("key", key);
-	}
-
 	public void setQuickAction(boolean quickAction) {
 		put("quickAction", quickAction);
 	}

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -212,34 +213,27 @@ public class FormContextSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "formFieldValues")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					FormFieldValue[] formFieldValuesArray =
-						new FormFieldValue[jsonParserFieldValues.length];
-
-					for (int i = 0; i < formFieldValuesArray.length; i++) {
-						formFieldValuesArray[i] = FormFieldValueSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					formContext.setFormFieldValues(formFieldValuesArray);
+					formContext.setFormFieldValues(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> FormFieldValueSerDes.toDTO((String)object)
+						).toArray(
+							size -> new FormFieldValue[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "formPageContexts")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					FormPageContext[] formPageContextsArray =
-						new FormPageContext[jsonParserFieldValues.length];
-
-					for (int i = 0; i < formPageContextsArray.length; i++) {
-						formPageContextsArray[i] = FormPageContextSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					formContext.setFormPageContexts(formPageContextsArray);
+					formContext.setFormPageContexts(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> FormPageContextSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new FormPageContext[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "readOnly")) {

@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/checkout_ct_collection"
@@ -67,7 +68,7 @@ public class CheckoutCTCollectionMVCActionCommand extends BaseMVCActionCommand {
 		hideDefaultSuccessMessage(actionRequest);
 
 		SessionMessages.add(
-			actionRequest, "requestProcessed",
+			_portal.getHttpServletRequest(actionRequest), "requestProcessed",
 			ParamUtil.getString(actionRequest, "successMessage"));
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");

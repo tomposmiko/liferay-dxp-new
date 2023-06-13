@@ -14,18 +14,17 @@
 
 package com.liferay.portal.search.internal.query.field;
 
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.query.field.FieldQueryBuilder;
 import com.liferay.portal.search.query.field.FieldQueryBuilderFactory;
 import com.liferay.portal.search.query.field.FieldQueryFactory;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
+import java.util.HashSet;
+
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * @author Michael C. Han
@@ -38,25 +37,28 @@ public class FieldQueryFactoryImpl implements FieldQueryFactory {
 		String fieldName, String keywords, boolean like,
 		boolean splitKeywords) {
 
-		FieldQueryBuilder fieldQueryBuilder = _getQueryBuilder(fieldName);
+		FieldQueryBuilder fieldQueryBuilder = getQueryBuilder(fieldName);
 
 		return fieldQueryBuilder.build(fieldName, keywords);
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerList = ServiceTrackerListFactory.open(
-			bundleContext, FieldQueryBuilderFactory.class);
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	protected void addFieldQueryBuilderFactory(
+		FieldQueryBuilderFactory fieldQueryBuilderFactory) {
+
+		_fieldQueryBuilderFactories.add(fieldQueryBuilderFactory);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerList.close();
+	protected FieldQueryBuilder getDefaultQueryBuilder() {
+		return descriptionFieldQueryBuilder;
 	}
 
-	private FieldQueryBuilder _getQueryBuilder(String fieldName) {
+	protected FieldQueryBuilder getQueryBuilder(String fieldName) {
 		for (FieldQueryBuilderFactory fieldQueryBuilderFactory :
-				_serviceTrackerList) {
+				_fieldQueryBuilderFactories) {
 
 			FieldQueryBuilder fieldQueryBuilder =
 				fieldQueryBuilderFactory.getQueryBuilder(fieldName);
@@ -66,12 +68,19 @@ public class FieldQueryFactoryImpl implements FieldQueryFactory {
 			}
 		}
 
-		return _descriptionFieldQueryBuilder;
+		return getDefaultQueryBuilder();
+	}
+
+	protected void removeFieldQueryBuilderFactory(
+		FieldQueryBuilderFactory fieldQueryBuilderFactory) {
+
+		_fieldQueryBuilderFactories.remove(fieldQueryBuilderFactory);
 	}
 
 	@Reference
-	private DescriptionFieldQueryBuilder _descriptionFieldQueryBuilder;
+	protected DescriptionFieldQueryBuilder descriptionFieldQueryBuilder;
 
-	private ServiceTrackerList<FieldQueryBuilderFactory> _serviceTrackerList;
+	private final HashSet<FieldQueryBuilderFactory>
+		_fieldQueryBuilderFactories = new HashSet<>();
 
 }

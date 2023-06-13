@@ -19,22 +19,20 @@ import com.liferay.friendly.url.exception.DuplicateFriendlyURLEntryException;
 import com.liferay.friendly.url.exception.FriendlyURLLengthException;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
-import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.friendly.url.service.FriendlyURLEntryLocalServiceUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Collections;
@@ -66,62 +64,62 @@ public class FriendlyURLEntryLocalServiceTest {
 
 	@After
 	public void tearDown() {
-		_friendlyURLEntryLocalService.deleteGroupFriendlyURLEntries(
+		FriendlyURLEntryLocalServiceUtil.deleteGroupFriendlyURLEntries(
 			_group.getGroupId(),
-			_classNameLocalService.getClassNameId(User.class));
-		_friendlyURLEntryLocalService.deleteGroupFriendlyURLEntries(
+			ClassNameLocalServiceUtil.getClassNameId(User.class));
+		FriendlyURLEntryLocalServiceUtil.deleteGroupFriendlyURLEntries(
 			_group.getGroupId(),
-			_classNameLocalService.getClassNameId(User.class));
+			ClassNameLocalServiceUtil.getClassNameId(User.class));
 	}
 
 	@Test
 	public void testAddFriendlyURLEntryKeepsOldLocalizedValues()
 		throws Exception {
 
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			Collections.singletonMap(
-				_language.getLanguageId(LocaleUtil.US), "url-title-en"),
+				LanguageUtil.getLanguageId(LocaleUtil.ENGLISH), "url-title-en"),
 			_getServiceContext());
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			Collections.singletonMap(
-				_language.getLanguageId(LocaleUtil.CHINA), "url-title-zh"),
+				LanguageUtil.getLanguageId(LocaleUtil.CHINA), "url-title-zh"),
 			_getServiceContext());
 
 		FriendlyURLEntry finalFriendlyURL =
-			_friendlyURLEntryLocalService.addFriendlyURLEntry(
+			FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 				_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 				"url-title-en", _getServiceContext());
 
 		Assert.assertEquals(
 			"url-title-en",
 			finalFriendlyURL.getUrlTitle(
-				_language.getLanguageId(LocaleUtil.US)));
+				LanguageUtil.getLanguageId(LocaleUtil.ENGLISH)));
 		Assert.assertEquals(
 			"url-title-zh",
 			finalFriendlyURL.getUrlTitle(
-				_language.getLanguageId(LocaleUtil.CHINA)));
+				LanguageUtil.getLanguageId(LocaleUtil.CHINA)));
 	}
 
 	@Test
 	public void testAddFriendlyURLEntryReusesOwnedUrlTitles() throws Exception {
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 		String urlTitle = "existing-url-title";
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			urlTitle, _getServiceContext());
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			"existing-url-title-2", _getServiceContext());
 
 		FriendlyURLEntry finalFriendlyURL =
-			_friendlyURLEntryLocalService.addFriendlyURLEntry(
+			FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 				_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 				urlTitle, _getServiceContext());
 
@@ -129,92 +127,64 @@ public class FriendlyURLEntryLocalServiceTest {
 	}
 
 	@Test
-	public void testDeleteFriendlyURLLocalizationEntry() throws Exception {
-		FriendlyURLEntry friendlyURLEntry =
-			_friendlyURLEntryLocalService.addFriendlyURLEntry(
-				_group.getGroupId(),
-				_classNameLocalService.getClassNameId(User.class),
-				TestPropsValues.getUserId(),
-				HashMapBuilder.put(
-					_language.getLanguageId(LocaleUtil.CHINA), "url-title-zh"
-				).put(
-					_language.getLanguageId(LocaleUtil.US), "url-title-en"
-				).build(),
-				_getServiceContext());
-
-		_friendlyURLEntryLocalService.deleteFriendlyURLLocalizationEntry(
-			friendlyURLEntry.getFriendlyURLEntryId(),
-			_language.getLanguageId(LocaleUtil.CHINA));
-
-		Assert.assertNotNull(
-			_friendlyURLEntryLocalService.fetchFriendlyURLEntry(
-				friendlyURLEntry.getFriendlyURLEntryId()));
-
-		_friendlyURLEntryLocalService.deleteFriendlyURLLocalizationEntry(
-			friendlyURLEntry.getFriendlyURLEntryId(),
-			_language.getLanguageId(LocaleUtil.US));
-
-		Assert.assertNull(
-			_friendlyURLEntryLocalService.fetchFriendlyURLEntry(
-				friendlyURLEntry.getFriendlyURLEntryId()));
-	}
-
-	@Test
 	public void testGetUniqueUrlTitleNormalizesUrlTitle() throws Exception {
 		String urlTitle = "url title with spaces";
 
-		Assert.assertEquals(
-			"url-title-with-spaces",
-			_friendlyURLEntryLocalService.getUniqueUrlTitle(
+		String uniqueUrlTitle =
+			FriendlyURLEntryLocalServiceUtil.getUniqueUrlTitle(
 				_group.getGroupId(),
-				_classNameLocalService.getClassNameId(User.class),
-				TestPropsValues.getUserId(), urlTitle, null));
+				ClassNameLocalServiceUtil.getClassNameId(User.class),
+				TestPropsValues.getUserId(), urlTitle);
+
+		Assert.assertEquals("url-title-with-spaces", uniqueUrlTitle);
 	}
 
 	@Test
 	public void testGetUniqueUrlTitleResolvesConflicts() throws Exception {
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 		String urlTitle = "existing-url-title";
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			urlTitle, _getServiceContext());
 
-		Assert.assertEquals(
-			"existing-url-title-1",
-			_friendlyURLEntryLocalService.getUniqueUrlTitle(
-				_group.getGroupId(), classNameId, _user.getUserId(), urlTitle,
-				null));
+		String uniqueUrlTitle =
+			FriendlyURLEntryLocalServiceUtil.getUniqueUrlTitle(
+				_group.getGroupId(), classNameId, _user.getUserId(), urlTitle);
+
+		Assert.assertEquals("existing-url-title-1", uniqueUrlTitle);
 	}
 
 	@Test
 	public void testGetUniqueUrlTitleReusesOwnedUrlTitles() throws Exception {
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 		String urlTitle = "existing-url-title";
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			urlTitle, _getServiceContext());
 
-		String uniqueUrlTitle = _friendlyURLEntryLocalService.getUniqueUrlTitle(
-			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
-			urlTitle, null);
+		String uniqueUrlTitle =
+			FriendlyURLEntryLocalServiceUtil.getUniqueUrlTitle(
+				_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
+				urlTitle);
 
 		Assert.assertEquals(urlTitle, uniqueUrlTitle);
 	}
 
 	@Test
 	public void testGetUniqueUrlTitleShortensToMaxLength() throws Exception {
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 
 		int maxLength = ModelHintsUtil.getMaxLength(
 			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
 
 		String urlTitle = StringUtil.randomString(maxLength + 1);
 
-		String uniqueUrlTitle = _friendlyURLEntryLocalService.getUniqueUrlTitle(
-			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
-			urlTitle, null);
+		String uniqueUrlTitle =
+			FriendlyURLEntryLocalServiceUtil.getUniqueUrlTitle(
+				_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
+				urlTitle);
 
 		Assert.assertEquals(maxLength, uniqueUrlTitle.length());
 	}
@@ -223,7 +193,7 @@ public class FriendlyURLEntryLocalServiceTest {
 	public void testGetUniqueUrlTitleWithNonasciiCharsShortensToMaxLength()
 		throws Exception {
 
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 
 		int maxLength = ModelHintsUtil.getMaxLength(
 			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
@@ -232,141 +202,90 @@ public class FriendlyURLEntryLocalServiceTest {
 
 		urlTitle += "あ";
 
-		String uniqueUrlTitle = _friendlyURLEntryLocalService.getUniqueUrlTitle(
-			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
-			urlTitle, null);
+		String uniqueUrlTitle =
+			FriendlyURLEntryLocalServiceUtil.getUniqueUrlTitle(
+				_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
+				urlTitle);
 
 		Assert.assertEquals(maxLength - 1, uniqueUrlTitle.length());
 	}
 
-	@Test
-	public void testValidateAllowsDuplicatesInDifferentLanguagesForDifferentClassPK()
-		throws Exception {
-
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
-
-		String urlTitle = _getRandomURLTitle();
-
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
-			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
-			HashMapBuilder.put(
-				_language.getLanguageId(LocaleUtil.getDefault()), urlTitle
-			).build(),
-			_getServiceContext());
-
-		_friendlyURLEntryLocalService.validate(
-			_group.getGroupId(), classNameId, _user.getUserId(),
-			_language.getLanguageId(LocaleUtil.BRAZIL), urlTitle);
-	}
-
-	@Test(expected = DuplicateFriendlyURLEntryException.class)
-	public void testValidateDuplicateLocalizedUrlTitleForDifferentClassPK()
-		throws Exception {
-
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
-
-		String urlTitle = _getRandomURLTitle();
-
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
-			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
-			HashMapBuilder.put(
-				_language.getLanguageId(LocaleUtil.getDefault()), urlTitle
-			).build(),
-			_getServiceContext());
-
-		_friendlyURLEntryLocalService.validate(
-			_group.getGroupId(), classNameId, _user.getUserId(),
-			_language.getLanguageId(LocaleUtil.getDefault()), urlTitle);
-	}
-
-	@Test
-	public void testValidateDuplicateLocalizedUrlTitleForSameClassPK()
-		throws Exception {
-
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
-
-		String urlTitle = _getRandomURLTitle();
-
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
-			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
-			HashMapBuilder.put(
-				_language.getLanguageId(LocaleUtil.getDefault()), urlTitle
-			).build(),
-			_getServiceContext());
-
-		_friendlyURLEntryLocalService.validate(
-			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
-			_language.getLanguageId(LocaleUtil.BRAZIL), urlTitle);
-	}
-
 	@Test(expected = DuplicateFriendlyURLEntryException.class)
 	public void testValidateDuplicateUrlTitle() throws Exception {
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 
-		String urlTitle = _getRandomURLTitle();
+		int maxLength = ModelHintsUtil.getMaxLength(
+			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		String urlTitle = StringUtil.randomString(maxLength);
+
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			urlTitle, _getServiceContext());
 
-		_friendlyURLEntryLocalService.validate(
+		FriendlyURLEntryLocalServiceUtil.validate(
 			_group.getGroupId(), classNameId, urlTitle);
 	}
 
 	@Test(expected = DuplicateFriendlyURLEntryException.class)
 	public void testValidateUrlTitleNotOwnedByModel() throws Exception {
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 
-		String urlTitle = _getRandomURLTitle();
+		int maxLength = ModelHintsUtil.getMaxLength(
+			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		String urlTitle = StringUtil.randomString(maxLength);
+
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			urlTitle, _getServiceContext());
 
-		_friendlyURLEntryLocalService.validate(
+		FriendlyURLEntryLocalServiceUtil.validate(
 			_group.getGroupId(), classNameId, _user.getUserId(), urlTitle);
 	}
 
 	@Test
 	public void testValidateUrlTitleOwnedByModel() throws Exception {
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 
-		String urlTitle = _getRandomURLTitle();
+		int maxLength = ModelHintsUtil.getMaxLength(
+			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
 
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+		String urlTitle = StringUtil.randomString(maxLength);
+
+		FriendlyURLEntryLocalServiceUtil.addFriendlyURLEntry(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			urlTitle, _getServiceContext());
 
-		_friendlyURLEntryLocalService.validate(
+		FriendlyURLEntryLocalServiceUtil.validate(
 			_group.getGroupId(), classNameId, TestPropsValues.getUserId(),
 			urlTitle);
 	}
 
 	@Test(expected = FriendlyURLLengthException.class)
 	public void testValidateUrlTitleWithInvalidLength() throws Exception {
-		long classNameId = _classNameLocalService.getClassNameId(User.class);
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 
 		int maxLength = ModelHintsUtil.getMaxLength(
 			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
 
 		String urlTitle = StringUtil.randomString(maxLength + 1);
 
-		_friendlyURLEntryLocalService.validate(
+		FriendlyURLEntryLocalServiceUtil.validate(
 			_group.getGroupId(), classNameId, urlTitle);
 	}
 
 	@Test
 	public void testValidateUrlTitleWithMaxLength() throws Exception {
-		_friendlyURLEntryLocalService.validate(
-			_group.getGroupId(),
-			_classNameLocalService.getClassNameId(User.class),
-			_getRandomURLTitle());
-	}
+		long classNameId = ClassNameLocalServiceUtil.getClassNameId(User.class);
 
-	private String _getRandomURLTitle() {
-		return StringUtil.randomString(
-			ModelHintsUtil.getMaxLength(
-				FriendlyURLEntryLocalization.class.getName(), "urlTitle"));
+		int maxLength = ModelHintsUtil.getMaxLength(
+			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
+
+		String urlTitle = StringUtil.randomString(maxLength);
+
+		FriendlyURLEntryLocalServiceUtil.validate(
+			_group.getGroupId(), classNameId, urlTitle);
 	}
 
 	private ServiceContext _getServiceContext() throws Exception {
@@ -374,17 +293,8 @@ public class FriendlyURLEntryLocalServiceTest {
 			_group.getGroupId(), _user.getUserId());
 	}
 
-	@Inject
-	private ClassNameLocalService _classNameLocalService;
-
-	@Inject
-	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
-
 	@DeleteAfterTestRun
 	private Group _group;
-
-	@Inject
-	private Language _language;
 
 	@DeleteAfterTestRun
 	private User _user;

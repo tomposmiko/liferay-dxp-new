@@ -28,6 +28,8 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 
+import java.io.IOException;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
@@ -41,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_HEALTH_CHECK,
 		"mvc.command.name=/commerce_health_check/fix_commerce_health_status_issue"
@@ -83,7 +86,7 @@ public class FixCommerceHealthStatusIssueMVCActionCommand
 		catch (Exception exception) {
 			hideDefaultErrorMessage(actionRequest);
 
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			jsonObject.put(
 				"error", exception.getMessage()
@@ -94,13 +97,13 @@ public class FixCommerceHealthStatusIssueMVCActionCommand
 
 		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
-		_writeJSON(actionResponse, jsonObject);
+		writeJSON(actionResponse, jsonObject);
 
 		hideDefaultSuccessMessage(actionRequest);
 	}
 
-	private void _writeJSON(ActionResponse actionResponse, Object object)
-		throws Exception {
+	protected void writeJSON(ActionResponse actionResponse, Object object)
+		throws IOException {
 
 		HttpServletResponse httpServletResponse =
 			_portal.getHttpServletResponse(actionResponse);

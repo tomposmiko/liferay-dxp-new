@@ -15,21 +15,21 @@
 package com.liferay.document.library.google.docs.internal.display.context;
 
 import com.liferay.document.library.display.context.DLUIItemKeys;
-import com.liferay.document.library.google.docs.internal.helper.GoogleDocsMetadataHelper;
+import com.liferay.document.library.google.docs.internal.util.GoogleDocsMetadataHelper;
 import com.liferay.document.library.google.docs.internal.util.constants.GoogleDocsConstants;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.UIItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.URLToolbarItem;
+import com.liferay.portal.kernel.servlet.taglib.ui.URLUIItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -46,15 +46,26 @@ public class GoogleDocsUIItemsProcessor {
 		_googleDocsMetadataHelper = googleDocsMetadataHelper;
 	}
 
-	public void processDropdownItems(List<DropdownItem> dropdownItems) {
-		_removeUnsupportedDropdownItems(dropdownItems);
+	public void processMenuItems(List<MenuItem> menuItems) {
+		_removeUnsupportedUIItems(menuItems);
 
-		_insertEditInGoogleDropdownItem(dropdownItems);
+		URLMenuItem urlMenuItem = _insertEditInGoogleURLUIItem(
+			new URLMenuItem(), menuItems);
+
+		urlMenuItem.setMethod("GET");
 	}
 
-	private <T> int _getIndex(List<T> items, Predicate<T> predicate) {
-		for (int i = 0; i < items.size(); i++) {
-			if (predicate.test(items.get(i))) {
+	public void processToolbarItems(List<ToolbarItem> toolbarItems) {
+		_removeUnsupportedUIItems(toolbarItems);
+
+		_insertEditInGoogleURLUIItem(new URLToolbarItem(), toolbarItems);
+	}
+
+	private int _getIndex(List<? extends UIItem> uiItems, String key) {
+		for (int i = 0; i < uiItems.size(); i++) {
+			UIItem uiItem = uiItems.get(i);
+
+			if (key.equals(uiItem.getKey())) {
 				return i;
 			}
 		}
@@ -62,68 +73,63 @@ public class GoogleDocsUIItemsProcessor {
 		return -1;
 	}
 
-	private void _insertEditInGoogleDropdownItem(
-		List<DropdownItem> dropdownItems) {
+	private <T extends URLUIItem> T _insertEditInGoogleURLUIItem(
+		T urlUIItem, List<? super T> urlUIItems) {
 
 		if (!_googleDocsMetadataHelper.containsField(
 				GoogleDocsConstants.DDM_FIELD_NAME_URL)) {
 
-			return;
+			return urlUIItem;
 		}
 
 		int index = _getIndex(
-			dropdownItems,
-			dropdownItem -> Objects.equals(
-				dropdownItem.get("key"), DLUIItemKeys.EDIT));
+			(List<? extends UIItem>)urlUIItems, DLUIItemKeys.EDIT);
 
 		if (index == -1) {
 			index = 0;
 		}
 
-		dropdownItems.add(
-			index,
-			DropdownItemBuilder.setHref(
-				_googleDocsMetadataHelper.getFieldValue(
-					GoogleDocsConstants.DDM_FIELD_NAME_URL)
-			).setKey(
-				GoogleDocsUIItemKeys.EDIT_IN_GOOGLE
-			).setLabel(
-				() -> {
-					ThemeDisplay themeDisplay =
-						(ThemeDisplay)_httpServletRequest.getAttribute(
-							WebKeys.THEME_DISPLAY);
+		urlUIItem.setKey(GoogleDocsUIItemKeys.EDIT_IN_GOOGLE);
 
-					return LanguageUtil.get(
-						themeDisplay.getLocale(), "edit-in-google-drive");
-				}
-			).setTarget(
-				"_blank"
-			).build());
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", themeDisplay.getLocale(), getClass());
+
+		String message = LanguageUtil.get(
+			resourceBundle, "edit-in-google-drive");
+
+		urlUIItem.setLabel(message);
+
+		urlUIItem.setTarget("_blank");
+
+		String editURL = _googleDocsMetadataHelper.getFieldValue(
+			GoogleDocsConstants.DDM_FIELD_NAME_URL);
+
+		urlUIItem.setURL(editURL);
+
+		urlUIItems.add(index, urlUIItem);
+
+		return urlUIItem;
 	}
 
-	private <T> void _removeUIItems(
-		List<T> items, Function<T, String> function, Set<String> keys) {
+	private void _removeUIItem(List<? extends UIItem> uiItems, String key) {
+		int index = _getIndex(uiItems, key);
 
-		Iterator<T> iterator = items.iterator();
-
-		while (iterator.hasNext()) {
-			T item = iterator.next();
-
-			if (keys.contains(function.apply(item))) {
-				iterator.remove();
-			}
+		if (index != -1) {
+			uiItems.remove(index);
 		}
 	}
 
-	private void _removeUnsupportedDropdownItems(
-		List<DropdownItem> dropdownItems) {
-
-		_removeUIItems(
-			dropdownItems, dropdownItem -> (String)dropdownItem.get("key"),
-			SetUtil.fromArray(
-				DLUIItemKeys.CANCEL_CHECKOUT, DLUIItemKeys.CHECKIN,
-				DLUIItemKeys.CHECKOUT, DLUIItemKeys.DOWNLOAD,
-				DLUIItemKeys.OPEN_IN_MS_OFFICE, "#edit-in-google-drive"));
+	private void _removeUnsupportedUIItems(List<? extends UIItem> uiItems) {
+		_removeUIItem(uiItems, DLUIItemKeys.CANCEL_CHECKOUT);
+		_removeUIItem(uiItems, DLUIItemKeys.CHECKIN);
+		_removeUIItem(uiItems, DLUIItemKeys.CHECKOUT);
+		_removeUIItem(uiItems, DLUIItemKeys.DOWNLOAD);
+		_removeUIItem(uiItems, DLUIItemKeys.OPEN_IN_MS_OFFICE);
+		_removeUIItem(uiItems, "#edit-in-google-drive");
 	}
 
 	private final GoogleDocsMetadataHelper _googleDocsMetadataHelper;

@@ -102,6 +102,18 @@ public class CounterLocalServiceTest {
 							objectName, "softEvictConnections", null, null);
 					}
 
+					// Tomcat
+
+					for (ObjectName objectName :
+							mBeanServer.queryNames(
+								null,
+								new ObjectName(
+									"TomcatJDBCPool:type=ConnectionPool," +
+										"name=*"))) {
+
+						mBeanServer.invoke(objectName, "purge", null, null);
+					}
+
 					return null;
 				}
 
@@ -131,13 +143,14 @@ public class CounterLocalServiceTest {
 
 		builder.setArguments(arguments);
 		builder.setBootstrapClassPath(
-			portalProcessConfig.getBootstrapClassPath());
+			_prependClassPath(
+				portalProcessConfig.getBootstrapClassPath(),
+				LiferayIntegrationTestRule.class));
 		builder.setReactClassLoader(PortalClassLoaderUtil.getClassLoader());
 		builder.setRuntimeClassPath(
 			_prependClassPath(
 				portalProcessConfig.getRuntimeClassPath(),
-				CounterLocalServiceTest.class,
-				LiferayIntegrationTestRule.class));
+				CounterLocalServiceTest.class));
 
 		ProcessConfig processConfig = builder.build();
 
@@ -176,28 +189,19 @@ public class CounterLocalServiceTest {
 		}
 	}
 
-	private String _prependClassPath(String baseClassPath, Class<?>... classes)
+	private String _prependClassPath(String baseClassPath, Class<?> clazz)
 		throws Exception {
 
-		StringBundler sb = new StringBundler((classes.length * 2) + 1);
+		ProtectionDomain protectionDomain = clazz.getProtectionDomain();
 
-		for (Class<?> clazz : classes) {
-			ProtectionDomain protectionDomain = clazz.getProtectionDomain();
+		CodeSource codeSource = protectionDomain.getCodeSource();
 
-			CodeSource codeSource = protectionDomain.getCodeSource();
+		URL url = codeSource.getLocation();
 
-			URL url = codeSource.getLocation();
+		File file = new File(url.toURI());
 
-			File file = new File(url.toURI());
-
-			sb.append(file.getPath());
-
-			sb.append(File.pathSeparator);
-		}
-
-		sb.append(baseClassPath);
-
-		return sb.toString();
+		return StringBundler.concat(
+			file.getPath(), File.pathSeparator, baseClassPath);
 	}
 
 	private static final String _COUNTER_NAME =
@@ -227,13 +231,25 @@ public class CounterLocalServiceTest {
 		public Long[] call() throws ProcessException {
 			System.setProperty(
 				PropsKeys.COUNTER_INCREMENT + "." + _counterName, "1");
+
 			System.setProperty("catalina.base", _catalinaBase);
-			System.setProperty("portal:hibernate.hbm.jaxb.cache", "false");
+
+			// C3PO
+
+			System.setProperty("portal:jdbc.default.maxPoolSize", "1");
+			System.setProperty("portal:jdbc.default.minPoolSize", "0");
 
 			// HikariCP
 
 			System.setProperty("portal:jdbc.default.maximumPoolSize", "1");
 			System.setProperty("portal:jdbc.default.minimumIdle", "0");
+
+			// Tomcat
+
+			System.setProperty("portal:jdbc.default.initialSize", "0");
+			System.setProperty("portal:jdbc.default.maxActive", "1");
+			System.setProperty("portal:jdbc.default.maxIdle", "0");
+			System.setProperty("portal:jdbc.default.minIdle", "0");
 
 			CacheKeyGeneratorUtil cacheKeyGeneratorUtil =
 				new CacheKeyGeneratorUtil();
@@ -244,7 +260,7 @@ public class CounterLocalServiceTest {
 			InitUtil.initWithSpring(
 				Arrays.asList(
 					"META-INF/base-spring.xml", "META-INF/counter-spring.xml"),
-				false, false, null);
+				false, true);
 
 			List<Long> ids = new ArrayList<>();
 

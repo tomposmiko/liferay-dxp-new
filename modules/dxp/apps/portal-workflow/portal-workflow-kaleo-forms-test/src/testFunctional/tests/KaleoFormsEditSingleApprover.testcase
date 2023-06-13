@@ -17,11 +17,11 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.addFieldSet(
-			kfFieldSetName = ${kfFieldSetName},
+			kfFieldSetName = "${kfFieldSetName}",
 			kfProcessName = "Kaleo Forms Process");
 
 		DynamicDataMapping.addField(
@@ -40,7 +40,7 @@ definition {
 		KaleoFormsAdmin.next();
 
 		KaleoFormsAdmin.chooseFieldSet(
-			kfFieldSetName = ${kfFieldSetName},
+			kfFieldSetName = "${kfFieldSetName}",
 			kfProcessName = "Kaleo Forms Process");
 
 		KaleoFormsAdmin.next();
@@ -67,7 +67,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -85,7 +85,7 @@ definition {
 
 			DMDocument.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 
 			Workflow.tearDownSpecificWorkflowDefinition(workflowDefinitionTitle = "Edited Workflow Definition");
 
@@ -97,7 +97,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test CompleteProcessAndViewEmailNotifications {
 		property portal.upstream = "quarantine";
 		property test.assert.javascript.errors = "false";
@@ -231,7 +231,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.editProcess(kfProcessName = "Kaleo Forms Process");
@@ -286,7 +286,7 @@ definition {
 		KaleoFormsAdmin.saveProcess(kfProcessName = "Kaleo Forms Process");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.viewProcess(kfProcessName = "Kaleo Forms Process");
@@ -300,7 +300,7 @@ definition {
 		Workflow.viewDefaultMyWorkflowTasksCP();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.submitNewProcess(kfProcessName = "Kaleo Forms Process");
@@ -328,12 +328,12 @@ definition {
 
 		Workflow.assignToMeTaskByActions(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Review");
 
 		Workflow.rejectTaskByActions(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Review");
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
@@ -342,7 +342,7 @@ definition {
 
 		Workflow.viewCompletedTask(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Review");
 
 		MockMock.viewMail(
@@ -362,12 +362,12 @@ definition {
 
 		Workflow.assignToMeTaskByActions(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Update");
 
 		Workflow.resubmitTaskByActions(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Update");
 
 		MockMock.viewMail(
@@ -387,19 +387,19 @@ definition {
 
 		Workflow.assignToMeTaskByActions(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Review");
 
 		Workflow.approveTaskByActions(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Review");
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
 		Workflow.viewCompletedTask(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Review");
 
 		Workflow.gotoCompletedTaskAssignedToMePreview(workflowAssetTitle = "Kaleo Forms Process");
@@ -409,15 +409,14 @@ definition {
 			fieldValue = "Test Test");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewApprovedProcessNotificationWithComments {
-		property ci.retries.disabled = "true";
 		property test.name.skip.portal.instance = "KaleoFormsEditSingleApprover#ViewApprovedProcessNotificationWithComments";
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.editProcess(kfProcessName = "Kaleo Forms Process");
@@ -434,7 +433,6 @@ definition {
 			nodeNotificationsDescription = "Review Notification Description",
 			nodeNotificationsExecutionType = "On Exit",
 			nodeNotificationsName = "Review Completed With Comments User Notification",
-			nodeNotificationsRecipientType = "Asset Creator",
 			nodeNotificationsTemplate = '''Submission reviewed. The reviewer left the following: $taskComments.''',
 			nodeNotificationsTemplateLanguage = "Velocity",
 			nodeNotificationsType = "User Notification");
@@ -457,7 +455,7 @@ definition {
 		KaleoFormsAdmin.saveProcess(kfProcessName = "Kaleo Forms Process");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.viewProcess(kfProcessName = "Kaleo Forms Process");
@@ -467,7 +465,7 @@ definition {
 		Workflow.viewDefaultMyWorkflowTasksCP();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.submitNewProcess(kfProcessName = "Kaleo Forms Process");
@@ -482,13 +480,13 @@ definition {
 
 		Workflow.assignToMeTaskByActions(
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Review");
 
 		Workflow.approveTaskByActions(
 			workflowActivityComment = "Process is approved",
 			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = ${workflowAssetType},
+			workflowAssetType = "${workflowAssetType}",
 			workflowTask = "Review");
 
 		Navigator.openURL();

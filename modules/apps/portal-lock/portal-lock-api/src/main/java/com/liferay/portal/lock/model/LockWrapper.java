@@ -448,11 +448,6 @@ public class LockWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected LockWrapper wrap(Lock lock) {
 		return new LockWrapper(lock);
 	}

@@ -12,13 +12,14 @@
  * details.
  */
 
-import {Observer} from '@clayui/modal/lib/types';
 import React from 'react';
+declare global {
+	const Liferay: any;
+}
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
-	observer: Observer;
+	observer: any;
 	onClose: () => void;
-	storageTypes: string[];
 }
 declare const ModalWithProvider: React.FC<IProps>;
 export default ModalWithProvider;

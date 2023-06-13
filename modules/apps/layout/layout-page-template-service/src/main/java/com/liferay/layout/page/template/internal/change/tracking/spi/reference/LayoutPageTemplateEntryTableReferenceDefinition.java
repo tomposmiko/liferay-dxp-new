@@ -65,7 +65,8 @@ public class LayoutPageTemplateEntryTableReferenceDefinition
 				)
 			)
 		).resourcePermissionReference(
-			LayoutPageTemplateEntryTable.INSTANCE.layoutPageTemplateEntryId,
+			LayoutPageTemplateEntryTable.INSTANCE.
+				layoutPageTemplateCollectionId,
 			LayoutPageTemplateEntry.class
 		);
 	}

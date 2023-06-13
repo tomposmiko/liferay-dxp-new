@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -90,9 +89,7 @@ public class ProductOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long catalogId;
 
-	@Schema(
-		example = "{hu_HU=Description HU, hr_HR=Description HR, en_US=Description}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getDescription() {
 		return description;
@@ -122,7 +119,7 @@ public class ProductOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> description;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getFacetable() {
 		return facetable;
 	}
@@ -150,9 +147,7 @@ public class ProductOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean facetable;
 
-	@Schema(
-		example = "checkbox, checkbox_multiple, date, numeric, radio, select"
-	)
+	@Schema
 	public String getFieldType() {
 		return fieldType;
 	}
@@ -182,7 +177,7 @@ public class ProductOption implements Serializable {
 	protected String fieldType;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -208,7 +203,7 @@ public class ProductOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(example = "color")
+	@Schema
 	public String getKey() {
 		return key;
 	}
@@ -235,7 +230,7 @@ public class ProductOption implements Serializable {
 	@NotEmpty
 	protected String key;
 
-	@Schema(example = "{en_US=Color, hr_HR=Color HR, hu_HU=Color HU}")
+	@Schema
 	@Valid
 	public Map<String, String> getName() {
 		return name;
@@ -266,7 +261,7 @@ public class ProductOption implements Serializable {
 	protected Map<String, String> name;
 
 	@DecimalMin("0")
-	@Schema(example = "30080")
+	@Schema
 	public Long getOptionId() {
 		return optionId;
 	}
@@ -295,7 +290,7 @@ public class ProductOption implements Serializable {
 	@NotNull
 	protected Long optionId;
 
-	@Schema(example = "1.2")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}
@@ -355,7 +350,7 @@ public class ProductOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ProductOptionValue[] productOptionValues;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getRequired() {
 		return required;
 	}
@@ -383,7 +378,7 @@ public class ProductOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean required;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getSkuContributor() {
 		return skuContributor;
 	}
@@ -589,9 +584,9 @@ public class ProductOption implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -617,7 +612,7 @@ public class ProductOption implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -649,7 +644,7 @@ public class ProductOption implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -665,10 +660,5 @@ public class ProductOption implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

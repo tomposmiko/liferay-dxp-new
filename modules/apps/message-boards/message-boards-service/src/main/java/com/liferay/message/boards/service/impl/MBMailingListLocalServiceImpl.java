@@ -23,6 +23,7 @@ import com.liferay.message.boards.exception.MailingListOutUserNameException;
 import com.liferay.message.boards.internal.messaging.MailingListRequest;
 import com.liferay.message.boards.model.MBMailingList;
 import com.liferay.message.boards.service.base.MBMailingListLocalServiceBaseImpl;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -30,13 +31,14 @@ import com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhit
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.Trigger;
-import com.liferay.portal.kernel.scheduler.TriggerFactory;
+import com.liferay.portal.kernel.scheduler.TriggerFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -77,7 +79,7 @@ public class MBMailingListLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		_validate(
+		validate(
 			emailAddress, inServerName, inUserName, outEmailAddress, outCustom,
 			outServerName, outUserName, active);
 
@@ -115,7 +117,7 @@ public class MBMailingListLocalServiceImpl
 		// Scheduler
 
 		if (active) {
-			_scheduleMailingList(mailingList);
+			scheduleMailingList(mailingList);
 		}
 
 		return mailingList;
@@ -144,7 +146,7 @@ public class MBMailingListLocalServiceImpl
 	public void deleteMailingList(MBMailingList mailingList)
 		throws PortalException {
 
-		_unscheduleMailingList(mailingList);
+		unscheduleMailingList(mailingList);
 
 		mbMailingListPersistence.remove(mailingList);
 	}
@@ -176,7 +178,7 @@ public class MBMailingListLocalServiceImpl
 
 		// Message boards mailing list
 
-		_validate(
+		validate(
 			emailAddress, inServerName, inUserName, outEmailAddress, outCustom,
 			outServerName, outUserName, active);
 
@@ -205,10 +207,17 @@ public class MBMailingListLocalServiceImpl
 
 		// Scheduler
 
-		_unscheduleMailingList(mailingList);
-
 		if (active) {
-			_scheduleMailingList(mailingList);
+			try (SafeCloseable safeCloseable =
+					ProxyModeThreadLocal.setWithSafeCloseable(true)) {
+
+				unscheduleMailingList(mailingList);
+
+				scheduleMailingList(mailingList);
+			}
+		}
+		else {
+			unscheduleMailingList(mailingList);
 		}
 
 		return mailingList;
@@ -233,21 +242,21 @@ public class MBMailingListLocalServiceImpl
 		}
 	}
 
-	private String _getSchedulerGroupName(MBMailingList mailingList) {
+	protected String getSchedulerGroupName(MBMailingList mailingList) {
 		return StringBundler.concat(
 			DestinationNames.MESSAGE_BOARDS_MAILING_LIST, StringPool.SLASH,
 			mailingList.getMailingListId());
 	}
 
-	private void _scheduleMailingList(MBMailingList mailingList)
+	protected void scheduleMailingList(MBMailingList mailingList)
 		throws PortalException {
 
-		String groupName = _getSchedulerGroupName(mailingList);
+		String groupName = getSchedulerGroupName(mailingList);
 
 		Calendar startDate = CalendarFactoryUtil.getCalendar();
 
-		Trigger trigger = _triggerFactory.createTrigger(
-			groupName, groupName, startDate.getTime(), null,
+		Trigger trigger = TriggerFactoryUtil.createTrigger(
+			groupName, groupName, startDate.getTime(),
 			mailingList.getInReadInterval(), TimeUnit.MINUTE);
 
 		MailingListRequest mailingListRequest = new MailingListRequest();
@@ -272,18 +281,18 @@ public class MBMailingListLocalServiceImpl
 
 		SchedulerEngineHelperUtil.schedule(
 			trigger, StorageType.PERSISTED, null,
-			DestinationNames.MESSAGE_BOARDS_MAILING_LIST, message);
+			DestinationNames.MESSAGE_BOARDS_MAILING_LIST, message, 0);
 	}
 
-	private void _unscheduleMailingList(MBMailingList mailingList)
+	protected void unscheduleMailingList(MBMailingList mailingList)
 		throws PortalException {
 
-		String groupName = _getSchedulerGroupName(mailingList);
+		String groupName = getSchedulerGroupName(mailingList);
 
 		SchedulerEngineHelperUtil.delete(groupName, StorageType.PERSISTED);
 	}
 
-	private void _validate(
+	protected void validate(
 			String emailAddress, String inServerName, String inUserName,
 			String outEmailAddress, boolean outCustom, String outServerName,
 			String outUserName, boolean active)
@@ -322,9 +331,6 @@ public class MBMailingListLocalServiceImpl
 	@Reference
 	private LiferayJSONDeserializationWhitelist
 		_liferayJSONDeserializationWhitelist;
-
-	@Reference
-	private TriggerFactory _triggerFactory;
 
 	private Closeable _unregister;
 

@@ -19,28 +19,24 @@ import ClayLayout from '@clayui/layout';
 import ClayModal, {useModal} from '@clayui/modal';
 import ClaySticker from '@clayui/sticker';
 import ClayTabs from '@clayui/tabs';
-import {ReactDOMServer, useEventListener} from '@liferay/frontend-js-react-web';
-import {useId} from '@liferay/layout-content-page-editor-web';
+import {useEventListener} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
 import {fetch, navigate, openSelectionModal} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 import '../css/ApplicationsMenu.scss';
 
 const getOpenMenuTooltip = (keyLabel) => (
 	<>
-		<div>{Liferay.Language.get('open-applications-menu')}</div>
-		<kbd className="c-kbd c-kbd-dark mt-1">
-			<kbd className="c-kbd">Ctrl</kbd>
-
-			<span className="c-kbd-separator">+</span>
-
+		<div>{Liferay.Language.get('open-menu')}</div>
+		<kbd className="c-kbd c-kbd-dark">
 			<kbd className="c-kbd">{keyLabel}</kbd>
-
 			<span className="c-kbd-separator">+</span>
-
-			<kbd className="c-kbd">A</kbd>
+			<kbd className="c-kbd">⇧</kbd>
+			<span className="c-kbd-separator">+</span>
+			<kbd className="c-kbd">M</kbd>
 		</kbd>
 	</>
 );
@@ -48,44 +44,45 @@ const getOpenMenuTooltip = (keyLabel) => (
 const SitesPanel = ({portletNamespace, sites, virtualInstance}) => {
 	return (
 		<div className="applications-menu-sites c-p-3 c-px-md-4">
-			<h2 className="applications-menu-sites-label c-mt-2 c-mt-md-0 mb-0 text-uppercase">
+			<h2 className="applications-menu-sites-label c-mt-2 c-mt-md-0 text-uppercase">
 				{Liferay.Language.get('sites')}
 			</h2>
 
 			<div className="c-mt-2">
-				{virtualInstance && (
-					<a
-						className="applications-menu-nav-link applications-menu-virtual-instance"
-						href={virtualInstance.url}
-					>
-						<ClayLayout.ContentRow verticalAlign="center">
-							<ClayLayout.ContentCol>
-								<ClaySticker>
-									<img
-										alt=""
-										height="32px"
-										src={virtualInstance.logoURL}
-									/>
-								</ClaySticker>
-							</ClayLayout.ContentCol>
+				<ul className="c-mb-0 list-unstyled">
+					{virtualInstance && (
+						<li className="applications-menu-virtual-instance c-mt-2">
+							<a
+								className="applications-menu-nav-link"
+								href={virtualInstance.url}
+							>
+								<ClayLayout.ContentRow verticalAlign="center">
+									<ClayLayout.ContentCol>
+										<ClaySticker>
+											<img
+												alt=""
+												height="32px"
+												src={virtualInstance.logoURL}
+											/>
+										</ClaySticker>
+									</ClayLayout.ContentCol>
 
-							<ClayLayout.ContentCol className="applications-menu-shrink c-ml-2">
-								<span className="text-truncate">
-									{virtualInstance.label}
-								</span>
-							</ClayLayout.ContentCol>
-						</ClayLayout.ContentRow>
-					</a>
-				)}
+									<ClayLayout.ContentCol className="applications-menu-shrink c-ml-2">
+										<span className="text-truncate">
+											{virtualInstance.label}
+										</span>
+									</ClayLayout.ContentCol>
+								</ClayLayout.ContentRow>
+							</a>
+						</li>
+					)}
+				</ul>
 			</div>
 
 			<div className="applications-menu-nav-divider c-my-3"></div>
 
 			<div className="applications-menu-sites c-my-2">
-				<ul
-					aria-label={Liferay.Language.get('sites')}
-					className="list-unstyled"
-				>
+				<ul className="list-unstyled">
 					{sites && (
 						<Sites
 							mySites={sites.mySites}
@@ -147,10 +144,7 @@ const Sites = ({mySites, portletNamespace, recentSites, viewAllURL}) => {
 				))}
 
 			{recentSites?.length > 0 && mySites?.length > 0 && (
-				<li
-					className="applications-menu-nav-divider c-mt-3"
-					role="presentation"
-				></li>
+				<li className="applications-menu-nav-divider c-mt-3"></li>
 			)}
 
 			{mySites?.length > 0 &&
@@ -215,13 +209,16 @@ const AppsPanel = ({
 
 	return (
 		<div className="applications-menu-wrapper">
+			<h1 className="sr-only">
+				{Liferay.Language.get('applications-menu')}
+			</h1>
 			<div className="applications-menu-header">
 				<ClayLayout.ContainerFluid>
 					<ClayLayout.Row>
 						<ClayLayout.Col>
 							<ClayLayout.ContentRow verticalAlign="center">
 								<ClayLayout.ContentCol expand>
-									<ClayTabs>
+									<ClayTabs modern>
 										{categories.map(
 											({key, label}, index) => (
 												<ClayTabs.Item
@@ -246,12 +243,9 @@ const AppsPanel = ({
 
 								<ClayLayout.ContentCol>
 									<ClayButtonWithIcon
-										aria-label={Liferay.Language.get(
-											'close'
-										)}
 										displayType="unstyled"
 										onClick={handleCloseButtonClick}
-										size="sm"
+										small
 										symbol="times"
 										title={Liferay.Language.get('close')}
 									/>
@@ -275,15 +269,56 @@ const AppsPanel = ({
 										<div className="applications-menu-nav-columns c-mt-md-3 c-my-2">
 											{childCategories.map(
 												({key, label, panelApps}) => (
-													<NavigationSection
-														id={`nav_${key}`}
+													<ClayLayout.Col
 														key={key}
-														label={label}
-														panelApps={panelApps}
-														selectedPortletId={
-															selectedPortletId
-														}
-													/>
+														md
+													>
+														<ul className="list-unstyled">
+															<li className="c-my-3">
+																<h2 className="applications-menu-nav-header">
+																	{label}
+																</h2>
+															</li>
+
+															{panelApps.map(
+																({
+																	label,
+																	portletId,
+																	url,
+																}) => (
+																	<li
+																		className="c-mt-2"
+																		key={
+																			portletId
+																		}
+																	>
+																		<a
+																			className={classNames(
+																				'component-link applications-menu-nav-link',
+																				{
+																					active:
+																						portletId ===
+																						selectedPortletId,
+																				}
+																			)}
+																			href={
+																				url
+																			}
+																		>
+																			<span
+																				className="c-inner"
+																				tabIndex="-1"
+																			>
+																				{
+																					label
+																				}
+																			</span>
+																		</a>
+																	</li>
+																)
+															)}
+														</ul>
+													</ClayLayout.Col>
 												)
 											)}
 										</div>
@@ -312,7 +347,7 @@ const AppsPanel = ({
 					<ClayLayout.Row>
 						<ClayLayout.Col lg="9" md="8">
 							<ClayLayout.ContentRow
-								className="applications-menu-border-top bg-white c-py-3"
+								className="applications-menu-border-top c-py-3"
 								verticalAlign="center"
 							>
 								<ClayLayout.ContentCol expand>
@@ -351,38 +386,6 @@ const AppsPanel = ({
 	);
 };
 
-const NavigationSection = ({id, label, panelApps, selectedPortletId}) => {
-	return (
-		<ClayLayout.Col md>
-			<nav aria-labelledby={id}>
-				<h2 className="applications-menu-nav-header c-my-3" id={id}>
-					{label}
-				</h2>
-
-				<ul className="list-unstyled">
-					{panelApps.map(({label, portletId, url}) => (
-						<li className="c-mt-2" key={portletId}>
-							<a
-								className={classNames(
-									'component-link applications-menu-nav-link',
-									{
-										active: portletId === selectedPortletId,
-									}
-								)}
-								href={url}
-							>
-								<span className="c-inner" tabIndex="-1">
-									{label}
-								</span>
-							</a>
-						</li>
-					))}
-				</ul>
-			</nav>
-		</ClayLayout.Col>
-	);
-};
-
 const ApplicationsMenu = ({
 	liferayLogoURL,
 	liferayName,
@@ -391,19 +394,14 @@ const ApplicationsMenu = ({
 	virtualInstance,
 }) => {
 	const [appsPanelData, setAppsPanelData] = useState({});
-	const buttonRef = useRef();
-	const buttonTitleId = useId();
 	const [visible, setVisible] = useState(false);
 
 	const {observer, onClose} = useModal({
-		onClose: () => {
-			setVisible(false);
-			buttonRef.current.focus();
-		},
+		onClose: () => setVisible(false),
 	});
 
 	const buttonTitle = useMemo(() => {
-		const keyLabel = Liferay.Browser.isMac() ? '⌥' : 'Alt';
+		const keyLabel = Liferay.Browser.isMac() ? '⌘' : 'Ctrl';
 
 		return getOpenMenuTooltip(keyLabel);
 	}, []);
@@ -436,12 +434,14 @@ const ApplicationsMenu = ({
 	useEventListener(
 		'keydown',
 		(event) => {
-			const AKey = Liferay.Browser.isMac() ? 'å' : 'a';
+			const isCMDPressed = Liferay.Browser.isMac()
+				? event.metaKey
+				: event.ctrlKey;
 
 			if (
-				event.ctrlKey &&
-				event.altKey &&
-				event.key.toLowerCase() === AKey
+				isCMDPressed &&
+				event.shiftKey &&
+				event.key.toLowerCase() === 'm'
 			) {
 				event.preventDefault();
 
@@ -477,11 +477,7 @@ const ApplicationsMenu = ({
 					observer={observer}
 					status="info"
 				>
-					<ClayModal.Header className="sr-only">
-						{Liferay.Language.get('applications-menu')}
-					</ClayModal.Header>
-
-					<ClayModal.Body className="p-0">
+					<ClayModal.Body>
 						<AppsPanel
 							handleCloseButtonClick={onClose}
 							liferayLogoURL={liferayLogoURL}
@@ -494,25 +490,19 @@ const ApplicationsMenu = ({
 			)}
 
 			<ClayButtonWithIcon
-				aria-haspopup="dialog"
-				aria-labelledby={buttonTitleId}
+				aria-label={Liferay.Language.get('open-menu')}
 				className="dropdown-toggle lfr-portal-tooltip"
 				data-qa-id="applicationsMenu"
-				data-title={ReactDOMServer.renderToString(buttonTitle)}
 				data-title-set-as-html
 				data-tooltip-align="bottom-left"
 				displayType="unstyled"
 				onClick={handleTriggerButtonClick}
 				onFocus={fetchCategories}
 				onMouseOver={fetchCategories}
-				ref={buttonRef}
-				size="sm"
+				small
 				symbol="grid"
+				title={ReactDOMServer.renderToString(buttonTitle)}
 			/>
-
-			<div className="sr-only" id={buttonTitleId}>
-				{buttonTitle}
-			</div>
 		</>
 	);
 };

@@ -30,8 +30,8 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -65,7 +65,7 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testArrayOfArrays() throws IOException {
-		_assertDocument(
+		assertDocument(
 			xContentBuilder -> xContentBuilder.startArray(
 				"alpha"
 			).startArray(
@@ -94,7 +94,7 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testArrayOfObjects() throws IOException {
-		_assertDocument(
+		assertDocument(
 			xContentBuilder -> xContentBuilder.field(
 				"group", "fans"
 			).field(
@@ -131,7 +131,7 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testInnerObject() throws IOException {
-		_assertDocument(
+		assertDocument(
 			xContentBuilder -> xContentBuilder.startObject(
 				"alpha"
 			).field(
@@ -143,7 +143,7 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testMultipleInnerObjects() throws IOException {
-		_assertDocument(
+		assertDocument(
 			xContentBuilder -> xContentBuilder.field(
 				"region", "US"
 			).field(
@@ -178,7 +178,7 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testMultipleValuesSetStrings() throws IOException {
-		_assertDocument(
+		assertDocument(
 			xContentBuilder -> xContentBuilder.array(
 				"alpha", new String[] {"one", "two", "three"}),
 			documentBuilder -> documentBuilder.setStrings(
@@ -187,7 +187,7 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testMultipleValuesSetValue() throws IOException {
-		_assertDocument(
+		assertDocument(
 			xContentBuilder -> xContentBuilder.array(
 				"alpha", new String[] {"one", "two", "three"}),
 			documentBuilder -> documentBuilder.setValue(
@@ -196,7 +196,7 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testMultipleValuesSetValues() throws IOException {
-		_assertDocument(
+		assertDocument(
 			xContentBuilder -> xContentBuilder.array(
 				"alpha", new String[] {"one", "two", "three"}),
 			documentBuilder -> documentBuilder.setValues(
@@ -205,28 +205,28 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testNull() throws Exception {
-		_assertDocumentSameAsLegacy(null, "{}");
+		assertDocumentSameAsLegacy(null, "{}");
 	}
 
 	@Test
 	public void testNullValue() throws Exception {
-		_assertDocument(
+		assertDocument(
 			"{\"field\":[null]}",
 			builder().setValue(_FIELD, Collections.singleton(null)));
 	}
 
 	@Test
 	public void testNullValues() throws Exception {
-		_assertDocument(
+		assertDocument(
 			"{\"field\":[null,null]}",
 			builder().setValues(_FIELD, Arrays.asList(null, null)));
 	}
 
 	@Test
 	public void testSpaces() throws Exception {
-		_assertDocument(StringPool.SPACE, "{\"field\":\" \"}");
+		assertDocument(StringPool.SPACE, "{\"field\":\" \"}");
 
-		_assertDocument(StringPool.THREE_SPACES, "{\"field\":\"   \"}");
+		assertDocument(StringPool.THREE_SPACES, "{\"field\":\"   \"}");
 	}
 
 	@Test
@@ -238,18 +238,49 @@ public class DefaultElasticsearchDocumentFactoryTest {
 
 	@Test
 	public void testStringBlank() throws Exception {
-		_assertDocumentSameAsLegacy(StringPool.BLANK, "{\"field\":\"\"}");
+		assertDocumentSameAsLegacy(StringPool.BLANK, "{\"field\":\"\"}");
 	}
 
 	@Test
 	public void testStringNull() throws Exception {
-		_assertDocumentSameAsLegacy(StringPool.NULL, "{\"field\":\"null\"}");
+		assertDocumentSameAsLegacy(StringPool.NULL, "{\"field\":\"null\"}");
 	}
 
 	public interface XContentBuilderConsumer {
 
 		public void accept(XContentBuilder xContentBuilder) throws IOException;
 
+	}
+
+	protected void assertDocument(
+		String expected, DocumentBuilder documentBuilder) {
+
+		Assert.assertEquals(
+			expected,
+			Strings.toString(
+				_elasticsearchDocumentFactory.getElasticsearchDocument(
+					documentBuilder.build())));
+	}
+
+	protected void assertDocument(String value, String json) {
+		assertDocument(
+			json, builder().setStrings(_FIELD, new String[] {value}));
+	}
+
+	protected void assertDocument(
+		XContentBuilderConsumer expectedXContentBuilderConsumer,
+		Consumer<DocumentBuilder> actualDocumentBuilderConsumer) {
+
+		XContentBuilder expectedXContentBuilder = createXContentBuilder(
+			expectedXContentBuilderConsumer);
+
+		XContentBuilder actualXContentBuilder =
+			_elasticsearchDocumentFactory.getElasticsearchDocument(
+				buildDocument(actualDocumentBuilderConsumer));
+
+		Assert.assertEquals(
+			Strings.toString(expectedXContentBuilder),
+			Strings.toString(actualXContentBuilder));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -263,47 +294,12 @@ public class DefaultElasticsearchDocumentFactoryTest {
 			_elasticsearchDocumentFactory.getElasticsearchDocument(document));
 	}
 
-	protected DocumentBuilder builder() {
-		return new DocumentBuilderImpl();
-	}
-
-	private void _assertDocument(
-		String expected, DocumentBuilder documentBuilder) {
-
-		Assert.assertEquals(
-			expected,
-			Strings.toString(
-				_elasticsearchDocumentFactory.getElasticsearchDocument(
-					documentBuilder.build())));
-	}
-
-	private void _assertDocument(String value, String json) {
-		_assertDocument(
-			json, builder().setStrings(_FIELD, new String[] {value}));
-	}
-
-	private void _assertDocument(
-		XContentBuilderConsumer expectedXContentBuilderConsumer,
-		Consumer<DocumentBuilder> actualDocumentBuilderConsumer) {
-
-		XContentBuilder expectedXContentBuilder = _createXContentBuilder(
-			expectedXContentBuilderConsumer);
-
-		XContentBuilder actualXContentBuilder =
-			_elasticsearchDocumentFactory.getElasticsearchDocument(
-				_buildDocument(actualDocumentBuilderConsumer));
-
-		Assert.assertEquals(
-			Strings.toString(expectedXContentBuilder),
-			Strings.toString(actualXContentBuilder));
-	}
-
-	private void _assertDocumentSameAsLegacy(String value, String json) {
-		_assertDocument(value, json);
+	protected void assertDocumentSameAsLegacy(String value, String json) {
+		assertDocument(value, json);
 		assertDocumentLegacy(value, json);
 	}
 
-	private Document _buildDocument(
+	protected Document buildDocument(
 		Consumer<DocumentBuilder> documentBuilderConsumer) {
 
 		DocumentBuilder documentBuilder = builder();
@@ -313,7 +309,11 @@ public class DefaultElasticsearchDocumentFactoryTest {
 		return documentBuilder.build();
 	}
 
-	private XContentBuilder _createXContentBuilder(
+	protected DocumentBuilder builder() {
+		return new DocumentBuilderImpl();
+	}
+
+	protected XContentBuilder createXContentBuilder(
 		XContentBuilderConsumer xContentBuilderConsumer) {
 
 		try {

@@ -17,7 +17,7 @@ package com.liferay.commerce.product.content.web.internal.util;
 import com.liferay.commerce.media.CommerceMediaResolverUtil;
 import com.liferay.commerce.product.content.util.CPMedia;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
-import com.liferay.document.library.util.DLURLHelperUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -31,18 +31,17 @@ public class CPMediaImpl implements CPMedia {
 	public CPMediaImpl(FileEntry fileEntry, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		String defaultURL = DLURLHelperUtil.getDownloadURL(
+		String defaultURL = DLUtil.getDownloadURL(
 			fileEntry, fileEntry.getFileVersion(), themeDisplay,
 			StringPool.BLANK);
 
 		_downloadURL = defaultURL;
 
 		_id = fileEntry.getFileEntryId();
-		_mimeType = fileEntry.getMimeType();
-		_size = 0;
-		_thumbnailURL = defaultURL;
-		_title = fileEntry.getTitle();
 		_url = defaultURL;
+		_thumbnailURL = defaultURL;
+		_mimeType = fileEntry.getMimeType();
+		_title = fileEntry.getTitle();
 	}
 
 	public CPMediaImpl(long groupId) throws PortalException {
@@ -52,7 +51,6 @@ public class CPMediaImpl implements CPMedia {
 
 		_id = 0;
 		_mimeType = null;
-		_size = 0;
 		_thumbnailURL = defaultURL;
 		_title = null;
 		_url = defaultURL;
@@ -72,11 +70,9 @@ public class CPMediaImpl implements CPMedia {
 
 		if (fileEntry == null) {
 			_mimeType = StringPool.BLANK;
-			_size = 0;
 		}
 		else {
 			_mimeType = fileEntry.getMimeType();
-			_size = fileEntry.getSize();
 		}
 
 		_thumbnailURL = CommerceMediaResolverUtil.getThumbnailURL(
@@ -96,11 +92,6 @@ public class CPMediaImpl implements CPMedia {
 	@Override
 	public long getId() {
 		return _id;
-	}
-
-	@Override
-	public long getSize() {
-		return _size;
 	}
 
 	@Override
@@ -126,7 +117,6 @@ public class CPMediaImpl implements CPMedia {
 	private final String _downloadURL;
 	private final long _id;
 	private final String _mimeType;
-	private final long _size;
 	private final String _thumbnailURL;
 	private final String _title;
 	private final String _url;

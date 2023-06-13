@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -90,8 +89,7 @@ public class AssetVocabularyIndexerIndexedFieldsTest {
 		_groups = groupSearchFixture.getGroups();
 
 		_indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper, uidFactory,
-			documentBuilderFactory);
+			resourcePermissionLocalService, uidFactory, documentBuilderFactory);
 		_defaultLocale = LocaleThreadLocal.getDefaultLocale();
 	}
 
@@ -127,14 +125,12 @@ public class AssetVocabularyIndexerIndexedFieldsTest {
 				searchRequestBuilderFactory.builder(
 				).companyId(
 					_group.getCompanyId()
-				).fetchSourceIncludes(
-					new String[] {"*_sortable"}
-				).fields(
-					StringPool.STAR
 				).groupIds(
 					_group.getGroupId()
 				).locale(
 					locale
+				).fields(
+					StringPool.STAR
 				).modelIndexerClasses(
 					AssetVocabulary.class
 				).queryString(
@@ -161,9 +157,6 @@ public class AssetVocabularyIndexerIndexedFieldsTest {
 
 	@Inject
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
-
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
 
 	@Inject
 	protected Searcher searcher;
@@ -205,17 +198,11 @@ public class AssetVocabularyIndexerIndexedFieldsTest {
 		).put(
 			Field.USER_NAME, StringUtil.lowerCase(assetVocabulary.getUserName())
 		).put(
-			Field.VISIBILITY_TYPE,
-			String.valueOf(assetVocabulary.getVisibilityType())
-		).put(
 			"name_sortable", StringUtil.lowerCase(assetVocabulary.getName())
 		).put(
 			"title_ja_JP", assetVocabulary.getName()
 		).put(
 			"title_sortable", StringUtil.lowerCase(assetVocabulary.getName())
-		).put(
-			"visibilityType_sortable",
-			String.valueOf(assetVocabulary.getVisibilityType())
 		).build();
 
 		_indexedFieldsFixture.populateUID(assetVocabulary, map);

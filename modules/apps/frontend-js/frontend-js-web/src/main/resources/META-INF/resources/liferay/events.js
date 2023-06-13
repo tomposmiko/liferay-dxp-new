@@ -13,8 +13,8 @@
  */
 
 (function (A) {
-	const CLICK_EVENTS = {};
-	const Util = Liferay.Util;
+	var CLICK_EVENTS = {};
+	var Util = Liferay.Util;
 
 	A.use('attribute', 'oop', (A) => {
 		A.augment(Liferay, A.Attribute, true);
@@ -24,19 +24,17 @@
 		Liferay,
 		'delegateClick',
 		(id, fn) => {
-			const element = A.config.doc.getElementById(id);
+			var element = A.config.doc.getElementById(id);
 
-			if (!element || element.id !== id) {
+			if (!element || element.id != id) {
 				return;
 			}
 
-			// eslint-disable-next-line @liferay/aui/no-one
-			const guid = A.one(element).addClass('lfr-delegate-click').guid();
+			var guid = A.one(element).addClass('lfr-delegate-click').guid();
 
 			CLICK_EVENTS[guid] = fn;
 
 			if (!Liferay._baseDelegateHandle) {
-				// eslint-disable-next-line @liferay/aui/no-get-body
 				Liferay._baseDelegateHandle = A.getBody().delegate(
 					'click',
 					Liferay._baseDelegate,
@@ -48,9 +46,9 @@
 	);
 
 	Liferay._baseDelegate = function (event) {
-		const id = event.currentTarget.attr('id');
+		var id = event.currentTarget.attr('id');
 
-		const fn = CLICK_EVENTS[id];
+		var fn = CLICK_EVENTS[id];
 
 		if (fn) {
 			fn.apply(this, arguments);
@@ -70,7 +68,6 @@
 
 				Liferay.fire('submitForm', {
 					action,
-					// eslint-disable-next-line @liferay/aui/no-one
 					form: A.one(form),
 					singleSubmit,
 					validate: validate !== false,
@@ -82,15 +79,15 @@
 
 	Liferay.publish('submitForm', {
 		defaultFn(event) {
-			const form = event.form;
+			var form = event.form;
 
-			let hasErrors = false;
+			var hasErrors = false;
 
 			if (event.validate) {
-				const liferayForm = Liferay.Form.get(form.attr('id'));
+				var liferayForm = Liferay.Form.get(form.attr('id'));
 
 				if (liferayForm) {
-					const validator = liferayForm.formValidator;
+					var validator = liferayForm.formValidator;
 
 					if (A.instanceOf(validator, A.FormValidator)) {
 						validator.validate();
@@ -104,35 +101,22 @@
 				}
 			}
 
-			function enableFormButtons(inputs) {
-				Util._submitLocked = null;
-
-				Util.toggleDisabled(inputs, false);
-			}
-
 			if (!hasErrors) {
-				let action = event.action || form.getAttribute('action');
+				var action = event.action || form.getAttribute('action');
 
-				const singleSubmit = event.singleSubmit;
+				var singleSubmit = event.singleSubmit;
 
-				const inputs = form.all(
+				var inputs = form.all(
 					'button[type=submit], input[type=button], input[type=image], input[type=reset], input[type=submit]'
 				);
 
-				const inputsArray = Array.from(inputs._nodes);
-
-				if (inputsArray.length) {
-					inputsArray.map((input) => {
-						input.disabled = true;
-						input.style.opacity = 0.5;
-					});
-				}
+				Util.disableFormButtons(inputs, form);
 
 				if (singleSubmit === false) {
 					Util._submitLocked = A.later(
 						1000,
 						Util,
-						enableFormButtons,
+						Util.enableFormButtons,
 						[inputs, form]
 					);
 				}
@@ -140,9 +124,9 @@
 					Util._submitLocked = true;
 				}
 
-				let baseURL;
-				let queryString;
-				const searchParamsIndex = action.indexOf('?');
+				var baseURL;
+				var queryString;
+				var searchParamsIndex = action.indexOf('?');
 
 				if (searchParamsIndex === -1) {
 					baseURL = action;
@@ -153,9 +137,9 @@
 					queryString = action.slice(searchParamsIndex + 1);
 				}
 
-				const searchParams = new URLSearchParams(queryString);
+				var searchParams = new URLSearchParams(queryString);
 
-				let authToken = searchParams.get('p_auth') || '';
+				var authToken = searchParams.get('p_auth') || '';
 
 				if (authToken.includes('#')) {
 					authToken = authToken.substring(0, authToken.indexOf('#'));
@@ -185,26 +169,24 @@
 	});
 
 	Liferay.after('closeWindow', (event) => {
-		const id = event.id;
+		var id = event.id;
 
-		const dialog = Util.getTop().Liferay.Util.Window.getById(id);
+		var dialog = Util.getTop().Liferay.Util.Window.getById(id);
 
 		if (dialog && dialog.iframe) {
-			const dialogWindow = dialog.iframe.node
-				.get('contentWindow')
-				.getDOM();
+			var dialogWindow = dialog.iframe.node.get('contentWindow').getDOM();
 
-			const openingWindow = dialogWindow.Liferay.Util.getOpener();
-			const redirect = event.redirect;
+			var openingWindow = dialogWindow.Liferay.Util.getOpener();
+			var redirect = event.redirect;
 
 			if (redirect) {
 				openingWindow.Liferay.Util.navigate(redirect);
 			}
 			else {
-				const refresh = event.refresh;
+				var refresh = event.refresh;
 
 				if (refresh && openingWindow) {
-					let data;
+					var data;
 
 					if (!event.portletAjaxable) {
 						data = {

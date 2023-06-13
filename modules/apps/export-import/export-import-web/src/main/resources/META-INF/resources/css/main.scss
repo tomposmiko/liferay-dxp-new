@@ -86,15 +86,6 @@
 		margin-right: 0.5em;
 	}
 
-	a.configuration-link,
-	a.content-link,
-	a.options-link,
-	a.refresh-link {
-		color: #000;
-		font-style: italic;
-		text-decoration: underline;
-	}
-
 	.selected-pages {
 		td.col-1 {
 			padding-top: 5px;
@@ -122,6 +113,11 @@
 
 .layout-selector {
 	padding-left: 0;
+}
+
+.layout-selector-options {
+	list-style: none;
+	margin-right: auto;
 }
 
 .lfr-export-dialog {

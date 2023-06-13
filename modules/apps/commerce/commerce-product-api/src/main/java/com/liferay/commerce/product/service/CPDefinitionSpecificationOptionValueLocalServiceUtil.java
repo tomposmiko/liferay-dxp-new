@@ -123,17 +123,6 @@ public class CPDefinitionSpecificationOptionValueLocalServiceUtil {
 			cpDefinitionSpecificationOptionValue);
 	}
 
-	public static CPDefinitionSpecificationOptionValue
-			deleteCPDefinitionSpecificationOptionValue(
-				CPDefinitionSpecificationOptionValue
-					cpDefinitionSpecificationOptionValue,
-				boolean makeCopy)
-		throws PortalException {
-
-		return getService().deleteCPDefinitionSpecificationOptionValue(
-			cpDefinitionSpecificationOptionValue, makeCopy);
-	}
-
 	/**
 	 * Deletes the cp definition specification option value with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
@@ -160,14 +149,6 @@ public class CPDefinitionSpecificationOptionValueLocalServiceUtil {
 
 		getService().deleteCPDefinitionSpecificationOptionValues(
 			cpDefinitionId);
-	}
-
-	public static void deleteCPDefinitionSpecificationOptionValues(
-			long cpDefinitionId, boolean makeCopy)
-		throws PortalException {
-
-		getService().deleteCPDefinitionSpecificationOptionValues(
-			cpDefinitionId, makeCopy);
 	}
 
 	public static void deleteCPSpecificationOptionDefinitionValues(

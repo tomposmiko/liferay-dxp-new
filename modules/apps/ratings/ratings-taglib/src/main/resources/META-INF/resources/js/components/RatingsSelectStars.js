@@ -20,8 +20,6 @@ import React, {useState} from 'react';
 
 import Lang from '../utils/lang';
 
-const ID_PREFIX = 'rsd_';
-
 export default function RatingsSelectStars({
 	averageScore,
 	disabled,
@@ -34,17 +32,10 @@ export default function RatingsSelectStars({
 	totalEntries,
 }) {
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-	const [focusId, setFocusId] = useState();
 
 	const handleOnClick = (index) => {
 		setIsDropdownOpen(false);
 		onVote(index);
-	};
-
-	const handleInitialFocus = () => {
-		if (!focusId) {
-			setFocusId(`${ID_PREFIX}0`);
-		}
 	};
 
 	return (
@@ -60,13 +51,9 @@ export default function RatingsSelectStars({
 						className: 'ratings-stars-dropdown',
 					}}
 					onActiveChange={(isActive) => setIsDropdownOpen(isActive)}
-					onFocus={handleInitialFocus}
-					role="listbox"
 					trigger={
 						<ClayButton
-							aria-expanded={isDropdownOpen}
-							aria-haspopup="listbox"
-							aria-label={getTitle()}
+							aria-pressed={!!score}
 							borderless
 							className="ratings-stars-dropdown-toggle"
 							disabled={disabled}
@@ -78,17 +65,13 @@ export default function RatingsSelectStars({
 							<span className="inline-item inline-item-before">
 								<ClayIcon symbol={score ? 'star' : 'star-o'} />
 							</span>
-
 							<span className="inline-item ratings-stars-button-text">
 								{score || '-'}
 							</span>
 						</ClayButton>
 					}
 				>
-					<ClayDropDown.ItemList
-						aria-activedescendant={focusId}
-						role="listbox"
-					>
+					<ClayDropDown.ItemList>
 						{starScores.map(({label}, index) => {
 							const srMessage =
 								index === 0
@@ -102,18 +85,12 @@ export default function RatingsSelectStars({
 							return (
 								<ClayDropDown.Item
 									active={label === score}
-									id={`${ID_PREFIX}index`}
 									key={index}
 									onClick={() => {
 										handleOnClick(index);
 									}}
-									onFocus={() => {
-										setFocusId(`${ID_PREFIX}index`);
-									}}
-									roleItem="option"
 								>
 									{label}
-
 									<span className="sr-only">
 										{Lang.sub(srMessage, [
 											index + 1,
@@ -126,16 +103,7 @@ export default function RatingsSelectStars({
 
 						<ClayDropDown.Item
 							disabled={score === 0}
-							id={`${ID_PREFIX}${Liferay.Language.get('delete')}`}
 							onClick={handleOnClick}
-							onFocus={() => {
-								setFocusId(
-									`${ID_PREFIX}${Liferay.Language.get(
-										'delete'
-									)}`
-								);
-							}}
-							roleItem="option"
 						>
 							{Liferay.Language.get('delete')}
 						</ClayDropDown.Item>
@@ -151,10 +119,8 @@ export default function RatingsSelectStars({
 							symbol="star"
 						/>
 					</span>
-
 					<span className="inline-item ratings-stars-average-text">
 						{averageScore.toFixed(1)}
-
 						{!!totalEntries &&
 							` (${totalEntries} ${
 								totalEntries === 1
@@ -162,7 +128,6 @@ export default function RatingsSelectStars({
 									: Liferay.Language.get('votes')
 							})`}
 					</span>
-
 					<span className="sr-only">{getSrAverageMessage()}</span>
 				</span>
 			</ClayLayout.ContentCol>

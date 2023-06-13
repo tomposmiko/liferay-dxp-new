@@ -44,11 +44,6 @@ public class RSSFormNavigatorEntry extends BaseConfigurationFormNavigatorEntry {
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	public boolean isVisible(User user, Object formModelBean) {
 		if (!_portal.isRSSFeedsEnabled() || !isDynamicAssetSelection()) {
 			return false;
@@ -58,17 +53,20 @@ public class RSSFormNavigatorEntry extends BaseConfigurationFormNavigatorEntry {
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected String getJspPath() {
 		return "/configuration/rss.jsp";
 	}
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)",
-		unbind = "-"
-	)
-	private ServletContext _servletContext;
 
 }

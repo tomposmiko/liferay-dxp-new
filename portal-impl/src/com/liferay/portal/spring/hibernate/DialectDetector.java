@@ -27,10 +27,12 @@ import com.liferay.portal.dao.orm.hibernate.SybaseASE157Dialect;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.sql.Connection;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
@@ -38,9 +40,7 @@ import javax.sql.DataSource;
 import org.hibernate.dialect.DB2400Dialect;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.Oracle10gDialect;
-import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
-import org.hibernate.engine.jdbc.dialect.spi.DatabaseMetaDataDialectResolutionInfoAdapter;
-import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
+import org.hibernate.dialect.resolver.DialectFactory;
 
 /**
  * @author Brian Wing Shun Chan
@@ -102,7 +102,7 @@ public class DialectDetector {
 			else if (dbName.startsWith("DB2") && (dbMajorVersion >= 9)) {
 				dialect = new DB2Dialect();
 			}
-			else if (dbName.startsWith("MariaDB")) {
+			else if (StringUtil.startsWith(dbInfo.getDriverName(), "mariadb")) {
 				dialect = new MariaDBDialect();
 			}
 			else if (dbName.startsWith("Microsoft") && (dbMajorVersion == 9)) {
@@ -116,12 +116,8 @@ public class DialectDetector {
 			}
 			else {
 				try (Connection connection = dataSource.getConnection()) {
-					DialectResolver dialectResolver =
-						new StandardDialectResolver();
-
-					dialect = dialectResolver.resolveDialect(
-						new DatabaseMetaDataDialectResolutionInfoAdapter(
-							connection.getMetaData()));
+					dialect = DialectFactory.buildDialect(
+						new Properties(), connection);
 				}
 			}
 		}
@@ -139,7 +135,7 @@ public class DialectDetector {
 				}
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 

@@ -62,7 +62,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = DefaultDDMStructureHelper.class)
+@Component(immediate = true, service = DefaultDDMStructureHelper.class)
 public class DefaultDDMStructureHelperImpl
 	implements DefaultDDMStructureHelper {
 
@@ -75,87 +75,85 @@ public class DefaultDDMStructureHelperImpl
 
 		Locale locale = _portal.getSiteDefaultLocale(groupId);
 
-		List<Element> structureElements = _getDDMStructures(
+		List<Element> structureElements = getDDMStructures(
 			classLoader, fileName, locale);
 
 		for (Element structureElement : structureElements) {
-			if (GetterUtil.getBoolean(
-					structureElement.elementText("dynamic-structure"))) {
+			boolean dynamicStructure = GetterUtil.getBoolean(
+				structureElement.elementText("dynamic-structure"));
 
+			if (dynamicStructure) {
 				continue;
 			}
 
 			String name = structureElement.elementText("name");
 
-			if (_ddmStructureLocalService.hasStructure(
-					groupId, classNameId, name) ||
+			String ddmStructureKey = name;
+
+			DDMStructure ddmStructure =
+				_ddmStructureLocalService.fetchStructure(
+					groupId, classNameId, ddmStructureKey);
+
+			if ((ddmStructure != null) ||
 				(name.equals(DLFileEntryTypeConstants.NAME_IG_IMAGE) &&
 				 !UpgradeProcessUtil.isCreateIGImageDocumentType())) {
 
 				continue;
 			}
 
-			_addDDMStructure(
-				userId, groupId, classNameId, classLoader, structureElement,
-				fileName, locale, serviceContext);
-		}
-	}
+			String description = structureElement.elementText("description");
 
-	@Override
-	public void addOrUpdateDDMStructures(
-			long userId, long groupId, long classNameId,
-			ClassLoader classLoader, String fileName,
-			ServiceContext serviceContext)
-		throws Exception {
+			Map<Locale, String> nameMap = new HashMap<>();
+			Map<Locale, String> descriptionMap = new HashMap<>();
 
-		Locale locale = _portal.getSiteDefaultLocale(groupId);
+			for (Locale curLocale : _language.getAvailableLocales(groupId)) {
+				ResourceBundle resourceBundle =
+					ResourceBundleUtil.getModuleAndPortalResourceBundle(
+						curLocale, getClass());
 
-		List<Element> structureElements = _getDDMStructures(
-			classLoader, fileName, locale);
+				nameMap.put(curLocale, _language.get(resourceBundle, name));
+				descriptionMap.put(
+					curLocale, _language.get(resourceBundle, description));
+			}
 
-		for (Element structureElement : structureElements) {
-			if (GetterUtil.getBoolean(
-					structureElement.elementText("dynamic-structure"))) {
+			DDMForm ddmForm = getDDMForm(groupId, locale, structureElement);
 
+			DDMFormLayout ddmFormLayout = getDDMFormLayout(
+				structureElement, ddmForm);
+
+			serviceContext.setAttribute(
+				"status", WorkflowConstants.STATUS_APPROVED);
+
+			ddmStructure = _ddmStructureLocalService.addStructure(
+				userId, groupId,
+				DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID, classNameId,
+				ddmStructureKey, nameMap, descriptionMap, ddmForm,
+				ddmFormLayout, StorageType.DEFAULT.toString(),
+				DDMStructureConstants.TYPE_DEFAULT, serviceContext);
+
+			Element templateElement = structureElement.element("template");
+
+			if (templateElement == null) {
 				continue;
 			}
 
-			String name = structureElement.elementText("name");
+			String templateFileName = templateElement.elementText("file-name");
 
-			DDMStructure ddmStructure =
-				_ddmStructureLocalService.fetchStructure(
-					groupId, classNameId, name);
+			String script = StringUtil.read(
+				classLoader,
+				FileUtil.getPath(fileName) + StringPool.SLASH +
+					templateFileName);
 
-			if (ddmStructure == null) {
-				_addDDMStructure(
-					userId, groupId, classNameId, classLoader, structureElement,
-					fileName, locale, serviceContext);
-			}
-			else {
-				Map<Locale, String> nameMap = new HashMap<>();
-				Map<Locale, String> descriptionMap = new HashMap<>();
+			boolean cacheable = GetterUtil.getBoolean(
+				templateElement.elementText("cacheable"));
 
-				for (Locale availableLocale :
-						_language.getAvailableLocales(groupId)) {
-
-					nameMap.put(
-						availableLocale, _language.get(availableLocale, name));
-					descriptionMap.put(
-						availableLocale,
-						_language.get(
-							availableLocale,
-							structureElement.elementText("description")));
-				}
-
-				DDMForm ddmForm = getDDMForm(groupId, locale, structureElement);
-
-				_ddmStructureLocalService.updateStructure(
-					userId, groupId,
-					DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
-					classNameId, name, nameMap, descriptionMap, ddmForm,
-					_getDDMFormLayout(structureElement, ddmForm),
-					serviceContext);
-			}
+			_ddmTemplateLocalService.addTemplate(
+				userId, groupId, _portal.getClassNameId(DDMStructure.class),
+				ddmStructure.getStructureId(), ddmStructure.getClassNameId(),
+				name, nameMap, null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
+				DDMTemplateConstants.TEMPLATE_MODE_CREATE,
+				TemplateConstants.LANG_TYPE_FTL, script, cacheable, false,
+				StringPool.BLANK, null, serviceContext);
 		}
 	}
 
@@ -165,7 +163,7 @@ public class DefaultDDMStructureHelperImpl
 			String dynamicDDMStructureName, Locale locale)
 		throws Exception {
 
-		List<Element> structureElements = _getDDMStructures(
+		List<Element> structureElements = getDDMStructures(
 			classLoader, fileName, locale);
 
 		for (Element structureElement : structureElements) {
@@ -228,61 +226,7 @@ public class DefaultDDMStructureHelperImpl
 			ddmForm, locale, _language.getAvailableLocales(groupId));
 	}
 
-	private void _addDDMStructure(
-			long userId, long groupId, long classNameId,
-			ClassLoader classLoader, Element structureElement, String fileName,
-			Locale locale, ServiceContext serviceContext)
-		throws Exception {
-
-		String name = structureElement.elementText("name");
-		Map<Locale, String> nameMap = new HashMap<>();
-		String description = structureElement.elementText("description");
-		Map<Locale, String> descriptionMap = new HashMap<>();
-
-		for (Locale availableLocale : _language.getAvailableLocales(groupId)) {
-			nameMap.put(availableLocale, _language.get(availableLocale, name));
-			descriptionMap.put(
-				availableLocale, _language.get(availableLocale, description));
-		}
-
-		DDMForm ddmForm = getDDMForm(groupId, locale, structureElement);
-
-		DDMFormLayout ddmFormLayout = _getDDMFormLayout(
-			structureElement, ddmForm);
-
-		serviceContext.setAttribute(
-			"status", WorkflowConstants.STATUS_APPROVED);
-
-		DDMStructure ddmStructure = _ddmStructureLocalService.addStructure(
-			userId, groupId, DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
-			classNameId, name, nameMap, descriptionMap, ddmForm, ddmFormLayout,
-			StorageType.DEFAULT.toString(), DDMStructureConstants.TYPE_DEFAULT,
-			serviceContext);
-
-		Element templateElement = structureElement.element("template");
-
-		if (templateElement != null) {
-			String templateFileName = templateElement.elementText("file-name");
-
-			String script = StringUtil.read(
-				classLoader,
-				FileUtil.getPath(fileName) + StringPool.SLASH +
-					templateFileName);
-
-			boolean cacheable = GetterUtil.getBoolean(
-				templateElement.elementText("cacheable"));
-
-			_ddmTemplateLocalService.addTemplate(
-				userId, groupId, _portal.getClassNameId(DDMStructure.class),
-				ddmStructure.getStructureId(), ddmStructure.getClassNameId(),
-				name, nameMap, null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
-				DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-				TemplateConstants.LANG_TYPE_FTL, script, cacheable, false,
-				StringPool.BLANK, null, serviceContext);
-		}
-	}
-
-	private DDMFormLayout _getDDMFormLayout(
+	protected DDMFormLayout getDDMFormLayout(
 		Element structureElement, DDMForm ddmForm) {
 
 		Element structureElementLayoutElement = structureElement.element(
@@ -304,7 +248,7 @@ public class DefaultDDMStructureHelperImpl
 		return _ddm.getDefaultDDMFormLayout(ddmForm);
 	}
 
-	private List<Element> _getDDMStructures(
+	protected List<Element> getDDMStructures(
 			ClassLoader classLoader, String fileName, Locale locale)
 		throws Exception {
 
@@ -317,6 +261,25 @@ public class DefaultDDMStructureHelperImpl
 		Element rootElement = document.getRootElement();
 
 		return rootElement.elements("structure");
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDM(DDM ddm) {
+		_ddm = ddm;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureLocalService(
+		DDMStructureLocalService ddmStructureLocalService) {
+
+		_ddmStructureLocalService = ddmStructureLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMTemplateLocalService(
+		DDMTemplateLocalService ddmTemplateLocalService) {
+
+		_ddmTemplateLocalService = ddmTemplateLocalService;
 	}
 
 	private DDMForm _getPopulateDDMForm(
@@ -385,13 +348,8 @@ public class DefaultDDMStructureHelperImpl
 		return localizedValue;
 	}
 
-	@Reference
 	private DDM _ddm;
-
-	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
 
 	@Reference(target = "(ddm.form.deserializer.type=json)")

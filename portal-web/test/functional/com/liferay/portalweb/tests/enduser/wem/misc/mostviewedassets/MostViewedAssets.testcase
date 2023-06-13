@@ -7,140 +7,112 @@ definition {
 	property testray.main.component.name = "Most Viewed Assets";
 
 	setUp {
-		task ("Set up instance and sign in") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			User.firstLoginPG();
-		}
-
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
-		}
+		User.firstLoginPG();
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
-		}
-		else {
-			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
-	@description = "The assets should be ordered by view counts in Most Viewed Assets widget."
-	@priority = 4
-	test ViewMostViewedAsset {
-		task ("Add two widget pages") {
-			for (var i : list "1,2") {
-				JSONLayout.addPublicLayout(
-					groupName = "Test Site Name",
-					layoutName = "Test Page Name ${i}");
-			}
+	@priority = "4"
+	test AssertMostViewedAsset {
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		for (var n : list "1,2") {
+			JSONLayout.addPublicLayout(
+				groupName = "Site Name",
+				layoutName = "Test Page ${n}");
 		}
 
-		task ("Add two web contents") {
-			for (var i : list "1,2") {
-				JSONWebcontent.addWebContent(
-					content = "Web Content Content",
-					groupName = "Test Site Name",
-					title = "Web Content Title ${i}");
-			}
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page 1",
+			widgetName = "Most Viewed Assets");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page 2",
+			widgetName = "Asset Publisher");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page 1",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.configureShowMetadataFieldsPG(
+			addMetadata = "true",
+			metadataFieldList = "View Count",
+			portletName = "Most Viewed Assets");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page 2",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.configureDisplaySettings(displaySettings = "View Count Increment");
+
+		for (var n : list "1,2") {
+			JSONWebcontent.addWebContent(
+				content = "Web Content Content",
+				groupName = "Site Name",
+				title = "Web Content Title ${n}");
 		}
 
-		task ("Add a Most Viewed Assets to first page") {
-			JSONLayout.addWidgetToPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name 1",
-				widgetName = "Most Viewed Assets");
-		}
+		var count = "0";
 
-		task ("Add an Asset Publisher to second page") {
-			JSONLayout.addWidgetToPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name 2",
-				widgetName = "Asset Publisher");
-		}
-
-		task ("Enable view count on Most Viewed Assets") {
+		while ("${count}" != "3") {
 			Navigator.gotoSitePage(
-				pageName = "Test Page Name 1",
-				siteName = "Test Site Name");
+				pageName = "Test Page 2",
+				siteName = "Site Name");
 
-			AssetPublisherPortlet.configureShowMetadataFieldsPG(
-				addMetadata = "true",
-				metadataFieldList = "View Count",
-				portletName = "Most Viewed Assets");
+			AssetPublisherPortlet.viewAssetDetailsPG(
+				assetContent = "Web Content Content",
+				assetTitle = "Web Content Title 1");
+
+			var count = ${count} + 1;
 		}
 
-		task ("Enable view count increment on Asset Publisher") {
+		Navigator.gotoSitePage(
+			pageName = "Test Page 1",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.viewAssetViewCount(
+			assetTitle = "Web Content Title 1",
+			viewCount = "3 View");
+
+		AssetPublisherPortlet.viewAssetViewCount(
+			assetTitle = "Web Content Title 2",
+			viewCount = "0 View");
+
+		var count = "0";
+
+		while ("${count}" != "5") {
 			Navigator.gotoSitePage(
-				pageName = "Test Page Name 2",
-				siteName = "Test Site Name");
+				pageName = "Test Page 2",
+				siteName = "Site Name");
 
-			AssetPublisherPortlet.configureDisplaySettings(displaySettings = "View Count Increment");
+			AssetPublisherPortlet.viewAssetDetailsPG(
+				assetContent = "Web Content Content",
+				assetTitle = "Web Content Title 2");
+
+			var count = ${count} + 1;
 		}
 
-		task ("View first web content three times") {
-			var count = 0;
+		Navigator.gotoSitePage(
+			pageName = "Test Page 1",
+			siteName = "Site Name");
 
-			while (${count} != 3) {
-				Navigator.gotoSitePage(
-					pageName = "Test Page Name 2",
-					siteName = "Test Site Name");
+		AssetPublisherPortlet.viewAssetViewCount(
+			assetTitle = "Web Content Title 2",
+			viewCount = "5 View");
 
-				AssetPublisherPortlet.viewAssetDetailsPG(
-					assetContent = "Web Content Content",
-					assetTitle = "Web Content Title 1");
-
-				var count = ${count} + 1;
-			}
-		}
-
-		task ("View number of counts for both web contents on Most Viewed Assets") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name 1",
-				siteName = "Test Site Name");
-
-			AssetPublisherPortlet.viewAssetViewCount(
-				assetTitle = "Web Content Title 1",
-				viewCount = "3 View");
-
-			AssetPublisherPortlet.viewAssetViewCount(
-				assetTitle = "Web Content Title 2",
-				viewCount = "0 View");
-		}
-
-		task ("View second web content five times") {
-			var count = 0;
-
-			while (${count} != 5) {
-				Navigator.gotoSitePage(
-					pageName = "Test Page Name 2",
-					siteName = "Test Site Name");
-
-				AssetPublisherPortlet.viewAssetDetailsPG(
-					assetContent = "Web Content Content",
-					assetTitle = "Web Content Title 2");
-
-				var count = ${count} + 1;
-			}
-		}
-
-		task ("View updated number of counts for both web contents on Most Viewed Assets") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name 1",
-				siteName = "Test Site Name");
-
-			AssetPublisherPortlet.viewAssetViewCount(
-				assetTitle = "Web Content Title 2",
-				viewCount = "5 View");
-
-			AssetPublisherPortlet.viewAssetViewCount(
-				assetTitle = "Web Content Title 1",
-				viewCount = "3 View");
-		}
+		AssetPublisherPortlet.viewAssetViewCount(
+			assetTitle = "Web Content Title 1",
+			viewCount = "3 View");
 	}
 
 }

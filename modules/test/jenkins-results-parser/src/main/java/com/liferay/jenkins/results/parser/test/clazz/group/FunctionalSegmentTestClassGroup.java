@@ -15,17 +15,12 @@
 package com.liferay.jenkins.results.parser.test.clazz.group;
 
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.Job;
-import com.liferay.jenkins.results.parser.PortalWorkspaceJob;
-import com.liferay.jenkins.results.parser.job.property.JobProperty;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
@@ -134,39 +129,15 @@ public class FunctionalSegmentTestClassGroup extends SegmentTestClassGroup {
 		sb.append(JenkinsResultsParserUtil.join(" ", axisGroupNames));
 		sb.append("\n");
 
-		String workspacePortalVersion = _getWorkspacePortalVersion();
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(workspacePortalVersion)) {
-			sb.append("TEST_PORTAL_BUNDLE_VERSION=");
-			sb.append(workspacePortalVersion);
-			sb.append("\n");
-		}
-
-		String workspaceName = _getWorkspaceName();
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(workspaceName)) {
-			sb.append("TEST_WORKSPACE_NAME=");
-			sb.append(workspaceName);
-			sb.append("\n");
-		}
-
 		return sb.toString();
 	}
 
 	protected FunctionalSegmentTestClassGroup(
-		BatchTestClassGroup batchTestClassGroup) {
+		BatchTestClassGroup parentBatchTestClassGroup) {
 
-		super(batchTestClassGroup);
+		super(parentBatchTestClassGroup);
 
-		_batchTestClassGroup = batchTestClassGroup;
-	}
-
-	protected FunctionalSegmentTestClassGroup(
-		BatchTestClassGroup batchTestClassGroup, JSONObject jsonObject) {
-
-		super(batchTestClassGroup, jsonObject);
-
-		_batchTestClassGroup = batchTestClassGroup;
+		_parentBatchTestClassGroup = parentBatchTestClassGroup;
 	}
 
 	protected Map.Entry<String, String> getEnvironmentVariableEntry(
@@ -178,9 +149,9 @@ public class FunctionalSegmentTestClassGroup extends SegmentTestClassGroup {
 			return null;
 		}
 
-		JobProperty jobProperty = _batchTestClassGroup.getJobProperty(name);
-
-		String value = jobProperty.getValue();
+		String value = JenkinsResultsParserUtil.getProperty(
+			_parentBatchTestClassGroup.getJobProperties(), name,
+			_parentBatchTestClassGroup.getBatchName());
 
 		if (JenkinsResultsParserUtil.isNullOrEmpty(value)) {
 			return null;
@@ -189,37 +160,6 @@ public class FunctionalSegmentTestClassGroup extends SegmentTestClassGroup {
 		return new AbstractMap.SimpleEntry<>(key, value);
 	}
 
-	private String _getWorkspaceName() {
-		BatchTestClassGroup batchTestClassGroup = getBatchTestClassGroup();
-
-		if (!(batchTestClassGroup instanceof FunctionalBatchTestClassGroup)) {
-			return null;
-		}
-
-		FunctionalBatchTestClassGroup functionalBatchTestClassGroup =
-			(FunctionalBatchTestClassGroup)batchTestClassGroup;
-
-		return functionalBatchTestClassGroup.getWorkspaceName();
-	}
-
-	private String _getWorkspacePortalVersion() {
-		String batchName = getBatchName();
-
-		if (!batchName.startsWith("functional-workspaces-")) {
-			return null;
-		}
-
-		Job job = getJob();
-
-		if (!(job instanceof PortalWorkspaceJob)) {
-			return null;
-		}
-
-		PortalWorkspaceJob portalWorkspaceJob = (PortalWorkspaceJob)job;
-
-		return portalWorkspaceJob.getWorkspacePortalVersion();
-	}
-
-	private final BatchTestClassGroup _batchTestClassGroup;
+	private final BatchTestClassGroup _parentBatchTestClassGroup;
 
 }

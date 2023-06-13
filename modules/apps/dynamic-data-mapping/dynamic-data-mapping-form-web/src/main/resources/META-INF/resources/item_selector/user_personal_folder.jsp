@@ -21,12 +21,10 @@ DDMUserPersonalFolderItemSelectorViewDisplayContext ddmUserPersonalFolderItemSel
 %>
 
 <liferay-item-selector:repository-entry-browser
-	editImageURL="<%= ddmUserPersonalFolderItemSelectorViewDisplayContext.getEditImageURL(liferayPortletResponse) %>"
 	emptyResultsMessage='<%= LanguageUtil.get(request, "there-are-no-documents-or-media-files-in-this-folder") %>'
-	folderId="<%= ddmUserPersonalFolderItemSelectorViewDisplayContext.getFolderId() %>"
 	itemSelectedEventName="<%= ddmUserPersonalFolderItemSelectorViewDisplayContext.getItemSelectedEventName() %>"
 	itemSelectorReturnTypeResolver="<%= ddmUserPersonalFolderItemSelectorViewDisplayContext.getItemSelectorReturnTypeResolver() %>"
-	maxFileSize="<%= DLValidatorUtil.getMaxAllowableSize(themeDisplay.getScopeGroupId(), null) %>"
+	maxFileSize="<%= DLValidatorUtil.getMaxAllowableSize() %>"
 	portletURL="<%= ddmUserPersonalFolderItemSelectorViewDisplayContext.getPortletURL() %>"
 	repositoryEntries="<%= ddmUserPersonalFolderItemSelectorViewDisplayContext.getPortletFileEntries() %>"
 	repositoryEntriesCount="<%= ddmUserPersonalFolderItemSelectorViewDisplayContext.getPortletFileEntriesCount() %>"

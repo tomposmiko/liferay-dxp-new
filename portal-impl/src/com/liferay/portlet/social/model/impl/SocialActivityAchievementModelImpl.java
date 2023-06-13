@@ -33,6 +33,7 @@ import com.liferay.social.kernel.model.SocialActivityAchievementModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -240,106 +241,120 @@ public class SocialActivityAchievementModelImpl
 	public Map<String, Function<SocialActivityAchievement, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<SocialActivityAchievement, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, SocialActivityAchievement>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<SocialActivityAchievement, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SocialActivityAchievement.class.getClassLoader(),
+			SocialActivityAchievement.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<SocialActivityAchievement, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<SocialActivityAchievement, Object>>();
+		try {
+			Constructor<SocialActivityAchievement> constructor =
+				(Constructor<SocialActivityAchievement>)
+					proxyClass.getConstructor(InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", SocialActivityAchievement::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", SocialActivityAchievement::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"activityAchievementId",
-				SocialActivityAchievement::getActivityAchievementId);
-			attributeGetterFunctions.put(
-				"groupId", SocialActivityAchievement::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", SocialActivityAchievement::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", SocialActivityAchievement::getUserId);
-			attributeGetterFunctions.put(
-				"createDate", SocialActivityAchievement::getCreateDate);
-			attributeGetterFunctions.put(
-				"name", SocialActivityAchievement::getName);
-			attributeGetterFunctions.put(
-				"firstInGroup", SocialActivityAchievement::getFirstInGroup);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map
+		<String, Function<SocialActivityAchievement, Object>>
+			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<SocialActivityAchievement, Object>>
+			_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<SocialActivityAchievement, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<SocialActivityAchievement, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<SocialActivityAchievement, Object>>();
+		Map<String, BiConsumer<SocialActivityAchievement, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<SocialActivityAchievement, ?>>();
 
-		static {
-			Map<String, BiConsumer<SocialActivityAchievement, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<SocialActivityAchievement, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", SocialActivityAchievement::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<SocialActivityAchievement, Long>)
+				SocialActivityAchievement::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SocialActivityAchievement::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<SocialActivityAchievement, Long>)
+				SocialActivityAchievement::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"activityAchievementId",
+			SocialActivityAchievement::getActivityAchievementId);
+		attributeSetterBiConsumers.put(
+			"activityAchievementId",
+			(BiConsumer<SocialActivityAchievement, Long>)
+				SocialActivityAchievement::setActivityAchievementId);
+		attributeGetterFunctions.put(
+			"groupId", SocialActivityAchievement::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<SocialActivityAchievement, Long>)
+				SocialActivityAchievement::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", SocialActivityAchievement::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<SocialActivityAchievement, Long>)
+				SocialActivityAchievement::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", SocialActivityAchievement::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<SocialActivityAchievement, Long>)
+				SocialActivityAchievement::setUserId);
+		attributeGetterFunctions.put(
+			"createDate", SocialActivityAchievement::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<SocialActivityAchievement, Long>)
+				SocialActivityAchievement::setCreateDate);
+		attributeGetterFunctions.put(
+			"name", SocialActivityAchievement::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<SocialActivityAchievement, String>)
+				SocialActivityAchievement::setName);
+		attributeGetterFunctions.put(
+			"firstInGroup", SocialActivityAchievement::getFirstInGroup);
+		attributeSetterBiConsumers.put(
+			"firstInGroup",
+			(BiConsumer<SocialActivityAchievement, Boolean>)
+				SocialActivityAchievement::setFirstInGroup);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<SocialActivityAchievement, Long>)
-					SocialActivityAchievement::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<SocialActivityAchievement, Long>)
-					SocialActivityAchievement::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"activityAchievementId",
-				(BiConsumer<SocialActivityAchievement, Long>)
-					SocialActivityAchievement::setActivityAchievementId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<SocialActivityAchievement, Long>)
-					SocialActivityAchievement::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<SocialActivityAchievement, Long>)
-					SocialActivityAchievement::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<SocialActivityAchievement, Long>)
-					SocialActivityAchievement::setUserId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<SocialActivityAchievement, Long>)
-					SocialActivityAchievement::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<SocialActivityAchievement, String>)
-					SocialActivityAchievement::setName);
-			attributeSetterBiConsumers.put(
-				"firstInGroup",
-				(BiConsumer<SocialActivityAchievement, Boolean>)
-					SocialActivityAchievement::setFirstInGroup);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -785,13 +800,44 @@ public class SocialActivityAchievementModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<SocialActivityAchievement, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<SocialActivityAchievement, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<SocialActivityAchievement, Object>
+				attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply((SocialActivityAchievement)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, SocialActivityAchievement>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						SocialActivityAchievement.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
@@ -807,8 +853,7 @@ public class SocialActivityAchievementModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<SocialActivityAchievement, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

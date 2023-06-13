@@ -150,7 +150,7 @@ public class ThemeLoader {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		_loadFromServletContext = loadFromServletContext;

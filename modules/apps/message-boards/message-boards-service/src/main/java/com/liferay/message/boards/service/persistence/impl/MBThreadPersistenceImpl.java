@@ -20,7 +20,6 @@ import com.liferay.message.boards.model.MBThreadTable;
 import com.liferay.message.boards.model.impl.MBThreadImpl;
 import com.liferay.message.boards.model.impl.MBThreadModelImpl;
 import com.liferay.message.boards.service.persistence.MBThreadPersistence;
-import com.liferay.message.boards.service.persistence.MBThreadUtil;
 import com.liferay.message.boards.service.persistence.impl.constants.MBPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -45,6 +44,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -57,11 +57,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -95,7 +94,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = MBThreadPersistence.class)
+@Component(service = {MBThreadPersistence.class, BasePersistence.class})
 public class MBThreadPersistenceImpl
 	extends BasePersistenceImpl<MBThread> implements MBThreadPersistence {
 
@@ -213,7 +212,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -602,7 +601,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -738,7 +737,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof MBThread) {
@@ -858,7 +857,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1029,7 +1028,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -1450,7 +1449,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1610,7 +1609,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -2298,7 +2297,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2460,7 +2459,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByRootMessageId, finderArgs, this);
+				_finderPathFetchByRootMessageId, finderArgs);
 		}
 
 		if (result instanceof MBThread) {
@@ -2574,7 +2573,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {rootMessageId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2723,7 +2722,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -3634,7 +3633,7 @@ public class MBThreadPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3683,7 +3682,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_C, finderArgs, this);
+				_finderPathWithPaginationFindByG_C, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -3802,7 +3801,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {groupId, categoryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3873,7 +3872,7 @@ public class MBThreadPersistenceImpl
 			finderArgs = new Object[] {groupId, StringUtil.merge(categoryIds)};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_C, finderArgs, this);
+				_finderPathWithPaginationCountByG_C, finderArgs);
 		}
 
 		if (count == null) {
@@ -4156,7 +4155,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -4892,7 +4891,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {groupId, categoryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5099,7 +5098,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -5829,7 +5828,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {groupId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -6037,7 +6036,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -6434,7 +6433,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {categoryId, priority};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -6589,7 +6588,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -7009,7 +7008,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {_getTime(lastPostDate), priority};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -7189,7 +7188,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -8016,7 +8015,7 @@ public class MBThreadPersistenceImpl
 				groupId, categoryId, _getTime(lastPostDate)
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -8271,7 +8270,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -9238,7 +9237,7 @@ public class MBThreadPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
@@ -9288,7 +9287,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_C_S, finderArgs, this);
+				_finderPathWithPaginationFindByG_C_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -9416,7 +9415,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {groupId, categoryId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -9494,7 +9493,7 @@ public class MBThreadPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_C_S, finderArgs, this);
+				_finderPathWithPaginationCountByG_C_S, finderArgs);
 		}
 
 		if (count == null) {
@@ -9808,7 +9807,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -10776,7 +10775,7 @@ public class MBThreadPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
@@ -10826,7 +10825,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_C_NotS, finderArgs, this);
+				_finderPathWithPaginationFindByG_C_NotS, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -10955,7 +10954,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {groupId, categoryId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11033,7 +11032,7 @@ public class MBThreadPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_C_NotS, finderArgs, this);
+				_finderPathWithPaginationCountByG_C_NotS, finderArgs);
 		}
 
 		if (count == null) {
@@ -11349,7 +11348,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -12125,7 +12124,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {groupId, categoryId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -12343,7 +12342,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThread mbThread : list) {
@@ -13119,7 +13118,7 @@ public class MBThreadPersistenceImpl
 
 			finderArgs = new Object[] {groupId, categoryId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -13377,7 +13376,7 @@ public class MBThreadPersistenceImpl
 		mbThread.setNew(true);
 		mbThread.setPrimaryKey(threadId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		mbThread.setUuid(uuid);
 
@@ -13492,7 +13491,7 @@ public class MBThreadPersistenceImpl
 		MBThreadModelImpl mbThreadModelImpl = (MBThreadModelImpl)mbThread;
 
 		if (Validator.isNull(mbThread.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			mbThread.setUuid(uuid);
 		}
@@ -13640,7 +13639,7 @@ public class MBThreadPersistenceImpl
 	 */
 	@Override
 	public MBThread fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(MBThread.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(MBThread.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -13854,7 +13853,7 @@ public class MBThreadPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThread>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -13930,7 +13929,7 @@ public class MBThreadPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -14351,30 +14350,11 @@ public class MBThreadPersistenceImpl
 				Integer.class.getName()
 			},
 			new String[] {"groupId", "categoryId", "status"}, false);
-
-		_setMBThreadUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMBThreadUtilPersistence(null);
-
 		entityCache.removeCache(MBThreadImpl.class.getName());
-	}
-
-	private void _setMBThreadUtilPersistence(
-		MBThreadPersistence mbThreadPersistence) {
-
-		try {
-			Field field = MBThreadUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mbThreadPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -14475,6 +14455,6 @@ public class MBThreadPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private MBThreadModelArgumentsResolver _mbThreadModelArgumentsResolver;
 
 }

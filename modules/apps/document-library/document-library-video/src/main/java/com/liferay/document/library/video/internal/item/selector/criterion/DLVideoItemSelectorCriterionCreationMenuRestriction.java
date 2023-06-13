@@ -46,8 +46,10 @@ public class DLVideoItemSelectorCriterionCreationMenuRestriction
 
 	private static final Set<String> _allowedCreationMenuUIItemKeys =
 		SetUtil.fromArray(
-			DLFileEntryType.class.getSimpleName() +
-				DLVideoConstants.DL_FILE_ENTRY_TYPE_KEY,
-			DLUIItemKeys.ADD_FOLDER, DLUIItemKeys.UPLOAD);
+			new String[] {
+				DLFileEntryType.class.getSimpleName() +
+					DLVideoConstants.DL_FILE_ENTRY_TYPE_KEY,
+				DLUIItemKeys.ADD_FOLDER, DLUIItemKeys.UPLOAD
+			});
 
 }

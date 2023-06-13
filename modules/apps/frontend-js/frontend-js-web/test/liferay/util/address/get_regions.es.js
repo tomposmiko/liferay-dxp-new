@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import getRegions from '../../../../src/main/resources/META-INF/resources/liferay/util/address/get_regions.es';
 
 describe('Liferay.Address.getRegions', () => {

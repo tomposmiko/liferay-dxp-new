@@ -1,42 +1,41 @@
 @import 'atlas-variables';
 
-html#{$cadmin-selector} {
-	.cadmin {
-		.page-editor__undo-history {
-			&.dropdown-menu {
-				max-height: 320px;
-				max-width: 280px;
-				width: 280px;
-			}
+@import '../variables';
 
-			.dropdown-item {
-				padding-right: 2.25rem;
-				text-overflow: ellipsis;
-				white-space: nowrap;
+.page-editor__undo-history {
+	&.dropdown-menu {
+		max-height: 320px;
+		max-width: 280px;
+		width: 280px;
+	}
 
-				span {
-					font-size: 0.75rem;
-				}
-			}
+	.dropdown-item {
+		text-overflow: ellipsis;
+		white-space: nowrap;
 
-			&__overlay {
-				height: 100vh;
-				left: 0;
-				position: fixed;
-				top: 0;
-				width: 100vw;
-				z-index: $undoHistoryOverlayZIndex;
-			}
+		span {
+			color: $secondary-l1;
+			font-size: 0.75rem;
+			margin-left: 1em;
 		}
 	}
 
-	body.has-control-menu .cadmin .page-editor__undo-history__overlay {
-		height: calc(100vh - #{$controlMenuHeight});
-		top: $controlMenuHeight;
+	&__overlay {
+		height: 100vh;
+		left: 0;
+		position: fixed;
+		top: 0;
+		width: 100vw;
+		z-index: $undoHistoryOverlayZIndex;
 
-		@include media-breakpoint-up(sm) {
-			height: calc(100vh - #{$desktopControlMenuHeight});
-			top: $desktopControlMenuHeight;
+		body.has-control-menu & {
+			height: calc(100vh - #{$controlMenuHeight});
+			top: $controlMenuHeight;
+
+			@include media-breakpoint-up(xl) {
+				height: calc(100vh - #{$desktopControlMenuHeight});
+				top: $desktopControlMenuHeight;
+			}
 		}
 	}
 }

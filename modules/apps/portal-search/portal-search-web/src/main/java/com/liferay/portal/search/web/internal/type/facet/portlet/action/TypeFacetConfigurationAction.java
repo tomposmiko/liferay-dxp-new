@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.asset.SearchableAssetClassNamesProvider;
-import com.liferay.portal.search.web.internal.facet.display.context.builder.AssetEntriesSearchFacetDisplayContextBuilder;
+import com.liferay.portal.search.web.internal.facet.display.builder.AssetEntriesSearchFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.type.facet.constants.TypeFacetPortletKeys;
 
 import javax.portlet.PortletConfig;
@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + TypeFacetPortletKeys.TYPE_FACET,
 	service = ConfigurationAction.class
 )
@@ -64,16 +65,27 @@ public class TypeFacetConfigurationAction extends DefaultConfigurationAction {
 			(RenderRequest)httpServletRequest.getAttribute(
 				JavaConstants.JAVAX_PORTLET_REQUEST);
 
-		AssetEntriesSearchFacetDisplayContextBuilder
-			assetEntriesSearchFacetDisplayContextBuilder =
-				_createAssetEntriesSearchFacetDisplayContextBuilder(
-					renderRequest);
+		AssetEntriesSearchFacetDisplayBuilder
+			assetEntriesSearchFacetDisplayBuilder =
+				createAssetEntriesSearchFacetDisplayBuilder(renderRequest);
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			assetEntriesSearchFacetDisplayContextBuilder.build());
+			assetEntriesSearchFacetDisplayBuilder.build());
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
+	}
+
+	protected AssetEntriesSearchFacetDisplayBuilder
+		createAssetEntriesSearchFacetDisplayBuilder(
+			RenderRequest renderRequest) {
+
+		try {
+			return new AssetEntriesSearchFacetDisplayBuilder(renderRequest);
+		}
+		catch (ConfigurationException configurationException) {
+			throw new RuntimeException(configurationException);
+		}
 	}
 
 	@Reference
@@ -82,18 +94,5 @@ public class TypeFacetConfigurationAction extends DefaultConfigurationAction {
 	@Reference
 	protected SearchableAssetClassNamesProvider
 		searchableAssetClassNamesProvider;
-
-	private AssetEntriesSearchFacetDisplayContextBuilder
-		_createAssetEntriesSearchFacetDisplayContextBuilder(
-			RenderRequest renderRequest) {
-
-		try {
-			return new AssetEntriesSearchFacetDisplayContextBuilder(
-				renderRequest);
-		}
-		catch (ConfigurationException configurationException) {
-			throw new RuntimeException(configurationException);
-		}
-	}
 
 }

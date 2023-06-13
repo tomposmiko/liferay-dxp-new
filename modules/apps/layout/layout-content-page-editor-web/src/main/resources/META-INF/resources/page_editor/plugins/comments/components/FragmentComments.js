@@ -20,6 +20,7 @@ import React from 'react';
 import editFragmentEntryComment from '../../../app/actions/editFragmentEntryLinkComment';
 import {useSelectItem} from '../../../app/contexts/ControlsContext';
 import {useDispatch, useSelector} from '../../../app/contexts/StoreContext';
+import SidebarPanelContent from '../../../common/components/SidebarPanelContent';
 import SidebarPanelHeader from '../../../common/components/SidebarPanelHeader';
 import AddCommentForm from './AddCommentForm';
 import FragmentComment from './FragmentComment';
@@ -41,53 +42,53 @@ export default function FragmentComments({fragmentEntryLink}) {
 
 	return (
 		<>
-			<div className="flex-shrink-0">
-				<SidebarPanelHeader
-					iconLeft={
-						<ClayButton
-							aria-label={Liferay.Language.get('back')}
-							borderless
-							className="mr-3 p-0"
-							displayType="secondary"
-							onClick={() => selectItem(null)}
-							size="sm"
-						>
-							<ClayIcon symbol="angle-left" />
-						</ClayButton>
-					}
+			<SidebarPanelHeader
+				className="comments-sidebar-title"
+				padded={false}
+			>
+				<ClayButton
+					borderless
+					className="mx-1 text-dark"
+					displayType="secondary"
+					onClick={() => selectItem(null)}
+					small
 				>
-					{name}
-				</SidebarPanelHeader>
+					<ClayIcon symbol="angle-left" />
+				</ClayButton>
 
+				<span>{name}</span>
+			</SidebarPanelHeader>
+
+			<SidebarPanelContent padded={false}>
 				<ResolvedCommentsToggle />
 
-				<AddCommentForm fragmentEntryLinkId={fragmentEntryLinkId} />
-			</div>
+				<div>
+					<AddCommentForm fragmentEntryLinkId={fragmentEntryLinkId} />
 
-			<div className="overflow-auto">
-				{fragmentEntryLinkComments.map((_, i) => {
-					const comment =
-						fragmentEntryLinkComments[
-							fragmentEntryLinkComments.length - 1 - i
-						];
+					{fragmentEntryLinkComments.map((_, i) => {
+						const comment =
+							fragmentEntryLinkComments[
+								fragmentEntryLinkComments.length - 1 - i
+							];
 
-					return (
-						<FragmentComment
-							comment={comment}
-							fragmentEntryLinkId={fragmentEntryLinkId}
-							key={comment.commentId}
-							onEdit={(fragmentEntryLinkComment) =>
-								dispatch(
-									editFragmentEntryComment({
-										fragmentEntryLinkComment,
-										fragmentEntryLinkId,
-									})
-								)
-							}
-						/>
-					);
-				})}
-			</div>
+						return (
+							<FragmentComment
+								comment={comment}
+								fragmentEntryLinkId={fragmentEntryLinkId}
+								key={comment.commentId}
+								onEdit={(fragmentEntryLinkComment) =>
+									dispatch(
+										editFragmentEntryComment({
+											fragmentEntryLinkComment,
+											fragmentEntryLinkId,
+										})
+									)
+								}
+							/>
+						);
+					})}
+				</div>
+			</SidebarPanelContent>
 		</>
 	);
 }

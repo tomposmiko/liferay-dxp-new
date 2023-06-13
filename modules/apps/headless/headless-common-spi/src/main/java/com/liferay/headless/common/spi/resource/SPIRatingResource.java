@@ -52,8 +52,6 @@ public class SPIRatingResource<T> {
 	public void deleteRating(Long classPK) throws Exception {
 		_checkPermission();
 
-		getRating(classPK);
-
 		_ratingsEntryLocalService.deleteEntry(
 			_user.getUserId(), _className, classPK);
 	}
@@ -65,7 +63,7 @@ public class SPIRatingResource<T> {
 	}
 
 	private void _checkPermission() throws Exception {
-		if (_user.isGuestUser()) {
+		if (_user.isDefaultUser()) {
 			throw new PrincipalException();
 		}
 	}

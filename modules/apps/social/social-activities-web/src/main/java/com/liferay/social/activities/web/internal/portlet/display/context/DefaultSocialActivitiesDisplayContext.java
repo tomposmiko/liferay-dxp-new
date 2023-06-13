@@ -14,16 +14,16 @@
 
 package com.liferay.social.activities.web.internal.portlet.display.context;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.social.activities.web.internal.helper.SocialActivitiesQueryHelper;
-import com.liferay.social.activities.web.internal.portlet.display.context.helper.SocialActivitiesRequestHelper;
+import com.liferay.social.activities.web.internal.portlet.display.context.util.SocialActivitiesRequestHelper;
+import com.liferay.social.activities.web.internal.util.SocialActivitiesQueryHelper;
 import com.liferay.social.kernel.model.SocialActivitySet;
 
 import java.util.List;
@@ -87,8 +87,7 @@ public class DefaultSocialActivitiesDisplayContext
 				_socialActivitiesRequestHelper.getLocale()));
 
 		String feedTitle = LanguageUtil.format(
-			_getResourceBundle(), "x's-activities", groupDescriptiveName,
-			false);
+			getResourceBundle(), "x's-activities", groupDescriptiveName, false);
 
 		LiferayPortletResponse liferayPortletResponse =
 			_socialActivitiesRequestHelper.getLiferayPortletResponse();
@@ -143,7 +142,7 @@ public class DefaultSocialActivitiesDisplayContext
 
 	@Override
 	public String getTaglibFeedTitle() throws PortalException {
-		return LanguageUtil.get(_getResourceBundle(), "rss");
+		return LanguageUtil.get(getResourceBundle(), "rss");
 	}
 
 	@Override
@@ -180,7 +179,7 @@ public class DefaultSocialActivitiesDisplayContext
 		return false;
 	}
 
-	private ResourceBundle _getResourceBundle() {
+	protected ResourceBundle getResourceBundle() {
 		if (_resourceBundle != null) {
 			return _resourceBundle;
 		}

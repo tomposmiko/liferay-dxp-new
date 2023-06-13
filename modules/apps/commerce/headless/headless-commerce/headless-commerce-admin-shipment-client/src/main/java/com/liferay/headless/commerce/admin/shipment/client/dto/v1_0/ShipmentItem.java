@@ -79,27 +79,6 @@ public class ShipmentItem implements Cloneable, Serializable {
 
 	protected Date createDate;
 
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String externalReferenceCode;
-
 	public Long getId() {
 		return id;
 	}
@@ -182,31 +161,6 @@ public class ShipmentItem implements Cloneable, Serializable {
 
 	protected Integer quantity;
 
-	public String getShipmentExternalReferenceCode() {
-		return shipmentExternalReferenceCode;
-	}
-
-	public void setShipmentExternalReferenceCode(
-		String shipmentExternalReferenceCode) {
-
-		this.shipmentExternalReferenceCode = shipmentExternalReferenceCode;
-	}
-
-	public void setShipmentExternalReferenceCode(
-		UnsafeSupplier<String, Exception>
-			shipmentExternalReferenceCodeUnsafeSupplier) {
-
-		try {
-			shipmentExternalReferenceCode =
-				shipmentExternalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String shipmentExternalReferenceCode;
-
 	public Long getShipmentId() {
 		return shipmentId;
 	}
@@ -248,27 +202,6 @@ public class ShipmentItem implements Cloneable, Serializable {
 	}
 
 	protected String userName;
-
-	public Boolean getValidateInventory() {
-		return validateInventory;
-	}
-
-	public void setValidateInventory(Boolean validateInventory) {
-		this.validateInventory = validateInventory;
-	}
-
-	public void setValidateInventory(
-		UnsafeSupplier<Boolean, Exception> validateInventoryUnsafeSupplier) {
-
-		try {
-			validateInventory = validateInventoryUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Boolean validateInventory;
 
 	public Long getWarehouseId() {
 		return warehouseId;

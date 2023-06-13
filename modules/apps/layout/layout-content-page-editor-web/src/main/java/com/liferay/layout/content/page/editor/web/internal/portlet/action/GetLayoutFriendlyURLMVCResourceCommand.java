@@ -18,9 +18,10 @@ import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortlet
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
@@ -40,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pablo Molina
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/get_layout_friendly_url"
@@ -63,18 +65,18 @@ public class GetLayoutFriendlyURLMVCResourceCommand
 		long layoutId = ParamUtil.getLong(resourceRequest, "layoutId");
 
 		try {
+			Layout layout = _layoutLocalService.getLayout(
+				groupId, privateLayout, layoutId);
+
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,
 				JSONUtil.put(
 					"friendlyURL",
-					_portal.getLayoutRelativeURL(
-						_layoutLocalService.getLayout(
-							groupId, privateLayout, layoutId),
-						themeDisplay)));
+					_portal.getLayoutRelativeURL(layout, themeDisplay)));
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			String errorMessage = "an-unexpected-error-occurred";
@@ -87,15 +89,12 @@ public class GetLayoutFriendlyURLMVCResourceCommand
 				resourceRequest, resourceResponse,
 				JSONUtil.put(
 					"error",
-					_language.get(themeDisplay.getRequest(), errorMessage)));
+					LanguageUtil.get(themeDisplay.getRequest(), errorMessage)));
 		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		GetLayoutFriendlyURLMVCResourceCommand.class);
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 import com.liferay.trash.TrashHelper;
 
@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.calendar.model.CalendarBooking",
 	service = ModelDocumentContributor.class
 )
@@ -51,7 +52,7 @@ public class CalendarBookingModelDocumentContributor
 
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
-		String[] descriptionLanguageIds = _getLanguageIds(
+		String[] descriptionLanguageIds = getLanguageIds(
 			defaultLanguageId, calendarBooking.getDescription());
 
 		for (String descriptionLanguageId : descriptionLanguageIds) {
@@ -59,21 +60,21 @@ public class CalendarBookingModelDocumentContributor
 				descriptionLanguageId);
 
 			document.addText(
-				_localization.getLocalizedName(
+				LocalizationUtil.getLocalizedName(
 					Field.DESCRIPTION, descriptionLanguageId),
 				description);
 		}
 
 		document.addKeyword(Field.RELATED_ENTRY, true);
 
-		String[] titleLanguageIds = _getLanguageIds(
+		String[] titleLanguageIds = getLanguageIds(
 			defaultLanguageId, calendarBooking.getTitle());
 
 		for (String titleLanguageId : titleLanguageIds) {
 			String title = calendarBooking.getTitle(titleLanguageId);
 
 			document.addText(
-				_localization.getLocalizedName(Field.TITLE, titleLanguageId),
+				LocalizationUtil.getLocalizedName(Field.TITLE, titleLanguageId),
 				title);
 		}
 
@@ -95,14 +96,11 @@ public class CalendarBookingModelDocumentContributor
 		document.addNumber("startTime", calendarBooking.getStartTime());
 	}
 
-	@Reference
-	protected ClassNameLocalService classNameLocalService;
+	protected String[] getLanguageIds(
+		String defaultLanguageId, String content) {
 
-	@Reference
-	protected TrashHelper trashHelper;
-
-	private String[] _getLanguageIds(String defaultLanguageId, String content) {
-		String[] languageIds = _localization.getAvailableLanguageIds(content);
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
+			content);
 
 		if (languageIds.length == 0) {
 			languageIds = new String[] {defaultLanguageId};
@@ -112,6 +110,9 @@ public class CalendarBookingModelDocumentContributor
 	}
 
 	@Reference
-	private Localization _localization;
+	protected ClassNameLocalService classNameLocalService;
+
+	@Reference
+	protected TrashHelper trashHelper;
 
 }

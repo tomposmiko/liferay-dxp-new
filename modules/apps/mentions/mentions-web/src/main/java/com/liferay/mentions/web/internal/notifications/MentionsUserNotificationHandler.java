@@ -22,8 +22,7 @@ import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.model.UserNotificationEvent;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.notifications.BaseModelUserNotificationHandler;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -42,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + MentionsPortletKeys.MENTIONS,
 	service = UserNotificationHandler.class
 )
@@ -69,7 +69,6 @@ public class MentionsUserNotificationHandler
 	@Override
 	protected String getTitle(
 		JSONObject jsonObject, AssetRenderer<?> assetRenderer,
-		UserNotificationEvent userNotificationEvent,
 		ServiceContext serviceContext) {
 
 		MBMessage mbMessage = _mbMessageLocalService.fetchMBMessage(
@@ -86,7 +85,7 @@ public class MentionsUserNotificationHandler
 			"content.Language", serviceContext.getLocale(), getClass());
 
 		if ((mbMessage != null) && mbMessage.isDiscussion()) {
-			return _language.format(
+			return LanguageUtil.format(
 				resourceBundle, "x-mentioned-you-in-a-comment-in-a-x",
 				new String[] {
 					HtmlUtil.escape(
@@ -97,7 +96,7 @@ public class MentionsUserNotificationHandler
 				false);
 		}
 
-		return _language.format(
+		return LanguageUtil.format(
 			resourceBundle, "x-mentioned-you-in-a-x",
 			new String[] {
 				HtmlUtil.escape(
@@ -108,10 +107,13 @@ public class MentionsUserNotificationHandler
 			false);
 	}
 
-	@Reference
-	private Language _language;
+	@Reference(unbind = "-")
+	protected void setMBMessageLocalService(
+		MBMessageLocalService mbMessageLocalService) {
 
-	@Reference
+		_mbMessageLocalService = mbMessageLocalService;
+	}
+
 	private MBMessageLocalService _mbMessageLocalService;
 
 	@Reference

@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = PortletConfigurationIconLocator.class)
+@Component(immediate = true, service = PortletConfigurationIconLocator.class)
 public class MVCPortletConfigurationIconLocator
 	implements PortletConfigurationIconLocator {
 
@@ -60,7 +60,13 @@ public class MVCPortletConfigurationIconLocator
 		return ParamUtil.getString(portletRequest, "mvcPath");
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setPortletLocalService(
+		PortletLocalService portletLocalService) {
+
+		_portletLocalService = portletLocalService;
+	}
+
 	private PortletLocalService _portletLocalService;
 
 }

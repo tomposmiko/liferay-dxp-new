@@ -72,12 +72,14 @@ public class SegmentResourceImpl extends BaseSegmentResourceImpl {
 
 		User user = _userService.getUserById(userAccountId);
 
+		long[] segmentsEntryIds =
+			_segmentsEntryProviderRegistry.getSegmentsEntryIds(
+				siteId, user.getModelClassName(), user.getPrimaryKey(),
+				_createSegmentsContext());
+
 		return Page.of(
 			transformToList(
-				ArrayUtil.toArray(
-					_segmentsEntryProviderRegistry.getSegmentsEntryIds(
-						siteId, user.getModelClassName(), user.getPrimaryKey(),
-						_createSegmentsContext())),
+				ArrayUtil.toArray(segmentsEntryIds),
 				segmentsEntryId -> _toSegment(
 					_segmentsEntryService.getSegmentsEntry(segmentsEntryId))));
 	}

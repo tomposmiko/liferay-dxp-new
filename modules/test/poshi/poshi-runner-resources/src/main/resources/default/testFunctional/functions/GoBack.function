@@ -1,8 +1,0 @@
-@default = "goBack"
-definition {
-
-	function goBack {
-		selenium.goBack();
-	}
-
-}

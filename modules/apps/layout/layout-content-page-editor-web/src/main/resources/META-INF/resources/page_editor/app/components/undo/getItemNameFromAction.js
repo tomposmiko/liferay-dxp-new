@@ -12,8 +12,7 @@
  * details.
  */
 
-import selectLayoutDataItemLabel from '../../selectors/selectLayoutDataItemLabel';
-import getFragmentItem from '../../utils/getFragmentItem';
+import getLayoutDataItemLabel from '../../utils/getLayoutDataItemLabel';
 
 /**
  * Obtain the name associated to the undo action,
@@ -41,12 +40,18 @@ export function getItemNameFromAction({action, state}) {
 	const item =
 		state.layoutData?.items[action.itemId] ||
 		action.layoutData?.items[action.itemId] ||
-		getFragmentItem(state.layoutData, action.fragmentEntryLinkId) ||
-		getFragmentItem(action.layoutData, action.fragmentEntryLinkId);
+		Object.values(state.layoutData?.items ?? {}).find(
+			(item) =>
+				item.config.fragmentEntryLinkId === action.fragmentEntryLinkId
+		) ||
+		Object.values(action.layoutData?.items ?? {}).find(
+			(item) =>
+				item.config.fragmentEntryLinkId === action.fragmentEntryLinkId
+		);
 
 	if (!item) {
 		return null;
 	}
 
-	return selectLayoutDataItemLabel({fragmentEntryLinks}, item);
+	return getLayoutDataItemLabel(item, fragmentEntryLinks);
 }

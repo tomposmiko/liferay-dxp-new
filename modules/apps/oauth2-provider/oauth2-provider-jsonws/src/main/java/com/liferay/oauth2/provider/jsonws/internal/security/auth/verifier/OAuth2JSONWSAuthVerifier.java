@@ -15,18 +15,20 @@
 package com.liferay.oauth2.provider.jsonws.internal.security.auth.verifier;
 
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
+import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScope;
 import com.liferay.oauth2.provider.jsonws.internal.service.access.policy.scope.SAPEntryScopeDescriptorFinderRegistrator;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
+import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.liferay.constants.OAuth2ProviderScopeLiferayConstants;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -50,9 +52,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Component;
@@ -82,32 +85,14 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 
 		AuthVerifierResult authVerifierResult = new AuthVerifierResult();
 
-		String accessTokenContent = _getAccessTokenContent(
+		OAuth2Authorization oAuth2Authorization = getOAuth2Authorization(
 			accessControlContext);
 
-		if (accessTokenContent == null) {
-			return authVerifierResult;
-		}
-
-		OAuth2Authorization oAuth2Authorization =
-			_oAuth2AuthorizationLocalService.
-				fetchOAuth2AuthorizationByAccessTokenContent(
-					accessTokenContent);
-
 		try {
-			BearerTokenProvider.AccessToken accessToken = _getAccessToken(
+			BearerTokenProvider.AccessToken accessToken = getAccessToken(
 				oAuth2Authorization);
 
 			if (accessToken == null) {
-				HttpServletResponse httpServletResponse =
-					accessControlContext.getResponse();
-
-				httpServletResponse.setStatus(
-					HttpServletResponse.SC_UNAUTHORIZED);
-
-				authVerifierResult.setState(
-					AuthVerifierResult.State.INVALID_CREDENTIALS);
-
 				return authVerifierResult;
 			}
 
@@ -126,19 +111,36 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				return authVerifierResult;
 			}
 
-			List<String> scopes = TransformUtil.transform(
+			List<OAuth2ScopeGrant> oAuth2AuthorizationOAuth2ScopeGrants =
 				_oAuth2ScopeGrantLocalService.
 					getOAuth2AuthorizationOAuth2ScopeGrants(
-						oAuth2Authorization.getOAuth2AuthorizationId()),
-				oAuth2ScopeGrant -> {
-					if (!_jaxRsApplicationNames.contains(
-							oAuth2ScopeGrant.getApplicationName())) {
+						oAuth2Authorization.getOAuth2AuthorizationId());
 
-						return null;
-					}
+			Stream<OAuth2ScopeGrant> stream =
+				oAuth2AuthorizationOAuth2ScopeGrants.stream();
 
-					return oAuth2ScopeGrant.getScope();
-				});
+			List<String> scopes = stream.filter(
+				oAuth2ScopeGrant -> _jaxRsApplicationNames.contains(
+					oAuth2ScopeGrant.getApplicationName())
+			).map(
+				OAuth2ScopeGrant::getScope
+			).collect(
+				Collectors.toList()
+			);
+
+			List<SAPEntryScope> sapEntryScopes =
+				_sapEntryScopeDescriptorFinderRegistrator.
+					getRegisteredSAPEntryScopes(companyId);
+
+			List<String> serviceAccessPolicyNames = new ArrayList<>(
+				sapEntryScopes.size());
+
+			for (SAPEntryScope sapEntryScope : sapEntryScopes) {
+				if (scopes.contains(sapEntryScope.getScope())) {
+					serviceAccessPolicyNames.add(
+						sapEntryScope.getSAPEntryName());
+				}
+			}
 
 			Map<String, Object> settings = authVerifierResult.getSettings();
 
@@ -146,16 +148,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				BearerTokenProvider.AccessToken.class.getName(), accessToken);
 			settings.put(
 				ServiceAccessPolicy.SERVICE_ACCESS_POLICY_NAMES,
-				TransformUtil.transform(
-					_sapEntryScopeDescriptorFinderRegistrator.
-						getRegisteredSAPEntryScopes(companyId),
-					sapEntryScope -> {
-						if (!scopes.contains(sapEntryScope.getScope())) {
-							return null;
-						}
-
-						return sapEntryScope.getSAPEntryName();
-					}));
+				serviceAccessPolicyNames);
 
 			authVerifierResult.setState(AuthVerifierResult.State.SUCCESS);
 			authVerifierResult.setUserId(accessToken.getUserId());
@@ -185,15 +178,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 				serviceReference.getProperty("osgi.jaxrs.name")));
 	}
 
-	protected void removeJaxRsApplicationName(
-		ServiceReference<ScopeFinder> serviceReference) {
-
-		_jaxRsApplicationNames.remove(
-			GetterUtil.getString(
-				serviceReference.getProperty("osgi.jaxrs.name")));
-	}
-
-	private BearerTokenProvider.AccessToken _getAccessToken(
+	protected BearerTokenProvider.AccessToken getAccessToken(
 			OAuth2Authorization oAuth2Authorization)
 		throws PortalException {
 
@@ -240,7 +225,7 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 			oAuth2Authorization.getUserName());
 	}
 
-	private String _getAccessTokenContent(
+	protected OAuth2Authorization getOAuth2Authorization(
 		AccessControlContext accessControlContext) {
 
 		HttpServletRequest httpServletRequest =
@@ -261,11 +246,22 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 			return null;
 		}
 
-		if (authorizationParts.length < 2) {
-			return StringPool.BLANK;
+		String token = authorizationParts[1];
+
+		if (Validator.isBlank(token)) {
+			return null;
 		}
 
-		return authorizationParts[1];
+		return _oAuth2AuthorizationLocalService.
+			fetchOAuth2AuthorizationByAccessTokenContent(token);
+	}
+
+	protected void removeJaxRsApplicationName(
+		ServiceReference<ScopeFinder> serviceReference) {
+
+		_jaxRsApplicationNames.remove(
+			GetterUtil.getString(
+				serviceReference.getProperty("osgi.jaxrs.name")));
 	}
 
 	private static final String _TOKEN_KEY = "Bearer";
@@ -298,5 +294,8 @@ public class OAuth2JSONWSAuthVerifier implements AuthVerifier {
 	@Reference
 	private SAPEntryScopeDescriptorFinderRegistrator
 		_sapEntryScopeDescriptorFinderRegistrator;
+
+	@Reference
+	private ScopeLocator _scopeLocator;
 
 }

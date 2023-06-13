@@ -18,7 +18,7 @@
 
 <liferay-util:include page="/wiki/top_links.jsp" servletContext="<%= application %>" />
 
-<div class="main-content-body mt-4">
+<div class="main-content-body">
 	<liferay-ui:header
 		title="draft-pages"
 	/>

@@ -237,8 +237,4 @@ public interface CommerceAccountGroupModel
 	@Override
 	public CommerceAccountGroup cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

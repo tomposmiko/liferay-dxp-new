@@ -24,12 +24,10 @@ import java.util.List;
  */
 public class ObjectLayoutImpl extends ObjectLayoutBaseImpl {
 
-	@Override
 	public List<ObjectLayoutTab> getObjectLayoutTabs() {
 		return _objectLayoutTabs;
 	}
 
-	@Override
 	public void setObjectLayoutTabs(List<ObjectLayoutTab> objectLayoutTabs) {
 		_objectLayoutTabs = objectLayoutTabs;
 	}

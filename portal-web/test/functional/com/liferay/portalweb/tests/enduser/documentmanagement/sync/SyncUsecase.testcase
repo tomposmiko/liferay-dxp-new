@@ -1,7 +1,7 @@
 @component-name = "portal-document-management"
 definition {
 
-	property custom.properties = "default.layout.template.id=1_column${line.separator}dl.actions.visible=true";
+	property custom.properties = "default.layout.template.id=1_column";
 	property osgi.app.includes = "oauth,oauth-api,oauth-service,oauth-web,sync-encryptor,sync-oauth,sync-security,sync-service,sync-web";
 	property portal.release = "false";
 	property portal.upstream = "true";
@@ -21,25 +21,28 @@ definition {
 			panel = "Control Panel",
 			portlet = "Sync Connector Admin");
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages",
-			site = ${siteName});
+			site = "${siteName}");
 
-		PagesAdmin.addPage(
+		SitePages.addPublicPage(
 			pageName = "Sync Page",
 			sitePageType = "Widget Page");
 
-		PagesAdmin.configurePage(
+		SitePages.configurePage(
 			columnName = "1 Column",
 			pageName = "Sync Page",
+			privacy = "Public Pages",
 			sitePageType = "Widget Page");
 
 		Navigator.gotoPage(pageName = "Sync Page");
 
 		Portlet.addPG(portletName = "Documents and Media");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		Navigator.gotoPage(pageName = "Sync Page");
 
@@ -49,7 +52,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -59,11 +62,11 @@ definition {
 
 			DMDocumentType.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactorneeded
 	test AddDocument {
 		property portal.acceptance = "false";

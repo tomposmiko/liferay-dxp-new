@@ -43,20 +43,19 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -96,7 +95,7 @@ public class WabProcessorTest {
 
 	@Test
 	public void testClassicThemeWab() throws Exception {
-		File file = getFile("dependencies/classic-theme.autodeployed.war");
+		File file = getFile("/classic-theme.autodeployed.war");
 
 		try (Jar jar = new Jar(file)) {
 			Assert.assertNull(jar.getBsn());
@@ -193,6 +192,9 @@ public class WabProcessorTest {
 				importedPackages.containsKey("com.liferay.portlet"));
 			Assert.assertTrue(importedPackages.containsKey("com.sun.el"));
 			Assert.assertTrue(
+				importedPackages.containsKey(
+					"org.apache.commons.chain.generic"));
+			Assert.assertTrue(
 				importedPackages.containsKey("org.apache.naming.java"));
 
 			// Check if packages only referenced in web.xml are imported
@@ -208,7 +210,7 @@ public class WabProcessorTest {
 	@Test
 	public void testFatCDIWabOptsOutOfOSGiCDIIntegration() throws Exception {
 		WabProcessor wabProcessor = new TestWabProcessor(
-			getFile("dependencies/jsf.cdi.applicant.portlet.war"),
+			getFile("/jsf.cdi.applicant.portlet.war"),
 			Collections.singletonMap(
 				"Web-ContextPath",
 				new String[] {"/jsf-cdi-applicant-portlet"}));
@@ -293,7 +295,7 @@ public class WabProcessorTest {
 	@Test
 	public void testSkinnyCDIWabGainsOSGiCDIIntegration() throws Exception {
 		WabProcessor wabProcessor = new TestWabProcessor(
-			getFile("dependencies/PortletV3AnnotatedDemo.war"),
+			getFile("/PortletV3AnnotatedDemo.war"),
 			Collections.singletonMap(
 				"Web-ContextPath",
 				new String[] {"/portlet-V3-annotated-demo"}));
@@ -355,7 +357,7 @@ public class WabProcessorTest {
 
 			Parameters requirements = domain.getRequireCapability();
 
-			Map.Entry<String, Attrs> entry = _findRequirement(
+			Map.Entry<String, Attrs> entry = findRequirement(
 				requirements, "osgi.extender",
 				HashMapBuilder.<String, Object>put(
 					"osgi.extender", "osgi.cdi"
@@ -378,7 +380,7 @@ public class WabProcessorTest {
 			// The bean portlet extension
 
 			Assert.assertNotNull(
-				_findRequirement(
+				findRequirement(
 					requirements, "osgi.cdi.extension",
 					Collections.singletonMap(
 						"osgi.cdi.extension",
@@ -387,7 +389,7 @@ public class WabProcessorTest {
 			// The http extension
 
 			Assert.assertNotNull(
-				_findRequirement(
+				findRequirement(
 					requirements, "osgi.cdi.extension",
 					Collections.singletonMap(
 						"osgi.cdi.extension", "aries.cdi.http")));
@@ -395,7 +397,7 @@ public class WabProcessorTest {
 			// The EL extension
 
 			Assert.assertNotNull(
-				_findRequirement(
+				findRequirement(
 					requirements, "osgi.cdi.extension",
 					Collections.singletonMap(
 						"osgi.cdi.extension", "aries.cdi.el.jsp")));
@@ -405,7 +407,7 @@ public class WabProcessorTest {
 	@Test
 	public void testThatEmbeddedLibsAreHandledProperly() throws Exception {
 		WabProcessor wabProcessor = new TestWabProcessor(
-			getFile("dependencies/tck-V3URLTests.wab.war"),
+			getFile("/tck-V3URLTests.wab.war"),
 			Collections.singletonMap(
 				"Web-ContextPath",
 				new String[] {"/portlet-V3-annotated-demo"}));
@@ -448,7 +450,7 @@ public class WabProcessorTest {
 
 			Parameters requirements = domain.getRequireCapability();
 
-			Map.Entry<String, Attrs> entry = _findRequirement(
+			Map.Entry<String, Attrs> entry = findRequirement(
 				requirements, "osgi.extender",
 				HashMapBuilder.<String, Object>put(
 					"osgi.extender", "osgi.cdi"
@@ -480,7 +482,7 @@ public class WabProcessorTest {
 			// The bean portlet extension
 
 			Assert.assertNotNull(
-				_findRequirement(
+				findRequirement(
 					requirements, "osgi.cdi.extension",
 					Collections.singletonMap(
 						"osgi.cdi.extension",
@@ -489,7 +491,7 @@ public class WabProcessorTest {
 			// The http extension
 
 			Assert.assertNotNull(
-				_findRequirement(
+				findRequirement(
 					requirements, "osgi.cdi.extension",
 					Collections.singletonMap(
 						"osgi.cdi.extension", "aries.cdi.http")));
@@ -497,25 +499,14 @@ public class WabProcessorTest {
 			// The EL extension
 
 			Assert.assertNotNull(
-				_findRequirement(
+				findRequirement(
 					requirements, "osgi.cdi.extension",
 					Collections.singletonMap(
 						"osgi.cdi.extension", "aries.cdi.el.jsp")));
 		}
 	}
 
-	protected File getFile(String fileName) throws URISyntaxException {
-		URL url = WabProcessor.class.getResource(fileName);
-
-		Assert.assertEquals(
-			url + "is not file protocol", "file", url.getProtocol());
-
-		Path path = Paths.get(url.toURI());
-
-		return path.toFile();
-	}
-
-	private Map.Entry<String, Attrs> _findRequirement(
+	protected Map.Entry<String, Attrs> findRequirement(
 			Parameters requirements, String namespace,
 			Map<String, Object> arguments)
 		throws Exception {
@@ -545,6 +536,17 @@ public class WabProcessorTest {
 		return null;
 	}
 
+	protected File getFile(String fileName) throws URISyntaxException {
+		URL url = WabProcessor.class.getResource(fileName);
+
+		Assert.assertEquals(
+			url + "is not file protocol", "file", url.getProtocol());
+
+		Path path = Paths.get(url.toURI());
+
+		return path.toFile();
+	}
+
 	private static class TestWabProcessor extends WabProcessor {
 
 		@Override
@@ -556,32 +558,15 @@ public class WabProcessorTest {
 
 				File parent = deployDir.getParentFile();
 
-				Files.walkFileTree(
-					parent.toPath(),
-					new SimpleFileVisitor<Path>() {
+				Stream<Path> pathsStream = Files.walk(parent.toPath());
 
-						@Override
-						public FileVisitResult postVisitDirectory(
-								Path path, IOException ioException)
-							throws IOException {
-
-							Files.delete(path);
-
-							return FileVisitResult.CONTINUE;
-						}
-
-						@Override
-						public FileVisitResult visitFile(
-								Path path,
-								BasicFileAttributes basicFileAttributes)
-							throws IOException {
-
-							Files.delete(path);
-
-							return FileVisitResult.CONTINUE;
-						}
-
-					});
+				pathsStream.sorted(
+					Comparator.reverseOrder()
+				).map(
+					Path::toFile
+				).forEach(
+					File::delete
+				);
 
 				parent.mkdirs();
 

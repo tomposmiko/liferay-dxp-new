@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author David Mendez Gonzalez
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class WebsiteStagedModelDataHandler
 	extends BaseStagedModelDataHandler<Website> {
 
@@ -109,22 +109,31 @@ public class WebsiteStagedModelDataHandler
 
 			importedWebsite = _websiteLocalService.addWebsite(
 				userId, website.getClassName(), website.getClassPK(),
-				website.getUrl(), website.getListTypeId(), website.isPrimary(),
+				website.getUrl(), website.getTypeId(), website.isPrimary(),
 				serviceContext);
 		}
 		else {
 			importedWebsite = _websiteLocalService.updateWebsite(
 				existingWebsite.getWebsiteId(), website.getUrl(),
-				website.getListTypeId(), website.isPrimary());
+				website.getTypeId(), website.isPrimary());
 		}
 
 		portletDataContext.importClassedModel(website, importedWebsite);
 	}
 
-	@Reference
-	private GroupLocalService _groupLocalService;
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setWebsiteLocalService(
+		WebsiteLocalService websiteLocalService) {
+
+		_websiteLocalService = websiteLocalService;
+	}
+
+	private GroupLocalService _groupLocalService;
 	private WebsiteLocalService _websiteLocalService;
 
 }

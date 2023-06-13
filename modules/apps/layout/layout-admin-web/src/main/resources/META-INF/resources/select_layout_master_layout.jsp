@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplayContext = new SelectLayoutPageTemplateEntryDisplayContext(request, liferayPortletResponse);
+SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplayContext = new SelectLayoutPageTemplateEntryDisplayContext(request);
 
 String backURL = selectLayoutPageTemplateEntryDisplayContext.getBackURL();
 
@@ -62,12 +62,12 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-master-page"));
 	</clay:sheet>
 </clay:container-fluid>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {delegate} = frontendJsWeb;
-
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 	var layoutPageTemplateEntries = document.getElementById(
 		'<portlet:namespace />layoutPageTemplateEntries'
 	);
+
+	var delegate = delegateModule.default;
 
 	var addLayoutActionOptionQueryClickHandler = delegate(
 		layoutPageTemplateEntries,
@@ -75,9 +75,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-master-page"));
 		'.add-layout-action-option',
 		(event) => {
 			Liferay.Util.openModal({
-				disableAutoClose: true,
 				height: '60vh',
-				id: 'addLayoutDialog',
+				id: '<portlet:namespace />addLayoutDialog',
 				size: 'md',
 				title: '<liferay-ui:message key="add-collection-page" />',
 				url: event.delegateTarget.dataset.addLayoutUrl,

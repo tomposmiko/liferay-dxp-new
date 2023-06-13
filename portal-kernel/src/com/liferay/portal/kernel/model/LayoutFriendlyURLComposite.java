@@ -19,12 +19,9 @@ package com.liferay.portal.kernel.model;
  */
 public class LayoutFriendlyURLComposite {
 
-	public LayoutFriendlyURLComposite(
-		Layout layout, String friendlyURL, boolean redirect) {
-
+	public LayoutFriendlyURLComposite(Layout layout, String friendlyURL) {
 		_layout = layout;
 		_friendlyURL = friendlyURL;
-		_redirect = redirect;
 	}
 
 	public String getFriendlyURL() {
@@ -33,10 +30,6 @@ public class LayoutFriendlyURLComposite {
 
 	public Layout getLayout() {
 		return _layout;
-	}
-
-	public boolean isRedirect() {
-		return _redirect;
 	}
 
 	public void setFriendlyURL(String friendlyURL) {
@@ -49,6 +42,5 @@ public class LayoutFriendlyURLComposite {
 
 	private String _friendlyURL;
 	private Layout _layout;
-	private final boolean _redirect;
 
 }

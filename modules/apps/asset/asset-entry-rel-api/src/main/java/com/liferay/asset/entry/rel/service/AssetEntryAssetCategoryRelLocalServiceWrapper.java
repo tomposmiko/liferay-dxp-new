@@ -30,10 +30,6 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	implements AssetEntryAssetCategoryRelLocalService,
 			   ServiceWrapper<AssetEntryAssetCategoryRelLocalService> {
 
-	public AssetEntryAssetCategoryRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AssetEntryAssetCategoryRelLocalServiceWrapper(
 		AssetEntryAssetCategoryRelLocalService
 			assetEntryAssetCategoryRelLocalService) {

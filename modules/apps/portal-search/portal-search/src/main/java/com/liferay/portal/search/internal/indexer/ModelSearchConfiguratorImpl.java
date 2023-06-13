@@ -47,7 +47,7 @@ public class ModelSearchConfiguratorImpl<T extends BaseModel<?>>
 		_modelSearchSettings = modelSearchSettings;
 		_modelSummaryContributor = modelSummaryContributor;
 
-		String className = modelSearchSettings.getClassName();
+		String className = _modelSearchSettings.getClassName();
 
 		_keywordQueryContributors = ServiceTrackerListFactory.open(
 			bundleContext, KeywordQueryContributor.class,
@@ -123,18 +123,22 @@ public class ModelSearchConfiguratorImpl<T extends BaseModel<?>>
 		return _searchContextContributors;
 	}
 
-	private final ServiceTrackerList<KeywordQueryContributor>
-		_keywordQueryContributors;
-	private final ServiceTrackerList<ModelDocumentContributor<?>>
-		_modelDocumentContributors;
+	private final ServiceTrackerList
+		<KeywordQueryContributor, KeywordQueryContributor>
+			_keywordQueryContributors;
+	private final ServiceTrackerList
+		<ModelDocumentContributor<?>, ModelDocumentContributor<?>>
+			_modelDocumentContributors;
 	private final ModelIndexerWriterContributor<T>
 		_modelIndexerWriterContributor;
 	private final ModelSearchSettings _modelSearchSettings;
 	private final ModelSummaryContributor _modelSummaryContributor;
 	private final ModelVisibilityContributor _modelVisibilityContributor;
-	private final ServiceTrackerList<QueryConfigContributor>
-		_queryConfigContributors;
-	private final ServiceTrackerList<SearchContextContributor>
-		_searchContextContributors;
+	private final ServiceTrackerList
+		<QueryConfigContributor, QueryConfigContributor>
+			_queryConfigContributors;
+	private final ServiceTrackerList
+		<SearchContextContributor, SearchContextContributor>
+			_searchContextContributors;
 
 }

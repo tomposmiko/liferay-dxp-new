@@ -18,7 +18,8 @@ import com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramEntryLocalService;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramEntryLocalServiceUtil;
 import com.liferay.commerce.shop.by.diagram.service.persistence.CSDiagramEntryPersistence;
-import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.commerce.shop.by.diagram.service.persistence.CSDiagramPinPersistence;
+import com.liferay.commerce.shop.by.diagram.service.persistence.CSDiagramSettingPersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -33,17 +34,13 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -138,13 +135,10 @@ public abstract class CSDiagramEntryLocalServiceBaseImpl
 	 *
 	 * @param csDiagramEntry the cs diagram entry
 	 * @return the cs diagram entry that was removed
-	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public CSDiagramEntry deleteCSDiagramEntry(CSDiagramEntry csDiagramEntry)
-		throws PortalException {
-
+	public CSDiagramEntry deleteCSDiagramEntry(CSDiagramEntry csDiagramEntry) {
 		return csDiagramEntryPersistence.remove(csDiagramEntry);
 	}
 
@@ -326,11 +320,6 @@ public abstract class CSDiagramEntryLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement CSDiagramEntryLocalServiceImpl#deleteCSDiagramEntry(CSDiagramEntry) to avoid orphaned data");
-		}
-
 		return csDiagramEntryLocalService.deleteCSDiagramEntry(
 			(CSDiagramEntry)persistedModel);
 	}
@@ -401,7 +390,7 @@ public abstract class CSDiagramEntryLocalServiceBaseImpl
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			CSDiagramEntryLocalService.class, IdentifiableOSGiService.class,
-			CTService.class, PersistedModelLocalService.class
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -422,23 +411,8 @@ public abstract class CSDiagramEntryLocalServiceBaseImpl
 		return CSDiagramEntryLocalService.class.getName();
 	}
 
-	@Override
-	public CTPersistence<CSDiagramEntry> getCTPersistence() {
-		return csDiagramEntryPersistence;
-	}
-
-	@Override
-	public Class<CSDiagramEntry> getModelClass() {
+	protected Class<?> getModelClass() {
 		return CSDiagramEntry.class;
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CSDiagramEntry>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return updateUnsafeFunction.apply(csDiagramEntryPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -491,10 +465,25 @@ public abstract class CSDiagramEntryLocalServiceBaseImpl
 	protected CSDiagramEntryPersistence csDiagramEntryPersistence;
 
 	@Reference
+	protected CSDiagramPinPersistence csDiagramPinPersistence;
+
+	@Reference
+	protected CSDiagramSettingPersistence csDiagramSettingPersistence;
+
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		CSDiagramEntryLocalServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
 
 }

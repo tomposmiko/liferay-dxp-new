@@ -4,7 +4,7 @@ The Source Formatter Gradle plugin lets you format project files using the
 [Liferay Source Formatter](https://github.com/liferay/liferay-portal/tree/master/modules/util/source-formatter)
 tool.
 
-The plugin has been successfully tested with Gradle 6.9.2.
+The plugin has been successfully tested with Gradle 5.6.4 and 6.6.1.
 
 ## Usage
 
@@ -13,7 +13,7 @@ To use the plugin, include it in your build script:
 ```gradle
 buildscript {
 	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.source.formatter", version: "5.2.21"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.source.formatter", version: "5.1.55"
 	}
 
 	repositories {
@@ -58,7 +58,7 @@ check {
 ```
 
 The same can be achieved by adding the following snippet to the `build.gradle`
-file in the root directory of a [*Liferay Workspace*](https://learn.liferay.com/web/guest/w/dxp/building-applications/tooling/liferay-workspace):
+file in the root directory of a [*Liferay Workspace*](https://dev.liferay.com/develop/tutorials/-/knowledge_base/7-0/liferay-workspace):
 
 ```gradle
 subprojects {
@@ -105,13 +105,12 @@ Property Name | Type | Default Value | Description
 `formatLocalChanges` | `boolean` | `false` | Whether to format only the unstaged files contained in `baseDir`. It sets the `format.local.changes` argument.
 `gitWorkingBranchName` | `String` | `"master"` | The Git working branch name. It sets the `git.working.branch.name` argument.
 `includeSubrepositories` | `boolean` | `false` | Whether to format files that are in read-only subrepositories. It sets the `include.subrepositories` argument.
-`javaParserEnabled` | `boolean` | `true` | Whether to allow Java and JSP formatting using JavaParser. It sets the `java.parser.enabled` argument.
 `maxLineLength` | `int` | `80` | The maximum number of characters allowed in Java files. It sets the `max.line.length` argument.
 `printErrors` | `boolean` | `true` | Whether to print formatting errors on the Standard Output stream. It sets the `source.print.errors` argument.
 `processorThreadCount` | `int` | `5` | The number of threads used by Source Formatter. It sets the `processor.thread.count` argument.
 `showDebugInformation` | `boolean` | `false` | Whether to show debug information, if present. It sets the `show.debug.information` argument.
-
-Note that setting the property `javaParserEnabled` to `false` may prevent certain Java and JSP checks from working correctly.
+`showDocumentation` | `boolean` | `false` | Whether to show the documentation for the source formatting issues, if present. It sets the `show.documentation` argument.
+`showStatusUpdates` | `boolean` | `false` | Whether to show status updates during source formatting, if present. It sets the `show.status.updates` argument.
 
 ## Additional Configuration
 
@@ -126,7 +125,7 @@ manually adding a dependency to the `sourceFormatter` configuration:
 
 ```gradle
 dependencies {
-	sourceFormatter group: "com.liferay", name: "com.liferay.source.formatter", version: "1.0.1308"
+	sourceFormatter group: "com.liferay", name: "com.liferay.source.formatter", version: "1.0.1156"
 }
 ```
 

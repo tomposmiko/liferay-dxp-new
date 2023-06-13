@@ -42,18 +42,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Andrea Sbarra
- * @author Alessio Antonio Rendina
  */
 @RunWith(Arquillian.class)
 public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -82,26 +79,6 @@ public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 	}
 
 	@Override
-	@Test
-	public void testDeleteShipmentByExternalReferenceCode() throws Exception {
-	}
-
-	@Override
-	@Test
-	public void testGetShipmentByExternalReferenceCode() throws Exception {
-	}
-
-	@Override
-	@Test
-	public void testPatchShipmentByExternalReferenceCode() throws Exception {
-	}
-
-	@Override
-	@Test
-	public void testPutShipmentByExternalReferenceCode() throws Exception {
-	}
-
-	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {
 			"accountId", "shippingAddressId", "shippingMethodId",
@@ -122,7 +99,6 @@ public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 				carrier = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				createDate = RandomTestUtil.nextDate();
 				expectedDate = RandomTestUtil.nextDate();
-				externalReferenceCode = RandomTestUtil.randomString();
 				modifiedDate = RandomTestUtil.nextDate();
 				orderId = _commerceOrder.getCommerceOrderId();
 				shippingAddressId = _commerceOrder.getShippingAddressId();
@@ -138,84 +114,36 @@ public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 
 	@Override
 	protected Shipment testDeleteShipment_addShipment() throws Exception {
-		return _addShipment(null);
-	}
-
-	@Override
-	protected Shipment testDeleteShipmentByExternalReferenceCode_addShipment()
-		throws Exception {
-
-		return _addShipment(null);
+		return _addShipment();
 	}
 
 	@Override
 	protected Shipment testGetShipment_addShipment() throws Exception {
-		return _addShipment(null);
-	}
-
-	@Override
-	protected Shipment testGetShipmentByExternalReferenceCode_addShipment()
-		throws Exception {
-
-		return _addShipment(null);
+		return _addShipment();
 	}
 
 	@Override
 	protected Shipment testGetShipmentsPage_addShipment(Shipment shipment)
 		throws Exception {
 
-		return _addShipment(shipment.getExternalReferenceCode());
+		return _addShipment();
 	}
 
 	@Override
 	protected Shipment testGraphQLShipment_addShipment() throws Exception {
-		return _addShipment(null);
+		return _addShipment();
 	}
 
 	@Override
 	protected Shipment testPatchShipment_addShipment() throws Exception {
-		return _addShipment(null);
-	}
-
-	@Override
-	protected Shipment testPatchShipmentByExternalReferenceCode_addShipment()
-		throws Exception {
-
-		return _addShipment(null);
+		return _addShipment();
 	}
 
 	@Override
 	protected Shipment testPostShipment_addShipment(Shipment shipment)
 		throws Exception {
 
-		return _addShipment(shipment.getExternalReferenceCode());
-	}
-
-	@Override
-	protected Shipment
-			testPostShipmentByExternalReferenceCodeStatusDelivered_addShipment(
-				Shipment shipment)
-		throws Exception {
-
-		return _addShipment(shipment.getExternalReferenceCode());
-	}
-
-	@Override
-	protected Shipment
-			testPostShipmentByExternalReferenceCodeStatusFinishProcessing_addShipment(
-				Shipment shipment)
-		throws Exception {
-
-		return _addShipment(shipment.getExternalReferenceCode());
-	}
-
-	@Override
-	protected Shipment
-			testPostShipmentByExternalReferenceCodeStatusShipped_addShipment(
-				Shipment shipment)
-		throws Exception {
-
-		return _addShipment(shipment.getExternalReferenceCode());
+		return _addShipment();
 	}
 
 	@Override
@@ -223,7 +151,7 @@ public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 			Shipment shipment)
 		throws Exception {
 
-		return _addShipment(shipment.getExternalReferenceCode());
+		return _addShipment();
 	}
 
 	@Override
@@ -231,7 +159,7 @@ public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 			Shipment shipment)
 		throws Exception {
 
-		return _addShipment(shipment.getExternalReferenceCode());
+		return _addShipment();
 	}
 
 	@Override
@@ -239,26 +167,13 @@ public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 			Shipment shipment)
 		throws Exception {
 
-		return _addShipment(shipment.getExternalReferenceCode());
+		return _addShipment();
 	}
 
-	@Override
-	protected Shipment testPutShipmentByExternalReferenceCode_addShipment()
-		throws Exception {
-
-		return _addShipment(null);
-	}
-
-	private Shipment _addShipment(String externalReferenceCode)
-		throws Exception {
-
+	private Shipment _addShipment() throws Exception {
 		_commerceShipment =
 			CommerceShipmentLocalServiceUtil.addCommerceShipment(
-				externalReferenceCode, _commerceOrder.getGroupId(),
-				_commerceOrder.getCommerceAccountId(),
-				_commerceOrder.getShippingAddressId(),
-				_commerceOrder.getCommerceShippingMethodId(),
-				_commerceOrder.getShippingOptionName(), _serviceContext);
+				_commerceOrder.getCommerceOrderId(), _serviceContext);
 
 		_commerceShipments.add(_commerceShipment);
 
@@ -274,8 +189,6 @@ public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 				carrier = commerceShipment.getCarrier();
 				createDate = commerceShipment.getCreateDate();
 				expectedDate = commerceShipment.getExpectedDate();
-				externalReferenceCode =
-					commerceShipment.getExternalReferenceCode();
 				id = commerceShipment.getCommerceShipmentId();
 				modifiedDate = commerceShipment.getModifiedDate();
 				shippingAddressId = commerceShipment.getCommerceAddressId();

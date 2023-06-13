@@ -18,20 +18,14 @@ import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.exception.FileNameException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.document.library.kernel.exception.InvalidFileException;
-import com.liferay.object.exception.ObjectEntryValuesException;
-import com.liferay.object.model.ObjectFieldSetting;
-import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.upload.UploadResponseHandler;
@@ -51,10 +45,6 @@ public class DDMFormUploadResponseHandler implements UploadResponseHandler {
 	public JSONObject onFailure(
 			PortletRequest portletRequest, PortalException portalException)
 		throws PortalException {
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(portalException);
-		}
 
 		JSONObject jsonObject = _defaultUploadResponseHandler.onFailure(
 			portletRequest, portalException);
@@ -78,24 +68,12 @@ public class DDMFormUploadResponseHandler implements UploadResponseHandler {
 		else if (portalException instanceof FileSizeException) {
 			errorMessage = themeDisplay.translate(
 				"please-enter-a-file-with-a-valid-file-size-no-larger-than-x",
-				_language.formatStorageSize(
+				LanguageUtil.formatStorageSize(
 					_ddmFormUploadValidator.getGuestUploadMaximumFileSize(),
 					themeDisplay.getLocale()));
 		}
 		else if (portalException instanceof InvalidFileException) {
 			errorMessage = themeDisplay.translate("please-enter-a-valid-file");
-		}
-		else if (portalException instanceof
-					ObjectEntryValuesException.InvalidFileExtension) {
-
-			ObjectFieldSetting objectFieldSetting =
-				_objectFieldSettingLocalService.fetchObjectFieldSetting(
-					ParamUtil.getLong(portletRequest, "objectFieldId"),
-					"acceptedFileExtensions");
-
-			errorMessage = themeDisplay.translate(
-				"please-enter-a-file-with-a-valid-extension-x",
-				objectFieldSetting.getValue());
 		}
 		else {
 			errorMessage = themeDisplay.translate(
@@ -114,19 +92,10 @@ public class DDMFormUploadResponseHandler implements UploadResponseHandler {
 			uploadPortletRequest, fileEntry);
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMFormUploadResponseHandler.class);
-
 	@Reference
 	private DDMFormUploadValidator _ddmFormUploadValidator;
 
 	@Reference(target = "(upload.response.handler.system.default=true)")
 	private UploadResponseHandler _defaultUploadResponseHandler;
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 }

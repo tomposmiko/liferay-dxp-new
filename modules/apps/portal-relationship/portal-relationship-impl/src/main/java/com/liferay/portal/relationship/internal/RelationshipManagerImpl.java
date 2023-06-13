@@ -28,6 +28,8 @@ import com.liferay.portal.relationship.RelationshipResource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -37,21 +39,22 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Máté Thurzó
  */
-@Component(service = RelationshipManager.class)
+@Component(immediate = true, service = RelationshipManager.class)
 public class RelationshipManagerImpl implements RelationshipManager {
 
 	@Override
 	public <T extends ClassedModel> Collection<? extends ClassedModel>
 		getInboundRelatedModels(Class<T> modelClass, long primKey) {
 
-		List<ClassedModel> inboundRelatedModels = new ArrayList<>();
+		List<Relationship<T>> relationships = _getRelationships(modelClass);
 
-		for (Relationship<T> relationship : _getRelationships(modelClass)) {
-			inboundRelatedModels.addAll(
-				relationship.getInboundRelatedModels(primKey));
-		}
+		Stream<Relationship<T>> stream = relationships.stream();
 
-		return inboundRelatedModels;
+		return stream.flatMap(
+			relationship -> relationship.getInboundRelatedModelStream(primKey)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
@@ -60,27 +63,46 @@ public class RelationshipManagerImpl implements RelationshipManager {
 		getInboundRelatedModels(
 			Class<T> modelClass, long primKey, Degree degree) {
 
+		List<Relationship<T>> relationships = _getRelationships(modelClass);
+
+		Stream<Relationship<T>> stream = relationships.stream();
+
 		List<ClassedModel> inboundRelatedClassedModels = new ArrayList<>();
 
-		for (Relationship<T> relationship : _getRelationships(modelClass)) {
-			for (ClassedModel inboundRelatedClassedModel :
-					relationship.getInboundRelatedModels(primKey)) {
+		stream.forEach(
+			relationship -> {
+				Stream<? extends ClassedModel> inboundRelatedModelStream =
+					relationship.getInboundRelatedModelStream(primKey);
 
-				inboundRelatedClassedModels.add(inboundRelatedClassedModel);
+				inboundRelatedModelStream.map(
+					inboundRelatedModel -> (ClassedModel)inboundRelatedModel
+				).forEach(
+					inboundRelatedClassedModel -> {
+						inboundRelatedClassedModels.add(
+							inboundRelatedClassedModel);
 
-				Degree minusOneDegree = Degree.minusOne(degree);
+						Degree minusOneDegree = Degree.minusOne(degree);
 
-				if (minusOneDegree.getDegree() <= 0) {
-					continue;
-				}
+						if (minusOneDegree.getDegree() <= 0) {
+							return;
+						}
 
-				inboundRelatedClassedModels.addAll(
-					getInboundRelatedModels(
-						(Class)inboundRelatedClassedModel.getModelClass(),
-						(long)inboundRelatedClassedModel.getPrimaryKeyObj(),
-						minusOneDegree));
-			}
-		}
+						Collection<? extends ClassedModel>
+							minusOneDegreeInboundRelatedClassedModels =
+								getInboundRelatedModels(
+									(Class)
+										inboundRelatedClassedModel.
+											getModelClass(),
+									(long)
+										inboundRelatedClassedModel.
+											getPrimaryKeyObj(),
+									minusOneDegree);
+
+						inboundRelatedClassedModels.addAll(
+							minusOneDegreeInboundRelatedClassedModels);
+					}
+				);
+			});
 
 		return inboundRelatedClassedModels;
 	}
@@ -89,14 +111,15 @@ public class RelationshipManagerImpl implements RelationshipManager {
 	public <T extends ClassedModel> Collection<? extends ClassedModel>
 		getOutboundRelatedModels(Class<T> modelClass, long primKey) {
 
-		List<ClassedModel> outboundRelatedModels = new ArrayList<>();
+		List<Relationship<T>> relationships = _getRelationships(modelClass);
 
-		for (Relationship<T> relationship : _getRelationships(modelClass)) {
-			outboundRelatedModels.addAll(
-				relationship.getOutboundRelatedModels(primKey));
-		}
+		Stream<Relationship<T>> stream = relationships.stream();
 
-		return outboundRelatedModels;
+		return stream.flatMap(
+			relationship -> relationship.getOutboundRelatedModelStream(primKey)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
@@ -105,27 +128,46 @@ public class RelationshipManagerImpl implements RelationshipManager {
 		getOutboundRelatedModels(
 			Class<T> modelClass, long primKey, Degree degree) {
 
+		List<Relationship<T>> relationships = _getRelationships(modelClass);
+
+		Stream<Relationship<T>> stream = relationships.stream();
+
 		List<ClassedModel> outBoundRelatedClassedModels = new ArrayList<>();
 
-		for (Relationship<T> relationship : _getRelationships(modelClass)) {
-			for (ClassedModel outboundRelatedClassedModel :
-					relationship.getOutboundRelatedModels(primKey)) {
+		stream.forEach(
+			relationship -> {
+				Stream<? extends ClassedModel> outboundRelatedModelStream =
+					relationship.getOutboundRelatedModelStream(primKey);
 
-				outBoundRelatedClassedModels.add(outboundRelatedClassedModel);
+				outboundRelatedModelStream.map(
+					outboundRelatedModel -> (ClassedModel)outboundRelatedModel
+				).forEach(
+					outboundRelatedClassedModel -> {
+						outBoundRelatedClassedModels.add(
+							outboundRelatedClassedModel);
 
-				Degree minusOneDegree = Degree.minusOne(degree);
+						Degree minusOneDegree = Degree.minusOne(degree);
 
-				if (minusOneDegree.getDegree() <= 0) {
-					continue;
-				}
+						if (minusOneDegree.getDegree() <= 0) {
+							return;
+						}
 
-				outBoundRelatedClassedModels.addAll(
-					getInboundRelatedModels(
-						(Class)outboundRelatedClassedModel.getModelClass(),
-						(long)outboundRelatedClassedModel.getPrimaryKeyObj(),
-						minusOneDegree));
-			}
-		}
+						Collection<? extends ClassedModel>
+							minusOneDegreeOutboundRelatedClassedModels =
+								getInboundRelatedModels(
+									(Class)
+										outboundRelatedClassedModel.
+											getModelClass(),
+									(long)
+										outboundRelatedClassedModel.
+											getPrimaryKeyObj(),
+									minusOneDegree);
+
+						outBoundRelatedClassedModels.addAll(
+							minusOneDegreeOutboundRelatedClassedModels);
+					}
+				);
+			});
 
 		return outBoundRelatedClassedModels;
 	}
@@ -134,13 +176,15 @@ public class RelationshipManagerImpl implements RelationshipManager {
 	public <T extends ClassedModel> Collection<? extends ClassedModel>
 		getRelatedModels(Class<T> modelClass, long primKey) {
 
-		List<ClassedModel> relatedModels = new ArrayList<>();
+		List<Relationship<T>> relationships = _getRelationships(modelClass);
 
-		for (Relationship<T> relationship : _getRelationships(modelClass)) {
-			relatedModels.addAll(relationship.getRelatedModels(primKey));
-		}
+		Stream<Relationship<T>> stream = relationships.stream();
 
-		return relatedModels;
+		return stream.flatMap(
+			relationship -> relationship.getRelatedModelStream(primKey)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
@@ -148,27 +192,42 @@ public class RelationshipManagerImpl implements RelationshipManager {
 	public <T extends ClassedModel> Collection<? extends ClassedModel>
 		getRelatedModels(Class<T> modelClass, long primKey, Degree degree) {
 
+		List<Relationship<T>> relationships = _getRelationships(modelClass);
+
+		Stream<Relationship<T>> stream = relationships.stream();
+
 		List<ClassedModel> relatedClassedModels = new ArrayList<>();
 
-		for (Relationship<T> relationship : _getRelationships(modelClass)) {
-			for (ClassedModel relatedClassedModel :
-					relationship.getRelatedModels(primKey)) {
+		stream.forEach(
+			relationship -> {
+				Stream<? extends ClassedModel> relatedModelStream =
+					relationship.getRelatedModelStream(primKey);
 
-				relatedClassedModels.add(relatedClassedModel);
+				relatedModelStream.map(
+					relatedModel -> (ClassedModel)relatedModel
+				).forEach(
+					relatedClassedModel -> {
+						relatedClassedModels.add(relatedClassedModel);
 
-				Degree minusOneDegree = Degree.minusOne(degree);
+						Degree minusOneDegree = Degree.minusOne(degree);
 
-				if (minusOneDegree.getDegree() <= 0) {
-					continue;
-				}
+						if (minusOneDegree.getDegree() <= 0) {
+							return;
+						}
 
-				relatedClassedModels.addAll(
-					getInboundRelatedModels(
-						(Class)relatedClassedModel.getModelClass(),
-						(long)relatedClassedModel.getPrimaryKeyObj(),
-						minusOneDegree));
-			}
-		}
+						Collection<? extends ClassedModel>
+							minusOneDegreeRelatedClassedModels =
+								getInboundRelatedModels(
+									(Class)relatedClassedModel.getModelClass(),
+									(long)
+										relatedClassedModel.getPrimaryKeyObj(),
+									minusOneDegree);
+
+						relatedClassedModels.addAll(
+							minusOneDegreeRelatedClassedModels);
+					}
+				);
+			});
 
 		return relatedClassedModels;
 	}

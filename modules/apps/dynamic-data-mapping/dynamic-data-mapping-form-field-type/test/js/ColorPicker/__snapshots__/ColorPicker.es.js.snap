@@ -3,7 +3,7 @@
 exports[`Field Color Picker renders field disabled 1`] = `
 <div>
   <div
-    aria-labelledby="colorPicker_fieldDetails"
+    aria-labelledby="colorPicker"
     class="form-group hide"
     data-field-name="colorPicker"
     tabindex="0"
@@ -18,6 +18,7 @@ exports[`Field Color Picker renders field disabled 1`] = `
     >
       <div
         class="input-group clay-color"
+        style=""
       >
         <div
           class="input-group-item input-group-item-shrink input-group-prepend"
@@ -30,7 +31,7 @@ exports[`Field Color Picker renders field disabled 1`] = `
               class="clay-color-btn dropdown-toggle btn"
               disabled=""
               style="background: rgb(0, 0, 0);"
-              title="#000000"
+              title="000000"
               type="button"
             />
           </div>
@@ -58,6 +59,7 @@ exports[`Field Color Picker renders field disabled 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -65,7 +67,7 @@ exports[`Field Color Picker renders field disabled 1`] = `
 exports[`Field Color Picker renders field with helptext 1`] = `
 <div>
   <div
-    aria-labelledby="colorPicker_fieldDetails"
+    aria-labelledby="colorPicker"
     class="form-group hide"
     data-field-name="colorPicker"
     tabindex="0"
@@ -80,6 +82,7 @@ exports[`Field Color Picker renders field with helptext 1`] = `
     >
       <div
         class="input-group clay-color"
+        style=""
       >
         <div
           class="input-group-item input-group-item-shrink input-group-prepend"
@@ -91,7 +94,7 @@ exports[`Field Color Picker renders field with helptext 1`] = `
               aria-label="Select a color"
               class="clay-color-btn dropdown-toggle btn"
               style="background: rgb(0, 0, 0);"
-              title="#000000"
+              title="000000"
               type="button"
             />
           </div>
@@ -118,21 +121,18 @@ exports[`Field Color Picker renders field with helptext 1`] = `
       type="hidden"
       value="false"
     />
-    <div
-      aria-hidden="true"
-      class="form-feedback-group lfr-de__field-feedback"
-    >
-      <div
-        id="colorPicker_fieldHelp"
-      >
-        Helptext
-      </div>
-    </div>
     <span
-      class="sr-only"
-      id="colorPicker_fieldDetails"
+      aria-hidden="true"
+      class="form-text"
     >
       Helptext
+    </span>
+    <span
+      class="sr-only"
+      id="colorPicker"
+    >
+      Helptext
+      <br />
     </span>
   </div>
 </div>
@@ -145,8 +145,8 @@ exports[`Field Color Picker renders field with label 1`] = `
     data-field-name="colorPicker"
   >
     <label
-      aria-labelledby="colorPicker_fieldDetails"
       class="ddm-label"
+      for="colorPicker"
       tabindex="0"
     >
       label
@@ -161,6 +161,7 @@ exports[`Field Color Picker renders field with label 1`] = `
     >
       <div
         class="input-group clay-color"
+        style=""
       >
         <div
           class="input-group-item input-group-item-shrink input-group-prepend"
@@ -172,7 +173,7 @@ exports[`Field Color Picker renders field with label 1`] = `
               aria-label="Select a color"
               class="clay-color-btn dropdown-toggle btn"
               style="background: rgb(0, 0, 0);"
-              title="#000000"
+              title="000000"
               type="button"
             />
           </div>
@@ -199,23 +200,18 @@ exports[`Field Color Picker renders field with label 1`] = `
       type="hidden"
       value="false"
     />
-    <div
+    <span
       aria-hidden="true"
-      class="form-feedback-group lfr-de__field-feedback"
+      class="form-text"
     >
-      <div
-        id="colorPicker_fieldHelp"
-      >
-        Helptext
-      </div>
-    </div>
+      Helptext
+    </span>
     <span
       class="sr-only"
-      id="colorPicker_fieldDetails"
+      id="colorPicker"
     >
-      label
-      <br />
       Helptext
+      <br />
     </span>
   </div>
 </div>

@@ -254,15 +254,35 @@ public class CPOptionLocalServiceUtil {
 		return getService().fetchCPOption(CPOptionId);
 	}
 
-	public static CPOption fetchCPOption(long companyId, String key) {
+	public static CPOption fetchCPOption(long companyId, String key)
+		throws PortalException {
+
 		return getService().fetchCPOption(companyId, key);
 	}
 
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option, or <code>null</code> if a matching cp option could not be found
+	 */
 	public static CPOption fetchCPOptionByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchCPOptionByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static CPOption fetchCPOptionByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchCPOptionByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -309,12 +329,20 @@ public class CPOptionLocalServiceUtil {
 		return getService().getCPOption(companyId, key);
 	}
 
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option
+	 * @throws PortalException if a matching cp option could not be found
+	 */
 	public static CPOption getCPOptionByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getCPOptionByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
 	}
 
 	/**

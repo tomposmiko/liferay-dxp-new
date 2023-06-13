@@ -13,11 +13,12 @@
  */
 
 import {
+	cleanup,
 	fireEvent,
 	queryAllByRole,
 	queryAllByText,
 	render,
-	waitFor,
+	waitForElement,
 } from '@testing-library/react';
 import React from 'react';
 
@@ -46,6 +47,8 @@ const defaultProps = {
 const renderLanguagesComponent = (props) => render(<Languages {...props} />);
 
 describe('Languages', () => {
+	afterEach(cleanup);
+
 	it('renders a radio group with the first option checked', () => {
 		const {getAllByRole} = renderLanguagesComponent(defaultProps);
 
@@ -70,7 +73,7 @@ describe('Languages', () => {
 	it('renders a "default" label at the first element', () => {
 		const {container, getByText} = renderLanguagesComponent(defaultProps);
 
-		expect(getByText('default')).toBeTruthy();
+		expect(getByText('default'));
 
 		const firstLanguageElement = container.querySelectorAll('tr')[1];
 
@@ -83,7 +86,7 @@ describe('Languages', () => {
 			inheritLocales: false,
 		});
 
-		expect(getByText('edit')).toBeTruthy();
+		expect(getByText('edit'));
 	});
 
 	it('renders inputs with the default values', () => {
@@ -147,7 +150,7 @@ describe('Languages', () => {
 			getByText(
 				'this-change-will-only-affect-the-newly-created-localized-content'
 			)
-		).toBeTruthy();
+		);
 	});
 
 	// LPS-111488
@@ -162,9 +165,7 @@ describe('Languages', () => {
 		const dropdownMenuSecond = result.baseElement.querySelectorAll(
 			'.dropdown-menu'
 		)[1];
-		const Buttons = queryAllByRole(dropdownMenuSecond, 'menuitem', {
-			hidden: true,
-		});
+		const Buttons = queryAllByRole(dropdownMenuSecond, 'button');
 
 		expect(Buttons[0].textContent).toBe('make-default');
 		expect(Buttons[1].textContent).toBe('move-up');
@@ -244,6 +245,8 @@ describe('Languages', () => {
 	describe('ManageLanguages', () => {
 		let result;
 
+		afterEach(cleanup);
+
 		beforeEach(() => {
 			result = renderLanguagesComponent({
 				...defaultProps,
@@ -254,13 +257,16 @@ describe('Languages', () => {
 		});
 
 		it('renders a modal when user clicks on Edit button', async () => {
-			const title = await result.findByText('language-selection');
-
-			expect(title).toBeTruthy();
+			const title = await waitForElement(() =>
+				result.getByText('language-selection')
+			);
+			expect(title);
 		});
 
 		it('renders custom locales checked', async () => {
-			const checkboxes = await result.findAllByRole('checkbox');
+			const checkboxes = await waitForElement(() =>
+				result.getAllByRole('checkbox')
+			);
 
 			expect(checkboxes).toHaveLength(4);
 
@@ -271,19 +277,23 @@ describe('Languages', () => {
 		});
 
 		it('custom locale check is disabled', async () => {
-			const checkboxes = await result.findAllByRole('checkbox');
+			const checkboxes = await waitForElement(() =>
+				result.getAllByRole('checkbox')
+			);
 
 			expect(checkboxes[1]).toHaveProperty('disabled', true);
 		});
 
 		it('uncheck custom locale and save', async () => {
-			const checkboxes = await result.findAllByRole('checkbox');
+			const checkboxes = await waitForElement(() =>
+				result.getAllByRole('checkbox')
+			);
 
 			fireEvent.click(checkboxes[0]);
 
 			fireEvent.click(result.getByText('done'));
 
-			const languagesList = await waitFor(() =>
+			const languagesList = await waitForElement(() =>
 				result.container.querySelectorAll('tbody > tr')
 			);
 
@@ -292,13 +302,15 @@ describe('Languages', () => {
 		});
 
 		it('add custom locale and save', async () => {
-			const checkboxes = await result.findAllByRole('checkbox');
+			const checkboxes = await waitForElement(() =>
+				result.getAllByRole('checkbox')
+			);
 
 			fireEvent.click(checkboxes[2]);
 
 			fireEvent.click(result.getByText('done'));
 
-			const languagesList = await waitFor(() =>
+			const languagesList = await waitForElement(() =>
 				result.container.querySelectorAll('tbody > tr')
 			);
 

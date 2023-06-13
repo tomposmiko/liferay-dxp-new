@@ -115,11 +115,13 @@ public class FileShortcutStagedModelRepository
 			});
 
 		exportActionableDynamicQuery.setPerformActionMethod(
-			(DLFileShortcut dlFileShortcut) ->
+			(DLFileShortcut dlFileShortcut) -> {
+				FileShortcut fileShortcut = _dlAppLocalService.getFileShortcut(
+					dlFileShortcut.getFileShortcutId());
+
 				StagedModelDataHandlerUtil.exportStagedModel(
-					portletDataContext,
-					_dlAppLocalService.getFileShortcut(
-						dlFileShortcut.getFileShortcutId())));
+					portletDataContext, fileShortcut);
+			});
 		exportActionableDynamicQuery.setStagedModelType(
 			new StagedModelType(DLFileShortcutConstants.getClassName()));
 

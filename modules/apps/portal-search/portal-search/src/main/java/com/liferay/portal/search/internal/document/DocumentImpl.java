@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.internal.document;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.document.Document;
@@ -28,6 +27,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Michael C. Han
@@ -161,15 +162,23 @@ public class DocumentImpl implements Document {
 	}
 
 	public <T> List<T> getValues(String name, Function<Object, T> function) {
-		return TransformUtil.transform(getValues(name), function::apply);
+		List<Object> values = getValues(name);
+
+		Stream<Object> stream = values.stream();
+
+		return stream.map(
+			function
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public void setFieldValues(String name, Collection<Object> values) {
 		if ((values == null) || values.isEmpty()) {
-			_removeField(name);
+			removeField(name);
 		}
 		else {
-			_putField(name, values);
+			putField(name, values);
 		}
 	}
 
@@ -179,15 +188,23 @@ public class DocumentImpl implements Document {
 	}
 
 	public void unsetField(String name) {
-		_removeField(name);
+		removeField(name);
+	}
+
+	protected Field putField(String name, Collection<Object> values) {
+		return _fields.put(name, new FieldImpl(name, values));
+	}
+
+	protected Field removeField(String name) {
+		return _fields.remove(name);
 	}
 
 	protected void setFieldValue(String name, Object value) {
 		if (_isEmpty(value)) {
-			_removeField(name);
+			removeField(name);
 		}
 		else {
-			_putField(name, Collections.singleton(value));
+			putField(name, Collections.singleton(value));
 		}
 	}
 
@@ -209,14 +226,6 @@ public class DocumentImpl implements Document {
 		}
 
 		return false;
-	}
-
-	private Field _putField(String name, Collection<Object> values) {
-		return _fields.put(name, new FieldImpl(name, values));
-	}
-
-	private Field _removeField(String name) {
-		return _fields.remove(name);
 	}
 
 	private Collection<Object> _toCollection(Object[] values) {

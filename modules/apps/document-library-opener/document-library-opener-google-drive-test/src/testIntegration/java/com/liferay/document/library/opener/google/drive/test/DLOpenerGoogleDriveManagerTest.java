@@ -113,11 +113,14 @@ public class DLOpenerGoogleDriveManagerTest {
 					FileUtil.read(
 						dlOpenerGoogleDriveFileReference.getContentFile()));
 
-				_dlAppService.checkInFileEntry(
-					fileEntry.getFileEntryId(), RandomTestUtil.randomString(),
+				ServiceContext serviceContext =
 					ServiceContextTestUtil.getServiceContext(
 						_company.getCompanyId(), _company.getGroupId(),
-						_user.getUserId()));
+						_user.getUserId());
+
+				_dlAppService.checkInFileEntry(
+					fileEntry.getFileEntryId(), RandomTestUtil.randomString(),
+					serviceContext);
 
 				Assert.assertFalse(
 					_dlOpenerGoogleDriveManager.isGoogleDriveFile(fileEntry));
@@ -143,12 +146,6 @@ public class DLOpenerGoogleDriveManagerTest {
 
 				Assert.assertTrue(
 					_dlOpenerGoogleDriveManager.isGoogleDriveFile(fileEntry));
-
-				_dlOpenerGoogleDriveManager.delete(
-					_user.getUserId(), fileEntry);
-
-				Assert.assertFalse(
-					_dlOpenerGoogleDriveManager.isGoogleDriveFile(fileEntry));
 			});
 	}
 
@@ -170,12 +167,6 @@ public class DLOpenerGoogleDriveManagerTest {
 						dlOpenerGoogleDriveFileReference.getContentFile()));
 
 				Assert.assertTrue(
-					_dlOpenerGoogleDriveManager.isGoogleDriveFile(fileEntry));
-
-				_dlOpenerGoogleDriveManager.delete(
-					_user.getUserId(), fileEntry);
-
-				Assert.assertFalse(
 					_dlOpenerGoogleDriveManager.isGoogleDriveFile(fileEntry));
 			});
 	}
@@ -244,7 +235,7 @@ public class DLOpenerGoogleDriveManagerTest {
 			ServiceContextTestUtil.getServiceContext(_company.getGroupId());
 
 		Folder folder = _dlAppLocalService.addFolder(
-			null, TestPropsValues.getUserId(), _company.getGroupId(),
+			TestPropsValues.getUserId(), _company.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
@@ -254,7 +245,7 @@ public class DLOpenerGoogleDriveManagerTest {
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN,
 			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
-			StringPool.BLANK, "liferay".getBytes(), null, null, serviceContext);
+			"liferay".getBytes(), null, null, serviceContext);
 	}
 
 	private String _getAuthorizationToken() throws Exception {

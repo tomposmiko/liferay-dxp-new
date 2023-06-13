@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.saml.runtime.configuration.SamlProviderConfigurationHelper;
 import com.liferay.saml.runtime.exception.StatusException;
 import com.liferay.saml.util.JspUtil;
 
@@ -58,10 +59,10 @@ public abstract class BaseSamlStrutsAction implements StrutsAction {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception.getMessage());
 			}
 
 			Class<?> clazz = exception.getClass();
@@ -87,12 +88,22 @@ public abstract class BaseSamlStrutsAction implements StrutsAction {
 		return null;
 	}
 
-	public abstract boolean isEnabled();
+	public boolean isEnabled() {
+		return samlProviderConfigurationHelper.isEnabled();
+	}
+
+	public void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		this.samlProviderConfigurationHelper = samlProviderConfigurationHelper;
+	}
 
 	protected abstract String doExecute(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
 		throws Exception;
+
+	protected SamlProviderConfigurationHelper samlProviderConfigurationHelper;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseSamlStrutsAction.class);

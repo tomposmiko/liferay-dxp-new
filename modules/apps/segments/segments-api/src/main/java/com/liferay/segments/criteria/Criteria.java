@@ -20,9 +20,11 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Represents a segment criteria as a composition of {@link Criterion} objects.
@@ -92,25 +94,19 @@ public final class Criteria implements Serializable {
 	}
 
 	public Conjunction getTypeConjunction(Type type) {
-		for (Criterion criterion : _criteria.values()) {
-			if (Objects.equals(type.getValue(), criterion.getTypeValue())) {
-				return Conjunction.parse(criterion.getConjunction());
-			}
-		}
+		Collection<Criterion> criteria = _criteria.values();
 
-		return Conjunction.AND;
-	}
+		Stream<Criterion> stream = criteria.stream();
 
-	public void mergeCriteria(Criteria criteria, Conjunction conjunction) {
-		Map<String, Criterion> criteriaMap = criteria._criteria;
-
-		for (Map.Entry<String, Criterion> entry : criteriaMap.entrySet()) {
-			Criterion criterion = entry.getValue();
-
-			addCriterion(
-				entry.getKey(), Type.parse(criterion.getTypeValue()),
-				criterion.getFilterString(), conjunction);
-		}
+		return stream.filter(
+			criterion -> Objects.equals(
+				type.getValue(), criterion.getTypeValue())
+		).map(
+			criterion -> Conjunction.parse(criterion.getConjunction())
+		).findFirst(
+		).orElse(
+			Conjunction.AND
+		);
 	}
 
 	public static final class Criterion implements Serializable {
@@ -179,14 +175,10 @@ public final class Criteria implements Serializable {
 
 	public enum Type {
 
-		ANALYTICS("analytics"), CONTEXT("context"), MODEL("model"),
-		REFERRED("referred");
+		CONTEXT("context"), MODEL("model"), REFERRED("referred");
 
 		public static Type parse(String value) {
-			if (Objects.equals(ANALYTICS.getValue(), value)) {
-				return ANALYTICS;
-			}
-			else if (Objects.equals(CONTEXT.getValue(), value)) {
+			if (Objects.equals(CONTEXT.getValue(), value)) {
 				return CONTEXT;
 			}
 			else if (Objects.equals(MODEL.getValue(), value)) {

@@ -102,7 +102,7 @@ public class ArgumentsUtil {
 			throw exception;
 		}
 
-		_log.error(exception);
+		_log.error(exception, exception);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(ArgumentsUtil.class);

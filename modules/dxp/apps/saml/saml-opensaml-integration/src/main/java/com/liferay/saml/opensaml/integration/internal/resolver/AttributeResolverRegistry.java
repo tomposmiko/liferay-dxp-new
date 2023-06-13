@@ -32,13 +32,13 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Mika Koivisto
  */
-@Component(service = AttributeResolverRegistry.class)
+@Component(immediate = true, service = AttributeResolverRegistry.class)
 public class AttributeResolverRegistry {
 
 	public AttributeResolver getAttributeResolver(String entityId) {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
-		AttributeResolver attributeResolver = _serviceTrackerMap.getService(
+		AttributeResolver attributeResolver = _attributeResolvers.getService(
 			companyId + "," + entityId);
 
 		if (attributeResolver == null) {
@@ -55,26 +55,32 @@ public class AttributeResolverRegistry {
 		return attributeResolver;
 	}
 
+	@Reference(
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(!(companyId=*))", unbind = "-"
+	)
+	public void setDefaultAttributeResolver(
+		AttributeResolver defaultAttributeResolver) {
+
+		_defaultAttributeResolver = defaultAttributeResolver;
+	}
+
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+		_attributeResolvers = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, AttributeResolver.class, "(companyId=*)",
 			new DefaultServiceReferenceMapper(_log));
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_attributeResolvers.close();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AttributeResolverRegistry.class);
 
-	@Reference(
-		policyOption = ReferencePolicyOption.GREEDY, target = "(!(companyId=*))"
-	)
+	private ServiceTrackerMap<String, AttributeResolver> _attributeResolvers;
 	private AttributeResolver _defaultAttributeResolver;
-
-	private ServiceTrackerMap<String, AttributeResolver> _serviceTrackerMap;
 
 }

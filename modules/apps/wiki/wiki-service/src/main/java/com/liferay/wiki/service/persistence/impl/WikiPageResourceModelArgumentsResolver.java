@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.wiki.model.impl.WikiPageResourceImpl",
-		"table.name=WikiPageResource"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		WikiPageResourceModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class WikiPageResourceModelArgumentsResolver
 	implements ArgumentsResolver {

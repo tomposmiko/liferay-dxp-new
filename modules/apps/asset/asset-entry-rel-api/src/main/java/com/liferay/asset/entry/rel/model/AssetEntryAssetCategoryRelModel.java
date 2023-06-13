@@ -167,8 +167,4 @@ public interface AssetEntryAssetCategoryRelModel
 	@Override
 	public AssetEntryAssetCategoryRel cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

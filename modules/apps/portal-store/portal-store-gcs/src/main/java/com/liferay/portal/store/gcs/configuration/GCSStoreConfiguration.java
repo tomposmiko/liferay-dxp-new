@@ -30,11 +30,11 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface GCSStoreConfiguration {
 
 	@ExtendedAttributeDefinition(
-		descriptionArguments = "https://cloud.google.com/iam/docs/creating-managing-service-account-keys"
+		descriptionArguments = "https://cloud.google.com/iam/docs/creating-managing-service-account-keys",
+		requiredInput = true
 	)
 	@Meta.AD(
-		description = "service-account-key-help", name = "service-account-key",
-		required = false
+		description = "service-account-key-help", name = "service-account-key"
 	)
 	public String serviceAccountKey();
 
@@ -89,10 +89,7 @@ public interface GCSStoreConfiguration {
 	)
 	public boolean retryJitter();
 
-	@Meta.AD(
-		deflt = "", description = "aes256-key-help", name = "aes256-key",
-		required = false
-	)
+	@Meta.AD(deflt = "", description = "aes256-key-help", name = "aes256-key")
 	public String aes256Key();
 
 }

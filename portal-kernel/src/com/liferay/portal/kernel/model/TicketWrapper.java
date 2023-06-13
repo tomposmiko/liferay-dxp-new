@@ -368,11 +368,6 @@ public class TicketWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected TicketWrapper wrap(Ticket ticket) {
 		return new TicketWrapper(ticket);
 	}

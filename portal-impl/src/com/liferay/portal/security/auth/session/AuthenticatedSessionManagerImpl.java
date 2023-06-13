@@ -14,15 +14,13 @@
 
 package com.liferay.portal.security.auth.session;
 
+import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.cluster.ClusterNode;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
-import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
-import com.liferay.portal.kernel.encryptor.EncryptorUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -35,15 +33,19 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserTracker;
 import com.liferay.portal.kernel.security.auth.AuthException;
+import com.liferay.portal.kernel.security.auth.AuthenticatedUserUUIDStoreUtil;
 import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.liveusers.LiveUsers;
@@ -88,8 +90,7 @@ public class AuthenticatedSessionManagerImpl
 		httpServletRequest = PortalUtil.getOriginalServletRequest(
 			httpServletRequest);
 
-		String queryString = HttpComponentsUtil.getQueryString(
-			httpServletRequest);
+		String queryString = HttpUtil.getQueryString(httpServletRequest);
 
 		if (Validator.isNotNull(queryString) &&
 			queryString.contains("password=")) {
@@ -125,7 +126,7 @@ public class AuthenticatedSessionManagerImpl
 			}
 		}
 
-		CookiesManagerUtil.validateSupportCookie(httpServletRequest);
+		CookieKeys.validateSupportCookie(httpServletRequest);
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
@@ -144,7 +145,7 @@ public class AuthenticatedSessionManagerImpl
 
 		// Set cookies
 
-		String domain = CookiesManagerUtil.getDomain(httpServletRequest);
+		String domain = CookieKeys.getDomain(httpServletRequest);
 
 		if (Validator.isNull(domain)) {
 			domain = null;
@@ -168,8 +169,7 @@ public class AuthenticatedSessionManagerImpl
 		}
 
 		Cookie companyIdCookie = new Cookie(
-			CookiesConstants.NAME_COMPANY_ID,
-			String.valueOf(company.getCompanyId()));
+			CookieKeys.COMPANY_ID, String.valueOf(company.getCompanyId()));
 
 		if (domain != null) {
 			companyIdCookie.setDomain(domain);
@@ -178,8 +178,8 @@ public class AuthenticatedSessionManagerImpl
 		companyIdCookie.setPath(StringPool.SLASH);
 
 		Cookie idCookie = new Cookie(
-			CookiesConstants.NAME_ID,
-			EncryptorUtil.encrypt(company.getKeyObj(), userIdString));
+			CookieKeys.ID,
+			Encryptor.encrypt(company.getKeyObj(), userIdString));
 
 		if (domain != null) {
 			idCookie.setDomain(domain);
@@ -205,15 +205,27 @@ public class AuthenticatedSessionManagerImpl
 			idCookie.setMaxAge(-1);
 		}
 
-		CookiesManagerUtil.addCookie(
-			CookiesConstants.CONSENT_TYPE_NECESSARY, companyIdCookie,
-			httpServletRequest, httpServletResponse);
-		CookiesManagerUtil.addCookie(
-			CookiesConstants.CONSENT_TYPE_NECESSARY, idCookie,
-			httpServletRequest, httpServletResponse);
+		boolean secure = httpServletRequest.isSecure();
+
+		if (secure && !PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
+			!StringUtil.equalsIgnoreCase(
+				Http.HTTPS, PropsValues.WEB_SERVER_PROTOCOL)) {
+
+			Boolean httpsInitial = (Boolean)httpSession.getAttribute(
+				WebKeys.HTTPS_INITIAL);
+
+			if ((httpsInitial == null) || !httpsInitial.booleanValue()) {
+				secure = false;
+			}
+		}
+
+		CookieKeys.addCookie(
+			httpServletRequest, httpServletResponse, companyIdCookie, secure);
+		CookieKeys.addCookie(
+			httpServletRequest, httpServletResponse, idCookie, secure);
 
 		if (rememberMe) {
-			Cookie loginCookie = new Cookie(CookiesConstants.NAME_LOGIN, login);
+			Cookie loginCookie = new Cookie(CookieKeys.LOGIN, login);
 
 			if (domain != null) {
 				loginCookie.setDomain(domain);
@@ -222,13 +234,12 @@ public class AuthenticatedSessionManagerImpl
 			loginCookie.setMaxAge(loginMaxAge);
 			loginCookie.setPath(StringPool.SLASH);
 
-			CookiesManagerUtil.addCookie(
-				CookiesConstants.CONSENT_TYPE_FUNCTIONAL, loginCookie,
-				httpServletRequest, httpServletResponse);
+			CookieKeys.addCookie(
+				httpServletRequest, httpServletResponse, loginCookie, secure);
 
 			Cookie passwordCookie = new Cookie(
-				CookiesConstants.NAME_PASSWORD,
-				EncryptorUtil.encrypt(company.getKeyObj(), password));
+				CookieKeys.PASSWORD,
+				Encryptor.encrypt(company.getKeyObj(), password));
 
 			if (domain != null) {
 				passwordCookie.setDomain(domain);
@@ -237,12 +248,12 @@ public class AuthenticatedSessionManagerImpl
 			passwordCookie.setMaxAge(loginMaxAge);
 			passwordCookie.setPath(StringPool.SLASH);
 
-			CookiesManagerUtil.addCookie(
-				CookiesConstants.CONSENT_TYPE_FUNCTIONAL, passwordCookie,
-				httpServletRequest, httpServletResponse);
+			CookieKeys.addCookie(
+				httpServletRequest, httpServletResponse, passwordCookie,
+				secure);
 
 			Cookie rememberMeCookie = new Cookie(
-				CookiesConstants.NAME_REMEMBER_ME, Boolean.TRUE.toString());
+				CookieKeys.REMEMBER_ME, Boolean.TRUE.toString());
 
 			if (domain != null) {
 				rememberMeCookie.setDomain(domain);
@@ -251,10 +262,52 @@ public class AuthenticatedSessionManagerImpl
 			rememberMeCookie.setMaxAge(loginMaxAge);
 			rememberMeCookie.setPath(StringPool.SLASH);
 
-			CookiesManagerUtil.addCookie(
-				CookiesConstants.CONSENT_TYPE_FUNCTIONAL, rememberMeCookie,
-				httpServletRequest, httpServletResponse);
+			CookieKeys.addCookie(
+				httpServletRequest, httpServletResponse, rememberMeCookie,
+				secure);
+
+			Cookie screenNameCookie = new Cookie(
+				CookieKeys.SCREEN_NAME,
+				Encryptor.encrypt(company.getKeyObj(), user.getScreenName()));
+
+			if (domain != null) {
+				screenNameCookie.setDomain(domain);
+			}
+
+			screenNameCookie.setMaxAge(loginMaxAge);
+			screenNameCookie.setPath(StringPool.SLASH);
+
+			CookieKeys.addCookie(
+				httpServletRequest, httpServletResponse, screenNameCookie,
+				secure);
 		}
+
+		if (!PropsValues.AUTH_USER_UUID_STORE_ENABLED) {
+			return;
+		}
+
+		String userUUID = StringBundler.concat(
+			userIdString, StringPool.PERIOD, System.nanoTime());
+
+		Cookie userUUIDCookie = new Cookie(
+			CookieKeys.USER_UUID,
+			Encryptor.encrypt(company.getKeyObj(), userUUID));
+
+		userUUIDCookie.setPath(StringPool.SLASH);
+
+		httpSession.setAttribute(CookieKeys.USER_UUID, userUUID);
+
+		if (rememberMe) {
+			userUUIDCookie.setMaxAge(loginMaxAge);
+		}
+		else {
+			userUUIDCookie.setMaxAge(-1);
+		}
+
+		CookieKeys.addCookie(
+			httpServletRequest, httpServletResponse, userUUIDCookie, secure);
+
+		AuthenticatedUserUUIDStoreUtil.register(userUUID);
 	}
 
 	@Override
@@ -269,26 +322,25 @@ public class AuthenticatedSessionManagerImpl
 			PropsKeys.LOGOUT_EVENTS_PRE, PropsValues.LOGOUT_EVENTS_PRE,
 			httpServletRequest, httpServletResponse);
 
-		String domain = CookiesManagerUtil.getDomain(httpServletRequest);
+		String domain = CookieKeys.getDomain(httpServletRequest);
 
 		if (Validator.isNull(domain)) {
 			domain = null;
 		}
 
 		boolean rememberMe = GetterUtil.getBoolean(
-			CookiesManagerUtil.getCookieValue(
-				CookiesConstants.NAME_REMEMBER_ME, httpServletRequest, false));
+			CookieKeys.getCookie(
+				httpServletRequest, CookieKeys.REMEMBER_ME, false));
 
-		CookiesManagerUtil.deleteCookies(
-			domain, httpServletRequest, httpServletResponse,
-			CookiesConstants.NAME_COMPANY_ID,
-			CookiesConstants.NAME_GUEST_LANGUAGE_ID, CookiesConstants.NAME_ID,
-			CookiesConstants.NAME_PASSWORD, CookiesConstants.NAME_REMEMBER_ME);
+		CookieKeys.deleteCookies(
+			httpServletRequest, httpServletResponse, domain,
+			CookieKeys.COMPANY_ID, CookieKeys.GUEST_LANGUAGE_ID, CookieKeys.ID,
+			CookieKeys.PASSWORD, CookieKeys.REMEMBER_ME);
 
 		if (!rememberMe) {
-			CookiesManagerUtil.deleteCookies(
-				domain, httpServletRequest, httpServletResponse,
-				CookiesConstants.NAME_LOGIN);
+			CookieKeys.deleteCookies(
+				httpServletRequest, httpServletResponse, domain,
+				CookieKeys.LOGIN);
 		}
 
 		try {
@@ -296,7 +348,7 @@ public class AuthenticatedSessionManagerImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -447,11 +499,21 @@ public class AuthenticatedSessionManagerImpl
 				headerMap, parameterMap, resultsMap);
 		}
 
+		User user = (User)resultsMap.get("user");
+
 		if (authResult != Authenticator.SUCCESS) {
+			if (user != null) {
+				user = UserLocalServiceUtil.fetchUser(user.getUserId());
+			}
+
+			if (user != null) {
+				UserLocalServiceUtil.checkLockout(user);
+			}
+
 			throw new AuthException();
 		}
 
-		return (User)resultsMap.get("user");
+		return user;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

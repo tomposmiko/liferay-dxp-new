@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.document.library.kernel.model.DLFileEntry",
 	service = RelationshipResource.class
 )

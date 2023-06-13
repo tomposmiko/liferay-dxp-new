@@ -14,23 +14,19 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.document.library.kernel.exception.NoSuchFileException;
-import com.liferay.document.library.kernel.store.DLStoreRequest;
-import com.liferay.document.library.kernel.store.DLStoreUtil;
-import com.liferay.document.library.kernel.util.DLValidatorUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.image.HookFactory;
 import com.liferay.portal.kernel.exception.ImageTypeException;
 import com.liferay.portal.kernel.exception.NoSuchImageException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.image.Hook;
 import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Image;
-import com.liferay.portal.kernel.util.GroupThreadLocal;
-import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
 import com.liferay.portal.service.base.ImageLocalServiceBaseImpl;
 
@@ -63,15 +59,9 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 			imagePersistence.remove(image);
 
-			String fileName = _getFileName(image.getImageId(), image.getType());
+			Hook hook = HookFactory.getInstance();
 
-			try {
-				DLStoreUtil.deleteFile(
-					image.getCompanyId(), _REPOSITORY_ID, fileName);
-			}
-			catch (NoSuchFileException noSuchFileException) {
-				throw new NoSuchImageException(noSuchFileException);
-			}
+			hook.deleteImage(image);
 
 			return image;
 		}
@@ -81,7 +71,7 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 			// exists. See LPS-30430. This exception can be ignored.
 
 			if (_log.isWarnEnabled()) {
-				_log.warn(noSuchImageException);
+				_log.warn(noSuchImageException, noSuchImageException);
 			}
 
 			return null;
@@ -260,32 +250,9 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 		image.setWidth(width);
 		image.setSize(size);
 
-		String fileName = _getFileName(image.getImageId(), image.getType());
+		Hook hook = HookFactory.getInstance();
 
-		DLValidatorUtil.validateFileSize(
-			GroupThreadLocal.getGroupId(), fileName,
-			MimeTypesUtil.getContentType(fileName), bytes);
-
-		if (DLStoreUtil.hasFile(
-				image.getCompanyId(), _REPOSITORY_ID, fileName)) {
-
-			DLStoreUtil.deleteFile(
-				image.getCompanyId(), _REPOSITORY_ID, fileName);
-		}
-
-		DLStoreUtil.addFile(
-			DLStoreRequest.builder(
-				image.getCompanyId(), _REPOSITORY_ID, fileName
-			).className(
-				image.getModelClassName()
-			).classPK(
-				image.getImageId()
-			).size(
-				image.getSize()
-			).validateFileExtension(
-				true
-			).build(),
-			bytes);
+		hook.updateImage(image, type, bytes);
 
 		image = imagePersistence.update(image);
 
@@ -362,10 +329,6 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 		}
 	}
 
-	private String _getFileName(long imageId, String type) {
-		return imageId + StringPool.PERIOD + type;
-	}
-
 	private long _getImageCompanyId(long imageId) {
 		Image image = getImage(imageId);
 
@@ -380,8 +343,6 @@ public class ImageLocalServiceImpl extends ImageLocalServiceBaseImpl {
 
 		return image.getCompanyId();
 	}
-
-	private static final long _REPOSITORY_ID = 0;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ImageLocalServiceImpl.class);

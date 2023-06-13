@@ -15,7 +15,6 @@
 package com.liferay.commerce.inventory.service;
 
 import com.liferay.commerce.inventory.model.CommerceInventoryBookedQuantity;
-import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.List;
 
@@ -47,29 +46,12 @@ public class CommerceInventoryBookedQuantityServiceUtil {
 			companyId, sku, start, end);
 	}
 
-	public static List<CommerceInventoryBookedQuantity>
-			getCommerceInventoryBookedQuantities(
-				long companyId, String keywords, String sku, int start, int end)
-		throws PortalException {
-
-		return getService().getCommerceInventoryBookedQuantities(
-			companyId, keywords, sku, start, end);
-	}
-
 	public static int getCommerceInventoryBookedQuantitiesCount(
 			long companyId, String sku)
 		throws com.liferay.portal.kernel.security.auth.PrincipalException {
 
 		return getService().getCommerceInventoryBookedQuantitiesCount(
 			companyId, sku);
-	}
-
-	public static int getCommerceInventoryBookedQuantitiesCount(
-			long companyId, String keywords, String sku)
-		throws PortalException {
-
-		return getService().getCommerceInventoryBookedQuantitiesCount(
-			companyId, keywords, sku);
 	}
 
 	/**

@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePricingPortletKeys.COMMERCE_DISCOUNT,
 		"mvc.command.name=/commerce_discount/edit_commerce_discount_qualifiers"
@@ -55,13 +56,42 @@ public class EditCommerceDiscountQualifiersMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCommerceDiscountQualifiers(actionRequest);
+				updateCommerceDiscountQualifiers(actionRequest);
 			}
 		}
 		catch (Exception exception) {
 			SessionErrors.add(actionRequest, exception.getClass());
 
 			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+		}
+	}
+
+	protected void updateCommerceDiscountQualifiers(ActionRequest actionRequest)
+		throws Exception {
+
+		long commerceDiscountId = ParamUtil.getLong(
+			actionRequest, "commerceDiscountId");
+
+		String accountQualifiers = ParamUtil.getString(
+			actionRequest, "accountQualifiers");
+
+		if (Objects.equals(accountQualifiers, "all")) {
+			_deleteCommerceDiscountAccountRels(commerceDiscountId);
+			_deleteCommerceDiscountAccountGroupRels(commerceDiscountId);
+		}
+		else if (Objects.equals(accountQualifiers, "accounts")) {
+			_deleteCommerceDiscountAccountGroupRels(commerceDiscountId);
+		}
+		else {
+			_deleteCommerceDiscountAccountRels(commerceDiscountId);
+		}
+
+		String channelQualifiers = ParamUtil.getString(
+			actionRequest, "channelQualifiers");
+
+		if (Objects.equals(channelQualifiers, "all")) {
+			_commerceChannelRelService.deleteCommerceChannelRels(
+				CommerceDiscount.class.getName(), commerceDiscountId);
 		}
 	}
 
@@ -97,35 +127,6 @@ public class EditCommerceDiscountQualifiersMVCActionCommand
 		_commerceDiscountAccountRelService.
 			deleteCommerceDiscountAccountRelsByCommerceDiscountId(
 				commerceDiscountId);
-	}
-
-	private void _updateCommerceDiscountQualifiers(ActionRequest actionRequest)
-		throws Exception {
-
-		long commerceDiscountId = ParamUtil.getLong(
-			actionRequest, "commerceDiscountId");
-
-		String accountQualifiers = ParamUtil.getString(
-			actionRequest, "accountQualifiers");
-
-		if (Objects.equals(accountQualifiers, "all")) {
-			_deleteCommerceDiscountAccountRels(commerceDiscountId);
-			_deleteCommerceDiscountAccountGroupRels(commerceDiscountId);
-		}
-		else if (Objects.equals(accountQualifiers, "accounts")) {
-			_deleteCommerceDiscountAccountGroupRels(commerceDiscountId);
-		}
-		else {
-			_deleteCommerceDiscountAccountRels(commerceDiscountId);
-		}
-
-		String channelQualifiers = ParamUtil.getString(
-			actionRequest, "channelQualifiers");
-
-		if (Objects.equals(channelQualifiers, "all")) {
-			_commerceChannelRelService.deleteCommerceChannelRels(
-				CommerceDiscount.class.getName(), commerceDiscountId);
-		}
 	}
 
 	@Reference

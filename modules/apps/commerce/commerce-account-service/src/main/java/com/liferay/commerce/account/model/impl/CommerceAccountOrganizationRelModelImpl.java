@@ -16,6 +16,7 @@ package com.liferay.commerce.account.model.impl;
 
 import com.liferay.commerce.account.model.CommerceAccountOrganizationRel;
 import com.liferay.commerce.account.model.CommerceAccountOrganizationRelModel;
+import com.liferay.commerce.account.model.CommerceAccountOrganizationRelSoap;
 import com.liferay.commerce.account.service.persistence.CommerceAccountOrganizationRelPK;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
@@ -32,15 +33,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -108,6 +112,24 @@ public class CommerceAccountOrganizationRelModelImpl
 	public static final String TX_MANAGER = "liferayTransactionManager";
 
 	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean ENTITY_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean FINDER_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean COLUMN_BITMASK_ENABLED = true;
+
+	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
@@ -127,18 +149,62 @@ public class CommerceAccountOrganizationRelModelImpl
 	public static final long USERID_COLUMN_BITMASK = 4L;
 
 	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+	public static CommerceAccountOrganizationRel toModel(
+		CommerceAccountOrganizationRelSoap soapModel) {
+
+		if (soapModel == null) {
+			return null;
+		}
+
+		CommerceAccountOrganizationRel model =
+			new CommerceAccountOrganizationRelImpl();
+
+		model.setCommerceAccountId(soapModel.getCommerceAccountId());
+		model.setOrganizationId(soapModel.getOrganizationId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+
+		return model;
 	}
 
 	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	public static List<CommerceAccountOrganizationRel> toModels(
+		CommerceAccountOrganizationRelSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<CommerceAccountOrganizationRel> models =
+			new ArrayList<CommerceAccountOrganizationRel>(soapModels.length);
+
+		for (CommerceAccountOrganizationRelSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.commerce.account.service.util.ServiceProps.get(
+			"lock.expiration.time.com.liferay.commerce.account.model.CommerceAccountOrganizationRel"));
 
 	public CommerceAccountOrganizationRelModelImpl() {
 	}
@@ -221,98 +287,110 @@ public class CommerceAccountOrganizationRelModelImpl
 	public Map<String, Function<CommerceAccountOrganizationRel, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CommerceAccountOrganizationRel, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CommerceAccountOrganizationRel>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<CommerceAccountOrganizationRel, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceAccountOrganizationRel.class.getClassLoader(),
+			CommerceAccountOrganizationRel.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<CommerceAccountOrganizationRel, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String,
-						 Function<CommerceAccountOrganizationRel, Object>>();
+		try {
+			Constructor<CommerceAccountOrganizationRel> constructor =
+				(Constructor<CommerceAccountOrganizationRel>)
+					proxyClass.getConstructor(InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"commerceAccountId",
-				CommerceAccountOrganizationRel::getCommerceAccountId);
-			attributeGetterFunctions.put(
-				"organizationId",
-				CommerceAccountOrganizationRel::getOrganizationId);
-			attributeGetterFunctions.put(
-				"companyId", CommerceAccountOrganizationRel::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", CommerceAccountOrganizationRel::getUserId);
-			attributeGetterFunctions.put(
-				"userName", CommerceAccountOrganizationRel::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", CommerceAccountOrganizationRel::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate",
-				CommerceAccountOrganizationRel::getModifiedDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map
+		<String, Function<CommerceAccountOrganizationRel, Object>>
+			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceAccountOrganizationRel, Object>>
+			_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<CommerceAccountOrganizationRel, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<CommerceAccountOrganizationRel, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String,
+					 Function<CommerceAccountOrganizationRel, Object>>();
+		Map<String, BiConsumer<CommerceAccountOrganizationRel, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<CommerceAccountOrganizationRel, ?>>();
 
-		static {
-			Map<String, BiConsumer<CommerceAccountOrganizationRel, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String,
-						 BiConsumer<CommerceAccountOrganizationRel, ?>>();
+		attributeGetterFunctions.put(
+			"commerceAccountId",
+			CommerceAccountOrganizationRel::getCommerceAccountId);
+		attributeSetterBiConsumers.put(
+			"commerceAccountId",
+			(BiConsumer<CommerceAccountOrganizationRel, Long>)
+				CommerceAccountOrganizationRel::setCommerceAccountId);
+		attributeGetterFunctions.put(
+			"organizationId",
+			CommerceAccountOrganizationRel::getOrganizationId);
+		attributeSetterBiConsumers.put(
+			"organizationId",
+			(BiConsumer<CommerceAccountOrganizationRel, Long>)
+				CommerceAccountOrganizationRel::setOrganizationId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceAccountOrganizationRel::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CommerceAccountOrganizationRel, Long>)
+				CommerceAccountOrganizationRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceAccountOrganizationRel::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<CommerceAccountOrganizationRel, Long>)
+				CommerceAccountOrganizationRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceAccountOrganizationRel::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<CommerceAccountOrganizationRel, String>)
+				CommerceAccountOrganizationRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceAccountOrganizationRel::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CommerceAccountOrganizationRel, Date>)
+				CommerceAccountOrganizationRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceAccountOrganizationRel::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<CommerceAccountOrganizationRel, Date>)
+				CommerceAccountOrganizationRel::setModifiedDate);
 
-			attributeSetterBiConsumers.put(
-				"commerceAccountId",
-				(BiConsumer<CommerceAccountOrganizationRel, Long>)
-					CommerceAccountOrganizationRel::setCommerceAccountId);
-			attributeSetterBiConsumers.put(
-				"organizationId",
-				(BiConsumer<CommerceAccountOrganizationRel, Long>)
-					CommerceAccountOrganizationRel::setOrganizationId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CommerceAccountOrganizationRel, Long>)
-					CommerceAccountOrganizationRel::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<CommerceAccountOrganizationRel, Long>)
-					CommerceAccountOrganizationRel::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<CommerceAccountOrganizationRel, String>)
-					CommerceAccountOrganizationRel::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<CommerceAccountOrganizationRel, Date>)
-					CommerceAccountOrganizationRel::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<CommerceAccountOrganizationRel, Date>)
-					CommerceAccountOrganizationRel::setModifiedDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -607,7 +685,7 @@ public class CommerceAccountOrganizationRelModelImpl
 	@Deprecated
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return true;
+		return ENTITY_CACHE_ENABLED;
 	}
 
 	/**
@@ -616,7 +694,7 @@ public class CommerceAccountOrganizationRelModelImpl
 	@Deprecated
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return true;
+		return FINDER_CACHE_ENABLED;
 	}
 
 	@Override
@@ -730,14 +808,45 @@ public class CommerceAccountOrganizationRelModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CommerceAccountOrganizationRel, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CommerceAccountOrganizationRel, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CommerceAccountOrganizationRel, Object>
+				attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply(
+					(CommerceAccountOrganizationRel)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, CommerceAccountOrganizationRel>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceAccountOrganizationRel.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
@@ -752,8 +861,7 @@ public class CommerceAccountOrganizationRelModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<CommerceAccountOrganizationRel, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

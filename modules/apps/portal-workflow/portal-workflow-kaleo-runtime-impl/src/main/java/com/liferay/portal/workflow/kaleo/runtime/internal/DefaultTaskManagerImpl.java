@@ -17,7 +17,6 @@ package com.liferay.portal.workflow.kaleo.runtime.internal;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -63,8 +62,7 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * @author Michael C. Han
  */
-@Component(service = AopService.class)
-@CTAware
+@Component(immediate = true, service = AopService.class)
 @Transactional(
 	isolation = Isolation.PORTAL, propagation = Propagation.REQUIRED,
 	rollbackFor = Exception.class
@@ -80,7 +78,7 @@ public class DefaultTaskManagerImpl
 		throws WorkflowException {
 
 		try {
-			return _assignWorkflowTask(
+			return assignWorkflowTask(
 				workflowTaskId, Role.class.getName(), roleId, comment, dueDate,
 				workflowContext, serviceContext);
 		}
@@ -100,7 +98,7 @@ public class DefaultTaskManagerImpl
 		throws WorkflowException {
 
 		try {
-			return _assignWorkflowTask(
+			return assignWorkflowTask(
 				workflowTaskId, User.class.getName(), assigneeUserId, comment,
 				dueDate, workflowContext, serviceContext);
 		}
@@ -169,7 +167,7 @@ public class DefaultTaskManagerImpl
 				}
 			}
 
-			return _completeWorkflowTask(
+			return doCompleteWorkflowTask(
 				workflowTaskId, transitionName, null, workflowContext,
 				serviceContext);
 		}
@@ -189,7 +187,7 @@ public class DefaultTaskManagerImpl
 		throws WorkflowException {
 
 		try {
-			return _completeWorkflowTask(
+			return doCompleteWorkflowTask(
 				workflowTaskId, transitionName, comment, workflowContext,
 				serviceContext);
 		}
@@ -223,7 +221,7 @@ public class DefaultTaskManagerImpl
 
 				if (Validator.isNull(kaleoFormDefinition)) {
 					FormDefinitionRetriever formDefinitionRetriever =
-						_getFormDefinitionRetriever();
+						getFormDefinitionRetriever();
 
 					if (formDefinitionRetriever != null) {
 						kaleoFormDefinition =
@@ -300,7 +298,7 @@ public class DefaultTaskManagerImpl
 		}
 	}
 
-	private WorkflowTask _assignWorkflowTask(
+	protected WorkflowTask assignWorkflowTask(
 			long workflowTaskId, String assigneeClassName, long assigneeClassPK,
 			String comment, Date dueDate,
 			Map<String, Serializable> workflowContext,
@@ -314,7 +312,7 @@ public class DefaultTaskManagerImpl
 		List<KaleoTaskAssignmentInstance> previousTaskAssignmentInstances =
 			kaleoTaskInstanceToken.getKaleoTaskAssignmentInstances();
 
-		workflowContext = _updateWorkflowContext(
+		workflowContext = updateWorkflowContext(
 			workflowContext, kaleoTaskInstanceToken);
 
 		if (kaleoTaskInstanceToken.isCompleted()) {
@@ -346,9 +344,19 @@ public class DefaultTaskManagerImpl
 			KaleoNode.class.getName(), kaleoTask.getKaleoNodeId(),
 			ExecutionType.ON_ASSIGNMENT, executionContext);
 
-		_notificationHelper.sendKaleoNotifications(
-			KaleoNode.class.getName(), kaleoTask.getKaleoNodeId(),
-			ExecutionType.ON_ASSIGNMENT, executionContext);
+		boolean selfAssignment = false;
+
+		if (assigneeClassName.equals(User.class.getName()) &&
+			(assigneeClassPK == serviceContext.getUserId())) {
+
+			selfAssignment = true;
+		}
+
+		if (!selfAssignment) {
+			_notificationHelper.sendKaleoNotifications(
+				KaleoNode.class.getName(), kaleoTask.getKaleoNodeId(),
+				ExecutionType.ON_ASSIGNMENT, executionContext);
+		}
 
 		kaleoLogLocalService.addTaskAssignmentKaleoLogs(
 			previousTaskAssignmentInstances, kaleoTaskInstanceToken, comment,
@@ -358,7 +366,7 @@ public class DefaultTaskManagerImpl
 			kaleoTaskInstanceToken, workflowContext);
 	}
 
-	private WorkflowTask _completeWorkflowTask(
+	protected WorkflowTask doCompleteWorkflowTask(
 			long workflowTaskId, String transitionName, String comment,
 			Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
@@ -380,7 +388,7 @@ public class DefaultTaskManagerImpl
 			currentKaleoNode.getKaleoTransition(transitionName);
 		}
 
-		workflowContext = _updateWorkflowContext(
+		workflowContext = updateWorkflowContext(
 			workflowContext, kaleoTaskInstanceToken);
 
 		if (kaleoTaskInstanceToken.isCompleted()) {
@@ -404,14 +412,14 @@ public class DefaultTaskManagerImpl
 			kaleoTaskInstanceToken, workflowContext);
 	}
 
-	private FormDefinitionRetriever _getFormDefinitionRetriever() {
+	protected FormDefinitionRetriever getFormDefinitionRetriever() {
 		return _serviceTracker.getService();
 	}
 
-	private Map<String, Serializable> _updateWorkflowContext(
+	protected Map<String, Serializable> updateWorkflowContext(
 			Map<String, Serializable> workflowContext,
 			KaleoTaskInstanceToken kaleoTaskInstanceToken)
-		throws Exception {
+		throws PortalException {
 
 		KaleoInstance kaleoInstance =
 			kaleoInstanceLocalService.getKaleoInstance(

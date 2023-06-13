@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.product.exception.DuplicateCommerceChannelExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchChannelException;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalServiceUtil;
@@ -125,12 +124,6 @@ public class CommerceChannelPersistenceTest {
 
 		CommerceChannel newCommerceChannel = _persistence.create(pk);
 
-		newCommerceChannel.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCommerceChannel.setCtCollectionId(RandomTestUtil.nextLong());
-
-		newCommerceChannel.setUuid(RandomTestUtil.randomString());
-
 		newCommerceChannel.setExternalReferenceCode(
 			RandomTestUtil.randomString());
 
@@ -165,14 +158,6 @@ public class CommerceChannelPersistenceTest {
 		CommerceChannel existingCommerceChannel = _persistence.findByPrimaryKey(
 			newCommerceChannel.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommerceChannel.getMvccVersion(),
-			newCommerceChannel.getMvccVersion());
-		Assert.assertEquals(
-			existingCommerceChannel.getCtCollectionId(),
-			newCommerceChannel.getCtCollectionId());
-		Assert.assertEquals(
-			existingCommerceChannel.getUuid(), newCommerceChannel.getUuid());
 		Assert.assertEquals(
 			existingCommerceChannel.getExternalReferenceCode(),
 			newCommerceChannel.getExternalReferenceCode());
@@ -215,46 +200,6 @@ public class CommerceChannelPersistenceTest {
 			newCommerceChannel.isDiscountsTargetNetPrice());
 	}
 
-	@Test(
-		expected = DuplicateCommerceChannelExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceChannel commerceChannel = addCommerceChannel();
-
-		CommerceChannel newCommerceChannel = addCommerceChannel();
-
-		newCommerceChannel.setCompanyId(commerceChannel.getCompanyId());
-
-		newCommerceChannel = _persistence.update(newCommerceChannel);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceChannel);
-
-		newCommerceChannel.setExternalReferenceCode(
-			commerceChannel.getExternalReferenceCode());
-
-		_persistence.update(newCommerceChannel);
-	}
-
-	@Test
-	public void testCountByUuid() throws Exception {
-		_persistence.countByUuid("");
-
-		_persistence.countByUuid("null");
-
-		_persistence.countByUuid((String)null);
-	}
-
-	@Test
-	public void testCountByUuid_C() throws Exception {
-		_persistence.countByUuid_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByUuid_C("null", 0L);
-
-		_persistence.countByUuid_C((String)null, 0L);
-	}
-
 	@Test
 	public void testCountByCompanyId() throws Exception {
 		_persistence.countByCompanyId(RandomTestUtil.nextLong());
@@ -270,12 +215,12 @@ public class CommerceChannelPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -303,12 +248,11 @@ public class CommerceChannelPersistenceTest {
 
 	protected OrderByComparator<CommerceChannel> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceChannel", "mvccVersion", true, "ctCollectionId", true,
-			"uuid", true, "externalReferenceCode", true, "commerceChannelId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "siteGroupId", true,
-			"name", true, "type", true, "typeSettings", true,
-			"commerceCurrencyCode", true, "priceDisplayType", true,
+			"CommerceChannel", "externalReferenceCode", true,
+			"commerceChannelId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"siteGroupId", true, "name", true, "type", true, "typeSettings",
+			true, "commerceCurrencyCode", true, "priceDisplayType", true,
 			"discountsTargetNetPrice", true);
 	}
 
@@ -586,27 +530,21 @@ public class CommerceChannelPersistenceTest {
 				new Class<?>[] {String.class}, "siteGroupId"));
 
 		Assert.assertEquals(
-			commerceChannel.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				commerceChannel, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(commerceChannel.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				commerceChannel, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			commerceChannel.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				commerceChannel, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CommerceChannel addCommerceChannel() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
 		CommerceChannel commerceChannel = _persistence.create(pk);
-
-		commerceChannel.setMvccVersion(RandomTestUtil.nextLong());
-
-		commerceChannel.setCtCollectionId(RandomTestUtil.nextLong());
-
-		commerceChannel.setUuid(RandomTestUtil.randomString());
 
 		commerceChannel.setExternalReferenceCode(RandomTestUtil.randomString());
 

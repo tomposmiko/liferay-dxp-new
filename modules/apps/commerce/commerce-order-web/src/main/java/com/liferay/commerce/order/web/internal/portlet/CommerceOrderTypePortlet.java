@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -52,10 +53,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/commerce_order_type/view.jsp",
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_ORDER_TYPE,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CommerceOrderTypePortlet.class, Portlet.class}
 )
 public class CommerceOrderTypePortlet extends MVCPortlet {
 

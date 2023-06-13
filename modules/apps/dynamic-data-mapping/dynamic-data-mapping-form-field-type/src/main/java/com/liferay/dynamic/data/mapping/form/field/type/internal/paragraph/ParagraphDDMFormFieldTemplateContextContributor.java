@@ -30,8 +30,12 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.PARAGRAPH,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		ParagraphDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class ParagraphDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -42,11 +46,11 @@ public class ParagraphDDMFormFieldTemplateContextContributor
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		return HashMapBuilder.<String, Object>put(
-			"text", _getText(ddmFormField, ddmFormFieldRenderingContext)
+			"text", getText(ddmFormField, ddmFormFieldRenderingContext)
 		).build();
 	}
 
-	private String _getText(
+	protected String getText(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 

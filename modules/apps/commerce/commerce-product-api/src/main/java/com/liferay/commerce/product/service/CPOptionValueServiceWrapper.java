@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.service;
 
-import com.liferay.commerce.product.model.CPOptionValue;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
@@ -27,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CPOptionValueServiceWrapper
 	implements CPOptionValueService, ServiceWrapper<CPOptionValueService> {
 
-	public CPOptionValueServiceWrapper() {
-		this(null);
-	}
-
 	public CPOptionValueServiceWrapper(
 		CPOptionValueService cpOptionValueService) {
 
@@ -38,7 +33,7 @@ public class CPOptionValueServiceWrapper
 	}
 
 	@Override
-	public CPOptionValue addCPOptionValue(
+	public com.liferay.commerce.product.model.CPOptionValue addCPOptionValue(
 			long cpOptionId, java.util.Map<java.util.Locale, String> titleMap,
 			double priority, String key,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -49,11 +44,12 @@ public class CPOptionValueServiceWrapper
 	}
 
 	@Override
-	public CPOptionValue addOrUpdateCPOptionValue(
-			String externalReferenceCode, long cpOptionId,
-			java.util.Map<java.util.Locale, String> nameMap, double priority,
-			String key,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.product.model.CPOptionValue
+			addOrUpdateCPOptionValue(
+				String externalReferenceCode, long cpOptionId,
+				java.util.Map<java.util.Locale, String> nameMap,
+				double priority, String key,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionValueService.addOrUpdateCPOptionValue(
@@ -69,8 +65,9 @@ public class CPOptionValueServiceWrapper
 	}
 
 	@Override
-	public CPOptionValue fetchByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+	public com.liferay.commerce.product.model.CPOptionValue
+			fetchByExternalReferenceCode(
+				String externalReferenceCode, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionValueService.fetchByExternalReferenceCode(
@@ -78,22 +75,24 @@ public class CPOptionValueServiceWrapper
 	}
 
 	@Override
-	public CPOptionValue fetchCPOptionValue(long cpOptionValueId)
+	public com.liferay.commerce.product.model.CPOptionValue fetchCPOptionValue(
+			long cpOptionValueId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionValueService.fetchCPOptionValue(cpOptionValueId);
 	}
 
 	@Override
-	public CPOptionValue getCPOptionValue(long cpOptionValueId)
+	public com.liferay.commerce.product.model.CPOptionValue getCPOptionValue(
+			long cpOptionValueId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionValueService.getCPOptionValue(cpOptionValueId);
 	}
 
 	@Override
-	public java.util.List<CPOptionValue> getCPOptionValues(
-			long cpOptionId, int start, int end)
+	public java.util.List<com.liferay.commerce.product.model.CPOptionValue>
+			getCPOptionValues(long cpOptionId, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionValueService.getCPOptionValues(cpOptionId, start, end);
@@ -117,11 +116,11 @@ public class CPOptionValueServiceWrapper
 	}
 
 	@Override
-	public com.liferay.portal.kernel.search.BaseModelSearchResult<CPOptionValue>
-			searchCPOptionValues(
+	public com.liferay.portal.kernel.search.BaseModelSearchResult
+		<com.liferay.commerce.product.model.CPOptionValue> searchCPOptionValues(
 				long companyId, long cpOptionId, String keywords, int start,
 				int end, com.liferay.portal.kernel.search.Sort[] sorts)
-		throws com.liferay.portal.kernel.exception.PortalException {
+			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionValueService.searchCPOptionValues(
 			companyId, cpOptionId, keywords, start, end, sorts);
@@ -137,7 +136,7 @@ public class CPOptionValueServiceWrapper
 	}
 
 	@Override
-	public CPOptionValue updateCPOptionValue(
+	public com.liferay.commerce.product.model.CPOptionValue updateCPOptionValue(
 			long cpOptionValueId,
 			java.util.Map<java.util.Locale, String> titleMap, double priority,
 			String key,

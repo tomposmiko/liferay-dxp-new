@@ -21,12 +21,11 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -97,12 +96,7 @@ public class ExpandoDisplayContext {
 					liferayPortletResponse.createRenderURL(), "mvcPath",
 					"/edit/select_field_type.jsp", "redirect",
 					PortalUtil.getCurrentURL(_httpServletRequest),
-					"modelResource", modelResource, "backTitle",
-					LanguageUtil.format(
-						_httpServletRequest, "go-to-x",
-						ResourceActionsUtil.getModelResource(
-							_httpServletRequest, modelResource),
-						false));
+					"modelResource", modelResource);
 
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "add-custom-field"));

@@ -14,18 +14,15 @@
 
 package com.liferay.headless.commerce.admin.catalog.internal.resource.v1_0;
 
-import com.liferay.commerce.model.CPDefinitionInventory;
 import com.liferay.commerce.product.exception.NoSuchCPDefinitionException;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.service.CPDefinitionInventoryService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductConfiguration;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.ProductConfigurationDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.ProductConfigurationUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductConfigurationResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
@@ -41,11 +38,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/product-configuration.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, ProductConfigurationResource.class}
 )
-@CTAware
 public class ProductConfigurationResourceImpl
 	extends BaseProductConfigurationResourceImpl implements NestedFieldSupport {
 
@@ -68,7 +65,7 @@ public class ProductConfigurationResourceImpl
 		return _toProductConfiguration(cpDefinition.getCPDefinitionId());
 	}
 
-	@NestedField(parentClass = Product.class, value = "productConfiguration")
+	@NestedField(parentClass = Product.class, value = "configuration")
 	@Override
 	public ProductConfiguration getProductIdConfiguration(
 			@NestedFieldId(value = "productId") Long id)
@@ -138,8 +135,7 @@ public class ProductConfigurationResourceImpl
 
 		return _productConfigurationDTOConverter.toDTO(
 			new DefaultDTOConverterContext(
-				_dtoConverterRegistry, cpDefinitionId,
-				contextAcceptLanguage.getPreferredLocale(), null, null));
+				cpDefinitionId, contextAcceptLanguage.getPreferredLocale()));
 	}
 
 	@Reference
@@ -149,12 +145,6 @@ public class ProductConfigurationResourceImpl
 	private CPDefinitionService _cpDefinitionService;
 
 	@Reference
-	private DTOConverterRegistry _dtoConverterRegistry;
-
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.ProductConfigurationDTOConverter)"
-	)
-	private DTOConverter<CPDefinitionInventory, ProductConfiguration>
-		_productConfigurationDTOConverter;
+	private ProductConfigurationDTOConverter _productConfigurationDTOConverter;
 
 }

@@ -50,7 +50,7 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 							"userid", userRow.getUserId()
 						).build()
 					%>'
-					href="javascript:void(0);"
+					href="javascript:;"
 				>
 					<%= userRow.getScreenName() %>
 				</aui:a>

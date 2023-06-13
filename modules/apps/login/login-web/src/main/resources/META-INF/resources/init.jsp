@@ -42,6 +42,7 @@ page import="com.liferay.portal.kernel.exception.CompanyMaxUsersException" %><%@
 page import="com.liferay.portal.kernel.exception.ContactBirthdayException" %><%@
 page import="com.liferay.portal.kernel.exception.ContactNameException" %><%@
 page import="com.liferay.portal.kernel.exception.CookieNotSupportedException" %><%@
+page import="com.liferay.portal.kernel.exception.DuplicateOpenIdException" %><%@
 page import="com.liferay.portal.kernel.exception.EmailAddressException" %><%@
 page import="com.liferay.portal.kernel.exception.GroupFriendlyURLException" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchCountryException" %><%@
@@ -101,6 +102,8 @@ page import="com.liferay.portal.util.PropsValues" %>
 <%@ page import="java.util.Calendar" %><%@
 page import="java.util.Date" %><%@
 page import="java.util.TimeZone" %>
+
+<%@ page import="javax.portlet.WindowState" %>
 
 <liferay-frontend:defineObjects />
 

@@ -34,7 +34,7 @@ public class SocialInteractionsConfigurationUtil {
 			String serviceName) {
 
 		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
-			companyId);
+			companyId, true);
 
 		boolean socialInteractionsFriendsEnabled = PrefsParamUtil.getBoolean(
 			portletPreferences, httpServletRequest,

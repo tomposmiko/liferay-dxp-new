@@ -82,38 +82,20 @@ public class AssetAutoTaggerTest extends BaseAssetAutoTaggerTestCase {
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN,
 			RandomTestUtil.randomString(), StringUtil.randomString(),
-			StringUtil.randomString(), StringUtil.randomString(), new byte[0],
-			null, null, serviceContext);
+			StringUtil.randomString(), new byte[0], null, null, serviceContext);
 
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
 
 		DLAppServiceUtil.updateFileEntry(
 			fileEntry.getFileEntryId(), fileEntry.getFileName(),
 			fileEntry.getMimeType(), fileEntry.getTitle(),
-			StringUtil.randomString(), fileEntry.getDescription(),
-			RandomTestUtil.randomString(), DLVersionNumberIncrease.MAJOR,
-			fileEntry.getContentStream(), fileEntry.getSize(),
-			fileEntry.getExpirationDate(), fileEntry.getReviewDate(),
-			serviceContext);
+			fileEntry.getDescription(), RandomTestUtil.randomString(),
+			DLVersionNumberIncrease.MAJOR, fileEntry.getContentStream(),
+			fileEntry.getSize(), fileEntry.getExpirationDate(),
+			fileEntry.getReviewDate(), serviceContext);
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
 			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
-
-		assertContainsAssetTagName(assetEntry, ASSET_TAG_NAME_AUTO);
-	}
-
-	@Test
-	public void testAutoTagsAssetOnUpdateIfEnabled() throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(group.getGroupId(), 0);
-
-		FileEntry fileEntry = addFileEntry(serviceContext);
-
-		serviceContext.setAssetTagNames(new String[0]);
-		serviceContext.setAttribute("updateAutoTags", Boolean.TRUE);
-
-		AssetEntry assetEntry = updateFileEntryAssetEntry(
-			fileEntry, serviceContext);
 
 		assertContainsAssetTagName(assetEntry, ASSET_TAG_NAME_AUTO);
 	}
@@ -166,22 +148,6 @@ public class AssetAutoTaggerTest extends BaseAssetAutoTaggerTestCase {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		AssetEntry assetEntry = addFileEntryAssetEntry(serviceContext);
-
-		assertDoesNotContainAssetTagName(assetEntry, ASSET_TAG_NAME_AUTO);
-	}
-
-	@Test
-	public void testDoesNotAutoTagAssetOnUpdateIfDisabled() throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(group.getGroupId(), 0);
-
-		FileEntry fileEntry = addFileEntry(serviceContext);
-
-		serviceContext.setAssetTagNames(new String[0]);
-		serviceContext.setAttribute("updateAutoTags", Boolean.FALSE);
-
-		AssetEntry assetEntry = updateFileEntryAssetEntry(
-			fileEntry, serviceContext);
 
 		assertDoesNotContainAssetTagName(assetEntry, ASSET_TAG_NAME_AUTO);
 	}

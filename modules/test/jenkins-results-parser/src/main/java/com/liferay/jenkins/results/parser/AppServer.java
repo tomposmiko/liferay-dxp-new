@@ -130,14 +130,14 @@ public class AppServer {
 	}
 
 	private long _getMaxLogSize() {
-		String appServerMaxLogSize = _project.getProperty(
-			"app.server.max.log.size");
+		String appServerMaxLogSizeInMB = _project.getProperty(
+			"app.server.max.log.size.in.mb");
 
-		if (appServerMaxLogSize == null) {
-			appServerMaxLogSize = "1";
+		if (appServerMaxLogSizeInMB == null) {
+			appServerMaxLogSizeInMB = "5";
 		}
 
-		return Long.valueOf(appServerMaxLogSize) * 1024 * 1024;
+		return Long.valueOf(appServerMaxLogSizeInMB) * 1024 * 1024;
 	}
 
 	private String _getPath() {

@@ -16,16 +16,14 @@
 
 <%@ include file="/init.jsp" %>
 
-<liferay-ui:error exception="<%= DuplicateCategoryException.class %>" message="there-is-another-category-with-the-same-name-and-the-same-parent" />
-
 <liferay-ui:success key="categoryAdded" message='<%= GetterUtil.getString(MultiSessionMessages.get(renderRequest, "categoryAdded")) %>' />
 <liferay-ui:success key="categoryUpdated" message='<%= GetterUtil.getString(MultiSessionMessages.get(renderRequest, "categoryUpdated")) %>' />
 
 <clay:container-fluid
 	cssClass="container-view"
 >
-	<liferay-site-navigation:breadcrumb
-		breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, true, false, false, true, true) %>"
+	<liferay-ui:breadcrumb
+		showLayout="<%= false %>"
 	/>
 
 	<clay:row>
@@ -68,12 +66,12 @@
 												</c:if>
 											</li>
 											<li>
-												<liferay-portlet:actionURL copyCurrentRenderParameters="<%= false %>" name="/asset_categories_admin/delete_asset_vocabulary" var="deleteVocabulariesURL">
+												<liferay-portlet:actionURL copyCurrentRenderParameters="<%= false %>" name="deleteVocabulary" var="deleteVocabulariesURL">
 													<portlet:param name="redirect" value="<%= assetCategoriesDisplayContext.getDefaultRedirect() %>" />
 												</liferay-portlet:actionURL>
 
 												<portlet:renderURL var="viewVocabulariesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-													<portlet:param name="mvcPath" value="/view_asset_vocabularies.jsp" />
+													<portlet:param name="mvcPath" value="/view_vocabularies.jsp" />
 												</portlet:renderURL>
 
 												<clay:dropdown-actions
@@ -84,7 +82,6 @@
 															"viewVocabulariesURL", viewVocabulariesURL.toString()
 														).build()
 													%>'
-													aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 													dropdownItems="<%= assetCategoriesDisplayContext.getVocabulariesDropdownItems() %>"
 													propsTransformer="js/ActionsComponentPropsTransformer"
 												/>
@@ -122,20 +119,21 @@
 														%>"
 													>
 														<span class="text-truncate"><%= HtmlUtil.escape(vocabulary.getTitle(locale)) %></span>
-														<span class="lfr-portal-tooltip" title="<%= LanguageUtil.get(request, "this-vocabulary-can-only-be-edited-from-the-global-site") %>">
-															<clay:icon
-																cssClass="ml-1 mt-1 text-muted"
-																symbol="lock"
-															/>
-														</span>
+
+														<liferay-ui:icon
+															icon="lock"
+															iconCssClass="ml-1 text-muted"
+															markupView="lexicon"
+															message="this-vocabulary-can-only-be-edited-from-the-global-site"
+														/>
 
 														<c:if test="<%= vocabulary.getVisibilityType() == AssetVocabularyConstants.VISIBILITY_TYPE_INTERNAL %>">
-															<span class="lfr-portal-tooltip" title="<%= LanguageUtil.get(request, "for-internal-use-only") %>">
-																<clay:icon
-																	cssClass="ml-1 mt-1 text-muted"
-																	symbol="low-vision"
-																/>
-															</span>
+															<liferay-ui:icon
+																icon="low-vision"
+																iconCssClass="ml-1 text-muted"
+																markupView="lexicon"
+																message="for-internal-use-only"
+															/>
 														</c:if>
 													</a>
 												</li>
@@ -176,12 +174,12 @@
 													<span class="text-truncate"><%= HtmlUtil.escape(vocabulary.getTitle(locale)) %></span>
 
 													<c:if test="<%= vocabulary.getVisibilityType() == AssetVocabularyConstants.VISIBILITY_TYPE_INTERNAL %>">
-														<span class="lfr-portal-tooltip" title="<%= LanguageUtil.get(request, "for-internal-use-only") %>">
-															<clay:icon
-																cssClass="ml-1 mt-1 text-muted"
-																symbol="low-vision"
-															/>
-														</span>
+														<liferay-ui:icon
+															icon="low-vision"
+															iconCssClass="ml-1 text-muted"
+															markupView="lexicon"
+															message="for-internal-use-only"
+														/>
 													</c:if>
 												</a>
 											</li>
@@ -241,7 +239,6 @@
 								%>
 
 								<clay:dropdown-actions
-									aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 									cssClass="component-action"
 									dropdownItems="<%= assetVocabularyActionDropdownItemsProvider.getActionDropdownItems(vocabulary) %>"
 									propsTransformer="js/VocabularyActionDropdownPropsTransformer"
@@ -263,7 +260,7 @@
 						<c:if test="<%= Validator.isNotNull(description) %>">
 							<div class="mb-2">
 								<span class="mr-1"><liferay-ui:message key="description" />:</span>
-								<span class="text-break text-secondary"><%= description %></span>
+								<span class="text-secondary"><%= description %></span>
 							</div>
 						</c:if>
 					</div>
@@ -273,21 +270,36 @@
 							<liferay-ui:message arguments="<%= assetCategoriesDisplayContext.getMaximumNumberOfCategoriesPerVocabulary() %>" key="the-maximum-number-of-categories-per-vocabulary-is-x" />
 						</span>
 
-						<liferay-learn:message
-							key="general"
-							resource="asset-taglib"
-						/>
+						<%
+						String linkURL = assetCategoriesDisplayContext.getLinkURL();
+						%>
+
+						<c:if test="<%= Validator.isNotNull(linkURL) %>">
+
+							<%
+							StringBundler sb = new StringBundler(3);
+
+							sb.append("<a href=\"");
+							sb.append(linkURL);
+							sb.append("\" target=\"_blank\">");
+							%>
+
+							<liferay-ui:message arguments='<%= new String[] {sb.toString(), "</a>"} %>' key="x-learn-how-x-to-tailor-categories-to-your-needs" />
+						</c:if>
 					</p>
 
 					<c:if test="<%= assetCategoriesDisplayContext.isAssetCategoriesLimitExceeded() %>">
-						<clay:alert
-							displayType="warning"
-							message='<%= LanguageUtil.format(request, "you-have-reached-the-limit-of-x-categories-for-this-vocabulary", assetCategoriesDisplayContext.getMaximumNumberOfCategoriesPerVocabulary()) %>'
-						/>
+						<div class="alert alert-warning">
+							<span class="alert-indicator">
+								<aui:icon image="warning" markupView="lexicon" />
+							</span>
+
+							<liferay-ui:message arguments="<%= assetCategoriesDisplayContext.getMaximumNumberOfCategoriesPerVocabulary() %>" key="you-have-reached-the-limit-of-x-categories-for-this-vocabulary" />
+						</div>
 					</c:if>
 
 					<clay:sheet-section>
-						<liferay-util:include page="/view_asset_categories.jsp" servletContext="<%= application %>" />
+						<liferay-util:include page="/view_categories.jsp" servletContext="<%= application %>" />
 					</clay:sheet-section>
 				</clay:sheet>
 			</c:if>

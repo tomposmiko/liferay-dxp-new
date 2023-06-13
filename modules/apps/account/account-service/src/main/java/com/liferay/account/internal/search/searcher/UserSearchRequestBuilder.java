@@ -81,7 +81,8 @@ public class UserSearchRequestBuilder {
 			}
 
 			FieldSort fieldSort = _sorts.field(
-				_sortFieldBuilder.getSortField(User.class, _sortField),
+				_sortFieldBuilder.getSortField(
+					User.class.getName(), _sortField),
 				sortOrder);
 
 			searchRequestBuilder.sorts(fieldSort);
@@ -137,6 +138,7 @@ public class UserSearchRequestBuilder {
 		}
 
 		searchContext.setAndSearch(andSearch);
+
 		searchContext.setAttributes(
 			HashMapBuilder.<String, Serializable>put(
 				Field.STATUS, _status
@@ -165,6 +167,7 @@ public class UserSearchRequestBuilder {
 			).putAll(
 				_attributes
 			).build());
+
 		searchContext.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		PermissionChecker permissionChecker =

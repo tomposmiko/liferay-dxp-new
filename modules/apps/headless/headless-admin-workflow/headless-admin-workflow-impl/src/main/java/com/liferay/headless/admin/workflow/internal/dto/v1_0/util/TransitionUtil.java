@@ -15,37 +15,31 @@
 package com.liferay.headless.admin.workflow.internal.dto.v1_0.util;
 
 import com.liferay.headless.admin.workflow.dto.v1_0.Transition;
-import com.liferay.portal.kernel.workflow.DefaultWorkflowTransition;
-import com.liferay.portal.kernel.workflow.WorkflowTransition;
+import com.liferay.portal.kernel.language.Language;
 
-import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author Inácio Nery
  */
 public class TransitionUtil {
 
-	public static Transition toTransition(Locale locale, String name) {
-		DefaultWorkflowTransition defaultWorkflowTransition =
-			new DefaultWorkflowTransition();
+	public static Transition toTransition(
+		Language language, String name, ResourceBundle resourceBundle) {
 
-		defaultWorkflowTransition.setName(name);
-
-		return toTransition(locale, defaultWorkflowTransition);
+		return toTransition(language, name, resourceBundle, null, null);
 	}
 
 	public static Transition toTransition(
-		Locale locale, WorkflowTransition workflowTransition) {
+		Language language, String name, ResourceBundle resourceBundle,
+		String sourceNodeName, String targetNodeName) {
 
 		Transition transition = new Transition();
 
-		transition.setLabel(
-			LabelUtil.getLabel(
-				workflowTransition.getName(), workflowTransition.getLabelMap(),
-				locale));
-		transition.setName(workflowTransition.getName());
-		transition.setSourceNodeName(workflowTransition.getSourceNodeName());
-		transition.setTargetNodeName(workflowTransition.getTargetNodeName());
+		transition.setLabel(language.get(resourceBundle, name));
+		transition.setName(name);
+		transition.setSourceNodeName(sourceNodeName);
+		transition.setTargetNodeName(targetNodeName);
 
 		return transition;
 	}

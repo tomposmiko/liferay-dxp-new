@@ -15,22 +15,21 @@
 package com.liferay.commerce.order.web.internal.display.context;
 
 import com.liferay.commerce.model.CommerceOrder;
-import com.liferay.commerce.order.web.internal.display.context.helper.CommerceOrderRequestHelper;
+import com.liferay.commerce.order.web.internal.display.context.util.CommerceOrderRequestHelper;
 import com.liferay.commerce.order.web.internal.search.CommerceOrderDisplayTerms;
 import com.liferay.commerce.order.web.internal.security.permission.resource.CommerceOrderPermission;
 import com.liferay.commerce.service.CommerceOrderNoteService;
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
-import com.liferay.frontend.data.set.model.FDSSortItemBuilder;
-import com.liferay.frontend.data.set.model.FDSSortItemList;
-import com.liferay.frontend.data.set.model.FDSSortItemListBuilder;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.SortItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.SortItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -70,7 +69,7 @@ public class CommerceOrderListDisplayContext {
 			_commerceOrderRequestHelper.getThemeDisplay();
 
 		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				PortletURLBuilder.create(
 					PortletURLFactoryUtil.create(
 						_commerceOrderRequestHelper.getRequest(),
@@ -89,26 +88,12 @@ public class CommerceOrderListDisplayContext {
 				"delete", null));
 	}
 
-	public int getCommerceOrderNotesCount(CommerceOrder commerceOrder)
-		throws PortalException {
-
-		if (CommerceOrderPermission.contains(
-				_commerceOrderRequestHelper.getPermissionChecker(),
-				commerceOrder, ActionKeys.UPDATE_DISCUSSION)) {
-
-			return _commerceOrderNoteService.getCommerceOrderNotesCount(
-				commerceOrder.getCommerceOrderId());
-		}
-
-		return _commerceOrderNoteService.getCommerceOrderNotesCount(
-			commerceOrder.getCommerceOrderId(), false);
-	}
-
-	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getClayDataSetActionDropdownItems()
 		throws PortalException {
 
 		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				PortletURLBuilder.create(
 					PortletProviderUtil.getPortletURL(
 						_commerceOrderRequestHelper.getRequest(),
@@ -123,21 +108,27 @@ public class CommerceOrderListDisplayContext {
 				LanguageUtil.get(
 					_commerceOrderRequestHelper.getRequest(), "view"),
 				"get", null, null),
-			new FDSActionDropdownItem(
-				null, "trash", "delete",
+			new ClayDataSetActionDropdownItem(
+				"/o/headless-commerce-admin-order/v1.0/orders/{id}", "trash",
+				"delete",
 				LanguageUtil.get(
 					_commerceOrderRequestHelper.getRequest(), "delete"),
-				null, null, null));
+				"delete", "delete", "async"));
 	}
 
-	public FDSSortItemList getFDSSortItemList() {
-		return FDSSortItemListBuilder.add(
-			FDSSortItemBuilder.setDirection(
-				"desc"
-			).setKey(
-				"createDate"
-			).build()
-		).build();
+	public int getCommerceOrderNotesCount(CommerceOrder commerceOrder)
+		throws PortalException {
+
+		if (CommerceOrderPermission.contains(
+				_commerceOrderRequestHelper.getPermissionChecker(),
+				commerceOrder, ActionKeys.UPDATE_DISCUSSION)) {
+
+			return _commerceOrderNoteService.getCommerceOrderNotesCount(
+				commerceOrder.getCommerceOrderId());
+		}
+
+		return _commerceOrderNoteService.getCommerceOrderNotesCount(
+			commerceOrder.getCommerceOrderId(), false);
 	}
 
 	public PortletURL getPortletURL() {
@@ -166,6 +157,19 @@ public class CommerceOrderListDisplayContext {
 		}
 
 		return portletURL;
+	}
+
+	public SortItemList getSortItemList() {
+		SortItemList sortItemList = new SortItemList();
+
+		SortItem sortItem = new SortItem();
+
+		sortItem.setDirection("desc");
+		sortItem.setKey("createDate");
+
+		sortItemList.add(sortItem);
+
+		return sortItemList;
 	}
 
 	private final CommerceOrderNoteService _commerceOrderNoteService;

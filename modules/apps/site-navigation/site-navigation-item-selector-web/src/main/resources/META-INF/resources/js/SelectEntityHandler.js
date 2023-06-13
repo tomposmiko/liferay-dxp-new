@@ -12,7 +12,6 @@
  * details.
  */
 
-import {getOpener} from 'frontend-js-web';
 export default class SelectEntityHandler {
 	constructor({buttonClass, containerId, eventName, returnType}) {
 		this.buttonClass = buttonClass;
@@ -34,7 +33,7 @@ export default class SelectEntityHandler {
 		const button = event.target.closest(this.buttonClass);
 
 		if (button) {
-			getOpener().Liferay.fire(this.eventName, {
+			Liferay.Util.getOpener().Liferay.fire(this.eventName, {
 				data: {
 					returnType: this.returnType,
 					value: {...button.dataset},

@@ -15,10 +15,9 @@
 package com.liferay.portal.search.similar.results.web.internal.contributor.wiki;
 
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
-import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.search.model.uid.UIDFactory;
-import com.liferay.portal.search.similar.results.web.internal.helper.HttpHelper;
 import com.liferay.portal.search.similar.results.web.internal.util.SearchStringUtil;
+import com.liferay.portal.search.similar.results.web.internal.util.http.HttpHelper;
 import com.liferay.portal.search.similar.results.web.spi.contributor.SimilarResultsContributor;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.RouteBuilder;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.RouteHelper;
@@ -45,53 +44,50 @@ public class WikiDisplaySimilarResultsContributor
 
 		SearchStringUtil.requireStartsWith(
 			WikiPortletKeys.WIKI_DISPLAY,
-			URLCodec.decodeURL(
-				_httpHelper.getPortletIdParameter(urlString, "p_p_id")));
+			_httpHelper.getPortletIdParameter(urlString, "p_p_id"));
 
 		routeBuilder.addAttribute(
-			"nodeName",
-			URLCodec.decodeURL(
-				_httpHelper.getPortletIdParameter(urlString, "nodeName"))
+			"nodeName", _httpHelper.getPortletIdParameter(urlString, "nodeName")
 		).addAttribute(
-			"title",
-			URLCodec.decodeURL(
-				_httpHelper.getPortletIdParameter(urlString, "title"))
+			"title", _httpHelper.getPortletIdParameter(urlString, "title")
 		);
 	}
 
 	@Override
-	protected AssetEntryLocalService getAssetEntryLocalService() {
-		return _assetEntryLocalService;
+	@Reference(unbind = "-")
+	protected void setAssetEntryLocalService(
+		AssetEntryLocalService assetEntryLocalService) {
+
+		super.setAssetEntryLocalService(assetEntryLocalService);
+	}
+
+	@Reference(unbind = "-")
+	protected void setHttpHelper(HttpHelper httpHelper) {
+		_httpHelper = httpHelper;
 	}
 
 	@Override
-	protected UIDFactory getUidFactory() {
-		return _uidFactory;
+	@Reference(unbind = "-")
+	protected void setUIDFactory(UIDFactory uidFactory) {
+		super.setUIDFactory(uidFactory);
 	}
 
 	@Override
-	protected WikiNodeLocalService getWikiNodeLocalService() {
-		return _wikiNodeLocalService;
+	@Reference(unbind = "-")
+	protected void setWikiNodeLocalService(
+		WikiNodeLocalService wikiNodeLocalService) {
+
+		super.setWikiNodeLocalService(wikiNodeLocalService);
 	}
 
 	@Override
-	protected WikiPageLocalService getWikiPageLocalService() {
-		return _wikiPageLocalService;
+	@Reference(unbind = "-")
+	protected void setWikiPageLocalService(
+		WikiPageLocalService wikiPageLocalService) {
+
+		super.setWikiPageLocalService(wikiPageLocalService);
 	}
 
-	@Reference
-	private AssetEntryLocalService _assetEntryLocalService;
-
-	@Reference
 	private HttpHelper _httpHelper;
-
-	@Reference
-	private UIDFactory _uidFactory;
-
-	@Reference
-	private WikiNodeLocalService _wikiNodeLocalService;
-
-	@Reference
-	private WikiPageLocalService _wikiPageLocalService;
 
 }

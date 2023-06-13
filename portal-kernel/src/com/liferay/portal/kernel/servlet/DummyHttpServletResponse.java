@@ -163,6 +163,7 @@ public class DummyHttpServletResponse implements HttpServletResponse {
 
 	@Override
 	public void setContentLengthLong(long contentLengthLong) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

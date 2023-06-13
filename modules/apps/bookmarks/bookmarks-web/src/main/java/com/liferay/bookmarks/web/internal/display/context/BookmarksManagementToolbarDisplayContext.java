@@ -19,6 +19,7 @@ import com.liferay.bookmarks.constants.BookmarksFolderConstants;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.constants.BookmarksWebKeys;
 import com.liferay.bookmarks.service.BookmarksFolderServiceUtil;
+import com.liferay.bookmarks.web.internal.portlet.toolbar.contributor.BookmarksPortletToolbarContributor;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
@@ -26,6 +27,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuil
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -34,8 +36,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.toolbar.contributor.PortletToolbarContributor;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -76,12 +76,15 @@ public class BookmarksManagementToolbarDisplayContext {
 		_trashHelper = trashHelper;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
-			liferayPortletRequest, liferayPortletResponse);
+			_liferayPortletRequest, _liferayPortletResponse);
+
 		_folderId = GetterUtil.getLong(
-			(String)httpServletRequest.getAttribute("view.jsp-folderId"));
-		_searchContainer = (SearchContainer)httpServletRequest.getAttribute(
+			(String)_httpServletRequest.getAttribute("view.jsp-folderId"));
+
+		_searchContainer = (SearchContainer)_httpServletRequest.getAttribute(
 			"view.jsp-bookmarksSearchContainer");
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -89,9 +92,21 @@ public class BookmarksManagementToolbarDisplayContext {
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.putData("action", "deleteEntries");
-				dropdownItem.setIcon("trash");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "delete"));
+
+				if (_trashHelper.isTrashEnabled(
+						_themeDisplay.getScopeGroupId())) {
+
+					dropdownItem.setIcon("trash");
+					dropdownItem.setLabel(
+						LanguageUtil.get(
+							_httpServletRequest, "move-to-recycle-bin"));
+				}
+				else {
+					dropdownItem.setIcon("times-circle");
+					dropdownItem.setLabel(
+						LanguageUtil.get(_httpServletRequest, "delete"));
+				}
+
 				dropdownItem.setQuickAction(true);
 			}
 		).build();
@@ -108,9 +123,10 @@ public class BookmarksManagementToolbarDisplayContext {
 			return null;
 		}
 
-		PortletToolbarContributor bookmarksPortletToolbarContributor =
-			(PortletToolbarContributor)_httpServletRequest.getAttribute(
-				BookmarksWebKeys.BOOKMARKS_PORTLET_TOOLBAR_CONTRIBUTOR);
+		BookmarksPortletToolbarContributor bookmarksPortletToolbarContributor =
+			(BookmarksPortletToolbarContributor)
+				_httpServletRequest.getAttribute(
+					BookmarksWebKeys.BOOKMARKS_PORTLET_TOOLBAR_CONTRIBUTOR);
 
 		List<Menu> menus =
 			bookmarksPortletToolbarContributor.getPortletTitleMenus(
@@ -164,11 +180,11 @@ public class BookmarksManagementToolbarDisplayContext {
 
 				User user = _themeDisplay.getUser();
 
-				labelItem.setLabel(
-					String.format(
-						"%s: %s",
-						LanguageUtil.get(_httpServletRequest, "owner"),
-						user.getFullName()));
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(_httpServletRequest, "owner"),
+					user.getFullName());
+
+				labelItem.setLabel(label);
 			}
 		).add(
 			() -> navigation.equals("recent"),
@@ -178,6 +194,7 @@ public class BookmarksManagementToolbarDisplayContext {
 					_removeNavigartionParameter(_currentURLObj));
 
 				labelItem.setCloseable(true);
+
 				labelItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "recent"));
 			}

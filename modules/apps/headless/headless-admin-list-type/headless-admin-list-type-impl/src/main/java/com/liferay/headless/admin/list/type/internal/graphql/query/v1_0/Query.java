@@ -25,15 +25,11 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.aggregation.Aggregation;
-import com.liferay.portal.vulcan.aggregation.Facet;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
-import com.liferay.portal.vulcan.graphql.annotation.GraphQLTypeExtension;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -72,16 +68,13 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinitions(aggregation: ___, filter: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinitions(page: ___, pageSize: ___, search: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public ListTypeDefinitionPage listTypeDefinitions(
 			@GraphQLName("search") String search,
-			@GraphQLName("aggregation") List<String> aggregations,
-			@GraphQLName("filter") String filterString,
 			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page,
-			@GraphQLName("sort") String sortsString)
+			@GraphQLName("page") int page)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -89,39 +82,13 @@ public class Query {
 			this::_populateResourceContext,
 			listTypeDefinitionResource -> new ListTypeDefinitionPage(
 				listTypeDefinitionResource.getListTypeDefinitionsPage(
-					search,
-					_aggregationBiFunction.apply(
-						listTypeDefinitionResource, aggregations),
-					_filterBiFunction.apply(
-						listTypeDefinitionResource, filterString),
-					Pagination.of(page, pageSize),
-					_sortsBiFunction.apply(
-						listTypeDefinitionResource, sortsString))));
+					search, Pagination.of(page, pageSize))));
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinitionByExternalReferenceCode(externalReferenceCode: ___){actions, dateCreated, dateModified, externalReferenceCode, id, listTypeEntries, name, name_i18n}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public ListTypeDefinition listTypeDefinitionByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_listTypeDefinitionResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			listTypeDefinitionResource ->
-				listTypeDefinitionResource.
-					getListTypeDefinitionByExternalReferenceCode(
-						externalReferenceCode));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinition(listTypeDefinitionId: ___){actions, dateCreated, dateModified, externalReferenceCode, id, listTypeEntries, name, name_i18n}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinition(listTypeDefinitionId: ___){actions, dateCreated, dateModified, id, listTypeEntries, name, name_i18n}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public ListTypeDefinition listTypeDefinition(
@@ -139,51 +106,14 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinitionByExternalReferenceCodeListTypeEntries(aggregation: ___, externalReferenceCode: ___, filter: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public ListTypeEntryPage
-			listTypeDefinitionByExternalReferenceCodeListTypeEntries(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
-				@GraphQLName("search") String search,
-				@GraphQLName("aggregation") List<String> aggregations,
-				@GraphQLName("filter") String filterString,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page,
-				@GraphQLName("sort") String sortsString)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_listTypeEntryResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			listTypeEntryResource -> new ListTypeEntryPage(
-				listTypeEntryResource.
-					getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage(
-						externalReferenceCode, search,
-						_aggregationBiFunction.apply(
-							listTypeEntryResource, aggregations),
-						_filterBiFunction.apply(
-							listTypeEntryResource, filterString),
-						Pagination.of(page, pageSize),
-						_sortsBiFunction.apply(
-							listTypeEntryResource, sortsString))));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinitionListTypeEntries(aggregation: ___, filter: ___, listTypeDefinitionId: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinitionListTypeEntries(listTypeDefinitionId: ___, page: ___, pageSize: ___, search: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public ListTypeEntryPage listTypeDefinitionListTypeEntries(
 			@GraphQLName("listTypeDefinitionId") Long listTypeDefinitionId,
 			@GraphQLName("search") String search,
-			@GraphQLName("aggregation") List<String> aggregations,
-			@GraphQLName("filter") String filterString,
 			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page,
-			@GraphQLName("sort") String sortsString)
+			@GraphQLName("page") int page)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -192,19 +122,13 @@ public class Query {
 			listTypeEntryResource -> new ListTypeEntryPage(
 				listTypeEntryResource.getListTypeDefinitionListTypeEntriesPage(
 					listTypeDefinitionId, search,
-					_aggregationBiFunction.apply(
-						listTypeEntryResource, aggregations),
-					_filterBiFunction.apply(
-						listTypeEntryResource, filterString),
-					Pagination.of(page, pageSize),
-					_sortsBiFunction.apply(
-						listTypeEntryResource, sortsString))));
+					Pagination.of(page, pageSize))));
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeEntry(listTypeEntryId: ___){actions, dateCreated, dateModified, externalReferenceCode, id, key, name, name_i18n, type}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeEntry(listTypeEntryId: ___){actions, dateCreated, dateModified, id, key, name, name_i18n, type}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public ListTypeEntry listTypeEntry(
@@ -218,54 +142,11 @@ public class Query {
 				listTypeEntryId));
 	}
 
-	@GraphQLTypeExtension(ListTypeDefinition.class)
-	public class
-		GetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageTypeExtension {
-
-		public GetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageTypeExtension(
-			ListTypeDefinition listTypeDefinition) {
-
-			_listTypeDefinition = listTypeDefinition;
-		}
-
-		@GraphQLField
-		public ListTypeEntryPage byExternalReferenceCodeListTypeEntries(
-				@GraphQLName("search") String search,
-				@GraphQLName("aggregation") List<String> aggregations,
-				@GraphQLName("filter") String filterString,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page,
-				@GraphQLName("sort") String sortsString)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_listTypeEntryResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				listTypeEntryResource -> new ListTypeEntryPage(
-					listTypeEntryResource.
-						getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage(
-							_listTypeDefinition.getExternalReferenceCode(),
-							search,
-							_aggregationBiFunction.apply(
-								listTypeEntryResource, aggregations),
-							_filterBiFunction.apply(
-								listTypeEntryResource, filterString),
-							Pagination.of(page, pageSize),
-							_sortsBiFunction.apply(
-								listTypeEntryResource, sortsString))));
-		}
-
-		private ListTypeDefinition _listTypeDefinition;
-
-	}
-
 	@GraphQLName("ListTypeDefinitionPage")
 	public class ListTypeDefinitionPage {
 
 		public ListTypeDefinitionPage(Page listTypeDefinitionPage) {
 			actions = listTypeDefinitionPage.getActions();
-
-			facets = listTypeDefinitionPage.getFacets();
 
 			items = listTypeDefinitionPage.getItems();
 			lastPage = listTypeDefinitionPage.getLastPage();
@@ -275,10 +156,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
-
-		@GraphQLField
-		protected List<Facet> facets;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<ListTypeDefinition> items;
@@ -303,8 +181,6 @@ public class Query {
 		public ListTypeEntryPage(Page listTypeEntryPage) {
 			actions = listTypeEntryPage.getActions();
 
-			facets = listTypeEntryPage.getFacets();
-
 			items = listTypeEntryPage.getItems();
 			lastPage = listTypeEntryPage.getLastPage();
 			page = listTypeEntryPage.getPage();
@@ -313,10 +189,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
-
-		@GraphQLField
-		protected List<Facet> facets;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<ListTypeEntry> items;
@@ -391,8 +264,6 @@ public class Query {
 		_listTypeEntryResourceComponentServiceObjects;
 
 	private AcceptLanguage _acceptLanguage;
-	private BiFunction<Object, List<String>, Aggregation>
-		_aggregationBiFunction;
 	private com.liferay.portal.kernel.model.Company _company;
 	private BiFunction<Object, String, Filter> _filterBiFunction;
 	private GroupLocalService _groupLocalService;

@@ -16,9 +16,10 @@ package com.liferay.portal.search.elasticsearch7.internal.connection;
 
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
+
+import java.util.stream.Stream;
 
 /**
  * @author Adam Brandizzi
@@ -121,19 +122,15 @@ public class ProxyConfig {
 		}
 
 		protected boolean shouldApplyConfig() {
-			if (!hasHostAndPort()) {
-				return false;
+			if (hasHostAndPort()) {
+				return Stream.of(
+					_networkHostAddresses
+				).allMatch(
+					host -> !_http.isNonProxyHost(_http.getDomain(host))
+				);
 			}
 
-			for (String networkHostAddress : _networkHostAddresses) {
-				if (_http.isNonProxyHost(
-						HttpComponentsUtil.getDomain(networkHostAddress))) {
-
-					return false;
-				}
-			}
-
-			return true;
+			return false;
 		}
 
 		protected boolean shouldApplyCredentials() {

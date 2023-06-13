@@ -142,8 +142,4 @@ public interface BrowserTrackerModel
 	@Override
 	public BrowserTracker cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

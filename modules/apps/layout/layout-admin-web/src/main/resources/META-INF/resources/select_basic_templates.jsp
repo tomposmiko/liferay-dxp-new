@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplayContext = new SelectLayoutPageTemplateEntryDisplayContext(request, liferayPortletResponse);
+SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplayContext = new SelectLayoutPageTemplateEntryDisplayContext(request);
 %>
 
 <div class="lfr-search-container-wrapper" id="<portlet:namespace />layoutTypes">
@@ -40,9 +40,9 @@ SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplay
 	</ul>
 
 	<c:if test="<%= selectLayoutPageTemplateEntryDisplayContext.getTypesCount() > 0 %>">
-		<h3 class="h6 sheet-subtitle">
+		<h6 class="sheet-subtitle">
 			<liferay-ui:message key="other" />
-		</h3>
+		</h6>
 
 		<ul class="card-page card-page-equal-height">
 

@@ -65,7 +65,7 @@ public class SamlSloContext implements Serializable {
 
 		try {
 			List<SamlIdpSpSession> samlIdpSpSessions =
-				samlIdpSpSessionLocalService.getSamlIdpSpSessions(
+				_samlIdpSpSessionLocalService.getSamlIdpSpSessions(
 					samlIdpSsoSession.getSamlIdpSsoSessionId());
 
 			for (SamlIdpSpSession samlIdpSpSession : samlIdpSpSessions) {
@@ -94,7 +94,7 @@ public class SamlSloContext implements Serializable {
 
 				try {
 					SamlIdpSpConnection samlIdpSpConnection =
-						samlIdpSpConnectionLocalService.getSamlIdpSpConnection(
+						_samlIdpSpConnectionLocalService.getSamlIdpSpConnection(
 							samlIdpSpSession.getCompanyId(), samlSpEntityId);
 
 					name = samlIdpSpConnection.getName();
@@ -103,7 +103,9 @@ public class SamlSloContext implements Serializable {
 							noSuchIdpSpConnectionException) {
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(noSuchIdpSpConnectionException);
+						_log.debug(
+							noSuchIdpSpConnectionException,
+							noSuchIdpSpConnectionException);
 					}
 				}
 
@@ -118,8 +120,11 @@ public class SamlSloContext implements Serializable {
 			}
 		}
 		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception.getMessage(), exception);
+			}
+			else if (_log.isWarnEnabled()) {
+				_log.warn(exception.getMessage());
 			}
 		}
 	}
@@ -139,10 +144,6 @@ public class SamlSloContext implements Serializable {
 
 	public MessageContext<?> getMessageContext() {
 		return _messageContext;
-	}
-
-	public String getRelayState() {
-		return _relayState;
 	}
 
 	public SamlSloRequestInfo getSamlSloRequestInfo(String entityId) {
@@ -167,7 +168,7 @@ public class SamlSloContext implements Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;
@@ -176,10 +177,6 @@ public class SamlSloContext implements Serializable {
 
 	public long getUserId() {
 		return _userId;
-	}
-
-	public void setRelayState(String relayState) {
-		_relayState = relayState;
 	}
 
 	public void setSamlSsoSessionId(String samlSsoSessionId) {
@@ -209,7 +206,6 @@ public class SamlSloContext implements Serializable {
 	private static final Log _log = LogFactoryUtil.getLog(SamlSloContext.class);
 
 	private final MessageContext<?> _messageContext;
-	private String _relayState;
 	private final SamlIdpSpConnectionLocalService
 		_samlIdpSpConnectionLocalService;
 	private final SamlIdpSpSessionLocalService _samlIdpSpSessionLocalService;

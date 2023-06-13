@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class SAPEntryLocalServiceWrapper
 	implements SAPEntryLocalService, ServiceWrapper<SAPEntryLocalService> {
 
-	public SAPEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SAPEntryLocalServiceWrapper(
 		SAPEntryLocalService sapEntryLocalService) {
 

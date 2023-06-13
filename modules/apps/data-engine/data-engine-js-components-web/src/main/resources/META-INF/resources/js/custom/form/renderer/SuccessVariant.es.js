@@ -21,9 +21,9 @@ import React, {useEffect, useState} from 'react';
 import {EVENT_TYPES as CORE_EVENT_TYPES} from '../../../core/actions/eventTypes.es';
 import {useForm, useFormState} from '../../../core/hooks/useForm.es';
 import {setValue} from '../../../utils/i18n.es';
-import {EVENT_TYPES} from '../eventTypes';
+import {EVENT_TYPES} from '../eventTypes.es';
 
-export function Container({children, pages, strings = {}}) {
+export const Container = ({children, pages, strings = {}}) => {
 	const {editingLanguageId} = useFormState();
 	const dispatch = useForm();
 
@@ -73,11 +73,11 @@ export function Container({children, pages, strings = {}}) {
 			</div>
 		</div>
 	);
-}
+};
 
 Container.displayName = 'SuccessVariant.Container';
 
-export function Page({page: {successPageSettings}}) {
+export const Page = ({page: {successPageSettings}}) => {
 	const {defaultLanguageId, editingLanguageId} = useFormState();
 
 	const dispatch = useForm();
@@ -144,6 +144,6 @@ export function Page({page: {successPageSettings}}) {
 			/>
 		</div>
 	);
-}
+};
 
 Page.displayName = 'SuccessVariant.Page';

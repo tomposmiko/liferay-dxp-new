@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFieldTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFieldImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFieldModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFieldPersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMFieldUtil;
 import com.liferay.dynamic.data.mapping.service.persistence.impl.constants.DDMPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -36,6 +35,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -46,7 +46,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -77,7 +76,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DDMFieldPersistence.class)
+@Component(service = {DDMFieldPersistence.class, BasePersistence.class})
 public class DDMFieldPersistenceImpl
 	extends BasePersistenceImpl<DDMField> implements DDMFieldPersistence {
 
@@ -196,7 +195,7 @@ public class DDMFieldPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMField>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMField ddmField : list) {
@@ -562,7 +561,7 @@ public class DDMFieldPersistenceImpl
 
 			finderArgs = new Object[] {storageId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -707,7 +706,7 @@ public class DDMFieldPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMField>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMField ddmField : list) {
@@ -1082,7 +1081,7 @@ public class DDMFieldPersistenceImpl
 
 			finderArgs = new Object[] {structureVersionId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1233,7 +1232,7 @@ public class DDMFieldPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMField>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMField ddmField : list) {
@@ -1656,7 +1655,7 @@ public class DDMFieldPersistenceImpl
 
 			finderArgs = new Object[] {companyId, fieldType};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1798,8 +1797,7 @@ public class DDMFieldPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByS_I, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByS_I, finderArgs);
 		}
 
 		if (result instanceof DDMField) {
@@ -1919,7 +1917,7 @@ public class DDMFieldPersistenceImpl
 
 			finderArgs = new Object[] {storageId, instanceId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2310,7 +2308,7 @@ public class DDMFieldPersistenceImpl
 	 */
 	@Override
 	public DDMField fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(DDMField.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(DDMField.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2524,7 +2522,7 @@ public class DDMFieldPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMField>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2600,7 +2598,7 @@ public class DDMFieldPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2790,30 +2788,11 @@ public class DDMFieldPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByS_I",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"storageId", "instanceId"}, false);
-
-		_setDDMFieldUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMFieldUtilPersistence(null);
-
 		entityCache.removeCache(DDMFieldImpl.class.getName());
-	}
-
-	private void _setDDMFieldUtilPersistence(
-		DDMFieldPersistence ddmFieldPersistence) {
-
-		try {
-			Field field = DDMFieldUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmFieldPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2878,5 +2857,8 @@ public class DDMFieldPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private DDMFieldModelArgumentsResolver _ddmFieldModelArgumentsResolver;
 
 }

@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceVersionImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceVersionModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceVersionPersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceVersionUtil;
 import com.liferay.dynamic.data.mapping.service.persistence.impl.constants.DDMPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -81,7 +80,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DDMFormInstanceVersionPersistence.class)
+@Component(
+	service = {DDMFormInstanceVersionPersistence.class, BasePersistence.class}
+)
 public class DDMFormInstanceVersionPersistenceImpl
 	extends BasePersistenceImpl<DDMFormInstanceVersion>
 	implements DDMFormInstanceVersionPersistence {
@@ -207,7 +208,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMFormInstanceVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMFormInstanceVersion ddmFormInstanceVersion : list) {
@@ -587,7 +588,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 
 			finderArgs = new Object[] {formInstanceId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -711,8 +712,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByF_V, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByF_V, finderArgs);
 		}
 
 		if (result instanceof DDMFormInstanceVersion) {
@@ -836,7 +836,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 
 			finderArgs = new Object[] {formInstanceId, version};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1008,7 +1008,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMFormInstanceVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMFormInstanceVersion ddmFormInstanceVersion : list) {
@@ -1410,7 +1410,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 
 			finderArgs = new Object[] {formInstanceId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1849,7 +1849,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 	@Override
 	public DDMFormInstanceVersion fetchByPrimaryKey(Serializable primaryKey) {
 		if (ctPersistenceHelper.isProductionMode(
-				DDMFormInstanceVersion.class, primaryKey)) {
+				DDMFormInstanceVersion.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2077,7 +2077,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMFormInstanceVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2153,7 +2153,7 @@ public class DDMFormInstanceVersionPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2338,31 +2338,11 @@ public class DDMFormInstanceVersionPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"formInstanceId", "status"}, false);
-
-		_setDDMFormInstanceVersionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMFormInstanceVersionUtilPersistence(null);
-
 		entityCache.removeCache(DDMFormInstanceVersionImpl.class.getName());
-	}
-
-	private void _setDDMFormInstanceVersionUtilPersistence(
-		DDMFormInstanceVersionPersistence ddmFormInstanceVersionPersistence) {
-
-		try {
-			Field field = DDMFormInstanceVersionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmFormInstanceVersionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2431,5 +2411,9 @@ public class DDMFormInstanceVersionPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private DDMFormInstanceVersionModelArgumentsResolver
+		_ddmFormInstanceVersionModelArgumentsResolver;
 
 }

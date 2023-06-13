@@ -23,22 +23,21 @@ import com.liferay.commerce.product.content.render.list.CPContentListRendererReg
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRenderer;
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRendererRegistry;
 import com.liferay.commerce.product.content.search.web.internal.configuration.CPSearchResultsPortletInstanceConfiguration;
-import com.liferay.commerce.product.content.search.web.internal.constants.CPSearchResultsConstants;
 import com.liferay.commerce.product.data.source.CPDataSourceResult;
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.commerce.product.type.CPType;
-import com.liferay.commerce.product.type.CPTypeRegistry;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -51,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 
@@ -67,7 +67,7 @@ public class CPSearchResultsDisplayContext {
 				cpContentListEntryRendererRegistry,
 			CPContentListRendererRegistry cpContentListRendererRegistry,
 			CPDefinitionHelper cpDefinitionHelper,
-			CPTypeRegistry cpTypeRegistry,
+			CPTypeServicesTracker cpTypeServicesTracker,
 			HttpServletRequest httpServletRequest,
 			PortletSharedSearchResponse portletSharedSearchResponse)
 		throws ConfigurationException {
@@ -76,7 +76,7 @@ public class CPSearchResultsDisplayContext {
 			cpContentListEntryRendererRegistry;
 		_cpContentListRendererRegistry = cpContentListRendererRegistry;
 		_cpDefinitionHelper = cpDefinitionHelper;
-		_cpTypeRegistry = cpTypeRegistry;
+		_cpTypeServicesTracker = cpTypeServicesTracker;
 		_httpServletRequest = httpServletRequest;
 		_portletSharedSearchResponse = portletSharedSearchResponse;
 
@@ -145,7 +145,7 @@ public class CPSearchResultsDisplayContext {
 	}
 
 	public CPDataSourceResult getCPDataSourceResult() {
-		List<CPCatalogEntry> cpCatalogEntries = _getCPCatalogEntries(
+		List<CPCatalogEntry> cpCatalogEntries = getCPCatalogEntries(
 			_portletSharedSearchResponse.getDocuments());
 
 		return new CPDataSourceResult(
@@ -182,7 +182,7 @@ public class CPSearchResultsDisplayContext {
 	}
 
 	public List<CPType> getCPTypes() {
-		return _cpTypeRegistry.getCPTypes();
+		return _cpTypeServicesTracker.getCPTypes();
 	}
 
 	public String getDisplayStyle() {
@@ -208,24 +208,6 @@ public class CPSearchResultsDisplayContext {
 		return _displayStyleGroupId;
 	}
 
-	public String getNames() {
-		StringBundler sb = new StringBundler();
-
-		List<CPType> cpTypes = getCPTypes();
-
-		for (int i = 0; i < cpTypes.size(); i++) {
-			CPType cpType = cpTypes.get(i);
-
-			sb.append(cpType.getLabel(_cpRequestHelper.getLocale()));
-
-			if ((i + 1) < cpTypes.size()) {
-				sb.append(",");
-			}
-		}
-
-		return sb.toString();
-	}
-
 	public String getOrderByCol() {
 		HttpServletRequest originalHttpServletRequest =
 			PortalUtil.getOriginalServletRequest(_httpServletRequest);
@@ -233,20 +215,12 @@ public class CPSearchResultsDisplayContext {
 		String portletId = ParamUtil.getString(
 			originalHttpServletRequest, "p_p_id");
 
-		String orderByCol = ParamUtil.getString(
+		return ParamUtil.getString(
 			originalHttpServletRequest,
 			StringBundler.concat(
 				StringPool.UNDERLINE, portletId, StringPool.UNDERLINE,
 				SearchContainer.DEFAULT_ORDER_BY_COL_PARAM),
-			CPSearchResultsConstants.SORT_OPTION_DEFAULT);
-
-		if (ArrayUtil.contains(
-				CPSearchResultsConstants.SORT_OPTIONS, orderByCol)) {
-
-			return orderByCol;
-		}
-
-		return CPSearchResultsConstants.SORT_OPTION_DEFAULT;
+			"relevance");
 	}
 
 	public int getPaginationDelta() {
@@ -258,7 +232,7 @@ public class CPSearchResultsDisplayContext {
 			return _searchContainer;
 		}
 
-		_searchContainer = _buildSearchContainer(
+		_searchContainer = buildSearchContainer(
 			getCPDataSourceResult(),
 			_portletSharedSearchResponse.getPaginationStart(), "start",
 			_portletSharedSearchResponse.getPaginationDelta(), "delta");
@@ -308,25 +282,34 @@ public class CPSearchResultsDisplayContext {
 		return false;
 	}
 
-	private SearchContainer<CPCatalogEntry> _buildSearchContainer(
+	protected SearchContainer<CPCatalogEntry> buildSearchContainer(
 		CPDataSourceResult cpDataSourceResult, int paginationStart,
 		String paginationStartParameterName, int paginationDelta,
 		String paginationDeltaParameterName) {
 
+		PortletRequest portletRequest =
+			_cpRequestHelper.getLiferayPortletRequest();
+		DisplayTerms displayTerms = null;
+		DisplayTerms searchTerms = null;
+		String curParam = paginationStartParameterName;
+		int cur = paginationStart;
+		int delta = paginationDelta;
+		List<String> headerNames = null;
+		String emptyResultsMessage = null;
+		String cssClass = null;
+
 		SearchContainer<CPCatalogEntry> searchContainer = new SearchContainer<>(
-			_cpRequestHelper.getLiferayPortletRequest(), null, null,
-			paginationStartParameterName, paginationStart, paginationDelta,
-			_getPortletURL(), null, null, null);
+			portletRequest, displayTerms, searchTerms, curParam, cur, delta,
+			getPortletURL(), headerNames, emptyResultsMessage, cssClass);
 
 		searchContainer.setDeltaParam(paginationDeltaParameterName);
-		searchContainer.setResultsAndTotal(
-			cpDataSourceResult::getCPCatalogEntries,
-			cpDataSourceResult.getLength());
+		searchContainer.setResults(cpDataSourceResult.getCPCatalogEntries());
+		searchContainer.setTotal(cpDataSourceResult.getLength());
 
 		return searchContainer;
 	}
 
-	private List<CPCatalogEntry> _getCPCatalogEntries(
+	protected List<CPCatalogEntry> getCPCatalogEntries(
 		List<Document> documents) {
 
 		List<CPCatalogEntry> cpCatalogEntries = new ArrayList<>();
@@ -340,8 +323,8 @@ public class CPSearchResultsDisplayContext {
 		return cpCatalogEntries;
 	}
 
-	private PortletURL _getPortletURL() {
-		final String urlString = _getURLString();
+	protected PortletURL getPortletURL() {
+		final String urlString = getURLString();
 
 		return new NullPortletURL() {
 
@@ -353,8 +336,8 @@ public class CPSearchResultsDisplayContext {
 		};
 	}
 
-	private String _getURLString() {
-		return HttpComponentsUtil.removeParameter(
+	protected String getURLString() {
+		return HttpUtil.removeParameter(
 			PortalUtil.getCurrentURL(_cpRequestHelper.getRequest()), "start");
 	}
 
@@ -365,7 +348,7 @@ public class CPSearchResultsDisplayContext {
 	private final CPRequestHelper _cpRequestHelper;
 	private final CPSearchResultsPortletInstanceConfiguration
 		_cpSearchResultsPortletInstanceConfiguration;
-	private final CPTypeRegistry _cpTypeRegistry;
+	private final CPTypeServicesTracker _cpTypeServicesTracker;
 	private long _displayStyleGroupId;
 	private final HttpServletRequest _httpServletRequest;
 	private final PortletSharedSearchResponse _portletSharedSearchResponse;

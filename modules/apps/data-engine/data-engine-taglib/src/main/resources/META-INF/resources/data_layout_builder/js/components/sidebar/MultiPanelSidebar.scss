@@ -4,8 +4,8 @@
 $controlMenuHeight: 48px;
 $defaultTransitionDuration: 0.5s;
 $desktopControlMenuHeight: 56px;
-$toolbarDesktopHeight: 64px;
-$toolbarHeight: 110px;
+$managementBarHeight: 64px;
+$toolbarHeight: 64px;
 
 // z-indexes for children of page-editor-sidebar (which is a stacking context).
 
@@ -18,48 +18,6 @@ $zIndexContent: 0;
 	position: fixed;
 	right: 0;
 	top: $toolbarHeight;
-
-	@include media-breakpoint-up(lg) {
-		height: calc(100vh - #{$toolbarDesktopHeight});
-		top: $toolbarDesktopHeight;
-
-		&-content {
-			height: calc(100vh - #{$toolbarDesktopHeight});
-		}
-	}
-
-	body.has-control-menu & {
-		height: calc(100vh - #{$controlMenuHeight + $toolbarHeight});
-		top: $controlMenuHeight + $toolbarHeight;
-
-		&-content {
-			height: calc(100vh - #{$controlMenuHeight + $toolbarHeight});
-		}
-
-		@include media-breakpoint-up(sm) {
-			height: calc(100vh - #{$desktopControlMenuHeight + $toolbarHeight});
-			top: $desktopControlMenuHeight + $toolbarHeight;
-
-			&-content {
-				height: calc(
-					100vh - #{$desktopControlMenuHeight + $toolbarHeight}
-				);
-			}
-		}
-
-		@include media-breakpoint-up(lg) {
-			height: calc(
-				100vh - #{$desktopControlMenuHeight + $toolbarDesktopHeight}
-			);
-			top: $desktopControlMenuHeight + $toolbarDesktopHeight;
-
-			&-content {
-				height: calc(
-					100vh - #{$desktopControlMenuHeight + $toolbarDesktopHeight}
-				);
-			}
-		}
-	}
 
 	&-buttons {
 		background-color: $white;
@@ -120,18 +78,27 @@ $zIndexContent: 0;
 	&-content {
 		background-color: $white;
 		border-left: 1px solid $gray-300;
+		height: calc(100vh - #{$controlMenuHeight + $toolbarHeight});
 		overflow-x: hidden;
 		position: fixed;
 		right: $multiPanelSidebarButtonWidth;
 		transform: translateX(100%);
 		transition: transform ease $defaultTransitionDuration;
-		visibility: hidden;
 		width: $multiPanelSidebarContentWidth;
 		z-index: $zIndexContent;
 
 		&-open {
 			transform: translateX(0);
-			visibility: visible;
+		}
+	}
+
+	body.has-control-menu & {
+		height: calc(100vh - #{$controlMenuHeight + $managementBarHeight});
+		top: $controlMenuHeight + $managementBarHeight;
+
+		@include media-breakpoint-up(lg) {
+			height: calc(100vh - #{$desktopControlMenuHeight + $toolbarHeight});
+			top: $desktopControlMenuHeight + $toolbarHeight;
 		}
 	}
 
@@ -176,7 +143,7 @@ $zIndexContent: 0;
 
 .rtl .multi-panel-sidebar {
 	&-content {
-		transform: translateX(100%);
+		transform: translateX(-100%);
 
 		&-open {
 			transform: translateX(0);

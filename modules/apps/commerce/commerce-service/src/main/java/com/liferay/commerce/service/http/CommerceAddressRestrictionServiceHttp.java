@@ -38,6 +38,7 @@ package com.liferay.commerce.service.http;
  * </p>
  *
  * @author Alessio Antonio Rendina
+ * @see CommerceAddressRestrictionServiceSoap
  * @generated
  */
 public class CommerceAddressRestrictionServiceHttp {

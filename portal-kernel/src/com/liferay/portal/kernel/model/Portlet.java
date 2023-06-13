@@ -219,6 +219,24 @@ public interface Portlet extends PersistedModel, PortletModel {
 			getAssetRendererFactoryInstances();
 
 	/**
+	 * Returns the names of the classes that represent atom collection adapters
+	 * associated with the portlet.
+	 *
+	 * @return the names of the classes that represent atom collection adapters
+	 associated with the portlet
+	 */
+	public java.util.List<String> getAtomCollectionAdapterClasses();
+
+	/**
+	 * Returns the atom collection adapter instances of the portlet.
+	 *
+	 * @return the atom collection adapter instances of the portlet
+	 */
+	public java.util.List
+		<com.liferay.portal.kernel.atom.AtomCollectionAdapter<?>>
+			getAtomCollectionAdapterInstances();
+
+	/**
 	 * Returns the names of the parameters that will be automatically propagated
 	 * through the portlet.
 	 *
@@ -413,8 +431,6 @@ public interface Portlet extends PersistedModel, PortletModel {
 	 * @return the name of the friendly URL mapping of the portlet
 	 */
 	public String getFriendlyURLMapping();
-
-	public String getFriendlyURLMapping(boolean lookUpFriendlyURLMapper);
 
 	/**
 	 * Returns the class loader resource path to the friendly URL routes of the
@@ -650,6 +666,21 @@ public interface Portlet extends PersistedModel, PortletModel {
 	public String getPluginType();
 
 	/**
+	 * Returns the name of the poller processor class of the portlet.
+	 *
+	 * @return the name of the poller processor class of the portlet
+	 */
+	public String getPollerProcessorClass();
+
+	/**
+	 * Returns the poller processor instance of the portlet.
+	 *
+	 * @return the poller processor instance of the portlet
+	 */
+	public com.liferay.portal.kernel.poller.PollerProcessor
+		getPollerProcessorInstance();
+
+	/**
 	 * Returns the name of the POP message listener class of the portlet.
 	 *
 	 * @return the name of the POP message listener class of the portlet
@@ -686,11 +717,6 @@ public interface Portlet extends PersistedModel, PortletModel {
 	 * @return the name of the portlet class of the portlet
 	 */
 	public String getPortletClass();
-
-	public String getPortletConfigurationListenerClass();
-
-	public com.liferay.portal.kernel.portlet.PortletConfigurationListener
-		getPortletConfigurationListenerInstance();
 
 	/**
 	 * Returns the name of the portlet data handler class of the portlet.
@@ -1687,6 +1713,16 @@ public interface Portlet extends PersistedModel, PortletModel {
 	public void setAsyncSupported(boolean asyncSupported);
 
 	/**
+	 * Sets the names of the classes that represent atom collection adapters
+	 * associated with the portlet.
+	 *
+	 * @param atomCollectionAdapterClasses the names of the classes that
+	 represent atom collection adapters associated with the portlet
+	 */
+	public void setAtomCollectionAdapterClasses(
+		java.util.List<String> atomCollectionAdapterClasses);
+
+	/**
 	 * Sets the names of the parameters that will be automatically propagated
 	 * through the portlet.
 	 *
@@ -2045,6 +2081,14 @@ public interface Portlet extends PersistedModel, PortletModel {
 		com.liferay.portal.kernel.plugin.PluginPackage pluginPackage);
 
 	/**
+	 * Sets the name of the poller processor class of the portlet.
+	 *
+	 * @param pollerProcessorClass the name of the poller processor class of the
+	 portlet
+	 */
+	public void setPollerProcessorClass(String pollerProcessorClass);
+
+	/**
 	 * Sets the name of the POP message listener class of the portlet.
 	 *
 	 * @param popMessageListenerClass the name of the POP message listener class
@@ -2074,9 +2118,6 @@ public interface Portlet extends PersistedModel, PortletModel {
 	 * @param portletClass the name of the portlet class of the portlet
 	 */
 	public void setPortletClass(String portletClass);
-
-	public void setPortletConfigurationListenerClass(
-		String portletConfigurationListenerClass);
 
 	/**
 	 * Sets the name of the portlet data handler class of the portlet.

@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.data.provider.web.internal.portlet.acti
 
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -31,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_DATA_PROVIDER,
 		"mvc.command.name=/dynamic_data_mapping_data_provider/delete_data_provider"
@@ -39,6 +41,13 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class DeleteDataProviderMVCActionCommand
 	extends BaseTransactionalMVCActionCommand {
+
+	protected void doDeleteDataProviderInstance(long dataProviderInstanceId)
+		throws PortalException {
+
+		_ddmDataProviderInstanceService.deleteDataProviderInstance(
+			dataProviderInstanceId);
+	}
 
 	@Override
 	protected void doTransactionalCommand(
@@ -63,15 +72,8 @@ public class DeleteDataProviderMVCActionCommand
 		for (long deleteDataProviderInstanceId :
 				deleteDataProviderInstanceIds) {
 
-			_deleteDataProviderInstance(deleteDataProviderInstanceId);
+			doDeleteDataProviderInstance(deleteDataProviderInstanceId);
 		}
-	}
-
-	private void _deleteDataProviderInstance(long dataProviderInstanceId)
-		throws Exception {
-
-		_ddmDataProviderInstanceService.deleteDataProviderInstance(
-			dataProviderInstanceId);
 	}
 
 	@Reference

@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
@@ -28,7 +27,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodParameter;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodSignature;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parser.util.OpenAPIParserUtil;
-import com.liferay.portal.tools.rest.builder.internal.freemarker.util.ConfigUtil;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.util.OpenAPIUtil;
 import com.liferay.portal.tools.rest.builder.internal.yaml.config.ConfigYAML;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Content;
@@ -60,6 +58,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * @author Peter Shin
@@ -120,8 +119,7 @@ public class ResourceOpenAPIParser {
 
 							if (configYAML.isGenerateBatch()) {
 								_addBatchJavaMethodSignature(
-									configYAML, javaMethodSignature,
-									javaMethodSignatures);
+									javaMethodSignature, javaMethodSignatures);
 							}
 						});
 				});
@@ -176,37 +174,31 @@ public class ResourceOpenAPIParser {
 					sb.toString() + "})");
 		}
 
+		List<JavaMethodParameter> javaMethodParameters =
+			javaMethodSignature.getJavaMethodParameters();
+
 		StringBundler sb = new StringBundler("");
 
-		for (Parameter parameter : operation.getParameters()) {
-			if (StringUtil.equals(parameter.getIn(), "header")) {
-				continue;
-			}
+		for (JavaMethodParameter javaMethodParameter : javaMethodParameters) {
+			String parameterName = javaMethodParameter.getParameterName();
 
-			sb.append(
-				_addParameter(_findParameter(operation, parameter.getName())));
+			if (parameterName.equals("pagination")) {
+				sb.append(_addParameter(_findParameter(operation, "page")));
+				sb.append(_addParameter(_findParameter(operation, "pageSize")));
+			}
+			else if (parameterName.equals("sorts")) {
+				sb.append(_addParameter(_findParameter(operation, "sort")));
+			}
+			else {
+				sb.append(
+					_addParameter(_findParameter(operation, parameterName)));
+			}
 		}
 
 		if (sb.length() > 0) {
 			methodAnnotations.add(
 				"@io.swagger.v3.oas.annotations.Parameters(value={" + sb +
 					"})");
-		}
-
-		for (JavaMethodParameter pathJavaMethodParameter :
-				javaMethodSignature.getPathJavaMethodParameters()) {
-
-			String parameterName = pathJavaMethodParameter.getParameterName();
-
-			if (parameterName.endsWith("Path") &&
-				Objects.equals(
-					pathJavaMethodParameter.getParameterType(),
-					"java.lang.String")) {
-
-				path = StringUtil.replace(
-					path, "{" + parameterName + "}",
-					"{" + parameterName + ": .+}");
-			}
 		}
 
 		methodAnnotations.add("@javax.ws.rs.Path(\"" + path + "\")");
@@ -246,9 +238,11 @@ public class ResourceOpenAPIParser {
 					javaMethodParameter, openAPIYAML, operation);
 			}
 
-			sb.append(
-				OpenAPIParserUtil.getParameter(
-					javaMethodParameter, parameterAnnotation));
+			String parameter = OpenAPIParserUtil.getParameter(
+				javaMethodParameter, parameterAnnotation);
+
+			sb.append(parameter);
+
 			sb.append(',');
 		}
 
@@ -259,201 +253,84 @@ public class ResourceOpenAPIParser {
 		return sb.toString();
 	}
 
-	public static Set<String> getVulcanBatchImplementationCreateStrategies(
-		List<JavaMethodSignature> javaMethodSignatures,
-		Map<String, String> properties) {
-
-		Set<String> createStrategies = new HashSet<>();
-
-		Set<String> propertyNames = properties.keySet();
-
-		for (JavaMethodSignature javaMethodSignature : javaMethodSignatures) {
-			String methodName = javaMethodSignature.getMethodName();
-			String parentSchemaName = javaMethodSignature.getParentSchemaName();
-			String schemaName = javaMethodSignature.getSchemaName();
-
-			if (parentSchemaName == null) {
-				parentSchemaName = "";
-			}
-
-			if (methodName.equals("post" + parentSchemaName + schemaName)) {
-				createStrategies.add("INSERT");
-			}
-			else if ((methodName.equals("putByExternalReferenceCode") ||
-					  methodName.equals(
-						  StringBundler.concat(
-							  "put", parentSchemaName, schemaName,
-							  "ByExternalReferenceCode"))) &&
-					 propertyNames.contains("externalReferenceCode")) {
-
-				createStrategies.add("UPSERT");
-			}
-		}
-
-		return createStrategies;
-	}
-
-	public static Set<String> getVulcanBatchImplementationUpdateStrategies(
-		List<JavaMethodSignature> javaMethodSignatures) {
-
-		Set<String> updateStrategies = new HashSet<>();
-
-		for (JavaMethodSignature javaMethodSignature : javaMethodSignatures) {
-			String methodName = javaMethodSignature.getMethodName();
-			String schemaName = javaMethodSignature.getSchemaName();
-
-			if (methodName.equals("patch" + schemaName)) {
-				updateStrategies.add("PARTIAL_UPDATE");
-			}
-			else if (methodName.equals("put" + schemaName)) {
-				updateStrategies.add("UPDATE");
-			}
-		}
-
-		return updateStrategies;
-	}
-
-	public static boolean hasReadVulcanBatchImplementation(
-		List<JavaMethodSignature> javaMethodSignatures) {
-
-		for (JavaMethodSignature javaMethodSignature : javaMethodSignatures) {
-			String methodName = javaMethodSignature.getMethodName();
-			String parentSchemaName = javaMethodSignature.getParentSchemaName();
-			String schemaName = javaMethodSignature.getSchemaName();
-
-			if (parentSchemaName == null) {
-				parentSchemaName = "";
-			}
-
-			if (methodName.equals(
-					StringBundler.concat(
-						"get", parentSchemaName,
-						TextFormatter.formatPlural(schemaName), "Page"))) {
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public static boolean hasResourceBatchJavaMethodSignatures(
-		List<JavaMethodSignature> javaMethodSignatures) {
-
-		for (JavaMethodSignature javaMethodSignature : javaMethodSignatures) {
-			String methodName = javaMethodSignature.getMethodName();
-
-			if (methodName.endsWith("Batch")) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public static boolean hasResourceGetPageJavaMethodSignature(
-		String javaDataType, List<JavaMethodSignature> javaMethodSignatures) {
-
-		String pageJavaDataType = StringBundler.concat(
-			Page.class.getName(), "<", javaDataType, ">");
-
-		for (JavaMethodSignature javaMethodSignature : javaMethodSignatures) {
-			if (StringUtil.equals(
-					pageJavaDataType, javaMethodSignature.getReturnType())) {
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	private static void _addBatchJavaMethodSignature(
-		ConfigYAML configYAML, JavaMethodSignature javaMethodSignature,
+		JavaMethodSignature javaMethodSignature,
 		List<JavaMethodSignature> javaMethodSignatures) {
 
-		BatchOperationType batchOperationType = null;
+		String parentSchemaName = javaMethodSignature.getParentSchemaName();
+
+		if (parentSchemaName == null) {
+			parentSchemaName = "";
+		}
 
 		String methodName = javaMethodSignature.getMethodName();
-		String parentSchemaName = GetterUtil.getString(
-			javaMethodSignature.getParentSchemaName());
+
 		String schemaName = javaMethodSignature.getSchemaName();
 
-		if (ConfigUtil.isVersionCompatible(configYAML, 2) &&
+		if (methodName.equals("delete" + schemaName) ||
+			methodName.equals("post" + parentSchemaName + schemaName) ||
 			methodName.equals(
 				StringBundler.concat(
-					"get", parentSchemaName,
-					TextFormatter.formatPlural(schemaName), "Page"))) {
+					"post", parentSchemaName, "Id", schemaName)) ||
+			methodName.equals("put" + schemaName)) {
 
-			batchOperationType = BatchOperationType.EXPORT;
-		}
-		else if (methodName.equals("delete" + schemaName) ||
-				 methodName.equals("post" + parentSchemaName + schemaName) ||
-				 methodName.equals(
-					 StringBundler.concat(
-						 "post", parentSchemaName, "Id", schemaName)) ||
-				 methodName.equals("put" + schemaName)) {
+			String batchPath = null;
 
-			batchOperationType = BatchOperationType.IMPORT;
-		}
-		else {
-			return;
-		}
+			String path = javaMethodSignature.getPath();
 
-		Operation batchOperation = _getBatchOperation(
-			batchOperationType, javaMethodSignature, methodName, schemaName);
-
-		String batchPath = _getBatchPath(
-			batchOperationType, javaMethodSignature.getPath(), schemaName);
-
-		for (JavaMethodSignature existingJavaMethodSignature :
-				javaMethodSignatures) {
-
-			String httpMethod = OpenAPIParserUtil.getHTTPMethod(
-				existingJavaMethodSignature.getOperation());
-
-			if (Objects.equals(
-					existingJavaMethodSignature.getPath(), batchPath) &&
-				httpMethod.equals(
-					OpenAPIParserUtil.getHTTPMethod(batchOperation))) {
-
-				return;
+			if (path.contains(StringUtil.lowerCaseFirstLetter(schemaName))) {
+				batchPath = StringUtil.removeSubstring(
+					path,
+					"/{" + StringUtil.lowerCaseFirstLetter(schemaName) + "Id}");
 			}
-		}
-
-		List<JavaMethodParameter> javaMethodParameters = new ArrayList<>();
-
-		for (JavaMethodParameter javaMethodParameter :
-				javaMethodSignature.getJavaMethodParameters()) {
-
-			if (_isValidParameter(
-					javaMethodParameter.getParameterName(), schemaName)) {
-
-				javaMethodParameters.add(javaMethodParameter);
+			else {
+				batchPath = StringUtil.removeSubstring(path, "/{id}");
 			}
-		}
 
-		javaMethodParameters.add(
-			new JavaMethodParameter("callbackURL", "String"));
+			Operation batchOperation = _getBatchOperation(
+				javaMethodSignature, methodName, schemaName);
 
-		if (batchOperationType == BatchOperationType.EXPORT) {
+			for (JavaMethodSignature existingJavaMethodSignature :
+					javaMethodSignatures) {
+
+				String httpMethod = OpenAPIParserUtil.getHTTPMethod(
+					existingJavaMethodSignature.getOperation());
+
+				if (Objects.equals(
+						existingJavaMethodSignature.getPath(),
+						batchPath + "/batch") &&
+					httpMethod.equals(
+						OpenAPIParserUtil.getHTTPMethod(batchOperation))) {
+
+					return;
+				}
+			}
+
+			List<JavaMethodParameter> javaMethodParameters = new ArrayList<>();
+
+			for (JavaMethodParameter javaMethodParameter :
+					javaMethodSignature.getJavaMethodParameters()) {
+
+				if (_isValidParameter(
+						javaMethodParameter.getParameterName(), schemaName)) {
+
+					javaMethodParameters.add(javaMethodParameter);
+				}
+			}
+
 			javaMethodParameters.add(
-				new JavaMethodParameter("contentType", "String"));
-			javaMethodParameters.add(
-				new JavaMethodParameter("fieldNames", "String"));
-		}
-		else if (batchOperationType == BatchOperationType.IMPORT) {
+				new JavaMethodParameter("callbackURL", "String"));
 			javaMethodParameters.add(
 				new JavaMethodParameter("object", "Object"));
-		}
 
-		javaMethodSignatures.add(
-			new JavaMethodSignature(
-				batchPath, javaMethodSignature.getPathItem(), batchOperation,
-				Collections.singleton(ContentTypes.APPLICATION_JSON),
-				schemaName, javaMethodParameters,
-				_getBatchMethodName(batchOperationType, methodName),
-				"javax.ws.rs.core.Response", parentSchemaName));
+			javaMethodSignatures.add(
+				new JavaMethodSignature(
+					batchPath + "/batch", javaMethodSignature.getPathItem(),
+					batchOperation,
+					Collections.singleton(ContentTypes.APPLICATION_JSON),
+					schemaName, javaMethodParameters, methodName + "Batch",
+					"javax.ws.rs.core.Response", parentSchemaName));
+		}
 	}
 
 	private static String _addParameter(Parameter parameter) {
@@ -497,23 +374,7 @@ public class ResourceOpenAPIParser {
 		return null;
 	}
 
-	private static String _getBatchMethodName(
-		BatchOperationType batchOperationType, String methodName) {
-
-		if (batchOperationType == BatchOperationType.EXPORT) {
-			return StringUtil.replaceFirst(methodName, "get", "post") +
-				"ExportBatch";
-		}
-		else if (batchOperationType == BatchOperationType.IMPORT) {
-			return methodName + "Batch";
-		}
-
-		throw new IllegalStateException(
-			"Unsupported batch operation type: " + batchOperationType);
-	}
-
 	private static Operation _getBatchOperation(
-		BatchOperationType batchOperationType,
 		JavaMethodSignature javaMethodSignature, String methodName,
 		String schemaName) {
 
@@ -521,9 +382,6 @@ public class ResourceOpenAPIParser {
 
 		if (methodName.startsWith("delete")) {
 			batchOperation = new Delete();
-		}
-		else if (methodName.startsWith("get")) {
-			batchOperation = new Post();
 		}
 		else if (methodName.startsWith("post")) {
 			batchOperation = new Post();
@@ -538,12 +396,8 @@ public class ResourceOpenAPIParser {
 			batchOperation.setOperationId(operation.getOperationId() + "Batch");
 		}
 
-		if (operation.isDeprecated()) {
-			batchOperation.setDeprecated(true);
-		}
-
 		batchOperation.setParameters(
-			_getBatchParameters(batchOperationType, operation, schemaName));
+			_getBatchParameters(operation, schemaName));
 		batchOperation.setTags(operation.getTags());
 
 		Response response = new Response();
@@ -564,8 +418,7 @@ public class ResourceOpenAPIParser {
 	}
 
 	private static List<Parameter> _getBatchParameters(
-		BatchOperationType batchOperationType, Operation operation,
-		String schemaName) {
+		Operation operation, String schemaName) {
 
 		List<Parameter> parameters = new ArrayList<>();
 
@@ -575,33 +428,24 @@ public class ResourceOpenAPIParser {
 			}
 		}
 
-		parameters.add(_getQueryParameter(null, "callbackURL"));
-
-		if (batchOperationType == BatchOperationType.EXPORT) {
-			parameters.add(_getQueryParameter("JSON", "contentType"));
-			parameters.add(_getQueryParameter(null, "fieldNames"));
-		}
+		parameters.add(_getCallbackURLParameter());
 
 		return parameters;
 	}
 
-	private static String _getBatchPath(
-		BatchOperationType batchOperationType, String path, String schemaName) {
+	private static Parameter _getCallbackURLParameter() {
+		Parameter parameter = new Parameter();
 
-		if (batchOperationType == BatchOperationType.EXPORT) {
-			return path + "/export-batch";
-		}
-		else if (batchOperationType == BatchOperationType.IMPORT) {
-			String batchPath = StringUtil.removeSubstrings(
-				path,
-				"/{" + StringUtil.lowerCaseFirstLetter(schemaName) + "Id}",
-				"/{id}");
+		parameter.setIn("query");
+		parameter.setName("callbackURL");
 
-			return batchPath + "/batch";
-		}
+		Schema schema = new Schema();
 
-		throw new IllegalStateException(
-			"Unsupported batch operation type: " + batchOperationType);
+		schema.setType("String");
+
+		parameter.setSchema(schema);
+
+		return parameter;
 	}
 
 	private static String _getDefaultValue(
@@ -655,10 +499,7 @@ public class ResourceOpenAPIParser {
 
 			if (StringUtil.equals(parameterName, "Accept-Language") ||
 				StringUtil.equals(parameterName, "aggregationTerms") ||
-				StringUtil.equals(parameterName, "fields") ||
 				StringUtil.equals(parameterName, "filter") ||
-				StringUtil.equals(parameterName, "nestedFields") ||
-				StringUtil.equals(parameterName, "restrictFields") ||
 				StringUtil.equals(parameterName, "sort")) {
 
 				continue;
@@ -681,7 +522,7 @@ public class ResourceOpenAPIParser {
 
 		String operationId = operation.getOperationId();
 
-		if ((operationId != null) && operationId.endsWith("PermissionsPage") &&
+		if ((operationId != null) && operationId.endsWith("Permission") &&
 			operationId.startsWith("put") && requestBodyMediaTypes.isEmpty()) {
 
 			javaMethodParameters.add(
@@ -1044,22 +885,13 @@ public class ResourceOpenAPIParser {
 	private static String _getParentSchema(
 		String path, Map<String, PathItem> pathItems, String schemaName) {
 
-		String basePath = path;
-
-		if (basePath.endsWith(
-				"/by-external-reference-code/{externalReferenceCode}")) {
-
-			basePath = StringUtil.removeLast(
-				path, "/by-external-reference-code/{externalReferenceCode}");
-		}
-
-		int lastIndexOfSlash = basePath.lastIndexOf("/");
+		int lastIndexOfSlash = path.lastIndexOf("/");
 
 		if (lastIndexOfSlash < 1) {
 			return null;
 		}
 
-		basePath = basePath.substring(0, lastIndexOfSlash);
+		String basePath = path.substring(0, lastIndexOfSlash);
 
 		if (basePath.equals("/asset-libraries/{assetLibraryId}")) {
 			return "AssetLibrary";
@@ -1089,24 +921,6 @@ public class ResourceOpenAPIParser {
 		return null;
 	}
 
-	private static Parameter _getQueryParameter(
-		String defaultValue, String parameterName) {
-
-		Parameter parameter = new Parameter();
-
-		parameter.setIn("query");
-		parameter.setName(parameterName);
-
-		Schema schema = new Schema();
-
-		schema.setDefault(defaultValue);
-		schema.setType("String");
-
-		parameter.setSchema(schema);
-
-		return parameter;
-	}
-
 	private static String _getReturnType(
 		Map<String, String> javaDataTypeMap, Operation operation, String path) {
 
@@ -1117,24 +931,25 @@ public class ResourceOpenAPIParser {
 		}
 
 		Integer httpStatusCode = null;
-		Response response = null;
 
 		Set<Map.Entry<ResponseCode, Response>> responseEntrySet =
 			responses.entrySet();
 
-		for (Map.Entry<ResponseCode, Response> responseEntry :
-				responseEntrySet) {
+		Stream<Map.Entry<ResponseCode, Response>> responseEntryStream =
+			responseEntrySet.stream();
 
-			ResponseCode responseCode = responseEntry.getKey();
+		Response response = responseEntryStream.filter(
+			responseEntry -> {
+				ResponseCode responseCode = responseEntry.getKey();
 
-			if (!responseCode.isDefaultResponse()) {
-				continue;
+				return responseCode.isDefaultResponse();
 			}
-
-			response = responseEntry.getValue();
-
-			break;
-		}
+		).findFirst(
+		).map(
+			Map.Entry::getValue
+		).orElse(
+			null
+		);
 
 		for (Map.Entry<ResponseCode, Response> entry : responses.entrySet()) {
 			ResponseCode responseCode = entry.getKey();
@@ -1250,23 +1065,11 @@ public class ResourceOpenAPIParser {
 	private static boolean _isValidParameter(String name, String schemaName) {
 		String schemaVarName = StringUtil.lowerCaseFirstLetter(schemaName);
 
-		if (StringUtil.equals(name, "aggregation") ||
-			StringUtil.equals(name, "aggregationTerms") ||
-			StringUtil.equals(name, "fields") ||
-			StringUtil.equals(name, "flatten") ||
-			StringUtil.equals(name, "id") ||
-			StringUtil.equals(name, "nestedFields") ||
-			StringUtil.equals(name, "page") ||
-			StringUtil.equals(name, "pageSize") ||
-			StringUtil.equals(name, "pagination") ||
-			StringUtil.equals(name, "restrictFields") ||
-			StringUtil.equals(name, schemaVarName) ||
-			StringUtil.equals(name, schemaVarName + "Id")) {
-
-			return false;
+		if (!name.equals(schemaVarName + "Id") && !name.equals(schemaVarName)) {
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	private static void _visitOperations(
@@ -1336,11 +1139,5 @@ public class ResourceOpenAPIParser {
 
 	private static final javax.ws.rs.core.Response.Status.Family
 		_FAMILY_SUCCESSFUL = javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
-
-	private enum BatchOperationType {
-
-		EXPORT, IMPORT
-
-	}
 
 }

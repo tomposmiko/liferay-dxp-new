@@ -16,10 +16,9 @@ package com.liferay.poshi.runner.logger;
 
 import com.liferay.poshi.core.PoshiContext;
 import com.liferay.poshi.core.PoshiGetterUtil;
-import com.liferay.poshi.core.PoshiStackTrace;
-import com.liferay.poshi.core.PoshiVariablesContext;
+import com.liferay.poshi.core.PoshiStackTraceUtil;
+import com.liferay.poshi.core.PoshiVariablesUtil;
 import com.liferay.poshi.core.util.FileUtil;
-import com.liferay.poshi.core.util.PropsValues;
 import com.liferay.poshi.core.util.StringUtil;
 import com.liferay.poshi.core.util.Validator;
 import com.liferay.poshi.runner.exception.PoshiRunnerLoggerException;
@@ -29,10 +28,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,30 +41,7 @@ import org.dom4j.Element;
  */
 public final class SummaryLogger {
 
-	public static void clear(String testNamespacedClassCommandName) {
-		if (_summaryLoggers.containsKey(testNamespacedClassCommandName)) {
-			SummaryLogger summaryLogger = _summaryLoggers.get(
-				testNamespacedClassCommandName);
-
-			summaryLogger.stopRunning();
-
-			_summaryLoggers.remove(testNamespacedClassCommandName);
-		}
-	}
-
-	public static synchronized SummaryLogger getSummaryLogger(
-		String testNamespacedClassCommandName) {
-
-		if (!_summaryLoggers.containsKey(testNamespacedClassCommandName)) {
-			_summaryLoggers.put(
-				testNamespacedClassCommandName,
-				new SummaryLogger(testNamespacedClassCommandName));
-		}
-
-		return _summaryLoggers.get(testNamespacedClassCommandName);
-	}
-
-	public void createSummaryReport() throws Exception {
+	public static void createSummaryReport() throws Exception {
 		String summaryHTMLContent = _readResource(
 			"META-INF/resources/html/summary.html");
 
@@ -90,23 +64,20 @@ public final class SummaryLogger {
 			summaryHTMLContent, "<ul id=\"summaryTitleContainer\" />",
 			_summaryTitleContainerLoggerElement.toString());
 
-		summaryHTMLContent = StringUtil.replace(
-			summaryHTMLContent, "<script defer src=\"../js/update_images.js\"",
-			"<script defer src=\"" + PropsValues.LOGGER_RESOURCES_URL +
-				"/js/update_images.js\"");
-
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(FileUtil.getCanonicalPath("."));
 		sb.append("/test-results/");
 		sb.append(
-			StringUtil.replace(getTestNamespacedClassCommandName(), "#", "_"));
+			StringUtil.replace(
+				PoshiContext.getTestCaseNamespacedClassCommandName(), "#",
+				"_"));
 		sb.append("/summary.html");
 
 		FileUtil.write(sb.toString(), summaryHTMLContent);
 	}
 
-	public void failSummary(
+	public static void failSummary(
 		Element element, String message, int screenshotNumber) {
 
 		if (_isCurrentMajorStep(element)) {
@@ -129,7 +100,7 @@ public final class SummaryLogger {
 		}
 	}
 
-	public LoggerElement getSummarySnapshotLoggerElement() {
+	public static LoggerElement getSummarySnapshotLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("summary-log");
@@ -156,11 +127,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	public String getTestNamespacedClassCommandName() {
-		return _testNamespacedClassCommandName;
-	}
-
-	public void passSummary(Element element) {
+	public static void passSummary(Element element) {
 		if (_isCurrentMajorStep(element)) {
 			if (_containsMinorStepWarning) {
 				_warnStepLoggerElement(_majorStepLoggerElement);
@@ -181,7 +148,7 @@ public final class SummaryLogger {
 		}
 	}
 
-	public void startMajorSteps() throws PoshiRunnerLoggerException {
+	public static void startMajorSteps() throws PoshiRunnerLoggerException {
 		try {
 			_causeBodyLoggerElement = _getCauseBodyLoggerElement();
 			_majorStepsLoggerElement = _getMajorStepsLoggerElement();
@@ -193,7 +160,7 @@ public final class SummaryLogger {
 		}
 	}
 
-	public void startRunning() {
+	public static void startRunning() {
 		_containsMinorStepWarning = false;
 
 		_summaryContentContainerLoggerElement = new LoggerElement(
@@ -216,7 +183,7 @@ public final class SummaryLogger {
 		_warningCount = 0;
 	}
 
-	public void startSummary(Element element) throws Exception {
+	public static void startSummary(Element element) throws Exception {
 		try {
 			if (_isMajorStep(element)) {
 				_startMajorStep(element);
@@ -247,11 +214,11 @@ public final class SummaryLogger {
 		}
 	}
 
-	public void stopRunning() {
+	public static void stopRunning() {
 		_stopMajorStep();
 	}
 
-	public void warnSummary(Element element, String message) {
+	public static void warnSummary(Element element, String message) {
 		if (_isCurrentMajorStep(element)) {
 			_causeBodyLoggerElement.setText(message);
 
@@ -279,16 +246,9 @@ public final class SummaryLogger {
 		}
 	}
 
-	private SummaryLogger(String testNamespacedClassCommandName) {
-		_testNamespacedClassCommandName = testNamespacedClassCommandName;
+	private static void _failStepLoggerElement(
+		LoggerElement stepLoggerElement) {
 
-		_poshiStackTrace = PoshiStackTrace.getPoshiStackTrace(
-			testNamespacedClassCommandName);
-		_poshiVariablesContext = PoshiVariablesContext.getPoshiVariablesContext(
-			testNamespacedClassCommandName);
-	}
-
-	private void _failStepLoggerElement(LoggerElement stepLoggerElement) {
 		stepLoggerElement.addClassName("summary-failure");
 
 		LoggerElement lineContainerLoggerElement =
@@ -303,7 +263,7 @@ public final class SummaryLogger {
 		lineContainerLoggerElement.setName("strong");
 	}
 
-	private LoggerElement _getButtonLoggerElement() {
+	private static LoggerElement _getButtonLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("btn header");
@@ -313,7 +273,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getCauseBodyLoggerElement() {
+	private static LoggerElement _getCauseBodyLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("cause-body");
@@ -322,7 +282,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getCauseHeaderLoggerElement() {
+	private static LoggerElement _getCauseHeaderLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("cause-header");
@@ -332,7 +292,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getCauseLoggerElement() {
+	private static LoggerElement _getCauseLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("cause");
@@ -343,7 +303,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getMajorStepLoggerElement(Element element)
+	private static LoggerElement _getMajorStepLoggerElement(Element element)
 		throws Exception {
 
 		LoggerElement loggerElement = new LoggerElement();
@@ -359,7 +319,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getMajorStepsLoggerElement() {
+	private static LoggerElement _getMajorStepsLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("major-steps");
@@ -368,7 +328,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getMinorStepLoggerElement(Element element)
+	private static LoggerElement _getMinorStepLoggerElement(Element element)
 		throws Exception {
 
 		LoggerElement loggerElement = new LoggerElement();
@@ -382,7 +342,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getMinorStepsLoggerElement() {
+	private static LoggerElement _getMinorStepsLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("content minor-steps");
@@ -391,7 +351,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getScreenshotsAfterHeaderLoggerElement() {
+	private static LoggerElement _getScreenshotsAfterHeaderLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setText("After Failure:");
@@ -400,7 +360,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getScreenshotsAfterLinkLoggerElement(
+	private static LoggerElement _getScreenshotsAfterLinkLoggerElement(
 		int screenshotNumber) {
 
 		LoggerElement loggerElement = new LoggerElement();
@@ -422,7 +382,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getScreenshotsAfterThumbnailLoggerElement(
+	private static LoggerElement _getScreenshotsAfterThumbnailLoggerElement(
 		int screenshotNumber) {
 
 		LoggerElement loggerElement = new LoggerElement();
@@ -443,7 +403,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getScreenshotsBeforeHeaderLoggerElement() {
+	private static LoggerElement _getScreenshotsBeforeHeaderLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setText("Before Failure:");
@@ -452,7 +412,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getScreenshotsBeforeLinkLoggerElement(
+	private static LoggerElement _getScreenshotsBeforeLinkLoggerElement(
 		int screenshotNumber) {
 
 		LoggerElement loggerElement = new LoggerElement();
@@ -474,7 +434,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getScreenshotsBeforeThumbnailLoggerElement(
+	private static LoggerElement _getScreenshotsBeforeThumbnailLoggerElement(
 		int screenshotNumber) {
 
 		LoggerElement loggerElement = new LoggerElement();
@@ -495,7 +455,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getScreenshotsHeaderLoggerElement() {
+	private static LoggerElement _getScreenshotsHeaderLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("screenshots-header");
@@ -505,7 +465,9 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getScreenshotsLoggerElement(int screenshotNumber) {
+	private static LoggerElement _getScreenshotsLoggerElement(
+		int screenshotNumber) {
+
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("screenshots");
@@ -526,7 +488,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getStatusLoggerElement(String status) {
+	private static LoggerElement _getStatusLoggerElement(String status) {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("status");
@@ -537,7 +499,8 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getStepDescriptionLoggerElement(Element element)
+	private static LoggerElement _getStepDescriptionLoggerElement(
+			Element element)
 		throws Exception {
 
 		LoggerElement loggerElement = new LoggerElement();
@@ -548,7 +511,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getStepsHeaderLoggerElement() {
+	private static LoggerElement _getStepsHeaderLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("steps-header");
@@ -558,7 +521,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getStepsLoggerElement() {
+	private static LoggerElement _getStepsLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("steps");
@@ -569,7 +532,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private String _getSummary(Element element) throws Exception {
+	private static String _getSummary(Element element) throws Exception {
 		String summary = null;
 
 		if (element.attributeValue("summary") != null) {
@@ -598,9 +561,6 @@ public final class SummaryLogger {
 					"macro-summary");
 				classType = "macro-summary";
 			}
-			else if (element.attributeValue("method") != null) {
-				return element.attributeValue("method");
-			}
 			else {
 				return null;
 			}
@@ -610,7 +570,8 @@ public final class SummaryLogger {
 					getClassCommandNameFromNamespacedClassCommandName(
 						namespacedClassCommandName);
 
-			String namespace = _poshiStackTrace.getCurrentNamespace();
+			String namespace = PoshiStackTraceUtil.getCurrentNamespace(
+				namespacedClassCommandName);
 
 			if (classType.startsWith("function")) {
 				summary = PoshiContext.getFunctionCommandSummary(
@@ -624,7 +585,7 @@ public final class SummaryLogger {
 
 		if (summary != null) {
 			summary = HtmlUtil.escape(
-				_poshiVariablesContext.getReplacedCommandVarsString(summary));
+				PoshiVariablesUtil.getReplacedCommandVarsString(summary));
 
 			return _replaceExecuteVars(summary, element);
 		}
@@ -632,7 +593,7 @@ public final class SummaryLogger {
 		return null;
 	}
 
-	private LoggerElement _getSummaryContentLoggerElement() {
+	private static LoggerElement _getSummaryContentLoggerElement() {
 		LoggerElement loggerElement = _summaryLogLoggerElement.copy();
 
 		LoggerElement stepsLoggerElement = loggerElement.loggerElement("div");
@@ -684,7 +645,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getSummaryLogLoggerElement() {
+	private static LoggerElement _getSummaryLogLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setClassName("summary-log");
@@ -696,12 +657,12 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getSummaryTestDescriptionLoggerElement() {
+	private static LoggerElement _getSummaryTestDescriptionLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement(
 			"summaryTestDescription");
 
 		String testCaseDescription = PoshiContext.getTestCaseDescription(
-			getTestNamespacedClassCommandName());
+			PoshiContext.getTestCaseNamespacedClassCommandName());
 
 		if (Validator.isNull(testCaseDescription)) {
 			testCaseDescription = "";
@@ -713,16 +674,19 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getSummaryTestNameLoggerElement() {
+	private static LoggerElement _getSummaryTestNameLoggerElement() {
 		LoggerElement loggerElement = new LoggerElement("summaryTestName");
 
 		loggerElement.setName("h3");
-		loggerElement.setText(getTestNamespacedClassCommandName());
+		loggerElement.setText(
+			PoshiContext.getTestCaseNamespacedClassCommandName());
 
 		return loggerElement;
 	}
 
-	private LoggerElement _getSummaryTitleLinkLoggerElement(String title) {
+	private static LoggerElement _getSummaryTitleLinkLoggerElement(
+		String title) {
+
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setAttribute("href", "#");
@@ -732,7 +696,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private LoggerElement _getSummaryTitleLoggerElement(String title) {
+	private static LoggerElement _getSummaryTitleLoggerElement(String title) {
 		LoggerElement loggerElement = new LoggerElement();
 
 		loggerElement.setName("li");
@@ -743,7 +707,7 @@ public final class SummaryLogger {
 		return loggerElement;
 	}
 
-	private boolean _isCurrentMajorStep(Element element) {
+	private static boolean _isCurrentMajorStep(Element element) {
 		if (element == _majorStepElement) {
 			return true;
 		}
@@ -751,7 +715,7 @@ public final class SummaryLogger {
 		return false;
 	}
 
-	private boolean _isCurrentMinorStep(Element element) {
+	private static boolean _isCurrentMinorStep(Element element) {
 		if (element == _minorStepElement) {
 			return true;
 		}
@@ -759,7 +723,7 @@ public final class SummaryLogger {
 		return false;
 	}
 
-	private boolean _isMajorStep(Element element) throws Exception {
+	private static boolean _isMajorStep(Element element) throws Exception {
 		String summary = _getSummary(element);
 
 		if (summary == null) {
@@ -768,8 +732,7 @@ public final class SummaryLogger {
 
 		if (!Objects.equals(element.getName(), "condition") &&
 			!Objects.equals(element.getName(), "execute") &&
-			!Objects.equals(element.getName(), "task") &&
-			!Objects.equals(element.getName(), "var")) {
+			!Objects.equals(element.getName(), "task")) {
 
 			return false;
 		}
@@ -778,7 +741,6 @@ public final class SummaryLogger {
 			Validator.isNull(element.attributeValue("function-summary")) &&
 			Validator.isNull(element.attributeValue("macro")) &&
 			Validator.isNull(element.attributeValue("macro-summary")) &&
-			Validator.isNull(element.attributeValue("method")) &&
 			Validator.isNull(element.attributeValue("summary"))) {
 
 			return false;
@@ -791,7 +753,7 @@ public final class SummaryLogger {
 		return true;
 	}
 
-	private boolean _isMinorStep(Element element) throws Exception {
+	private static boolean _isMinorStep(Element element) throws Exception {
 		String summary = _getSummary(element);
 
 		if ((summary == null) ||
@@ -806,7 +768,9 @@ public final class SummaryLogger {
 		return true;
 	}
 
-	private void _passStepLoggerElement(LoggerElement stepLoggerElement) {
+	private static void _passStepLoggerElement(
+		LoggerElement stepLoggerElement) {
+
 		LoggerElement lineContainerLoggerElement =
 			stepLoggerElement.loggerElement("div");
 
@@ -814,7 +778,7 @@ public final class SummaryLogger {
 			_getStatusLoggerElement("PASSED"));
 	}
 
-	private String _readResource(String path) throws Exception {
+	private static String _readResource(String path) throws Exception {
 		StringBuilder sb = new StringBuilder();
 
 		ClassLoader classLoader = SummaryLogger.class.getClassLoader();
@@ -838,7 +802,7 @@ public final class SummaryLogger {
 		return sb.toString();
 	}
 
-	private void _removeUnneededStepsFromLoggerElement(
+	private static void _removeUnneededStepsFromLoggerElement(
 		LoggerElement loggerElement) {
 
 		LoggerElement majorStepsLoggerElement = loggerElement.loggerElement(
@@ -868,27 +832,26 @@ public final class SummaryLogger {
 		}
 	}
 
-	private String _replaceExecuteVars(String token, Element element)
+	private static String _replaceExecuteVars(String token, Element element)
 		throws Exception {
 
 		Matcher matcher = _pattern.matcher(token);
 
 		while (matcher.find() &&
-			   _poshiVariablesContext.containsKeyInExecuteMap(
-				   matcher.group(1))) {
+			   PoshiVariablesUtil.containsKeyInExecuteMap(matcher.group(1))) {
 
 			String varName = matcher.group(1);
 
 			String varValue = HtmlUtil.escape(
-				_poshiVariablesContext.getStringFromExecuteMap(varName));
+				PoshiVariablesUtil.getStringFromExecuteMap(varName));
 
 			if ((element.attributeValue("function") != null) &&
 				varName.startsWith("locator")) {
 
 				varName = StringUtil.replace(varName, "locator", "locator-key");
 
-				String locatorKey =
-					_poshiVariablesContext.getStringFromExecuteMap(varName);
+				String locatorKey = PoshiVariablesUtil.getStringFromExecuteMap(
+					varName);
 
 				if (Validator.isNotNull(locatorKey)) {
 					StringBuilder sb = new StringBuilder();
@@ -909,15 +872,15 @@ public final class SummaryLogger {
 		return token;
 	}
 
-	private void _startMajorStep(Element element) {
+	private static void _startMajorStep(Element element) {
 		_majorStepElement = element;
 	}
 
-	private void _startMinorStep(Element element) {
+	private static void _startMinorStep(Element element) {
 		_minorStepElement = element;
 	}
 
-	private void _stopMajorStep() {
+	private static void _stopMajorStep() {
 		_majorStepElement = null;
 		_majorStepLoggerElement = null;
 		_minorStepElement = null;
@@ -925,12 +888,14 @@ public final class SummaryLogger {
 		_minorStepsLoggerElement = null;
 	}
 
-	private void _stopMinorStep() {
+	private static void _stopMinorStep() {
 		_minorStepElement = null;
 		_minorStepLoggerElement = null;
 	}
 
-	private void _warnStepLoggerElement(LoggerElement stepLoggerElement) {
+	private static void _warnStepLoggerElement(
+		LoggerElement stepLoggerElement) {
+
 		stepLoggerElement.addClassName("summary-warning");
 
 		LoggerElement lineContainerLoggerElement =
@@ -945,25 +910,19 @@ public final class SummaryLogger {
 		lineContainerLoggerElement.setName("strong");
 	}
 
+	private static LoggerElement _causeBodyLoggerElement;
+	private static boolean _containsMinorStepWarning;
+	private static Element _majorStepElement;
+	private static LoggerElement _majorStepLoggerElement;
+	private static LoggerElement _majorStepsLoggerElement;
+	private static Element _minorStepElement;
+	private static LoggerElement _minorStepLoggerElement;
+	private static LoggerElement _minorStepsLoggerElement;
 	private static final Pattern _pattern = Pattern.compile("\\$\\{([^}]*)\\}");
-	private static final Map<String, SummaryLogger> _summaryLoggers =
-		new HashMap<>();
-
-	private LoggerElement _causeBodyLoggerElement;
-	private boolean _containsMinorStepWarning;
-	private Element _majorStepElement;
-	private LoggerElement _majorStepLoggerElement;
-	private LoggerElement _majorStepsLoggerElement;
-	private Element _minorStepElement;
-	private LoggerElement _minorStepLoggerElement;
-	private LoggerElement _minorStepsLoggerElement;
-	private final PoshiStackTrace _poshiStackTrace;
-	private final PoshiVariablesContext _poshiVariablesContext;
-	private LoggerElement _summaryContentContainerLoggerElement;
-	private LoggerElement _summaryContentWrapperLoggerElement;
-	private LoggerElement _summaryLogLoggerElement;
-	private LoggerElement _summaryTitleContainerLoggerElement;
-	private final String _testNamespacedClassCommandName;
-	private int _warningCount;
+	private static LoggerElement _summaryContentContainerLoggerElement;
+	private static LoggerElement _summaryContentWrapperLoggerElement;
+	private static LoggerElement _summaryLogLoggerElement;
+	private static LoggerElement _summaryTitleContainerLoggerElement;
+	private static int _warningCount;
 
 }

@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Bryan Engler
  */
-@Component(service = RescoreBuilderFactory.class)
+@Component(immediate = true, service = RescoreBuilderFactory.class)
 public class RescoreBuilderFactoryImpl implements RescoreBuilderFactory {
 
 	@Override

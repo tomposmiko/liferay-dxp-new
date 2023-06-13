@@ -13,7 +13,6 @@
  */
 
 import {useEventListener} from '@liferay/frontend-js-react-web';
-import {setSessionValue} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
 import LayoutReports from './components/LayoutReports';
@@ -24,64 +23,37 @@ import SidebarHeader from './components/SidebarHeader';
 import {ConstantsContextProvider} from './context/ConstantsContext';
 
 export default function App(props) {
-	const {isPanelStateOpen} = props;
+	const {portletNamespace} = props;
 
 	const layoutReportsPanelToggle = document.getElementById(
-		`layoutReportsPanelToggleId`
+		`${portletNamespace}layoutReportsPanelToggleId`
 	);
-
-	const layoutReportsPanelId = document.getElementById(
-		`layoutReportsPanelId`
-	);
-
-	const sidenavInstance = Liferay.SideNavigation.instance(
-		layoutReportsPanelToggle
-	);
-
-	if (isPanelStateOpen) {
-		layoutReportsPanelToggle.setAttribute('aria-pressed', true);
-	}
-
-	const handleKeydownPanel = (event) => {
-		if (event.key === 'Escape') {
-			sidenavInstance.toggle();
-		}
-	};
 
 	useEffect(() => {
+		const sidenavInstance = Liferay.SideNavigation.instance(
+			layoutReportsPanelToggle
+		);
+
 		sidenavInstance.on('open.lexicon.sidenav', () => {
-			setSessionValue(
+			Liferay.Util.Session.set(
 				'com.liferay.layout.reports.web_layoutReportsPanelState',
 				'open'
 			);
-
-			layoutReportsPanelToggle.setAttribute('aria-pressed', true);
-			layoutReportsPanelId.focus();
 		});
 
 		sidenavInstance.on('closed.lexicon.sidenav', () => {
-			setSessionValue(
+			Liferay.Util.Session.set(
 				'com.liferay.layout.reports.web_layoutReportsPanelState',
 				'closed'
 			);
-
-			layoutReportsPanelToggle.setAttribute('aria-pressed', false);
-			layoutReportsPanelToggle.focus();
 		});
 
 		Liferay.once('screenLoad', () => {
 			Liferay.SideNavigation.destroy(layoutReportsPanelToggle);
 		});
-	}, [layoutReportsPanelToggle, layoutReportsPanelId, sidenavInstance]);
+	}, [layoutReportsPanelToggle, portletNamespace]);
 
 	const [eventTriggered, setEventTriggered] = useState(false);
-
-	useEventListener(
-		'keydown',
-		handleKeydownPanel,
-		false,
-		layoutReportsPanelId
-	);
 
 	useEventListener(
 		'mouseenter',
@@ -101,7 +73,6 @@ export default function App(props) {
 		<ConstantsContextProvider constants={props}>
 			<StoreContextProvider>
 				<SidebarHeader />
-
 				<SidebarBody>
 					<LayoutReports eventTriggered={eventTriggered} />
 				</SidebarBody>

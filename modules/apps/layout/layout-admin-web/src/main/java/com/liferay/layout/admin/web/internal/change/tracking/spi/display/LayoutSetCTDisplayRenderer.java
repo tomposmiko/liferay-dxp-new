@@ -17,11 +17,11 @@ package com.liferay.layout.admin.web.internal.change.tracking.spi.display;
 import com.liferay.change.tracking.spi.display.BaseCTDisplayRenderer;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSet;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.GroupPermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -93,19 +93,25 @@ public class LayoutSetCTDisplayRenderer
 	public String getTitle(Locale locale, LayoutSet layoutSet)
 		throws PortalException {
 
+		String title = "pages";
+
 		Group group = layoutSet.getGroup();
 
 		if (!group.isLayoutSetPrototype() && !group.isLayoutPrototype()) {
-			return group.getLayoutRootNodeName(
-				layoutSet.isPrivateLayout(), locale);
+			if (layoutSet.isPrivateLayout()) {
+				title = "private-pages";
+			}
+			else {
+				title = "public-pages";
+			}
 		}
 
-		return _language.get(locale, "page-set");
+		return _language.get(locale, title);
 	}
 
 	@Override
 	public String getTypeName(Locale locale) {
-		return _language.get(locale, "page-set");
+		return _language.get(locale, "pages");
 	}
 
 	@Reference

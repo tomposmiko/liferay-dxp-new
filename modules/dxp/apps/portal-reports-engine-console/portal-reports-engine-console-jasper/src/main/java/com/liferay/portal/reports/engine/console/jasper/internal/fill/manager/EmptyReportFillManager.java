@@ -21,7 +21,8 @@ import org.osgi.service.component.annotations.Component;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	property = "reportDataSourceType=empty", service = ReportFillManager.class
+	immediate = true, property = "reportDataSourceType=empty",
+	service = ReportFillManager.class
 )
 public class EmptyReportFillManager extends BaseReportFillManager {
 }

@@ -30,7 +30,7 @@ AssetEntryResult assetEntryResult = (AssetEntryResult)request.getAttribute("view
 
 <%
 for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
-	AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
+	AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(assetEntry.getClassNameId());
 
 	if (assetRendererFactory == null) {
 		continue;
@@ -48,7 +48,7 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 	}
 	catch (Exception e) {
 		if (_log.isWarnEnabled()) {
-			_log.warn(e);
+			_log.warn(e, e);
 		}
 	}
 
@@ -61,9 +61,7 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 	request.setAttribute("view.jsp-assetRendererFactory", assetRendererFactory);
 %>
 
-	<liferay-util:include page="/view_asset_entry_full_content.jsp" servletContext="<%= application %>">
-		<liferay-util:param name="viewSingleAsset" value="false" />
-	</liferay-util:include>
+	<liferay-util:include page="/view_asset_entry_full_content.jsp" servletContext="<%= application %>" />
 
 <%
 }

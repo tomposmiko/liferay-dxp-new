@@ -16,6 +16,7 @@ package com.liferay.portlet.announcements.model.impl;
 
 import com.liferay.announcements.kernel.model.AnnouncementsFlag;
 import com.liferay.announcements.kernel.model.AnnouncementsFlagModel;
+import com.liferay.announcements.kernel.model.AnnouncementsFlagSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -35,15 +36,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -157,6 +161,57 @@ public class AnnouncementsFlagModelImpl
 	@Deprecated
 	public static final long CREATEDATE_COLUMN_BITMASK = 16L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AnnouncementsFlag toModel(AnnouncementsFlagSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		AnnouncementsFlag model = new AnnouncementsFlagImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setFlagId(soapModel.getFlagId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setEntryId(soapModel.getEntryId());
+		model.setValue(soapModel.getValue());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<AnnouncementsFlag> toModels(
+		AnnouncementsFlagSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<AnnouncementsFlag> models = new ArrayList<AnnouncementsFlag>(
+			soapModels.length);
+
+		for (AnnouncementsFlagSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.announcements.kernel.model.AnnouncementsFlag"));
@@ -237,90 +292,97 @@ public class AnnouncementsFlagModelImpl
 	public Map<String, Function<AnnouncementsFlag, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AnnouncementsFlag, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AnnouncementsFlag>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<AnnouncementsFlag, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AnnouncementsFlag.class.getClassLoader(), AnnouncementsFlag.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<AnnouncementsFlag, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<AnnouncementsFlag, Object>>();
+		try {
+			Constructor<AnnouncementsFlag> constructor =
+				(Constructor<AnnouncementsFlag>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AnnouncementsFlag::getMvccVersion);
-			attributeGetterFunctions.put(
-				"flagId", AnnouncementsFlag::getFlagId);
-			attributeGetterFunctions.put(
-				"companyId", AnnouncementsFlag::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", AnnouncementsFlag::getUserId);
-			attributeGetterFunctions.put(
-				"createDate", AnnouncementsFlag::getCreateDate);
-			attributeGetterFunctions.put(
-				"entryId", AnnouncementsFlag::getEntryId);
-			attributeGetterFunctions.put("value", AnnouncementsFlag::getValue);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AnnouncementsFlag, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AnnouncementsFlag, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<AnnouncementsFlag, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AnnouncementsFlag, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<AnnouncementsFlag, Object>>();
+		Map<String, BiConsumer<AnnouncementsFlag, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<AnnouncementsFlag, ?>>();
 
-		static {
-			Map<String, BiConsumer<AnnouncementsFlag, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<AnnouncementsFlag, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", AnnouncementsFlag::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AnnouncementsFlag, Long>)
+				AnnouncementsFlag::setMvccVersion);
+		attributeGetterFunctions.put("flagId", AnnouncementsFlag::getFlagId);
+		attributeSetterBiConsumers.put(
+			"flagId",
+			(BiConsumer<AnnouncementsFlag, Long>)AnnouncementsFlag::setFlagId);
+		attributeGetterFunctions.put(
+			"companyId", AnnouncementsFlag::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AnnouncementsFlag, Long>)
+				AnnouncementsFlag::setCompanyId);
+		attributeGetterFunctions.put("userId", AnnouncementsFlag::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<AnnouncementsFlag, Long>)AnnouncementsFlag::setUserId);
+		attributeGetterFunctions.put(
+			"createDate", AnnouncementsFlag::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<AnnouncementsFlag, Date>)
+				AnnouncementsFlag::setCreateDate);
+		attributeGetterFunctions.put("entryId", AnnouncementsFlag::getEntryId);
+		attributeSetterBiConsumers.put(
+			"entryId",
+			(BiConsumer<AnnouncementsFlag, Long>)AnnouncementsFlag::setEntryId);
+		attributeGetterFunctions.put("value", AnnouncementsFlag::getValue);
+		attributeSetterBiConsumers.put(
+			"value",
+			(BiConsumer<AnnouncementsFlag, Integer>)
+				AnnouncementsFlag::setValue);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AnnouncementsFlag, Long>)
-					AnnouncementsFlag::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"flagId",
-				(BiConsumer<AnnouncementsFlag, Long>)
-					AnnouncementsFlag::setFlagId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AnnouncementsFlag, Long>)
-					AnnouncementsFlag::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<AnnouncementsFlag, Long>)
-					AnnouncementsFlag::setUserId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<AnnouncementsFlag, Date>)
-					AnnouncementsFlag::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"entryId",
-				(BiConsumer<AnnouncementsFlag, Long>)
-					AnnouncementsFlag::setEntryId);
-			attributeSetterBiConsumers.put(
-				"value",
-				(BiConsumer<AnnouncementsFlag, Integer>)
-					AnnouncementsFlag::setValue);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -734,12 +796,41 @@ public class AnnouncementsFlagModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AnnouncementsFlag, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AnnouncementsFlag, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AnnouncementsFlag, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((AnnouncementsFlag)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AnnouncementsFlag>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AnnouncementsFlag.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -753,8 +844,7 @@ public class AnnouncementsFlagModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<AnnouncementsFlag, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

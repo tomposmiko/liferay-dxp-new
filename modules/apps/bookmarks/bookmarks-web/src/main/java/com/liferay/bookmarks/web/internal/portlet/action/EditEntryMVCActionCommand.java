@@ -35,7 +35,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -57,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Levente Hudák
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS,
 		"javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS_ADMIN,
@@ -67,109 +68,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			BookmarksEntry entry = null;
-
-			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				entry = _updateEntry(actionRequest);
-			}
-			else if (cmd.equals(Constants.DELETE)) {
-				_deleteEntry(actionRequest, false);
-			}
-			else if (cmd.equals(Constants.MOVE)) {
-				_moveEntries(actionRequest);
-			}
-			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
-				_deleteEntry(actionRequest, true);
-			}
-			else if (cmd.equals(Constants.RESTORE)) {
-				restoreTrashEntries(actionRequest);
-			}
-			else if (cmd.equals(Constants.SUBSCRIBE)) {
-				_subscribeEntry(actionRequest);
-			}
-			else if (cmd.equals(Constants.UNSUBSCRIBE)) {
-				_unsubscribeEntry(actionRequest);
-			}
-
-			String portletResource = ParamUtil.getString(
-				actionRequest, "portletResource");
-
-			if (Validator.isNotNull(portletResource)) {
-				hideDefaultSuccessMessage(actionRequest);
-
-				MultiSessionMessages.add(
-					actionRequest, portletResource + "requestProcessed");
-			}
-
-			String redirect = _portal.escapeRedirect(
-				ParamUtil.getString(actionRequest, "redirect"));
-
-			if (Validator.isNotNull(redirect)) {
-				if (cmd.equals(Constants.ADD) && (entry != null)) {
-					String portletId = HttpComponentsUtil.getParameter(
-						redirect, "portletResource", false);
-
-					String namespace = _portal.getPortletNamespace(portletId);
-
-					if (Validator.isNotNull(portletId)) {
-						redirect = HttpComponentsUtil.addParameter(
-							redirect, namespace + "className",
-							BookmarksEntry.class.getName());
-						redirect = HttpComponentsUtil.addParameter(
-							redirect, namespace + "classPK",
-							entry.getEntryId());
-					}
-				}
-
-				actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof NoSuchEntryException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-
-				actionResponse.setRenderParameter(
-					"mvcPath", "/bookmarks/error.jsp");
-			}
-			else if (exception instanceof EntryURLException ||
-					 exception instanceof NoSuchFolderException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-			}
-			else if (exception instanceof AssetCategoryException ||
-					 exception instanceof AssetTagException) {
-
-				SessionErrors.add(
-					actionRequest, exception.getClass(), exception);
-			}
-			else {
-				throw exception;
-			}
-		}
-	}
-
-	protected void restoreTrashEntries(ActionRequest actionRequest)
-		throws Exception {
-
-		long[] restoreTrashEntryIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "restoreTrashEntryIds"), 0L);
-
-		for (long restoreTrashEntryId : restoreTrashEntryIds) {
-			_trashEntryService.restoreEntry(restoreTrashEntryId);
-		}
-	}
-
-	private void _deleteEntry(ActionRequest actionRequest, boolean moveToTrash)
+	protected void deleteEntry(ActionRequest actionRequest, boolean moveToTrash)
 		throws Exception {
 
 		long[] deleteEntryIds = null;
@@ -222,7 +121,98 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private void _moveEntries(ActionRequest actionRequest) throws Exception {
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			BookmarksEntry entry = null;
+
+			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+				entry = updateEntry(actionRequest);
+			}
+			else if (cmd.equals(Constants.DELETE)) {
+				deleteEntry(actionRequest, false);
+			}
+			else if (cmd.equals(Constants.MOVE)) {
+				moveEntries(actionRequest);
+			}
+			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
+				deleteEntry(actionRequest, true);
+			}
+			else if (cmd.equals(Constants.RESTORE)) {
+				restoreTrashEntries(actionRequest);
+			}
+			else if (cmd.equals(Constants.SUBSCRIBE)) {
+				subscribeEntry(actionRequest);
+			}
+			else if (cmd.equals(Constants.UNSUBSCRIBE)) {
+				unsubscribeEntry(actionRequest);
+			}
+
+			String portletResource = ParamUtil.getString(
+				actionRequest, "portletResource");
+
+			if (Validator.isNotNull(portletResource)) {
+				hideDefaultSuccessMessage(actionRequest);
+
+				MultiSessionMessages.add(
+					actionRequest, portletResource + "requestProcessed");
+			}
+
+			String redirect = _portal.escapeRedirect(
+				ParamUtil.getString(actionRequest, "redirect"));
+
+			if (Validator.isNotNull(redirect)) {
+				if (cmd.equals(Constants.ADD) && (entry != null)) {
+					String portletId = _http.getParameter(
+						redirect, "portletResource", false);
+
+					String namespace = _portal.getPortletNamespace(portletId);
+
+					if (Validator.isNotNull(portletId)) {
+						redirect = _http.addParameter(
+							redirect, namespace + "className",
+							BookmarksEntry.class.getName());
+						redirect = _http.addParameter(
+							redirect, namespace + "classPK",
+							entry.getEntryId());
+					}
+				}
+
+				actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof NoSuchEntryException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+
+				actionResponse.setRenderParameter(
+					"mvcPath", "/bookmarks/error.jsp");
+			}
+			else if (exception instanceof EntryURLException ||
+					 exception instanceof NoSuchFolderException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+			}
+			else if (exception instanceof AssetCategoryException ||
+					 exception instanceof AssetTagException) {
+
+				SessionErrors.add(
+					actionRequest, exception.getClass(), exception);
+			}
+			else {
+				throw exception;
+			}
+		}
+	}
+
+	protected void moveEntries(ActionRequest actionRequest) throws Exception {
 		long newFolderId = ParamUtil.getLong(actionRequest, "newFolderId");
 
 		long[] folderIds = ParamUtil.getLongValues(
@@ -240,13 +230,26 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private void _subscribeEntry(ActionRequest actionRequest) throws Exception {
+	protected void restoreTrashEntries(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] restoreTrashEntryIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "restoreTrashEntryIds"), 0L);
+
+		for (long restoreTrashEntryId : restoreTrashEntryIds) {
+			_trashEntryService.restoreEntry(restoreTrashEntryId);
+		}
+	}
+
+	protected void subscribeEntry(ActionRequest actionRequest)
+		throws Exception {
+
 		long entryId = ParamUtil.getLong(actionRequest, "entryId");
 
 		_bookmarksEntryService.subscribeEntry(entryId);
 	}
 
-	private void _unsubscribeEntry(ActionRequest actionRequest)
+	protected void unsubscribeEntry(ActionRequest actionRequest)
 		throws Exception {
 
 		long entryId = ParamUtil.getLong(actionRequest, "entryId");
@@ -254,7 +257,7 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		_bookmarksEntryService.unsubscribeEntry(entryId);
 	}
 
-	private BookmarksEntry _updateEntry(ActionRequest actionRequest)
+	protected BookmarksEntry updateEntry(ActionRequest actionRequest)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -297,6 +300,9 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private BookmarksFolderService _bookmarksFolderService;
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private Portal _portal;

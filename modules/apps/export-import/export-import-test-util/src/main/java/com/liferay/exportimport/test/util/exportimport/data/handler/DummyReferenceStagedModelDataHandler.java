@@ -28,7 +28,12 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Akos Thurzo
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(
+	immediate = true,
+	service = {
+		DummyReferenceStagedModelDataHandler.class, StagedModelDataHandler.class
+	}
+)
 public class DummyReferenceStagedModelDataHandler
 	extends BaseStagedModelDataHandler<DummyReference> {
 
@@ -90,8 +95,17 @@ public class DummyReferenceStagedModelDataHandler
 	}
 
 	@Reference(
-		target = "(model.class.name=com.liferay.exportimport.test.util.model.DummyReference)"
+		target = "(model.class.name=com.liferay.exportimport.test.util.model.DummyReference)",
+		unbind = "-"
 	)
+	protected void setDummyReferenceStagedModelRepository(
+		StagedModelRepository<DummyReference>
+			dummyReferenceStagedModelRepository) {
+
+		_dummyReferenceStagedModelRepository =
+			dummyReferenceStagedModelRepository;
+	}
+
 	private StagedModelRepository<DummyReference>
 		_dummyReferenceStagedModelRepository;
 

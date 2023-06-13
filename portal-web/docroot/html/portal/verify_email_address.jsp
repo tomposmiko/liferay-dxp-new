@@ -71,7 +71,7 @@ String ticketKey = ParamUtil.getString(request, "ticketKey");
 				</div>
 			</c:if>
 
-			<aui:input class="lfr-input-text-container" label="email-verification-code" name="ticketKey" size="36" type="text" value="<%= ticketKey %>" />
+			<aui:input autoFocus="<%= true %>" class="lfr-input-text-container" label="email-verification-code" name="ticketKey" size="36" type="text" value="<%= ticketKey %>" />
 
 			<aui:button-row>
 				<aui:button type="submit" value="verify" />

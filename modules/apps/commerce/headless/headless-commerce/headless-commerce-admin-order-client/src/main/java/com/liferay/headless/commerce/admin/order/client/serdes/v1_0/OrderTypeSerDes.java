@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -58,7 +59,7 @@ public class OrderTypeSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (orderType.getActions() != null) {
 			if (sb.length() > 1) {
@@ -233,7 +234,7 @@ public class OrderTypeSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (orderType.getActions() == null) {
 			map.put("actions", null);
@@ -429,19 +430,15 @@ public class OrderTypeSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "orderTypeChannels")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					OrderTypeChannel[] orderTypeChannelsArray =
-						new OrderTypeChannel[jsonParserFieldValues.length];
-
-					for (int i = 0; i < orderTypeChannelsArray.length; i++) {
-						orderTypeChannelsArray[i] =
-							OrderTypeChannelSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
-					orderType.setOrderTypeChannels(orderTypeChannelsArray);
+					orderType.setOrderTypeChannels(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> OrderTypeChannelSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new OrderTypeChannel[size]
+						));
 				}
 			}
 			else if (Objects.equals(

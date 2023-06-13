@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -58,13 +59,14 @@ public class AssetCategoriesNavigationDisplayContext {
 		_httpServletRequest = httpServletRequest;
 		_renderResponse = renderResponse;
 
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		_hidePortletWhenEmpty = GetterUtil.getBoolean(
-			(String)httpServletRequest.getAttribute(
+			(String)_httpServletRequest.getAttribute(
 				"liferay-asset:asset-tags-navigation:hidePortletWhenEmpty"));
 		_vocabularyIds = (long[])httpServletRequest.getAttribute(
 			"liferay-asset:asset-tags-navigation:vocabularyIds");
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
 	}
 
 	public long getCategoryId() {
@@ -182,7 +184,8 @@ public class AssetCategoriesNavigationDisplayContext {
 		).put(
 			"id", category.getCategoryId()
 		).put(
-			"name", category.getTitle(_themeDisplay.getLocale())
+			"name",
+			HtmlUtil.escape(category.getTitle(_themeDisplay.getLocale()))
 		).put(
 			"url", _getPortletURL(category.getCategoryId())
 		).put(
@@ -215,7 +218,7 @@ public class AssetCategoriesNavigationDisplayContext {
 			portletURL.setParameter("categoryId", String.valueOf(categoryId));
 		}
 
-		return portletURL.toString();
+		return HtmlUtil.escape(portletURL.toString());
 	}
 
 	private JSONArray _getVocabulariesJSONArray() throws PortalException {
@@ -243,7 +246,9 @@ public class AssetCategoriesNavigationDisplayContext {
 				).put(
 					"id", vocabulary.getVocabularyId()
 				).put(
-					"name", vocabulary.getTitle(_themeDisplay.getLocale())
+					"name",
+					HtmlUtil.escape(
+						vocabulary.getTitle(_themeDisplay.getLocale()))
 				));
 		}
 

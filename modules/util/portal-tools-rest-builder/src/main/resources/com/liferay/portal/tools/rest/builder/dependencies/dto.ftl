@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -51,9 +49,7 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -134,7 +130,6 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 		<#assign
 			propertySchema = freeMarkerTool.getDTOPropertySchema(propertyName, schema)
 			propertyType = properties[propertyName]
-			sizeParameters = []
 		/>
 
 		<#if propertySchema.maximum??>
@@ -147,18 +142,6 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 
 		<#if propertySchema.jsonMap>
 			@JsonAnyGetter
-		</#if>
-
-		<#if propertySchema.maxLength??>
-			<#assign sizeParameters = sizeParameters + ["max = ${propertySchema.maxLength}"] />
-		</#if>
-
-		<#if propertySchema.minLength??>
-			<#assign sizeParameters = sizeParameters + ["min = ${propertySchema.minLength}"] />
-		</#if>
-
-		<#if sizeParameters?has_content>
-			@Size(${sizeParameters?join(", ")})
 		</#if>
 
 		@Schema(
@@ -178,7 +161,7 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 					,
 				</#if>
 
-				example = "${freeMarkerTool.getObjectFieldStringValue(propertyType, propertySchema.example)}"
+				example = "${propertySchema.example}"
 			</#if>
 		)
 
@@ -243,14 +226,7 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 			<#else>
 				access = JsonProperty.Access.READ_WRITE
 			</#if>
-
-			<#if propertySchema.name?? && !stringUtil.equals(propertyName, propertySchema.name)>
-				, value = "${propertySchema.name}"
-			</#if>
 		)
-		<#if propertySchema.xml??>
-			@XmlElement(name = "${propertySchema.xml.name}")
-		</#if>
 		<#if schema.requiredPropertySchemaNames?? && schema.requiredPropertySchemaNames?seq_contains(propertyName)>
 			<#if stringUtil.equals(propertyType, "String")>
 				@NotEmpty
@@ -299,38 +275,17 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 		</#list>
 
 		<#list properties?keys as propertyName>
-			<#assign
-				propertySchema = freeMarkerTool.getDTOPropertySchema(propertyName, schema)
-				propertyType = properties[propertyName]
-			/>
+			<#assign propertyType = properties[propertyName] />
 
 			if (${propertyName} != null) {
 				if (sb.length() > 1) {
 					sb.append(", ");
 				}
 
-				<#if propertySchema.name?? && !stringUtil.equals(propertyName, propertySchema.name)>
-					<#assign key = propertySchema.name />
-				<#else>
-					<#assign key = propertyName />
-				</#if>
+				sb.append("\"${propertyName}\": ");
 
-				sb.append("\"${key}\": ");
-
-				<#if allSchemas[propertyType]??>
+				<#if allSchemas[propertyType]?? || stringUtil.equals(propertyType, "Object")>
 					sb.append(String.valueOf(${propertyName}));
-				<#elseif stringUtil.equals(propertyType, "Object")>
-					if (${propertyName} instanceof Map) {
-						sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)${propertyName}));
-					}
-					else if (${propertyName} instanceof String) {
-						sb.append("\"");
-						sb.append(_escape((String)${propertyName}));
-						sb.append("\"");
-					}
-					else {
-						sb.append(${propertyName});
-					}
 				<#else>
 					<#if propertyType?contains("[]")>
 						sb.append("[");
@@ -440,7 +395,9 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 	</#list>
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(String.valueOf(object), _JSON_ESCAPE_STRINGS[0], _JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -466,7 +423,7 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -498,7 +455,7 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -514,10 +471,5 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

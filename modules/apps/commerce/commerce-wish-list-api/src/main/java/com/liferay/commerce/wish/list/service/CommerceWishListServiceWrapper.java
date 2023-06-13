@@ -27,10 +27,6 @@ public class CommerceWishListServiceWrapper
 	implements CommerceWishListService,
 			   ServiceWrapper<CommerceWishListService> {
 
-	public CommerceWishListServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceWishListServiceWrapper(
 		CommerceWishListService commerceWishListService) {
 

@@ -107,12 +107,16 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		_addTestVariant("small.hd", "uuid1", 100, 100);
 		_addTestVariant("medium", "uuid2", 300, 300);
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
+
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -148,12 +152,16 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		_addTestVariant("medium", "uuid2", 300, 200);
 		_addTestVariant("extra", "uuid3", 500, 330);
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
+
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -190,15 +198,19 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 	public void testHDMediaQueryAppliesWhenHeightHas1PXLessThanExpected()
 		throws Exception {
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
+
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
 
 		_addTestVariant("small", "uuid0", 50, 50);
 		_addTestVariant("small.hd", "uuid1", 99, 100);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -230,12 +242,16 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		_addTestVariant("small", "uuid0", 50, 50);
 		_addTestVariant("small.hd", "uuid1", 101, 100);
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
+
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -267,12 +283,16 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		_addTestVariant("small", "uuid0", 50, 50);
 		_addTestVariant("small.hd", "uuid1", 100, 99);
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
+
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -301,15 +321,19 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 	public void testHDMediaQueryAppliesWhenWidthHas1PXMoreThanExpected()
 		throws Exception {
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
+
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
 
 		_addTestVariant("small", "uuid0", 50, 50);
 		_addTestVariant("small.hd", "uuid1", 100, 101);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -338,15 +362,19 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 	public void testHDMediaQueryNotAppliesWhenHeightHas2PXLessThanExpected()
 		throws Exception {
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
+
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
 
 		_addTestVariant("small", "uuid0", 50, 50);
 		_addTestVariant("small.hd", "uuid1", 98, 200);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -375,15 +403,19 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 	public void testHDMediaQueryNotAppliesWhenHeightHas2PXMoreThanExpected()
 		throws Exception {
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
+
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
 
 		_addTestVariant("small", "uuid0", 50, 50);
 		_addTestVariant("small.hd", "uuid1", 102, 200);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -415,12 +447,16 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		_addTestVariant("small", "uuid0", 50, 50);
 		_addTestVariant("small.hd", "uuid1", 200, 98);
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
+
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -452,12 +488,16 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		_addTestVariant("small", "uuid0", 50, 50);
 		_addTestVariant("small.hd", "uuid1", 200, 102);
 
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
+
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String defaultSource = jsonObject.getString("defaultSource");
 
@@ -586,7 +626,7 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 	private byte[] _getImageBytes() throws Exception {
 		return FileUtil.getBytes(
 			FileEntryAMImageURLItemSelectorReturnTypeResolverTest.class,
-			"dependencies/image.jpg");
+			"image.jpg");
 	}
 
 	private static final Pattern _pattern = Pattern.compile("\\?t=\\d+");

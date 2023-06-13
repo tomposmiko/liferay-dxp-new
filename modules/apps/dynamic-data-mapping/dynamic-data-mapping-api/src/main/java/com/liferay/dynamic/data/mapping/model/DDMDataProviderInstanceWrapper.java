@@ -778,11 +778,6 @@ public class DDMDataProviderInstanceWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<DDMDataProviderInstance, Object>>
 		getAttributeGetterFunctions() {
 

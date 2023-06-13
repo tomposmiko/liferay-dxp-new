@@ -323,8 +323,4 @@ public interface RegionModel
 	@Override
 	public Region cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

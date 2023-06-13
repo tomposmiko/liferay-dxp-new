@@ -70,7 +70,7 @@ public class LinkToPageDDMFormFieldValueRenderer
 				}
 				catch (PortalException portalException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(portalException);
+						_log.warn(portalException, portalException);
 					}
 
 					return LanguageUtil.format(

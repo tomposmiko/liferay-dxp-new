@@ -57,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.reports.engine.console.web.internal.admin.configuration.ReportsEngineAdminWebConfiguration",
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=reports-portlet",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -81,8 +82,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.portlet-info.title=Reports Admin",
 		"javax.portlet.portlet-mode=text/html;config",
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator,guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -94,11 +94,11 @@ public class AdminPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		try {
-			_setDefinitionRequestAttribute(renderRequest);
+			setDefinitionRequestAttribute(renderRequest);
 
-			_setSourceRequestAttribute(renderRequest);
+			setSourceRequestAttribute(renderRequest);
 
-			_setReportsEngineAdminWebConfigurationRequestAttribute(
+			setReportsEngineAdminWebConfigurationRequestAttribute(
 				renderRequest);
 		}
 		catch (Exception exception) {
@@ -124,7 +124,7 @@ public class AdminPortlet extends MVCPortlet {
 			String resourceID = resourceRequest.getResourceID();
 
 			if (resourceID.equals("download")) {
-				_serveDownload(resourceRequest, resourceResponse);
+				serveDownload(resourceRequest, resourceResponse);
 			}
 		}
 		catch (IOException ioException) {
@@ -138,6 +138,18 @@ public class AdminPortlet extends MVCPortlet {
 		}
 	}
 
+	@Reference(unbind = "-")
+	public void setDefinitionLocalService(
+		DefinitionLocalService definitionLocalService) {
+
+		_definitionLocalService = definitionLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setSourceLocalService(SourceLocalService sourceLocalService) {
+		_sourceLocalService = sourceLocalService;
+	}
+
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
@@ -146,13 +158,7 @@ public class AdminPortlet extends MVCPortlet {
 				ReportsEngineAdminWebConfiguration.class, properties);
 	}
 
-	@Reference
-	protected DefinitionLocalService definitionLocalService;
-
-	@Reference
-	protected SourceLocalService sourceLocalService;
-
-	private void _serveDownload(
+	protected void serveDownload(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
@@ -171,7 +177,7 @@ public class AdminPortlet extends MVCPortlet {
 			MimeTypesUtil.getContentType(fileName));
 	}
 
-	private void _setDefinitionRequestAttribute(RenderRequest renderRequest)
+	protected void setDefinitionRequestAttribute(RenderRequest renderRequest)
 		throws PortalException {
 
 		long definitionId = ParamUtil.getLong(renderRequest, "definitionId");
@@ -179,13 +185,13 @@ public class AdminPortlet extends MVCPortlet {
 		Definition definition = null;
 
 		if (definitionId > 0) {
-			definition = definitionLocalService.getDefinition(definitionId);
+			definition = _definitionLocalService.getDefinition(definitionId);
 		}
 
 		renderRequest.setAttribute(ReportsEngineWebKeys.DEFINITION, definition);
 	}
 
-	private void _setReportsEngineAdminWebConfigurationRequestAttribute(
+	protected void setReportsEngineAdminWebConfigurationRequestAttribute(
 		RenderRequest renderRequest) {
 
 		renderRequest.setAttribute(
@@ -193,7 +199,7 @@ public class AdminPortlet extends MVCPortlet {
 			_reportsEngineAdminWebConfiguration);
 	}
 
-	private void _setSourceRequestAttribute(RenderRequest renderRequest)
+	protected void setSourceRequestAttribute(RenderRequest renderRequest)
 		throws PortalException {
 
 		long sourceId = ParamUtil.getLong(renderRequest, "sourceId");
@@ -201,13 +207,15 @@ public class AdminPortlet extends MVCPortlet {
 		Source source = null;
 
 		if (sourceId > 0) {
-			source = sourceLocalService.getSource(sourceId);
+			source = _sourceLocalService.getSource(sourceId);
 		}
 
 		renderRequest.setAttribute(ReportsEngineWebKeys.SOURCE, source);
 	}
 
+	private DefinitionLocalService _definitionLocalService;
 	private volatile ReportsEngineAdminWebConfiguration
 		_reportsEngineAdminWebConfiguration;
+	private SourceLocalService _sourceLocalService;
 
 }

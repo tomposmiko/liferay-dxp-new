@@ -24,17 +24,20 @@ long commercePriceListId = commercePriceListDisplayContext.getCommercePriceListI
 
 <c:if test="<%= commercePriceListDisplayContext.hasPermission(commercePriceListId, ActionKeys.UPDATE) %>">
 	<div class="pt-4">
-		<frontend-data-set:classic-display
+		<clay:data-set-display
 			contextParams='<%=
 				HashMapBuilder.<String, String>put(
 					"commercePriceListId", String.valueOf(commercePriceListId)
 				).build()
 			%>'
 			creationMenu="<%= commercePriceListDisplayContext.getPriceModifiersCreationMenu() %>"
-			dataProviderKey="<%= CommercePricingFDSNames.PRICE_MODIFIERS %>"
-			formName="fm"
-			id="<%= CommercePricingFDSNames.PRICE_MODIFIERS %>"
+			dataProviderKey="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_MODIFIERS %>"
+			formId="fm"
+			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_MODIFIERS %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= currentURLObj %>"
 			style="stacked"
 		/>
 	</div>

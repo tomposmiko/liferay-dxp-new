@@ -63,21 +63,10 @@ public class ListTypeDefinitionLocalServiceUtil {
 	}
 
 	public static ListTypeDefinition addListTypeDefinition(
-			String externalReferenceCode, long userId)
+			long userId, Map<java.util.Locale, String> nameMap)
 		throws PortalException {
 
-		return getService().addListTypeDefinition(
-			externalReferenceCode, userId);
-	}
-
-	public static ListTypeDefinition addListTypeDefinition(
-			String externalReferenceCode, long userId,
-			Map<java.util.Locale, String> nameMap,
-			List<com.liferay.list.type.model.ListTypeEntry> listTypeEntries)
-		throws PortalException {
-
-		return getService().addListTypeDefinition(
-			externalReferenceCode, userId, nameMap, listTypeEntries);
+		return getService().addListTypeDefinition(userId, nameMap);
 	}
 
 	/**
@@ -239,14 +228,6 @@ public class ListTypeDefinitionLocalServiceUtil {
 		return getService().fetchListTypeDefinition(listTypeDefinitionId);
 	}
 
-	public static ListTypeDefinition
-		fetchListTypeDefinitionByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return getService().fetchListTypeDefinitionByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the list type definition with the matching UUID and company.
 	 *
@@ -294,15 +275,6 @@ public class ListTypeDefinitionLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getListTypeDefinition(listTypeDefinitionId);
-	}
-
-	public static ListTypeDefinition
-			getListTypeDefinitionByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getListTypeDefinitionByExternalReferenceCode(
-			externalReferenceCode, companyId);
 	}
 
 	/**
@@ -382,14 +354,11 @@ public class ListTypeDefinitionLocalServiceUtil {
 	}
 
 	public static ListTypeDefinition updateListTypeDefinition(
-			String externalReferenceCode, long listTypeDefinitionId,
-			long userId, Map<java.util.Locale, String> nameMap,
-			List<com.liferay.list.type.model.ListTypeEntry> listTypeEntries)
+			long listTypeDefinitionId, Map<java.util.Locale, String> nameMap)
 		throws PortalException {
 
 		return getService().updateListTypeDefinition(
-			externalReferenceCode, listTypeDefinitionId, userId, nameMap,
-			listTypeEntries);
+			listTypeDefinitionId, nameMap);
 	}
 
 	public static ListTypeDefinitionLocalService getService() {

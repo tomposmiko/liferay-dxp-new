@@ -12,7 +12,6 @@
  * details.
  */
 
-import ClayEmptyState from '@clayui/empty-state';
 import classNames from 'classnames';
 import {
 	EVENT_TYPES as CORE_EVENT_TYPES,
@@ -22,9 +21,10 @@ import {
 } from 'data-engine-js-components-web';
 import React from 'react';
 
-import {sub} from '../../utils/lang.es';
+import {dropLayoutBuilderField} from '../../actions.es';
 import {getSearchRegex} from '../../utils/search.es';
 import CollapsablePanel from '../collapsable-panel/CollapsablePanel.es';
+import EmptyState from '../empty-state/EmptyState.es';
 import FieldType from './FieldType.es';
 
 const FieldTypeWrapper = ({
@@ -52,19 +52,16 @@ const FieldTypeWrapper = ({
 			icon={getIcon()}
 			onDoubleClick={({name}) => {
 				dispatch({
-					payload: {
-						fieldType: {
-							...fieldTypes.find(
-								({name: typeName}) => typeName === name
-							),
-							editable: true,
-						},
+					payload: dropLayoutBuilderField({
+						addedToPlaceholder: true,
+						fieldTypeName: name,
+						fieldTypes,
 						indexes: {
 							columnIndex: 0,
 							pageIndex: activePage,
 							rowIndex: pages[activePage].rows.length,
 						},
-					},
+					}),
 					type: CORE_EVENT_TYPES.FIELD.ADD,
 				});
 			}}
@@ -75,10 +72,10 @@ const FieldTypeWrapper = ({
 const FieldTypeList = ({
 	dataDefinition,
 	deleteLabel,
+	emptyState,
 	keywords,
 	onClick,
 	onDelete,
-	searchClicked,
 	showEmptyState = true,
 }) => {
 	const {fieldTypes} = useConfig();
@@ -97,59 +94,8 @@ const FieldTypeList = ({
 		})
 		.sort(({displayOrder: a}, {displayOrder: b}) => a - b);
 
-	const screenReaderSearchResult = document.getElementById(
-		'screenReaderSearchResult'
-	);
-
-	if (screenReaderSearchResult) {
-		if (keywords !== '' && searchClicked) {
-			if (filteredFieldTypes.length) {
-				screenReaderSearchResult.innerText = sub(
-					Liferay.Language.get(
-						'x-results-returned-for-the-search-term-x'
-					),
-					[filteredFieldTypes.length, keywords]
-				);
-			}
-			else {
-				screenReaderSearchResult.innerText = sub(
-					Liferay.Language.get(
-						`${sub(
-							Liferay.Language.get(
-								'there-are-no-results-for-the-search-term-x'
-							),
-							[keywords]
-						)} ${Liferay.Language.get(
-							'check-your-spelling-or-search-for-a-different-term'
-						)}`
-					),
-					[filteredFieldTypes.length, keywords]
-				);
-			}
-		}
-		else if (searchClicked) {
-			screenReaderSearchResult.innerText = sub(
-				Liferay.Language.get('search-field-is-empty'),
-				[filteredFieldTypes.length, keywords]
-			);
-		}
-		else {
-			screenReaderSearchResult.innerText = '';
-		}
-	}
-
 	if (showEmptyState && !filteredFieldTypes.length) {
-		return (
-			<ClayEmptyState
-				description={sub(
-					Liferay.Language.get('there-are-no-results-for-x'),
-					[keywords]
-				)}
-				imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.gif`}
-				small
-				title={Liferay.Language.get('no-results-found')}
-			/>
-		);
+		return <EmptyState emptyState={emptyState} keywords={keywords} small />;
 	}
 
 	return filteredFieldTypes.map((fieldType, index) => {

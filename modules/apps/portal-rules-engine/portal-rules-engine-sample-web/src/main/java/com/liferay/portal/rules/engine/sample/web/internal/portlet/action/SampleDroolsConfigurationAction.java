@@ -38,6 +38,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletPreferences;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -47,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SampleDroolsPortletKeys.SAMPLE_DROOLS,
 	service = ConfigurationAction.class
 )
@@ -72,7 +74,7 @@ public class SampleDroolsConfigurationAction
 
 		PortletPreferences preferences = actionRequest.getPreferences();
 
-		_updatePreferences(actionRequest, preferences);
+		updatePreferences(actionRequest, preferences);
 
 		if (SessionErrors.isEmpty(actionRequest)) {
 			preferences.store();
@@ -84,7 +86,16 @@ public class SampleDroolsConfigurationAction
 		}
 	}
 
-	private void _updatePreferences(
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.portal.rules.engine.sample.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected void updatePreferences(
 			ActionRequest actionRequest, PortletPreferences preferences)
 		throws Exception {
 
@@ -112,7 +123,7 @@ public class SampleDroolsConfigurationAction
 				_rulesEngine.update(domainName, rulesResourceRetriever);
 			}
 			catch (RulesEngineException rulesEngineException) {
-				_log.error(rulesEngineException);
+				_log.error(rulesEngineException, rulesEngineException);
 
 				SessionErrors.add(actionRequest, "rulesEngineException");
 			}

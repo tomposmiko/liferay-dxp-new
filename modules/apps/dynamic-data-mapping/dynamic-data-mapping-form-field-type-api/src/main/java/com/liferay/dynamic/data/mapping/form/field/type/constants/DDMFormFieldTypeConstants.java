@@ -29,8 +29,6 @@ public class DDMFormFieldTypeConstants {
 
 	public static final String DATE = "date";
 
-	public static final String DATE_TIME = "date_time";
-
 	public static final String DDM_IMAGE = "ddm-image";
 
 	public static final String DOCUMENT_LIBRARY = "document_library";
@@ -45,11 +43,7 @@ public class DDMFormFieldTypeConstants {
 
 	public static final String IMAGE = "image";
 
-	public static final String JOURNAL_ARTICLE = "journal_article";
-
 	public static final String KEY_VALUE = "key_value";
-
-	public static final String LINK_TO_LAYOUT = "link_to_layout";
 
 	public static final String LOCALIZABLE_TEXT = "localizable_text";
 

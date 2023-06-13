@@ -14,11 +14,9 @@
 
 package com.liferay.segments.experiment.web.internal.portlet.action.test;
 
-import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.configuration.test.util.CompanyConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -26,7 +24,6 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -36,12 +33,14 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PrefsProps;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.util.PrefsPropsImpl;
 import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.constants.SegmentsExperimentConstants;
 import com.liferay.segments.model.SegmentsEntry;
@@ -49,6 +48,8 @@ import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.model.SegmentsExperiment;
 import com.liferay.segments.service.SegmentsExperimentLocalService;
 import com.liferay.segments.test.util.SegmentsTestUtil;
+
+import java.util.Objects;
 
 import javax.portlet.ActionRequest;
 
@@ -79,7 +80,15 @@ public class AddSegmentsExperimentMVCActionCommandTest {
 
 	@Test
 	public void testAddSegmentsExperiment() throws Exception {
+		PrefsProps prefsProps = PrefsPropsUtil.getPrefsProps();
+
 		String liferayAnalyticsURL = "http://localhost:8080/";
+
+		PrefsPropsWrapper prefsPropsWrapper = new PrefsPropsWrapper(
+			liferayAnalyticsURL, prefsProps);
+
+		ReflectionTestUtil.setFieldValue(
+			PrefsPropsUtil.class, "_prefsProps", prefsPropsWrapper);
 
 		String description = RandomTestUtil.randomString();
 
@@ -97,16 +106,7 @@ public class AddSegmentsExperimentMVCActionCommandTest {
 			_getMockLiferayPortletActionRequest(
 				description, goal.getLabel(), name, segmentsExperience);
 
-		try (CompanyConfigurationTemporarySwapper
-				companyConfigurationTemporarySwapper =
-					new CompanyConfigurationTemporarySwapper(
-						TestPropsValues.getCompanyId(),
-						AnalyticsConfiguration.class.getName(),
-						HashMapDictionaryBuilder.<String, Object>put(
-							"liferayAnalyticsURL", liferayAnalyticsURL
-						).build(),
-						SettingsFactoryUtil.getSettingsFactory())) {
-
+		try {
 			JSONObject jsonObject = ReflectionTestUtil.invoke(
 				_mvcActionCommand, "_addSegmentsExperiment",
 				new Class<?>[] {ActionRequest.class},
@@ -125,9 +125,8 @@ public class AddSegmentsExperimentMVCActionCommandTest {
 			SegmentsExperiment segmentsExperiment =
 				_segmentsExperimentLocalService.fetchSegmentsExperiment(
 					segmentsExperience.getSegmentsExperienceId(),
-					_classNameLocalService.getClassNameId(
-						Layout.class.getName()),
-					segmentsExperience.getPlid(),
+					segmentsExperience.getClassNameId(),
+					segmentsExperience.getClassPK(),
 					new int[] {
 						SegmentsExperimentConstants.Status.DRAFT.getValue()
 					});
@@ -170,6 +169,10 @@ public class AddSegmentsExperimentMVCActionCommandTest {
 				String.valueOf(
 					segmentsExperimentJSONObject.getJSONObject("status")));
 		}
+		finally {
+			ReflectionTestUtil.setFieldValue(
+				PrefsPropsUtil.class, "_prefsProps", prefsProps);
+		}
 	}
 
 	private SegmentsExperience _addSegmentsExperience(String segmentsEntryName)
@@ -180,10 +183,12 @@ public class AddSegmentsExperimentMVCActionCommandTest {
 			segmentsEntryName, RandomTestUtil.randomString(), StringPool.BLANK,
 			SegmentsEntryConstants.SOURCE_DEFAULT);
 
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		long classNameId = _classNameLocalService.getClassNameId(
+			Layout.class.getName());
+		Layout layout = LayoutTestUtil.addLayout(_group);
 
 		return SegmentsTestUtil.addSegmentsExperience(
-			segmentsEntry.getSegmentsEntryId(), layout.getPlid(),
+			segmentsEntry.getSegmentsEntryId(), classNameId, layout.getPlid(),
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 	}
 
@@ -199,11 +204,9 @@ public class AddSegmentsExperimentMVCActionCommandTest {
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
 
 		mockLiferayPortletActionRequest.setParameter(
-			"classNameId",
-			String.valueOf(
-				_classNameLocalService.getClassNameId(Layout.class.getName())));
+			"classNameId", String.valueOf(segmentsExperience.getClassNameId()));
 		mockLiferayPortletActionRequest.setParameter(
-			"classPK", String.valueOf(segmentsExperience.getPlid()));
+			"classPK", String.valueOf(segmentsExperience.getClassPK()));
 		mockLiferayPortletActionRequest.setParameter(
 			"description", description);
 		mockLiferayPortletActionRequest.setParameter("goal", goal);
@@ -243,5 +246,32 @@ public class AddSegmentsExperimentMVCActionCommandTest {
 
 	@Inject
 	private SegmentsExperimentLocalService _segmentsExperimentLocalService;
+
+	private static class PrefsPropsWrapper extends PrefsPropsImpl {
+
+		public PrefsPropsWrapper(
+			String liferayAnalyticsURL, PrefsProps prefsProps) {
+
+			_liferayAnalyticsURL = liferayAnalyticsURL;
+			_prefsProps = prefsProps;
+		}
+
+		@Override
+		public String getString(long companyId, String name) {
+			if (Objects.equals("liferayAnalyticsFaroBackendURL", name)) {
+				return null;
+			}
+
+			if (Objects.equals("liferayAnalyticsURL", name)) {
+				return _liferayAnalyticsURL;
+			}
+
+			return _prefsProps.getString(companyId, name);
+		}
+
+		private final String _liferayAnalyticsURL;
+		private final PrefsProps _prefsProps;
+
+	}
 
 }

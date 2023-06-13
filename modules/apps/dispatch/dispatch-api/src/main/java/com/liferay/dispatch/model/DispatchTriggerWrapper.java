@@ -14,7 +14,6 @@
 
 package com.liferay.dispatch.model;
 
-import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
@@ -44,8 +43,6 @@ public class DispatchTriggerWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("uuid", getUuid());
-		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("dispatchTriggerId", getDispatchTriggerId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -63,7 +60,6 @@ public class DispatchTriggerWrapper
 		attributes.put("overlapAllowed", isOverlapAllowed());
 		attributes.put("startDate", getStartDate());
 		attributes.put("system", isSystem());
-		attributes.put("timeZoneId", getTimeZoneId());
 
 		return attributes;
 	}
@@ -74,19 +70,6 @@ public class DispatchTriggerWrapper
 
 		if (mvccVersion != null) {
 			setMvccVersion(mvccVersion);
-		}
-
-		String uuid = (String)attributes.get("uuid");
-
-		if (uuid != null) {
-			setUuid(uuid);
-		}
-
-		String externalReferenceCode = (String)attributes.get(
-			"externalReferenceCode");
-
-		if (externalReferenceCode != null) {
-			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long dispatchTriggerId = (Long)attributes.get("dispatchTriggerId");
@@ -186,12 +169,6 @@ public class DispatchTriggerWrapper
 
 		if (system != null) {
 			setSystem(system);
-		}
-
-		String timeZoneId = (String)attributes.get("timeZoneId");
-
-		if (timeZoneId != null) {
-			setTimeZoneId(timeZoneId);
 		}
 	}
 
@@ -305,16 +282,6 @@ public class DispatchTriggerWrapper
 	}
 
 	/**
-	 * Returns the external reference code of this dispatch trigger.
-	 *
-	 * @return the external reference code of this dispatch trigger
-	 */
-	@Override
-	public String getExternalReferenceCode() {
-		return model.getExternalReferenceCode();
-	}
-
-	/**
 	 * Returns the modified date of this dispatch trigger.
 	 *
 	 * @return the modified date of this dispatch trigger
@@ -389,26 +356,6 @@ public class DispatchTriggerWrapper
 		return model.getSystem();
 	}
 
-	@Override
-	public Date getTimeZoneEndDate() {
-		return model.getTimeZoneEndDate();
-	}
-
-	/**
-	 * Returns the time zone ID of this dispatch trigger.
-	 *
-	 * @return the time zone ID of this dispatch trigger
-	 */
-	@Override
-	public String getTimeZoneId() {
-		return model.getTimeZoneId();
-	}
-
-	@Override
-	public Date getTimeZoneStartDate() {
-		return model.getTimeZoneStartDate();
-	}
-
 	/**
 	 * Returns the user ID of this dispatch trigger.
 	 *
@@ -437,16 +384,6 @@ public class DispatchTriggerWrapper
 	@Override
 	public String getUserUuid() {
 		return model.getUserUuid();
-	}
-
-	/**
-	 * Returns the uuid of this dispatch trigger.
-	 *
-	 * @return the uuid of this dispatch trigger
-	 */
-	@Override
-	public String getUuid() {
-		return model.getUuid();
 	}
 
 	/**
@@ -584,16 +521,6 @@ public class DispatchTriggerWrapper
 	}
 
 	/**
-	 * Sets the external reference code of this dispatch trigger.
-	 *
-	 * @param externalReferenceCode the external reference code of this dispatch trigger
-	 */
-	@Override
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		model.setExternalReferenceCode(externalReferenceCode);
-	}
-
-	/**
 	 * Sets the modified date of this dispatch trigger.
 	 *
 	 * @param modifiedDate the modified date of this dispatch trigger
@@ -664,16 +591,6 @@ public class DispatchTriggerWrapper
 	}
 
 	/**
-	 * Sets the time zone ID of this dispatch trigger.
-	 *
-	 * @param timeZoneId the time zone ID of this dispatch trigger
-	 */
-	@Override
-	public void setTimeZoneId(String timeZoneId) {
-		model.setTimeZoneId(timeZoneId);
-	}
-
-	/**
 	 * Sets the user ID of this dispatch trigger.
 	 *
 	 * @param userId the user ID of this dispatch trigger
@@ -701,26 +618,6 @@ public class DispatchTriggerWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	/**
-	 * Sets the uuid of this dispatch trigger.
-	 *
-	 * @param uuid the uuid of this dispatch trigger
-	 */
-	@Override
-	public void setUuid(String uuid) {
-		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return model.getStagedModelType();
 	}
 
 	@Override

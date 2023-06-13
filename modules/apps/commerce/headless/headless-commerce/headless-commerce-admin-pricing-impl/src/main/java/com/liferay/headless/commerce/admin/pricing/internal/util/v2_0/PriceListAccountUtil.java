@@ -14,9 +14,9 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.util.v2_0;
 
-import com.liferay.account.exception.NoSuchEntryException;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryService;
+import com.liferay.commerce.account.exception.NoSuchAccountException;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.model.CommercePriceListAccountRel;
 import com.liferay.commerce.price.list.service.CommercePriceListAccountRelService;
@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.util.Validator;
 public class PriceListAccountUtil {
 
 	public static CommercePriceListAccountRel addCommercePriceListAccountRel(
-			AccountEntryService accountEntryService,
+			CommerceAccountService commerceAccountService,
 			CommercePriceListAccountRelService
 				commercePriceListAccountRelService,
 			PriceListAccount priceListAccount,
@@ -44,22 +44,22 @@ public class PriceListAccountUtil {
 		ServiceContext serviceContext = serviceContextHelper.getServiceContext(
 			commercePriceList.getGroupId());
 
-		AccountEntry accountEntry;
+		CommerceAccount commerceAccount;
 
 		if (Validator.isNull(
 				priceListAccount.getAccountExternalReferenceCode())) {
 
-			accountEntry = accountEntryService.getAccountEntry(
+			commerceAccount = commerceAccountService.getCommerceAccount(
 				priceListAccount.getAccountId());
 		}
 		else {
-			accountEntry =
-				accountEntryService.fetchAccountEntryByExternalReferenceCode(
+			commerceAccount =
+				commerceAccountService.fetchByExternalReferenceCode(
 					serviceContext.getCompanyId(),
 					priceListAccount.getAccountExternalReferenceCode());
 
-			if (accountEntry == null) {
-				throw new NoSuchEntryException(
+			if (commerceAccount == null) {
+				throw new NoSuchAccountException(
 					"Unable to find account with external reference code " +
 						priceListAccount.getAccountExternalReferenceCode());
 			}
@@ -68,7 +68,7 @@ public class PriceListAccountUtil {
 		return commercePriceListAccountRelService.
 			addCommercePriceListAccountRel(
 				commercePriceList.getCommercePriceListId(),
-				accountEntry.getAccountEntryId(),
+				commerceAccount.getCommerceAccountId(),
 				GetterUtil.get(priceListAccount.getOrder(), 0), serviceContext);
 	}
 

@@ -29,18 +29,14 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = ModelListener.class)
+@Component(enabled = false, immediate = true, service = ModelListener.class)
 public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onAfterRemove(Layout layout) throws ModelListenerException {
-		if (layout == null) {
-			return;
-		}
-
 		List<CPDisplayLayout> cpDisplayLayouts =
 			_cpDisplayLayoutLocalService.
-				getCPDisplayLayoutsByGroupIdAndLayoutUuid(
+				fetchCPDisplayLayoutByGroupIdAndLayoutUuid(
 					layout.getGroupId(), layout.getUuid());
 
 		for (CPDisplayLayout cpDisplayLayout : cpDisplayLayouts) {

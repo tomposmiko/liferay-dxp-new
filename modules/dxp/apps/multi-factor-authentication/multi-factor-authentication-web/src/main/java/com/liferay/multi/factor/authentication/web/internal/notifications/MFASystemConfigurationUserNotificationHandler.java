@@ -15,7 +15,7 @@
 package com.liferay.multi.factor.authentication.web.internal.notifications;
 
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marta Medio
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
 	service = UserNotificationHandler.class
 )
@@ -47,7 +48,7 @@ public class MFASystemConfigurationUserNotificationHandler
 			ServiceContext serviceContext)
 		throws Exception {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			userNotificationEvent.getPayload());
 
 		boolean mfaDisableGlobally = jsonObject.getBoolean(
@@ -68,25 +69,13 @@ public class MFASystemConfigurationUserNotificationHandler
 					"administrator");
 		}
 
+		String title = _language.get(
+			serviceContext.getLocale(), "multi-factor-authentication");
+
 		return StringUtil.replace(
 			getBodyTemplate(), new String[] {"[$BODY$]", "[$TITLE$]"},
-			new String[] {
-				body, getTitle(userNotificationEvent, serviceContext)
-			});
+			new String[] {body, title});
 	}
-
-	@Override
-	protected String getTitle(
-			UserNotificationEvent userNotificationEvent,
-			ServiceContext serviceContext)
-		throws Exception {
-
-		return _language.get(
-			serviceContext.getLocale(), "multi-factor-authentication");
-	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Language _language;

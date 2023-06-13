@@ -18,69 +18,36 @@ import React, {useState} from 'react';
 
 import '../css/main.scss';
 import ButtonGuide from './guides/ButtonGuide';
-import CardGuide from './guides/CardGuide';
 import ColorGuide from './guides/ColorGuide';
 import FormGuide from './guides/FormGuide';
 import GeneralGuide from './guides/GeneralGuide';
-import LabelGuide from './guides/LabelGuide';
-import TableGuide from './guides/TableGuide';
-import TabsGuide from './guides/TabsGuide';
 import TypographyGuide from './guides/TypographyGuide';
 
 const TABS = [
 	{
 		content: <ColorGuide />,
-		hash: '#colors',
 		label: Liferay.Language.get('colors'),
 	},
 	{
 		content: <TypographyGuide />,
-		hash: '#typography',
 		label: Liferay.Language.get('typography'),
 	},
 	{
 		content: <GeneralGuide />,
-		hash: '#general',
 		label: Liferay.Language.get('general'),
 	},
 	{
 		content: <ButtonGuide />,
-		hash: '#buttons',
 		label: Liferay.Language.get('buttons'),
 	},
 	{
-		content: <CardGuide />,
-		hash: '#cards',
-		label: Liferay.Language.get('cards'),
-	},
-	{
 		content: <FormGuide />,
-		hash: '#forms',
 		label: Liferay.Language.get('forms'),
-	},
-	{
-		content: <LabelGuide />,
-		hash: '#labels',
-		label: Liferay.Language.get('labels'),
-	},
-	{
-		content: <TableGuide />,
-		hash: '#tables',
-		label: Liferay.Language.get('tables'),
-	},
-	{
-		content: <TabsGuide />,
-		hash: '#tabs',
-		label: Liferay.Language.get('tabs'),
 	},
 ];
 
 export default function App() {
-	const [activeTabKeyValue, setActiveTabKeyValue] = useState(
-		TABS.findIndex((tab) => tab.hash === location.hash) >= 0
-			? location.hash
-			: TABS[0].hash
-	);
+	const [activeTabKeyValue, setActiveTabKeyValue] = useState(0);
 
 	return (
 		<div className="dialect-style-guide">
@@ -93,34 +60,28 @@ export default function App() {
 					</ClayLayout.Col>
 				</ClayLayout.Row>
 
-				<ClayTabs>
+				<ClayTabs modern>
 					{TABS.map((tab, i) => (
 						<ClayTabs.Item
-							active={activeTabKeyValue === tab.hash}
-							href={tab.hash}
+							active={activeTabKeyValue === i}
 							id={`tab-${i}`}
 							innerProps={{
-								'aria-controls': `tabpanel-${tab.hash}`,
+								'aria-controls': `tabpanel-${i}`,
 							}}
 							key={tab.label}
-							onClick={() => setActiveTabKeyValue(tab.hash)}
+							onClick={() => setActiveTabKeyValue(i)}
 						>
 							{tab.label}
 						</ClayTabs.Item>
 					))}
 				</ClayTabs>
 
-				<ClayTabs.Content
-					activeIndex={TABS.findIndex(
-						(tab) => tab.hash === activeTabKeyValue
-					)}
-					fade
-				>
-					{TABS.map((tab) => (
+				<ClayTabs.Content activeIndex={activeTabKeyValue} fade>
+					{TABS.map((tab, i) => (
 						<ClayTabs.TabPane
-							aria-labelledby={`tab-${tab.hash}`}
-							id={`tabpanel-${tab.hash}`}
-							key={tab.hash}
+							aria-labelledby={`tab-${i}`}
+							id={`tabpanel-${i}`}
+							key={tab.label}
 						>
 							{tab.content}
 						</ClayTabs.TabPane>

@@ -14,13 +14,26 @@
 
 package com.liferay.commerce.notification.web.internal.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.notification.web.internal.constants.CommerceNotificationScreenNavigationConstants;
+import com.liferay.commerce.notification.web.internal.display.context.CommerceNotificationQueueEntriesDisplayContext;
+import com.liferay.commerce.product.constants.CommerceChannelConstants;
+import com.liferay.commerce.product.model.CommerceChannel;
+import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+
+import java.io.IOException;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -30,16 +43,25 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=35",
-	service = ScreenNavigationCategory.class
+	enabled = false,
+	property = {
+		"screen.navigation.category.order:Integer=35",
+		"screen.navigation.entry.order:Integer=10"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class CommerceChannelNotificationsTemplatesScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory,
+			   ScreenNavigationEntry<CommerceChannel> {
 
 	@Override
 	public String getCategoryKey() {
-		return CommerceNotificationScreenNavigationConstants.
-			CATEGORY_KEY_COMMERCE_NOTIFICATION_TEMPLATES;
+		return "notification-templates";
+	}
+
+	@Override
+	public String getEntryKey() {
+		return getCategoryKey();
 	}
 
 	@Override
@@ -47,16 +69,54 @@ public class CommerceChannelNotificationsTemplatesScreenNavigationCategory
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return language.get(resourceBundle, getCategoryKey());
+		return LanguageUtil.get(resourceBundle, getCategoryKey());
 	}
 
 	@Override
 	public String getScreenNavigationKey() {
-		return CommerceNotificationScreenNavigationConstants.
-			SCREEN_NAVIGATION_KEY_COMMERCE_CHANNEL_GENERAL;
+		return "commerce.channel.general";
+	}
+
+	@Override
+	public boolean isVisible(User user, CommerceChannel commerceChannel) {
+		if (CommerceChannelConstants.CHANNEL_TYPE_SITE.equals(
+				commerceChannel.getType())) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		CommerceNotificationQueueEntriesDisplayContext
+			commerceNotificationQueueEntriesDisplayContext =
+				new CommerceNotificationQueueEntriesDisplayContext(
+					_commerceChannelLocalService, httpServletRequest);
+
+		httpServletRequest.setAttribute(
+			WebKeys.PORTLET_DISPLAY_CONTEXT,
+			commerceNotificationQueueEntriesDisplayContext);
+
+		_jspRenderer.renderJSP(
+			_servletContext, httpServletRequest, httpServletResponse,
+			"/view_templates.jsp");
 	}
 
 	@Reference
-	protected Language language;
+	private CommerceChannelLocalService _commerceChannelLocalService;
+
+	@Reference
+	private JSPRenderer _jspRenderer;
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.notification.web)"
+	)
+	private ServletContext _servletContext;
 
 }

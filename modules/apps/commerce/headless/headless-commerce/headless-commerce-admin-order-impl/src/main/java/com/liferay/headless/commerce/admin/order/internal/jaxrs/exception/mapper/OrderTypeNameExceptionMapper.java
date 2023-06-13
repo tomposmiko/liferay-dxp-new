@@ -18,6 +18,7 @@ import com.liferay.commerce.exception.CommerceOrderTypeNameException;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.osgi.service.component.annotations.Component;
@@ -26,10 +27,11 @@ import org.osgi.service.component.annotations.Component;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = {
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Order)",
 		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Order.OrderTypeNameExceptionMapper"
+		"osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Order.OrderTypeNameException"
 	},
 	service = ExceptionMapper.class
 )
@@ -40,7 +42,9 @@ public class OrderTypeNameExceptionMapper
 	protected Problem getProblem(
 		CommerceOrderTypeNameException commerceOrderTypeNameException) {
 
-		return new Problem(commerceOrderTypeNameException);
+		return new Problem(
+			Response.Status.BAD_REQUEST,
+			commerceOrderTypeNameException.getMessage());
 	}
 
 }

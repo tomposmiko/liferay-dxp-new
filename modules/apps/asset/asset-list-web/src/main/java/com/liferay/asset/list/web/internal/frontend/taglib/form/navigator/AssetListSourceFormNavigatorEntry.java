@@ -41,11 +41,6 @@ public class AssetListSourceFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	public boolean isVisible(User user, AssetListEntry assetListEntry) {
 		if (assetListEntry == null) {
 			return false;
@@ -61,11 +56,17 @@ public class AssetListSourceFormNavigatorEntry
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.asset.list.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected String getJspPath() {
 		return "/asset_list/source.jsp";
 	}
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.asset.list.web)")
-	private ServletContext _servletContext;
 
 }

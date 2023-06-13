@@ -14,8 +14,6 @@
 
 package com.liferay.portal.model.impl;
 
-import com.liferay.document.library.kernel.service.DLAppServiceUtil;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -28,21 +26,18 @@ import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.VirtualHost;
 import com.liferay.portal.kernel.model.cache.CacheField;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.kernel.service.ThemeLocalServiceUtil;
 import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.URLCodec;
+import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
@@ -109,42 +104,6 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 		return _companyFallbackVirtualHostname;
 	}
 
-	@Override
-	public String getFaviconURL() {
-		if (_faviconURL != null) {
-			return _faviconURL;
-		}
-
-		if (getFaviconFileEntryId() == 0) {
-			return null;
-		}
-
-		FileEntry fileEntry = null;
-
-		try {
-			fileEntry = DLAppServiceUtil.getFileEntry(getFaviconFileEntryId());
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-		}
-
-		if (fileEntry == null) {
-			return null;
-		}
-
-		_faviconURL = HtmlUtil.escape(
-			StringBundler.concat(
-				PortalUtil.getPathContext(), "/documents/",
-				fileEntry.getRepositoryId(), StringPool.SLASH,
-				fileEntry.getFolderId(), StringPool.SLASH,
-				URLCodec.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())),
-				StringPool.SLASH, URLCodec.encodeURL(fileEntry.getUuid())));
-
-		return _faviconURL;
-	}
-
 	/**
 	 * Returns the layout set's group.
 	 *
@@ -197,7 +156,7 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return logoId;
@@ -250,7 +209,7 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 				_settingsUnicodeProperties.load(super.getSettings());
 			}
 			catch (IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 			}
 		}
 
@@ -289,6 +248,31 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 	}
 
 	/**
+	 * Returns the name of the layout set's default virtual host.
+	 *
+	 * <p>
+	 * When accessing a layout set that has a virtual host, the URL elements
+	 * "/web/sitename" or "/group/sitename" can be omitted.
+	 * </p>
+	 *
+	 * @return     the layout set's default virtual host name, or an empty
+	 *             string if the layout set has no virtual hosts configured
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getVirtualHostnames()}
+	 */
+	@Deprecated
+	@Override
+	public String getVirtualHostname() {
+		TreeMap<String, String> virtualHostnames = getVirtualHostnames();
+
+		if (virtualHostnames.isEmpty()) {
+			return StringPool.BLANK;
+		}
+
+		return virtualHostnames.firstKey();
+	}
+
+	/**
 	 * Returns the names of the layout set's virtual hosts.
 	 *
 	 * <p>
@@ -308,9 +292,15 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 			return new TreeMap<>(_virtualHostnames);
 		}
 
-		List<VirtualHost> virtualHosts =
-			VirtualHostLocalServiceUtil.getVirtualHosts(
+		List<VirtualHost> virtualHosts = null;
+
+		try {
+			virtualHosts = VirtualHostLocalServiceUtil.getVirtualHosts(
 				getCompanyId(), getLayoutSetId());
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+		}
 
 		if (ListUtil.isEmpty(virtualHosts)) {
 			_virtualHostnames = new TreeMap<>();
@@ -374,6 +364,22 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 	}
 
 	/**
+	 * Sets the name of the layout set's virtual host.
+	 *
+	 * @param      virtualHostname the name of the layout set's virtual host
+	 * @see        #getVirtualHostname()
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #setVirtualHostnames(TreeMap)}
+	 */
+	@Deprecated
+	@Override
+	public void setVirtualHostname(String virtualHostname) {
+		_virtualHostnames = TreeMapBuilder.put(
+			virtualHostname, StringPool.BLANK
+		).build();
+	}
+
+	/**
 	 * Sets the names of the layout set's virtual host name and language IDs.
 	 *
 	 * @param virtualHostnames the map of the layout set's virtual host name and
@@ -395,7 +401,7 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -415,7 +421,6 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 	@CacheField(propagateToInterface = true)
 	private String _companyFallbackVirtualHostname;
 
-	private String _faviconURL;
 	private UnicodeProperties _settingsUnicodeProperties;
 
 	@CacheField(propagateToInterface = true)

@@ -15,11 +15,9 @@
 package com.liferay.account.service;
 
 import com.liferay.account.model.AccountGroup;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -31,7 +29,6 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -40,7 +37,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.io.Serializable;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -84,8 +80,7 @@ public interface AccountGroupLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public AccountGroup addAccountGroup(
-			long userId, String description, String name,
-			ServiceContext serviceContext)
+			long userId, String description, String name)
 		throws PortalException;
 
 	public AccountGroup checkGuestAccountGroup(long companyId)
@@ -115,12 +110,10 @@ public interface AccountGroupLocalService
 	 *
 	 * @param accountGroup the account group
 	 * @return the account group that was removed
-	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
-	public AccountGroup deleteAccountGroup(AccountGroup accountGroup)
-		throws PortalException;
+	public AccountGroup deleteAccountGroup(AccountGroup accountGroup);
 
 	/**
 	 * Deletes the account group with the primary key from the database. Also notifies the appropriate model listeners.
@@ -219,20 +212,24 @@ public interface AccountGroupLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AccountGroup fetchAccountGroup(long accountGroupId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AccountGroup fetchAccountGroupByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
 	/**
-	 * Returns the account group with the matching UUID and company.
+	 * Returns the account group with the matching external reference code and company.
 	 *
-	 * @param uuid the account group's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
 	 * @return the matching account group, or <code>null</code> if a matching account group could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AccountGroup fetchAccountGroupByUuidAndCompanyId(
-		String uuid, long companyId);
+	public AccountGroup fetchAccountGroupByExternalReferenceCode(
+		long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountGroupByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AccountGroup fetchAccountGroupByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	/**
 	 * Returns the account group with the primary key.
@@ -245,22 +242,17 @@ public interface AccountGroupLocalService
 	public AccountGroup getAccountGroup(long accountGroupId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AccountGroup getAccountGroupByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException;
-
 	/**
-	 * Returns the account group with the matching UUID and company.
+	 * Returns the account group with the matching external reference code and company.
 	 *
-	 * @param uuid the account group's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
 	 * @return the matching account group
 	 * @throws PortalException if a matching account group could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AccountGroup getAccountGroupByUuidAndCompanyId(
-			String uuid, long companyId)
+	public AccountGroup getAccountGroupByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -283,15 +275,6 @@ public interface AccountGroupLocalService
 		OrderByComparator<AccountGroup> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<AccountGroup> getAccountGroups(
-		long companyId, String name, int start, int end,
-		OrderByComparator<AccountGroup> orderByComparator);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<AccountGroup> getAccountGroupsByAccountEntryId(
-		long accountEntryId, int start, int end);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AccountGroup> getAccountGroupsByAccountGroupId(
 		long[] accountGroupIds);
 
@@ -307,20 +290,10 @@ public interface AccountGroupLocalService
 	public int getAccountGroupsCount(long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long getAccountGroupsCount(long companyId, String name);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getAccountGroupsCountByAccountEntryId(long accountEntryId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AccountGroup getDefaultAccountGroup(long companyId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
@@ -348,11 +321,6 @@ public interface AccountGroupLocalService
 		long companyId, String keywords, int start, int end,
 		OrderByComparator<AccountGroup> orderByComparator);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BaseModelSearchResult<AccountGroup> searchAccountGroups(
-		long companyId, String keywords, LinkedHashMap<String, Object> params,
-		int start, int end, OrderByComparator<AccountGroup> orderByComparator);
-
 	/**
 	 * Updates the account group in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -368,18 +336,7 @@ public interface AccountGroupLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public AccountGroup updateAccountGroup(
-			long accountGroupId, String description, String name,
-			ServiceContext serviceContext)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public AccountGroup updateExternalReferenceCode(
-			AccountGroup accountGroup, String externalReferenceCode)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public AccountGroup updateExternalReferenceCode(
-			long accountGroupId, String externalReferenceCode)
+			long accountGroupId, String description, String name)
 		throws PortalException;
 
 }

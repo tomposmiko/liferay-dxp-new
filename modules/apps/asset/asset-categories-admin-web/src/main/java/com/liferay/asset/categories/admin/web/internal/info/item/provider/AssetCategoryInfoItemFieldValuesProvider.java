@@ -26,9 +26,12 @@ import com.liferay.info.item.field.reader.InfoItemFieldReaderFieldSetProvider;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -46,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = InfoItemFieldValuesProvider.class)
+@Component(immediate = true, service = InfoItemFieldValuesProvider.class)
 public class AssetCategoryInfoItemFieldValuesProvider
 	implements InfoItemFieldValuesProvider<AssetCategory> {
 
@@ -116,20 +119,28 @@ public class AssetCategoryInfoItemFieldValuesProvider
 		ThemeDisplay themeDisplay = _getThemeDisplay();
 
 		if (themeDisplay != null) {
-			assetCategoryInfoFieldValues.add(
-				new InfoFieldValue<>(
-					AssetCategoryInfoItemFields.displayPageURLInfoField,
-					_getDisplayPageURL(assetCategory, themeDisplay)));
+			try {
+				assetCategoryInfoFieldValues.add(
+					new InfoFieldValue<>(
+						AssetCategoryInfoItemFields.displayPageURLInfoField,
+						_getDisplayPageURL(assetCategory, themeDisplay)));
+			}
+			catch (PortalException portalException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(portalException, portalException);
+				}
+			}
 		}
 
 		return assetCategoryInfoFieldValues;
 	}
 
 	private String _getDisplayPageURL(
-		AssetCategory assetCategory, ThemeDisplay themeDisplay) {
+			AssetCategory assetCategory, ThemeDisplay themeDisplay)
+		throws PortalException {
 
 		LayoutDisplayPageProvider layoutDisplayPageProvider =
-			_layoutDisplayPageProviderRegistry.
+			_layoutDisplayPageProviderTracker.
 				getLayoutDisplayPageProviderByClassName(
 					AssetCategory.class.getName());
 
@@ -168,6 +179,9 @@ public class AssetCategoryInfoItemFieldValuesProvider
 		return null;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetCategoryInfoItemFieldValuesProvider.class);
+
 	@Reference
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
 
@@ -176,8 +190,7 @@ public class AssetCategoryInfoItemFieldValuesProvider
 		_infoItemFieldReaderFieldSetProvider;
 
 	@Reference
-	private LayoutDisplayPageProviderRegistry
-		_layoutDisplayPageProviderRegistry;
+	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
 
 	@Reference
 	private Portal _portal;

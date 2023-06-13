@@ -28,10 +28,6 @@ public class SegmentsExperimentServiceWrapper
 	implements SegmentsExperimentService,
 			   ServiceWrapper<SegmentsExperimentService> {
 
-	public SegmentsExperimentServiceWrapper() {
-		this(null);
-	}
-
 	public SegmentsExperimentServiceWrapper(
 		SegmentsExperimentService segmentsExperimentService) {
 

@@ -22,24 +22,24 @@
 AUI.add(
 	'liferay-pagination',
 	(A) => {
-		const ANode = A.Node;
-		const Lang = A.Lang;
+		var ANode = A.Node;
+		var Lang = A.Lang;
 
-		const BOUNDING_BOX = 'boundingBox';
+		var BOUNDING_BOX = 'boundingBox';
 
-		const ITEMS_PER_PAGE = 'itemsPerPage';
+		var ITEMS_PER_PAGE = 'itemsPerPage';
 
-		const ITEMS_PER_PAGE_LIST = 'itemsPerPageList';
+		var ITEMS_PER_PAGE_LIST = 'itemsPerPageList';
 
-		const NAME = 'pagination';
+		var NAME = 'pagination';
 
-		const PAGE = 'page';
+		var PAGE = 'page';
 
-		const RESULTS = 'results';
+		var RESULTS = 'results';
 
-		const STR_SPACE = ' ';
+		var STR_SPACE = ' ';
 
-		const Pagination = A.Component.create({
+		var Pagination = A.Component.create({
 			ATTRS: {
 				itemsPerPage: {
 					validator: Lang.isNumber,
@@ -67,7 +67,6 @@ AUI.add(
 
 				strings: {
 					setter(value) {
-						// eslint-disable-next-line @liferay/aui/no-merge
 						return A.merge(value, {
 							items: Liferay.Language.get('items'),
 							next: Liferay.Language.get('next'),
@@ -94,13 +93,13 @@ AUI.add(
 
 			prototype: {
 				_afterResultsChange() {
-					const instance = this;
+					var instance = this;
 
 					instance._syncResults();
 				},
 
 				_dispatchRequest(state) {
-					const instance = this;
+					var instance = this;
 
 					if (
 						!Object.prototype.hasOwnProperty.call(
@@ -118,9 +117,9 @@ AUI.add(
 				},
 
 				_getLabelContent(itemsPerPage) {
-					const instance = this;
+					var instance = this;
 
-					const results = {};
+					var results = {};
 
 					if (!itemsPerPage) {
 						itemsPerPage = instance.get(ITEMS_PER_PAGE);
@@ -134,9 +133,9 @@ AUI.add(
 				},
 
 				_getResultsContent(page, itemsPerPage) {
-					const instance = this;
+					var instance = this;
 
-					const results = instance.get(RESULTS);
+					var results = instance.get(RESULTS);
 
 					if (!Lang.isValue(page)) {
 						page = instance.get(PAGE);
@@ -146,10 +145,10 @@ AUI.add(
 						itemsPerPage = instance.get(ITEMS_PER_PAGE);
 					}
 
-					let resultsContent;
+					var resultsContent;
 
 					if (results > itemsPerPage) {
-						const tmp = page * itemsPerPage;
+						var tmp = page * itemsPerPage;
 
 						resultsContent = Lang.sub(instance._resultsMessage, [
 							(page - 1) * itemsPerPage + 1,
@@ -168,22 +167,22 @@ AUI.add(
 				},
 
 				_onChangeRequest(event) {
-					const instance = this;
+					var instance = this;
 
-					const state = event.state;
+					var state = event.state;
 
-					const page = state.page;
+					var page = state.page;
 
-					const itemsPerPage = state.itemsPerPage;
+					var itemsPerPage = state.itemsPerPage;
 
 					instance._syncLabel(itemsPerPage);
 					instance._syncResults(page, itemsPerPage);
 				},
 
 				_onItemClick(event) {
-					const instance = this;
+					var instance = this;
 
-					const itemsPerPage = Lang.toInt(
+					var itemsPerPage = Lang.toInt(
 						event.currentTarget
 							.one('.taglib-text-icon')
 							.attr('data-value')
@@ -193,18 +192,18 @@ AUI.add(
 				},
 
 				_onItemsPerPageChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const page = instance.get(PAGE);
+					var page = instance.get(PAGE);
 
-					const itemsPerPage = event.newVal;
+					var itemsPerPage = event.newVal;
 
 					instance._dispatchRequest({
 						itemsPerPage,
 						page,
 					});
 
-					const results = instance.get(RESULTS);
+					var results = instance.get(RESULTS);
 
 					instance.set(
 						'visible',
@@ -213,9 +212,9 @@ AUI.add(
 				},
 
 				_syncLabel(itemsPerPage) {
-					const instance = this;
+					var instance = this;
 
-					const results = instance._getLabelContent(itemsPerPage);
+					var results = instance._getLabelContent(itemsPerPage);
 
 					instance._deltaSelector
 						.one('.lfr-pagination-delta-selector-amount')
@@ -226,9 +225,9 @@ AUI.add(
 				},
 
 				_syncResults(page, itemsPerPage) {
-					const instance = this;
+					var instance = this;
 
-					const result = instance._getResultsContent(
+					var result = instance._getResultsContent(
 						page,
 						itemsPerPage
 					);
@@ -237,19 +236,19 @@ AUI.add(
 				},
 
 				_uiSetVisible(val) {
-					const instance = this;
+					var instance = this;
 
-					const hideClass = instance.get('hideClass');
+					var hideClass = instance.get('hideClass');
 
-					let hiddenClass = instance.getClassName('hidden');
+					var hiddenClass = instance.getClassName('hidden');
 
 					if (hideClass !== false) {
 						hiddenClass += STR_SPACE + (hideClass || 'hide');
 					}
 
-					const results = instance.get(RESULTS);
+					var results = instance.get(RESULTS);
 
-					const itemsPerPageList = instance.get(ITEMS_PER_PAGE_LIST);
+					var itemsPerPageList = instance.get(ITEMS_PER_PAGE_LIST);
 
 					instance._paginationControls.toggleClass(
 						hiddenClass,
@@ -268,7 +267,7 @@ AUI.add(
 				TPL_DELTA_SELECTOR:
 					'<div class="lfr-pagination-delta-selector">' +
 					'<div class="btn-group lfr-icon-menu">' +
-					'<a class="btn btn-secondary direction-down dropdown-toggle max-display-items-15" href="javascript:void(0);" id="{id}" title="{title}">' +
+					'<a class="btn btn-secondary direction-down dropdown-toggle max-display-items-15" href="javascript:;" id="{id}" title="{title}">' +
 					'<span class="lfr-pagination-delta-selector-amount">{amount}</span>' +
 					'<span class="lfr-icon-menu-text">{title}</span>' +
 					'<i class="icon-caret-down"></i>' +
@@ -278,7 +277,7 @@ AUI.add(
 
 				TPL_ITEM:
 					'<li id="{idLi}" role="presentation">' +
-					'<a class="dropdown-item lfr-pagination-link taglib-icon" href="javascript:void(0);" id="{idLink}" role="menuitem">' +
+					'<a class="dropdown-item lfr-pagination-link taglib-icon" href="javascript:;" id="{idLink}" role="menuitem">' +
 					'<span class="taglib-text-icon" data-index="{index}" data-value="{value}">{value}</span>' +
 					'</a>' +
 					'</li>',
@@ -290,7 +289,7 @@ AUI.add(
 					'<small class="search-results" id="{id}">{value}</small>',
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					Pagination.superclass.bindUI.apply(instance, arguments);
 
@@ -321,23 +320,23 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					new A.EventHandle(instance._eventHandles).detach();
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					Pagination.superclass.renderUI.apply(instance, arguments);
 
-					const boundingBox = instance.get(BOUNDING_BOX);
+					var boundingBox = instance.get(BOUNDING_BOX);
 
 					boundingBox.addClass('lfr-pagination');
 
-					const namespace = instance.get('namespace');
+					var namespace = instance.get('namespace');
 
-					const deltaSelectorId = namespace + 'dataSelectorId';
+					var deltaSelectorId = namespace + 'dataSelectorId';
 
 					instance._itemsPerPageMessage = Liferay.Language.get(
 						'items-per-page'
@@ -349,9 +348,9 @@ AUI.add(
 						'showing-x-results'
 					);
 
-					const selectorLabel = instance._getLabelContent();
+					var selectorLabel = instance._getLabelContent();
 
-					const deltaSelector = ANode.create(
+					var deltaSelector = ANode.create(
 						Lang.sub(instance.TPL_DELTA_SELECTOR, {
 							amount: selectorLabel.amount,
 							id: deltaSelectorId,
@@ -359,26 +358,26 @@ AUI.add(
 						})
 					);
 
-					const itemContainer = ANode.create(
+					var itemContainer = ANode.create(
 						Lang.sub(instance.TPL_ITEM_CONTAINER, {
 							id: namespace + 'itemContainerId',
 						})
 					);
 
-					const itemsContainer = ANode.create(
+					var itemsContainer = ANode.create(
 						Lang.sub(instance.TPL_CONTAINER, {
 							id: namespace + 'itemsContainer',
 						})
 					);
 
-					const searchResults = ANode.create(
+					var searchResults = ANode.create(
 						Lang.sub(instance.TPL_RESULTS, {
 							id: namespace + 'searchResultsId',
 							value: instance._getResultsContent(),
 						})
 					);
 
-					const buffer = instance
+					var buffer = instance
 						.get(ITEMS_PER_PAGE_LIST)
 						.map((item, index) => {
 							return Lang.sub(instance.TPL_ITEM, {

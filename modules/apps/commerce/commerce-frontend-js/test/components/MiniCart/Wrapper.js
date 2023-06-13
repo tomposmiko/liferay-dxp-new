@@ -31,6 +31,7 @@ describe('MiniCart Wrapper', () => {
 			[ORDER_BUTTON]: () => <div>{ORDER_BUTTON}</div>,
 		},
 		isOpen: false,
+		spritemap: 'someSpritemap.svg',
 	};
 
 	const COMPONENT_SELECTOR = '.mini-cart-wrapper';

@@ -27,10 +27,6 @@ public class COREntryRelLocalServiceWrapper
 	implements COREntryRelLocalService,
 			   ServiceWrapper<COREntryRelLocalService> {
 
-	public COREntryRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public COREntryRelLocalServiceWrapper(
 		COREntryRelLocalService corEntryRelLocalService) {
 

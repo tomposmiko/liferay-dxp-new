@@ -28,7 +28,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.product.content.contributor.name=" + CPContentContributorConstants.SUBSCRIPTION_INFO,
 	service = CPContentContributor.class
 )
@@ -72,10 +73,11 @@ public class SubscriptionInfoCPContentContributor
 			return jsonObject;
 		}
 
+		String subscriptionInfo = _getSubscriptionInfo(
+			cpInstance.getCPSubscriptionInfo(), httpServletRequest);
+
 		jsonObject.put(
-			CPContentContributorConstants.SUBSCRIPTION_INFO,
-			_getSubscriptionInfo(
-				cpInstance.getCPSubscriptionInfo(), httpServletRequest));
+			CPContentContributorConstants.SUBSCRIPTION_INFO, subscriptionInfo);
 
 		return jsonObject;
 	}
@@ -113,13 +115,13 @@ public class SubscriptionInfoCPContentContributor
 		StringBundler sb = new StringBundler(
 			(maxSubscriptionCycles > 0) ? 6 : 3);
 
-		sb.append(_language.get(httpServletRequest, "payment-subscription"));
+		sb.append(LanguageUtil.get(httpServletRequest, "payment-subscription"));
 		sb.append(StringPool.OPEN_PARENTHESIS);
 
 		String subscriptionPeriodKey = _getPeriodKey(
 			subscriptionLength, period);
 
-		String subscriptionMessage = _language.format(
+		String subscriptionMessage = LanguageUtil.format(
 			httpServletRequest, "every-x-x",
 			new Object[] {subscriptionLength, subscriptionPeriodKey}, true);
 
@@ -134,7 +136,7 @@ public class SubscriptionInfoCPContentContributor
 
 			String durationPeriodKey = _getPeriodKey(totalLength, period);
 
-			String durationMessage = _language.format(
+			String durationMessage = LanguageUtil.format(
 				httpServletRequest, "duration-x-x",
 				new Object[] {totalLength, durationPeriodKey}, true);
 
@@ -154,9 +156,6 @@ public class SubscriptionInfoCPContentContributor
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

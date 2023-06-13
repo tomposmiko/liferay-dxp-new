@@ -159,10 +159,6 @@
 			INNER JOIN
 				CPDefinition ON
 					CPDefinition.CPDefinitionId = CPricingClassCPDefinitionRel.CPDefinitionId
-			INNER JOIN
-				CommercePricingClass
-			ON
-				CommercePricingClass.commercePricingClassId = CPricingClassCPDefinitionRel.commercePricingClassId
 			LEFT JOIN
 				CPDefinitionLocalization
 			ON
@@ -182,10 +178,6 @@
 			INNER JOIN
 				CPDefinition ON
 					CPDefinition.CPDefinitionId = CPricingClassCPDefinitionRel.CPDefinitionId
-			INNER JOIN
-				CommercePricingClass
-			ON
-				CommercePricingClass.commercePricingClassId = CPricingClassCPDefinitionRel.commercePricingClassId
 			LEFT JOIN
 				CPDefinitionLocalization
 			ON

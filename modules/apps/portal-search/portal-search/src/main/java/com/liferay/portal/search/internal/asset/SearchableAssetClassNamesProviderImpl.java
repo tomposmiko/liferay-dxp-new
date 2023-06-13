@@ -19,8 +19,9 @@ import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.search.asset.SearchableAssetClassNamesProvider;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -28,33 +29,47 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Bryan Engler
  */
-@Component(service = SearchableAssetClassNamesProvider.class)
+@Component(immediate = true, service = SearchableAssetClassNamesProvider.class)
 public class SearchableAssetClassNamesProviderImpl
 	implements SearchableAssetClassNamesProvider {
 
 	@Override
 	public String[] getClassNames(long companyId) {
-		List<String> classNames = new ArrayList<>();
-
 		List<AssetRendererFactory<?>> assetRendererFactories =
 			assetRendererFactoryRegistry.getAssetRendererFactories(companyId);
 
-		for (AssetRendererFactory<?> assetRendererFactory :
-				assetRendererFactories) {
+		Stream<AssetRendererFactory<?>> stream1 =
+			assetRendererFactories.stream();
 
-			if (assetRendererFactory.isSearchable()) {
-				String className = assetRendererFactory.getClassName();
+		String[] searchEngineHelperEntryClassNames =
+			searchEngineHelper.getEntryClassNames();
 
-				if (ArrayUtil.contains(
-						searchEngineHelper.getEntryClassNames(), className,
-						false)) {
+		String[] array1 = stream1.filter(
+			AssetRendererFactory::isSearchable
+		).map(
+			AssetRendererFactory::getClassName
+		).filter(
+			className -> ArrayUtil.contains(
+				searchEngineHelperEntryClassNames, className, false)
+		).toArray(
+			String[]::new
+		);
 
-					classNames.add(className);
-				}
-			}
-		}
+		Stream<String> stream2 = Arrays.stream(
+			searchEngineHelperEntryClassNames);
 
-		return classNames.toArray(new String[0]);
+		String[] array2 = stream2.filter(
+			className -> className.startsWith(
+				"com.liferay.object.model.ObjectDefinition#")
+		).toArray(
+			String[]::new
+		);
+
+		String[] classNames = new String[array1.length + array2.length];
+
+		ArrayUtil.combine(array1, array2, classNames);
+
+		return classNames;
 	}
 
 	@Reference

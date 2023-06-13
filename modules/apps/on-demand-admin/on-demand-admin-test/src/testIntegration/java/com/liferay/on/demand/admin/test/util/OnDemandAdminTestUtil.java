@@ -38,7 +38,7 @@ public class OnDemandAdminTestUtil {
 
 		User user = UserTestUtil.addUser(
 			company.getCompanyId(), TestPropsValues.getUserId(), null,
-			screenName + StringPool.AT + company.getMx(), screenName,
+			company.getMx() + StringPool.AT + screenName, screenName,
 			company.getLocale(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), null,
 			ServiceContextTestUtil.getServiceContext());

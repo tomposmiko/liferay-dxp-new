@@ -46,7 +46,7 @@ public class LayoutData {
 
 		ContainerStyledLayoutStructureItem containerStyledLayoutStructureItem =
 			(ContainerStyledLayoutStructureItem)
-				layoutStructure.addContainerStyledLayoutStructureItem(
+				layoutStructure.addContainerLayoutStructureItem(
 					rootLayoutStructureItem.getItemId(), 0);
 
 		boolean wrapWidgetPageContent = GetterUtil.getBoolean(

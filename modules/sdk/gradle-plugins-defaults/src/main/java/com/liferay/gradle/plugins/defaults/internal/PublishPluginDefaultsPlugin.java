@@ -101,8 +101,10 @@ public class PublishPluginDefaultsPlugin
 			PluginConfig pluginConfig = pluginConfigs.create(name);
 
 			if (gradlePluginFiles.length == 1) {
-				pluginConfig.setDisplayName(
-					bundleExtension.getInstruction(Constants.BUNDLE_NAME));
+				String displayName = bundleExtension.getInstruction(
+					Constants.BUNDLE_NAME);
+
+				pluginConfig.setDisplayName(displayName);
 			}
 
 			pluginConfig.setId(fileName.substring(0, fileName.length() - 11));
@@ -121,9 +123,10 @@ public class PublishPluginDefaultsPlugin
 					if (Validator.isNull(
 							pluginBundleExtension.getDescription())) {
 
-						pluginBundleExtension.setDescription(
-							bundleExtension.getInstruction(
-								Constants.BUNDLE_DESCRIPTION));
+						String description = bundleExtension.getInstruction(
+							Constants.BUNDLE_DESCRIPTION);
+
+						pluginBundleExtension.setDescription(description);
 					}
 
 					Set<String> pluginBundleTags = new TreeSet<>(

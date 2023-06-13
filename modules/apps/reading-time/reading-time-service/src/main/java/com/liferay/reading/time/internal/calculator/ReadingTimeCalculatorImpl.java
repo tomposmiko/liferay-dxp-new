@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -40,17 +41,17 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = ReadingTimeCalculator.class)
+@Component(immediate = true, service = ReadingTimeCalculator.class)
 public class ReadingTimeCalculatorImpl implements ReadingTimeCalculator {
 
 	@Override
-	public Duration calculate(GroupedModel groupedModel) {
+	public Optional<Duration> calculate(GroupedModel groupedModel) {
 		ReadingTimeModelInfo<GroupedModel> readingTimeModelInfo =
 			(ReadingTimeModelInfo<GroupedModel>)_serviceTrackerMap.getService(
 				groupedModel.getModelClassName());
 
 		if (readingTimeModelInfo == null) {
-			return null;
+			return Optional.empty();
 		}
 
 		return calculate(
@@ -60,15 +61,15 @@ public class ReadingTimeCalculatorImpl implements ReadingTimeCalculator {
 	}
 
 	@Override
-	public Duration calculate(
+	public Optional<Duration> calculate(
 		String content, String contentType, Locale locale) {
 
 		if (!_supportedContentTypes.contains(contentType)) {
-			return null;
+			return Optional.empty();
 		}
 
 		if (Validator.isNull(content)) {
-			return Duration.ZERO;
+			return Optional.of(Duration.ZERO);
 		}
 
 		Document document = Jsoup.parseBodyFragment(content);
@@ -82,7 +83,10 @@ public class ReadingTimeCalculatorImpl implements ReadingTimeCalculator {
 
 		List<Element> images = document.getElementsByTag("img");
 
-		return readingTimeDuration.plus(Duration.ofSeconds(3 * images.size()));
+		readingTimeDuration = readingTimeDuration.plus(
+			Duration.ofSeconds(3 * images.size()));
+
+		return Optional.of(readingTimeDuration);
 	}
 
 	@Activate

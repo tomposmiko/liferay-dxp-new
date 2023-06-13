@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.configuration.DefaultKeywordQueryConfiguration",
-	service = KeywordQueryContributor.class
+	immediate = true, service = KeywordQueryContributor.class
 )
 public class DefaultKeywordQueryContributor implements KeywordQueryContributor {
 

@@ -13,6 +13,5 @@
  */
 
 export const FRAGMENT_CONFIGURATION_ROLES = {
-	advanced: 'advanced',
 	style: 'style',
 };

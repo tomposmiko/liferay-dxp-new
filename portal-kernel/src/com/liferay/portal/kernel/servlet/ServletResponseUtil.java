@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.servlet;
 
 import com.liferay.petra.nio.CharsetEncoderUtil;
-import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -49,9 +48,7 @@ import java.nio.channels.FileChannel;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -245,7 +242,7 @@ public class ServletResponseUtil {
 					contentLength = bytes.length;
 				}
 
-				setContentLength(httpServletResponse, contentLength);
+				httpServletResponse.setContentLength(contentLength);
 
 				httpServletResponse.flushBuffer();
 
@@ -386,7 +383,7 @@ public class ServletResponseUtil {
 				}
 				catch (IOException ioException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(ioException);
+						_log.warn(ioException, ioException);
 					}
 				}
 			}
@@ -403,8 +400,7 @@ public class ServletResponseUtil {
 
 		try {
 			StreamUtil.transfer(
-				inputStream, httpServletResponse.getOutputStream(),
-				contentLength);
+				inputStream, httpServletResponse.getOutputStream());
 		}
 		catch (IOException ioException) {
 			_checkSocketException(ioException);
@@ -485,21 +481,6 @@ public class ServletResponseUtil {
 			String extension = GetterUtil.getString(
 				FileUtil.getExtension(fileName));
 
-			if (extension.isEmpty() && Validator.isNotNull(contentType)) {
-				Set<String> extensions = MimeTypesUtil.getExtensions(
-					contentType);
-
-				Iterator<String> iterator = extensions.iterator();
-
-				if (iterator.hasNext()) {
-					extension = iterator.next();
-
-					int index = extension.lastIndexOf(CharPool.PERIOD);
-
-					extension = extension.substring(index + 1);
-				}
-			}
-
 			extension = StringUtil.toLowerCase(extension);
 
 			String[] mimeTypesContentDispositionInline = null;
@@ -510,7 +491,7 @@ public class ServletResponseUtil {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				mimeTypesContentDispositionInline = new String[0];
@@ -571,11 +552,11 @@ public class ServletResponseUtil {
 			isClientAbortException(ioException)) {
 
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioException);
+				_log.warn(ioException.getMessage());
 			}
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
+				_log.debug(ioException, ioException);
 			}
 		}
 		else {

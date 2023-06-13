@@ -24,13 +24,13 @@ import {VIEWS} from './utils/constants';
 
 import '../style/main.scss';
 function OrganizationChart({pageSize, rootOrganizationId, spritemap}) {
-	const [modalActive, setModalActive] = useState(false);
-	const [modalData, setModalData] = useState(null);
-	const [currentView, setCurrentView] = useState(VIEWS[0]);
-	const [expanded, setExpanded] = useState(false);
-	const [menuData, setMenuData] = useState(null);
-	const [menuParentData, setMenuParentData] = useState(null);
-	const [rootData, setRootData] = useState(null);
+	const [modalActive, updateModalActive] = useState(false);
+	const [modalData, updateModalData] = useState(null);
+	const [currentView, updateCurrentView] = useState(VIEWS[0]);
+	const [expanded, updateExpanded] = useState(false);
+	const [menuData, updateMenuData] = useState(null);
+	const [menuParentData, updateMenuParentData] = useState(null);
+	const [rootData, updateRootData] = useState(null);
 	const clickedMenuButtonRef = useRef(null);
 	const chartSVGRef = useRef(null);
 	const chartInstanceRef = useRef(null);
@@ -39,11 +39,11 @@ function OrganizationChart({pageSize, rootOrganizationId, spritemap}) {
 
 	useEffect(() => {
 		if (Number(rootOrganizationId)) {
-			getOrganization(rootOrganizationId).then(setRootData);
+			getOrganization(rootOrganizationId).then(updateRootData);
 		}
 		else {
 			getOrganizations(pageSize).then((jsonResponse) =>
-				setRootData(jsonResponse.items)
+				updateRootData(jsonResponse.items)
 			);
 		}
 	}, [rootOrganizationId, pageSize]);
@@ -60,23 +60,23 @@ function OrganizationChart({pageSize, rootOrganizationId, spritemap}) {
 				spritemap,
 				{
 					open: (parentData, type) => {
-						setModalData({
+						updateModalData({
 							parentData,
 							type,
 						});
-						setModalActive(true);
+						updateModalActive(true);
 					},
 				},
 				{
 					close: () => {
 						clickedMenuButtonRef.current = null;
-						setMenuData(null);
-						setMenuParentData(null);
+						updateMenuData(null);
+						updateMenuParentData(null);
 					},
 					open: (target, data, parentData) => {
 						clickedMenuButtonRef.current = target;
-						setMenuData(data);
-						setMenuParentData(parentData);
+						updateMenuData(data);
+						updateMenuParentData(parentData);
 					},
 				}
 			);
@@ -90,7 +90,7 @@ function OrganizationChart({pageSize, rootOrganizationId, spritemap}) {
 			value={{
 				chartInstanceRef,
 				currentView,
-				setCurrentView,
+				updateCurrentView,
 			}}
 		>
 			<ManagementBar />
@@ -101,7 +101,7 @@ function OrganizationChart({pageSize, rootOrganizationId, spritemap}) {
 				<div className="zoom-controls">
 					<ClayButtonWithIcon
 						displayType="secondary"
-						onClick={() => setExpanded(!expanded)}
+						onClick={() => updateExpanded(!expanded)}
 						small
 						symbol="expand"
 					/>
@@ -132,7 +132,7 @@ function OrganizationChart({pageSize, rootOrganizationId, spritemap}) {
 
 			<ModalProvider
 				active={modalActive}
-				closeModal={() => setModalActive(false)}
+				closeModal={() => updateModalActive(false)}
 				parentData={modalData?.parentData}
 				type={modalData?.type}
 			/>

@@ -14,7 +14,8 @@
 
 package com.liferay.portlet.configuration.icon.print.internal;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -25,12 +26,11 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = PortletConfigurationIcon.class)
+@Component(immediate = true, service = PortletConfigurationIcon.class)
 public class PrintPortletConfigurationIcon
 	extends BasePortletConfigurationIcon {
 
@@ -41,7 +41,22 @@ public class PrintPortletConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "print");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), "print");
+	}
+
+	@Override
+	public String getOnClick(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		return StringBundler.concat(
+			"location.href = '", portletDisplay.getURLPrint(),
+			"'; return false;");
 	}
 
 	@Override
@@ -76,7 +91,9 @@ public class PrintPortletConfigurationIcon
 		return portletDisplay.isShowPrintIcon();
 	}
 
-	@Reference
-	private Language _language;
+	@Override
+	public boolean isToolTip() {
+		return false;
+	}
 
 }

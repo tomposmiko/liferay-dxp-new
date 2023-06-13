@@ -70,9 +70,8 @@ public interface SXPElementLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public SXPElement addSXPElement(
-			String externalReferenceCode, long userId,
-			Map<Locale, String> descriptionMap, String elementDefinitionJSON,
-			boolean readOnly, String schemaVersion,
+			long userId, Map<Locale, String> descriptionMap,
+			String elementDefinitionJSON, boolean readOnly,
 			Map<Locale, String> titleMap, int type,
 			ServiceContext serviceContext)
 		throws PortalException;
@@ -104,8 +103,6 @@ public interface SXPElementLocalService
 	 */
 	@Transactional(enabled = false)
 	public SXPElement createSXPElement(long sxpElementId);
-
-	public void deleteCompanySXPElements(long companyId) throws PortalException;
 
 	/**
 	 * @throws PortalException
@@ -220,10 +217,6 @@ public interface SXPElementLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SXPElement fetchSXPElement(long sxpElementId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SXPElement fetchSXPElementByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
 	/**
 	 * Returns the sxp element with the matching UUID and company.
 	 *
@@ -270,11 +263,6 @@ public interface SXPElementLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SXPElement getSXPElement(long sxpElementId) throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SXPElement getSXPElementByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException;
-
 	/**
 	 * Returns the sxp element with the matching UUID and company.
 	 *
@@ -302,9 +290,6 @@ public interface SXPElementLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<SXPElement> getSXPElements(int start, int end);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<SXPElement> getSXPElements(long companyId, boolean readOnly);
-
 	/**
 	 * Returns the number of sxp elements.
 	 *
@@ -320,7 +305,7 @@ public interface SXPElementLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public SXPElement updateSXPElement(
 			long userId, long sxpElementId, Map<Locale, String> descriptionMap,
-			String elementDefinitionJSON, boolean hidden, String schemaVersion,
+			String elementDefinitionJSON, boolean hidden,
 			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException;
 

@@ -61,14 +61,10 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "history
 				"title", wikiPage.getTitle()
 			).buildPortletURL()
 		%>'
+		total="<%= SocialActivityLocalServiceUtil.getActivitiesCount(0, WikiPage.class.getName(), wikiPage.getResourcePrimKey()) %>"
 	>
-
-		<%
-		WikiSocialActivityHelper wikiSocialActivityHelper = new WikiSocialActivityHelper(wikiRequestHelper);
-		%>
-
 		<liferay-ui:search-container-results
-			results="<%= wikiSocialActivityHelper.getApprovedSocialActivities(wikiPage, searchContainer.getStart(), searchContainer.getEnd()) %>"
+			results="<%= SocialActivityLocalServiceUtil.getActivities(0, WikiPage.class.getName(), wikiPage.getResourcePrimKey(), searchContainer.getStart(), searchContainer.getEnd()) %>"
 		/>
 
 		<liferay-ui:search-container-row
@@ -79,6 +75,8 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "history
 		>
 
 			<%
+			WikiSocialActivityHelper wikiSocialActivityHelper = new WikiSocialActivityHelper(wikiRequestHelper);
+
 			JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject(socialActivity.getExtraData());
 
 			double version = extraDataJSONObject.getDouble("version", 0);
@@ -154,8 +152,6 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "history
 			</c:choose>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator
-			markupView="lexicon"
-		/>
+		<liferay-ui:search-iterator />
 	</liferay-ui:search-container>
 </div>

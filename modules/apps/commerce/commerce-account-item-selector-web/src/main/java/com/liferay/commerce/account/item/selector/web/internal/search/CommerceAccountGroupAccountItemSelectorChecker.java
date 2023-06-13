@@ -14,10 +14,10 @@
 
 package com.liferay.commerce.account.item.selector.web.internal.search;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.model.AccountGroup;
-import com.liferay.account.model.AccountGroupRel;
-import com.liferay.account.service.AccountGroupRelLocalService;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.model.CommerceAccountGroup;
+import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRel;
+import com.liferay.commerce.account.service.CommerceAccountGroupCommerceAccountRelLocalService;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 
 import javax.portlet.RenderResponse;
@@ -29,29 +29,34 @@ public class CommerceAccountGroupAccountItemSelectorChecker
 	extends EmptyOnClickRowChecker {
 
 	public CommerceAccountGroupAccountItemSelectorChecker(
-		RenderResponse renderResponse, AccountGroup accountGroup,
-		AccountGroupRelLocalService accountGroupRelLocalService) {
+		RenderResponse renderResponse,
+		CommerceAccountGroup commerceAccountGroup,
+		CommerceAccountGroupCommerceAccountRelLocalService
+			commerceAccountGroupCommerceAccountRelLocalService) {
 
 		super(renderResponse);
 
-		_accountGroup = accountGroup;
-		_accountGroupRelLocalService = accountGroupRelLocalService;
+		_commerceAccountGroup = commerceAccountGroup;
+		_commerceAccountGroupCommerceAccountRelLocalService =
+			commerceAccountGroupCommerceAccountRelLocalService;
 	}
 
 	@Override
 	public boolean isChecked(Object object) {
-		if (_accountGroup == null) {
+		if (_commerceAccountGroup == null) {
 			return false;
 		}
 
-		AccountEntry accountEntry = (AccountEntry)object;
+		CommerceAccount commerceAccount = (CommerceAccount)object;
 
-		AccountGroupRel accountGroupRel =
-			_accountGroupRelLocalService.fetchAccountGroupRel(
-				_accountGroup.getAccountGroupId(), AccountEntry.class.getName(),
-				accountEntry.getAccountEntryId());
+		CommerceAccountGroupCommerceAccountRel
+			commerceAccountGroupCommerceAccountRel =
+				_commerceAccountGroupCommerceAccountRelLocalService.
+					fetchCommerceAccountGroupCommerceAccountRel(
+						_commerceAccountGroup.getCommerceAccountGroupId(),
+						commerceAccount.getCommerceAccountId());
 
-		if (accountGroupRel == null) {
+		if (commerceAccountGroupCommerceAccountRel == null) {
 			return false;
 		}
 
@@ -63,7 +68,8 @@ public class CommerceAccountGroupAccountItemSelectorChecker
 		return isChecked(object);
 	}
 
-	private final AccountGroup _accountGroup;
-	private final AccountGroupRelLocalService _accountGroupRelLocalService;
+	private final CommerceAccountGroup _commerceAccountGroup;
+	private final CommerceAccountGroupCommerceAccountRelLocalService
+		_commerceAccountGroupCommerceAccountRelLocalService;
 
 }

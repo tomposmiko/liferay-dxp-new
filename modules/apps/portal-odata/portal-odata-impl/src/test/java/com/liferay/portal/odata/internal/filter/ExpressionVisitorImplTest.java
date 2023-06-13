@@ -21,16 +21,12 @@ import com.liferay.portal.kernel.search.TermQuery;
 import com.liferay.portal.kernel.search.TermRangeQuery;
 import com.liferay.portal.kernel.search.WildcardQuery;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.kernel.search.filter.ExistsFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.ComplexEntityField;
-import com.liferay.portal.odata.entity.DateEntityField;
-import com.liferay.portal.odata.entity.DateTimeEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.StringEntityField;
@@ -53,15 +49,14 @@ import com.liferay.portal.search.internal.query.NestedFieldQueryHelperImpl;
 import com.liferay.portal.search.query.NestedFieldQueryHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.time.Instant;
-
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.Assertions;
@@ -169,62 +164,6 @@ public class ExpressionVisitorImplTest {
 
 		Assert.assertEquals(entityField.getName(), queryTerm.getField());
 		Assert.assertEquals("*", queryTerm.getValue());
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithEqualOperationAndNullValueForDateField() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		EntityField entityField = entityFieldsMap.get("date");
-
-		BooleanFilter booleanFilter =
-			(BooleanFilter)
-				_expressionVisitorImpl.visitBinaryExpressionOperation(
-					BinaryExpression.Operation.EQ, entityField, null);
-
-		Assert.assertTrue(booleanFilter.hasClauses());
-
-		List<BooleanClause<Filter>> booleanClauses =
-			booleanFilter.getMustNotBooleanClauses();
-
-		Assert.assertEquals(
-			booleanClauses.toString(), 1, booleanClauses.size());
-
-		BooleanClause<Filter> queryBooleanClause = booleanClauses.get(0);
-
-		ExistsFilter existsFilter =
-			(ExistsFilter)queryBooleanClause.getClause();
-
-		Assert.assertEquals(entityField.getName(), existsFilter.getField());
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithEqualOperationAndNullValueForDateTimeField() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		EntityField entityField = entityFieldsMap.get("dateTime");
-
-		BooleanFilter booleanFilter =
-			(BooleanFilter)
-				_expressionVisitorImpl.visitBinaryExpressionOperation(
-					BinaryExpression.Operation.EQ, entityField, null);
-
-		Assert.assertTrue(booleanFilter.hasClauses());
-
-		List<BooleanClause<Filter>> booleanClauses =
-			booleanFilter.getMustNotBooleanClauses();
-
-		Assert.assertEquals(
-			booleanClauses.toString(), 1, booleanClauses.size());
-
-		BooleanClause<Filter> queryBooleanClause = booleanClauses.get(0);
-
-		ExistsFilter existsFilter =
-			(ExistsFilter)queryBooleanClause.getClause();
-
-		Assert.assertEquals(entityField.getName(), existsFilter.getField());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -440,34 +379,6 @@ public class ExpressionVisitorImplTest {
 
 		Assert.assertEquals(entityField.getName(), queryTerm.getField());
 		Assert.assertEquals("*", queryTerm.getValue());
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithNotEqualOperationAndNullValueForDateField() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		EntityField entityField = entityFieldsMap.get("date");
-
-		ExistsFilter existsFilter =
-			(ExistsFilter)_expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.NE, entityField, null);
-
-		Assert.assertEquals(entityField.getName(), existsFilter.getField());
-	}
-
-	@Test
-	public void testVisitBinaryExpressionOperationWithNotEqualOperationAndNullValueForDateTimeField() {
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		EntityField entityField = entityFieldsMap.get("dateTime");
-
-		ExistsFilter existsFilter =
-			(ExistsFilter)_expressionVisitorImpl.visitBinaryExpressionOperation(
-				BinaryExpression.Operation.NE, entityField, null);
-
-		Assert.assertEquals(entityField.getName(), existsFilter.getField());
 	}
 
 	@Test
@@ -690,35 +601,6 @@ public class ExpressionVisitorImplTest {
 	}
 
 	@Test
-	public void testVisitMethodExpressionWithNow() throws ParseException {
-		Date initialDate = new Date();
-
-		Instant initialInstant = initialDate.toInstant();
-
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-			"yyyyMMddHHmmss");
-
-		ExpressionVisitorImpl expressionVisitorImpl = new ExpressionVisitorImpl(
-			simpleDateFormat, LocaleUtil.getDefault(), _entityModel,
-			nestedFieldQueryHelper);
-
-		Date actualDate = simpleDateFormat.parse(
-			(String)expressionVisitorImpl.visitMethodExpression(
-				Collections.emptyList(), MethodExpression.Type.NOW));
-
-		Instant actualInstant = Instant.ofEpochMilli(actualDate.getTime());
-
-		Date finalDate = new Date();
-
-		Instant finalInstant = finalDate.toInstant();
-
-		Assert.assertTrue(
-			actualInstant.getEpochSecond() >= initialInstant.getEpochSecond());
-		Assert.assertTrue(
-			actualInstant.getEpochSecond() <= finalInstant.getEpochSecond());
-	}
-
-	@Test
 	public void testVisitMethodExpressionWithStartsWith() {
 		Map<String, EntityField> entityFieldsMap =
 			_entityModel.getEntityFieldsMap();
@@ -811,27 +693,21 @@ public class ExpressionVisitorImplTest {
 
 		@Override
 		public Map<String, EntityField> getEntityFieldsMap() {
-			return HashMapBuilder.put(
-				"date",
-				(EntityField)new DateEntityField(
-					"date", locale -> "date", locale -> "date")
-			).put(
-				"dateTime",
-				new DateTimeEntityField(
-					"dateTime", locale -> "dateTime", locale -> "dateTime")
-			).put(
-				"keywords",
+			return Stream.of(
 				new CollectionEntityField(
-					new StringEntityField("keywords", locale -> "keywords.raw"))
-			).put(
-				"title", new StringEntityField("title", locale -> "title")
-			).put(
-				"values",
+					new StringEntityField(
+						"keywords", locale -> "keywords.raw")),
 				new ComplexEntityField(
 					"values",
-					Collections.singletonList(
-						new StringEntityField("value1", locale -> "value1")))
-			).build();
+					Stream.of(
+						new StringEntityField("value1", locale -> "value1")
+					).collect(
+						Collectors.toList()
+					)),
+				new StringEntityField("title", locale -> "title")
+			).collect(
+				Collectors.toMap(EntityField::getName, Function.identity())
+			);
 		}
 
 		@Override

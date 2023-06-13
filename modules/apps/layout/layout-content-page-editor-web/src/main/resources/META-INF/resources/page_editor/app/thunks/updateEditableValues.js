@@ -13,31 +13,42 @@
  */
 
 import updateEditableValuesAction from '../actions/updateEditableValues';
+import updatePageContents from '../actions/updatePageContents';
 import FragmentService from '../services/FragmentService';
+import InfoItemService from '../services/InfoItemService';
 
 export default function updateEditableValues({
 	editableValues,
 	fragmentEntryLinkId,
+	languageId,
+	segmentsExperienceId,
 }) {
-	return (dispatch, getState) => {
-		const {languageId, segmentsExperienceId} = getState();
-
-		return FragmentService.updateEditableValues({
+	return (dispatch) =>
+		FragmentService.updateEditableValues({
 			editableValues,
 			fragmentEntryLinkId,
 			languageId,
 			onNetworkStatus: dispatch,
-			segmentsExperienceId,
-		}).then(({fragmentEntryLink, pageContents}) => {
-			dispatch(
-				updateEditableValuesAction({
-					content: fragmentEntryLink.content,
-					editableValues,
-					fragmentEntryLinkId,
-					pageContents,
-					segmentsExperienceId,
-				})
-			);
-		});
-	};
+		})
+			.then((fragmentEntryLink) => {
+				dispatch(
+					updateEditableValuesAction({
+						content: fragmentEntryLink.content,
+						editableValues,
+						fragmentEntryLinkId,
+						segmentsExperienceId,
+					})
+				);
+			})
+			.then(() => {
+				InfoItemService.getPageContents({
+					onNetworkStatus: dispatch,
+				}).then((pageContents) => {
+					dispatch(
+						updatePageContents({
+							pageContents,
+						})
+					);
+				});
+			});
 }

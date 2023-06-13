@@ -413,9 +413,9 @@ class App extends EventEmitter {
 			return this.activeScreen;
 		}
 		/* jshint newcap: false */
-		let screen = this.screens[path];
+		var screen = this.screens[path];
 		if (!screen) {
-			const handler = route.getHandler();
+			var handler = route.getHandler();
 			if (
 				handler === Screen ||
 				Screen.isImplementedBy(handler.prototype)
@@ -460,7 +460,7 @@ class App extends EventEmitter {
 	 * @return {Promise} Returns a pending request cancellable promise.
 	 */
 	doNavigate_(path, opt_replaceHistory) {
-		const route = this.findRoute(path);
+		var route = this.findRoute(path);
 		if (!route) {
 			return Promise.reject(new Error('No route for ' + path));
 		}
@@ -468,7 +468,7 @@ class App extends EventEmitter {
 		this.stopPendingNavigate_();
 		this.isNavigationPending = true;
 
-		const nextScreen = this.createScreenInstance(path, route);
+		var nextScreen = this.createScreenInstance(path, route);
 
 		return this.maybePreventDeactivate_()
 			.then(() => this.maybePreventActivate_(nextScreen))
@@ -563,8 +563,8 @@ class App extends EventEmitter {
 	 */
 	findRoute(path) {
 		path = this.getRoutePath(path);
-		for (let i = 0; i < this.routes.length; i++) {
-			const route = this.routes[i];
+		for (var i = 0; i < this.routes.length; i++) {
+			var route = this.routes[i];
 			if (route.matchesPath(path)) {
 				return route;
 			}
@@ -689,7 +689,7 @@ class App extends EventEmitter {
 	 * @return {boolean}
 	 */
 	hasRoutes() {
-		return !!this.routes.length;
+		return this.routes.length > 0;
 	}
 
 	/**
@@ -720,7 +720,7 @@ class App extends EventEmitter {
 	 * @protected
 	 */
 	lockHistoryScrollPosition_() {
-		const state = window.history.state;
+		var state = window.history.state;
 		if (!state) {
 			return;
 		}
@@ -734,8 +734,8 @@ class App extends EventEmitter {
 		// behaviors can happen even on the same browser, hence the race will decide
 		// the winner.
 
-		let winner = false;
-		const switchScrollPositionRace = function () {
+		var winner = false;
+		var switchScrollPositionRace = function () {
 			document.removeEventListener(
 				'scroll',
 				switchScrollPositionRace,
@@ -807,7 +807,7 @@ class App extends EventEmitter {
 			return;
 		}
 
-		let navigateFailed = false;
+		var navigateFailed = false;
 		try {
 			this.navigate(getUrlPath(href), false, event);
 		}
@@ -937,8 +937,8 @@ class App extends EventEmitter {
 	 * @param {!string} path Path containing anchor
 	 */
 	maybeUpdateScrollPositionState_() {
-		const hash = window.location.hash;
-		const anchorElement = document.getElementById(hash.substring(1));
+		var hash = window.location.hash;
+		var anchorElement = document.getElementById(hash.substring(1));
 		if (anchorElement) {
 			const {offsetLeft, offsetTop} = getNodeOffset(anchorElement);
 			this.saveHistoryCurrentPageScrollPosition_(offsetTop, offsetLeft);
@@ -1019,7 +1019,7 @@ class App extends EventEmitter {
 	 * @protected
 	 */
 	onBeforeUnloadDefault_(event) {
-		const func = window._onbeforeunload;
+		var func = window._onbeforeunload;
 		if (func && !func._overloaded && func()) {
 			event.preventDefault();
 		}
@@ -1051,7 +1051,7 @@ class App extends EventEmitter {
 	 * @protected
 	 */
 	onDocSubmitDelegate_(event) {
-		const form = event.delegateTarget;
+		var form = event.delegateTarget;
 		if (form.method === 'get') {
 			return;
 		}
@@ -1112,7 +1112,7 @@ class App extends EventEmitter {
 			return;
 		}
 
-		const state = event.state;
+		var state = event.state;
 
 		if (!state) {
 			if (window.location.hash) {
@@ -1193,7 +1193,7 @@ class App extends EventEmitter {
 		this.captureScrollPositionFromScrollEvent = false;
 		document.documentElement.classList.add(this.loadingCssClass);
 
-		const endNavigatePayload = {
+		var endNavigatePayload = {
 			form: event.form,
 			path: event.path,
 		};
@@ -1229,12 +1229,12 @@ class App extends EventEmitter {
 	 * @return {Promise} Returns a pending request cancellable promise.
 	 */
 	prefetch(path) {
-		const route = this.findRoute(path);
+		var route = this.findRoute(path);
 		if (!route) {
 			return Promise.reject(new Error('No route for ' + path));
 		}
 
-		const nextScreen = this.createScreenInstance(path, route);
+		var nextScreen = this.createScreenInstance(path, route);
 
 		return nextScreen
 			.load(path)
@@ -1296,7 +1296,7 @@ class App extends EventEmitter {
 	 */
 	prepareNavigateSurfaces_(nextScreen, surfaces, params) {
 		Object.keys(surfaces).forEach((id) => {
-			const surfaceContent = nextScreen.getSurfaceContent(id, params);
+			var surfaceContent = nextScreen.getSurfaceContent(id, params);
 			surfaces[id].addContent(nextScreen.getId(), surfaceContent);
 		});
 	}
@@ -1328,7 +1328,7 @@ class App extends EventEmitter {
 	 * @param {!string} path Path containing the querystring part.
 	 */
 	removeScreen(path) {
-		const screen = this.screens[path];
+		var screen = this.screens[path];
 		if (screen) {
 			Object.keys(this.surfaces).forEach((surfaceId) =>
 				this.surfaces[surfaceId].remove(screen.getId())
@@ -1344,7 +1344,7 @@ class App extends EventEmitter {
 	 * @param {!number} scrollLeft Number containing the left scroll position to be saved.
 	 */
 	saveHistoryCurrentPageScrollPosition_(scrollTop, scrollLeft) {
-		const state = window.history.state;
+		var state = window.history.state;
 		if (state && state.senna) {
 			[state.scrollTop, state.scrollLeft] = [scrollTop, scrollLeft];
 			window.history.replaceState(state, null, null);
@@ -1456,15 +1456,15 @@ class App extends EventEmitter {
 	 * @return {?Promise=}
 	 */
 	syncScrollPositionSyncThenAsync_() {
-		const state = window.history.state;
+		var state = window.history.state;
 		if (!state) {
 			return;
 		}
 
-		const scrollTop = state.scrollTop;
-		const scrollLeft = state.scrollLeft;
+		var scrollTop = state.scrollTop;
+		var scrollLeft = state.scrollLeft;
 
-		const sync = () => {
+		var sync = () => {
 			if (this.updateScrollPosition) {
 				window.scrollTo(scrollLeft, scrollTop);
 			}

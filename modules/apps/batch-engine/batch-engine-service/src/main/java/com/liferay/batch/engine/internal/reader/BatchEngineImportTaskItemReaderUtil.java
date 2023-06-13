@@ -15,24 +15,16 @@
 package com.liferay.batch.engine.internal.reader;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -75,10 +67,10 @@ public class BatchEngineImportTaskItemReaderUtil {
 			}
 
 			for (Field declaredField : itemClass.getDeclaredFields()) {
-				JsonAnySetter[] jsonAnySetters =
+				JsonAnySetter[] annotationsByType =
 					declaredField.getAnnotationsByType(JsonAnySetter.class);
 
-				if (jsonAnySetters.length > 0) {
+				if (annotationsByType.length > 0) {
 					field = declaredField;
 
 					break;
@@ -99,6 +91,26 @@ public class BatchEngineImportTaskItemReaderUtil {
 		return item;
 	}
 
+	public static void handleMapField(
+		String fieldName, Map<String, Object> fieldNameValueMap,
+		int lastDelimiterIndex, String value) {
+
+		String key = fieldName.substring(lastDelimiterIndex + 1);
+
+		fieldName = fieldName.substring(0, lastDelimiterIndex);
+
+		Map<String, String> valueMap =
+			(Map<String, String>)fieldNameValueMap.get(fieldName);
+
+		if (valueMap == null) {
+			valueMap = new HashMap<>();
+
+			fieldNameValueMap.put(fieldName, valueMap);
+		}
+
+		valueMap.put(key, value);
+	}
+
 	public static Map<String, Object> mapFieldNames(
 		Map<String, ? extends Serializable> fieldNameMappingMap,
 		Map<String, Object> fieldNameValueMap) {
@@ -114,76 +126,13 @@ public class BatchEngineImportTaskItemReaderUtil {
 				entry.getKey());
 
 			if (Validator.isNotNull(targetFieldName)) {
-				Object object = targetFieldNameValueMap.get(targetFieldName);
-
-				if ((object != null) && (object instanceof Map)) {
-					Map<?, ?> map = (Map)object;
-
-					map.putAll((Map)entry.getValue());
-				}
-				else {
-					targetFieldNameValueMap.put(
-						targetFieldName, entry.getValue());
-				}
+				targetFieldNameValueMap.put(targetFieldName, entry.getValue());
 			}
 		}
 
 		return targetFieldNameValueMap;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BatchEngineImportTaskItemReaderUtil.class);
-
-	private static final ObjectMapper _objectMapper = new ObjectMapper() {
-		{
-			SimpleModule simpleModule = new SimpleModule();
-
-			simpleModule.addDeserializer(Map.class, new MapStdDeserializer());
-
-			registerModule(simpleModule);
-		}
-	};
-
-	private static class MapStdDeserializer
-		extends StdDeserializer<Map<String, Object>> {
-
-		public MapStdDeserializer() {
-			this(Map.class);
-		}
-
-		@Override
-		public Map<String, Object> deserialize(
-				JsonParser jsonParser,
-				DeserializationContext deserializationContext)
-			throws IOException {
-
-			try {
-				return deserializationContext.readValue(
-					jsonParser, LinkedHashMap.class);
-			}
-			catch (Exception exception) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
-				}
-
-				Map<String, Object> map = new LinkedHashMap<>();
-
-				String string = jsonParser.getValueAsString();
-
-				for (String line : string.split(StringPool.RETURN_NEW_LINE)) {
-					String[] lineParts = line.split(StringPool.COLON);
-
-					map.put(lineParts[0], lineParts[1]);
-				}
-
-				return map;
-			}
-		}
-
-		protected MapStdDeserializer(Class<?> clazz) {
-			super(clazz);
-		}
-
-	}
+	private static final ObjectMapper _objectMapper = new ObjectMapper();
 
 }

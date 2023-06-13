@@ -9,19 +9,18 @@
  * distribution rights of the Software.
  */
 
-import {
-	hoursToMilliseconds,
-	intervalToDuration,
-	minutesToMilliseconds,
-} from 'date-fns';
+import moment from 'moment';
 
-export function durationAsMilliseconds(days = 0, fullHours) {
-	const [hours = 0, minutes = 0] = fullHours.split(':');
+export function durationAsMilliseconds(days, fullHours) {
+	const [hours, minutes] = fullHours.split(':');
 
-	return (
-		hoursToMilliseconds(Number(days) * 24 + Number(hours)) +
-		minutesToMilliseconds(Number(minutes))
-	);
+	return moment
+		.duration({
+			days,
+			hours,
+			minutes,
+		})
+		.asMilliseconds();
 }
 
 export function formatDuration(millisecondsDuration) {
@@ -63,30 +62,31 @@ export function formatHours(hours, minutes) {
 }
 
 export function getDurationValues(durationValue) {
-	const fullDuration = intervalToDuration({
-		end: new Date(durationValue),
-		start: new Date(0),
-	});
+	const fullDuration = moment.duration(durationValue);
 
 	return {
-		days: fullDuration.days || null,
-		hours: fullDuration.hours || null,
-		minutes: fullDuration.minutes || null,
-		seconds: fullDuration.seconds || null,
+		// eslint-disable-next-line radix
+		days: parseInt(fullDuration.asDays()) || null,
+		hours: fullDuration.hours() || null,
+		minutes: fullDuration.minutes() || null,
+		seconds: fullDuration.seconds() || null,
 	};
 }
 
 export function remainingTimeFormat(
 	onTime,
-	remainingTime = 0,
+	remainingTime,
 	ignoreZeros = false
 ) {
 	const remainingTimePositive = onTime ? remainingTime : remainingTime * -1;
 
-	const {days, hours, minutes, seconds} = intervalToDuration({
-		end: new Date(0, 0, 0, 0, 0, 0, remainingTimePositive),
-		start: new Date(0, 0, 0, 0, 0, 0, 0),
-	});
+	const remainingTimeUTC = moment.utc(remainingTimePositive);
+
+	const days = remainingTimeUTC.format('D') - 1;
+
+	const hours = remainingTimeUTC.format('HH');
+
+	const minutes = remainingTimeUTC.format('mm');
 
 	let durationText = '';
 
@@ -104,6 +104,8 @@ export function remainingTimeFormat(
 		}
 
 		if (!durationText) {
+			const seconds = remainingTimeUTC.format('ss');
+
 			durationText += `${seconds}sec`;
 		}
 

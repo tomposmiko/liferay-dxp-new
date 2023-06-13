@@ -24,6 +24,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.exception.NoSuchFeedException;
 import com.liferay.journal.model.JournalFeed;
+import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalFeedLocalService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -35,9 +36,11 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -54,7 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Díaz
  */
 @Component(
-	property = "content.processor.type=JournalFeedReferences",
+	immediate = true, property = "content.processor.type=JournalFeedReferences",
 	service = ExportImportContentProcessor.class
 )
 public class JournalFeedReferencesExportImportContentProcessor
@@ -67,7 +70,7 @@ public class JournalFeedReferencesExportImportContentProcessor
 			boolean escapeContent)
 		throws Exception {
 
-		return _replaceExportJournalFeedReferences(
+		return replaceExportJournalFeedReferences(
 			portletDataContext, stagedModel, content, exportReferencedContent);
 	}
 
@@ -77,7 +80,7 @@ public class JournalFeedReferencesExportImportContentProcessor
 			String content)
 		throws Exception {
 
-		return _replaceImportJournalFeedReferences(
+		return replaceImportJournalFeedReferences(
 			portletDataContext, stagedModel, content);
 	}
 
@@ -85,12 +88,12 @@ public class JournalFeedReferencesExportImportContentProcessor
 	public void validateContentReferences(long groupId, String content)
 		throws PortalException {
 
-		if (_isValidateJournalFeedReferences()) {
-			_validateJournalFeedReferences(groupId, content);
+		if (isValidateJournalFeedReferences()) {
+			validateJournalFeedReferences(groupId, content);
 		}
 	}
 
-	private JournalFeed _getJournalFeed(Map<String, String> map) {
+	protected JournalFeed getJournalFeed(Map<String, String> map) {
 		if (MapUtil.isEmpty(map)) {
 			return null;
 		}
@@ -107,15 +110,18 @@ public class JournalFeedReferencesExportImportContentProcessor
 			}
 		}
 		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+			else if (_log.isWarnEnabled()) {
+				_log.warn(exception.getMessage());
 			}
 		}
 
 		return journalFeed;
 	}
 
-	private Map<String, String> _getJournalFeedReferenceParameters(
+	protected Map<String, String> getJournalFeedReferenceParameters(
 		long groupId, String content, int beginPos, int endPos) {
 
 		endPos = StringUtil.indexOfAny(
@@ -152,37 +158,23 @@ public class JournalFeedReferencesExportImportContentProcessor
 		).build();
 	}
 
-	private String _getJournalFeedReferenceURL(
-		String content, int beginPos, int endPos) {
-
-		endPos = StringUtil.indexOfAny(
-			content, _JOURNAL_FEED_REFERENCE_STOP_CHARS, beginPos, endPos);
-
-		if (endPos == -1) {
-			return null;
-		}
-
-		return content.substring(beginPos, endPos);
-	}
-
-	private boolean _isValidateJournalFeedReferences() {
+	protected boolean isValidateJournalFeedReferences() {
 		try {
-			ExportImportServiceConfiguration exportImportServiceConfiguration =
+			ExportImportServiceConfiguration configuration =
 				_configurationProvider.getCompanyConfiguration(
 					ExportImportServiceConfiguration.class,
 					CompanyThreadLocal.getCompanyId());
 
-			return exportImportServiceConfiguration.
-				validateJournalFeedReferences();
+			return configuration.validateJournalFeedReferences();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return true;
 	}
 
-	private String _replaceExportJournalFeedReferences(
+	protected String replaceExportJournalFeedReferences(
 			PortletDataContext portletDataContext, StagedModel stagedModel,
 			String content, boolean exportReferencedContent)
 		throws Exception {
@@ -215,11 +207,11 @@ public class JournalFeedReferencesExportImportContentProcessor
 			}
 
 			Map<String, String> journalFeedReferenceParameters =
-				_getJournalFeedReferenceParameters(
+				getJournalFeedReferenceParameters(
 					portletDataContext.getScopeGroupId(), content, beginPos,
 					endPos);
 
-			JournalFeed journalFeed = _getJournalFeed(
+			JournalFeed journalFeed = getJournalFeed(
 				journalFeedReferenceParameters);
 
 			if (journalFeed == null) {
@@ -288,7 +280,7 @@ public class JournalFeedReferencesExportImportContentProcessor
 		return sb.toString();
 	}
 
-	private String _replaceImportJournalFeedReferences(
+	protected String replaceImportJournalFeedReferences(
 			PortletDataContext portletDataContext, StagedModel stagedModel,
 			String content)
 		throws Exception {
@@ -373,8 +365,11 @@ public class JournalFeedReferencesExportImportContentProcessor
 					journalFeedId);
 			}
 			catch (PortalException portalException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+				if (_log.isDebugEnabled()) {
+					_log.debug(portalException, portalException);
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn(portalException.getMessage());
 				}
 
 				continue;
@@ -390,7 +385,14 @@ public class JournalFeedReferencesExportImportContentProcessor
 		return content;
 	}
 
-	private void _validateJournalFeedReferences(long groupId, String content)
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
+	}
+
+	protected void validateJournalFeedReferences(long groupId, String content)
 		throws PortalException {
 
 		String[] patterns = {_JOURNAL_FEED_FRIENDLY_URL};
@@ -405,9 +407,12 @@ public class JournalFeedReferencesExportImportContentProcessor
 				break;
 			}
 
-			JournalFeed journalFeed = _getJournalFeed(
-				_getJournalFeedReferenceParameters(
-					groupId, content, beginPos, endPos));
+			Map<String, String> journalFeedReferenceParameters =
+				getJournalFeedReferenceParameters(
+					groupId, content, beginPos, endPos);
+
+			JournalFeed journalFeed = getJournalFeed(
+				journalFeedReferenceParameters);
 
 			if (journalFeed == null) {
 				ExportImportContentValidationException
@@ -417,13 +422,8 @@ public class JournalFeedReferencesExportImportContentProcessor
 								class.getName(),
 							new NoSuchFeedException());
 
-				exportImportContentValidationException.setJournalArticleFeedURL(
-					_getJournalFeedReferenceURL(content, beginPos, endPos));
 				exportImportContentValidationException.setStagedModelClassName(
 					JournalFeed.class.getName());
-				exportImportContentValidationException.setType(
-					ExportImportContentValidationException.
-						JOURNAL_FEED_NOT_FOUND);
 
 				throw exportImportContentValidationException;
 			}
@@ -445,12 +445,23 @@ public class JournalFeedReferencesExportImportContentProcessor
 		JournalFeedReferencesExportImportContentProcessor.class);
 
 	@Reference
+	private CompanyLocalService _companyLocalService;
+
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference
+	private Http _http;
+
+	@Reference
+	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
 	private JournalFeedLocalService _journalFeedLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }

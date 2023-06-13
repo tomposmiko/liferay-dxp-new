@@ -15,12 +15,11 @@
 package com.liferay.blogs.web.internal.portlet.action;
 
 import com.liferay.blogs.constants.BlogsPortletKeys;
-import com.liferay.blogs.web.internal.display.context.BlogsViewEntriesDisplayContext;
-import com.liferay.blogs.web.internal.display.context.BlogsViewImagesDisplayContext;
+import com.liferay.blogs.web.internal.constants.BlogsWebKeys;
+import com.liferay.blogs.web.internal.display.context.BlogEntriesDisplayContext;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HtmlParser;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.trash.TrashHelper;
@@ -37,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + BlogsPortletKeys.BLOGS,
 		"javax.portlet.name=" + BlogsPortletKeys.BLOGS_ADMIN,
@@ -58,14 +58,11 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		}
 
 		renderRequest.setAttribute(
-			BlogsViewEntriesDisplayContext.class.getName(),
-			new BlogsViewEntriesDisplayContext(
-				_htmlParser, _portal, renderRequest, renderResponse,
+			BlogsWebKeys.BLOG_ENTRIES_DISPLAY_CONTEXT,
+			new BlogEntriesDisplayContext(
+				_portal.getLiferayPortletRequest(renderRequest),
+				_portal.getLiferayPortletResponse(renderResponse),
 				_trashHelper));
-		renderRequest.setAttribute(
-			BlogsViewImagesDisplayContext.class.getName(),
-			new BlogsViewImagesDisplayContext(
-				_portal.getHttpServletRequest(renderRequest)));
 
 		return "/blogs_admin/view.jsp";
 	}
@@ -78,9 +75,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 		return portletDisplay.getPortletName();
 	}
-
-	@Reference
-	private HtmlParser _htmlParser;
 
 	@Reference
 	private Portal _portal;

@@ -62,13 +62,6 @@ public class WorkflowHandlerWrapper<T> implements WorkflowHandler<T> {
 	}
 
 	@Override
-	public long getDiscussionClassPK(
-		Map<String, Serializable> workflowContext) {
-
-		return _workflowHandler.getDiscussionClassPK(workflowContext);
-	}
-
-	@Override
 	public String getIconCssClass() {
 		return _workflowHandler.getIconCssClass();
 	}
@@ -108,6 +101,20 @@ public class WorkflowHandlerWrapper<T> implements WorkflowHandler<T> {
 
 		return _workflowHandler.getURLEdit(
 			classPK, liferayPortletRequest, liferayPortletResponse);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #getNotificationLink(long, ServiceContext)}}
+	 */
+	@Deprecated
+	@Override
+	public String getURLEditWorkflowTask(
+			long workflowTaskId, ServiceContext serviceContext)
+		throws PortalException {
+
+		return _workflowHandler.getURLEditWorkflowTask(
+			workflowTaskId, serviceContext);
 	}
 
 	@Override
@@ -151,11 +158,6 @@ public class WorkflowHandlerWrapper<T> implements WorkflowHandler<T> {
 	@Override
 	public boolean isAssetTypeSearchable() {
 		return _workflowHandler.isAssetTypeSearchable();
-	}
-
-	@Override
-	public boolean isCommentable() {
-		return _workflowHandler.isCommentable();
 	}
 
 	@Override

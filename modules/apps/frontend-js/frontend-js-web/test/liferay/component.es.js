@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import {
 	component,
 	componentReady,

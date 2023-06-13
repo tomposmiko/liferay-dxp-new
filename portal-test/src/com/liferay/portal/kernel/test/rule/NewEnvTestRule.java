@@ -229,19 +229,17 @@ public class NewEnvTestRule implements TestRule {
 		for (String variable : variables) {
 			String resolvedVariable = resolveSystemProperty(variable);
 
-			int index = resolvedVariable.indexOf(CharPool.EQUAL);
+			String[] parts = StringUtil.split(resolvedVariable, CharPool.EQUAL);
 
-			if (index == -1) {
+			if (parts.length != 2) {
 				throw new IllegalArgumentException(
 					StringBundler.concat(
 						"Wrong environment variable ", variable,
 						" resolved as ", resolvedVariable,
-						". Need to contain \"=\""));
+						". Need to be \"key=value\" format"));
 			}
 
-			environmentMap.put(
-				resolvedVariable.substring(0, index),
-				resolvedVariable.substring(index + 1));
+			environmentMap.put(parts[0], parts[1]);
 		}
 
 		return environmentMap;

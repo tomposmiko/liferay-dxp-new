@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class COREntryServiceWrapper
 	implements COREntryService, ServiceWrapper<COREntryService> {
 
-	public COREntryServiceWrapper() {
-		this(null);
-	}
-
 	public COREntryServiceWrapper(COREntryService corEntryService) {
 		_corEntryService = corEntryService;
 	}

@@ -47,8 +47,7 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		_initializeContext();
 
 		return _importTaskResource.deleteImportTask(
-			name, callbackURL, _getExternalReferenceCode(),
-			_getImportStrategy(), _getTaskItemDelegateName(), object);
+			name, callbackURL, _getTaskItemDelegateName(), object);
 	}
 
 	@Override
@@ -59,9 +58,7 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		_initializeContext();
 
 		return _importTaskResource.postImportTask(
-			name, callbackURL, _getQueryParameterValue("createStrategy"),
-			_getExternalReferenceCode(), fields, _getImportStrategy(),
-			_getTaskItemDelegateName(), _getItemsArray(object));
+			name, callbackURL, fields, _getTaskItemDelegateName(), object);
 	}
 
 	@Override
@@ -71,9 +68,7 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		_initializeContext();
 
 		return _importTaskResource.putImportTask(
-			name, callbackURL, _getExternalReferenceCode(),
-			_getImportStrategy(), _getTaskItemDelegateName(),
-			_getQueryParameterValue("updateStrategy"), object);
+			name, callbackURL, _getTaskItemDelegateName(), object);
 	}
 
 	@Override
@@ -103,32 +98,14 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		_contextUser = contextUser;
 	}
 
-	private String _getExternalReferenceCode() {
-		return _getQueryParameterValue("externalReferenceCode");
-	}
-
-	private String _getImportStrategy() {
-		return _getQueryParameterValue("importStrategy");
-	}
-
-	private Object _getItemsArray(Object object) {
-		if (!(object instanceof Map)) {
-			return object;
-		}
-
-		Map<?, ?> map = (Map)object;
-
-		return map.get("items");
-	}
-
-	private String _getQueryParameterValue(String queryParameterName) {
+	private String _getTaskItemDelegateName() {
 		MultivaluedMap<String, String> queryParameters =
 			_contextUriInfo.getQueryParameters();
 
 		for (Map.Entry<String, List<String>> entry :
 				queryParameters.entrySet()) {
 
-			if (!Objects.equals(entry.getKey(), queryParameterName)) {
+			if (!Objects.equals(entry.getKey(), "taskItemDelegateName")) {
 				continue;
 			}
 
@@ -142,10 +119,6 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		}
 
 		return null;
-	}
-
-	private String _getTaskItemDelegateName() {
-		return _getQueryParameterValue("taskItemDelegateName");
 	}
 
 	private void _initializeContext() {

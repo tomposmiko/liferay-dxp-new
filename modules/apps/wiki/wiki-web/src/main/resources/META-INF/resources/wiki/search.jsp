@@ -48,18 +48,55 @@ WikiURLHelper wikiURLHelper = new WikiURLHelper(wikiRequestHelper, renderRespons
 
 	<div class="form-search">
 		<liferay-ui:input-search
+			autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>"
 			placeholder='<%= LanguageUtil.get(request, "keywords") %>'
 			title='<%= LanguageUtil.get(request, "search-pages") %>'
 		/>
 	</div>
 
-	<%
-	WikiSearchDisplayContext wikiSearchDisplayContext = new WikiSearchDisplayContext(request, renderRequest, renderResponse, wikiPortletInstanceSettingsHelper);
-	%>
-
 	<liferay-ui:search-container
-		searchContainer="<%= wikiSearchDisplayContext.getSearchContainer() %>"
+		emptyResultsMessage='<%= LanguageUtil.format(request, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false) %>'
+		iteratorURL='<%=
+			PortletURLBuilder.createRenderURL(
+				renderResponse
+			).setMVCRenderCommandName(
+				"/wiki/search"
+			).setRedirect(
+				redirect
+			).setKeywords(
+				keywords
+			).setParameter(
+				"nodeId", nodeId
+			).buildPortletURL()
+		%>'
 	>
+
+		<%
+		Indexer<WikiPage> indexer = IndexerRegistryUtil.getIndexer(WikiPage.class);
+
+		SearchContext searchContext = SearchContextFactory.getInstance(request);
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(wikiPortletInstanceSettingsHelper.isEnableHighlighting());
+
+		searchContext.setAttribute("paginationType", "more");
+		searchContext.setEnd(searchContainer.getEnd());
+		searchContext.setIncludeAttachments(true);
+		searchContext.setIncludeDiscussions(true);
+		searchContext.setKeywords(keywords);
+		searchContext.setNodeIds(nodeIds);
+		searchContext.setStart(searchContainer.getStart());
+
+		Hits hits = indexer.search(searchContext);
+
+		searchContainer.setTotal(hits.getLength());
+		%>
+
+		<liferay-ui:search-container-results
+			results="<%= SearchResultUtil.getSearchResults(hits, locale) %>"
+		/>
+
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.kernel.search.SearchResult"
 			modelVar="searchResult"

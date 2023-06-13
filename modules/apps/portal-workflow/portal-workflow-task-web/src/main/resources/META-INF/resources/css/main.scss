@@ -95,6 +95,12 @@
 	.form-navigator {
 		.user-info,
 		.organization-info {
+			.user-logo,
+			.organization-logo {
+				margin-right: 5px;
+				width: 35px;
+			}
+
 			.user-name {
 				word-wrap: break-word;
 			}
@@ -325,7 +331,6 @@
 }
 
 .asset-type,
-.author,
 .task-name,
 .due-date {
 	margin-right: 20px;
@@ -363,8 +368,4 @@
 			margin-right: 0.5rem;
 		}
 	}
-}
-
-.navigation-bar-light {
-	padding-top: 2.5rem;
 }

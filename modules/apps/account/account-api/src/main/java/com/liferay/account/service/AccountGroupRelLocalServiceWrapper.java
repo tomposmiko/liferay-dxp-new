@@ -27,10 +27,6 @@ public class AccountGroupRelLocalServiceWrapper
 	implements AccountGroupRelLocalService,
 			   ServiceWrapper<AccountGroupRelLocalService> {
 
-	public AccountGroupRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AccountGroupRelLocalServiceWrapper(
 		AccountGroupRelLocalService accountGroupRelLocalService) {
 
@@ -319,14 +315,6 @@ public class AccountGroupRelLocalServiceWrapper
 		getAccountGroupRels(int start, int end) {
 
 		return _accountGroupRelLocalService.getAccountGroupRels(start, end);
-	}
-
-	@Override
-	public java.util.List<com.liferay.account.model.AccountGroupRel>
-		getAccountGroupRels(long accountGroupId, String className) {
-
-		return _accountGroupRelLocalService.getAccountGroupRels(
-			accountGroupId, className);
 	}
 
 	@Override

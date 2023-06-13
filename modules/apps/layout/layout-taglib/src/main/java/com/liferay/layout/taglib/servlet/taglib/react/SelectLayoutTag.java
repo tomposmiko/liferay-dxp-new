@@ -15,33 +15,34 @@
 package com.liferay.layout.taglib.servlet.taglib.react;
 
 import com.liferay.exportimport.kernel.staging.StagingUtil;
-import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
-import com.liferay.layout.item.selector.LayoutItemSelectorReturnType;
 import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
-import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
-import com.liferay.portal.kernel.service.LayoutServiceUtil;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.util.IncludeTag;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
@@ -58,10 +59,6 @@ public class SelectLayoutTag extends IncludeTag {
 
 	public boolean getFollowURLOnTitleClick() {
 		return _followURLOnTitleClick;
-	}
-
-	public String getItemSelectorReturnType() {
-		return _itemSelectorReturnType;
 	}
 
 	public String getItemSelectorSaveEvent() {
@@ -104,10 +101,6 @@ public class SelectLayoutTag extends IncludeTag {
 		return _privateLayout;
 	}
 
-	public boolean isShowDraftLayouts() {
-		return _showDraftLayouts;
-	}
-
 	public boolean isShowHiddenLayouts() {
 		return _showHiddenLayouts;
 	}
@@ -126,10 +119,6 @@ public class SelectLayoutTag extends IncludeTag {
 
 	public void setFollowURLOnTitleClick(boolean followURLOnTitleClick) {
 		_followURLOnTitleClick = followURLOnTitleClick;
-	}
-
-	public void setItemSelectorReturnType(String itemSelectorReturnType) {
-		_itemSelectorReturnType = itemSelectorReturnType;
 	}
 
 	public void setItemSelectorSaveEvent(String itemSelectorSaveEvent) {
@@ -163,10 +152,6 @@ public class SelectLayoutTag extends IncludeTag {
 		_privateLayout = privateLayout;
 	}
 
-	public void setShowDraftLayouts(boolean showDraftLayouts) {
-		_showDraftLayouts = showDraftLayouts;
-	}
-
 	public void setShowHiddenLayouts(boolean showHiddenLayouts) {
 		_showHiddenLayouts = showHiddenLayouts;
 	}
@@ -187,13 +172,11 @@ public class SelectLayoutTag extends IncludeTag {
 		_componentId = null;
 		_enableCurrentPage = false;
 		_followURLOnTitleClick = false;
-		_itemSelectorReturnType = null;
 		_itemSelectorSaveEvent = null;
 		_multiSelection = false;
 		_namespace = null;
 		_pathThemeImages = null;
 		_privateLayout = false;
-		_showDraftLayouts = false;
 		_showHiddenLayouts = false;
 		_viewType = null;
 	}
@@ -210,7 +193,7 @@ public class SelectLayoutTag extends IncludeTag {
 				"liferay-layout:select-layout:data", _getData());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -233,6 +216,44 @@ public class SelectLayoutTag extends IncludeTag {
 		).build();
 	}
 
+	private String _getLayoutBreadcrumb(Layout layout) throws Exception {
+		HttpServletRequest httpServletRequest = getRequest();
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		Locale locale = themeDisplay.getLocale();
+
+		List<Layout> ancestors = layout.getAncestors();
+
+		StringBundler sb = new StringBundler((4 * ancestors.size()) + 5);
+
+		if (layout.isPrivateLayout()) {
+			sb.append(LanguageUtil.get(httpServletRequest, "private-pages"));
+		}
+		else {
+			sb.append(LanguageUtil.get(httpServletRequest, "public-pages"));
+		}
+
+		sb.append(StringPool.SPACE);
+		sb.append(StringPool.GREATER_THAN);
+		sb.append(StringPool.SPACE);
+
+		Collections.reverse(ancestors);
+
+		for (Layout ancestor : ancestors) {
+			sb.append(HtmlUtil.escape(ancestor.getName(locale)));
+			sb.append(StringPool.SPACE);
+			sb.append(StringPool.GREATER_THAN);
+			sb.append(StringPool.SPACE);
+		}
+
+		sb.append(HtmlUtil.escape(layout.getName(locale)));
+
+		return sb.toString();
+	}
+
 	private JSONArray _getLayoutsJSONArray(
 			long groupId, boolean privateLayout, long parentLayoutId,
 			String[] selectedLayoutUuid)
@@ -246,12 +267,13 @@ public class SelectLayoutTag extends IncludeTag {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		List<Layout> layouts = LayoutServiceUtil.getLayouts(
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
 			groupId, privateLayout, parentLayoutId);
 
 		for (Layout layout : layouts) {
 			if ((layout.isHidden() && !_showHiddenLayouts) ||
-				_isExcludedLayout(layout) || StagingUtil.isIncomplete(layout)) {
+				_isContentLayoutDraft(layout) ||
+				StagingUtil.isIncomplete(layout)) {
 
 				continue;
 			}
@@ -275,7 +297,7 @@ public class SelectLayoutTag extends IncludeTag {
 			jsonObject.put(
 				"groupId", layout.getGroupId()
 			).put(
-				"icon", layout.getIcon()
+				"icon", "page"
 			).put(
 				"id", layout.getUuid()
 			).put(
@@ -283,11 +305,7 @@ public class SelectLayoutTag extends IncludeTag {
 			).put(
 				"name", layout.getName(themeDisplay.getLocale())
 			).put(
-				"payload", _getPayload(layout, themeDisplay)
-			).put(
 				"privateLayout", layout.isPrivateLayout()
-			).put(
-				"returnType", getItemSelectorReturnType()
 			).put(
 				"url",
 				PortalUtil.getLayoutRelativeURL(layout, themeDisplay, false)
@@ -297,8 +315,7 @@ public class SelectLayoutTag extends IncludeTag {
 				jsonObject.put("selected", true);
 			}
 
-			jsonObject.put(
-				"value", layout.getBreadcrumb(themeDisplay.getLocale()));
+			jsonObject.put("value", _getLayoutBreadcrumb(layout));
 
 			jsonArray.put(jsonObject);
 		}
@@ -342,64 +359,23 @@ public class SelectLayoutTag extends IncludeTag {
 			));
 	}
 
-	private String _getPayload(Layout layout, ThemeDisplay themeDisplay)
-		throws Exception {
-
-		if (Objects.equals(
-				LayoutItemSelectorReturnType.class.getName(),
-				getItemSelectorReturnType())) {
-
-			return JSONUtil.put(
-				"layoutId", layout.getLayoutId()
-			).put(
-				"name", layout.getName(themeDisplay.getLocale())
-			).put(
-				"plid", layout.getPlid()
-			).put(
-				"previewURL",
-				() -> {
-					String layoutURL = HttpComponentsUtil.addParameter(
-						PortalUtil.getLayoutFullURL(layout, themeDisplay),
-						"p_l_mode", Constants.PREVIEW);
-
-					return HttpComponentsUtil.addParameter(
-						layoutURL, "p_p_auth",
-						AuthTokenUtil.getToken(getRequest()));
-				}
-			).put(
-				"private", layout.isPrivateLayout()
-			).put(
-				"url", PortalUtil.getLayoutFullURL(layout, themeDisplay)
-			).put(
-				"uuid", layout.getUuid()
-			).toString();
-		}
-		else if (Objects.equals(
-					UUIDItemSelectorReturnType.class.getName(),
-					getItemSelectorReturnType())) {
-
-			return layout.getUuid();
-		}
-
-		return PortalUtil.getLayoutRelativeURL(layout, themeDisplay, false);
-	}
-
 	private long _getSelPlid() {
 		return ParamUtil.getLong(
 			getRequest(), "selPlid", LayoutConstants.DEFAULT_PLID);
 	}
 
-	private boolean _isExcludedLayout(Layout layout) {
+	private boolean _isContentLayoutDraft(Layout layout) {
 		if (!layout.isTypeContent()) {
 			return false;
 		}
 
-		if (layout.fetchDraftLayout() != null) {
-			if (_showDraftLayouts) {
-				return false;
-			}
+		Layout draftLayout = layout.fetchDraftLayout();
 
-			return !layout.isPublished();
+		if (draftLayout != null) {
+			boolean published = GetterUtil.getBoolean(
+				draftLayout.getTypeSettingsProperty("published"));
+
+			return !published;
 		}
 
 		if (layout.isApproved() && !layout.isHidden() && !layout.isSystem()) {
@@ -418,13 +394,11 @@ public class SelectLayoutTag extends IncludeTag {
 	private String _componentId;
 	private boolean _enableCurrentPage;
 	private boolean _followURLOnTitleClick;
-	private String _itemSelectorReturnType;
 	private String _itemSelectorSaveEvent;
 	private boolean _multiSelection;
 	private String _namespace;
 	private String _pathThemeImages;
 	private boolean _privateLayout;
-	private boolean _showDraftLayouts;
 	private boolean _showHiddenLayouts;
 	private String _viewType;
 

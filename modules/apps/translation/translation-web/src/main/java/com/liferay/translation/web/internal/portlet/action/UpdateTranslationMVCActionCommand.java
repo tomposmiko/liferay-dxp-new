@@ -19,7 +19,7 @@ import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
@@ -32,24 +32,22 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropertiesParamUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.translation.constants.TranslationPortletKeys;
 import com.liferay.translation.service.TranslationEntryService;
-import com.liferay.translation.web.internal.helper.TranslationRequestHelper;
+import com.liferay.translation.web.internal.util.TranslationRequestUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -74,23 +72,19 @@ public class UpdateTranslationMVCActionCommand extends BaseMVCActionCommand {
 			long groupId = ParamUtil.getLong(actionRequest, "groupId");
 
 			long segmentsExperienceId = ParamUtil.getLong(
-				actionRequest, "segmentsExperienceId");
+				actionRequest, "segmentsExperienceId",
+				SegmentsExperienceConstants.ID_DEFAULT);
 
-			TranslationRequestHelper translationRequestHelper =
-				new TranslationRequestHelper(
-					_infoItemServiceRegistry, actionRequest,
-					_segmentsExperienceLocalService);
-
-			String className = translationRequestHelper.getClassName(
-				segmentsExperienceId);
-			long classPK = translationRequestHelper.getClassPK(
-				segmentsExperienceId);
+			String className = TranslationRequestUtil.getClassName(
+				actionRequest, segmentsExperienceId);
+			long classPK = TranslationRequestUtil.getClassPK(
+				actionRequest, segmentsExperienceId);
 
 			InfoItemReference infoItemReference = new InfoItemReference(
 				className, classPK);
 
 			InfoItemObjectProvider<Object> infoItemObjectProvider =
-				_infoItemServiceRegistry.getFirstInfoItemService(
+				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemObjectProvider.class,
 					infoItemReference.getClassName());
 
@@ -122,7 +116,7 @@ public class UpdateTranslationMVCActionCommand extends BaseMVCActionCommand {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			SessionErrors.add(actionRequest, exception.getClass(), exception);
 
@@ -131,29 +125,9 @@ public class UpdateTranslationMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private Map<String, String[]> _getInfoFieldParameterValues(
-		PortletRequest portletRequest) {
-
-		Map<String, String[]> values = new HashMap<>();
-
-		Map<String, String[]> parameterMap = portletRequest.getParameterMap();
-
-		for (String parameterName : parameterMap.keySet()) {
-			if (parameterName.startsWith(_PARAMETER_NAME_INFO_FIELD)) {
-				values.put(
-					parameterName.substring(
-						_PARAMETER_NAME_INFO_FIELD.length(),
-						parameterName.length() - 2),
-					portletRequest.getParameterValues(parameterName));
-			}
-		}
-
-		return values;
-	}
-
-	private <T> List<InfoField<?>> _getInfoFields(String className, T object) {
+	private <T> List<InfoField> _getInfoFields(String className, T object) {
 		InfoItemFormProvider<T> infoItemFormProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormProvider.class, className);
 
 		InfoForm infoForm = infoItemFormProvider.getInfoForm(object);
@@ -166,40 +140,36 @@ public class UpdateTranslationMVCActionCommand extends BaseMVCActionCommand {
 
 		List<InfoFieldValue<Object>> infoFieldValues = new ArrayList<>();
 
-		Map<String, String[]> infoFieldParameterValues =
-			_getInfoFieldParameterValues(actionRequest);
-
+		UnicodeProperties infoFieldUnicodeProperties =
+			PropertiesParamUtil.getProperties(actionRequest, "infoField--");
 		InfoItemFieldValues infoItemFieldValues = _getInfoItemFieldValues(
 			className, object);
 
-		for (InfoField<?> infoField : _getInfoFields(className, object)) {
-			String[] infoFieldParameterValue = infoFieldParameterValues.get(
-				infoField.getUniqueId());
+		for (InfoField infoField : _getInfoFields(className, object)) {
+			String value = infoFieldUnicodeProperties.get(infoField.getName());
 
-			if (ArrayUtil.isNotEmpty(infoFieldParameterValue)) {
+			if (value != null) {
 				Locale sourceLocale = _getSourceLocale(actionRequest);
 
-				List<InfoFieldValue<Object>> sourceInfoFieldValues =
-					new ArrayList<>(
-						infoItemFieldValues.getInfoFieldValues(
-							infoField.getUniqueId()));
+				infoFieldValues.add(
+					new InfoFieldValue<>(
+						infoField,
+						InfoLocalizedValue.builder(
+						).value(
+							_getTargetLocale(actionRequest), value
+						).value(
+							biConsumer -> {
+								InfoFieldValue<Object> infoFieldValue =
+									infoItemFieldValues.getInfoFieldValue(
+										infoField.getName());
 
-				for (int i = 0; i < infoFieldParameterValue.length; i++) {
-					InfoFieldValue<Object> sourceInfoFieldValue =
-						sourceInfoFieldValues.get(i);
-
-					infoFieldValues.add(
-						new InfoFieldValue<>(
-							infoField,
-							InfoLocalizedValue.builder(
-							).value(
-								_getTargetLocale(actionRequest),
-								infoFieldParameterValue[i]
-							).value(
-								sourceLocale,
-								sourceInfoFieldValue.getValue(sourceLocale)
-							).build()));
-				}
+								if (infoFieldValue != null) {
+									biConsumer.accept(
+										sourceLocale,
+										infoFieldValue.getValue(sourceLocale));
+								}
+							}
+						).build()));
 			}
 		}
 
@@ -210,7 +180,7 @@ public class UpdateTranslationMVCActionCommand extends BaseMVCActionCommand {
 		String className, T object) {
 
 		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFieldValuesProvider.class, className);
 
 		return infoItemFieldValuesProvider.getInfoItemFieldValues(object);
@@ -232,16 +202,11 @@ public class UpdateTranslationMVCActionCommand extends BaseMVCActionCommand {
 		return LocaleUtil.fromLanguageId(_getTargetLanguageId(actionRequest));
 	}
 
-	private static final String _PARAMETER_NAME_INFO_FIELD = "infoField--";
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpdateTranslationMVCActionCommand.class);
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
-
-	@Reference
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private TranslationEntryService _translationEntryService;

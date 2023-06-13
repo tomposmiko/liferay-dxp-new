@@ -99,21 +99,6 @@ public interface SXPBlueprintModel
 	public void setUuid(String uuid);
 
 	/**
-	 * Returns the external reference code of this sxp blueprint.
-	 *
-	 * @return the external reference code of this sxp blueprint
-	 */
-	@AutoEscape
-	public String getExternalReferenceCode();
-
-	/**
-	 * Sets the external reference code of this sxp blueprint.
-	 *
-	 * @param externalReferenceCode the external reference code of this sxp blueprint
-	 */
-	public void setExternalReferenceCode(String externalReferenceCode);
-
-	/**
 	 * Returns the sxp blueprint ID of this sxp blueprint.
 	 *
 	 * @return the sxp blueprint ID of this sxp blueprint
@@ -356,21 +341,6 @@ public interface SXPBlueprintModel
 	public void setElementInstancesJSON(String elementInstancesJSON);
 
 	/**
-	 * Returns the schema version of this sxp blueprint.
-	 *
-	 * @return the schema version of this sxp blueprint
-	 */
-	@AutoEscape
-	public String getSchemaVersion();
-
-	/**
-	 * Sets the schema version of this sxp blueprint.
-	 *
-	 * @param schemaVersion the schema version of this sxp blueprint
-	 */
-	public void setSchemaVersion(String schemaVersion);
-
-	/**
 	 * Returns the title of this sxp blueprint.
 	 *
 	 * @return the title of this sxp blueprint
@@ -468,21 +438,6 @@ public interface SXPBlueprintModel
 	 * @param defaultLocale the default locale
 	 */
 	public void setTitleMap(Map<Locale, String> titleMap, Locale defaultLocale);
-
-	/**
-	 * Returns the version of this sxp blueprint.
-	 *
-	 * @return the version of this sxp blueprint
-	 */
-	@AutoEscape
-	public String getVersion();
-
-	/**
-	 * Sets the version of this sxp blueprint.
-	 *
-	 * @param version the version of this sxp blueprint
-	 */
-	public void setVersion(String version);
 
 	/**
 	 * Returns the status of this sxp blueprint.
@@ -644,9 +599,5 @@ public interface SXPBlueprintModel
 
 	@Override
 	public SXPBlueprint cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

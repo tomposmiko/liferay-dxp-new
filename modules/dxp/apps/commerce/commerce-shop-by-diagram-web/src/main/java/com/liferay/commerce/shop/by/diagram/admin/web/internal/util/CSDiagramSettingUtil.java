@@ -22,25 +22,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.FileVersion;
 
 /**
  * @author Andrea Sbarra
- * @author Crescenzo Rega
  */
 public class CSDiagramSettingUtil {
-
-	public static FileVersion getFileVersion(CSDiagramSetting csDiagramSetting)
-		throws Exception {
-
-		FileEntry fileEntry = _fetchFileEntry(csDiagramSetting);
-
-		if (fileEntry != null) {
-			return fileEntry.getFileVersion();
-		}
-
-		return null;
-	}
 
 	public static String getImageURL(
 			CSDiagramSetting csDiagramSetting, DLURLHelper dlURLHelper)
@@ -59,10 +45,6 @@ public class CSDiagramSettingUtil {
 	private static FileEntry _fetchFileEntry(CSDiagramSetting csDiagramSetting)
 		throws Exception {
 
-		if (csDiagramSetting == null) {
-			return null;
-		}
-
 		try {
 			CPAttachmentFileEntry cpAttachmentFileEntry =
 				csDiagramSetting.getCPAttachmentFileEntry();
@@ -73,7 +55,9 @@ public class CSDiagramSettingUtil {
 					noSuchCPAttachmentFileEntryException) {
 
 			if (_log.isInfoEnabled()) {
-				_log.info(noSuchCPAttachmentFileEntryException);
+				_log.info(
+					noSuchCPAttachmentFileEntryException,
+					noSuchCPAttachmentFileEntryException);
 			}
 
 			return null;

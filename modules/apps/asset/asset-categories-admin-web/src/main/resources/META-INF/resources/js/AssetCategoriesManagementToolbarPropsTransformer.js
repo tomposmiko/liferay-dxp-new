@@ -14,8 +14,6 @@
 
 import {addParams, navigate, openSelectionModal} from 'frontend-js-web';
 
-import openDeleteCategoryModal from './openDeleteCategoryModal';
-
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	const setCategoryDisplayPageTemplate = (
 		setCategoryDisplayPageTemplateURL
@@ -37,21 +35,21 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 	};
 
 	const deleteSelectedCategories = () => {
-		openDeleteCategoryModal({
-			multiple: true,
-			onDelete: () => {
-				const form = document.getElementById(`${portletNamespace}fm`);
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			const form = document.getElementById(`${portletNamespace}fm`);
 
-				if (form) {
-					submitForm(form);
-				}
-			},
-		});
+			if (form) {
+				submitForm(form);
+			}
+		}
 	};
 
 	const selectCategory = (itemData) => {
 		openSelectionModal({
-			height: '70vh',
 			iframeBodyCssClass: '',
 			onSelect(selectedItem) {
 				const category = selectedItem
@@ -66,7 +64,6 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 				}
 			},
 			selectEventName: `${portletNamespace}selectCategory`,
-			size: 'md',
 			title: Liferay.Language.get('select-category'),
 			url: itemData?.categoriesSelectorURL,
 		});

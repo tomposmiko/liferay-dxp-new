@@ -95,7 +95,7 @@ public class ServiceWrapperRegistry {
 				serviceBag.replace();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -119,7 +119,7 @@ public class ServiceWrapperRegistry {
 			}
 			catch (BeanLocatorException beanLocatorException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(beanLocatorException);
+					_log.debug(beanLocatorException, beanLocatorException);
 				}
 
 				serviceReference = _bundleContext.getServiceReference(

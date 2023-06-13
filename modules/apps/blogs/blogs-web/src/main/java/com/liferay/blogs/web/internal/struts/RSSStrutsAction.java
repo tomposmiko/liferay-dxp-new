@@ -20,12 +20,9 @@ import com.liferay.blogs.service.BlogsEntryService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.model.CompanyConstants;
-import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.struts.StrutsAction;
@@ -50,7 +47,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(property = "path=/blogs/rss", service = StrutsAction.class)
+@Component(
+	immediate = true, property = "path=/blogs/rss", service = StrutsAction.class
+)
 public class RSSStrutsAction implements StrutsAction {
 
 	@Override
@@ -121,14 +120,14 @@ public class RSSStrutsAction implements StrutsAction {
 
 		String rss = StringPool.BLANK;
 
-		if (companyId != CompanyConstants.SYSTEM) {
+		if (companyId > 0) {
 			String entryURL = _getFindEntryURL(themeDisplay);
 
 			rss = _blogsEntryService.getCompanyEntriesRSS(
 				companyId, new Date(), status, max, type, version, displayStyle,
 				StringPool.BLANK, entryURL, themeDisplay);
 		}
-		else if (groupId != GroupConstants.DEFAULT_LIVE_GROUP_ID) {
+		else if (groupId > 0) {
 			long plid = ParamUtil.getLong(
 				httpServletRequest, "plid", themeDisplay.getPlid());
 
@@ -138,9 +137,7 @@ public class RSSStrutsAction implements StrutsAction {
 				groupId, new Date(), status, max, type, version, displayStyle,
 				feedURL, feedURL, themeDisplay);
 		}
-		else if (organizationId !=
-					OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
-
+		else if (organizationId > 0) {
 			String entryURL = _getFindEntryURL(themeDisplay);
 
 			rss = _blogsEntryService.getOrganizationEntriesRSS(
@@ -169,7 +166,7 @@ public class RSSStrutsAction implements StrutsAction {
 		long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
 
 		if ((groupId == 0) ||
-			_groupPermission.contains(
+			GroupPermissionUtil.contains(
 				themeDisplay.getPermissionChecker(), groupId,
 				ActionKeys.VIEW)) {
 
@@ -202,9 +199,6 @@ public class RSSStrutsAction implements StrutsAction {
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
-
-	@Reference
-	private GroupPermission _groupPermission;
 
 	@Reference
 	private Portal _portal;

@@ -43,85 +43,21 @@ public class PortalTopLevelBuild
 
 	@Override
 	public BranchInformation getOSBAsahBranchInformation() {
-		if (fromArchive || !(this instanceof PortalWorkspaceBuild)) {
-			return getBranchInformation("osb.asah");
-		}
-
-		PortalWorkspaceBuild portalWorkspaceBuild = (PortalWorkspaceBuild)this;
-
-		PortalWorkspace portalWorkspace =
-			portalWorkspaceBuild.getPortalWorkspace();
-
-		if (portalWorkspace == null) {
-			return null;
-		}
-
-		WorkspaceGitRepository workspaceGitRepository =
-			portalWorkspace.getOSBAsahWorkspaceGitRepository();
-
-		if (workspaceGitRepository == null) {
-			return null;
-		}
-
-		return new WorkspaceBranchInformation(workspaceGitRepository);
+		return getBranchInformation("osb.asah");
 	}
 
 	@Override
 	public BranchInformation getOSBFaroBranchInformation() {
-		if (fromArchive || !(this instanceof PortalWorkspaceBuild)) {
-			return getBranchInformation("osb.faro");
-		}
-
-		PortalWorkspaceBuild portalWorkspaceBuild = (PortalWorkspaceBuild)this;
-
-		PortalWorkspace portalWorkspace =
-			portalWorkspaceBuild.getPortalWorkspace();
-
-		if (portalWorkspace == null) {
-			return null;
-		}
-
-		WorkspaceGitRepository workspaceGitRepository =
-			portalWorkspace.getOSBFaroWorkspaceGitRepository();
-
-		if (workspaceGitRepository == null) {
-			return null;
-		}
-
-		return new WorkspaceBranchInformation(workspaceGitRepository);
+		return getBranchInformation("osb.faro");
 	}
 
 	@Override
 	public BranchInformation getPluginsBranchInformation() {
-		if (fromArchive || !(this instanceof PortalWorkspaceBuild)) {
-			return getBranchInformation("plugins");
-		}
-
-		PortalWorkspaceBuild portalWorkspaceBuild = (PortalWorkspaceBuild)this;
-
-		PortalWorkspace portalWorkspace =
-			portalWorkspaceBuild.getPortalWorkspace();
-
-		if (portalWorkspace == null) {
-			return null;
-		}
-
-		WorkspaceGitRepository workspaceGitRepository =
-			portalWorkspace.getPluginsWorkspaceGitRepository();
-
-		if (workspaceGitRepository == null) {
-			return null;
-		}
-
-		return new WorkspaceBranchInformation(workspaceGitRepository);
+		return getBranchInformation("plugins");
 	}
 
 	@Override
 	public BranchInformation getPortalBaseBranchInformation() {
-		if (this instanceof PortalWorkspaceBuild) {
-			return null;
-		}
-
 		BranchInformation portalBranchInformation =
 			getPortalBranchInformation();
 
@@ -141,27 +77,7 @@ public class PortalTopLevelBuild
 
 	@Override
 	public BranchInformation getPortalBranchInformation() {
-		if (fromArchive || !(this instanceof PortalWorkspaceBuild)) {
-			return getBranchInformation("portal");
-		}
-
-		PortalWorkspaceBuild portalWorkspaceBuild = (PortalWorkspaceBuild)this;
-
-		PortalWorkspace portalWorkspace =
-			portalWorkspaceBuild.getPortalWorkspace();
-
-		if (portalWorkspace == null) {
-			return null;
-		}
-
-		WorkspaceGitRepository workspaceGitRepository =
-			portalWorkspace.getPortalWorkspaceGitRepository();
-
-		if (workspaceGitRepository == null) {
-			return null;
-		}
-
-		return new WorkspaceBranchInformation(workspaceGitRepository);
+		return getBranchInformation("portal");
 	}
 
 	@Override

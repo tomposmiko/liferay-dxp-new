@@ -51,7 +51,7 @@ public abstract class BaseAnalyticsMVCRenderCommand
 			servletContext.getRequestDispatcher(getJspPath());
 
 		try {
-			_setHttpServletRequestAttributes(
+			setHttpServletRequestAttributes(
 				PortalUtil.getHttpServletRequest(renderRequest));
 
 			requestDispatcher.include(
@@ -72,18 +72,7 @@ public abstract class BaseAnalyticsMVCRenderCommand
 
 	protected abstract String getJspPath();
 
-	@Reference
-	protected AnalyticsUsersManager analyticsUsersManager;
-
-	@Reference
-	protected ConfigurationProvider configurationProvider;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.analytics.settings.web)"
-	)
-	protected ServletContext servletContext;
-
-	private void _setHttpServletRequestAttributes(
+	protected void setHttpServletRequestAttributes(
 			HttpServletRequest httpServletRequest)
 		throws Exception {
 
@@ -100,6 +89,14 @@ public abstract class BaseAnalyticsMVCRenderCommand
 			AnalyticsSettingsWebKeys.ANALYTICS_USERS_MANAGER,
 			analyticsUsersManager);
 	}
+
+	@Reference
+	protected AnalyticsUsersManager analyticsUsersManager;
+
+	@Reference
+	protected ConfigurationProvider configurationProvider;
+
+	protected volatile ServletContext servletContext;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseAnalyticsMVCRenderCommand.class);

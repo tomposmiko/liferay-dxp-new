@@ -14,13 +14,13 @@
 
 package com.liferay.commerce.test.util.context;
 
-import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
+import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
 import com.liferay.commerce.context.BaseCommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.service.CommerceCurrencyLocalService;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
-import com.liferay.commerce.product.service.CommerceChannelAccountEntryRelLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -33,11 +33,9 @@ public class TestCustomCommerceContext extends BaseCommerceContext {
 
 	public TestCustomCommerceContext(
 		long companyId, long commerceChannelGroupId, long orderId,
-		long commerceAccountId,
-		AccountEntryLocalService accountEntryLocalService,
-		CommerceAccountHelper commerceAccountHelper,
-		CommerceChannelAccountEntryRelLocalService
-			commerceChannelAccountEntryRelLocalService,
+		long commerceAccountId, CommerceAccountHelper commerceAccountHelper,
+		CommerceAccountLocalService commerceAccountLocalService,
+		CommerceAccountService commerceAccountService,
 		CommerceChannelLocalService commerceChannelLocalService,
 		CommerceCurrencyLocalService commerceCurrencyLocalService,
 		CommerceOrderService commerceOrderService,
@@ -45,10 +43,10 @@ public class TestCustomCommerceContext extends BaseCommerceContext {
 
 		super(
 			companyId, commerceChannelGroupId, orderId, commerceAccountId,
-			accountEntryLocalService, commerceAccountHelper,
-			commerceChannelAccountEntryRelLocalService,
-			commerceChannelLocalService, commerceCurrencyLocalService,
-			commerceOrderService, configurationProvider);
+			commerceAccountHelper, commerceAccountLocalService,
+			commerceAccountService, commerceChannelLocalService,
+			commerceCurrencyLocalService, commerceOrderService,
+			configurationProvider);
 
 		_companyId = companyId;
 		_commerceCurrencyLocalService = commerceCurrencyLocalService;

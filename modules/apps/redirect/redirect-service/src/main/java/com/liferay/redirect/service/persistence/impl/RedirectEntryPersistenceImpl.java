@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -45,19 +46,17 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.redirect.exception.NoSuchEntryException;
 import com.liferay.redirect.model.RedirectEntry;
 import com.liferay.redirect.model.RedirectEntryTable;
 import com.liferay.redirect.model.impl.RedirectEntryImpl;
 import com.liferay.redirect.model.impl.RedirectEntryModelImpl;
 import com.liferay.redirect.service.persistence.RedirectEntryPersistence;
-import com.liferay.redirect.service.persistence.RedirectEntryUtil;
 import com.liferay.redirect.service.persistence.impl.constants.RedirectPersistenceConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -84,7 +83,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = RedirectEntryPersistence.class)
+@Component(service = {RedirectEntryPersistence.class, BasePersistence.class})
 public class RedirectEntryPersistenceImpl
 	extends BasePersistenceImpl<RedirectEntry>
 	implements RedirectEntryPersistence {
@@ -201,7 +200,7 @@ public class RedirectEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RedirectEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (RedirectEntry redirectEntry : list) {
@@ -583,7 +582,7 @@ public class RedirectEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -713,7 +712,7 @@ public class RedirectEntryPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof RedirectEntry) {
@@ -824,7 +823,7 @@ public class RedirectEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -990,7 +989,7 @@ public class RedirectEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RedirectEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (RedirectEntry redirectEntry : list) {
@@ -1406,7 +1405,7 @@ public class RedirectEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1561,7 +1560,7 @@ public class RedirectEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RedirectEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (RedirectEntry redirectEntry : list) {
@@ -2251,7 +2250,7 @@ public class RedirectEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2445,7 +2444,7 @@ public class RedirectEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RedirectEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (RedirectEntry redirectEntry : list) {
@@ -3238,7 +3237,7 @@ public class RedirectEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, destinationURL};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3440,8 +3439,7 @@ public class RedirectEntryPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_S, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_S, finderArgs);
 		}
 
 		if (result instanceof RedirectEntry) {
@@ -3552,7 +3550,7 @@ public class RedirectEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, sourceURL};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3756,7 +3754,7 @@ public class RedirectEntryPersistenceImpl
 		redirectEntry.setNew(true);
 		redirectEntry.setPrimaryKey(redirectEntryId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		redirectEntry.setUuid(uuid);
 
@@ -3875,7 +3873,7 @@ public class RedirectEntryPersistenceImpl
 			(RedirectEntryModelImpl)redirectEntry;
 
 		if (Validator.isNull(redirectEntry.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			redirectEntry.setUuid(uuid);
 		}
@@ -4104,7 +4102,7 @@ public class RedirectEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RedirectEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4174,7 +4172,7 @@ public class RedirectEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -4338,31 +4336,11 @@ public class RedirectEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "sourceURL"}, false);
-
-		_setRedirectEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setRedirectEntryUtilPersistence(null);
-
 		entityCache.removeCache(RedirectEntryImpl.class.getName());
-	}
-
-	private void _setRedirectEntryUtilPersistence(
-		RedirectEntryPersistence redirectEntryPersistence) {
-
-		try {
-			Field field = RedirectEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, redirectEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -4452,6 +4430,7 @@ public class RedirectEntryPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private RedirectEntryModelArgumentsResolver
+		_redirectEntryModelArgumentsResolver;
 
 }

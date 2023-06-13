@@ -22,7 +22,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Eudaldo Alonso
  */
 @Component(
-	property = "content.type=journal",
+	immediate = true, property = "content.type=journal",
 	service = DataLayoutBuilderDefinition.class
 )
 public class JournalDataLayoutBuilderDefinition
@@ -45,9 +45,7 @@ public class JournalDataLayoutBuilderDefinition
 
 	@Override
 	public String[] getDisabledProperties() {
-		return new String[] {
-			"objectFieldName", "predefinedValue", "requiredErrorMessage"
-		};
+		return new String[] {"predefinedValue", "requiredErrorMessage"};
 	}
 
 	@Override

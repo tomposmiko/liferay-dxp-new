@@ -87,7 +87,11 @@ public interface PrefsProps {
 
 	public PortletPreferences getPreferences();
 
+	public PortletPreferences getPreferences(boolean readOnly);
+
 	public PortletPreferences getPreferences(long companyId);
+
+	public PortletPreferences getPreferences(long companyId, boolean readOnly);
 
 	public Properties getProperties(
 		PortletPreferences preferences, String prefix, boolean removePrefix);

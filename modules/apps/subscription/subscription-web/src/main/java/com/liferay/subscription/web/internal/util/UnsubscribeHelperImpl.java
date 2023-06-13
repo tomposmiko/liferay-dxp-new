@@ -33,14 +33,14 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.subscription.web.internal.configuration.SubscriptionConfiguration",
-	service = UnsubscribeHelper.class
+	immediate = true, service = UnsubscribeHelper.class
 )
 public class UnsubscribeHelperImpl implements UnsubscribeHelper {
 
 	@Override
 	public void registerHooks(SubscriptionSender subscriptionSender) {
 		UnsubscribeHooks unsubscribeHooks = new UnsubscribeHooks(
-			_subscriptionConfiguration, _ticketLocalService, _userLocalService,
+			_configuration, _ticketLocalService, _userLocalService,
 			subscriptionSender);
 
 		subscriptionSender.addHook(
@@ -55,11 +55,11 @@ public class UnsubscribeHelperImpl implements UnsubscribeHelper {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_subscriptionConfiguration = ConfigurableUtil.createConfigurable(
+		_configuration = ConfigurableUtil.createConfigurable(
 			SubscriptionConfiguration.class, properties);
 	}
 
-	private volatile SubscriptionConfiguration _subscriptionConfiguration;
+	private volatile SubscriptionConfiguration _configuration;
 
 	@Reference
 	private TicketLocalService _ticketLocalService;

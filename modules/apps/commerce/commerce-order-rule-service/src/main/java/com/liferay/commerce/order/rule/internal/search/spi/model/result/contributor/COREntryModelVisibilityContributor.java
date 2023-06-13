@@ -19,6 +19,7 @@ import com.liferay.commerce.order.rule.service.COREntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.spi.model.result.contributor.ModelVisibilityContributor;
 
 import org.osgi.service.component.annotations.Component;
@@ -28,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "indexer.class.name=com.liferay.commerce.order.rule.model.COREntry",
 	service = ModelVisibilityContributor.class
 )
@@ -39,7 +41,7 @@ public class COREntryModelVisibilityContributor
 		try {
 			COREntry corEntry = _corEntryLocalService.getCOREntry(classPK);
 
-			return isVisible(corEntry.getStatus(), status);
+			return _isVisible(corEntry.getStatus(), status);
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
@@ -50,6 +52,17 @@ public class COREntryModelVisibilityContributor
 
 			return false;
 		}
+	}
+
+	private boolean _isVisible(int entryStatus, int queryStatus) {
+		if (((queryStatus != WorkflowConstants.STATUS_ANY) &&
+			 (entryStatus == queryStatus)) ||
+			(entryStatus != WorkflowConstants.STATUS_IN_TRASH)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

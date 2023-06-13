@@ -9,19 +9,16 @@
  * distribution rights of the Software.
  */
 
-import {render} from '@testing-library/react';
+import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
 import BasicInformation from '../../../src/main/resources/META-INF/resources/js/components/BasicInformation';
-import {StoreStateContext} from '../../../src/main/resources/META-INF/resources/js/context/StoreContext';
 
 import '@testing-library/jest-dom/extend-expect';
 
-jest.mock('frontend-js-web', () => ({
-	sub: jest.fn((langKey, arg) => langKey.replace('x', arg)),
-}));
-
 describe('BasicInformation', () => {
+	afterEach(cleanup);
+
 	it('renders author, publish date and title', () => {
 		const testProps = {
 			author: {
@@ -32,7 +29,7 @@ describe('BasicInformation', () => {
 			canonicalURL:
 				'http://localhost:8080/en/web/guest/-/basic-web-content',
 			onSelectedLanguageClick: () => {},
-			publishDate: 'Thu Sep 20 08:17:57 GMT 2021',
+			publishDate: 'Thu Feb 17 08:17:57 GMT 2020',
 			title: 'A testing page',
 			viewURLs: [
 				{
@@ -54,18 +51,13 @@ describe('BasicInformation', () => {
 			],
 		};
 
-		const {getByText} = render(
-			<StoreStateContext.Provider value={{languageTag: 'en-US'}}>
-				<BasicInformation {...testProps} />
-			</StoreStateContext.Provider>
-		);
+		const {getByText} = render(<BasicInformation {...testProps} />);
 
 		expect(getByText(testProps.title)).toBeInTheDocument();
 
 		expect(getByText(testProps.canonicalURL)).toBeInTheDocument();
 
-		const formattedPublishDate = 'September 20, 2021';
-
+		const formattedPublishDate = 'February 17, 2020';
 		expect(
 			getByText('published-on-' + formattedPublishDate)
 		).toBeInTheDocument();

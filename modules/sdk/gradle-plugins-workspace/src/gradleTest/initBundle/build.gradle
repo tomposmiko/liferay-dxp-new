@@ -2,6 +2,7 @@ task runGradleTest
 
 gradle.liferayWorkspace {
 	environment = "production"
+	homeDir = new File(buildDir, "bundles")
 }
 
 runGradleTest {
@@ -28,16 +29,6 @@ runGradleTest {
 
 			assert expectedFile.text.normalize() == generatedFile.text.normalize()
 		}
-
-		String tomcatVersion = gradle.liferayWorkspace.appServerTomcatVersion;
-
-		File bundleTomcatDir = new File(initBundle.destinationDir, "tomcat-9.0.10");
-
-		File bundleTomcatBinDir = new File(bundleTomcatDir, "bin");
-
-		File generatedEmptyShFile = new File(bundleTomcatBinDir, "setEnv1.sh");
-
-		assert generatedEmptyShFile.exists();
 
 		// Bundle
 

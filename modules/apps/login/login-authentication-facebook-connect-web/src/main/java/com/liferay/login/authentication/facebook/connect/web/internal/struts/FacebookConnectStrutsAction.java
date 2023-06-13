@@ -14,23 +14,22 @@
 
 package com.liferay.login.authentication.facebook.connect.web.internal.struts;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.UserEmailAddressException;
 import com.liferay.portal.kernel.facebook.FacebookConnect;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -108,6 +107,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  */
 @Component(
+	immediate = true,
 	property = {
 		"/common/referer_jsp.jsp=/common/referer_jsp.jsp",
 		"path=/portal/facebook_connect_oauth"
@@ -137,7 +137,7 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 
 		String state = ParamUtil.getString(httpServletRequest, "state");
 
-		JSONObject stateJSONObject = _jsonFactory.createJSONObject(state);
+		JSONObject stateJSONObject = JSONFactoryUtil.createJSONObject(state);
 
 		String stateNonce = stateJSONObject.getString("stateNonce");
 
@@ -173,14 +173,14 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 				httpServletRequest);
 
 			try {
-				User user = _setFacebookCredentials(
+				User user = setFacebookCredentials(
 					httpSession, themeDisplay.getCompanyId(), token,
 					serviceContext);
 
 				if ((user != null) &&
 					(user.getStatus() == WorkflowConstants.STATUS_INCOMPLETE)) {
 
-					_redirectUpdateAccount(
+					redirectUpdateAccount(
 						httpServletRequest, httpServletResponse, user);
 
 					return null;
@@ -188,12 +188,12 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 
 				Class<?> clazz = portalException.getClass();
 
-				_sendError(
+				sendError(
 					clazz.getSimpleName(), httpServletRequest,
 					httpServletResponse);
 
@@ -214,7 +214,7 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 		_forward = GetterUtil.getString(properties, "/common/referer_jsp.jsp");
 	}
 
-	private User _addUser(
+	protected User addUser(
 			HttpSession httpSession, long companyId, JSONObject jsonObject,
 			ServiceContext serviceContext)
 		throws Exception {
@@ -226,13 +226,14 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 		boolean autoScreenName = true;
 		String screenName = StringPool.BLANK;
 		String emailAddress = jsonObject.getString("email");
-
+		long facebookId = jsonObject.getLong("id");
+		String openId = StringPool.BLANK;
 		Locale locale = LocaleUtil.getDefault();
 		String firstName = jsonObject.getString("first_name");
 		String middleName = StringPool.BLANK;
 		String lastName = jsonObject.getString("last_name");
-		long prefixListTypeId = 0;
-		long suffixListTypeId = 0;
+		long prefixId = 0;
+		long suffixId = 0;
 		boolean male = Objects.equals(jsonObject.getString("gender"), "male");
 		int birthdayMonth = Calendar.JANUARY;
 		int birthdayDay = 1;
@@ -246,11 +247,10 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 
 		User user = _userLocalService.addUser(
 			creatorUserId, companyId, autoPassword, password1, password2,
-			autoScreenName, screenName, emailAddress, locale, firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, jobTitle,
-			UserConstants.TYPE_REGULAR, groupIds, organizationIds, roleIds,
-			userGroupIds, sendEmail, serviceContext);
+			autoScreenName, screenName, emailAddress, facebookId, openId,
+			locale, firstName, middleName, lastName, prefixId, suffixId, male,
+			birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
+			organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
 
 		user = _userLocalService.updateLastLogin(
 			user.getUserId(), user.getLoginIP());
@@ -266,26 +266,7 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 		return user;
 	}
 
-	private void _checkAllowUserCreation(long companyId, JSONObject jsonObject)
-		throws Exception {
-
-		Company company = _companyLocalService.getCompany(companyId);
-
-		if (!company.isStrangers()) {
-			throw new StrangersNotAllowedException(companyId);
-		}
-
-		String emailAddress = jsonObject.getString("email");
-
-		if (company.hasCompanyMx(emailAddress) &&
-			!company.isStrangersWithMx()) {
-
-			throw new UserEmailAddressException.MustNotUseCompanyMx(
-				emailAddress);
-		}
-	}
-
-	private void _redirectUpdateAccount(
+	protected void redirectUpdateAccount(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, User user)
 		throws Exception {
@@ -316,7 +297,7 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 			).buildString());
 	}
 
-	private void _sendError(
+	protected void sendError(
 			String error, HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
 		throws Exception {
@@ -334,7 +315,12 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 		httpServletResponse.sendRedirect(portletURL.toString());
 	}
 
-	private User _setFacebookCredentials(
+	@Reference(unbind = "-")
+	protected void setFacebookConnect(FacebookConnect facebookConnect) {
+		_facebookConnect = facebookConnect;
+	}
+
+	protected User setFacebookCredentials(
 			HttpSession httpSession, long companyId, String token,
 			ServiceContext serviceContext)
 		throws Exception {
@@ -409,18 +395,23 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 				return user;
 			}
 
-			user = _updateUser(user, jsonObject, serviceContext);
+			user = updateUser(user, jsonObject, serviceContext);
 		}
 		else {
 			_checkAllowUserCreation(companyId, jsonObject);
 
-			user = _addUser(httpSession, companyId, jsonObject, serviceContext);
+			user = addUser(httpSession, companyId, jsonObject, serviceContext);
 		}
 
 		return user;
 	}
 
-	private User _updateUser(
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	protected User updateUser(
 			User user, JSONObject jsonObject, ServiceContext serviceContext)
 		throws Exception {
 
@@ -467,14 +458,33 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 			user.getUserId(), StringPool.BLANK, StringPool.BLANK,
 			StringPool.BLANK, false, user.getReminderQueryQuestion(),
 			user.getReminderQueryAnswer(), user.getScreenName(), emailAddress,
-			true, null, user.getLanguageId(), user.getTimeZoneId(),
-			user.getGreeting(), user.getComments(), firstName,
-			user.getMiddleName(), lastName, contact.getPrefixListTypeId(),
-			contact.getSuffixListTypeId(), male, birthdayMonth, birthdayDay,
+			facebookId, user.getOpenId(), true, null, user.getLanguageId(),
+			user.getTimeZoneId(), user.getGreeting(), user.getComments(),
+			firstName, user.getMiddleName(), lastName, contact.getPrefixId(),
+			contact.getSuffixId(), male, birthdayMonth, birthdayDay,
 			birthdayYear, contact.getSmsSn(), contact.getFacebookSn(),
 			contact.getJabberSn(), contact.getSkypeSn(), contact.getTwitterSn(),
 			contact.getJobTitle(), groupIds, organizationIds, roleIds,
 			userGroupRoles, userGroupIds, serviceContext);
+	}
+
+	private void _checkAllowUserCreation(long companyId, JSONObject jsonObject)
+		throws Exception {
+
+		Company company = _companyLocalService.getCompany(companyId);
+
+		if (!company.isStrangers()) {
+			throw new StrangersNotAllowedException(companyId);
+		}
+
+		String emailAddress = jsonObject.getString("email");
+
+		if (company.hasCompanyMx(emailAddress) &&
+			!company.isStrangersWithMx()) {
+
+			throw new UserEmailAddressException.MustNotUseCompanyMx(
+				emailAddress);
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -483,18 +493,12 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
-	@Reference
 	private FacebookConnect _facebookConnect;
-
 	private String _forward;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

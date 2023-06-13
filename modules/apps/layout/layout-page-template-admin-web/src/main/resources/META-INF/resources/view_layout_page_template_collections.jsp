@@ -53,7 +53,7 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 										expand="<%= true %>"
 									>
 										<strong class="text-uppercase">
-											<liferay-ui:message key="page-template-sets" />
+											<liferay-ui:message key="collections" />
 										</strong>
 									</clay:content-col>
 
@@ -94,7 +94,6 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 															"viewLayoutPageTemplateCollectionURL", viewLayoutPageTemplateCollectionURL.toString()
 														).build()
 													%>'
-													aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 													dropdownItems="<%= layoutPageTemplateDisplayContext.getCollectionsDropdownItems() %>"
 													propsTransformer="js/ActionsComponentPropsTransformer"
 												/>
@@ -134,14 +133,14 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 							</c:when>
 							<c:otherwise>
 								<p class="text-uppercase">
-									<strong><liferay-ui:message key="page-template-sets" /></strong>
+									<strong><liferay-ui:message key="collections" /></strong>
 								</p>
 
 								<liferay-frontend:empty-result-message
 									actionDropdownItems="<%= layoutPageTemplateDisplayContext.isShowAddButton(LayoutPageTemplateActionKeys.ADD_LAYOUT_PAGE_TEMPLATE_COLLECTION) ? layoutPageTemplateDisplayContext.getActionDropdownItems() : null %>"
 									animationType="<%= EmptyResultMessageKeys.AnimationType.NONE %>"
-									description='<%= LanguageUtil.get(request, "page-template-sets-are-needed-to-create-page-templates") %>'
-									elementType='<%= LanguageUtil.get(request, "page-template-sets") %>'
+									description='<%= LanguageUtil.get(request, "collections-are-needed-to-create-page-templates") %>'
+									elementType='<%= LanguageUtil.get(request, "collections") %>'
 								/>
 							</c:otherwise>
 						</c:choose>
@@ -166,8 +165,10 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 						<clay:content-row
 							verticalAlign="center"
 						>
-							<clay:content-col>
-								<span>
+							<clay:content-col
+								expand="<%= true %>"
+							>
+								<span class="text-uppercase">
 									<%= HtmlUtil.escape(layoutPageTemplateCollection.getName()) %>
 								</span>
 							</clay:content-col>
@@ -182,7 +183,6 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 								%>
 
 								<clay:dropdown-actions
-									aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 									dropdownItems="<%= layoutPageTemplateCollectionActionDropdownItem.getActionDropdownItems(layoutPageTemplateCollection) %>"
 									propsTransformer="js/propsTransformers/LayoutPageTemplateCollectionPropsTransformer"
 								/>

@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + RecentBloggersPortletKeys.RECENT_BLOGGERS,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -67,7 +68,7 @@ public class RecentBloggersExportImportPortletPreferencesProcessor
 		throws PortletDataException {
 
 		try {
-			return _updateExportPortletPreferences(
+			return updateExportPortletPreferences(
 				portletDataContext, portletDataContext.getPortletId(),
 				portletPreferences);
 		}
@@ -85,7 +86,7 @@ public class RecentBloggersExportImportPortletPreferencesProcessor
 		throws PortletDataException {
 
 		try {
-			return _updateImportPortletPreferences(
+			return updateImportPortletPreferences(
 				portletDataContext, portletPreferences);
 		}
 		catch (Exception exception) {
@@ -95,7 +96,7 @@ public class RecentBloggersExportImportPortletPreferencesProcessor
 		}
 	}
 
-	private PortletPreferences _updateExportPortletPreferences(
+	protected PortletPreferences updateExportPortletPreferences(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
@@ -138,7 +139,7 @@ public class RecentBloggersExportImportPortletPreferencesProcessor
 		return portletPreferences;
 	}
 
-	private PortletPreferences _updateImportPortletPreferences(
+	protected PortletPreferences updateImportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws Exception {

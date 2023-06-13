@@ -18,23 +18,23 @@
 AUI.add(
 	'liferay-message',
 	(A) => {
-		const EVENT_DATA_DISMISS_ALL = {
+		var EVENT_DATA_DISMISS_ALL = {
 			categoryVisible: false,
 		};
 
-		const NAME = 'liferaymessage';
+		var NAME = 'liferaymessage';
 
-		const REGEX_CSS_TYPE = A.DOM._getRegExp(
+		var REGEX_CSS_TYPE = A.DOM._getRegExp(
 			'\\blfr-message-(alert|error|help|info|success)\\b',
 			'g'
 		);
 
-		const TPL_HIDE_NOTICES =
+		var TPL_HIDE_NOTICES =
 			'<button aria-label="' +
 			Liferay.Language.get('close') +
 			'" type="button" class="close">&#x00D7;</button>';
 
-		const Message = A.Component.create({
+		var Message = A.Component.create({
 			ATTRS: {
 				closeButton: {
 					valueFn() {
@@ -48,10 +48,10 @@ AUI.add(
 
 				hideAllNotices: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
 						return A.Node.create(
-							'<a href="javascript:void(0);"><small>' +
+							'<a href="javascript:;"><small>' +
 								instance.get('strings.dismissAll') ||
 								Liferay.Language.get(
 									'disable-this-note-for-all-portlets'
@@ -90,16 +90,16 @@ AUI.add(
 
 			prototype: {
 				_afterVisibleChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const messageVisible = event.newVal;
+					var messageVisible = event.newVal;
 
 					instance._contentBox.toggle(messageVisible);
 
 					instance.get('trigger').toggle(!messageVisible);
 
 					if (instance.get('persistent')) {
-						const sessionData = {};
+						var sessionData = {};
 
 						if (themeDisplay.isImpersonated()) {
 							sessionData.doAsUserId = themeDisplay.getDoAsUserIdEncoded();
@@ -120,25 +120,25 @@ AUI.add(
 				},
 
 				_onCloseButtonClick() {
-					const instance = this;
+					var instance = this;
 
 					instance.hide();
 				},
 
 				_onHideAllClick() {
-					const instance = this;
+					var instance = this;
 
 					instance.set('visible', false, EVENT_DATA_DISMISS_ALL);
 				},
 
 				_onTriggerClick() {
-					const instance = this;
+					var instance = this;
 
 					instance.show();
 				},
 
 				_uiSetDismissible(value) {
-					const instance = this;
+					var instance = this;
 
 					instance._boundingBox.toggleClass(
 						instance._cssDismissible,
@@ -147,7 +147,7 @@ AUI.add(
 				},
 
 				_uiSetPersistent(value) {
-					const instance = this;
+					var instance = this;
 
 					instance._boundingBox.toggleClass(
 						instance._cssPersistent,
@@ -156,11 +156,11 @@ AUI.add(
 				},
 
 				_uiSetType(value) {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance._contentBox;
+					var contentBox = instance._contentBox;
 
-					let cssClass = contentBox
+					var cssClass = contentBox
 						.attr('class')
 						.replace(REGEX_CSS_TYPE, '');
 
@@ -170,7 +170,7 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._dismissible) {
 						instance.after(
@@ -178,7 +178,7 @@ AUI.add(
 							instance._afterVisibleChange
 						);
 
-						const closeButton = instance._closeButton;
+						var closeButton = instance._closeButton;
 
 						if (closeButton) {
 							closeButton.on(
@@ -188,7 +188,7 @@ AUI.add(
 							);
 						}
 
-						const trigger = instance._trigger;
+						var trigger = instance._trigger;
 
 						if (trigger) {
 							trigger.on(
@@ -198,7 +198,7 @@ AUI.add(
 							);
 						}
 
-						const hideAllNotices = instance._hideAllNotices;
+						var hideAllNotices = instance._hideAllNotices;
 
 						if (hideAllNotices) {
 							hideAllNotices.on(
@@ -211,7 +211,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._boundingBox = instance.get('boundingBox');
 					instance._contentBox = instance.get('contentBox');
@@ -225,21 +225,19 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
-					const dismissible = instance.get('dismissible');
+					var dismissible = instance.get('dismissible');
 
 					if (dismissible) {
-						const trigger = instance.get('trigger');
+						var trigger = instance.get('trigger');
 
 						instance._trigger = trigger;
 
-						const closeButton = instance.get('closeButton');
+						var closeButton = instance.get('closeButton');
 
 						if (instance.get('persistenceCategory')) {
-							const hideAllNotices = instance.get(
-								'hideAllNotices'
-							);
+							var hideAllNotices = instance.get('hideAllNotices');
 
 							instance._contentBox.append(hideAllNotices);
 

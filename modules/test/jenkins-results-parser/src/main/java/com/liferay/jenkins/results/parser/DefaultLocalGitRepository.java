@@ -14,8 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import java.io.File;
-
 /**
  * @author Michael Hashimoto
  */
@@ -25,12 +23,6 @@ public class DefaultLocalGitRepository extends BaseLocalGitRepository {
 		String name, String upstreamBranchName) {
 
 		super(name, upstreamBranchName);
-	}
-
-	protected DefaultLocalGitRepository(
-		String name, String upstreamBranchName, File repositoryDir) {
-
-		super(name, upstreamBranchName, repositoryDir);
 	}
 
 }

@@ -19,18 +19,18 @@ import com.liferay.commerce.model.CommerceOrderType;
 import com.liferay.commerce.order.rule.model.COREntryRel;
 import com.liferay.commerce.order.rule.service.COREntryRelService;
 import com.liferay.commerce.service.CommerceOrderTypeService;
-import com.liferay.commerce.term.model.CommerceTermEntryRel;
-import com.liferay.commerce.term.service.CommerceTermEntryRelService;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderRuleOrderType;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderType;
-import com.liferay.headless.commerce.admin.order.dto.v1_0.TermOrderType;
+import com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.OrderTypeDTOConverter;
 import com.liferay.headless.commerce.admin.order.internal.odata.entity.v1_0.OrderTypeEntityModel;
 import com.liferay.headless.commerce.admin.order.resource.v1_0.OrderTypeResource;
 import com.liferay.headless.commerce.core.util.DateConfig;
 import com.liferay.headless.commerce.core.util.ExpandoUtil;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -60,6 +59,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/order-type.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, OrderTypeResource.class}
@@ -143,27 +143,20 @@ public class OrderTypeResourceImpl
 			CommerceOrderType.class.getName(), search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
-			searchContext -> {
-				searchContext.setAttribute(
-					"status", WorkflowConstants.STATUS_ANY);
-				searchContext.setCompanyId(contextCompany.getCompanyId());
+			new UnsafeConsumer() {
+
+				public void accept(Object object) throws Exception {
+					SearchContext searchContext = (SearchContext)object;
+
+					searchContext.setAttribute(
+						"status", WorkflowConstants.STATUS_ANY);
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+				}
+
 			},
 			sorts,
 			document -> _toOrderType(
 				GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))));
-	}
-
-	@NestedField(parentClass = TermOrderType.class, value = "orderType")
-	@Override
-	public OrderType getTermOrderTypeOrderType(Long id) throws Exception {
-		CommerceTermEntryRel commerceTermEntryRel =
-			_commerceTermEntryRelService.getCommerceTermEntryRel(id);
-
-		CommerceOrderType commerceOrderType =
-			_commerceOrderTypeService.getCommerceOrderType(
-				commerceTermEntryRel.getClassPK());
-
-		return _toOrderType(commerceOrderType.getCommerceOrderTypeId());
 	}
 
 	@Override
@@ -327,18 +320,13 @@ public class OrderTypeResourceImpl
 	private CommerceOrderTypeService _commerceOrderTypeService;
 
 	@Reference
-	private CommerceTermEntryRelService _commerceTermEntryRelService;
-
-	@Reference
 	private COREntryRelService _corEntryRelService;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.OrderTypeDTOConverter)"
-	)
-	private DTOConverter<CommerceOrderType, OrderType> _orderTypeDTOConverter;
+	@Reference
+	private OrderTypeDTOConverter _orderTypeDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

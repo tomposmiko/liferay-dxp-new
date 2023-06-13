@@ -242,8 +242,4 @@ public interface RedirectNotFoundEntryModel
 	@Override
 	public RedirectNotFoundEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

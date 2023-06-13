@@ -9,7 +9,13 @@
  * distribution rights of the Software.
  */
 
-import {act, fireEvent, render, waitFor, within} from '@testing-library/react';
+import {
+	act,
+	fireEvent,
+	render,
+	waitForElement,
+	within,
+} from '@testing-library/react';
 import React from 'react';
 
 import ResultRankingsForm from '../../../src/main/resources/META-INF/resources/js/components/ResultRankingsForm.es';
@@ -66,15 +72,11 @@ describe('ResultRankingsForm', () => {
 	`(
 		'renders the results ranking items after loading in the $tab tab',
 		async ({expected, tab}) => {
-			const {
-				findByTestId,
-				getByTestId,
-				getByText,
-			} = renderTestResultRankingsForm();
+			const {getByTestId, getByText} = renderTestResultRankingsForm();
 
 			fireEvent.click(getByText(tab));
 
-			await findByTestId(expected[0]);
+			await waitForElement(() => getByTestId(expected[0]));
 
 			expected.forEach((id) => {
 				expect(getByTestId(id)).toBeInTheDocument();
@@ -83,45 +85,36 @@ describe('ResultRankingsForm', () => {
 	);
 
 	it.each`
-		initialAliases             | addedAliases | expectedValue | expected                           | description
-		${['one', 'two', 'three']} | ${[]}        | ${''}         | ${['one', 'two', 'three']}         | ${'initial aliases'}
-		${[]}                      | ${['one']}   | ${''}         | ${['one']}                         | ${'added alias'}
-		${['one', 'two', 'three']} | ${['four']}  | ${''}         | ${['one', 'two', 'three', 'four']} | ${'added alias with initial'}
-		${[]}                      | ${[' ']}     | ${' '}        | ${[]}                              | ${'blank alias'}
-		${[]}                      | ${[' one ']} | ${''}         | ${['one']}                         | ${'trimmed alias'}
-		${['one', 'two', 'three']} | ${['one']}   | ${''}         | ${['one', 'two', 'three']}         | ${'no duplicate aliases'}
-	`(
-		'renders $description',
-		({addedAliases, expected, expectedValue, initialAliases}) => {
-			const {container} = renderTestResultRankingsForm({
-				initialAliases,
-			});
+		initialAliases             | addedAliases | expected                           | description
+		${['one', 'two', 'three']} | ${[]}        | ${['one', 'two', 'three']}         | ${'initial aliases'}
+		${[]}                      | ${['one']}   | ${['one']}                         | ${'added alias'}
+		${['one', 'two', 'three']} | ${['four']}  | ${['one', 'two', 'three', 'four']} | ${'added alias with initial'}
+		${[]}                      | ${[' ']}     | ${[]}                              | ${'blank alias'}
+		${[]}                      | ${[' one ']} | ${['one']}                         | ${'trimmed alias'}
+		${['one', 'two', 'three']} | ${['one']}   | ${['one', 'two', 'three']}         | ${'no duplicate aliases'}
+	`('renders $description', ({addedAliases, expected, initialAliases}) => {
+		const {container} = renderTestResultRankingsForm({
+			initialAliases,
+		});
 
-			const input = container.querySelector('.form-control-inset');
+		const input = container.querySelector('.form-control-inset');
 
-			addedAliases.forEach((alias) => {
-				fireEvent.change(input, {target: {value: alias}});
+		addedAliases.forEach((alias) => {
+			fireEvent.change(input, {target: {value: alias}});
 
-				fireEvent.keyDown(input, {
-					key: 'Enter',
-					keyCode: 13,
-					which: 13,
-				});
-			});
+			fireEvent.keyDown(input, {key: 'Enter', keyCode: 13, which: 13});
+		});
 
-			expect(input.getAttribute('value')).toBe(expectedValue);
+		expect(input.getAttribute('value')).toBe('');
 
-			const tagsElement = container.querySelectorAll(
-				'.label-item-expand'
-			);
+		const tagsElement = container.querySelectorAll('.label-item-expand');
 
-			expect(tagsElement).toHaveLength(expected.length);
+		expect(tagsElement).toHaveLength(expected.length);
 
-			tagsElement.forEach((element, i) => {
-				expect(element).toHaveTextContent(expected[i]);
-			});
-		}
-	);
+		tagsElement.forEach((element, i) => {
+			expect(element).toHaveTextContent(expected[i]);
+		});
+	});
 
 	it('removes an initial alias after clicking delete', async () => {
 		const {container} = renderTestResultRankingsForm({
@@ -153,7 +146,7 @@ describe('ResultRankingsForm', () => {
 			fireEvent.click(getByText('hidden'));
 		}
 
-		await waitFor(() => getByTestId(id));
+		await waitForElement(() => getByTestId(id));
 
 		fireEvent.click(within(getByTestId(id)).getByTitle(button));
 
@@ -169,7 +162,6 @@ describe('ResultRankingsForm', () => {
 		async ({button, id, newButton, selector}) => {
 			const {
 				container,
-				findByTestId,
 				getByTestId,
 				getByText,
 			} = renderTestResultRankingsForm();
@@ -180,7 +172,7 @@ describe('ResultRankingsForm', () => {
 
 			fireEvent.click(getByText(order[0]));
 
-			await findByTestId(id);
+			await waitForElement(() => getByTestId(id));
 
 			fireEvent.click(within(getByTestId(id)).getByTitle(button));
 
@@ -197,13 +189,9 @@ describe('ResultRankingsForm', () => {
 		${'105'} | ${PIN_BUTTON_LABEL}   | ${'100,101,102,103,104,105'}
 		${'100'} | ${UNPIN_BUTTON_LABEL} | ${'101,102,103,104'}
 	`('updates the pinnedIds by $button', async ({button, expected, id}) => {
-		const {
-			container,
-			findByTestId,
-			getByTestId,
-		} = renderTestResultRankingsForm();
+		const {container, getByTestId} = renderTestResultRankingsForm();
 
-		await findByTestId(id);
+		await waitForElement(() => getByTestId(id));
 
 		fireEvent.click(within(getByTestId(id)).getByTitle(button));
 
@@ -211,17 +199,13 @@ describe('ResultRankingsForm', () => {
 	});
 
 	it('fetches more results after clicking on load more button', async () => {
-		const {
-			container,
-			findByTestId,
-			getByTestId,
-		} = renderTestResultRankingsForm();
+		const {container, getByTestId} = renderTestResultRankingsForm();
 
-		await findByTestId('100');
+		await waitForElement(() => getByTestId('100'));
 
 		fireEvent.click(container.querySelector('.load-more-button'));
 
-		await findByTestId('110');
+		await waitForElement(() => getByTestId('110'));
 
 		expect(getByTestId('110')).toHaveTextContent(
 			'This is a Document Example'
@@ -232,19 +216,19 @@ describe('ResultRankingsForm', () => {
 	});
 
 	it('has the same pinned end index if there are no additional pinned items loaded', async () => {
-		const {container, findByTestId} = renderTestResultRankingsForm();
+		const {container, getByTestId} = renderTestResultRankingsForm();
 
 		const pinnedIdsEndIndexInput = container.querySelector(
 			'#pinnedIdsEndIndex'
 		);
 
-		await findByTestId('100');
+		await waitForElement(() => getByTestId('100'));
 
 		expect(pinnedIdsEndIndexInput.value).toBe('4');
 
 		fireEvent.click(container.querySelector('.load-more-button'));
 
-		await findByTestId('110');
+		await waitForElement(() => getByTestId('110'));
 
 		expect(pinnedIdsEndIndexInput.value).toBe('4');
 	});

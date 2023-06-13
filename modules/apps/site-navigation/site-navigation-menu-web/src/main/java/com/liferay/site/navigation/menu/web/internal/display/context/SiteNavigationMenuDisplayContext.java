@@ -18,15 +18,12 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.site.navigation.constants.SiteNavigationConstants;
@@ -36,6 +33,8 @@ import com.liferay.site.navigation.menu.web.internal.configuration.SiteNavigatio
 import com.liferay.site.navigation.menu.web.internal.constants.SiteNavigationMenuWebKeys;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalServiceUtil;
+
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -190,10 +189,11 @@ public class SiteNavigationMenuDisplayContext {
 		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new UUIDItemSelectorReturnType());
 
-		return String.valueOf(
-			itemSelector.getItemSelectorURL(
-				RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
-				eventName, itemSelectorCriterion));
+		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
+			RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
+			eventName, itemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	public String getRootMenuItemType() {
@@ -255,41 +255,6 @@ public class SiteNavigationMenuDisplayContext {
 		}
 
 		return _getDefaultSelectSiteNavigationMenuType();
-	}
-
-	public String getSelectSiteNavigationMenuTypeLabel() {
-		String typeKey = "select";
-
-		int type = getSelectSiteNavigationMenuType();
-
-		if (type == SiteNavigationConstants.TYPE_PRIMARY) {
-			typeKey = "primary-navigation";
-		}
-		else if (type == SiteNavigationConstants.TYPE_PRIVATE_PAGES_HIERARCHY) {
-			typeKey = "private-pages-hierarchy";
-		}
-		else if (type == SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)_httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			Group group = themeDisplay.getScopeGroup();
-
-			if (group.isPrivateLayoutsEnabled()) {
-				typeKey = "public-pages-hierarchy";
-			}
-			else {
-				typeKey = "pages-hierarchy";
-			}
-		}
-		else if (type == SiteNavigationConstants.TYPE_SECONDARY) {
-			typeKey = "secondary-navigation";
-		}
-		else if (type == SiteNavigationConstants.TYPE_SOCIAL) {
-			typeKey = "social-navigation";
-		}
-
-		return LanguageUtil.get(_httpServletRequest, typeKey);
 	}
 
 	public SiteNavigationMenu getSiteNavigationMenu() {
@@ -363,49 +328,11 @@ public class SiteNavigationMenuDisplayContext {
 		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new UUIDItemSelectorReturnType());
 
-		return String.valueOf(
-			itemSelector.getItemSelectorURL(
-				RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
-				eventName, itemSelectorCriterion));
-	}
+		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
+			RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
+			eventName, itemSelectorCriterion);
 
-	public String getSiteNavigationMenuName() {
-		SiteNavigationMenu siteNavigationMenu = getSiteNavigationMenu();
-
-		if (siteNavigationMenu != null) {
-			return HtmlUtil.escape(siteNavigationMenu.getName());
-		}
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		Group group = themeDisplay.getScopeGroup();
-
-		if (!group.isPrivateLayoutsEnabled()) {
-			return LanguageUtil.get(_httpServletRequest, "pages-hierarchy");
-		}
-
-		if (getSelectSiteNavigationMenuType() ==
-				SiteNavigationConstants.TYPE_PRIVATE_PAGES_HIERARCHY) {
-
-			return LanguageUtil.get(
-				_httpServletRequest, "private-pages-hierarchy");
-		}
-
-		if (getSelectSiteNavigationMenuType() ==
-				SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY) {
-
-			return LanguageUtil.get(
-				_httpServletRequest, "public-pages-hierarchy");
-		}
-
-		Layout layout = themeDisplay.getLayout();
-
-		return LanguageUtil.get(
-			_httpServletRequest,
-			layout.isPrivateLayout() ? "private-pages-hierarchy" :
-				"public-pages-hierarchy");
+		return itemSelectorURL.toString();
 	}
 
 	public int getSiteNavigationMenuType() {
@@ -424,6 +351,30 @@ public class SiteNavigationMenuDisplayContext {
 		return _navigationMenuType;
 	}
 
+	public String getSiteNavigationMenuTypeLabel() {
+		int type = getSiteNavigationMenuType();
+
+		String typeKey = "select";
+
+		if (type == SiteNavigationConstants.TYPE_PRIMARY) {
+			typeKey = "primary-navigation";
+		}
+		else if (type == SiteNavigationConstants.TYPE_PRIVATE_PAGES_HIERARCHY) {
+			typeKey = "private-pages-hierarchy";
+		}
+		else if (type == SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY) {
+			typeKey = "public-pages-hierarchy";
+		}
+		else if (type == SiteNavigationConstants.TYPE_SECONDARY) {
+			typeKey = "secondary-navigation";
+		}
+		else if (type == SiteNavigationConstants.TYPE_SOCIAL) {
+			typeKey = "social-navigation";
+		}
+
+		return LanguageUtil.get(_httpServletRequest, typeKey);
+	}
+
 	public boolean isPreview() {
 		if (_preview != null) {
 			return _preview;
@@ -440,17 +391,11 @@ public class SiteNavigationMenuDisplayContext {
 		long siteNavigationMenuId =
 			_siteNavigationMenuPortletInstanceConfiguration.
 				siteNavigationMenuId();
-		String siteNavigationMenuName =
-			_siteNavigationMenuPortletInstanceConfiguration.
-				siteNavigationMenuName();
 		int siteNavigationMenuType =
 			_siteNavigationMenuPortletInstanceConfiguration.
 				siteNavigationMenuType();
 
-		if (((siteNavigationMenuId > 0) ||
-			 Validator.isNotNull(siteNavigationMenuName)) &&
-			(siteNavigationMenuType == -1)) {
-
+		if ((siteNavigationMenuId > 0) && (siteNavigationMenuType == -1)) {
 			return true;
 		}
 
@@ -463,17 +408,12 @@ public class SiteNavigationMenuDisplayContext {
 				WebKeys.THEME_DISPLAY);
 
 		Layout layout = themeDisplay.getLayout();
-		Group scopeGroup = themeDisplay.getScopeGroup();
 
-		if (layout.isPrivateLayout() && scopeGroup.hasPrivateLayouts()) {
+		if (layout.isPrivateLayout()) {
 			return SiteNavigationConstants.TYPE_PRIVATE_PAGES_HIERARCHY;
 		}
 
-		if (layout.isPublicLayout() && scopeGroup.hasPublicLayouts()) {
-			return SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY;
-		}
-
-		return SiteNavigationConstants.TYPE_PRIMARY;
+		return SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY;
 	}
 
 	private String _getSiteNavigationMenuName() {

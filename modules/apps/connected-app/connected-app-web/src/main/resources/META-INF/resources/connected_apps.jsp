@@ -28,7 +28,7 @@
 	<div class="sheet-section">
 		<liferay-portlet:actionURL name="/connected_app/revoke_connected_app" varImpl="actionCommandURL" />
 
-		<aui:form action="<%= actionCommandURL %>" cssClass="portlet-users-admin-edit-user" data-senna-off="true" method="post" name="fm">
+		<aui:form action="<%= actionCommandURL.toString() %>" cssClass="portlet-users-admin-edit-user" data-senna-off="true" method="post" name="fm">
 
 			<%
 			User selUser = PortalUtil.getSelectedUser(request);
@@ -77,7 +77,7 @@
 			%>
 
 			<c:if test="<%= connectedApps.isEmpty() %>">
-				<span class="text-secondary">
+				<span class="text-muted">
 					<liferay-ui:message key="no-applications-have-been-approved-yet" />
 				</span>
 			</c:if>
@@ -85,12 +85,12 @@
 	</div>
 </div>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {delegate} = frontendJsWeb;
-
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 	var connectedAppKeyInput = document.querySelector(
 		'[name=<portlet:namespace />connectedAppKey]'
 	);
+
+	var delegate = delegateModule.default;
 
 	delegate(
 		document.getElementById('<portlet:namespace />connectedApp'),

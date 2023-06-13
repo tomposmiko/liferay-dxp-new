@@ -39,11 +39,7 @@ SiteNavigationMenu siteNavigationMenu = siteNavigationAdminDisplayContext.getSit
 				<strong><liferay-ui:message key="this-menu-will-act-as-the" /></strong>
 			</h5>
 
-			<clay:icon
-				symbol="check-circle-full"
-			/>
-
-			<liferay-ui:message key="<%= typeKey %>" />
+			<aui:icon image="check-circle-full" markupView="lexicon" /> <liferay-ui:message key="<%= typeKey %>" />
 		</div>
 	</c:if>
 

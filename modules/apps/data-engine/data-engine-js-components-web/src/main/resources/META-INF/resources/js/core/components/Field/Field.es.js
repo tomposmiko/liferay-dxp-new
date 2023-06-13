@@ -132,7 +132,6 @@ const mountStruct = (event, field, value, key) => {
 const FieldLazy = ({
 	field,
 	fieldTypes,
-	itemPath,
 	onBlur,
 	onChange,
 	onFocus,
@@ -151,7 +150,6 @@ const FieldLazy = ({
 
 	return (
 		<ComponentLazy
-			itemPath={itemPath}
 			onBlur={(event) => {
 				focusDurationRef.current.end = new Date();
 				onBlur(mountStruct(event, field), focusDurationRef.current);
@@ -176,7 +174,7 @@ const getRootParentField = (field, currentLoc, {loc, root}) => {
 	if (root) {
 		return {
 			...field,
-			loc: [...loc, currentLoc],
+			loc: [currentLoc, ...loc],
 			root,
 		};
 	}
@@ -188,7 +186,7 @@ const getRootParentField = (field, currentLoc, {loc, root}) => {
 	};
 };
 
-export function Field({field, itemPath, loc, ...otherProps}) {
+export const Field = ({field, loc, ...otherProps}) => {
 	const parentField = useContext(ParentFieldContext);
 	const {defaultLanguageId, editingLanguageId} = useFormState();
 	const {fieldTypes} = usePage();
@@ -225,7 +223,6 @@ export function Field({field, itemPath, loc, ...otherProps}) {
 						[field.type]
 					)}
 				</p>
-
 				{hasError.network && (
 					<ClayButton
 						className="ddm-field-renderer--button"
@@ -254,7 +251,6 @@ export function Field({field, itemPath, loc, ...otherProps}) {
 									readOnly: getReadOnly(field),
 								}}
 								fieldTypes={fieldTypes}
-								itemPath={itemPath}
 								{...otherProps}
 							/>
 						</ParentFieldContext.Provider>
@@ -263,4 +259,4 @@ export function Field({field, itemPath, loc, ...otherProps}) {
 			</AutoFocus>
 		</ErrorBoundary>
 	);
-}
+};

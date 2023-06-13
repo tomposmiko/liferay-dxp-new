@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.PageContext;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -39,8 +40,12 @@ import org.osgi.service.component.annotations.Component;
  * @author Bruno Basto
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.CAPTCHA,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		CaptchaDDMFormFieldTemplateContextContributor.class,
+		DDMFormFieldTemplateContextContributor.class
+	}
 )
 public class CaptchaDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -56,7 +61,7 @@ public class CaptchaDDMFormFieldTemplateContextContributor
 			html = renderCaptchaTag(ddmFormField, ddmFormFieldRenderingContext);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return Collections.singletonMap("html", html);
@@ -79,11 +84,11 @@ public class CaptchaDDMFormFieldTemplateContextContributor
 
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
-		captchaTag.setPageContext(
-			PageContextFactoryUtil.create(
-				httpServletRequest,
-				new PipingServletResponse(
-					httpServletResponse, unsyncStringWriter)));
+		PageContext pageContext = PageContextFactoryUtil.create(
+			httpServletRequest,
+			new PipingServletResponse(httpServletResponse, unsyncStringWriter));
+
+		captchaTag.setPageContext(pageContext);
 
 		captchaTag.runTag();
 

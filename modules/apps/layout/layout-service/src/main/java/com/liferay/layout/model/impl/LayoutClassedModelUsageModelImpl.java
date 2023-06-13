@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -271,142 +272,152 @@ public class LayoutClassedModelUsageModelImpl
 	public Map<String, Function<LayoutClassedModelUsage, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<LayoutClassedModelUsage, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, LayoutClassedModelUsage>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<LayoutClassedModelUsage, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LayoutClassedModelUsage.class.getClassLoader(),
+			LayoutClassedModelUsage.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<LayoutClassedModelUsage, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<LayoutClassedModelUsage, Object>>();
+		try {
+			Constructor<LayoutClassedModelUsage> constructor =
+				(Constructor<LayoutClassedModelUsage>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", LayoutClassedModelUsage::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", LayoutClassedModelUsage::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"uuid", LayoutClassedModelUsage::getUuid);
-			attributeGetterFunctions.put(
-				"layoutClassedModelUsageId",
-				LayoutClassedModelUsage::getLayoutClassedModelUsageId);
-			attributeGetterFunctions.put(
-				"groupId", LayoutClassedModelUsage::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", LayoutClassedModelUsage::getCompanyId);
-			attributeGetterFunctions.put(
-				"createDate", LayoutClassedModelUsage::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", LayoutClassedModelUsage::getModifiedDate);
-			attributeGetterFunctions.put(
-				"classNameId", LayoutClassedModelUsage::getClassNameId);
-			attributeGetterFunctions.put(
-				"classPK", LayoutClassedModelUsage::getClassPK);
-			attributeGetterFunctions.put(
-				"containerKey", LayoutClassedModelUsage::getContainerKey);
-			attributeGetterFunctions.put(
-				"containerType", LayoutClassedModelUsage::getContainerType);
-			attributeGetterFunctions.put(
-				"plid", LayoutClassedModelUsage::getPlid);
-			attributeGetterFunctions.put(
-				"type", LayoutClassedModelUsage::getType);
-			attributeGetterFunctions.put(
-				"lastPublishDate", LayoutClassedModelUsage::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<LayoutClassedModelUsage, Object>>
+		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<LayoutClassedModelUsage, Object>>
+			_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<LayoutClassedModelUsage, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<LayoutClassedModelUsage, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<LayoutClassedModelUsage, Object>>();
+		Map<String, BiConsumer<LayoutClassedModelUsage, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<LayoutClassedModelUsage, ?>>();
 
-		static {
-			Map<String, BiConsumer<LayoutClassedModelUsage, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<LayoutClassedModelUsage, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", LayoutClassedModelUsage::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", LayoutClassedModelUsage::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", LayoutClassedModelUsage::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<LayoutClassedModelUsage, String>)
+				LayoutClassedModelUsage::setUuid);
+		attributeGetterFunctions.put(
+			"layoutClassedModelUsageId",
+			LayoutClassedModelUsage::getLayoutClassedModelUsageId);
+		attributeSetterBiConsumers.put(
+			"layoutClassedModelUsageId",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setLayoutClassedModelUsageId);
+		attributeGetterFunctions.put(
+			"groupId", LayoutClassedModelUsage::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", LayoutClassedModelUsage::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", LayoutClassedModelUsage::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<LayoutClassedModelUsage, Date>)
+				LayoutClassedModelUsage::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", LayoutClassedModelUsage::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<LayoutClassedModelUsage, Date>)
+				LayoutClassedModelUsage::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", LayoutClassedModelUsage::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", LayoutClassedModelUsage::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setClassPK);
+		attributeGetterFunctions.put(
+			"containerKey", LayoutClassedModelUsage::getContainerKey);
+		attributeSetterBiConsumers.put(
+			"containerKey",
+			(BiConsumer<LayoutClassedModelUsage, String>)
+				LayoutClassedModelUsage::setContainerKey);
+		attributeGetterFunctions.put(
+			"containerType", LayoutClassedModelUsage::getContainerType);
+		attributeSetterBiConsumers.put(
+			"containerType",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setContainerType);
+		attributeGetterFunctions.put("plid", LayoutClassedModelUsage::getPlid);
+		attributeSetterBiConsumers.put(
+			"plid",
+			(BiConsumer<LayoutClassedModelUsage, Long>)
+				LayoutClassedModelUsage::setPlid);
+		attributeGetterFunctions.put("type", LayoutClassedModelUsage::getType);
+		attributeSetterBiConsumers.put(
+			"type",
+			(BiConsumer<LayoutClassedModelUsage, Integer>)
+				LayoutClassedModelUsage::setType);
+		attributeGetterFunctions.put(
+			"lastPublishDate", LayoutClassedModelUsage::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<LayoutClassedModelUsage, Date>)
+				LayoutClassedModelUsage::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<LayoutClassedModelUsage, String>)
-					LayoutClassedModelUsage::setUuid);
-			attributeSetterBiConsumers.put(
-				"layoutClassedModelUsageId",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setLayoutClassedModelUsageId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<LayoutClassedModelUsage, Date>)
-					LayoutClassedModelUsage::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<LayoutClassedModelUsage, Date>)
-					LayoutClassedModelUsage::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setClassPK);
-			attributeSetterBiConsumers.put(
-				"containerKey",
-				(BiConsumer<LayoutClassedModelUsage, String>)
-					LayoutClassedModelUsage::setContainerKey);
-			attributeSetterBiConsumers.put(
-				"containerType",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setContainerType);
-			attributeSetterBiConsumers.put(
-				"plid",
-				(BiConsumer<LayoutClassedModelUsage, Long>)
-					LayoutClassedModelUsage::setPlid);
-			attributeSetterBiConsumers.put(
-				"type",
-				(BiConsumer<LayoutClassedModelUsage, Integer>)
-					LayoutClassedModelUsage::setType);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<LayoutClassedModelUsage, Date>)
-					LayoutClassedModelUsage::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -1060,13 +1071,44 @@ public class LayoutClassedModelUsageModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<LayoutClassedModelUsage, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<LayoutClassedModelUsage, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<LayoutClassedModelUsage, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply((LayoutClassedModelUsage)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, LayoutClassedModelUsage>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						LayoutClassedModelUsage.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
@@ -1091,8 +1133,7 @@ public class LayoutClassedModelUsageModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<LayoutClassedModelUsage, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

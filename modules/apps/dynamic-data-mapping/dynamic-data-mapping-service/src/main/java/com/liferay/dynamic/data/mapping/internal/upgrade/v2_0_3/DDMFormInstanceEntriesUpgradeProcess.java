@@ -54,7 +54,7 @@ public class DDMFormInstanceEntriesUpgradeProcess extends UpgradeProcess {
 				String data = resultSet.getString("data_");
 
 				preparedStatement2.setString(
-					1, _updateFieldValuesToLocalizable(data));
+					1, updateFieldValuesToLocalizable(data));
 
 				long contentId = resultSet.getLong("contentId");
 
@@ -67,7 +67,7 @@ public class DDMFormInstanceEntriesUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private String _updateFieldValuesToLocalizable(String definition)
+	protected String updateFieldValuesToLocalizable(String definition)
 		throws PortalException {
 
 		JSONObject ddmFormValuesJSONObject = _jsonFactory.createJSONObject(
@@ -95,7 +95,7 @@ public class DDMFormInstanceEntriesUpgradeProcess extends UpgradeProcess {
 			}
 		}
 
-		return ddmFormValuesJSONObject.toString();
+		return ddmFormValuesJSONObject.toJSONString();
 	}
 
 	private final JSONFactory _jsonFactory;

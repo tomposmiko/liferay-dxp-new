@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.util;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
 import java.util.Date;
@@ -25,11 +24,6 @@ import java.util.TimeZone;
  * @author Alessio Antonio Rendina
  */
 public interface CPSubscriptionType {
-
-	public UnicodeProperties
-			getDeliverySubscriptionTypeSettingsUnicodeProperties(
-				UnicodeProperties subscriptionTypeSettingsUnicodeProperties)
-		throws PortalException;
 
 	public String getLabel(Locale locale);
 
@@ -43,9 +37,5 @@ public interface CPSubscriptionType {
 	public Date getSubscriptionStartDate(
 		TimeZone timeZone,
 		UnicodeProperties subscriptionTypeSettingsUnicodeProperties);
-
-	public UnicodeProperties getSubscriptionTypeSettingsUnicodeProperties(
-			UnicodeProperties subscriptionTypeSettingsUnicodeProperties)
-		throws PortalException;
 
 }

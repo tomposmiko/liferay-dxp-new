@@ -27,7 +27,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -57,7 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Basto
  * @author Brian Wing Shun Chan
  */
-@Component(service = DDMXML.class)
+@Component(immediate = true, service = DDMXML.class)
 public class DDMXMLImpl implements DDMXML {
 
 	@Override
@@ -80,7 +80,7 @@ public class DDMXMLImpl implements DDMXML {
 		}
 		catch (DocumentException documentException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(documentException);
+				_log.debug(documentException.getMessage(), documentException);
 			}
 
 			return null;
@@ -136,8 +136,11 @@ public class DDMXMLImpl implements DDMXML {
 							"default-locale");
 					}
 
-					field.setDefaultLocale(
-						LocaleUtil.fromLanguageId(defaultLanguageId));
+					Locale defaultLocale = LocaleUtil.fromLanguageId(
+						defaultLanguageId);
+
+					field.setDefaultLocale(defaultLocale);
+
 					field.setDDMStructureId(structure.getStructureId());
 					field.setName(fieldName);
 					field.setValue(locale, fieldValueSerializable);
@@ -172,14 +175,13 @@ public class DDMXMLImpl implements DDMXML {
 			while (iterator.hasNext()) {
 				Field field = iterator.next();
 
-				List<Node> nodes = _getElementsByName(
-					document, field.getName());
+				List<Node> nodes = getElementsByName(document, field.getName());
 
 				for (Node node : nodes) {
 					document.remove(node);
 				}
 
-				_appendField(rootElement, field);
+				appendField(rootElement, field);
 			}
 
 			return document.formattedString();
@@ -213,7 +215,7 @@ public class DDMXMLImpl implements DDMXML {
 		try {
 			Document document = _saxReader.read(xml, getXMLSchema());
 
-			_validate(document);
+			validate(document);
 
 			return document.asXML();
 		}
@@ -235,7 +237,7 @@ public class DDMXMLImpl implements DDMXML {
 		}
 	}
 
-	private void _appendField(Element element, Field field) {
+	protected void appendField(Element element, Field field) {
 		Element dynamicElementElement = element.addElement("dynamic-element");
 
 		dynamicElementElement.addAttribute(
@@ -253,13 +255,13 @@ public class DDMXMLImpl implements DDMXML {
 				dynamicContentElement.addAttribute(
 					"language-id", LocaleUtil.toLanguageId(locale));
 
-				_updateField(dynamicContentElement, value);
+				updateField(dynamicContentElement, value);
 			}
 		}
 	}
 
-	private List<Node> _getElementsByName(Document document, String name) {
-		name = _html.escapeXPathAttribute(name);
+	protected List<Node> getElementsByName(Document document, String name) {
+		name = HtmlUtil.escapeXPathAttribute(name);
 
 		XPath xPathSelector = _saxReader.createXPath(
 			StringBundler.concat("//dynamic-element[@name=", name, "]"));
@@ -267,7 +269,12 @@ public class DDMXMLImpl implements DDMXML {
 		return xPathSelector.selectNodes(document);
 	}
 
-	private void _updateField(
+	@Reference(unbind = "-")
+	protected void setSAXReader(SAXReader saxReader) {
+		_saxReader = saxReader;
+	}
+
+	protected void updateField(
 		Element dynamicContentElement, Serializable fieldValue) {
 
 		dynamicContentElement.clearContent();
@@ -283,7 +290,7 @@ public class DDMXMLImpl implements DDMXML {
 		dynamicContentElement.addCDATA(valueString.trim());
 	}
 
-	private void _validate(Document document) throws Exception {
+	protected void validate(Document document) throws Exception {
 		XPath xPathSelector = _saxReader.createXPath("//dynamic-element");
 
 		List<Node> nodes = xPathSelector.selectNodes(document);
@@ -318,12 +325,7 @@ public class DDMXMLImpl implements DDMXML {
 
 	private static final Log _log = LogFactoryUtil.getLog(DDMXMLImpl.class);
 
-	@Reference
-	private Html _html;
-
-	@Reference
 	private SAXReader _saxReader;
-
 	private XMLSchema _xmlSchema;
 
 }

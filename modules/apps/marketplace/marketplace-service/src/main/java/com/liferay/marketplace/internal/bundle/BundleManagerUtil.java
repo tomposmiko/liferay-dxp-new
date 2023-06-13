@@ -14,76 +14,62 @@
 
 package com.liferay.marketplace.internal.bundle;
 
-import com.liferay.osgi.util.service.Snapshot;
-
 import java.io.File;
 
 import java.util.List;
 import java.util.jar.Manifest;
 
 import org.osgi.framework.Bundle;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Ryan Park
  */
+@Component(service = {})
 public class BundleManagerUtil {
 
 	public static Bundle getBundle(String symbolicName, String version) {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		return bundleManagerImpl.getBundle(symbolicName, version);
+		return _bundleManagerImpl.getBundle(symbolicName, version);
 	}
 
 	public static List<Bundle> getBundles() {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		return bundleManagerImpl.getBundles();
+		return _bundleManagerImpl.getBundles();
 	}
 
 	public static List<Bundle> getInstalledBundles() {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		return bundleManagerImpl.getInstalledBundles();
+		return _bundleManagerImpl.getInstalledBundles();
 	}
 
 	public static Manifest getManifest(File file) {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		return bundleManagerImpl.getManifest(file);
+		return _bundleManagerImpl.getManifest(file);
 	}
 
 	public static void installLPKG(File file) throws Exception {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		bundleManagerImpl.installLPKG(file);
+		_bundleManagerImpl.installLPKG(file);
 	}
 
 	public static boolean isInstalled(Bundle bundle) {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		return bundleManagerImpl.isInstalled(bundle);
+		return _bundleManagerImpl.isInstalled(bundle);
 	}
 
 	public static boolean isInstalled(String symbolicName, String version) {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		return bundleManagerImpl.isInstalled(symbolicName, version);
+		return _bundleManagerImpl.isInstalled(symbolicName, version);
 	}
 
 	public static void uninstallBundle(Bundle bundle) {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		bundleManagerImpl.uninstallBundle(bundle);
+		_bundleManagerImpl.uninstallBundle(bundle);
 	}
 
 	public static void uninstallBundle(String symbolicName, String version) {
-		BundleManagerImpl bundleManagerImpl = _bundleManagerImplSnapshot.get();
-
-		bundleManagerImpl.uninstallBundle(symbolicName, version);
+		_bundleManagerImpl.uninstallBundle(symbolicName, version);
 	}
 
-	private static final Snapshot<BundleManagerImpl>
-		_bundleManagerImplSnapshot = new Snapshot<>(
-			BundleManagerUtil.class, BundleManagerImpl.class);
+	@Reference(unbind = "-")
+	protected void setBundleManager(BundleManagerImpl bundleManagerImpl) {
+		_bundleManagerImpl = bundleManagerImpl;
+	}
+
+	private static BundleManagerImpl _bundleManagerImpl;
 
 }

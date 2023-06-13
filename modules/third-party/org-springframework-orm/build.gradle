@@ -3,13 +3,15 @@ import com.liferay.gradle.plugins.patcher.PatchTask
 apply plugin: "com.liferay.patcher"
 
 task deployJar(type: Copy)
-task jarManifest
 task jarPatched(type: Zip)
 task patch(type: PatchTask)
 
+sourceCompatibility = "1.6"
+targetCompatibility = "1.6"
+
 dependencies {
-	compile group: "org.hibernate", name: "hibernate-core", version: "5.6.7.Final"
-	compile group: "org.springframework", name: "spring-orm", version: "5.2.24.RELEASE"
+	compile group: "org.hibernate", name: "hibernate-core", version: "3.6.10.Final"
+	compile group: "org.springframework", name: "spring-orm", version: "4.3.22.RELEASE"
 }
 
 deploy {
@@ -35,12 +37,6 @@ jar {
 	dependsOn jarPatched
 }
 
-jarManifest {
-	doLast {
-		ant.jar(destfile: jar.archivePath, update: true)
-	}
-}
-
 jarPatched {
 	archiveName = jar.archiveName
 	destinationDir = jar.destinationDir
@@ -57,8 +53,6 @@ patch {
 	ext {
 		autoClean = false
 	}
-
-	fileNames "org/springframework/orm/hibernate5/SpringSessionSynchronization.java"
 
 	originalLibModuleName = "spring-orm"
 }

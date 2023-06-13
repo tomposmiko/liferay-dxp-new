@@ -12,11 +12,11 @@
  * details.
  */
 
-import {EVENT_TYPES} from '../eventTypes';
+import {EVENT_TYPES} from '../eventTypes.es';
 
-export default function objectFieldsReducer(state, action) {
+export default (state, action) => {
 	switch (action.type) {
-		case EVENT_TYPES.OBJECT.FIELDS_CHANGE: {
+		case EVENT_TYPES.OBJECT_FIELDS.ADD: {
 			const {objectFields} = action.payload;
 
 			return {
@@ -26,4 +26,4 @@ export default function objectFieldsReducer(state, action) {
 		default:
 			return state;
 	}
-}
+};

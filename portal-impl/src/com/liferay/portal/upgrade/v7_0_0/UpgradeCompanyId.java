@@ -17,7 +17,6 @@ package com.liferay.portal.upgrade.v7_0_0;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.BaseCompanyIdUpgradeProcess;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.util.PortalInstances;
 
 import java.io.IOException;
 
@@ -31,7 +30,6 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
- * @author Luis Ortiz
  */
 public class UpgradeCompanyId extends BaseCompanyIdUpgradeProcess {
 
@@ -39,23 +37,19 @@ public class UpgradeCompanyId extends BaseCompanyIdUpgradeProcess {
 	protected TableUpdater[] getTableUpdaters() {
 		return new TableUpdater[] {
 			new TableUpdater("AnnouncementsFlag", "User_", "userId"),
-			new CompanyIdNotNullTableUpdater(
+			new TableUpdater(
 				"AssetEntries_AssetCategories", "AssetCategory", "categoryId"),
-			new CompanyIdNotNullTableUpdater(
-				"AssetEntries_AssetTags", "AssetTag", "tagId"),
+			new TableUpdater("AssetEntries_AssetTags", "AssetTag", "tagId"),
 			new TableUpdater("AssetTagStats", "AssetTag", "tagId"),
 			new TableUpdater("BrowserTracker", "User_", "userId"),
 			new TableUpdater(
 				"DLFileEntryMetadata", "DLFileEntry", "fileEntryId"),
-			new CompanyIdNotNullTableUpdater(
+			new TableUpdater(
 				"DLFileEntryTypes_DLFolders", "DLFolder", "folderId"),
 			new DLSyncEventTableUpdater("DLSyncEvent"),
-			new CompanyIdNotNullTableUpdater(
-				"Groups_Orgs", "Group_", "groupId"),
-			new CompanyIdNotNullTableUpdater(
-				"Groups_Roles", "Group_", "groupId"),
-			new CompanyIdNotNullTableUpdater(
-				"Groups_UserGroups", "Group_", "groupId"),
+			new TableUpdater("Groups_Orgs", "Group_", "groupId"),
+			new TableUpdater("Groups_Roles", "Group_", "groupId"),
+			new TableUpdater("Groups_UserGroups", "Group_", "groupId"),
 			new TableUpdater(
 				"Image", "imageId",
 				new String[][] {
@@ -92,34 +86,15 @@ public class UpgradeCompanyId extends BaseCompanyIdUpgradeProcess {
 			new TableUpdater("TrashVersion", "TrashEntry", "entryId"),
 			new TableUpdater("UserGroupGroupRole", "UserGroup", "userGroupId"),
 			new TableUpdater("UserGroupRole", "User_", "userId"),
-			new CompanyIdNotNullTableUpdater(
-				"UserGroups_Teams", "UserGroup", "userGroupId"),
+			new TableUpdater("UserGroups_Teams", "UserGroup", "userGroupId"),
 			new TableUpdater("UserIdMapper", "User_", "userId"),
-			new CompanyIdNotNullTableUpdater("Users_Groups", "User_", "userId"),
-			new CompanyIdNotNullTableUpdater("Users_Orgs", "User_", "userId"),
-			new CompanyIdNotNullTableUpdater("Users_Roles", "User_", "userId"),
-			new CompanyIdNotNullTableUpdater("Users_Teams", "User_", "userId"),
-			new CompanyIdNotNullTableUpdater(
-				"Users_UserGroups", "User_", "userId"),
+			new TableUpdater("Users_Groups", "User_", "userId"),
+			new TableUpdater("Users_Orgs", "User_", "userId"),
+			new TableUpdater("Users_Roles", "User_", "userId"),
+			new TableUpdater("Users_Teams", "User_", "userId"),
+			new TableUpdater("Users_UserGroups", "User_", "userId"),
 			new TableUpdater("UserTrackerPath", "UserTracker", "userTrackerId")
 		};
-	}
-
-	protected class CompanyIdNotNullTableUpdater extends TableUpdater {
-
-		public CompanyIdNotNullTableUpdater(
-			String tableName, String foreignTableName, String columnName) {
-
-			super(tableName, foreignTableName, columnName);
-		}
-
-		@Override
-		public void update(Connection connection) throws Exception {
-			super.update(connection);
-
-			alterColumnType(getTableName(), "companyId", "LONG NOT NULL");
-		}
-
 	}
 
 	protected class DLSyncEventTableUpdater extends TableUpdater {
@@ -161,69 +136,70 @@ public class UpgradeCompanyId extends BaseCompanyIdUpgradeProcess {
 		public void update(Connection connection)
 			throws IOException, SQLException {
 
-			long[] companyIds = PortalInstances.getCompanyIdsBySQL();
+			List<Long> companyIds = getCompanyIds(connection);
 
-			if (companyIds.length == 1) {
-				runSQL(connection, getUpdateSQL(String.valueOf(companyIds[0])));
+			if (companyIds.size() == 1) {
+				String selectSQL = String.valueOf(companyIds.get(0));
+
+				runSQL(connection, getUpdateSQL(selectSQL));
 
 				return;
 			}
 
 			// Company
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"Company", "companyId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_COMPANY));
+			String updateSQL = _getUpdateSQL(
+				"Company", "companyId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_COMPANY);
+
+			runSQL(connection, updateSQL);
 
 			// Group
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"Group_", "groupId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_GROUP));
+			updateSQL = _getUpdateSQL(
+				"Group_", "groupId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_GROUP);
+
+			runSQL(connection, updateSQL);
 
 			// Layout
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"Layout", "plid", "plid",
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT));
+			updateSQL = _getUpdateSQL(
+				"Layout", "plid", "plid", PortletKeys.PREFS_OWNER_TYPE_LAYOUT);
+
+			runSQL(connection, updateSQL);
 
 			// LayoutRevision
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"LayoutRevision", "layoutRevisionId", "plid",
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT));
+			updateSQL = _getUpdateSQL(
+				"LayoutRevision", "layoutRevisionId", "plid",
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT);
+
+			runSQL(connection, updateSQL);
 
 			// Organization
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"Organization_", "organizationId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_ORGANIZATION));
+			updateSQL = _getUpdateSQL(
+				"Organization_", "organizationId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_ORGANIZATION);
+
+			runSQL(connection, updateSQL);
 
 			// PortletItem
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"PortletItem", "portletItemId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_ARCHIVED));
+			updateSQL = _getUpdateSQL(
+				"PortletItem", "portletItemId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_ARCHIVED);
+
+			runSQL(connection, updateSQL);
 
 			// User_
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"User_", "userId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_USER));
+			updateSQL = _getUpdateSQL(
+				"User_", "userId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_USER);
+
+			runSQL(connection, updateSQL);
 		}
 
 		private String _getSelectSQL(
@@ -260,11 +236,11 @@ public class UpgradeCompanyId extends BaseCompanyIdUpgradeProcess {
 				String columnName, int ownerType)
 			throws IOException, SQLException {
 
+			String selectSQL = _getSelectSQL(
+				foreignTableName, foreignColumnName, columnName);
+
 			return StringBundler.concat(
-				getUpdateSQL(
-					_getSelectSQL(
-						foreignTableName, foreignColumnName, columnName)),
-				" where ownerType = ", ownerType,
+				getUpdateSQL(selectSQL), " where ownerType = ", ownerType,
 				" and (companyId is null or companyId = 0)");
 		}
 

@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutFriendlyURL;
 import com.liferay.portal.kernel.service.LayoutFriendlyURLLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
@@ -36,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Sergio González
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class LayoutFriendlyURLStagedModelDataHandler
 	extends BaseStagedModelDataHandler<LayoutFriendlyURL> {
 
@@ -120,10 +121,10 @@ public class LayoutFriendlyURLStagedModelDataHandler
 		LayoutFriendlyURL importedLayoutFriendlyURL = null;
 
 		LayoutFriendlyURL existingLayoutFriendlyURL =
-			_fetchExistingLayoutFriendlyURL(
+			fetchExistingLayoutFriendlyURL(
 				portletDataContext, layoutFriendlyURL, plid);
 
-		layoutFriendlyURL = _getUniqueLayoutFriendlyURL(
+		layoutFriendlyURL = getUniqueLayoutFriendlyURL(
 			portletDataContext, layoutFriendlyURL, existingLayoutFriendlyURL);
 
 		if (existingLayoutFriendlyURL == null) {
@@ -151,7 +152,7 @@ public class LayoutFriendlyURLStagedModelDataHandler
 			layoutFriendlyURL, importedLayoutFriendlyURL);
 	}
 
-	private LayoutFriendlyURL _fetchExistingLayoutFriendlyURL(
+	protected LayoutFriendlyURL fetchExistingLayoutFriendlyURL(
 		PortletDataContext portletDataContext,
 		LayoutFriendlyURL layoutFriendlyURL, long plid) {
 
@@ -169,7 +170,7 @@ public class LayoutFriendlyURLStagedModelDataHandler
 		return existingLayoutFriendlyURL;
 	}
 
-	private LayoutFriendlyURL _getUniqueLayoutFriendlyURL(
+	protected LayoutFriendlyURL getUniqueLayoutFriendlyURL(
 			PortletDataContext portletDataContext,
 			LayoutFriendlyURL layoutFriendlyURL,
 			LayoutFriendlyURL existingLayoutFriendlyURL)
@@ -177,7 +178,7 @@ public class LayoutFriendlyURLStagedModelDataHandler
 
 		String friendlyURL = layoutFriendlyURL.getFriendlyURL();
 
-		boolean privateLayout = portletDataContext.isPrivateLayout();
+		boolean privateLayout = layoutFriendlyURL.isPrivateLayout();
 
 		if (existingLayoutFriendlyURL != null) {
 			privateLayout = existingLayoutFriendlyURL.isPrivateLayout();
@@ -204,7 +205,21 @@ public class LayoutFriendlyURLStagedModelDataHandler
 		return layoutFriendlyURL;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setLayoutFriendlyURLLocalService(
+		LayoutFriendlyURLLocalService layoutFriendlyURLLocalService) {
+
+		_layoutFriendlyURLLocalService = layoutFriendlyURLLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
 	private LayoutFriendlyURLLocalService _layoutFriendlyURLLocalService;
+	private LayoutLocalService _layoutLocalService;
 
 }

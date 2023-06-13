@@ -28,7 +28,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONContext;
 import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONDeserializerTransformer;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.json.JSONTransformer;
 import com.liferay.portal.kernel.log.Log;
@@ -57,7 +57,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @author Iván Zaera
  * @author Roberto Díaz
  */
-@Component(service = ItemSelectorCriterionSerializer.class)
+@Component(immediate = true, service = ItemSelectorCriterionSerializer.class)
 public class ItemSelectorCriterionSerializerImpl
 	implements ItemSelectorCriterionSerializer {
 
@@ -66,7 +66,7 @@ public class ItemSelectorCriterionSerializerImpl
 		Class<T> itemSelectorCriterionClass, String json) {
 
 		JSONDeserializer<T> jsonDeserializer =
-			_jsonFactory.createJSONDeserializer();
+			JSONFactoryUtil.createJSONDeserializer();
 
 		jsonDeserializer.transform(
 			_desiredItemSelectorReturnTypesJSONDeserializerTransformer,
@@ -77,7 +77,7 @@ public class ItemSelectorCriterionSerializerImpl
 
 	@Override
 	public String serialize(ItemSelectorCriterion itemSelectorCriterion) {
-		JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();
+		JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
 
 		jsonSerializer.transform(
 			_desiredItemSelectorReturnTypesJSONTransformer,
@@ -86,6 +86,15 @@ public class ItemSelectorCriterionSerializerImpl
 		jsonSerializer.exclude(_EXCLUDED_FIELD_NAMES);
 
 		return jsonSerializer.serializeDeep(itemSelectorCriterion);
+	}
+
+	@Reference(unbind = "-")
+	public void setItemSelectorViewReturnTypeProviderHandler(
+		ItemSelectorViewReturnTypeProviderHandler
+			itemSelectorViewReturnTypeProviderHandler) {
+
+		_itemSelectorViewReturnTypeProviderHandler =
+			itemSelectorViewReturnTypeProviderHandler;
 	}
 
 	@Activate
@@ -165,14 +174,8 @@ public class ItemSelectorCriterionSerializerImpl
 			new DesiredItemSelectorReturnTypesJSONTransformer();
 	private final ConcurrentMap<String, List<ItemSelectorReturnType>>
 		_itemSelectorReturnTypes = new ConcurrentHashMap<>();
-
-	@Reference
 	private ItemSelectorViewReturnTypeProviderHandler
 		_itemSelectorViewReturnTypeProviderHandler;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
 	private ServiceTracker
 		<ItemSelectorViewReturnTypeProvider, ItemSelectorViewReturnTypeProvider>
 			_serviceTracker;

@@ -64,6 +64,13 @@ public abstract class BaseSearcher extends BaseIndexer<Object> {
 	}
 
 	@Override
+	public void registerIndexerPostProcessor(
+		IndexerPostProcessor indexerPostProcessor) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	protected void doDelete(Object object) throws Exception {
 		throw new UnsupportedOperationException();
 	}

@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import java.io.IOException;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -46,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = {
 		"dynamic.data.mapping.form.builder.servlet=true",
 		"osgi.http.whiteboard.context.path=/dynamic-data-mapping-form-builder-fieldset-definition",
@@ -78,10 +80,13 @@ public class DDMFieldSetDefinitionServlet extends BaseDDMFormBuilderServlet {
 
 		LocaleThreadLocal.setThemeDisplayLocale(locale);
 
+		Optional<DDMStructure> ddmStructureOptional = Optional.ofNullable(
+			getDDMStructure(ddmStructureId));
+
 		DDMFormBuilderContextRequest ddmFormBuilderContextRequest =
 			DDMFormBuilderContextRequest.with(
-				_getDDMStructure(ddmStructureId), httpServletRequest,
-				httpServletResponse, locale, true);
+				ddmStructureOptional, httpServletRequest, httpServletResponse,
+				locale, true);
 
 		String portletNamespace = ParamUtil.getString(
 			httpServletRequest, "portletNamespace");
@@ -102,12 +107,12 @@ public class DDMFieldSetDefinitionServlet extends BaseDDMFormBuilderServlet {
 			jsonSerializer.serializeDeep(fieldContext.getContext()));
 	}
 
-	private DDMStructure _getDDMStructure(long ddmStructureId) {
+	protected DDMStructure getDDMStructure(long ddmStructureId) {
 		try {
 			return _ddmStructureService.getStructure(ddmStructureId);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return null;
