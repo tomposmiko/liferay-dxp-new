@@ -14,6 +14,7 @@
 
 package com.liferay.document.library.internal.service;
 
+import com.liferay.document.library.internal.util.DLSubscriptionSender;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
@@ -25,6 +26,7 @@ import com.liferay.document.library.kernel.service.DLAppHelperLocalServiceWrappe
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.util.DLAppHelperThreadLocal;
+import com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
@@ -38,7 +40,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.EscapableLocalizableFunction;
-import com.liferay.portal.kernel.util.GroupSubscriptionCheckSubscriptionSender;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.Validator;
@@ -48,11 +49,15 @@ import com.liferay.portlet.documentlibrary.DLGroupServiceSettings;
 import com.liferay.portlet.documentlibrary.constants.DLConstants;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.Serializable;
 
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -126,6 +131,22 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 		}
 	}
 
+	@Activate
+	protected void activate() {
+		_closeable = _liferayJSONDeserializationWhitelist.register(
+			DLSubscriptionSender.class.getName());
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		try {
+			_closeable.close();
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+	}
+
 	protected void notifySubscribers(
 			long userId, FileVersion fileVersion, String entryURL,
 			ServiceContext serviceContext)
@@ -187,9 +208,8 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 			folder = _dlAppLocalService.getFolder(folderId);
 		}
 
-		SubscriptionSender subscriptionSender =
-			new GroupSubscriptionCheckSubscriptionSender(
-				DLConstants.RESOURCE_NAME);
+		SubscriptionSender subscriptionSender = new DLSubscriptionSender(
+			DLConstants.RESOURCE_NAME, folderId);
 
 		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
 
@@ -310,11 +330,17 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 		return true;
 	}
 
+	private Closeable _closeable;
+
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
 	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
+
+	@Reference
+	private LiferayJSONDeserializationWhitelist
+		_liferayJSONDeserializationWhitelist;
 
 	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;

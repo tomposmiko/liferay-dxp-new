@@ -15,6 +15,7 @@
 package com.liferay.portal.search.test.util.query;
 
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.generic.WildcardQueryImpl;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
@@ -36,17 +37,21 @@ import org.junit.Test;
 public abstract class BaseWildcardQueryTestCase extends BaseIndexingTestCase {
 
 	@Test
+	public void testSpacedFieldName() {
+		String fieldName = "expando__keyword__custom_fields__spaced name";
+		String value = "one";
+
+		index(fieldName, value);
+
+		assertTermFilterFieldName(fieldName, value);
+	}
+
+	@Test
 	public void testWildcardQuery() {
 		for (int i = 0; i < 10; i++) {
-			addDocument(
-				DocumentCreationHelpers.singleKeyword(
-					Field.USER_NAME, "SomeUser" + i));
-			addDocument(
-				DocumentCreationHelpers.singleKeyword(
-					Field.USER_NAME, "OtherUser" + i));
-			addDocument(
-				DocumentCreationHelpers.singleKeyword(
-					Field.USER_NAME, "Other" + i));
+			index(Field.USER_NAME, "SomeUser" + i);
+			index(Field.USER_NAME, "OtherUser" + i);
+			index(Field.USER_NAME, "Other" + i);
 		}
 
 		assertSearch(
@@ -86,6 +91,29 @@ public abstract class BaseWildcardQueryTestCase extends BaseIndexingTestCase {
 						Assert.assertTrue(userName.startsWith("OtherUser"));
 					});
 			});
+	}
+
+	protected void assertTermFilterFieldName(String fieldName, String value) {
+		assertSearch(
+			indexingTestHelper -> {
+				indexingTestHelper.setQuery(
+					new WildcardQueryImpl(fieldName, value));
+
+				indexingTestHelper.search();
+
+				StringBuilder sb = new StringBuilder(3);
+
+				sb.append("Expected \"");
+				sb.append(fieldName);
+				sb.append("\" to be escaped in Solr and return a result.");
+
+				Assert.assertEquals(
+					sb.toString(), 1, indexingTestHelper.searchCount());
+			});
+	}
+
+	protected void index(String fieldName, String value) {
+		addDocument(DocumentCreationHelpers.singleKeyword(fieldName, value));
 	}
 
 }

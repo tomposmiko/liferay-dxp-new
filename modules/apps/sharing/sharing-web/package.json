@@ -9,7 +9,7 @@
 		"@clayui/icon": "3.56.0",
 		"@clayui/layout": "3.56.0",
 		"@clayui/modal": "3.8.0",
-		"@clayui/multi-select": "3.8.0",
+		"@clayui/multi-select": "3.64.0",
 		"@clayui/sticker": "3.56.0",
 		"frontend-js-react-web": "*",
 		"frontend-js-web": "*",
@@ -23,5 +23,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "2.0.57"
+	"version": "2.0.58"
 }
