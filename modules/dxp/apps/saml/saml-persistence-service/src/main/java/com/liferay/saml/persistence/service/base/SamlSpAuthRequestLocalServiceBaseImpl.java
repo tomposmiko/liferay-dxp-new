@@ -53,8 +53,6 @@ import com.liferay.saml.persistence.service.persistence.SamlSpSessionPersistence
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -402,7 +400,7 @@ public abstract class SamlSpAuthRequestLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		SamlSpAuthRequestLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -417,7 +415,8 @@ public abstract class SamlSpAuthRequestLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		samlSpAuthRequestLocalService = (SamlSpAuthRequestLocalService)aopProxy;
 
-		_setLocalServiceUtilService(samlSpAuthRequestLocalService);
+		SamlSpAuthRequestLocalServiceUtil.setService(
+			samlSpAuthRequestLocalService);
 	}
 
 	/**
@@ -460,23 +459,6 @@ public abstract class SamlSpAuthRequestLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		SamlSpAuthRequestLocalService samlSpAuthRequestLocalService) {
-
-		try {
-			Field field =
-				SamlSpAuthRequestLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, samlSpAuthRequestLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

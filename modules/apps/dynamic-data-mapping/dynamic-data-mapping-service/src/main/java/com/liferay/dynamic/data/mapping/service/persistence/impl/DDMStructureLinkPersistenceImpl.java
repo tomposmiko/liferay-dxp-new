@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2273,12 +2272,12 @@ public class DDMStructureLinkPersistenceImpl
 			},
 			new String[] {"classNameId", "classPK", "structureId"}, false);
 
-		_setDDMStructureLinkUtilPersistence(this);
+		DDMStructureLinkUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMStructureLinkUtilPersistence(null);
+		DDMStructureLinkUtil.setPersistence(null);
 
 		entityCache.removeCache(DDMStructureLinkImpl.class.getName());
 
@@ -2288,22 +2287,6 @@ public class DDMStructureLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDDMStructureLinkUtilPersistence(
-		DDMStructureLinkPersistence ddmStructureLinkPersistence) {
-
-		try {
-			Field field = DDMStructureLinkUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmStructureLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

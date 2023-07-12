@@ -58,8 +58,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -575,7 +573,7 @@ public abstract class AssetDisplayPageEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		AssetDisplayPageEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -592,7 +590,8 @@ public abstract class AssetDisplayPageEntryLocalServiceBaseImpl
 		assetDisplayPageEntryLocalService =
 			(AssetDisplayPageEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(assetDisplayPageEntryLocalService);
+		AssetDisplayPageEntryLocalServiceUtil.setService(
+			assetDisplayPageEntryLocalService);
 	}
 
 	/**
@@ -650,23 +649,6 @@ public abstract class AssetDisplayPageEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		AssetDisplayPageEntryLocalService assetDisplayPageEntryLocalService) {
-
-		try {
-			Field field =
-				AssetDisplayPageEntryLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, assetDisplayPageEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

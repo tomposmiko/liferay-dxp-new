@@ -504,6 +504,12 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(
+		CommerceInventoryWarehouseLocalService service) {
+
+		_service = service;
+	}
+
 	private static volatile CommerceInventoryWarehouseLocalService _service;
 
 }

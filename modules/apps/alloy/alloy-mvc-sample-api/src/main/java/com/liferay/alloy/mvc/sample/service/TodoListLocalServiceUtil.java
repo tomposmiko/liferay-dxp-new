@@ -293,6 +293,10 @@ public class TodoListLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(TodoListLocalService service) {
+		_service = service;
+	}
+
 	private static volatile TodoListLocalService _service;
 
 }

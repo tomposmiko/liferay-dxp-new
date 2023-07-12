@@ -315,6 +315,10 @@ public class BlogsEntryServiceUtil {
 		return _service;
 	}
 
+	public static void setService(BlogsEntryService service) {
+		_service = service;
+	}
+
 	private static volatile BlogsEntryService _service;
 
 }

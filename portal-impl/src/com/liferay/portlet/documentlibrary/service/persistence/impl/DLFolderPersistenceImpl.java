@@ -64,7 +64,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -15744,11 +15743,11 @@ public class DLFolderPersistenceImpl
 			},
 			false);
 
-		_setDLFolderUtilPersistence(this);
+		DLFolderUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setDLFolderUtilPersistence(null);
+		DLFolderUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFolderImpl.class.getName());
 
@@ -15761,21 +15760,6 @@ public class DLFolderPersistenceImpl
 		}
 
 		TableMapperFactory.removeTableMapper("DLFileEntryTypes_DLFolders");
-	}
-
-	private void _setDLFolderUtilPersistence(
-		DLFolderPersistence dlFolderPersistence) {
-
-		try {
-			Field field = DLFolderUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, dlFolderPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@BeanReference(type = DLFileEntryTypePersistence.class)

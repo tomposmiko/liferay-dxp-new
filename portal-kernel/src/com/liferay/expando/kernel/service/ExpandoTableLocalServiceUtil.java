@@ -416,6 +416,10 @@ public class ExpandoTableLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(ExpandoTableLocalService service) {
+		_service = service;
+	}
+
 	private static volatile ExpandoTableLocalService _service;
 
 }

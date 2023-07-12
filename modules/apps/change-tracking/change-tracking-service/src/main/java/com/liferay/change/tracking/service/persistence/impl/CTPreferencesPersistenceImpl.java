@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1936,12 +1935,12 @@ public class CTPreferencesPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "userId"}, false);
 
-		_setCTPreferencesUtilPersistence(this);
+		CTPreferencesUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCTPreferencesUtilPersistence(null);
+		CTPreferencesUtil.setPersistence(null);
 
 		entityCache.removeCache(CTPreferencesImpl.class.getName());
 
@@ -1951,22 +1950,6 @@ public class CTPreferencesPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCTPreferencesUtilPersistence(
-		CTPreferencesPersistence ctPreferencesPersistence) {
-
-		try {
-			Field field = CTPreferencesUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ctPreferencesPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

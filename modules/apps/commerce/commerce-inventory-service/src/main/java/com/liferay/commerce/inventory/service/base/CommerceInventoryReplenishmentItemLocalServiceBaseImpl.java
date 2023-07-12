@@ -56,8 +56,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -860,7 +858,7 @@ public abstract class CommerceInventoryReplenishmentItemLocalServiceBaseImpl
 			"com.liferay.commerce.inventory.model.CommerceInventoryReplenishmentItem",
 			commerceInventoryReplenishmentItemLocalService);
 
-		_setLocalServiceUtilService(
+		CommerceInventoryReplenishmentItemLocalServiceUtil.setService(
 			commerceInventoryReplenishmentItemLocalService);
 	}
 
@@ -868,7 +866,7 @@ public abstract class CommerceInventoryReplenishmentItemLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.inventory.model.CommerceInventoryReplenishmentItem");
 
-		_setLocalServiceUtilService(null);
+		CommerceInventoryReplenishmentItemLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -911,24 +909,6 @@ public abstract class CommerceInventoryReplenishmentItemLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		CommerceInventoryReplenishmentItemLocalService
-			commerceInventoryReplenishmentItemLocalService) {
-
-		try {
-			Field field =
-				CommerceInventoryReplenishmentItemLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceInventoryReplenishmentItemLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

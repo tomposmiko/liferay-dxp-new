@@ -1403,7 +1403,7 @@ definition {
 
 		FormViewBuilder.switchToAdvancedTab();
 
-		FormViewBuilder.setFieldPredefinedDate(fieldValue = "03/02/2019");
+		FormViewBuilder.setFieldPredefinedDate(fieldValue = 03022019);
 
 		FormViewBuilder.closeSidebar();
 

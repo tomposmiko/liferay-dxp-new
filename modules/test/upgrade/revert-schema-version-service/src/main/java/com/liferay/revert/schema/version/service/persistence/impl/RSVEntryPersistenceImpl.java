@@ -45,8 +45,6 @@ import com.liferay.revert.schema.version.service.persistence.impl.constants.RSVP
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -596,12 +594,12 @@ public class RSVEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_setRSVEntryUtilPersistence(this);
+		RSVEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setRSVEntryUtilPersistence(null);
+		RSVEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(RSVEntryImpl.class.getName());
 
@@ -611,21 +609,6 @@ public class RSVEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setRSVEntryUtilPersistence(
-		RSVEntryPersistence rsvEntryPersistence) {
-
-		try {
-			Field field = RSVEntryUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, rsvEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

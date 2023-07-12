@@ -53,7 +53,6 @@ import com.liferay.social.kernel.service.persistence.SocialRelationUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6762,11 +6761,11 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"userId1", "userId2", "type_"}, false);
 
-		_setSocialRelationUtilPersistence(this);
+		SocialRelationUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setSocialRelationUtilPersistence(null);
+		SocialRelationUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(SocialRelationImpl.class.getName());
 
@@ -6776,22 +6775,6 @@ public class SocialRelationPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSocialRelationUtilPersistence(
-		SocialRelationPersistence socialRelationPersistence) {
-
-		try {
-			Field field = SocialRelationUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, socialRelationPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

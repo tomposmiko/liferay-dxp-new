@@ -50,8 +50,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -375,7 +373,7 @@ public abstract class StatusLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		StatusLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -390,7 +388,7 @@ public abstract class StatusLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		statusLocalService = (StatusLocalService)aopProxy;
 
-		_setLocalServiceUtilService(statusLocalService);
+		StatusLocalServiceUtil.setService(statusLocalService);
 	}
 
 	/**
@@ -432,22 +430,6 @@ public abstract class StatusLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		StatusLocalService statusLocalService) {
-
-		try {
-			Field field = StatusLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, statusLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

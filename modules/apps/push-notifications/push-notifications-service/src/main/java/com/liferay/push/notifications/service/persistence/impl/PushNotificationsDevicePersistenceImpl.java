@@ -51,7 +51,6 @@ import com.liferay.push.notifications.service.persistence.impl.constants.PushNot
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1853,12 +1852,12 @@ public class PushNotificationsDevicePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"userId", "platform"}, false);
 
-		_setPushNotificationsDeviceUtilPersistence(this);
+		PushNotificationsDeviceUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setPushNotificationsDeviceUtilPersistence(null);
+		PushNotificationsDeviceUtil.setPersistence(null);
 
 		entityCache.removeCache(PushNotificationsDeviceImpl.class.getName());
 
@@ -1868,22 +1867,6 @@ public class PushNotificationsDevicePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setPushNotificationsDeviceUtilPersistence(
-		PushNotificationsDevicePersistence pushNotificationsDevicePersistence) {
-
-		try {
-			Field field = PushNotificationsDeviceUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, pushNotificationsDevicePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

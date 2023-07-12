@@ -47,7 +47,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2093,11 +2092,11 @@ public class CommerceAddressRestrictionPersistenceImpl
 			new String[] {"classNameId", "classPK", "commerceCountryId"},
 			false);
 
-		_setCommerceAddressRestrictionUtilPersistence(this);
+		CommerceAddressRestrictionUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceAddressRestrictionUtilPersistence(null);
+		CommerceAddressRestrictionUtil.setPersistence(null);
 
 		entityCache.removeCache(CommerceAddressRestrictionImpl.class.getName());
 
@@ -2107,23 +2106,6 @@ public class CommerceAddressRestrictionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceAddressRestrictionUtilPersistence(
-		CommerceAddressRestrictionPersistence
-			commerceAddressRestrictionPersistence) {
-
-		try {
-			Field field = CommerceAddressRestrictionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceAddressRestrictionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

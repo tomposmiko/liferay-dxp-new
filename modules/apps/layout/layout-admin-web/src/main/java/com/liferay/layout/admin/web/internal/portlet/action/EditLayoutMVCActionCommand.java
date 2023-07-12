@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutService;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
@@ -88,11 +87,9 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 			long liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId");
 			long stagingGroupId = ParamUtil.getLong(
 				actionRequest, "stagingGroupId");
-			boolean privateLayout = ParamUtil.getBoolean(
-				actionRequest, "privateLayout");
-			long layoutId = ParamUtil.getLong(actionRequest, "layoutId");
 			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 				actionRequest, "name");
+			long selPlid = ParamUtil.getLong(actionRequest, "selPlid");
 			String type = ParamUtil.getString(uploadPortletRequest, "type");
 			boolean hidden = ParamUtil.getBoolean(
 				uploadPortletRequest, "hidden");
@@ -114,8 +111,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 				iconBytes = FileUtil.getBytes(fileEntry.getContentStream());
 			}
 
-			Layout layout = _layoutLocalService.getLayout(
-				groupId, privateLayout, layoutId);
+			Layout layout = _layoutLocalService.getLayout(selPlid);
 
 			long masterLayoutPlid = ParamUtil.getLong(
 				uploadPortletRequest, "masterLayoutPlid",
@@ -165,11 +161,12 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 			}
 
 			layout = _layoutService.updateLayout(
-				groupId, privateLayout, layoutId, layout.getParentLayoutId(),
-				nameMap, layout.getTitleMap(), layout.getDescriptionMap(),
-				layout.getKeywordsMap(), layout.getRobotsMap(), type, hidden,
-				friendlyURLMap, !deleteLogo, iconBytes, masterLayoutPlid,
-				styleBookEntryId, serviceContext);
+				groupId, layout.isPrivateLayout(), layout.getLayoutId(),
+				layout.getParentLayoutId(), nameMap, layout.getTitleMap(),
+				layout.getDescriptionMap(), layout.getKeywordsMap(),
+				layout.getRobotsMap(), type, hidden, friendlyURLMap,
+				!deleteLogo, iconBytes, masterLayoutPlid, styleBookEntryId,
+				serviceContext);
 
 			UnicodeProperties formTypeSettingsUnicodeProperties =
 				PropertiesParamUtil.getProperties(
@@ -184,9 +181,10 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 						Sites.LAYOUT_UPDATEABLE));
 
 				_layoutService.updateLayout(
-					groupId, privateLayout, draftLayout.getLayoutId(),
-					draftLayout.getParentLayoutId(), nameMap,
-					draftLayout.getTitleMap(), draftLayout.getDescriptionMap(),
+					groupId, layout.isPrivateLayout(),
+					draftLayout.getLayoutId(), draftLayout.getParentLayoutId(),
+					nameMap, draftLayout.getTitleMap(),
+					draftLayout.getDescriptionMap(),
 					draftLayout.getKeywordsMap(), draftLayout.getRobotsMap(),
 					type, draftLayout.isHidden(),
 					draftLayout.getFriendlyURLMap(), !deleteLogo, iconBytes,
@@ -204,7 +202,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 			if (Validator.isNotNull(linkToLayoutUuid)) {
 				Layout linkToLayout = _layoutService.getLayoutByUuidAndGroupId(
-					linkToLayoutUuid, groupId, privateLayout);
+					linkToLayoutUuid, groupId, layout.isPrivateLayout());
 
 				formTypeSettingsUnicodeProperties.put(
 					"linkToLayoutId",
@@ -243,7 +241,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 			}
 
 			layout = _layoutService.updateLayout(
-				groupId, privateLayout, layoutId,
+				groupId, layout.isPrivateLayout(), layout.getLayoutId(),
 				layoutTypeSettingsUnicodeProperties.toString());
 
 			EventsProcessorUtil.process(
@@ -254,7 +252,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 			ActionUtil.updateLookAndFeel(
 				actionRequest, themeDisplay.getCompanyId(), liveGroupId,
-				stagingGroupId, privateLayout, layout.getLayoutId(),
+				stagingGroupId, layout.isPrivateLayout(), layout.getLayoutId(),
 				layout.getTypeSettingsProperties());
 
 			String redirect = ParamUtil.getString(actionRequest, "redirect");
@@ -297,8 +295,5 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 }

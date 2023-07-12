@@ -53,8 +53,6 @@ import com.liferay.remote.app.service.persistence.RemoteAppEntryPersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -485,7 +483,7 @@ public abstract class RemoteAppEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		RemoteAppEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -500,7 +498,7 @@ public abstract class RemoteAppEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		remoteAppEntryLocalService = (RemoteAppEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(remoteAppEntryLocalService);
+		RemoteAppEntryLocalServiceUtil.setService(remoteAppEntryLocalService);
 	}
 
 	/**
@@ -542,22 +540,6 @@ public abstract class RemoteAppEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		RemoteAppEntryLocalService remoteAppEntryLocalService) {
-
-		try {
-			Field field = RemoteAppEntryLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, remoteAppEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

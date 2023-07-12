@@ -48,7 +48,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1562,11 +1561,11 @@ public class UserNotificationDeliveryPersistenceImpl
 			},
 			false);
 
-		_setUserNotificationDeliveryUtilPersistence(this);
+		UserNotificationDeliveryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setUserNotificationDeliveryUtilPersistence(null);
+		UserNotificationDeliveryUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(
 			UserNotificationDeliveryImpl.class.getName());
@@ -1577,23 +1576,6 @@ public class UserNotificationDeliveryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setUserNotificationDeliveryUtilPersistence(
-		UserNotificationDeliveryPersistence
-			userNotificationDeliveryPersistence) {
-
-		try {
-			Field field = UserNotificationDeliveryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, userNotificationDeliveryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

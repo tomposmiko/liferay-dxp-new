@@ -697,6 +697,12 @@ public class CommerceBOMFolderApplicationRelUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		CommerceBOMFolderApplicationRelPersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile CommerceBOMFolderApplicationRelPersistence
 		_persistence;
 

@@ -53,7 +53,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2913,11 +2912,11 @@ public class RepositoryEntryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"repositoryId", "mappedId"}, false);
 
-		_setRepositoryEntryUtilPersistence(this);
+		RepositoryEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setRepositoryEntryUtilPersistence(null);
+		RepositoryEntryUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(RepositoryEntryImpl.class.getName());
 
@@ -2927,22 +2926,6 @@ public class RepositoryEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setRepositoryEntryUtilPersistence(
-		RepositoryEntryPersistence repositoryEntryPersistence) {
-
-		try {
-			Field field = RepositoryEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, repositoryEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

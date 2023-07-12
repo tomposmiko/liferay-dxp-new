@@ -47,8 +47,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -412,7 +410,7 @@ public abstract class AppBuilderAppDataRecordLinkLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		AppBuilderAppDataRecordLinkLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -428,7 +426,8 @@ public abstract class AppBuilderAppDataRecordLinkLocalServiceBaseImpl
 		appBuilderAppDataRecordLinkLocalService =
 			(AppBuilderAppDataRecordLinkLocalService)aopProxy;
 
-		_setLocalServiceUtilService(appBuilderAppDataRecordLinkLocalService);
+		AppBuilderAppDataRecordLinkLocalServiceUtil.setService(
+			appBuilderAppDataRecordLinkLocalService);
 	}
 
 	/**
@@ -471,24 +470,6 @@ public abstract class AppBuilderAppDataRecordLinkLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		AppBuilderAppDataRecordLinkLocalService
-			appBuilderAppDataRecordLinkLocalService) {
-
-		try {
-			Field field =
-				AppBuilderAppDataRecordLinkLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, appBuilderAppDataRecordLinkLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

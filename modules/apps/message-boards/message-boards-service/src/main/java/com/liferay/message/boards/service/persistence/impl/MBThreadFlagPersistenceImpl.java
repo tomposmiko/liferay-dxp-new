@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3688,12 +3687,12 @@ public class MBThreadFlagPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"userId", "threadId"}, false);
 
-		_setMBThreadFlagUtilPersistence(this);
+		MBThreadFlagUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMBThreadFlagUtilPersistence(null);
+		MBThreadFlagUtil.setPersistence(null);
 
 		entityCache.removeCache(MBThreadFlagImpl.class.getName());
 
@@ -3703,22 +3702,6 @@ public class MBThreadFlagPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setMBThreadFlagUtilPersistence(
-		MBThreadFlagPersistence mbThreadFlagPersistence) {
-
-		try {
-			Field field = MBThreadFlagUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mbThreadFlagPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

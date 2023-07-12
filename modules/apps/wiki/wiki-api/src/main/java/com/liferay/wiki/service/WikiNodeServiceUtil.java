@@ -148,6 +148,10 @@ public class WikiNodeServiceUtil {
 		return _service;
 	}
 
+	public static void setService(WikiNodeService service) {
+		_service = service;
+	}
+
 	private static volatile WikiNodeService _service;
 
 }

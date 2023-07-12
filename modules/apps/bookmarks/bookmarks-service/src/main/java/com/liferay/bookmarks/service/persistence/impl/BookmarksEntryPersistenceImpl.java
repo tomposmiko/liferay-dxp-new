@@ -56,7 +56,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -13322,12 +13321,12 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "folderId", "status"}, false);
 
-		_setBookmarksEntryUtilPersistence(this);
+		BookmarksEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setBookmarksEntryUtilPersistence(null);
+		BookmarksEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(BookmarksEntryImpl.class.getName());
 
@@ -13337,22 +13336,6 @@ public class BookmarksEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setBookmarksEntryUtilPersistence(
-		BookmarksEntryPersistence bookmarksEntryPersistence) {
-
-		try {
-			Field field = BookmarksEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, bookmarksEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

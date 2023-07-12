@@ -60,7 +60,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -7572,11 +7571,11 @@ public class AssetVocabularyPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setAssetVocabularyUtilPersistence(this);
+		AssetVocabularyUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setAssetVocabularyUtilPersistence(null);
+		AssetVocabularyUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(AssetVocabularyImpl.class.getName());
 
@@ -7586,22 +7585,6 @@ public class AssetVocabularyPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setAssetVocabularyUtilPersistence(
-		AssetVocabularyPersistence assetVocabularyPersistence) {
-
-		try {
-			Field field = AssetVocabularyUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, assetVocabularyPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

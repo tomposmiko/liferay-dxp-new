@@ -50,7 +50,6 @@ import com.liferay.sync.service.persistence.impl.constants.SyncPersistenceConsta
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -6958,12 +6957,12 @@ public class SyncDLObjectPersistenceImpl
 			},
 			new String[] {"repositoryId", "parentFolderId", "type_"}, false);
 
-		_setSyncDLObjectUtilPersistence(this);
+		SyncDLObjectUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSyncDLObjectUtilPersistence(null);
+		SyncDLObjectUtil.setPersistence(null);
 
 		entityCache.removeCache(SyncDLObjectImpl.class.getName());
 
@@ -6973,22 +6972,6 @@ public class SyncDLObjectPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSyncDLObjectUtilPersistence(
-		SyncDLObjectPersistence syncDLObjectPersistence) {
-
-		try {
-			Field field = SyncDLObjectUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, syncDLObjectPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

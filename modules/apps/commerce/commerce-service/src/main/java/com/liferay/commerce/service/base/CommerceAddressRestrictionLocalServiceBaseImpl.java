@@ -70,8 +70,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -1363,14 +1361,15 @@ public abstract class CommerceAddressRestrictionLocalServiceBaseImpl
 			"com.liferay.commerce.model.CommerceAddressRestriction",
 			commerceAddressRestrictionLocalService);
 
-		_setLocalServiceUtilService(commerceAddressRestrictionLocalService);
+		CommerceAddressRestrictionLocalServiceUtil.setService(
+			commerceAddressRestrictionLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.model.CommerceAddressRestriction");
 
-		_setLocalServiceUtilService(null);
+		CommerceAddressRestrictionLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -1413,24 +1412,6 @@ public abstract class CommerceAddressRestrictionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		CommerceAddressRestrictionLocalService
-			commerceAddressRestrictionLocalService) {
-
-		try {
-			Field field =
-				CommerceAddressRestrictionLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceAddressRestrictionLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

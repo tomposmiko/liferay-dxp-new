@@ -174,6 +174,7 @@ const Main = ({
 		localizedValue={localizedValue}
 		name={name}
 		readOnly={readOnly}
+		style={null}
 	>
 		<Numeric
 			{...{

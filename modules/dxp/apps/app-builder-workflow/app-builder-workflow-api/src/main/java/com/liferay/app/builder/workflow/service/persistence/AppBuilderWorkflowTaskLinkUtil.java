@@ -996,6 +996,12 @@ public class AppBuilderWorkflowTaskLinkUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		AppBuilderWorkflowTaskLinkPersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile AppBuilderWorkflowTaskLinkPersistence _persistence;
 
 }

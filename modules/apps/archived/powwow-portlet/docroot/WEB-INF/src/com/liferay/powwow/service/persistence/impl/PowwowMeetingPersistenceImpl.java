@@ -51,7 +51,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3687,11 +3686,11 @@ public class PowwowMeetingPersistenceImpl
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"powwowServerId", "status"}, false);
 
-		_setPowwowMeetingUtilPersistence(this);
+		PowwowMeetingUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setPowwowMeetingUtilPersistence(null);
+		PowwowMeetingUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(PowwowMeetingImpl.class.getName());
 
@@ -3701,22 +3700,6 @@ public class PowwowMeetingPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setPowwowMeetingUtilPersistence(
-		PowwowMeetingPersistence powwowMeetingPersistence) {
-
-		try {
-			Field field = PowwowMeetingUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, powwowMeetingPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

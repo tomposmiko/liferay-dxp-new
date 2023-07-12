@@ -47,8 +47,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -412,7 +410,7 @@ public abstract class AppBuilderWorkflowTaskLinkLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		AppBuilderWorkflowTaskLinkLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -428,7 +426,8 @@ public abstract class AppBuilderWorkflowTaskLinkLocalServiceBaseImpl
 		appBuilderWorkflowTaskLinkLocalService =
 			(AppBuilderWorkflowTaskLinkLocalService)aopProxy;
 
-		_setLocalServiceUtilService(appBuilderWorkflowTaskLinkLocalService);
+		AppBuilderWorkflowTaskLinkLocalServiceUtil.setService(
+			appBuilderWorkflowTaskLinkLocalService);
 	}
 
 	/**
@@ -471,24 +470,6 @@ public abstract class AppBuilderWorkflowTaskLinkLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		AppBuilderWorkflowTaskLinkLocalService
-			appBuilderWorkflowTaskLinkLocalService) {
-
-		try {
-			Field field =
-				AppBuilderWorkflowTaskLinkLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, appBuilderWorkflowTaskLinkLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

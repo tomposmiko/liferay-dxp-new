@@ -57,7 +57,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -5106,12 +5105,12 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "name"}, false);
 
-		_setLayoutPageTemplateCollectionUtilPersistence(this);
+		LayoutPageTemplateCollectionUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setLayoutPageTemplateCollectionUtilPersistence(null);
+		LayoutPageTemplateCollectionUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			LayoutPageTemplateCollectionImpl.class.getName());
@@ -5122,24 +5121,6 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLayoutPageTemplateCollectionUtilPersistence(
-		LayoutPageTemplateCollectionPersistence
-			layoutPageTemplateCollectionPersistence) {
-
-		try {
-			Field field =
-				LayoutPageTemplateCollectionUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutPageTemplateCollectionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

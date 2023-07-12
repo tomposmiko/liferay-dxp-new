@@ -474,6 +474,7 @@ const Main = ({
 				maximumRepetitions > 0 ? checkMaximumRepetitions() : false
 			}
 			readOnly={hasCustomError ? true : readOnly}
+			style={null}
 			valid={hasCustomError ? false : valid}
 		>
 			{allowGuestUsers && !isSignedIn ? (

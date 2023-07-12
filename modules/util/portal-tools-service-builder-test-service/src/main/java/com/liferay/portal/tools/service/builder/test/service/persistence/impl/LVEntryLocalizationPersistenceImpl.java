@@ -45,7 +45,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntry
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1677,11 +1676,11 @@ public class LVEntryLocalizationPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"headId"},
 			false);
 
-		_setLVEntryLocalizationUtilPersistence(this);
+		LVEntryLocalizationUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setLVEntryLocalizationUtilPersistence(null);
+		LVEntryLocalizationUtil.setPersistence(null);
 
 		entityCache.removeCache(LVEntryLocalizationImpl.class.getName());
 
@@ -1691,22 +1690,6 @@ public class LVEntryLocalizationPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLVEntryLocalizationUtilPersistence(
-		LVEntryLocalizationPersistence lvEntryLocalizationPersistence) {
-
-		try {
-			Field field = LVEntryLocalizationUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, lvEntryLocalizationPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

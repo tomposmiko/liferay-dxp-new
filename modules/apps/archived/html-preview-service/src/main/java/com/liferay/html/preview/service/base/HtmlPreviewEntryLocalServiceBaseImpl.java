@@ -47,8 +47,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -393,7 +391,7 @@ public abstract class HtmlPreviewEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		HtmlPreviewEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -408,7 +406,8 @@ public abstract class HtmlPreviewEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		htmlPreviewEntryLocalService = (HtmlPreviewEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(htmlPreviewEntryLocalService);
+		HtmlPreviewEntryLocalServiceUtil.setService(
+			htmlPreviewEntryLocalService);
 	}
 
 	/**
@@ -450,23 +449,6 @@ public abstract class HtmlPreviewEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		HtmlPreviewEntryLocalService htmlPreviewEntryLocalService) {
-
-		try {
-			Field field =
-				HtmlPreviewEntryLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, htmlPreviewEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

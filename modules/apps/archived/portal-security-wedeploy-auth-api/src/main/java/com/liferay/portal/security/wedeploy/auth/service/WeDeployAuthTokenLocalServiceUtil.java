@@ -343,6 +343,10 @@ public class WeDeployAuthTokenLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(WeDeployAuthTokenLocalService service) {
+		_service = service;
+	}
+
 	private static volatile WeDeployAuthTokenLocalService _service;
 
 }

@@ -53,7 +53,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3248,11 +3247,11 @@ public class SystemEventPersistenceImpl
 			},
 			new String[] {"groupId", "classNameId", "classPK", "type_"}, false);
 
-		_setSystemEventUtilPersistence(this);
+		SystemEventUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setSystemEventUtilPersistence(null);
+		SystemEventUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(SystemEventImpl.class.getName());
 
@@ -3262,22 +3261,6 @@ public class SystemEventPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSystemEventUtilPersistence(
-		SystemEventPersistence systemEventPersistence) {
-
-		try {
-			Field field = SystemEventUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, systemEventPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -607,11 +607,12 @@ const Main = ({
 
 	return (
 		<FieldBase
+			{...otherProps}
 			label={label}
 			localizedValue={localizedValue}
 			name={name}
 			readOnly={readOnly}
-			{...otherProps}
+			style={null}
 		>
 			<Select
 				multiple={multiple}

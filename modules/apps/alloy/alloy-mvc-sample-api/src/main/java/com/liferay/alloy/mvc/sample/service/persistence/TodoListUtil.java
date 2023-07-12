@@ -270,6 +270,10 @@ public class TodoListUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(TodoListPersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile TodoListPersistence _persistence;
 
 }

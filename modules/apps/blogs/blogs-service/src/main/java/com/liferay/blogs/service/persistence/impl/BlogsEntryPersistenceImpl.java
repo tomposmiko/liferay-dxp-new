@@ -62,7 +62,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -22082,12 +22081,12 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "displayDate", "status"}, false);
 
-		_setBlogsEntryUtilPersistence(this);
+		BlogsEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setBlogsEntryUtilPersistence(null);
+		BlogsEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(BlogsEntryImpl.class.getName());
 
@@ -22097,21 +22096,6 @@ public class BlogsEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setBlogsEntryUtilPersistence(
-		BlogsEntryPersistence blogsEntryPersistence) {
-
-		try {
-			Field field = BlogsEntryUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, blogsEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

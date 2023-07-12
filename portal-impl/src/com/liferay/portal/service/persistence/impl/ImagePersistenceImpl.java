@@ -53,7 +53,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1356,11 +1355,11 @@ public class ImagePersistenceImpl
 			new String[] {Integer.class.getName()}, new String[] {"size_"},
 			false);
 
-		_setImageUtilPersistence(this);
+		ImageUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setImageUtilPersistence(null);
+		ImageUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(ImageImpl.class.getName());
 
@@ -1370,19 +1369,6 @@ public class ImagePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setImageUtilPersistence(ImagePersistence imagePersistence) {
-		try {
-			Field field = ImageUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, imagePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

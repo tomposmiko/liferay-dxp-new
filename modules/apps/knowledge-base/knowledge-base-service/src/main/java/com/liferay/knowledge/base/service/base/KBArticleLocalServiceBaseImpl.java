@@ -68,8 +68,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -600,7 +598,7 @@ public abstract class KBArticleLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		KBArticleLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -615,7 +613,7 @@ public abstract class KBArticleLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		kbArticleLocalService = (KBArticleLocalService)aopProxy;
 
-		_setLocalServiceUtilService(kbArticleLocalService);
+		KBArticleLocalServiceUtil.setService(kbArticleLocalService);
 	}
 
 	/**
@@ -657,22 +655,6 @@ public abstract class KBArticleLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		KBArticleLocalService kbArticleLocalService) {
-
-		try {
-			Field field = KBArticleLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, kbArticleLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

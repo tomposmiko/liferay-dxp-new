@@ -51,7 +51,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6743,11 +6742,11 @@ public class PortletPreferencesPersistenceImpl
 			},
 			new String[] {"ownerId", "ownerType", "plid", "portletId"}, false);
 
-		_setPortletPreferencesUtilPersistence(this);
+		PortletPreferencesUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setPortletPreferencesUtilPersistence(null);
+		PortletPreferencesUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(PortletPreferencesImpl.class.getName());
 
@@ -6757,22 +6756,6 @@ public class PortletPreferencesPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setPortletPreferencesUtilPersistence(
-		PortletPreferencesPersistence portletPreferencesPersistence) {
-
-		try {
-			Field field = PortletPreferencesUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, portletPreferencesPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

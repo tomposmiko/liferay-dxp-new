@@ -50,7 +50,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2954,11 +2953,11 @@ public class CPDefinitionGroupedEntryPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"CPDefinitionId", "entryCProductId"}, false);
 
-		_setCPDefinitionGroupedEntryUtilPersistence(this);
+		CPDefinitionGroupedEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCPDefinitionGroupedEntryUtilPersistence(null);
+		CPDefinitionGroupedEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(CPDefinitionGroupedEntryImpl.class.getName());
 
@@ -2968,23 +2967,6 @@ public class CPDefinitionGroupedEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCPDefinitionGroupedEntryUtilPersistence(
-		CPDefinitionGroupedEntryPersistence
-			cpDefinitionGroupedEntryPersistence) {
-
-		try {
-			Field field = CPDefinitionGroupedEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cpDefinitionGroupedEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

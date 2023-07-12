@@ -1042,6 +1042,10 @@ public class WikiPageLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(WikiPageLocalService service) {
+		_service = service;
+	}
+
 	private static volatile WikiPageLocalService _service;
 
 }

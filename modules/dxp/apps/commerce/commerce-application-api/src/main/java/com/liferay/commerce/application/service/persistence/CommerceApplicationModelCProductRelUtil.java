@@ -698,6 +698,12 @@ public class CommerceApplicationModelCProductRelUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		CommerceApplicationModelCProductRelPersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile CommerceApplicationModelCProductRelPersistence
 		_persistence;
 

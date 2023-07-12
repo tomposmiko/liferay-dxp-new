@@ -61,8 +61,6 @@ import com.liferay.search.experiences.service.persistence.SXPBlueprintPersistenc
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -559,7 +557,7 @@ public abstract class SXPBlueprintLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		SXPBlueprintLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -574,7 +572,7 @@ public abstract class SXPBlueprintLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		sxpBlueprintLocalService = (SXPBlueprintLocalService)aopProxy;
 
-		_setLocalServiceUtilService(sxpBlueprintLocalService);
+		SXPBlueprintLocalServiceUtil.setService(sxpBlueprintLocalService);
 	}
 
 	/**
@@ -616,22 +614,6 @@ public abstract class SXPBlueprintLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		SXPBlueprintLocalService sxpBlueprintLocalService) {
-
-		try {
-			Field field = SXPBlueprintLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, sxpBlueprintLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

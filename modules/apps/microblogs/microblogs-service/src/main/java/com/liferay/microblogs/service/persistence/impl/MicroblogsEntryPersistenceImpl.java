@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -14036,12 +14035,12 @@ public class MicroblogsEntryPersistenceImpl
 			},
 			false);
 
-		_setMicroblogsEntryUtilPersistence(this);
+		MicroblogsEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMicroblogsEntryUtilPersistence(null);
+		MicroblogsEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(MicroblogsEntryImpl.class.getName());
 
@@ -14051,22 +14050,6 @@ public class MicroblogsEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setMicroblogsEntryUtilPersistence(
-		MicroblogsEntryPersistence microblogsEntryPersistence) {
-
-		try {
-			Field field = MicroblogsEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, microblogsEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

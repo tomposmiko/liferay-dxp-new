@@ -48,8 +48,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.ERCComp
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -509,14 +507,14 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 			"com.liferay.portal.tools.service.builder.test.model.ERCCompanyEntry",
 			ercCompanyEntryLocalService);
 
-		_setLocalServiceUtilService(ercCompanyEntryLocalService);
+		ERCCompanyEntryLocalServiceUtil.setService(ercCompanyEntryLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.tools.service.builder.test.model.ERCCompanyEntry");
 
-		_setLocalServiceUtilService(null);
+		ERCCompanyEntryLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -558,23 +556,6 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		ERCCompanyEntryLocalService ercCompanyEntryLocalService) {
-
-		try {
-			Field field =
-				ERCCompanyEntryLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, ercCompanyEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

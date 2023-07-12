@@ -370,6 +370,12 @@ public class CommerceDataIntegrationProcessLogLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(
+		CommerceDataIntegrationProcessLogLocalService service) {
+
+		_service = service;
+	}
+
 	private static volatile CommerceDataIntegrationProcessLogLocalService
 		_service;
 

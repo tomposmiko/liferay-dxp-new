@@ -49,7 +49,6 @@ import com.liferay.portal.workflow.kaleo.service.persistence.impl.constants.Kale
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3049,12 +3048,12 @@ public class KaleoNotificationPersistenceImpl
 			new String[] {"kaleoClassName", "kaleoClassPK", "executionType"},
 			false);
 
-		_setKaleoNotificationUtilPersistence(this);
+		KaleoNotificationUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setKaleoNotificationUtilPersistence(null);
+		KaleoNotificationUtil.setPersistence(null);
 
 		entityCache.removeCache(KaleoNotificationImpl.class.getName());
 
@@ -3064,22 +3063,6 @@ public class KaleoNotificationPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setKaleoNotificationUtilPersistence(
-		KaleoNotificationPersistence kaleoNotificationPersistence) {
-
-		try {
-			Field field = KaleoNotificationUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, kaleoNotificationPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

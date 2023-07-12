@@ -228,8 +228,7 @@ public class OpenIdConnectAuthenticationHandlerImpl
 			throw new SystemException(
 				StringBundler.concat(
 					"Unable to send user to OpenId Connect service ",
-					authenticationRequestURI.toString(), ": ",
-					ioException.getMessage()),
+					authenticationRequestURI, ": ", ioException.getMessage()),
 				ioException);
 		}
 	}
@@ -291,8 +290,8 @@ public class OpenIdConnectAuthenticationHandlerImpl
 		catch (ParseException | URISyntaxException exception) {
 			throw new OpenIdConnectServiceException.AuthenticationException(
 				StringBundler.concat(
-					"Unable to process response from ", requestURL.toString(),
-					": ", exception.getMessage()),
+					"Unable to process response from ", requestURL, ": ",
+					exception.getMessage()),
 				exception);
 		}
 	}

@@ -55,7 +55,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6386,12 +6385,12 @@ public class FragmentCompositionPersistenceImpl
 			new String[] {"groupId", "fragmentCollectionId", "name", "status"},
 			false);
 
-		_setFragmentCompositionUtilPersistence(this);
+		FragmentCompositionUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setFragmentCompositionUtilPersistence(null);
+		FragmentCompositionUtil.setPersistence(null);
 
 		entityCache.removeCache(FragmentCompositionImpl.class.getName());
 
@@ -6401,22 +6400,6 @@ public class FragmentCompositionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setFragmentCompositionUtilPersistence(
-		FragmentCompositionPersistence fragmentCompositionPersistence) {
-
-		try {
-			Field field = FragmentCompositionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, fragmentCompositionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

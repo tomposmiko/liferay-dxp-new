@@ -236,6 +236,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							AccountRoleResourceImpl.class,
 							"getAccountRolesPage"));
+
+					put(
+						"query#Account.parentAccount",
+						new ObjectValuePair<>(
+							AccountResourceImpl.class, "getAccount"));
 				}
 			};
 

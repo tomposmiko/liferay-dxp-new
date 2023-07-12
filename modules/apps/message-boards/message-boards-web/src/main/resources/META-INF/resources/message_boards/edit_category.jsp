@@ -123,7 +123,7 @@ if (portletTitleBasedNavigation) {
 					</c:if>
 				</c:if>
 
-				<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="name" />
+				<aui:input autocomplete="off" autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="name" />
 
 				<aui:input name="description" />
 

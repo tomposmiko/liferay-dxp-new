@@ -50,7 +50,6 @@ import com.liferay.saml.persistence.service.persistence.impl.constants.SamlPersi
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -1533,12 +1532,12 @@ public class SamlSpMessagePersistenceImpl
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"samlIdpEntityId", "samlIdpResponseKey"}, false);
 
-		_setSamlSpMessageUtilPersistence(this);
+		SamlSpMessageUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSamlSpMessageUtilPersistence(null);
+		SamlSpMessageUtil.setPersistence(null);
 
 		entityCache.removeCache(SamlSpMessageImpl.class.getName());
 
@@ -1548,22 +1547,6 @@ public class SamlSpMessagePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSamlSpMessageUtilPersistence(
-		SamlSpMessagePersistence samlSpMessagePersistence) {
-
-		try {
-			Field field = SamlSpMessageUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, samlSpMessagePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

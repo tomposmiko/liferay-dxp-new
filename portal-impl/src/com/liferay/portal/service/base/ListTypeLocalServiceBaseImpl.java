@@ -48,8 +48,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -480,14 +478,14 @@ public abstract class ListTypeLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.ListType", listTypeLocalService);
 
-		_setLocalServiceUtilService(listTypeLocalService);
+		ListTypeLocalServiceUtil.setService(listTypeLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.ListType");
 
-		_setLocalServiceUtilService(null);
+		ListTypeLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -529,22 +527,6 @@ public abstract class ListTypeLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		ListTypeLocalService listTypeLocalService) {
-
-		try {
-			Field field = ListTypeLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, listTypeLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

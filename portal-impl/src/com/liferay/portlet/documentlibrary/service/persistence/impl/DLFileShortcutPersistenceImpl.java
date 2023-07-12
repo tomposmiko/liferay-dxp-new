@@ -57,7 +57,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -7146,11 +7145,11 @@ public class DLFileShortcutPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "active_", "status"}, false);
 
-		_setDLFileShortcutUtilPersistence(this);
+		DLFileShortcutUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setDLFileShortcutUtilPersistence(null);
+		DLFileShortcutUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFileShortcutImpl.class.getName());
 
@@ -7160,22 +7159,6 @@ public class DLFileShortcutPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDLFileShortcutUtilPersistence(
-		DLFileShortcutPersistence dlFileShortcutPersistence) {
-
-		try {
-			Field field = DLFileShortcutUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, dlFileShortcutPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -53,7 +53,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntry
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -7075,11 +7074,11 @@ public class LVEntryVersionPersistenceImpl
 			},
 			new String[] {"groupId", "uniqueGroupKey", "version"}, false);
 
-		_setLVEntryVersionUtilPersistence(this);
+		LVEntryVersionUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setLVEntryVersionUtilPersistence(null);
+		LVEntryVersionUtil.setPersistence(null);
 
 		entityCache.removeCache(LVEntryVersionImpl.class.getName());
 
@@ -7092,22 +7091,6 @@ public class LVEntryVersionPersistenceImpl
 		}
 
 		TableMapperFactory.removeTableMapper("BigDecimalEntries_LVEntries");
-	}
-
-	private void _setLVEntryVersionUtilPersistence(
-		LVEntryVersionPersistence lvEntryVersionPersistence) {
-
-		try {
-			Field field = LVEntryVersionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, lvEntryVersionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private BundleContext _bundleContext;

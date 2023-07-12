@@ -57,7 +57,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6402,11 +6401,11 @@ public class LayoutFriendlyURLPersistenceImpl
 			},
 			false);
 
-		_setLayoutFriendlyURLUtilPersistence(this);
+		LayoutFriendlyURLUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setLayoutFriendlyURLUtilPersistence(null);
+		LayoutFriendlyURLUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(LayoutFriendlyURLImpl.class.getName());
 
@@ -6416,22 +6415,6 @@ public class LayoutFriendlyURLPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLayoutFriendlyURLUtilPersistence(
-		LayoutFriendlyURLPersistence layoutFriendlyURLPersistence) {
-
-		try {
-			Field field = LayoutFriendlyURLUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutFriendlyURLPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

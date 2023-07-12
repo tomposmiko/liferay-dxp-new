@@ -332,6 +332,10 @@ public class PowwowServerLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(PowwowServerLocalService service) {
+		_service = service;
+	}
+
 	private static volatile PowwowServerLocalService _service;
 
 }

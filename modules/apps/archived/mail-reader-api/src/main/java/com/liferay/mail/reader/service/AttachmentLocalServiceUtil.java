@@ -327,6 +327,10 @@ public class AttachmentLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(AttachmentLocalService service) {
+		_service = service;
+	}
+
 	private static volatile AttachmentLocalService _service;
 
 }

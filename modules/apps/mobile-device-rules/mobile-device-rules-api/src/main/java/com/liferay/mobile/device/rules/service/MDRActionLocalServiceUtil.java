@@ -452,6 +452,10 @@ public class MDRActionLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(MDRActionLocalService service) {
+		_service = service;
+	}
+
 	private static volatile MDRActionLocalService _service;
 
 }

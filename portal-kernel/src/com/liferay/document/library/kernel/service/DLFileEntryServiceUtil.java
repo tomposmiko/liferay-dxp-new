@@ -426,6 +426,10 @@ public class DLFileEntryServiceUtil {
 		return _service;
 	}
 
+	public static void setService(DLFileEntryService service) {
+		_service = service;
+	}
+
 	private static volatile DLFileEntryService _service;
 
 }

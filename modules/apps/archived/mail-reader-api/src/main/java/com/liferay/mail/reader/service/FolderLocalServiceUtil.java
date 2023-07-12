@@ -340,6 +340,10 @@ public class FolderLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(FolderLocalService service) {
+		_service = service;
+	}
+
 	private static volatile FolderLocalService _service;
 
 }

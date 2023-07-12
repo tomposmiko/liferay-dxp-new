@@ -108,7 +108,7 @@ definition {
 			liveSite = "true",
 			webContentTitle = "WC WebContent Title");
 
-		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
 		AssertElementPresent(
 			key_imageTitle = "Document_2.jpg",
@@ -150,7 +150,7 @@ definition {
 			liveSite = "true",
 			webContentTitle = "WC WebContent Title");
 
-		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
 		AssertElementNotPresent(
 			key_imageTitle = "Document_2.jpg",
@@ -306,7 +306,7 @@ definition {
 			liveSite = "true",
 			webContentTitle = "WC WebContent Title");
 
-		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
 		AssertElementPresent(
 			key_imageTitle = "Document_2.jpg",
@@ -336,7 +336,7 @@ definition {
 			liveSite = "true",
 			webContentTitle = "WC WebContent Title");
 
-		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
 		AssertElementPresent(
 			key_imageTitle = "Document_3.jpg",

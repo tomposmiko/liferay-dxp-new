@@ -59,8 +59,6 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
-import java.lang.reflect.Field;
-
 import javax.sql.DataSource;
 
 /**
@@ -1710,11 +1708,12 @@ public abstract class CPDefinitionOptionValueRelServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		_setServiceUtilService(cpDefinitionOptionValueRelService);
+		CPDefinitionOptionValueRelServiceUtil.setService(
+			cpDefinitionOptionValueRelService);
 	}
 
 	public void destroy() {
-		_setServiceUtilService(null);
+		CPDefinitionOptionValueRelServiceUtil.setService(null);
 	}
 
 	/**
@@ -1757,23 +1756,6 @@ public abstract class CPDefinitionOptionValueRelServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setServiceUtilService(
-		CPDefinitionOptionValueRelService cpDefinitionOptionValueRelService) {
-
-		try {
-			Field field =
-				CPDefinitionOptionValueRelServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, cpDefinitionOptionValueRelService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

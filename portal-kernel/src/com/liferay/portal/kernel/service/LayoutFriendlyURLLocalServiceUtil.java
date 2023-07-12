@@ -494,6 +494,10 @@ public class LayoutFriendlyURLLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(LayoutFriendlyURLLocalService service) {
+		_service = service;
+	}
+
 	private static volatile LayoutFriendlyURLLocalService _service;
 
 }

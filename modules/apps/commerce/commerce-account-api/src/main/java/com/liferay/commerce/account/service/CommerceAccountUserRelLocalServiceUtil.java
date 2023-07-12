@@ -408,6 +408,10 @@ public class CommerceAccountUserRelLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CommerceAccountUserRelLocalService service) {
+		_service = service;
+	}
+
 	private static volatile CommerceAccountUserRelLocalService _service;
 
 }

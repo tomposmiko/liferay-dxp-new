@@ -1203,7 +1203,8 @@ AUI.add(
 					var container = siblings[0].get('container');
 
 					container
-						.one('.lfr-ddm-repeatable-delete-button')
+						.all('.lfr-ddm-repeatable-delete-button')
+						.pop()
 						.toggle(siblings.length > 1);
 				},
 

@@ -49,8 +49,6 @@ import com.liferay.view.count.service.persistence.ViewCountEntryPersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -390,7 +388,7 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		ViewCountEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -405,7 +403,7 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		viewCountEntryLocalService = (ViewCountEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(viewCountEntryLocalService);
+		ViewCountEntryLocalServiceUtil.setService(viewCountEntryLocalService);
 	}
 
 	/**
@@ -447,22 +445,6 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		ViewCountEntryLocalService viewCountEntryLocalService) {
-
-		try {
-			Field field = ViewCountEntryLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, viewCountEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

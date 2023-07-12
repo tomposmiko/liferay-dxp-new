@@ -53,7 +53,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2178,11 +2177,11 @@ public class ExpandoRowPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"tableId", "classPK"}, false);
 
-		_setExpandoRowUtilPersistence(this);
+		ExpandoRowUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setExpandoRowUtilPersistence(null);
+		ExpandoRowUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(ExpandoRowImpl.class.getName());
 
@@ -2192,21 +2191,6 @@ public class ExpandoRowPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setExpandoRowUtilPersistence(
-		ExpandoRowPersistence expandoRowPersistence) {
-
-		try {
-			Field field = ExpandoRowUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, expandoRowPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

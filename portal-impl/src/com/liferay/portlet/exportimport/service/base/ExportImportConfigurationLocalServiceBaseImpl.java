@@ -52,8 +52,6 @@ import com.liferay.trash.kernel.service.persistence.TrashEntryPersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -724,14 +722,15 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 			"com.liferay.exportimport.kernel.model.ExportImportConfiguration",
 			exportImportConfigurationLocalService);
 
-		_setLocalServiceUtilService(exportImportConfigurationLocalService);
+		ExportImportConfigurationLocalServiceUtil.setService(
+			exportImportConfigurationLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.exportimport.kernel.model.ExportImportConfiguration");
 
-		_setLocalServiceUtilService(null);
+		ExportImportConfigurationLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -774,24 +773,6 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		ExportImportConfigurationLocalService
-			exportImportConfigurationLocalService) {
-
-		try {
-			Field field =
-				ExportImportConfigurationLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, exportImportConfigurationLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

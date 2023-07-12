@@ -48,8 +48,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -376,7 +374,7 @@ public abstract class CTProcessLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		CTProcessLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -391,7 +389,7 @@ public abstract class CTProcessLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ctProcessLocalService = (CTProcessLocalService)aopProxy;
 
-		_setLocalServiceUtilService(ctProcessLocalService);
+		CTProcessLocalServiceUtil.setService(ctProcessLocalService);
 	}
 
 	/**
@@ -433,22 +431,6 @@ public abstract class CTProcessLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		CTProcessLocalService ctProcessLocalService) {
-
-		try {
-			Field field = CTProcessLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, ctProcessLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

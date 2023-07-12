@@ -758,6 +758,10 @@ public class AccountRoleUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(AccountRolePersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile AccountRolePersistence _persistence;
 
 }

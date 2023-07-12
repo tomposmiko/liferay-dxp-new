@@ -90,8 +90,6 @@ import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -1642,14 +1640,14 @@ public abstract class LayoutLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.Layout", layoutLocalService);
 
-		_setLocalServiceUtilService(layoutLocalService);
+		LayoutLocalServiceUtil.setService(layoutLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.Layout");
 
-		_setLocalServiceUtilService(null);
+		LayoutLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -1705,22 +1703,6 @@ public abstract class LayoutLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		LayoutLocalService layoutLocalService) {
-
-		try {
-			Field field = LayoutLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

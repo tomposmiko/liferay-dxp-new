@@ -50,7 +50,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4670,11 +4669,11 @@ public class CommerceCountryPersistenceImpl
 			},
 			new String[] {"companyId", "shippingAllowed", "active_"}, false);
 
-		_setCommerceCountryUtilPersistence(this);
+		CommerceCountryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceCountryUtilPersistence(null);
+		CommerceCountryUtil.setPersistence(null);
 
 		entityCache.removeCache(CommerceCountryImpl.class.getName());
 
@@ -4684,22 +4683,6 @@ public class CommerceCountryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceCountryUtilPersistence(
-		CommerceCountryPersistence commerceCountryPersistence) {
-
-		try {
-			Field field = CommerceCountryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceCountryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -49,7 +49,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1786,11 +1785,11 @@ public class CommerceAccountOrganizationRelPersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"organizationId"}, false);
 
-		_setCommerceAccountOrganizationRelUtilPersistence(this);
+		CommerceAccountOrganizationRelUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceAccountOrganizationRelUtilPersistence(null);
+		CommerceAccountOrganizationRelUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			CommerceAccountOrganizationRelImpl.class.getName());
@@ -1801,24 +1800,6 @@ public class CommerceAccountOrganizationRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceAccountOrganizationRelUtilPersistence(
-		CommerceAccountOrganizationRelPersistence
-			commerceAccountOrganizationRelPersistence) {
-
-		try {
-			Field field =
-				CommerceAccountOrganizationRelUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceAccountOrganizationRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

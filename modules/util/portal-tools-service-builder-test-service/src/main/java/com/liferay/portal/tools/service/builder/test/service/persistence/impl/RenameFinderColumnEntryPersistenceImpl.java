@@ -45,7 +45,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.RenameF
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -932,11 +931,11 @@ public class RenameFinderColumnEntryPersistenceImpl
 			new String[] {String.class.getName()},
 			new String[] {"renamedColumn"}, false);
 
-		_setRenameFinderColumnEntryUtilPersistence(this);
+		RenameFinderColumnEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setRenameFinderColumnEntryUtilPersistence(null);
+		RenameFinderColumnEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(RenameFinderColumnEntryImpl.class.getName());
 
@@ -946,22 +945,6 @@ public class RenameFinderColumnEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setRenameFinderColumnEntryUtilPersistence(
-		RenameFinderColumnEntryPersistence renameFinderColumnEntryPersistence) {
-
-		try {
-			Field field = RenameFinderColumnEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, renameFinderColumnEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

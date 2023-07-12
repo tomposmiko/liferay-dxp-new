@@ -2361,6 +2361,10 @@ public class CPInstanceUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(CPInstancePersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile CPInstancePersistence _persistence;
 
 }

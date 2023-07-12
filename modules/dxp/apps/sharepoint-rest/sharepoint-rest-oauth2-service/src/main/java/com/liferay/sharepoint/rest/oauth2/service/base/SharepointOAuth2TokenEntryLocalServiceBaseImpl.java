@@ -47,8 +47,6 @@ import com.liferay.sharepoint.rest.oauth2.service.persistence.SharepointOAuth2To
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -412,7 +410,7 @@ public abstract class SharepointOAuth2TokenEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		SharepointOAuth2TokenEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -428,7 +426,8 @@ public abstract class SharepointOAuth2TokenEntryLocalServiceBaseImpl
 		sharepointOAuth2TokenEntryLocalService =
 			(SharepointOAuth2TokenEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(sharepointOAuth2TokenEntryLocalService);
+		SharepointOAuth2TokenEntryLocalServiceUtil.setService(
+			sharepointOAuth2TokenEntryLocalService);
 	}
 
 	/**
@@ -471,24 +470,6 @@ public abstract class SharepointOAuth2TokenEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		SharepointOAuth2TokenEntryLocalService
-			sharepointOAuth2TokenEntryLocalService) {
-
-		try {
-			Field field =
-				SharepointOAuth2TokenEntryLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, sharepointOAuth2TokenEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

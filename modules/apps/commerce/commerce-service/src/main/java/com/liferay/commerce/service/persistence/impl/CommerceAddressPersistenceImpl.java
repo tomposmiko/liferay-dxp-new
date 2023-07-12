@@ -51,7 +51,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -5815,11 +5814,11 @@ public class CommerceAddressPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setCommerceAddressUtilPersistence(this);
+		CommerceAddressUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceAddressUtilPersistence(null);
+		CommerceAddressUtil.setPersistence(null);
 
 		entityCache.removeCache(CommerceAddressImpl.class.getName());
 
@@ -5829,22 +5828,6 @@ public class CommerceAddressPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceAddressUtilPersistence(
-		CommerceAddressPersistence commerceAddressPersistence) {
-
-		try {
-			Field field = CommerceAddressUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceAddressPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

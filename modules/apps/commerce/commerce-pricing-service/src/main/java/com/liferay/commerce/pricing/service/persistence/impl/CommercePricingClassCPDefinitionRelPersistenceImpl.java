@@ -48,7 +48,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2146,11 +2145,11 @@ public class CommercePricingClassCPDefinitionRelPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"commercePricingClassId", "CPDefinitionId"}, false);
 
-		_setCommercePricingClassCPDefinitionRelUtilPersistence(this);
+		CommercePricingClassCPDefinitionRelUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommercePricingClassCPDefinitionRelUtilPersistence(null);
+		CommercePricingClassCPDefinitionRelUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			CommercePricingClassCPDefinitionRelImpl.class.getName());
@@ -2161,24 +2160,6 @@ public class CommercePricingClassCPDefinitionRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommercePricingClassCPDefinitionRelUtilPersistence(
-		CommercePricingClassCPDefinitionRelPersistence
-			commercePricingClassCPDefinitionRelPersistence) {
-
-		try {
-			Field field =
-				CommercePricingClassCPDefinitionRelUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commercePricingClassCPDefinitionRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

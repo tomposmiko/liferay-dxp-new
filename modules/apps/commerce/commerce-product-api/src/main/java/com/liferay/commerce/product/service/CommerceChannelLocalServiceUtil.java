@@ -471,6 +471,10 @@ public class CommerceChannelLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CommerceChannelLocalService service) {
+		_service = service;
+	}
+
 	private static volatile CommerceChannelLocalService _service;
 
 }

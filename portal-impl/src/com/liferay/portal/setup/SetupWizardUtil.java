@@ -40,15 +40,20 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
 
 import java.sql.Connection;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -300,11 +305,15 @@ public class SetupWizardUtil {
 			String password, String jndiName)
 		throws Exception {
 
-		if (Validator.isNull(jndiName)) {
-			Class.forName(driverClassName);
-		}
-
 		DataSource dataSource = null;
+
+		if (!DriverClassNamesHolder.contains(driverClassName)) {
+			throw new Exception(
+				StringBundler.concat(
+					driverClassName,
+					" is not specified in the portal property \"",
+					PropsKeys.SETUP_DATABASE_DRIVER_CLASS_NAME, "\""));
+		}
 
 		try {
 			dataSource = DataSourceFactoryUtil.initDataSource(
@@ -485,5 +494,28 @@ public class SetupWizardUtil {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SetupWizardUtil.class);
+
+	private static class DriverClassNamesHolder {
+
+		public static boolean contains(String driverClassName) {
+			return _driverClassNames.contains(driverClassName);
+		}
+
+		private static void _add(Object object) {
+			_driverClassNames.add(String.valueOf(object));
+		}
+
+		private static final Set<String> _driverClassNames = new HashSet<>();
+
+		static {
+			Properties properties = PropsUtil.getProperties(
+				PropsKeys.SETUP_DATABASE_DRIVER_CLASS_NAME, true);
+
+			Collection<Object> values = properties.values();
+
+			values.forEach(DriverClassNamesHolder::_add);
+		}
+
+	}
 
 }

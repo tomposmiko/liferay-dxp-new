@@ -53,8 +53,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -545,7 +543,7 @@ public abstract class AppBuilderAppVersionLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		AppBuilderAppVersionLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -561,7 +559,8 @@ public abstract class AppBuilderAppVersionLocalServiceBaseImpl
 		appBuilderAppVersionLocalService =
 			(AppBuilderAppVersionLocalService)aopProxy;
 
-		_setLocalServiceUtilService(appBuilderAppVersionLocalService);
+		AppBuilderAppVersionLocalServiceUtil.setService(
+			appBuilderAppVersionLocalService);
 	}
 
 	/**
@@ -604,23 +603,6 @@ public abstract class AppBuilderAppVersionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		AppBuilderAppVersionLocalService appBuilderAppVersionLocalService) {
-
-		try {
-			Field field =
-				AppBuilderAppVersionLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, appBuilderAppVersionLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

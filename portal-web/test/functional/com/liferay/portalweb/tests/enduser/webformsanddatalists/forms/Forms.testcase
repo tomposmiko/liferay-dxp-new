@@ -3451,7 +3451,7 @@ definition {
 
 		FormFields.editDate(
 			fieldName = ${fieldDateField},
-			fieldValue = "05/02/2016");
+			fieldValue = 05022016);
 
 		FormFields.selectCheckboxOption(
 			checkboxOption = "Checkbox 1",
@@ -3987,7 +3987,7 @@ definition {
 
 		FormFields.editDate(
 			fieldName = ${fieldDateField},
-			fieldValue = "05/02/2016");
+			fieldValue = 05022016);
 
 		FormFields.selectCheckboxOption(
 			checkboxOption = "Checkbox 1",
@@ -4079,9 +4079,9 @@ definition {
 			formPageCurrent = "Page 1",
 			formPageNext = "Page 2");
 
-		//FormFields.viewTextLabel(
-		//	fieldLabel = "Grid Field Survey",
-		//	fieldName = "${fieldGridField}");
+		FormFields.viewTextLabel(
+			fieldLabel = "Grid Field Survey",
+			fieldName = ${fieldGridField});
 
 		FormPortlet.nextPage(
 			formPageCurrent = "Page 2",
@@ -5382,7 +5382,7 @@ definition {
 
 		FormFields.editDate(
 			fieldName = ${fieldDateField},
-			fieldValue = "01/01/2016");
+			fieldValue = 01012016);
 
 		FormPortlet.waitForValidationErrorNotPresent();
 

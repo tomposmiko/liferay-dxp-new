@@ -51,7 +51,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2906,12 +2905,12 @@ public class CTEntryPersistenceImpl
 			new String[] {"ctCollectionId", "modelClassNameId", "modelClassPK"},
 			false);
 
-		_setCTEntryUtilPersistence(this);
+		CTEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCTEntryUtilPersistence(null);
+		CTEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(CTEntryImpl.class.getName());
 
@@ -2921,21 +2920,6 @@ public class CTEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCTEntryUtilPersistence(
-		CTEntryPersistence ctEntryPersistence) {
-
-		try {
-			Field field = CTEntryUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ctEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

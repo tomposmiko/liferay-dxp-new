@@ -133,7 +133,7 @@ const Main = ({
 	localizedValueEdited,
 	...otherProps
 }) => (
-	<FieldBase name={name} readOnly={readOnly} {...otherProps}>
+	<FieldBase {...otherProps} name={name} readOnly={readOnly} style={null}>
 		<CheckboxMultiple
 			disabled={readOnly}
 			inline={inline}

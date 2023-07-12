@@ -49,7 +49,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1869,11 +1868,11 @@ public class CompanyPersistenceImpl
 			new String[] {Boolean.class.getName()}, new String[] {"system_"},
 			false);
 
-		_setCompanyUtilPersistence(this);
+		CompanyUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCompanyUtilPersistence(null);
+		CompanyUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(CompanyImpl.class.getName());
 
@@ -1883,21 +1882,6 @@ public class CompanyPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCompanyUtilPersistence(
-		CompanyPersistence companyPersistence) {
-
-		try {
-			Field field = CompanyUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, companyPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

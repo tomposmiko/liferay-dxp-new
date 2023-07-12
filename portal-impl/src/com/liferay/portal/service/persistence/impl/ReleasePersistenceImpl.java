@@ -51,7 +51,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -909,11 +908,11 @@ public class ReleasePersistenceImpl
 			"countByServletContextName", new String[] {String.class.getName()},
 			new String[] {"servletContextName"}, false);
 
-		_setReleaseUtilPersistence(this);
+		ReleaseUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setReleaseUtilPersistence(null);
+		ReleaseUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(ReleaseImpl.class.getName());
 
@@ -923,21 +922,6 @@ public class ReleasePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setReleaseUtilPersistence(
-		ReleasePersistence releasePersistence) {
-
-		try {
-			Field field = ReleaseUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, releasePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

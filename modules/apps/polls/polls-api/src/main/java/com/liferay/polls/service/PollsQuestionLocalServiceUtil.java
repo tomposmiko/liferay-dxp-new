@@ -514,6 +514,10 @@ public class PollsQuestionLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(PollsQuestionLocalService service) {
+		_service = service;
+	}
+
 	private static volatile PollsQuestionLocalService _service;
 
 }

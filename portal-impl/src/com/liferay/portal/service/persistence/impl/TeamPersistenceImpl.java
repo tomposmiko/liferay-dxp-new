@@ -64,7 +64,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -4695,11 +4694,11 @@ public class TeamPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "name"}, false);
 
-		_setTeamUtilPersistence(this);
+		TeamUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setTeamUtilPersistence(null);
+		TeamUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(TeamImpl.class.getName());
 
@@ -4713,19 +4712,6 @@ public class TeamPersistenceImpl
 
 		TableMapperFactory.removeTableMapper("Users_Teams");
 		TableMapperFactory.removeTableMapper("UserGroups_Teams");
-	}
-
-	private void _setTeamUtilPersistence(TeamPersistence teamPersistence) {
-		try {
-			Field field = TeamUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, teamPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@BeanReference(type = UserPersistence.class)

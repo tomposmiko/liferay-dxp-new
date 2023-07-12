@@ -53,8 +53,6 @@ import com.liferay.social.kernel.service.persistence.SocialActivityCounterPersis
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -613,14 +611,15 @@ public abstract class SocialActivityAchievementLocalServiceBaseImpl
 			"com.liferay.social.kernel.model.SocialActivityAchievement",
 			socialActivityAchievementLocalService);
 
-		_setLocalServiceUtilService(socialActivityAchievementLocalService);
+		SocialActivityAchievementLocalServiceUtil.setService(
+			socialActivityAchievementLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.social.kernel.model.SocialActivityAchievement");
 
-		_setLocalServiceUtilService(null);
+		SocialActivityAchievementLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -678,24 +677,6 @@ public abstract class SocialActivityAchievementLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		SocialActivityAchievementLocalService
-			socialActivityAchievementLocalService) {
-
-		try {
-			Field field =
-				SocialActivityAchievementLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, socialActivityAchievementLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

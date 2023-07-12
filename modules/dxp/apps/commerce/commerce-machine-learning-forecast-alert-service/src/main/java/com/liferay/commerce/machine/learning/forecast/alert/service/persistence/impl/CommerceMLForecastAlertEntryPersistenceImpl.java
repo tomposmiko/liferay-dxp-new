@@ -52,7 +52,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -5172,11 +5171,11 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			false);
 
-		_setCommerceMLForecastAlertEntryUtilPersistence(this);
+		CommerceMLForecastAlertEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceMLForecastAlertEntryUtilPersistence(null);
+		CommerceMLForecastAlertEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			CommerceMLForecastAlertEntryImpl.class.getName());
@@ -5187,24 +5186,6 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceMLForecastAlertEntryUtilPersistence(
-		CommerceMLForecastAlertEntryPersistence
-			commerceMLForecastAlertEntryPersistence) {
-
-		try {
-			Field field =
-				CommerceMLForecastAlertEntryUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceMLForecastAlertEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

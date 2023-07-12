@@ -52,7 +52,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2197,11 +2196,11 @@ public class WorkflowInstanceLinkPersistenceImpl
 			new String[] {"groupId", "companyId", "classNameId", "classPK"},
 			false);
 
-		_setWorkflowInstanceLinkUtilPersistence(this);
+		WorkflowInstanceLinkUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setWorkflowInstanceLinkUtilPersistence(null);
+		WorkflowInstanceLinkUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(WorkflowInstanceLinkImpl.class.getName());
 
@@ -2211,22 +2210,6 @@ public class WorkflowInstanceLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setWorkflowInstanceLinkUtilPersistence(
-		WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence) {
-
-		try {
-			Field field = WorkflowInstanceLinkUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, workflowInstanceLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

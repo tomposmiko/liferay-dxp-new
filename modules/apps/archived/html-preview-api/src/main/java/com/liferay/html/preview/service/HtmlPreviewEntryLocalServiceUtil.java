@@ -330,6 +330,10 @@ public class HtmlPreviewEntryLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(HtmlPreviewEntryLocalService service) {
+		_service = service;
+	}
+
 	private static volatile HtmlPreviewEntryLocalService _service;
 
 }

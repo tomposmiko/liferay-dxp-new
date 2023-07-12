@@ -106,6 +106,8 @@ public class SXPElementResourceImpl
 				_jsonFactory.createJSONObject(
 					sxpElement.getElementDefinitionJSON())
 			).put(
+				"externalReferenceCode", sxpElement.getExternalReferenceCode()
+			).put(
 				"schemaVersion", sxpElement.getSchemaVersion()
 			).put(
 				"title_i18n",
@@ -237,6 +239,7 @@ public class SXPElementResourceImpl
 				sxpElement.getId(), contextAcceptLanguage.getPreferredLocale(),
 				contextUriInfo, contextUser),
 			_sxpElementService.addSXPElement(
+				sxpElement.getExternalReferenceCode(),
 				LocalizedMapUtil.getLocalizedMap(
 					contextAcceptLanguage.getPreferredLocale(),
 					sxpElement.getDescription(),
@@ -263,7 +266,7 @@ public class SXPElementResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
 				contextUser),
 			_sxpElementService.addSXPElement(
-				sxpElement.getDescriptionMap(),
+				null, sxpElement.getDescriptionMap(),
 				sxpElement.getElementDefinitionJSON(), false,
 				sxpElement.getSchemaVersion(),
 				TitleMapUtil.copy(sxpElement.getTitleMap()),

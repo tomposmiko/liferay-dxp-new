@@ -51,7 +51,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2313,12 +2312,12 @@ public class DDMTemplateVersionPersistenceImpl
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"templateId", "status"}, false);
 
-		_setDDMTemplateVersionUtilPersistence(this);
+		DDMTemplateVersionUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMTemplateVersionUtilPersistence(null);
+		DDMTemplateVersionUtil.setPersistence(null);
 
 		entityCache.removeCache(DDMTemplateVersionImpl.class.getName());
 
@@ -2328,22 +2327,6 @@ public class DDMTemplateVersionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDDMTemplateVersionUtilPersistence(
-		DDMTemplateVersionPersistence ddmTemplateVersionPersistence) {
-
-		try {
-			Field field = DDMTemplateVersionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmTemplateVersionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

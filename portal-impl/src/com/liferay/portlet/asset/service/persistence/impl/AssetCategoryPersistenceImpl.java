@@ -65,7 +65,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -13554,11 +13553,11 @@ public class AssetCategoryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setAssetCategoryUtilPersistence(this);
+		AssetCategoryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setAssetCategoryUtilPersistence(null);
+		AssetCategoryUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(AssetCategoryImpl.class.getName());
 
@@ -13571,22 +13570,6 @@ public class AssetCategoryPersistenceImpl
 		}
 
 		TableMapperFactory.removeTableMapper("AssetEntries_AssetCategories");
-	}
-
-	private void _setAssetCategoryUtilPersistence(
-		AssetCategoryPersistence assetCategoryPersistence) {
-
-		try {
-			Field field = AssetCategoryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, assetCategoryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@BeanReference(type = AssetEntryPersistence.class)

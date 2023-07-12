@@ -50,7 +50,6 @@ import com.liferay.saml.persistence.service.persistence.impl.constants.SamlPersi
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1503,12 +1502,12 @@ public class SamlSpIdpConnectionPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "samlIdpEntityId"}, false);
 
-		_setSamlSpIdpConnectionUtilPersistence(this);
+		SamlSpIdpConnectionUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSamlSpIdpConnectionUtilPersistence(null);
+		SamlSpIdpConnectionUtil.setPersistence(null);
 
 		entityCache.removeCache(SamlSpIdpConnectionImpl.class.getName());
 
@@ -1518,22 +1517,6 @@ public class SamlSpIdpConnectionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSamlSpIdpConnectionUtilPersistence(
-		SamlSpIdpConnectionPersistence samlSpIdpConnectionPersistence) {
-
-		try {
-			Field field = SamlSpIdpConnectionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, samlSpIdpConnectionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

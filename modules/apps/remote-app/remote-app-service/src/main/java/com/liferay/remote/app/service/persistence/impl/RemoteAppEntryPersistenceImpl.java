@@ -52,7 +52,6 @@ import com.liferay.remote.app.service.persistence.impl.constants.RemoteAppPersis
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2113,12 +2112,12 @@ public class RemoteAppEntryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "url"}, false);
 
-		_setRemoteAppEntryUtilPersistence(this);
+		RemoteAppEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setRemoteAppEntryUtilPersistence(null);
+		RemoteAppEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(RemoteAppEntryImpl.class.getName());
 
@@ -2128,22 +2127,6 @@ public class RemoteAppEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setRemoteAppEntryUtilPersistence(
-		RemoteAppEntryPersistence remoteAppEntryPersistence) {
-
-		try {
-			Field field = RemoteAppEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, remoteAppEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2302,12 +2301,12 @@ public class DDMDataProviderInstanceLinkPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"dataProviderInstanceId", "structureId"}, false);
 
-		_setDDMDataProviderInstanceLinkUtilPersistence(this);
+		DDMDataProviderInstanceLinkUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMDataProviderInstanceLinkUtilPersistence(null);
+		DDMDataProviderInstanceLinkUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			DDMDataProviderInstanceLinkImpl.class.getName());
@@ -2318,24 +2317,6 @@ public class DDMDataProviderInstanceLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDDMDataProviderInstanceLinkUtilPersistence(
-		DDMDataProviderInstanceLinkPersistence
-			ddmDataProviderInstanceLinkPersistence) {
-
-		try {
-			Field field =
-				DDMDataProviderInstanceLinkUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmDataProviderInstanceLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

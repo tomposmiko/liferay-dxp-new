@@ -57,7 +57,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3973,11 +3972,11 @@ public class RatingsEntryPersistenceImpl
 			},
 			new String[] {"classNameId", "classPK", "score"}, false);
 
-		_setRatingsEntryUtilPersistence(this);
+		RatingsEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setRatingsEntryUtilPersistence(null);
+		RatingsEntryUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(RatingsEntryImpl.class.getName());
 
@@ -3987,22 +3986,6 @@ public class RatingsEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setRatingsEntryUtilPersistence(
-		RatingsEntryPersistence ratingsEntryPersistence) {
-
-		try {
-			Field field = RatingsEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ratingsEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

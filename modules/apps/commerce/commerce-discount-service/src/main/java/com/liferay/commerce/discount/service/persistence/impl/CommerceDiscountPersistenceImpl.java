@@ -54,7 +54,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -7376,11 +7375,11 @@ public class CommerceDiscountPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setCommerceDiscountUtilPersistence(this);
+		CommerceDiscountUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceDiscountUtilPersistence(null);
+		CommerceDiscountUtil.setPersistence(null);
 
 		entityCache.removeCache(CommerceDiscountImpl.class.getName());
 
@@ -7390,22 +7389,6 @@ public class CommerceDiscountPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceDiscountUtilPersistence(
-		CommerceDiscountPersistence commerceDiscountPersistence) {
-
-		try {
-			Field field = CommerceDiscountUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceDiscountPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

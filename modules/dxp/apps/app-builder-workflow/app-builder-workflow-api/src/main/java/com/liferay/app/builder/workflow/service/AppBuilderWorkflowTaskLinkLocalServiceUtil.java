@@ -361,6 +361,12 @@ public class AppBuilderWorkflowTaskLinkLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(
+		AppBuilderWorkflowTaskLinkLocalService service) {
+
+		_service = service;
+	}
+
 	private static volatile AppBuilderWorkflowTaskLinkLocalService _service;
 
 }

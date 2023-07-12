@@ -371,6 +371,10 @@ public class SyncDeviceLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(SyncDeviceLocalService service) {
+		_service = service;
+	}
+
 	private static volatile SyncDeviceLocalService _service;
 
 }

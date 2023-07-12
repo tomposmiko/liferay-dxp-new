@@ -138,11 +138,12 @@ const ColorPicker = ({
 
 	return (
 		<FieldBase
+			{...otherProps}
 			name={name}
 			onClick={handleColorDropDownClicked}
 			readOnly={readOnly}
 			spritemap={spritemap}
-			{...otherProps}
+			style={null}
 		>
 			<ClayColorPickerWithState
 				inputValue={value ? value : predefinedValue}

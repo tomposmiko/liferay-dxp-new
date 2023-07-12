@@ -405,6 +405,10 @@ public class SXPBlueprintLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(SXPBlueprintLocalService service) {
+		_service = service;
+	}
+
 	private static volatile SXPBlueprintLocalService _service;
 
 }

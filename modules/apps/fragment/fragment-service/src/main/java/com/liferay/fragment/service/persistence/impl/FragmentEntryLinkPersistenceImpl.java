@@ -56,7 +56,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -10686,12 +10685,12 @@ public class FragmentEntryLinkPersistenceImpl
 			},
 			false);
 
-		_setFragmentEntryLinkUtilPersistence(this);
+		FragmentEntryLinkUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setFragmentEntryLinkUtilPersistence(null);
+		FragmentEntryLinkUtil.setPersistence(null);
 
 		entityCache.removeCache(FragmentEntryLinkImpl.class.getName());
 
@@ -10701,22 +10700,6 @@ public class FragmentEntryLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setFragmentEntryLinkUtilPersistence(
-		FragmentEntryLinkPersistence fragmentEntryLinkPersistence) {
-
-		try {
-			Field field = FragmentEntryLinkUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, fragmentEntryLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

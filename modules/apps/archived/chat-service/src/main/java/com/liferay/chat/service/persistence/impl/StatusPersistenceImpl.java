@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -2410,12 +2409,12 @@ public class StatusPersistenceImpl
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"modifiedDate", "online_"}, false);
 
-		_setStatusUtilPersistence(this);
+		StatusUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setStatusUtilPersistence(null);
+		StatusUtil.setPersistence(null);
 
 		entityCache.removeCache(StatusImpl.class.getName());
 
@@ -2425,21 +2424,6 @@ public class StatusPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setStatusUtilPersistence(
-		StatusPersistence statusPersistence) {
-
-		try {
-			Field field = StatusUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, statusPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

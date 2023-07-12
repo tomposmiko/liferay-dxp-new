@@ -51,7 +51,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2006,11 +2005,11 @@ public class VirtualHostPersistenceImpl
 			new String[] {"companyId", "layoutSetId", "defaultVirtualHost"},
 			false);
 
-		_setVirtualHostUtilPersistence(this);
+		VirtualHostUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setVirtualHostUtilPersistence(null);
+		VirtualHostUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(VirtualHostImpl.class.getName());
 
@@ -2020,22 +2019,6 @@ public class VirtualHostPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setVirtualHostUtilPersistence(
-		VirtualHostPersistence virtualHostPersistence) {
-
-		try {
-			Field field = VirtualHostUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, virtualHostPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

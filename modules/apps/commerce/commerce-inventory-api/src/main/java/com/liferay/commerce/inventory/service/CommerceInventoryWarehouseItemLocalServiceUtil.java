@@ -612,6 +612,12 @@ public class CommerceInventoryWarehouseItemLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(
+		CommerceInventoryWarehouseItemLocalService service) {
+
+		_service = service;
+	}
+
 	private static volatile CommerceInventoryWarehouseItemLocalService _service;
 
 }

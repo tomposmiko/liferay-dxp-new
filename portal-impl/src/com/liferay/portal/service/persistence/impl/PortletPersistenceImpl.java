@@ -49,7 +49,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -1408,11 +1407,11 @@ public class PortletPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "portletId"}, false);
 
-		_setPortletUtilPersistence(this);
+		PortletUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setPortletUtilPersistence(null);
+		PortletUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(PortletImpl.class.getName());
 
@@ -1422,21 +1421,6 @@ public class PortletPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setPortletUtilPersistence(
-		PortletPersistence portletPersistence) {
-
-		try {
-			Field field = PortletUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, portletPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

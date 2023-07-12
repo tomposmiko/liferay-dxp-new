@@ -113,6 +113,10 @@ public class PowwowMeetingServiceUtil {
 		return _service;
 	}
 
+	public static void setService(PowwowMeetingService service) {
+		_service = service;
+	}
+
 	private static volatile PowwowMeetingService _service;
 
 }

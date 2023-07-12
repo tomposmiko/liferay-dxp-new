@@ -22,6 +22,10 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 
 import java.util.Map;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
@@ -38,12 +42,16 @@ public class LayoutAdaptiveMediaProcessorImpl
 
 	@Override
 	public String processAdaptiveMediaContent(String content) {
-		if (!_ffLayoutContentPageEditorConfiguration.adaptiveMediaEnabled()) {
-			return content;
+		if (_ffLayoutContentPageEditorConfiguration.adaptiveMediaEnabled()) {
+			content = _contentTransformerHandler.transform(
+				ContentTransformerContentTypes.HTML, content);
 		}
 
-		return _contentTransformerHandler.transform(
-			ContentTransformerContentTypes.HTML, content);
+		Document document = Jsoup.parse(content);
+
+		Element bodyElement = document.body();
+
+		return bodyElement.html();
 	}
 
 	@Modified

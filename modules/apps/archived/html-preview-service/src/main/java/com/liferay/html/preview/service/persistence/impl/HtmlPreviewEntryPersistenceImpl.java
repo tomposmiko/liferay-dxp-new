@@ -50,7 +50,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -962,12 +961,12 @@ public class HtmlPreviewEntryPersistenceImpl
 			},
 			new String[] {"groupId", "classNameId", "classPK"}, false);
 
-		_setHtmlPreviewEntryUtilPersistence(this);
+		HtmlPreviewEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setHtmlPreviewEntryUtilPersistence(null);
+		HtmlPreviewEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(HtmlPreviewEntryImpl.class.getName());
 
@@ -977,22 +976,6 @@ public class HtmlPreviewEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setHtmlPreviewEntryUtilPersistence(
-		HtmlPreviewEntryPersistence htmlPreviewEntryPersistence) {
-
-		try {
-			Field field = HtmlPreviewEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, htmlPreviewEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

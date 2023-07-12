@@ -44,8 +44,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.Localiz
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -602,11 +600,11 @@ public class LocalizedEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_setLocalizedEntryUtilPersistence(this);
+		LocalizedEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setLocalizedEntryUtilPersistence(null);
+		LocalizedEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(LocalizedEntryImpl.class.getName());
 
@@ -616,22 +614,6 @@ public class LocalizedEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLocalizedEntryUtilPersistence(
-		LocalizedEntryPersistence localizedEntryPersistence) {
-
-		try {
-			Field field = LocalizedEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, localizedEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

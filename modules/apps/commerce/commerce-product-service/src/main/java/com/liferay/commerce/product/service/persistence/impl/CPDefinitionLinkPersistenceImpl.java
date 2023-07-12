@@ -50,7 +50,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4683,11 +4682,11 @@ public class CPDefinitionLinkPersistenceImpl
 			},
 			new String[] {"CPDefinitionId", "CProductId", "type_"}, false);
 
-		_setCPDefinitionLinkUtilPersistence(this);
+		CPDefinitionLinkUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCPDefinitionLinkUtilPersistence(null);
+		CPDefinitionLinkUtil.setPersistence(null);
 
 		entityCache.removeCache(CPDefinitionLinkImpl.class.getName());
 
@@ -4697,22 +4696,6 @@ public class CPDefinitionLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCPDefinitionLinkUtilPersistence(
-		CPDefinitionLinkPersistence cpDefinitionLinkPersistence) {
-
-		try {
-			Field field = CPDefinitionLinkUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cpDefinitionLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

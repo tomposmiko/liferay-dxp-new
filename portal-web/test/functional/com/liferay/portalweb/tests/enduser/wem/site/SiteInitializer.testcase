@@ -190,7 +190,7 @@ definition {
 				actual = ${containerWidth},
 				expected = ${screenWidth});
 
-			for (var cardLink : list "wk1774476306-liferay-employee,lf1774476306-david-aragon,hl1774476306-david-aragon,au1774476306-volkswagen-golf-1.6,hm1774476306-sepulveda-blvd") {
+			for (var cardLink : list "wk1774476306-liferay-employee,lf1774476306-david-aragon,hl1774476306-david-aragon,au1774476306-volkswagen-golf-1-6,hm1774476306-sepulveda-blvd") {
 				AssertElementPresent(
 					key_card = ${cardLink},
 					locator1 = "Card#CARD_STYLE");
@@ -236,7 +236,7 @@ definition {
 					expected = ${screenWidth});
 			}
 
-			for (var cardLink : list "sepulveda-blvd-chm2546333,volkswagen-golf-cau5846990,david-aragon%C3%A9s-che3326955,volkswagen-golf-cau4536398,volkswagen-golf-cau6821256,sepulveda-blvd-chm2371402,david-aragon%C3%A9s-chl22214389,sepulveda-blvd-chm6821402") {
+			for (var cardLink : list "sepulveda-blvd-chm2546333,volkswagen-golf-cau5846990,david-aragones-che3326955,volkswagen-golf-cau4536398,volkswagen-golf-cau6821256,sepulveda-blvd-chm2371402,david-aragones-chl22214389,sepulveda-blvd-chm6821402") {
 				AssertElementPresent(
 					key_card = ${cardLink},
 					locator1 = "Card#CARD_STYLE");

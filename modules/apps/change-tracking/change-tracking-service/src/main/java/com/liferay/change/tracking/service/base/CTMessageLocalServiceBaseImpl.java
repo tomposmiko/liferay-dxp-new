@@ -47,8 +47,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -375,7 +373,7 @@ public abstract class CTMessageLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		CTMessageLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -390,7 +388,7 @@ public abstract class CTMessageLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ctMessageLocalService = (CTMessageLocalService)aopProxy;
 
-		_setLocalServiceUtilService(ctMessageLocalService);
+		CTMessageLocalServiceUtil.setService(ctMessageLocalService);
 	}
 
 	/**
@@ -432,22 +430,6 @@ public abstract class CTMessageLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		CTMessageLocalService ctMessageLocalService) {
-
-		try {
-			Field field = CTMessageLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, ctMessageLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

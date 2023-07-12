@@ -131,6 +131,12 @@ public class CommerceDataIntegrationProcessServiceUtil {
 		return _service;
 	}
 
+	public static void setService(
+		CommerceDataIntegrationProcessService service) {
+
+		_service = service;
+	}
+
 	private static volatile CommerceDataIntegrationProcessService _service;
 
 }

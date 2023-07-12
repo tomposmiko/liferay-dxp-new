@@ -54,7 +54,6 @@ import com.liferay.portal.reports.engine.console.service.persistence.impl.consta
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3491,12 +3490,12 @@ public class DefinitionPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_setDefinitionUtilPersistence(this);
+		DefinitionUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDefinitionUtilPersistence(null);
+		DefinitionUtil.setPersistence(null);
 
 		entityCache.removeCache(DefinitionImpl.class.getName());
 
@@ -3506,21 +3505,6 @@ public class DefinitionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDefinitionUtilPersistence(
-		DefinitionPersistence definitionPersistence) {
-
-		try {
-			Field field = DefinitionUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, definitionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

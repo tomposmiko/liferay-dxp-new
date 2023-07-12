@@ -498,6 +498,10 @@ public class CPDefinitionLinkLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CPDefinitionLinkLocalService service) {
+		_service = service;
+	}
+
 	private static volatile CPDefinitionLinkLocalService _service;
 
 }

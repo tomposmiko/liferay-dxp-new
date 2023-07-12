@@ -421,6 +421,10 @@ public class CommerceRegionLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CommerceRegionLocalService service) {
+		_service = service;
+	}
+
 	private static volatile CommerceRegionLocalService _service;
 
 }

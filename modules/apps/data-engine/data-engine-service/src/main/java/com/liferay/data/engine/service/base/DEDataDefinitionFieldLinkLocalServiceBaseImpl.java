@@ -55,8 +55,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -583,7 +581,7 @@ public abstract class DEDataDefinitionFieldLinkLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		DEDataDefinitionFieldLinkLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -599,7 +597,8 @@ public abstract class DEDataDefinitionFieldLinkLocalServiceBaseImpl
 		deDataDefinitionFieldLinkLocalService =
 			(DEDataDefinitionFieldLinkLocalService)aopProxy;
 
-		_setLocalServiceUtilService(deDataDefinitionFieldLinkLocalService);
+		DEDataDefinitionFieldLinkLocalServiceUtil.setService(
+			deDataDefinitionFieldLinkLocalService);
 	}
 
 	/**
@@ -642,24 +641,6 @@ public abstract class DEDataDefinitionFieldLinkLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		DEDataDefinitionFieldLinkLocalService
-			deDataDefinitionFieldLinkLocalService) {
-
-		try {
-			Field field =
-				DEDataDefinitionFieldLinkLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, deDataDefinitionFieldLinkLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

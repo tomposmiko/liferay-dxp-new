@@ -784,6 +784,10 @@ public class CTCollectionUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(CTCollectionPersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile CTCollectionPersistence _persistence;
 
 }

@@ -51,7 +51,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3775,12 +3774,12 @@ public class DDMFormInstanceRecordVersionPersistenceImpl
 			},
 			false);
 
-		_setDDMFormInstanceRecordVersionUtilPersistence(this);
+		DDMFormInstanceRecordVersionUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMFormInstanceRecordVersionUtilPersistence(null);
+		DDMFormInstanceRecordVersionUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			DDMFormInstanceRecordVersionImpl.class.getName());
@@ -3791,24 +3790,6 @@ public class DDMFormInstanceRecordVersionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDDMFormInstanceRecordVersionUtilPersistence(
-		DDMFormInstanceRecordVersionPersistence
-			ddmFormInstanceRecordVersionPersistence) {
-
-		try {
-			Field field =
-				DDMFormInstanceRecordVersionUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmFormInstanceRecordVersionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

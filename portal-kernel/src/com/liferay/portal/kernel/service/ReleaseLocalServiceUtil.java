@@ -380,6 +380,10 @@ public class ReleaseLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(ReleaseLocalService service) {
+		_service = service;
+	}
+
 	private static volatile ReleaseLocalService _service;
 
 }

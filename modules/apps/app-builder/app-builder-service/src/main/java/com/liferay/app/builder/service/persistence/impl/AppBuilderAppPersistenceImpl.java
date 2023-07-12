@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -9091,12 +9090,12 @@ public class AppBuilderAppPersistenceImpl
 			new String[] {"groupId", "companyId", "ddmStructureId", "scope"},
 			false);
 
-		_setAppBuilderAppUtilPersistence(this);
+		AppBuilderAppUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setAppBuilderAppUtilPersistence(null);
+		AppBuilderAppUtil.setPersistence(null);
 
 		entityCache.removeCache(AppBuilderAppImpl.class.getName());
 
@@ -9106,22 +9105,6 @@ public class AppBuilderAppPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setAppBuilderAppUtilPersistence(
-		AppBuilderAppPersistence appBuilderAppPersistence) {
-
-		try {
-			Field field = AppBuilderAppUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, appBuilderAppPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

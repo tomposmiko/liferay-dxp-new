@@ -458,6 +458,10 @@ public class CommerceBOMEntryUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(CommerceBOMEntryPersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile CommerceBOMEntryPersistence _persistence;
 
 }

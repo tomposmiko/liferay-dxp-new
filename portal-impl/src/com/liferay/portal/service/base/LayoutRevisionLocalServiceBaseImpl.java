@@ -56,8 +56,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -771,14 +769,14 @@ public abstract class LayoutRevisionLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.LayoutRevision",
 			layoutRevisionLocalService);
 
-		_setLocalServiceUtilService(layoutRevisionLocalService);
+		LayoutRevisionLocalServiceUtil.setService(layoutRevisionLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.LayoutRevision");
 
-		_setLocalServiceUtilService(null);
+		LayoutRevisionLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -820,22 +818,6 @@ public abstract class LayoutRevisionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		LayoutRevisionLocalService layoutRevisionLocalService) {
-
-		try {
-			Field field = LayoutRevisionLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutRevisionLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

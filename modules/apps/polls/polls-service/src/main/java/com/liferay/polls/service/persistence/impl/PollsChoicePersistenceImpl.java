@@ -52,7 +52,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2882,12 +2881,12 @@ public class PollsChoicePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"questionId", "name"}, false);
 
-		_setPollsChoiceUtilPersistence(this);
+		PollsChoiceUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setPollsChoiceUtilPersistence(null);
+		PollsChoiceUtil.setPersistence(null);
 
 		entityCache.removeCache(PollsChoiceImpl.class.getName());
 
@@ -2897,22 +2896,6 @@ public class PollsChoicePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setPollsChoiceUtilPersistence(
-		PollsChoicePersistence pollsChoicePersistence) {
-
-		try {
-			Field field = PollsChoiceUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, pollsChoicePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

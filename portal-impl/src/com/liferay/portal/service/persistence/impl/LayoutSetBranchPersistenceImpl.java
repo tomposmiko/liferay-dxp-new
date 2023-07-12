@@ -53,7 +53,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3883,11 +3882,11 @@ public class LayoutSetBranchPersistenceImpl
 			},
 			new String[] {"groupId", "privateLayout", "master"}, false);
 
-		_setLayoutSetBranchUtilPersistence(this);
+		LayoutSetBranchUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setLayoutSetBranchUtilPersistence(null);
+		LayoutSetBranchUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(LayoutSetBranchImpl.class.getName());
 
@@ -3897,22 +3896,6 @@ public class LayoutSetBranchPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLayoutSetBranchUtilPersistence(
-		LayoutSetBranchPersistence layoutSetBranchPersistence) {
-
-		try {
-			Field field = LayoutSetBranchUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutSetBranchPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

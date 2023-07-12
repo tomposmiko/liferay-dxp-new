@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -6272,12 +6271,12 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 			},
 			false);
 
-		_setDEDataDefinitionFieldLinkUtilPersistence(this);
+		DEDataDefinitionFieldLinkUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDEDataDefinitionFieldLinkUtilPersistence(null);
+		DEDataDefinitionFieldLinkUtil.setPersistence(null);
 
 		entityCache.removeCache(DEDataDefinitionFieldLinkImpl.class.getName());
 
@@ -6287,23 +6286,6 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDEDataDefinitionFieldLinkUtilPersistence(
-		DEDataDefinitionFieldLinkPersistence
-			deDataDefinitionFieldLinkPersistence) {
-
-		try {
-			Field field = DEDataDefinitionFieldLinkUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, deDataDefinitionFieldLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -595,6 +595,10 @@ public class VirtualHostUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(VirtualHostPersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile VirtualHostPersistence _persistence;
 
 }

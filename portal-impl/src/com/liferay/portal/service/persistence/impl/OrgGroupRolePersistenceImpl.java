@@ -50,7 +50,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1642,11 +1641,11 @@ public class OrgGroupRolePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"roleId"},
 			false);
 
-		_setOrgGroupRoleUtilPersistence(this);
+		OrgGroupRoleUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setOrgGroupRoleUtilPersistence(null);
+		OrgGroupRoleUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(OrgGroupRoleImpl.class.getName());
 
@@ -1656,22 +1655,6 @@ public class OrgGroupRolePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setOrgGroupRoleUtilPersistence(
-		OrgGroupRolePersistence orgGroupRolePersistence) {
-
-		try {
-			Field field = OrgGroupRoleUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, orgGroupRolePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

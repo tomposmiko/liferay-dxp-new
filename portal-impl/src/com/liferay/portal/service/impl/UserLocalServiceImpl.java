@@ -5390,12 +5390,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
-		if ((status == WorkflowConstants.STATUS_APPROVED) &&
-			(user.getStatus() != WorkflowConstants.STATUS_APPROVED)) {
-
-			validateCompanyMaxUsers(user.getCompanyId());
-		}
-
 		String passwordUnencrypted = (String)serviceContext.getAttribute(
 			"passwordUnencrypted");
 
@@ -5808,6 +5802,21 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		user.setOpenId(openId);
 
 		return userLocalService.updateUser(user);
+	}
+
+	public void validateMaxUsers(long companyId) throws PortalException {
+		Company company = companyPersistence.findByPrimaryKey(companyId);
+
+		if (company.isSystem() || (company.getMaxUsers() == 0)) {
+			return;
+		}
+
+		int userCount = searchCount(
+			companyId, null, WorkflowConstants.STATUS_APPROVED, null);
+
+		if (userCount >= company.getMaxUsers()) {
+			throw new CompanyMaxUsersException();
+		}
 	}
 
 	/**
@@ -7063,7 +7072,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			Locale locale)
 		throws PortalException {
 
-		validateCompanyMaxUsers(companyId);
+		validateMaxUsers(companyId);
 
 		if (!autoScreenName) {
 			validateScreenName(companyId, userId, screenName);
@@ -7141,23 +7150,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		if (Validator.isNotNull(smsSn) && !Validator.isEmailAddress(smsSn)) {
 			throw new UserSmsException.MustBeEmailAddress(smsSn);
-		}
-	}
-
-	protected void validateCompanyMaxUsers(long companyId)
-		throws PortalException {
-
-		Company company = companyPersistence.findByPrimaryKey(companyId);
-
-		if (company.isSystem() || (company.getMaxUsers() == 0)) {
-			return;
-		}
-
-		int userCount = searchCount(
-			companyId, null, WorkflowConstants.STATUS_APPROVED, null);
-
-		if (userCount >= company.getMaxUsers()) {
-			throw new CompanyMaxUsersException();
 		}
 	}
 

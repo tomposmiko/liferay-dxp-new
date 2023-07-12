@@ -50,7 +50,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4033,11 +4032,11 @@ public class CPDisplayLayoutPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
 
-		_setCPDisplayLayoutUtilPersistence(this);
+		CPDisplayLayoutUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCPDisplayLayoutUtilPersistence(null);
+		CPDisplayLayoutUtil.setPersistence(null);
 
 		entityCache.removeCache(CPDisplayLayoutImpl.class.getName());
 
@@ -4047,22 +4046,6 @@ public class CPDisplayLayoutPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCPDisplayLayoutUtilPersistence(
-		CPDisplayLayoutPersistence cpDisplayLayoutPersistence) {
-
-		try {
-			Field field = CPDisplayLayoutUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cpDisplayLayoutPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

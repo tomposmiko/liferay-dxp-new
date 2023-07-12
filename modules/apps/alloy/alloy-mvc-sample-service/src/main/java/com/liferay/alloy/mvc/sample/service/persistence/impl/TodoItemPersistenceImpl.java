@@ -46,7 +46,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -636,11 +635,11 @@ public class TodoItemPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_setTodoItemUtilPersistence(this);
+		TodoItemUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setTodoItemUtilPersistence(null);
+		TodoItemUtil.setPersistence(null);
 
 		entityCache.removeCache(TodoItemImpl.class.getName());
 
@@ -650,21 +649,6 @@ public class TodoItemPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setTodoItemUtilPersistence(
-		TodoItemPersistence todoItemPersistence) {
-
-		try {
-			Field field = TodoItemUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, todoItemPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

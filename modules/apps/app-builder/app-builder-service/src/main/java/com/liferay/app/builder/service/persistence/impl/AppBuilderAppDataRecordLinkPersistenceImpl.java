@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2320,12 +2319,12 @@ public class AppBuilderAppDataRecordLinkPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"appBuilderAppId", "ddlRecordId"}, false);
 
-		_setAppBuilderAppDataRecordLinkUtilPersistence(this);
+		AppBuilderAppDataRecordLinkUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setAppBuilderAppDataRecordLinkUtilPersistence(null);
+		AppBuilderAppDataRecordLinkUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			AppBuilderAppDataRecordLinkImpl.class.getName());
@@ -2336,24 +2335,6 @@ public class AppBuilderAppDataRecordLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setAppBuilderAppDataRecordLinkUtilPersistence(
-		AppBuilderAppDataRecordLinkPersistence
-			appBuilderAppDataRecordLinkPersistence) {
-
-		try {
-			Field field =
-				AppBuilderAppDataRecordLinkUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, appBuilderAppDataRecordLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

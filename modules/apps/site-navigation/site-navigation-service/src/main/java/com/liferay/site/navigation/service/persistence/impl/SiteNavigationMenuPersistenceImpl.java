@@ -58,7 +58,6 @@ import com.liferay.site.navigation.service.persistence.impl.constants.SiteNaviga
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -8217,12 +8216,12 @@ public class SiteNavigationMenuPersistenceImpl
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"groupId", "auto_"}, false);
 
-		_setSiteNavigationMenuUtilPersistence(this);
+		SiteNavigationMenuUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSiteNavigationMenuUtilPersistence(null);
+		SiteNavigationMenuUtil.setPersistence(null);
 
 		entityCache.removeCache(SiteNavigationMenuImpl.class.getName());
 
@@ -8232,22 +8231,6 @@ public class SiteNavigationMenuPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSiteNavigationMenuUtilPersistence(
-		SiteNavigationMenuPersistence siteNavigationMenuPersistence) {
-
-		try {
-			Field field = SiteNavigationMenuUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, siteNavigationMenuPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

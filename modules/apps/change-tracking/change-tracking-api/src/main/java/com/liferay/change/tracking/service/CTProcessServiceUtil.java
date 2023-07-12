@@ -66,6 +66,10 @@ public class CTProcessServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CTProcessService service) {
+		_service = service;
+	}
+
 	private static volatile CTProcessService _service;
 
 }

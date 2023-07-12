@@ -1588,6 +1588,10 @@ public class DispatchTriggerUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(DispatchTriggerPersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile DispatchTriggerPersistence _persistence;
 
 }

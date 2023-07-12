@@ -66,8 +66,6 @@ import com.liferay.portal.workflow.kaleo.service.persistence.KaleoTransitionPers
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -429,7 +427,7 @@ public abstract class KaleoDefinitionVersionLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		KaleoDefinitionVersionLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -445,7 +443,8 @@ public abstract class KaleoDefinitionVersionLocalServiceBaseImpl
 		kaleoDefinitionVersionLocalService =
 			(KaleoDefinitionVersionLocalService)aopProxy;
 
-		_setLocalServiceUtilService(kaleoDefinitionVersionLocalService);
+		KaleoDefinitionVersionLocalServiceUtil.setService(
+			kaleoDefinitionVersionLocalService);
 	}
 
 	/**
@@ -488,23 +487,6 @@ public abstract class KaleoDefinitionVersionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		KaleoDefinitionVersionLocalService kaleoDefinitionVersionLocalService) {
-
-		try {
-			Field field =
-				KaleoDefinitionVersionLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, kaleoDefinitionVersionLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

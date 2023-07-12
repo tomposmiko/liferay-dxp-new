@@ -50,7 +50,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2710,11 +2709,11 @@ public class CommercePriceListChannelRelPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"commerceChannelId", "commercePriceListId"}, false);
 
-		_setCommercePriceListChannelRelUtilPersistence(this);
+		CommercePriceListChannelRelUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommercePriceListChannelRelUtilPersistence(null);
+		CommercePriceListChannelRelUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			CommercePriceListChannelRelImpl.class.getName());
@@ -2725,24 +2724,6 @@ public class CommercePriceListChannelRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommercePriceListChannelRelUtilPersistence(
-		CommercePriceListChannelRelPersistence
-			commercePriceListChannelRelPersistence) {
-
-		try {
-			Field field =
-				CommercePriceListChannelRelUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commercePriceListChannelRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

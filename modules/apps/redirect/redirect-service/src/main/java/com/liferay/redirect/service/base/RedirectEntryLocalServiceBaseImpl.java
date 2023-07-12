@@ -53,8 +53,6 @@ import com.liferay.redirect.service.persistence.RedirectEntryPersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -519,7 +517,7 @@ public abstract class RedirectEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		RedirectEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -534,7 +532,7 @@ public abstract class RedirectEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		redirectEntryLocalService = (RedirectEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(redirectEntryLocalService);
+		RedirectEntryLocalServiceUtil.setService(redirectEntryLocalService);
 	}
 
 	/**
@@ -576,22 +574,6 @@ public abstract class RedirectEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		RedirectEntryLocalService redirectEntryLocalService) {
-
-		try {
-			Field field = RedirectEntryLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, redirectEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

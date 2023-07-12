@@ -55,7 +55,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6821,11 +6820,11 @@ public class DLFileVersionPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "title", "version"}, false);
 
-		_setDLFileVersionUtilPersistence(this);
+		DLFileVersionUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setDLFileVersionUtilPersistence(null);
+		DLFileVersionUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFileVersionImpl.class.getName());
 
@@ -6835,22 +6834,6 @@ public class DLFileVersionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDLFileVersionUtilPersistence(
-		DLFileVersionPersistence dlFileVersionPersistence) {
-
-		try {
-			Field field = DLFileVersionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, dlFileVersionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -356,6 +356,7 @@ const Main = ({
 		name={name}
 		readOnly={readOnly}
 		spritemap={spritemap}
+		style={null}
 	>
 		<DatePicker
 			defaultLanguageId={defaultLanguageId}

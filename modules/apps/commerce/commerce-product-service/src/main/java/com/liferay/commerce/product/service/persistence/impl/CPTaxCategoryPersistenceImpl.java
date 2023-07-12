@@ -50,7 +50,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1504,11 +1503,11 @@ public class CPTaxCategoryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setCPTaxCategoryUtilPersistence(this);
+		CPTaxCategoryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCPTaxCategoryUtilPersistence(null);
+		CPTaxCategoryUtil.setPersistence(null);
 
 		entityCache.removeCache(CPTaxCategoryImpl.class.getName());
 
@@ -1518,22 +1517,6 @@ public class CPTaxCategoryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCPTaxCategoryUtilPersistence(
-		CPTaxCategoryPersistence cpTaxCategoryPersistence) {
-
-		try {
-			Field field = CPTaxCategoryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cpTaxCategoryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

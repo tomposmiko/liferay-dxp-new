@@ -53,7 +53,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4619,11 +4618,11 @@ public class PhonePersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "primary_"},
 			false);
 
-		_setPhoneUtilPersistence(this);
+		PhoneUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setPhoneUtilPersistence(null);
+		PhoneUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(PhoneImpl.class.getName());
 
@@ -4633,19 +4632,6 @@ public class PhonePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setPhoneUtilPersistence(PhonePersistence phonePersistence) {
-		try {
-			Field field = PhoneUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, phonePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

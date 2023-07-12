@@ -50,7 +50,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -4897,11 +4896,11 @@ public class CommerceWishListPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "defaultWishList"}, false);
 
-		_setCommerceWishListUtilPersistence(this);
+		CommerceWishListUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceWishListUtilPersistence(null);
+		CommerceWishListUtil.setPersistence(null);
 
 		entityCache.removeCache(CommerceWishListImpl.class.getName());
 
@@ -4911,22 +4910,6 @@ public class CommerceWishListPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceWishListUtilPersistence(
-		CommerceWishListPersistence commerceWishListPersistence) {
-
-		try {
-			Field field = CommerceWishListUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceWishListPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

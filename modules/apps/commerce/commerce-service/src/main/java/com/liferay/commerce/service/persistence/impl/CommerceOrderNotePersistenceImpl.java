@@ -50,7 +50,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2097,11 +2096,11 @@ public class CommerceOrderNotePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setCommerceOrderNoteUtilPersistence(this);
+		CommerceOrderNoteUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceOrderNoteUtilPersistence(null);
+		CommerceOrderNoteUtil.setPersistence(null);
 
 		entityCache.removeCache(CommerceOrderNoteImpl.class.getName());
 
@@ -2111,22 +2110,6 @@ public class CommerceOrderNotePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceOrderNoteUtilPersistence(
-		CommerceOrderNotePersistence commerceOrderNotePersistence) {
-
-		try {
-			Field field = CommerceOrderNoteUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceOrderNotePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

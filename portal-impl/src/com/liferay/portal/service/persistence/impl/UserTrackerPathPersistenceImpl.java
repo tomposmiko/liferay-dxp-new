@@ -49,7 +49,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -1161,11 +1160,11 @@ public class UserTrackerPathPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"userTrackerId"},
 			false);
 
-		_setUserTrackerPathUtilPersistence(this);
+		UserTrackerPathUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setUserTrackerPathUtilPersistence(null);
+		UserTrackerPathUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(UserTrackerPathImpl.class.getName());
 
@@ -1175,22 +1174,6 @@ public class UserTrackerPathPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setUserTrackerPathUtilPersistence(
-		UserTrackerPathPersistence userTrackerPathPersistence) {
-
-		try {
-			Field field = UserTrackerPathUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, userTrackerPathPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -233,6 +233,10 @@ public class CommerceInventoryWarehouseServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CommerceInventoryWarehouseService service) {
+		_service = service;
+	}
+
 	private static volatile CommerceInventoryWarehouseService _service;
 
 }

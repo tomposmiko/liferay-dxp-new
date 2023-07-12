@@ -52,7 +52,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2620,12 +2619,12 @@ public class MDRActionPersistenceImpl
 			"countByRuleGroupInstanceId", new String[] {Long.class.getName()},
 			new String[] {"ruleGroupInstanceId"}, false);
 
-		_setMDRActionUtilPersistence(this);
+		MDRActionUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMDRActionUtilPersistence(null);
+		MDRActionUtil.setPersistence(null);
 
 		entityCache.removeCache(MDRActionImpl.class.getName());
 
@@ -2635,21 +2634,6 @@ public class MDRActionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setMDRActionUtilPersistence(
-		MDRActionPersistence mdrActionPersistence) {
-
-		try {
-			Field field = MDRActionUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mdrActionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

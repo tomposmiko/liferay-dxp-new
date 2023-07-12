@@ -374,6 +374,10 @@ public class DLAppHelperLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(DLAppHelperLocalService service) {
+		_service = service;
+	}
+
 	private static volatile DLAppHelperLocalService _service;
 
 }

@@ -50,7 +50,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1968,11 +1967,11 @@ public class AnnouncementsFlagPersistenceImpl
 			},
 			new String[] {"userId", "entryId", "value"}, false);
 
-		_setAnnouncementsFlagUtilPersistence(this);
+		AnnouncementsFlagUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setAnnouncementsFlagUtilPersistence(null);
+		AnnouncementsFlagUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(AnnouncementsFlagImpl.class.getName());
 
@@ -1982,22 +1981,6 @@ public class AnnouncementsFlagPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setAnnouncementsFlagUtilPersistence(
-		AnnouncementsFlagPersistence announcementsFlagPersistence) {
-
-		try {
-			Field field = AnnouncementsFlagUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, announcementsFlagPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

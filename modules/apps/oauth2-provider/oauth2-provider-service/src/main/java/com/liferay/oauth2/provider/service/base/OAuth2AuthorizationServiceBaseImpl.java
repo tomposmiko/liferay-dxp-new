@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
 
-import java.lang.reflect.Field;
-
 import javax.sql.DataSource;
 
 import org.osgi.service.component.annotations.Deactivate;
@@ -62,7 +60,7 @@ public abstract class OAuth2AuthorizationServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		_setServiceUtilService(null);
+		OAuth2AuthorizationServiceUtil.setService(null);
 	}
 
 	@Override
@@ -76,7 +74,7 @@ public abstract class OAuth2AuthorizationServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		oAuth2AuthorizationService = (OAuth2AuthorizationService)aopProxy;
 
-		_setServiceUtilService(oAuth2AuthorizationService);
+		OAuth2AuthorizationServiceUtil.setService(oAuth2AuthorizationService);
 	}
 
 	/**
@@ -119,22 +117,6 @@ public abstract class OAuth2AuthorizationServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setServiceUtilService(
-		OAuth2AuthorizationService oAuth2AuthorizationService) {
-
-		try {
-			Field field = OAuth2AuthorizationServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, oAuth2AuthorizationService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

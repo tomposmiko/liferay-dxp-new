@@ -59,7 +59,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -16062,11 +16061,11 @@ public class DLFileEntryPersistenceImpl
 			},
 			false);
 
-		_setDLFileEntryUtilPersistence(this);
+		DLFileEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setDLFileEntryUtilPersistence(null);
+		DLFileEntryUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFileEntryImpl.class.getName());
 
@@ -16076,22 +16075,6 @@ public class DLFileEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDLFileEntryUtilPersistence(
-		DLFileEntryPersistence dlFileEntryPersistence) {
-
-		try {
-			Field field = DLFileEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, dlFileEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

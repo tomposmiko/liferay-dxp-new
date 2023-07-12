@@ -50,7 +50,6 @@ import com.liferay.social.kernel.service.persistence.SocialActivityLimitUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2949,11 +2948,11 @@ public class SocialActivityLimitPersistenceImpl
 			},
 			false);
 
-		_setSocialActivityLimitUtilPersistence(this);
+		SocialActivityLimitUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setSocialActivityLimitUtilPersistence(null);
+		SocialActivityLimitUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(SocialActivityLimitImpl.class.getName());
 
@@ -2963,22 +2962,6 @@ public class SocialActivityLimitPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSocialActivityLimitUtilPersistence(
-		SocialActivityLimitPersistence socialActivityLimitPersistence) {
-
-		try {
-			Field field = SocialActivityLimitUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, socialActivityLimitPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

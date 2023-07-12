@@ -55,7 +55,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4569,11 +4568,11 @@ public class LayoutPrototypePersistenceImpl
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"companyId", "active_"}, false);
 
-		_setLayoutPrototypeUtilPersistence(this);
+		LayoutPrototypeUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setLayoutPrototypeUtilPersistence(null);
+		LayoutPrototypeUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(LayoutPrototypeImpl.class.getName());
 
@@ -4583,22 +4582,6 @@ public class LayoutPrototypePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLayoutPrototypeUtilPersistence(
-		LayoutPrototypePersistence layoutPrototypePersistence) {
-
-		try {
-			Field field = LayoutPrototypeUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutPrototypePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

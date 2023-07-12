@@ -66,7 +66,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -10903,11 +10902,11 @@ public class OrganizationPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setOrganizationUtilPersistence(this);
+		OrganizationUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setOrganizationUtilPersistence(null);
+		OrganizationUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(OrganizationImpl.class.getName());
 
@@ -10921,22 +10920,6 @@ public class OrganizationPersistenceImpl
 
 		TableMapperFactory.removeTableMapper("Groups_Orgs");
 		TableMapperFactory.removeTableMapper("Users_Orgs");
-	}
-
-	private void _setOrganizationUtilPersistence(
-		OrganizationPersistence organizationPersistence) {
-
-		try {
-			Field field = OrganizationUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, organizationPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@BeanReference(type = GroupPersistence.class)

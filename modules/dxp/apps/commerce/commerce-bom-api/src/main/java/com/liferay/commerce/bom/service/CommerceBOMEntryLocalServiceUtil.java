@@ -340,6 +340,10 @@ public class CommerceBOMEntryLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CommerceBOMEntryLocalService service) {
+		_service = service;
+	}
+
 	private static volatile CommerceBOMEntryLocalService _service;
 
 }

@@ -52,7 +52,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -7390,11 +7389,11 @@ public class CPInstancePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setCPInstanceUtilPersistence(this);
+		CPInstanceUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCPInstanceUtilPersistence(null);
+		CPInstanceUtil.setPersistence(null);
 
 		entityCache.removeCache(CPInstanceImpl.class.getName());
 
@@ -7404,21 +7403,6 @@ public class CPInstancePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCPInstanceUtilPersistence(
-		CPInstancePersistence cpInstancePersistence) {
-
-		try {
-			Field field = CPInstanceUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cpInstancePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

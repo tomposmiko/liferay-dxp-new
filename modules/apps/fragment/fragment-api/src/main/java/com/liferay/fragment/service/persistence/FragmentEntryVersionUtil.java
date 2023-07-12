@@ -5173,6 +5173,12 @@ public class FragmentEntryVersionUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		FragmentEntryVersionPersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile FragmentEntryVersionPersistence _persistence;
 
 }

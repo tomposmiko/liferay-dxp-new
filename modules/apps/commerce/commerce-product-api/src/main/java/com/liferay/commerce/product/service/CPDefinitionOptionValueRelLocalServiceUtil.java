@@ -628,6 +628,12 @@ public class CPDefinitionOptionValueRelLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(
+		CPDefinitionOptionValueRelLocalService service) {
+
+		_service = service;
+	}
+
 	private static volatile CPDefinitionOptionValueRelLocalService _service;
 
 }

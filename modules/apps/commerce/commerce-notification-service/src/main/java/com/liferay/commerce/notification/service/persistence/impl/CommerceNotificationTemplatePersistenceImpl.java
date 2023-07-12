@@ -52,7 +52,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -5215,11 +5214,11 @@ public class CommerceNotificationTemplatePersistenceImpl
 			},
 			new String[] {"groupId", "type_", "enabled"}, false);
 
-		_setCommerceNotificationTemplateUtilPersistence(this);
+		CommerceNotificationTemplateUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceNotificationTemplateUtilPersistence(null);
+		CommerceNotificationTemplateUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			CommerceNotificationTemplateImpl.class.getName());
@@ -5230,24 +5229,6 @@ public class CommerceNotificationTemplatePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceNotificationTemplateUtilPersistence(
-		CommerceNotificationTemplatePersistence
-			commerceNotificationTemplatePersistence) {
-
-		try {
-			Field field =
-				CommerceNotificationTemplateUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceNotificationTemplatePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -52,7 +52,6 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1506,12 +1505,12 @@ public class AccountGroupPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setAccountGroupUtilPersistence(this);
+		AccountGroupUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setAccountGroupUtilPersistence(null);
+		AccountGroupUtil.setPersistence(null);
 
 		entityCache.removeCache(AccountGroupImpl.class.getName());
 
@@ -1521,22 +1520,6 @@ public class AccountGroupPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setAccountGroupUtilPersistence(
-		AccountGroupPersistence accountGroupPersistence) {
-
-		try {
-			Field field = AccountGroupUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, accountGroupPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

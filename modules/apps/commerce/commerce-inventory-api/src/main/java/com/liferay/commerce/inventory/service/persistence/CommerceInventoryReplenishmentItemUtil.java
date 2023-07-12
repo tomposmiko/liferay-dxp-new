@@ -1275,6 +1275,12 @@ public class CommerceInventoryReplenishmentItemUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		CommerceInventoryReplenishmentItemPersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile CommerceInventoryReplenishmentItemPersistence
 		_persistence;
 

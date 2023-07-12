@@ -51,7 +51,6 @@ import com.liferay.social.kernel.service.persistence.SocialActivitySettingUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3585,11 +3584,11 @@ public class SocialActivitySettingPersistenceImpl
 			new String[] {"groupId", "classNameId", "activityType", "name"},
 			false);
 
-		_setSocialActivitySettingUtilPersistence(this);
+		SocialActivitySettingUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setSocialActivitySettingUtilPersistence(null);
+		SocialActivitySettingUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(SocialActivitySettingImpl.class.getName());
 
@@ -3599,22 +3598,6 @@ public class SocialActivitySettingPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSocialActivitySettingUtilPersistence(
-		SocialActivitySettingPersistence socialActivitySettingPersistence) {
-
-		try {
-			Field field = SocialActivitySettingUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, socialActivitySettingPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

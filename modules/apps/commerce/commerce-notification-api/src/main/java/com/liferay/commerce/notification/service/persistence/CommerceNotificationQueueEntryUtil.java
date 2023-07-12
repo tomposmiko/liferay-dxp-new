@@ -1248,6 +1248,12 @@ public class CommerceNotificationQueueEntryUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		CommerceNotificationQueueEntryPersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile CommerceNotificationQueueEntryPersistence
 		_persistence;
 

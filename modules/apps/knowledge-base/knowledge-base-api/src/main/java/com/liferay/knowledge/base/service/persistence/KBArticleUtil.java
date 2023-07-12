@@ -10522,6 +10522,10 @@ public class KBArticleUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(KBArticlePersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile KBArticlePersistence _persistence;
 
 }

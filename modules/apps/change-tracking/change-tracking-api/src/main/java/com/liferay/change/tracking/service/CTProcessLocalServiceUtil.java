@@ -309,6 +309,10 @@ public class CTProcessLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CTProcessLocalService service) {
+		_service = service;
+	}
+
 	private static volatile CTProcessLocalService _service;
 
 }

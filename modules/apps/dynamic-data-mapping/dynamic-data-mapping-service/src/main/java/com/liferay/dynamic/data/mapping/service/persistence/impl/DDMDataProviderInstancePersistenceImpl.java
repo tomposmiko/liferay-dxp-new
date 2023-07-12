@@ -58,7 +58,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -4398,12 +4397,12 @@ public class DDMDataProviderInstancePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_setDDMDataProviderInstanceUtilPersistence(this);
+		DDMDataProviderInstanceUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMDataProviderInstanceUtilPersistence(null);
+		DDMDataProviderInstanceUtil.setPersistence(null);
 
 		entityCache.removeCache(DDMDataProviderInstanceImpl.class.getName());
 
@@ -4413,22 +4412,6 @@ public class DDMDataProviderInstancePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDDMDataProviderInstanceUtilPersistence(
-		DDMDataProviderInstancePersistence ddmDataProviderInstancePersistence) {
-
-		try {
-			Field field = DDMDataProviderInstanceUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmDataProviderInstancePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

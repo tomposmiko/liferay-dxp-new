@@ -49,7 +49,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -1719,11 +1718,11 @@ public class UserIdMapperPersistenceImpl
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"type_", "externalUserId"}, false);
 
-		_setUserIdMapperUtilPersistence(this);
+		UserIdMapperUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setUserIdMapperUtilPersistence(null);
+		UserIdMapperUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(UserIdMapperImpl.class.getName());
 
@@ -1733,22 +1732,6 @@ public class UserIdMapperPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setUserIdMapperUtilPersistence(
-		UserIdMapperPersistence userIdMapperPersistence) {
-
-		try {
-			Field field = UserIdMapperUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, userIdMapperPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

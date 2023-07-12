@@ -53,7 +53,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -3120,12 +3119,12 @@ public class CalendarNotificationTemplatePersistenceImpl
 			},
 			false);
 
-		_setCalendarNotificationTemplateUtilPersistence(this);
+		CalendarNotificationTemplateUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCalendarNotificationTemplateUtilPersistence(null);
+		CalendarNotificationTemplateUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			CalendarNotificationTemplateImpl.class.getName());
@@ -3136,24 +3135,6 @@ public class CalendarNotificationTemplatePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCalendarNotificationTemplateUtilPersistence(
-		CalendarNotificationTemplatePersistence
-			calendarNotificationTemplatePersistence) {
-
-		try {
-			Field field =
-				CalendarNotificationTemplateUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, calendarNotificationTemplatePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

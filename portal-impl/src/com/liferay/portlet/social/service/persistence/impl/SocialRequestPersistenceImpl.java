@@ -53,7 +53,6 @@ import com.liferay.social.kernel.service.persistence.SocialRequestUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -7467,11 +7466,11 @@ public class SocialRequestPersistenceImpl
 			},
 			false);
 
-		_setSocialRequestUtilPersistence(this);
+		SocialRequestUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setSocialRequestUtilPersistence(null);
+		SocialRequestUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(SocialRequestImpl.class.getName());
 
@@ -7481,22 +7480,6 @@ public class SocialRequestPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSocialRequestUtilPersistence(
-		SocialRequestPersistence socialRequestPersistence) {
-
-		try {
-			Field field = SocialRequestUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, socialRequestPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

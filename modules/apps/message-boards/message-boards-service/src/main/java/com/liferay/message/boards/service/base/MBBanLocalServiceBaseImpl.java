@@ -56,8 +56,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -507,7 +505,7 @@ public abstract class MBBanLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		MBBanLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -522,7 +520,7 @@ public abstract class MBBanLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		mbBanLocalService = (MBBanLocalService)aopProxy;
 
-		_setLocalServiceUtilService(mbBanLocalService);
+		MBBanLocalServiceUtil.setService(mbBanLocalService);
 	}
 
 	/**
@@ -578,22 +576,6 @@ public abstract class MBBanLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		MBBanLocalService mbBanLocalService) {
-
-		try {
-			Field field = MBBanLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, mbBanLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

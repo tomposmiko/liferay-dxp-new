@@ -51,7 +51,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3455,12 +3454,12 @@ public class CTSContentPersistenceImpl
 			},
 			false);
 
-		_setCTSContentUtilPersistence(this);
+		CTSContentUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCTSContentUtilPersistence(null);
+		CTSContentUtil.setPersistence(null);
 
 		entityCache.removeCache(CTSContentImpl.class.getName());
 
@@ -3470,21 +3469,6 @@ public class CTSContentPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCTSContentUtilPersistence(
-		CTSContentPersistence ctsContentPersistence) {
-
-		try {
-			Field field = CTSContentUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ctsContentPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

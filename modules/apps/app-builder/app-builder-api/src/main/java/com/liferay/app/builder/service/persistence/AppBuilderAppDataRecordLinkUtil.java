@@ -828,6 +828,12 @@ public class AppBuilderAppDataRecordLinkUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		AppBuilderAppDataRecordLinkPersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile AppBuilderAppDataRecordLinkPersistence _persistence;
 
 }

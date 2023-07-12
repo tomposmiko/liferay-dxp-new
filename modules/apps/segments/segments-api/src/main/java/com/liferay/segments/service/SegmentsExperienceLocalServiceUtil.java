@@ -532,6 +532,10 @@ public class SegmentsExperienceLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(SegmentsExperienceLocalService service) {
+		_service = service;
+	}
+
 	private static volatile SegmentsExperienceLocalService _service;
 
 }

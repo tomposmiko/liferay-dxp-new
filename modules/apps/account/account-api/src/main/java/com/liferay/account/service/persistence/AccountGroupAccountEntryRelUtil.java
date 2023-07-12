@@ -727,6 +727,12 @@ public class AccountGroupAccountEntryRelUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		AccountGroupAccountEntryRelPersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile AccountGroupAccountEntryRelPersistence _persistence;
 
 }

@@ -58,7 +58,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -34288,12 +34287,12 @@ public class JournalArticlePersistenceImpl
 			new String[] {"groupId", "folderId", "classNameId", "status"},
 			false);
 
-		_setJournalArticleUtilPersistence(this);
+		JournalArticleUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setJournalArticleUtilPersistence(null);
+		JournalArticleUtil.setPersistence(null);
 
 		entityCache.removeCache(JournalArticleImpl.class.getName());
 
@@ -34303,22 +34302,6 @@ public class JournalArticlePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setJournalArticleUtilPersistence(
-		JournalArticlePersistence journalArticlePersistence) {
-
-		try {
-			Field field = JournalArticleUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, journalArticlePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

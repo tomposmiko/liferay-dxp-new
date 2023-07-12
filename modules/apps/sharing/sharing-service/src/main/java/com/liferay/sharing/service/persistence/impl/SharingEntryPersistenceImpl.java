@@ -52,7 +52,6 @@ import com.liferay.sharing.service.persistence.impl.constants.SharingPersistence
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -6127,12 +6126,12 @@ public class SharingEntryPersistenceImpl
 			},
 			new String[] {"toUserId", "classNameId", "classPK"}, false);
 
-		_setSharingEntryUtilPersistence(this);
+		SharingEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSharingEntryUtilPersistence(null);
+		SharingEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(SharingEntryImpl.class.getName());
 
@@ -6142,22 +6141,6 @@ public class SharingEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSharingEntryUtilPersistence(
-		SharingEntryPersistence sharingEntryPersistence) {
-
-		try {
-			Field field = SharingEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, sharingEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

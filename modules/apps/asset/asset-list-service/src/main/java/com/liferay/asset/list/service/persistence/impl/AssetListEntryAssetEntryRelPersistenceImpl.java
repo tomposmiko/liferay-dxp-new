@@ -56,7 +56,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -4871,12 +4870,12 @@ public class AssetListEntryAssetEntryRelPersistenceImpl
 			new String[] {"assetListEntryId", "segmentsEntryId", "position"},
 			false);
 
-		_setAssetListEntryAssetEntryRelUtilPersistence(this);
+		AssetListEntryAssetEntryRelUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setAssetListEntryAssetEntryRelUtilPersistence(null);
+		AssetListEntryAssetEntryRelUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			AssetListEntryAssetEntryRelImpl.class.getName());
@@ -4887,24 +4886,6 @@ public class AssetListEntryAssetEntryRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setAssetListEntryAssetEntryRelUtilPersistence(
-		AssetListEntryAssetEntryRelPersistence
-			assetListEntryAssetEntryRelPersistence) {
-
-		try {
-			Field field =
-				AssetListEntryAssetEntryRelUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, assetListEntryAssetEntryRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

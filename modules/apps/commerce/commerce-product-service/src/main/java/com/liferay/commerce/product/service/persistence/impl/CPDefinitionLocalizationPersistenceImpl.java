@@ -51,7 +51,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1528,11 +1527,11 @@ public class CPDefinitionLocalizationPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"CPDefinitionId", "languageId"}, false);
 
-		_setCPDefinitionLocalizationUtilPersistence(this);
+		CPDefinitionLocalizationUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCPDefinitionLocalizationUtilPersistence(null);
+		CPDefinitionLocalizationUtil.setPersistence(null);
 
 		entityCache.removeCache(CPDefinitionLocalizationImpl.class.getName());
 
@@ -1542,23 +1541,6 @@ public class CPDefinitionLocalizationPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCPDefinitionLocalizationUtilPersistence(
-		CPDefinitionLocalizationPersistence
-			cpDefinitionLocalizationPersistence) {
-
-		try {
-			Field field = CPDefinitionLocalizationUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cpDefinitionLocalizationPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

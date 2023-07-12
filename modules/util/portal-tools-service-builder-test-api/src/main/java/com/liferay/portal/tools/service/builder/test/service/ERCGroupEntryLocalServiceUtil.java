@@ -384,6 +384,10 @@ public class ERCGroupEntryLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(ERCGroupEntryLocalService service) {
+		_service = service;
+	}
+
 	private static volatile ERCGroupEntryLocalService _service;
 
 }

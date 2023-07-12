@@ -60,8 +60,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -545,7 +543,7 @@ public abstract class KBCommentLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		KBCommentLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -560,7 +558,7 @@ public abstract class KBCommentLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		kbCommentLocalService = (KBCommentLocalService)aopProxy;
 
-		_setLocalServiceUtilService(kbCommentLocalService);
+		KBCommentLocalServiceUtil.setService(kbCommentLocalService);
 	}
 
 	/**
@@ -602,22 +600,6 @@ public abstract class KBCommentLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		KBCommentLocalService kbCommentLocalService) {
-
-		try {
-			Field field = KBCommentLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, kbCommentLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

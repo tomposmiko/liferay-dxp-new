@@ -42,7 +42,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.NullCon
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -893,11 +892,11 @@ public class NullConvertibleEntryPersistenceImpl
 			new String[] {String.class.getName()}, new String[] {"name"},
 			false);
 
-		_setNullConvertibleEntryUtilPersistence(this);
+		NullConvertibleEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setNullConvertibleEntryUtilPersistence(null);
+		NullConvertibleEntryUtil.setPersistence(null);
 
 		dummyEntityCache.removeCache(NullConvertibleEntryImpl.class.getName());
 
@@ -907,22 +906,6 @@ public class NullConvertibleEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setNullConvertibleEntryUtilPersistence(
-		NullConvertibleEntryPersistence nullConvertibleEntryPersistence) {
-
-		try {
-			Field field = NullConvertibleEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, nullConvertibleEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

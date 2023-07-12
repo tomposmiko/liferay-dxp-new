@@ -196,7 +196,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/2016");
+			fieldValue = 05022016);
 
 		AppBuilderAdmin.save();
 
@@ -236,7 +236,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/2000");
+			fieldValue = 05022000);
 
 		AppBuilderAdmin.save();
 
@@ -308,7 +308,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/1999");
+			fieldValue = 05021999);
 
 		AppBuilderAdmin.save();
 
@@ -340,7 +340,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/1989");
+			fieldValue = 05021989);
 
 		AppBuilderAdmin.cancel();
 
@@ -502,7 +502,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/2016");
+			fieldValue = 05022016);
 
 		AppBuilderAdmin.save();
 
@@ -542,7 +542,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/2000");
+			fieldValue = 05022000);
 
 		AppBuilderAdmin.save();
 
@@ -614,7 +614,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/1999");
+			fieldValue = 05021999);
 
 		AppBuilderAdmin.save();
 
@@ -646,7 +646,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/1989");
+			fieldValue = 05021989);
 
 		AppBuilderAdmin.cancel();
 
@@ -821,7 +821,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/2016");
+			fieldValue = 05022016);
 
 		AppBuilderAdmin.save();
 
@@ -865,7 +865,7 @@ definition {
 
 		FormViewBuilder.editDate(
 			fieldName = "Date of birth",
-			fieldValue = "05/02/2014");
+			fieldValue = 05022014);
 
 		AppBuilderAdmin.save();
 

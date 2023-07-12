@@ -142,7 +142,7 @@ const Main = ({
 	const [state, setState] = useState(value);
 
 	return (
-		<FieldBase name={name} readOnly={readOnly} {...otherProps}>
+		<FieldBase {...otherProps} name={name} readOnly={readOnly} style={null}>
 			<Grid
 				columns={columns}
 				disabled={readOnly}

@@ -48,7 +48,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -1347,12 +1346,12 @@ public class DLSyncEventPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"typePK"},
 			false);
 
-		_setDLSyncEventUtilPersistence(this);
+		DLSyncEventUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDLSyncEventUtilPersistence(null);
+		DLSyncEventUtil.setPersistence(null);
 
 		entityCache.removeCache(DLSyncEventImpl.class.getName());
 
@@ -1362,22 +1361,6 @@ public class DLSyncEventPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDLSyncEventUtilPersistence(
-		DLSyncEventPersistence dlSyncEventPersistence) {
-
-		try {
-			Field field = DLSyncEventUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, dlSyncEventPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

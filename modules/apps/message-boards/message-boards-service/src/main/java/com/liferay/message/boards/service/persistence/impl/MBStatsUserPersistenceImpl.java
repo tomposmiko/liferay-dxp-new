@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2756,12 +2755,12 @@ public class MBStatsUserPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "messageCount"}, false);
 
-		_setMBStatsUserUtilPersistence(this);
+		MBStatsUserUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMBStatsUserUtilPersistence(null);
+		MBStatsUserUtil.setPersistence(null);
 
 		entityCache.removeCache(MBStatsUserImpl.class.getName());
 
@@ -2771,22 +2770,6 @@ public class MBStatsUserPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setMBStatsUserUtilPersistence(
-		MBStatsUserPersistence mbStatsUserPersistence) {
-
-		try {
-			Field field = MBStatsUserUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mbStatsUserPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -56,8 +56,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -733,14 +731,15 @@ public abstract class CPDefinitionGroupedEntryLocalServiceBaseImpl
 			"com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry",
 			cpDefinitionGroupedEntryLocalService);
 
-		_setLocalServiceUtilService(cpDefinitionGroupedEntryLocalService);
+		CPDefinitionGroupedEntryLocalServiceUtil.setService(
+			cpDefinitionGroupedEntryLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry");
 
-		_setLocalServiceUtilService(null);
+		CPDefinitionGroupedEntryLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -783,24 +782,6 @@ public abstract class CPDefinitionGroupedEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		CPDefinitionGroupedEntryLocalService
-			cpDefinitionGroupedEntryLocalService) {
-
-		try {
-			Field field =
-				CPDefinitionGroupedEntryLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, cpDefinitionGroupedEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -48,7 +48,6 @@ import com.liferay.sync.service.persistence.impl.constants.SyncPersistenceConsta
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -2049,12 +2048,12 @@ public class SyncDLFileVersionDiffPersistenceImpl
 			},
 			false);
 
-		_setSyncDLFileVersionDiffUtilPersistence(this);
+		SyncDLFileVersionDiffUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSyncDLFileVersionDiffUtilPersistence(null);
+		SyncDLFileVersionDiffUtil.setPersistence(null);
 
 		entityCache.removeCache(SyncDLFileVersionDiffImpl.class.getName());
 
@@ -2064,22 +2063,6 @@ public class SyncDLFileVersionDiffPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSyncDLFileVersionDiffUtilPersistence(
-		SyncDLFileVersionDiffPersistence syncDLFileVersionDiffPersistence) {
-
-		try {
-			Field field = SyncDLFileVersionDiffUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, syncDLFileVersionDiffPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

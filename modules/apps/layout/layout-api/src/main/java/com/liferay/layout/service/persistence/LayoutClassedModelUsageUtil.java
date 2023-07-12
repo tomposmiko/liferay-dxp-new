@@ -1568,6 +1568,12 @@ public class LayoutClassedModelUsageUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(
+		LayoutClassedModelUsagePersistence persistence) {
+
+		_persistence = persistence;
+	}
+
 	private static volatile LayoutClassedModelUsagePersistence _persistence;
 
 }

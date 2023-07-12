@@ -49,8 +49,6 @@ import com.liferay.portal.workflow.kaleo.forms.service.persistence.KaleoProcessP
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -393,7 +391,7 @@ public abstract class KaleoProcessLinkLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		KaleoProcessLinkLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -408,7 +406,8 @@ public abstract class KaleoProcessLinkLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		kaleoProcessLinkLocalService = (KaleoProcessLinkLocalService)aopProxy;
 
-		_setLocalServiceUtilService(kaleoProcessLinkLocalService);
+		KaleoProcessLinkLocalServiceUtil.setService(
+			kaleoProcessLinkLocalService);
 	}
 
 	/**
@@ -450,23 +449,6 @@ public abstract class KaleoProcessLinkLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		KaleoProcessLinkLocalService kaleoProcessLinkLocalService) {
-
-		try {
-			Field field =
-				KaleoProcessLinkLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, kaleoProcessLinkLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

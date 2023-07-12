@@ -51,7 +51,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -3083,11 +3082,11 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setCommerceInventoryWarehouseItemUtilPersistence(this);
+		CommerceInventoryWarehouseItemUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceInventoryWarehouseItemUtilPersistence(null);
+		CommerceInventoryWarehouseItemUtil.setPersistence(null);
 
 		entityCache.removeCache(
 			CommerceInventoryWarehouseItemImpl.class.getName());
@@ -3098,24 +3097,6 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceInventoryWarehouseItemUtilPersistence(
-		CommerceInventoryWarehouseItemPersistence
-			commerceInventoryWarehouseItemPersistence) {
-
-		try {
-			Field field =
-				CommerceInventoryWarehouseItemUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceInventoryWarehouseItemPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

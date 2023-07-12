@@ -55,8 +55,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -521,7 +519,7 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		MDRRuleGroupLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -536,7 +534,7 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		mdrRuleGroupLocalService = (MDRRuleGroupLocalService)aopProxy;
 
-		_setLocalServiceUtilService(mdrRuleGroupLocalService);
+		MDRRuleGroupLocalServiceUtil.setService(mdrRuleGroupLocalService);
 	}
 
 	/**
@@ -578,22 +576,6 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		MDRRuleGroupLocalService mdrRuleGroupLocalService) {
-
-		try {
-			Field field = MDRRuleGroupLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, mdrRuleGroupLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

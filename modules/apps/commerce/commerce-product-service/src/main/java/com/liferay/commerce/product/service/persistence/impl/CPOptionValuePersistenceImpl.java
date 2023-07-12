@@ -52,7 +52,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -3469,11 +3468,11 @@ public class CPOptionValuePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setCPOptionValueUtilPersistence(this);
+		CPOptionValueUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCPOptionValueUtilPersistence(null);
+		CPOptionValueUtil.setPersistence(null);
 
 		entityCache.removeCache(CPOptionValueImpl.class.getName());
 
@@ -3483,22 +3482,6 @@ public class CPOptionValuePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCPOptionValueUtilPersistence(
-		CPOptionValuePersistence cpOptionValuePersistence) {
-
-		try {
-			Field field = CPOptionValueUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cpOptionValuePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -49,7 +49,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1764,11 +1763,11 @@ public class CommerceAccountUserRelPersistenceImpl
 			"countByCommerceAccountUserId", new String[] {Long.class.getName()},
 			new String[] {"commerceAccountUserId"}, false);
 
-		_setCommerceAccountUserRelUtilPersistence(this);
+		CommerceAccountUserRelUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setCommerceAccountUserRelUtilPersistence(null);
+		CommerceAccountUserRelUtil.setPersistence(null);
 
 		entityCache.removeCache(CommerceAccountUserRelImpl.class.getName());
 
@@ -1778,22 +1777,6 @@ public class CommerceAccountUserRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCommerceAccountUserRelUtilPersistence(
-		CommerceAccountUserRelPersistence commerceAccountUserRelPersistence) {
-
-		try {
-			Field field = CommerceAccountUserRelUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceAccountUserRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

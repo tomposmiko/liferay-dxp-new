@@ -55,7 +55,6 @@ import com.liferay.style.book.service.persistence.impl.constants.StyleBookPersis
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -9054,12 +9053,12 @@ public class StyleBookEntryPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"headId"},
 			false);
 
-		_setStyleBookEntryUtilPersistence(this);
+		StyleBookEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setStyleBookEntryUtilPersistence(null);
+		StyleBookEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(StyleBookEntryImpl.class.getName());
 
@@ -9069,22 +9068,6 @@ public class StyleBookEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setStyleBookEntryUtilPersistence(
-		StyleBookEntryPersistence styleBookEntryPersistence) {
-
-		try {
-			Field field = StyleBookEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, styleBookEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

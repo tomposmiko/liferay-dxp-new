@@ -53,8 +53,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -751,14 +749,15 @@ public abstract class CommerceNotificationQueueEntryLocalServiceBaseImpl
 			"com.liferay.commerce.notification.model.CommerceNotificationQueueEntry",
 			commerceNotificationQueueEntryLocalService);
 
-		_setLocalServiceUtilService(commerceNotificationQueueEntryLocalService);
+		CommerceNotificationQueueEntryLocalServiceUtil.setService(
+			commerceNotificationQueueEntryLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.notification.model.CommerceNotificationQueueEntry");
 
-		_setLocalServiceUtilService(null);
+		CommerceNotificationQueueEntryLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -801,24 +800,6 @@ public abstract class CommerceNotificationQueueEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		CommerceNotificationQueueEntryLocalService
-			commerceNotificationQueueEntryLocalService) {
-
-		try {
-			Field field =
-				CommerceNotificationQueueEntryLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceNotificationQueueEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

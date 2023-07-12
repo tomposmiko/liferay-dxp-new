@@ -847,6 +847,10 @@ public class CalendarBookingLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(CalendarBookingLocalService service) {
+		_service = service;
+	}
+
 	private static volatile CalendarBookingLocalService _service;
 
 }

@@ -53,7 +53,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4627,11 +4626,11 @@ public class WebsitePersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "primary_"},
 			false);
 
-		_setWebsiteUtilPersistence(this);
+		WebsiteUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setWebsiteUtilPersistence(null);
+		WebsiteUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(WebsiteImpl.class.getName());
 
@@ -4641,21 +4640,6 @@ public class WebsitePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setWebsiteUtilPersistence(
-		WebsitePersistence websitePersistence) {
-
-		try {
-			Field field = WebsiteUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, websitePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

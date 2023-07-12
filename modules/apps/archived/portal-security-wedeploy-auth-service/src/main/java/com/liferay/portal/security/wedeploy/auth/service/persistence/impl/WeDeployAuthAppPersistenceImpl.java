@@ -50,7 +50,6 @@ import com.liferay.portal.security.wedeploy.auth.service.persistence.impl.consta
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1308,12 +1307,12 @@ public class WeDeployAuthAppPersistenceImpl
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"clientId", "clientSecret"}, false);
 
-		_setWeDeployAuthAppUtilPersistence(this);
+		WeDeployAuthAppUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setWeDeployAuthAppUtilPersistence(null);
+		WeDeployAuthAppUtil.setPersistence(null);
 
 		entityCache.removeCache(WeDeployAuthAppImpl.class.getName());
 
@@ -1323,22 +1322,6 @@ public class WeDeployAuthAppPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setWeDeployAuthAppUtilPersistence(
-		WeDeployAuthAppPersistence weDeployAuthAppPersistence) {
-
-		try {
-			Field field = WeDeployAuthAppUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, weDeployAuthAppPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

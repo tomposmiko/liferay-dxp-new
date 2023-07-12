@@ -63,8 +63,6 @@ import com.liferay.portal.workflow.metrics.service.persistence.WorkflowMetricsSL
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -622,7 +620,7 @@ public abstract class WorkflowMetricsSLADefinitionVersionLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		WorkflowMetricsSLADefinitionVersionLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -638,7 +636,7 @@ public abstract class WorkflowMetricsSLADefinitionVersionLocalServiceBaseImpl
 		workflowMetricsSLADefinitionVersionLocalService =
 			(WorkflowMetricsSLADefinitionVersionLocalService)aopProxy;
 
-		_setLocalServiceUtilService(
+		WorkflowMetricsSLADefinitionVersionLocalServiceUtil.setService(
 			workflowMetricsSLADefinitionVersionLocalService);
 	}
 
@@ -682,24 +680,6 @@ public abstract class WorkflowMetricsSLADefinitionVersionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		WorkflowMetricsSLADefinitionVersionLocalService
-			workflowMetricsSLADefinitionVersionLocalService) {
-
-		try {
-			Field field =
-				WorkflowMetricsSLADefinitionVersionLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, workflowMetricsSLADefinitionVersionLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -58,19 +58,38 @@ const ImportSXPBlueprintModal = ({redirectURL}) => {
 					? '/o/search-experiences-rest/v1.0/sxp-elements'
 					: '/o/search-experiences-rest/v1.0/sxp-blueprints';
 
-				fetch(fetchURL, {
-					body: importText,
-					headers: DEFAULT_HEADERS,
-					method: 'POST',
+			fetch(fetchURL, {
+				body: importText,
+				headers: DEFAULT_HEADERS,
+				method: 'POST',
+			})
+				.then((response) => {
+					return response.json().then((data) => ({
+						ok: response.ok,
+						responseContent: data,
+					}));
 				})
-					.then((response) => {
-						return response.json().then((data) => ({
-							ok: response.ok,
-							responseContent: data,
-						}));
-					})
-					.then(({ok, responseContent}) => {
-						if (!ok) {
+				.then(({ok, responseContent}) => {
+					if (!ok) {
+						if (
+							responseContent.type.includes(
+								'DuplicateSXPBlueprintExternalReferenceCodeException'
+							) ||
+							responseContent.type.includes(
+								'DuplicateSXPElementExternalReferenceCodeException'
+							)
+						) {
+							_handleFormError(
+								isElement
+									? Liferay.Language.get(
+											'unable-to-import-element-with-the-same-external-reference-code-as-an-existing-element'
+									  )
+									: Liferay.Language.get(
+											'unable-to-import-blueprint-with-the-same-external-reference-code-as-an-existing-blueprint'
+									  )
+							);
+						}
+						else {
 							_handleFormError(
 								isElement
 									? Liferay.Language.get(
@@ -80,6 +99,7 @@ const ImportSXPBlueprintModal = ({redirectURL}) => {
 											'unable-to-import-because-the-blueprint-configuration-is-invalid'
 									  )
 							);
+						}
 
 							if (process.env.NODE_ENV === 'development') {
 								console.error(responseContent.title);

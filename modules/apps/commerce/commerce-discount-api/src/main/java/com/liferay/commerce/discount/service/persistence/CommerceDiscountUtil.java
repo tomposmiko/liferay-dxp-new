@@ -1995,6 +1995,10 @@ public class CommerceDiscountUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(CommerceDiscountPersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile CommerceDiscountPersistence _persistence;
 
 }

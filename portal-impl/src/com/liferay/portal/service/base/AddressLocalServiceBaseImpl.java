@@ -60,8 +60,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -727,14 +725,14 @@ public abstract class AddressLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.Address", addressLocalService);
 
-		_setLocalServiceUtilService(addressLocalService);
+		AddressLocalServiceUtil.setService(addressLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.Address");
 
-		_setLocalServiceUtilService(null);
+		AddressLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -776,22 +774,6 @@ public abstract class AddressLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		AddressLocalService addressLocalService) {
-
-		try {
-			Field field = AddressLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, addressLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

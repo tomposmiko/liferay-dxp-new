@@ -48,8 +48,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -410,7 +408,7 @@ public abstract class AccountGroupLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		AccountGroupLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -425,7 +423,7 @@ public abstract class AccountGroupLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		accountGroupLocalService = (AccountGroupLocalService)aopProxy;
 
-		_setLocalServiceUtilService(accountGroupLocalService);
+		AccountGroupLocalServiceUtil.setService(accountGroupLocalService);
 	}
 
 	/**
@@ -467,22 +465,6 @@ public abstract class AccountGroupLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		AccountGroupLocalService accountGroupLocalService) {
-
-		try {
-			Field field = AccountGroupLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, accountGroupLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

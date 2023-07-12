@@ -56,8 +56,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -704,14 +702,15 @@ public abstract class CommerceMLForecastAlertEntryLocalServiceBaseImpl
 			"com.liferay.commerce.machine.learning.forecast.alert.model.CommerceMLForecastAlertEntry",
 			commerceMLForecastAlertEntryLocalService);
 
-		_setLocalServiceUtilService(commerceMLForecastAlertEntryLocalService);
+		CommerceMLForecastAlertEntryLocalServiceUtil.setService(
+			commerceMLForecastAlertEntryLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.machine.learning.forecast.alert.model.CommerceMLForecastAlertEntry");
 
-		_setLocalServiceUtilService(null);
+		CommerceMLForecastAlertEntryLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -754,24 +753,6 @@ public abstract class CommerceMLForecastAlertEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		CommerceMLForecastAlertEntryLocalService
-			commerceMLForecastAlertEntryLocalService) {
-
-		try {
-			Field field =
-				CommerceMLForecastAlertEntryLocalServiceUtil.class.
-					getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceMLForecastAlertEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -63,7 +63,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -15868,11 +15867,11 @@ public class GroupPersistenceImpl
 			},
 			false);
 
-		_setGroupUtilPersistence(this);
+		GroupUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setGroupUtilPersistence(null);
+		GroupUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(GroupImpl.class.getName());
 
@@ -15888,19 +15887,6 @@ public class GroupPersistenceImpl
 		TableMapperFactory.removeTableMapper("Groups_Roles");
 		TableMapperFactory.removeTableMapper("Groups_UserGroups");
 		TableMapperFactory.removeTableMapper("Users_Groups");
-	}
-
-	private void _setGroupUtilPersistence(GroupPersistence groupPersistence) {
-		try {
-			Field field = GroupUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, groupPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@BeanReference(type = OrganizationPersistence.class)

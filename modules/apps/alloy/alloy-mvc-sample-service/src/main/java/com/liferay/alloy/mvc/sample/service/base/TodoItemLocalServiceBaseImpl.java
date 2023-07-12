@@ -51,8 +51,6 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -590,14 +588,14 @@ public abstract class TodoItemLocalServiceBaseImpl
 			"com.liferay.alloy.mvc.sample.model.TodoItem",
 			todoItemLocalService);
 
-		_setLocalServiceUtilService(todoItemLocalService);
+		TodoItemLocalServiceUtil.setService(todoItemLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.alloy.mvc.sample.model.TodoItem");
 
-		_setLocalServiceUtilService(null);
+		TodoItemLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -639,22 +637,6 @@ public abstract class TodoItemLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		TodoItemLocalService todoItemLocalService) {
-
-		try {
-			Field field = TodoItemLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, todoItemLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

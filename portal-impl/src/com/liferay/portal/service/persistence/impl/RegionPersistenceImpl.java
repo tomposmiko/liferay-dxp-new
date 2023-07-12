@@ -48,7 +48,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -2459,11 +2458,11 @@ public class RegionPersistenceImpl
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"countryId", "active_"}, false);
 
-		_setRegionUtilPersistence(this);
+		RegionUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setRegionUtilPersistence(null);
+		RegionUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(RegionImpl.class.getName());
 
@@ -2473,21 +2472,6 @@ public class RegionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setRegionUtilPersistence(
-		RegionPersistence regionPersistence) {
-
-		try {
-			Field field = RegionUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, regionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

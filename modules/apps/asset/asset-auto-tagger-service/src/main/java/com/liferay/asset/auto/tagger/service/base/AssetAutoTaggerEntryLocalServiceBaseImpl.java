@@ -50,8 +50,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -408,7 +406,7 @@ public abstract class AssetAutoTaggerEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		AssetAutoTaggerEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -425,7 +423,8 @@ public abstract class AssetAutoTaggerEntryLocalServiceBaseImpl
 		assetAutoTaggerEntryLocalService =
 			(AssetAutoTaggerEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(assetAutoTaggerEntryLocalService);
+		AssetAutoTaggerEntryLocalServiceUtil.setService(
+			assetAutoTaggerEntryLocalService);
 	}
 
 	/**
@@ -483,23 +482,6 @@ public abstract class AssetAutoTaggerEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		AssetAutoTaggerEntryLocalService assetAutoTaggerEntryLocalService) {
-
-		try {
-			Field field =
-				AssetAutoTaggerEntryLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, assetAutoTaggerEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

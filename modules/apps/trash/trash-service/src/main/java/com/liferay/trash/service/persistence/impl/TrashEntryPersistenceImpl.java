@@ -51,7 +51,6 @@ import com.liferay.trash.service.persistence.impl.constants.TrashPersistenceCons
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -3350,12 +3349,12 @@ public class TrashEntryPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
 
-		_setTrashEntryUtilPersistence(this);
+		TrashEntryUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setTrashEntryUtilPersistence(null);
+		TrashEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(TrashEntryImpl.class.getName());
 
@@ -3365,21 +3364,6 @@ public class TrashEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setTrashEntryUtilPersistence(
-		TrashEntryPersistence trashEntryPersistence) {
-
-		try {
-			Field field = TrashEntryUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, trashEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -50,7 +50,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3864,11 +3863,11 @@ public class UserGroupRolePersistenceImpl
 			},
 			new String[] {"userId", "groupId", "roleId"}, false);
 
-		_setUserGroupRoleUtilPersistence(this);
+		UserGroupRoleUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setUserGroupRoleUtilPersistence(null);
+		UserGroupRoleUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(UserGroupRoleImpl.class.getName());
 
@@ -3878,22 +3877,6 @@ public class UserGroupRolePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setUserGroupRoleUtilPersistence(
-		UserGroupRolePersistence userGroupRolePersistence) {
-
-		try {
-			Field field = UserGroupRoleUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, userGroupRolePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

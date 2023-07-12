@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2623,12 +2622,12 @@ public class LayoutSEOSitePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_setLayoutSEOSiteUtilPersistence(this);
+		LayoutSEOSiteUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setLayoutSEOSiteUtilPersistence(null);
+		LayoutSEOSiteUtil.setPersistence(null);
 
 		entityCache.removeCache(LayoutSEOSiteImpl.class.getName());
 
@@ -2638,22 +2637,6 @@ public class LayoutSEOSitePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLayoutSEOSiteUtilPersistence(
-		LayoutSEOSitePersistence layoutSEOSitePersistence) {
-
-		try {
-			Field field = LayoutSEOSiteUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutSEOSitePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

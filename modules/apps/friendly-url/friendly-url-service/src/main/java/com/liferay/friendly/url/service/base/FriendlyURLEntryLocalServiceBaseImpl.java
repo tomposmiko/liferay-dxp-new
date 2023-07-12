@@ -61,8 +61,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -743,7 +741,7 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		FriendlyURLEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -758,7 +756,8 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		friendlyURLEntryLocalService = (FriendlyURLEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(friendlyURLEntryLocalService);
+		FriendlyURLEntryLocalServiceUtil.setService(
+			friendlyURLEntryLocalService);
 	}
 
 	/**
@@ -815,23 +814,6 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		FriendlyURLEntryLocalService friendlyURLEntryLocalService) {
-
-		try {
-			Field field =
-				FriendlyURLEntryLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, friendlyURLEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

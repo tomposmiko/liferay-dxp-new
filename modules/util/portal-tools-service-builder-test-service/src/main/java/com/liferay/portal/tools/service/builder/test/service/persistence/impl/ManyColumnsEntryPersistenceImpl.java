@@ -42,8 +42,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.ManyCol
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -601,11 +599,11 @@ public class ManyColumnsEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_setManyColumnsEntryUtilPersistence(this);
+		ManyColumnsEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setManyColumnsEntryUtilPersistence(null);
+		ManyColumnsEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(ManyColumnsEntryImpl.class.getName());
 
@@ -615,22 +613,6 @@ public class ManyColumnsEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setManyColumnsEntryUtilPersistence(
-		ManyColumnsEntryPersistence manyColumnsEntryPersistence) {
-
-		try {
-			Field field = ManyColumnsEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, manyColumnsEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

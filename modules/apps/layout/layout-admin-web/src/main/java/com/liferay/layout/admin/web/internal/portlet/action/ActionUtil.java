@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.ThemeSettingImpl;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -50,15 +49,7 @@ public class ActionUtil {
 
 		Set<String> keys = typeSettingsUnicodeProperties.keySet();
 
-		Iterator<String> iterator = keys.iterator();
-
-		while (iterator.hasNext()) {
-			String key = iterator.next();
-
-			if (key.startsWith(keyPrefix)) {
-				iterator.remove();
-			}
-		}
+		keys.removeIf(key -> key.startsWith(keyPrefix));
 	}
 
 	public static String getColorSchemeId(
@@ -87,6 +78,12 @@ public class ActionUtil {
 			UnicodeProperties typeSettingsUnicodeProperties)
 		throws Exception {
 
+		long groupId = liveGroupId;
+
+		if (stagingGroupId > 0) {
+			groupId = stagingGroupId;
+		}
+
 		String[] devices = StringUtil.split(
 			ParamUtil.getString(actionRequest, "devices"));
 
@@ -114,14 +111,8 @@ public class ActionUtil {
 					companyId, deviceThemeId, deviceColorSchemeId);
 
 				updateThemeSettingsProperties(
-					actionRequest, companyId, typeSettingsUnicodeProperties,
-					device, deviceThemeId, true);
-			}
-
-			long groupId = liveGroupId;
-
-			if (stagingGroupId > 0) {
-				groupId = stagingGroupId;
+					actionRequest, companyId, groupId, layoutId, privateLayout,
+					typeSettingsUnicodeProperties, device, deviceThemeId, true);
 			}
 
 			LayoutServiceUtil.updateLayout(
@@ -134,8 +125,9 @@ public class ActionUtil {
 		}
 	}
 
-	public static UnicodeProperties updateThemeSettingsProperties(
-			ActionRequest actionRequest, long companyId,
+	public static void updateThemeSettingsProperties(
+			ActionRequest actionRequest, long companyId, long groupId,
+			long layoutId, boolean privateLayout,
 			UnicodeProperties typeSettingsUnicodeProperties, String device,
 			String deviceThemeId, boolean layout)
 		throws Exception {
@@ -148,18 +140,17 @@ public class ActionUtil {
 			theme.getConfigurableSettings();
 
 		if (themeSettings.isEmpty()) {
-			return typeSettingsUnicodeProperties;
+			return;
 		}
 
 		setThemeSettingProperties(
-			actionRequest, typeSettingsUnicodeProperties, themeSettings, device,
-			layout);
-
-		return typeSettingsUnicodeProperties;
+			actionRequest, groupId, layoutId, privateLayout,
+			typeSettingsUnicodeProperties, themeSettings, device, layout);
 	}
 
 	protected static void setThemeSettingProperties(
-			ActionRequest actionRequest,
+			ActionRequest actionRequest, long groupId, long layoutId,
+			boolean privateLayout,
 			UnicodeProperties typeSettingsUnicodeProperties,
 			Map<String, ThemeSetting> themeSettings, String device,
 			boolean isLayout)
@@ -168,11 +159,6 @@ public class ActionUtil {
 		Layout layout = null;
 
 		if (isLayout) {
-			long groupId = ParamUtil.getLong(actionRequest, "groupId");
-			boolean privateLayout = ParamUtil.getBoolean(
-				actionRequest, "privateLayout");
-			long layoutId = ParamUtil.getLong(actionRequest, "layoutId");
-
 			layout = LayoutLocalServiceUtil.getLayout(
 				groupId, privateLayout, layoutId);
 		}

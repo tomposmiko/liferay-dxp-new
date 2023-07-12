@@ -69,6 +69,7 @@ public class SXPElementServiceSoap {
 
 	public static com.liferay.search.experiences.model.SXPElementSoap
 			addSXPElement(
+				String externalReferenceCode,
 				String[] descriptionMapLanguageIds,
 				String[] descriptionMapValues, String elementDefinitionJSON,
 				boolean readOnly, String schemaVersion,
@@ -85,8 +86,9 @@ public class SXPElementServiceSoap {
 
 			com.liferay.search.experiences.model.SXPElement returnValue =
 				SXPElementServiceUtil.addSXPElement(
-					descriptionMap, elementDefinitionJSON, readOnly,
-					schemaVersion, titleMap, type, serviceContext);
+					externalReferenceCode, descriptionMap,
+					elementDefinitionJSON, readOnly, schemaVersion, titleMap,
+					type, serviceContext);
 
 			return com.liferay.search.experiences.model.SXPElementSoap.
 				toSoapModel(returnValue);

@@ -65,8 +65,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -652,7 +650,7 @@ public abstract class LayoutPageTemplateEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		LayoutPageTemplateEntryLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -669,7 +667,8 @@ public abstract class LayoutPageTemplateEntryLocalServiceBaseImpl
 		layoutPageTemplateEntryLocalService =
 			(LayoutPageTemplateEntryLocalService)aopProxy;
 
-		_setLocalServiceUtilService(layoutPageTemplateEntryLocalService);
+		LayoutPageTemplateEntryLocalServiceUtil.setService(
+			layoutPageTemplateEntryLocalService);
 	}
 
 	/**
@@ -727,24 +726,6 @@ public abstract class LayoutPageTemplateEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		LayoutPageTemplateEntryLocalService
-			layoutPageTemplateEntryLocalService) {
-
-		try {
-			Field field =
-				LayoutPageTemplateEntryLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutPageTemplateEntryLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

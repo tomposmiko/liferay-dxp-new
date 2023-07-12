@@ -47,7 +47,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -857,11 +856,11 @@ public class ClassNamePersistenceImpl
 			new String[] {String.class.getName()}, new String[] {"value"},
 			false);
 
-		_setClassNameUtilPersistence(this);
+		ClassNameUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setClassNameUtilPersistence(null);
+		ClassNameUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(ClassNameImpl.class.getName());
 
@@ -871,21 +870,6 @@ public class ClassNamePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setClassNameUtilPersistence(
-		ClassNamePersistence classNamePersistence) {
-
-		try {
-			Field field = ClassNameUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, classNamePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

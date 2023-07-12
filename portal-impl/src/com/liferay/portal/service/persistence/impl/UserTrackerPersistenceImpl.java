@@ -50,7 +50,6 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2210,11 +2209,11 @@ public class UserTrackerPersistenceImpl
 			new String[] {String.class.getName()}, new String[] {"sessionId"},
 			false);
 
-		_setUserTrackerUtilPersistence(this);
+		UserTrackerUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setUserTrackerUtilPersistence(null);
+		UserTrackerUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(UserTrackerImpl.class.getName());
 
@@ -2224,22 +2223,6 @@ public class UserTrackerPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setUserTrackerUtilPersistence(
-		UserTrackerPersistence userTrackerPersistence) {
-
-		try {
-			Field field = UserTrackerUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, userTrackerPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

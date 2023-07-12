@@ -50,7 +50,6 @@ import com.liferay.social.kernel.service.persistence.SocialActivityAchievementUt
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -4182,11 +4181,11 @@ public class SocialActivityAchievementPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "firstInGroup"}, false);
 
-		_setSocialActivityAchievementUtilPersistence(this);
+		SocialActivityAchievementUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setSocialActivityAchievementUtilPersistence(null);
+		SocialActivityAchievementUtil.setPersistence(null);
 
 		EntityCacheUtil.removeCache(
 			SocialActivityAchievementImpl.class.getName());
@@ -4197,23 +4196,6 @@ public class SocialActivityAchievementPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSocialActivityAchievementUtilPersistence(
-		SocialActivityAchievementPersistence
-			socialActivityAchievementPersistence) {
-
-		try {
-			Field field = SocialActivityAchievementUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, socialActivityAchievementPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -3478,6 +3478,10 @@ public class UserLocalServiceUtil {
 		return getService().updateUser(user);
 	}
 
+	public static void validateMaxUsers(long companyId) throws PortalException {
+		getService().validateMaxUsers(companyId);
+	}
+
 	/**
 	 * Verifies the email address of the ticket.
 	 *
@@ -3491,6 +3495,10 @@ public class UserLocalServiceUtil {
 
 	public static UserLocalService getService() {
 		return _service;
+	}
+
+	public static void setService(UserLocalService service) {
+		_service = service;
 	}
 
 	private static volatile UserLocalService _service;

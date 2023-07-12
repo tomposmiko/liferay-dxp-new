@@ -47,8 +47,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -454,14 +452,15 @@ public abstract class PortalPreferencesLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.PortalPreferences",
 			portalPreferencesLocalService);
 
-		_setLocalServiceUtilService(portalPreferencesLocalService);
+		PortalPreferencesLocalServiceUtil.setService(
+			portalPreferencesLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.PortalPreferences");
 
-		_setLocalServiceUtilService(null);
+		PortalPreferencesLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -504,23 +503,6 @@ public abstract class PortalPreferencesLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		PortalPreferencesLocalService portalPreferencesLocalService) {
-
-		try {
-			Field field =
-				PortalPreferencesLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, portalPreferencesLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

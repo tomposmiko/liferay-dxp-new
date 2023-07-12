@@ -684,6 +684,10 @@ public class RemoteAppEntryUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(RemoteAppEntryPersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile RemoteAppEntryPersistence _persistence;
 
 }

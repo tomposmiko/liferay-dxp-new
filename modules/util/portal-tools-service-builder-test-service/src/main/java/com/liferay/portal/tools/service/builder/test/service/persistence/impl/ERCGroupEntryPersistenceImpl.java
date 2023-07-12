@@ -50,7 +50,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.ERCGrou
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2407,11 +2406,11 @@ public class ERCGroupEntryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "externalReferenceCode"}, false);
 
-		_setERCGroupEntryUtilPersistence(this);
+		ERCGroupEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setERCGroupEntryUtilPersistence(null);
+		ERCGroupEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(ERCGroupEntryImpl.class.getName());
 
@@ -2421,22 +2420,6 @@ public class ERCGroupEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setERCGroupEntryUtilPersistence(
-		ERCGroupEntryPersistence ercGroupEntryPersistence) {
-
-		try {
-			Field field = ERCGroupEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ercGroupEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

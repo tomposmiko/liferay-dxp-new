@@ -50,7 +50,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.ERCComp
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2145,11 +2144,11 @@ public class ERCCompanyEntryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		_setERCCompanyEntryUtilPersistence(this);
+		ERCCompanyEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setERCCompanyEntryUtilPersistence(null);
+		ERCCompanyEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(ERCCompanyEntryImpl.class.getName());
 
@@ -2159,22 +2158,6 @@ public class ERCCompanyEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setERCCompanyEntryUtilPersistence(
-		ERCCompanyEntryPersistence ercCompanyEntryPersistence) {
-
-		try {
-			Field field = ERCCompanyEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ercCompanyEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

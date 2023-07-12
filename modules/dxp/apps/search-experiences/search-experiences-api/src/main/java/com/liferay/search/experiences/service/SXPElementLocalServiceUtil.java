@@ -406,6 +406,10 @@ public class SXPElementLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(SXPElementLocalService service) {
+		_service = service;
+	}
+
 	private static volatile SXPElementLocalService _service;
 
 }

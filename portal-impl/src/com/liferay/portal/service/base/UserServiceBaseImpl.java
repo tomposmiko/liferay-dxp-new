@@ -72,8 +72,6 @@ import com.liferay.social.kernel.service.persistence.SocialActivityPersistence;
 import com.liferay.social.kernel.service.persistence.SocialRelationPersistence;
 import com.liferay.social.kernel.service.persistence.SocialRequestPersistence;
 
-import java.lang.reflect.Field;
-
 import javax.sql.DataSource;
 
 /**
@@ -2084,11 +2082,11 @@ public abstract class UserServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		_setServiceUtilService(userService);
+		UserServiceUtil.setService(userService);
 	}
 
 	public void destroy() {
-		_setServiceUtilService(null);
+		UserServiceUtil.setService(null);
 	}
 
 	/**
@@ -2130,19 +2128,6 @@ public abstract class UserServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setServiceUtilService(UserService userService) {
-		try {
-			Field field = UserServiceUtil.class.getDeclaredField("_service");
-
-			field.setAccessible(true);
-
-			field.set(null, userService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

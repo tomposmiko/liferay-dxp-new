@@ -350,6 +350,7 @@ const Main = ({
 			localizedValue={localizedValue}
 			name={name}
 			readOnly={readOnly}
+			style={null}
 		>
 			<Component
 				accessibleProps={{

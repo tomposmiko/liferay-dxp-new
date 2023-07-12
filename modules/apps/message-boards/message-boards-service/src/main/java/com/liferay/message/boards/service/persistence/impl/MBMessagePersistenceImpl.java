@@ -64,7 +64,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -22625,12 +22624,12 @@ public class MBMessagePersistenceImpl
 			},
 			new String[] {"userId", "classNameId", "classPK", "status"}, false);
 
-		_setMBMessageUtilPersistence(this);
+		MBMessageUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMBMessageUtilPersistence(null);
+		MBMessageUtil.setPersistence(null);
 
 		entityCache.removeCache(MBMessageImpl.class.getName());
 
@@ -22640,21 +22639,6 @@ public class MBMessagePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setMBMessageUtilPersistence(
-		MBMessagePersistence mbMessagePersistence) {
-
-		try {
-			Field field = MBMessageUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mbMessagePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -53,8 +53,6 @@ import com.liferay.site.service.persistence.SiteFriendlyURLPersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -524,7 +522,7 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+		SiteFriendlyURLLocalServiceUtil.setService(null);
 	}
 
 	@Override
@@ -539,7 +537,7 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		siteFriendlyURLLocalService = (SiteFriendlyURLLocalService)aopProxy;
 
-		_setLocalServiceUtilService(siteFriendlyURLLocalService);
+		SiteFriendlyURLLocalServiceUtil.setService(siteFriendlyURLLocalService);
 	}
 
 	/**
@@ -581,23 +579,6 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		SiteFriendlyURLLocalService siteFriendlyURLLocalService) {
-
-		try {
-			Field field =
-				SiteFriendlyURLLocalServiceUtil.class.getDeclaredField(
-					"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, siteFriendlyURLLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

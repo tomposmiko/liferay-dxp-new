@@ -374,6 +374,10 @@ public class RemoteAppEntryLocalServiceUtil {
 		return _service;
 	}
 
+	public static void setService(RemoteAppEntryLocalService service) {
+		_service = service;
+	}
+
 	private static volatile RemoteAppEntryLocalService _service;
 
 }

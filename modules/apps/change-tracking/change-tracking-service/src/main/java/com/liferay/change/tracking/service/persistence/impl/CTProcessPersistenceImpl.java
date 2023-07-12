@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1662,12 +1661,12 @@ public class CTProcessPersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"ctCollectionId"}, false);
 
-		_setCTProcessUtilPersistence(this);
+		CTProcessUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCTProcessUtilPersistence(null);
+		CTProcessUtil.setPersistence(null);
 
 		entityCache.removeCache(CTProcessImpl.class.getName());
 
@@ -1677,21 +1676,6 @@ public class CTProcessPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setCTProcessUtilPersistence(
-		CTProcessPersistence ctProcessPersistence) {
-
-		try {
-			Field field = CTProcessUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ctProcessPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -47,7 +47,6 @@ import com.liferay.portal.tools.service.builder.test.service.persistence.LazyBlo
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -1477,11 +1476,11 @@ public class LazyBlobEntryPersistenceImpl
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, false);
 
-		_setLazyBlobEntryUtilPersistence(this);
+		LazyBlobEntryUtil.setPersistence(this);
 	}
 
 	public void destroy() {
-		_setLazyBlobEntryUtilPersistence(null);
+		LazyBlobEntryUtil.setPersistence(null);
 
 		entityCache.removeCache(LazyBlobEntryImpl.class.getName());
 
@@ -1491,22 +1490,6 @@ public class LazyBlobEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLazyBlobEntryUtilPersistence(
-		LazyBlobEntryPersistence lazyBlobEntryPersistence) {
-
-		try {
-			Field field = LazyBlobEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, lazyBlobEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

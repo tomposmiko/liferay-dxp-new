@@ -52,7 +52,6 @@ import com.liferay.portal.lock.service.persistence.impl.constants.LockPersistenc
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -3184,12 +3183,12 @@ public class LockPersistenceImpl
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"className", "key_"}, false);
 
-		_setLockUtilPersistence(this);
+		LockUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setLockUtilPersistence(null);
+		LockUtil.setPersistence(null);
 
 		entityCache.removeCache(LockImpl.class.getName());
 
@@ -3199,19 +3198,6 @@ public class LockPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setLockUtilPersistence(LockPersistence lockPersistence) {
-		try {
-			Field field = LockUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, lockPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

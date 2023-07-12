@@ -52,7 +52,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4878,12 +4877,12 @@ public class DDLRecordPersistenceImpl
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"className", "classPK"}, false);
 
-		_setDDLRecordUtilPersistence(this);
+		DDLRecordUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDLRecordUtilPersistence(null);
+		DDLRecordUtil.setPersistence(null);
 
 		entityCache.removeCache(DDLRecordImpl.class.getName());
 
@@ -4893,21 +4892,6 @@ public class DDLRecordPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setDDLRecordUtilPersistence(
-		DDLRecordPersistence ddlRecordPersistence) {
-
-		try {
-			Field field = DDLRecordUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddlRecordPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

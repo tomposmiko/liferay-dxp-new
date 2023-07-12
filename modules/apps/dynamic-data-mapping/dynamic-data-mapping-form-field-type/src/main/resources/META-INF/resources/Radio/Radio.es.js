@@ -56,7 +56,7 @@ const Radio = ({
 	);
 
 	return (
-		<FieldBase {...otherProps} name={name} readOnly={disabled}>
+		<FieldBase {...otherProps} name={name} readOnly={disabled} style={null}>
 			<div className="ddm-radio" onBlur={onBlur} onFocus={onFocus}>
 				{options.map((option) => (
 					<ClayRadio

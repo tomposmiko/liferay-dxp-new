@@ -51,7 +51,6 @@ import com.liferay.segments.service.persistence.impl.constants.SegmentsPersisten
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2934,12 +2933,12 @@ public class SegmentsEntryRelPersistenceImpl
 			},
 			new String[] {"segmentsEntryId", "classNameId", "classPK"}, false);
 
-		_setSegmentsEntryRelUtilPersistence(this);
+		SegmentsEntryRelUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSegmentsEntryRelUtilPersistence(null);
+		SegmentsEntryRelUtil.setPersistence(null);
 
 		entityCache.removeCache(SegmentsEntryRelImpl.class.getName());
 
@@ -2949,22 +2948,6 @@ public class SegmentsEntryRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setSegmentsEntryRelUtilPersistence(
-		SegmentsEntryRelPersistence segmentsEntryRelPersistence) {
-
-		try {
-			Field field = SegmentsEntryRelUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, segmentsEntryRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

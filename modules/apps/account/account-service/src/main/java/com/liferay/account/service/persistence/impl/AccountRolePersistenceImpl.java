@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2145,12 +2144,12 @@ public class AccountRolePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"roleId"},
 			false);
 
-		_setAccountRoleUtilPersistence(this);
+		AccountRoleUtil.setPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setAccountRoleUtilPersistence(null);
+		AccountRoleUtil.setPersistence(null);
 
 		entityCache.removeCache(AccountRoleImpl.class.getName());
 
@@ -2160,22 +2159,6 @@ public class AccountRolePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
-		}
-	}
-
-	private void _setAccountRoleUtilPersistence(
-		AccountRolePersistence accountRolePersistence) {
-
-		try {
-			Field field = AccountRoleUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, accountRolePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

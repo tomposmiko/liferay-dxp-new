@@ -1501,6 +1501,10 @@ public class AssetEntryUsageUtil {
 		return _persistence;
 	}
 
+	public static void setPersistence(AssetEntryUsagePersistence persistence) {
+		_persistence = persistence;
+	}
+
 	private static volatile AssetEntryUsagePersistence _persistence;
 
 }

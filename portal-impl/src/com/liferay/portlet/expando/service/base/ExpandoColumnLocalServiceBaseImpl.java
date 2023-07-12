@@ -56,8 +56,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -748,14 +746,14 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 			"com.liferay.expando.kernel.model.ExpandoColumn",
 			expandoColumnLocalService);
 
-		_setLocalServiceUtilService(expandoColumnLocalService);
+		ExpandoColumnLocalServiceUtil.setService(expandoColumnLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.expando.kernel.model.ExpandoColumn");
 
-		_setLocalServiceUtilService(null);
+		ExpandoColumnLocalServiceUtil.setService(null);
 	}
 
 	/**
@@ -812,22 +810,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
-		}
-	}
-
-	private void _setLocalServiceUtilService(
-		ExpandoColumnLocalService expandoColumnLocalService) {
-
-		try {
-			Field field = ExpandoColumnLocalServiceUtil.class.getDeclaredField(
-				"_service");
-
-			field.setAccessible(true);
-
-			field.set(null, expandoColumnLocalService);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

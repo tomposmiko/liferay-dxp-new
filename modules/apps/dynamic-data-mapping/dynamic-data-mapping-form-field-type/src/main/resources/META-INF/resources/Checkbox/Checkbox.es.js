@@ -142,12 +142,13 @@ const Main = ({
 
 	return (
 		<FieldBase
+			{...otherProps}
 			label={label}
 			name={name}
 			required={required}
 			showLabel={false}
 			spritemap={spritemap}
-			{...otherProps}
+			style={null}
 		>
 			<Toggle
 				checked={value !== undefined ? value : predefinedValue}
