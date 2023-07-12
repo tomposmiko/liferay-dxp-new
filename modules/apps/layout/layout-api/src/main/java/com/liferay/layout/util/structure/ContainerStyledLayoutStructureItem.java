@@ -75,6 +75,8 @@ public class ContainerStyledLayoutStructureItem
 		JSONObject jsonObject = super.getItemConfigJSONObject();
 
 		return jsonObject.put(
+			"indexed", _indexed
+		).put(
 			"link", _linkJSONObject
 		).put(
 			"widthType", _widthType
@@ -106,6 +108,10 @@ public class ContainerStyledLayoutStructureItem
 	@Override
 	public int hashCode() {
 		return HashUtil.hash(0, getItemId());
+	}
+
+	public boolean isIndexed() {
+		return _indexed;
 	}
 
 	/**
@@ -165,6 +171,10 @@ public class ContainerStyledLayoutStructureItem
 	 */
 	@Deprecated
 	public void setContentDisplay(String contentDisplay) {
+	}
+
+	public void setIndexed(boolean indexed) {
+		_indexed = indexed;
 	}
 
 	/**
@@ -266,6 +276,10 @@ public class ContainerStyledLayoutStructureItem
 
 		super.updateItemConfig(itemConfigJSONObject);
 
+		if (itemConfigJSONObject.has("indexed")) {
+			setIndexed(itemConfigJSONObject.getBoolean("indexed"));
+		}
+
 		if (itemConfigJSONObject.has("link")) {
 			setLinkJSONObject(itemConfigJSONObject.getJSONObject("link"));
 		}
@@ -364,6 +378,7 @@ public class ContainerStyledLayoutStructureItem
 		"shadow-sm", "0 .125rem .25rem rgba(0, 0, 0, 0.075)"
 	).build();
 
+	private boolean _indexed = true;
 	private JSONObject _linkJSONObject;
 	private String _widthType = "fluid";
 

@@ -2330,6 +2330,11 @@ components:
                     items:
                         $ref: "#/components/schemas/FragmentViewport"
                     type: array
+                indexed:
+                    # @review
+                    description:
+                        A flag that indicates whether the page fragment instance is indexed or not.
+                    type: boolean
                 widgetInstances:
                     items:
                         $ref: "#/components/schemas/WidgetInstance"
@@ -2346,6 +2351,11 @@ components:
                         $ref: "#/components/schemas/FragmentViewport"
                     type: array
                 gutters:
+                    type: boolean
+                indexed:
+                    # @review
+                    description:
+                        A flag that indicates whether the page row is indexed or not.
                     type: boolean
                 modulesPerRow:
                     type: integer
@@ -2424,6 +2434,11 @@ components:
                     items:
                         $ref: "#/components/schemas/FragmentViewport"
                     type: array
+                indexed:
+                    # @review
+                    description:
+                        A flag that indicates whether the page section is indexed or not.
+                    type: boolean
                 layout:
                     properties:
                         align:
@@ -3217,7 +3232,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.delivery.client', and version '3.0.25'."
+        'com.liferay.headless.delivery.client', and version '3.0.26'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

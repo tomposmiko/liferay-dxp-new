@@ -986,6 +986,10 @@
 					"title": "The fragmentViewports Schema",
 					"type": "array"
 				},
+				"indexed": {
+					"title": "The indexed Schema",
+					"type": "boolean"
+				},
 				"widgetInstances": {
 					"items": {
 						"$ref": "#/definitions/WidgetInstance"
@@ -1017,6 +1021,10 @@
 				},
 				"gutters": {
 					"title": "The gutters Schema",
+					"type": "boolean"
+				},
+				"indexed": {
+					"title": "The indexed Schema",
 					"type": "boolean"
 				},
 				"modulesPerRow": {
@@ -1165,6 +1173,10 @@
 					},
 					"title": "The fragmentViewports Schema",
 					"type": "array"
+				},
+				"indexed": {
+					"title": "The indexed Schema",
+					"type": "boolean"
 				},
 				"layout": {
 					"additionalProperties": false,

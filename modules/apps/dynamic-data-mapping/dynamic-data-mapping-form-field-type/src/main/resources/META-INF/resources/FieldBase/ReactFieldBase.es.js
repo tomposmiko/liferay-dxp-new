@@ -146,10 +146,15 @@ function FieldBase({
 			type === 'grid' ||
 			type === 'paragraph' ||
 			type === 'radio');
+	const showFor = type === 'text' || type === 'numeric';
 
 	if (!renderLabel) {
 		parentDivTabIndex = 0;
 		parentDivAriaLabelledby = fieldDetailsId;
+	}
+
+	if (label) {
+		fieldDetails += Liferay.Util.escape(label) + '<br>';
 	}
 
 	if (tip) {
@@ -170,9 +175,10 @@ function FieldBase({
 		fieldDetails += requiredText;
 	}
 
-	const accessibleProps = fieldDetails
-		? {'aria-labelledby': fieldDetailsId}
-		: null;
+	const accessibleProps = {
+		...(fieldDetails && {'aria-labelledby': fieldDetailsId}),
+		...(showFor ? {htmlFor: id ?? name} : {tabIndex: 0}),
+	};
 
 	return (
 		<ClayTooltipProvider>
@@ -247,7 +253,6 @@ function FieldBase({
 								<legend
 									{...accessibleProps}
 									className="lfr-ddm-legend"
-									tabIndex="0"
 								>
 									{label && showLabel && label}
 
@@ -266,8 +271,6 @@ function FieldBase({
 										'ddm-empty': !showLabel && !required,
 										'ddm-label': showLabel || required,
 									})}
-									htmlFor={id ?? name}
-									tabIndex="0"
 								>
 									{label && showLabel && label}
 
