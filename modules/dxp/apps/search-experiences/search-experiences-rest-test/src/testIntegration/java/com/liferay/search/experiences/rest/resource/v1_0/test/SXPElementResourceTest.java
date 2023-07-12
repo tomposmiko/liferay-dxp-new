@@ -15,9 +15,13 @@
 package com.liferay.search.experiences.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SXPElement;
+import com.liferay.search.experiences.rest.client.http.HttpInvoker;
+import com.liferay.search.experiences.rest.client.pagination.Page;
 
 import java.util.Collections;
 
@@ -31,6 +35,45 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public class SXPElementResourceTest extends BaseSXPElementResourceTestCase {
+
+	@Override
+	@Test
+	public void testGetSXPElementExport() throws Exception {
+		SXPElement sxpElement = randomSXPElement();
+
+		SXPElement postSXPElement = testPostSXPElement_addSXPElement(
+			sxpElement);
+
+		HttpInvoker.HttpResponse httpResponse =
+			sxpElementResource.getSXPElementExportHttpResponse(
+				postSXPElement.getId());
+
+		Assert.assertTrue(
+			JSONUtil.equals(
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()),
+				JSONUtil.put(
+					"description_i18n",
+					JSONUtil.put("en_US", sxpElement.getDescription())
+				).put(
+					"elementDefinition", JSONFactoryUtil.createJSONObject()
+				).put(
+					"schemaVersion", postSXPElement.getSchemaVersion()
+				).put(
+					"title_i18n", JSONUtil.put("en_US", sxpElement.getTitle())
+				).put(
+					"type", postSXPElement.getType()
+				)));
+	}
+
+	@Override
+	@Test
+	public void testGetSXPElementsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		_deleteSXPElements();
+
+		super.testGetSXPElementsPageWithFilterDateTimeEquals();
+	}
 
 	@Ignore
 	@Override
@@ -49,25 +92,33 @@ public class SXPElementResourceTest extends BaseSXPElementResourceTestCase {
 	public void testPostSXPElement() throws Exception {
 		super.testPostSXPElement();
 
-		// Missing i18n
+		String description = RandomTestUtil.randomString();
+		String title = RandomTestUtil.randomString();
 
 		SXPElement sxpElement = SXPElement.toDTO(
 			JSONUtil.put(
-				"description", RandomTestUtil.randomString()
+				"description", description
 			).put(
-				"title", RandomTestUtil.randomString()
+				"title", title
 			).toString());
 
 		SXPElement postSXPElement = testPostSXPElement_addSXPElement(
 			sxpElement);
 
 		sxpElement.setCreateDate(postSXPElement.getCreateDate());
+
+		sxpElement.setDescription_i18n(
+			Collections.singletonMap(
+				LocaleUtil.toBCP47LanguageId(LocaleUtil.US), description));
 		sxpElement.setId(postSXPElement.getId());
 		sxpElement.setModifiedDate(postSXPElement.getModifiedDate());
-		sxpElement.setUserName(postSXPElement.getUserName());
-
 		sxpElement.setReadOnly(false);
+		sxpElement.setSchemaVersion(postSXPElement.getSchemaVersion());
+		sxpElement.setTitle_i18n(
+			Collections.singletonMap(
+				LocaleUtil.toBCP47LanguageId(LocaleUtil.US), title));
 		sxpElement.setType(0);
+		sxpElement.setUserName(postSXPElement.getUserName());
 
 		Assert.assertEquals(sxpElement.toString(), postSXPElement.toString());
 
@@ -84,11 +135,11 @@ public class SXPElementResourceTest extends BaseSXPElementResourceTestCase {
 	protected SXPElement randomSXPElement() throws Exception {
 		SXPElement sxpElement = super.randomSXPElement();
 
-		sxpElement.setTitle_i18n(
-			Collections.singletonMap("en_US", sxpElement.getTitle()));
-
 		sxpElement.setDescription_i18n(
 			Collections.singletonMap("en_US", sxpElement.getDescription()));
+		sxpElement.setTitle(_TITLE_PREFIX + sxpElement.getTitle());
+		sxpElement.setTitle_i18n(
+			Collections.singletonMap("en_US", sxpElement.getTitle()));
 
 		return sxpElement;
 	}
@@ -141,5 +192,20 @@ public class SXPElementResourceTest extends BaseSXPElementResourceTestCase {
 	private SXPElement _addSXPElement(SXPElement sxpElement) throws Exception {
 		return sxpElementResource.postSXPElement(sxpElement);
 	}
+
+	private void _deleteSXPElements() throws Exception {
+		Page<SXPElement> page = sxpElementResource.getSXPElementsPage(
+			null, null, null, null);
+
+		for (SXPElement sxpElement : page.getItems()) {
+			String title = sxpElement.getTitle();
+
+			if (title.startsWith(_TITLE_PREFIX)) {
+				sxpElementResource.deleteSXPElement(sxpElement.getId());
+			}
+		}
+	}
+
+	private static final String _TITLE_PREFIX = "SXPERT";
 
 }

@@ -121,6 +121,8 @@ components:
                             type: boolean
                         includeResponseString:
                             type: boolean
+                        languageId:
+                            type: string
                         queryString:
                             type: string
                         searchableAssetTypes:
@@ -349,6 +351,13 @@ components:
                     type: string
         SXPBlueprint:
             properties:
+                actions:
+                    additionalProperties:
+                        additionalProperties:
+                            type: string
+                        type: object
+                    readOnly: true
+                    type: object
                 configuration:
                     $ref: "#/components/schemas/Configuration"
                 createDate:
@@ -370,6 +379,8 @@ components:
                 modifiedDate:
                     format: date
                     type: string
+                schemaVersion:
+                    type: string
                 title:
                     type: string
                 title_i18n:
@@ -381,6 +392,13 @@ components:
             type: object
         SXPElement:
             properties:
+                actions:
+                    additionalProperties:
+                        additionalProperties:
+                            type: string
+                        type: object
+                    readOnly: true
+                    type: object
                 createDate:
                     format: date
                     type: string
@@ -402,6 +420,8 @@ components:
                     type: string
                 readOnly:
                     type: boolean
+                schemaVersion:
+                    type: string
                 title:
                     type: string
                 title_i18n:
@@ -429,23 +449,12 @@ components:
             type: object
         SearchResponse:
             properties:
-                documents:
+                errors:
                     items:
-                        properties:
-                            documentFields:
-                                additionalProperties:
-                                    $ref: "#/components/schemas/DocumentField"
-                                type: object
-                            explanation:
-                                type: string
-                            score:
-                                format: double
-                                type: number
+                        additionalProperties:
+                            type: string
                         type: object
                     type: array
-                maxScore:
-                    format: double
-                    type: number
                 page:
                     type: integer
                 pageSize:
@@ -458,10 +467,36 @@ components:
                     type: object
                 responseString:
                     type: string
+                searchHits:
+                    properties:
+                        hits:
+                            items:
+                                properties:
+                                    documentFields:
+                                        additionalProperties:
+                                            $ref: "#/components/schemas/DocumentField"
+                                        type: object
+                                    explanation:
+                                        type: string
+                                    id:
+                                        type: string
+                                    score:
+                                        format: float
+                                        type: number
+                                    version:
+                                        format: int64
+                                        type: integer
+                                type: object
+                            type: array
+                        maxScore:
+                            format: float
+                            type: number
+                        totalHits:
+                            format: int64
+                            type: integer
+                    type: object
                 searchRequest:
                     $ref: "#/components/schemas/SearchRequest"
-                totalHits:
-                    type: integer
             type: object
         SearchableAssetName:
             properties:

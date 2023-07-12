@@ -11,8 +11,45 @@
 
 import moment from 'moment';
 
-import {CONFIG_PREFIX} from './constants';
+import {CONFIG_PREFIX, DEFAULT_ERROR} from './constants';
 import {INPUT_TYPES} from './inputTypes';
+import {renameKeys} from './language';
+
+/**
+ * Function to get valid classNames and return them sorted.
+ *
+ * @param {Array} items Array of objects with classNames
+ * @return {Array} Array of classNames
+ */
+export function filterAndSortClassNames(items = []) {
+	return items
+		.map(({className}) => className)
+		.filter((item) => item)
+		.sort();
+}
+
+/**
+ * Used for formatting a search response's error message.
+ * @param {object} error Information about the error.
+ * @returns {object}
+ */
+export function getResultsError({
+	exceptionClass,
+	exceptionTrace,
+	msg,
+	severity,
+}) {
+	return {
+		errors: [
+			{
+				exceptionClass,
+				exceptionTrace,
+				msg: msg || DEFAULT_ERROR,
+				severity: severity || Liferay.Language.get('error'),
+			},
+		],
+	};
+}
 
 /**
  * Function used to identify whether a required value is not undefined
@@ -67,7 +104,7 @@ export function isEmpty(value, type = '') {
  * @return {String} The converted JSON string.
  */
 export function parseAndPrettifyJSON(json) {
-	if (!isDefined(json)) {
+	if (!isDefined(json) || json === '') {
 		return '';
 	}
 
@@ -81,6 +118,30 @@ export function parseAndPrettifyJSON(json) {
 
 		return json;
 	}
+}
+
+const BRACKETS_QUOTES_REGEX = new RegExp(/[[\]"]/, 'g');
+
+/**
+ * Function to remove brackets and quotations from a string.
+ *
+ * @param {String} value String with brackets and quotes
+ * @return {String}
+ */
+export function removeBrackets(value) {
+	return value.replace(BRACKETS_QUOTES_REGEX, '');
+}
+
+/**
+ * Function to remove duplicates in an array.
+ *
+ * @param {Array} items Array of items with repeated values
+ * @return {Array}
+ */
+export function removeDuplicates(items) {
+	return items.filter(
+		(item, position, self) => self.indexOf(item) === position
+	);
 }
 
 /**
@@ -193,6 +254,208 @@ export function cleanUIConfiguration(uiConfiguration = {}) {
 }
 
 /**
+ * Function for replacing the ${variable_name} with actual value.
+ *
+ * @param {object} _.sxpElement SXP Element with elementDefinition
+ * @param {object} _.uiConfigurationValues Values that will replace the keys in uiConfiguration
+ * @return {object}
+ */
+export function getConfigurationEntry({sxpElement, uiConfigurationValues}) {
+	const fieldSets = cleanUIConfiguration(
+		sxpElement.elementDefinition?.uiConfiguration
+	).fieldSets;
+
+	if (
+		fieldSets.length > 0 &&
+		!isCustomJSONSXPElement(uiConfigurationValues)
+	) {
+		let flattenJSON = JSON.stringify(
+			sxpElement.elementDefinition?.configuration || {}
+		);
+
+		fieldSets.map(({fields}) => {
+			fields.map((config) => {
+				let configValue = '';
+
+				const initialConfigValue = uiConfigurationValues[config.name];
+
+				if (
+					config.typeOptions?.nullable &&
+					isEmpty(initialConfigValue, config.type)
+				) {
+
+					// Remove property entirely if blank.
+					// Check for regex with leading and trailing commas first.
+
+					const nullRegex = `\\"[\\w\\._]+\\"\\:\\"\\$\\{${CONFIG_PREFIX}\\.${config.name}}\\"`;
+
+					flattenJSON = replaceStr(
+						flattenJSON,
+						new RegExp(nullRegex + `,`),
+						''
+					);
+
+					flattenJSON = replaceStr(
+						flattenJSON,
+						new RegExp(`,` + nullRegex),
+						''
+					);
+
+					flattenJSON = replaceStr(
+						flattenJSON,
+						new RegExp(nullRegex),
+						''
+					);
+				}
+				else if (config.type === INPUT_TYPES.DATE) {
+					configValue = initialConfigValue
+						? JSON.parse(
+								moment
+									.unix(initialConfigValue)
+									.format(
+										config.typeOptions?.format ||
+											'YYYYMMDDHHMMSS'
+									)
+						  )
+						: '';
+				}
+				else if (config.type === INPUT_TYPES.ITEM_SELECTOR) {
+					configValue = JSON.stringify(
+						initialConfigValue.map((item) => item.value)
+					);
+				}
+				else if (config.type === INPUT_TYPES.FIELD_MAPPING) {
+					const {
+						boost,
+						field,
+						languageIdPosition,
+						locale = '',
+					} = initialConfigValue;
+
+					const transformedLocale = !locale ? locale : `_${locale}`;
+
+					let localizedField;
+
+					if (languageIdPosition > -1) {
+						localizedField =
+							field.substring(0, languageIdPosition) +
+							transformedLocale +
+							field.substring(languageIdPosition);
+					}
+					else {
+						localizedField = field + transformedLocale;
+					}
+
+					localizedField = replaceStr(localizedField, /[\\"]+/, '');
+
+					configValue =
+						boost && boost > 0
+							? `${localizedField}^${boost}`
+							: localizedField;
+				}
+				else if (config.type === INPUT_TYPES.FIELD_MAPPING_LIST) {
+					const fields = initialConfigValue
+						.filter(({field}) => !!field) // Remove blank fields
+						.map(
+							({
+								boost,
+								field,
+								languageIdPosition,
+								locale = '',
+							}) => {
+								const transformedLocale = !locale
+									? locale
+									: `_${locale}`;
+
+								let localizedField;
+
+								if (languageIdPosition > -1) {
+									localizedField =
+										field.substring(0, languageIdPosition) +
+										transformedLocale +
+										field.substring(languageIdPosition);
+								}
+								else {
+									localizedField = field + transformedLocale;
+								}
+
+								localizedField = replaceStr(
+									localizedField,
+									/[\\"]+/,
+									''
+								);
+
+								return boost && boost > 0
+									? `${localizedField}^${boost}`
+									: localizedField;
+							}
+						);
+
+					configValue = JSON.stringify(fields);
+				}
+				else if (config.type === INPUT_TYPES.JSON) {
+					try {
+						JSON.parse(initialConfigValue);
+						configValue = initialConfigValue;
+					}
+					catch {
+						configValue = '{}';
+					}
+				}
+				else if (config.type === INPUT_TYPES.KEYWORDS) {
+					configValue =
+						replaceStr(initialConfigValue, /[\\"]+/, '') ||
+						'${keywords}';
+				}
+				else if (config.type === INPUT_TYPES.MULTISELECT) {
+					configValue = JSON.stringify(
+						initialConfigValue.map((item) => item.value)
+					);
+				}
+				else if (config.type === INPUT_TYPES.NUMBER) {
+					configValue =
+						typeof config.typeOptions?.unitSuffix === 'string'
+							? typeof initialConfigValue === 'string'
+								? initialConfigValue.concat(
+										config.typeOptions?.unitSuffix
+								  )
+								: JSON.stringify(initialConfigValue).concat(
+										config.typeOptions?.unitSuffix
+								  )
+							: initialConfigValue;
+				}
+				else if (config.type === INPUT_TYPES.SLIDER) {
+					configValue = initialConfigValue;
+				}
+				else {
+					configValue = replaceStr(initialConfigValue, /[\\"]+/, '');
+				}
+
+				// Check whether to add quotes around output
+
+				const key =
+					typeof configValue === 'number' ||
+					config.type === INPUT_TYPES.ITEM_SELECTOR ||
+					config.type === INPUT_TYPES.FIELD_MAPPING_LIST ||
+					config.type === INPUT_TYPES.JSON ||
+					config.type === INPUT_TYPES.MULTISELECT
+						? `"$\{${CONFIG_PREFIX}.${config.name}}"`
+						: `\${${CONFIG_PREFIX}.${config.name}}`;
+
+				flattenJSON = replaceStr(flattenJSON, key, configValue);
+			});
+		});
+
+		return JSON.parse(flattenJSON);
+	}
+
+	return (
+		parseCustomSXPElement(sxpElement, uiConfigurationValues)
+			.elementDefinition?.configuration || {}
+	);
+}
+
+/**
  * Function for retrieving a valid default value from one element
  * configuration entry. Returns the proper empty value for invalid values.
  *
@@ -284,224 +547,35 @@ export function getDefaultValue(item) {
 }
 
 /**
- * Function for replacing the ${variable_name} with actual value.
+ * Function that provides the element JSON, with title, description, and elementDefinition.
+ * The elementDefinition's configuration is updated to have its variables replaced with
+ * values from uiConfigurationValues.
  *
- * @param {object} _.sxpElement SXP Element with elementDefinition
- * @param {object} _.uiConfigurationValues Values that will replace the keys in uiConfiguration
+ * @param {object} sxpElement SXP Element with title, description, elementDefinition
+ * @param {object=} uiConfigurationValues Values that will replace the keys in uiConfiguration
  * @return {object}
  */
-export function getConfigurationEntry({sxpElement, uiConfigurationValues}) {
-	const fieldSets = cleanUIConfiguration(
-		sxpElement.elementDefinition?.uiConfiguration
-	).fieldSets;
+export function getSXPElementJSON(sxpElement, uiConfigurationValues) {
+	const {description_i18n, elementDefinition, title_i18n} = sxpElement;
 
-	if (fieldSets.length > 0) {
-		let flattenJSON = JSON.stringify(
-			sxpElement.elementDefinition?.configuration || {}
-		);
+	const {category, configuration, icon} = elementDefinition;
 
-		fieldSets.map(({fields}) => {
-			fields.map((config) => {
-				let configValue = '';
-
-				const initialConfigValue = uiConfigurationValues[config.name];
-
-				if (
-					config.typeOptions?.nullable &&
-					isEmpty(initialConfigValue, config.type)
-				) {
-
-					// Remove property entirely if blank.
-					// Check for regex with leading and trailing commas first.
-
-					const nullRegex = `\\"[\\w\\._]+\\"\\:\\"\\$\\{${CONFIG_PREFIX}\\.${config.name}}\\"`;
-
-					flattenJSON = replaceStr(
-						flattenJSON,
-						new RegExp(nullRegex + `,`),
-						''
-					);
-
-					flattenJSON = replaceStr(
-						flattenJSON,
-						new RegExp(`,` + nullRegex),
-						''
-					);
-
-					flattenJSON = replaceStr(
-						flattenJSON,
-						new RegExp(nullRegex),
-						''
-					);
-				}
-				else if (config.type === INPUT_TYPES.DATE) {
-					configValue = initialConfigValue
-						? JSON.parse(
-								moment
-									.unix(initialConfigValue)
-									.format(
-										config.typeOptions?.format ||
-											'YYYYMMDDHHMMSS'
-									)
-						  )
-						: '';
-				}
-				else if (config.type === INPUT_TYPES.ITEM_SELECTOR) {
-					configValue = JSON.stringify(
-						initialConfigValue.map((item) => item.value)
-					);
-				}
-				else if (config.type === INPUT_TYPES.FIELD_MAPPING) {
-					const {
-						boost,
-						field,
-						languageIdPosition,
-						locale = '',
-					} = initialConfigValue;
-
-					const transformedLocale =
-						!locale || locale.includes('$') ? locale : `_${locale}`;
-
-					let localizedField;
-
-					if (languageIdPosition > -1) {
-						localizedField =
-							field.substring(0, languageIdPosition) +
-							transformedLocale +
-							field.substring(languageIdPosition);
-					}
-					else {
-						localizedField = field + transformedLocale;
-					}
-
-					localizedField = replaceStr(localizedField, /[\\"]+/, '');
-
-					configValue =
-						boost && boost > 0
-							? `${localizedField}^${boost}`
-							: localizedField;
-				}
-				else if (config.type === INPUT_TYPES.FIELD_MAPPING_LIST) {
-					const fields = initialConfigValue
-						.filter(({field}) => !!field) // Remove blank fields
-						.map(
-							({
-								boost,
-								field,
-								languageIdPosition,
-								locale = '',
-							}) => {
-								const transformedLocale =
-									!locale || locale.includes('$')
-										? locale
-										: `_${locale}`;
-
-								let localizedField;
-
-								if (languageIdPosition > -1) {
-									localizedField =
-										field.substring(0, languageIdPosition) +
-										transformedLocale +
-										field.substring(languageIdPosition);
-								}
-								else {
-									localizedField = field + transformedLocale;
-								}
-
-								localizedField = replaceStr(
-									localizedField,
-									/[\\"]+/,
-									''
-								);
-
-								return boost && boost > 0
-									? `${localizedField}^${boost}`
-									: localizedField;
-							}
-						);
-
-					configValue = JSON.stringify(fields);
-				}
-				else if (config.type === INPUT_TYPES.JSON) {
-					try {
-						JSON.parse(initialConfigValue);
-						configValue = initialConfigValue;
-					}
-					catch {
-						configValue = '{}';
-					}
-				}
-				else if (config.type === INPUT_TYPES.KEYWORDS) {
-					configValue =
-						replaceStr(initialConfigValue, /[\\"]+/, '') ||
-						'${keywords}';
-				}
-				else if (config.type === INPUT_TYPES.MULTISELECT) {
-					configValue = JSON.stringify(
-						initialConfigValue.map((item) => item.value)
-					);
-				}
-				else if (config.type === INPUT_TYPES.NUMBER) {
-					configValue =
-						typeof config.typeOptions?.unitSuffix === 'string'
-							? typeof initialConfigValue === 'string'
-								? initialConfigValue.concat(
-										config.typeOptions?.unitSuffix
-								  )
-								: JSON.stringify(initialConfigValue).concat(
-										config.typeOptions?.unitSuffix
-								  )
-							: initialConfigValue;
-				}
-				else if (config.type === INPUT_TYPES.SLIDER) {
-					configValue = initialConfigValue;
-				}
-				else {
-					configValue = replaceStr(initialConfigValue, /[\\"]+/, '');
-				}
-
-				// Check whether to add quotes around output
-
-				const key =
-					typeof configValue === 'number' ||
-					config.type === INPUT_TYPES.ITEM_SELECTOR ||
-					config.type === INPUT_TYPES.FIELD_MAPPING_LIST ||
-					config.type === INPUT_TYPES.JSON ||
-					config.type === INPUT_TYPES.MULTISELECT
-						? `"$\{${CONFIG_PREFIX}.${config.name}}"`
-						: `\${${CONFIG_PREFIX}.${config.name}}`;
-
-				flattenJSON = replaceStr(flattenJSON, key, configValue);
-			});
-		});
-
-		return JSON.parse(flattenJSON);
-	}
-
-	return (
-		parseCustomSXPElement(sxpElement, uiConfigurationValues)
-			.elementDefinition?.configuration || {}
-	);
-}
-
-/**
- * Function for parsing custom json element text into sxpElement
- *
- * @param {object} sxpElement Original sxpElement (default)
- * @param {object} uiConfigurationValues Contains custom JSON for sxpElement
- * @return {object}
- */
-export function parseCustomSXPElement(sxpElement, uiConfigurationValues) {
-	try {
-		if (isDefined(uiConfigurationValues.sxpElement)) {
-			return JSON.parse(uiConfigurationValues.sxpElement);
-		}
-
-		return sxpElement;
-	}
-	catch {
-		return sxpElement;
-	}
+	return {
+		description_i18n: renameKeys(description_i18n, (str) =>
+			str.replace('-', '_')
+		),
+		elementDefinition: {
+			category,
+			configuration: uiConfigurationValues
+				? getConfigurationEntry({
+						sxpElement,
+						uiConfigurationValues,
+				  })
+				: configuration,
+			icon,
+		},
+		title_i18n: renameKeys(title_i18n, (str) => str.replace('-', '_')),
+	};
 }
 
 /**
@@ -537,93 +611,40 @@ export function getUIConfigurationValues(sxpElement = {}) {
 		);
 	}
 
-	return {sxpElement: JSON.stringify(sxpElement, null, '\t')};
+	return {
+		sxpElement: JSON.stringify(getSXPElementJSON(sxpElement), null, '\t'),
+	};
 }
 
 /**
- * Function for transforming the framework configuration's `clause_contributor`
- * object to an object of clause contributors with `enabled` state.
- *
- * Example:
- * getClauseContributorsState({
- * 		clauseContributorsExcludes: [
- * 			'com.liferay.account.internal.search.spi.model.query.contributor.AccountGroupKeywordQueryContributor',
- * 		],
- * 		clauseContributorsIncludes: [
- * 			'com.liferay.account.internal.search.spi.model.query.contributor.AccountEntryKeywordQueryContributor',
- * 			'com.liferay.address.internal.search.spi.model.query.contributor.AddressKeywordQueryContributor'
- * 		]
- * 	});
- * => {com.liferay.account.internal.search.spi.model.query.contributor.AccountEntryKeywordQueryContributor: true,
- *		com.liferay.account.internal.search.spi.model.query.contributor.AccountGroupKeywordQueryContributor: false,
- *		com.liferay.address.internal.search.spi.model.query.contributor.AddressKeywordQueryContributor: true}
- *
- * @param {object} { clauseContributorsExcludes, clauseContributorsIncludes } The framework configuration's
- * clause contributors object
- * @return {object} An object of enabled state for each contributor
+ * Used for handling if the element instance is a custom JSON element. This
+ * function makes it easier to globally handle the logic for differentiating
+ * between a custom JSON element and a standard element.
+ * @param {object} uiConfigurationValues
+ * @returns {boolean}
  */
-export function getClauseContributorsState({
-	clauseContributorsExcludes,
-	clauseContributorsIncludes,
-}) {
-	const clauseContributorsState = {};
-
-	if (Array.isArray(clauseContributorsExcludes)) {
-		clauseContributorsExcludes.forEach((exclude) => {
-			clauseContributorsState[exclude] = false;
-		});
-	}
-
-	if (Array.isArray(clauseContributorsIncludes)) {
-		clauseContributorsIncludes.forEach((include) => {
-			clauseContributorsState[include] = true;
-		});
-	}
-
-	return clauseContributorsState;
+export function isCustomJSONSXPElement(uiConfigurationValues) {
+	return isDefined(uiConfigurationValues.sxpElement);
 }
 
 /**
- * Function for transforming the `enabled` state object to the framework
- * configuration's clause contributors object.
+ * Function for parsing custom json element text into sxpElement
  *
- * Example:
- * getClauseContributorsConfig(
- *		{
- *			'com.liferay.account.internal.search.spi.model.query.contributor.AccountEntryKeywordQueryContributor': true,
- *			'com.liferay.account.internal.search.spi.model.query.contributor.AccountGroupKeywordQueryContributor': false,
- *			'com.liferay.address.internal.search.spi.model.query.contributor.AddressKeywordQueryContributor': true
- *		}
- *	);
- * => {
- * 		clauseContributorsExcludes: [
- * 			'com.liferay.account.internal.search.spi.model.query.contributor.AccountGroupKeywordQueryContributor',
- * 		],
- * 		clauseContributorsIncludes: [
- * 			'com.liferay.account.internal.search.spi.model.query.contributor.AccountEntryKeywordQueryContributor',
- * 			'com.liferay.address.internal.search.spi.model.query.contributor.AddressKeywordQueryContributor'
- * 		]
- * 	}
- *
- * @param {object} clauseContributorsEnabledState State object that tracks whether clause is enabled/disabled
- * @return {object} The framework configuration's clause contributors object
+ * @param {object} sxpElement Original sxpElement (default)
+ * @param {object} uiConfigurationValues Contains custom JSON for sxpElement
+ * @return {object}
  */
-export function getClauseContributorsConfig(
-	clauseContributorsEnabledState = {}
-) {
-	const clauseContributorsExcludes = [];
-	const clauseContributorsIncludes = [];
-
-	Object.keys(clauseContributorsEnabledState).forEach((key) => {
-		if (clauseContributorsEnabledState[key]) {
-			clauseContributorsIncludes.push(key);
+export function parseCustomSXPElement(sxpElement, uiConfigurationValues) {
+	try {
+		if (isDefined(uiConfigurationValues.sxpElement)) {
+			return JSON.parse(uiConfigurationValues.sxpElement);
 		}
-		else {
-			clauseContributorsExcludes.push(key);
-		}
-	});
 
-	return {clauseContributorsExcludes, clauseContributorsIncludes};
+		return sxpElement;
+	}
+	catch {
+		return sxpElement;
+	}
 }
 
 /**
@@ -645,4 +666,34 @@ export function transformToSearchContextAttributes(attributes) {
 			}),
 			{}
 		);
+}
+
+/**
+ * Converts the results from search preview into the format expected
+ * for `hits` property inside PreviewSidebar.
+ *
+ * @param {object} results Contains search hits
+ * @returns {Array}
+ */
+export function transformToSearchPreviewHits(results) {
+	const searchHits = results.searchHits?.hits || [];
+
+	const finalHits = [];
+
+	searchHits.forEach((hit) => {
+		const documentFields = {};
+
+		Object.entries(hit.documentFields).forEach(([key, value]) => {
+			documentFields[key] = removeBrackets(
+				JSON.stringify(value.values || [])
+			);
+		});
+
+		finalHits.push({
+			...hit,
+			documentFields,
+		});
+	});
+
+	return finalHits;
 }

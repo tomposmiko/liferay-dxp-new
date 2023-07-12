@@ -36,17 +36,17 @@ import org.apache.lucene.search.FuzzyQuery;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.search.MatchQuery;
+import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.index.search.MatchQueryParser;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.profile.ProfileShardResult;
+import org.elasticsearch.search.profile.SearchProfileShardResult;
 import org.elasticsearch.search.profile.query.QueryProfileShardResult;
+import org.elasticsearch.xcontent.ToXContent;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
+import org.elasticsearch.xcontent.XContentType;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -78,54 +78,25 @@ public class CommonSearchResponseAssemblerImpl
 			baseSearchRequest.getStatsRequests());
 	}
 
-	protected String getProfileShardResultString(
-			ProfileShardResult profileShardResult)
-		throws IOException {
-
-		XContentBuilder xContentBuilder = XContentFactory.contentBuilder(
-			XContentType.JSON);
-
-		List<QueryProfileShardResult> queryProfileShardResults =
-			profileShardResult.getQueryProfileResults();
-
-		queryProfileShardResults.forEach(
-			queryProfileShardResult -> {
-				try {
-					xContentBuilder.startObject();
-
-					queryProfileShardResult.toXContent(
-						xContentBuilder, ToXContent.EMPTY_PARAMS);
-
-					xContentBuilder.endObject();
-				}
-				catch (IOException ioException) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(ioException, ioException);
-					}
-				}
-			});
-
-		return Strings.toString(xContentBuilder);
-	}
-
 	protected void setExecutionProfile(
 		SearchResponse searchResponse, BaseSearchResponse baseSearchResponse) {
 
-		Map<String, ProfileShardResult> profileShardResults =
+		Map<String, SearchProfileShardResult> searchProfileShardResults =
 			searchResponse.getProfileResults();
 
-		if (MapUtil.isEmpty(profileShardResults)) {
+		if (MapUtil.isEmpty(searchProfileShardResults)) {
 			return;
 		}
 
 		Map<String, String> executionProfile = new HashMap<>();
 
-		profileShardResults.forEach(
-			(shardKey, profileShardResult) -> {
+		searchProfileShardResults.forEach(
+			(shardKey, searchProfileShardResult) -> {
 				try {
 					executionProfile.put(
 						shardKey,
-						getProfileShardResultString(profileShardResult));
+						_getSearchProfileShardResultString(
+							searchProfileShardResult));
 				}
 				catch (IOException ioException) {
 					if (_log.isInfoEnabled()) {
@@ -243,7 +214,7 @@ public class CommonSearchResponseAssemblerImpl
 		",\"fuzzy_transpositions\":" + FuzzyQuery.defaultTranspositions;
 
 	protected static final String LENIENT_STRING =
-		",\"lenient\":" + MatchQuery.DEFAULT_LENIENCY;
+		",\"lenient\":" + MatchQueryParser.DEFAULT_LENIENCY;
 
 	protected static final String MAX_EXPANSIONS_STRING =
 		",\"max_expansions\":" + FuzzyQuery.defaultMaxExpansions;
@@ -254,10 +225,41 @@ public class CommonSearchResponseAssemblerImpl
 		",\"prefix_length\":" + FuzzyQuery.defaultPrefixLength;
 
 	protected static final String SLOP_STRING =
-		",\"slop\":" + MatchQuery.DEFAULT_PHRASE_SLOP;
+		",\"slop\":" + MatchQueryParser.DEFAULT_PHRASE_SLOP;
 
 	protected static final String ZERO_TERMS_QUERY_STRING =
-		",\"zero_terms_query\":\"" + MatchQuery.DEFAULT_ZERO_TERMS_QUERY + "\"";
+		",\"zero_terms_query\":\"" + MatchQueryParser.DEFAULT_ZERO_TERMS_QUERY +
+			"\"";
+
+	private String _getSearchProfileShardResultString(
+			SearchProfileShardResult searchProfileShardResult)
+		throws IOException {
+
+		XContentBuilder xContentBuilder = XContentFactory.contentBuilder(
+			XContentType.JSON);
+
+		List<QueryProfileShardResult> queryProfileShardResults =
+			searchProfileShardResult.getQueryProfileResults();
+
+		queryProfileShardResults.forEach(
+			queryProfileShardResult -> {
+				try {
+					xContentBuilder.startObject();
+
+					queryProfileShardResult.toXContent(
+						xContentBuilder, ToXContent.EMPTY_PARAMS);
+
+					xContentBuilder.endObject();
+				}
+				catch (IOException ioException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(ioException, ioException);
+					}
+				}
+			});
+
+		return Strings.toString(xContentBuilder);
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommonSearchResponseAssemblerImpl.class);

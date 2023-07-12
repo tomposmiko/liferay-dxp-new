@@ -1609,8 +1609,8 @@ public class LayoutStagedModelDataHandler
 
 			fragmentEntryLink.setClassNameId(
 				_portal.getClassNameId(Layout.class));
-			fragmentEntryLink.setClassPK(importedLayout.getPlid());
-			fragmentEntryLink.setPlid(importedLayout.getPlid());
+			fragmentEntryLink.setClassPK(layout.getPlid());
+			fragmentEntryLink.setPlid(layout.getPlid());
 
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, fragmentEntryLink);
@@ -2798,7 +2798,11 @@ public class LayoutStagedModelDataHandler
 			typeSettingsUnicodeProperties.setProperty(
 				"collectionPK", String.valueOf(assetListEntryId));
 
-			layout.setTypeSettingsProperties(typeSettingsUnicodeProperties);
+			importedLayout = _layoutLocalService.getLayout(
+				importedLayout.getPlid());
+
+			importedLayout.setTypeSettingsProperties(
+				typeSettingsUnicodeProperties);
 
 			importedLayout = _layoutLocalService.updateLayout(importedLayout);
 		}

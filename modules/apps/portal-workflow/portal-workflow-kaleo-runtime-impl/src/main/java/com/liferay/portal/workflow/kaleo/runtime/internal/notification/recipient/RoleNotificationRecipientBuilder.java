@@ -14,6 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.notification.recipient;
 
+import com.liferay.depot.constants.DepotRolesConstants;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
@@ -41,6 +42,7 @@ import com.liferay.portal.workflow.kaleo.runtime.util.validator.GroupAwareRoleVa
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
@@ -212,6 +214,28 @@ public class RoleNotificationRecipientBuilder
 				users.addAll(
 					_userLocalService.getUserGroupUsers(
 						userGroupGroupRole.getUserGroupId()));
+			}
+
+			if (Objects.equals(
+					role.getName(), DepotRolesConstants.ASSET_LIBRARY_MEMBER) ||
+				Objects.equals(role.getName(), RoleConstants.SITE_MEMBER)) {
+
+				users.addAll(
+					_userLocalService.getGroupUsers(
+						groupId, WorkflowConstants.STATUS_APPROVED, null));
+			}
+
+			if (Objects.equals(
+					role.getName(), RoleConstants.ORGANIZATION_USER)) {
+
+				Group group = _groupLocalService.getGroup(groupId);
+
+				if (group.isOrganization()) {
+					long organizationId = group.getClassPK();
+
+					users.addAll(
+						_userLocalService.getOrganizationUsers(organizationId));
+				}
 			}
 		}
 

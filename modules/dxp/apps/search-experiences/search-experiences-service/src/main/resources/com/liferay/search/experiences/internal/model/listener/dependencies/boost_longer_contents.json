@@ -1,6 +1,6 @@
 {
 	"description_i18n": {
-		"en_US": "Boost contents with longer content translation for the current language."
+		"en_US": "Boost contents with longer content in the user's current language."
 	},
 	"elementDefinition": {
 		"category": "boost",
@@ -17,14 +17,15 @@
 										"boost": "${configuration.boost}",
 										"field_value_factor": {
 											"factor": "${configuration.factor}",
-											"field": "content_${context.language_id}_length_sortable",
+											"field": "contentLength_${context.language_id}_sortable",
 											"missing": 1,
 											"modifier": "${configuration.modifier}"
 										}
 									}
 								}
 							}
-						]
+						],
+						"enabled": true
 					}
 				]
 			}

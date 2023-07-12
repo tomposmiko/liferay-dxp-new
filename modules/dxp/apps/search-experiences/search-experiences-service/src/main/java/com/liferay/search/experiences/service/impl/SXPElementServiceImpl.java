@@ -38,7 +38,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	enabled = false,
 	property = {
 		"json.web.service.context.name=sxp",
 		"json.web.service.context.path=SXPElement"
@@ -50,7 +49,8 @@ public class SXPElementServiceImpl extends SXPElementServiceBaseImpl {
 	@Override
 	public SXPElement addSXPElement(
 			Map<Locale, String> descriptionMap, String elementDefinitionJSON,
-			boolean readOnly, Map<Locale, String> titleMap, int type,
+			boolean readOnly, String schemaVersion,
+			Map<Locale, String> titleMap, int type,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -59,7 +59,7 @@ public class SXPElementServiceImpl extends SXPElementServiceBaseImpl {
 
 		return sxpElementLocalService.addSXPElement(
 			getUserId(), descriptionMap, elementDefinitionJSON, readOnly,
-			titleMap, type, serviceContext);
+			schemaVersion, titleMap, type, serviceContext);
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class SXPElementServiceImpl extends SXPElementServiceBaseImpl {
 	@Override
 	public SXPElement updateSXPElement(
 			long sxpElementId, Map<Locale, String> descriptionMap,
-			String elementDefinitionJSON, boolean hidden,
+			String elementDefinitionJSON, String schemaVersion, boolean hidden,
 			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -102,7 +102,7 @@ public class SXPElementServiceImpl extends SXPElementServiceBaseImpl {
 
 		return _sxpElementLocalService.updateSXPElement(
 			getUserId(), sxpElementId, descriptionMap, elementDefinitionJSON,
-			hidden, titleMap, serviceContext);
+			hidden, schemaVersion, titleMap, serviceContext);
 	}
 
 	@Reference(target = "(resource.name=" + SXPConstants.RESOURCE_NAME + ")")

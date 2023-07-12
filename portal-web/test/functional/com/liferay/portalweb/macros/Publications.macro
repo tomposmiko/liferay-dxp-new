@@ -120,6 +120,10 @@ definition {
 		}
 
 		if ("${conflictingChanges}" == "true") {
+			if (IsElementNotPresent(locator1 = "Publications#NEEDS_MANUAL_RESOLUTION_HEADER_EXPANDED")) {
+				Click(locator1 = "Publications#NEEDS_MANUAL_RESOLUTION_HEADER_COLLAPSED");
+			}
+
 			Click(
 				key_entryTitle = "${entryTitle}",
 				locator1 = "Publications#CONFLICTING_CHANGES_DISCARD_ELLIPSIS");
@@ -231,6 +235,10 @@ definition {
 	}
 
 	macro gotoViewDiffInConflictingPublications {
+		if (IsElementNotPresent(locator1 = "Publications#NEEDS_MANUAL_RESOLUTION_HEADER_EXPANDED")) {
+			Click(locator1 = "Publications#NEEDS_MANUAL_RESOLUTION_HEADER_COLLAPSED");
+		}
+
 		Click(
 			key_entryTitle = "${entryTitle}",
 			locator1 = "Publications#CONFLICTING_CHANGES_CONTENT_LINK");
@@ -358,9 +366,7 @@ definition {
 		}
 
 		var publishDateDay = Time.getUTCDay();
-
 		var publishDateMonth = Time.getUTCMonth();
-
 		var publishDateYear = Time.getUTCYear();
 
 		var publishDate = "${publishDateYear}-${publishDateMonth}-${publishDateDay}";
@@ -370,7 +376,6 @@ definition {
 			value1 = "${publishDate}");
 
 		var publishTimeHours = Time.getUTCHours();
-
 		var publishTimeMinutes = Time.getUTCMinutes();
 
 		if ("${utcMinutes}" == "58") {
@@ -487,6 +492,24 @@ definition {
 		AssertVisible(locator1 = "Publications#DISABLED_PUBLISH_BUTTON");
 	}
 
+	macro viewPublicationOrderInHistory {
+		if (!(isSet(paginationView))) {
+			LexiconEntry.changeDisplayStyle(displayStyle = "list");
+		}
+
+		var resultOrder = "0";
+
+		for (var publicationName : list "${publicationList}") {
+			var resultOrder = ${resultOrder} + 1;
+
+			AssertTextEquals.assertPartialText(
+				key_publicationName = "${publicationName}",
+				locator1 = "Publications#PUBLICATION_ORDER_IN_HISTORY",
+				resultOrder = "${resultOrder}",
+				value1 = "${publicationName}");
+		}
+	}
+
 	macro viewPublicationPublished {
 		ApplicationsMenu.gotoPortlet(
 			category = "Publications",
@@ -543,7 +566,11 @@ definition {
 	macro workOnProduction {
 		Click(locator1 = "Publications#PUBLICATIONS_INDICATOR_BUTTON");
 
-		MenuItem.click(menuItem = "Work on Production");
+		ClickNoError(
+			key_menuItem = "Work on Production",
+			locator1 = "MenuItem#ANY_MENU_ITEM");
+
+		AssertConfirm(value1 = "Any changes made in production will immediately be live. Continue to production?");
 	}
 
 }

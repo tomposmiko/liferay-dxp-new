@@ -32,7 +32,7 @@ if (Validator.isNull(redirect)) {
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-renderResponse.setTitle(LanguageUtil.get(request, "edit-element"));
+renderResponse.setTitle(LanguageUtil.get(request, "view-element"));
 %>
 
 <div>
@@ -43,6 +43,12 @@ renderResponse.setTitle(LanguageUtil.get(request, "edit-element"));
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"defaultLocale", LocaleUtil.toLanguageId(LocaleUtil.getDefault())
+			).put(
+				"jsonAutocompleteEnabled", GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-148749"))
+			).put(
+				"learnMessages", LearnMessageUtil.getJSONObject("search-experiences-web")
+			).put(
+				"locale", themeDisplay.getLanguageId()
 			).put(
 				"namespace", liferayPortletResponse.getNamespace()
 			).put(

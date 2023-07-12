@@ -61,20 +61,20 @@ public class SearchResponse implements Serializable {
 
 	@Schema
 	@Valid
-	public Document[] getDocuments() {
-		return documents;
+	public Map[] getErrors() {
+		return errors;
 	}
 
-	public void setDocuments(Document[] documents) {
-		this.documents = documents;
+	public void setErrors(Map[] errors) {
+		this.errors = errors;
 	}
 
 	@JsonIgnore
-	public void setDocuments(
-		UnsafeSupplier<Document[], Exception> documentsUnsafeSupplier) {
+	public void setErrors(
+		UnsafeSupplier<Map[], Exception> errorsUnsafeSupplier) {
 
 		try {
-			documents = documentsUnsafeSupplier.get();
+			errors = errorsUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -86,35 +86,7 @@ public class SearchResponse implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Document[] documents;
-
-	@Schema
-	public Double getMaxScore() {
-		return maxScore;
-	}
-
-	public void setMaxScore(Double maxScore) {
-		this.maxScore = maxScore;
-	}
-
-	@JsonIgnore
-	public void setMaxScore(
-		UnsafeSupplier<Double, Exception> maxScoreUnsafeSupplier) {
-
-		try {
-			maxScore = maxScoreUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Double maxScore;
+	protected Map[] errors;
 
 	@Schema
 	public Integer getPage() {
@@ -286,6 +258,35 @@ public class SearchResponse implements Serializable {
 
 	@Schema
 	@Valid
+	public SearchHits getSearchHits() {
+		return searchHits;
+	}
+
+	public void setSearchHits(SearchHits searchHits) {
+		this.searchHits = searchHits;
+	}
+
+	@JsonIgnore
+	public void setSearchHits(
+		UnsafeSupplier<SearchHits, Exception> searchHitsUnsafeSupplier) {
+
+		try {
+			searchHits = searchHitsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected SearchHits searchHits;
+
+	@Schema
+	@Valid
 	public SearchRequest getSearchRequest() {
 		return searchRequest;
 	}
@@ -312,34 +313,6 @@ public class SearchResponse implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected SearchRequest searchRequest;
-
-	@Schema
-	public Integer getTotalHits() {
-		return totalHits;
-	}
-
-	public void setTotalHits(Integer totalHits) {
-		this.totalHits = totalHits;
-	}
-
-	@JsonIgnore
-	public void setTotalHits(
-		UnsafeSupplier<Integer, Exception> totalHitsUnsafeSupplier) {
-
-		try {
-			totalHits = totalHitsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer totalHits;
 
 	@Override
 	public boolean equals(Object object) {
@@ -368,34 +341,24 @@ public class SearchResponse implements Serializable {
 
 		sb.append("{");
 
-		if (documents != null) {
+		if (errors != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"documents\": ");
+			sb.append("\"errors\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < documents.length; i++) {
-				sb.append(String.valueOf(documents[i]));
+			for (int i = 0; i < errors.length; i++) {
+				sb.append(errors[i]);
 
-				if ((i + 1) < documents.length) {
+				if ((i + 1) < errors.length) {
 					sb.append(", ");
 				}
 			}
 
 			sb.append("]");
-		}
-
-		if (maxScore != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"maxScore\": ");
-
-			sb.append(maxScore);
 		}
 
 		if (page != null) {
@@ -487,6 +450,16 @@ public class SearchResponse implements Serializable {
 			sb.append("\"");
 		}
 
+		if (searchHits != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"searchHits\": ");
+
+			sb.append(String.valueOf(searchHits));
+		}
+
 		if (searchRequest != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -495,16 +468,6 @@ public class SearchResponse implements Serializable {
 			sb.append("\"searchRequest\": ");
 
 			sb.append(String.valueOf(searchRequest));
-		}
-
-		if (totalHits != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"totalHits\": ");
-
-			sb.append(totalHits);
 		}
 
 		sb.append("}");

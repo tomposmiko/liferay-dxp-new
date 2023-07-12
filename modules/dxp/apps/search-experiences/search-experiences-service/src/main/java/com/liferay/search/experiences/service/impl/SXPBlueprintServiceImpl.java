@@ -38,7 +38,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	enabled = false,
 	property = {
 		"json.web.service.context.name=sxp",
 		"json.web.service.context.path=SXPBlueprint",
@@ -52,8 +51,8 @@ public class SXPBlueprintServiceImpl extends SXPBlueprintServiceBaseImpl {
 	@Override
 	public SXPBlueprint addSXPBlueprint(
 			String configurationJSON, Map<Locale, String> descriptionMap,
-			String elementInstancesJSON, Map<Locale, String> titleMap,
-			ServiceContext serviceContext)
+			String elementInstancesJSON, String schemaVersion,
+			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -61,7 +60,7 @@ public class SXPBlueprintServiceImpl extends SXPBlueprintServiceBaseImpl {
 
 		return sxpBlueprintLocalService.addSXPBlueprint(
 			getUserId(), configurationJSON, descriptionMap,
-			elementInstancesJSON, titleMap, serviceContext);
+			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
 	}
 
 	@Override
@@ -92,7 +91,8 @@ public class SXPBlueprintServiceImpl extends SXPBlueprintServiceBaseImpl {
 	public SXPBlueprint updateSXPBlueprint(
 			long sxpBlueprintId, String configurationJSON,
 			Map<Locale, String> descriptionMap, String elementInstancesJSON,
-			Map<Locale, String> titleMap, ServiceContext serviceContext)
+			String schemaVersion, Map<Locale, String> titleMap,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		_sxpBlueprintModelResourcePermission.check(
@@ -100,7 +100,7 @@ public class SXPBlueprintServiceImpl extends SXPBlueprintServiceBaseImpl {
 
 		return _sxpBlueprintLocalService.updateSXPBlueprint(
 			getUserId(), sxpBlueprintId, configurationJSON, descriptionMap,
-			elementInstancesJSON, titleMap, serviceContext);
+			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
 	}
 
 	@Reference

@@ -22,6 +22,8 @@ import com.liferay.headless.commerce.admin.catalog.resource.v1_0.CategoryResourc
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionCategoryResource;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionResource;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionValueResource;
+import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductAccountGroupResource;
+import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductChannelResource;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductConfigurationResource;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductGroupProductResource;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductGroupResource;
@@ -70,6 +72,10 @@ public class ServletDataImpl implements ServletData {
 			_optionValueResourceComponentServiceObjects);
 		Mutation.setProductResourceComponentServiceObjects(
 			_productResourceComponentServiceObjects);
+		Mutation.setProductAccountGroupResourceComponentServiceObjects(
+			_productAccountGroupResourceComponentServiceObjects);
+		Mutation.setProductChannelResourceComponentServiceObjects(
+			_productChannelResourceComponentServiceObjects);
 		Mutation.setProductConfigurationResourceComponentServiceObjects(
 			_productConfigurationResourceComponentServiceObjects);
 		Mutation.setProductGroupResourceComponentServiceObjects(
@@ -110,6 +116,10 @@ public class ServletDataImpl implements ServletData {
 			_optionValueResourceComponentServiceObjects);
 		Query.setProductResourceComponentServiceObjects(
 			_productResourceComponentServiceObjects);
+		Query.setProductAccountGroupResourceComponentServiceObjects(
+			_productAccountGroupResourceComponentServiceObjects);
+		Query.setProductChannelResourceComponentServiceObjects(
+			_productChannelResourceComponentServiceObjects);
 		Query.setProductConfigurationResourceComponentServiceObjects(
 			_productConfigurationResourceComponentServiceObjects);
 		Query.setProductGroupResourceComponentServiceObjects(
@@ -179,6 +189,14 @@ public class ServletDataImpl implements ServletData {
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<ProductResource>
 		_productResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<ProductAccountGroupResource>
+		_productAccountGroupResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<ProductChannelResource>
+		_productChannelResourceComponentServiceObjects;
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<ProductConfigurationResource>
