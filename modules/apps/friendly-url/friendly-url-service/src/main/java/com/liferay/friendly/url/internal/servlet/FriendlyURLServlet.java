@@ -205,6 +205,13 @@ public class FriendlyURLServlet extends HttpServlet {
 				if (!LayoutPermissionUtil.contains(
 						permissionChecker, layout, ActionKeys.VIEW)) {
 
+					if (PropsValues.AUTH_LOGIN_PROMPT_ENABLED) {
+						String redirect = portal.getLayoutActualURL(
+							layout, Portal.PATH_MAIN);
+
+						return new Redirect(redirect);
+					}
+
 					throw new LayoutPermissionException();
 				}
 			}
@@ -248,7 +255,9 @@ public class FriendlyURLServlet extends HttpServlet {
 
 				if (Validator.isNotNull(i18nLanguageId) &&
 					!LanguageUtil.isAvailableLocale(
-						group.getGroupId(), i18nLanguageId)) {
+						group.getGroupId(), i18nLanguageId) &&
+					(!portal.isGroupControlPanelPath(path) ||
+					 !LanguageUtil.isAvailableLocale(i18nLanguageId))) {
 
 					localeUnavailable = true;
 				}

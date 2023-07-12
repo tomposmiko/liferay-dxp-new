@@ -768,7 +768,17 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 		if (cpInstances.size() == 1) {
 			CPInstance cpInstance = cpInstances.get(0);
 
-			document.addNumber(CPField.BASE_PRICE, cpInstance.getPrice());
+			BigDecimal price = cpInstance.getPrice();
+			BigDecimal promoPrice = cpInstance.getPromoPrice();
+
+			if ((promoPrice.compareTo(BigDecimal.ZERO) > 0) &&
+				CommerceBigDecimalUtil.lt(promoPrice, price)) {
+
+				document.addNumber(CPField.BASE_PRICE, promoPrice);
+			}
+			else {
+				document.addNumber(CPField.BASE_PRICE, price);
+			}
 		}
 		else if (!cpInstances.isEmpty()) {
 			CPInstance firstCPInstance = cpInstances.get(0);
@@ -789,6 +799,14 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 							CommercePriceListConstants.TYPE_PRICE_LIST);
 
 				BigDecimal price = commercePriceEntry.getPrice();
+
+				BigDecimal promoPrice = cpInstance.getPromoPrice();
+
+				if ((promoPrice.compareTo(BigDecimal.ZERO) > 0) &&
+					CommerceBigDecimalUtil.lt(promoPrice, price)) {
+
+					price = promoPrice;
+				}
 
 				if (CommerceBigDecimalUtil.lt(price, lowestPrice)) {
 					lowestPrice = price;

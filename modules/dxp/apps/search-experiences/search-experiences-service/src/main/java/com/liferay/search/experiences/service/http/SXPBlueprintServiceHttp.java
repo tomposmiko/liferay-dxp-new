@@ -53,7 +53,8 @@ public class SXPBlueprintServiceHttp {
 
 	public static com.liferay.search.experiences.model.SXPBlueprint
 			addSXPBlueprint(
-				HttpPrincipal httpPrincipal, String configurationJSON,
+				HttpPrincipal httpPrincipal, String externalReferenceCode,
+				String configurationJSON,
 				java.util.Map<java.util.Locale, String> descriptionMap,
 				String elementInstancesJSON, String schemaVersion,
 				java.util.Map<java.util.Locale, String> titleMap,
@@ -66,8 +67,9 @@ public class SXPBlueprintServiceHttp {
 				_addSXPBlueprintParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, configurationJSON, descriptionMap,
-				elementInstancesJSON, schemaVersion, titleMap, serviceContext);
+				methodKey, externalReferenceCode, configurationJSON,
+				descriptionMap, elementInstancesJSON, schemaVersion, titleMap,
+				serviceContext);
 
 			Object returnObj = null;
 
@@ -178,6 +180,49 @@ public class SXPBlueprintServiceHttp {
 	}
 
 	public static com.liferay.search.experiences.model.SXPBlueprint
+			getSXPBlueprintByExternalReferenceCode(
+				HttpPrincipal httpPrincipal, long companyId,
+				String externalReferenceCode)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				SXPBlueprintServiceUtil.class,
+				"getSXPBlueprintByExternalReferenceCode",
+				_getSXPBlueprintByExternalReferenceCodeParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, externalReferenceCode);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.search.experiences.model.SXPBlueprint)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
+	public static com.liferay.search.experiences.model.SXPBlueprint
 			updateSXPBlueprint(
 				HttpPrincipal httpPrincipal, long sxpBlueprintId,
 				String configurationJSON,
@@ -190,7 +235,7 @@ public class SXPBlueprintServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SXPBlueprintServiceUtil.class, "updateSXPBlueprint",
-				_updateSXPBlueprintParameterTypes3);
+				_updateSXPBlueprintParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, sxpBlueprintId, configurationJSON, descriptionMap,
@@ -229,15 +274,19 @@ public class SXPBlueprintServiceHttp {
 
 	private static final Class<?>[] _addSXPBlueprintParameterTypes0 =
 		new Class[] {
-			String.class, java.util.Map.class, String.class, String.class,
-			java.util.Map.class,
+			String.class, String.class, java.util.Map.class, String.class,
+			String.class, java.util.Map.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _deleteSXPBlueprintParameterTypes1 =
 		new Class[] {long.class};
 	private static final Class<?>[] _getSXPBlueprintParameterTypes2 =
 		new Class[] {long.class};
-	private static final Class<?>[] _updateSXPBlueprintParameterTypes3 =
+	private static final Class<?>[]
+		_getSXPBlueprintByExternalReferenceCodeParameterTypes3 = new Class[] {
+			long.class, String.class
+		};
+	private static final Class<?>[] _updateSXPBlueprintParameterTypes4 =
 		new Class[] {
 			long.class, String.class, java.util.Map.class, String.class,
 			String.class, java.util.Map.class,
