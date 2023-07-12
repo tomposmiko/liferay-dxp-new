@@ -15,6 +15,7 @@
 package com.liferay.layout.taglib.servlet.taglib;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
+import com.liferay.layout.constants.LayoutWebKeys;
 import com.liferay.layout.taglib.internal.display.context.RenderLayoutStructureDisplayContext;
 import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.layout.util.structure.LayoutStructure;
@@ -51,7 +52,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				ServletContextUtil.getSegmentsEntryRetriever(),
 				isShowPreview()));
 
-		request.setAttribute(LAYOUT_STRUCTURE, _layoutStructure);
+		request.setAttribute(LayoutWebKeys.LAYOUT_STRUCTURE, _layoutStructure);
 
 		return super.doStartTag();
 	}
@@ -119,6 +120,11 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		return _PAGE;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             LayoutWebKeys.LAYOUT_STRUCTURE}
+	 */
+	@Deprecated
 	protected static final String LAYOUT_STRUCTURE =
 		RenderLayoutStructureTag.class.getName() + "#LAYOUT_STRUCTURE";
 

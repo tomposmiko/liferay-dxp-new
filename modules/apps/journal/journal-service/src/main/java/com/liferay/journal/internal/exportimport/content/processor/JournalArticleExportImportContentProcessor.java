@@ -19,6 +19,7 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.Value;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Field;
@@ -49,6 +50,8 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -63,6 +66,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -677,15 +681,18 @@ public class JournalArticleExportImportContentProcessor
 	private DDMStructure _fetchDDMStructure(
 		PortletDataContext portletDataContext, JournalArticle article) {
 
-		long formerGroupId = article.getGroupId();
+		Map<String, String> ddmStructureKeys =
+			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
+				DDMStructure.class + ".ddmStructureKey");
 
-		article.setGroupId(portletDataContext.getScopeGroupId());
+		String ddmStructureKey = MapUtil.getString(
+			ddmStructureKeys, article.getDDMStructureKey(),
+			article.getDDMStructureKey());
 
-		DDMStructure ddmStructure = article.getDDMStructure();
-
-		article.setGroupId(formerGroupId);
-
-		return ddmStructure;
+		return _ddmStructureLocalService.fetchStructure(
+			portletDataContext.getScopeGroupId(),
+			_portal.getClassNameId(JournalArticle.class), ddmStructureKey,
+			true);
 	}
 
 	private Fields _getDDMStructureFields(
@@ -719,6 +726,9 @@ public class JournalArticleExportImportContentProcessor
 	private ExportImportContentProcessor<DDMFormValues>
 		_ddmFormValuesExportImportContentProcessor;
 
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
+
 	@Reference(target = "(model.class.name=java.lang.String)")
 	private ExportImportContentProcessor<String>
 		_defaultTextExportImportContentProcessor;
@@ -741,5 +751,8 @@ public class JournalArticleExportImportContentProcessor
 
 	@Reference
 	private JSONFactory _jsonFactory;
+
+	@Reference
+	private Portal _portal;
 
 }

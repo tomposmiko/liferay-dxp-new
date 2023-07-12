@@ -35,7 +35,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.document.Document;
+import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -123,16 +123,15 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 
 		FileEntry fileEntry = addFileEntry(fileName_jp);
 
-		Document document = dlSearchFixture.searchOnlyOneSearchHit(
-			searchTerm, LocaleUtil.JAPAN);
-
-		document = indexedFieldsFixture.postProcessDocument(document);
+		SearchResponse searchResponse =
+			dlSearchFixture.searchOnlyOneSearchResponse(
+				searchTerm, LocaleUtil.JAPAN);
 
 		Map<String, String> map = new HashMap<>();
 
 		populateExpectedFieldValues(fileEntry, map);
 
-		FieldValuesAssert.assertFieldValues(searchTerm, document, map);
+		FieldValuesAssert.assertFieldValues(map, searchResponse);
 	}
 
 	protected String getContents(FileEntry fileEntry) throws Exception {
@@ -273,7 +272,7 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 		populateLocalizedTitles(fileEntry, map);
 		populateViewCount(fileEntry, map);
 
-		indexedFieldsFixture.populatePriority("0.0", map, true);
+		indexedFieldsFixture.populatePriority("0.0", map);
 		indexedFieldsFixture.populateRoleIdFields(
 			fileEntry.getCompanyId(), DLFileEntry.class.getName(),
 			fileEntry.getPrimaryKey(), fileEntry.getGroupId(), null, map);

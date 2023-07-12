@@ -9493,15 +9493,14 @@ public class OrganizationPersistenceImpl
 		OrganizationModelImpl organizationModelImpl =
 			(OrganizationModelImpl)organization;
 
-		if (Validator.isNull(organization.getExternalReferenceCode())) {
-			organization.setExternalReferenceCode(
-				String.valueOf(organization.getPrimaryKey()));
-		}
-
 		if (Validator.isNull(organization.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
 
 			organization.setUuid(uuid);
+		}
+
+		if (Validator.isNull(organization.getExternalReferenceCode())) {
+			organization.setExternalReferenceCode(organization.getUuid());
 		}
 
 		ServiceContext serviceContext =
@@ -9624,7 +9623,9 @@ public class OrganizationPersistenceImpl
 	 */
 	@Override
 	public Organization fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(Organization.class)) {
+		if (CTPersistenceHelperUtil.isProductionMode(
+				Organization.class, primaryKey)) {
+
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
