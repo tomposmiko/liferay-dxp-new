@@ -276,6 +276,8 @@ public class InfoDisplayContributorWrapper
 						InfoField.builder(
 						).infoFieldType(
 							_getInfoFieldTypeType(infoDisplayField.getType())
+						).namespace(
+							InfoDisplayField.class.getSimpleName()
 						).name(
 							infoDisplayField.getKey()
 						).labelInfoLocalizedValue(
@@ -331,6 +333,8 @@ public class InfoDisplayContributorWrapper
 						InfoField infoField = InfoField.builder(
 						).infoFieldType(
 							TextInfoFieldType.INSTANCE
+						).namespace(
+							InfoDisplayField.class.getName()
 						).name(
 							fieldName
 						).labelInfoLocalizedValue(

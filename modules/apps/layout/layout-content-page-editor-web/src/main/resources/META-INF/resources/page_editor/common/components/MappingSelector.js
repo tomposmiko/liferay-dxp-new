@@ -25,6 +25,7 @@ import {config} from '../../app/config/index';
 import CollectionService from '../../app/services/CollectionService';
 import InfoItemService from '../../app/services/InfoItemService';
 import {useDispatch, useSelector} from '../../app/store/index';
+import getSelectedField from '../../app/utils/getSelectedField';
 import isMapped from '../../app/utils/isMapped';
 import {useId} from '../../app/utils/useId';
 import ItemSelector from './ItemSelector';
@@ -354,6 +355,8 @@ function MappingFieldSelect({fieldSets, fieldType, onValueSelect, value}) {
 
 	const hasWarnings = fieldSets && fieldSets.length === 0;
 
+	const selectedField = getSelectedField({fieldSets, value});
+
 	return (
 		<ClayForm.Group
 			className={classNames({'has-warning': hasWarnings})}
@@ -368,7 +371,7 @@ function MappingFieldSelect({fieldSets, fieldType, onValueSelect, value}) {
 				disabled={!(fieldSets && fieldSets.length)}
 				id={mappingSelectorFieldSelectId}
 				onChange={onValueSelect}
-				value={value}
+				value={selectedField?.key}
 			>
 				{fieldSets && fieldSets.length && (
 					<>

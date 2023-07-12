@@ -14,19 +14,18 @@
 
 package com.liferay.asset.info.internal.item;
 
+import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.info.field.InfoField;
-import com.liferay.info.field.type.ImageInfoFieldType;
 import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.localized.InfoLocalizedValue;
 
 /**
  * @author Jorge Ferrer
  */
-public interface AssetEntryInfoItemFields {
+public class AssetEntryInfoItemFields {
 
 	public static final InfoField<TextInfoFieldType> createDateInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"createDate"
@@ -35,8 +34,7 @@ public interface AssetEntryInfoItemFields {
 				AssetEntryInfoItemFields.class, "create-date")
 		).build();
 	public static final InfoField<TextInfoFieldType> descriptionInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"description"
@@ -45,8 +43,7 @@ public interface AssetEntryInfoItemFields {
 				AssetEntryInfoItemFields.class, "description")
 		).build();
 	public static final InfoField<TextInfoFieldType> expirationDateInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"expirationDate"
@@ -55,8 +52,7 @@ public interface AssetEntryInfoItemFields {
 				AssetEntryInfoItemFields.class, "expiration-date")
 		).build();
 	public static final InfoField<TextInfoFieldType> modifiedDateInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"modifiedDate"
@@ -65,8 +61,7 @@ public interface AssetEntryInfoItemFields {
 				AssetEntryInfoItemFields.class, "modified-date")
 		).build();
 	public static final InfoField<TextInfoFieldType> summaryInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"summary"
@@ -75,8 +70,7 @@ public interface AssetEntryInfoItemFields {
 				AssetEntryInfoItemFields.class, "summary")
 		).build();
 	public static final InfoField<TextInfoFieldType> titleInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"title"
@@ -84,8 +78,7 @@ public interface AssetEntryInfoItemFields {
 			InfoLocalizedValue.localize(AssetEntryInfoItemFields.class, "title")
 		).build();
 	public static final InfoField<TextInfoFieldType> urlInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"url"
@@ -93,8 +86,7 @@ public interface AssetEntryInfoItemFields {
 			InfoLocalizedValue.localize(AssetEntryInfoItemFields.class, "url")
 		).build();
 	public static final InfoField<TextInfoFieldType> userNameInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"userName"
@@ -102,18 +94,17 @@ public interface AssetEntryInfoItemFields {
 			InfoLocalizedValue.localize(
 				AssetEntryInfoItemFields.class, "user-name")
 		).build();
-	public static final InfoField userProfileImage = InfoField.builder(
-	).infoFieldType(
-		ImageInfoFieldType.INSTANCE
-	).name(
-		"userProfileImage"
-	).labelInfoLocalizedValue(
-		InfoLocalizedValue.localize(
-			AssetEntryInfoItemFields.class, "user-profile-image")
-	).build();
+	public static final InfoField userProfileImage =
+		BuilderHolder._builder.infoFieldType(
+			TextInfoFieldType.INSTANCE
+		).name(
+			"userProfileImage"
+		).labelInfoLocalizedValue(
+			InfoLocalizedValue.localize(
+				AssetEntryInfoItemFields.class, "user-profile-image")
+		).build();
 	public static final InfoField<TextInfoFieldType> viewCountInfoField =
-		InfoField.builder(
-		).infoFieldType(
+		BuilderHolder._builder.infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"viewName"
@@ -121,5 +112,12 @@ public interface AssetEntryInfoItemFields {
 			InfoLocalizedValue.localize(
 				AssetEntryInfoItemFields.class, "view-count")
 		).build();
+
+	private static class BuilderHolder {
+
+		private static final InfoField.NamespacedBuilder _builder =
+			InfoField.builder(AssetEntry.class.getSimpleName());
+
+	}
 
 }

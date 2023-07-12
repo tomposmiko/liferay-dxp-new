@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 
 /**
  * @author Brian Wing Shun Chan
@@ -239,19 +240,21 @@ public class OAuth2AuthorizationLocalServiceImpl
 	}
 
 	@Activate
+	@Modified
 	protected void activate(Map<String, Object> properties) {
 		OAuth2ProviderConfiguration oAuth2ProviderConfiguration =
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		int expiredAuthorizationsAfterlifeDuration =
+		int expiredAuthorizationsAfterlifeDuration = Math.max(
 			oAuth2ProviderConfiguration.
-				expiredAuthorizationsAfterlifeDuration();
+				expiredAuthorizationsAfterlifeDuration(),
+			0);
 
 		_expiredAuthorizationsAfterlifeDurationMillis =
 			expiredAuthorizationsAfterlifeDuration * Time.SECOND;
 	}
 
-	private long _expiredAuthorizationsAfterlifeDurationMillis;
+	private volatile long _expiredAuthorizationsAfterlifeDurationMillis;
 
 }

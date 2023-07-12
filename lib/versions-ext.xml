@@ -1702,7 +1702,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/hikaricp.jar</file-name>
-				<version>4.0.3</version>
+				<version>2.7.0</version>
 				<project-name>HikariCP</project-name>
 				<project-url>https://github.com/brettwooldridge/HikariCP</project-url>
 				<licenses>
@@ -1899,7 +1899,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/javassist.jar</file-name>
-				<version>3.18.2 GA</version>
+				<version>3.29.0 GA</version>
 				<project-name>Javassist</project-name>
 				<project-url>http://www.csg.is.titech.ac.jp/~chiba/javassist</project-url>
 				<licenses>
@@ -2444,7 +2444,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/metadata-extractor.jar</file-name>
-				<version>2.13.0</version>
+				<version>2.18.0</version>
 				<project-name>Metadata Extractor</project-name>
 				<project-url>http://www.drewnoakes.com/code/exif</project-url>
 				<licenses>
@@ -3431,7 +3431,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/xmlsec.jar</file-name>
-				<version>1.5.8</version>
+				<version>2.1.7</version>
 				<project-name>XML Security</project-name>
 				<project-url>http://santuario.apache.org</project-url>
 				<licenses>

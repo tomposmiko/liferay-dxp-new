@@ -125,7 +125,7 @@ public class FragmentEntryConfigurationParserImpl
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getConfigurationJSONObject(String, String)}
+	 *             #getContextObjects(JSONObject, String, long[])}
 	 */
 	@Deprecated
 	@Override
@@ -137,6 +137,11 @@ public class FragmentEntryConfigurationParserImpl
 		return getConfigurationJSONObject(configuration, editableValues);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getContextObjects(JSONObject, String, long[])}
+	 */
+	@Deprecated
 	@Override
 	public Map<String, Object> getContextObjects(
 		JSONObject configurationValuesJSONObject, String configuration) {
@@ -170,7 +175,7 @@ public class FragmentEntryConfigurationParserImpl
 					"collectionSelector")) {
 
 				Object contextListObject = _getInfoListObjectEntry(
-					configurationValuesJSONObject.getString(name));
+					configurationValuesJSONObject.getString(name), null);
 
 				if (contextListObject != null) {
 					contextObjects.put(
@@ -182,17 +187,51 @@ public class FragmentEntryConfigurationParserImpl
 		return contextObjects;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getContextObjects(JSONObject, String)}
-	 */
-	@Deprecated
 	@Override
 	public Map<String, Object> getContextObjects(
 		JSONObject configurationValuesJSONObject, String configuration,
-		long[] segmentsExperienceIds) {
+		long[] segmentsEntryIds) {
 
-		return getContextObjects(configurationValuesJSONObject, configuration);
+		HashMap<String, Object> contextObjects = new HashMap<>();
+
+		List<FragmentConfigurationField> fragmentConfigurationFields =
+			getFragmentConfigurationFields(configuration);
+
+		for (FragmentConfigurationField fragmentConfigurationField :
+				fragmentConfigurationFields) {
+
+			String name = fragmentConfigurationField.getName();
+
+			if (StringUtil.equalsIgnoreCase(
+					fragmentConfigurationField.getType(), "itemSelector")) {
+
+				Object contextObject = _getInfoDisplayObjectEntry(
+					configurationValuesJSONObject.getString(name));
+
+				if (contextObject != null) {
+					contextObjects.put(
+						name + _CONTEXT_OBJECT_SUFFIX, contextObject);
+				}
+
+				continue;
+			}
+
+			if (StringUtil.equalsIgnoreCase(
+					fragmentConfigurationField.getType(),
+					"collectionSelector")) {
+
+				Object contextListObject = _getInfoListObjectEntry(
+					configurationValuesJSONObject.getString(name),
+					segmentsEntryIds);
+
+				if (contextListObject != null) {
+					contextObjects.put(
+						name + _CONTEXT_OBJECT_LIST_SUFFIX, contextListObject);
+				}
+			}
+		}
+
+		return contextObjects;
 	}
 
 	@Override
@@ -509,7 +548,9 @@ public class FragmentEntryConfigurationParserImpl
 		return null;
 	}
 
-	private Object _getInfoListObjectEntry(String value) {
+	private Object _getInfoListObjectEntry(
+		String value, long[] segmentsEntryIds) {
+
 		if (Validator.isNull(value)) {
 			return Collections.emptyList();
 		}
@@ -538,9 +579,18 @@ public class FragmentEntryConfigurationParserImpl
 				return Collections.emptyList();
 			}
 
+			DefaultLayoutListRetrieverContext
+				defaultLayoutListRetrieverContext =
+					new DefaultLayoutListRetrieverContext();
+
+			if (segmentsEntryIds != null) {
+				defaultLayoutListRetrieverContext.setSegmentsEntryIds(
+					segmentsEntryIds);
+			}
+
 			return layoutListRetriever.getList(
 				listObjectReferenceFactory.getListObjectReference(jsonObject),
-				new DefaultLayoutListRetrieverContext());
+				defaultLayoutListRetrieverContext);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

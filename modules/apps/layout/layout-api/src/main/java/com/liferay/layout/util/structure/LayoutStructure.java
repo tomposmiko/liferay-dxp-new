@@ -707,6 +707,9 @@ public class LayoutStructure {
 			new ColumnLayoutStructureItem(parentItemId);
 
 		columnLayoutStructureItem.setSize(size);
+		columnLayoutStructureItem.setViewportConfiguration(
+			ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
+			JSONUtil.put("size", 12));
 
 		_updateLayoutStructure(columnLayoutStructureItem, position);
 	}
@@ -788,6 +791,17 @@ public class LayoutStructure {
 				continue;
 			}
 
+			if (!updateEmpty &&
+				Objects.equals(
+					ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
+					viewportSizeId)) {
+
+				columnLayoutStructureItem.setViewportConfiguration(
+					viewportSizeId, JSONUtil.put("size", 12));
+
+				continue;
+			}
+
 			Map<String, JSONObject> columnViewportConfigurations =
 				columnLayoutStructureItem.getViewportConfigurations();
 
@@ -800,6 +814,17 @@ public class LayoutStructure {
 
 			if (!columnViewportConfigurationJSONObject.has("size") &&
 				!updateEmpty) {
+
+				continue;
+			}
+
+			if (columnViewportConfigurationJSONObject.has("size") &&
+				!updateEmpty &&
+				Objects.equals(
+					ViewportSize.PORTRAIT_MOBILE.getViewportSizeId(),
+					viewportSizeId)) {
+
+				columnViewportConfigurationJSONObject.remove("size");
 
 				continue;
 			}
@@ -844,7 +869,20 @@ public class LayoutStructure {
 
 		viewportConfigurationJSONObject.put("numberOfColumns", numberOfColumns);
 
-		if (viewportConfigurationJSONObject.has("modulesPerRow")) {
+		if (Objects.equals(
+				ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
+				viewportSizeId)) {
+
+			viewportConfigurationJSONObject.put("modulesPerRow", 1);
+		}
+		else if (Objects.equals(
+					ViewportSize.PORTRAIT_MOBILE.getViewportSizeId(),
+					viewportSizeId) &&
+				 viewportConfigurationJSONObject.has("modulesPerRow")) {
+
+			viewportConfigurationJSONObject.remove("modulesPerRow");
+		}
+		else if (viewportConfigurationJSONObject.has("modulesPerRow")) {
 			viewportConfigurationJSONObject.put(
 				"modulesPerRow", numberOfColumns);
 		}
