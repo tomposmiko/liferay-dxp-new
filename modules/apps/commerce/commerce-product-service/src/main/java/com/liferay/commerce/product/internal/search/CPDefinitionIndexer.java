@@ -798,6 +798,10 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 							cpInstance.getCPInstanceUuid(),
 							CommercePriceListConstants.TYPE_PRICE_LIST);
 
+				if (commercePriceEntry == null) {
+					continue;
+				}
+
 				BigDecimal price = commercePriceEntry.getPrice();
 
 				BigDecimal promoPrice = cpInstance.getPromoPrice();

@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
+import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -52,9 +53,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -62,7 +61,10 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Zoltán Takács
  * @generated
  */
-@Component(immediate = true, service = SpecificationResource.Factory.class)
+@Component(
+	property = "resource.locator.key=/headless-commerce-admin-catalog/v1.0/Specification",
+	service = SpecificationResource.Factory.class
+)
 @Generated("")
 public class SpecificationResourceFactoryImpl
 	implements SpecificationResource.Factory {
@@ -134,16 +136,6 @@ public class SpecificationResourceFactoryImpl
 			private User _user;
 
 		};
-	}
-
-	@Activate
-	protected void activate() {
-		SpecificationResource.FactoryHolder.factory = this;
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		SpecificationResource.FactoryHolder.factory = null;
 	}
 
 	private static Function<InvocationHandler, SpecificationResource>
@@ -219,6 +211,7 @@ public class SpecificationResourceFactoryImpl
 		specificationResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		specificationResource.setRoleLocalService(_roleLocalService);
+		specificationResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(specificationResource, arguments);
@@ -268,6 +261,9 @@ public class SpecificationResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

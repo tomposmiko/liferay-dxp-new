@@ -20,6 +20,7 @@ import com.liferay.depot.model.DepotEntryGroupRel;
 import com.liferay.depot.service.DepotEntryGroupRelLocalService;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.depot.test.util.DepotStagingTestUtil;
+import com.liferay.depot.test.util.DepotTestUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -325,11 +326,48 @@ public class DepotEntryGroupRelStagingTest {
 				getDepotEntryGroupRelByUuidAndGroupId(
 					liveDepotEntryGroupRel.getUuid(), _liveGroup.getGroupId()));
 
-		Assert.assertNull(
+		Assert.assertNotNull(
 			_depotEntryGroupRelLocalService.
 				fetchDepotEntryGroupRelByDepotEntryIdToGroupId(
 					_stagingDepotEntry.getDepotEntryId(),
 					_stagingGroup.getGroupId()));
+	}
+
+	@Test
+	public void testDepotEntryGroupRelConnectedToStagedSiteBeforeConnectingStagedDepotAndStagedSite()
+		throws Exception {
+
+		DepotEntryGroupRel livingDepotEntryGroupRel =
+			_depotEntryGroupRelLocalService.addDepotEntryGroupRel(
+				_liveDepotEntry.getDepotEntryId(), _liveGroup.getGroupId());
+
+		Assert.assertEquals(
+			_liveDepotEntry.getDepotEntryId(),
+			livingDepotEntryGroupRel.getDepotEntryId());
+
+		Assert.assertNotNull(
+			_depotEntryGroupRelLocalService.
+				fetchDepotEntryGroupRelByDepotEntryIdToGroupId(
+					_liveDepotEntry.getDepotEntryId(),
+					_liveGroup.getGroupId()));
+
+		DepotTestUtil.withLocalStagingEnabled(
+			_liveGroup,
+			stagingGroup -> {
+				Assert.assertNotNull(
+					_depotEntryGroupRelLocalService.
+						fetchDepotEntryGroupRelByDepotEntryIdToGroupId(
+							_liveDepotEntry.getDepotEntryId(),
+							stagingGroup.getGroupId()));
+
+				DepotTestUtil.withLocalStagingEnabled(
+					_liveDepotEntry,
+					stagingDepotEntry -> Assert.assertNotNull(
+						_depotEntryGroupRelLocalService.
+							fetchDepotEntryGroupRelByDepotEntryIdToGroupId(
+								stagingDepotEntry.getDepotEntryId(),
+								stagingGroup.getGroupId())));
+			});
 	}
 
 	private DepotEntry _addDepotEntry() throws Exception {

@@ -16,6 +16,7 @@ package com.liferay.app.builder.workflow.rest.resource.v1_0;
 
 import com.liferay.app.builder.workflow.rest.dto.v1_0.AppWorkflowDataRecordLink;
 import com.liferay.app.builder.workflow.rest.dto.v1_0.DataRecordIds;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
+import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 
@@ -51,10 +53,6 @@ import org.osgi.annotation.versioning.ProviderType;
 @Generated("")
 @ProviderType
 public interface AppWorkflowDataRecordLinkResource {
-
-	public static Builder builder() {
-		return FactoryHolder.factory.create();
-	}
 
 	public Page<AppWorkflowDataRecordLink>
 			postAppAppWorkflowDataRecordLinksPage(
@@ -98,6 +96,8 @@ public interface AppWorkflowDataRecordLinkResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
+	public void setSortParserProvider(SortParserProvider sortParserProvider);
+
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -109,10 +109,8 @@ public interface AppWorkflowDataRecordLinkResource {
 		return null;
 	}
 
-	public static class FactoryHolder {
-
-		public static volatile Factory factory;
-
+	public default Sort[] toSorts(String sortsString) {
+		return new Sort[0];
 	}
 
 	@ProviderType

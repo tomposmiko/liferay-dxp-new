@@ -904,12 +904,19 @@ public class PortalImpl implements Portal {
 		Enumeration<String> enumeration = actionRequest.getParameterNames();
 
 		while (enumeration.hasMoreElements()) {
-			String param = enumeration.nextElement();
+			String actionParameterName = enumeration.nextElement();
 
-			if (renderParameters.get(actionResponse.getNamespace() + param) ==
-					null) {
+			if (actionParameterName.equals("password1") ||
+				actionParameterName.equals("password2")) {
 
-				String[] values = actionRequest.getParameterValues(param);
+				continue;
+			}
+
+			String[] values = renderParameters.get(
+				actionResponse.getNamespace() + actionParameterName);
+
+			if (values == null) {
+				values = actionRequest.getParameterValues(actionParameterName);
 
 				if (values == null) {
 					values = new String[0];
@@ -926,7 +933,7 @@ public class PortalImpl implements Portal {
 						});
 				}
 
-				actionResponse.setRenderParameter(param, values);
+				actionResponse.setRenderParameter(actionParameterName, values);
 			}
 		}
 	}
