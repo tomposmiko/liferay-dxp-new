@@ -15,7 +15,7 @@
 package com.liferay.portal.security.sso.openid.connect.internal.session.manager;
 
 import com.liferay.counter.kernel.service.CounterLocalService;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
@@ -23,16 +23,17 @@ import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationConfiguration;
 import com.liferay.portal.kernel.messaging.DestinationFactory;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
-import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.sso.openid.connect.OpenIdConnectProvider;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectProviderRegistry;
+import com.liferay.portal.security.sso.openid.connect.configuration.OpenIdConnectConfiguration;
 import com.liferay.portal.security.sso.openid.connect.constants.OpenIdConnectWebKeys;
 import com.liferay.portal.security.sso.openid.connect.internal.constants.OpenIdConnectDestinationNames;
-import com.liferay.portal.security.sso.openid.connect.internal.scheduler.OpenIdConnectTokenRefreshScheduler;
 import com.liferay.portal.security.sso.openid.connect.internal.util.OpenIdConnectTokenRequestUtil;
 import com.liferay.portal.security.sso.openid.connect.persistence.model.OpenIdConnectSession;
 import com.liferay.portal.security.sso.openid.connect.persistence.service.OpenIdConnectSessionLocalService;
@@ -47,33 +48,27 @@ import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Arthur Chan
  */
-@Component(immediate = true, service = OfflineOpenIdConnectSessionManager.class)
+@Component(
+	configurationPid = "com.liferay.portal.security.sso.openid.connect.configuration.OpenIdConnectConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = OfflineOpenIdConnectSessionManager.class
+)
 public class OfflineOpenIdConnectSessionManager {
-
-	public void endOpenIdConnectSession(long openIdConnectSessionId) {
-		try {
-			_openIdConnectTokenRefreshScheduler.unschedule(
-				openIdConnectSessionId);
-		}
-		catch (SchedulerException schedulerException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(schedulerException, schedulerException);
-			}
-		}
-	}
 
 	public boolean isOpenIdConnectSession(HttpSession httpSession) {
 		if (httpSession == null) {
@@ -103,22 +98,28 @@ public class OfflineOpenIdConnectSessionManager {
 				openIdConnectSessionId);
 
 		if (openIdConnectSession == null) {
-			endOpenIdConnectSession(openIdConnectSessionId);
-
 			return true;
 		}
 
 		AccessToken accessToken = _getAccessToken(openIdConnectSession);
 
-		long currentTime = System.currentTimeMillis();
 		long lifetime = accessToken.getLifetime() * Time.SECOND;
+
 		Date modifiedDate = openIdConnectSession.getModifiedDate();
 
-		if ((currentTime - modifiedDate.getTime()) < lifetime) {
-			return false;
+		long elapsedTime = System.currentTimeMillis() - modifiedDate.getTime();
+
+		if (elapsedTime > (lifetime - _tokenRefreshOffsetMillis)) {
+			Message message = new Message();
+
+			message.put("openIdConnectSessionId", openIdConnectSessionId);
+
+			_messageBus.sendMessage(
+				OpenIdConnectDestinationNames.OPENID_CONNECT_TOKEN_REFRESH,
+				message);
 		}
 
-		return true;
+		return false;
 	}
 
 	public long startOpenIdConnectSession(
@@ -136,111 +137,88 @@ public class OfflineOpenIdConnectSessionManager {
 						OpenIdConnectSession.class.getName()));
 		}
 
-		AccessToken accessToken = oidcTokens.getAccessToken();
-
 		_updateOpenIdConnectSession(
-			accessToken, configurationPid, oidcTokens.getIDTokenString(),
-			oidcTokens.getRefreshToken(), openIdConnectSession, providerName,
-			userId);
-
-		if (openIdConnectSession.getRefreshToken() != null) {
-			try {
-				_openIdConnectTokenRefreshScheduler.schedule(
-					accessToken.getLifetime(),
-					openIdConnectSession.getOpenIdConnectSessionId(),
-					openIdConnectSession.getModifiedDate());
-			}
-			catch (SchedulerException schedulerException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(schedulerException, schedulerException);
-				}
-			}
-		}
+			oidcTokens.getAccessToken(), configurationPid,
+			oidcTokens.getIDTokenString(), oidcTokens.getRefreshToken(),
+			openIdConnectSession, providerName, userId);
 
 		return openIdConnectSession.getOpenIdConnectSessionId();
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
+	@Modified
+	protected void activate(
+			BundleContext bundleContext, Map<String, Object> properties)
+		throws Exception {
+
 		_bundleContext = bundleContext;
 
-		DestinationConfiguration destinationConfiguration =
-			DestinationConfiguration.createSerialDestinationConfiguration(
-				OpenIdConnectDestinationNames.OPENID_CONNECT_TOKEN_REFRESH);
+		OpenIdConnectConfiguration openIdConnectConfiguration =
+			ConfigurableUtil.createConfigurable(
+				OpenIdConnectConfiguration.class, properties);
 
-		Destination destination = _destinationFactory.createDestination(
-			destinationConfiguration);
+		if (openIdConnectConfiguration.tokenRefreshOffset() < 30) {
+			throw new IllegalArgumentException(
+				"Token refresh offset needs to be at least 30 seconds");
+		}
 
-		Dictionary<String, Object> dictionary =
-			HashMapDictionaryBuilder.<String, Object>put(
-				"destination.name", destination.getName()
-			).build();
+		_tokenRefreshOffsetMillis =
+			openIdConnectConfiguration.tokenRefreshOffset() * Time.SECOND;
 
-		_serviceRegistration1 = bundleContext.registerService(
-			Destination.class, destination, dictionary);
+		if (!openIdConnectConfiguration.enabled()) {
+			deactivate();
 
-		_serviceRegistration2 = bundleContext.registerService(
-			MessageListener.class, new OpenIdConnectMessageListener(),
-			dictionary);
+			return;
+		}
+
+		_registerServices(
+			bundleContext,
+			OpenIdConnectDestinationNames.OPENID_CONNECT_TOKEN_REFRESH);
 	}
 
 	@Deactivate
-	protected void deactivate() throws Exception {
-		if (_serviceRegistration1 != null) {
-			Destination destination = _bundleContext.getService(
-				_serviceRegistration1.getReference());
-
-			_serviceRegistration1.unregister();
-
-			destination.destroy();
-		}
-
-		if (_serviceRegistration2 != null) {
-			_serviceRegistration2.unregister();
-		}
-
-		_bundleContext = null;
+	protected void deactivate() {
+		_unregisterServices();
 	}
 
-	private void _extendOpenIdConnectSession(
-			OpenIdConnectSession openIdConnectSession)
-		throws Exception {
+	private AccessToken _extendOpenIdConnectSession(
+		OpenIdConnectSession openIdConnectSession) {
 
-		if (openIdConnectSession.getRefreshToken() == null) {
-			return;
+		if (Validator.isNull(openIdConnectSession.getRefreshToken())) {
+			_openIdConnectSessionLocalService.deleteOpenIdConnectSession(
+				openIdConnectSession);
+
+			return null;
 		}
 
 		RefreshToken refreshToken = new RefreshToken(
 			openIdConnectSession.getRefreshToken());
 
-		OIDCTokens oidcTokens = OpenIdConnectTokenRequestUtil.request(
-			_openIdConnectProviderRegistry.findOpenIdConnectProvider(
-				CompanyThreadLocal.getCompanyId(),
-				openIdConnectSession.getProviderName()),
-			refreshToken);
+		try {
+			OpenIdConnectProvider<OIDCClientMetadata, OIDCProviderMetadata>
+				openIdConnectProvider =
+					_openIdConnectProviderRegistry.findOpenIdConnectProvider(
+						CompanyThreadLocal.getCompanyId(),
+						openIdConnectSession.getProviderName());
 
-		AccessToken oldAccessToken = _getAccessToken(openIdConnectSession);
+			OIDCTokens oidcTokens = OpenIdConnectTokenRequestUtil.request(
+				openIdConnectProvider, refreshToken);
 
-		AccessToken accessToken = oidcTokens.getAccessToken();
+			_updateOpenIdConnectSession(
+				oidcTokens.getAccessToken(), openIdConnectSession,
+				oidcTokens.getRefreshToken());
 
-		_updateOpenIdConnectSession(
-			accessToken, openIdConnectSession, oidcTokens.getRefreshToken());
-
-		if ((openIdConnectSession.getRefreshToken() != null) &&
-			(oldAccessToken.getLifetime() != accessToken.getLifetime())) {
-
-			try {
-				_openIdConnectTokenRefreshScheduler.reschedule(
-					accessToken.getLifetime(),
-					openIdConnectSession.getOpenIdConnectSessionId(),
-					openIdConnectSession.getModifiedDate());
-			}
-			catch (SchedulerException schedulerException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(schedulerException, schedulerException);
-				}
-			}
+			return oidcTokens.getAccessToken();
 		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception);
+			}
+
+			_openIdConnectSessionLocalService.deleteOpenIdConnectSession(
+				openIdConnectSession);
+		}
+
+		return null;
 	}
 
 	private AccessToken _getAccessToken(
@@ -256,6 +234,52 @@ public class OfflineOpenIdConnectSessionManager {
 			}
 
 			return null;
+		}
+	}
+
+	private void _registerServices(
+		BundleContext bundleContext, String destinationName) {
+
+		if (_messageListenerServiceRegistration != null) {
+			return;
+		}
+
+		DestinationConfiguration destinationConfiguration =
+			DestinationConfiguration.createSerialDestinationConfiguration(
+				destinationName);
+
+		Destination destination = _destinationFactory.createDestination(
+			destinationConfiguration);
+
+		Dictionary<String, Object> dictionary =
+			HashMapDictionaryBuilder.<String, Object>put(
+				"destination.name", destination.getName()
+			).build();
+
+		_destinationServiceRegistration = bundleContext.registerService(
+			Destination.class, destination, dictionary);
+
+		_messageListenerServiceRegistration = bundleContext.registerService(
+			MessageListener.class, new TokenRefreshMessageListener(),
+			dictionary);
+	}
+
+	private void _unregisterServices() {
+		if (_messageListenerServiceRegistration != null) {
+			_messageListenerServiceRegistration.unregister();
+
+			_messageListenerServiceRegistration = null;
+		}
+
+		if (_destinationServiceRegistration != null) {
+			Destination destination = _bundleContext.getService(
+				_destinationServiceRegistration.getReference());
+
+			destination.destroy();
+
+			_destinationServiceRegistration.unregister();
+
+			_destinationServiceRegistration = null;
 		}
 	}
 
@@ -300,6 +324,14 @@ public class OfflineOpenIdConnectSessionManager {
 	@Reference
 	private DestinationFactory _destinationFactory;
 
+	private ServiceRegistration<Destination> _destinationServiceRegistration;
+
+	@Reference
+	private MessageBus _messageBus;
+
+	private ServiceRegistration<MessageListener>
+		_messageListenerServiceRegistration;
+
 	@Reference
 	private OpenIdConnectProviderRegistry
 		<OIDCClientMetadata, OIDCProviderMetadata>
@@ -308,32 +340,38 @@ public class OfflineOpenIdConnectSessionManager {
 	@Reference
 	private OpenIdConnectSessionLocalService _openIdConnectSessionLocalService;
 
-	@Reference
-	private OpenIdConnectTokenRefreshScheduler
-		_openIdConnectTokenRefreshScheduler;
+	private volatile long _tokenRefreshOffsetMillis = 60 * Time.SECOND;
 
-	private ServiceRegistration<Destination> _serviceRegistration1;
-	private ServiceRegistration<MessageListener> _serviceRegistration2;
+	private class TokenRefreshMessageListener extends BaseMessageListener {
 
-	private class OpenIdConnectMessageListener extends BaseMessageListener {
-
+		@Override
 		protected void doReceive(Message message) throws Exception {
-			long openIdConnectSessionId = GetterUtil.getLong(
-				message.getPayload());
+			Long openIdConnectSessionId = message.getLong(
+				"openIdConnectSessionId");
 
-			try {
-				_extendOpenIdConnectSession(
-					_openIdConnectSessionLocalService.getOpenIdConnectSession(
-						openIdConnectSessionId));
+			if ((openIdConnectSessionId == null) ||
+				(openIdConnectSessionId < 1)) {
+
+				return;
 			}
-			catch (PortalException portalException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Unable to get OpenId Connect session " +
-							openIdConnectSessionId,
-						portalException);
-				}
+
+			OpenIdConnectSession openIdConnectSession =
+				_openIdConnectSessionLocalService.fetchOpenIdConnectSession(
+					openIdConnectSessionId);
+
+			if (openIdConnectSession == null) {
+				return;
 			}
+
+			Date modifiedDate = openIdConnectSession.getModifiedDate();
+
+			if (System.currentTimeMillis() <=
+					(modifiedDate.getTime() + _tokenRefreshOffsetMillis)) {
+
+				return;
+			}
+
+			_extendOpenIdConnectSession(openIdConnectSession);
 		}
 
 	}
