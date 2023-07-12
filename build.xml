@@ -249,7 +249,6 @@ message.
 						/>
 
 						<gradle-execute dir="${project.dir}/modules" forcedcacheenabled="false" task=":${baseline.current.branch.project.path}:baseline">
-							<arg value="--parallel" />
 							<arg value="-Dbaseline.ignoreFailures=true" />
 						</gradle-execute>
 					</then>
@@ -295,7 +294,6 @@ message.
 		<setup-yarn />
 
 		<gradle-execute dir="modules/core" task="deploy">
-			<arg value="--parallel" />
 			<arg value="-Dbuild.profile=portal-pre" />
 			<arg value="-Pforced.deploy.dir=${project.dir}/tmp/lib-pre" />
 		</gradle-execute>
@@ -303,7 +301,6 @@ message.
 		<ant dir="portal-kernel" inheritAll="false" target="install-portal-snapshot" />
 
 		<gradle-execute dir="modules/apps" task="deploy">
-			<arg value="--parallel" />
 			<arg value="-Dbuild.profile=portal-pre" />
 			<arg value="-Pforced.deploy.dir=${project.dir}/tmp/lib-pre" />
 		</gradle-execute>
@@ -416,12 +413,10 @@ message.
 			<equals arg1="${build.marketplace.apps.enabled}" arg2="true" />
 			<then>
 				<gradle-execute dir="${project.dir}/modules" task="deploy">
-					<arg value="--parallel" />
 					<arg value="-Dbuild.profile=portal-pre" />
 				</gradle-execute>
 
 				<gradle-execute dir="${project.dir}/modules" task="deploy">
-					<arg value="--parallel" />
 					<arg value="-Dbuild.exclude.dirs=${build.exclude.dirs}" />
 					<arg value="-Dbuild.include.dirs=${build.include.dirs}" />
 					<arg value="-Dbuild.profile=${build.profile}" />
@@ -442,7 +437,6 @@ message.
 							</resourcecount>
 							<then>
 								<gradle-execute dir="${project.dir}/modules" task="deploy">
-									<arg value="--parallel" />
 									<arg value="-Ddeploy.only.profile=ci" />
 								</gradle-execute>
 							</then>
@@ -452,7 +446,6 @@ message.
 			</then>
 			<else>
 				<gradle-execute dir="${project.dir}/modules/core" task="deploy">
-					<arg value="--parallel" />
 					<arg value="-Dbuild.exclude.dirs=${build.exclude.dirs}" />
 					<arg value="-Dbuild.include.dirs=${build.include.dirs}" />
 					<arg value="-Dbuild.profile=${build.profile}" />
@@ -469,7 +462,6 @@ message.
 					<isset property="build.app.server.lib.marker.files" />
 					<then>
 						<gradle-execute dir="${project.dir}/modules" task="deployTool">
-							<arg value="--parallel" />
 							<arg value="-Dbuild.exclude.dirs=${build.exclude.dirs}" />
 							<arg value="-Dbuild.include.dirs=${build.include.dirs}" />
 							<arg value="-Dbuild.profile=${build.profile}" />
@@ -480,7 +472,6 @@ message.
 					</then>
 					<else>
 						<gradle-execute dir="${project.dir}/modules" task="deployTool">
-							<arg value="--parallel" />
 							<arg value="-Dbuild.exclude.dirs=${build.exclude.dirs}" />
 							<arg value="-Dbuild.include.dirs=${build.include.dirs}" />
 							<arg value="-Dbuild.profile=${build.profile}" />
@@ -1280,19 +1271,16 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 
 		<gradle-execute dir="modules" forcedcacheenabled="false" setupbinariescache="false" task="clean">
 			<arg value="--continue" />
-			<arg value="--parallel" />
 		</gradle-execute>
 
 		<gradle-execute dir="modules" forcedcacheenabled="false" setupbinariescache="false" task="classes">
 			<arg value="--continue" />
-			<arg value="--parallel" />
 			<arg value="testClasses" />
 			<arg value="testIntegrationClasses" />
 		</gradle-execute>
 
 		<gradle-execute dir="modules/sdk/gradle-util" failonerror="false" forcedcacheenabled="false" setupbinariescache="false" task="spotbugsMain">
 			<arg value="--continue" />
-			<arg value="--parallel" />
 		</gradle-execute>
 
 		<ant dir="portal-web" inheritAll="false" target="update-gradle-cache" />

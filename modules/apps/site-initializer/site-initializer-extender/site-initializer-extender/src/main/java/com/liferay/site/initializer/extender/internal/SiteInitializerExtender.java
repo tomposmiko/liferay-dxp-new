@@ -17,7 +17,6 @@ package com.liferay.site.initializer.extender.internal;
 import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
-import com.liferay.commerce.initializer.util.PortletSettingsImporter;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
@@ -116,7 +115,7 @@ public class SiteInitializerExtender
 				_listTypeEntryResourceFactory, _objectDefinitionLocalService,
 				_objectDefinitionResourceFactory,
 				_objectRelationshipResourceFactory, _objectEntryLocalService,
-				_organizationResourceFactory, _portal, _portletSettingsImporter,
+				_organizationResourceFactory, _portal,
 				_remoteAppEntryLocalService, _resourceActionLocalService,
 				_resourcePermissionLocalService, _roleLocalService,
 				_sapEntryLocalService, _settingsFactory,
@@ -263,9 +262,6 @@ public class SiteInitializerExtender
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortletSettingsImporter _portletSettingsImporter;
 
 	@Reference
 	private RemoteAppEntryLocalService _remoteAppEntryLocalService;

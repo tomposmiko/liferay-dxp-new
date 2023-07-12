@@ -39,7 +39,7 @@
 			classname="com.liferay.portal.tools.DBBuilder"
 			classpathref="db.builder.classpath"
 			failonerror="true"
-			fork="${fork.mode}"
+			fork="true"
 			outputproperty="db.builder.output"
 		>
 			<jvmarg if:true="${jvm.debug}" line="${jpda.settings}" />
@@ -118,7 +118,7 @@
 		<java
 			classname="com.liferay.portal.tools.HypersonicLoader"
 			classpathref="project.classpath"
-			fork="${fork.mode}"
+			fork="true"
 		>
 			<jvmarg if:true="${jvm.debug}" line="${jpda.settings}" />
 			<arg value="-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties" />
