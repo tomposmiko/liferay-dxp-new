@@ -15,7 +15,6 @@
 package com.liferay.sharing.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link SharingEntryLocalService}.
@@ -895,11 +894,6 @@ public class SharingEntryLocalServiceWrapper
 		com.liferay.sharing.model.SharingEntry sharingEntry) {
 
 		return _sharingEntryLocalService.updateSharingEntry(sharingEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _sharingEntryLocalService.getBasePersistence();
 	}
 
 	@Override

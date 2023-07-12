@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPDefinitionLinkLocalService}.
@@ -569,11 +568,6 @@ public class CPDefinitionLinkLocalServiceWrapper
 
 		_cpDefinitionLinkLocalService.updateCPDefinitionLinks(
 			cpDefinitionId1, cpDefinitionIds2, type, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpDefinitionLinkLocalService.getBasePersistence();
 	}
 
 	@Override

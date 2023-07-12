@@ -89,24 +89,6 @@ public class RepositoryEntryBrowserDisplayContext {
 		return StringPool.BLANK;
 	}
 
-	public boolean isPreviewable(FileVersion fileVersion) {
-		if (fileVersion == null) {
-			return false;
-		}
-
-		if (ArrayUtil.contains(
-				PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES,
-				fileVersion.getMimeType()) ||
-			ImageProcessorUtil.isImageSupported(fileVersion.getMimeType()) ||
-			Objects.equals(
-				VIDEO_EXTERNAL_SHORTCUT, fileVersion.getMimeType())) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	public boolean isSearchEverywhere() {
 		if (_searchEverywhere != null) {
 			return _searchEverywhere;

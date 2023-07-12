@@ -1376,7 +1376,11 @@ definition {
 			category = "Configuration",
 			portlet = "Site Settings");
 
-		var siteID = selenium.getElementValue("SitesEditSite#SITE_ID");
+		var siteID = "siteID";
+
+		Copy(
+			locator1 = "SitesEditSite#SITE_ID",
+			value1 = "siteID");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -1387,7 +1391,8 @@ definition {
 			siteID = ${siteID},
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
-			userLastName = "userln");
+			userLastName = "userln",
+			userScreenName = ${SiteID});
 	}
 
 	@priority = 4

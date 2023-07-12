@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -544,17 +543,6 @@ public class RoleLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<Role> getGroupRolesAndTeamRoles(
-		long companyId, String name, java.util.List<String> excludedNames,
-		String title, String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId, int start, int end) {
-
-		return _roleLocalService.getGroupRolesAndTeamRoles(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId, start, end);
-	}
-
-	@Override
 	public int getGroupRolesAndTeamRolesCount(
 		long companyId, String keywords, java.util.List<String> excludedNames,
 		int[] types, long excludedTeamRoleId, long teamGroupId) {
@@ -562,17 +550,6 @@ public class RoleLocalServiceWrapper
 		return _roleLocalService.getGroupRolesAndTeamRolesCount(
 			companyId, keywords, excludedNames, types, excludedTeamRoleId,
 			teamGroupId);
-	}
-
-	@Override
-	public int getGroupRolesAndTeamRolesCount(
-		long companyId, String name, java.util.List<String> excludedNames,
-		String title, String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId) {
-
-		return _roleLocalService.getGroupRolesAndTeamRolesCount(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId);
 	}
 
 	@Override
@@ -1442,11 +1419,6 @@ public class RoleLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_roleLocalService.validateName(name);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _roleLocalService.getBasePersistence();
 	}
 
 	@Override

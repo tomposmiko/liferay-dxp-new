@@ -113,7 +113,7 @@ Export-Package:\
 	\
 	com.sun.security.auth.module,\
 	\
-	com.thoughtworks.xstream.*;version='1.4.20',\
+	com.thoughtworks.xstream.*;version='1.4.19',\
 	\
 	io.netty.*;version='4.1',\
 	\
@@ -256,7 +256,7 @@ Export-Package:\
 	\
 	org.jdom2.*;version='2.0.6',\
 	\
-	org.json.*;version='20230227',\
+	org.json.*;version='20180813',\
 	\
 	org.objectweb.asm;version='7.0',\
 	org.objectweb.asm.commons;version='7.0',\

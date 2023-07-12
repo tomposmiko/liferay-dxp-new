@@ -15,7 +15,6 @@
 package com.liferay.multi.factor.authentication.email.otp.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link MFAEmailOTPEntryLocalService}.
@@ -386,11 +385,6 @@ public class MFAEmailOTPEntryLocalServiceWrapper
 
 		return _mfaEmailOTPEntryLocalService.updateMFAEmailOTPEntry(
 			mfaEmailOTPEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _mfaEmailOTPEntryLocalService.getBasePersistence();
 	}
 
 	@Override

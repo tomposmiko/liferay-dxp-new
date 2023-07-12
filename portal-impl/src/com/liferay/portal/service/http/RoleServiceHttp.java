@@ -280,44 +280,6 @@ public class RoleServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.portal.kernel.model.Role>
-		getGroupRolesAndTeamRoles(
-			HttpPrincipal httpPrincipal, long companyId, String name,
-			java.util.List<String> excludedNames, String title,
-			String description, int[] types, long excludedTeamRoleId,
-			long teamGroupId, int start, int end) {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				RoleServiceUtil.class, "getGroupRolesAndTeamRoles",
-				_getGroupRolesAndTeamRolesParameterTypes6);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, name, excludedNames, title, description,
-				types, excludedTeamRoleId, teamGroupId, start, end);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return (java.util.List<com.liferay.portal.kernel.model.Role>)
-				returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
 	public static int getGroupRolesAndTeamRolesCount(
 		HttpPrincipal httpPrincipal, long companyId, String keywords,
 		java.util.List<String> excludedNames, int[] types,
@@ -326,46 +288,11 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "getGroupRolesAndTeamRolesCount",
-				_getGroupRolesAndTeamRolesCountParameterTypes7);
+				_getGroupRolesAndTeamRolesCountParameterTypes6);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, keywords, excludedNames, types,
 				excludedTeamRoleId, teamGroupId);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return ((Integer)returnObj).intValue();
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static int getGroupRolesAndTeamRolesCount(
-		HttpPrincipal httpPrincipal, long companyId, String name,
-		java.util.List<String> excludedNames, String title, String description,
-		int[] types, long excludedTeamRoleId, long teamGroupId) {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				RoleServiceUtil.class, "getGroupRolesAndTeamRolesCount",
-				_getGroupRolesAndTeamRolesCountParameterTypes8);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, name, excludedNames, title, description,
-				types, excludedTeamRoleId, teamGroupId);
 
 			Object returnObj = null;
 
@@ -394,7 +321,7 @@ public class RoleServiceHttp {
 
 		try {
 			MethodKey methodKey = new MethodKey(
-				RoleServiceUtil.class, "getRole", _getRoleParameterTypes9);
+				RoleServiceUtil.class, "getRole", _getRoleParameterTypes7);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, roleId);
 
@@ -432,7 +359,7 @@ public class RoleServiceHttp {
 
 		try {
 			MethodKey methodKey = new MethodKey(
-				RoleServiceUtil.class, "getRole", _getRoleParameterTypes10);
+				RoleServiceUtil.class, "getRole", _getRoleParameterTypes8);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, name);
@@ -471,7 +398,7 @@ public class RoleServiceHttp {
 
 		try {
 			MethodKey methodKey = new MethodKey(
-				RoleServiceUtil.class, "getRoles", _getRolesParameterTypes11);
+				RoleServiceUtil.class, "getRoles", _getRolesParameterTypes9);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, type, subtype);
@@ -511,7 +438,7 @@ public class RoleServiceHttp {
 
 		try {
 			MethodKey methodKey = new MethodKey(
-				RoleServiceUtil.class, "getRoles", _getRolesParameterTypes12);
+				RoleServiceUtil.class, "getRoles", _getRolesParameterTypes10);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, types);
@@ -553,7 +480,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "getUserGroupGroupRoles",
-				_getUserGroupGroupRolesParameterTypes13);
+				_getUserGroupGroupRolesParameterTypes11);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, userId, groupId);
@@ -595,7 +522,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "getUserGroupRoles",
-				_getUserGroupRolesParameterTypes14);
+				_getUserGroupRolesParameterTypes12);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, userId, groupId);
@@ -638,7 +565,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "getUserRelatedRoles",
-				_getUserRelatedRolesParameterTypes15);
+				_getUserRelatedRolesParameterTypes13);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, userId, groups);
@@ -679,7 +606,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "getUserRoles",
-				_getUserRolesParameterTypes16);
+				_getUserRolesParameterTypes14);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, userId);
 
@@ -720,7 +647,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "hasUserRole",
-				_hasUserRoleParameterTypes17);
+				_hasUserRoleParameterTypes15);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, userId, companyId, name, inherited);
@@ -761,7 +688,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "hasUserRoles",
-				_hasUserRolesParameterTypes18);
+				_hasUserRolesParameterTypes16);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, userId, companyId, names, inherited);
@@ -803,7 +730,7 @@ public class RoleServiceHttp {
 
 		try {
 			MethodKey methodKey = new MethodKey(
-				RoleServiceUtil.class, "search", _searchParameterTypes19);
+				RoleServiceUtil.class, "search", _searchParameterTypes17);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, keywords, types, params, start, end,
@@ -838,7 +765,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "searchCount",
-				_searchCountParameterTypes20);
+				_searchCountParameterTypes18);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, keywords, types, params);
@@ -871,7 +798,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "unsetUserRoles",
-				_unsetUserRolesParameterTypes21);
+				_unsetUserRolesParameterTypes19);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, userId, roleIds);
@@ -911,7 +838,7 @@ public class RoleServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				RoleServiceUtil.class, "updateRole",
-				_updateRoleParameterTypes22);
+				_updateRoleParameterTypes20);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, roleId, name, titleMap, descriptionMap, subtype,
@@ -968,58 +895,47 @@ public class RoleServiceHttp {
 			long.class, String.class, java.util.List.class, int[].class,
 			long.class, long.class, int.class, int.class
 		};
-	private static final Class<?>[] _getGroupRolesAndTeamRolesParameterTypes6 =
-		new Class[] {
-			long.class, String.class, java.util.List.class, String.class,
-			String.class, int[].class, long.class, long.class, int.class,
-			int.class
-		};
 	private static final Class<?>[]
-		_getGroupRolesAndTeamRolesCountParameterTypes7 = new Class[] {
+		_getGroupRolesAndTeamRolesCountParameterTypes6 = new Class[] {
 			long.class, String.class, java.util.List.class, int[].class,
 			long.class, long.class
 		};
-	private static final Class<?>[]
-		_getGroupRolesAndTeamRolesCountParameterTypes8 = new Class[] {
-			long.class, String.class, java.util.List.class, String.class,
-			String.class, int[].class, long.class, long.class
-		};
-	private static final Class<?>[] _getRoleParameterTypes9 = new Class[] {
+	private static final Class<?>[] _getRoleParameterTypes7 = new Class[] {
 		long.class
 	};
-	private static final Class<?>[] _getRoleParameterTypes10 = new Class[] {
+	private static final Class<?>[] _getRoleParameterTypes8 = new Class[] {
 		long.class, String.class
 	};
-	private static final Class<?>[] _getRolesParameterTypes11 = new Class[] {
+	private static final Class<?>[] _getRolesParameterTypes9 = new Class[] {
 		int.class, String.class
 	};
-	private static final Class<?>[] _getRolesParameterTypes12 = new Class[] {
+	private static final Class<?>[] _getRolesParameterTypes10 = new Class[] {
 		long.class, int[].class
 	};
-	private static final Class<?>[] _getUserGroupGroupRolesParameterTypes13 =
+	private static final Class<?>[] _getUserGroupGroupRolesParameterTypes11 =
 		new Class[] {long.class, long.class};
-	private static final Class<?>[] _getUserGroupRolesParameterTypes14 =
+	private static final Class<?>[] _getUserGroupRolesParameterTypes12 =
 		new Class[] {long.class, long.class};
-	private static final Class<?>[] _getUserRelatedRolesParameterTypes15 =
+	private static final Class<?>[] _getUserRelatedRolesParameterTypes13 =
 		new Class[] {long.class, java.util.List.class};
-	private static final Class<?>[] _getUserRolesParameterTypes16 =
+	private static final Class<?>[] _getUserRolesParameterTypes14 =
 		new Class[] {long.class};
-	private static final Class<?>[] _hasUserRoleParameterTypes17 = new Class[] {
+	private static final Class<?>[] _hasUserRoleParameterTypes15 = new Class[] {
 		long.class, long.class, String.class, boolean.class
 	};
-	private static final Class<?>[] _hasUserRolesParameterTypes18 =
+	private static final Class<?>[] _hasUserRolesParameterTypes16 =
 		new Class[] {long.class, long.class, String[].class, boolean.class};
-	private static final Class<?>[] _searchParameterTypes19 = new Class[] {
+	private static final Class<?>[] _searchParameterTypes17 = new Class[] {
 		long.class, String.class, Integer[].class,
 		java.util.LinkedHashMap.class, int.class, int.class,
 		com.liferay.portal.kernel.util.OrderByComparator.class
 	};
-	private static final Class<?>[] _searchCountParameterTypes20 = new Class[] {
+	private static final Class<?>[] _searchCountParameterTypes18 = new Class[] {
 		long.class, String.class, Integer[].class, java.util.LinkedHashMap.class
 	};
-	private static final Class<?>[] _unsetUserRolesParameterTypes21 =
+	private static final Class<?>[] _unsetUserRolesParameterTypes19 =
 		new Class[] {long.class, long[].class};
-	private static final Class<?>[] _updateRoleParameterTypes22 = new Class[] {
+	private static final Class<?>[] _updateRoleParameterTypes20 = new Class[] {
 		long.class, String.class, java.util.Map.class, java.util.Map.class,
 		String.class, com.liferay.portal.kernel.service.ServiceContext.class
 	};

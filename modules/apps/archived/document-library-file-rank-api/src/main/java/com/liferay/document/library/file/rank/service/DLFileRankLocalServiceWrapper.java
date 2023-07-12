@@ -15,7 +15,6 @@
 package com.liferay.document.library.file.rank.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link DLFileRankLocalService}.
@@ -410,11 +409,6 @@ public class DLFileRankLocalServiceWrapper
 
 		return _dlFileRankLocalService.updateFileRank(
 			groupId, companyId, userId, fileEntryId, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _dlFileRankLocalService.getBasePersistence();
 	}
 
 	@Override

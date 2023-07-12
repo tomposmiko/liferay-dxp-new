@@ -27,14 +27,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletApp;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
-import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.RequestDispatcherUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -350,42 +349,11 @@ public class ComboServlet extends HttpServlet {
 			fileContentBag = _EMPTY_FILE_CONTENT_BAG;
 		}
 		else {
-			BufferCacheServletResponse bufferCacheServletResponse =
-				RequestDispatcherUtil.getBufferCacheServletResponse(
+			ObjectValuePair<String, Long> objectValuePair =
+				RequestDispatcherUtil.getContentAndLastModifiedTime(
 					requestDispatcher, httpServletRequest, httpServletResponse);
 
-			String stringFileContent = StringPool.BLANK;
-
-			String cacheControl = GetterUtil.getString(
-				bufferCacheServletResponse.getHeader("Cache-Control"));
-			String contentType = GetterUtil.getString(
-				bufferCacheServletResponse.getContentType());
-			int status = bufferCacheServletResponse.getStatus();
-
-			if (cacheControl.contains("no-cache") ||
-				cacheControl.contains("no-store")) {
-
-				_log.error(
-					"Skip " + modulePath +
-						" because it sent no-cache or no-store headers");
-			}
-			else if (!contentType.startsWith("application/javascript") &&
-					 !contentType.startsWith("text/css") &&
-					 !contentType.startsWith("text/javascript")) {
-
-				_log.error(
-					"Skip " + modulePath +
-						" because its content type is not CSS or JavaScript");
-			}
-			else if (status != HttpServletResponse.SC_OK) {
-				_log.error(
-					StringBundler.concat(
-						"Skip ", modulePath, " because it returns HTTP status ",
-						status));
-			}
-			else {
-				stringFileContent = bufferCacheServletResponse.getString();
-			}
+			String stringFileContent = objectValuePair.getKey();
 
 			Pattern pattern = Pattern.compile(_BUNDLER_MODULE_PATTERN);
 
@@ -463,10 +431,7 @@ public class ComboServlet extends HttpServlet {
 
 			fileContentBag = new FileContentBag(
 				stringFileContent.getBytes(StringPool.UTF8),
-				GetterUtil.getLong(
-					bufferCacheServletResponse.getHeader(
-						HttpHeaders.LAST_MODIFIED),
-					-1));
+				objectValuePair.getValue());
 		}
 
 		if (PropsValues.COMBO_CHECK_TIMESTAMP) {

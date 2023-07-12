@@ -156,17 +156,13 @@ definition {
 		property custom.system.properties = "user.country=FR${line.separator}user.language=fr";
 		property test.name.skip.portal.instance = "Locale#ConfigureURLToAlwaysShowLocale";
 
-		User.firstLoginPG(
-			localization = "FR",
-			localizedAgree = "Je suis d'accord",
-			localizedAnswer = "Réponse",
-			localizedSaveButton = "Enregistrer");
+		User.firstLoginPG();
 
-		AssertLocation(value1 = "http://localhost:8080/fr/web/guest/home");
+		AssertLocation(value1 = "http://localhost:8080/fr/web/guest");
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/guest");
 
-		AssertLocation(value1 = "http://localhost:8080/fr/web/guest");
+		AssertLocation(value1 = "http://localhost:8080/en/web/guest");
 	}
 
 	@priority = 4

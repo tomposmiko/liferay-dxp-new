@@ -83,8 +83,6 @@ definition {
 			Button.clickSave();
 
 			Alert.viewSuccessMessage();
-
-			Alert.closeMessage(messageType = "SUCCESS");
 		}
 	}
 

@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -1375,11 +1374,6 @@ public class DDMStructureLocalServiceWrapper
 		return _ddmStructureLocalService.updateStructure(
 			userId, structureId, parentStructureId, nameMap, descriptionMap,
 			definition, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _ddmStructureLocalService.getBasePersistence();
 	}
 
 	@Override

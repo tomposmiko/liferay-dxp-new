@@ -17,7 +17,6 @@ package com.liferay.message.boards.service;
 import com.liferay.message.boards.model.MBThreadFlag;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -438,11 +437,6 @@ public class MBThreadFlagLocalServiceWrapper
 	@Override
 	public MBThreadFlag updateMBThreadFlag(MBThreadFlag mbThreadFlag) {
 		return _mbThreadFlagLocalService.updateMBThreadFlag(mbThreadFlag);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _mbThreadFlagLocalService.getBasePersistence();
 	}
 
 	@Override

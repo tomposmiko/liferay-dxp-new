@@ -15,7 +15,6 @@
 package com.liferay.blogs.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link BlogsStatsUserLocalService}.
@@ -472,11 +471,6 @@ public class BlogsStatsUserLocalServiceWrapper
 		return _blogsStatsUserLocalService.updateStatsUser(
 			groupId, userId, ratingsTotalEntries, ratingsTotalScore,
 			ratingsAverageScore);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _blogsStatsUserLocalService.getBasePersistence();
 	}
 
 	@Override

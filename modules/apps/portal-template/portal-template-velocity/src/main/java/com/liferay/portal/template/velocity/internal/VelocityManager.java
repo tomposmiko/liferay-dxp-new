@@ -18,6 +18,8 @@ import com.liferay.petra.lang.ClassLoaderPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.cache.SingleVMPool;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateException;
@@ -176,9 +178,25 @@ public class VelocityManager extends BaseTemplateManager {
 				"liferay." + VelocityEngine.RESOURCE_LOADER + ".class",
 				LiferayResourceLoader.class.getName());
 
-			extendedProperties.setProperty(
-				"liferay." + VelocityEngine.RESOURCE_LOADER + "portal.cache",
-				_velocityTemplateResourceCache.getSecondLevelPortalCache());
+			if (cacheEnabled) {
+				PortalCache<TemplateResource, org.apache.velocity.Template>
+					portalCache =
+						(PortalCache
+							<TemplateResource, org.apache.velocity.Template>)
+								_singleVMPool.getPortalCache(
+									StringBundler.concat(
+										TemplateResource.class.getName(),
+										StringPool.POUND,
+										TemplateConstants.LANG_TYPE_VM));
+
+				extendedProperties.setProperty(
+					"liferay." + VelocityEngine.RESOURCE_LOADER +
+						"portal.cache",
+					portalCache);
+
+				_velocityTemplateResourceCache.setSecondLevelPortalCache(
+					portalCache);
+			}
 
 			extendedProperties.setProperty(
 				VelocityEngine.RESOURCE_MANAGER_CLASS,
@@ -292,6 +310,9 @@ public class VelocityManager extends BaseTemplateManager {
 
 	private static volatile VelocityEngineConfiguration
 		_velocityEngineConfiguration;
+
+	@Reference
+	private SingleVMPool _singleVMPool;
 
 	private VelocityEngine _velocityEngine;
 

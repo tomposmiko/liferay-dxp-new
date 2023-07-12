@@ -197,17 +197,16 @@ definition {
 			entryContent = ${entryContent},
 			entryTitle = ${entryTitle});
 
+		var key_entryContent = ${entryContent};
+		var key_entryTitle = ${entryTitle};
+
 		BlogsEntry.viewPG(
 			entryContent = ${entryContent},
 			entryTitle = ${entryTitle});
 
 		Pause(locator1 = 3000);
 
-		WaitForSPARefresh();
-
-		MouseOver(locator1 = "BlogsEntry#COMMENTS_TRACKBACK_URL");
-
-		var backtrackURL = selenium.getElementValue("BlogsEntry#COMMENTS_TRACKBACK_URL");
+		Copy(locator1 = "BlogsEntry#COMMENTS_TRACKBACK_URL");
 
 		if (${virtualHosts} == "true") {
 			var currentURL = Navigator.getCurrentURL();
@@ -230,9 +229,7 @@ definition {
 
 		Panel.expandPanel(panel = "Configuration");
 
-		Type(
-			locator1 = "TextInput#TRACKBACKS",
-			value1 = ${backtrackURL});
+		Paste(locator1 = "TextInput#TRACKBACKS");
 
 		AssertClick(
 			locator1 = "Button#PUBLISH",

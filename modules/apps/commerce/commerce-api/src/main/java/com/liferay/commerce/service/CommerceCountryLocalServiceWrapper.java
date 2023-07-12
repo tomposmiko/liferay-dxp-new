@@ -15,7 +15,6 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceCountryLocalService}.
@@ -585,11 +584,6 @@ public class CommerceCountryLocalServiceWrapper
 
 		return _commerceCountryLocalService.updateCommerceCountryChannelFilter(
 			commerceCountryId, enable);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceCountryLocalService.getBasePersistence();
 	}
 
 	@Override

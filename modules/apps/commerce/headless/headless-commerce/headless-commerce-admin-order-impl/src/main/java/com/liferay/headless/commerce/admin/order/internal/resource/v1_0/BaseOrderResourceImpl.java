@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -439,7 +438,7 @@ public abstract class BaseOrderResourceImpl
 		String createStrategy = (String)parameters.getOrDefault(
 			"createStrategy", "INSERT");
 
-		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
+		if ("INSERT".equalsIgnoreCase(createStrategy)) {
 			orderUnsafeConsumer = order -> postOrder(order);
 		}
 
@@ -537,7 +536,7 @@ public abstract class BaseOrderResourceImpl
 		String updateStrategy = (String)parameters.getOrDefault(
 			"updateStrategy", "UPDATE");
 
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
+		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
 			orderUnsafeConsumer = order -> patchOrder(
 				order.getId() != null ? order.getId() :
 					_parseLong((String)parameters.get("orderId")),

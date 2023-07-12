@@ -86,13 +86,11 @@ definition {
 
 		ACCustomEvents.disableAttributes(disableAttributesList = ${disableAttributesList});
 
-		var clipboard = selenium.getElementValue("//code");
+		Copy(locator1 = "//code");
 
 		ACUtils.clickAnyButton(button = "Edit");
 
-		Type(
-			locator1 = "TextArea#DESCRIPTION",
-			value1 = ${clipboard});
+		Paste(locator1 = "TextArea#DESCRIPTION");
 
 		static var sampleJavascript = selenium.getText("TextArea#DESCRIPTION");
 

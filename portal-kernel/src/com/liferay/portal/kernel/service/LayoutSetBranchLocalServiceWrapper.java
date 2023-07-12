@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link LayoutSetBranchLocalService}.
  *
@@ -52,9 +50,9 @@ public class LayoutSetBranchLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetBranch addLayoutSetBranch(
-			long userId, long groupId, boolean privateLayout, String name,
-			String description, boolean master, long copyLayoutSetBranchId,
-			ServiceContext serviceContext)
+			long userId, long groupId, boolean privateLayout,
+			java.lang.String name, java.lang.String description, boolean master,
+			long copyLayoutSetBranchId, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetBranchLocalService.addLayoutSetBranch(
@@ -303,7 +301,7 @@ public class LayoutSetBranchLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetBranch fetchLayoutSetBranch(
-		long groupId, boolean privateLayout, String name) {
+		long groupId, boolean privateLayout, java.lang.String name) {
 
 		return _layoutSetBranchLocalService.fetchLayoutSetBranch(
 			groupId, privateLayout, name);
@@ -342,7 +340,7 @@ public class LayoutSetBranchLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetBranch getLayoutSetBranch(
-			long groupId, boolean privateLayout, String name)
+			long groupId, boolean privateLayout, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetBranchLocalService.getLayoutSetBranch(
@@ -400,7 +398,7 @@ public class LayoutSetBranchLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _layoutSetBranchLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -458,17 +456,12 @@ public class LayoutSetBranchLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetBranch
 			updateLayoutSetBranch(
-				long layoutSetBranchId, String name, String description,
-				ServiceContext serviceContext)
+				long layoutSetBranchId, java.lang.String name,
+				java.lang.String description, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetBranchLocalService.updateLayoutSetBranch(
 			layoutSetBranchId, name, description, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _layoutSetBranchLocalService.getBasePersistence();
 	}
 
 	@Override

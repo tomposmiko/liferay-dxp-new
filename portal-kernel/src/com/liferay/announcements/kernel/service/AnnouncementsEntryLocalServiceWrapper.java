@@ -15,7 +15,6 @@
 package com.liferay.announcements.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AnnouncementsEntryLocalService}.
@@ -590,11 +589,6 @@ public class AnnouncementsEntryLocalServiceWrapper
 		return _announcementsEntryLocalService.updateEntry(
 			entryId, title, content, url, type, displayDate, expirationDate,
 			priority);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _announcementsEntryLocalService.getBasePersistence();
 	}
 
 	@Override

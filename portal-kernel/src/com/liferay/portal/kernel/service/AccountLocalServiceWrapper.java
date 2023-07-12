@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link AccountLocalService}.
  *
@@ -295,7 +293,7 @@ public class AccountLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _accountLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -325,11 +323,6 @@ public class AccountLocalServiceWrapper
 		com.liferay.portal.kernel.model.Account account) {
 
 		return _accountLocalService.updateAccount(account);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _accountLocalService.getBasePersistence();
 	}
 
 	@Override

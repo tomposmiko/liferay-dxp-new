@@ -15,7 +15,6 @@
 package com.liferay.portal.reports.engine.console.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link DefinitionLocalService}.
@@ -498,11 +497,6 @@ public class DefinitionLocalServiceWrapper
 
 		_definitionLocalService.updateDefinitionResources(
 			definition, communityPermissions, guestPermissions);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _definitionLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -762,7 +762,7 @@ public abstract class BaseDataDefinitionResourceImpl
 		String updateStrategy = (String)parameters.getOrDefault(
 			"updateStrategy", "UPDATE");
 
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
+		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			dataDefinitionUnsafeConsumer = dataDefinition -> putDataDefinition(
 				dataDefinition.getId() != null ? dataDefinition.getId() :
 					_parseLong((String)parameters.get("dataDefinitionId")),

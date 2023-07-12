@@ -707,7 +707,7 @@ public abstract class BaseDataRecordCollectionResourceImpl
 		String createStrategy = (String)parameters.getOrDefault(
 			"createStrategy", "INSERT");
 
-		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
+		if ("INSERT".equalsIgnoreCase(createStrategy)) {
 			if (parameters.containsKey("dataDefinitionId")) {
 				dataRecordCollectionUnsafeConsumer =
 					dataRecordCollection ->
@@ -832,7 +832,7 @@ public abstract class BaseDataRecordCollectionResourceImpl
 		String updateStrategy = (String)parameters.getOrDefault(
 			"updateStrategy", "UPDATE");
 
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
+		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			dataRecordCollectionUnsafeConsumer =
 				dataRecordCollection -> putDataRecordCollection(
 					dataRecordCollection.getId() != null ?

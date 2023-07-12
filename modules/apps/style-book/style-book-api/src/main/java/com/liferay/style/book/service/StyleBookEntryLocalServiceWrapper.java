@@ -16,7 +16,6 @@ package com.liferay.style.book.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.style.book.model.StyleBookEntry;
 
@@ -607,11 +606,6 @@ public class StyleBookEntryLocalServiceWrapper
 
 		return _styleBookEntryLocalService.updateStyleBookEntry(
 			draftStyleBookEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _styleBookEntryLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,7 +15,6 @@
 package com.liferay.portal.tools.service.builder.test.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link EagerBlobEntryLocalService}.
@@ -367,11 +366,6 @@ public class EagerBlobEntryLocalServiceWrapper
 				eagerBlobEntry) {
 
 		return _eagerBlobEntryLocalService.updateEagerBlobEntry(eagerBlobEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _eagerBlobEntryLocalService.getBasePersistence();
 	}
 
 	@Override

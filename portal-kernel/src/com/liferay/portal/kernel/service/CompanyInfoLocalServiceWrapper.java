@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link CompanyInfoLocalService}.
  *
@@ -300,7 +298,7 @@ public class CompanyInfoLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _companyInfoLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -330,11 +328,6 @@ public class CompanyInfoLocalServiceWrapper
 		com.liferay.portal.kernel.model.CompanyInfo companyInfo) {
 
 		return _companyInfoLocalService.updateCompanyInfo(companyInfo);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _companyInfoLocalService.getBasePersistence();
 	}
 
 	@Override

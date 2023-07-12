@@ -15,7 +15,6 @@
 package com.liferay.change.tracking.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CTProcessLocalService}.
@@ -345,11 +344,6 @@ public class CTProcessLocalServiceWrapper
 		com.liferay.change.tracking.model.CTProcess ctProcess) {
 
 		return _ctProcessLocalService.updateCTProcess(ctProcess);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _ctProcessLocalService.getBasePersistence();
 	}
 
 	@Override

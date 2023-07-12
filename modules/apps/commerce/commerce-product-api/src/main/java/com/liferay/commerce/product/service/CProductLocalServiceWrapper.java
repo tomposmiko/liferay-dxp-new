@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CProductLocalService}.
@@ -480,11 +479,6 @@ public class CProductLocalServiceWrapper
 
 		return _cProductLocalService.updatePublishedCPDefinitionId(
 			cProductId, publishedCPDefinitionId);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cProductLocalService.getBasePersistence();
 	}
 
 	@Override

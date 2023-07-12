@@ -16,7 +16,6 @@ package com.liferay.portal.tools.service.builder.test.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.tools.service.builder.test.model.CacheMissEntry;
 
@@ -319,11 +318,6 @@ public class CacheMissEntryLocalServiceWrapper
 	@Override
 	public CacheMissEntry updateCacheMissEntry(CacheMissEntry cacheMissEntry) {
 		return _cacheMissEntryLocalService.updateCacheMissEntry(cacheMissEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cacheMissEntryLocalService.getBasePersistence();
 	}
 
 	@Override

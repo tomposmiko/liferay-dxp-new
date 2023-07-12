@@ -15,7 +15,6 @@
 package com.liferay.reading.time.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link ReadingTimeEntryLocalService}.
@@ -497,11 +496,6 @@ public class ReadingTimeEntryLocalServiceWrapper
 
 		return _readingTimeEntryLocalService.updateReadingTimeEntry(
 			readingTimeEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _readingTimeEntryLocalService.getBasePersistence();
 	}
 
 	@Override

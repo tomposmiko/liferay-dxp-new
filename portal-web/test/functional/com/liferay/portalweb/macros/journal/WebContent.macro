@@ -142,7 +142,7 @@ definition {
 	macro addFailWithoutRequiredCategoryAssetTypeCP {
 		PortletEntry.inputTitle(title = "Web Content Title");
 
-		Type.typeEditorWaitForEditor(
+		Type.typeCKEditorWaitForCKEditor(
 			key_fieldLabel = "content",
 			locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 			value1 = "Web Content Content");
@@ -205,7 +205,7 @@ definition {
 		AssertElementNotPresent(locator1 = "TextInput#REQUIRED_ALERT");
 
 		if (isSet(webContentContent)) {
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "content",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = ${webContentContent});
@@ -355,7 +355,7 @@ definition {
 
 		PortletEntry.inputTitle(title = ${webContentTitle});
 
-		Type.typeEditorWaitForEditor(
+		Type.typeCKEditorWaitForCKEditor(
 			key_fieldLabel = "content",
 			locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 			value1 = ${webContentContent});
@@ -588,7 +588,7 @@ definition {
 		}
 
 		if (isSet(webContentHTML)) {
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "HTML",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = ${webContentHTML});
@@ -655,7 +655,7 @@ definition {
 				value1 = "Select");
 
 			while (IsElementNotPresent(locator1 = "WC#LINK_TO_PAGE_SELECT_PAGE_RADIO")) {
-				ExecuteJavaScript(value1 = "document.querySelector('.top-ended').scrollTop = 1000");
+				RunScript(locator1 = "document.querySelector('.top-ended').scrollTop = 1000");
 
 				if (IsElementNotPresent(locator1 = "WC#LINK_TO_PAGE_SELECT_PAGE_RADIO")) {
 					Click(locator1 = "WC#LINK_TO_PAGE_NEXT_PAGE");
@@ -754,7 +754,7 @@ definition {
 		}
 
 		if (isSet(description)) {
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "Summary",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = ${description});
@@ -946,7 +946,7 @@ definition {
 		WebContent.addCP(webContentTitle = ${webContentTitleEdit});
 
 		if (isSet(webContentContentEdit)) {
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "content",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = ${webContentContentEdit});
@@ -1101,7 +1101,7 @@ definition {
 		WebContent.addCP(webContentTitle = "");
 
 		if (isSet(webContentContent)) {
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "content",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = ${webContentContent});
@@ -1124,7 +1124,7 @@ definition {
 				value1 = ${webContentText});
 		}
 		else {
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "content",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = ${webContentContentEdit});
@@ -1163,7 +1163,7 @@ definition {
 		WebContent.addCP(webContentTitle = ${webContentTitleEdit});
 
 		if (isSet(webContentContentEdit)) {
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "content",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = ${webContentContentEdit});

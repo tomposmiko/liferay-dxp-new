@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -576,11 +575,6 @@ public class DDMDataProviderInstanceLocalServiceWrapper
 
 		return _ddmDataProviderInstanceLocalService.
 			updateDDMDataProviderInstance(ddmDataProviderInstance);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _ddmDataProviderInstanceLocalService.getBasePersistence();
 	}
 
 	@Override

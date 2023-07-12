@@ -18,13 +18,10 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectProvider;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectServiceException;
 
-import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jose.Header;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jose.util.DefaultResourceRetriever;
-import com.nimbusds.jwt.JWT;
 import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
 import com.nimbusds.oauth2.sdk.AuthorizationGrant;
 import com.nimbusds.oauth2.sdk.ErrorObject;
@@ -53,8 +50,6 @@ import java.io.IOException;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-
-import java.util.Objects;
 
 import net.minidev.json.JSONObject;
 
@@ -139,7 +134,9 @@ public class OpenIdConnectTokenRequestUtil {
 			OIDCTokens oidcTokens = oidcTokenResponse.getOIDCTokens();
 
 			_validate(
-				clientID, secret, nonce, oidcProviderMetadata, oidcTokens,
+				clientID, secret, nonce,
+				openIdConnectProvider.getOIDCClientMetadata(),
+				oidcProviderMetadata, oidcTokens,
 				openIdConnectProvider.getTokenConnectionTimeout());
 
 			return oidcTokens;
@@ -161,61 +158,46 @@ public class OpenIdConnectTokenRequestUtil {
 	}
 
 	private static IDTokenClaimsSet _validate(
-			ClientID clientID, Secret secret, Nonce nonce,
+			ClientID clientID, Secret clientSecret, Nonce nonce,
+			OIDCClientMetadata oidcClientMetadata,
 			OIDCProviderMetadata oidcProviderMetadata, OIDCTokens oidcTokens,
 			int tokenConnectionTimeout)
 		throws OpenIdConnectServiceException.TokenException {
 
-		try {
-			JWT idToken = oidcTokens.getIDToken();
+		IDTokenValidator idTokenValidator = null;
 
-			Header header = idToken.getHeader();
+		if (JWSAlgorithm.Family.HMAC_SHA.contains(
+				oidcClientMetadata.getIDTokenJWSAlg())) {
 
-			Algorithm algorithm = header.getAlgorithm();
-
+			idTokenValidator = new IDTokenValidator(
+				oidcProviderMetadata.getIssuer(), clientID,
+				oidcClientMetadata.getIDTokenJWSAlg(), clientSecret);
+		}
+		else {
 			URI uri = oidcProviderMetadata.getJWKSetURI();
 
-			String name = algorithm.getName();
-
-			for (JWSAlgorithm jwsAlgorithm :
-					oidcProviderMetadata.getIDTokenJWSAlgs()) {
-
-				if (Objects.equals(jwsAlgorithm.getName(), name)) {
-					if (JWSAlgorithm.Family.HMAC_SHA.contains(jwsAlgorithm)) {
-						IDTokenValidator idTokenValidator =
-							new IDTokenValidator(
-								oidcProviderMetadata.getIssuer(), clientID,
-								jwsAlgorithm, secret);
-
-						return idTokenValidator.validate(idToken, nonce);
-					}
-
-					IDTokenValidator idTokenValidator = new IDTokenValidator(
-						oidcProviderMetadata.getIssuer(), clientID,
-						jwsAlgorithm, uri.toURL(),
-						new DefaultResourceRetriever(
-							tokenConnectionTimeout, tokenConnectionTimeout));
-
-					return idTokenValidator.validate(idToken, nonce);
-				}
+			try {
+				idTokenValidator = new IDTokenValidator(
+					oidcProviderMetadata.getIssuer(), clientID,
+					oidcClientMetadata.getIDTokenJWSAlg(), uri.toURL(),
+					new DefaultResourceRetriever(
+						tokenConnectionTimeout, tokenConnectionTimeout));
 			}
+			catch (MalformedURLException malformedURLException) {
+				throw new OpenIdConnectServiceException.TokenException(
+					"Invalid JSON web key URL: " +
+						malformedURLException.getMessage(),
+					malformedURLException);
+			}
+		}
 
-			throw new OpenIdConnectServiceException.TokenException(
-				StringBundler.concat(
-					"Signing algorithm ", name,
-					" rejected by OpenID Connect client: ",
-					clientID.getValue()));
+		try {
+			return idTokenValidator.validate(oidcTokens.getIDToken(), nonce);
 		}
 		catch (BadJOSEException | JOSEException exception) {
 			throw new OpenIdConnectServiceException.TokenException(
 				"Unable to validate tokens: " + exception.getMessage(),
 				exception);
-		}
-		catch (MalformedURLException malformedURLException) {
-			throw new OpenIdConnectServiceException.TokenException(
-				"Invalid JSON web key URL: " +
-					malformedURLException.getMessage(),
-				malformedURLException);
 		}
 	}
 

@@ -69,7 +69,7 @@ definition {
 
 		WebContent.addCP(webContentTitle = "Basic S.P.A.C.E. Banner (Japanese Translation)");
 
-		Type.typeEditorWaitForEditor(
+		Type.typeCKEditorWaitForCKEditor(
 			key_fieldLabel = "Summary",
 			locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 			value1 = "A Japanese translation of the basic front page banner");

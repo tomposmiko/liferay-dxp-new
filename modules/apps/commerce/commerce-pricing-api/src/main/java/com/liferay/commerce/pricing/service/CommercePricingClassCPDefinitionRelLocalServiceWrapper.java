@@ -15,7 +15,6 @@
 package com.liferay.commerce.pricing.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommercePricingClassCPDefinitionRelLocalService}.
@@ -480,12 +479,6 @@ public class CommercePricingClassCPDefinitionRelLocalServiceWrapper
 		return _commercePricingClassCPDefinitionRelLocalService.
 			updateCommercePricingClassCPDefinitionRel(
 				commercePricingClassCPDefinitionRel);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commercePricingClassCPDefinitionRelLocalService.
-			getBasePersistence();
 	}
 
 	@Override

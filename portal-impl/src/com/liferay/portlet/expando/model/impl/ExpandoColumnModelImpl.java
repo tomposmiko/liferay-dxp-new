@@ -70,9 +70,9 @@ public class ExpandoColumnModelImpl
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
 		{"columnId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"modifiedDate", Types.TIMESTAMP}, {"tableId", Types.BIGINT},
-		{"name", Types.VARCHAR}, {"type_", Types.INTEGER},
-		{"defaultData", Types.CLOB}, {"typeSettings", Types.CLOB}
+		{"tableId", Types.BIGINT}, {"name", Types.VARCHAR},
+		{"type_", Types.INTEGER}, {"defaultData", Types.CLOB},
+		{"typeSettings", Types.CLOB}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -83,7 +83,6 @@ public class ExpandoColumnModelImpl
 		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("columnId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("tableId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("type_", Types.INTEGER);
@@ -92,7 +91,7 @@ public class ExpandoColumnModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ExpandoColumn (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,columnId LONG not null,companyId LONG,modifiedDate DATE null,tableId LONG,name VARCHAR(75) null,type_ INTEGER,defaultData TEXT null,typeSettings TEXT null,primary key (columnId, ctCollectionId))";
+		"create table ExpandoColumn (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,columnId LONG not null,companyId LONG,tableId LONG,name VARCHAR(75) null,type_ INTEGER,defaultData TEXT null,typeSettings TEXT null,primary key (columnId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table ExpandoColumn";
 
@@ -157,7 +156,6 @@ public class ExpandoColumnModelImpl
 		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setColumnId(soapModel.getColumnId());
 		model.setCompanyId(soapModel.getCompanyId());
-		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setTableId(soapModel.getTableId());
 		model.setName(soapModel.getName());
 		model.setType(soapModel.getType());
@@ -292,8 +290,6 @@ public class ExpandoColumnModelImpl
 			"ctCollectionId", ExpandoColumn::getCtCollectionId);
 		attributeGetterFunctions.put("columnId", ExpandoColumn::getColumnId);
 		attributeGetterFunctions.put("companyId", ExpandoColumn::getCompanyId);
-		attributeGetterFunctions.put(
-			"modifiedDate", ExpandoColumn::getModifiedDate);
 		attributeGetterFunctions.put("tableId", ExpandoColumn::getTableId);
 		attributeGetterFunctions.put("name", ExpandoColumn::getName);
 		attributeGetterFunctions.put("type", ExpandoColumn::getType);
@@ -325,9 +321,6 @@ public class ExpandoColumnModelImpl
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<ExpandoColumn, Long>)ExpandoColumn::setCompanyId);
-		attributeSetterBiConsumers.put(
-			"modifiedDate",
-			(BiConsumer<ExpandoColumn, Date>)ExpandoColumn::setModifiedDate);
 		attributeSetterBiConsumers.put(
 			"tableId",
 			(BiConsumer<ExpandoColumn, Long>)ExpandoColumn::setTableId);
@@ -404,27 +397,6 @@ public class ExpandoColumnModelImpl
 		}
 
 		_companyId = companyId;
-	}
-
-	@JSON
-	@Override
-	public Date getModifiedDate() {
-		return _modifiedDate;
-	}
-
-	public boolean hasSetModifiedDate() {
-		return _setModifiedDate;
-	}
-
-	@Override
-	public void setModifiedDate(Date modifiedDate) {
-		_setModifiedDate = true;
-
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_modifiedDate = modifiedDate;
 	}
 
 	@JSON
@@ -582,7 +554,6 @@ public class ExpandoColumnModelImpl
 		expandoColumnImpl.setCtCollectionId(getCtCollectionId());
 		expandoColumnImpl.setColumnId(getColumnId());
 		expandoColumnImpl.setCompanyId(getCompanyId());
-		expandoColumnImpl.setModifiedDate(getModifiedDate());
 		expandoColumnImpl.setTableId(getTableId());
 		expandoColumnImpl.setName(getName());
 		expandoColumnImpl.setType(getType());
@@ -656,8 +627,6 @@ public class ExpandoColumnModelImpl
 	public void resetOriginalValues() {
 		_columnOriginalValues = Collections.emptyMap();
 
-		_setModifiedDate = false;
-
 		_columnBitmask = 0;
 	}
 
@@ -673,15 +642,6 @@ public class ExpandoColumnModelImpl
 		expandoColumnCacheModel.columnId = getColumnId();
 
 		expandoColumnCacheModel.companyId = getCompanyId();
-
-		Date modifiedDate = getModifiedDate();
-
-		if (modifiedDate != null) {
-			expandoColumnCacheModel.modifiedDate = modifiedDate.getTime();
-		}
-		else {
-			expandoColumnCacheModel.modifiedDate = Long.MIN_VALUE;
-		}
 
 		expandoColumnCacheModel.tableId = getTableId();
 
@@ -807,8 +767,6 @@ public class ExpandoColumnModelImpl
 	private long _ctCollectionId;
 	private long _columnId;
 	private long _companyId;
-	private Date _modifiedDate;
-	private boolean _setModifiedDate;
 	private long _tableId;
 	private String _name;
 	private int _type;
@@ -848,7 +806,6 @@ public class ExpandoColumnModelImpl
 		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("columnId", _columnId);
 		_columnOriginalValues.put("companyId", _companyId);
-		_columnOriginalValues.put("modifiedDate", _modifiedDate);
 		_columnOriginalValues.put("tableId", _tableId);
 		_columnOriginalValues.put("name", _name);
 		_columnOriginalValues.put("type_", _type);
@@ -885,17 +842,15 @@ public class ExpandoColumnModelImpl
 
 		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("modifiedDate", 16L);
+		columnBitmasks.put("tableId", 16L);
 
-		columnBitmasks.put("tableId", 32L);
+		columnBitmasks.put("name", 32L);
 
-		columnBitmasks.put("name", 64L);
+		columnBitmasks.put("type_", 64L);
 
-		columnBitmasks.put("type_", 128L);
+		columnBitmasks.put("defaultData", 128L);
 
-		columnBitmasks.put("defaultData", 256L);
-
-		columnBitmasks.put("typeSettings", 512L);
+		columnBitmasks.put("typeSettings", 256L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

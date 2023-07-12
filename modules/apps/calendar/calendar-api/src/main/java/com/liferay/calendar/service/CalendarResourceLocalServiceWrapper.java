@@ -15,7 +15,6 @@
 package com.liferay.calendar.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CalendarResourceLocalService}.
@@ -535,11 +534,6 @@ public class CalendarResourceLocalServiceWrapper
 		return _calendarResourceLocalService.updateCalendarResource(
 			calendarResourceId, nameMap, descriptionMap, active,
 			serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _calendarResourceLocalService.getBasePersistence();
 	}
 
 	@Override

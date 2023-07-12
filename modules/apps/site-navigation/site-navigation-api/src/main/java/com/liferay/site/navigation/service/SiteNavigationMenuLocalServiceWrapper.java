@@ -16,7 +16,6 @@ package com.liferay.site.navigation.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 
@@ -545,11 +544,6 @@ public class SiteNavigationMenuLocalServiceWrapper
 
 		return _siteNavigationMenuLocalService.updateSiteNavigationMenu(
 			siteNavigationMenu);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _siteNavigationMenuLocalService.getBasePersistence();
 	}
 
 	@Override

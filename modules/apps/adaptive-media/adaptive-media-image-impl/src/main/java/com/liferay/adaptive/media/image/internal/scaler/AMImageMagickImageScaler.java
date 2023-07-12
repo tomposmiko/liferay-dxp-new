@@ -45,7 +45,14 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Eric Yan
  */
-@Component(service = AMImageScaler.class)
+@Component(
+	immediate = true,
+	property = {
+		"mime.type=image/gif", "mime.type=image/heic", "mime.type=image/tiff",
+		"mime.type=image/webp"
+	},
+	service = AMImageScaler.class
+)
 public class AMImageMagickImageScaler implements AMImageScaler {
 
 	@Override

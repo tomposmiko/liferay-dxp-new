@@ -17,7 +17,6 @@ package com.liferay.journal.service;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -786,11 +785,6 @@ public class JournalFolderLocalServiceWrapper
 
 		_journalFolderLocalService.validateFolderDDMStructures(
 			folderId, parentFolderId);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _journalFolderLocalService.getBasePersistence();
 	}
 
 	@Override

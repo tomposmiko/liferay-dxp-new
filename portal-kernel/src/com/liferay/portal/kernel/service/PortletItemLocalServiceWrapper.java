@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link PortletItemLocalService}.
  *
@@ -35,8 +33,8 @@ public class PortletItemLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PortletItem addPortletItem(
-			long userId, long groupId, String name, String portletId,
-			String className)
+			long userId, long groupId, java.lang.String name,
+			java.lang.String portletId, java.lang.String className)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _portletItemLocalService.addPortletItem(
@@ -260,7 +258,7 @@ public class PortletItemLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _portletItemLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -292,7 +290,8 @@ public class PortletItemLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PortletItem getPortletItem(
-			long groupId, String name, String portletId, String className)
+			long groupId, java.lang.String name, java.lang.String portletId,
+			java.lang.String className)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _portletItemLocalService.getPortletItem(
@@ -319,14 +318,16 @@ public class PortletItemLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.PortletItem>
-		getPortletItems(long groupId, String className) {
+		getPortletItems(long groupId, java.lang.String className) {
 
 		return _portletItemLocalService.getPortletItems(groupId, className);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.PortletItem>
-		getPortletItems(long groupId, String portletId, String className) {
+		getPortletItems(
+			long groupId, java.lang.String portletId,
+			java.lang.String className) {
 
 		return _portletItemLocalService.getPortletItems(
 			groupId, portletId, className);
@@ -344,8 +345,8 @@ public class PortletItemLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PortletItem updatePortletItem(
-			long userId, long groupId, String name, String portletId,
-			String className)
+			long userId, long groupId, java.lang.String name,
+			java.lang.String portletId, java.lang.String className)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _portletItemLocalService.updatePortletItem(
@@ -367,11 +368,6 @@ public class PortletItemLocalServiceWrapper
 		com.liferay.portal.kernel.model.PortletItem portletItem) {
 
 		return _portletItemLocalService.updatePortletItem(portletItem);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _portletItemLocalService.getBasePersistence();
 	}
 
 	@Override

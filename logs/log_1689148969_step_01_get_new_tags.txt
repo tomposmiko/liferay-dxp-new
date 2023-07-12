@@ -1,0 +1,208 @@
++ lc_cd /home/tompos/git/liferay/p/liferay-portal-ee
++ '[' -d /home/tompos/git/liferay/p/liferay-portal-ee ']'
++ cd /home/tompos/git/liferay/p/liferay-portal-ee
++ get_all_tags
++ git tag -l --sort=creatordate '--format=%(refname:short)' '7.[0-9].1[03]-u[0-9]*'
++ lc_cd /home/tompos/git/liferay/p/liferay-dxp
++ '[' -d /home/tompos/git/liferay/p/liferay-dxp ']'
++ cd /home/tompos/git/liferay/p/liferay-dxp
++ get_all_tags
++ git tag -l --sort=creatordate '--format=%(refname:short)' '7.[0-9].1[03]-u[0-9]*'
++ local tag_name
++ rm -f /tmp/tags_file_new.txt
+++ cat /tmp/tags_file_ee.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u1 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u2 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u3 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u4 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u5 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u6 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u7 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u8 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u9 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u10 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u15 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u16 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u17 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u18 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u19 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u20 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u21 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u22 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u23 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u24 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u4 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u25 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u26 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u5 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u27 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u28 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u6 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u29 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u30 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u7 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u31 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u32 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u33 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u34 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u8 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u35 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u9 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u36 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u10 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u37 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u38 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u11 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u39 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u40 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u41 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u12 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u42 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u13 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u43 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u44 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u45 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u46 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u14 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u47 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u48 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u15 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u49 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u16 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u50 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u51 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u17 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u52 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u53 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u54 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u18 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u55 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u56 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u57 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u19 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u58 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u59 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u60 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u20 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u61 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u62 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u63 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u64 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u21 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u65 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u66 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u22 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u67 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u68 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u23 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u69 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u70 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u71 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u72 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u73 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u24 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u74 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u75 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u25 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.4.13-u76 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u26 /tmp/tags_file_dxp.txt
++ for tag_name in $(cat "${TAGS_FILE_EE}")
++ grep -qw 7.3.10-u29 /tmp/tags_file_dxp.txt
++ echo '###################################### TAGS_FILE_NEW: /tmp/tags_file_new.txt'
+###################################### TAGS_FILE_NEW: /tmp/tags_file_new.txt
++ set +x

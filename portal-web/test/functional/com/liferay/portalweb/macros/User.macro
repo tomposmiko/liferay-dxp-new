@@ -51,9 +51,6 @@ definition {
 		else if (${localization} == "ES") {
 			var localizedSignIn = "Acceder";
 		}
-		else if (${localization} == "FR") {
-			var localizedSignIn = "Ouvrir une session";
-		}
 		else {
 			var localizedSignIn = "Sign In";
 		}
@@ -91,9 +88,6 @@ definition {
 		}
 		else if (${localization} == "ES") {
 			var localizedSignIn = "Acceder";
-		}
-		else if (${localization} == "FR") {
-			var localizedSignIn = "Ouvrir une session";
 		}
 		else {
 			var localizedSignIn = "Sign In";
@@ -531,7 +525,7 @@ definition {
 	macro addScreenNameNumberSiteIdCP {
 		LexiconEntry.gotoAdd();
 
-		Type(
+		Paste(
 			locator1 = "UsersAndOrganizationsEditUser#DETAILS_SCREEN_NAME_FIELD",
 			value1 = ${siteID});
 
@@ -873,7 +867,7 @@ definition {
 			locator1 = "UsersAndOrganizationsEditUser#ROLES_ORGANIZATION_ROLES_SELECT_LINK",
 			value1 = "Select");
 
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#SELECT_ORGANIZATION_ROLE");
+		SelectFrame(locator1 = "IFrame#SELECT_ORGANIZATION_ROLE");
 
 		var key_roleTitle = ${roleTitle};
 

@@ -16,7 +16,6 @@ package com.liferay.social.kernel.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.social.kernel.model.SocialActivityAchievement;
 
@@ -421,11 +420,6 @@ public class SocialActivityAchievementLocalServiceWrapper
 
 		return _socialActivityAchievementLocalService.
 			updateSocialActivityAchievement(socialActivityAchievement);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _socialActivityAchievementLocalService.getBasePersistence();
 	}
 
 	@Override

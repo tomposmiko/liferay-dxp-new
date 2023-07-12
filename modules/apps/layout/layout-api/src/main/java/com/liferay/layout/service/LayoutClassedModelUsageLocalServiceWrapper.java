@@ -17,7 +17,6 @@ package com.liferay.layout.service;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -543,11 +542,6 @@ public class LayoutClassedModelUsageLocalServiceWrapper
 
 		return _layoutClassedModelUsageLocalService.
 			updateLayoutClassedModelUsage(layoutClassedModelUsage);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _layoutClassedModelUsageLocalService.getBasePersistence();
 	}
 
 	@Override

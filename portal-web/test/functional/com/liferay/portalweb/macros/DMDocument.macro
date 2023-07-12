@@ -105,7 +105,7 @@ definition {
 				value1 = "Select");
 
 			while (IsElementNotPresent(locator1 = "WC#LINK_TO_PAGE_SELECT_PAGE_RADIO")) {
-				ExecuteJavaScript(value1 = "document.querySelector('.top-ended').scrollTop = 1000");
+				RunScript(locator1 = "document.querySelector('.top-ended').scrollTop = 1000");
 			}
 
 			Click(locator1 = "WC#LINK_TO_PAGE_SELECT_PAGE_RADIO");

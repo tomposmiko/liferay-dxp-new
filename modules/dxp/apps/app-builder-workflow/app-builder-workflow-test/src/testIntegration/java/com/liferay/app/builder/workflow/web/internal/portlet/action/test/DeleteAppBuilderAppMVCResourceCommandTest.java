@@ -25,7 +25,6 @@ import com.liferay.portal.test.log.Log4JLoggerTestUtil;
 import org.apache.log4j.Level;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,7 +32,6 @@ import org.junit.runner.RunWith;
  * @author Rafael Praxedes
  */
 @DataGuard(scope = DataGuard.Scope.METHOD)
-@Ignore
 @RunWith(Arquillian.class)
 public class DeleteAppBuilderAppMVCResourceCommandTest
 	extends BaseAppBuilderPortletTestCase {

@@ -15,7 +15,6 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceAddressRestrictionLocalService}.
@@ -440,11 +439,6 @@ public class CommerceAddressRestrictionLocalServiceWrapper
 
 		return _commerceAddressRestrictionLocalService.
 			updateCommerceAddressRestriction(commerceAddressRestriction);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceAddressRestrictionLocalService.getBasePersistence();
 	}
 
 	@Override

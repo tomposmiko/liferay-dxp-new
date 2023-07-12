@@ -1433,7 +1433,11 @@ definition {
 			category = "Configuration",
 			portlet = "Site Settings");
 
-		var siteID = selenium.getElementValue("SitesEditSite#SITE_ID");
+		var siteID = "siteID";
+
+		Copy(
+			locator1 = "SitesEditSite#SITE_ID",
+			value1 = "siteID");
 
 		User.logoutPG(
 			nodePort = 9080,

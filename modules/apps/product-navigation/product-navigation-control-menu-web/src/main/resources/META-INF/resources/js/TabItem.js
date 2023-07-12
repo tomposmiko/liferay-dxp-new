@@ -24,11 +24,7 @@ import {LAYOUT_DATA_ITEM_TYPES} from './constants/layoutDataItemTypes';
 import {useDragSymbol} from './useDragAndDrop';
 
 const addItem = ({item, plid, setWidgets, widgets}) => {
-	let targetItem = document.querySelector('.portlet-dropzone.customizable');
-
-	if (!targetItem) {
-		targetItem = document.querySelector('.portlet-dropzone');
-	}
+	const targetItem = document.querySelector('.portlet-dropzone');
 
 	addPortlet({item, plid, targetItem});
 

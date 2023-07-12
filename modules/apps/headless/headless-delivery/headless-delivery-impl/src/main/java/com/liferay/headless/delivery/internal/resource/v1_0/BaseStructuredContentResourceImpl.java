@@ -1550,7 +1550,7 @@ public abstract class BaseStructuredContentResourceImpl
 		String createStrategy = (String)parameters.getOrDefault(
 			"createStrategy", "INSERT");
 
-		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
+		if ("INSERT".equalsIgnoreCase(createStrategy)) {
 			if (parameters.containsKey("structuredContentFolderId")) {
 				structuredContentUnsafeConsumer = structuredContent ->
 					postStructuredContentFolderStructuredContent(
@@ -1700,7 +1700,7 @@ public abstract class BaseStructuredContentResourceImpl
 		String updateStrategy = (String)parameters.getOrDefault(
 			"updateStrategy", "UPDATE");
 
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
+		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
 			structuredContentUnsafeConsumer =
 				structuredContent -> patchStructuredContent(
 					structuredContent.getId() != null ?
@@ -1710,7 +1710,7 @@ public abstract class BaseStructuredContentResourceImpl
 					structuredContent);
 		}
 
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
+		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			structuredContentUnsafeConsumer =
 				structuredContent -> putStructuredContent(
 					structuredContent.getId() != null ?

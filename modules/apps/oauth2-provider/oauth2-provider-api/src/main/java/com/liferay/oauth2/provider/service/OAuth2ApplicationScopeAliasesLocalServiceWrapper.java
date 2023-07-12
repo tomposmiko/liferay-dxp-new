@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link OAuth2ApplicationScopeAliasesLocalService}.
@@ -420,11 +419,6 @@ public class OAuth2ApplicationScopeAliasesLocalServiceWrapper
 
 		return _oAuth2ApplicationScopeAliasesLocalService.
 			updateOAuth2ApplicationScopeAliases(oAuth2ApplicationScopeAliases);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _oAuth2ApplicationScopeAliasesLocalService.getBasePersistence();
 	}
 
 	@Override

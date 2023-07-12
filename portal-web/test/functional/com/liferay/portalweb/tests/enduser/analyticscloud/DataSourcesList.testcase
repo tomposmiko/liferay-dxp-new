@@ -26,19 +26,13 @@ definition {
 		var dataSourceList = "";
 
 		for (var n : list "1,2,3") {
-			ACSettings.goToDataSources();
-
-			Click(locator1 = "ACDXPSettings#AC_GENERIC_ADD_OR_CONFIRMATION_BUTTON");
-
-			Click(locator1 = "ACSettings#DXP_DATA_SOURCE_OPTION");
-
-			var token = selenium.getElementValue("ACSettings#TOKEN_INPUT_FIELD");
+			ACSettings.takeTokenFromAnalyticsCloud();
 
 			TestCase.setUpPortalInstance();
 
 			ACUtils.launchDXP();
 
-			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(acToken = ${token});
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 
 			var dataSource = StringUtil.replace(${propertyName}, " Combined Property", "");
 

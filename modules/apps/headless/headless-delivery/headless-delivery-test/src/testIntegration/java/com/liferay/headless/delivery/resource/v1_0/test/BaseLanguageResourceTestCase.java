@@ -546,19 +546,14 @@ public abstract class BaseLanguageResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		assertValid(page.getActions(), expectedActions);
-	}
+		Map<String, Map<String, String>> actions = page.getActions();
 
-	protected void assertValid(
-		Map<String, Map<String, String>> actions1,
-		Map<String, Map<String, String>> actions2) {
-
-		for (String key : actions2.keySet()) {
-			Map action = actions1.get(key);
+		for (String key : expectedActions.keySet()) {
+			Map action = actions.get(key);
 
 			Assert.assertNotNull(key + " does not contain an action", action);
 
-			Map<String, String> expectedAction = actions2.get(key);
+			Map expectedAction = expectedActions.get(key);
 
 			Assert.assertEquals(
 				expectedAction.get("method"), action.get("method"));

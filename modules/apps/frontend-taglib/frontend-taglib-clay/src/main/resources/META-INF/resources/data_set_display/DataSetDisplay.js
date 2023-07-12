@@ -46,7 +46,7 @@ import {
 	loadData,
 } from './utilities/index';
 import {logError} from './utilities/logError';
-import {getJsModule} from './utilities/modules';
+import getJsModule from './utilities/modules';
 import ViewsContext from './views/ViewsContext';
 import {getViewContentRenderer} from './views/index';
 

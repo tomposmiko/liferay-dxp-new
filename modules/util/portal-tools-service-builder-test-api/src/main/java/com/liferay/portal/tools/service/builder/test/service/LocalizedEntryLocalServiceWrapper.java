@@ -15,7 +15,6 @@
 package com.liferay.portal.tools.service.builder.test.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link LocalizedEntryLocalService}.
@@ -390,11 +389,6 @@ public class LocalizedEntryLocalServiceWrapper
 
 		return _localizedEntryLocalService.updateLocalizedEntryLocalizations(
 			localizedEntry, titleMap, contentMap);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _localizedEntryLocalService.getBasePersistence();
 	}
 
 	@Override

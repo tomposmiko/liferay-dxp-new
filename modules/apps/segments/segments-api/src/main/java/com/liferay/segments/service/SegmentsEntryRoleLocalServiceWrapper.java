@@ -16,7 +16,6 @@ package com.liferay.segments.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.segments.model.SegmentsEntryRole;
 
@@ -410,11 +409,6 @@ public class SegmentsEntryRoleLocalServiceWrapper
 
 		return _segmentsEntryRoleLocalService.updateSegmentsEntryRole(
 			segmentsEntryRole);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _segmentsEntryRoleLocalService.getBasePersistence();
 	}
 
 	@Override

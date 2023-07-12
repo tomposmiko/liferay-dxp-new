@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -662,7 +661,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 		String createStrategy = (String)parameters.getOrDefault(
 			"createStrategy", "INSERT");
 
-		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
+		if ("INSERT".equalsIgnoreCase(createStrategy)) {
 			if (parameters.containsKey("taxonomyVocabularyId")) {
 				taxonomyCategoryUnsafeConsumer =
 					taxonomyCategory -> postTaxonomyVocabularyTaxonomyCategory(
@@ -782,7 +781,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 		String updateStrategy = (String)parameters.getOrDefault(
 			"updateStrategy", "UPDATE");
 
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
+		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
 			taxonomyCategoryUnsafeConsumer =
 				taxonomyCategory -> patchTaxonomyCategory(
 					taxonomyCategory.getId() != null ?
@@ -791,7 +790,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 					taxonomyCategory);
 		}
 
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
+		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			taxonomyCategoryUnsafeConsumer =
 				taxonomyCategory -> putTaxonomyCategory(
 					taxonomyCategory.getId() != null ?

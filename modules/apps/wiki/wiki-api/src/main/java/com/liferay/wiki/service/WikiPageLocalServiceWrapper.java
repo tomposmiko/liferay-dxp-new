@@ -15,7 +15,6 @@
 package com.liferay.wiki.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link WikiPageLocalService}.
@@ -1216,11 +1215,6 @@ public class WikiPageLocalServiceWrapper
 		com.liferay.portal.kernel.service.ServiceContext serviceContext) {
 
 		return _wikiPageLocalService.updateWikiPage(wikiPage, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _wikiPageLocalService.getBasePersistence();
 	}
 
 	@Override

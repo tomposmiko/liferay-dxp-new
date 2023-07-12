@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link RepositoryEntryLocalService}.
  *
@@ -35,8 +33,8 @@ public class RepositoryEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.RepositoryEntry addRepositoryEntry(
-			long userId, long groupId, long repositoryId, String mappedId,
-			ServiceContext serviceContext)
+			long userId, long groupId, long repositoryId,
+			java.lang.String mappedId, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _repositoryEntryLocalService.addRepositoryEntry(
@@ -99,7 +97,7 @@ public class RepositoryEntryLocalServiceWrapper
 
 	@Override
 	public void deleteRepositoryEntries(
-			long repositoryId, Iterable<String> mappedIds)
+			long repositoryId, java.lang.Iterable<java.lang.String> mappedIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_repositoryEntryLocalService.deleteRepositoryEntries(
@@ -127,7 +125,8 @@ public class RepositoryEntryLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteRepositoryEntry(long repositoryId, String mappedId)
+	public void deleteRepositoryEntry(
+			long repositoryId, java.lang.String mappedId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_repositoryEntryLocalService.deleteRepositoryEntry(
@@ -273,7 +272,8 @@ public class RepositoryEntryLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.RepositoryEntry
-		fetchRepositoryEntryByUuidAndGroupId(String uuid, long groupId) {
+		fetchRepositoryEntryByUuidAndGroupId(
+			java.lang.String uuid, long groupId) {
 
 		return _repositoryEntryLocalService.
 			fetchRepositoryEntryByUuidAndGroupId(uuid, groupId);
@@ -310,7 +310,7 @@ public class RepositoryEntryLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _repositoryEntryLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -359,7 +359,8 @@ public class RepositoryEntryLocalServiceWrapper
 	 */
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.RepositoryEntry>
-		getRepositoryEntriesByUuidAndCompanyId(String uuid, long companyId) {
+		getRepositoryEntriesByUuidAndCompanyId(
+			java.lang.String uuid, long companyId) {
 
 		return _repositoryEntryLocalService.
 			getRepositoryEntriesByUuidAndCompanyId(uuid, companyId);
@@ -378,7 +379,7 @@ public class RepositoryEntryLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.RepositoryEntry>
 		getRepositoryEntriesByUuidAndCompanyId(
-			String uuid, long companyId, int start, int end,
+			java.lang.String uuid, long companyId, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
 				<com.liferay.portal.kernel.model.RepositoryEntry>
 					orderByComparator) {
@@ -416,7 +417,8 @@ public class RepositoryEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.RepositoryEntry getRepositoryEntry(
-			long userId, long groupId, long repositoryId, String objectId)
+			long userId, long groupId, long repositoryId,
+			java.lang.String objectId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _repositoryEntryLocalService.getRepositoryEntry(
@@ -425,7 +427,7 @@ public class RepositoryEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.RepositoryEntry getRepositoryEntry(
-			String uuid, long groupId)
+			java.lang.String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _repositoryEntryLocalService.getRepositoryEntry(uuid, groupId);
@@ -441,7 +443,8 @@ public class RepositoryEntryLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.RepositoryEntry
-			getRepositoryEntryByUuidAndGroupId(String uuid, long groupId)
+			getRepositoryEntryByUuidAndGroupId(
+				java.lang.String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _repositoryEntryLocalService.getRepositoryEntryByUuidAndGroupId(
@@ -450,7 +453,8 @@ public class RepositoryEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.RepositoryEntry
-			updateRepositoryEntry(long repositoryEntryId, String mappedId)
+			updateRepositoryEntry(
+				long repositoryEntryId, java.lang.String mappedId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _repositoryEntryLocalService.updateRepositoryEntry(
@@ -474,11 +478,6 @@ public class RepositoryEntryLocalServiceWrapper
 
 		return _repositoryEntryLocalService.updateRepositoryEntry(
 			repositoryEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _repositoryEntryLocalService.getBasePersistence();
 	}
 
 	@Override

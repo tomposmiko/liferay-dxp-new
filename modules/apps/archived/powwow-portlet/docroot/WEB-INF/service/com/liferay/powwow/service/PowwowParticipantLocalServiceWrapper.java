@@ -15,7 +15,6 @@
 package com.liferay.powwow.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link PowwowParticipantLocalService}.
@@ -400,11 +399,6 @@ public class PowwowParticipantLocalServiceWrapper
 
 		return _powwowParticipantLocalService.updateStatus(
 			powwowParticipantId, status);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _powwowParticipantLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,7 +15,6 @@
 package com.liferay.external.data.source.test.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link TestEntityLocalService}.
@@ -326,11 +325,6 @@ public class TestEntityLocalServiceWrapper
 			com.liferay.external.data.source.test.model.TestEntity testEntity) {
 
 		return _testEntityLocalService.updateTestEntity(testEntity);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _testEntityLocalService.getBasePersistence();
 	}
 
 	@Override

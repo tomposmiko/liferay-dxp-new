@@ -15,7 +15,6 @@
 package com.liferay.account.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AccountGroupAccountEntryRelLocalService}.
@@ -413,11 +412,6 @@ public class AccountGroupAccountEntryRelLocalServiceWrapper
 
 		return _accountGroupAccountEntryRelLocalService.
 			updateAccountGroupAccountEntryRel(accountGroupAccountEntryRel);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _accountGroupAccountEntryRelLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,7 +15,6 @@
 package com.liferay.app.builder.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AppBuilderAppLocalService}.
@@ -612,11 +611,6 @@ public class AppBuilderAppLocalServiceWrapper
 		return _appBuilderAppLocalService.updateAppBuilderApp(
 			userId, appBuilderAppId, active, ddmStructureId,
 			ddmStructureLayoutId, deDataListViewId, nameMap);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _appBuilderAppLocalService.getBasePersistence();
 	}
 
 	@Override

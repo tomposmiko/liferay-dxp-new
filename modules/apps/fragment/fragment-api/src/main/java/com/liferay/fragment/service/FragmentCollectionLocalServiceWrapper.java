@@ -17,7 +17,6 @@ package com.liferay.fragment.service;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -501,11 +500,6 @@ public class FragmentCollectionLocalServiceWrapper
 
 		return _fragmentCollectionLocalService.updateFragmentCollection(
 			fragmentCollectionId, name, description);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _fragmentCollectionLocalService.getBasePersistence();
 	}
 
 	@Override

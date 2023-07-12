@@ -15,7 +15,6 @@
 package com.liferay.portal.security.sso.openid.connect.persistence.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link OpenIdConnectSessionLocalService}.
@@ -370,11 +369,6 @@ public class OpenIdConnectSessionLocalServiceWrapper
 
 		return _openIdConnectSessionLocalService.updateOpenIdConnectSession(
 			openIdConnectSession);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _openIdConnectSessionLocalService.getBasePersistence();
 	}
 
 	@Override

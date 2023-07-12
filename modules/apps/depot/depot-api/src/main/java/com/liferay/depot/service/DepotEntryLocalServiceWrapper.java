@@ -15,7 +15,6 @@
 package com.liferay.depot.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link DepotEntryLocalService}.
@@ -487,11 +486,6 @@ public class DepotEntryLocalServiceWrapper
 		return _depotEntryLocalService.updateDepotEntry(
 			depotEntryId, nameMap, descriptionMap, depotAppCustomizationMap,
 			typeSettingsUnicodeProperties, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _depotEntryLocalService.getBasePersistence();
 	}
 
 	@Override

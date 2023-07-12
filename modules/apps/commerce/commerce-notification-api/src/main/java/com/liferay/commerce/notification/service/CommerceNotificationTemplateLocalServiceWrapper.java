@@ -15,7 +15,6 @@
 package com.liferay.commerce.notification.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceNotificationTemplateLocalService}.
@@ -559,11 +558,6 @@ public class CommerceNotificationTemplateLocalServiceWrapper
 				commerceNotificationTemplateId, name, description, from,
 				fromNameMap, to, cc, bcc, type, enabled, subjectMap, bodyMap,
 				serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceNotificationTemplateLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -38,7 +38,6 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -67,7 +66,6 @@ public class AppWorkflowDataRecordLinkResourceTest
 		).build();
 	}
 
-	@Ignore
 	@Override
 	@Test
 	public void testPostAppAppWorkflowDataRecordLinksPage() throws Exception {

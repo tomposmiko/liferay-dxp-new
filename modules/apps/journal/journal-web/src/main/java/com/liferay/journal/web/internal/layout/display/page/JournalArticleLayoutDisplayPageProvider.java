@@ -70,7 +70,7 @@ public class JournalArticleLayoutDisplayPageProvider
 			journalArticleLocalService.fetchArticleByUrlTitle(
 				groupId, urlTitle);
 
-		if ((article == null) || article.isExpired() || article.isInTrash()) {
+		if ((article == null) || article.isInTrash()) {
 			return null;
 		}
 

@@ -15,7 +15,6 @@
 package com.liferay.alloy.mvc.sample.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link TodoItemLocalService}.
@@ -323,11 +322,6 @@ public class TodoItemLocalServiceWrapper
 		com.liferay.alloy.mvc.sample.model.TodoItem todoItem) {
 
 		return _todoItemLocalService.updateTodoItem(todoItem);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _todoItemLocalService.getBasePersistence();
 	}
 
 	@Override

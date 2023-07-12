@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.security.xml;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.transform.TransformerFactory;
 
 import org.xml.sax.XMLReader;
 
@@ -31,10 +30,6 @@ public class SecureXMLFactoryProviderUtil {
 
 	public static DocumentBuilderFactory newDocumentBuilderFactory() {
 		return getSecureXMLFactoryProvider().newDocumentBuilderFactory();
-	}
-
-	public static TransformerFactory newTransformerFactory() {
-		return _secureXMLFactoryProvider.newTransformerFactory();
 	}
 
 	public static XMLInputFactory newXMLInputFactory() {

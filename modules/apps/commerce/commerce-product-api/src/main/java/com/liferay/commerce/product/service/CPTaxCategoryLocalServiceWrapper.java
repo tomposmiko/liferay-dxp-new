@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPTaxCategoryLocalService}.
@@ -459,11 +458,6 @@ public class CPTaxCategoryLocalServiceWrapper
 
 		return _cpTaxCategoryLocalService.updateCPTaxCategory(
 			externalReferenceCode, cpTaxCategoryId, nameMap, descriptionMap);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpTaxCategoryLocalService.getBasePersistence();
 	}
 
 	@Override

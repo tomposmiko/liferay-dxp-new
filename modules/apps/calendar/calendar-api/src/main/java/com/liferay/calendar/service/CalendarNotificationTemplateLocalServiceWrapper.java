@@ -15,7 +15,6 @@
 package com.liferay.calendar.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CalendarNotificationTemplateLocalService}.
@@ -491,11 +490,6 @@ public class CalendarNotificationTemplateLocalServiceWrapper
 			updateCalendarNotificationTemplate(
 				calendarNotificationTemplateId, notificationTypeSettings,
 				subject, body, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _calendarNotificationTemplateLocalService.getBasePersistence();
 	}
 
 	@Override

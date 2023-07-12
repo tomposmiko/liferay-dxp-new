@@ -132,7 +132,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 			cssClass="col-md-offset-2"
 			md="8"
 		>
-			<c:if test="<%= !layout.isTypeAssetDisplay() && blogsPortletInstanceConfiguration.enableComments() %>">
+			<c:if test="<%= blogsPortletInstanceConfiguration.enableComments() %>">
 
 				<%
 				Discussion discussion = CommentManagerUtil.getDiscussion(user.getUserId(), scopeGroupId, BlogsEntry.class.getName(), entry.getEntryId(), new ServiceContextFunction(request));
