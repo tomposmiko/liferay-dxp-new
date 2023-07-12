@@ -17,15 +17,10 @@ package com.liferay.portal.template.freemarker.internal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.cache.PortalCache;
-import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
-import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.template.BaseTemplateResourceCache;
 import com.liferay.portal.template.freemarker.configuration.FreeMarkerEngineConfiguration;
-
-import freemarker.cache.TemplateCache;
 
 import java.util.Map;
 
@@ -43,12 +38,6 @@ import org.osgi.service.component.annotations.Modified;
 )
 public class FreeMarkerTemplateResourceCache extends BaseTemplateResourceCache {
 
-	public PortalCache<TemplateResource, TemplateCache.MaybeMissingTemplate>
-		getSecondLevelPortalCache() {
-
-		return _secondLevelPortalCache;
-	}
-
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		FreeMarkerEngineConfiguration freeMarkerEngineConfiguration =
@@ -57,44 +46,28 @@ public class FreeMarkerTemplateResourceCache extends BaseTemplateResourceCache {
 
 		init(
 			freeMarkerEngineConfiguration.resourceModificationCheck(),
-			_PORTAL_CACHE_NAME);
-
-		if (isEnabled()) {
-			_secondLevelPortalCache = PortalCacheHelperUtil.getPortalCache(
-				PortalCacheManagerNames.SINGLE_VM,
-				StringBundler.concat(
-					TemplateResource.class.getName(), StringPool.POUND,
-					TemplateConstants.LANG_TYPE_FTL));
-
-			setSecondLevelPortalCache(_secondLevelPortalCache);
-		}
+			_PORTAL_CACHE_NAME,
+			StringBundler.concat(
+				TemplateResource.class.getName(), StringPool.POUND,
+				TemplateConstants.LANG_TYPE_FTL));
 	}
 
 	@Deactivate
 	protected void deactivate() {
 		destroy();
-
-		if (_secondLevelPortalCache != null) {
-			PortalCacheHelperUtil.removePortalCache(
-				PortalCacheManagerNames.SINGLE_VM,
-				_secondLevelPortalCache.getPortalCacheName());
-
-			_secondLevelPortalCache = null;
-		}
 	}
 
 	@Modified
 	protected void modified(Map<String, Object> properties) {
-		deactivate();
+		FreeMarkerEngineConfiguration freeMarkerEngineConfiguration =
+			ConfigurableUtil.createConfigurable(
+				FreeMarkerEngineConfiguration.class, properties);
 
-		activate(properties);
+		setModificationCheckInterval(
+			freeMarkerEngineConfiguration.resourceModificationCheck());
 	}
 
 	private static final String _PORTAL_CACHE_NAME =
 		FreeMarkerTemplateResourceCache.class.getName();
-
-	private volatile PortalCache
-		<TemplateResource, TemplateCache.MaybeMissingTemplate>
-			_secondLevelPortalCache;
 
 }

@@ -15,6 +15,7 @@
 package com.liferay.marketplace.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link ModuleLocalService}.
@@ -375,6 +376,11 @@ public class ModuleLocalServiceWrapper
 		com.liferay.marketplace.model.Module module) {
 
 		return _moduleLocalService.updateModule(module);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _moduleLocalService.getBasePersistence();
 	}
 
 	@Override

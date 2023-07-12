@@ -16,6 +16,7 @@ package com.liferay.trash.web.internal.servlet.taglib.util;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -56,7 +57,9 @@ public class TrashViewContentActionDropdownItemsProvider {
 			() -> _trashHandler.isMovable(_classPK),
 			_getMoveActionDropdownItem()
 		).add(
-			() -> _trashHandler.isDeletable(_classPK),
+			() ->
+				CTCollectionThreadLocal.isProductionMode() &&
+				_trashHandler.isDeletable(_classPK),
 			_getDeleteActionDropdownItem()
 		).build();
 	}

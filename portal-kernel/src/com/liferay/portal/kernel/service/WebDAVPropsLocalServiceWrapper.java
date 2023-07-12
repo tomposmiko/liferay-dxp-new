@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.service;
 
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
 /**
  * Provides a wrapper for {@link WebDAVPropsLocalService}.
  *
@@ -103,7 +105,7 @@ public class WebDAVPropsLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteWebDAVProps(java.lang.String className, long classPK) {
+	public void deleteWebDAVProps(String className, long classPK) {
 		_webDAVPropsLocalService.deleteWebDAVProps(className, classPK);
 	}
 
@@ -253,7 +255,7 @@ public class WebDAVPropsLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
+	public String getOSGiServiceIdentifier() {
 		return _webDAVPropsLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -285,7 +287,7 @@ public class WebDAVPropsLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.WebDAVProps getWebDAVProps(
-		long companyId, java.lang.String className, long classPK) {
+		long companyId, String className, long classPK) {
 
 		return _webDAVPropsLocalService.getWebDAVProps(
 			companyId, className, classPK);
@@ -342,6 +344,11 @@ public class WebDAVPropsLocalServiceWrapper
 		com.liferay.portal.kernel.model.WebDAVProps webDAVProps) {
 
 		return _webDAVPropsLocalService.updateWebDAVProps(webDAVProps);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _webDAVPropsLocalService.getBasePersistence();
 	}
 
 	@Override

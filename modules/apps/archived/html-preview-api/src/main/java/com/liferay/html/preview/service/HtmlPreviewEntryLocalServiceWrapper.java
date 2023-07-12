@@ -15,6 +15,7 @@
 package com.liferay.html.preview.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link HtmlPreviewEntryLocalService}.
@@ -362,6 +363,11 @@ public class HtmlPreviewEntryLocalServiceWrapper
 
 		return _htmlPreviewEntryLocalService.updateHtmlPreviewEntry(
 			htmlPreviewEntryId, content, mimeType, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _htmlPreviewEntryLocalService.getBasePersistence();
 	}
 
 	@Override

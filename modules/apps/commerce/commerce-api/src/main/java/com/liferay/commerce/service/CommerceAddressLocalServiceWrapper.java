@@ -15,6 +15,7 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceAddressLocalService}.
@@ -686,6 +687,11 @@ public class CommerceAddressLocalServiceWrapper
 			commerceAddressId, name, description, street1, street2, street3,
 			city, zip, commerceRegionId, commerceCountryId, phoneNumber, type,
 			serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceAddressLocalService.getBasePersistence();
 	}
 
 	@Override

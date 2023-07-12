@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class RequestDispatcherUtil {
 
-	public static ObjectValuePair<String, Long> getContentAndLastModifiedTime(
+	public static BufferCacheServletResponse getBufferCacheServletResponse(
 			RequestDispatcher requestDispatcher,
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
@@ -83,6 +83,36 @@ public class RequestDispatcherUtil {
 
 			},
 			bufferCacheServletResponse);
+
+		return bufferCacheServletResponse;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getContentAndLastModifiedTimeObjectValuePair(
+	 *             RequestDispatcher, HttpServletRequest, HttpServletResponse)}
+	 */
+	@Deprecated
+	public static ObjectValuePair<String, Long> getContentAndLastModifiedTime(
+			RequestDispatcher requestDispatcher,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws Exception {
+
+		return getContentAndLastModifiedTimeObjectValuePair(
+			requestDispatcher, httpServletRequest, httpServletResponse);
+	}
+
+	public static ObjectValuePair<String, Long>
+			getContentAndLastModifiedTimeObjectValuePair(
+				RequestDispatcher requestDispatcher,
+				HttpServletRequest httpServletRequest,
+				HttpServletResponse httpServletResponse)
+		throws Exception {
+
+		BufferCacheServletResponse bufferCacheServletResponse =
+			getBufferCacheServletResponse(
+				requestDispatcher, httpServletRequest, httpServletResponse);
 
 		return new ObjectValuePair<>(
 			bufferCacheServletResponse.getString(),

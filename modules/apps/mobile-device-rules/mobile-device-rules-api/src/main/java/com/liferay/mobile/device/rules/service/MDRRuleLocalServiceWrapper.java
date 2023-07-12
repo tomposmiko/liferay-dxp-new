@@ -15,6 +15,7 @@
 package com.liferay.mobile.device.rules.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link MDRRuleLocalService}.
@@ -529,6 +530,11 @@ public class MDRRuleLocalServiceWrapper
 		return _mdrRuleLocalService.updateRule(
 			ruleId, nameMap, descriptionMap, type,
 			typeSettingsUnicodeProperties, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _mdrRuleLocalService.getBasePersistence();
 	}
 
 	@Override

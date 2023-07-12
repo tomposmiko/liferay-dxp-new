@@ -15,6 +15,7 @@
 package com.liferay.calendar.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CalendarBookingLocalService}.
@@ -985,6 +986,11 @@ public class CalendarBookingLocalServiceWrapper
 
 		return _calendarBookingLocalService.updateStatus(
 			userId, calendarBookingId, status, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _calendarBookingLocalService.getBasePersistence();
 	}
 
 	@Override

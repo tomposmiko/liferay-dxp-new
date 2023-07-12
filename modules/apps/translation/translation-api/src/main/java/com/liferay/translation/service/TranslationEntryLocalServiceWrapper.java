@@ -15,6 +15,7 @@
 package com.liferay.translation.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link TranslationEntryLocalService}.
@@ -472,6 +473,11 @@ public class TranslationEntryLocalServiceWrapper
 
 		return _translationEntryLocalService.updateTranslationEntry(
 			translationEntry);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _translationEntryLocalService.getBasePersistence();
 	}
 
 	@Override

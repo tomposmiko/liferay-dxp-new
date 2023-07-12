@@ -147,8 +147,7 @@ definition {
 
 	@priority = 5
 	test AddJoinXORWorkflowDefinitionViaViewTab {
-		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "Kaleodesigner#AddJoinXORNodeEditNameAndDesciptionAndDeleteViaViewTab";
+		property test.name.skip.portal.instance = "Kaleodesigner#AddJoinXORWorkflowDefinitionViaViewTab";
 		property testray.component.names = "Training";
 
 		ApplicationsMenu.gotoPortlet(
@@ -215,7 +214,7 @@ definition {
 
 		KaleoDesigner.addConnectorViaViewTab(
 			connectorName = "Join2",
-			nodeType = "state2",
+			nodeType = "state",
 			nodeTypeDestination = "join-xor");
 
 		KaleoDesigner.addConnectorAndNodeViaViewTab(
@@ -347,7 +346,6 @@ definition {
 	@description = "This is a use case for LPS-53992."
 	@priority = 5
 	test AddTaskNodeEditNameAndDesciptionAndNotificationsAndDeleteViaViewTab {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "Kaleodesigner#AddTaskNodeEditNameAndDesciptionAndNotificationsAndDeleteViaViewTab";
 		property testray.component.names = "Training";
 
@@ -689,7 +687,6 @@ definition {
 
 	@priority = 5
 	test EditAssignmentsForTaskNodeKDCP {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "Kaleodesigner#EditAssignmentsForTaskNodeKDCP";
 		property testray.component.names = "Training";
 
@@ -791,7 +788,6 @@ definition {
 
 	@priority = 3
 	test PublishWorkflowDefinitionWithConnectorPointingToStartNodeAndViewErrorMessage {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "Kaleodesigner#PublishWorkflowDefinitionWithConnectorPointingToStartNodeAndViewErrorMessage";
 
 		ApplicationsMenu.gotoPortlet(
@@ -810,25 +806,18 @@ definition {
 		KaleoDesigner.deleteNode(nodeNodeLabel = "EndNode");
 
 		KaleoDesigner.addNodeViaViewTab(
-			nodeDescription = "Start Node Description",
-			nodeName = "Start",
-			nodeNodeLabel = "Start",
-			nodeType = "start");
+			nodeDescription = "End Node Description",
+			nodeName = "End",
+			nodeNodeLabel = "Task",
+			nodeType = "task");
 
 		KaleoDesigner.addConnectorAndNodeViaViewTab(
-			connectorName = "Approve",
-			newNode = "Task",
-			newNodeDescription = "End Node Description",
-			newNodeName = "End",
-			newNodeType = "task",
-			nodeType = "start");
-
-		KaleoDesigner.deleteConnector(connectorLabel = "Approve");
-
-		KaleoDesigner.addConnectorViaViewTab(
 			connectorName = "Reverse",
-			nodeType = "task",
-			nodeTypeDestination = "start2");
+			newNode = "Start",
+			newNodeDescription = "Start Node Description",
+			newNodeName = "Start",
+			newNodeType = "start",
+			nodeType = "task");
 
 		Workflow.publishInvalidWorkflowDefinition(errorMessage = "The Start node cannot have an incoming transition.");
 	}
@@ -1329,7 +1318,6 @@ definition {
 	@description = "This is a use case for LPS-48590."
 	@priority = 4
 	test ViewSourceXMLNotErasedWhenInvalid {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "Kaleodesigner#ViewSourceXMLNotErasedWhenInvalid";
 
 		ApplicationsMenu.gotoPortlet(

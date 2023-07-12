@@ -15,6 +15,7 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPDefinitionInventoryLocalService}.
@@ -485,6 +486,11 @@ public class CPDefinitionInventoryLocalServiceWrapper
 			lowStockActivity, displayAvailability, displayStockQuantity,
 			minStockQuantity, backOrders, minOrderQuantity, maxOrderQuantity,
 			allowedOrderQuantities, multipleOrderQuantity);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _cpDefinitionInventoryLocalService.getBasePersistence();
 	}
 
 	@Override

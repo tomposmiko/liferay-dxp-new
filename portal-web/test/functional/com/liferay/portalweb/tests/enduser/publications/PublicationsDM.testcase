@@ -220,28 +220,8 @@ definition {
 			changeOrder = 3,
 			changeSite = "Guest",
 			changeTitle = "DM Folder 1 Name",
-			changeType = "Modified",
-			changeUser = "Test Test");
-
-		// Workaround LPS-121488
-
-		/*Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Recycle Bin",
-			portlet = "Recycle Bin");
-
-		RecycleBin.emptyCP();
-
-		Publications.gotoReviewChanges();
-
-		PublicationsChanges.viewChangesViaChangesStyle(
-			changeCategory = "Documents Folder",
-			changeOrder = "3",
-			changeSite = "Guest",
-			changeTitle = "DM Folder 1 Name",
 			changeType = "Deleted",
-			changeUser = "Test Test");*/
+			changeUser = "Test Test");
 	}
 
 	@priority = 4

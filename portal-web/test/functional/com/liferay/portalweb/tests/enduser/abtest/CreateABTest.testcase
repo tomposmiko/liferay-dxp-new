@@ -24,7 +24,7 @@ definition {
 			emailAddress = "test@liferay.com",
 			password = "test");
 
-		AnalyticsCloud.takeTokenFromAnalyticsCloud();
+		var token = AnalyticsCloud.takeTokenFromAnalyticsCloud();
 
 		// Go to DXP portal
 
@@ -36,7 +36,7 @@ definition {
 
 		// Connect and synchronyze with Analytics Cloud
 
-		AnalyticsCloud.syncAnalyticsCloud();
+		AnalyticsCloud.syncAnalyticsCloud(token = ${token});
 
 		// Create content page
 

@@ -15,6 +15,7 @@
 package com.liferay.knowledge.base.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link KBTemplateLocalService}.
@@ -476,6 +477,11 @@ public class KBTemplateLocalServiceWrapper
 
 		_kbTemplateLocalService.updateKBTemplateResources(
 			kbTemplate, groupPermissions, guestPermissions);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _kbTemplateLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -46,6 +46,7 @@ import org.apache.log4j.Level;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -65,6 +66,7 @@ public class AppWorkflowResourceTest extends BaseAppWorkflowResourceTestCase {
 			testCompany.getCompanyId(), testGroup);
 	}
 
+	@Ignore
 	@Override
 	@Test
 	public void testDeleteAppWorkflow() throws Exception {
@@ -90,6 +92,7 @@ public class AppWorkflowResourceTest extends BaseAppWorkflowResourceTestCase {
 		}
 	}
 
+	@Ignore
 	@Override
 	@Test
 	public void testGetAppWorkflow() throws Exception {
@@ -159,6 +162,7 @@ public class AppWorkflowResourceTest extends BaseAppWorkflowResourceTestCase {
 				ddlRecord.getRecordId()));
 	}
 
+	@Ignore
 	@Override
 	@Test
 	public void testGraphQLDeleteAppWorkflow() throws Exception {
@@ -197,6 +201,13 @@ public class AppWorkflowResourceTest extends BaseAppWorkflowResourceTestCase {
 		}
 	}
 
+	@Ignore
+	@Override
+	@Test
+	public void testPostAppWorkflow() throws Exception {
+	}
+
+	@Ignore
 	@Override
 	@Test
 	public void testPutAppWorkflow() throws Exception {

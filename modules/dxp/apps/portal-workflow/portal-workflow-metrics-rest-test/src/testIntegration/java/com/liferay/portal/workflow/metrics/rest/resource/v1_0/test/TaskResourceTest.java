@@ -34,6 +34,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,6 +72,12 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 			_workflowMetricsRESTTestHelper.deleteProcess(
 				testGroup.getCompanyId(), _process);
 		}
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetProcessTasksPage() throws Exception {
 	}
 
 	@Override

@@ -15,6 +15,7 @@
 package com.liferay.commerce.product.type.virtual.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPDefinitionVirtualSettingLocalService}.
@@ -590,6 +591,11 @@ public class CPDefinitionVirtualSettingLocalServiceWrapper
 				sampleFileEntryId, sampleUrl, termsOfUseRequired,
 				termsOfUseContentMap, termsOfUseJournalArticleResourcePrimKey,
 				serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _cpDefinitionVirtualSettingLocalService.getBasePersistence();
 	}
 
 	@Override

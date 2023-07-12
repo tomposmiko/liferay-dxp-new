@@ -15,6 +15,7 @@
 package com.liferay.commerce.bom.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceBOMFolderApplicationRelLocalService}.
@@ -431,6 +432,12 @@ public class CommerceBOMFolderApplicationRelLocalServiceWrapper
 		return _commerceBOMFolderApplicationRelLocalService.
 			updateCommerceBOMFolderApplicationRel(
 				commerceBOMFolderApplicationRel);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceBOMFolderApplicationRelLocalService.
+			getBasePersistence();
 	}
 
 	@Override

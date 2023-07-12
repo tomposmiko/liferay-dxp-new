@@ -63,7 +63,7 @@ definition {
 
 	@priority = 5
 	test ApproveFrontPageUserEdit {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",

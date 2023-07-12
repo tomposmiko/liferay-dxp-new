@@ -1,7 +1,7 @@
 definition {
 
 	macro addFullDescriptionViaCKEditor {
-		Type.typeCKEditor(
+		Type.typeEditor(
 			locator1 = "CKEditor#BODY_FIELD",
 			value1 = ${entryFullDescription});
 	}

@@ -15,6 +15,7 @@
 package com.liferay.mail.reader.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link FolderLocalService}.
@@ -377,6 +378,11 @@ public class FolderLocalServiceWrapper
 
 		return _folderLocalService.updateFolder(
 			folderId, fullName, displayName, remoteMessageCount);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _folderLocalService.getBasePersistence();
 	}
 
 	@Override

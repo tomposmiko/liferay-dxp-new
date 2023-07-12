@@ -15,6 +15,7 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceOrderNoteLocalService}.
@@ -466,6 +467,11 @@ public class CommerceOrderNoteLocalServiceWrapper
 		return _commerceOrderNoteLocalService.upsertCommerceOrderNote(
 			commerceOrderNoteId, commerceOrderId, content, restricted,
 			externalReferenceCode, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceOrderNoteLocalService.getBasePersistence();
 	}
 
 	@Override

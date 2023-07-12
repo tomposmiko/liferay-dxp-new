@@ -546,7 +546,7 @@ AUI.add(
 
 					if (item.localizable) {
 						fieldValue['value'] = {
-							[themeDisplay.getLanguageId()]: value,
+							[themeDisplay.getLanguageId()]: value.toString(),
 						};
 					}
 					else {

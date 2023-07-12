@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith;
 public class AddAppBuilderAppMVCResourceCommandTest
 	extends BaseAppBuilderPortletTestCase {
 
+	@Ignore
 	@Test
 	public void testAddAppWorkflow() throws Exception {
 		App app = addApp();

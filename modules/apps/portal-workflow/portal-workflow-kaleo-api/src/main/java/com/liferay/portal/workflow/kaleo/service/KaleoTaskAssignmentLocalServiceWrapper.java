@@ -15,6 +15,7 @@
 package com.liferay.portal.workflow.kaleo.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link KaleoTaskAssignmentLocalService}.
@@ -415,6 +416,11 @@ public class KaleoTaskAssignmentLocalServiceWrapper
 
 		return _kaleoTaskAssignmentLocalService.updateKaleoTaskAssignment(
 			kaleoTaskAssignment);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _kaleoTaskAssignmentLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,6 +15,7 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPInstanceLocalService}.
@@ -1477,6 +1478,11 @@ public class CPInstanceLocalServiceWrapper
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, neverExpire, unspsc,
 			serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _cpInstanceLocalService.getBasePersistence();
 	}
 
 	@Override

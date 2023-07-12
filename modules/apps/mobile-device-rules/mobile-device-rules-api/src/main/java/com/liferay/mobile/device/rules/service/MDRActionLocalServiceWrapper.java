@@ -15,6 +15,7 @@
 package com.liferay.mobile.device.rules.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link MDRActionLocalService}.
@@ -521,6 +522,11 @@ public class MDRActionLocalServiceWrapper
 		com.liferay.mobile.device.rules.model.MDRAction mdrAction) {
 
 		return _mdrActionLocalService.updateMDRAction(mdrAction);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _mdrActionLocalService.getBasePersistence();
 	}
 
 	@Override

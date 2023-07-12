@@ -15,6 +15,7 @@
 package com.liferay.data.engine.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link DEDataListViewLocalService}.
@@ -461,6 +462,11 @@ public class DEDataListViewLocalServiceWrapper
 
 		return _deDataListViewLocalService.updateDEDataListView(
 			deDataListViewId, appliedFilters, fieldNames, nameMap, sortField);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _deDataListViewLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,6 +15,7 @@
 package com.liferay.portal.security.service.access.policy.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link SAPEntryLocalService}.
@@ -459,6 +460,11 @@ public class SAPEntryLocalServiceWrapper
 				sapEntry) {
 
 		return _sapEntryLocalService.updateSAPEntry(sapEntry);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _sapEntryLocalService.getBasePersistence();
 	}
 
 	@Override

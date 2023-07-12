@@ -15,6 +15,7 @@
 package com.liferay.blogs.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link BlogsEntryLocalService}.
@@ -979,6 +980,11 @@ public class BlogsEntryLocalServiceWrapper
 
 		return _blogsEntryLocalService.updateStatus(
 			userId, entryId, status, serviceContext, workflowContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _blogsEntryLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,6 +15,7 @@
 package com.liferay.polls.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link PollsQuestionLocalService}.
@@ -578,6 +579,11 @@ public class PollsQuestionLocalServiceWrapper
 			userId, questionId, titleMap, descriptionMap, expirationDateMonth,
 			expirationDateDay, expirationDateYear, expirationDateHour,
 			expirationDateMinute, neverExpire, choices, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _pollsQuestionLocalService.getBasePersistence();
 	}
 
 	@Override

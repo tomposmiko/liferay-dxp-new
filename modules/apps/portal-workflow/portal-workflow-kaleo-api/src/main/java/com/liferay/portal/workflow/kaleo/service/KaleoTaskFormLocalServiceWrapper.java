@@ -15,6 +15,7 @@
 package com.liferay.portal.workflow.kaleo.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link KaleoTaskFormLocalService}.
@@ -366,6 +367,11 @@ public class KaleoTaskFormLocalServiceWrapper
 				kaleoTaskForm) {
 
 		return _kaleoTaskFormLocalService.updateKaleoTaskForm(kaleoTaskForm);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _kaleoTaskFormLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,6 +15,7 @@
 package com.liferay.calendar.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CalendarLocalService}.
@@ -551,6 +552,11 @@ public class CalendarLocalServiceWrapper
 
 		return _calendarLocalService.updateColor(
 			calendarId, color, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _calendarLocalService.getBasePersistence();
 	}
 
 	@Override

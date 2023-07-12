@@ -15,6 +15,7 @@
 package com.liferay.commerce.account.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceAccountGroupRelLocalService}.
@@ -410,6 +411,11 @@ public class CommerceAccountGroupRelLocalServiceWrapper
 
 		return _commerceAccountGroupRelLocalService.
 			updateCommerceAccountGroupRel(commerceAccountGroupRel);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceAccountGroupRelLocalService.getBasePersistence();
 	}
 
 	@Override

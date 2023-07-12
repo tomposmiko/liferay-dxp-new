@@ -15,6 +15,7 @@
 package com.liferay.opensocial.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link GadgetLocalService}.
@@ -431,6 +432,11 @@ public class GadgetLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _gadgetLocalService.updateGadget(gadgetId, portletCategoryNames);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _gadgetLocalService.getBasePersistence();
 	}
 
 	@Override

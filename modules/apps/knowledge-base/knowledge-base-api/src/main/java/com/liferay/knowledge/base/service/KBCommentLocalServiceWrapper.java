@@ -15,6 +15,7 @@
 package com.liferay.knowledge.base.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link KBCommentLocalService}.
@@ -588,6 +589,11 @@ public class KBCommentLocalServiceWrapper
 
 		return _kbCommentLocalService.updateStatus(
 			userId, kbCommentId, status, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _kbCommentLocalService.getBasePersistence();
 	}
 
 	@Override

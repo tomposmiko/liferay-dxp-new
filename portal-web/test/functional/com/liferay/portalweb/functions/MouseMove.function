@@ -1,14 +1,12 @@
-@default = "paste"
+@default = "mouseMoveAt"
 definition {
 
-	function paste {
+	function mouseMoveAt {
 		WaitForSPARefresh();
 
 		selenium.waitForVisible();
 
-		selenium.mouseOver();
-
-		selenium.paste();
+		selenium.mouseMoveAt(${locator1}, ${value1});
 
 		selenium.assertJavaScriptErrors();
 

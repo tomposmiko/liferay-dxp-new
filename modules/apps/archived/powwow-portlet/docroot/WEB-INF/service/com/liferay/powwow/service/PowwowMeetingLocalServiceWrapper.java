@@ -15,6 +15,7 @@
 package com.liferay.powwow.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link PowwowMeetingLocalService}.
@@ -436,6 +437,11 @@ public class PowwowMeetingLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _powwowMeetingLocalService.updateStatus(powwowMeetingId, status);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _powwowMeetingLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.UserGroupGroupRole;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -461,6 +462,11 @@ public class UserGroupGroupRoleLocalServiceWrapper
 
 		return _userGroupGroupRoleLocalService.updateUserGroupGroupRole(
 			userGroupGroupRole);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _userGroupGroupRoleLocalService.getBasePersistence();
 	}
 
 	@Override

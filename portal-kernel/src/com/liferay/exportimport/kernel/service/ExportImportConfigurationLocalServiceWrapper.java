@@ -15,6 +15,7 @@
 package com.liferay.exportimport.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link ExportImportConfigurationLocalService}.
@@ -582,6 +583,11 @@ public class ExportImportConfigurationLocalServiceWrapper
 
 		return _exportImportConfigurationLocalService.updateStatus(
 			userId, exportImportConfigurationId, status);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _exportImportConfigurationLocalService.getBasePersistence();
 	}
 
 	@Override

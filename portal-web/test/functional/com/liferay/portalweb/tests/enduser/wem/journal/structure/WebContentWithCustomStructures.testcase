@@ -842,14 +842,14 @@ definition {
 		}
 
 		task ("Type content to the first HTML field") {
-			Type.typeCKEditorWaitForCKEditor(
+			Type.typeEditorWaitForEditor(
 				key_fieldLabel = "HTML",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = "This is the first HTML field");
 		}
 
 		task ("Type content to the second HTML field") {
-			Type.typeCKEditorWaitForCKEditor(
+			Type.typeEditorWaitForEditor(
 				index = 2,
 				key_fieldLabel = "HTML",
 				locator1 = "CKEditor#ANY_BODY_FIELD_WEB_CONTENT_ARTICLE",
@@ -935,12 +935,12 @@ definition {
 		}
 
 		task ("Assert the alert message is still shown after clear content of HTML field") {
-			Type.typeCKEditorWaitForCKEditor(
+			Type.typeEditorWaitForEditor(
 				key_fieldLabel = "HTML",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = "Web Content Content");
 
-			Type.typeCKEditorWaitForCKEditor(
+			Type.typeEditorWaitForEditor(
 				key_fieldLabel = "HTML",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = "");
@@ -951,7 +951,7 @@ definition {
 		}
 
 		task ("Type content in HTML field then Publish") {
-			Type.typeCKEditorWaitForCKEditor(
+			Type.typeEditorWaitForEditor(
 				key_fieldLabel = "HTML",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = "Web Content Content");

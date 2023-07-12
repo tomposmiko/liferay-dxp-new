@@ -24,7 +24,7 @@ var element = document.evaluate("${locator1}", document, null, XPathResult.FIRST
 element.scrollIntoView(true);
 		''';
 
-		selenium.runScript(${javascript});
+		selenium.executeJavaScript(${javascript});
 
 		selenium.assertJavaScriptErrors();
 

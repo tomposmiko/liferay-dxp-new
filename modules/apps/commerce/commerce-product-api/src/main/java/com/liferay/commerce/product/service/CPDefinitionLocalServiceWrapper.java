@@ -15,6 +15,7 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPDefinitionLocalService}.
@@ -1365,6 +1366,11 @@ public class CPDefinitionLocalServiceWrapper
 			subscriptionLength, subscriptionType,
 			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
 			externalReferenceCode, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _cpDefinitionLocalService.getBasePersistence();
 	}
 
 	@Override
