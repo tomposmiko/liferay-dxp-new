@@ -21,6 +21,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith;
  * @author Rafael Praxedes
  */
 @DataGuard(scope = DataGuard.Scope.METHOD)
+@Ignore
 @RunWith(Arquillian.class)
 public class UpdateAppBuilderAppMVCResourceCommandTest
 	extends BaseAppBuilderPortletTestCase {

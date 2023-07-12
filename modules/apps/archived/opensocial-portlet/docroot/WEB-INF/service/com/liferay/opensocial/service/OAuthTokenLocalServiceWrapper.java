@@ -15,6 +15,7 @@
 package com.liferay.opensocial.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link OAuthTokenLocalService}.
@@ -363,6 +364,11 @@ public class OAuthTokenLocalServiceWrapper
 		com.liferay.opensocial.model.OAuthToken oAuthToken) {
 
 		return _oAuthTokenLocalService.updateOAuthToken(oAuthToken);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _oAuthTokenLocalService.getBasePersistence();
 	}
 
 	@Override

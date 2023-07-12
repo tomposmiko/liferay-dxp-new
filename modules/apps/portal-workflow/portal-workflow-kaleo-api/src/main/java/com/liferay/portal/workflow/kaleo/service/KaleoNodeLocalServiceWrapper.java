@@ -15,6 +15,7 @@
 package com.liferay.portal.workflow.kaleo.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link KaleoNodeLocalService}.
@@ -354,6 +355,11 @@ public class KaleoNodeLocalServiceWrapper
 		com.liferay.portal.workflow.kaleo.model.KaleoNode kaleoNode) {
 
 		return _kaleoNodeLocalService.updateKaleoNode(kaleoNode);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _kaleoNodeLocalService.getBasePersistence();
 	}
 
 	@Override

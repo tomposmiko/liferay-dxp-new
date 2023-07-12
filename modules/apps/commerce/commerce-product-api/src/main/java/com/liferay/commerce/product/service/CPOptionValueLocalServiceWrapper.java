@@ -15,6 +15,7 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPOptionValueLocalService}.
@@ -515,6 +516,11 @@ public class CPOptionValueLocalServiceWrapper
 		return _cpOptionValueLocalService.upsertCPOptionValue(
 			cpOptionId, nameMap, priority, key, externalReferenceCode,
 			serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _cpOptionValueLocalService.getBasePersistence();
 	}
 
 	@Override

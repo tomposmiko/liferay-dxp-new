@@ -15,6 +15,7 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPAttachmentFileEntryLocalService}.
@@ -757,6 +758,11 @@ public class CPAttachmentFileEntryLocalServiceWrapper
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			neverExpire, titleMap, json, priority, type, externalReferenceCode,
 			serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _cpAttachmentFileEntryLocalService.getBasePersistence();
 	}
 
 	@Override

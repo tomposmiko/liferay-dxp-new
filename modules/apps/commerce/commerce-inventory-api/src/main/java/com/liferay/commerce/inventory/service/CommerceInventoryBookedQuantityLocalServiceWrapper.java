@@ -15,6 +15,7 @@
 package com.liferay.commerce.inventory.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceInventoryBookedQuantityLocalService}.
@@ -443,6 +444,12 @@ public class CommerceInventoryBookedQuantityLocalServiceWrapper
 			updateCommerceInventoryBookedQuantity(
 				userId, commerceInventoryBookedQuantityId, quantity, context,
 				mvccVersion);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceInventoryBookedQuantityLocalService.
+			getBasePersistence();
 	}
 
 	@Override

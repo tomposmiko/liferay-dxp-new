@@ -15,6 +15,7 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceShippingMethodLocalService}.
@@ -490,6 +491,11 @@ public class CommerceShippingMethodLocalServiceWrapper
 		return _commerceShippingMethodLocalService.updateCommerceShippingMethod(
 			commerceShippingMethodId, nameMap, descriptionMap, imageFile,
 			priority, active);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceShippingMethodLocalService.getBasePersistence();
 	}
 
 	@Override

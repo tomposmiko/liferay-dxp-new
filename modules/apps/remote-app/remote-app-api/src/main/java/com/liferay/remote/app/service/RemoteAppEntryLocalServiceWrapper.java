@@ -15,6 +15,7 @@
 package com.liferay.remote.app.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link RemoteAppEntryLocalService}.
@@ -410,6 +411,11 @@ public class RemoteAppEntryLocalServiceWrapper
 		com.liferay.remote.app.model.RemoteAppEntry remoteAppEntry) {
 
 		return _remoteAppEntryLocalService.updateRemoteAppEntry(remoteAppEntry);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _remoteAppEntryLocalService.getBasePersistence();
 	}
 
 	@Override

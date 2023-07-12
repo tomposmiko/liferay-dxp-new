@@ -15,6 +15,7 @@
 package com.liferay.invitation.invite.members.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link MemberRequestLocalService}.
@@ -435,6 +436,11 @@ public class MemberRequestLocalServiceWrapper
 
 		return _memberRequestLocalService.updateMemberRequest(
 			key, receiverUserId);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _memberRequestLocalService.getBasePersistence();
 	}
 
 	@Override

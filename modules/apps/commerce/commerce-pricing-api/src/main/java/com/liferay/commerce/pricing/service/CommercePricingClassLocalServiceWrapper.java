@@ -15,6 +15,7 @@
 package com.liferay.commerce.pricing.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommercePricingClassLocalService}.
@@ -572,6 +573,11 @@ public class CommercePricingClassLocalServiceWrapper
 		return _commercePricingClassLocalService.upsertCommercePricingClass(
 			commercePricingClassId, userId, titleMap, descriptionMap,
 			externalReferenceCode, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commercePricingClassLocalService.getBasePersistence();
 	}
 
 	@Override

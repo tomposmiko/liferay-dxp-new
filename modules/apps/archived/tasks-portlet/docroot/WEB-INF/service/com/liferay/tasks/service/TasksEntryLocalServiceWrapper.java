@@ -15,6 +15,7 @@
 package com.liferay.tasks.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link TasksEntryLocalService}.
@@ -482,6 +483,11 @@ public class TasksEntryLocalServiceWrapper
 
 		return _tasksEntryLocalService.updateTasksEntryStatus(
 			tasksEntryId, resolverUserId, status, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _tasksEntryLocalService.getBasePersistence();
 	}
 
 	@Override

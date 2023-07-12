@@ -15,6 +15,7 @@
 package com.liferay.mobile.device.rules.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link MDRRuleGroupInstanceLocalService}.
@@ -574,6 +575,11 @@ public class MDRRuleGroupInstanceLocalServiceWrapper
 
 		return _mdrRuleGroupInstanceLocalService.updateRuleGroupInstance(
 			ruleGroupInstanceId, priority);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _mdrRuleGroupInstanceLocalService.getBasePersistence();
 	}
 
 	@Override

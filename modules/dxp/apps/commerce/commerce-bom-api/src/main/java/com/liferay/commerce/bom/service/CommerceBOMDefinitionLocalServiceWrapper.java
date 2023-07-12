@@ -15,6 +15,7 @@
 package com.liferay.commerce.bom.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceBOMDefinitionLocalService}.
@@ -377,6 +378,11 @@ public class CommerceBOMDefinitionLocalServiceWrapper
 
 		return _commerceBOMDefinitionLocalService.updateCommerceBOMDefinition(
 			commerceBOMDefinitionId, cpAttachmentFileEntryId, name);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceBOMDefinitionLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,6 +15,7 @@
 package com.liferay.sync.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link SyncDLObjectLocalService}.
@@ -392,6 +393,11 @@ public class SyncDLObjectLocalServiceWrapper
 		com.liferay.sync.model.SyncDLObject syncDLObject) {
 
 		return _syncDLObjectLocalService.updateSyncDLObject(syncDLObject);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _syncDLObjectLocalService.getBasePersistence();
 	}
 
 	@Override

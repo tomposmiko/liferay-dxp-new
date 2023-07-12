@@ -338,7 +338,9 @@ public class PortalClassPathUtil {
 
 	private static ProcessConfig _portalProcessConfig;
 	private static final List<String> _processArgs = Arrays.asList(
+		"-Dclass.loader.aggregate.properties.util.quiet=true",
 		"-Dconfiguration.impl.quiet=true", "-Djava.awt.headless=true",
-		"-Dserver.detector.quiet=true", "-Dsystem.properties.quiet=true");
+		"-Dprops.util.quiet=true", "-Dserver.detector.quiet=true",
+		"-Dsystem.properties.quiet=true");
 
 }

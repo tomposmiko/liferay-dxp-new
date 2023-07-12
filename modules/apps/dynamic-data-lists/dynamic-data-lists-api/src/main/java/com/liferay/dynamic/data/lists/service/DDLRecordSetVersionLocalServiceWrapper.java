@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.lists.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link DDLRecordSetVersionLocalService}.
@@ -403,6 +404,11 @@ public class DDLRecordSetVersionLocalServiceWrapper
 
 		return _ddlRecordSetVersionLocalService.updateDDLRecordSetVersion(
 			ddlRecordSetVersion);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _ddlRecordSetVersionLocalService.getBasePersistence();
 	}
 
 	@Override

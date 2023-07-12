@@ -15,6 +15,7 @@
 package com.liferay.commerce.data.integration.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceDataIntegrationProcessLogLocalService}.
@@ -429,6 +430,12 @@ public class CommerceDataIntegrationProcessLogLocalServiceWrapper
 		return _commerceDataIntegrationProcessLogLocalService.
 			updateCommerceDataIntegrationProcessLog(
 				cDataIntegrationProcessLogId, error, output, status, endDate);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceDataIntegrationProcessLogLocalService.
+			getBasePersistence();
 	}
 
 	@Override

@@ -15,6 +15,7 @@
 package com.liferay.chat.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link EntryLocalService}.
@@ -347,6 +348,11 @@ public class EntryLocalServiceWrapper
 		com.liferay.chat.model.Entry entry) {
 
 		return _entryLocalService.updateEntry(entry);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _entryLocalService.getBasePersistence();
 	}
 
 	@Override

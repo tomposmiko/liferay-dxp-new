@@ -1,8 +1,7 @@
 <div class="nav-item">
 	<div class="btn sign-in-btn">
 		<svg class="lexicon-icon">
-			<use
-				href="${themeDisplay.getPathThemeImages()}/lexicon/icons.svg#user"/>
+			<use href="${themeDisplay.getPathThemeImages()}/lexicon/icons.svg#user" />
 		</svg>
 
 		<div class="modal-dialog sign-in-wrapper">

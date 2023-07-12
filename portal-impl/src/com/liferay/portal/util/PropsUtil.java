@@ -360,7 +360,9 @@ public class PropsUtil {
 
 		String globalSharedLibDir = _getLibDir(Servlet.class);
 
-		if (_log.isInfoEnabled()) {
+		if (!GetterUtil.getBoolean(System.getProperty("props.util.quiet")) &&
+			_log.isInfoEnabled()) {
+
 			_log.info("Global shared lib directory " + globalSharedLibDir);
 		}
 
@@ -371,7 +373,9 @@ public class PropsUtil {
 
 		String globalLibDir = _getLibDir(ReleaseInfo.class);
 
-		if (_log.isInfoEnabled()) {
+		if (!GetterUtil.getBoolean(System.getProperty("props.util.quiet")) &&
+			_log.isInfoEnabled()) {
+
 			_log.info("Global lib directory " + globalLibDir);
 		}
 
@@ -394,7 +398,9 @@ public class PropsUtil {
 			portalLibDir = portalLibDirProperty;
 		}
 
-		if (_log.isInfoEnabled()) {
+		if (!GetterUtil.getBoolean(System.getProperty("props.util.quiet")) &&
+			_log.isInfoEnabled()) {
+
 			_log.info("Portal lib directory " + portalLibDir);
 		}
 

@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.service;
 
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
 /**
  * Provides a wrapper for {@link LayoutSetPrototypeLocalService}.
  *
@@ -55,9 +57,8 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	public com.liferay.portal.kernel.model.LayoutSetPrototype
 			addLayoutSetPrototype(
 				long userId, long companyId,
-				java.util.Map<java.util.Locale, java.lang.String> nameMap,
-				java.util.Map<java.util.Locale, java.lang.String>
-					descriptionMap,
+				java.util.Map<java.util.Locale, String> nameMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
 				boolean active, boolean layoutsUpdateable,
 				ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -282,8 +283,7 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetPrototype
-		fetchLayoutSetPrototypeByUuidAndCompanyId(
-			java.lang.String uuid, long companyId) {
+		fetchLayoutSetPrototypeByUuidAndCompanyId(String uuid, long companyId) {
 
 		return _layoutSetPrototypeLocalService.
 			fetchLayoutSetPrototypeByUuidAndCompanyId(uuid, companyId);
@@ -340,8 +340,7 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetPrototype
-			getLayoutSetPrototypeByUuidAndCompanyId(
-				java.lang.String uuid, long companyId)
+			getLayoutSetPrototypeByUuidAndCompanyId(String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetPrototypeLocalService.
@@ -391,7 +390,7 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
+	public String getOSGiServiceIdentifier() {
 		return _layoutSetPrototypeLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -409,7 +408,7 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.LayoutSetPrototype>
 		search(
-			long companyId, java.lang.Boolean active, int start, int end,
+			long companyId, Boolean active, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
 				<com.liferay.portal.kernel.model.LayoutSetPrototype>
 					orderByComparator) {
@@ -419,7 +418,7 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	}
 
 	@Override
-	public int searchCount(long companyId, java.lang.Boolean active) {
+	public int searchCount(long companyId, Boolean active) {
 		return _layoutSetPrototypeLocalService.searchCount(companyId, active);
 	}
 
@@ -447,9 +446,8 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	public com.liferay.portal.kernel.model.LayoutSetPrototype
 			updateLayoutSetPrototype(
 				long layoutSetPrototypeId,
-				java.util.Map<java.util.Locale, java.lang.String> nameMap,
-				java.util.Map<java.util.Locale, java.lang.String>
-					descriptionMap,
+				java.util.Map<java.util.Locale, String> nameMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
 				boolean active, boolean layoutsUpdateable,
 				ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -461,12 +459,16 @@ public class LayoutSetPrototypeLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetPrototype
-			updateLayoutSetPrototype(
-				long layoutSetPrototypeId, java.lang.String settings)
+			updateLayoutSetPrototype(long layoutSetPrototypeId, String settings)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetPrototypeLocalService.updateLayoutSetPrototype(
 			layoutSetPrototypeId, settings);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _layoutSetPrototypeLocalService.getBasePersistence();
 	}
 
 	@Override

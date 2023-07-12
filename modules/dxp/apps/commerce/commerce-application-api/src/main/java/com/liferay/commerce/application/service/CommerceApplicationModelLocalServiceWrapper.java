@@ -15,6 +15,7 @@
 package com.liferay.commerce.application.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceApplicationModelLocalService}.
@@ -381,6 +382,11 @@ public class CommerceApplicationModelLocalServiceWrapper
 		return _commerceApplicationModelLocalService.
 			updateCommerceApplicationModel(
 				commerceApplicationModelId, name, year);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceApplicationModelLocalService.getBasePersistence();
 	}
 
 	@Override

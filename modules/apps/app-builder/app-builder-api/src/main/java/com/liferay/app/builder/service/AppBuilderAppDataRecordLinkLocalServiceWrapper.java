@@ -15,6 +15,7 @@
 package com.liferay.app.builder.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AppBuilderAppDataRecordLinkLocalService}.
@@ -415,6 +416,11 @@ public class AppBuilderAppDataRecordLinkLocalServiceWrapper
 
 		return _appBuilderAppDataRecordLinkLocalService.
 			updateAppBuilderAppDataRecordLink(appBuilderAppDataRecordLink);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _appBuilderAppDataRecordLinkLocalService.getBasePersistence();
 	}
 
 	@Override

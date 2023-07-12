@@ -15,6 +15,7 @@
 package com.liferay.multi.factor.authentication.timebased.otp.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link MFATimeBasedOTPEntryLocalService}.
@@ -386,6 +387,11 @@ public class MFATimeBasedOTPEntryLocalServiceWrapper
 
 		return _mfaTimeBasedOTPEntryLocalService.updateMFATimeBasedOTPEntry(
 			mfaTimeBasedOTPEntry);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _mfaTimeBasedOTPEntryLocalService.getBasePersistence();
 	}
 
 	@Override

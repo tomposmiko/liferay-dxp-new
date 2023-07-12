@@ -112,10 +112,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
@@ -596,16 +598,16 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	public String getSelectedLayoutsJSON(
 		long groupId, boolean privateLayout, String selectedNodes) {
 
-		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
 		List<Layout> layouts = _layoutLocalService.getLayouts(
-			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+			groupId, privateLayout);
+
+		Node root = _buildTree(new Node(null), new LinkedList<Layout>(layouts));
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		long[] selectedPlids = StringUtil.split(selectedNodes, 0L);
 
-		for (Layout layout : layouts) {
-			populateLayoutsJSON(jsonArray, layout, selectedPlids);
-		}
+		populateLayoutsJSON(jsonArray, root, selectedPlids);
 
 		if (ArrayUtil.contains(selectedPlids, 0)) {
 			jsonArray.put(
@@ -1300,39 +1302,42 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	}
 
 	protected boolean populateLayoutsJSON(
-		JSONArray layoutsJSONArray, Layout layout, long[] selectedLayoutIds) {
+		JSONArray layoutsJSONArray, Node node, long[] selectedLayoutIds) {
 
-		List<Layout> childLayouts = layout.getChildren();
+		List<Node> childNodes = node.getChildNodes();
 		JSONArray childLayoutsJSONArray = null;
 		boolean includeChildren = true;
 
-		if (ListUtil.isNotEmpty(childLayouts)) {
+		if (ListUtil.isNotEmpty(childNodes)) {
 			childLayoutsJSONArray = JSONFactoryUtil.createJSONArray();
 
-			for (Layout childLayout : childLayouts) {
+			for (Node childNode : childNodes) {
 				if (!populateLayoutsJSON(
-						childLayoutsJSONArray, childLayout,
-						selectedLayoutIds)) {
+						childLayoutsJSONArray, childNode, selectedLayoutIds)) {
 
 					includeChildren = false;
 				}
 			}
 		}
 
-		boolean checked = ArrayUtil.contains(
-			selectedLayoutIds, layout.getLayoutId());
+		Layout layout = node.getLayout();
 
-		if (checked) {
-			layoutsJSONArray.put(
-				JSONUtil.put(
-					"includeChildren", includeChildren
-				).put(
-					"plid", layout.getPlid()
-				));
-		}
+		if (layout != null) {
+			boolean checked = ArrayUtil.contains(
+				selectedLayoutIds, layout.getLayoutId());
 
-		if (checked && includeChildren) {
-			return true;
+			if (checked) {
+				layoutsJSONArray.put(
+					JSONUtil.put(
+						"includeChildren", includeChildren
+					).put(
+						"plid", layout.getPlid()
+					));
+			}
+
+			if (checked && includeChildren) {
+				return true;
+			}
 		}
 
 		if (childLayoutsJSONArray != null) {
@@ -1432,6 +1437,39 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		return null;
+	}
+
+	private Node _buildTree(Node parentNode, List<Layout> layouts) {
+		Layout parentLayout = parentNode.getLayout();
+
+		long parentLayoutId =
+			(parentLayout != null) ? parentLayout.getLayoutId() : 0;
+
+		Stream<Layout> layoutsStream = layouts.stream();
+
+		List<Layout> childLayouts = layoutsStream.filter(
+			layout -> layout.getParentLayoutId() == parentLayoutId
+		).collect(
+			Collectors.toList()
+		);
+
+		layouts.removeAll(childLayouts);
+
+		Stream<Layout> childLayoutsStream = childLayouts.stream();
+
+		List<Node> childNodes = childLayoutsStream.map(
+			layout -> new Node(layout)
+		).collect(
+			Collectors.toList()
+		);
+
+		parentNode.addChildNodes(childNodes);
+
+		for (Node childNode : childNodes) {
+			_buildTree(childNode, layouts);
+		}
+
+		return parentNode;
 	}
 
 	private Map<String, Boolean> _createAllPortletSetupControlsMap(
@@ -1634,6 +1672,29 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		private final Group _group;
 		private final ManifestSummary _manifestSummary;
+
+	}
+
+	private class Node {
+
+		public Node(Layout layout) {
+			_layout = layout;
+		}
+
+		public void addChildNodes(List<Node> childNodes) {
+			_childNodes = childNodes;
+		}
+
+		public List<Node> getChildNodes() {
+			return _childNodes;
+		}
+
+		public Layout getLayout() {
+			return _layout;
+		}
+
+		private List<Node> _childNodes = new LinkedList<>();
+		private final Layout _layout;
 
 	}
 

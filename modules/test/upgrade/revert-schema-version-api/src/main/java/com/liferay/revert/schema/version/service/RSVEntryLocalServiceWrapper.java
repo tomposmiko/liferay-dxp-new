@@ -15,6 +15,7 @@
 package com.liferay.revert.schema.version.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link RSVEntryLocalService}.
@@ -322,6 +323,11 @@ public class RSVEntryLocalServiceWrapper
 		com.liferay.revert.schema.version.model.RSVEntry rsvEntry) {
 
 		return _rsvEntryLocalService.updateRSVEntry(rsvEntry);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _rsvEntryLocalService.getBasePersistence();
 	}
 
 	@Override

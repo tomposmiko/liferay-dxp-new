@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -1037,7 +1038,7 @@ public abstract class BaseMessageBoardThreadResourceImpl
 		String createStrategy = (String)parameters.getOrDefault(
 			"createStrategy", "INSERT");
 
-		if ("INSERT".equalsIgnoreCase(createStrategy)) {
+		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			if (parameters.containsKey("messageBoardSectionId")) {
 				messageBoardThreadUnsafeConsumer =
 					messageBoardThread ->
@@ -1170,7 +1171,7 @@ public abstract class BaseMessageBoardThreadResourceImpl
 		String updateStrategy = (String)parameters.getOrDefault(
 			"updateStrategy", "UPDATE");
 
-		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
+		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 			messageBoardThreadUnsafeConsumer =
 				messageBoardThread -> patchMessageBoardThread(
 					messageBoardThread.getId() != null ?
@@ -1180,7 +1181,7 @@ public abstract class BaseMessageBoardThreadResourceImpl
 					messageBoardThread);
 		}
 
-		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
+		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
 			messageBoardThreadUnsafeConsumer =
 				messageBoardThread -> putMessageBoardThread(
 					messageBoardThread.getId() != null ?

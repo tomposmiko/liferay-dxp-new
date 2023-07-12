@@ -14,7 +14,6 @@
 
 package com.liferay.portal.vulcan.jaxrs.exception.mapper;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 

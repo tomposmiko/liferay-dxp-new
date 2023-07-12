@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.service;
 
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
 /**
  * Provides a wrapper for {@link MembershipRequestLocalService}.
  *
@@ -34,7 +36,7 @@ public class MembershipRequestLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.MembershipRequest
 			addMembershipRequest(
-				long userId, long groupId, java.lang.String comments,
+				long userId, long groupId, String comments,
 				ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -340,7 +342,7 @@ public class MembershipRequestLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
+	public String getOSGiServiceIdentifier() {
 		return _membershipRequestLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -410,14 +412,19 @@ public class MembershipRequestLocalServiceWrapper
 
 	@Override
 	public void updateStatus(
-			long replierUserId, long membershipRequestId,
-			java.lang.String replyComments, long statusId,
-			boolean addUserToGroup, ServiceContext serviceContext)
+			long replierUserId, long membershipRequestId, String replyComments,
+			long statusId, boolean addUserToGroup,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_membershipRequestLocalService.updateStatus(
 			replierUserId, membershipRequestId, replyComments, statusId,
 			addUserToGroup, serviceContext);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _membershipRequestLocalService.getBasePersistence();
 	}
 
 	@Override

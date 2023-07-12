@@ -15,6 +15,7 @@
 package com.liferay.depot.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link DepotAppCustomizationLocalService}.
@@ -370,6 +371,11 @@ public class DepotAppCustomizationLocalServiceWrapper
 
 		return _depotAppCustomizationLocalService.updateDepotAppCustomization(
 			depotEntryId, enabled, portletId);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _depotAppCustomizationLocalService.getBasePersistence();
 	}
 
 	@Override

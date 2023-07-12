@@ -15,6 +15,7 @@
 package com.liferay.commerce.inventory.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceInventoryAuditLocalService}.
@@ -378,6 +379,11 @@ public class CommerceInventoryAuditLocalServiceWrapper
 
 		return _commerceInventoryAuditLocalService.updateCommerceInventoryAudit(
 			commerceInventoryAudit);
+	}
+
+	@Override
+	public BasePersistence<?> getBasePersistence() {
+		return _commerceInventoryAuditLocalService.getBasePersistence();
 	}
 
 	@Override
