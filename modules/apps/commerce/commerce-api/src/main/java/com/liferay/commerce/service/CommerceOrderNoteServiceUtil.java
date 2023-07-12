@@ -135,10 +135,6 @@ public class CommerceOrderNoteServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceOrderNoteService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceOrderNoteService _service;
 
 }

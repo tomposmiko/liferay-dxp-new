@@ -34,7 +34,6 @@ import com.liferay.headless.delivery.dto.v1_0.ContextReference;
 import com.liferay.headless.delivery.dto.v1_0.PageElement;
 import com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer.util.PortletConfigurationImporterHelper;
 import com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer.util.PortletPermissionsImporterHelper;
-import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.petra.string.StringPool;
@@ -54,7 +53,6 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -98,49 +96,41 @@ public class FragmentLayoutStructureItemImporter
 			return null;
 		}
 
-		FragmentStyledLayoutStructureItem fragmentStyledLayoutStructureItem =
-			(FragmentStyledLayoutStructureItem)
-				layoutStructure.addFragmentStyledLayoutStructureItem(
-					fragmentEntryLink.getFragmentEntryLinkId(), parentItemId,
-					position);
+		LayoutStructureItem layoutStructureItem =
+			layoutStructure.addFragmentStyledLayoutStructureItem(
+				fragmentEntryLink.getFragmentEntryLinkId(), parentItemId,
+				position);
 
 		Map<String, Object> definitionMap = getDefinitionMap(
 			pageElement.getDefinition());
 
-		if (definitionMap == null) {
-			return fragmentStyledLayoutStructureItem;
-		}
+		if (definitionMap != null) {
+			Map<String, Object> fragmentStyleMap =
+				(Map<String, Object>)definitionMap.get("fragmentStyle");
 
-		Map<String, Object> fragmentStyleMap =
-			(Map<String, Object>)definitionMap.get("fragmentStyle");
-
-		if (fragmentStyleMap != null) {
-			JSONObject jsonObject = JSONUtil.put(
-				"styles", toStylesJSONObject(fragmentStyleMap));
-
-			fragmentStyledLayoutStructureItem.updateItemConfig(jsonObject);
-		}
-
-		if (definitionMap.containsKey("fragmentViewports")) {
-			List<Map<String, Object>> fragmentViewports =
-				(List<Map<String, Object>>)definitionMap.get(
-					"fragmentViewports");
-
-			for (Map<String, Object> fragmentViewport : fragmentViewports) {
+			if (fragmentStyleMap != null) {
 				JSONObject jsonObject = JSONUtil.put(
-					(String)fragmentViewport.get("id"),
-					toFragmentViewportStylesJSONObject(fragmentViewport));
+					"styles", toStylesJSONObject(fragmentStyleMap));
 
-				fragmentStyledLayoutStructureItem.updateItemConfig(jsonObject);
+				layoutStructureItem.updateItemConfig(jsonObject);
+			}
+
+			if (definitionMap.containsKey("fragmentViewports")) {
+				List<Map<String, Object>> fragmentViewports =
+					(List<Map<String, Object>>)definitionMap.get(
+						"fragmentViewports");
+
+				for (Map<String, Object> fragmentViewport : fragmentViewports) {
+					JSONObject jsonObject = JSONUtil.put(
+						(String)fragmentViewport.get("id"),
+						toFragmentViewportStylesJSONObject(fragmentViewport));
+
+					layoutStructureItem.updateItemConfig(jsonObject);
+				}
 			}
 		}
 
-		if (definitionMap.containsKey("indexed")) {
-			fragmentStyledLayoutStructureItem.setIndexed(
-				GetterUtil.getBoolean(definitionMap.get("indexed")));
-		}
-
-		return fragmentStyledLayoutStructureItem;
+		return layoutStructureItem;
 	}
 
 	@Override
@@ -214,20 +204,11 @@ public class FragmentLayoutStructureItemImporter
 		Map<String, String> editableTypes =
 			EditableFragmentEntryProcessorUtil.getEditableTypes(html);
 
-		JSONObject fragmentEntryProcessorValuesJSONObject =
-			JSONFactoryUtil.createJSONObject();
-
-		JSONObject backgroundImageFragmentEntryProcessorJSONObject =
+		JSONObject fragmentEntryProcessorValuesJSONObject = JSONUtil.put(
+			"com.liferay.fragment.entry.processor.background.image." +
+				"BackgroundImageFragmentEntryProcessor",
 			_toBackgroundImageFragmentEntryProcessorJSONObject(
-				(List<Object>)definitionMap.get("fragmentFields"));
-
-		if (backgroundImageFragmentEntryProcessorJSONObject.length() > 0) {
-			fragmentEntryProcessorValuesJSONObject.put(
-				"com.liferay.fragment.entry.processor.background.image." +
-					"BackgroundImageFragmentEntryProcessor",
-				_toBackgroundImageFragmentEntryProcessorJSONObject(
-					(List<Object>)definitionMap.get("fragmentFields")));
-		}
+				(List<Object>)definitionMap.get("fragmentFields")));
 
 		JSONObject editableFragmentEntryProcessorJSONObject =
 			_toEditableFragmentEntryProcessorJSONObject(

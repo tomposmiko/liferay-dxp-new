@@ -15,7 +15,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -36,7 +36,7 @@ definition {
 	}
 
 	@description = "LPS-89260 - Verify that rules are working for multiple selection fields"
-	@priority = 4
+	@priority = "4"
 	test CanUseRuleOnMultipleSelectionField {
 		property test.name.skip.portal.instance = "FormRules#CanUseRuleOnMultipleSelectionField";
 
@@ -51,23 +51,23 @@ definition {
 		Form.editName();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 1,
+			fieldPositionNumber = "1",
 			fieldType = "Multiple Selection");
 
 		FormFields.editOptionsRow(
 			optionName = "student",
 			optionValue = "student",
-			rowNumber = 1);
+			rowNumber = "1");
 
 		FormFields.editOptionsRow(
 			optionName = "professional",
 			optionValue = "professional",
-			rowNumber = 2);
+			rowNumber = "2");
 
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 2,
+			fieldPositionNumber = "2",
 			fieldType = "Numeric");
 
 		Form.editFieldLabelMetal(fieldValue = "student ID");
@@ -81,13 +81,13 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Multiple Selection",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueField = "student",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Enable",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "student ID");
 
 		FormRules.save();
@@ -104,7 +104,7 @@ definition {
 	}
 
 	@description = "LPS-102616 Configure data providers in both input and output fields in autofill rule"
-	@priority = 5
+	@priority = "5"
 	test CanUtilizeDataProvidersInAutofillRule {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -144,7 +144,7 @@ definition {
 
 		Form.editDescription();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextField = FormFields.getFieldName();
 
@@ -154,7 +154,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 2);
+		Form.addTextField(fieldPositionNumber = "2");
 
 		var fieldNameTextField2 = FormFields.getFieldName();
 
@@ -171,11 +171,11 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Postal code",
 			conditionOperator = "Is not empty",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.configureActionOptions(
 			action = "Autofill",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "zipcloud");
 
 		FormRules.selectAutofillFromDataProvider(
@@ -197,18 +197,18 @@ definition {
 		FormsAdminNavigator.gotoPublishedForm();
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField},
-			fieldValue = 1500000);
+			fieldName = "${fieldNameTextField}",
+			fieldValue = "1500000");
 
 		FormFields.viewTextValue(
-			fieldName = ${fieldNameTextField2},
+			fieldName = "${fieldNameTextField2}",
 			fieldValue = "東京都");
 
 		FormPortlet.submitSuccessfully();
 	}
 
 	@description = "This is a use case for LPS-80771."
-	@priority = 5
+	@priority = "5"
 	test ChangeFieldTypeThatBelongsToARule {
 		property portal.acceptance = "false";
 		property portal.upstream = "true";
@@ -223,7 +223,7 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextField = FormFields.getFieldName();
 
@@ -231,7 +231,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 2);
+		Form.addTextField(fieldPositionNumber = "2");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 2");
 
@@ -245,12 +245,12 @@ definition {
 			conditionField = "Text Field",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Require",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Text Field 2");
 
 		FormRules.save();
@@ -259,21 +259,21 @@ definition {
 
 		Form.save();
 
-		FormsAdminNavigator.gotoEditField(fieldName = ${fieldNameTextField});
+		FormsAdminNavigator.gotoEditField(fieldName = "${fieldNameTextField}");
 
 		Form.changeFieldTypeModalConfirmation(selectOption = "Select from List");
 
 		FormFields.viewTextLabel(
 			fieldLabel = "Text Field",
-			fieldName = ${fieldNameTextField});
+			fieldName = "${fieldNameTextField}");
 
 		FormsAdminNavigator.gotoRules();
 
-		FormRules.viewBrokenRule(ruleNumber = 1);
+		FormRules.viewBrokenRule(ruleNumber = "1");
 	}
 
 	@description = "This is a use case for LPS-80771."
-	@priority = 5
+	@priority = "5"
 	test ChangeFieldTypeThatBelongsToCalculatorExpression {
 		property portal.acceptance = "false";
 		property portal.upstream = "true";
@@ -289,7 +289,7 @@ definition {
 		Form.editName();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 1,
+			fieldPositionNumber = "1",
 			fieldType = "Numeric");
 
 		var fieldNameNumericField = FormFields.getFieldName();
@@ -299,7 +299,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 2,
+			fieldPositionNumber = "2",
 			fieldType = "Numeric");
 
 		Form.editFieldLabelMetal(fieldValue = "Numeric Field 2");
@@ -307,7 +307,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 3,
+			fieldPositionNumber = "3",
 			fieldType = "Numeric");
 
 		Form.editFieldLabelMetal(fieldValue = "Total");
@@ -320,15 +320,15 @@ definition {
 
 		FormRules.selectConditionField(
 			conditionField = "Numeric Field",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.selectConditionOperator(
 			conditionOperator = "Is not empty",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.selectAction(
 			action = "Calculate",
-			actionRowNumber = 1);
+			actionRowNumber = "1");
 
 		FormRules.selectCalculateResultField(calculateResultField = "Total");
 
@@ -344,17 +344,17 @@ definition {
 
 		Form.save();
 
-		FormsAdminNavigator.gotoEditField(fieldName = ${fieldNameNumericField});
+		FormsAdminNavigator.gotoEditField(fieldName = "${fieldNameNumericField}");
 
 		Form.changeFieldTypeModalConfirmation(selectOption = "Select from List");
 
 		FormsAdminNavigator.gotoRules();
 
-		FormRules.viewBrokenRule(ruleNumber = 1);
+		FormRules.viewBrokenRule(ruleNumber = "1");
 	}
 
 	@description = "This is a use case for LPS-70446."
-	@priority = 5
+	@priority = "5"
 	test ConfigureAutofillRule {
 		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "FormRules#ConfigureAutofillRule";
@@ -397,7 +397,7 @@ definition {
 
 		Form.editDescription();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextField = FormFields.getFieldName();
 
@@ -406,7 +406,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 2,
+			fieldPositionNumber = "2",
 			fieldType = "Select from List");
 
 		var fieldNameCountries = FormFields.getFieldName();
@@ -420,7 +420,7 @@ definition {
 		FormFields.editOptionsRow(
 			optionName = "Select2",
 			optionValue = "Select 2",
-			rowNumber = 2);
+			rowNumber = "2");
 
 		Form.closeSidebar();
 
@@ -432,12 +432,12 @@ definition {
 			conditionField = "Text Field",
 			conditionFieldValue = "country",
 			conditionOperator = "Contains",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Autofill",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Liferay Countries");
 
 		FormRules.selectAutofillFromDataProvider(
@@ -456,29 +456,29 @@ definition {
 
 		FormFields.viewTextLabel(
 			fieldLabel = "Text Field",
-			fieldName = ${fieldNameTextField});
+			fieldName = "${fieldNameTextField}");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField},
+			fieldName = "${fieldNameTextField}",
 			fieldValue = "test");
 
 		FormFields.viewSelectOptionsList(
-			fieldName = ${fieldNameCountries},
+			fieldName = "${fieldNameCountries}",
 			selectOption = "Option");
 
 		Refresh();
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField},
+			fieldName = "${fieldNameTextField}",
 			fieldValue = "country");
 
 		FormFields.viewSelectOptionsList(
-			fieldName = ${fieldNameCountries},
+			fieldName = "${fieldNameCountries}",
 			selectOption = "Afghanistan");
 	}
 
 	@description = "This is a use case for LPS-71592."
-	@priority = 5
+	@priority = "5"
 	test ConfigureCalculateRule {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#ConfigureCalculateRule";
@@ -496,7 +496,7 @@ definition {
 		Form.editName();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 1,
+			fieldPositionNumber = "1",
 			fieldType = "Numeric");
 
 		var fieldNameQuantity = FormFields.getFieldName();
@@ -506,7 +506,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 2,
+			fieldPositionNumber = "2",
 			fieldType = "Numeric");
 
 		var fieldNameValue = FormFields.getFieldName();
@@ -516,7 +516,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 3,
+			fieldPositionNumber = "3",
 			fieldType = "Numeric");
 
 		var fieldNameTotal = FormFields.getFieldName();
@@ -531,15 +531,15 @@ definition {
 
 		FormRules.selectConditionField(
 			conditionField = "Quantity",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.selectConditionOperator(
 			conditionOperator = "Is not empty",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.selectAction(
 			action = "Calculate",
-			actionRowNumber = 1);
+			actionRowNumber = "1");
 
 		FormRules.selectCalculateResultField(calculateResultField = "Total");
 
@@ -578,19 +578,19 @@ definition {
 		FormPortlet.waitFormRenderer(text = "Submit");
 
 		FormFields.editText(
-			fieldName = ${fieldNameValue},
-			fieldValue = 5);
+			fieldName = "${fieldNameValue}",
+			fieldValue = "5");
 
 		FormFields.editText(
-			fieldName = ${fieldNameQuantity},
-			fieldValue = 10);
+			fieldName = "${fieldNameQuantity}",
+			fieldValue = "10");
 
 		FormFields.viewTextValue(
-			fieldName = ${fieldNameTotal},
-			fieldValue = 50);
+			fieldName = "${fieldNameTotal}",
+			fieldValue = "50");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ConfigureRequireRule {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#ConfigureRequireRule";
@@ -607,7 +607,7 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextField = FormFields.getFieldName();
 
@@ -616,7 +616,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 2,
+			fieldPositionNumber = "2",
 			fieldType = "Date");
 
 		Form.editFieldLabelMetal(fieldValue = "Date Field");
@@ -631,12 +631,12 @@ definition {
 			conditionField = "Text Field",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Require",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Date Field");
 
 		FormRules.save();
@@ -670,7 +670,7 @@ definition {
 		FormFields.viewRequiredAsteriskNotPresent();
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField},
+			fieldName = "${fieldNameTextField}",
 			fieldValue = "test");
 
 		FormFields.viewRequiredAsterisk();
@@ -680,7 +680,7 @@ definition {
 
 	// Ignored because of the ticket LRQA-57207
 
-	@priority = 5
+	@priority = "5"
 	test ConfigureShowRuleUsingAndCondition {
 		property test.name.skip.portal.instance = "FormRules#ConfigureShowRuleUsingAndCondition";
 
@@ -696,7 +696,7 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextField1 = FormFields.getFieldName();
 
@@ -704,7 +704,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 2);
+		Form.addTextField(fieldPositionNumber = "2");
 
 		var fieldNameTextField2 = FormFields.getFieldName();
 
@@ -713,7 +713,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 3,
+			fieldPositionNumber = "3",
 			fieldType = "Date");
 
 		var fieldNameDateField = FormFields.getFieldName();
@@ -736,25 +736,25 @@ definition {
 
 		FormRules.viewRuleCondition(
 			condition = "AND",
-			conditonRowNumber = 1);
+			conditonRowNumber = "1");
 
 		FormRules.configureConditionOptions(
 			conditionField = "Text Field 1",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureConditionOptions(
 			conditionField = "Text Field 2",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 2,
+			conditionRowNumber = "2",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Date Field");
 
 		FormRules.save();
@@ -786,23 +786,23 @@ definition {
 		FormPortlet.waitFormRenderer(text = "Submit");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField1},
+			fieldName = "${fieldNameTextField1}",
 			fieldValue = "test");
 
 		FormFields.viewDateFieldNotPresent(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField2},
+			fieldName = "${fieldNameTextField2}",
 			fieldValue = "test");
 
 		FormFields.viewDateField(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ConfigureUserBelongsToRule {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#ConfigureUserBelongsToRule";
@@ -827,7 +827,7 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNamePublic = FormFields.getFieldName();
 
@@ -835,7 +835,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameManager = FormFields.getFieldName();
 
@@ -850,19 +850,19 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "User",
 			conditionOperator = "Belongs to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Site Administrator");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Manager");
 
 		FormRules.addAction();
 
 		FormRules.configureActionOptions(
 			action = "Require",
-			actionRowNumber = 2,
+			actionRowNumber = "2",
 			actionTarget = "Manager");
 
 		FormRules.save();
@@ -873,7 +873,7 @@ definition {
 			conditionField = "User",
 			conditionFieldConstant = "Site Administrator",
 			conditionOperator = "Belongs to",
-			ruleNumber = 1);
+			ruleNumber = "1");
 
 		FormRules.viewSummary(
 			action = "Show",
@@ -881,7 +881,7 @@ definition {
 			conditionField = "User",
 			conditionFieldConstant = "Site Administrator",
 			conditionOperator = "Belongs to",
-			ruleNumber = 1);
+			ruleNumber = "1");
 
 		FormsAdminNavigator.gotoFormBuilder();
 
@@ -911,11 +911,11 @@ definition {
 
 		FormFields.viewTextField(
 			fieldLabel = "Public",
-			fieldName = ${fieldNamePublic});
+			fieldName = "${fieldNamePublic}");
 
 		FormFields.viewTextFieldNotVisible(
 			fieldLabel = "Manager",
-			fieldName = ${fieldNameManager});
+			fieldName = "${fieldNameManager}");
 
 		Navigator.openURL();
 
@@ -936,23 +936,23 @@ definition {
 
 		FormFields.viewTextField(
 			fieldLabel = "Public",
-			fieldName = ${fieldNamePublic});
+			fieldName = "${fieldNamePublic}");
 
 		FormFields.viewTextField(
 			fieldLabel = "Manager",
-			fieldName = ${fieldNameManager});
+			fieldName = "${fieldNameManager}");
 
 		FormFields.editText(
-			fieldName = ${fieldNamePublic},
+			fieldName = "${fieldNamePublic}",
 			fieldValue = "Message");
 
 		FormFields.editText(
-			fieldName = ${fieldNameManager},
+			fieldName = "${fieldNameManager}",
 			fieldValue = "Admin Comments");
 
 		FormFields.viewTextField(
 			fieldLabel = "Manager",
-			fieldName = ${fieldNameManager});
+			fieldName = "${fieldNameManager}");
 
 		FormPortlet.submitSuccessfully();
 
@@ -974,7 +974,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-119818."
-	@priority = 5
+	@priority = "5"
 	test DeleteFieldThatBelongsToARule {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -989,7 +989,7 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field");
 
@@ -997,7 +997,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 2);
+		Form.addTextField(fieldPositionNumber = "2");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 2");
 
@@ -1011,12 +1011,12 @@ definition {
 			conditionField = "Text Field",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Require",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Text Field 2");
 
 		FormRules.save();
@@ -1027,15 +1027,15 @@ definition {
 
 		Form.deleteFieldModalConfirmation(
 			fieldLabel = "Text Field",
-			fieldName = ${fieldNameTextField});
+			fieldName = "${fieldNameTextField}");
 
 		FormsAdminNavigator.gotoRules();
 
-		FormRules.viewBrokenRule(ruleNumber = 1);
+		FormRules.viewBrokenRule(ruleNumber = "1");
 	}
 
 	@description = "This is a use case for LPS-79095."
-	@priority = 5
+	@priority = "5"
 	test EditRule {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#EditRule";
@@ -1050,13 +1050,13 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field");
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 2");
 
@@ -1070,12 +1070,12 @@ definition {
 			conditionField = "Text Field",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Require",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Text Field 2");
 
 		FormsAdminNavigator.gotoFormBuilder();
@@ -1098,25 +1098,25 @@ definition {
 
 		FormsAdminNavigator.gotoRules();
 
-		FormRules.gotoEdit(ruleNumber = 1);
+		FormRules.gotoEdit(ruleNumber = "1");
 
 		FormRules.configureConditionOptions(
 			conditionField = "Text Field",
 			conditionFieldValue = "test edit",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Text Field 2");
 
 		FormRules.save();
 	}
 
 	@description = "LPS-77284 - Verify that sync between rule builder and fields/pages "
-	@priority = 5
+	@priority = "5"
 	test SyncBetweenFormAndRuleBuilder {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#SyncBetweenFormAndRuleBuilder";
@@ -1133,33 +1133,33 @@ definition {
 
 		Form.editPageTitle(
 			formPageName = "Page 1",
-			formTitleNumber = 1);
+			formTitleNumber = "1");
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 1");
 
 		Form.closeSidebar();
 
-		Form.addPage(formAddNewPageNumber = 1);
+		Form.addPage(formAddNewPageNumber = "1");
 
 		Form.editPageTitle(
 			formPageName = "Page 2",
-			formTitleNumber = 2);
+			formTitleNumber = "2");
 
-		Form.addTextField(fieldPositionNumber = 3);
+		Form.addTextField(fieldPositionNumber = "3");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 2");
 
 		Form.closeSidebar();
 
-		Form.addPage(formAddNewPageNumber = 2);
+		Form.addPage(formAddNewPageNumber = "2");
 
 		Form.editPageTitle(
 			formPageName = "Page 3",
-			formTitleNumber = 3);
+			formTitleNumber = "3");
 
-		Form.addTextField(fieldPositionNumber = 5);
+		Form.addTextField(fieldPositionNumber = "5");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 3");
 
@@ -1172,54 +1172,54 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Text Field 1",
 			conditionOperator = "Is not empty",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.configureActionOptions(
 			action = "Jump to Page",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "2 Page 2");
 
 		FormsAdminNavigator.gotoFormBuilder();
 
 		Form.deleteCurrentLastPage(
-			formDropDownNumber = 1,
-			formPageNumber = 3);
+			formDropDownNumber = "1",
+			formPageNumber = "3");
 
 		Form.gotoAddField(
-			fieldPositionNumber = 1,
+			fieldPositionNumber = "1",
 			fieldType = "Date");
 
 		FormsAdminNavigator.gotoRules();
 
-		var key_conditionRowNumber = 1;
+		var key_conditionRowNumber = "1";
 
 		Click(locator1 = "FormRules#RULE_BUILDER_CONDITION_FIELD");
 
 		for (var conditionField : list "Text Field 1,Text Field 2,Date") {
-			var key_conditionField = ${conditionField};
+			var key_conditionField = "${conditionField}";
 
 			AssertElementPresent(
 				locator1 = "FormRules#RULE_BUILDER_SELECT_CONDITION_FIELD",
-				value1 = ${conditionField});
+				value1 = "${conditionField}");
 		}
 
-		var key_actionRowNumber = 1;
+		var key_actionRowNumber = "1";
 
 		Click(locator1 = "FormRules#RULE_BUILDER_ACTION_TARGET_FIELD");
 
 		AssertElementPresent(
-			key_actionRowNumber = 1,
+			key_actionRowNumber = "1",
 			key_actionTarget = "2 Page 2",
 			locator1 = "FormRules#RULE_BUILDER_SELECT_ACTION_TARGET");
 
 		AssertElementNotPresent(
-			key_actionRowNumber = 1,
+			key_actionRowNumber = "1",
 			key_actionTarget = "3 Page 3",
 			locator1 = "FormRules#RULE_BUILDER_SELECT_ACTION_TARGET");
 	}
 
 	@description = "This is a use case for LPS-71399."
-	@priority = 4
+	@priority = "4"
 	test UseIsNotEmptyRuleToShowField {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#UseIsNotEmptyRuleToShowField";
@@ -1234,7 +1234,7 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextField = FormFields.getFieldName();
 
@@ -1243,7 +1243,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 2,
+			fieldPositionNumber = "2",
 			fieldType = "Date");
 
 		var fieldNameDateField = FormFields.getFieldName();
@@ -1259,11 +1259,11 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Text Field",
 			conditionOperator = "Is not empty",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Date Field");
 
 		FormRules.save();
@@ -1286,41 +1286,41 @@ definition {
 
 		FormFields.viewDateFieldNotPresent(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField},
-			fieldValue = 1);
+			fieldName = "${fieldNameTextField}",
+			fieldValue = "1");
 
 		FormFields.viewDateField(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField},
+			fieldName = "${fieldNameTextField}",
 			fieldValue = "Test");
 
 		FormFields.viewDateField(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField},
+			fieldName = "${fieldNameTextField}",
 			fieldValue = "%");
 
 		FormFields.viewDateField(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 
-		FormFields.editTextWithBackspace(fieldName = ${fieldNameTextField});
+		FormFields.editTextWithBackspace(fieldName = "${fieldNameTextField}");
 
 		FormFields.viewDateFieldNotPresent(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 	}
 
 	@description = "This is a use case for LPS-73332."
-	@priority = 2
+	@priority = "2"
 	test ViewExistingFormRuleIsNotCopiedToNewForm {
 		property portal.acceptance = "true";
 
@@ -1334,13 +1334,13 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 1");
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 2);
+		Form.addTextField(fieldPositionNumber = "2");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 2");
 
@@ -1354,12 +1354,12 @@ definition {
 			conditionField = "Text Field 1",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Text Field 2");
 
 		FormRules.save();
@@ -1380,7 +1380,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-71466."
-	@priority = 2
+	@priority = "2"
 	test ViewPredefinedValueCanBeUsedToRequireAnotherField {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#ViewPredefinedValueCanBeUsedToRequireAnotherField";
@@ -1395,7 +1395,7 @@ definition {
 
 		Form.editName(formName = "Test Form");
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextField1 = FormFields.getFieldName();
 
@@ -1409,7 +1409,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 2);
+		Form.addTextField(fieldPositionNumber = "2");
 
 		var fieldNameTextField2 = FormFields.getFieldName();
 
@@ -1425,12 +1425,12 @@ definition {
 			conditionField = "Text Field 1",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Require",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Text Field 2");
 
 		FormRules.save();
@@ -1441,7 +1441,7 @@ definition {
 			conditionField = "Text Field 1",
 			conditionFieldConstant = "test",
 			conditionOperator = "Is equal to",
-			ruleNumber = 1);
+			ruleNumber = "1");
 
 		FormsAdminNavigator.gotoFormBuilder();
 
@@ -1456,13 +1456,13 @@ definition {
 		FormPortlet.submit();
 
 		FormFields.viewFieldValidationErrorMessage(
-			fieldName = ${fieldNameTextField2},
+			fieldName = "${fieldNameTextField2}",
 			fieldValidationErrorMessage = "This field is required.");
 
 		Refresh();
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField1},
+			fieldName = "${fieldNameTextField1}",
 			fieldValue = "testing");
 
 		FormFields.viewRequiredAsteriskNotPresent();
@@ -1471,7 +1471,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-73332."
-	@priority = 2
+	@priority = "2"
 	test ViewPreviousFormRuleIsCopiedToNewDuplicatedForm {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#ViewPreviousFormRuleIsCopiedToNewDuplicatedForm";
@@ -1486,13 +1486,13 @@ definition {
 
 		Form.editName(formName = "Test Form");
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 1");
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 2);
+		Form.addTextField(fieldPositionNumber = "2");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field 2");
 
@@ -1506,12 +1506,12 @@ definition {
 			conditionField = "Text Field 1",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Text Field 2");
 
 		FormRules.save();
@@ -1538,11 +1538,11 @@ definition {
 			conditionField = "Text Field 1",
 			conditionFieldConstant = "test",
 			conditionOperator = "Is equal to",
-			ruleNumber = 1);
+			ruleNumber = "1");
 	}
 
 	@description = "This is a use case for LPS-69733."
-	@priority = 2
+	@priority = "2"
 	test ViewRuleConditionOperatorFieldOptions {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#ViewRuleConditionOperatorFieldOptions";
@@ -1557,7 +1557,7 @@ definition {
 
 		Form.editName();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		Form.editFieldLabelMetal(fieldValue = "Text Field");
 
@@ -1567,17 +1567,17 @@ definition {
 
 		FormRules.addRule();
 
-		FormRules.viewConditionOperatorOptionsNotPresent(conditionRowNumber = 1);
+		FormRules.viewConditionOperatorOptionsNotPresent(conditionRowNumber = "1");
 
 		FormRules.selectConditionField(
 			conditionField = "Text Field",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
-		FormRules.viewConditionOperatorOptionsIsPresent(conditionRowNumber = 1);
+		FormRules.viewConditionOperatorOptionsIsPresent(conditionRowNumber = "1");
 	}
 
 	@description = "This is a use case for LPS-75495."
-	@priority = 3
+	@priority = "3"
 	test ViewShowRuleActivationAfterInputtingUnrelatedField {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormRules#ViewShowRuleActivationAfterInputtingUnrelatedField";
@@ -1592,7 +1592,7 @@ definition {
 
 		Form.editName(formName = "Test Form");
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextField1 = FormFields.getFieldName();
 
@@ -1600,7 +1600,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = 2);
+		Form.addTextField(fieldPositionNumber = "2");
 
 		var fieldNameTextField2 = FormFields.getFieldName();
 
@@ -1609,7 +1609,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 3,
+			fieldPositionNumber = "3",
 			fieldType = "Date");
 
 		var fieldNameDateField = FormFields.getFieldName();
@@ -1628,12 +1628,12 @@ definition {
 			conditionField = "Text Field 1",
 			conditionFieldValue = "test",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Date Field");
 
 		FormRules.save();
@@ -1655,20 +1655,20 @@ definition {
 		FormPortlet.waitFormRenderer(text = "Submit");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField2},
+			fieldName = "${fieldNameTextField2}",
 			fieldValue = "testing");
 
 		FormFields.viewDateFieldNotPresent(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextField1},
+			fieldName = "${fieldNameTextField1}",
 			fieldValue = "test");
 
 		FormFields.viewDateField(
 			fieldLabel = "Date Field",
-			fieldName = ${fieldNameDateField});
+			fieldName = "${fieldNameDateField}");
 	}
 
 }

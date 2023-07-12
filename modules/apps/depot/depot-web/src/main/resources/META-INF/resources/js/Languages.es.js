@@ -110,8 +110,8 @@ const Languages = ({
 		<div className="mt-5">
 			<ClayRadioGroup
 				name={`${portletNamespace}TypeSettingsProperties--inheritLocales--`}
-				onChange={setCurrentInheritLocales}
-				value={currentInheritLocales}
+				onSelectedValueChange={setCurrentInheritLocales}
+				selectedValue={currentInheritLocales}
 			>
 				<ClayRadio
 					label={Liferay.Language.get(

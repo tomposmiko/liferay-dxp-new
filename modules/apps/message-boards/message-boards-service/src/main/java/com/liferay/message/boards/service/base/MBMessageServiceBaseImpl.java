@@ -27,11 +27,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -60,7 +60,7 @@ public abstract class MBMessageServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		MBMessageServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public abstract class MBMessageServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		mbMessageService = (MBMessageService)aopProxy;
 
-		MBMessageServiceUtil.setService(mbMessageService);
+		_setServiceUtilService(mbMessageService);
 	}
 
 	/**
@@ -116,6 +116,20 @@ public abstract class MBMessageServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(MBMessageService mbMessageService) {
+		try {
+			Field field = MBMessageServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mbMessageService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -197,8 +211,5 @@ public abstract class MBMessageServiceBaseImpl
 
 	@Reference
 	protected MBThreadFinder mbThreadFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MBMessageServiceBaseImpl.class);
 
 }

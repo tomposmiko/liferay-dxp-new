@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -30,6 +28,8 @@ import com.liferay.site.navigation.service.SiteNavigationMenuItemService;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemServiceUtil;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemPersistence;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -59,7 +59,7 @@ public abstract class SiteNavigationMenuItemServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		SiteNavigationMenuItemServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -73,8 +73,7 @@ public abstract class SiteNavigationMenuItemServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		siteNavigationMenuItemService = (SiteNavigationMenuItemService)aopProxy;
 
-		SiteNavigationMenuItemServiceUtil.setService(
-			siteNavigationMenuItemService);
+		_setServiceUtilService(siteNavigationMenuItemService);
 	}
 
 	/**
@@ -120,6 +119,23 @@ public abstract class SiteNavigationMenuItemServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		SiteNavigationMenuItemService siteNavigationMenuItemService) {
+
+		try {
+			Field field =
+				SiteNavigationMenuItemServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, siteNavigationMenuItemService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected
 		com.liferay.site.navigation.service.SiteNavigationMenuItemLocalService
@@ -144,8 +160,5 @@ public abstract class SiteNavigationMenuItemServiceBaseImpl
 
 	@Reference
 	protected SiteNavigationMenuPersistence siteNavigationMenuPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SiteNavigationMenuItemServiceBaseImpl.class);
 
 }

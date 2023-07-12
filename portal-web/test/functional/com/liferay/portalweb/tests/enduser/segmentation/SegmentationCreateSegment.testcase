@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,7 +35,7 @@ definition {
 	}
 
 	@description = "Validate if the user can create a segment with Properties User and Email Segment with Contains Option"
-	@priority = 5
+	@priority = "5"
 	test AddSegmentUserEmailAddressContains {
 		LexiconEntry.gotoAdd();
 
@@ -53,7 +53,7 @@ definition {
 	}
 
 	@description = "Validate if the user can create a segment with Properties User and Email Segment with Equals Option"
-	@priority = 5
+	@priority = "5"
 	test AddSegmentUserEmailAddressEquals {
 		LexiconEntry.gotoAdd();
 
@@ -71,7 +71,7 @@ definition {
 	}
 
 	@description = "Validate if the user can create a segment with Properties User and Email Segment with Not Contains Option"
-	@priority = 5
+	@priority = "5"
 	test AddSegmentUserEmailAddressNotContains {
 		LexiconEntry.gotoAdd();
 
@@ -89,7 +89,7 @@ definition {
 	}
 
 	@description = "Validate if the user can create a segment with Properties User and Email Segment with Not Equals Option"
-	@priority = 5
+	@priority = "5"
 	test AddSegmentUserEmailAddressNotEquals {
 		LexiconEntry.gotoAdd();
 
@@ -107,13 +107,13 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-103516."
-	@priority = 5
+	@priority = "5"
 	test ViewSegmentFieldsType {
 		LexiconEntry.gotoAdd();
 
 		for (var fieldType : list "User,Organization,Session") {
 			AssertElementPresent(
-				key_typeName = ${fieldType},
+				key_typeName = "${fieldType}",
 				locator1 = "Segmentation#SEGMENT_FIELDS_TYPE");
 		}
 	}

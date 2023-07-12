@@ -581,12 +581,12 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolverTest {
 		Assert.assertTrue(
 			StringBundler.concat(
 				"Could not find expected max-width of '", expectedMaxWidth,
-				"' in '", sourceJSONObject, "'"),
+				"' in '", sourceJSONObject.toString(), "'"),
 			(expectedMaxWidth == 0) || assertedMaxWidth);
 		Assert.assertTrue(
 			StringBundler.concat(
 				"Could not find expected min-width of '", expectedMinWidth,
-				"' in '", sourceJSONObject, "'"),
+				"' in '", sourceJSONObject.toString(), "'"),
 			(expectedMinWidth == 0) || assertedMinWidth);
 	}
 

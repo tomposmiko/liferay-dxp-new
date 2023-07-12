@@ -62,7 +62,7 @@ public class OptionValue implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(OptionValue.class, json);
 	}
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -91,7 +91,7 @@ public class OptionValue implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -117,7 +117,7 @@ public class OptionValue implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(example = "black")
+	@Schema
 	public String getKey() {
 		return key;
 	}
@@ -144,7 +144,7 @@ public class OptionValue implements Serializable {
 	@NotEmpty
 	protected String key;
 
-	@Schema(example = "{en_US=Black, hr_HR=Black HR, hu_HU=Black HU}")
+	@Schema
 	@Valid
 	public Map<String, String> getName() {
 		return name;
@@ -174,7 +174,7 @@ public class OptionValue implements Serializable {
 	@NotNull
 	protected Map<String, String> name;
 
-	@Schema(example = "1.2")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}

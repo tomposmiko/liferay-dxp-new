@@ -313,7 +313,13 @@ public class AssetVocabularyLocalServiceUtil {
 		return getService().fetchAssetVocabulary(vocabularyId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary, or <code>null</code> if a matching asset vocabulary could not be found
+	 */
 	public static AssetVocabulary fetchAssetVocabularyByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -321,6 +327,9 @@ public class AssetVocabularyLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetVocabularyByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static AssetVocabulary fetchAssetVocabularyByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -425,7 +434,14 @@ public class AssetVocabularyLocalServiceUtil {
 		return getService().getAssetVocabulary(vocabularyId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary
+	 * @throws PortalException if a matching asset vocabulary could not be found
+	 */
 	public static AssetVocabulary getAssetVocabularyByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -635,12 +651,6 @@ public class AssetVocabularyLocalServiceUtil {
 			serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #updateVocabulary(long, String, Map, Map, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
 	public static AssetVocabulary updateVocabulary(
 			long vocabularyId, String name, String title,
 			Map<java.util.Locale, String> titleMap,
@@ -655,10 +665,6 @@ public class AssetVocabularyLocalServiceUtil {
 
 	public static AssetVocabularyLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(AssetVocabularyLocalService service) {
-		_service = service;
 	}
 
 	private static volatile AssetVocabularyLocalService _service;

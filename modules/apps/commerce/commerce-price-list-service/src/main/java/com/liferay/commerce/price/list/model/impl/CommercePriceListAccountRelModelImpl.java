@@ -323,98 +323,92 @@ public class CommercePriceListAccountRelModelImpl
 	private static final Map
 		<String, Function<CommercePriceListAccountRel, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommercePriceListAccountRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommercePriceListAccountRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommercePriceListAccountRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"uuid", CommercePriceListAccountRel::getUuid);
-		attributeGetterFunctions.put(
-			"commercePriceListAccountRelId",
-			CommercePriceListAccountRel::getCommercePriceListAccountRelId);
-		attributeGetterFunctions.put(
-			"companyId", CommercePriceListAccountRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommercePriceListAccountRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommercePriceListAccountRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommercePriceListAccountRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommercePriceListAccountRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceAccountId",
-			CommercePriceListAccountRel::getCommerceAccountId);
-		attributeGetterFunctions.put(
-			"commercePriceListId",
-			CommercePriceListAccountRel::getCommercePriceListId);
-		attributeGetterFunctions.put(
-			"order", CommercePriceListAccountRel::getOrder);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CommercePriceListAccountRel::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommercePriceListAccountRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommercePriceListAccountRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommercePriceListAccountRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"uuid", CommercePriceListAccountRel::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommercePriceListAccountRel, String>)
 				CommercePriceListAccountRel::setUuid);
+		attributeGetterFunctions.put(
+			"commercePriceListAccountRelId",
+			CommercePriceListAccountRel::getCommercePriceListAccountRelId);
 		attributeSetterBiConsumers.put(
 			"commercePriceListAccountRelId",
 			(BiConsumer<CommercePriceListAccountRel, Long>)
 				CommercePriceListAccountRel::setCommercePriceListAccountRelId);
+		attributeGetterFunctions.put(
+			"companyId", CommercePriceListAccountRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommercePriceListAccountRel, Long>)
 				CommercePriceListAccountRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommercePriceListAccountRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommercePriceListAccountRel, Long>)
 				CommercePriceListAccountRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommercePriceListAccountRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommercePriceListAccountRel, String>)
 				CommercePriceListAccountRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommercePriceListAccountRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommercePriceListAccountRel, Date>)
 				CommercePriceListAccountRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommercePriceListAccountRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommercePriceListAccountRel, Date>)
 				CommercePriceListAccountRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceAccountId",
+			CommercePriceListAccountRel::getCommerceAccountId);
 		attributeSetterBiConsumers.put(
 			"commerceAccountId",
 			(BiConsumer<CommercePriceListAccountRel, Long>)
 				CommercePriceListAccountRel::setCommerceAccountId);
+		attributeGetterFunctions.put(
+			"commercePriceListId",
+			CommercePriceListAccountRel::getCommercePriceListId);
 		attributeSetterBiConsumers.put(
 			"commercePriceListId",
 			(BiConsumer<CommercePriceListAccountRel, Long>)
 				CommercePriceListAccountRel::setCommercePriceListId);
+		attributeGetterFunctions.put(
+			"order", CommercePriceListAccountRel::getOrder);
 		attributeSetterBiConsumers.put(
 			"order",
 			(BiConsumer<CommercePriceListAccountRel, Integer>)
 				CommercePriceListAccountRel::setOrder);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CommercePriceListAccountRel::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CommercePriceListAccountRel, Date>)
 				CommercePriceListAccountRel::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -439,12 +439,6 @@ public class CommerceNotificationQueueEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceNotificationQueueEntryLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceNotificationQueueEntryLocalService _service;
 
 }

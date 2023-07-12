@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,6 +27,8 @@ import com.liferay.portal.security.audit.storage.model.AuditEvent;
 import com.liferay.portal.security.audit.storage.service.AuditEventService;
 import com.liferay.portal.security.audit.storage.service.AuditEventServiceUtil;
 import com.liferay.portal.security.audit.storage.service.persistence.AuditEventPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class AuditEventServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		AuditEventServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class AuditEventServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		auditEventService = (AuditEventService)aopProxy;
 
-		AuditEventServiceUtil.setService(auditEventService);
+		_setServiceUtilService(auditEventService);
 	}
 
 	/**
@@ -116,6 +116,20 @@ public abstract class AuditEventServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(AuditEventService auditEventService) {
+		try {
+			Field field = AuditEventServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, auditEventService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected
 		com.liferay.portal.security.audit.storage.service.AuditEventLocalService
@@ -148,8 +162,5 @@ public abstract class AuditEventServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AuditEventServiceBaseImpl.class);
 
 }

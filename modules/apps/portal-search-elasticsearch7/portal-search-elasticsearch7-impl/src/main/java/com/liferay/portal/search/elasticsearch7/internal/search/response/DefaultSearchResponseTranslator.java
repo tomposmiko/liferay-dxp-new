@@ -52,7 +52,7 @@ import java.util.Map;
 import org.apache.lucene.search.TotalHits;
 
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -109,11 +109,7 @@ public class DefaultSearchResponseTranslator
 		Document document, Map<String, HighlightField> highlightFields,
 		String fieldName, Locale locale) {
 
-		String snippetFieldName = fieldName;
-
-		if (!fieldName.startsWith("nestedFieldArray.")) {
-			snippetFieldName = Field.getLocalizedName(locale, fieldName);
-		}
+		String snippetFieldName = Field.getLocalizedName(locale, fieldName);
 
 		HighlightField highlightField = highlightFields.get(snippetFieldName);
 
@@ -129,11 +125,10 @@ public class DefaultSearchResponseTranslator
 
 		Object[] array = highlightField.fragments();
 
-		document.add(
-			new Field(
-				StringBundler.concat(
-					Field.SNIPPET, StringPool.UNDERLINE, snippetFieldName),
-				StringUtil.merge(array, StringPool.TRIPLE_PERIOD)));
+		document.addText(
+			StringBundler.concat(
+				Field.SNIPPET, StringPool.UNDERLINE, snippetFieldName),
+			StringUtil.merge(array, StringPool.TRIPLE_PERIOD));
 	}
 
 	protected void addSnippets(
@@ -375,7 +370,7 @@ public class DefaultSearchResponseTranslator
 		Hits hits, Map<String, Aggregation> aggregationsMap,
 		Map<String, Stats> statsMap) {
 
-		if (MapUtil.isNotEmpty(statsMap)) {
+		if (!MapUtil.isEmpty(statsMap)) {
 			for (Stats stats : statsMap.values()) {
 				hits.addStatsResults(getStatsResults(aggregationsMap, stats));
 			}

@@ -15,7 +15,7 @@ import {useCallback, useState} from 'react';
 const useIsAdmin = () => {
 	const [isAdmin, setAdmin] = useState();
 
-	const fetchData = useCallback(() => {
+	const fetchData = useCallback(async () => {
 		const fetchURL = new URL(
 			'/o/headless-admin-user/v1.0/my-user-account',
 			Liferay.ThemeDisplay.getPortalURL()
@@ -25,28 +25,28 @@ const useIsAdmin = () => {
 			'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
 		};
 
-		fetch(fetchURL, {
+		const response = await fetch(fetchURL, {
 			headers,
 			method: 'GET',
-		})
-			.then((response) => {
-				if (response.ok) {
-					return response.json();
-				}
-				else {
-					throw response;
-				}
-			})
-			.then((data) => {
+		});
+
+		const data = await response.json();
+
+		if (response.ok) {
+			setAdmin(data);
+
+			const callback = (currentUserAccount) => {
 				setAdmin(
-					data?.roleBriefs?.some(
+					currentUserAccount?.roleBriefs?.some(
 						(role) => role.name === 'Administrator'
 					)
 				);
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+			};
+
+			return callback(data);
+		}
+
+		throw data;
 	}, []);
 
 	return {

@@ -16,7 +16,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98303. Assert that a page that uses a default layout template, does not have a 'Nested Application' Widget, and is not set as customizable can be converted to a Content Page by default."
-	@priority = 5
+	@priority = "5"
 	test ConvertBasicWidgetPageToContentPage {
 		property portal.acceptance = "true";
 
@@ -44,7 +44,7 @@ definition {
 			menuItem = "Convert to content page...",
 			pageName = "Test Page Name");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		PageEditor.assertFragmentSidebarLoaded();
 
@@ -69,7 +69,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98325. Assert that multiple pages with several widget pages(that can be converted) and an api to convert bulk widget pages to content pages is executed, all widget pages are converted."
-	@priority = 5
+	@priority = "5"
 	test ConvertMultipleWidgetPagesToContentPagesViaAPI {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "ContentPageConverter#ConvertMultipleWidgetPagesToContentPagesViaAPI";
@@ -140,7 +140,7 @@ definition {
 
 		ServerAdministration.executeScript(
 			language = "Groovy",
-			script = ${script});
+			script = "${script}");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
@@ -182,7 +182,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98589. Multiple widgets with different application decorators survive content page conversion."
-	@priority = 5
+	@priority = "5"
 	test ConvertWidgetPageDecoratorsToContentPage {
 		property portal.acceptance = "true";
 
@@ -253,7 +253,7 @@ definition {
 			menuItem = "Convert to content page...",
 			pageName = "Test Page Name");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		Button.clickPublish();
 
@@ -280,7 +280,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98325. Assert that widget pages with nested application and customization setting can be converted to content pages via API."
-	@priority = 5
+	@priority = "5"
 	test ConvertWidgetPagesWithNestedApplicationAndCustomizationSettingToContentPagesViaAPI {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "ContentPageConverter#ConvertWidgetPagesWithNestedApplicationAndCustomizationSettingToContentPagesViaAPI";
@@ -301,7 +301,7 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "Test Site Name");
 
 		PageCustomizations.enableSectionCustomizableCP(
-			columnId = 1,
+			columnId = "1",
 			pageName = "Test Page Name 2");
 
 		JSONLayout.addPublicLayout(
@@ -319,7 +319,7 @@ definition {
 
 		ServerAdministration.executeScript(
 			language = "Groovy",
-			script = ${script});
+			script = "${script}");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
@@ -336,7 +336,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-105943. When convert a widget page with one Customizable column, there will be a warning message shown in conversion review"
-	@priority = 5
+	@priority = "5"
 	test ConvertWidgetPageWithCustomizableColumnContainingWidgets {
 		property portal.acceptance = "true";
 
@@ -352,7 +352,7 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "Test Site Name");
 
 		PageCustomizations.enableSectionCustomizableCP(
-			columnId = 1,
+			columnId = "1",
 			pageName = "Test Page Name");
 
 		Navigator.gotoSitePage(
@@ -398,7 +398,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-105943. When convert a widget page with one Nested Applications widget containing widgets, there will be a warning message shown in conversion preview"
-	@priority = 5
+	@priority = "5"
 	test ConvertWidgetPageWithNestedApplicationsContainingWidgets {
 		property portal.acceptance = "true";
 
@@ -412,13 +412,13 @@ definition {
 			layoutTemplate = "1 Column");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Test Site Name",
 			layoutName = "Test Page Name",
 			widgetName = "Nested Applications");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Test Site Name",
 			layoutName = "Test Page Name",
 			widgetName = "Asset Publisher");
@@ -481,7 +481,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-105943. When convert a widget page with a non-standard layout, there will be a warning message shown in conversion preview"
-	@priority = 5
+	@priority = "5"
 	test ConvertWidgetPageWithNonStandardLayout {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "ContentPageConverter#ConvertWidgetPageWithNonStandardLayout";
@@ -514,8 +514,8 @@ definition {
 		Portlet.addPG(portletName = "Profile");
 
 		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = 1,
-			columnNumberTo = 2,
+			columnNumberFrom = "1",
+			columnNumberTo = "2",
 			portletName = "Profile");
 
 		Navigator.gotoSitePage(
@@ -546,15 +546,15 @@ definition {
 			locator1 = "Message#CONVERSION_ALERT_MESSAGE");
 
 		AssertElementPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Asset Publisher')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		AssertElementPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Profile')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		Button.clickPublish();
@@ -564,20 +564,20 @@ definition {
 			siteName = "Test Site Name");
 
 		AssertElementPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Asset Publisher')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		AssertElementPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Profile')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 	}
 
 	@description = "This is a test for LPS-105943. When convert a widget page with one Customizable column and a non-standard layout, there will be two warning messages shown in conversion preview"
-	@priority = 3
+	@priority = "3"
 	test ConvertWidgetPageWithNonStandardLayoutAndCustomizableColumns {
 		property test.name.skip.portal.instance = "ContentPageConverter#ConvertWidgetPageWithNonStandardLayoutAndCustomizableColumns";
 
@@ -617,8 +617,8 @@ definition {
 		Portlet.addPG(portletName = "Profile");
 
 		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = 1,
-			columnNumberTo = 2,
+			columnNumberFrom = "1",
+			columnNumberTo = "2",
 			portletName = "Profile");
 
 		Navigator.gotoSitePage(
@@ -652,15 +652,15 @@ definition {
 			value1 = "This page has customizable columns. This capability is not supported for content pages and will be lost if the conversion draft is published. This page uses a custom page layout. A best-effort conversion has been performed. Verify the conversion draft before publishing it.");
 
 		AssertElementNotPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Asset Publisher')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		AssertElementNotPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Profile')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		Button.clickPublish();
@@ -670,20 +670,20 @@ definition {
 			siteName = "Test Site Name");
 
 		AssertElementNotPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Asset Publisher')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		AssertElementNotPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Profile')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 	}
 
 	@description = "This is a test for LPS-105943. When convert a widget page with one Nested Applications widget containing widgets and a non-standard layout, there will be two warning messages shown in conversion preview"
-	@priority = 3
+	@priority = "3"
 	test ConvertWidgetPageWithNonStandardLayoutAndNestedApplicationsContainingWidgets {
 		property test.name.skip.portal.instance = "ContentPageConverter#ConvertWidgetPageWithNonStandardLayoutAndNestedApplicationsContainingWidgets";
 
@@ -713,12 +713,12 @@ definition {
 				pageName = "Test Page Name",
 				siteName = "Test Site Name");
 
-			Portlet.addPG(portletName = ${portletName});
+			Portlet.addPG(portletName = "${portletName}");
 
 			Portlet.dragAndDropPortletToColumnPG(
-				columnNumberFrom = 1,
-				columnNumberTo = 2,
-				portletName = ${portletName});
+				columnNumberFrom = "1",
+				columnNumberTo = "2",
+				portletName = "${portletName}");
 		}
 
 		Navigator.gotoSitePage(
@@ -779,21 +779,21 @@ definition {
 			value1 = "This page uses nested applications widgets. All widgets that were inside a nested application widget have been placed in a single column and may require manual reorganization. This page uses a custom page layout. A best-effort conversion has been performed. Verify the conversion draft before publishing it.");
 
 		AssertElementNotPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Nested Applications')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		AssertElementPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Asset Publisher')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		AssertElementPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Profile')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		Button.clickPublish();
@@ -803,26 +803,26 @@ definition {
 			siteName = "Test Site Name");
 
 		AssertElementNotPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Nested Applications')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		AssertElementPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Asset Publisher')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 
 		AssertElementPresent(
-			key_columnNumber = 1,
+			key_columnNumber = "1",
 			key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Profile')]",
-			key_position = 1,
+			key_position = "1",
 			locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 	}
 
 	@description = "This is a test for LPS-98589. Can edit the title of the widgets with "borderless" and "decorate" decorators in content page with correct permissions."
-	@priority = 5
+	@priority = "5"
 	test EditConvertedContentPageWithDecorator {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -973,7 +973,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-106198. check the status for convension draft page and can edit widget page to content page conversion in draft form."
-	@priority = 5
+	@priority = "5"
 	test ViewAndEditConversionDraftPage {
 		property portal.acceptance = "true";
 

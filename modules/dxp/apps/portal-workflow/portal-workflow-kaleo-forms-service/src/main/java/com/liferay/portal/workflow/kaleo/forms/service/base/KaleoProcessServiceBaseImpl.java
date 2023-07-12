@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -31,6 +29,8 @@ import com.liferay.portal.workflow.kaleo.forms.service.KaleoProcessServiceUtil;
 import com.liferay.portal.workflow.kaleo.forms.service.persistence.KaleoProcessFinder;
 import com.liferay.portal.workflow.kaleo.forms.service.persistence.KaleoProcessLinkPersistence;
 import com.liferay.portal.workflow.kaleo.forms.service.persistence.KaleoProcessPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -59,7 +59,7 @@ public abstract class KaleoProcessServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		KaleoProcessServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public abstract class KaleoProcessServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		kaleoProcessService = (KaleoProcessService)aopProxy;
 
-		KaleoProcessServiceUtil.setService(kaleoProcessService);
+		_setServiceUtilService(kaleoProcessService);
 	}
 
 	/**
@@ -115,6 +115,22 @@ public abstract class KaleoProcessServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		KaleoProcessService kaleoProcessService) {
+
+		try {
+			Field field = KaleoProcessServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, kaleoProcessService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -181,8 +197,5 @@ public abstract class KaleoProcessServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
 		workflowInstanceLinkLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		KaleoProcessServiceBaseImpl.class);
 
 }

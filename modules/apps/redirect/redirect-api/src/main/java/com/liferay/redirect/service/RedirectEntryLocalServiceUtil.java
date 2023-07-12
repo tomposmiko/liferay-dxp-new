@@ -461,10 +461,6 @@ public class RedirectEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(RedirectEntryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile RedirectEntryLocalService _service;
 
 }

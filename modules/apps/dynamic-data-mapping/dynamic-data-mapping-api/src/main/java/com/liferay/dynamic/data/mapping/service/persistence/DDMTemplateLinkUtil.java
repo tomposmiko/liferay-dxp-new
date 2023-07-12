@@ -514,10 +514,6 @@ public class DDMTemplateLinkUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(DDMTemplateLinkPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile DDMTemplateLinkPersistence _persistence;
 
 }

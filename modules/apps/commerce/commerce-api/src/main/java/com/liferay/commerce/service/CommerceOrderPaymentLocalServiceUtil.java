@@ -349,10 +349,6 @@ public class CommerceOrderPaymentLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceOrderPaymentLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceOrderPaymentLocalService _service;
 
 }

@@ -17,6 +17,7 @@ package com.liferay.portal.search.web.internal.display.context;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Company;
@@ -233,6 +234,10 @@ public class SearchDisplayContextTest {
 		setUpRequestKeywords(keywords);
 
 		PropsTestUtil.setProps(Collections.emptyMap());
+
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(createJSONFactory());
 
 		return new SearchDisplayContext(
 			renderRequest, portletPreferences,

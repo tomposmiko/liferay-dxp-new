@@ -53,7 +53,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 								<liferay-ui:user-portrait
 									cssClass="user-icon-lg"
 									userId="<%= commerceOrderNote.getUserId() %>"
-									userName="<%= HtmlUtil.escape(commerceOrderNote.getUserName()) %>"
+									userName="<%= commerceOrderNote.getUserName() %>"
 								/>
 							</div>
 
@@ -65,7 +65,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 									%>
 
 									<aui:a cssClass="author-link" href="<%= ((commerceOrderNoteUser != null) && commerceOrderNoteUser.isActive()) ? commerceOrderNoteUser.getDisplayURL(themeDisplay) : null %>">
-										<%= HtmlUtil.escape(commerceOrderNote.getUserName()) %>
+										<%= commerceOrderNote.getUserName() %>
 
 										<c:if test="<%= commerceOrderNote.getUserId() == user.getUserId() %>">
 											(<liferay-ui:message key="you" />)

@@ -21,7 +21,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -30,7 +30,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-116975. Map all categories from asset entry to editable field."
-	@priority = 4
+	@priority = "4"
 	test MapAllCategoriesToEditableField {
 		JSONCategory.addVocabulary(
 			groupName = "Test Site Name",
@@ -89,10 +89,12 @@ definition {
 			categoryName = "Category Name 3-1",
 			groupName = "Test Site Name",
 			vocabularyName = "Vocabulary Name 3");
+
 		var categoryId4 = JSONCategory.getCategoryId(
 			categoryName = "Category Name 3-2",
 			groupName = "Test Site Name",
 			vocabularyName = "Vocabulary Name 3");
+
 		var categoryId5 = JSONCategory.getCategoryId(
 			categoryName = "Category Name 3-3",
 			groupName = "Test Site Name",
@@ -145,7 +147,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-116034. The custom ddmfields of content are available for mapping in editable field."
-	@priority = 4
+	@priority = "4"
 	test MapCustomDDMFieldToFragment {
 		task ("Add a custom Web Content structure") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -236,7 +238,7 @@ definition {
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Text");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			PageEditor.waitForAutoSave();
 
@@ -266,7 +268,7 @@ definition {
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Text");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			PageEditor.waitForAutoSave();
 
@@ -297,7 +299,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-116034. The custom ddmfields of single type collection items are available for mapping in editable field."
-	@priority = 4
+	@priority = "4"
 	test MapCustomDDMFieldToFragmentInCollectionDisplayBasedOnSingleTypeCollection {
 		task ("Add a custom Web Content structure") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -419,10 +421,10 @@ definition {
 				id = "element-text");
 
 			AssertTextEquals(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_element = "//div[contains(@class,'page-editor__topper') and contains(.,'Heading')]//*[contains(@data-lfr-editable-id,'element-text')]",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_CELL_NESTED_ELEMENT",
 				value1 = "Web Content Content");
 
@@ -433,9 +435,9 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertTextEquals(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
 				value1 = "Web Content Content");
 		}
@@ -464,10 +466,10 @@ definition {
 				id = "element-text");
 
 			AssertTextEquals(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_element = "//div[contains(@class,'page-editor__topper') and contains(.,'Paragraph')]//*[contains(@data-lfr-editable-id,'element-text')]",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_CELL_NESTED_ELEMENT",
 				value1 = "DM Document Text");
 
@@ -478,16 +480,16 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertTextEquals(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "paragraph",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
 				value1 = "DM Document Text");
 		}
 	}
 
 	@description = "This is a test for LPS-121330. Can add an internal link to the Container element."
-	@priority = 5
+	@priority = "5"
 	test MapDisplayPageURLToContainerElement {
 		property portal.acceptance = "true";
 
@@ -554,18 +556,10 @@ definition {
 
 			var baseURL = PropsUtil.get("portal.url");
 
-			if (IsElementPresent(locator1 = "xpath=(//a[contains(@href,'${baseURL}/en/web/test-site-name/w/web-content-title')])")) {
-				AssertVisible(
-					key_append = "//img",
-					key_URL = "${baseURL}/en/web/test-site-name/w/web-content-title",
-					locator1 = "Fragment#FRAGMENT_LINK");
-			}
-			else {
-				AssertVisible(
-					key_append = "//img",
-					key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
-					locator1 = "Fragment#FRAGMENT_LINK");
-			}
+			AssertVisible(
+				key_append = "//img",
+				key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
+				locator1 = "Fragment#FRAGMENT_LINK");
 
 			PageEditor.clickPublish();
 		}
@@ -577,28 +571,15 @@ definition {
 
 			var baseURL = PropsUtil.get("portal.url");
 
-			if (IsElementPresent(locator1 = "xpath=(//a[contains(@href,'${baseURL}/en/web/test-site-name/w/web-content-title')])")) {
-				AssertVisible(
-					key_append = "/img",
-					key_URL = "${baseURL}/en/web/test-site-name/w/web-content-title",
-					locator1 = "Fragment#FRAGMENT_LINK");
+			AssertVisible(
+				key_append = "/img",
+				key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
+				locator1 = "Fragment#FRAGMENT_LINK");
 
-				Click(
-					key_append = "/img",
-					key_URL = "${baseURL}/en/web/test-site-name/w/web-content-title",
-					locator1 = "Fragment#FRAGMENT_LINK");
-			}
-			else {
-				AssertVisible(
-					key_append = "/img",
-					key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
-					locator1 = "Fragment#FRAGMENT_LINK");
-
-				Click(
-					key_append = "/img",
-					key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
-					locator1 = "Fragment#FRAGMENT_LINK");
-			}
+			Click(
+				key_append = "/img",
+				key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
+				locator1 = "Fragment#FRAGMENT_LINK");
 
 			AssertTextEquals(
 				locator1 = "ControlMenu#HEADING",
@@ -606,12 +587,13 @@ definition {
 
 			AssertVisible(
 				key_assetContent = "Web Content Content",
+				key_assetTitle = "Web Content Title",
 				locator1 = "PageEditor#ASSET_CONTENT");
 		}
 	}
 
 	@description = "This is a test for LPS-119817. Map manual URL to Container element."
-	@priority = 5
+	@priority = "5"
 	test MapManualURLToContainerElement {
 		property portal.acceptance = "true";
 
@@ -665,7 +647,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-120094. Map manual URL to Image fragment."
-	@priority = 5
+	@priority = "5"
 	test MapManualURLToImageFragment {
 		property portal.acceptance = "true";
 
@@ -719,7 +701,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98031 and LPS-120348. Map Manual URL to Link fragment and select blank as target."
-	@priority = 5
+	@priority = "5"
 	test MapManualURLToLinkFragment {
 		property portal.acceptance = "true";
 
@@ -767,7 +749,7 @@ definition {
 				key_URL = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
-			var siteName = TestCase.getSiteName(siteName = ${siteName});
+			var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 			SelectWindow.selectPopUp(locator1 = "null");
 
@@ -778,7 +760,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-117818. Map manual URL to text fragment."
-	@priority = 5
+	@priority = "5"
 	test MapManualURLToTextFragment {
 		property portal.acceptance = "true";
 
@@ -827,7 +809,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-118276. Map single vocabulary with single category from asset entry to editable field."
-	@priority = 5
+	@priority = "5"
 	test MapSingleCategoryFromAssetEntryToEditableField {
 		task ("Add a new vocabulary") {
 			JSONCategory.addVocabulary(
@@ -847,7 +829,7 @@ definition {
 				vocabularyName = "Vocabulary Name");
 
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				content = "Web Content Content",
 				groupName = "Test Site Name",
 				title = "Web Content Title");
@@ -855,7 +837,7 @@ definition {
 
 		task ("Add a blogs entry with the new category") {
 			JSONBlog.addEntry(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				entryContent = "Blogs Entry Content",
 				entryTitle = "Blogs Entry Title",
 				groupName = "Test Site Name");
@@ -863,7 +845,7 @@ definition {
 
 		task ("Add a document based on Basic Document with the new category") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				dmDocumentDescription = "DM Document Description",
 				dmDocumentTitle = "Document Title",
 				groupName = "Test Site Name",
@@ -891,7 +873,7 @@ definition {
 				entryTitle = "Web Content Title",
 				navItem = "Web Content");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Select(
 				locator1 = "PageEditorEditableLink#FIELD",
@@ -913,7 +895,7 @@ definition {
 				entryTitle = "Blogs Entry Title",
 				navItem = "Blogs");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Select(
 				locator1 = "PageEditorEditableLink#FIELD",
@@ -935,7 +917,7 @@ definition {
 				entryTitle = "Document Title",
 				navItem = "Documents and Media");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Select(
 				locator1 = "PageEditorEditableLink#FIELD",
@@ -949,7 +931,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-116975. Map multiple tags from asset entry to editable field."
-	@priority = 5
+	@priority = "5"
 	test MapTagsToEditableField {
 		property portal.acceptance = "true";
 
@@ -999,7 +981,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-116975. Map single tag from asset entry to editable field."
-	@priority = 5
+	@priority = "5"
 	test MapTagToEditableField {
 		property portal.acceptance = "true";
 
@@ -1041,7 +1023,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-96794. Mapped Web Contents' state will appear in the sidebar in a Page Editor's edit mode."
-	@priority = 4
+	@priority = "4"
 	test MapWebContentsToBannerFragment {
 		for (var count : list "1,2,3") {
 			JSONWebcontent.addWebContent(
@@ -1132,7 +1114,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-96794. Mapped Web Content will appear in the sidebar in a Page Editor's edit mode."
-	@priority = 5
+	@priority = "5"
 	test MapWebContentURLToLinkFragment {
 		property portal.acceptance = "true";
 
@@ -1178,9 +1160,9 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-112749. When mapping asset field to fragment in Collection Display based on collection with multiple itemTypes, the Item Type label will be shown in mapping label."
-	@priority = 4
+	@priority = "4"
 	test ViewItemTypeLabelMappedInCollectionWithMultipleItemTypes {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 
 		JSONWebcontent.addWebContent(
 			content = "Web Content Content",
@@ -1265,7 +1247,7 @@ definition {
 		for (var field : list "Title,Description,Summary,User Name,Create Date,Modified Date,Expiration Date,View Count,URL,All Categories,Tags") {
 			AssertElementPresent(
 				key_fieldLabel = "Field",
-				key_value = ${field},
+				key_value = "${field}",
 				locator1 = "Select#GENERIC_SELECT_VALUE");
 		}
 
@@ -1289,15 +1271,15 @@ definition {
 		for (var field : list "Title,Description,Summary,User Name,Create Date,Modified Date,Expiration Date,View Count,URL,All Categories,Tags") {
 			AssertElementPresent(
 				key_fieldLabel = "Field",
-				key_value = ${field},
+				key_value = "${field}",
 				locator1 = "Select#GENERIC_SELECT_VALUE");
 		}
 	}
 
 	@description = "This is a use case for LPS-112749. When mapping asset field fragment in Collection Display based on collection with single itemType and specific subType, the Item Type and Item Subtype label will be shown in mapping panel."
-	@priority = 4
+	@priority = "4"
 	test ViewItemTypeLabelMappedInCollectionWithSingleAndSpecificItemType {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 
 		JSONWebcontent.addWebContent(
 			content = "Web Content Content",
@@ -1391,9 +1373,9 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-112749. When mapping asset field to fragment in Collection Display based on collection with single itemType, the Item Type label will be shown in mapping panel."
-	@priority = 4
+	@priority = "4"
 	test ViewItemTypeLabelMappedInCollectionWithSingleItemType {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 
 		JSONWebcontent.addWebContent(
 			content = "Web Content Content",
@@ -1506,7 +1488,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-118979. The mappable fields are grouped by fieldset in content page."
-	@priority = 5
+	@priority = "5"
 	test ViewMappableFieldsAreGroupedByFieldset {
 		property portal.acceptance = "true";
 
@@ -1571,7 +1553,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1597,7 +1579,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1605,7 +1587,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Schedule",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
@@ -1621,7 +1603,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1629,7 +1611,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Content",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1637,7 +1619,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Configuration",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1645,7 +1627,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
@@ -1661,7 +1643,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1669,7 +1651,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "File Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1683,16 +1665,16 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
 	}
 
 	@description = "This is a test for LPS-118979. The mappable fields are grouped by fieldset in Collection Display based on single type collection."
-	@priority = 4
+	@priority = "4"
 	test ViewMappableFieldsAreGroupedByFieldsetInCollectionDisplayBasedOnSingleTypeCollection {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 
 		task ("Add a web content article based on Basic Web Content") {
 			JSONWebcontent.addWebContent(
@@ -1786,20 +1768,20 @@ definition {
 
 		task ("Access to the mapping panel of Heading") {
 			Click.clickNoWaitForVisible(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_element = "//div[contains(@class,'page-editor')]//li[contains(.,'Heading')]",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_CELL_NESTED_ELEMENT");
 
 			Click(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_element = "//*[contains(@class,'heading') and contains(@data-lfr-editable-id,'element-text')]",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_CELL_NESTED_ELEMENT");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			AssertClick(
 				key_navItem = "Mapping",
@@ -1812,7 +1794,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1838,7 +1820,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1846,7 +1828,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Schedule",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
@@ -1859,20 +1841,20 @@ definition {
 
 		task ("Access to the mapping panel of Heading") {
 			Click.clickNoWaitForVisible(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_element = "//div[contains(@class,'page-editor')]//li[contains(.,'Heading')]",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_CELL_NESTED_ELEMENT");
 
 			Click(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_element = "//*[contains(@class,'heading') and contains(@data-lfr-editable-id,'element-text')]",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_CELL_NESTED_ELEMENT");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			AssertClick(
 				key_navItem = "Mapping",
@@ -1885,7 +1867,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1893,7 +1875,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Content",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1901,7 +1883,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Configuration",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1909,7 +1891,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
@@ -1922,20 +1904,20 @@ definition {
 
 		task ("Access to the mapping panel of Heading") {
 			Click.clickNoWaitForVisible(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_element = "//div[contains(@class,'page-editor')]//li[contains(.,'Heading')]",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_CELL_NESTED_ELEMENT");
 
 			Click(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_element = "//*[contains(@class,'heading') and contains(@data-lfr-editable-id,'element-text')]",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_CELL_NESTED_ELEMENT");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			AssertClick(
 				key_navItem = "Mapping",
@@ -1948,7 +1930,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1956,7 +1938,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "File Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1970,14 +1952,14 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
 	}
 
 	@description = "This is a test for LPS-96794. In a Permission mode, the edit actions associated that will show a modal with the permission information. In an edit mode, the edit actions associated that will show a modal with the usages of the web content."
-	@priority = 4
+	@priority = "4"
 	test ViewPermissionsAndUsageViaSidebarWithMappedWebContent {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -2038,7 +2020,7 @@ definition {
 
 		AssertElementPresent(
 			locator1 = "AssetLists#ASSET_LIST_USAGES",
-			usageAmount = 2,
+			usageAmount = "2",
 			usageType = "Pages");
 	}
 

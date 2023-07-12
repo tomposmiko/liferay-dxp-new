@@ -297,82 +297,76 @@ public class CommerceBOMFolderModelImpl
 
 	private static final Map<String, Function<CommerceBOMFolder, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceBOMFolder, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceBOMFolder, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceBOMFolder, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceBOMFolderId", CommerceBOMFolder::getCommerceBOMFolderId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceBOMFolder::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceBOMFolder::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceBOMFolder::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceBOMFolder::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceBOMFolder::getModifiedDate);
-		attributeGetterFunctions.put(
-			"parentCommerceBOMFolderId",
-			CommerceBOMFolder::getParentCommerceBOMFolderId);
-		attributeGetterFunctions.put("name", CommerceBOMFolder::getName);
-		attributeGetterFunctions.put("logoId", CommerceBOMFolder::getLogoId);
-		attributeGetterFunctions.put(
-			"treePath", CommerceBOMFolder::getTreePath);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceBOMFolder, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceBOMFolder, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommerceBOMFolder, ?>>();
 
+		attributeGetterFunctions.put(
+			"commerceBOMFolderId", CommerceBOMFolder::getCommerceBOMFolderId);
 		attributeSetterBiConsumers.put(
 			"commerceBOMFolderId",
 			(BiConsumer<CommerceBOMFolder, Long>)
 				CommerceBOMFolder::setCommerceBOMFolderId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceBOMFolder::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceBOMFolder, Long>)
 				CommerceBOMFolder::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceBOMFolder::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceBOMFolder, Long>)CommerceBOMFolder::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceBOMFolder::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceBOMFolder, String>)
 				CommerceBOMFolder::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceBOMFolder::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceBOMFolder, Date>)
 				CommerceBOMFolder::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceBOMFolder::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceBOMFolder, Date>)
 				CommerceBOMFolder::setModifiedDate);
+		attributeGetterFunctions.put(
+			"parentCommerceBOMFolderId",
+			CommerceBOMFolder::getParentCommerceBOMFolderId);
 		attributeSetterBiConsumers.put(
 			"parentCommerceBOMFolderId",
 			(BiConsumer<CommerceBOMFolder, Long>)
 				CommerceBOMFolder::setParentCommerceBOMFolderId);
+		attributeGetterFunctions.put("name", CommerceBOMFolder::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceBOMFolder, String>)CommerceBOMFolder::setName);
+		attributeGetterFunctions.put("logoId", CommerceBOMFolder::getLogoId);
 		attributeSetterBiConsumers.put(
 			"logoId",
 			(BiConsumer<CommerceBOMFolder, Long>)CommerceBOMFolder::setLogoId);
+		attributeGetterFunctions.put(
+			"treePath", CommerceBOMFolder::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath",
 			(BiConsumer<CommerceBOMFolder, String>)
 				CommerceBOMFolder::setTreePath);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -14,8 +14,9 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib;
 
-import com.liferay.frontend.taglib.clay.internal.util.DropdownItemListUtil;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownGroupItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -28,21 +29,10 @@ import javax.servlet.jsp.JspException;
 public class DropdownMenuTag extends ButtonTag {
 
 	@Override
-	public int doEndTag() throws JspException {
-		if (_empty) {
-			return EVAL_PAGE;
-		}
-
-		return super.doEndTag();
-	}
-
-	@Override
 	public int doStartTag() throws JspException {
 		setAttributeNamespace(_ATTRIBUTE_NAMESPACE);
 
-		_empty = DropdownItemListUtil.isEmpty(_dropdownItems);
-
-		if (_empty) {
+		if (_isEmpty(_dropdownItems)) {
 			return SKIP_BODY;
 		}
 
@@ -211,7 +201,6 @@ public class DropdownMenuTag extends ButtonTag {
 
 		_buttonType = null;
 		_dropdownItems = null;
-		_empty = null;
 		_expanded = false;
 		_itemsIconAlignment = null;
 		_searchable = false;
@@ -221,7 +210,7 @@ public class DropdownMenuTag extends ButtonTag {
 
 	@Override
 	protected String getHydratedModuleName() {
-		if (DropdownItemListUtil.isEmpty(_dropdownItems)) {
+		if (_isEmpty(_dropdownItems)) {
 			return null;
 		}
 
@@ -235,11 +224,32 @@ public class DropdownMenuTag extends ButtonTag {
 		return super.prepareProps(props);
 	}
 
+	private boolean _isEmpty(List<DropdownItem> dropdownItems) {
+		if (ListUtil.isEmpty(_dropdownItems)) {
+			return true;
+		}
+
+		for (DropdownItem dropdownItem : dropdownItems) {
+			if (!(dropdownItem instanceof DropdownGroupItem)) {
+				return false;
+			}
+
+			Object items = dropdownItem.get("items");
+
+			if ((items instanceof List) &&
+				ListUtil.isNotEmpty((List<?>)items)) {
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private static final String _ATTRIBUTE_NAMESPACE = "clay:dropdown-menu:";
 
 	private String _buttonType;
 	private List<DropdownItem> _dropdownItems;
-	private Boolean _empty;
 	private boolean _expanded;
 	private String _itemsIconAlignment;
 	private boolean _searchable;

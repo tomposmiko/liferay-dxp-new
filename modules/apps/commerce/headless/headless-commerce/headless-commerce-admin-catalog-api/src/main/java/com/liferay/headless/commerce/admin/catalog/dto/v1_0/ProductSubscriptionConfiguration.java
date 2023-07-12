@@ -62,7 +62,7 @@ public class ProductSubscriptionConfiguration implements Serializable {
 			ProductSubscriptionConfiguration.class, json);
 	}
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getEnable() {
 		return enable;
 	}
@@ -90,7 +90,7 @@ public class ProductSubscriptionConfiguration implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean enable;
 
-	@Schema(example = "2")
+	@Schema
 	public Integer getLength() {
 		return length;
 	}
@@ -118,7 +118,7 @@ public class ProductSubscriptionConfiguration implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer length;
 
-	@Schema(example = "12")
+	@Schema
 	public Long getNumberOfLength() {
 		return numberOfLength;
 	}
@@ -146,7 +146,7 @@ public class ProductSubscriptionConfiguration implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long numberOfLength;
 
-	@Schema(example = "month")
+	@Schema
 	@Valid
 	public SubscriptionType getSubscriptionType() {
 		return subscriptionType;
@@ -185,7 +185,7 @@ public class ProductSubscriptionConfiguration implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected SubscriptionType subscriptionType;
 
-	@Schema(example = "{monthDay=1, monthlyMode=0}")
+	@Schema
 	@Valid
 	public Map<String, String> getSubscriptionTypeSettings() {
 		return subscriptionTypeSettings;

@@ -376,7 +376,7 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 		List<Long> assetCategoryIds =
 			_contentDashboardAdminDisplayContext.getAssetCategoryIds();
 
-		if (ListUtil.isNotEmpty(assetCategoryIds)) {
+		if (!ListUtil.isEmpty(assetCategoryIds)) {
 			Stream<Long> stream = assetCategoryIds.stream();
 
 			portletURL.setParameter(
@@ -391,7 +391,7 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 		Set<String> assetTagIds =
 			_contentDashboardAdminDisplayContext.getAssetTagIds();
 
-		if (SetUtil.isNotEmpty(assetTagIds)) {
+		if (!SetUtil.isEmpty(assetTagIds)) {
 			Stream<String> stream = assetTagIds.stream();
 
 			portletURL.setParameter(
@@ -401,7 +401,7 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 		List<Long> authorIds =
 			_contentDashboardAdminDisplayContext.getAuthorIds();
 
-		if (ListUtil.isNotEmpty(authorIds)) {
+		if (!ListUtil.isEmpty(authorIds)) {
 			Stream<Long> stream = authorIds.stream();
 
 			portletURL.setParameter(
@@ -416,7 +416,7 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 		List<? extends ContentDashboardItemType> contentDashboardItemTypes =
 			_contentDashboardAdminDisplayContext.getContentDashboardItemTypes();
 
-		if (ListUtil.isNotEmpty(contentDashboardItemTypes)) {
+		if (!ListUtil.isEmpty(contentDashboardItemTypes)) {
 			Stream<? extends ContentDashboardItemType> stream =
 				contentDashboardItemTypes.stream();
 
@@ -636,7 +636,7 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 				DropdownItem dropdownItem = new DropdownItem();
 
 				dropdownItem.setActive(
-					ListUtil.isNotEmpty(
+					!ListUtil.isEmpty(
 						_contentDashboardAdminDisplayContext.
 							getAssetCategoryIds()));
 
@@ -702,7 +702,7 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 				DropdownItem dropdownItem = new DropdownItem();
 
 				dropdownItem.setActive(
-					ListUtil.isNotEmpty(contentDashboardItemTypes));
+					!ListUtil.isEmpty(contentDashboardItemTypes));
 
 				dropdownItem.putData(
 					"action", "selectContentDashboardItemType");
@@ -746,7 +746,7 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 				dropdownItem.putData(
 					"selectTagURL", String.valueOf(_getAssetTagSelectorURL()));
 				dropdownItem.setActive(
-					ListUtil.isNotEmpty(
+					!ListUtil.isEmpty(
 						_contentDashboardAdminDisplayContext.
 							getAssetCategoryIds()));
 				dropdownItem.setLabel(

@@ -16,7 +16,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 	}
 
 	@description = "Test that the UI for adding a WC folder works."
-	@priority = 5
+	@priority = "5"
 	test AddFolder {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training,Web Content Administration";
@@ -38,7 +38,7 @@ definition {
 	}
 
 	@description = "Test that the UI for adding a WC works."
-	@priority = 4
+	@priority = "4"
 	test AddWebContent {
 		property testray.component.names = "Web Content Administration";
 
@@ -62,7 +62,7 @@ definition {
 	}
 
 	@description = "Test that the UI for saving a WC as a draft works."
-	@priority = 4
+	@priority = "4"
 	test AddWebContentDraft {
 		property testray.component.names = "Web Content Administration";
 
@@ -87,7 +87,7 @@ definition {
 	}
 
 	@description = "Test that the UI for adding multiple WC works."
-	@priority = 3
+	@priority = "3"
 	test AddWebContentMultiple {
 		property testray.component.names = "Web Content Administration";
 
@@ -147,7 +147,7 @@ definition {
 	}
 
 	@description = "Test that the UI for editing WC localization works."
-	@priority = 4
+	@priority = "4"
 	test EditWCAddLocalization {
 		property testray.component.names = "Localization,Web Content Administration";
 
@@ -183,30 +183,8 @@ definition {
 			webContentTitle = "WC Contenido de la web Titulo");
 	}
 
-	@description = "This is a test for LPS-153323. View kebab icon of web content visible."
-	@priority = 4
-	test ViewKebabIconOfWebContentVisible {
-		property testray.component.names = "Web Content Administration";
-
-		task ("Add a published web content based on Basic Web Content") {
-			JSONWebcontent.addWebContent(
-				content = "Web Content Content",
-				groupName = "Test Site Name",
-				title = "Web Content Title");
-		}
-
-		task ("Check kebab icon of the web content visible") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			AssertCssValue(
-				locator1 = "//dd//button[contains(@class, 'dropdown-toggle')]",
-				locator2 = "color",
-				value1 = "rgba(107, 108, 126, 1)");
-		}
-	}
-
 	@description = "This is a test for LPS-146458. View the available status filters of Web Content admin."
-	@priority = 5
+	@priority = "5"
 	test ViewStatusFiltersOfWebContentAdmin {
 		property portal.acceptance = "true";
 
@@ -223,11 +201,11 @@ definition {
 			Click(locator1 = "Dropdown#FILTER_AND_ORDER");
 
 			for (var filterName : list "Draft,Scheduled,With Approved Versions,With Expired Versions") {
-				MenuItem.viewVisible(menuItem = ${filterName});
+				MenuItem.viewVisible(menuItem = "${filterName}");
 			}
 
 			for (var filterName : list "Denied,Pending") {
-				MenuItem.viewNotPresent(menuItem = ${filterName});
+				MenuItem.viewNotPresent(menuItem = "${filterName}");
 			}
 		}
 
@@ -245,7 +223,7 @@ definition {
 			Click(locator1 = "Dropdown#FILTER_AND_ORDER");
 
 			for (var filterName : list "Draft,Denied,Pending,Scheduled,With Approved Versions,With Expired Versions") {
-				MenuItem.viewVisible(menuItem = ${filterName});
+				MenuItem.viewVisible(menuItem = "${filterName}");
 			}
 		}
 	}

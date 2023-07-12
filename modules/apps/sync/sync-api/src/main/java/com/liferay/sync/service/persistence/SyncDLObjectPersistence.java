@@ -1373,7 +1373,7 @@ public interface SyncDLObjectPersistence extends BasePersistence<SyncDLObject> {
 	 *
 	 * @param modifiedTime the modified time
 	 * @param repositoryId the repository ID
-	 * @param events the events
+	 * @param event the event
 	 * @param start the lower bound of the range of sync dl objects
 	 * @param end the upper bound of the range of sync dl objects (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1631,7 +1631,7 @@ public interface SyncDLObjectPersistence extends BasePersistence<SyncDLObject> {
 	 *
 	 * @param repositoryId the repository ID
 	 * @param parentFolderId the parent folder ID
-	 * @param types the types
+	 * @param type the type
 	 * @param start the lower bound of the range of sync dl objects
 	 * @param end the upper bound of the range of sync dl objects (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)

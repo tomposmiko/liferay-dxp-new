@@ -88,10 +88,6 @@ public class AddressServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AddressService service) {
-		_service = service;
-	}
-
 	private static volatile AddressService _service;
 
 }

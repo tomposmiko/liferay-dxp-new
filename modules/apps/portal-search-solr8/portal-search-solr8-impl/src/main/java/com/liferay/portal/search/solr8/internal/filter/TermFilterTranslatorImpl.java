@@ -14,10 +14,7 @@
 
 package com.liferay.portal.search.solr8.internal.filter;
 
-import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.filter.TermFilter;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -34,22 +31,11 @@ public class TermFilterTranslatorImpl implements TermFilterTranslator {
 
 	@Override
 	public Query translate(TermFilter termFilter) {
-		String value = termFilter.getValue();
-
-		if (value.isEmpty()) {
-			value = StringPool.DOUBLE_APOSTROPHE;
-		}
-
 		Term term = new Term(
-			_escape(termFilter.getField()),
-			ClientUtils.escapeQueryChars(value));
+			termFilter.getField(),
+			ClientUtils.escapeQueryChars(termFilter.getValue()));
 
 		return new TermQuery(term);
-	}
-
-	private String _escape(String value) {
-		return StringUtil.replace(
-			value, CharPool.SPACE, StringPool.BACK_SLASH + StringPool.SPACE);
 	}
 
 }

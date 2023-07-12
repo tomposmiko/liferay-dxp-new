@@ -107,10 +107,6 @@ public class ExpandoValueServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ExpandoValueService service) {
-		_service = service;
-	}
-
 	private static volatile ExpandoValueService _service;
 
 }

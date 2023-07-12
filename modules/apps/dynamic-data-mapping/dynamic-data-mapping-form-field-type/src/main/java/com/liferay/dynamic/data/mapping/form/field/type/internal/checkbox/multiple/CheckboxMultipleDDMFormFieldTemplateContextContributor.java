@@ -60,9 +60,8 @@ public class CheckboxMultipleDDMFormFieldTemplateContextContributor
 		).put(
 			"predefinedValue",
 			getValue(
-				DDMFormFieldTypeUtil.getPropertyValue(
-					ddmFormField, ddmFormFieldRenderingContext.getLocale(),
-					"predefinedValue"))
+				DDMFormFieldTypeUtil.getPredefinedValue(
+					ddmFormField, ddmFormFieldRenderingContext))
 		).put(
 			"showAsSwitcher",
 			GetterUtil.getBoolean(ddmFormField.getProperty("showAsSwitcher"))

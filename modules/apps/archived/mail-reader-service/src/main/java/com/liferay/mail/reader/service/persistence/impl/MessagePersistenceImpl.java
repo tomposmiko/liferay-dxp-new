@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1937,12 +1938,12 @@ public class MessagePersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"folderId", "remoteMessageId"}, false);
 
-		MessageUtil.setPersistence(this);
+		_setMessageUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		MessageUtil.setPersistence(null);
+		_setMessageUtilPersistence(null);
 
 		entityCache.removeCache(MessageImpl.class.getName());
 
@@ -1952,6 +1953,21 @@ public class MessagePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setMessageUtilPersistence(
+		MessagePersistence messagePersistence) {
+
+		try {
+			Field field = MessageUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, messagePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

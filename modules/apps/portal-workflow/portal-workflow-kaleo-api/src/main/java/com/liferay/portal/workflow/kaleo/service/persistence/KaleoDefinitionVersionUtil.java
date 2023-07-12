@@ -730,12 +730,6 @@ public class KaleoDefinitionVersionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		KaleoDefinitionVersionPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile KaleoDefinitionVersionPersistence _persistence;
 
 }

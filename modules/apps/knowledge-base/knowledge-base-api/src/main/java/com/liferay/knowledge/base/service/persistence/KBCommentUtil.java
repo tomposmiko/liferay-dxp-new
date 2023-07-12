@@ -1698,7 +1698,7 @@ public class KBCommentUtil {
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of kb comments
 	 * @param end the upper bound of the range of kb comments (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1903,10 +1903,6 @@ public class KBCommentUtil {
 
 	public static KBCommentPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(KBCommentPersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static volatile KBCommentPersistence _persistence;

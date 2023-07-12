@@ -86,7 +86,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -1842,17 +1841,14 @@ public class DDMTemplateLocalServiceImpl
 
 	private long[] _getAncestorSiteAndDepotGroupIds(long groupId) {
 		try {
-			DepotEntryLocalService depotEntryLocalService =
-				_depotEntryLocalService;
-
-			if (depotEntryLocalService == null) {
+			if (_depotEntryLocalService == null) {
 				return _portal.getAncestorSiteGroupIds(groupId);
 			}
 
 			return ArrayUtil.append(
 				_portal.getAncestorSiteGroupIds(groupId),
 				ListUtil.toLongArray(
-					depotEntryLocalService.getGroupConnectedDepotEntries(
+					_depotEntryLocalService.getGroupConnectedDepotEntries(
 						groupId, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
 					DepotEntry::getGroupId));
 		}
@@ -1883,10 +1879,9 @@ public class DDMTemplateLocalServiceImpl
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private volatile DepotEntryLocalService _depotEntryLocalService;
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference
 	private Portal _portal;

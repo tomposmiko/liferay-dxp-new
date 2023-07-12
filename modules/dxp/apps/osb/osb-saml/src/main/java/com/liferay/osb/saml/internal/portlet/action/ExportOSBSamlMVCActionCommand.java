@@ -64,6 +64,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -71,7 +72,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.saml.runtime.configuration.SamlConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN,
 		"mvc.command.name=/saml/saas/admin/export"
@@ -124,7 +125,7 @@ public class ExportOSBSamlMVCActionCommand extends BaseMVCActionCommand {
 			if (json != null) {
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(json);
 
-				if (Objects.equals(jsonObject.get("result"), "resultError")) {
+				if (Objects.equals("resultError", jsonObject.get("result"))) {
 					SessionErrors.add(actionRequest, "exportError");
 				}
 			}

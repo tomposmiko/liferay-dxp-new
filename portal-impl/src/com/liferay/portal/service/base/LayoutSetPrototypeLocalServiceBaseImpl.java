@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -57,6 +55,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -754,15 +754,14 @@ public abstract class LayoutSetPrototypeLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.LayoutSetPrototype",
 			layoutSetPrototypeLocalService);
 
-		LayoutSetPrototypeLocalServiceUtil.setService(
-			layoutSetPrototypeLocalService);
+		_setLocalServiceUtilService(layoutSetPrototypeLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.LayoutSetPrototype");
 
-		LayoutSetPrototypeLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -805,6 +804,23 @@ public abstract class LayoutSetPrototypeLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		LayoutSetPrototypeLocalService layoutSetPrototypeLocalService) {
+
+		try {
+			Field field =
+				LayoutSetPrototypeLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutSetPrototypeLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -858,9 +874,6 @@ public abstract class LayoutSetPrototypeLocalServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutSetPrototypeLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

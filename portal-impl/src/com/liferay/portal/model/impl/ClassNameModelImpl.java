@@ -268,35 +268,29 @@ public class ClassNameModelImpl
 
 	private static final Map<String, Function<ClassName, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<ClassName, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<ClassName, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", ClassName::getMvccVersion);
-		attributeGetterFunctions.put("classNameId", ClassName::getClassNameId);
-		attributeGetterFunctions.put("value", ClassName::getValue);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<ClassName, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<ClassName, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ClassName, Object>>();
 		Map<String, BiConsumer<ClassName, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<ClassName, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", ClassName::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<ClassName, Long>)ClassName::setMvccVersion);
+		attributeGetterFunctions.put("classNameId", ClassName::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<ClassName, Long>)ClassName::setClassNameId);
+		attributeGetterFunctions.put("value", ClassName::getValue);
 		attributeSetterBiConsumers.put(
 			"value", (BiConsumer<ClassName, String>)ClassName::setValue);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

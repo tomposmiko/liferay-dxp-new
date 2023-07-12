@@ -30,8 +30,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
@@ -39,6 +37,8 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.trash.kernel.service.persistence.TrashEntryPersistence;
 import com.liferay.trash.kernel.service.persistence.TrashVersionPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -661,11 +661,11 @@ public abstract class DLFileShortcutServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		DLFileShortcutServiceUtil.setService(dlFileShortcutService);
+		_setServiceUtilService(dlFileShortcutService);
 	}
 
 	public void destroy() {
-		DLFileShortcutServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -707,6 +707,22 @@ public abstract class DLFileShortcutServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		DLFileShortcutService dlFileShortcutService) {
+
+		try {
+			Field field = DLFileShortcutServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileShortcutService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -841,8 +857,5 @@ public abstract class DLFileShortcutServiceBaseImpl
 
 	@BeanReference(type = DLFolderFinder.class)
 	protected DLFolderFinder dlFolderFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLFileShortcutServiceBaseImpl.class);
 
 }

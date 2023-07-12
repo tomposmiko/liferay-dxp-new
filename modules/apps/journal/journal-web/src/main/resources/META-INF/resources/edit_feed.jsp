@@ -211,10 +211,10 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 						<aui:select label="template" name="ddmTemplateKey" showEmptyOption="<%= true %>">
 
 							<%
-							for (DDMTemplate ddmTemplate : ddmTemplates) {
+							for (DDMTemplate ddTemplate : ddmTemplates) {
 							%>
 
-								<aui:option label="<%= HtmlUtil.escape(ddmTemplate.getName(locale)) %>" selected="<%= Objects.equals(ddmTemplateKey, ddmTemplate.getTemplateKey()) %>" value="<%= ddmTemplate.getTemplateKey() %>" />
+								<aui:option label="<%= HtmlUtil.escape(ddTemplate.getName(locale)) %>" selected="<%= Objects.equals(ddmTemplateKey, ddTemplate.getTemplateKey()) %>" value="<%= ddTemplate.getTemplateKey() %>" />
 
 							<%
 							}

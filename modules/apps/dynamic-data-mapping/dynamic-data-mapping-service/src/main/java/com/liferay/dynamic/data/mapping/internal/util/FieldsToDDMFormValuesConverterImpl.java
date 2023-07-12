@@ -29,13 +29,12 @@ import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
 import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
 import java.math.BigDecimal;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 
 import java.util.ArrayList;
@@ -225,14 +224,7 @@ public class FieldsToDDMFormValuesConverterImpl
 		else if ((fieldValue instanceof Number) &&
 				 !(fieldValue instanceof Integer)) {
 
-			NumberFormat numberFormat = null;
-
-			if (StringUtil.equals(locale.getLanguage(), "ar")) {
-				numberFormat = _getArabicDecimalFormat(locale);
-			}
-			else {
-				numberFormat = NumberFormat.getInstance(locale);
-			}
+			NumberFormat numberFormat = NumberFormat.getInstance(locale);
 
 			Number number = (Number)fieldValue;
 
@@ -328,16 +320,16 @@ public class FieldsToDDMFormValuesConverterImpl
 
 		DDMFormField ddmFormField = ddmFormFieldMap.get(fieldName);
 
-		Field field = ddmFields.get(fieldName);
-
-		if (!ddmFormField.isTransient() && (field != null)) {
+		if (Validator.isNotNull(ddmFormField.getDataType())) {
 			if (ddmFormField.isLocalizable()) {
 				setDDMFormFieldValueLocalizedValue(
-					ddmFormFieldValue, field, ddmFieldsCounter.get(fieldName));
+					ddmFormFieldValue, ddmFields.get(fieldName),
+					ddmFieldsCounter.get(fieldName));
 			}
 			else {
 				setDDMFormFieldValueUnlocalizedValue(
-					ddmFormFieldValue, field, ddmFieldsCounter.get(fieldName));
+					ddmFormFieldValue, ddmFields.get(fieldName),
+					ddmFieldsCounter.get(fieldName));
 			}
 		}
 
@@ -390,24 +382,6 @@ public class FieldsToDDMFormValuesConverterImpl
 		String value = (String)fieldsDisplayField.getValue();
 
 		return StringUtil.split(value);
-	}
-
-	private DecimalFormat _getArabicDecimalFormat(Locale locale) {
-		DecimalFormat decimalFormat = (DecimalFormat)DecimalFormat.getInstance(
-			locale);
-
-		DecimalFormatSymbols decimalFormatSymbols =
-			decimalFormat.getDecimalFormatSymbols();
-
-		decimalFormatSymbols.setZeroDigit('0');
-
-		decimalFormat.setDecimalFormatSymbols(decimalFormatSymbols);
-
-		decimalFormat.setGroupingUsed(false);
-		decimalFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
-		decimalFormat.setParseBigDecimal(true);
-
-		return decimalFormat;
 	}
 
 	private boolean _isBigDecimalAndInteger(Object number) {

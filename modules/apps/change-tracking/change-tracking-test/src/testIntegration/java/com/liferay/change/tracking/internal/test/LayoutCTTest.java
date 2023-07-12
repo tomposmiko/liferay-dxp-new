@@ -112,8 +112,8 @@ public class LayoutCTTest {
 				layout, _layoutLocalService.fetchLayout(layout.getPlid()));
 
 			try (SafeCloseable safeCloseable2 =
-					CTCollectionThreadLocal.
-						setProductionModeWithSafeCloseable()) {
+					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+						CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 				Assert.assertNull(
 					_layoutLocalService.fetchLayout(layout.getPlid()));
@@ -255,13 +255,13 @@ public class LayoutCTTest {
 			Assert.assertEquals(
 				layout, _layoutLocalService.fetchLayout(layout.getPlid()));
 
-			layout.setFriendlyURL("/" + RandomTestUtil.randomString());
+			layout.setFriendlyURL("/testModifyLayout");
 
 			layout = _layoutLocalService.updateLayout(layout);
 
 			try (SafeCloseable safeCloseable2 =
-					CTCollectionThreadLocal.
-						setProductionModeWithSafeCloseable()) {
+					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+						CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 				Layout productionLayout = _layoutLocalService.fetchLayout(
 					layout.getPlid());
@@ -423,7 +423,7 @@ public class LayoutCTTest {
 
 			_layoutLocalService.deleteLayout(deletedLayout);
 
-			modifiedLayout.setFriendlyURL("/" + RandomTestUtil.randomString());
+			modifiedLayout.setFriendlyURL("/testModifyLayout");
 
 			_layoutLocalService.updateLayout(modifiedLayout);
 		}
@@ -546,7 +546,7 @@ public class LayoutCTTest {
 
 	@Test
 	public void testPublishLayoutWithConflictingConstraints() throws Exception {
-		String friendlyURL = "/" + RandomTestUtil.randomString();
+		String friendlyURL = "/testModifyLayout";
 
 		Layout layout1 = LayoutTestUtil.addLayout(_group);
 
@@ -605,9 +605,9 @@ public class LayoutCTTest {
 	}
 
 	@Test
-	public void testPublishLayoutWithFriendlyURLUpdate() throws Exception {
-		String ctFriendlyURL = "/" + RandomTestUtil.randomString();
-		String newCTFriendlyURL = "/" + RandomTestUtil.randomString();
+	public void testPublishLayoutWithConflictingUpdate() throws Exception {
+		String ctFriendlyURL = "/testCTLayout";
+		String conflictingFriendlyURL = "/testConflictingLayout";
 
 		Layout layout = LayoutTestUtil.addLayout(_group);
 
@@ -620,7 +620,7 @@ public class LayoutCTTest {
 			_layoutLocalService.updateLayout(layout);
 		}
 
-		layout.setFriendlyURL(newCTFriendlyURL);
+		layout.setFriendlyURL(conflictingFriendlyURL);
 
 		layout = _layoutLocalService.updateLayout(layout);
 
@@ -637,14 +637,29 @@ public class LayoutCTTest {
 				captureAppender.getLoggingEvents();
 
 			Assert.assertEquals(
-				loggingEvents.toString(), 0, loggingEvents.size());
+				loggingEvents.toString(), 1, loggingEvents.size());
+
+			LoggingEvent loggingEvent = loggingEvents.get(0);
+
+			ThrowableInformation throwableInformation =
+				loggingEvent.getThrowableInformation();
+
+			Assert.assertNotNull(throwableInformation);
+
+			Throwable throwable = throwableInformation.getThrowable();
+
+			Assert.assertNotNull(throwable);
+
+			String message = throwable.getMessage();
+
+			Assert.assertTrue(message, message.startsWith("Unable to publish"));
 		}
 
 		layout = _layoutLocalService.fetchLayout(layout.getPlid());
 
 		Assert.assertNotNull(layout);
 
-		Assert.assertEquals(layout.getFriendlyURL(), ctFriendlyURL);
+		Assert.assertEquals(layout.getFriendlyURL(), conflictingFriendlyURL);
 
 		try (SafeCloseable safeCloseable =
 				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
@@ -654,7 +669,7 @@ public class LayoutCTTest {
 
 			Assert.assertNotNull(layout);
 
-			Assert.assertEquals(layout.getFriendlyURL(), newCTFriendlyURL);
+			Assert.assertEquals(layout.getFriendlyURL(), ctFriendlyURL);
 		}
 	}
 
@@ -666,7 +681,7 @@ public class LayoutCTTest {
 				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
 					_ctCollection.getCtCollectionId())) {
 
-			layout.setFriendlyURL("/" + RandomTestUtil.randomString());
+			layout.setFriendlyURL("/testModifyLayout");
 
 			layout = _layoutLocalService.updateLayout(layout);
 		}
@@ -714,7 +729,9 @@ public class LayoutCTTest {
 	}
 
 	@Test
-	public void testPublishModifiedLayoutWithIgnorable() throws Exception {
+	public void testPublishModifiedLayoutWithIgnorableChange()
+		throws Exception {
+
 		Layout layout = LayoutTestUtil.addLayout(_group);
 
 		Date modifiedDate = layout.getModifiedDate();
@@ -734,8 +751,6 @@ public class LayoutCTTest {
 
 			layout = _layoutLocalService.updateLayout(layout);
 		}
-
-		modifiedDate = layout.getModifiedDate();
 
 		_ctProcessLocalService.addCTProcess(
 			_ctCollection.getUserId(), _ctCollection.getCtCollectionId());
@@ -766,20 +781,18 @@ public class LayoutCTTest {
 				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
 					_ctCollection.getCtCollectionId())) {
 
-			layout.setModifiedDate(
-				new Date(modifiedDate.getTime() + Time.HOUR));
+			layout.setModifiedDate(modifiedDate);
 
 			layout = _layoutLocalService.updateLayout(layout);
 		}
 
 		layout = _layoutLocalService.getLayout(layout.getPlid());
 
-		layout.setModifiedDate(
-			new Date(modifiedDate.getTime() + (2 * Time.HOUR)));
+		modifiedDate = new Date(modifiedDate.getTime() + Time.HOUR);
+
+		layout.setModifiedDate(modifiedDate);
 
 		layout = _layoutLocalService.updateLayout(layout);
-
-		modifiedDate = layout.getModifiedDate();
 
 		_ctProcessLocalService.addCTProcess(
 			_ctCollection.getUserId(), _ctCollection.getCtCollectionId());
@@ -828,7 +841,7 @@ public class LayoutCTTest {
 				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
 					_ctCollection.getCtCollectionId())) {
 
-			layout.setFriendlyURL("/" + RandomTestUtil.randomString());
+			layout.setFriendlyURL("/testModifyLayout");
 
 			layout = _layoutLocalService.updateLayout(layout);
 		}
@@ -916,8 +929,8 @@ public class LayoutCTTest {
 				_layoutLocalService.fetchLayout(layout.getPlid()));
 
 			try (SafeCloseable safeCloseable2 =
-					CTCollectionThreadLocal.
-						setProductionModeWithSafeCloseable()) {
+					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+						CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 				Assert.assertEquals(
 					layout, _layoutLocalService.fetchLayout(layout.getPlid()));

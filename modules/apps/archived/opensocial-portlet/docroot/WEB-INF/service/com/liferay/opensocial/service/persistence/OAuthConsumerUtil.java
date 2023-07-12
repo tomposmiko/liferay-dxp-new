@@ -509,10 +509,6 @@ public class OAuthConsumerUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(OAuthConsumerPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile OAuthConsumerPersistence _persistence;
 
 }

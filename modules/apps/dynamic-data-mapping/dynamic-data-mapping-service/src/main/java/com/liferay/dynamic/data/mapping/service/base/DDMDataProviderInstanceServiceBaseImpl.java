@@ -26,11 +26,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -60,7 +60,7 @@ public abstract class DDMDataProviderInstanceServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DDMDataProviderInstanceServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -75,8 +75,7 @@ public abstract class DDMDataProviderInstanceServiceBaseImpl
 		ddmDataProviderInstanceService =
 			(DDMDataProviderInstanceService)aopProxy;
 
-		DDMDataProviderInstanceServiceUtil.setService(
-			ddmDataProviderInstanceService);
+		_setServiceUtilService(ddmDataProviderInstanceService);
 	}
 
 	/**
@@ -122,6 +121,23 @@ public abstract class DDMDataProviderInstanceServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		DDMDataProviderInstanceService ddmDataProviderInstanceService) {
+
+		try {
+			Field field =
+				DDMDataProviderInstanceServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmDataProviderInstanceService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected
 		com.liferay.dynamic.data.mapping.service.
@@ -155,8 +171,5 @@ public abstract class DDMDataProviderInstanceServiceBaseImpl
 	@Reference
 	protected DDMDataProviderInstanceLinkPersistence
 		ddmDataProviderInstanceLinkPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMDataProviderInstanceServiceBaseImpl.class);
 
 }

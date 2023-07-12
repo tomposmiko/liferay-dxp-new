@@ -132,10 +132,6 @@ public class CTCollectionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CTCollectionService service) {
-		_service = service;
-	}
-
 	private static volatile CTCollectionService _service;
 
 }

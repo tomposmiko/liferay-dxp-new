@@ -83,8 +83,8 @@ const ListItems = ({defaultLanguageId, itemType, items}) => {
 						<Cell align={'right'}>
 							<ClayRadioGroup
 								inline
-								onChange={() => onItemIdChange(id)}
-								value={itemId}
+								onSelectedValueChange={() => onItemIdChange(id)}
+								selectedValue={itemId}
 							>
 								<ClayRadio value={id} />
 							</ClayRadioGroup>

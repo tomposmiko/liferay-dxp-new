@@ -39,6 +39,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -46,7 +47,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.data.integration.talend.internal.configuration.CommerceDataIntegrationProcessConfiguration",
-	enabled = false, service = TalendProcessTypeHelper.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
+	service = TalendProcessTypeHelper.class
 )
 public class TalendProcessTypeHelperImpl implements TalendProcessTypeHelper {
 

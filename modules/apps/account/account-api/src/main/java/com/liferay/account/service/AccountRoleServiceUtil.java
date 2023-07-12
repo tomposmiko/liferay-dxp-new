@@ -47,10 +47,6 @@ public class AccountRoleServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AccountRoleService service) {
-		_service = service;
-	}
-
 	private static volatile AccountRoleService _service;
 
 }

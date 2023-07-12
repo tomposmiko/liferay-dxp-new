@@ -24,7 +24,6 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuil
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -161,23 +160,7 @@ public class DepotAdminSitesDisplayContext {
 		Group group = GroupServiceUtil.getGroup(
 			depotEntryGroupRel.getToGroupId());
 
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(group.getDescriptiveName(locale));
-
-		if (group.isStaged() && !group.isStagedRemotely() &&
-			group.isStagingGroup()) {
-
-			sb.append(StringPool.SPACE);
-			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append(
-				LanguageUtil.get(
-					PortalUtil.getHttpServletRequest(_liferayPortletRequest),
-					"staging"));
-			sb.append(StringPool.CLOSE_PARENTHESIS);
-		}
-
-		return sb.toString();
+		return group.getDescriptiveName(locale);
 	}
 
 	public boolean isLiveDepotEntry() throws PortalException {

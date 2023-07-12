@@ -54,6 +54,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3798,11 +3799,11 @@ public class GadgetPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "url"}, false);
 
-		GadgetUtil.setPersistence(this);
+		_setGadgetUtilPersistence(this);
 	}
 
 	public void destroy() {
-		GadgetUtil.setPersistence(null);
+		_setGadgetUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(GadgetImpl.class.getName());
 
@@ -3812,6 +3813,21 @@ public class GadgetPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setGadgetUtilPersistence(
+		GadgetPersistence gadgetPersistence) {
+
+		try {
+			Field field = GadgetUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, gadgetPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

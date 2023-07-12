@@ -326,78 +326,72 @@ public class CPDisplayLayoutModelImpl
 
 	private static final Map<String, Function<CPDisplayLayout, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CPDisplayLayout, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPDisplayLayout, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CPDisplayLayout, Object>>();
-
-		attributeGetterFunctions.put("uuid", CPDisplayLayout::getUuid);
-		attributeGetterFunctions.put(
-			"CPDisplayLayoutId", CPDisplayLayout::getCPDisplayLayoutId);
-		attributeGetterFunctions.put("groupId", CPDisplayLayout::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CPDisplayLayout::getCompanyId);
-		attributeGetterFunctions.put("userId", CPDisplayLayout::getUserId);
-		attributeGetterFunctions.put("userName", CPDisplayLayout::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPDisplayLayout::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPDisplayLayout::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", CPDisplayLayout::getClassNameId);
-		attributeGetterFunctions.put("classPK", CPDisplayLayout::getClassPK);
-		attributeGetterFunctions.put(
-			"layoutUuid", CPDisplayLayout::getLayoutUuid);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CPDisplayLayout, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CPDisplayLayout, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CPDisplayLayout, ?>>();
 
+		attributeGetterFunctions.put("uuid", CPDisplayLayout::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CPDisplayLayout, String>)CPDisplayLayout::setUuid);
+		attributeGetterFunctions.put(
+			"CPDisplayLayoutId", CPDisplayLayout::getCPDisplayLayoutId);
 		attributeSetterBiConsumers.put(
 			"CPDisplayLayoutId",
 			(BiConsumer<CPDisplayLayout, Long>)
 				CPDisplayLayout::setCPDisplayLayoutId);
+		attributeGetterFunctions.put("groupId", CPDisplayLayout::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CPDisplayLayout::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setCompanyId);
+		attributeGetterFunctions.put("userId", CPDisplayLayout::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setUserId);
+		attributeGetterFunctions.put("userName", CPDisplayLayout::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPDisplayLayout, String>)CPDisplayLayout::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPDisplayLayout::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPDisplayLayout, Date>)CPDisplayLayout::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPDisplayLayout::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPDisplayLayout, Date>)
 				CPDisplayLayout::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", CPDisplayLayout::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setClassNameId);
+		attributeGetterFunctions.put("classPK", CPDisplayLayout::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setClassPK);
+		attributeGetterFunctions.put(
+			"layoutUuid", CPDisplayLayout::getLayoutUuid);
 		attributeSetterBiConsumers.put(
 			"layoutUuid",
 			(BiConsumer<CPDisplayLayout, String>)
 				CPDisplayLayout::setLayoutUuid);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

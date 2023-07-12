@@ -16,8 +16,6 @@ package com.liferay.portal.search.internal.background.task;
 
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
@@ -134,20 +132,7 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 				ReindexBackgroundTaskConstants.SINGLE_START, companyId,
 				companyIds);
 
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					StringBundler.concat(
-						"Start reindexing company ", companyId,
-						" for class name ", className));
-			}
-
-			CTSQLModeThreadLocal.CTSQLMode ctSQLMode =
-				CTSQLModeThreadLocal.getCTSQLMode();
-
 			try {
-				CTSQLModeThreadLocal.setCTSQLModeWithSafeCloseable(
-					CTSQLModeThreadLocal.CTSQLMode.CT_ALL);
-
 				for (SearchEngine searchEngine : searchEngines) {
 					searchEngine.initialize(companyId);
 				}
@@ -161,18 +146,9 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 				_log.error(exception, exception);
 			}
 			finally {
-				CTSQLModeThreadLocal.setCTSQLModeWithSafeCloseable(ctSQLMode);
-
 				reindexStatusMessageSender.sendStatusMessage(
 					ReindexBackgroundTaskConstants.SINGLE_END, companyId,
 					companyIds);
-
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						StringBundler.concat(
-							"Finished reindexing company ", companyId,
-							" for class name ", className));
-				}
 			}
 		}
 	}

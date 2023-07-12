@@ -50,7 +50,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -63,7 +63,7 @@ definition {
 	}
 
 	@description = "This ensures that image in basic article in depot can be deleted and republished in staging site when enabling local staging."
-	@priority = 5
+	@priority = "5"
 	test DeleteImageInDepot {
 		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
 
@@ -108,7 +108,7 @@ definition {
 			liveSite = "true",
 			webContentTitle = "WC WebContent Title");
 
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		AssertElementPresent(
 			key_imageTitle = "Document_2.jpg",
@@ -150,7 +150,7 @@ definition {
 			liveSite = "true",
 			webContentTitle = "WC WebContent Title");
 
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		AssertElementNotPresent(
 			key_imageTitle = "Document_2.jpg",
@@ -158,7 +158,7 @@ definition {
 	}
 
 	@description = "This ensures that friendly URL in basic article in depot can be edited and republished in staging site when enabling local staging."
-	@priority = 5
+	@priority = "5"
 	test EditFriendlyURLInDepot {
 		DepotNavigator.openDepotWebContentAdminStaging(depotName = "Test Depot Name");
 
@@ -257,7 +257,7 @@ definition {
 	}
 
 	@description = "This ensures that image in basic article in depot can be edited and republished in staging site when enabling local staging."
-	@priority = 5
+	@priority = "5"
 	test EditImageInDepot {
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
@@ -306,7 +306,7 @@ definition {
 			liveSite = "true",
 			webContentTitle = "WC WebContent Title");
 
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		AssertElementPresent(
 			key_imageTitle = "Document_2.jpg",
@@ -336,7 +336,7 @@ definition {
 			liveSite = "true",
 			webContentTitle = "WC WebContent Title");
 
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		AssertElementPresent(
 			key_imageTitle = "Document_3.jpg",
@@ -344,7 +344,7 @@ definition {
 	}
 
 	@description = "This ensures that an article using a structure stored in depot can be deleted and republished in staging site when enabling local staging."
-	@priority = 5
+	@priority = "5"
 	test PublishDeletedWCCustomization {
 		DepotNavigator.openDepotAdmin();
 
@@ -429,7 +429,7 @@ definition {
 	}
 
 	@description = "This ensures that an article using a structure stored in depot can be edited and republished in staging site when enabling local staging."
-	@priority = 5
+	@priority = "5"
 	test PublishEditedWCCustomization {
 		DepotNavigator.openDepotAdmin();
 
@@ -520,7 +520,7 @@ definition {
 	}
 
 	@description = "This ensures that web content with a category in depot can be published in local staging site."
-	@priority = 4
+	@priority = "4"
 	test PublishWCWithCategory {
 		DepotNavigator.openDepotCategoriesAdminStaging(depotName = "Test Depot Name");
 
@@ -575,7 +575,7 @@ definition {
 	}
 
 	@description = "This ensures that a web content folder with an article in depot can be published in AP through widget config manual selection when enabling local staging."
-	@priority = 5
+	@priority = "5"
 	test PublishWebContentFolder {
 		DepotNavigator.openDepotWebContentAdminStaging(depotName = "Test Depot Name");
 

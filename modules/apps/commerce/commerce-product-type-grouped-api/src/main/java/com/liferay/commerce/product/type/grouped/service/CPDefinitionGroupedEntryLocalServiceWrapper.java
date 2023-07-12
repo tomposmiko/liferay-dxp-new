@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.type.grouped.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPDefinitionGroupedEntryLocalService}.
@@ -600,11 +599,6 @@ public class CPDefinitionGroupedEntryLocalServiceWrapper
 		return _cpDefinitionGroupedEntryLocalService.
 			updateCPDefinitionGroupedEntry(
 				cpDefinitionGroupedEntryId, priority, quantity);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpDefinitionGroupedEntryLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -212,6 +212,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteAccountBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -220,7 +221,7 @@ public class Mutation {
 			_accountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			accountResource -> accountResource.deleteAccountBatch(
-				callbackURL, object));
+				id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -290,6 +291,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteAccountAddressBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -299,7 +301,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.deleteAccountAddressBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -330,6 +332,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response updateAccountAddressBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -339,7 +342,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.putAccountAddressBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -373,6 +376,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createAccountIdAccountAddressBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -382,7 +386,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.postAccountIdAccountAddressBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -450,6 +454,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteAccountGroupBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -459,7 +464,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountGroupResource ->
 				accountGroupResource.deleteAccountGroupBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -537,6 +542,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createAccountIdAccountMemberBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -546,7 +552,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountMemberResource ->
 				accountMemberResource.postAccountIdAccountMemberBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -625,6 +631,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createAccountIdAccountOrganizationBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -634,7 +641,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountOrganizationResource ->
 				accountOrganizationResource.
-					postAccountIdAccountOrganizationBatch(callbackURL, object));
+					postAccountIdAccountOrganizationBatch(
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -805,6 +813,9 @@ public class Mutation {
 		userResource.setContextUser(_user);
 		userResource.setGroupLocalService(_groupLocalService);
 		userResource.setRoleLocalService(_roleLocalService);
+
+		userResource.setVulcanBatchEngineImportTaskResource(
+			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private static ComponentServiceObjects<AccountResource>

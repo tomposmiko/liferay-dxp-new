@@ -128,12 +128,14 @@ public class DDMValueUtil {
 							layoutLocalService),
 					preferredLocale);
 			}
-
-			return _toLocalizedValue(
-				contentFieldValue, localizedContentFieldValues,
-				(localizedContentFieldValue, locale) -> GetterUtil.getString(
-					localizedContentFieldValue.getData()),
-				preferredLocale);
+			else {
+				return _toLocalizedValue(
+					contentFieldValue, localizedContentFieldValues,
+					(localizedContentFieldValue, locale) ->
+						GetterUtil.getString(
+							localizedContentFieldValue.getData()),
+					preferredLocale);
+			}
 		}
 
 		if (Objects.equals(

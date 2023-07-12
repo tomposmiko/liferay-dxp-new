@@ -11,40 +11,29 @@
 
 import React, {useEffect, useState} from 'react';
 
-import useClipboardJS from '../hooks/useClipboardJS';
 import ErrorBoundary from '../shared/ErrorBoundary';
 import ThemeContext from '../shared/ThemeContext';
-import {COPY_BUTTON_CSS_CLASS} from '../utils/constants';
-import fetchData from '../utils/fetch/fetch_data';
-import formatLocaleWithUnderscores from '../utils/language/format_locale_with_underscores';
-import renameKeys from '../utils/language/rename_keys';
-import transformLocale from '../utils/language/transform_locale';
-import {openInitialSuccessToast} from '../utils/toasts';
+import {fetchData} from '../utils/fetch';
+import {renameKeys} from '../utils/language';
 import EditSXPElementForm from './EditSXPElementForm';
 
 /**
  * Gets the formatted description_i18n object from the sxp element response.
  * Also creates an object using the default locale and `description` field if
- * the description_i18n object is undefined. If the description_i18n object is
- * {}, it will return object with placeholder: {'en_US': ''}.
+ * the description_i18n object is undefined.
  *
- * The expected return format is: {'en_US': 'description'}
+ * The expected return format is: [{'en_US': 'description'}]
  * @param {object} sxpElementResponse The response object from the GET
  * 	sxp-elements
  * @param {string} defaultLocale The default locale
- * @returns {object}
+ * @returns {Array}
  */
 const getDescriptionI18n = (sxpElementResponse, defaultLocale) => {
-	let descriptionObject = renameKeys(
-		sxpElementResponse.description_i18n,
-		transformLocale
-	);
+	const descriptionObject = sxpElementResponse.description_i18n || {
+		[defaultLocale]: sxpElementResponse.description,
+	};
 
-	if (Object.keys(descriptionObject).length === 0) {
-		descriptionObject = {[defaultLocale]: ''};
-	}
-
-	return renameKeys(descriptionObject, formatLocaleWithUnderscores);
+	return renameKeys(descriptionObject, (str) => str.replace('-', '_'));
 };
 
 /**
@@ -52,15 +41,14 @@ const getDescriptionI18n = (sxpElementResponse, defaultLocale) => {
  * @param {object} sxpElementResponse The response object from the GET
  * 	sxp-elements
  * @param {string} defaultLocale The default locale
- * @returns {object}
+ * @returns {Array}
  */
-const getTitleI18n = (sxpElementResponse) => {
-	const titleObject = renameKeys(
-		sxpElementResponse.title_i18n,
-		transformLocale
-	);
+const getTitleI18n = (sxpElementResponse, defaultLocale) => {
+	const titleObject = sxpElementResponse.title_i18n || {
+		[defaultLocale]: sxpElementResponse.title,
+	};
 
-	return renameKeys(titleObject, formatLocaleWithUnderscores);
+	return renameKeys(titleObject, (str) => str.replace('-', '_'));
 };
 
 /**
@@ -76,15 +64,13 @@ const transformToSXPElementExportFormat = (
 	return {
 		description_i18n: getDescriptionI18n(sxpElementResponse, defaultLocale),
 		elementDefinition: sxpElementResponse.elementDefinition,
-		title_i18n: getTitleI18n(sxpElementResponse),
+		title_i18n: getTitleI18n(sxpElementResponse, defaultLocale),
 		type: sxpElementResponse.type,
 	};
 };
 
 export default function ({
 	defaultLocale,
-	learnMessages,
-	locale,
 	namespace,
 	redirectURL,
 	sxpElementId,
@@ -92,24 +78,24 @@ export default function ({
 	const [predefinedVariables, setPredefinedVariables] = useState(null);
 	const [sxpElementResponse, setSXPElementResponse] = useState(null);
 
-	useClipboardJS('.' + COPY_BUTTON_CSS_CLASS);
-
 	useEffect(() => {
-		openInitialSuccessToast();
+		fetchData(
+			`/o/search-experiences-rest/v1.0/sxp-elements/${sxpElementId}`,
+			{
+				method: 'GET',
+			},
+			(responseContent) => setSXPElementResponse(responseContent),
+			() => setSXPElementResponse({})
+		);
 
 		fetchData(
-			`/o/search-experiences-rest/v1.0/sxp-elements/${sxpElementId}`
-		)
-			.then((responseContent) => setSXPElementResponse(responseContent))
-			.catch(() => setSXPElementResponse({}));
-
-		fetchData(
-			'/o/search-experiences-rest/v1.0/sxp-parameter-contributor-definitions'
-		)
-			.then((responseContent) =>
-				setPredefinedVariables(responseContent.items)
-			)
-			.catch(() => setPredefinedVariables([]));
+			'/o/search-experiences-rest/v1.0/sxp-parameter-contributor-definitions',
+			{
+				method: 'GET',
+			},
+			(responseContent) => setPredefinedVariables(responseContent.items),
+			() => setPredefinedVariables([])
+		);
 	}, []); //eslint-disable-line
 
 	if (!sxpElementResponse || !predefinedVariables) {
@@ -121,8 +107,6 @@ export default function ({
 			value={{
 				availableLanguages: Liferay.Language.available,
 				defaultLocale,
-				learnMessages,
-				locale,
 				namespace,
 				redirectURL,
 			}}
@@ -138,7 +122,10 @@ export default function ({
 							sxpElementResponse,
 							defaultLocale
 						)}
-						initialTitle={getTitleI18n(sxpElementResponse)}
+						initialTitle={getTitleI18n(
+							sxpElementResponse,
+							defaultLocale
+						)}
 						predefinedVariables={predefinedVariables}
 						readOnly={sxpElementResponse.readOnly}
 						sxpElementId={sxpElementId}

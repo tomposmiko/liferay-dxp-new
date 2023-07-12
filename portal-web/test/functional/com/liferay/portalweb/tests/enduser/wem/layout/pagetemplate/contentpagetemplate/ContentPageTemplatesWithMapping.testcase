@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Content Page Templates";
+	property testray.main.component.name = "Layout Page Templates";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -27,7 +27,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -36,7 +36,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98031."
-	@priority = 5
+	@priority = "5"
 	test MapManualURLToLinkFragment {
 		property portal.acceptance = "true";
 

@@ -197,7 +197,8 @@ public class CTStore implements Store {
 		}
 
 		try (SafeCloseable safeCloseable =
-				CTCollectionThreadLocal.setProductionModeWithSafeCloseable()) {
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 			for (CTSContent ctsContent :
 					_ctsContentLocalService.getCTSContentsByDirectory(
@@ -269,8 +270,8 @@ public class CTStore implements Store {
 
 		if (deletedCTSContentIds != null) {
 			try (SafeCloseable safeCloseable =
-					CTCollectionThreadLocal.
-						setProductionModeWithSafeCloseable()) {
+					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+						CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 				for (CTSContent ctsContent :
 						_ctsContentLocalService.getCTSContents(
@@ -302,8 +303,8 @@ public class CTStore implements Store {
 			}
 
 			try (SafeCloseable safeCloseable =
-					CTCollectionThreadLocal.
-						setProductionModeWithSafeCloseable()) {
+					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+						CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 				if (_ctsContentLocalService.hasCTSContent(
 						companyId, repositoryId, fileName, versionLabel,
@@ -363,7 +364,8 @@ public class CTStore implements Store {
 		}
 
 		try (SafeCloseable safeCloseable =
-				CTCollectionThreadLocal.setProductionModeWithSafeCloseable()) {
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 			return _ctsContentLocalService.hasCTSContent(
 				companyId, repositoryId, fileName, versionLabel, _storeType);
@@ -377,7 +379,8 @@ public class CTStore implements Store {
 		try (InputStream inputStream = _store.getFileAsStream(
 				companyId, repositoryId, fileName, versionLabel);
 			SafeCloseable safeCloseable =
-				CTCollectionThreadLocal.setProductionModeWithSafeCloseable()) {
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 			_ctsContentLocalService.addCTSContent(
 				companyId, repositoryId, fileName, versionLabel, _storeType,

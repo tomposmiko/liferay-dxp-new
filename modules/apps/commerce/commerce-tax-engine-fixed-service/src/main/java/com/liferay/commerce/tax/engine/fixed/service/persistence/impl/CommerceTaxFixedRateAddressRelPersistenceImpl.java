@@ -48,6 +48,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2336,11 +2337,11 @@ public class CommerceTaxFixedRateAddressRelPersistenceImpl
 			"countByCommerceCountryId", new String[] {Long.class.getName()},
 			new String[] {"commerceCountryId"}, false);
 
-		CommerceTaxFixedRateAddressRelUtil.setPersistence(this);
+		_setCommerceTaxFixedRateAddressRelUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceTaxFixedRateAddressRelUtil.setPersistence(null);
+		_setCommerceTaxFixedRateAddressRelUtilPersistence(null);
 
 		entityCache.removeCache(
 			CommerceTaxFixedRateAddressRelImpl.class.getName());
@@ -2351,6 +2352,24 @@ public class CommerceTaxFixedRateAddressRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceTaxFixedRateAddressRelUtilPersistence(
+		CommerceTaxFixedRateAddressRelPersistence
+			commerceTaxFixedRateAddressRelPersistence) {
+
+		try {
+			Field field =
+				CommerceTaxFixedRateAddressRelUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceTaxFixedRateAddressRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

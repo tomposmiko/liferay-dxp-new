@@ -2,7 +2,7 @@
 definition {
 
 	property osgi.module.configuration.file.names = "com.liferay.questions.web.internal.configuration.QuestionsConfiguration-default.config";
-	property osgi.module.configurations = "com.liferay.portlet.display-category=\"category.collaboration\"\nenableRedirectToLogin=\"true\"";
+	property osgi.module.configurations = "com.liferay.portlet.display-category=&quot;category.collaboration&quot;\nenableRedirectToLogin=&quot;true&quot;";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Questions";
@@ -26,7 +26,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -43,7 +43,7 @@ definition {
 	}
 
 	@description = "Validate if Question portlet have one tab with all tags used in the questions"
-	@priority = 3
+	@priority = "3"
 	test ListOfTagsAppearsInTheTagsTab {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -76,19 +76,19 @@ definition {
 
 		Questions.gotoCategory(categoryName = "Question ListOfTagsAppearsInTheTagsTab");
 
-		Pause(locator = 3000);
+		Pause(locator = "3000");
 
 		Questions.gotoTab(questionTabField = "Tags");
 
 		Questions.configureTagsFilter(filterBy = "Latest Created");
 
 		for (var tagName : list "tag1,tag2") {
-			Questions.viewTags(tagName = ${tagName});
+			Questions.viewTags(tagName = "${tagName}");
 		}
 	}
 
 	@description = "Validate if the user can sort the tags."
-	@priority = 4
+	@priority = "4"
 	test SortQuestionsTags {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -116,40 +116,40 @@ definition {
 		Questions.gotoTab(questionTabField = "Tags");
 
 		Questions.viewTagsFilterResults(
-			position = 1,
+			position = "1",
 			tagName = "tag1",
 			usedTimes = "Used 2 Times");
 
 		Questions.viewTagsFilterResults(
-			position = 2,
+			position = "2",
 			tagName = "tag2",
 			usedTimes = "Used 1 Times");
 
 		Questions.configureTagsFilter(filterBy = "Latest Created");
 
 		Questions.viewTagsFilterResults(
-			position = 1,
+			position = "1",
 			tagName = "tag2");
 
 		Questions.viewTagsFilterResults(
-			position = 2,
+			position = "2",
 			tagName = "tag1");
 
 		Questions.configureTagsFilter(filterBy = "Number of Usages");
 
 		Questions.viewTagsFilterResults(
-			position = 1,
+			position = "1",
 			tagName = "tag1",
 			usedTimes = "Used 2 Times");
 
 		Questions.viewTagsFilterResults(
-			position = 2,
+			position = "2",
 			tagName = "tag2",
 			usedTimes = "Used 1 Times");
 	}
 
 	@description = "Validate if when the user click in the tag of the Tags tab, the user is redirected to the questions that use this tag"
-	@priority = 3
+	@priority = "3"
 	test TagCardRedirectTheUserToTheQuestionsThatAreUsingThisTag {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -166,7 +166,7 @@ definition {
 
 		Questions.gotoCategory(categoryName = "Question TagCardRedirectTheUserToTheQuestionsThatAreUsingThisTag");
 
-		Pause(locator = 3000);
+		Pause(locator = "3000");
 
 		Click(
 			key_questionTabField = "Tags",
@@ -182,7 +182,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-119780. It ensures that the user can search by tags in the tags search field."
-	@priority = 4
+	@priority = "4"
 	test ValidateSearchByQuestionTags {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -205,7 +205,7 @@ definition {
 			searchKey = "tag1",
 			searchTag = "true");
 
-		Pause(locator = 3000);
+		Pause(locator = "3000");
 
 		Questions.viewTags(tagName = "tag1");
 
@@ -214,7 +214,7 @@ definition {
 		Click(locator1 = "Questions#SEARCH_RESULTS_CLEAR_BUTTON");
 
 		for (var tagName : list "tag1,tag2,tag3") {
-			Questions.viewTags(tagName = ${tagName});
+			Questions.viewTags(tagName = "${tagName}");
 		}
 
 		Questions.configureTagsFilter(filterBy = "Latest Created");
@@ -223,7 +223,7 @@ definition {
 			searchKey = "tag2",
 			searchTag = "true");
 
-		Pause(locator = 3000);
+		Pause(locator = "3000");
 
 		Questions.viewTags(tagName = "tag2");
 
@@ -232,19 +232,19 @@ definition {
 		Click(locator1 = "Questions#SEARCH_RESULTS_CLEAR_BUTTON");
 
 		for (var tagName : list "tag1,tag2,tag3") {
-			Questions.viewTags(tagName = ${tagName});
+			Questions.viewTags(tagName = "${tagName}");
 		}
 	}
 
 	@description = "Validate if the Tags tab of the question portlet, the tags are ordered by occurrences"
-	@priority = 4
+	@priority = "4"
 	test ValidateTagsOccurrences {
 		for (var num : list "1,2") {
 			Navigator.gotoPage(pageName = "Questions Page");
 
 			Questions.gotoTab(questionTabField = "Questions");
 
-			Pause(locator1 = 2000);
+			Pause(locator1 = "2000");
 
 			Questions.addRootTopic(
 				rootTopicDescription = "Description",
@@ -264,14 +264,14 @@ definition {
 
 		Questions.gotoCategory(categoryName = "Question ValidateTagsOccurrences1");
 
-		Pause(locator = 3000);
+		Pause(locator = "3000");
 
 		Click(
 			key_questionTabField = "Tags",
 			locator1 = "Questions#QUESTIONS_LIST_TAB_FIELD");
 
 		Questions.viewTags(
-			amountOfUsedTimes = 2,
+			amountOfUsedTimes = "2",
 			tagName = "tag1");
 
 		Navigator.gotoPage(pageName = "Questions Page");
@@ -288,7 +288,7 @@ definition {
 		Questions.gotoTab(questionTabField = "Tags");
 
 		Questions.viewTags(
-			amountOfUsedTimes = 3,
+			amountOfUsedTimes = "3",
 			tagName = "tag1");
 	}
 

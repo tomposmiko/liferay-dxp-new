@@ -435,10 +435,6 @@ public class CPDefinitionInventoryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPDefinitionInventoryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CPDefinitionInventoryLocalService _service;
 
 }

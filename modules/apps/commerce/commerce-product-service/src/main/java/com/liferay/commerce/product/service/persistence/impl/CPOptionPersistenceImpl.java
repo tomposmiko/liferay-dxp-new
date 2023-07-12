@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
-import com.liferay.commerce.product.exception.DuplicateCPOptionExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPOptionException;
 import com.liferay.commerce.product.model.CPOption;
 import com.liferay.commerce.product.model.CPOptionTable;
@@ -54,6 +53,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -3698,33 +3698,6 @@ public class CPOptionPersistenceImpl
 			cpOption.setUuid(uuid);
 		}
 
-		if (Validator.isNull(cpOption.getExternalReferenceCode())) {
-			cpOption.setExternalReferenceCode(cpOption.getUuid());
-		}
-		else {
-			CPOption ercCPOption = fetchByC_ERC(
-				cpOption.getCompanyId(), cpOption.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCPOption != null) {
-					throw new DuplicateCPOptionExternalReferenceCodeException(
-						"Duplicate cp option with external reference code " +
-							cpOption.getExternalReferenceCode() +
-								" and company " + cpOption.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCPOption != null) &&
-					(cpOption.getCPOptionId() != ercCPOption.getCPOptionId())) {
-
-					throw new DuplicateCPOptionExternalReferenceCodeException(
-						"Duplicate cp option with external reference code " +
-							cpOption.getExternalReferenceCode() +
-								" and company " + cpOption.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -4138,11 +4111,11 @@ public class CPOptionPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CPOptionUtil.setPersistence(this);
+		_setCPOptionUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CPOptionUtil.setPersistence(null);
+		_setCPOptionUtilPersistence(null);
 
 		entityCache.removeCache(CPOptionImpl.class.getName());
 
@@ -4152,6 +4125,21 @@ public class CPOptionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCPOptionUtilPersistence(
+		CPOptionPersistence cpOptionPersistence) {
+
+		try {
+			Field field = CPOptionUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, cpOptionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

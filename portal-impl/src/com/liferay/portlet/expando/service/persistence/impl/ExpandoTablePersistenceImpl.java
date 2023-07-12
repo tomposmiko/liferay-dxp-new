@@ -50,6 +50,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1284,9 +1285,7 @@ public class ExpandoTablePersistenceImpl
 	 */
 	@Override
 	public ExpandoTable fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				ExpandoTable.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(ExpandoTable.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -1741,11 +1740,11 @@ public class ExpandoTablePersistenceImpl
 			},
 			new String[] {"companyId", "classNameId", "name"}, false);
 
-		ExpandoTableUtil.setPersistence(this);
+		_setExpandoTableUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ExpandoTableUtil.setPersistence(null);
+		_setExpandoTableUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(ExpandoTableImpl.class.getName());
 
@@ -1755,6 +1754,22 @@ public class ExpandoTablePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setExpandoTableUtilPersistence(
+		ExpandoTablePersistence expandoTablePersistence) {
+
+		try {
+			Field field = ExpandoTableUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, expandoTablePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

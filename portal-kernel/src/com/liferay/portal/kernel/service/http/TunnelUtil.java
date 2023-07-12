@@ -50,10 +50,6 @@ public class TunnelUtil {
 			HttpPrincipal httpPrincipal, MethodHandler methodHandler)
 		throws Exception {
 
-		if (_log.isDebugEnabled()) {
-			_log.debug("Method handler " + methodHandler);
-		}
-
 		HttpURLConnection httpURLConnection = _getConnection(httpPrincipal);
 
 		TunnelAuthenticationManagerUtil.setCredentials(
@@ -91,10 +87,6 @@ public class TunnelUtil {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Unable to read object", eofException);
 			}
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Return object " + returnObject);
 		}
 
 		if ((returnObject != null) && (returnObject instanceof Exception)) {

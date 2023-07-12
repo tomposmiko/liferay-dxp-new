@@ -50,7 +50,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -59,7 +59,7 @@ definition {
 	}
 
 	@description = "This case ensures a user can be mentioned in a comment when he has valid permission."
-	@priority = 5
+	@priority = "5"
 	test MentionUserWithValidPermissions {
 		JSONUser.addUser(
 			userEmailAddress = "user1@liferay.com",
@@ -115,7 +115,7 @@ definition {
 			content = "Lorem ipsum dolor sit amet",
 			fragmentClass = "header",
 			fragmentName = "Title",
-			position = 1);
+			position = "1");
 
 		Click.clickAt(locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENTS");
 
@@ -133,7 +133,7 @@ definition {
 	}
 
 	@description = "This case ensures that the user can mention the other user in a comment."
-	@priority = 5
+	@priority = "5"
 	test ViewCommentMentionedUser {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -171,7 +171,7 @@ definition {
 	}
 
 	@description = "This case ensures a user cannot access a comment he is mentioned on after his permissions are revoked."
-	@priority = 5
+	@priority = "5"
 	test ViewMentionAfterRevokingPermissions {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -228,7 +228,7 @@ definition {
 			userLoginEmailAddress = "user2@liferay.com",
 			userLoginFullName = "userfn userln");
 
-		Notifications.viewBadgeCount(notificationCount = 1);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
 		Notifications.gotoNotifications();
 

@@ -340,10 +340,6 @@ public class CommerceInventoryAuditLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceInventoryAuditLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceInventoryAuditLocalService _service;
 
 }

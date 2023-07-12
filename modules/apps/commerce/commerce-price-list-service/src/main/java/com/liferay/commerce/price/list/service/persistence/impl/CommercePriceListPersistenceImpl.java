@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.price.list.service.persistence.impl;
 
-import com.liferay.commerce.price.list.exception.DuplicateCommercePriceListExternalReferenceCodeException;
 import com.liferay.commerce.price.list.exception.NoSuchPriceListException;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.model.CommercePriceListTable;
@@ -55,6 +54,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -3756,7 +3756,7 @@ public class CommercePriceListPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommercePriceListModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param companyId the company ID
 	 * @param start the lower bound of the range of commerce price lists
 	 * @param end the upper bound of the range of commerce price lists (not inclusive)
@@ -6080,7 +6080,7 @@ public class CommercePriceListPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommercePriceListModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param companyId the company ID
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce price lists
@@ -7607,7 +7607,7 @@ public class CommercePriceListPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommercePriceListModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param companyId the company ID
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce price lists
@@ -8962,38 +8962,6 @@ public class CommercePriceListPersistenceImpl
 			commercePriceList.setUuid(uuid);
 		}
 
-		if (Validator.isNull(commercePriceList.getExternalReferenceCode())) {
-			commercePriceList.setExternalReferenceCode(
-				commercePriceList.getUuid());
-		}
-		else {
-			CommercePriceList ercCommercePriceList = fetchByC_ERC(
-				commercePriceList.getCompanyId(),
-				commercePriceList.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommercePriceList != null) {
-					throw new DuplicateCommercePriceListExternalReferenceCodeException(
-						"Duplicate commerce price list with external reference code " +
-							commercePriceList.getExternalReferenceCode() +
-								" and company " +
-									commercePriceList.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommercePriceList != null) &&
-					(commercePriceList.getCommercePriceListId() !=
-						ercCommercePriceList.getCommercePriceListId())) {
-
-					throw new DuplicateCommercePriceListExternalReferenceCodeException(
-						"Duplicate commerce price list with external reference code " +
-							commercePriceList.getExternalReferenceCode() +
-								" and company " +
-									commercePriceList.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -9560,11 +9528,11 @@ public class CommercePriceListPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommercePriceListUtil.setPersistence(this);
+		_setCommercePriceListUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommercePriceListUtil.setPersistence(null);
+		_setCommercePriceListUtilPersistence(null);
 
 		entityCache.removeCache(CommercePriceListImpl.class.getName());
 
@@ -9574,6 +9542,22 @@ public class CommercePriceListPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommercePriceListUtilPersistence(
+		CommercePriceListPersistence commercePriceListPersistence) {
+
+		try {
+			Field field = CommercePriceListUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commercePriceListPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

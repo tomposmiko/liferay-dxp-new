@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-87134. Assert we can navigate to a child page in the Navigation Menu widget."
-	@priority = 5
+	@priority = "5"
 	test AddChildPage {
 		property portal.acceptance = "true";
 
@@ -56,7 +56,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-87134. Assert we can navigate to different pages in the Navigation Menu widget."
-	@priority = 5
+	@priority = "5"
 	test AddMultiplePages {
 		property portal.acceptance = "true";
 
@@ -78,7 +78,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-87134. Assert Pages Hierarchy is the default navigation in the Navigation Menu widget. If this fails we need to either report this as a bug or adjust the rest of the tests in this testcase to set pages hierarchy as the default in the Navigation Menu widget."
-	@priority = 3
+	@priority = "3"
 	test AssertPagesHierarchyNavigationIsDefault {
 		task ("Add a page to the site") {
 			JSONLayout.addPublicLayout(
@@ -102,7 +102,7 @@ definition {
 	}
 
 	@description = "Assert we can edit the site page name and that it updates on the Navigation Menu widget"
-	@priority = 4
+	@priority = "4"
 	test EditSitePage {
 		task ("Add a page to the site") {
 			JSONLayout.addPublicLayout(
@@ -134,7 +134,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-87134. Assert we can hide pages in the Navigation Menu widget."
-	@priority = 4
+	@priority = "4"
 	test HidePages {
 		task ("Add a page to the site") {
 			JSONLayout.addPublicLayout(

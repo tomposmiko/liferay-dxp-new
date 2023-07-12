@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -55,6 +53,8 @@ import com.liferay.sharing.service.persistence.SharingEntryFinder;
 import com.liferay.sharing.service.persistence.SharingEntryPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -542,7 +542,7 @@ public abstract class SharingEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		SharingEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -557,7 +557,7 @@ public abstract class SharingEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		sharingEntryLocalService = (SharingEntryLocalService)aopProxy;
 
-		SharingEntryLocalServiceUtil.setService(sharingEntryLocalService);
+		_setLocalServiceUtilService(sharingEntryLocalService);
 	}
 
 	/**
@@ -602,6 +602,22 @@ public abstract class SharingEntryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SharingEntryLocalService sharingEntryLocalService) {
+
+		try {
+			Field field = SharingEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, sharingEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected SharingEntryLocalService sharingEntryLocalService;
 
 	@Reference
@@ -613,8 +629,5 @@ public abstract class SharingEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SharingEntryLocalServiceBaseImpl.class);
 
 }

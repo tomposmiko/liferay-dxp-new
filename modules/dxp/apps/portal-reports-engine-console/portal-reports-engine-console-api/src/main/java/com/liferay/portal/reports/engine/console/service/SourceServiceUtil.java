@@ -101,10 +101,6 @@ public class SourceServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SourceService service) {
-		_service = service;
-	}
-
 	private static volatile SourceService _service;
 
 }

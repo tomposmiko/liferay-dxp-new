@@ -182,7 +182,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -193,7 +193,7 @@ definition {
 	}
 
 	@description = "Export a live site into a different staging site. This test is focused on modern site building features. The high level steps of this test are outlined in LRQA-44517."
-	@priority = 5
+	@priority = "5"
 	test ImportLiveSiteToStagingSite {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SitesExportImportWithStaging#ImportLiveSiteToStagingSite";
@@ -258,11 +258,11 @@ definition {
 			AssertVisible(
 				key_content = "Submit",
 				key_fragmentClass = "footer",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "Fragment#PAGE_EDITOR_FRAGMENT");
 
 			for (var button : list "Submit,Cancel") {
-				Button.viewPresent(button = ${button});
+				Button.viewPresent(button = "${button}");
 			}
 		}
 
@@ -279,7 +279,7 @@ definition {
 				locator1 = "Fragment#FRAGMENT");
 
 			for (var button : list "Submit,Cancel") {
-				Button.viewPresent(button = ${button});
+				Button.viewPresent(button = "${button}");
 			}
 
 			Click(

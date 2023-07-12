@@ -27,7 +27,6 @@ import com.liferay.portal.test.rule.Inject;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -39,7 +38,6 @@ import org.junit.runner.RunWith;
 public class WorkflowAppBuilderAppsPortletTabTest
 	extends BaseAppBuilderPortletTestCase {
 
-	@Ignore
 	@Test
 	public void testDeleteApp() throws Exception {
 		App app = addApp();

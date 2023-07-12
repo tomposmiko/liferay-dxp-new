@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link KaleoInstanceTokenLocalService}.
@@ -492,11 +491,6 @@ public class KaleoInstanceTokenLocalServiceWrapper
 
 		return _kaleoInstanceTokenLocalService.updateKaleoInstanceToken(
 			kaleoInstanceTokenId, currentKaleoNodeId);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _kaleoInstanceTokenLocalService.getBasePersistence();
 	}
 
 	@Override

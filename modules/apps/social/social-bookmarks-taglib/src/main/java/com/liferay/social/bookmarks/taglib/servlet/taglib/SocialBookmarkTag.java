@@ -22,8 +22,6 @@ import com.liferay.taglib.util.AttributesTagSupport;
 
 import java.io.IOException;
 
-import java.util.Map;
-
 import javax.servlet.ServletException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
@@ -41,9 +39,6 @@ public class SocialBookmarkTag extends AttributesTagSupport {
 			SocialBookmark socialBookmark = _getSocialBookmark();
 
 			if (socialBookmark != null) {
-				request.setAttribute(
-					"liferay-social-bookmarks:bookmark:additionalProps",
-					_additionalProps);
 				request.setAttribute(
 					"liferay-social-bookmarks:bookmark:displayStyle",
 					_displayStyle);
@@ -70,10 +65,6 @@ public class SocialBookmarkTag extends AttributesTagSupport {
 		catch (IOException | ServletException exception) {
 			throw new JspException(exception);
 		}
-	}
-
-	public void setAdditionalProps(Map<String, Object> additionalProps) {
-		_additionalProps = additionalProps;
 	}
 
 	public void setDisplayStyle(String displayStyle) {
@@ -107,7 +98,6 @@ public class SocialBookmarkTag extends AttributesTagSupport {
 		return SocialBookmarksRegistryUtil.getSocialBookmark(_type);
 	}
 
-	private Map<String, Object> _additionalProps;
 	private String _displayStyle;
 	private String _target;
 	private String _title;

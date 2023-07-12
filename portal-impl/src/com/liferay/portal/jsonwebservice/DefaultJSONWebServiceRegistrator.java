@@ -15,8 +15,6 @@
 package com.liferay.portal.jsonwebservice;
 
 import com.liferay.petra.reflect.AnnotationLocator;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanLocator;
 import com.liferay.portal.kernel.bean.BeanLocatorException;
 import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
@@ -30,7 +28,6 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceScannerStrategy;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.spring.aop.AopInvocationHandler;
 import com.liferay.portal.util.PropsValues;
@@ -281,19 +278,7 @@ public class DefaultJSONWebServiceRegistrator
 			String path = _jsonWebServiceMappingResolver.resolvePath(
 				serviceBeanClass, method);
 
-			String portalContextPath = PortalUtil.getPathContext();
-
-			String contextNamePath = path;
-
-			if (!contextPath.equals(portalContextPath)) {
-				contextNamePath = StringBundler.concat(
-					StringPool.SLASH, contextName, StringPool.PERIOD,
-					path.substring(1));
-			}
-
-			if (!_jsonWebServiceNaming.isIncludedPath(
-					contextPath, contextNamePath)) {
-
+			if (!_jsonWebServiceNaming.isIncludedPath(contextPath, path)) {
 				continue;
 			}
 

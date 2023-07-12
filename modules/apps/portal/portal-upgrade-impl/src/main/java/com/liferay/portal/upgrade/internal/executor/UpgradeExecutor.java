@@ -44,7 +44,6 @@ import java.util.function.Supplier;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -145,11 +144,8 @@ public class UpgradeExecutor {
 
 		Release release = _releaseLocalService.fetchRelease(bundleSymbolicName);
 
-		ServiceRegistration<Release> oldServiceRegistration = null;
-
 		if (release != null) {
-			oldServiceRegistration = _releasePublisher.publishInProgress(
-				release);
+			_releasePublisher.publishInProgress(release);
 		}
 
 		UpgradeInfosRunnable upgradeInfosRunnable = new UpgradeInfosRunnable(
@@ -162,19 +158,8 @@ public class UpgradeExecutor {
 
 		release = _releaseLocalService.fetchRelease(bundleSymbolicName);
 
-		ServiceRegistration<Release> inProgressServiceRegistration = null;
-
 		if (release != null) {
-			inProgressServiceRegistration = _releasePublisher.publish(
-				release, _isInitialRelease(upgradeInfos));
-		}
-
-		if (inProgressServiceRegistration != null) {
-			inProgressServiceRegistration.unregister();
-		}
-
-		if (oldServiceRegistration != null) {
-			oldServiceRegistration.unregister();
+			_releasePublisher.publish(release, _isInitialRelease(upgradeInfos));
 		}
 
 		return release;
@@ -201,10 +186,10 @@ public class UpgradeExecutor {
 		if (fromSchemaVersion.equals("0.0.0") &&
 			upgradeStepName.equals("Initial Database Creation")) {
 
-			return true;
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

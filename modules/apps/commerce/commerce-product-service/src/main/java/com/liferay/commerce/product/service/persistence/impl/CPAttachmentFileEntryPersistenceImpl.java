@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
-import com.liferay.commerce.product.exception.DuplicateCPAttachmentFileEntryExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPAttachmentFileEntryException;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPAttachmentFileEntryTable;
@@ -52,6 +51,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -5321,41 +5321,6 @@ public class CPAttachmentFileEntryPersistenceImpl
 			cpAttachmentFileEntry.setUuid(uuid);
 		}
 
-		if (Validator.isNull(
-				cpAttachmentFileEntry.getExternalReferenceCode())) {
-
-			cpAttachmentFileEntry.setExternalReferenceCode(
-				cpAttachmentFileEntry.getUuid());
-		}
-		else {
-			CPAttachmentFileEntry ercCPAttachmentFileEntry = fetchByC_ERC(
-				cpAttachmentFileEntry.getCompanyId(),
-				cpAttachmentFileEntry.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCPAttachmentFileEntry != null) {
-					throw new DuplicateCPAttachmentFileEntryExternalReferenceCodeException(
-						"Duplicate cp attachment file entry with external reference code " +
-							cpAttachmentFileEntry.getExternalReferenceCode() +
-								" and company " +
-									cpAttachmentFileEntry.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCPAttachmentFileEntry != null) &&
-					(cpAttachmentFileEntry.getCPAttachmentFileEntryId() !=
-						ercCPAttachmentFileEntry.
-							getCPAttachmentFileEntryId())) {
-
-					throw new DuplicateCPAttachmentFileEntryExternalReferenceCodeException(
-						"Duplicate cp attachment file entry with external reference code " +
-							cpAttachmentFileEntry.getExternalReferenceCode() +
-								" and company " +
-									cpAttachmentFileEntry.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -5874,11 +5839,11 @@ public class CPAttachmentFileEntryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CPAttachmentFileEntryUtil.setPersistence(this);
+		_setCPAttachmentFileEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CPAttachmentFileEntryUtil.setPersistence(null);
+		_setCPAttachmentFileEntryUtilPersistence(null);
 
 		entityCache.removeCache(CPAttachmentFileEntryImpl.class.getName());
 
@@ -5888,6 +5853,22 @@ public class CPAttachmentFileEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCPAttachmentFileEntryUtilPersistence(
+		CPAttachmentFileEntryPersistence cpAttachmentFileEntryPersistence) {
+
+		try {
+			Field field = CPAttachmentFileEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, cpAttachmentFileEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

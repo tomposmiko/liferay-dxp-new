@@ -45,8 +45,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -65,6 +63,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -1173,14 +1173,14 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 			"com.liferay.document.library.kernel.model.DLFileEntryType",
 			dlFileEntryTypeLocalService);
 
-		DLFileEntryTypeLocalServiceUtil.setService(dlFileEntryTypeLocalService);
+		_setLocalServiceUtilService(dlFileEntryTypeLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.document.library.kernel.model.DLFileEntryType");
 
-		DLFileEntryTypeLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1237,6 +1237,23 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		DLFileEntryTypeLocalService dlFileEntryTypeLocalService) {
+
+		try {
+			Field field =
+				DLFileEntryTypeLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileEntryTypeLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1343,9 +1360,6 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 
 	@BeanReference(type = DLFolderFinder.class)
 	protected DLFolderFinder dlFolderFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLFileEntryTypeLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -99,16 +100,6 @@ public class PageRowDefinitionSerDes {
 			sb.append("\"gutters\": ");
 
 			sb.append(pageRowDefinition.getGutters());
-		}
-
-		if (pageRowDefinition.getIndexed() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"indexed\": ");
-
-			sb.append(pageRowDefinition.getIndexed());
 		}
 
 		if (pageRowDefinition.getModulesPerRow() != null) {
@@ -234,13 +225,6 @@ public class PageRowDefinitionSerDes {
 			map.put("gutters", String.valueOf(pageRowDefinition.getGutters()));
 		}
 
-		if (pageRowDefinition.getIndexed() == null) {
-			map.put("indexed", null);
-		}
-		else {
-			map.put("indexed", String.valueOf(pageRowDefinition.getIndexed()));
-		}
-
 		if (pageRowDefinition.getModulesPerRow() == null) {
 			map.put("modulesPerRow", null);
 		}
@@ -325,30 +309,20 @@ public class PageRowDefinitionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "fragmentViewports")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					FragmentViewport[] fragmentViewportsArray =
-						new FragmentViewport[jsonParserFieldValues.length];
-
-					for (int i = 0; i < fragmentViewportsArray.length; i++) {
-						fragmentViewportsArray[i] =
-							FragmentViewportSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					pageRowDefinition.setFragmentViewports(
-						fragmentViewportsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> FragmentViewportSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new FragmentViewport[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "gutters")) {
 				if (jsonParserFieldValue != null) {
 					pageRowDefinition.setGutters((Boolean)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "indexed")) {
-				if (jsonParserFieldValue != null) {
-					pageRowDefinition.setIndexed((Boolean)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "modulesPerRow")) {
@@ -378,18 +352,14 @@ public class PageRowDefinitionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "rowViewports")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					RowViewport[] rowViewportsArray =
-						new RowViewport[jsonParserFieldValues.length];
-
-					for (int i = 0; i < rowViewportsArray.length; i++) {
-						rowViewportsArray[i] = RowViewportSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					pageRowDefinition.setRowViewports(rowViewportsArray);
+					pageRowDefinition.setRowViewports(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RowViewportSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RowViewport[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "verticalAlignment")) {

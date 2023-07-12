@@ -61,14 +61,14 @@ public class FragmentConfigurationField {
 
 	public String getDefaultValue() {
 		if (Validator.isNotNull(_defaultValue) &&
-			!Objects.equals(_type, "itemSelector")) {
+			!Objects.equals("itemSelector", _type)) {
 
 			return _defaultValue;
 		}
-		else if (Objects.equals(_type, "colorPalette")) {
+		else if (Objects.equals("colorPalette", _type)) {
 			return _getColorPaletteDefaultValue();
 		}
-		else if (Objects.equals(_type, "itemSelector")) {
+		else if (Objects.equals("itemSelector", _type)) {
 			return _getItemSelectorDefaultValue();
 		}
 

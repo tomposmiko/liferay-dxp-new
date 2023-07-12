@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyInfo;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -46,6 +44,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -441,14 +441,14 @@ public abstract class CompanyInfoLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.CompanyInfo",
 			companyInfoLocalService);
 
-		CompanyInfoLocalServiceUtil.setService(companyInfoLocalService);
+		_setLocalServiceUtilService(companyInfoLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.CompanyInfo");
 
-		CompanyInfoLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -493,6 +493,22 @@ public abstract class CompanyInfoLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		CompanyInfoLocalService companyInfoLocalService) {
+
+		try {
+			Field field = CompanyInfoLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, companyInfoLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = CompanyInfoLocalService.class)
 	protected CompanyInfoLocalService companyInfoLocalService;
 
@@ -504,9 +520,6 @@ public abstract class CompanyInfoLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CompanyInfoLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

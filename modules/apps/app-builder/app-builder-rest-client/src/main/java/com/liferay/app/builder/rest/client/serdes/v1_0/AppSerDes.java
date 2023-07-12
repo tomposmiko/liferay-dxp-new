@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -401,18 +402,14 @@ public class AppSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "appDeployments")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AppDeployment[] appDeploymentsArray =
-						new AppDeployment[jsonParserFieldValues.length];
-
-					for (int i = 0; i < appDeploymentsArray.length; i++) {
-						appDeploymentsArray[i] = AppDeploymentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					app.setAppDeployments(appDeploymentsArray);
+					app.setAppDeployments(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AppDeploymentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new AppDeployment[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dataDefinitionId")) {

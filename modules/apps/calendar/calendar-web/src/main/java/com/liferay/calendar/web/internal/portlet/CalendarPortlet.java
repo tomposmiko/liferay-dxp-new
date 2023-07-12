@@ -946,24 +946,20 @@ public class CalendarPortlet extends MVCPortlet {
 	protected java.util.Calendar getJCalendar(
 		PortletRequest portletRequest, String name) {
 
+		int month = ParamUtil.getInteger(portletRequest, name + "Month");
+		int day = ParamUtil.getInteger(portletRequest, name + "Day");
+		int year = ParamUtil.getInteger(portletRequest, name + "Year");
 		int hour = ParamUtil.getInteger(portletRequest, name + "Hour");
+		int minute = ParamUtil.getInteger(portletRequest, name + "Minute");
 
-		if (ParamUtil.getInteger(portletRequest, name + "AmPm") ==
-				java.util.Calendar.PM) {
+		int amPm = ParamUtil.getInteger(portletRequest, name + "AmPm");
 
+		if (amPm == java.util.Calendar.PM) {
 			hour += 12;
 		}
 
-		TimeZone timeZone = ParamUtil.getBoolean(portletRequest, "allDay") ?
-			TimeZoneUtil.getTimeZone(StringPool.UTC) :
-				getTimeZone(portletRequest);
-
 		return JCalendarUtil.getJCalendar(
-			ParamUtil.getInteger(portletRequest, name + "Year"),
-			ParamUtil.getInteger(portletRequest, name + "Month"),
-			ParamUtil.getInteger(portletRequest, name + "Day"), hour,
-			ParamUtil.getInteger(portletRequest, name + "Minute"), 0, 0,
-			timeZone);
+			year, month, day, hour, minute, 0, 0, getTimeZone(portletRequest));
 	}
 
 	protected String getNotificationTypeSettings(
@@ -1330,7 +1326,6 @@ public class CalendarPortlet extends MVCPortlet {
 
 		long[] calendarIds = ParamUtil.getLongValues(
 			resourceRequest, "calendarIds");
-		TimeZone timeZone = getTimeZone(resourceRequest);
 
 		if (!ArrayUtil.isEmpty(calendarIds)) {
 			java.util.Calendar endTimeJCalendar = getJCalendar(
@@ -1343,7 +1338,7 @@ public class CalendarPortlet extends MVCPortlet {
 			calendarBookings = _calendarBookingService.search(
 				themeDisplay.getCompanyId(), new long[0], calendarIds,
 				new long[0], -1, null, startTimeJCalendar.getTimeInMillis(),
-				endTimeJCalendar.getTimeInMillis(), timeZone, true, statuses,
+				endTimeJCalendar.getTimeInMillis(), true, statuses,
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 				new CalendarBookingStartTimeComparator(true));
 
@@ -1358,7 +1353,7 @@ public class CalendarPortlet extends MVCPortlet {
 		}
 
 		JSONArray jsonArray = CalendarUtil.toCalendarBookingsJSONArray(
-			themeDisplay, calendarBookings, timeZone);
+			themeDisplay, calendarBookings, getTimeZone(resourceRequest));
 
 		writeJSON(resourceRequest, resourceResponse, jsonArray);
 	}

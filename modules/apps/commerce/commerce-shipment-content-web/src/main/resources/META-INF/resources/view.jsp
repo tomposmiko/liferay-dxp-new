@@ -48,7 +48,7 @@ CommerceShipmentContentDisplayContext commerceShipmentContentDisplayContext = (C
 
 		<liferay-ui:search-container-column-text
 			name="customer-name"
-			value="<%= HtmlUtil.escape(commerceShipmentContentDisplayContext.getCommerceShipmentAccountName(commerceShipment)) %>"
+			value="<%= commerceShipmentContentDisplayContext.getCommerceShipmentAccountName(commerceShipment) %>"
 		/>
 
 		<liferay-ui:search-container-column-text

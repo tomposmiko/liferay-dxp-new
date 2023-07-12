@@ -27,7 +27,6 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.criteria.AssetEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.asset.criterion.AssetEntryItemSelectorCriterion;
-import com.liferay.item.selector.criteria.constants.ItemSelectorCriteriaConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.constants.JournalWebKeys;
 import com.liferay.journal.content.asset.addon.entry.ContentMetadataAssetAddonEntry;
@@ -532,7 +531,6 @@ public class JournalContentDisplayContext {
 			new AssetEntryItemSelectorReturnType());
 
 		assetEntryItemSelectorCriterion.setGroupId(getGroupId());
-		assetEntryItemSelectorCriterion.setScopeGroupType(getScopeGroupType());
 		assetEntryItemSelectorCriterion.setShowNonindexable(true);
 		assetEntryItemSelectorCriterion.setShowScheduled(true);
 		assetEntryItemSelectorCriterion.setSingleSelect(true);
@@ -572,24 +570,6 @@ public class JournalContentDisplayContext {
 			_portletRequest, "portletResource");
 
 		return _portletResource;
-	}
-
-	public String getScopeGroupType() {
-		Group scopeGroup = _themeDisplay.getScopeGroup();
-
-		if (scopeGroup.isDepot()) {
-			return ItemSelectorCriteriaConstants.SCOPE_GROUP_TYPE_ASSET_LIBRARY;
-		}
-
-		if (scopeGroup.getGroupId() == _themeDisplay.getCompanyGroupId()) {
-			return ItemSelectorCriteriaConstants.SCOPE_GROUP_TYPE_GLOBAL;
-		}
-
-		if (scopeGroup.isLayout()) {
-			return ItemSelectorCriteriaConstants.SCOPE_GROUP_TYPE_PAGE;
-		}
-
-		return ItemSelectorCriteriaConstants.SCOPE_GROUP_TYPE_SITE;
 	}
 
 	public JournalArticle getSelectedArticle() {
@@ -895,15 +875,31 @@ public class JournalContentDisplayContext {
 
 		JournalArticleDisplay articleDisplay = getArticleDisplay();
 
-		if ((articleDisplay == null) || !hasViewPermission()) {
+		if (articleDisplay == null) {
 			_showArticle = false;
 
 			return _showArticle;
 		}
 
-		if ((article.isPending() || article.isScheduled() || isExpired()) &&
-			!isPreview()) {
+		if (!hasViewPermission()) {
+			_showArticle = false;
 
+			return _showArticle;
+		}
+
+		if (isExpired()) {
+			_showArticle = false;
+
+			return _showArticle;
+		}
+
+		if (article.isScheduled() && !isPreview()) {
+			_showArticle = false;
+
+			return _showArticle;
+		}
+
+		if (article.isPending() && !isPreview()) {
 			_showArticle = false;
 
 			return _showArticle;

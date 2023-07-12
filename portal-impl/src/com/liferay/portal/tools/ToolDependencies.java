@@ -194,6 +194,8 @@ public class ToolDependencies {
 
 		ResourceActionsImpl resourceActionsImpl = new ResourceActionsImpl();
 
+		resourceActionsImpl.afterPropertiesSet();
+
 		resourceActionsUtil.setResourceActions(resourceActionsImpl);
 	}
 

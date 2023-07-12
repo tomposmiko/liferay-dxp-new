@@ -100,8 +100,8 @@ public class DefaultMapToDDMFormValuesConverterStrategy
 
 				DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue() {
 					{
-						setInstanceId(entry.getKey());
 						setName(ddmFormField.getName());
+						setInstanceId(entry.getKey());
 					}
 				};
 

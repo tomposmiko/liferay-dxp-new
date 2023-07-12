@@ -48,6 +48,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -1495,11 +1496,11 @@ public class ServiceComponentPersistenceImpl
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"buildNamespace", "buildNumber"}, false);
 
-		ServiceComponentUtil.setPersistence(this);
+		_setServiceComponentUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ServiceComponentUtil.setPersistence(null);
+		_setServiceComponentUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(ServiceComponentImpl.class.getName());
 
@@ -1509,6 +1510,22 @@ public class ServiceComponentPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setServiceComponentUtilPersistence(
+		ServiceComponentPersistence serviceComponentPersistence) {
+
+		try {
+			Field field = ServiceComponentUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, serviceComponentPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -372,106 +372,100 @@ public class AssetCategoryModelImpl
 
 	private static final Map<String, Function<AssetCategory, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<AssetCategory, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AssetCategory, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AssetCategory::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", AssetCategory::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", AssetCategory::getUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode", AssetCategory::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"categoryId", AssetCategory::getCategoryId);
-		attributeGetterFunctions.put("groupId", AssetCategory::getGroupId);
-		attributeGetterFunctions.put("companyId", AssetCategory::getCompanyId);
-		attributeGetterFunctions.put("userId", AssetCategory::getUserId);
-		attributeGetterFunctions.put("userName", AssetCategory::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", AssetCategory::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AssetCategory::getModifiedDate);
-		attributeGetterFunctions.put(
-			"parentCategoryId", AssetCategory::getParentCategoryId);
-		attributeGetterFunctions.put("treePath", AssetCategory::getTreePath);
-		attributeGetterFunctions.put("name", AssetCategory::getName);
-		attributeGetterFunctions.put("title", AssetCategory::getTitle);
-		attributeGetterFunctions.put(
-			"description", AssetCategory::getDescription);
-		attributeGetterFunctions.put(
-			"vocabularyId", AssetCategory::getVocabularyId);
-		attributeGetterFunctions.put(
-			"lastPublishDate", AssetCategory::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<AssetCategory, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AssetCategory, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetCategory, Object>>();
 		Map<String, BiConsumer<AssetCategory, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AssetCategory, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AssetCategory::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetCategory::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", AssetCategory::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<AssetCategory, String>)AssetCategory::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", AssetCategory::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<AssetCategory, String>)
 				AssetCategory::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"categoryId", AssetCategory::getCategoryId);
 		attributeSetterBiConsumers.put(
 			"categoryId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setCategoryId);
+		attributeGetterFunctions.put("groupId", AssetCategory::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setGroupId);
+		attributeGetterFunctions.put("companyId", AssetCategory::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetCategory::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setUserId);
+		attributeGetterFunctions.put("userName", AssetCategory::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AssetCategory, String>)AssetCategory::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AssetCategory::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AssetCategory, Date>)AssetCategory::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AssetCategory::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AssetCategory, Date>)AssetCategory::setModifiedDate);
+		attributeGetterFunctions.put(
+			"parentCategoryId", AssetCategory::getParentCategoryId);
 		attributeSetterBiConsumers.put(
 			"parentCategoryId",
 			(BiConsumer<AssetCategory, Long>)
 				AssetCategory::setParentCategoryId);
+		attributeGetterFunctions.put("treePath", AssetCategory::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath",
 			(BiConsumer<AssetCategory, String>)AssetCategory::setTreePath);
+		attributeGetterFunctions.put("name", AssetCategory::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<AssetCategory, String>)AssetCategory::setName);
+		attributeGetterFunctions.put("title", AssetCategory::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<AssetCategory, String>)AssetCategory::setTitle);
+		attributeGetterFunctions.put(
+			"description", AssetCategory::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<AssetCategory, String>)AssetCategory::setDescription);
+		attributeGetterFunctions.put(
+			"vocabularyId", AssetCategory::getVocabularyId);
 		attributeSetterBiConsumers.put(
 			"vocabularyId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setVocabularyId);
+		attributeGetterFunctions.put(
+			"lastPublishDate", AssetCategory::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<AssetCategory, Date>)AssetCategory::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -4,7 +4,7 @@ definition {
 	macro viewHeaderTitle {
 		AssertTextEquals(
 			locator1 = "ControlMenu#HEADING",
-			value1 = ${headerTitle});
+			value1 = "${headerTitle}");
 	}
 
 }

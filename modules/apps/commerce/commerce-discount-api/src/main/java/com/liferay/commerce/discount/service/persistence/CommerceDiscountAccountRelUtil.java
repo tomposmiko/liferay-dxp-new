@@ -1090,12 +1090,6 @@ public class CommerceDiscountAccountRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceDiscountAccountRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceDiscountAccountRelPersistence _persistence;
 
 }

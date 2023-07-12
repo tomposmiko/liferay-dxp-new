@@ -34,7 +34,7 @@ definition {
 
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ((${testPortalInstance} == "true") && !(IsTestName(locator1 = "", value1 = ${testNameSkipPortalInstance}))) {
+		if (("${testPortalInstance}" == "true") && !(IsTestName(locator1 = "", value1 = "${testNameSkipPortalInstance}"))) {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -50,25 +50,25 @@ definition {
 
 			Permissions.removePermissionViaAPI(
 				resourceAction = "VIEW_CONTROL_PANEL",
-				resourceName = 90,
+				resourceName = "90",
 				roleTitle = "User");
 
 			for (var roleTitle : list "Portal Content Reviewer,User") {
 				Permissions.removePermissionViaAPI(
 					resourceAction = "ACCESS_IN_CONTROL_PANEL",
 					resourceName = "com_liferay_app_builder_web_internal_portlet_ObjectsPortlet",
-					roleTitle = ${roleTitle});
+					roleTitle = "${roleTitle}");
 
 				Permissions.removePermissionViaAPI(
 					resourceAction = "MANAGE",
 					resourceName = "com.liferay.app.builder",
-					roleTitle = ${roleTitle});
+					roleTitle = "${roleTitle}");
 			}
 		}
 	}
 
 	@description = "Access and set permissions for a custom object"
-	@priority = 4
+	@priority = "4"
 	test AccessAndSetPermissionsForCustomObject {
 		property portal.acceptance = "true";
 
@@ -101,7 +101,7 @@ definition {
 	}
 
 	@description = "Add a Custom Object with valid name"
-	@priority = 5
+	@priority = "5"
 	test AddCustomObjectWithValidName {
 		property portal.acceptance = "true";
 
@@ -118,7 +118,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-104569."
-	@priority = 5
+	@priority = "5"
 	test AddMultipleFormViewsToTheSameObject {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AppBuilder#AddMultipleFormViewsToTheSameObject";
@@ -137,26 +137,26 @@ definition {
 
 		var fieldList = "Text,Select from List,Single Selection,Multiple Selection,Date,Numeric,Upload";
 
-		for (var field : list ${fieldList}) {
+		for (var field : list "${fieldList}") {
 			AppBuilderAdmin.add();
 
 			FormViewBuilder.addFormViewAndValidateFieldLabel(
-				fieldType = ${field},
+				fieldType = "${field}",
 				formViewName = "My Form View with ${field} 1");
 
 			FormViewBuilder.addFormViewAndValidateFieldLabel(
-				fieldType = ${field},
+				fieldType = "${field}",
 				formViewName = "My Form View with ${field} 2");
 
 			FormViewBuilder.openFormView(formViewName = "My Form View with ${field} 1");
 
-			FormViewBuilder.validateFieldLabel(fieldLabel = ${field});
+			FormViewBuilder.validateFieldLabel(fieldLabel = "${field}");
 
 			AppBuilderAdmin.gotoBack();
 
 			FormViewBuilder.openFormView(formViewName = "My Form View with ${field} 2");
 
-			FormViewBuilder.validateFieldLabel(fieldLabel = ${field});
+			FormViewBuilder.validateFieldLabel(fieldLabel = "${field}");
 
 			AppBuilderAdmin.gotoBack();
 		}
@@ -173,7 +173,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-95964"
-	@priority = 5
+	@priority = "5"
 	test AddRulesViaFormView {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AppBuilder#AddRulesViaFormView";
@@ -210,11 +210,11 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Text Field",
 			conditionOperator = "Is not empty",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Options");
 
 		FormViewBuilder.ruleSave();
@@ -238,11 +238,11 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Text Field",
 			conditionOperator = "Is empty",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Options");
 
 		FormViewBuilder.ruleSave();
@@ -267,7 +267,7 @@ definition {
 	}
 
 	@description = "Add a Form View with a Date field"
-	@priority = 5
+	@priority = "5"
 	test AddSimpleFormViewWithDateField {
 		property portal.acceptance = "true";
 
@@ -282,7 +282,7 @@ definition {
 	}
 
 	@description = "Add a Form View with a Multiple Selection field"
-	@priority = 5
+	@priority = "5"
 	test AddSimpleFormViewWithMultipleSelectionField {
 		property portal.acceptance = "true";
 
@@ -297,7 +297,7 @@ definition {
 	}
 
 	@description = "Add a Form View with a Numeric field"
-	@priority = 5
+	@priority = "5"
 	test AddSimpleFormViewWithNumericField {
 		property portal.acceptance = "true";
 
@@ -312,7 +312,7 @@ definition {
 	}
 
 	@description = "Add a Form View with a Select From List field"
-	@priority = 5
+	@priority = "5"
 	test AddSimpleFormViewWithSelectFromListField {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AppBuilder#AddSimpleFormViewWithSelectFromListField";
@@ -328,7 +328,7 @@ definition {
 	}
 
 	@description = "Add a Form View with a Single Selection field"
-	@priority = 5
+	@priority = "5"
 	test AddSimpleFormViewWithSingleSelectionField {
 		property portal.acceptance = "true";
 
@@ -343,7 +343,7 @@ definition {
 	}
 
 	@description = "Add a Form View with a Text Field"
-	@priority = 5
+	@priority = "5"
 	test AddSimpleFormViewWithTextField {
 		property portal.acceptance = "true";
 
@@ -358,7 +358,7 @@ definition {
 	}
 
 	@description = "Add a Form View with a Upload field"
-	@priority = 5
+	@priority = "5"
 	test AddSimpleFormViewWithUploadField {
 		property portal.acceptance = "true";
 
@@ -373,7 +373,7 @@ definition {
 	}
 
 	@description = "Add a Table View"
-	@priority = 5
+	@priority = "5"
 	test AddSimpleTableView {
 		property portal.acceptance = "true";
 
@@ -408,7 +408,7 @@ definition {
 	}
 
 	@description = "Attempt to add a Custom Object without a valid name"
-	@priority = 5
+	@priority = "5"
 	test AttemptToAddCustomObjectWithoutValidName {
 		property portal.acceptance = "true";
 
@@ -450,7 +450,7 @@ definition {
 	}
 
 	@description = "Change order of list from default most recent on top to oldest."
-	@priority = 5
+	@priority = "5"
 	test ChangeFormViewsListOrderByDate {
 		property portal.acceptance = "true";
 
@@ -470,26 +470,26 @@ definition {
 		AppBuilderAdmin.validateCustomObjectNameOnHeader(customObjectName = "Custom Object Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Date Field - Form View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Text Field - Form View Title");
 
 		AppBuilderAdmin.filterListAscendAndDescend();
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Text Field - Form View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Date Field - Form View Title");
 	}
 
 	@description = "Order the list of Form Views by Name/Title (Asc or Desc)"
-	@priority = 5
+	@priority = "5"
 	test ChangeFormViewsListOrderByName {
 		property portal.acceptance = "true";
 
@@ -509,26 +509,26 @@ definition {
 		AppBuilderAdmin.validateCustomObjectNameOnHeader(customObjectName = "Custom Object Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Date Field - Form View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Text Field - Form View Title");
 
 		AppBuilderAdmin.chooseSearchFilterByOption(filterOption = "Name");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Text Field - Form View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Date Field - Form View Title");
 	}
 
 	@description = "Change order of Table Views list from the default of most recent on top to oldest."
-	@priority = 5
+	@priority = "5"
 	test ChangeTableViewsListOrderByDate {
 		property portal.acceptance = "true";
 
@@ -550,26 +550,26 @@ definition {
 			tableViewName = "Upload Field - Table View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Upload Field - Table View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Single Selection Field - Table View Title");
 
 		AppBuilderAdmin.filterListAscendAndDescend();
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Single Selection Field - Table View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Upload Field - Table View Title");
 	}
 
 	@description = "Order the list of Table Views by Name/Title (Asc or Desc)"
-	@priority = 5
+	@priority = "5"
 	test ChangeTableViewsListOrderByName {
 		property portal.acceptance = "true";
 
@@ -591,26 +591,26 @@ definition {
 			tableViewName = "Numeric Field - Table View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Numeric Field - Table View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Text Field - Table View Title");
 
 		AppBuilderAdmin.chooseSearchFilterByOption(filterOption = "Name");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Text Field - Table View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Numeric Field - Table View Title");
 	}
 
 	@description = "Delete an existing custom object with no associated relationships"
-	@priority = 5
+	@priority = "5"
 	test DeleteCustomObjectWithAssociatedRelationship {
 		property portal.acceptance = "true";
 
@@ -652,7 +652,7 @@ definition {
 	}
 
 	@description = "Delete an existing custom object with no associated relationships"
-	@priority = 5
+	@priority = "5"
 	test DeleteCustomObjectWithNoAssociatedRelationship {
 		property portal.acceptance = "true";
 
@@ -667,7 +667,7 @@ definition {
 	}
 
 	@description = "Delete fieldsets used in a form view and when it is not used"
-	@priority = 5
+	@priority = "5"
 	test DeleteFieldSet {
 		property portal.acceptance = "true";
 
@@ -684,7 +684,7 @@ definition {
 		FormViewBuilder.goToFieldsetsTab();
 
 		FormViewBuilder.deleteFieldSetEntry(
-			rowNumber = 1,
+			rowNumber = "1",
 			selectAction = "Delete");
 
 		FormViewBuilder.setUpTwoFieldSets(
@@ -705,7 +705,7 @@ definition {
 		FormViewBuilder.goToFieldsetsTab();
 
 		FormViewBuilder.deleteFieldSetEntry(
-			rowNumber = 1,
+			rowNumber = "1",
 			selectAction = "Delete");
 
 		FormViewBuilder.setUpTwoFieldSets(
@@ -722,7 +722,7 @@ definition {
 		FormViewBuilder.goToFieldsetsTab();
 
 		FormViewBuilder.deleteDisabledFieldSetEntry(
-			rowNumber = 1,
+			rowNumber = "1",
 			selectAction = "Delete");
 
 		FormViewBuilder.setUpTwoFieldSets(
@@ -749,7 +749,7 @@ definition {
 		FormViewBuilder.goToFieldsetsTab();
 
 		FormViewBuilder.deleteFieldSetEntry(
-			rowNumber = 1,
+			rowNumber = "1",
 			selectAction = "Delete");
 
 		FormViewBuilder.setUpTwoFieldSets(
@@ -790,7 +790,7 @@ definition {
 		FormViewBuilder.goToFieldsetsTab();
 
 		FormViewBuilder.deleteDisabledFieldSetEntry(
-			rowNumber = 1,
+			rowNumber = "1",
 			selectAction = "Delete");
 
 		FormViewBuilder.save();
@@ -801,7 +801,7 @@ definition {
 	}
 
 	@description = "Delete an existing Form View with no active publishing through the kebab/action menu"
-	@priority = 5
+	@priority = "5"
 	test DeleteFormViewThroughActionMenu {
 		property portal.acceptance = "true";
 
@@ -818,7 +818,7 @@ definition {
 	}
 
 	@description = "Delete a publishing"
-	@priority = 5
+	@priority = "5"
 	test DeletePublishing {
 		property portal.acceptance = "true";
 
@@ -852,7 +852,7 @@ definition {
 	}
 
 	@description = "Delete an existing Table View with no active publishing through the kebab/action menu"
-	@priority = 5
+	@priority = "5"
 	test DeleteTableViewThroughActionMenu {
 		property portal.acceptance = "true";
 
@@ -872,7 +872,7 @@ definition {
 	}
 
 	@description = "Choose between the existing Form Views of an object when deploying an app"
-	@priority = 5
+	@priority = "5"
 	test DeployAnAppChoosingBetweenTheExistingFormViews {
 		property portal.acceptance = "true";
 
@@ -927,15 +927,15 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Numeric",
-			fieldValue = 123);
+			fieldValue = "123");
 
 		AppBuilderAdmin.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = 123);
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "123");
 	}
 
 	@description = "Create more than one Table View and choose between the two when deploying an App"
-	@priority = 5
+	@priority = "5"
 	test DeployAppChoosingBetweenDifferentTableViews {
 		property portal.acceptance = "true";
 
@@ -1076,7 +1076,7 @@ definition {
 	}
 
 	@description = "Deploy multiple apps using the same Form View and Table View"
-	@priority = 5
+	@priority = "5"
 	test DeployAppsWithSameFVandTV {
 		property portal.acceptance = "true";
 
@@ -1158,7 +1158,7 @@ definition {
 	}
 
 	@description = "Clear search results when clicking the Clear button on the search results banner"
-	@priority = 5
+	@priority = "5"
 	test FormViewClearSearchResults {
 		property portal.acceptance = "true";
 
@@ -1184,16 +1184,16 @@ definition {
 		AppBuilderAdmin.clearSearch();
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Date Field - Form View Title");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 2,
+			rowNumber = "2",
 			title = "Text Field - Form View Title");
 	}
 
 	@description = "Validate returns by search engine using a search term"
-	@priority = 5
+	@priority = "5"
 	test FormViewSearchByTerm {
 		property portal.acceptance = "true";
 
@@ -1218,7 +1218,7 @@ definition {
 	}
 
 	@description = "No results found screen is shown when the search doesn't retrieve any results"
-	@priority = 5
+	@priority = "5"
 	test FormViewSearchNoResultsFound {
 		property portal.acceptance = "true";
 
@@ -1243,7 +1243,7 @@ definition {
 	}
 
 	@description = "Remove a field added to the Objects Sidebar and make sure is not possible to save an empty form"
-	@priority = 5
+	@priority = "5"
 	test MakeSureIsNotPossibleSaveEmptyFormView {
 		property portal.upstream = "true";
 
@@ -1282,11 +1282,11 @@ definition {
 
 		FormViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myFormViewName});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myFormViewName}");
 	}
 
 	@description = "Place a widget in my page with only a Form View of my App"
-	@priority = 5
+	@priority = "5"
 	test PlaceFormViewWidget {
 		property portal.acceptance = "true";
 
@@ -1313,11 +1313,11 @@ definition {
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = ${myFormViewName});
+		FormViewBuilder.setName(formViewName = "${myFormViewName}");
 
 		FormViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myFormViewName});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myFormViewName}");
 
 		AppBuilderAdmin.switchTab(tabName = "Table Views");
 
@@ -1327,17 +1327,17 @@ definition {
 
 		TableViewBuilder.addColumnByDoubleClick(fieldType = "Nickname");
 
-		TableViewBuilder.setName(tableViewName = ${myTableViewName});
+		TableViewBuilder.setName(tableViewName = "${myTableViewName}");
 
 		TableViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName}");
 
 		App.add(
-			appTitle = ${myAppName},
+			appTitle = "${myAppName}",
 			deployOption = "Widget",
-			formViewName = ${myFormViewName},
-			tableViewName = ${myTableViewName});
+			formViewName = "${myFormViewName}",
+			tableViewName = "${myTableViewName}");
 
 		JSONLayout.addPublicLayout(
 			groupName = "App Builder Site Name",
@@ -1374,7 +1374,7 @@ definition {
 	}
 
 	@description = "LRQA-56514: Make sure predefined values are persisted when creating a Form View"
-	@priority = 5
+	@priority = "5"
 	test PredefinedValuesArePersistedInFormView {
 		property portal.acceptance = "true";
 
@@ -1395,7 +1395,7 @@ definition {
 
 		FormViewBuilder.switchToAdvancedTab();
 
-		FormViewBuilder.setFieldPredefinedText(fieldValue = 12345);
+		FormViewBuilder.setFieldPredefinedText(fieldValue = "12345");
 
 		FormViewBuilder.closeSidebar();
 
@@ -1403,7 +1403,7 @@ definition {
 
 		FormViewBuilder.switchToAdvancedTab();
 
-		FormViewBuilder.setFieldPredefinedDate(fieldValue = 03022019);
+		FormViewBuilder.setFieldPredefinedDate(fieldValue = "03/02/2019");
 
 		FormViewBuilder.closeSidebar();
 
@@ -1413,7 +1413,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Select${number}",
 				optionValue = "Select ${number}",
-				rowNumber = ${number});
+				rowNumber = "${number}");
 		}
 
 		FormViewBuilder.switchToAdvancedTab();
@@ -1428,7 +1428,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Multiple${number}",
 				optionValue = "Multiple ${number}",
-				rowNumber = ${number});
+				rowNumber = "${number}");
 		}
 
 		FormViewBuilder.switchToAdvancedTab();
@@ -1445,7 +1445,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Task${number}",
 				optionValue = "Task ${number}",
-				rowNumber = ${number});
+				rowNumber = "${number}");
 		}
 
 		FormViewBuilder.switchToAdvancedTab();
@@ -1468,7 +1468,7 @@ definition {
 
 		FormViewBuilder.validatePredefinedText(
 			fieldName = "Numeric",
-			fieldValue = 12345);
+			fieldValue = "12345");
 
 		FormViewBuilder.validatePredefinedDate(
 			fieldName = "Date",
@@ -1488,7 +1488,7 @@ definition {
 	}
 
 	@description = "Publish my app as a widget and submit entry"
-	@priority = 5
+	@priority = "5"
 	test PublishAppAsWidgetAndSubmitEntry {
 		property portal.acceptance = "true";
 
@@ -1540,7 +1540,7 @@ definition {
 	}
 
 	@description = "Publish my app as a widget with only a Table View"
-	@priority = 5
+	@priority = "5"
 	test PublishAppAsWidgetWithOnlyTableView {
 		property portal.acceptance = "true";
 
@@ -1596,7 +1596,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Numeric",
-			fieldValue = 1987);
+			fieldValue = "1987");
 
 		AppBuilderAdmin.save();
 
@@ -1618,11 +1618,11 @@ definition {
 
 		DetailsView.validateEntry(entry = "Content of form deployed as widget");
 
-		DetailsView.validateEntry(entry = 1987);
+		DetailsView.validateEntry(entry = "1987");
 	}
 
 	@description = "Publish my app in one or more sites"
-	@priority = 5
+	@priority = "5"
 	test PublishAppsInOneOrMoreSites {
 		property portal.acceptance = "true";
 
@@ -1809,7 +1809,7 @@ definition {
 	}
 
 	@description = "Publish apps in the product menu and reuse its views"
-	@priority = 5
+	@priority = "5"
 	test PublishAppsInProductMenuAndReuseItsViews {
 		property portal.acceptance = "true";
 
@@ -1830,11 +1830,11 @@ definition {
 
 		FormViewBuilder.addFieldByDoubleClick(fieldType = "Text");
 
-		FormViewBuilder.setFieldLabel(fieldLabel = ${myTextFieldName_1});
+		FormViewBuilder.setFieldLabel(fieldLabel = "${myTextFieldName_1}");
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = ${myFormViewName_1});
+		FormViewBuilder.setName(formViewName = "${myFormViewName_1}");
 
 		FormViewBuilder.save();
 
@@ -1842,39 +1842,39 @@ definition {
 
 		FormViewBuilder.addFieldByDoubleClick(fieldType = "Text");
 
-		FormViewBuilder.setFieldLabel(fieldLabel = ${myTextFieldName_2});
+		FormViewBuilder.setFieldLabel(fieldLabel = "${myTextFieldName_2}");
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = ${myFormViewName_2});
+		FormViewBuilder.setName(formViewName = "${myFormViewName_2}");
 
 		FormViewBuilder.save();
 
 		TableViewBuilder.addBasicTableView(
-			fieldType = ${myTextFieldName_1},
-			tableViewName = ${myTableViewName_1});
+			fieldType = "${myTextFieldName_1}",
+			tableViewName = "${myTableViewName_1}");
 
 		TableViewBuilder.addBasicTableView(
-			fieldType = ${myTextFieldName_2},
-			tableViewName = ${myTableViewName_2});
+			fieldType = "${myTextFieldName_2}",
+			tableViewName = "${myTableViewName_2}");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName_1});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName_1}");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName_2});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName_2}");
 
 		AppBuilderAdmin.switchTab(tabName = "Apps");
 
 		AppBuilderAdmin.add();
 
-		AppBuilderAdmin.setName(title = ${myAppName_1});
+		AppBuilderAdmin.setName(title = "${myAppName_1}");
 
-		App.selectFormView(formViewName = ${myFormViewName_1});
+		App.selectFormView(formViewName = "${myFormViewName_1}");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName_1});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName_1}");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName_2});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName_2}");
 
-		App.selectTableView(tableViewName = ${myTableViewName_1});
+		App.selectTableView(tableViewName = "${myTableViewName_1}");
 
 		App.toggleDeploy(deployOption = "Product Menu");
 
@@ -1899,52 +1899,52 @@ definition {
 		App.clickDeploy();
 
 		App.add(
-			appTitle = ${myAppName_2},
+			appTitle = "${myAppName_2}",
 			deployOption = "Product Menu",
-			formViewName = ${myFormViewName_2},
-			tableViewName = ${myTableViewName_2});
+			formViewName = "${myFormViewName_2}",
+			tableViewName = "${myTableViewName_2}");
 
 		App.add(
-			appTitle = ${myAppName_3},
+			appTitle = "${myAppName_3}",
 			deployOption = "Product Menu",
-			formViewName = ${myFormViewName_1},
-			tableViewName = ${myTableViewName_2});
+			formViewName = "${myFormViewName_1}",
+			tableViewName = "${myTableViewName_2}");
 
-		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = ${myAppName_1});
+		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "${myAppName_1}");
 
 		AppBuilderAdmin.addEntry();
 
 		FormViewBuilder.editText(
-			fieldName = ${myTextFieldName_1},
+			fieldName = "${myTextFieldName_1}",
 			fieldValue = "Content from Form 1");
 
 		AppBuilderAdmin.save();
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Content from Form 1");
 
-		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = ${myAppName_2});
+		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "${myAppName_2}");
 
 		AppBuilderAdmin.addEntry();
 
 		FormViewBuilder.editText(
-			fieldName = ${myTextFieldName_2},
+			fieldName = "${myTextFieldName_2}",
 			fieldValue = "Content from Form 2");
 
 		AppBuilderAdmin.save();
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Content from Form 2");
 
-		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = ${myAppName_3});
+		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "${myAppName_3}");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Content from Form 2");
 
 		AppBuilderAdmin.addEntry();
 
-		FormViewBuilder.validateFieldLabel(fieldLabel = ${myTextFieldName_1});
+		FormViewBuilder.validateFieldLabel(fieldLabel = "${myTextFieldName_1}");
 	}
 
 	@description = "Publish apps in standalone mode and reuse its views"
-	@priority = 4
+	@priority = "4"
 	test PublishAppsInStandaloneAndReuseItsViews {
 		property portal.acceptance = "true";
 
@@ -1965,11 +1965,11 @@ definition {
 
 		FormViewBuilder.addFieldByDoubleClick(fieldType = "Text");
 
-		FormViewBuilder.setFieldLabel(fieldLabel = ${myTextFieldName_1});
+		FormViewBuilder.setFieldLabel(fieldLabel = "${myTextFieldName_1}");
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = ${myFormViewName_1});
+		FormViewBuilder.setName(formViewName = "${myFormViewName_1}");
 
 		FormViewBuilder.save();
 
@@ -1977,31 +1977,31 @@ definition {
 
 		FormViewBuilder.addFieldByDoubleClick(fieldType = "Text");
 
-		FormViewBuilder.setFieldLabel(fieldLabel = ${myTextFieldName_2});
+		FormViewBuilder.setFieldLabel(fieldLabel = "${myTextFieldName_2}");
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = ${myFormViewName_2});
+		FormViewBuilder.setName(formViewName = "${myFormViewName_2}");
 
 		FormViewBuilder.save();
 
 		TableViewBuilder.addBasicTableView(
-			fieldType = ${myTextFieldName_1},
-			tableViewName = ${myTableViewName_1});
+			fieldType = "${myTextFieldName_1}",
+			tableViewName = "${myTableViewName_1}");
 
 		TableViewBuilder.addBasicTableView(
-			fieldType = ${myTextFieldName_2},
-			tableViewName = ${myTableViewName_2});
+			fieldType = "${myTextFieldName_2}",
+			tableViewName = "${myTableViewName_2}");
 
 		AppBuilderAdmin.switchTab(tabName = "Apps");
 
 		App.clickNewAppButton();
 
-		AppBuilderAdmin.setName(title = ${myAppName_1});
+		AppBuilderAdmin.setName(title = "${myAppName_1}");
 
-		App.selectFormView(formViewName = ${myFormViewName_1});
+		App.selectFormView(formViewName = "${myFormViewName_1}");
 
-		App.selectTableView(tableViewName = ${myTableViewName_1});
+		App.selectTableView(tableViewName = "${myTableViewName_1}");
 
 		App.toggleDeploy(deployOption = "Widget");
 
@@ -2014,25 +2014,25 @@ definition {
 		VerifyElementPresent(locator1 = "Message#SUCCESS_DISMISSIBLE");
 
 		App.add(
-			appTitle = ${myAppName_2},
+			appTitle = "${myAppName_2}",
 			deployOption = "Standalone",
-			formViewName = ${myFormViewName_2},
-			tableViewName = ${myTableViewName_2});
+			formViewName = "${myFormViewName_2}",
+			tableViewName = "${myTableViewName_2}");
 
 		App.add(
-			appTitle = ${myAppName_3},
+			appTitle = "${myAppName_3}",
 			deployOption = "Standalone",
-			formViewName = ${myFormViewName_1},
-			tableViewName = ${myTableViewName_2});
+			formViewName = "${myFormViewName_1}",
+			tableViewName = "${myTableViewName_2}");
 
-		AppBuilderAdmin.openStandAloneApp(itemName = ${myAppName_1});
+		AppBuilderAdmin.openStandAloneApp(itemName = "${myAppName_1}");
 
 		SelectWindow.selectPopUp(locator1 = "null");
 
 		AppBuilderAdmin.addEntry();
 
 		FormViewBuilder.editText(
-			fieldName = ${myTextFieldName_1},
+			fieldName = "${myTextFieldName_1}",
 			fieldValue = "Content from Form 1");
 
 		AppBuilderAdmin.save();
@@ -2043,14 +2043,14 @@ definition {
 
 		Navigator.closeWindow();
 
-		AppBuilderAdmin.openStandAloneApp(itemName = ${myAppName_2});
+		AppBuilderAdmin.openStandAloneApp(itemName = "${myAppName_2}");
 
 		SelectWindow.selectPopUp(locator1 = "null");
 
 		AppBuilderAdmin.addEntry();
 
 		FormViewBuilder.editText(
-			fieldName = ${myTextFieldName_2},
+			fieldName = "${myTextFieldName_2}",
 			fieldValue = "Content from Form 2");
 
 		AppBuilderAdmin.save();
@@ -2061,7 +2061,7 @@ definition {
 
 		Navigator.closeWindow();
 
-		AppBuilderAdmin.openStandAloneApp(itemName = ${myAppName_3});
+		AppBuilderAdmin.openStandAloneApp(itemName = "${myAppName_3}");
 
 		SelectWindow.selectPopUp(locator1 = "null");
 
@@ -2069,13 +2069,13 @@ definition {
 
 		AppBuilderAdmin.addEntry();
 
-		FormViewBuilder.validateFieldLabel(fieldLabel = ${myTextFieldName_1});
+		FormViewBuilder.validateFieldLabel(fieldLabel = "${myTextFieldName_1}");
 
 		Navigator.closeWindow();
 	}
 
 	@description = "Make sure removing a field from a specific Form View is not impacting another Form View"
-	@priority = 5
+	@priority = "5"
 	test RemoveFieldInMultipleFormViews {
 		property portal.acceptance = "true";
 
@@ -2110,7 +2110,7 @@ definition {
 	}
 
 	@description = "Search for a column(field) in the columns list in Table View Builder"
-	@priority = 5
+	@priority = "5"
 	test SearchColumnListInTableViewBuilder {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AppBuilder#SearchColumnListInTableViewBuilder";
@@ -2123,7 +2123,7 @@ definition {
 		FormViewBuilder.setName(formViewName = "Form View Title 1");
 
 		for (var fieldType : list "Text,Select from List,Single Selection,Multiple Selection,Date,Numeric,Upload") {
-			FormViewBuilder.addFieldByDoubleClick(fieldType = ${fieldType});
+			FormViewBuilder.addFieldByDoubleClick(fieldType = "${fieldType}");
 
 			FormViewBuilder.closeSidebar();
 		}
@@ -2143,17 +2143,17 @@ definition {
 		TableViewBuilder.validateColumnLabelAtSidebar(columnLabel = "Date");
 
 		for (var columnLabel : list "Text,Select from List,Single Selection,Multiple Selection,Numeric,Upload") {
-			TableViewBuilder.validateNoColumnLabelAtSidebar(columnLabel = ${columnLabel});
+			TableViewBuilder.validateNoColumnLabelAtSidebar(columnLabel = "${columnLabel}");
 		}
 
 		TableViewBuilder.clearSearch();
 
-		TableViewBuilder.searchByItem(itemName = 2);
+		TableViewBuilder.searchByItem(itemName = "2");
 
 		TableViewBuilder.validateColumnLabelAtSidebar(columnLabel = "My Text 23");
 
 		for (var columnLabel : list "Select from List,Single Selection,Multiple Selection,Date,Numeric,Upload") {
-			TableViewBuilder.validateNoColumnLabelAtSidebar(columnLabel = ${columnLabel});
+			TableViewBuilder.validateNoColumnLabelAtSidebar(columnLabel = "${columnLabel}");
 		}
 
 		TableViewBuilder.clearSearch();
@@ -2167,7 +2167,7 @@ definition {
 		TableViewBuilder.validateColumnLabelAtSidebar(columnLabel = "Multiple Selection");
 
 		for (var columnLabel : list "Text,Date,Numeric,Upload") {
-			TableViewBuilder.validateNoColumnLabelAtSidebar(columnLabel = ${columnLabel});
+			TableViewBuilder.validateNoColumnLabelAtSidebar(columnLabel = "${columnLabel}");
 		}
 
 		TableViewBuilder.clearSearch();
@@ -2175,18 +2175,18 @@ definition {
 		TableViewBuilder.searchByItem(itemName = "Oranges");
 
 		for (var columnLabel : list "Text,Select from List,Single Selection,Multiple Selection,Date,Numeric,Upload") {
-			TableViewBuilder.validateNoColumnLabelAtSidebar(columnLabel = ${columnLabel});
+			TableViewBuilder.validateNoColumnLabelAtSidebar(columnLabel = "${columnLabel}");
 		}
 
 		TableViewBuilder.clearSearch();
 
 		for (var columnLabel : list "My Text 23,Select from List,Single Selection,Multiple Selection,Date,Numeric,Upload") {
-			TableViewBuilder.validateColumnLabelAtSidebar(columnLabel = ${columnLabel});
+			TableViewBuilder.validateColumnLabelAtSidebar(columnLabel = "${columnLabel}");
 		}
 	}
 
 	@description = "Search for a deployment in the deployment lists"
-	@priority = 5
+	@priority = "5"
 	test SearchForDeployedItem {
 		property portal.acceptance = "true";
 
@@ -2219,21 +2219,21 @@ definition {
 			tableViewName = "My Table View");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 3,
+			rowNumber = "3",
 			title = "First App");
 
 		AppBuilderAdmin.searchByItem(itemName = "App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 3,
+			rowNumber = "3",
 			title = "First App");
 
 		AppBuilderAdmin.clearSearch();
@@ -2241,11 +2241,11 @@ definition {
 		AppBuilderAdmin.chooseSearchFilterByOption(filterOption = "Modified Date");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 3,
+			rowNumber = "3",
 			title = "First App");
 
 		AppBuilderAdmin.searchByItem(itemName = "First");
@@ -2253,7 +2253,7 @@ definition {
 		AppBuilderAdmin.validateIfSearchItemIsFound(itemName = "First");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "First App");
 
 		AppBuilderAdmin.clearSearch();
@@ -2265,26 +2265,26 @@ definition {
 		AppBuilderAdmin.clearSearch();
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 3,
+			rowNumber = "3",
 			title = "First App");
 
 		AppBuilderAdmin.chooseSearchFilterByOption(filterOption = "Name");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 3,
+			rowNumber = "3",
 			title = "First App");
 	}
 
 	@description = "Search for an object in the object list"
-	@priority = 5
+	@priority = "5"
 	test SearchForObject {
 		property portal.acceptance = "true";
 
@@ -2309,22 +2309,22 @@ definition {
 
 		AppBuilderAdmin.gotoBack();
 
-		AppBuilderAdmin.searchByItem(itemName = 1);
+		AppBuilderAdmin.searchByItem(itemName = "1");
 
-		AppBuilderAdmin.validateIfSearchItemIsFound(itemName = 1);
+		AppBuilderAdmin.validateIfSearchItemIsFound(itemName = "1");
 
 		AppBuilderAdmin.clearSearch();
 
 		AppBuilderAdmin.chooseSearchFilterByOption(filterOption = "Name");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "my custom object 3");
 
 		AppBuilderAdmin.chooseSearchFilterByOption(filterOption = "Modified Date");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "my custom object 3");
 
 		AppBuilderAdmin.searchByItem(itemName = "!@#");
@@ -2333,7 +2333,7 @@ definition {
 	}
 
 	@description = "Set permissions for User and Portal Content Reviewer and perform CRUD operations in a deployed widget App"
-	@priority = 5
+	@priority = "5"
 	test SetPermissionsFor2RolesAndPerformCRUD {
 		property portal.acceptance = "true";
 
@@ -2426,7 +2426,7 @@ definition {
 			siteName = "App Builder Site Name");
 
 		for (var number : list "1,2") {
-			if (${number} == 2) {
+			if ("${number}" == "2") {
 				User.logoutAndLoginPG(
 					userLoginEmailAddress = "test@liferay.com",
 					userLoginFullName = "Test Test");
@@ -2465,7 +2465,7 @@ definition {
 
 			FormViewBuilder.editText(
 				fieldName = "Numeric",
-				fieldValue = 1914);
+				fieldValue = "1914");
 
 			AppBuilderAdmin.save();
 
@@ -2475,7 +2475,7 @@ definition {
 
 			DetailsView.validateEntry(entry = "Testing permission.");
 
-			DetailsView.validateEntry(entry = 1914);
+			DetailsView.validateEntry(entry = "1914");
 
 			DetailsView.editEntry();
 
@@ -2496,7 +2496,7 @@ definition {
 	}
 
 	@description = "Clear Table View search results when clicking the Clear button on the search results banner"
-	@priority = 5
+	@priority = "5"
 	test TableViewClearSearchResults {
 		property portal.acceptance = "true";
 
@@ -2519,12 +2519,12 @@ definition {
 		AppBuilderAdmin.clearSearch();
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = 1,
+			rowNumber = "1",
 			title = "Upload Field - Table View Title");
 	}
 
 	@description = "Validate Table View search returns by search engine using a search term"
-	@priority = 5
+	@priority = "5"
 	test TableViewSearchByTerm {
 		property portal.acceptance = "true";
 
@@ -2551,7 +2551,7 @@ definition {
 	}
 
 	@description = "No results found screen is shown when the Table View search doesn't retrieve any results"
-	@priority = 5
+	@priority = "5"
 	test TableViewSearchNoResultsFound {
 		property portal.acceptance = "true";
 
@@ -2580,7 +2580,7 @@ definition {
 	}
 
 	@description = "Unpublish and Republish an App"
-	@priority = 5
+	@priority = "5"
 	test UnpublishAndRepublish {
 		property portal.acceptance = "true";
 
@@ -2739,7 +2739,7 @@ definition {
 	}
 
 	@description = "Update an existing deployment"
-	@priority = 5
+	@priority = "5"
 	test UpdateDeployment {
 		property portal.acceptance = "true";
 
@@ -2931,7 +2931,7 @@ definition {
 	}
 
 	@description = "As an App Adm, I want to make my app's name available in different languages"
-	@priority = 5
+	@priority = "5"
 	test ValidateAppLocalization {
 		property portal.acceptance = "true";
 
@@ -3021,7 +3021,7 @@ definition {
 	}
 
 	@description = "Make sure the search result show if the column is available to be added or already inserted in the table view"
-	@priority = 5
+	@priority = "5"
 	test ValidateDisabledFieldInTableView {
 		property portal.acceptance = "true";
 
@@ -3045,7 +3045,7 @@ definition {
 	}
 
 	@description = "Validate empty list state of Apps listing screen"
-	@priority = 5
+	@priority = "5"
 	test ValidateEmptyStateOfAppsListingScreen {
 		property portal.acceptance = "true";
 
@@ -3064,7 +3064,7 @@ definition {
 	}
 
 	@description = "Validate empty list state of Custom Object listing screen"
-	@priority = 5
+	@priority = "5"
 	test ValidateEmptyStateOfCustomObjectListingScreen {
 		property portal.acceptance = "true";
 
@@ -3078,7 +3078,7 @@ definition {
 	}
 
 	@description = "Validate empty list state of Form View listing screen"
-	@priority = 5
+	@priority = "5"
 	test ValidateEmptyStateOfFormViewListingScreen {
 		property portal.acceptance = "true";
 
@@ -3095,7 +3095,7 @@ definition {
 	}
 
 	@description = "Validate empty list state of Table View listing screen"
-	@priority = 5
+	@priority = "5"
 	test ValidateEmptyStateOfTableViewListingScreen {
 		property portal.acceptance = "true";
 
@@ -3114,7 +3114,7 @@ definition {
 	}
 
 	@description = "View details of an entry in an App"
-	@priority = 5
+	@priority = "5"
 	test ViewEntryDetails {
 		property portal.acceptance = "true";
 
@@ -3141,11 +3141,11 @@ definition {
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = ${myFormViewName});
+		FormViewBuilder.setName(formViewName = "${myFormViewName}");
 
 		FormViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myFormViewName});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myFormViewName}");
 
 		AppBuilderAdmin.switchTab(tabName = "Table Views");
 
@@ -3155,19 +3155,19 @@ definition {
 
 		TableViewBuilder.addColumnByDoubleClick(fieldType = "Nickname");
 
-		TableViewBuilder.setName(tableViewName = ${myTableViewName});
+		TableViewBuilder.setName(tableViewName = "${myTableViewName}");
 
 		TableViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName});
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName}");
 
 		App.add(
-			appTitle = ${myAppName},
+			appTitle = "${myAppName}",
 			deployOption = "Product Menu",
-			formViewName = ${myFormViewName},
-			tableViewName = ${myTableViewName});
+			formViewName = "${myFormViewName}",
+			tableViewName = "${myTableViewName}");
 
-		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = ${myAppName});
+		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "${myAppName}");
 
 		AppBuilderAdmin.addEntry();
 
@@ -3223,7 +3223,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-95964"
-	@priority = 5
+	@priority = "5"
 	test ViewFieldSetsInTableView {
 		property portal.acceptance = "true";
 
@@ -3281,7 +3281,7 @@ definition {
 	}
 
 	@description = "Saved form view rules run during new entry submissions"
-	@priority = 5
+	@priority = "5"
 	test ViewFormViewRules {
 		property portal.acceptance = "true";
 
@@ -3310,7 +3310,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Option${number}",
 				optionValue = "Option ${number}",
-				rowNumber = ${number});
+				rowNumber = "${number}");
 		}
 
 		FormViewBuilder.closeSidebar();
@@ -3341,7 +3341,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Select${number}",
 				optionValue = "Select ${number}",
-				rowNumber = ${number});
+				rowNumber = "${number}");
 		}
 
 		FormViewBuilder.closeSidebar();
@@ -3356,7 +3356,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Single${number}",
 				optionValue = "Single ${number}",
-				rowNumber = ${number});
+				rowNumber = "${number}");
 		}
 
 		FormViewBuilder.editFieldLabel(
@@ -3382,11 +3382,11 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Multiple Selection",
 			conditionOperator = "Is not empty",
-			conditionRowNumber = 1);
+			conditionRowNumber = "1");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Upload");
 
 		FormViewBuilder.ruleSave();
@@ -3401,14 +3401,14 @@ definition {
 
 		FormRules.configureConditionOptions(
 			conditionField = "Numeric",
-			conditionFieldValue = 0,
+			conditionFieldValue = "0",
 			conditionOperator = "Is greater than",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Enable",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Text");
 
 		FormViewBuilder.ruleSave();
@@ -3423,14 +3423,14 @@ definition {
 
 		FormRules.configureConditionOptions(
 			conditionField = "Numeric",
-			conditionFieldValue = 0,
+			conditionFieldValue = "0",
 			conditionOperator = "Is less than or equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.selectAction(
 			action = "Calculate",
-			actionRowNumber = 1);
+			actionRowNumber = "1");
 
 		FormRules.selectCalculateResultField(calculateResultField = "Total");
 
@@ -3453,13 +3453,13 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Select from List",
 			conditionOperator = "Is not equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueField = "Select 1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Enable",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Single Selection");
 
 		FormViewBuilder.ruleSave();
@@ -3478,21 +3478,21 @@ definition {
 
 		FormRules.configureConditionOptions(
 			conditionField = "Text",
-			conditionFieldValue = 0,
+			conditionFieldValue = "0",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Value");
 
 		FormRules.configureConditionOptions(
 			conditionField = "Select from List",
 			conditionOperator = "Is not equal to",
-			conditionRowNumber = 2,
+			conditionRowNumber = "2",
 			conditionValueField = "Select 1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Single Selection");
 
 		FormViewBuilder.ruleSave();
@@ -3508,12 +3508,12 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "User",
 			conditionOperator = "Belongs to",
-			conditionRowNumber = 1,
+			conditionRowNumber = "1",
 			conditionValueType = "Portal Content Reviewer");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = 1,
+			actionRowNumber = "1",
 			actionTarget = "Numeric");
 
 		FormViewBuilder.ruleSave();
@@ -3574,19 +3574,19 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Numeric",
-			fieldValue = 0);
+			fieldValue = "0");
 
 		FormViewBuilder.editText(
 			fieldName = "Quantity",
-			fieldValue = 5);
+			fieldValue = "5");
 
 		FormViewBuilder.editText(
 			fieldName = "Value",
-			fieldValue = 5);
+			fieldValue = "5");
 
 		AppBuilderAdmin.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = 25);
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "25");
 
 		AppBuilderAdmin.addEntry();
 
@@ -3596,11 +3596,11 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Numeric",
-			fieldValue = 2);
+			fieldValue = "2");
 
 		FormViewBuilder.editText(
 			fieldName = "Text",
-			fieldValue = 0);
+			fieldValue = "0");
 
 		FormViewBuilder.validateFieldLabel(fieldLabel = "Single Selection");
 

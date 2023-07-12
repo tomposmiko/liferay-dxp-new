@@ -49,6 +49,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -57,7 +58,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.workflow.configuration.WorkflowDefinitionConfiguration",
-	immediate = true, service = WorkflowDeployer.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = WorkflowDeployer.class
 )
 public class DefaultWorkflowDeployer implements WorkflowDeployer {
 

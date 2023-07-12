@@ -17,7 +17,7 @@ definition {
 			layoutName = "Blogs Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Site Name",
 			layoutName = "Blogs Page",
 			widgetName = "Blogs");
@@ -30,7 +30,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -43,7 +43,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-98324. It ensures that Auto tags can be added and removed via Gogo Shell."
-	@priority = 4
+	@priority = "4"
 	test AddAndRemoveAutoTagViaGogoShell {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#AddOrRemoveAutoTagViaGogoShell";
 
@@ -55,7 +55,7 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/blogs-page");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewAutoTag(
@@ -73,7 +73,7 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/blogs-page");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewNoTag(
@@ -89,7 +89,7 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/blogs-page");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewAutoTag(
@@ -98,7 +98,7 @@ definition {
 	}
 
 	@description = "This test ensures that a blog entry can get autotagged on a staging site and that the tags will be published to live successfully."
-	@priority = 4
+	@priority = "4"
 	test AssertAutoTagAfterPublishToLive {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#AssertAutoTagAfterPublishToLive";
 
@@ -123,7 +123,7 @@ definition {
 			siteName = "Site Name");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewAutoTag(
@@ -141,7 +141,7 @@ definition {
 			siteName = "Site Name");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewAutoTag(
@@ -150,7 +150,7 @@ definition {
 	}
 
 	@description = "This test ensures that a blog entry can be auto tagged after publishing from draft status."
-	@priority = 3
+	@priority = "3"
 	test BlogEntryCanBeAutoTaggedAfterPublishingFromDraftStatus {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#BlogEntryCanBeAutoTaggedAfterPublishingFromDraftStatus";
 
@@ -169,7 +169,7 @@ definition {
 		Navigator.gotoNavItem(navItem = "Not Published (1)");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewNoTag(
@@ -187,7 +187,7 @@ definition {
 			siteName = "Site Name");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewAutoTag(
@@ -196,7 +196,7 @@ definition {
 	}
 
 	@description = "This test ensures that when autotagging is disabled while adding a site, Blog entries will not be autotagged."
-	@priority = 5
+	@priority = "5"
 	test DisableAutoTaggingForSite {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "BlogsAutoTagging#DisableAutoTaggingForSite";
@@ -208,7 +208,7 @@ definition {
 			layoutName = "AutoTag Disabled Site Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Site AutoTag Disabled",
 			layoutName = "AutoTag Disabled Site Page",
 			widgetName = "Blogs");
@@ -227,7 +227,7 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-autotag-disabled/autotag-disabled-site-page");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewNoTag(
@@ -236,7 +236,7 @@ definition {
 	}
 
 	@description = "This test ensures that if a user manual adds a tag when adding a blog entry, the entry will not be autotagged."
-	@priority = 5
+	@priority = "5"
 	test NoAutoTagForManuallyAddedEntry {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#NoAutoTagForManuallyAddedEntry";
 
@@ -251,7 +251,7 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/blogs-page");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewAutoTag(
@@ -264,7 +264,7 @@ definition {
 	}
 
 	@description = "This test ensures that autotags generated for a blog entry can be removed."
-	@priority = 4
+	@priority = "4"
 	test RemoveAutoTag {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#RemoveAutoTag";
 
@@ -286,7 +286,7 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/blogs-page");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewNoTag(
@@ -295,7 +295,7 @@ definition {
 	}
 
 	@description = "This test asserts that a blog entry is auto tagged when OpenNLP Text Auto Tagging is enabled."
-	@priority = 5
+	@priority = "5"
 	test Smoke {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "BlogsAutoTagging#Smoke";
@@ -308,7 +308,7 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/blogs-page");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewAutoTag(

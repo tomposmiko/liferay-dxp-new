@@ -50,6 +50,7 @@ import com.liferay.portal.workflow.kaleo.service.persistence.impl.constants.Kale
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1955,12 +1956,12 @@ public class KaleoConditionPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"kaleoNodeId"},
 			false);
 
-		KaleoConditionUtil.setPersistence(this);
+		_setKaleoConditionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		KaleoConditionUtil.setPersistence(null);
+		_setKaleoConditionUtilPersistence(null);
 
 		entityCache.removeCache(KaleoConditionImpl.class.getName());
 
@@ -1970,6 +1971,22 @@ public class KaleoConditionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setKaleoConditionUtilPersistence(
+		KaleoConditionPersistence kaleoConditionPersistence) {
+
+		try {
+			Field field = KaleoConditionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, kaleoConditionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

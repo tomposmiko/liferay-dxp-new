@@ -174,15 +174,6 @@ class SearchBar extends Component {
 									<ClayManagementToolbar.Item>
 										<div className="nav-link nav-link-monospaced">
 											<ClayButton
-												aria-label={
-													this._isAnyHidden()
-														? Liferay.Language.get(
-																'show-result'
-														  )
-														: Liferay.Language.get(
-																'hide-result'
-														  )
-												}
 												className="btn-outline-borderless component-action"
 												displayType="secondary"
 												onClick={this._handleClickHide}
@@ -210,15 +201,6 @@ class SearchBar extends Component {
 									<ClayManagementToolbar.Item>
 										<div className="nav-link nav-link-monospaced">
 											<ClayButton
-												aria-label={
-													this._isAnyUnpinned()
-														? Liferay.Language.get(
-																'pin-result'
-														  )
-														: Liferay.Language.get(
-																'unpin-result'
-														  )
-												}
 												className="btn-outline-borderless component-action"
 												displayType="secondary"
 												onClick={this._handleClickPin}

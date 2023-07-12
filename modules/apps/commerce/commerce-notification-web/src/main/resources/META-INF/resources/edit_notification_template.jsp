@@ -134,10 +134,10 @@ if (commerceNotificationTemplate != null) {
 								%>
 
 									<dt>
-										<%= HtmlUtil.escape(entry.getKey()) %>
+										<%= entry.getKey() %>
 									</dt>
 									<dd>
-										<%= HtmlUtil.escape(entry.getValue()) %>
+										<%= entry.getValue() %>
 									</dd>
 
 								<%
@@ -190,10 +190,10 @@ if (commerceNotificationTemplate != null) {
 						%>
 
 							<dt>
-								<%= HtmlUtil.escape(entry.getKey()) %>
+								<%= entry.getKey() %>
 							</dt>
 							<dd>
-								<%= HtmlUtil.escape(entry.getValue()) %>
+								<%= entry.getValue() %>
 							</dd>
 
 						<%

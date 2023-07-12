@@ -10,17 +10,10 @@
 </thead>
 
 <tbody>
-
 <!-- ADD_EVENT_AND_ATTRIBUTE_TO_ANALYSE -->
-
 <tr>
 	<td>ADD_EVENT_BUTTON</td>
 	<td>//button[contains(@class,'add-event-button')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISABLED_ADD_EVENT_BUTTON</td>
-	<td>//*[contains(@class,'link-disabled')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -38,20 +31,16 @@
 	<td>xpath=(//div[contains(@class,'attribute-list')]//div[@class='drag-handle'])[${indexEnd}]</td>
 	<td></td>
 </tr>
-
 <!-- SEARCH_EVENT_ANALYSE -->
-
 <tr>
 	<td>SEARCH_BAR_EVENT_ANALYSE</td>
 	<td>//div[contains(@class,'show')]/..//input[@type='text' and @placeholder='Search' and not(@disabled)]</td>
 	<td></td>
 </tr>
-
 <!-- EDIT_ATTRIBUTE -->
-
 <tr>
 	<td>FILTER_BUTTON</td>
-	<td>//*[text()='${key_attributeName}']/..//button[contains(@class,'options-button')]//*</td>
+	<td>//button[contains(@class,'btn-secondary')]//*</td>
 	<td></td>
 </tr>
 <tr>
@@ -79,17 +68,13 @@
 	<td>xpath=(//span[@aria-haspopup='true'])[${index}]</td>
 	<td></td>
 </tr>
-
 <!-- REMOVE_BUTTON -->
-
 <tr>
 	<td>REMOVE_BUTTON</td>
 	<td>//div[contains(@class,'chip-root')]//*[contains(text(),'${key_removeValue}')]/ancestor::div/button[contains(@class,'remove-button')]</td>
 	<td></td>
 </tr>
-
 <!-- VIEW_ANALYSIS -->
-
 <tr>
 	<td>VIEW_TOTAL_NUMBER_RELATED_COLUMN_INFORMATION</td>
 	<td>//span[text()='${key_columnInformationValue}']/ancestor::tr//span[text()='${key_totalEventsValue}']</td>
@@ -106,7 +91,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>VIEW_ANALYSIS_INFORMATION_SPECIFIC_ORDER</td>
+	<td>VIEW_ANALYSIS_INFORMATION_SPECIFC_ORDER</td>
 	<td>xpath=(//span[@class='text-truncate' and contains(text(),'${key_commonInformation}')])[${index}]</td>
 	<td></td>
 </tr>

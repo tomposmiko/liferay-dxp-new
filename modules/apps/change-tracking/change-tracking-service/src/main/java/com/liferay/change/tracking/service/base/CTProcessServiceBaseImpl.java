@@ -25,11 +25,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class CTProcessServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		CTProcessServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class CTProcessServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ctProcessService = (CTProcessService)aopProxy;
 
-		CTProcessServiceUtil.setService(ctProcessService);
+		_setServiceUtilService(ctProcessService);
 	}
 
 	/**
@@ -117,6 +117,20 @@ public abstract class CTProcessServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(CTProcessService ctProcessService) {
+		try {
+			Field field = CTProcessServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ctProcessService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.change.tracking.service.CTProcessLocalService
 		ctProcessLocalService;
@@ -139,8 +153,5 @@ public abstract class CTProcessServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.CompanyService companyService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTProcessServiceBaseImpl.class);
 
 }

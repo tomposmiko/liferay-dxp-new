@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceCatalogLocalService}.
@@ -295,7 +294,13 @@ public class CommerceCatalogLocalServiceWrapper
 			commerceCatalogId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce catalog with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce catalog's external reference code
+	 * @return the matching commerce catalog, or <code>null</code> if a matching commerce catalog could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
 		fetchCommerceCatalogByExternalReferenceCode(
@@ -314,6 +319,9 @@ public class CommerceCatalogLocalServiceWrapper
 			groupId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceCatalogByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
@@ -358,7 +366,14 @@ public class CommerceCatalogLocalServiceWrapper
 			commerceCatalogId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce catalog with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce catalog's external reference code
+	 * @return the matching commerce catalog
+	 * @throws PortalException if a matching commerce catalog could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
 			getCommerceCatalogByExternalReferenceCode(
@@ -512,11 +527,6 @@ public class CommerceCatalogLocalServiceWrapper
 		return _commerceCatalogLocalService.
 			updateCommerceCatalogExternalReferenceCode(
 				commerceCatalogId, externalReferenceCode);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceCatalogLocalService.getBasePersistence();
 	}
 
 	@Override

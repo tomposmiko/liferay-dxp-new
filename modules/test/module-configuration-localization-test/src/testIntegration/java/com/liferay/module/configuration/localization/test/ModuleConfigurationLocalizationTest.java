@@ -62,12 +62,12 @@ public class ModuleConfigurationLocalizationTest {
 
 	@Test
 	public void testConfigurationLocalization() {
-		StringBundler sb = new StringBundler();
-
 		Bundle currentBundle = FrameworkUtil.getBundle(
 			ModuleConfigurationLocalizationTest.class);
 
 		BundleContext bundleContext = currentBundle.getBundleContext();
+
+		StringBundler sb = new StringBundler();
 
 		for (Bundle bundle : bundleContext.getBundles()) {
 			String bundleError = _collectBundleError(bundle);
@@ -134,17 +134,27 @@ public class ModuleConfigurationLocalizationTest {
 					bundle.getSymbolicName());
 
 		if (resourceBundleLoader == null) {
-			resourceBundleLoader =
-				ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
-		}
-		else {
-			resourceBundleLoader = new AggregateResourceBundleLoader(
-				resourceBundleLoader,
-				ResourceBundleLoaderUtil.getPortalResourceBundleLoader());
+			sb.append(
+				"\n\tMissing default language file for configuration pids: ");
+
+			for (String pid : pids) {
+				sb.append(pid);
+				sb.append(StringPool.COMMA);
+			}
+
+			sb.setIndex(sb.index() - 1);
+
+			return sb.toString();
 		}
 
-		ResourceBundle resourceBundle = resourceBundleLoader.loadResourceBundle(
-			LocaleUtil.getDefault());
+		ResourceBundleLoader aggregateResourceBundleLoader =
+			new AggregateResourceBundleLoader(
+				resourceBundleLoader,
+				ResourceBundleLoaderUtil.getPortalResourceBundleLoader());
+
+		ResourceBundle resourceBundle =
+			aggregateResourceBundleLoader.loadResourceBundle(
+				LocaleUtil.getDefault());
 
 		for (String pid : pids) {
 			String configurationError = _collectConfigurationError(

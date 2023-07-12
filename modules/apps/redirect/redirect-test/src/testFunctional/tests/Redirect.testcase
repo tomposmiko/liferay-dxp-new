@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -33,10 +33,11 @@ definition {
 	}
 
 	@description = "This ensures that a user will be redirected to the target URL of a permanent redirection."
-	@priority = 5
+	@priority = "5"
 	test AccessPermanentEntry {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
@@ -56,10 +57,9 @@ definition {
 			${portalURL}/web/test-site-name/test-source-page \
 				-w %{http_code}
 		''';
+		var output = JSONCurlUtil.post("${curl}");
 
-		var output = JSONCurlUtil.post(${curl});
-
-		if (contains(${output}, 301)) {
+		if (contains("${output}", "301")) {
 			echo("This is a permanent redirect.");
 		}
 		else {
@@ -68,10 +68,11 @@ definition {
 	}
 
 	@description = "This ensures that the user will be redirected to the cached target URL of a permanent redirection after it is updated."
-	@priority = 5
+	@priority = "5"
 	test AccessPermanentEntryAfterEdit {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -102,10 +103,11 @@ definition {
 	}
 
 	@description = "This ensures that a user will be redirected to the target URL of a temporary redirection."
-	@priority = 5
+	@priority = "5"
 	test AccessTemporaryEntry {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
@@ -122,10 +124,9 @@ definition {
 			${portalURL}/web/test-site-name/test-source-page \
 				-w %{http_code}
 		''';
+		var output = JSONCurlUtil.post("${curl}");
 
-		var output = JSONCurlUtil.post(${curl});
-
-		if (contains(${output}, 302)) {
+		if (contains("${output}", "302")) {
 			echo("This is a temporary redirect.");
 		}
 		else {
@@ -134,10 +135,11 @@ definition {
 	}
 
 	@description = "This ensures that the user will be redirected to the latest target URL of a temporary redirection after it is updated."
-	@priority = 5
+	@priority = "5"
 	test AccessTemporaryEntryAfterEdit {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -166,7 +168,7 @@ definition {
 	}
 
 	@description = "This ensures that a user cannot create more than one redirection with the same sourceURL."
-	@priority = 5
+	@priority = "5"
 	test AddDuplicateSourceURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -186,7 +188,7 @@ definition {
 	}
 
 	@description = "This ensures that an entry can be added without update references."
-	@priority = 5
+	@priority = "5"
 	test AddEntryWithoutReferences {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -228,7 +230,7 @@ definition {
 	}
 
 	@description = "This ensures that an entry can be added with update references."
-	@priority = 5
+	@priority = "5"
 	test AddEntryWithReferences {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -273,17 +275,9 @@ definition {
 	}
 
 	@description = "This ensures that an expired permanent redirect can be added from an active 404 URL."
-	@priority = 4
+	@priority = "4"
 	test AddExpiredEntryFromActive404 {
-		property test.name.skip.portal.instance = "Redirect#AddExpiredEntryFromActive404";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page1",
@@ -316,17 +310,9 @@ definition {
 	}
 
 	@description = "This ensures that an expired temporary redirect can be added from an ignored 404 URL."
-	@priority = 4
+	@priority = "4"
 	test AddExpiredEntryFromIgnored404 {
-		property test.name.skip.portal.instance = "Redirect#AddExpiredEntryFromIgnored404";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page1",
@@ -363,7 +349,7 @@ definition {
 	}
 
 	@description = "This ensures that a permanent redirect can be added."
-	@priority = 5
+	@priority = "5"
 	test AddPermanentEntry {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -384,17 +370,9 @@ definition {
 	}
 
 	@description = "This ensures that a permanent redirect can be added from an active 404 URL."
-	@priority = 5
+	@priority = "5"
 	test AddPermanentEntryFromActive404 {
-		property test.name.skip.portal.instance = "Redirect#AddPermanentEntryFromActive404";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page1",
@@ -426,17 +404,9 @@ definition {
 	}
 
 	@description = "This ensures that a permanent redirect can be added from an ignored 404 URL."
-	@priority = 5
+	@priority = "5"
 	test AddPermanentEntryFromIgnored404 {
-		property test.name.skip.portal.instance = "Redirect#AddPermanentEntryFromIgnored404";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page1",
@@ -471,7 +441,7 @@ definition {
 	}
 
 	@description = "This ensures that a user cannot create a redirect if the sourceURL has invalid characters."
-	@priority = 5
+	@priority = "5"
 	test AddSourceURLWithInvalidCharacters {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -480,7 +450,7 @@ definition {
 		Redirect.addEntry(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
 			siteName = "test-site-name",
-			sourceURL = "/test-source-page",
+			sourceURL = "test-source-page!@#$",
 			sourceURLVariation = "Invalid");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
@@ -491,17 +461,9 @@ definition {
 	}
 
 	@description = "This ensures that a temporary redirect can be added from an active 404 URL."
-	@priority = 5
+	@priority = "5"
 	test AddTempEntryFromActive404 {
-		property test.name.skip.portal.instance = "Redirect#AddTempEntryFromActive404";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page1",
@@ -532,17 +494,9 @@ definition {
 	}
 
 	@description = "This ensures that a temporary redirect can be added from an ignored 404 URL."
-	@priority = 5
+	@priority = "5"
 	test AddTempEntryFromIgnored404 {
-		property test.name.skip.portal.instance = "Redirect#AddTempEntryFromIgnored404";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page1",
@@ -578,7 +532,7 @@ definition {
 	}
 
 	@description = "This ensures that a redirection chain can be avoided."
-	@priority = 5
+	@priority = "5"
 	test AvoidRedirectChain {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -623,35 +577,12 @@ definition {
 		AssertLocation(value1 = "${portalURL}/web/test-site-name/test-page2");
 	}
 
-	@description = "This ensures that the 404 tab is not shown and no new 404 tracking is performed when 404 tracking is disabled."
-	@priority = 5
-	test CannotView404ByDefault {
-		property test.name.skip.portal.instance = "Redirect#CannotView404ByDefault";
-
-		var portalURL = PropsUtil.get("portal.url");
-
-		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/my-url-that-does-not-exist");
-
-		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
-
-		Redirect.view404URLsTab(disabled404Tracking = "true");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
-
-		Redirect.open404URLsAdmin(siteURLKey = "test-site-name");
-
-		Redirect.view404URLsDefault();
-	}
-
 	@description = "This ensures that the destination URL passes validation before it can be used."
-	@priority = 5
+	@priority = "5"
 	test CheckDestinationURL {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -661,7 +592,7 @@ definition {
 			Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
 			Redirect.addEntry(
-				destinationURL = ${destinationURL},
+				destinationURL = "${destinationURL}",
 				destinationURLVariation = "RelativeURL",
 				siteName = "test-site-name",
 				sourceURL = "test-source-page");
@@ -683,13 +614,13 @@ definition {
 			destinationPageName = "Test Destination Page",
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
 			groupName = "Test Site Name",
-			portalName = ${siteName},
+			portalName = "${siteName}",
 			siteName = "test-site-name",
 			sourceURL = "test-source-page");
 	}
 
 	@description = "This ensures that a redirection chain will be created."
-	@priority = 5
+	@priority = "5"
 	test CreateRedirectChain {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -732,29 +663,8 @@ definition {
 		AssertLocation(value1 = "${portalURL}/web/test-site-name/test-page2");
 	}
 
-	@description = "This test covers LPS-152732. It ensures that the default redirect can not override localized redirect."
-	@priority = 4
-	test DefaultRedirectCanNotOverrideLocalizedRedirect {
-		var portalURL = PropsUtil.get("portal.url");
-
-		JSONRedirect.addRedirect(
-			destinationURL = "https://google.hu",
-			groupName = "Test Site Name",
-			permanent = "true",
-			sourceURL = "hu/google");
-
-		JSONRedirect.addRedirect(
-			destinationURL = "https://google.com",
-			groupName = "Test Site Name",
-			sourceURL = "google");
-
-		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/hu/google");
-
-		AssertLocation(value1 = "https://www.google.hu/");
-	}
-
 	@description = "This ensures that all redirect entries can be deleted simultaneously."
-	@priority = 5
+	@priority = "5"
 	test DeleteEntries {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -791,7 +701,7 @@ definition {
 	}
 
 	@description = "This ensures that a redirect entry can be deleted."
-	@priority = 5
+	@priority = "5"
 	test DeleteEntry {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -813,57 +723,12 @@ definition {
 		Redirect.viewDefault();
 	}
 
-	@description = "This ensures that there's no new 404 tracking is performed when it is re-disabled at system settings."
-	@priority = 4
-	test Disable404InSystemSettings {
-		property test.name.skip.portal.instance = "Redirect#Disable404InSystemSettings";
-
-		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		SystemSettings.saveConfiguration();
-
-		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/my-url-that-does-not-exist");
-
-		Redirect.open404URLsAdmin(siteURLKey = "test-site-name");
-
-		Redirect.view404URLs(
-			ignoreURL = "${portalURL}/web/test-site-name/my-url-that-does-not-exist",
-			requestNumber = 1);
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.disableCheckbox(fieldName = "enabled");
-
-		SystemSettings.saveConfiguration();
-
-		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
-
-		Redirect.view404URLsTab(disabled404Tracking = "true");
-
-		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/my-url-that-does-not-exist");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		SystemSettings.saveConfiguration();
-
-		Redirect.open404URLsAdmin(siteURLKey = "test-site-name");
-
-		Redirect.view404URLs(
-			ignoreURL = "${portalURL}/web/test-site-name/my-url-that-does-not-exist",
-			requestNumber = 1);
-	}
-
 	@description = "This ensures that an unexpired redirect can be edited."
-	@priority = 5
+	@priority = "5"
 	test EditEntry {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
@@ -901,17 +766,9 @@ definition {
 	}
 
 	@description = "This ensures that a URL can be ignored after reactivation."
-	@priority = 5
+	@priority = "5"
 	test IgnoreURLAfterReactivation {
-		property test.name.skip.portal.instance = "Redirect#IgnoreURLAfterReactivation";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page1",
@@ -927,7 +784,7 @@ definition {
 		Redirect.view404URLs(
 			activeIgnoreURL = "true",
 			ignoreURL = "${portalURL}/web/test-site-name/test-destination-page1",
-			requestNumber = 1);
+			requestNumber = "1");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -951,22 +808,14 @@ definition {
 
 		Redirect.view404URLs(
 			ignoreURL = "${portalURL}/web/test-site-name/test-destination-page1",
-			requestNumber = 1);
+			requestNumber = "1");
 	}
 
 	@description = "This will be ignored until LPS-121379 is fixed. This ensures that the 404 URLs can be ordered by requests."
 	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test Order404URLsByRequests {
-		property test.name.skip.portal.instance = "Redirect#Order404URLsByRequests";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -999,25 +848,25 @@ definition {
 		Redirect.view404URLs(
 			activeIgnoreURL = "true",
 			ignoreURL = "${portalURL}/web/test-site-name/test-destination-page1",
-			requestNumber = 1);
+			requestNumber = "1");
 
 		Redirect.view404URLs(
 			ignoreURL = "${portalURL}/web/test-site-name/test-destination-page2",
-			requestNumber = 2);
+			requestNumber = "2");
 
 		Redirect.viewOrderedURLs(
-			entry1 = 1,
-			entry2 = 2);
+			entry1 = "1",
+			entry2 = "2");
 
 		Click(locator1 = "ManagementBar#ORDER_ICON_GENERIC");
 
 		Redirect.viewOrderedURLs(
-			entry1 = 2,
-			entry2 = 1);
+			entry1 = "2",
+			entry2 = "1");
 	}
 
 	@description = "This ensures that accessing a nonexistent URL redirects the user to the home of the current site."
-	@priority = 4
+	@priority = "4"
 	test Redirect404sToSiteHomePage {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -1035,7 +884,7 @@ definition {
 	}
 
 	@description = "This ensures that an expired permanent redirect can be reset."
-	@priority = 5
+	@priority = "5"
 	test ResetExpiredEntry {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -1062,7 +911,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-110773. It ensures that a redirect entry can be found by search."
-	@priority = 3
+	@priority = "3"
 	test SearchEntry {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -1076,12 +925,12 @@ definition {
 		for (var searchTerm : list "source,destination") {
 			Redirect.viewResultEntryTitle(
 				searchEntryTitle = "${portalURL}/web/test-site-name/test-source-page",
-				searchTerm = ${searchTerm});
+				searchTerm = "${searchTerm}");
 		}
 	}
 
 	@description = "This ensures that the redirect can be set."
-	@priority = 5
+	@priority = "5"
 	test Smoke {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
@@ -1114,7 +963,7 @@ definition {
 	}
 
 	@description = "This ensures that an entry can be updated with checking update redirect."
-	@priority = 5
+	@priority = "5"
 	test UpdateEntryWithCheckingUpdateRedirect {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -1166,17 +1015,9 @@ definition {
 	}
 
 	@description = "This ensures that the 404 URLs can be viewed after reactivating."
-	@priority = 5
+	@priority = "5"
 	test View404URLsAfterReactivating {
-		property test.name.skip.portal.instance = "Redirect#View404URLsAfterReactivating";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		for (var i : list "1,2,3") {
 			JSONLayout.addPublicLayout(
@@ -1223,7 +1064,7 @@ definition {
 	}
 
 	@description = "This ensures that the information related to the redirection can be viewed."
-	@priority = 5
+	@priority = "5"
 	test ViewEntryInfo {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -1235,9 +1076,9 @@ definition {
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
 		for (var redirectURL : list "${portalURL}/web/test-site-name/test-source-page,${portalURL}/web/test-site-name/test-destination-page") {
-			Redirect.viewEntryFloatingURL(redirectURL = ${redirectURL});
+			Redirect.viewEntryFloatingURL(redirectURL = "${redirectURL}");
 
-			Pause(locator1 = 2000);
+			Pause(locator1 = "2000");
 		}
 
 		Check(
@@ -1250,10 +1091,11 @@ definition {
 	}
 
 	@description = "This ensures that an expired temporary redirect can be reactivated."
-	@priority = 5
+	@priority = "5"
 	test ViewExpiredAndActiveEntries {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
@@ -1285,7 +1127,7 @@ definition {
 	}
 
 	@description = "This ensures that an expired permanent redirect can be viewed."
-	@priority = 5
+	@priority = "5"
 	test ViewExpiredPermanentEntry {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -1306,7 +1148,7 @@ definition {
 	}
 
 	@description = "This ensures that an expired temporary redirect can be viewed."
-	@priority = 5
+	@priority = "5"
 	test ViewExpiredTempEntry {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -1326,17 +1168,9 @@ definition {
 	}
 
 	@description = "This ensures that an ignored URL can be viewed."
-	@priority = 5
+	@priority = "5"
 	test ViewIgnoredURL {
-		property test.name.skip.portal.instance = "Redirect#ViewIgnoredURL";
-
 		var portalURL = PropsUtil.get("portal.url");
-
-		Redirect.openToConfigInSystemSettings();
-
-		FormFields.enableCheckbox(fieldName = "enabled");
-
-		PortletEntry.save();
 
 		JSONRedirect.addRedirect(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page1",
@@ -1353,7 +1187,7 @@ definition {
 		Redirect.view404URLs(
 			activeIgnoreURL = "true",
 			ignoreURL = "${portalURL}/web/test-site-name/test-destination-page1",
-			requestNumber = 1);
+			requestNumber = "1");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -1367,7 +1201,7 @@ definition {
 
 		Redirect.view404URLs(
 			ignoreURL = "${portalURL}/web/test-site-name/test-destination-page1",
-			requestNumber = 1);
+			requestNumber = "1");
 	}
 
 }

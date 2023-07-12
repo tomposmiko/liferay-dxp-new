@@ -58,9 +58,7 @@ public class Folder implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Folder.class, json);
 	}
 
-	@Schema(
-		example = "[{id=31130, name=Item 1, slug=/Item-1, street2=/Item/31130, thumbnail=/schema.jpg}]"
-	)
+	@Schema
 	@Valid
 	public Breadcrumb[] getBreadcrumbs() {
 		return breadcrumbs;

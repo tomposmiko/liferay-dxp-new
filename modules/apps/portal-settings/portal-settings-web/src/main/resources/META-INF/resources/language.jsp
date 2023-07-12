@@ -87,7 +87,7 @@
 
 		for (String propsValuesLanguageId : SetUtil.fromArray(PropsValues.LOCALES)) {
 			if (!ArrayUtil.contains(availableLanguageIds, propsValuesLanguageId)) {
-				Locale propsValuesLocale = LocaleUtil.fromLanguageId(propsValuesLanguageId, false);
+				Locale propsValuesLocale = LocaleUtil.fromLanguageId(propsValuesLanguageId);
 
 				rightList.add(new KeyValuePair(propsValuesLanguageId, propsValuesLocale.getDisplayName(locale)));
 			}

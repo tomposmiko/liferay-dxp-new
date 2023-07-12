@@ -368,10 +368,6 @@ public class PowwowParticipantLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(PowwowParticipantLocalService service) {
-		_service = service;
-	}
-
 	private static volatile PowwowParticipantLocalService _service;
 
 }

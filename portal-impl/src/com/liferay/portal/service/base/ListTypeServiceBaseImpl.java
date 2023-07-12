@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
@@ -30,6 +28,8 @@ import com.liferay.portal.kernel.service.ListTypeServiceUtil;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.ListTypePersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -204,11 +204,11 @@ public abstract class ListTypeServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		ListTypeServiceUtil.setService(listTypeService);
+		_setServiceUtilService(listTypeService);
 	}
 
 	public void destroy() {
-		ListTypeServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -253,6 +253,20 @@ public abstract class ListTypeServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(ListTypeService listTypeService) {
+		try {
+			Field field = ListTypeServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, listTypeService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(
 		type = com.liferay.portal.kernel.service.ListTypeLocalService.class
 	)
@@ -285,8 +299,5 @@ public abstract class ListTypeServiceBaseImpl
 
 	@BeanReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ListTypeServiceBaseImpl.class);
 
 }

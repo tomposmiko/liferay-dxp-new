@@ -597,12 +597,6 @@ public class OAuth2ApplicationUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		OAuth2ApplicationPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile OAuth2ApplicationPersistence _persistence;
 
 }

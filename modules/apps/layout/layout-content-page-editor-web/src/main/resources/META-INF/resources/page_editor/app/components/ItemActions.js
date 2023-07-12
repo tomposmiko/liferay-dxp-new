@@ -27,16 +27,19 @@ import canBeRemoved from '../utils/canBeRemoved';
 import canBeSaved from '../utils/canBeSaved';
 import {useSelectItem} from './Controls';
 import SaveFragmentCompositionModal from './SaveFragmentCompositionModal';
-import {useWidgets} from './WidgetsContext';
 
 export default function ItemActions({item}) {
 	const [active, setActive] = useState(false);
 	const dispatch = useDispatch();
 	const selectItem = useSelectItem();
-	const state = useSelector((state) => state);
-	const widgets = useWidgets();
 
-	const {fragmentEntryLinks, layoutData, segmentsExperienceId} = state;
+	const state = useSelector((state) => state);
+	const {
+		fragmentEntryLinks,
+		layoutData,
+		segmentsExperienceId,
+		widgets,
+	} = state;
 
 	const [openSaveModal, setOpenSaveModal] = useState(false);
 

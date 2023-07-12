@@ -51,7 +51,8 @@ public class HeapDumpTestRule implements TestRule {
 
 				Future<?> future = HeapUtil.heapDump(
 					_live, true,
-					StringBundler.concat(description, "-", date, "-before.bin"),
+					StringBundler.concat(
+						description.toString(), "-", date, "-before.bin"),
 					EchoOutputProcessor.INSTANCE);
 
 				future.get();
@@ -65,7 +66,7 @@ public class HeapDumpTestRule implements TestRule {
 					future = HeapUtil.heapDump(
 						_live, true,
 						StringBundler.concat(
-							description, "-", date, "-after.bin"),
+							description.toString(), "-", date, "-after.bin"),
 						EchoOutputProcessor.INSTANCE);
 
 					future.get();

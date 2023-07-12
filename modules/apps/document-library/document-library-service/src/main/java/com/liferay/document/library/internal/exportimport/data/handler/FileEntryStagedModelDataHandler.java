@@ -545,8 +545,6 @@ public class FileEntryStagedModelDataHandler
 							if (_log.isDebugEnabled()) {
 								_log.debug(exception, exception);
 							}
-
-							updateFileEntry = true;
 						}
 					}
 
@@ -970,7 +968,7 @@ public class FileEntryStagedModelDataHandler
 		AssetDisplayPageEntry assetDisplayPageEntry =
 			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
 				fileEntry.getGroupId(),
-				_portal.getClassNameId(FileEntry.class.getName()),
+				_portal.getClassNameId(DLFileEntry.class),
 				fileEntry.getFileEntryId());
 
 		if (assetDisplayPageEntry != null) {

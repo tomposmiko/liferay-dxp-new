@@ -15,7 +15,6 @@
 package com.liferay.commerce.discount.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceDiscountLocalService}.
@@ -473,7 +472,13 @@ public class CommerceDiscountLocalServiceWrapper
 			commerceDiscountId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce discount with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce discount's external reference code
+	 * @return the matching commerce discount, or <code>null</code> if a matching commerce discount could not be found
+	 */
 	@Override
 	public com.liferay.commerce.discount.model.CommerceDiscount
 		fetchCommerceDiscountByExternalReferenceCode(
@@ -484,6 +489,9 @@ public class CommerceDiscountLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceDiscountByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.discount.model.CommerceDiscount
@@ -651,7 +659,14 @@ public class CommerceDiscountLocalServiceWrapper
 			commerceDiscountId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce discount with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce discount's external reference code
+	 * @return the matching commerce discount
+	 * @throws PortalException if a matching commerce discount could not be found
+	 */
 	@Override
 	public com.liferay.commerce.discount.model.CommerceDiscount
 			getCommerceDiscountByExternalReferenceCode(
@@ -1193,11 +1208,6 @@ public class CommerceDiscountLocalServiceWrapper
 			displayDateHour, displayDateMinute, expirationDateMonth,
 			expirationDateDay, expirationDateYear, expirationDateHour,
 			expirationDateMinute, neverExpire, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceDiscountLocalService.getBasePersistence();
 	}
 
 	@Override

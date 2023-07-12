@@ -26,11 +26,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -59,7 +59,7 @@ public abstract class DDLRecordVersionServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DDLRecordVersionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public abstract class DDLRecordVersionServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddlRecordVersionService = (DDLRecordVersionService)aopProxy;
 
-		DDLRecordVersionServiceUtil.setService(ddlRecordVersionService);
+		_setServiceUtilService(ddlRecordVersionService);
 	}
 
 	/**
@@ -118,6 +118,22 @@ public abstract class DDLRecordVersionServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		DDLRecordVersionService ddlRecordVersionService) {
+
+		try {
+			Field field = DDLRecordVersionServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddlRecordVersionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected
 		com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService
@@ -137,8 +153,5 @@ public abstract class DDLRecordVersionServiceBaseImpl
 
 	@Reference
 	protected DDLRecordFinder ddlRecordFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDLRecordVersionServiceBaseImpl.class);
 
 }

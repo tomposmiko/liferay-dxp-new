@@ -12,7 +12,6 @@
  * details.
  */
 
-import ClayButton from '@clayui/button';
 import ClayForm, {ClaySelect, ClaySelectWithOption} from '@clayui/form';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
@@ -26,7 +25,6 @@ import {config} from '../../app/config/index';
 import CollectionService from '../../app/services/CollectionService';
 import InfoItemService from '../../app/services/InfoItemService';
 import {useDispatch, useSelector} from '../../app/store/index';
-import getSelectedField from '../../app/utils/getSelectedField';
 import isMapped from '../../app/utils/isMapped';
 import {useId} from '../../app/utils/useId';
 import ItemSelector from './ItemSelector';
@@ -330,36 +328,13 @@ function MappingSelector({fieldType, mappedItem, onMappingSelect}) {
 			)}
 
 			{selectedSourceTypeId === MAPPING_SOURCE_TYPE_IDS.content && (
-				<>
-					<ClayForm.Group small>
-						<ItemSelector
-							label={Liferay.Language.get('content')}
-							onItemSelect={onInfoItemSelect}
-							selectedItemTitle={selectedItem.title}
-						/>
-					</ClayForm.Group>
-
-					{selectedItem.title && (
-						<ClayButton
-							className="mt-2"
-							displayType="secondary"
-							onClick={() => {
-								setSelectedItem({});
-
-								if (isMapped(mappedItem)) {
-									onMappingSelect({
-										classNameId: '',
-										classPK: '',
-										fieldId: '',
-										mappedField: '',
-									});
-								}
-							}}
-						>
-							{Liferay.Language.get('clear')}
-						</ClayButton>
-					)}
-				</>
+				<ClayForm.Group small>
+					<ItemSelector
+						label={Liferay.Language.get('content')}
+						onItemSelect={onInfoItemSelect}
+						selectedItemTitle={selectedItem.title}
+					/>
+				</ClayForm.Group>
 			)}
 
 			<ClayForm.Group small>
@@ -379,8 +354,6 @@ function MappingFieldSelect({fieldSets, fieldType, onValueSelect, value}) {
 
 	const hasWarnings = fieldSets && fieldSets.length === 0;
 
-	const selectedField = getSelectedField({fieldSets, value});
-
 	return (
 		<ClayForm.Group
 			className={classNames({'has-warning': hasWarnings})}
@@ -395,7 +368,7 @@ function MappingFieldSelect({fieldSets, fieldType, onValueSelect, value}) {
 				disabled={!(fieldSets && fieldSets.length)}
 				id={mappingSelectorFieldSelectId}
 				onChange={onValueSelect}
-				value={selectedField?.key}
+				value={value}
 			>
 				{fieldSets && fieldSets.length && (
 					<>

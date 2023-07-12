@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.sites.kernel.util.Sites;
 
 import java.util.Date;
 
@@ -63,9 +65,19 @@ public class LayoutSetPrototypeLayoutModelListener
 				LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(
 					group.getClassPK());
 
+			layoutSetPrototype.setModifiedDate(modifiedDate);
+
+			LayoutSetPrototypeLocalServiceUtil.updateLayoutSetPrototype(
+				layoutSetPrototype);
+
 			LayoutSet layoutSet = layoutSetPrototype.getLayoutSet();
 
 			layoutSet.setModifiedDate(modifiedDate);
+
+			UnicodeProperties settingsUnicodeProperties =
+				layoutSet.getSettingsProperties();
+
+			settingsUnicodeProperties.remove(Sites.MERGE_FAIL_COUNT);
 
 			LayoutSetLocalServiceUtil.updateLayoutSet(layoutSet);
 		}

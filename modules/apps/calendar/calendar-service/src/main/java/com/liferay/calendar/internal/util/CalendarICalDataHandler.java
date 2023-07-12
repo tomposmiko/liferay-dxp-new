@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -52,20 +51,14 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.net.URI;
 
-import java.time.Duration;
-import java.time.Period;
-import java.time.temporal.TemporalAmount;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TimeZone;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -75,6 +68,7 @@ import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Property;
@@ -82,7 +76,6 @@ import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
-import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Cn;
@@ -201,10 +194,10 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 
 		Map<Locale, String> descriptionMap = new HashMap<>();
 
-		String description = _getXAltDescription(vEvent);
+		Description description = vEvent.getDescription();
 
 		if (description != null) {
-			descriptionMap.put(user.getLocale(), description);
+			descriptionMap.put(user.getLocale(), description.getValue());
 		}
 
 		// Location
@@ -327,9 +320,9 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 
 			DateTime dateTime = trigger.getDateTime();
 
-			TemporalAmount temporalAmount = trigger.getDuration();
+			Dur dur = trigger.getDuration();
 
-			if ((dateTime == null) && (temporalAmount == null)) {
+			if ((dateTime == null) && (dur == null)) {
 				continue;
 			}
 
@@ -343,13 +336,15 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 				}
 			}
 			else {
-				Duration duration = Duration.from(temporalAmount);
-
-				if (!duration.isNegative()) {
+				if (!dur.isNegative()) {
 					continue;
 				}
 
-				time += duration.toMillis();
+				time += dur.getWeeks() * Time.WEEK;
+				time += dur.getDays() * Time.DAY;
+				time += dur.getHours() * Time.HOUR;
+				time += dur.getMinutes() * Time.MINUTE;
+				time += dur.getSeconds() * Time.SECOND;
 			}
 
 			reminders[i] = time;
@@ -485,9 +480,9 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 	protected VAlarm toICalAlarm(
 		NotificationType notificationType, long reminder, String emailAddress) {
 
-		TemporalAmount temporalAmount = toTemporalAmount(reminder);
+		Dur dur = toICalDur(reminder);
 
-		VAlarm vAlarm = new VAlarm(temporalAmount);
+		VAlarm vAlarm = new VAlarm(dur);
 
 		PropertyList propertyList = vAlarm.getProperties();
 
@@ -557,22 +552,10 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 		propertiesList.add(CalScale.GREGORIAN);
 		propertiesList.add(Method.PUBLISH);
 
-		List<CalendarComponent> calendarComponents =
-			iCalCalendar.getComponents();
-
-		Set<String> timeZoneIds = new HashSet<>();
+		List<VEvent> vEvents = iCalCalendar.getComponents();
 
 		for (CalendarBooking calendarBooking : calendarBookings) {
-			TimeZone timeZone = calendarBooking.getTimeZone();
-
-			if (timeZoneIds.add(timeZone.getID())) {
-				net.fortuna.ical4j.model.TimeZone icalTimeZone =
-					_toICalTimeZone(timeZone);
-
-				calendarComponents.add(icalTimeZone.getVTimeZone());
-			}
-
-			calendarComponents.add(toICalEvent(calendarBooking));
+			vEvents.add(toICalEvent(calendarBooking));
 		}
 
 		return iCalCalendar;
@@ -591,6 +574,40 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 		}
 
 		return dateTime;
+	}
+
+	protected Dur toICalDur(long reminder) {
+		int weeks = (int)(reminder / Time.WEEK);
+
+		if (weeks > 0) {
+			return new Dur(weeks);
+		}
+
+		int days = (int)(reminder / Time.DAY);
+
+		if (days > 0) {
+			return new Dur(days, 0, 0, 0);
+		}
+
+		int hours = (int)(reminder / Time.HOUR);
+
+		if (hours > 0) {
+			return new Dur(0, hours, 0, 0);
+		}
+
+		int minutes = (int)(reminder / Time.MINUTE);
+
+		if (minutes > 0) {
+			return new Dur(0, 0, minutes, 0);
+		}
+
+		int seconds = (int)(reminder / Time.SECOND);
+
+		if (seconds > 0) {
+			return new Dur(0, 0, 0, seconds);
+		}
+
+		return null;
 	}
 
 	protected VEvent toICalEvent(CalendarBooking calendarBooking)
@@ -641,12 +658,10 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 
 		// Title
 
-		User user = UserLocalServiceUtil.fetchUser(calendarBooking.getUserId());
+		User user = UserLocalServiceUtil.getUser(calendarBooking.getUserId());
 
-		Locale locale =
-			(user != null) ? user.getLocale() : LocaleUtil.getSiteDefault();
-
-		Summary summary = new Summary(calendarBooking.getTitle(locale));
+		Summary summary = new Summary(
+			calendarBooking.getTitle(user.getLocale()));
 
 		propertyList.add(summary);
 
@@ -656,7 +671,7 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 			calendarBooking.getCompanyId());
 
 		String calendarBookingDescription = StringUtil.replace(
-			calendarBooking.getDescription(locale),
+			calendarBooking.getDescription(user.getLocale()),
 			new String[] {"href=\"/", "src=\"/"},
 			new String[] {
 				"href=\"" + company.getPortalURL(calendarBooking.getGroupId()) +
@@ -717,7 +732,7 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 
 		long firstReminder = calendarBooking.getFirstReminder();
 
-		if ((firstReminder > 0) && (user != null)) {
+		if (firstReminder > 0) {
 			VAlarm vAlarm = toICalAlarm(
 				calendarBooking.getFirstReminderNotificationType(),
 				firstReminder, user.getEmailAddress());
@@ -727,7 +742,7 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 
 		long secondReminder = calendarBooking.getSecondReminder();
 
-		if ((secondReminder > 0) && (user != null)) {
+		if (secondReminder > 0) {
 			VAlarm alarm = toICalAlarm(
 				calendarBooking.getSecondReminderNotificationType(),
 				secondReminder, user.getEmailAddress());
@@ -825,40 +840,6 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 		return unsyncStringWriter.toString();
 	}
 
-	protected TemporalAmount toTemporalAmount(long reminder) {
-		int weeks = (int)(reminder / Time.WEEK);
-
-		if (weeks > 0) {
-			return Period.ofWeeks(weeks);
-		}
-
-		int days = (int)(reminder / Time.DAY);
-
-		if (days > 0) {
-			return Period.ofDays(days);
-		}
-
-		int hours = (int)(reminder / Time.HOUR);
-
-		if (hours > 0) {
-			return Duration.ofHours(hours);
-		}
-
-		int minutes = (int)(reminder / Time.MINUTE);
-
-		if (minutes > 0) {
-			return Duration.ofMinutes(minutes);
-		}
-
-		int seconds = (int)(reminder / Time.SECOND);
-
-		if (seconds > 0) {
-			return Duration.ofSeconds(seconds);
-		}
-
-		return null;
-	}
-
 	private void _addHourMinuteFromTimeInMillis(
 		long sourceTimeInMillis, java.util.Calendar targetJCalendar) {
 
@@ -889,16 +870,6 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 		recur.setUntil(new DateTime(jCalendar.getTimeInMillis()));
 	}
 
-	private String _getDescription(VEvent vEvent) {
-		Property descriptionProperty = vEvent.getDescription();
-
-		if (descriptionProperty == null) {
-			return null;
-		}
-
-		return descriptionProperty.getValue();
-	}
-
 	private TimeZoneRegistry _getTimeZoneRegistry() {
 		if (_timeZoneRegistry == null) {
 			TimeZoneRegistryFactory timeZoneRegistryFactory =
@@ -908,24 +879,6 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 		}
 
 		return _timeZoneRegistry;
-	}
-
-	private String _getXAltDescription(VEvent vEvent) {
-		Property xAltDescProperty = vEvent.getProperty("X-ALT-DESC");
-
-		if (xAltDescProperty == null) {
-			return _getDescription(vEvent);
-		}
-
-		Parameter fmtTypeParameter = xAltDescProperty.getParameter("FMTTYPE");
-
-		if ((fmtTypeParameter == null) ||
-			!Objects.equals(fmtTypeParameter.getValue(), "text/html")) {
-
-			return _getDescription(vEvent);
-		}
-
-		return xAltDescProperty.getValue();
 	}
 
 	private net.fortuna.ical4j.model.TimeZone _toICalTimeZone(

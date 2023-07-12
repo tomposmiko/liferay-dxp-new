@@ -138,7 +138,7 @@ public class LocalizationImplUnitTest {
 
 				}));
 
-		Locale locale = LocaleUtil.fromLanguageId(defaultContentLocale, false);
+		Locale locale = LocaleUtil.fromLanguageId(defaultContentLocale);
 
 		LocaleUtil.setDefault(
 			locale.getLanguage(), locale.getCountry(), locale.getVariant());
@@ -147,7 +147,7 @@ public class LocalizationImplUnitTest {
 
 		localizationUtil.setLocalization(new LocalizationImpl());
 
-		Locale contentDefaultLocale = LocaleUtil.fromLanguageId("es_ES", false);
+		Locale contentDefaultLocale = LocaleUtil.fromLanguageId("es_ES");
 
 		Locale[] contentAvailableLocales = getContentAvailableLocales(
 			"es_ES,en_US,de_DE");
@@ -159,13 +159,13 @@ public class LocalizationImplUnitTest {
 		if (expectedResult) {
 			Assert.assertTrue(
 				LocaleUtil.equals(
-					LocaleUtil.fromLanguageId(expectedLocale, false),
+					LocaleUtil.fromLanguageId(expectedLocale),
 					defaultImportLocale));
 		}
 		else {
 			Assert.assertFalse(
 				LocaleUtil.equals(
-					LocaleUtil.fromLanguageId(expectedLocale, false),
+					LocaleUtil.fromLanguageId(expectedLocale),
 					defaultImportLocale));
 		}
 	}

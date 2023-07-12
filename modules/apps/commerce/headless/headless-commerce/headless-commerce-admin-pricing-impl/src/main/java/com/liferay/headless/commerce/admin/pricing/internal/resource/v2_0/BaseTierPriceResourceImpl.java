@@ -29,16 +29,10 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortField;
-import com.liferay.portal.odata.sort.SortParser;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
@@ -50,21 +44,16 @@ import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Array;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Generated;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -410,6 +399,10 @@ public abstract class BaseTierPriceResourceImpl
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "id"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "callbackURL"
 			)
@@ -424,6 +417,9 @@ public abstract class BaseTierPriceResourceImpl
 	@javax.ws.rs.Produces("application/json")
 	@Override
 	public Response deleteTierPriceBatch(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull @javax.ws.rs.PathParam("id")
+			Long id,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -511,31 +507,20 @@ public abstract class BaseTierPriceResourceImpl
 	@Override
 	@SuppressWarnings("PMD.UnusedLocalVariable")
 	public void create(
-			Collection<TierPrice> tierPrices,
+			java.util.Collection<TierPrice> tierPrices,
 			Map<String, Serializable> parameters)
 		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Override
 	public void delete(
-			Collection<TierPrice> tierPrices,
+			java.util.Collection<TierPrice> tierPrices,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
 		for (TierPrice tierPrice : tierPrices) {
 			deleteTierPrice(tierPrice.getId());
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray();
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray("PARTIAL_UPDATE");
 	}
 
 	@Override
@@ -563,8 +548,7 @@ public abstract class BaseTierPriceResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return null;
 	}
 
 	@Override
@@ -591,45 +575,9 @@ public abstract class BaseTierPriceResourceImpl
 
 	@Override
 	public void update(
-			Collection<TierPrice> tierPrices,
+			java.util.Collection<TierPrice> tierPrices,
 			Map<String, Serializable> parameters)
 		throws Exception {
-
-		UnsafeConsumer<TierPrice, Exception> tierPriceUnsafeConsumer = null;
-
-		String updateStrategy = (String)parameters.getOrDefault(
-			"updateStrategy", "UPDATE");
-
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
-			tierPriceUnsafeConsumer = tierPrice -> patchTierPrice(
-				tierPrice.getId() != null ? tierPrice.getId() :
-					_parseLong((String)parameters.get("tierPriceId")),
-				tierPrice);
-		}
-
-		if (tierPriceUnsafeConsumer == null) {
-			throw new NotSupportedException(
-				"Update strategy \"" + updateStrategy +
-					"\" is not supported for TierPrice");
-		}
-
-		if (contextBatchUnsafeConsumer != null) {
-			contextBatchUnsafeConsumer.accept(
-				tierPrices, tierPriceUnsafeConsumer);
-		}
-		else {
-			for (TierPrice tierPrice : tierPrices) {
-				tierPriceUnsafeConsumer.accept(tierPrice);
-			}
-		}
-	}
-
-	private Long _parseLong(String value) {
-		if (value != null) {
-			return Long.parseLong(value);
-		}
-
-		return null;
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
@@ -638,8 +586,9 @@ public abstract class BaseTierPriceResourceImpl
 
 	public void setContextBatchUnsafeConsumer(
 		UnsafeBiConsumer
-			<Collection<TierPrice>, UnsafeConsumer<TierPrice, Exception>,
-			 Exception> contextBatchUnsafeConsumer) {
+			<java.util.Collection<TierPrice>,
+			 UnsafeConsumer<TierPrice, Exception>, Exception>
+				contextBatchUnsafeConsumer) {
 
 		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
@@ -704,10 +653,6 @@ public abstract class BaseTierPriceResourceImpl
 		this.roleLocalService = roleLocalService;
 	}
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider) {
-		this.sortParserProvider = sortParserProvider;
-	}
-
 	public void setVulcanBatchEngineImportTaskResource(
 		VulcanBatchEngineImportTaskResource
 			vulcanBatchEngineImportTaskResource) {
@@ -736,49 +681,9 @@ public abstract class BaseTierPriceResourceImpl
 		}
 		catch (Exception exception) {
 			_log.error("Invalid filter " + filterString, exception);
-
-			return null;
-		}
-	}
-
-	@Override
-	public Sort[] toSorts(String sortString) {
-		if (Validator.isNull(sortString)) {
-			return null;
 		}
 
-		try {
-			SortParser sortParser = sortParserProvider.provide(
-				getEntityModel(Collections.emptyMap()));
-
-			if (sortParser == null) {
-				return null;
-			}
-
-			com.liferay.portal.odata.sort.Sort oDataSort =
-				new com.liferay.portal.odata.sort.Sort(
-					sortParser.parse(sortString));
-
-			List<SortField> sortFields = oDataSort.getSortFields();
-
-			Sort[] sorts = new Sort[sortFields.size()];
-
-			for (int i = 0; i < sortFields.size(); i++) {
-				SortField sortField = sortFields.get(i);
-
-				sorts[i] = new Sort(
-					sortField.getSortableFieldName(
-						contextAcceptLanguage.getPreferredLocale()),
-					!sortField.isAscending());
-			}
-
-			return sorts;
-		}
-		catch (Exception exception) {
-			_log.error("Invalid sort " + sortString, exception);
-
-			return new Sort[0];
-		}
+		return null;
 	}
 
 	protected Map<String, String> addAction(
@@ -815,85 +720,38 @@ public abstract class BaseTierPriceResourceImpl
 			actionName, siteId, methodName, null, permissionName, siteId);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transform(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transform(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transform(collection, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> R[] transform(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz) {
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
 
 		return TransformUtil.transform(array, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> R[] transformToArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-		Class<?> clazz) {
+	protected <T, R> R[] transformToArray(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
 
 		return TransformUtil.transformToArray(
 			collection, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transformToList(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> long[] transformToLongArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
-
-		try {
-			return unsafeTransformToLongArray(collection, unsafeFunction);
-		}
-		catch (Throwable throwable) {
-			throw new RuntimeException(throwable);
-		}
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransform(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransform(collection, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransform(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransform(array, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransformToArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransformToArray(
-			collection, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransformToList(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransformToList(array, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> long[] unsafeTransformToLongArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return (long[])_unsafeTransformToPrimitiveArray(
-			collection, unsafeFunction, long[].class);
-	}
-
 	protected AcceptLanguage contextAcceptLanguage;
 	protected UnsafeBiConsumer
-		<Collection<TierPrice>, UnsafeConsumer<TierPrice, Exception>, Exception>
-			contextBatchUnsafeConsumer;
+		<java.util.Collection<TierPrice>, UnsafeConsumer<TierPrice, Exception>,
+		 Exception> contextBatchUnsafeConsumer;
 	protected com.liferay.portal.kernel.model.Company contextCompany;
 	protected HttpServletRequest contextHttpServletRequest;
 	protected HttpServletResponse contextHttpServletResponse;
@@ -906,26 +764,8 @@ public abstract class BaseTierPriceResourceImpl
 	protected ResourceActionLocalService resourceActionLocalService;
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 	protected RoleLocalService roleLocalService;
-	protected SortParserProvider sortParserProvider;
 	protected VulcanBatchEngineImportTaskResource
 		vulcanBatchEngineImportTaskResource;
-
-	private <T, R, E extends Throwable> Object _unsafeTransformToPrimitiveArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		List<R> list = unsafeTransform(collection, unsafeFunction);
-
-		Object array = clazz.cast(
-			Array.newInstance(clazz.getComponentType(), list.size()));
-
-		for (int i = 0; i < list.size(); i++) {
-			Array.set(array, i, list.get(i));
-		}
-
-		return array;
-	}
 
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseTierPriceResourceImpl.class);

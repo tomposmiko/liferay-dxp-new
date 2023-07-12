@@ -71,7 +71,7 @@ portletURL.setParameter("searchContainerId", "dispatchTriggers");
 
 					<liferay-ui:search-container-column-text
 						name="task-executor-type"
-						value="<%= dispatchTriggerDisplayContext.getDispatchTaskExecutorName(dispatchTrigger.getDispatchTaskExecutorType(), locale) %>"
+						property="dispatchTaskExecutorType"
 					/>
 
 					<liferay-ui:search-container-column-text
@@ -98,7 +98,7 @@ portletURL.setParameter("searchContainerId", "dispatchTriggers");
 						DispatchTaskStatus dispatchTaskStatus = dispatchTrigger.getDispatchTaskStatus();
 						%>
 
-						<h6 class="status-row-<%= row.getRowId() %> background-task-status-row background-task-status-<%= dispatchTaskStatus.getLabel() %> <%= dispatchTaskStatus.getCssClass() %>">
+						<h6 class="background-task-status-row background-task-status-<%= dispatchTaskStatus.getLabel() %> <%= dispatchTaskStatus.getCssClass() %>">
 							<liferay-ui:message key="<%= dispatchTaskStatus.getLabel() %>" />
 						</h6>
 					</liferay-ui:search-container-column-text>

@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -51,6 +49,8 @@ import com.liferay.social.kernel.service.SocialActivitySettingLocalServiceUtil;
 import com.liferay.social.kernel.service.persistence.SocialActivitySettingPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -575,15 +575,14 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 			"com.liferay.social.kernel.model.SocialActivitySetting",
 			socialActivitySettingLocalService);
 
-		SocialActivitySettingLocalServiceUtil.setService(
-			socialActivitySettingLocalService);
+		_setLocalServiceUtilService(socialActivitySettingLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.social.kernel.model.SocialActivitySetting");
 
-		SocialActivitySettingLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -644,6 +643,23 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SocialActivitySettingLocalService socialActivitySettingLocalService) {
+
+		try {
+			Field field =
+				SocialActivitySettingLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivitySettingLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = SocialActivitySettingLocalService.class)
 	protected SocialActivitySettingLocalService
 		socialActivitySettingLocalService;
@@ -677,9 +693,6 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 
 	@BeanReference(type = GroupFinder.class)
 	protected GroupFinder groupFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialActivitySettingLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -48,6 +48,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1123,11 +1124,11 @@ public class OrgLaborPersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"organizationId"}, false);
 
-		OrgLaborUtil.setPersistence(this);
+		_setOrgLaborUtilPersistence(this);
 	}
 
 	public void destroy() {
-		OrgLaborUtil.setPersistence(null);
+		_setOrgLaborUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(OrgLaborImpl.class.getName());
 
@@ -1137,6 +1138,21 @@ public class OrgLaborPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setOrgLaborUtilPersistence(
+		OrgLaborPersistence orgLaborPersistence) {
+
+		try {
+			Field field = OrgLaborUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, orgLaborPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

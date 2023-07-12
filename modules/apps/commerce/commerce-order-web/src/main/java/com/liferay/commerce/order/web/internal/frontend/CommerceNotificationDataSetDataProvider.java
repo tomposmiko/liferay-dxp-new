@@ -109,7 +109,8 @@ public class CommerceNotificationDataSetDataProvider
 						"success",
 						getCommerceNotificationTemplateType(
 							commerceNotificationQueueEntry)),
-					commerceNotificationQueueEntry.getSubject(),
+					HtmlUtil.escape(
+						commerceNotificationQueueEntry.getSubject()),
 					HtmlUtil.extractText(
 						commerceNotificationQueueEntry.getBody()),
 					getNotificationPanelURL(

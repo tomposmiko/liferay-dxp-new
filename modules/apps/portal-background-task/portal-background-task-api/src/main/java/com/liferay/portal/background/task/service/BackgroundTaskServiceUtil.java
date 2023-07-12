@@ -68,10 +68,6 @@ public class BackgroundTaskServiceUtil {
 		return _service;
 	}
 
-	public static void setService(BackgroundTaskService service) {
-		_service = service;
-	}
-
 	private static volatile BackgroundTaskService _service;
 
 }

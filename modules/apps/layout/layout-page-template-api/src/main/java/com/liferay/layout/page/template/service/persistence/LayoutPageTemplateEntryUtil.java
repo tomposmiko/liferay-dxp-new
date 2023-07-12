@@ -7178,12 +7178,6 @@ public class LayoutPageTemplateEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		LayoutPageTemplateEntryPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile LayoutPageTemplateEntryPersistence _persistence;
 
 }

@@ -38,8 +38,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -66,6 +64,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -276,7 +276,13 @@ public abstract class UserGroupLocalServiceBaseImpl
 		return userGroupPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
+	 */
 	@Override
 	public UserGroup fetchUserGroupByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -285,6 +291,9 @@ public abstract class UserGroupLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserGroupByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public UserGroup fetchUserGroupByReferenceCode(
@@ -294,7 +303,14 @@ public abstract class UserGroupLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group
+	 * @throws PortalException if a matching user group could not be found
+	 */
 	@Override
 	public UserGroup getUserGroupByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -1385,14 +1401,14 @@ public abstract class UserGroupLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.UserGroup", userGroupLocalService);
 
-		UserGroupLocalServiceUtil.setService(userGroupLocalService);
+		_setLocalServiceUtilService(userGroupLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.UserGroup");
 
-		UserGroupLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1448,6 +1464,22 @@ public abstract class UserGroupLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		UserGroupLocalService userGroupLocalService) {
+
+		try {
+			Field field = UserGroupLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, userGroupLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1548,9 +1580,6 @@ public abstract class UserGroupLocalServiceBaseImpl
 
 	@BeanReference(type = UserGroupGroupRoleFinder.class)
 	protected UserGroupGroupRoleFinder userGroupGroupRoleFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		UserGroupLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

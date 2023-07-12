@@ -47,6 +47,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1255,11 +1256,11 @@ public class CommerceShippingFixedOptionPersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"commerceShippingMethodId"}, false);
 
-		CommerceShippingFixedOptionUtil.setPersistence(this);
+		_setCommerceShippingFixedOptionUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceShippingFixedOptionUtil.setPersistence(null);
+		_setCommerceShippingFixedOptionUtilPersistence(null);
 
 		entityCache.removeCache(
 			CommerceShippingFixedOptionImpl.class.getName());
@@ -1270,6 +1271,24 @@ public class CommerceShippingFixedOptionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceShippingFixedOptionUtilPersistence(
+		CommerceShippingFixedOptionPersistence
+			commerceShippingFixedOptionPersistence) {
+
+		try {
+			Field field =
+				CommerceShippingFixedOptionUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceShippingFixedOptionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

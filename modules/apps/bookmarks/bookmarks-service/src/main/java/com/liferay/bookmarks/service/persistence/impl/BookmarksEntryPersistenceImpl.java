@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2996,7 +2997,7 @@ public class BookmarksEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -8866,7 +8867,7 @@ public class BookmarksEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -10386,7 +10387,7 @@ public class BookmarksEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -11980,7 +11981,7 @@ public class BookmarksEntryPersistenceImpl
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -13321,12 +13322,12 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "folderId", "status"}, false);
 
-		BookmarksEntryUtil.setPersistence(this);
+		_setBookmarksEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		BookmarksEntryUtil.setPersistence(null);
+		_setBookmarksEntryUtilPersistence(null);
 
 		entityCache.removeCache(BookmarksEntryImpl.class.getName());
 
@@ -13336,6 +13337,22 @@ public class BookmarksEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setBookmarksEntryUtilPersistence(
+		BookmarksEntryPersistence bookmarksEntryPersistence) {
+
+		try {
+			Field field = BookmarksEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, bookmarksEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

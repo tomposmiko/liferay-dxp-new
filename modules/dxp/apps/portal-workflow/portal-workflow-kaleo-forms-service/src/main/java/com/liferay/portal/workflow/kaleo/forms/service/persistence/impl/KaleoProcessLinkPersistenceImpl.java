@@ -47,6 +47,7 @@ import com.liferay.portal.workflow.kaleo.forms.service.persistence.impl.constant
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1447,12 +1448,12 @@ public class KaleoProcessLinkPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"kaleoProcessId", "workflowTaskName"}, false);
 
-		KaleoProcessLinkUtil.setPersistence(this);
+		_setKaleoProcessLinkUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		KaleoProcessLinkUtil.setPersistence(null);
+		_setKaleoProcessLinkUtilPersistence(null);
 
 		entityCache.removeCache(KaleoProcessLinkImpl.class.getName());
 
@@ -1462,6 +1463,22 @@ public class KaleoProcessLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setKaleoProcessLinkUtilPersistence(
+		KaleoProcessLinkPersistence kaleoProcessLinkPersistence) {
+
+		try {
+			Field field = KaleoProcessLinkUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, kaleoProcessLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

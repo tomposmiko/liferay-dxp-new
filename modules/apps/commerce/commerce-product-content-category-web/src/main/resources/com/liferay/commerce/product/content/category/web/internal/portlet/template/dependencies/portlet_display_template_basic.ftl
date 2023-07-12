@@ -22,12 +22,12 @@
 	</#if>
 
 	<div>
-		<img src="${htmlUtil.escapeAttribute(image)}">
+		<img src="${image}">
 	</div>
 
 	<div class="container-fluid-1280">
-		<h1>${htmlUtil.escape(title)}</h1>
+		<h1>${title}</h1>
 
-		<p>${htmlUtil.escape(description)}</p>
+		<p>${description}</p>
 	</div>
 </div>

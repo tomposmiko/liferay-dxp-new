@@ -17,6 +17,9 @@ package com.liferay.portal.test.rule;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.rules.TestRule;
 
 /**
@@ -32,10 +35,13 @@ public class LiferayUnitTestRule extends AggregateTestRule {
 	}
 
 	private static TestRule[] _getTestRules() {
-		return new TestRule[] {
-			InitializeKernelUtilTestRule.INSTANCE,
-			AspectJNewEnvTestRule.INSTANCE, NewEnvTestRule.INSTANCE
-		};
+		List<TestRule> testRules = new ArrayList<>();
+
+		testRules.add(InitializeKernelUtilTestRule.INSTANCE);
+		testRules.add(AspectJNewEnvTestRule.INSTANCE);
+		testRules.add(NewEnvTestRule.INSTANCE);
+
+		return testRules.toArray(new TestRule[0]);
 	}
 
 }

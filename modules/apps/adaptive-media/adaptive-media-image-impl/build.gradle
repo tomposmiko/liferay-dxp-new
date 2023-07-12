@@ -1,6 +1,6 @@
 dependencies {
-	compileInclude group: "com.adobe.xmp", name: "xmpcore", version: "6.1.11"
-	compileInclude group: "com.drewnoakes", name: "metadata-extractor", version: "2.18.0"
+	compileInclude group: "com.adobe.xmp", name: "xmpcore", version: "6.0.6"
+	compileInclude group: "com.drewnoakes", name: "metadata-extractor", version: "2.13.0"
 
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bnd.annotation", version: "4.2.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
@@ -12,10 +12,6 @@ dependencies {
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 	compileOnly project(":apps:adaptive-media:adaptive-media-api")
 	compileOnly project(":apps:adaptive-media:adaptive-media-image-api")
-	compileOnly project(":apps:document-library:document-library-api")
-	compileOnly project(":apps:dynamic-data-mapping:dynamic-data-mapping-api")
-	compileOnly project(":apps:journal:journal-api")
-	compileOnly project(":apps:static:osgi:osgi-util")
 	compileOnly project(":apps:static:portal-configuration:portal-configuration-metatype-api")
 	compileOnly project(":core:osgi-service-tracker-collections")
 	compileOnly project(":core:petra:petra-concurrent")
@@ -23,6 +19,11 @@ dependencies {
 	compileOnly project(":core:petra:petra-sql-dsl-api")
 	compileOnly project(":core:petra:petra-string")
 	compileOnly project(":core:registry-api")
+
+	testCompile group: "org.jabsorb", name: "jabsorb", version: "1.3.1"
+	testCompile group: "org.jodd", name: "jodd-json", version: "3.6.4"
+	testCompile group: "org.slf4j", name: "slf4j-api", version: "1.7.26"
+	testCompile project(":core:petra:petra-lang")
 }
 
 liferayOSGi {

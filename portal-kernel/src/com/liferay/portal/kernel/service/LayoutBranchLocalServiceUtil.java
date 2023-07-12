@@ -358,10 +358,6 @@ public class LayoutBranchLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(LayoutBranchLocalService service) {
-		_service = service;
-	}
-
 	private static volatile LayoutBranchLocalService _service;
 
 }

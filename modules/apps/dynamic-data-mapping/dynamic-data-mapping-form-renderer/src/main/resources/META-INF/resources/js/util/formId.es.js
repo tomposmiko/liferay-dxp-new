@@ -17,6 +17,3 @@ import dom from 'metal-dom';
 export const getFormNode = (element) => dom.closest(element, 'form');
 
 export const getFormId = (form) => form?.dataset.ddmforminstanceid;
-
-export const getFormTitle = () =>
-	document.querySelector('[data-form-title]')?.dataset.formTitle;

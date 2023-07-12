@@ -880,12 +880,6 @@ public class RecentLayoutBranchUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		RecentLayoutBranchPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile RecentLayoutBranchPersistence _persistence;
 
 }

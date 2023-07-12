@@ -18,10 +18,14 @@ import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.util.PropsValues;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,6 +39,7 @@ public class AddResourceActionsPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
+		Set<String> names = new HashSet<>();
 		String xml = StringUtil.read(
 			AddResourceActionsPortalInstanceLifecycleListener.class.
 				getClassLoader(),
@@ -44,14 +49,23 @@ public class AddResourceActionsPortalInstanceLifecycleListener
 		String[] languageIds = ArrayUtil.sortedUnique(PropsValues.LOCALES);
 
 		for (int i = 0; i < languageIds.length; i++) {
-			_resourceActions.populateModelResources(
+			_resourceActions.read(
 				SAXReaderUtil.read(
 					StringUtil.replace(
 						StringUtil.replace(
 							xml, "[$LANGUAGE_ID$]", languageIds[i]),
-						"[$WEIGHT$]", String.valueOf(i))));
+						"[$WEIGHT$]", String.valueOf(i))),
+				names);
+		}
+
+		for (String name : names) {
+			_resourceActionLocalService.checkResourceActions(
+				name, _resourceActions.getModelResourceActions(name));
 		}
 	}
+
+	@Reference
+	private ResourceActionLocalService _resourceActionLocalService;
 
 	@Reference
 	private ResourceActions _resourceActions;

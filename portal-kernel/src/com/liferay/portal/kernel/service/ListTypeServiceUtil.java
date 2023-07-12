@@ -75,10 +75,6 @@ public class ListTypeServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ListTypeService service) {
-		_service = service;
-	}
-
 	private static volatile ListTypeService _service;
 
 }

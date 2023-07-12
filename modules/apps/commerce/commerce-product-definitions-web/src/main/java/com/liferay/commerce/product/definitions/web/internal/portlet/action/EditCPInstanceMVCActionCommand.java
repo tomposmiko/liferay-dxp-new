@@ -52,7 +52,6 @@ import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.math.BigDecimal;
 
@@ -296,10 +295,10 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 
 			_updateCommercePriceEntry(
 				cpInstance, CommercePriceListConstants.TYPE_PRICE_LIST, price,
-				promoPrice, serviceContext);
+				serviceContext);
 
 			_updateCommercePriceEntry(
-				cpInstance, CommercePriceListConstants.TYPE_PROMOTION, price,
+				cpInstance, CommercePriceListConstants.TYPE_PROMOTION,
 				promoPrice, serviceContext);
 		}
 
@@ -367,7 +366,7 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 
 	private void _updateCommercePriceEntry(
 			CPInstance cpInstance, String type, BigDecimal price,
-			BigDecimal promoPrice, ServiceContext serviceContext)
+			ServiceContext serviceContext)
 		throws Exception {
 
 		CommercePriceList commercePriceList =
@@ -380,19 +379,17 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 				commercePriceList.getCommercePriceListId(),
 				cpInstance.getCPInstanceUuid());
 
-		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
-
 		if (commercePriceEntry == null) {
 			CPDefinition cpDefinition = cpInstance.getCPDefinition();
 
 			_commercePriceEntryLocalService.addCommercePriceEntry(
 				cpDefinition.getCProductId(), cpInstance.getCPInstanceUuid(),
-				commercePriceList.getCommercePriceListId(), price, promoPrice,
+				commercePriceList.getCommercePriceListId(), price, null,
 				serviceContext);
 		}
 		else {
 			_commercePriceEntryLocalService.updateCommercePriceEntry(
-				commercePriceEntry.getCommercePriceEntryId(), price, promoPrice,
+				commercePriceEntry.getCommercePriceEntryId(), price, null,
 				serviceContext);
 		}
 	}

@@ -53,6 +53,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4649,11 +4650,11 @@ public class EmailAddressPersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "primary_"},
 			false);
 
-		EmailAddressUtil.setPersistence(this);
+		_setEmailAddressUtilPersistence(this);
 	}
 
 	public void destroy() {
-		EmailAddressUtil.setPersistence(null);
+		_setEmailAddressUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(EmailAddressImpl.class.getName());
 
@@ -4663,6 +4664,22 @@ public class EmailAddressPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setEmailAddressUtilPersistence(
+		EmailAddressPersistence emailAddressPersistence) {
+
+		try {
+			Field field = EmailAddressUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, emailAddressPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

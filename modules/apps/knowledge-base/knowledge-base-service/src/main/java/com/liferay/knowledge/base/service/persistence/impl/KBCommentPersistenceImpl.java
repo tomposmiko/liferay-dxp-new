@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4701,7 +4702,7 @@ public class KBCommentPersistenceImpl
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of kb comments
 	 * @param end the upper bound of the range of kb comments (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5764,12 +5765,12 @@ public class KBCommentPersistenceImpl
 			},
 			new String[] {"classNameId", "classPK", "status"}, false);
 
-		KBCommentUtil.setPersistence(this);
+		_setKBCommentUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		KBCommentUtil.setPersistence(null);
+		_setKBCommentUtilPersistence(null);
 
 		entityCache.removeCache(KBCommentImpl.class.getName());
 
@@ -5779,6 +5780,21 @@ public class KBCommentPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setKBCommentUtilPersistence(
+		KBCommentPersistence kbCommentPersistence) {
+
+		try {
+			Field field = KBCommentUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, kbCommentPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

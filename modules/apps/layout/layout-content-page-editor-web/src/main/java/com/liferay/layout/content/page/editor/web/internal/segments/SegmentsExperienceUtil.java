@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -62,7 +61,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -84,22 +82,10 @@ public class SegmentsExperienceUtil {
 			long userId)
 		throws PortalException {
 
-		boolean copyLayout = CopyLayoutThreadLocal.isCopyLayout();
-
-		try {
-			CopyLayoutThreadLocal.setCopyLayout(true);
-
-			_copyLayoutData(
-				plid, commentManager, groupId, portletRegistry,
-				sourceSegmentsExperienceId, targetSegmentsExperienceId,
-				serviceContextFunction, userId);
-		}
-		catch (Throwable throwable) {
-			throw new PortalException(throwable);
-		}
-		finally {
-			CopyLayoutThreadLocal.setCopyLayout(copyLayout);
-		}
+		_copyLayoutData(
+			plid, commentManager, groupId, portletRegistry,
+			sourceSegmentsExperienceId, targetSegmentsExperienceId,
+			serviceContextFunction, userId);
 	}
 
 	public static Map<String, Object> getAvailableSegmentsExperiences(
@@ -451,12 +437,7 @@ public class SegmentsExperienceUtil {
 				layoutStructure.getLayoutStructureItems()) {
 
 			if (!(layoutStructureItem instanceof
-					FragmentStyledLayoutStructureItem) ||
-				ListUtil.exists(
-					layoutStructure.getDeletedLayoutStructureItems(),
-					deletedLayoutStructureItem -> Objects.equals(
-						deletedLayoutStructureItem.getItemId(),
-						layoutStructureItem.getItemId()))) {
+					FragmentStyledLayoutStructureItem)) {
 
 				continue;
 			}

@@ -358,13 +358,6 @@ public class FragmentEntryLinkLocalServiceUtil {
 		return getService().getFragmentEntryLink(fragmentEntryLinkId);
 	}
 
-	public static FragmentEntryLink getFragmentEntryLink(
-		long groupId, long originalFragmentEntryLinkId, long plid) {
-
-		return getService().getFragmentEntryLink(
-			groupId, originalFragmentEntryLinkId, plid);
-	}
-
 	/**
 	 * Returns the fragment entry link matching the UUID and group.
 	 *
@@ -460,18 +453,6 @@ public class FragmentEntryLinkLocalServiceUtil {
 		return getService().getFragmentEntryLinks(
 			groupId, fragmentEntryId, classNameId, start, end,
 			orderByComparator);
-	}
-
-	public static List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String rendererKey) {
-
-		return getService().getFragmentEntryLinks(companyId, rendererKey);
-	}
-
-	public static List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String[] rendererKeys) {
-
-		return getService().getFragmentEntryLinks(companyId, rendererKeys);
 	}
 
 	public static List<FragmentEntryLink> getFragmentEntryLinks(
@@ -799,14 +780,6 @@ public class FragmentEntryLinkLocalServiceUtil {
 			fragmentEntryLinksEditableValuesMap);
 	}
 
-	public static void updateLatestChanges(
-			com.liferay.fragment.model.FragmentEntry fragmentEntry,
-			FragmentEntryLink fragmentEntryLink)
-		throws PortalException {
-
-		getService().updateLatestChanges(fragmentEntry, fragmentEntryLink);
-	}
-
 	public static void updateLatestChanges(long fragmentEntryLinkId)
 		throws PortalException {
 
@@ -815,10 +788,6 @@ public class FragmentEntryLinkLocalServiceUtil {
 
 	public static FragmentEntryLinkLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(FragmentEntryLinkLocalService service) {
-		_service = service;
 	}
 
 	private static volatile FragmentEntryLinkLocalService _service;

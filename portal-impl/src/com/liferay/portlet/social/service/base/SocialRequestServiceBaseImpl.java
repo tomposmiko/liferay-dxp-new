@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -32,6 +30,8 @@ import com.liferay.social.kernel.model.SocialRequest;
 import com.liferay.social.kernel.service.SocialRequestService;
 import com.liferay.social.kernel.service.SocialRequestServiceUtil;
 import com.liferay.social.kernel.service.persistence.SocialRequestPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -311,11 +311,11 @@ public abstract class SocialRequestServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		SocialRequestServiceUtil.setService(socialRequestService);
+		_setServiceUtilService(socialRequestService);
 	}
 
 	public void destroy() {
-		SocialRequestServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -357,6 +357,22 @@ public abstract class SocialRequestServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		SocialRequestService socialRequestService) {
+
+		try {
+			Field field = SocialRequestServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, socialRequestService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -414,8 +430,5 @@ public abstract class SocialRequestServiceBaseImpl
 	protected
 		com.liferay.social.kernel.service.SocialRequestInterpreterLocalService
 			socialRequestInterpreterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialRequestServiceBaseImpl.class);
 
 }

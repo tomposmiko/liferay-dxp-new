@@ -35,9 +35,7 @@
 	<td>title=Documents - OneDrive</td>
 	<td></td>
 </tr>
-
 <!--DOCUMENTS-->
-
 <tr>
 	<td>DOCUMENTS_SAVE_STATUS</td>
 	<td>//span[@id='BreadcrumbSaveStatus']</td>

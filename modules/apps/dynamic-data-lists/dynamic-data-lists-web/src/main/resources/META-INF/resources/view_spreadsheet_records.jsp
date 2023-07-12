@@ -143,8 +143,6 @@ DDMStructure ddmStructure = recordSet.getDDMStructure();
 	});
 
 	var spreadSheet = new Liferay.SpreadSheet({
-		addRecordURL:
-			'<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/dynamic_data_lists/add_record" />',
 		boundingBox: '#<portlet:namespace />dataTable',
 		columns: columns,
 		contentBox: '#<portlet:namespace />dataTableContent',

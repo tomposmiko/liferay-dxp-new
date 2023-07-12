@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
@@ -36,6 +34,8 @@ import com.liferay.portal.kernel.service.persistence.UserGroupRoleFinder;
 import com.liferay.portal.kernel.service.persistence.UserGroupRolePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -401,11 +401,11 @@ public abstract class UserGroupRoleServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		UserGroupRoleServiceUtil.setService(userGroupRoleService);
+		_setServiceUtilService(userGroupRoleService);
 	}
 
 	public void destroy() {
-		UserGroupRoleServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -447,6 +447,22 @@ public abstract class UserGroupRoleServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		UserGroupRoleService userGroupRoleService) {
+
+		try {
+			Field field = UserGroupRoleServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, userGroupRoleService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -515,8 +531,5 @@ public abstract class UserGroupRoleServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		UserGroupRoleServiceBaseImpl.class);
 
 }

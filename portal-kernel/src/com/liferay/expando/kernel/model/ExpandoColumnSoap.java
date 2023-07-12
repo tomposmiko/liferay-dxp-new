@@ -17,7 +17,6 @@ package com.liferay.expando.kernel.model;
 import java.io.Serializable;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,7 +36,6 @@ public class ExpandoColumnSoap implements Serializable {
 		soapModel.setCtCollectionId(model.getCtCollectionId());
 		soapModel.setColumnId(model.getColumnId());
 		soapModel.setCompanyId(model.getCompanyId());
-		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setTableId(model.getTableId());
 		soapModel.setName(model.getName());
 		soapModel.setType(model.getType());
@@ -128,14 +126,6 @@ public class ExpandoColumnSoap implements Serializable {
 		_companyId = companyId;
 	}
 
-	public Date getModifiedDate() {
-		return _modifiedDate;
-	}
-
-	public void setModifiedDate(Date modifiedDate) {
-		_modifiedDate = modifiedDate;
-	}
-
 	public long getTableId() {
 		return _tableId;
 	}
@@ -180,7 +170,6 @@ public class ExpandoColumnSoap implements Serializable {
 	private long _ctCollectionId;
 	private long _columnId;
 	private long _companyId;
-	private Date _modifiedDate;
 	private long _tableId;
 	private String _name;
 	private int _type;

@@ -2891,7 +2891,7 @@ public class MBMessageUtil {
 	 * </p>
 	 *
 	 * @param userId the user ID
-	 * @param classNameIds the class name IDs
+	 * @param classNameId the class name ID
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5564,7 +5564,7 @@ public class MBMessageUtil {
 	 * </p>
 	 *
 	 * @param userId the user ID
-	 * @param classNameIds the class name IDs
+	 * @param classNameId the class name ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -6831,10 +6831,6 @@ public class MBMessageUtil {
 
 	public static MBMessagePersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(MBMessagePersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static volatile MBMessagePersistence _persistence;

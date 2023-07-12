@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class PortalInstancesLocalServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		PortalInstancesLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class PortalInstancesLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		portalInstancesLocalService = (PortalInstancesLocalService)aopProxy;
 
-		PortalInstancesLocalServiceUtil.setService(portalInstancesLocalService);
+		_setLocalServiceUtilService(portalInstancesLocalService);
 	}
 
 	/**
@@ -108,13 +108,27 @@ public abstract class PortalInstancesLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		PortalInstancesLocalService portalInstancesLocalService) {
+
+		try {
+			Field field =
+				PortalInstancesLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, portalInstancesLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected PortalInstancesLocalService portalInstancesLocalService;
 
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PortalInstancesLocalServiceBaseImpl.class);
 
 }

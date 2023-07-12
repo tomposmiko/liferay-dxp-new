@@ -49,6 +49,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -1985,11 +1986,11 @@ public class AnnouncementsDeliveryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"userId", "type_"}, false);
 
-		AnnouncementsDeliveryUtil.setPersistence(this);
+		_setAnnouncementsDeliveryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		AnnouncementsDeliveryUtil.setPersistence(null);
+		_setAnnouncementsDeliveryUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(AnnouncementsDeliveryImpl.class.getName());
 
@@ -1999,6 +2000,22 @@ public class AnnouncementsDeliveryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAnnouncementsDeliveryUtilPersistence(
+		AnnouncementsDeliveryPersistence announcementsDeliveryPersistence) {
+
+		try {
+			Field field = AnnouncementsDeliveryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, announcementsDeliveryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

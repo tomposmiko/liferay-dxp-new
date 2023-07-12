@@ -19,6 +19,7 @@ import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portal.search.elasticsearch7.internal.document.DocumentFieldsTranslator;
+import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.geolocation.GeoBuilders;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.highlight.HighlightFieldBuilderFactory;
@@ -62,10 +63,11 @@ public class SearchHitsTranslator {
 	public SearchHits translate(
 		org.elasticsearch.search.SearchHits elasticsearchSearchHits) {
 
-		return translate(elasticsearchSearchHits, null);
+		return translate(null, elasticsearchSearchHits, null);
 	}
 
 	public SearchHits translate(
+		SearchSearchRequest searchSearchRequest,
 		org.elasticsearch.search.SearchHits elasticsearchSearchHits,
 		String alternateUidFieldName) {
 
@@ -84,7 +86,9 @@ public class SearchHitsTranslator {
 				elasticsearchSearchHitArray) {
 
 			searchHits.add(
-				translate(elasticsearchSearchHit, alternateUidFieldName));
+				translate(
+					searchSearchRequest, elasticsearchSearchHit,
+					alternateUidFieldName));
 		}
 
 		return searchHitsBuilder.addSearchHits(
@@ -96,33 +100,7 @@ public class SearchHitsTranslator {
 		).build();
 	}
 
-	protected SearchHit translate(
-		org.elasticsearch.search.SearchHit elasticsearchSearchHit,
-		String alternateUidFieldName) {
-
-		SearchHitBuilder searchHitBuilder =
-			_searchHitBuilderFactory.getSearchHitBuilder();
-
-		return searchHitBuilder.addHighlightFields(
-			_translateHighlightFields(elasticsearchSearchHit)
-		).addSources(
-			elasticsearchSearchHit.getSourceAsMap()
-		).document(
-			_translateDocument(elasticsearchSearchHit, alternateUidFieldName)
-		).explanation(
-			_getExplanationString(elasticsearchSearchHit)
-		).id(
-			elasticsearchSearchHit.getId()
-		).matchedQueries(
-			elasticsearchSearchHit.getMatchedQueries()
-		).score(
-			elasticsearchSearchHit.getScore()
-		).version(
-			elasticsearchSearchHit.getVersion()
-		).build();
-	}
-
-	private String _getExplanationString(
+	protected String getExplanationString(
 		org.elasticsearch.search.SearchHit elasticsearchSearchHit) {
 
 		Explanation explanation = elasticsearchSearchHit.getExplanation();
@@ -134,7 +112,37 @@ public class SearchHitsTranslator {
 		return StringPool.BLANK;
 	}
 
-	private Document _translateDocument(
+	protected SearchHit translate(
+		SearchSearchRequest searchSearchRequest,
+		org.elasticsearch.search.SearchHit elasticsearchSearchHit,
+		String alternateUidFieldName) {
+
+		SearchHitBuilder searchHitBuilder =
+			_searchHitBuilderFactory.getSearchHitBuilder();
+
+		return searchHitBuilder.addHighlightFields(
+			translateHighlightFields(elasticsearchSearchHit)
+		).addSources(
+			elasticsearchSearchHit.getSourceAsMap()
+		).document(
+			translateDocument(
+				searchSearchRequest, elasticsearchSearchHit,
+				alternateUidFieldName)
+		).explanation(
+			getExplanationString(elasticsearchSearchHit)
+		).id(
+			elasticsearchSearchHit.getId()
+		).matchedQueries(
+			elasticsearchSearchHit.getMatchedQueries()
+		).score(
+			elasticsearchSearchHit.getScore()
+		).version(
+			elasticsearchSearchHit.getVersion()
+		).build();
+	}
+
+	protected Document translateDocument(
+		SearchSearchRequest searchSearchRequest,
 		org.elasticsearch.search.SearchHit elasticsearchSearchHit,
 		String alternateUidFieldName) {
 
@@ -143,23 +151,50 @@ public class SearchHitsTranslator {
 
 		DocumentBuilder documentBuilder = _documentBuilderFactory.builder();
 
-		Map<String, Object> documentSourceMap =
-			elasticsearchSearchHit.getSourceAsMap();
+		boolean useSource = false;
 
-		documentFieldsTranslator.translate(documentBuilder, documentSourceMap);
+		if (searchSearchRequest != null) {
+			Boolean fetchSource = searchSearchRequest.getFetchSource();
 
-		Map<String, DocumentField> documentFieldsMap =
-			elasticsearchSearchHit.getFields();
+			if (fetchSource != null) {
+				useSource = fetchSource.booleanValue();
+			}
+			else {
+				String[] fetchSourceExcludes =
+					searchSearchRequest.getFetchSourceExcludes();
+				String[] fetchSourceIncludes =
+					searchSearchRequest.getFetchSourceIncludes();
 
-		documentFieldsTranslator.translate(documentFieldsMap, documentBuilder);
+				if ((fetchSourceExcludes != null) ||
+					(fetchSourceIncludes != null)) {
 
-		documentFieldsTranslator.populateAlternateUID(
-			documentFieldsMap, documentBuilder, alternateUidFieldName);
+					useSource = true;
+				}
+			}
+		}
+
+		if (useSource) {
+			Map<String, Object> documentSourceMap =
+				elasticsearchSearchHit.getSourceAsMap();
+
+			documentFieldsTranslator.translate(
+				documentBuilder, documentSourceMap);
+		}
+		else {
+			Map<String, DocumentField> documentFieldsMap =
+				elasticsearchSearchHit.getFields();
+
+			documentFieldsTranslator.translate(
+				documentFieldsMap, documentBuilder);
+
+			documentFieldsTranslator.populateAlternateUID(
+				documentFieldsMap, documentBuilder, alternateUidFieldName);
+		}
 
 		return documentBuilder.build();
 	}
 
-	private HighlightField _translateHighlightField(
+	protected HighlightField translateHighlightField(
 		org.elasticsearch.search.fetch.subphase.highlight.HighlightField
 			elasticsearchHighlightField) {
 
@@ -175,7 +210,7 @@ public class SearchHitsTranslator {
 		).build();
 	}
 
-	private List<HighlightField> _translateHighlightFields(
+	protected List<HighlightField> translateHighlightFields(
 		org.elasticsearch.search.SearchHit elasticsearchSearchHit) {
 
 		Map
@@ -188,7 +223,7 @@ public class SearchHitsTranslator {
 		for (org.elasticsearch.search.fetch.subphase.highlight.HighlightField
 				highlightField : map.values()) {
 
-			highlightFields.add(_translateHighlightField(highlightField));
+			highlightFields.add(translateHighlightField(highlightField));
 		}
 
 		return highlightFields;

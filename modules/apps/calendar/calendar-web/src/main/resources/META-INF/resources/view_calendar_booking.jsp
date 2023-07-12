@@ -58,36 +58,15 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 				<dt>
 					<liferay-ui:message key="starts" />:
 				</dt>
-
-				<c:choose>
-					<c:when test="<%= calendarBooking.isAllDay() %>">
-						<dd>
-							<%= utcLongDateJFormat.format(startTimeJCalendar.getTime()) %>, <%= utcTimeJFormat.format(startTimeJCalendar.getTime()) %>
-						</dd>
-					</c:when>
-					<c:otherwise>
-						<dd>
-							<%= longDateJFormat.format(startTimeJCalendar.getTime()) %>, <%= timeJFormat.format(startTimeJCalendar.getTime()) %>
-						</dd>
-					</c:otherwise>
-				</c:choose>
-
+				<dd>
+					<%= dateFormatLongDate.format(startTimeJCalendar.getTime()) + ", " + dateFormatTime.format(startTimeJCalendar.getTime()) %>
+				</dd>
 				<dt>
 					<liferay-ui:message key="ends" />:
 				</dt>
-
-				<c:choose>
-					<c:when test="<%= calendarBooking.isAllDay() %>">
-						<dd>
-							<%= utcLongDateJFormat.format(endTimeJCalendar.getTime()) %>, <%= utcTimeJFormat.format(endTimeJCalendar.getTime()) %>
-						</dd>
-					</c:when>
-					<c:otherwise>
-						<dd>
-							<%= longDateJFormat.format(endTimeJCalendar.getTime()) %>, <%= timeJFormat.format(endTimeJCalendar.getTime()) %>
-						</dd>
-					</c:otherwise>
-				</c:choose>
+				<dd>
+					<%= dateFormatLongDate.format(endTimeJCalendar.getTime()) + ", " + dateFormatTime.format(endTimeJCalendar.getTime()) %>
+				</dd>
 
 				<%
 				List<CalendarBooking> childCalendarBookings = calendarDisplayContext.getChildCalendarBookings(calendarBooking);

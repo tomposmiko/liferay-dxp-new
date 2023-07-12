@@ -2802,7 +2802,7 @@ public class DLFileEntryUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param start the lower bound of the range of document library file entries
 	 * @param end the upper bound of the range of document library file entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3636,7 +3636,7 @@ public class DLFileEntryUtil {
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param start the lower bound of the range of document library file entries
 	 * @param end the upper bound of the range of document library file entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4336,7 +4336,7 @@ public class DLFileEntryUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param fileEntryTypeId the file entry type ID
 	 * @param start the lower bound of the range of document library file entries
 	 * @param end the upper bound of the range of document library file entries (not inclusive)
@@ -4814,10 +4814,6 @@ public class DLFileEntryUtil {
 
 	public static DLFileEntryPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(DLFileEntryPersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static volatile DLFileEntryPersistence _persistence;

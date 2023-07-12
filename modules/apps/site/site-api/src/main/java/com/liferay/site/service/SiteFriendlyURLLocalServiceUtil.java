@@ -447,10 +447,6 @@ public class SiteFriendlyURLLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SiteFriendlyURLLocalService service) {
-		_service = service;
-	}
-
 	private static volatile SiteFriendlyURLLocalService _service;
 
 }

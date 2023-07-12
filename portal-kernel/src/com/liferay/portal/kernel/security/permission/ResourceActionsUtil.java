@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.exception.ResourceActionsException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.xml.Document;
 
 import java.util.List;
 import java.util.Locale;
@@ -278,19 +277,6 @@ public class ResourceActionsUtil {
 		return getResourceActions().isRootModelResource(modelResource);
 	}
 
-	public static void populateModelResources(
-			ClassLoader classLoader, String... sources)
-		throws ResourceActionsException {
-
-		getResourceActions().populateModelResources(classLoader, sources);
-	}
-
-	public static void populateModelResources(Document document)
-		throws ResourceActionsException {
-
-		getResourceActions().populateModelResources(document);
-	}
-
 	public static void populatePortletResource(
 			Portlet portlet, ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -299,27 +285,12 @@ public class ResourceActionsUtil {
 			portlet, classLoader, sources);
 	}
 
-	public static void populatePortletResources(
-			ClassLoader classLoader, String... sources)
-		throws ResourceActionsException {
-
-		getResourceActions().populatePortletResources(classLoader, sources);
-	}
-
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	public static void read(ClassLoader classLoader, String source)
 		throws Exception {
 
 		getResourceActions().read(classLoader, source);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	public static void read(ClassLoader classLoader, String... sources)
 		throws Exception {
 
@@ -349,10 +320,6 @@ public class ResourceActionsUtil {
 		getResourceActions().read(servletContextName, classLoader, sources);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	public static void readAndCheck(ClassLoader classLoader, String... sources)
 		throws Exception {
 

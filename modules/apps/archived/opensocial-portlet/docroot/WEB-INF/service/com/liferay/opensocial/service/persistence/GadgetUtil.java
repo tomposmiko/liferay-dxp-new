@@ -1077,10 +1077,6 @@ public class GadgetUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(GadgetPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile GadgetPersistence _persistence;
 
 }

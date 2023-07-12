@@ -330,10 +330,6 @@ public class MFAEmailOTPEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(MFAEmailOTPEntryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile MFAEmailOTPEntryLocalService _service;
 
 }

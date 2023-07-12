@@ -234,11 +234,11 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 					<div class="sidebar-panel">
 
 						<%
-						boolean latestVersion = fileVersion.equals(fileEntry.getLatestFileVersion());
+						boolean isLatestVersion = fileVersion.equals(fileEntry.getLatestFileVersion());
 
 						String urlLabel = null;
 
-						if (latestVersion) {
+						if (isLatestVersion) {
 							urlLabel = LanguageUtil.get(resourceBundle, "latest-version-url");
 						}
 						else {
@@ -253,7 +253,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 
 							<div class="input-group input-group-sm">
 								<div class="input-group-item input-group-prepend">
-									<input class="form-control" id="<%= urlInputId %>" value="<%= DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, StringPool.BLANK, !latestVersion, true) %>" />
+									<input class="form-control" id="<%= urlInputId %>" value="<%= DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, StringPool.BLANK, !isLatestVersion, true) %>" />
 								</div>
 
 								<span class="input-group-append input-group-item input-group-item-shrink">
@@ -268,9 +268,18 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 							</div>
 						</div>
 
-						<c:if test="<%= portletDisplay.isWebDAVEnabled() && fileEntry.isSupportsSocial() && latestVersion %>">
+						<c:if test="<%= portletDisplay.isWebDAVEnabled() && fileEntry.isSupportsSocial() && isLatestVersion %>">
 
 							<%
+							String webDavHelpMessage = null;
+
+							if (BrowserSnifferUtil.isWindows(request)) {
+								webDavHelpMessage = LanguageUtil.format(request, "webdav-windows-help", new Object[] {"https://support.microsoft.com/en-us/kb/892211", "https://help.liferay.com/hc/en-us/articles/360028720352-Desktop-Access-to-Documents-and-Media"}, false);
+							}
+							else {
+								webDavHelpMessage = LanguageUtil.format(request, "webdav-help", "https://help.liferay.com/hc/en-us/articles/360028720352-Desktop-Access-to-Documents-and-Media", false);
+							}
+
 							String webDavURLInputId = liferayPortletResponse.getNamespace() + "webDavURLInput";
 							%>
 
@@ -278,7 +287,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 								<label for="<%= webDavURLInputId %>">
 									<liferay-ui:message key='<%= TextFormatter.format("webDavURL", TextFormatter.K) %>' />
 
-									<liferay-ui:icon-help message='<%= LanguageUtil.get(request, "webdav-help") %>' />
+									<liferay-ui:icon-help message="<%= webDavHelpMessage %>" />
 								</label>
 
 								<div class="input-group input-group-sm">
@@ -449,7 +458,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 									cssClass="metadata"
 									defaultState="closed"
 									extended="<%= true %>"
-									id='<%= "documentLibraryMetadataPanel_" + ddmStructure.getStructureId() + StringPool.UNDERLINE + fileEntry.getFileEntryId() %>'
+									id='<%= "documentLibraryMetadataPanel_" + fileEntry.getFileEntryId() %>'
 									markupView="lexicon"
 									persistState="<%= true %>"
 									title="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>"
@@ -518,7 +527,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 								collapsible="<%= true %>"
 								cssClass="lfr-asset-metadata"
 								defaultState="closed"
-								id='<%= "documentLibraryMetadataPanel_" + ddmStructure.getStructureId() + StringPool.UNDERLINE + fileEntry.getFileEntryId() %>'
+								id='<%= "documentLibraryMetadataPanel_" + fileEntry.getFileEntryId() %>'
 								markupView="lexicon"
 								persistState="<%= true %>"
 								title='<%= "metadata." + ddmStructure.getStructureKey() %>'

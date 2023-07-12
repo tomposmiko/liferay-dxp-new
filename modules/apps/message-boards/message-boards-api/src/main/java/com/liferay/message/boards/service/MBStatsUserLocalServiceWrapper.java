@@ -17,7 +17,6 @@ package com.liferay.message.boards.service;
 import com.liferay.message.boards.model.MBStatsUser;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -412,11 +411,6 @@ public class MBStatsUserLocalServiceWrapper
 
 		return _mbStatsUserLocalService.updateStatsUser(
 			groupId, userId, messageCount, lastPostDate);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _mbStatsUserLocalService.getBasePersistence();
 	}
 
 	@Override

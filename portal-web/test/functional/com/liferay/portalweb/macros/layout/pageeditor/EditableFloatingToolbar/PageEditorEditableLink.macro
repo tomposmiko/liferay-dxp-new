@@ -12,30 +12,28 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		NavItem.click(navItem = ${navItem});
+		NavItem.click(navItem = "${navItem}");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "cards");
 
 		Click(
-			key_card = ${entryTitle},
+			key_card = "${entryTitle}",
 			locator1 = "Card#CARD_TITLE");
 
-		Pause(locator1 = 3000);
-
-		SelectFrameTop();
+		Pause(locator1 = "3000");
 	}
 
 	macro _selectField {
 		Select(
 			locator1 = "PageEditorEditableLink#FIELD",
-			value1 = ${field});
+			value1 = "${field}");
 	}
 
 	macro gotoEditableFieldLink {
 		PageEditor.clickEditableField(
-			contributed = ${contributed},
-			fragmentName = ${fragmentName},
-			id = ${id});
+			contributed = "${contributed}",
+			fragmentName = "${fragmentName}",
+			id = "${id}");
 
 		PageEditor.gotoTab(tabName = "Selection");
 
@@ -51,18 +49,18 @@ definition {
 		PageEditorEditableLink._gotoFromContentField();
 
 		PageEditorEditableLink._selectContent(
-			entryTitle = ${entryTitle},
-			navItem = ${navItem});
+			entryTitle = "${entryTitle}",
+			navItem = "${navItem}");
 
-		PageEditorEditableLink._selectField(field = ${field});
+		PageEditorEditableLink._selectField(field = "${field}");
 	}
 
 	macro updateURL {
-		Variables.assertDefined(parameterList = ${url});
+		Variables.assertDefined(parameterList = "${url}");
 
 		Type(
 			locator1 = "PageEditorEditableLink#URL",
-			value1 = ${url});
+			value1 = "${url}");
 
 		Click(
 			key_sidebarButton = "Selection",
@@ -72,9 +70,9 @@ definition {
 			Select(
 				key_fieldLabel = "Target",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
-				value1 = ${target});
+				value1 = "${target}");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 		}
 
 		PageEditor.waitForAutoSave();

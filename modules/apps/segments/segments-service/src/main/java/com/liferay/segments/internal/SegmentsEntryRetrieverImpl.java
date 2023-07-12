@@ -18,13 +18,19 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.segments.SegmentsEntryRetriever;
 import com.liferay.segments.constants.SegmentsEntryConstants;
+import com.liferay.segments.constants.SegmentsWebKeys;
 import com.liferay.segments.context.Context;
 import com.liferay.segments.provider.SegmentsEntryProviderRegistry;
 import com.liferay.segments.simulator.SegmentsEntrySimulator;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,37 +46,68 @@ public class SegmentsEntryRetrieverImpl implements SegmentsEntryRetriever {
 
 	@Override
 	public long[] getSegmentsEntryIds(
-		long groupId, long userId, Context context, long[] segmentEntryIds) {
+		long groupId, long userId, Context context) {
 
-		return ArrayUtil.toLongArray(
-			SetUtil.fromArray(
-				ArrayUtil.append(
-					_getSegmentEntryIds(
-						groupId, userId, context, segmentEntryIds),
-					SegmentsEntryConstants.ID_DEFAULT)));
+		Optional<long[]> segmentsEntryIdsOptional =
+			_getSegmentsEntryIdsOptional();
+
+		long[] segmentsEntryIds = ArrayUtil.append(
+			segmentsEntryIdsOptional.orElseGet(
+				() -> {
+					if ((_segmentsEntrySimulator != null) &&
+						_segmentsEntrySimulator.isSimulationActive(userId)) {
+
+						return _segmentsEntrySimulator.
+							getSimulatedSegmentsEntryIds(userId);
+					}
+
+					try {
+						return _segmentsEntryProviderRegistry.
+							getSegmentsEntryIds(
+								groupId, User.class.getName(), userId, context);
+					}
+					catch (PortalException portalException) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(portalException.getMessage());
+						}
+
+						return new long[0];
+					}
+				}),
+			SegmentsEntryConstants.ID_DEFAULT);
+
+		Optional<HttpServletRequest> httpServletRequestOptional =
+			_getHttpServletRequestOptional();
+
+		httpServletRequestOptional.ifPresent(
+			httpServletRequest -> httpServletRequest.setAttribute(
+				SegmentsWebKeys.SEGMENTS_ENTRY_IDS, segmentsEntryIds));
+
+		return segmentsEntryIds;
 	}
 
-	private long[] _getSegmentEntryIds(
-		long groupId, long userId, Context context, long[] segmentEntryIds) {
+	private Optional<HttpServletRequest> _getHttpServletRequestOptional() {
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
-		if ((_segmentsEntrySimulator != null) &&
-			_segmentsEntrySimulator.isSimulationActive(userId)) {
-
-			return _segmentsEntrySimulator.getSimulatedSegmentsEntryIds(userId);
+		if (serviceContext == null) {
+			return Optional.empty();
 		}
 
-		try {
-			return _segmentsEntryProviderRegistry.getSegmentsEntryIds(
-				groupId, User.class.getName(), userId, context,
-				segmentEntryIds);
-		}
-		catch (PortalException portalException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
-			}
+		return Optional.ofNullable(serviceContext.getRequest());
+	}
 
-			return new long[0];
-		}
+	private Optional<long[]> _getSegmentsEntryIdsOptional() {
+		Optional<HttpServletRequest> httpServletRequestOptional =
+			_getHttpServletRequestOptional();
+
+		return Optional.ofNullable(
+			httpServletRequestOptional.map(
+				httpServletRequest -> (long[])httpServletRequest.getAttribute(
+					SegmentsWebKeys.SEGMENTS_ENTRY_IDS)
+			).orElse(
+				null
+			));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

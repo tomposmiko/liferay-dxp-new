@@ -43,7 +43,7 @@
 				<span id="<portlet:namespace />journalArticleNameInput">
 					<c:choose>
 						<c:when test="<%= journalArticle != null %>">
-							<%= HtmlUtil.escape(journalArticle.getTitle()) %>
+							<%= journalArticle.getTitle() %>
 						</c:when>
 						<c:otherwise>
 							<span class="text-muted"><liferay-ui:message key="none" /></span>
@@ -110,7 +110,7 @@
 
 					journalArticleRemove.classList.remove('hide');
 
-					journalArticleNameInput.innerText = event.assettitle;
+					journalArticleNameInput.innerHTML = event.assettitle;
 				}
 			);
 		});
@@ -124,7 +124,7 @@
 				'#<portlet:namespace />termsOfUseJournalArticleResourcePrimKey'
 			).value = 0;
 
-			journalArticleNameInput.innerText = '<liferay-ui:message key="none" />';
+			journalArticleNameInput.innerHTML = '<liferay-ui:message key="none" />';
 
 			journalArticleRemove.classList.add('hide');
 		});

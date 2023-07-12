@@ -62,8 +62,8 @@ public class NestedFieldsSupportMapToDDMFormValuesConverterStrategy
 
 		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue() {
 			{
-				setInstanceId(instanceId);
 				setName(ddmFormField.getName());
+				setInstanceId(instanceId);
 			}
 		};
 

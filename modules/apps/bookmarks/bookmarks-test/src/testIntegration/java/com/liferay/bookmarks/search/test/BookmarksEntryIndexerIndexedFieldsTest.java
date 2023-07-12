@@ -134,8 +134,6 @@ public class BookmarksEntryIndexerIndexedFieldsTest {
 					MODEL_INDEXER_CLASS
 				).queryString(
 					searchTerm
-				).fetchSourceIncludes(
-					new String[] {"*_sortable"}
 				).build()));
 	}
 

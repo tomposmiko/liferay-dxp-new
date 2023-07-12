@@ -15,7 +15,6 @@
 package com.liferay.commerce.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.exception.DuplicateCommerceOrderItemExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.service.CommerceOrderItemLocalServiceUtil;
@@ -361,28 +360,6 @@ public class CommerceOrderItemPersistenceTest {
 		Assert.assertEquals(
 			existingCommerceOrderItem.isManuallyAdjusted(),
 			newCommerceOrderItem.isManuallyAdjusted());
-	}
-
-	@Test(
-		expected = DuplicateCommerceOrderItemExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceOrderItem commerceOrderItem = addCommerceOrderItem();
-
-		CommerceOrderItem newCommerceOrderItem = addCommerceOrderItem();
-
-		newCommerceOrderItem.setCompanyId(commerceOrderItem.getCompanyId());
-
-		newCommerceOrderItem = _persistence.update(newCommerceOrderItem);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceOrderItem);
-
-		newCommerceOrderItem.setExternalReferenceCode(
-			commerceOrderItem.getExternalReferenceCode());
-
-		_persistence.update(newCommerceOrderItem);
 	}
 
 	@Test

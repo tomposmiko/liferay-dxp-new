@@ -50,11 +50,11 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 						<%
 						List<SegmentsEntry> availableSegmentsEntries = editAssetListDisplayContext.getAvailableSegmentsEntries();
 
-						List<AssetListEntrySegmentsEntryRel> assetListEntrySegmentsEntryRels = editAssetListDisplayContext.getAssetListEntrySegmentsEntryRels();
+						List<AssetListEntrySegmentsEntryRel> assetEntryListSegmentsEntryRels = editAssetListDisplayContext.getAssetListEntrySegmentsEntryRels();
 						%>
 
 						<c:choose>
-							<c:when test="<%= assetListEntrySegmentsEntryRels.size() > 1 %>">
+							<c:when test="<%= assetEntryListSegmentsEntryRels.size() > 1 %>">
 								<clay:content-row
 									verticalAlign="center"
 								>
@@ -64,10 +64,6 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 										<strong class="text-uppercase">
 											<liferay-ui:message key="personalized-variations" />
 										</strong>
-
-										<p>
-											<liferay-ui:message key="personalized-variations-help" />
-										</p
 									</clay:content-col>
 
 									<c:if test="<%= Validator.isNotNull(assetListEntry.getAssetEntryType()) %>">
@@ -92,7 +88,7 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 								<ul class="nav nav-stacked">
 
 									<%
-									for (AssetListEntrySegmentsEntryRel assetListEntrySegmentsEntryRel : assetListEntrySegmentsEntryRels) {
+									for (AssetListEntrySegmentsEntryRel assetListEntrySegmentsEntryRel : assetEntryListSegmentsEntryRels) {
 									%>
 
 										<li class="nav-item">

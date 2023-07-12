@@ -280,7 +280,6 @@ public class TaxonomyVocabularyResourceImpl
 			{
 				required = ArrayUtil.contains(
 					requiredClassNameIds, classNameId);
-
 				setSubtype(
 					() -> {
 						if (classTypePK ==
@@ -429,7 +428,7 @@ public class TaxonomyVocabularyResourceImpl
 	private long _getClassTypePK(long classNameId, String subtype, long groupId)
 		throws Exception {
 
-		if (Objects.equals(subtype, "AllAssetSubtypes") ||
+		if (Objects.equals("AllAssetSubtypes", subtype) ||
 			(classNameId == AssetCategoryConstants.ALL_CLASS_NAME_ID) ||
 			(subtype == null)) {
 

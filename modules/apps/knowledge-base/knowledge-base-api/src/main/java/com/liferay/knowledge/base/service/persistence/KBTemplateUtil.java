@@ -922,10 +922,6 @@ public class KBTemplateUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(KBTemplatePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile KBTemplatePersistence _persistence;
 
 }

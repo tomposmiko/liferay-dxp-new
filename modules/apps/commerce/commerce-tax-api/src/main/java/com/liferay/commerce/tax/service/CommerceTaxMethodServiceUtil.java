@@ -137,10 +137,6 @@ public class CommerceTaxMethodServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceTaxMethodService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceTaxMethodService _service;
 
 }

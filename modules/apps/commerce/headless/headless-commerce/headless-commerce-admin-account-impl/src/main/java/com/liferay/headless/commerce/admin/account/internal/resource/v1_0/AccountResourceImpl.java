@@ -266,8 +266,7 @@ public class AccountResourceImpl
 				GetterUtil.get(
 					account.getType(),
 					CommerceAccountConstants.ACCOUNT_TYPE_PERSONAL),
-				GetterUtil.getBoolean(account.getActive(), true),
-				account.getExternalReferenceCode(),
+				true, account.getExternalReferenceCode(),
 				_serviceContextHelper.getServiceContext());
 
 		if (account.getDefaultBillingAccountAddressId() > 0) {
@@ -460,8 +459,7 @@ public class AccountResourceImpl
 			commerceAccount.getCommerceAccountId(), account.getName(), true,
 			null, _getEmailAddress(account, commerceAccount),
 			GetterUtil.get(account.getTaxId(), commerceAccount.getTaxId()),
-			GetterUtil.getBoolean(
-				account.getActive(), commerceAccount.isActive()),
+			commerceAccount.isActive(),
 			GetterUtil.getLong(
 				account.getDefaultBillingAccountAddressId(),
 				commerceAccount.getDefaultBillingAddressId()),

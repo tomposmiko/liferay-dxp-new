@@ -17,7 +17,6 @@ package com.liferay.fragment.service;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -396,14 +395,6 @@ public class FragmentEntryLinkLocalServiceWrapper
 			fragmentEntryLinkId);
 	}
 
-	@Override
-	public FragmentEntryLink getFragmentEntryLink(
-		long groupId, long originalFragmentEntryLinkId, long plid) {
-
-		return _fragmentEntryLinkLocalService.getFragmentEntryLink(
-			groupId, originalFragmentEntryLinkId, plid);
-	}
-
 	/**
 	 * Returns the fragment entry link matching the UUID and group.
 	 *
@@ -512,22 +503,6 @@ public class FragmentEntryLinkLocalServiceWrapper
 		return _fragmentEntryLinkLocalService.getFragmentEntryLinks(
 			groupId, fragmentEntryId, classNameId, start, end,
 			orderByComparator);
-	}
-
-	@Override
-	public java.util.List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String rendererKey) {
-
-		return _fragmentEntryLinkLocalService.getFragmentEntryLinks(
-			companyId, rendererKey);
-	}
-
-	@Override
-	public java.util.List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String[] rendererKeys) {
-
-		return _fragmentEntryLinkLocalService.getFragmentEntryLinks(
-			companyId, rendererKeys);
 	}
 
 	@Override
@@ -895,25 +870,10 @@ public class FragmentEntryLinkLocalServiceWrapper
 	}
 
 	@Override
-	public void updateLatestChanges(
-			com.liferay.fragment.model.FragmentEntry fragmentEntry,
-			FragmentEntryLink fragmentEntryLink)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_fragmentEntryLinkLocalService.updateLatestChanges(
-			fragmentEntry, fragmentEntryLink);
-	}
-
-	@Override
 	public void updateLatestChanges(long fragmentEntryLinkId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_fragmentEntryLinkLocalService.updateLatestChanges(fragmentEntryLinkId);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _fragmentEntryLinkLocalService.getBasePersistence();
 	}
 
 	@Override

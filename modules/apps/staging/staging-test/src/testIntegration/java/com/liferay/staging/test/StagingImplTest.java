@@ -62,7 +62,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -84,7 +83,9 @@ import java.lang.reflect.Modifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -181,18 +182,31 @@ public class StagingImplTest {
 
 	@Test
 	public void testInitialPublication() throws Exception {
+		long companyId = _group.getCompanyId();
+
+		ExportImportServiceConfiguration exportImportServiceConfiguration =
+			ConfigurationProviderUtil.getCompanyConfiguration(
+				ExportImportServiceConfiguration.class, companyId);
+
+		boolean stagingDeleteTempLarOnSuccess =
+			exportImportServiceConfiguration.stagingDeleteTempLarOnSuccess();
+
+		Dictionary<String, Object> properties = new Hashtable<>();
+
+		properties.put("stagingDeleteTempLarOnSuccess", false);
+
 		ConfigurationProviderUtil.saveCompanyConfiguration(
-			ExportImportServiceConfiguration.class, _group.getCompanyId(),
-			HashMapDictionaryBuilder.<String, Object>put(
-				"stagingDeleteTempLarOnSuccess", false
-			).build());
+			ExportImportServiceConfiguration.class, companyId, properties);
 
 		try {
 			doTestInitialPublication();
 		}
 		finally {
-			ConfigurationProviderUtil.deleteCompanyConfiguration(
-				ExportImportServiceConfiguration.class, _group.getCompanyId());
+			properties.put(
+				"stagingDeleteTempLarOnSuccess", stagingDeleteTempLarOnSuccess);
+
+			ConfigurationProviderUtil.saveCompanyConfiguration(
+				ExportImportServiceConfiguration.class, companyId, properties);
 		}
 	}
 

@@ -912,10 +912,6 @@ public class LayoutBranchUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(LayoutBranchPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile LayoutBranchPersistence _persistence;
 
 }

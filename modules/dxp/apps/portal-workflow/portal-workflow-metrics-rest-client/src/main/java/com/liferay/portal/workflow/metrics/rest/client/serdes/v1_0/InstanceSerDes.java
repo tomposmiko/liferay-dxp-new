@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -558,18 +559,14 @@ public class InstanceSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "assignees")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Assignee[] assigneesArray =
-						new Assignee[jsonParserFieldValues.length];
-
-					for (int i = 0; i < assigneesArray.length; i++) {
-						assigneesArray[i] = AssigneeSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					instance.setAssignees(assigneesArray);
+					instance.setAssignees(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AssigneeSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Assignee[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "className")) {
@@ -636,18 +633,14 @@ public class InstanceSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "slaResults")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					SLAResult[] slaResultsArray =
-						new SLAResult[jsonParserFieldValues.length];
-
-					for (int i = 0; i < slaResultsArray.length; i++) {
-						slaResultsArray[i] = SLAResultSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					instance.setSlaResults(slaResultsArray);
+					instance.setSlaResults(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> SLAResultSerDes.toDTO((String)object)
+						).toArray(
+							size -> new SLAResult[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "slaStatus")) {
@@ -665,18 +658,14 @@ public class InstanceSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "transitions")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Transition[] transitionsArray =
-						new Transition[jsonParserFieldValues.length];
-
-					for (int i = 0; i < transitionsArray.length; i++) {
-						transitionsArray[i] = TransitionSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					instance.setTransitions(transitionsArray);
+					instance.setTransitions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> TransitionSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Transition[size]
+						));
 				}
 			}
 		}

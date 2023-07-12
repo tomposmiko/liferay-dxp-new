@@ -142,12 +142,6 @@ public class CommerceShippingFixedOptionRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceShippingFixedOptionRelService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceShippingFixedOptionRelService _service;
 
 }

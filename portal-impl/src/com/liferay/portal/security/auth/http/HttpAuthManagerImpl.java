@@ -168,8 +168,9 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 
 			return getDigestUserId(httpServletRequest, httpAuthorizationHeader);
 		}
-
-		throw new UnsupportedOperationException("Scheme " + scheme);
+		else {
+			throw new UnsupportedOperationException("Scheme " + scheme);
+		}
 	}
 
 	@Override
@@ -209,8 +210,9 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 			return parseDigest(
 				httpServletRequest, authorization, authorizationParts);
 		}
-
-		throw new UnsupportedOperationException("Scheme " + scheme);
+		else {
+			throw new UnsupportedOperationException("Scheme " + scheme);
+		}
 	}
 
 	protected void generateBasicChallenge(

@@ -33,7 +33,7 @@ definition {
 
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -42,7 +42,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-119979. Customize the Layout of Grid in each viewport."
-	@priority = 4
+	@priority = "4"
 	test CustomizeLayoutOfGridInEachViewport {
 		task ("Add a Grid to page") {
 			ContentPagesNavigator.openEditContentPage(
@@ -56,7 +56,7 @@ definition {
 
 		task ("Change the Number of Modules to 6") {
 			PageEditor.editLayoutGrid(
-				columnCount = 6,
+				columnCount = "6",
 				panel = "General");
 		}
 
@@ -71,14 +71,14 @@ definition {
 				key_deviceType = "Tablet",
 				locator1 = "PageEditor#DEVICE_TYPE");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Select(
 				key_fieldLabel = "Layout",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "3 Modules per Row");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 		}
 
 		task ("Select the 6 Modules per Row as Layout in Landscape Phone viewport") {
@@ -86,14 +86,14 @@ definition {
 				key_deviceType = "Landscape Phone",
 				locator1 = "PageEditor#DEVICE_TYPE");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Select(
 				key_fieldLabel = "Layout",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "6 Modules per Row");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 		}
 
 		task ("Select the 1 Module per Row as Layout in Portrait Phone viewport") {
@@ -101,14 +101,14 @@ definition {
 				key_deviceType = "Portrait Phone",
 				locator1 = "PageEditor#DEVICE_TYPE");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Select(
 				key_fieldLabel = "Layout",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "1 Module per Row");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 		}
 
 		task ("Assert the Layout of Grid is 2 Modules per Row and the height of module is greater than 20px in Desktop viewport") {
@@ -116,20 +116,19 @@ definition {
 				key_deviceType = "Desktop",
 				locator1 = "PageEditor#DEVICE_TYPE");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			PageEditor.viewGridStyle(
-				columnCount = 6,
-				layout = 6,
-				position = 1);
+				columnCount = "6",
+				layout = "6",
+				position = "1");
 
 			var moduleHeight = selenium.getElementHeight("//div[contains(@class,'page-editor__topper__bar') and contains(.,'Grid')]//following-sibling::div[contains(@class,'page-editor__topper__content')]//div[contains(@class,'col-6')]");
-
-			var moduleHeight = StringUtil.replace(${moduleHeight}, "px", "");
+			var moduleHeight = StringUtil.replace("${moduleHeight}", "px", "");
 
 			TestUtils.isGreaterThan(
-				actual = ${moduleHeight},
-				expected = 20);
+				actual = "${moduleHeight}",
+				expected = "20");
 		}
 
 		task ("Assert the Layout of Grid is 3 Modules per Row and the height of module is greater than 20px in Tablet viewport") {
@@ -137,22 +136,21 @@ definition {
 				key_deviceType = "Tablet",
 				locator1 = "PageEditor#DEVICE_TYPE");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#PAGE_EDITOR_GLOBAL_CONTEXT_IFRAME");
 
 			PageEditor.viewGridStyle(
-				columnCount = 6,
-				layout = 4,
-				position = 1);
+				columnCount = "6",
+				layout = "4",
+				position = "1");
 
 			var moduleHeight = selenium.getElementHeight("//div[contains(@class,'page-editor__topper__bar') and contains(.,'Grid')]//following-sibling::div[contains(@class,'page-editor__topper__content')]//div[contains(@class,'col-4')]");
-
-			var moduleHeight = StringUtil.replace(${moduleHeight}, "px", "");
+			var moduleHeight = StringUtil.replace("${moduleHeight}", "px", "");
 
 			TestUtils.isGreaterThan(
-				actual = ${moduleHeight},
-				expected = 20);
+				actual = "${moduleHeight}",
+				expected = "20");
 
 			SelectFrame(value1 = "relative=top");
 		}
@@ -162,22 +160,21 @@ definition {
 				key_deviceType = "Landscape Phone",
 				locator1 = "PageEditor#DEVICE_TYPE");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#PAGE_EDITOR_GLOBAL_CONTEXT_IFRAME");
 
 			PageEditor.viewGridStyle(
-				columnCount = 6,
-				layout = 2,
-				position = 1);
+				columnCount = "6",
+				layout = "2",
+				position = "1");
 
 			var moduleHeight = selenium.getElementHeight("//div[contains(@class,'page-editor__topper__bar') and contains(.,'Grid')]//following-sibling::div[contains(@class,'page-editor__topper__content')]//div[contains(@class,'col-2')]");
-
-			var moduleHeight = StringUtil.replace(${moduleHeight}, "px", "");
+			var moduleHeight = StringUtil.replace("${moduleHeight}", "px", "");
 
 			TestUtils.isGreaterThan(
-				actual = ${moduleHeight},
-				expected = 20);
+				actual = "${moduleHeight}",
+				expected = "20");
 
 			SelectFrame(value1 = "relative=top");
 		}
@@ -187,29 +184,28 @@ definition {
 				key_deviceType = "Portrait Phone",
 				locator1 = "PageEditor#DEVICE_TYPE");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#PAGE_EDITOR_GLOBAL_CONTEXT_IFRAME");
 
 			PageEditor.viewGridStyle(
-				columnCount = 6,
-				layout = 12,
-				position = 1);
+				columnCount = "6",
+				layout = "12",
+				position = "1");
 
 			var moduleHeight = selenium.getElementHeight("//div[contains(@class,'page-editor__topper__bar') and contains(.,'Grid')]//following-sibling::div[contains(@class,'page-editor__topper__content')]//div[contains(@class,'col-12')]");
-
-			var moduleHeight = StringUtil.replace(${moduleHeight}, "px", "");
+			var moduleHeight = StringUtil.replace("${moduleHeight}", "px", "");
 
 			TestUtils.isGreaterThan(
-				actual = ${moduleHeight},
-				expected = 20);
+				actual = "${moduleHeight}",
+				expected = "20");
 
 			SelectFrame(value1 = "relative=top");
 		}
 	}
 
 	@description = "This is a test for LPS-110723. When change to other viewports, there are only limited common fragment style categories available."
-	@priority = 4
+	@priority = "4"
 	test PropagateCommonFragmentStyleDefinedInDesktopToOtherViewports {
 		task ("Add a Paragraph to page") {
 			ContentPagesNavigator.openEditContentPage(
@@ -225,47 +221,47 @@ definition {
 			PageEditor.gotoStyle(fragmentName = "Paragraph");
 
 			PageEditor.configureFragment(
-				marginBottom = 2,
-				marginLeft = 2,
-				marginRight = 2,
-				marginTop = 2,
-				paddingBottom = 2,
-				paddingLeft = 2,
-				paddingRight = 2,
-				paddingTop = 2);
+				marginBottom = "2",
+				marginLeft = "2",
+				marginRight = "2",
+				marginTop = "2",
+				paddingBottom = "2",
+				paddingLeft = "2",
+				paddingRight = "2",
+				paddingTop = "2");
 
 			PageEditor.viewFragmentStyle(
 				fragmentName = "Paragraph",
-				marginBottom = 2,
-				marginLeft = 2,
-				marginRight = 2,
-				marginTop = 2,
-				paddingBottom = 2,
-				paddingLeft = 2,
-				paddingRight = 2,
-				paddingTop = 2);
+				marginBottom = "2",
+				marginLeft = "2",
+				marginRight = "2",
+				marginTop = "2",
+				paddingBottom = "2",
+				paddingLeft = "2",
+				paddingRight = "2",
+				paddingTop = "2");
 		}
 
 		task ("Assert the common styles are propagated to other viewports") {
 			for (var deviceType : list "Tablet,Landscape Phone,Portrait Phone") {
 				Click(
-					key_deviceType = ${deviceType},
+					key_deviceType = "${deviceType}",
 					locator1 = "PageEditor#DEVICE_TYPE");
 
-				Pause(locator1 = 3000);
+				Pause(locator1 = "3000");
 
 				SelectFrame.selectFrameNoLoading(locator1 = "IFrame#PAGE_EDITOR_GLOBAL_CONTEXT_IFRAME");
 
 				PageEditor.viewFragmentStyle(
 					fragmentName = "Paragraph",
-					marginBottom = 2,
-					marginLeft = 2,
-					marginRight = 2,
-					marginTop = 2,
-					paddingBottom = 2,
-					paddingLeft = 2,
-					paddingRight = 2,
-					paddingTop = 2);
+					marginBottom = "2",
+					marginLeft = "2",
+					marginRight = "2",
+					marginTop = "2",
+					paddingBottom = "2",
+					paddingLeft = "2",
+					paddingRight = "2",
+					paddingTop = "2");
 
 				SelectFrame(value1 = "relative=top");
 			}
@@ -273,7 +269,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-110707. Can resize the width of device viewport when edit content page."
-	@priority = 5
+	@priority = "5"
 	test ResizeDeviceViewport {
 		property portal.acceptance = "true";
 
@@ -317,7 +313,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-110723. When change to other viewports, there are only limited common fragment style categories available."
-	@priority = 5
+	@priority = "5"
 	test ViewCommonFragmentStyleFieldSets {
 		task ("Add a Heading to page") {
 			ContentPagesNavigator.openEditContentPage(
@@ -332,7 +328,7 @@ definition {
 		task ("Assert all common fragment style fieldsets are available on Desktop viewport") {
 			PageEditor.clickConfigurableField(fragmentName = "Heading");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			AssertClick(
 				key_navItem = "Styles",
@@ -341,7 +337,7 @@ definition {
 
 			for (var fieldSetLabel : list "Margin,Padding,Size,Text,Background,Borders,Effects") {
 				AssertElementPresent(
-					key_fieldSetLabel = ${fieldSetLabel},
+					key_fieldSetLabel = "${fieldSetLabel}",
 					locator1 = "PageEditor#COMMON_STYLES_FIELDSET_LABEL");
 			}
 		}
@@ -349,14 +345,14 @@ definition {
 		task ("Assert only Margin and Padding are available on other viewports") {
 			for (var deviceType : list "Tablet,Landscape Phone,Portrait Phone") {
 				Click(
-					key_deviceType = ${deviceType},
+					key_deviceType = "${deviceType}",
 					locator1 = "PageEditor#DEVICE_TYPE");
 
-				Pause(locator1 = 3000);
+				Pause(locator1 = "3000");
 
 				for (var fieldSetLabel : list "Margin,Padding") {
 					AssertElementPresent(
-						key_fieldSetLabel = ${fieldSetLabel},
+						key_fieldSetLabel = "${fieldSetLabel}",
 						locator1 = "PageEditor#COMMON_STYLES_FIELDSET_LABEL");
 				}
 			}

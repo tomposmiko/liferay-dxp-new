@@ -245,68 +245,62 @@ public class RemoteAppEntryModelImpl
 
 	private static final Map<String, Function<RemoteAppEntry, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<RemoteAppEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<RemoteAppEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", RemoteAppEntry::getMvccVersion);
-		attributeGetterFunctions.put("uuid", RemoteAppEntry::getUuid);
-		attributeGetterFunctions.put(
-			"remoteAppEntryId", RemoteAppEntry::getRemoteAppEntryId);
-		attributeGetterFunctions.put("companyId", RemoteAppEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", RemoteAppEntry::getUserId);
-		attributeGetterFunctions.put("userName", RemoteAppEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", RemoteAppEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", RemoteAppEntry::getModifiedDate);
-		attributeGetterFunctions.put("name", RemoteAppEntry::getName);
-		attributeGetterFunctions.put("url", RemoteAppEntry::getUrl);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<RemoteAppEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<RemoteAppEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<RemoteAppEntry, Object>>();
 		Map<String, BiConsumer<RemoteAppEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<RemoteAppEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", RemoteAppEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<RemoteAppEntry, Long>)RemoteAppEntry::setMvccVersion);
+		attributeGetterFunctions.put("uuid", RemoteAppEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<RemoteAppEntry, String>)RemoteAppEntry::setUuid);
+		attributeGetterFunctions.put(
+			"remoteAppEntryId", RemoteAppEntry::getRemoteAppEntryId);
 		attributeSetterBiConsumers.put(
 			"remoteAppEntryId",
 			(BiConsumer<RemoteAppEntry, Long>)
 				RemoteAppEntry::setRemoteAppEntryId);
+		attributeGetterFunctions.put("companyId", RemoteAppEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<RemoteAppEntry, Long>)RemoteAppEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", RemoteAppEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<RemoteAppEntry, Long>)RemoteAppEntry::setUserId);
+		attributeGetterFunctions.put("userName", RemoteAppEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<RemoteAppEntry, String>)RemoteAppEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", RemoteAppEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<RemoteAppEntry, Date>)RemoteAppEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", RemoteAppEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<RemoteAppEntry, Date>)RemoteAppEntry::setModifiedDate);
+		attributeGetterFunctions.put("name", RemoteAppEntry::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<RemoteAppEntry, String>)RemoteAppEntry::setName);
+		attributeGetterFunctions.put("url", RemoteAppEntry::getUrl);
 		attributeSetterBiConsumers.put(
 			"url", (BiConsumer<RemoteAppEntry, String>)RemoteAppEntry::setUrl);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

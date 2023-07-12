@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.workflow.kaleo.forms.constants.KaleoFormsPortletKeys;
 import com.liferay.portal.workflow.kaleo.forms.model.KaleoProcess;
 
 import java.sql.PreparedStatement;
@@ -222,9 +223,20 @@ public class UpgradeKaleoProcess extends UpgradeProcess {
 	protected void initKaleoFormsDDMCompositeModelsResourceActions()
 		throws Exception {
 
-		_resourceActions.populateModelResources(
+		_resourceActions.read(
 			UpgradeKaleoProcess.class.getClassLoader(),
 			"/resource-actions/default.xml");
+
+		List<String> modelNames = _resourceActions.getPortletModelResources(
+			KaleoFormsPortletKeys.KALEO_FORMS_ADMIN);
+
+		for (String modelName : modelNames) {
+			List<String> modelActions =
+				_resourceActions.getModelResourceActions(modelName);
+
+			_resourceActionLocalService.checkResourceActions(
+				modelName, modelActions);
+		}
 	}
 
 	protected void updateDDLRecordSet(

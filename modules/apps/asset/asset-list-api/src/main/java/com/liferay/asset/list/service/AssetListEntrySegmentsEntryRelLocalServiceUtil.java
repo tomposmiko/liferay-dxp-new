@@ -474,12 +474,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		AssetListEntrySegmentsEntryRelLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile AssetListEntrySegmentsEntryRelLocalService _service;
 
 }

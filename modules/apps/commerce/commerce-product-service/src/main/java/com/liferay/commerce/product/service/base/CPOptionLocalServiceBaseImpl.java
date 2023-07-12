@@ -64,8 +64,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -81,6 +79,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -289,7 +289,13 @@ public abstract class CPOptionLocalServiceBaseImpl
 		return cpOptionPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option, or <code>null</code> if a matching cp option could not be found
+	 */
 	@Override
 	public CPOption fetchCPOptionByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -298,6 +304,9 @@ public abstract class CPOptionLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CPOption fetchCPOptionByReferenceCode(
@@ -307,7 +316,14 @@ public abstract class CPOptionLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option
+	 * @throws PortalException if a matching cp option could not be found
+	 */
 	@Override
 	public CPOption getCPOptionByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -1695,14 +1711,14 @@ public abstract class CPOptionLocalServiceBaseImpl
 			"com.liferay.commerce.product.model.CPOption",
 			cpOptionLocalService);
 
-		CPOptionLocalServiceUtil.setService(cpOptionLocalService);
+		_setLocalServiceUtilService(cpOptionLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.product.model.CPOption");
 
-		CPOptionLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1744,6 +1760,22 @@ public abstract class CPOptionLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CPOptionLocalService cpOptionLocalService) {
+
+		try {
+			Field field = CPOptionLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, cpOptionLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1987,9 +2019,6 @@ public abstract class CPOptionLocalServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CPOptionLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

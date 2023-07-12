@@ -119,17 +119,6 @@ public class RoleServiceWrapper
 	}
 
 	@Override
-	public java.util.List<Role> getGroupRolesAndTeamRoles(
-		long companyId, String name, java.util.List<String> excludedNames,
-		String title, String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId, int start, int end) {
-
-		return _roleService.getGroupRolesAndTeamRoles(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId, start, end);
-	}
-
-	@Override
 	public int getGroupRolesAndTeamRolesCount(
 		long companyId, String keywords, java.util.List<String> excludedNames,
 		int[] types, long excludedTeamRoleId, long teamGroupId) {
@@ -137,17 +126,6 @@ public class RoleServiceWrapper
 		return _roleService.getGroupRolesAndTeamRolesCount(
 			companyId, keywords, excludedNames, types, excludedTeamRoleId,
 			teamGroupId);
-	}
-
-	@Override
-	public int getGroupRolesAndTeamRolesCount(
-		long companyId, String name, java.util.List<String> excludedNames,
-		String title, String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId) {
-
-		return _roleService.getGroupRolesAndTeamRolesCount(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId);
 	}
 
 	/**

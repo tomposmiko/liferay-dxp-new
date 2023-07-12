@@ -15,7 +15,6 @@
 package com.liferay.commerce.pricing.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommercePricingClassLocalService}.
@@ -289,7 +288,13 @@ public class CommercePricingClassLocalServiceWrapper
 			commercePricingClassId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce pricing class with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce pricing class's external reference code
+	 * @return the matching commerce pricing class, or <code>null</code> if a matching commerce pricing class could not be found
+	 */
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
 		fetchCommercePricingClassByExternalReferenceCode(
@@ -300,6 +305,9 @@ public class CommercePricingClassLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePricingClassByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
@@ -356,7 +364,14 @@ public class CommercePricingClassLocalServiceWrapper
 			getCommercePricingClassByCPDefinition(cpDefinitionId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce pricing class with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce pricing class's external reference code
+	 * @return the matching commerce pricing class
+	 * @throws PortalException if a matching commerce pricing class could not be found
+	 */
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
 			getCommercePricingClassByExternalReferenceCode(
@@ -573,11 +588,6 @@ public class CommercePricingClassLocalServiceWrapper
 		return _commercePricingClassLocalService.upsertCommercePricingClass(
 			commercePricingClassId, userId, titleMap, descriptionMap,
 			externalReferenceCode, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commercePricingClassLocalService.getBasePersistence();
 	}
 
 	@Override

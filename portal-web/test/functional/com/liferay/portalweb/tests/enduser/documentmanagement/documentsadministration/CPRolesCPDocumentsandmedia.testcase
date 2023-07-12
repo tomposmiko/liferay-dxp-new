@@ -15,7 +15,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,7 +35,7 @@ definition {
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewDocumentsAndMediaPortletRegRole {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -78,7 +78,7 @@ definition {
 		DMPortlet.viewNoPermissionCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewDocumentsAndMediaPortletSiteRole {
 		Permissions.setUpSiteRoleLoginUserCP(
 			pageName = "Documents and Media Page",

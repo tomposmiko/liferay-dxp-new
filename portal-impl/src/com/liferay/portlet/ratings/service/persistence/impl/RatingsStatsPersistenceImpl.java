@@ -54,6 +54,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -173,7 +174,7 @@ public class RatingsStatsPersistenceImpl
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
-	 * @param classPKs the class pks
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of ratings statses
 	 * @param end the upper bound of the range of ratings statses (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1063,9 +1064,7 @@ public class RatingsStatsPersistenceImpl
 	 */
 	@Override
 	public RatingsStats fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				RatingsStats.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(RatingsStats.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -1521,11 +1520,11 @@ public class RatingsStatsPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
 
-		RatingsStatsUtil.setPersistence(this);
+		_setRatingsStatsUtilPersistence(this);
 	}
 
 	public void destroy() {
-		RatingsStatsUtil.setPersistence(null);
+		_setRatingsStatsUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(RatingsStatsImpl.class.getName());
 
@@ -1535,6 +1534,22 @@ public class RatingsStatsPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setRatingsStatsUtilPersistence(
+		RatingsStatsPersistence ratingsStatsPersistence) {
+
+		try {
+			Field field = RatingsStatsUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ratingsStatsPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

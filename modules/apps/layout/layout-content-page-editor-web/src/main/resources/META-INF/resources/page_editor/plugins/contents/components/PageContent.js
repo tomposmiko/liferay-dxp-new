@@ -83,10 +83,7 @@ export default function PageContent(props) {
 			onMouseLeave={handleMouseLeave}
 			onMouseOver={handleMouseOver}
 		>
-			<div
-				className="d-flex lfr-portal-tooltip', pl-3 pr-2 py-3"
-				title={props.title}
-			>
+			<div className="d-flex pl-3 pr-2 py-3">
 				<ClayLayout.ContentCol expand>
 					<strong className="list-group-title text-truncate">
 						{props.title}

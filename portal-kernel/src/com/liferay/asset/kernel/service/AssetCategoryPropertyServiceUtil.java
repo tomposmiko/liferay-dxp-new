@@ -95,10 +95,6 @@ public class AssetCategoryPropertyServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AssetCategoryPropertyService service) {
-		_service = service;
-	}
-
 	private static volatile AssetCategoryPropertyService _service;
 
 }

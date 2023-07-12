@@ -18,7 +18,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This ensures that previous asset selections persist in collections after DM and WC applications are disabled."
-	@priority = 5
+	@priority = "5"
 	test SelectDisabledAssetsFromCollections {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -93,7 +93,7 @@ definition {
 	}
 
 	@description = "This ensures that the Applications can be set in a depot."
-	@priority = 5
+	@priority = "5"
 	test Smoke {
 		property portal.acceptance = "true";
 		property testray.component.names = "Asset Lists";
@@ -106,7 +106,7 @@ definition {
 
 		for (var application : list "Collections,Documents and Media,Web Content") {
 			AssertChecked(
-				checkboxName = ${application},
+				checkboxName = "${application}",
 				locator1 = "Checkbox#ANY_CHECKBOX");
 		}
 
@@ -147,7 +147,7 @@ definition {
 	}
 
 	@description = "This ensures that the Collections application can be viewed after reactivating in a depot."
-	@priority = 5
+	@priority = "5"
 	test ViewCollectionsAfterReactivating {
 		DepotNavigator.openDepotAssetListsAdmin(depotName = "Test Depot Name");
 
@@ -208,7 +208,7 @@ definition {
 	}
 
 	@description = "This ensures that a user cannot see the sections of both the product menu and the dashboard that contain disabled applications."
-	@priority = 5
+	@priority = "5"
 	test ViewDepotWithAllAppsDisabled {
 		DepotNavigator.openDepotAdmin();
 
@@ -232,7 +232,7 @@ definition {
 
 		for (var portletName : list "Web Content,Documents and Media,Collections,Recycle Bin") {
 			AssertElementNotPresent(
-				key_card = ${portletName},
+				key_card = "${portletName}",
 				locator1 = "Card#CARD");
 		}
 
@@ -250,7 +250,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot web content persists in WCD as previously and it's not appeared in the item selector on a connected site when WC application is disabled."
-	@priority = 5
+	@priority = "5"
 	test ViewDisabledAssetViaWCD {
 		JSONGroup.addGroup(groupName = "Test Site Name");
 
@@ -311,7 +311,7 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		Click(locator1 = "Button#CHANGE");
 
@@ -343,7 +343,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot image persists in blog entry as previously and it's not appeared in the item selector on a connected site when DM application is disabled."
-	@priority = 5
+	@priority = "5"
 	test ViewDisabledImageViaBlogs {
 		JSONGroup.addGroup(groupName = "Test Site Name");
 
@@ -382,7 +382,7 @@ definition {
 
 		Button.clickPublish();
 
-		Pause(locator1 = 10000);
+		Pause(locator1 = "10000");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -420,7 +420,7 @@ definition {
 	}
 
 	@description = "This ensures that the DM application can be viewed after reactivating in a depot."
-	@priority = 5
+	@priority = "5"
 	test ViewDMAfterReactivating {
 		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
@@ -474,7 +474,7 @@ definition {
 	}
 
 	@description = "This ensures that the WC application can be viewed after reactivating in a depot."
-	@priority = 5
+	@priority = "5"
 	test ViewWCAfterReactivating {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",

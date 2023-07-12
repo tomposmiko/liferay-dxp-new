@@ -15,12 +15,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewWCDNestedPortlets {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -35,13 +35,13 @@ definition {
 			layoutTemplate = "1 Column");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Nested Portlets Page",
 			widgetName = "Nested Applications");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Nested Portlets Page",
 			widgetName = "Web Content Display");
@@ -57,14 +57,14 @@ definition {
 		WaitForElementNotPresent(locator1 = "IFrame#MODAL_BODY");
 
 		NestedPortlets.dragAndDropPortletToPortletColumnPG(
-			columnNumberFrom = 1,
-			portletColumnNumberTo = 1,
+			columnNumberFrom = "1",
+			portletColumnNumberTo = "1",
 			portletName = "Web Content Display");
 
 		Navigator.gotoPage(pageName = "Nested Portlets Page");
 
 		NestedPortlets.viewPG(
-			portletColumnNumberTo = 1,
+			portletColumnNumberTo = "1",
 			portletName = "Web Content Display");
 	}
 

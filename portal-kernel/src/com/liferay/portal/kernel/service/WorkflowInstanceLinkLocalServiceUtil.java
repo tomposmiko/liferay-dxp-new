@@ -397,10 +397,6 @@ public class WorkflowInstanceLinkLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(WorkflowInstanceLinkLocalService service) {
-		_service = service;
-	}
-
 	private static volatile WorkflowInstanceLinkLocalService _service;
 
 }

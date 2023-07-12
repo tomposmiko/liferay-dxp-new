@@ -14,7 +14,6 @@
 
 package com.liferay.bulk.rest.internal.resource.v1_0.factory;
 
-import com.liferay.bulk.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.bulk.rest.resource.v1_0.SelectionResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Alejandro Tardín
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/bulk/v1.0/Selection",
-	service = SelectionResource.Factory.class
-)
+@Component(immediate = true, service = SelectionResource.Factory.class)
 @Generated("")
 public class SelectionResourceFactoryImpl implements SelectionResource.Factory {
 
@@ -137,6 +134,16 @@ public class SelectionResourceFactoryImpl implements SelectionResource.Factory {
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		SelectionResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		SelectionResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, SelectionResource>
 		_getProxyProviderFunction() {
 
@@ -184,7 +191,7 @@ public class SelectionResourceFactoryImpl implements SelectionResource.Factory {
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		SelectionResource selectionResource =
@@ -208,7 +215,6 @@ public class SelectionResourceFactoryImpl implements SelectionResource.Factory {
 		selectionResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		selectionResource.setRoleLocalService(_roleLocalService);
-		selectionResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(selectionResource, arguments);
@@ -248,6 +254,9 @@ public class SelectionResourceFactoryImpl implements SelectionResource.Factory {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -256,9 +265,6 @@ public class SelectionResourceFactoryImpl implements SelectionResource.Factory {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

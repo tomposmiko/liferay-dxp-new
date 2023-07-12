@@ -56,7 +56,7 @@ public class Position implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Position.class, json);
 	}
 
-	@Schema(example = "33.54")
+	@Schema
 	public Double getX() {
 		return x;
 	}
@@ -82,7 +82,7 @@ public class Position implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double x;
 
-	@Schema(example = "33.54")
+	@Schema
 	public Double getY() {
 		return y;
 	}

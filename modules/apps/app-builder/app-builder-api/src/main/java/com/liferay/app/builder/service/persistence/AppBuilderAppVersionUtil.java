@@ -1288,12 +1288,6 @@ public class AppBuilderAppVersionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		AppBuilderAppVersionPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile AppBuilderAppVersionPersistence _persistence;
 
 }

@@ -14,7 +14,6 @@
 
 package com.liferay.portal.jsonwebservice;
 
-import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -28,6 +27,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import jodd.servlet.ServletUtil;
+
 /**
  * @author Igor Spasic
  */
@@ -37,8 +38,8 @@ public class JSONRPCRequest {
 		HttpServletRequest httpServletRequest) {
 
 		try {
-			String requestBody = StreamUtil.toString(
-				httpServletRequest.getInputStream());
+			String requestBody = ServletUtil.readRequestBody(
+				httpServletRequest);
 
 			if (Validator.isNull(requestBody) ||
 				!requestBody.startsWith(StringPool.OPEN_CURLY_BRACE) ||

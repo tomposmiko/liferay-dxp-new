@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is for LPS-116078. Can navigate to preview page via page preview info bar but not interact with preview page in style book editor."
-	@priority = 4
+	@priority = "4"
 	test CanNavigateToPreviewPageViaPagePreviewInfoBarButNotAllowInteractWithPreviewPage {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -80,7 +80,7 @@ definition {
 				key_content = "Banner Title Example",
 				key_element = "h1",
 				key_id = "title",
-				key_type = "text",
+				key_type = "rich-text",
 				locator1 = "StyleBookEditor#CONTRIBUTED_FRAGMENT_INLINE_CONTENT");
 		}
 
@@ -122,7 +122,7 @@ definition {
 	}
 
 	@description = "This is for LPS-116078. Can not preview style book when there are no pages in site."
-	@priority = 4
+	@priority = "4"
 	test CannotPreviewStyleBookWhenSiteWithoutPage {
 		task ("Add a style book") {
 			StyleBooksAdmin.openStyleBooksAdmin(siteURLKey = "test-site-name");
@@ -142,7 +142,7 @@ definition {
 	}
 
 	@description = "This is for LPS-121979 and LPS-120005. Change the configuration of page won't break the connection with its style book."
-	@priority = 5
+	@priority = "5"
 	test ChangeConfigurationOfPageBasedOnStyleBook {
 		property portal.acceptance = "true";
 
@@ -202,7 +202,7 @@ definition {
 				key_fragmentName = "Paragraph",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
 				locator2 = "font-family",
-				value1 = ${fontFamily});
+				value1 = "${fontFamily}");
 
 			PageEditor.clickPublish();
 		}
@@ -216,7 +216,7 @@ definition {
 				key_fragmentName = "paragraph",
 				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
 				locator2 = "font-family",
-				value1 = ${fontFamily});
+				value1 = "${fontFamily}");
 		}
 
 		task ("Modify the page name") {
@@ -234,12 +234,12 @@ definition {
 				key_fragmentName = "paragraph",
 				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
 				locator2 = "font-family",
-				value1 = ${fontFamily});
+				value1 = "${fontFamily}");
 		}
 	}
 
 	@description = "This is for LPS-116106. Page Creator can change style book of content page via Look and Feel settings."
-	@priority = 4
+	@priority = "4"
 	test ChangeStyleBookOfContentPageViaLookAndFeel {
 		task ("Add a style book") {
 			StyleBooksAdmin.openStyleBooksAdmin(siteURLKey = "test-site-name");
@@ -460,7 +460,7 @@ definition {
 	}
 
 	@description = "This is for LPS-116106. Page Creator can change style book of widget page via Look and Feel settings."
-	@priority = 4
+	@priority = "4"
 	test ChangeStyleBookOfWidgetPageViaLookAndFeel {
 		task ("Add a style book") {
 			StyleBooksAdmin.openStyleBooksAdmin(siteURLKey = "test-site-name");
@@ -481,7 +481,7 @@ definition {
 
 			StyleBooks.waitForAutoSave();
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			StyleBooks.expandSection(sectionName = "Button Secondary");
 
@@ -597,7 +597,7 @@ definition {
 	}
 
 	@description = "This is for LPS-116078. Can preview the effect on page when edit the style book."
-	@priority = 5
+	@priority = "5"
 	test PreviewTheEffectOnPageInStyleBookEditor {
 		property portal.acceptance = "true";
 
@@ -639,7 +639,7 @@ definition {
 				key_content = "Banner Title Example",
 				key_element = "h1",
 				key_id = "title",
-				key_type = "text",
+				key_type = "rich-text",
 				locator1 = "StyleBookEditor#CONTRIBUTED_FRAGMENT_INLINE_CONTENT");
 
 			SelectFrameTop();
@@ -692,7 +692,7 @@ definition {
 				key_content = "Banner Title Example",
 				key_element = "h1",
 				key_id = "title",
-				key_type = "text",
+				key_type = "rich-text",
 				locator1 = "StyleBookEditor#CONTRIBUTED_FRAGMENT_INLINE_CONTENT",
 				locator2 = "font-size",
 				value1 = "32px");

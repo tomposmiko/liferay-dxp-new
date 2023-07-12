@@ -35,8 +35,6 @@ public class BlogsPortletLayoutFinder extends BasePortletLayoutFinder {
 		return _PORTLET_IDS;
 	}
 
-	private static final String[] _PORTLET_IDS = {
-		BlogsPortletKeys.BLOGS, BlogsPortletKeys.BLOGS_AGGREGATOR
-	};
+	private static final String[] _PORTLET_IDS = {BlogsPortletKeys.BLOGS};
 
 }

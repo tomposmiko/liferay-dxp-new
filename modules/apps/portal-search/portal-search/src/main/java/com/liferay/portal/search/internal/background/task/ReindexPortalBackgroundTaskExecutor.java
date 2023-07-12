@@ -53,10 +53,6 @@ public class ReindexPortalBackgroundTaskExecutor
 				ReindexBackgroundTaskConstants.PORTAL_START, companyId,
 				companyIds);
 
-			if (_log.isInfoEnabled()) {
-				_log.info("Start reindexing company " + companyId);
-			}
-
 			try {
 				SearchEngineInitializer searchEngineInitializer =
 					new SearchEngineInitializer(
@@ -71,10 +67,6 @@ public class ReindexPortalBackgroundTaskExecutor
 				ReindexStatusMessageSenderUtil.sendStatusMessage(
 					ReindexBackgroundTaskConstants.PORTAL_END, companyId,
 					companyIds);
-
-				if (_log.isInfoEnabled()) {
-					_log.info("Finished reindexing company " + companyId);
-				}
 			}
 		}
 	}

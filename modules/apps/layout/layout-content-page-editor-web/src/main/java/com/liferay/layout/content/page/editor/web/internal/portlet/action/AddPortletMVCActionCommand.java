@@ -28,8 +28,10 @@ import com.liferay.layout.content.page.editor.web.internal.util.layout.structure
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.PortletIdException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.InvokerPortlet;
 import com.liferay.portal.kernel.portlet.LiferayRenderRequest;
@@ -49,6 +51,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.RenderRequestFactory;
@@ -148,7 +151,9 @@ public class AddPortletMVCActionCommand
 
 		String namespace = StringUtil.randomId();
 
-		String instanceId = _getPortletInstanceId(namespace, portletId);
+		String instanceId = _getPortletInstanceId(
+			namespace, themeDisplay.getLayout(), portletId,
+			segmentsExperienceId);
 
 		JSONObject editableValueJSONObject =
 			_fragmentEntryProcessorRegistry.getDefaultEditableValuesJSONObject(
@@ -209,13 +214,27 @@ public class AddPortletMVCActionCommand
 				_itemSelector, portletId));
 	}
 
-	private String _getPortletInstanceId(String namespace, String portletId)
+	private String _getPortletInstanceId(
+			String namespace, Layout layout, String portletId,
+			long segmentsExperienceId)
 		throws Exception {
 
 		Portlet portlet = _portletLocalService.getPortletById(portletId);
 
 		if (portlet.isInstanceable()) {
 			return namespace;
+		}
+
+		long count = _portletPreferencesLocalService.getPortletPreferencesCount(
+			PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid(), portletId);
+
+		if ((count > 0) &&
+			!LayoutStructureUtil.isPortletMarkedForDeletion(
+				layout.getGroupId(), layout.getPlid(), portletId,
+				segmentsExperienceId)) {
+
+			throw new PortletIdException(
+				"Unable to add uninstanceable portlet more than once");
 		}
 
 		return StringPool.BLANK;

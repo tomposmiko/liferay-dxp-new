@@ -493,13 +493,7 @@ public interface CPInstanceLocalService
 			long cpDefinitionId, ServiceContext serviceContext)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #checkCPInstances(long)}
-	 */
-	@Deprecated
 	public void checkCPInstances() throws PortalException;
-
-	public void checkCPInstances(long cpDefinitionId) throws PortalException;
 
 	public void checkCPInstancesByDisplayDate(long cpDefinitionId)
 		throws PortalException;
@@ -638,11 +632,20 @@ public interface CPInstanceLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPInstance fetchCPInstance(long CPInstanceId);
 
-	@Deprecated
+	/**
+	 * Returns the cp instance with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp instance's external reference code
+	 * @return the matching cp instance, or <code>null</code> if a matching cp instance could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPInstance fetchCPInstanceByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPInstanceByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPInstance fetchCPInstanceByReferenceCode(
@@ -719,7 +722,14 @@ public interface CPInstanceLocalService
 	public CPInstance getCPInstance(long cpDefinitionId, String sku)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the cp instance with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp instance's external reference code
+	 * @return the matching cp instance
+	 * @throws PortalException if a matching cp instance could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPInstance getCPInstanceByExternalReferenceCode(
 			long companyId, String externalReferenceCode)

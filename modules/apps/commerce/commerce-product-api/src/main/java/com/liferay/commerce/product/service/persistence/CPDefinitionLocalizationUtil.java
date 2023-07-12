@@ -547,12 +547,6 @@ public class CPDefinitionLocalizationUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CPDefinitionLocalizationPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CPDefinitionLocalizationPersistence _persistence;
 
 }

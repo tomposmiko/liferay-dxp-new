@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jsoup.Jsoup;
@@ -133,10 +132,6 @@ public class DropZoneContentPageEditorListener
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		if (serviceContext == null) {
-			return;
-		}
-
 		String processedHTML =
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
 				fragmentEntryLink,
@@ -176,12 +171,8 @@ public class DropZoneContentPageEditorListener
 		}
 
 		if (childrenItemIds.size() > elements.size()) {
-			List<String> copyOfChildrenItemIds = new ArrayList<>(
-				childrenItemIds);
-
-			List<String> childrenItemIdsToRemove =
-				copyOfChildrenItemIds.subList(
-					elements.size(), copyOfChildrenItemIds.size());
+			List<String> childrenItemIdsToRemove = childrenItemIds.subList(
+				elements.size(), childrenItemIds.size());
 
 			childrenItemIdsToRemove.forEach(
 				layoutStructure::deleteLayoutStructureItem);

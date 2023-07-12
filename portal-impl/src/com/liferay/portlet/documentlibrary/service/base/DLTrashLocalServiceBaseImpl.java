@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -96,11 +96,11 @@ public abstract class DLTrashLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		DLTrashLocalServiceUtil.setService(dlTrashLocalService);
+		_setLocalServiceUtilService(dlTrashLocalService);
 	}
 
 	public void destroy() {
-		DLTrashLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -137,6 +137,22 @@ public abstract class DLTrashLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		DLTrashLocalService dlTrashLocalService) {
+
+		try {
+			Field field = DLTrashLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlTrashLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = DLTrashLocalService.class)
 	protected DLTrashLocalService dlTrashLocalService;
 
@@ -145,8 +161,5 @@ public abstract class DLTrashLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLTrashLocalServiceBaseImpl.class);
 
 }

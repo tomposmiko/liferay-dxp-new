@@ -131,10 +131,6 @@ public class CPMeasurementUnitServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPMeasurementUnitService service) {
-		_service = service;
-	}
-
 	private static volatile CPMeasurementUnitService _service;
 
 }

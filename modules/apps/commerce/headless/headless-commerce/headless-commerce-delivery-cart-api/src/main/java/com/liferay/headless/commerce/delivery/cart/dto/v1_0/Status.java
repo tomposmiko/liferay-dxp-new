@@ -82,7 +82,7 @@ public class Status implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer code;
 
-	@Schema(example = "black")
+	@Schema
 	public String getLabel() {
 		return label;
 	}
@@ -110,7 +110,7 @@ public class Status implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String label;
 
-	@Schema(example = "black")
+	@Schema
 	public String getLabel_i18n() {
 		return label_i18n;
 	}

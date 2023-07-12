@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceChannelRelLocalService}.
@@ -427,11 +426,6 @@ public class CommerceChannelRelLocalServiceWrapper
 
 		return _commerceChannelRelLocalService.updateCommerceChannelRel(
 			commerceChannelRel);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceChannelRelLocalService.getBasePersistence();
 	}
 
 	@Override

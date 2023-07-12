@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2027,12 +2028,12 @@ public class AccountGroupAccountEntryRelPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"accountGroupId", "accountEntryId"}, false);
 
-		AccountGroupAccountEntryRelUtil.setPersistence(this);
+		_setAccountGroupAccountEntryRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AccountGroupAccountEntryRelUtil.setPersistence(null);
+		_setAccountGroupAccountEntryRelUtilPersistence(null);
 
 		entityCache.removeCache(
 			AccountGroupAccountEntryRelImpl.class.getName());
@@ -2043,6 +2044,24 @@ public class AccountGroupAccountEntryRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAccountGroupAccountEntryRelUtilPersistence(
+		AccountGroupAccountEntryRelPersistence
+			accountGroupAccountEntryRelPersistence) {
+
+		try {
+			Field field =
+				AccountGroupAccountEntryRelUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, accountGroupAccountEntryRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

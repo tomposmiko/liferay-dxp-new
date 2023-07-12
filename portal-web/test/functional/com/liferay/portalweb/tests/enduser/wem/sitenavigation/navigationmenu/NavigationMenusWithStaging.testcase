@@ -51,7 +51,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -60,7 +60,7 @@ definition {
 	}
 
 	@description = "Navigation menus are only editable in the staging site and cannot be edited in the live site."
-	@priority = 5
+	@priority = "5"
 	test CannotEditNavigationMenuInLive {
 		property portal.acceptance = "true";
 
@@ -108,7 +108,7 @@ definition {
 	}
 
 	@description = "Deleted Navigation menus will not appear in live after publish. This case covers LPS-89358."
-	@priority = 3
+	@priority = "3"
 	test DeletedNavigationMenuNotInLiveAfterPublish {
 		task ("Add the first page to the navigation menu") {
 			NavigationMenusAdmin.addItem(
@@ -167,7 +167,7 @@ definition {
 	}
 
 	@description = "Edits to navigation menus will appear in live until after publish. This test has the Navigation Menu widget display a specific navigation menu and covers LPS-86525."
-	@priority = 5
+	@priority = "5"
 	test PublishEditedNavigationMenu {
 		property portal.acceptance = "true";
 
@@ -265,7 +265,7 @@ definition {
 				locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON",
 				value1 = "Publish to Live");
 
-			Pause(locator1 = 30000);
+			Pause(locator1 = "30000");
 
 			AssertTextEquals(
 				locator1 = "Staging#PROCESS_RESULT",
@@ -306,7 +306,7 @@ definition {
 	}
 
 	@description = "Edits to navigation menus will appear in live until after publish. This test has the Navigation Menu widget display the primary navigation menu and covers LPS-86529."
-	@priority = 5
+	@priority = "5"
 	test PublishEditedPrimaryNavigationMenu {
 		property portal.acceptance = "true";
 
@@ -412,7 +412,7 @@ definition {
 				locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON",
 				value1 = "Publish to Live");
 
-			Pause(locator1 = 30000);
+			Pause(locator1 = "30000");
 
 			AssertTextEquals(
 				locator1 = "Staging#PROCESS_RESULT",
@@ -453,7 +453,7 @@ definition {
 	}
 
 	@description = "Navigation menus can be published to live and do not appear in live until published. This is a use case for LPS-86142 and LPS-112993."
-	@priority = 5
+	@priority = "5"
 	test PublishNavigationMenu {
 		property portal.acceptance = "true";
 
@@ -599,7 +599,7 @@ definition {
 	}
 
 	@description = "Publishing navigation menus should not also publish pages. When publishing only navigation menus, pages that exist in the staging site but do not exist in the live site should not appear in the Navigation Menu widget. This test has the Navigation Menu widget display a specific navigation menu and covers LPS-86525."
-	@priority = 5
+	@priority = "5"
 	test PublishNavigationMenuWithDeletedPages {
 		property portal.acceptance = "true";
 
@@ -648,7 +648,7 @@ definition {
 				locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON",
 				value1 = "Publish to Live");
 
-			Pause(locator1 = 30000);
+			Pause(locator1 = "30000");
 
 			AssertTextEquals(
 				locator1 = "Staging#PROCESS_RESULT",
@@ -675,7 +675,7 @@ definition {
 	}
 
 	@description = "Navigation menus can be published to live and do not appear in live until published. This test has the Navigation Menu widget display the primary navigation menu."
-	@priority = 5
+	@priority = "5"
 	test PublishPrimaryNavigationMenu {
 		property portal.acceptance = "true";
 
@@ -829,7 +829,7 @@ definition {
 	}
 
 	@description = "Publishing navigation menus should not also publish pages. When publishing only navigation menus, pages that exist in the staging site but do not exist in the live site should not appear in the Navigation Menu widget. This test has the Navigation Menu widget display the primary navigation menu."
-	@priority = 5
+	@priority = "5"
 	test PublishPrimaryNavigationMenuWithDeletedPages {
 		property portal.acceptance = "true";
 
@@ -888,7 +888,7 @@ definition {
 				locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON",
 				value1 = "Publish to Live");
 
-			Pause(locator1 = 30000);
+			Pause(locator1 = "30000");
 
 			AssertTextEquals(
 				locator1 = "Staging#PROCESS_RESULT",
@@ -915,7 +915,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-113994. The Naviation Menu is able to display more than 2 sublevels page hierarchy when use the default template after enable Live."
-	@priority = 3
+	@priority = "3"
 	test ShowMoreThanTwoSublevelsWhenSelectPublicPagesHierarchyAndBarMinimallyStyled {
 		task ("Add a site via JSON") {
 			JSONGroup.addGroup(groupName = "Site Name");
@@ -959,11 +959,11 @@ definition {
 
 			NavigationMenusWidget.selectNavigation(menuType = "Public Pages Hierarchy");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			NavigationMenusWidget.selectDisplayTemplate(templateName = "Bar minimally styled");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Portlet.saveAndCloseConfig();
 		}

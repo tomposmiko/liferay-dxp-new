@@ -42,7 +42,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -433,7 +433,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 
 		List<StatsRequest> statsRequests = baseSearchRequest.getStatsRequests();
 
-		if (ListUtil.isNotEmpty(statsRequests)) {
+		if (!ListUtil.isEmpty(statsRequests)) {
 			statsRequests.forEach(
 				statsRequest -> _statsTranslator.populateRequest(
 					searchSourceBuilder, statsRequest));
@@ -515,9 +515,10 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		else if (scoreMode == Rescore.ScoreMode.TOTAL) {
 			return QueryRescoreMode.Total;
 		}
-
-		throw new IllegalArgumentException(
-			"Invalid Rescore.ScoreMode: " + scoreMode);
+		else {
+			throw new IllegalArgumentException(
+				"Invalid Rescore.ScoreMode: " + scoreMode);
+		}
 	}
 
 	protected QueryBuilder translateQuery(

@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This ensures that a user is redirected to the updated friendlyURL when he accesses the former friendlyURL."
-	@priority = 5
+	@priority = "5"
 	test RedirectToUpdatedFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -51,7 +51,7 @@ definition {
 	}
 
 	@description = "This ensures that a user is redirected to the updated localized friendlyURL when he accesses the former localized friendlyURL."
-	@priority = 5
+	@priority = "5"
 	test RedirectToUpdatedLocalizedFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -85,7 +85,7 @@ definition {
 	}
 
 	@description = "This ensures that the old friendlyURL can be removed from the history."
-	@priority = 5
+	@priority = "5"
 	test RemoveOldFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -111,7 +111,7 @@ definition {
 	}
 
 	@description = "This ensures that the old friendlyURL can be restored from the history."
-	@priority = 5
+	@priority = "5"
 	test RestoreOldFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -141,7 +141,7 @@ definition {
 	}
 
 	@description = "This ensures that accessing an old friendlyURL in the default language after publishing the new friendly URL will redirect the user to the new URL."
-	@priority = 5
+	@priority = "5"
 	test StagingFriendlyURLRedirect {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -175,7 +175,7 @@ definition {
 	}
 
 	@description = "This ensures that accessing an old localized friendlyURL after publishing the new friendly URL will redirect the user to the new URL."
-	@priority = 5
+	@priority = "5"
 	test StagingLocalizedFriendlyURLRedirect {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -235,7 +235,7 @@ definition {
 	}
 
 	@description = "This ensures that both the active URL and old friendlyURL can be viewed from the history."
-	@priority = 5
+	@priority = "5"
 	test ViewFriendlyURLs {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -265,7 +265,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-116068. It ensures that both the active URL and old friendlyURL can be viewed from the history of a default page."
-	@priority = 5
+	@priority = "5"
 	test ViewFriendlyURLsViaDefaultPage {
 		SitePages.openPagesAdmin(siteURLKey = "guest");
 
@@ -291,7 +291,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-119836. It ensures the localized URL with special characters can be escaped correctly."
-	@priority = 4
+	@priority = "4"
 	test ViewFriendlyURLWithSpecialCharacters {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -317,7 +317,7 @@ definition {
 	}
 
 	@description = "This ensures that both the localized active URL and old friendlyURL can be viewed from the history."
-	@priority = 5
+	@priority = "5"
 	test ViewLocalizedFriendlyURLs {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -365,7 +365,7 @@ definition {
 	}
 
 	@description = "This ensures that the multiple old friendlyURLs can be viewed from the history. This test also covers the first old friendlyURL is the last one."
-	@priority = 5
+	@priority = "5"
 	test ViewMultipleOldFriendlyURLs {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -391,7 +391,7 @@ definition {
 	}
 
 	@description = "This ensures that only the active URL can be viewed by default language from the history after localization without friendlyURL."
-	@priority = 5
+	@priority = "5"
 	test ViewURLsAfterLocalizationWithoutFriendlyURL {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",

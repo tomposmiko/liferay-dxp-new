@@ -109,8 +109,6 @@ function ItemFinder(props) {
 		props
 			.onItemCreated(textFilter)
 			.then((id) => {
-				showNotification(props.itemCreatedMessage);
-
 				updateTextFilter('');
 
 				if (id) {
@@ -153,7 +151,6 @@ ItemFinder.propTypes = {
 	createNewItemLabel: PropTypes.string,
 	getSelectedItems: PropTypes.func.isRequired,
 	inputPlaceholder: PropTypes.string,
-	itemCreatedMessage: PropTypes.string,
 	itemCreation: PropTypes.bool,
 	itemSelectedMessage: PropTypes.string,
 	itemsKey: PropTypes.string.isRequired,
@@ -169,7 +166,6 @@ ItemFinder.propTypes = {
 
 ItemFinder.defaultProps = {
 	currentPage: 1,
-	itemCreatedMessage: Liferay.Language.get('item-created'),
 	itemCreation: true,
 	itemSelectedMessage: Liferay.Language.get('item-selected'),
 	multiSelectableEntries: false,

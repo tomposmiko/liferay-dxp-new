@@ -204,30 +204,24 @@ public class CounterModelImpl
 
 	private static final Map<String, Function<Counter, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<Counter, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Counter, Object>>();
-
-		attributeGetterFunctions.put("name", Counter::getName);
-		attributeGetterFunctions.put("currentId", Counter::getCurrentId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<Counter, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Counter, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Counter, Object>>();
 		Map<String, BiConsumer<Counter, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Counter, ?>>();
 
+		attributeGetterFunctions.put("name", Counter::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Counter, String>)Counter::setName);
+		attributeGetterFunctions.put("currentId", Counter::getCurrentId);
 		attributeSetterBiConsumers.put(
 			"currentId", (BiConsumer<Counter, Long>)Counter::setCurrentId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

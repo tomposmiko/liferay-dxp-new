@@ -169,10 +169,6 @@ public class FragmentCompositionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(FragmentCompositionService service) {
-		_service = service;
-	}
-
 	private static volatile FragmentCompositionService _service;
 
 }

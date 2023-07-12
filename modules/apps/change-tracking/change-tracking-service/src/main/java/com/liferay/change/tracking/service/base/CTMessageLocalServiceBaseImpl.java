@@ -32,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -46,6 +44,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -373,7 +373,7 @@ public abstract class CTMessageLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		CTMessageLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -388,7 +388,7 @@ public abstract class CTMessageLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ctMessageLocalService = (CTMessageLocalService)aopProxy;
 
-		CTMessageLocalServiceUtil.setService(ctMessageLocalService);
+		_setLocalServiceUtilService(ctMessageLocalService);
 	}
 
 	/**
@@ -433,6 +433,22 @@ public abstract class CTMessageLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		CTMessageLocalService ctMessageLocalService) {
+
+		try {
+			Field field = CTMessageLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ctMessageLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected CTMessageLocalService ctMessageLocalService;
 
 	@Reference
@@ -441,8 +457,5 @@ public abstract class CTMessageLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTMessageLocalServiceBaseImpl.class);
 
 }

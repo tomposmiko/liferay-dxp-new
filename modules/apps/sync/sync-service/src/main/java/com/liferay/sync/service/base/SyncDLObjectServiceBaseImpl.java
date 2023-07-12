@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -32,6 +30,8 @@ import com.liferay.sync.service.persistence.SyncDLFileVersionDiffPersistence;
 import com.liferay.sync.service.persistence.SyncDLObjectFinder;
 import com.liferay.sync.service.persistence.SyncDLObjectPersistence;
 import com.liferay.sync.service.persistence.SyncDevicePersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -60,7 +60,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		SyncDLObjectServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public abstract class SyncDLObjectServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		syncDLObjectService = (SyncDLObjectService)aopProxy;
 
-		SyncDLObjectServiceUtil.setService(syncDLObjectService);
+		_setServiceUtilService(syncDLObjectService);
 	}
 
 	/**
@@ -116,6 +116,22 @@ public abstract class SyncDLObjectServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		SyncDLObjectService syncDLObjectService) {
+
+		try {
+			Field field = SyncDLObjectServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, syncDLObjectService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -232,8 +248,5 @@ public abstract class SyncDLObjectServiceBaseImpl
 	@Reference
 	protected com.liferay.document.library.kernel.service.DLTrashService
 		dlTrashService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SyncDLObjectServiceBaseImpl.class);
 
 }

@@ -61,6 +61,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -5501,9 +5502,7 @@ public class AssetEntryPersistenceImpl
 	 */
 	@Override
 	public AssetEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				AssetEntry.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(AssetEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -6526,7 +6525,6 @@ public class AssetEntryPersistenceImpl
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
 		Set<String> ctIgnoreColumnNames = new HashSet<String>();
-		Set<String> ctMergeColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -6548,7 +6546,7 @@ public class AssetEntryPersistenceImpl
 		ctStrictColumnNames.add("publishDate");
 		ctStrictColumnNames.add("expirationDate");
 		ctStrictColumnNames.add("mimeType");
-		ctMergeColumnNames.add("title");
+		ctStrictColumnNames.add("title");
 		ctStrictColumnNames.add("description");
 		ctStrictColumnNames.add("summary");
 		ctStrictColumnNames.add("url");
@@ -6563,7 +6561,6 @@ public class AssetEntryPersistenceImpl
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
-		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK, Collections.singleton("entryId"));
 		_ctColumnNamesMap.put(
@@ -6799,11 +6796,11 @@ public class AssetEntryPersistenceImpl
 			},
 			false);
 
-		AssetEntryUtil.setPersistence(this);
+		_setAssetEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		AssetEntryUtil.setPersistence(null);
+		_setAssetEntryUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(AssetEntryImpl.class.getName());
 
@@ -6817,6 +6814,21 @@ public class AssetEntryPersistenceImpl
 
 		TableMapperFactory.removeTableMapper("AssetEntries_AssetCategories");
 		TableMapperFactory.removeTableMapper("AssetEntries_AssetTags");
+	}
+
+	private void _setAssetEntryUtilPersistence(
+		AssetEntryPersistence assetEntryPersistence) {
+
+		try {
+			Field field = AssetEntryUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, assetEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@BeanReference(type = AssetCategoryPersistence.class)

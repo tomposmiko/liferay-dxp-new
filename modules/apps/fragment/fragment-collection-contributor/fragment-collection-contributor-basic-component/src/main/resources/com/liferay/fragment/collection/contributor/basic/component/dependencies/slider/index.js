@@ -17,26 +17,6 @@ function getActiveIndicator() {
 	return fragmentElement.querySelector('.carousel-navigation .active');
 }
 
-function activateIndicator(activeItem, nextItem, movement) {
-	if (movement) {
-		activeItem.classList.add(movement);
-		nextItem.classList.add(movement);
-	}
-
-	getActiveIndicator().classList.remove('active');
-	indicators[this.nextItemIndex].classList.add('active');
-}
-
-function activateItem(activeItem, nextItem, movement) {
-	activeItem.classList.remove('active');
-	nextItem.classList.add('active');
-
-	if (movement) {
-		activeItem.classList.remove(movement);
-		nextItem.classList.remove(movement);
-	}
-}
-
 function move(movement, index = null) {
 	if (moving) {
 		return;
@@ -46,24 +26,29 @@ function move(movement, index = null) {
 
 	const activeItem = fragmentElement.querySelector('.carousel-item.active');
 	const indexActiveItem = items.indexOf(activeItem);
+	const activeIndicator = getActiveIndicator();
 
-	this.nextItemIndex =
+	let nextItemIndex =
 		indexActiveItem < 1 ? items.length - 1 : indexActiveItem - 1;
 
 	if (index !== null) {
-		this.nextItemIndex = index;
+		nextItemIndex = index;
 	}
 	else if (movement === MOVE_RIGHT) {
-		this.nextItemIndex =
-			indexActiveItem >= items.length - 1 ? 0 : indexActiveItem + 1;
+		nextItemIndex = indexActiveItem >= 2 ? 0 : indexActiveItem + 1;
 	}
 
-	const nextItem = items[this.nextItemIndex];
+	const nextItem = items[nextItemIndex];
 
-	activateIndicator(activeItem, nextItem, movement);
+	activeItem.classList.add(movement);
+	nextItem.classList.add(movement);
+	activeIndicator.classList.remove('active');
+	indicators[nextItemIndex].classList.add('active');
 
 	setTimeout(function () {
-		activateItem(activeItem, nextItem, movement);
+		activeItem.classList.remove('active', movement);
+		nextItem.classList.add('active');
+		nextItem.classList.remove(movement);
 
 		moving = false;
 	}, 600);
@@ -88,16 +73,6 @@ function createInterval() {
 
 (function main() {
 	let intervalId = createInterval();
-
-	if (this.nextItemIndex) {
-		const activeItem = fragmentElement.querySelector(
-			'.carousel-item.active'
-		);
-		const nextItem = items[this.nextItemIndex];
-
-		activateIndicator(activeItem, nextItem);
-		activateItem(activeItem, nextItem);
-	}
 
 	prev.addEventListener('click', function () {
 		clearInterval(intervalId);

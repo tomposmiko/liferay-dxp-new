@@ -1343,12 +1343,6 @@ public class CPMeasurementUnitUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CPMeasurementUnitPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CPMeasurementUnitPersistence _persistence;
 
 }

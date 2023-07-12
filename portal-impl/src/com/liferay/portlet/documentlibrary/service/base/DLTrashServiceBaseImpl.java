@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -116,11 +116,11 @@ public abstract class DLTrashServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		DLTrashServiceUtil.setService(dlTrashService);
+		_setServiceUtilService(dlTrashService);
 	}
 
 	public void destroy() {
-		DLTrashServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -157,6 +157,19 @@ public abstract class DLTrashServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(DLTrashService dlTrashService) {
+		try {
+			Field field = DLTrashServiceUtil.class.getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlTrashService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(
 		type = com.liferay.document.library.kernel.service.DLTrashLocalService.class
 	)
@@ -171,8 +184,5 @@ public abstract class DLTrashServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLTrashServiceBaseImpl.class);
 
 }

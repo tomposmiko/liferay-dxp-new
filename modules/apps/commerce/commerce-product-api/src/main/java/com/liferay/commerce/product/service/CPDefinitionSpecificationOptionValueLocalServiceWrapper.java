@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPDefinitionSpecificationOptionValueLocalService}.
@@ -630,12 +629,6 @@ public class CPDefinitionSpecificationOptionValueLocalServiceWrapper
 		return _cpDefinitionSpecificationOptionValueLocalService.
 			updateCPOptionCategoryId(
 				cpDefinitionSpecificationOptionValueId, cpOptionCategoryId);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpDefinitionSpecificationOptionValueLocalService.
-			getBasePersistence();
 	}
 
 	@Override

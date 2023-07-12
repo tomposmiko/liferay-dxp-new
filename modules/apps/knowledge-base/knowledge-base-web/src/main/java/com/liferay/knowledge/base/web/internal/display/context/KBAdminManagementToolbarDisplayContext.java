@@ -413,9 +413,7 @@ public class KBAdminManagementToolbarDisplayContext {
 					_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
 					WorkflowConstants.STATUS_ANY, _searchContainer.getStart(),
 					_searchContainer.getEnd(),
-					KBUtil.getKBObjectsOrderByComparator(
-						_searchContainer.getOrderByCol(),
-						_searchContainer.getOrderByType())));
+					_searchContainer.getOrderByComparator()));
 		}
 		else {
 			OrderByComparator<KBArticle> kbArticleOrderByComparator =

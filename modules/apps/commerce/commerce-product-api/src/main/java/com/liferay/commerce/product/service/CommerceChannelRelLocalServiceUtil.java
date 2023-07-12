@@ -375,10 +375,6 @@ public class CommerceChannelRelLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceChannelRelLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceChannelRelLocalService _service;
 
 }

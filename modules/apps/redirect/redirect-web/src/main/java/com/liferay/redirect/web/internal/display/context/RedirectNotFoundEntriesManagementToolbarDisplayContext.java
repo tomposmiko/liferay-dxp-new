@@ -52,14 +52,15 @@ public class RedirectNotFoundEntriesManagementToolbarDisplayContext
 		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		RedirectNotFoundEntryLocalService redirectNotFoundEntryLocalService,
 		SearchContainer<RedirectNotFoundEntry> searchContainer) {
 
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			searchContainer);
 
-		_redirectNotFoundEntryLocalService = redirectNotFoundEntryLocalService;
+		_redirectNotFoundEntryLocalService =
+			(RedirectNotFoundEntryLocalService)httpServletRequest.getAttribute(
+				RedirectNotFoundEntryLocalService.class.getName());
 	}
 
 	@Override

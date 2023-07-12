@@ -20,14 +20,14 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.screens.service.ScreensCommentService;
 import com.liferay.screens.service.ScreensCommentServiceUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -56,7 +56,7 @@ public abstract class ScreensCommentServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		ScreensCommentServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public abstract class ScreensCommentServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		screensCommentService = (ScreensCommentService)aopProxy;
 
-		ScreensCommentServiceUtil.setService(screensCommentService);
+		_setServiceUtilService(screensCommentService);
 	}
 
 	/**
@@ -104,6 +104,22 @@ public abstract class ScreensCommentServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		ScreensCommentService screensCommentService) {
+
+		try {
+			Field field = ScreensCommentServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, screensCommentService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -146,8 +162,5 @@ public abstract class ScreensCommentServiceBaseImpl
 	@Reference
 	protected com.liferay.asset.kernel.service.AssetEntryService
 		assetEntryService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ScreensCommentServiceBaseImpl.class);
 
 }

@@ -28,7 +28,7 @@ import {
 	UPDATE_DATASET_DISPLAY,
 } from '../../utilities/eventsDefinitions';
 import {executeAsyncAction, getRandomId, loadData} from '../../utilities/index';
-import {getJsModule} from '../../utilities/modules';
+import getJsModule from '../../utilities/modules';
 import {
 	showErrorNotification,
 	showNotification,
@@ -476,7 +476,6 @@ function DatasetDisplay(props) {
 				selectedItemsKey: props.selectedItemsKey,
 				selectedItemsValue,
 				selectionType: props.selectionType,
-				setPageNumber,
 				sidePanelId: datasetDisplaySupportSidePanelId,
 				sorting,
 				style: props.style,

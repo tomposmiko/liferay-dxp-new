@@ -381,11 +381,9 @@ const Main = ({
 	const handleGuestUploadFileChanged = (errorMessage, event, value) => {
 		configureErrorMessage(errorMessage);
 
-		if (value != null) {
-			setCurrentValue(value);
+		setCurrentValue(value);
 
-			onChange(event, value ? value : '{}');
-		}
+		onChange(event, value ? value : '{}');
 	};
 
 	const isExceededUploadRequestSizeLimit = (fileSize) => {
@@ -474,7 +472,6 @@ const Main = ({
 				maximumRepetitions > 0 ? checkMaximumRepetitions() : false
 			}
 			readOnly={hasCustomError ? true : readOnly}
-			style={null}
 			valid={hasCustomError ? false : valid}
 		>
 			{allowGuestUsers && !isSignedIn ? (

@@ -342,6 +342,7 @@ else {
 						className="<%= DLFileEntry.class.getName() %>"
 						classPK="<%= assetClassPK %>"
 						classTypePK="<%= fileEntryTypeId %>"
+						visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
 					/>
 
 					<liferay-asset:asset-tags-selector

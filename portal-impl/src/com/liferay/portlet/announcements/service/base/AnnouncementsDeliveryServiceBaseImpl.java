@@ -24,13 +24,13 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -227,12 +227,11 @@ public abstract class AnnouncementsDeliveryServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		AnnouncementsDeliveryServiceUtil.setService(
-			announcementsDeliveryService);
+		_setServiceUtilService(announcementsDeliveryService);
 	}
 
 	public void destroy() {
-		AnnouncementsDeliveryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -278,6 +277,23 @@ public abstract class AnnouncementsDeliveryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		AnnouncementsDeliveryService announcementsDeliveryService) {
+
+		try {
+			Field field =
+				AnnouncementsDeliveryServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, announcementsDeliveryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(
 		type = com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService.class
 	)
@@ -311,8 +327,5 @@ public abstract class AnnouncementsDeliveryServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AnnouncementsDeliveryServiceBaseImpl.class);
 
 }

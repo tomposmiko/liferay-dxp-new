@@ -81,10 +81,6 @@ public class WebsiteServiceUtil {
 		return _service;
 	}
 
-	public static void setService(WebsiteService service) {
-		_service = service;
-	}
-
 	private static volatile WebsiteService _service;
 
 }

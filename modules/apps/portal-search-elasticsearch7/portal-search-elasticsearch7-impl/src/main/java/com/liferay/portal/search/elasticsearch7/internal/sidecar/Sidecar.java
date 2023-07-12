@@ -277,8 +277,6 @@ public class Sidecar {
 			System.getenv()
 		).put(
 			"HOSTNAME", "localhost"
-		).put(
-			"LIBFFI_TMPDIR", _sidecarHomePath.toString()
 		).build();
 	}
 
@@ -338,7 +336,7 @@ public class Sidecar {
 			return waitForPublishedAddress(noticeableFuture);
 		}
 		catch (IOException ioException) {
-			if (Objects.equals(ioException.getMessage(), "Stream closed")) {
+			if (Objects.equals("Stream closed", ioException.getMessage())) {
 				throw new RuntimeException(
 					StringBundler.concat(
 						"Sidecar JVM did not launch successfully. ",
@@ -415,8 +413,16 @@ public class Sidecar {
 		String versionNumber = ResourceUtil.getResourceAsString(
 			getClass(), SidecarVersionConstants.SIDECAR_VERSION_FILE_NAME);
 
-		if (versionNumber.equals(ElasticsearchDistribution.VERSION)) {
-			return new ElasticsearchDistribution();
+		if (versionNumber.equals("7.3.0")) {
+			return new Elasticsearch730Distribution();
+		}
+
+		if (versionNumber.equals("7.7.0")) {
+			return new Elasticsearch770Distribution();
+		}
+
+		if (versionNumber.equals("7.9.0")) {
+			return new Elasticsearch790Distribution();
 		}
 
 		throw new IllegalArgumentException(
@@ -528,27 +534,6 @@ public class Sidecar {
 						methodVisitor.visitInsn(Opcodes.RETURN);
 					},
 					classLoader));
-
-			modifiedClasses.put(
-				"org.elasticsearch.bootstrap.Security",
-				ClassModificationUtil.getModifiedClassBytes(
-					"org.elasticsearch.bootstrap.Security", "configure",
-					methodVisitor -> {
-						methodVisitor.visitCode();
-						methodVisitor.visitInsn(Opcodes.RETURN);
-					},
-					classLoader));
-
-			modifiedClasses.put(
-				"org.elasticsearch.bootstrap.Spawner",
-				ClassModificationUtil.getModifiedClassBytes(
-					"org.elasticsearch.bootstrap.Spawner",
-					"spawnNativeControllers",
-					methodVisitor -> {
-						methodVisitor.visitCode();
-						methodVisitor.visitInsn(Opcodes.RETURN);
-					},
-					classLoader));
 		}
 		catch (Exception exception) {
 			_log.error("Unable to modify classes", exception);
@@ -571,7 +556,7 @@ public class Sidecar {
 
 			List<String> list = settings.getAsList(key);
 
-			if (ListUtil.isNotEmpty(list)) {
+			if (!ListUtil.isEmpty(list)) {
 				String keyValue = StringBundler.concat(
 					key, StringPool.EQUAL, StringUtil.merge(list));
 

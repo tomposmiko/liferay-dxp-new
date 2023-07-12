@@ -523,10 +523,6 @@ public class SamlSpMessageUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(SamlSpMessagePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile SamlSpMessagePersistence _persistence;
 
 }

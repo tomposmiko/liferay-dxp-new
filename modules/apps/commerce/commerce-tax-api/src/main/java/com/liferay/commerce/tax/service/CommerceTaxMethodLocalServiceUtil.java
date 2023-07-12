@@ -380,10 +380,6 @@ public class CommerceTaxMethodLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceTaxMethodLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceTaxMethodLocalService _service;
 
 }

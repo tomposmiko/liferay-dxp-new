@@ -48,6 +48,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -1843,11 +1844,11 @@ public class CommerceInventoryAuditPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "sku"}, false);
 
-		CommerceInventoryAuditUtil.setPersistence(this);
+		_setCommerceInventoryAuditUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceInventoryAuditUtil.setPersistence(null);
+		_setCommerceInventoryAuditUtilPersistence(null);
 
 		entityCache.removeCache(CommerceInventoryAuditImpl.class.getName());
 
@@ -1857,6 +1858,22 @@ public class CommerceInventoryAuditPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceInventoryAuditUtilPersistence(
+		CommerceInventoryAuditPersistence commerceInventoryAuditPersistence) {
+
+		try {
+			Field field = CommerceInventoryAuditUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceInventoryAuditPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

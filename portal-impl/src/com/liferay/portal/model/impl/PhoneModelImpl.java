@@ -323,66 +323,60 @@ public class PhoneModelImpl extends BaseModelImpl<Phone> implements PhoneModel {
 
 	private static final Map<String, Function<Phone, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<Phone, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Phone, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", Phone::getMvccVersion);
-		attributeGetterFunctions.put("uuid", Phone::getUuid);
-		attributeGetterFunctions.put("phoneId", Phone::getPhoneId);
-		attributeGetterFunctions.put("companyId", Phone::getCompanyId);
-		attributeGetterFunctions.put("userId", Phone::getUserId);
-		attributeGetterFunctions.put("userName", Phone::getUserName);
-		attributeGetterFunctions.put("createDate", Phone::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Phone::getModifiedDate);
-		attributeGetterFunctions.put("classNameId", Phone::getClassNameId);
-		attributeGetterFunctions.put("classPK", Phone::getClassPK);
-		attributeGetterFunctions.put("number", Phone::getNumber);
-		attributeGetterFunctions.put("extension", Phone::getExtension);
-		attributeGetterFunctions.put("typeId", Phone::getTypeId);
-		attributeGetterFunctions.put("primary", Phone::getPrimary);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<Phone, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Phone, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Phone, Object>>();
 		Map<String, BiConsumer<Phone, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Phone, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Phone::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Phone, Long>)Phone::setMvccVersion);
+		attributeGetterFunctions.put("uuid", Phone::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Phone, String>)Phone::setUuid);
+		attributeGetterFunctions.put("phoneId", Phone::getPhoneId);
 		attributeSetterBiConsumers.put(
 			"phoneId", (BiConsumer<Phone, Long>)Phone::setPhoneId);
+		attributeGetterFunctions.put("companyId", Phone::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Phone, Long>)Phone::setCompanyId);
+		attributeGetterFunctions.put("userId", Phone::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Phone, Long>)Phone::setUserId);
+		attributeGetterFunctions.put("userName", Phone::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Phone, String>)Phone::setUserName);
+		attributeGetterFunctions.put("createDate", Phone::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Phone, Date>)Phone::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Phone::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Phone, Date>)Phone::setModifiedDate);
+		attributeGetterFunctions.put("classNameId", Phone::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId", (BiConsumer<Phone, Long>)Phone::setClassNameId);
+		attributeGetterFunctions.put("classPK", Phone::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<Phone, Long>)Phone::setClassPK);
+		attributeGetterFunctions.put("number", Phone::getNumber);
 		attributeSetterBiConsumers.put(
 			"number", (BiConsumer<Phone, String>)Phone::setNumber);
+		attributeGetterFunctions.put("extension", Phone::getExtension);
 		attributeSetterBiConsumers.put(
 			"extension", (BiConsumer<Phone, String>)Phone::setExtension);
+		attributeGetterFunctions.put("typeId", Phone::getTypeId);
 		attributeSetterBiConsumers.put(
 			"typeId", (BiConsumer<Phone, Long>)Phone::setTypeId);
+		attributeGetterFunctions.put("primary", Phone::getPrimary);
 		attributeSetterBiConsumers.put(
 			"primary", (BiConsumer<Phone, Boolean>)Phone::setPrimary);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

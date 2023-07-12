@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Account;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.AccountService;
@@ -29,6 +27,8 @@ import com.liferay.portal.kernel.service.AccountServiceUtil;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.AccountPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -135,11 +135,11 @@ public abstract class AccountServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		AccountServiceUtil.setService(accountService);
+		_setServiceUtilService(accountService);
 	}
 
 	public void destroy() {
-		AccountServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -184,6 +184,19 @@ public abstract class AccountServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(AccountService accountService) {
+		try {
+			Field field = AccountServiceUtil.class.getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, accountService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(
 		type = com.liferay.portal.kernel.service.AccountLocalService.class
 	)
@@ -201,8 +214,5 @@ public abstract class AccountServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountServiceBaseImpl.class);
 
 }

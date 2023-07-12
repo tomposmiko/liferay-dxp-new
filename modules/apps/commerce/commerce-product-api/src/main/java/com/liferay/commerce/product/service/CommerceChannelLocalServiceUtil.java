@@ -243,7 +243,13 @@ public class CommerceChannelLocalServiceUtil {
 		return getService().fetchCommerceChannel(commerceChannelId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce channel with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce channel's external reference code
+	 * @return the matching commerce channel, or <code>null</code> if a matching commerce channel could not be found
+	 */
 	public static CommerceChannel fetchCommerceChannelByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -251,6 +257,9 @@ public class CommerceChannelLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceChannelByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CommerceChannel fetchCommerceChannelByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -291,7 +300,14 @@ public class CommerceChannelLocalServiceUtil {
 		return getService().getCommerceChannel(commerceChannelId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce channel with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce channel's external reference code
+	 * @return the matching commerce channel
+	 * @throws PortalException if a matching commerce channel could not be found
+	 */
 	public static CommerceChannel getCommerceChannelByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -347,14 +363,6 @@ public class CommerceChannelLocalServiceUtil {
 		return getService().getCommerceChannels(companyId);
 	}
 
-	public static List<CommerceChannel> getCommerceChannels(
-			long companyId, String keywords, int start, int end)
-		throws PortalException {
-
-		return getService().getCommerceChannels(
-			companyId, keywords, start, end);
-	}
-
 	/**
 	 * Returns the number of commerce channels.
 	 *
@@ -362,12 +370,6 @@ public class CommerceChannelLocalServiceUtil {
 	 */
 	public static int getCommerceChannelsCount() {
 		return getService().getCommerceChannelsCount();
-	}
-
-	public static int getCommerceChannelsCount(long companyId, String keywords)
-		throws PortalException {
-
-		return getService().getCommerceChannelsCount(companyId, keywords);
 	}
 
 	public static
@@ -469,10 +471,6 @@ public class CommerceChannelLocalServiceUtil {
 
 	public static CommerceChannelLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(CommerceChannelLocalService service) {
-		_service = service;
 	}
 
 	private static volatile CommerceChannelLocalService _service;

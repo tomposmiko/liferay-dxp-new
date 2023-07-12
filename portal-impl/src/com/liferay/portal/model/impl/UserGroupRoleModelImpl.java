@@ -293,55 +293,49 @@ public class UserGroupRoleModelImpl
 
 	private static final Map<String, Function<UserGroupRole, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<UserGroupRole, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<UserGroupRole, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", UserGroupRole::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", UserGroupRole::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"userGroupRoleId", UserGroupRole::getUserGroupRoleId);
-		attributeGetterFunctions.put("companyId", UserGroupRole::getCompanyId);
-		attributeGetterFunctions.put("userId", UserGroupRole::getUserId);
-		attributeGetterFunctions.put("groupId", UserGroupRole::getGroupId);
-		attributeGetterFunctions.put("roleId", UserGroupRole::getRoleId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<UserGroupRole, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<UserGroupRole, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<UserGroupRole, Object>>();
 		Map<String, BiConsumer<UserGroupRole, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<UserGroupRole, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", UserGroupRole::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", UserGroupRole::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"userGroupRoleId", UserGroupRole::getUserGroupRoleId);
 		attributeSetterBiConsumers.put(
 			"userGroupRoleId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setUserGroupRoleId);
+		attributeGetterFunctions.put("companyId", UserGroupRole::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setCompanyId);
+		attributeGetterFunctions.put("userId", UserGroupRole::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setUserId);
+		attributeGetterFunctions.put("groupId", UserGroupRole::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setGroupId);
+		attributeGetterFunctions.put("roleId", UserGroupRole::getRoleId);
 		attributeSetterBiConsumers.put(
 			"roleId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setRoleId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

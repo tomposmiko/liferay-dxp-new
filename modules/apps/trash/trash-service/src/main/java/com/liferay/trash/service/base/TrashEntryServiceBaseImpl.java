@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -30,6 +28,8 @@ import com.liferay.trash.service.TrashEntryService;
 import com.liferay.trash.service.TrashEntryServiceUtil;
 import com.liferay.trash.service.persistence.TrashEntryPersistence;
 import com.liferay.trash.service.persistence.TrashVersionPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class TrashEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		TrashEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class TrashEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		trashEntryService = (TrashEntryService)aopProxy;
 
-		TrashEntryServiceUtil.setService(trashEntryService);
+		_setServiceUtilService(trashEntryService);
 	}
 
 	/**
@@ -117,6 +117,20 @@ public abstract class TrashEntryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(TrashEntryService trashEntryService) {
+		try {
+			Field field = TrashEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, trashEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.trash.service.TrashEntryLocalService
 		trashEntryLocalService;
@@ -158,8 +172,5 @@ public abstract class TrashEntryServiceBaseImpl
 
 	@Reference
 	protected TrashVersionPersistence trashVersionPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		TrashEntryServiceBaseImpl.class);
 
 }

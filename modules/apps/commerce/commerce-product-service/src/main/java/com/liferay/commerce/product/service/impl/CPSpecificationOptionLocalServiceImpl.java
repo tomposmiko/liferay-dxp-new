@@ -179,8 +179,7 @@ public class CPSpecificationOptionLocalServiceImpl
 			long companyId, String key)
 		throws PortalException {
 
-		return cpSpecificationOptionPersistence.findByC_K(
-			companyId, FriendlyURLNormalizerUtil.normalize(key));
+		return cpSpecificationOptionPersistence.findByC_K(companyId, key);
 	}
 
 	@Override

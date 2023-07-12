@@ -59,6 +59,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -8515,7 +8516,7 @@ public class DLFileEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param start the lower bound of the range of document library file entries
 	 * @param end the upper bound of the range of document library file entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -11178,7 +11179,7 @@ public class DLFileEntryPersistenceImpl
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param start the lower bound of the range of document library file entries
 	 * @param end the upper bound of the range of document library file entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -13595,7 +13596,7 @@ public class DLFileEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param fileEntryTypeId the file entry type ID
 	 * @param start the lower bound of the range of document library file entries
 	 * @param end the upper bound of the range of document library file entries (not inclusive)
@@ -15160,9 +15161,7 @@ public class DLFileEntryPersistenceImpl
 	 */
 	@Override
 	public DLFileEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				DLFileEntry.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(DLFileEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -16061,11 +16060,11 @@ public class DLFileEntryPersistenceImpl
 			},
 			false);
 
-		DLFileEntryUtil.setPersistence(this);
+		_setDLFileEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		DLFileEntryUtil.setPersistence(null);
+		_setDLFileEntryUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFileEntryImpl.class.getName());
 
@@ -16075,6 +16074,22 @@ public class DLFileEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDLFileEntryUtilPersistence(
+		DLFileEntryPersistence dlFileEntryPersistence) {
+
+		try {
+			Field field = DLFileEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

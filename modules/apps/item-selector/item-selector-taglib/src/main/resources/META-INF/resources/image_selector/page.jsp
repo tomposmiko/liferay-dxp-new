@@ -74,7 +74,7 @@ if (fileEntryId != 0) {
 
 		<div class="file-validation-info">
 			<c:if test="<%= Validator.isNotNull(validExtensions) %>">
-				<strong><%= HtmlUtil.escape(validExtensions) %></strong>
+				<strong><%= validExtensions %></strong>
 			</c:if>
 
 			<c:if test="<%= maxFileSize != 0 %>">
@@ -141,7 +141,7 @@ if (!draggableImage.equals("none")) {
 
 <aui:script use="<%= modules %>">
 	var imageSelector = new Liferay.ImageSelector({
-		errorNode: '#<%= randomNamespace %>errorAlert',
+		errorNode: '#<%= randomNamespace + "errorAlert" %>',
 		fileEntryImageNode: '#<%= randomNamespace %>image',
 		itemSelectorEventName: '<%= itemSelectorEventName %>',
 		itemSelectorURL: '<%= itemSelectorURL %>',

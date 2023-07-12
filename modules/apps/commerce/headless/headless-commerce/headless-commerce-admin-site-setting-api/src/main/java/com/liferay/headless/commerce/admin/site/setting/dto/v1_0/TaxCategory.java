@@ -61,7 +61,7 @@ public class TaxCategory implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(TaxCategory.class, json);
 	}
 
-	@Schema(example = "{en_US=Croatia, hr_HR=Hrvatska, hu_HU=Horvatorszag}")
+	@Schema
 	@Valid
 	public Map<String, String> getDescription() {
 		return description;
@@ -92,7 +92,7 @@ public class TaxCategory implements Serializable {
 	protected Map<String, String> description;
 
 	@DecimalMin("0")
-	@Schema(example = "23130")
+	@Schema
 	public Long getGroupId() {
 		return groupId;
 	}
@@ -121,7 +121,7 @@ public class TaxCategory implements Serializable {
 	protected Long groupId;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -147,7 +147,7 @@ public class TaxCategory implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "{en_US=Croatia, hr_HR=Hrvatska, hu_HU=Horvatorszag}")
+	@Schema
 	@Valid
 	public Map<String, String> getName() {
 		return name;

@@ -112,7 +112,7 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 	Liferay.provide(
 		window,
 		'<portlet:namespace />selectFormTemplate',
-		function (classPK, mode, workflowDefinition, workflowTaskName) {
+		function (classPK, mode, sessionParamName) {
 			Liferay.Util.openDDMPortlet(
 				{
 					basePortletURL:
@@ -142,17 +142,7 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 
 					var data = {};
 
-					data[
-						'<portlet:namespace />kaleoProcessLinkDDMStructureId'
-					] = classPK;
-					data['<portlet:namespace />kaleoProcessLinkDDMTemplateId'] =
-						event.ddmtemplateid;
-					data[
-						'<portlet:namespace />kaleoProcessLinkWorkflowDefinition'
-					] = workflowDefinition;
-					data[
-						'<portlet:namespace />kaleoProcessLinkWorkflowTaskName'
-					] = workflowTaskName;
+					data[sessionParamName] = event.ddmtemplateid;
 
 					A.io.request(
 						'<portlet:resourceURL id="saveInPortletSession" />',
@@ -197,15 +187,11 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 		function (event) {
 			var A = AUI();
 
+			var taskFormPairsParamName = event.taskFormPairsParamName;
+
 			var data = {};
 
-			data['<portlet:namespace />kaleoProcessLinkDDMStructureId'] =
-				event.ddmStructureId;
-			data['<portlet:namespace />kaleoProcessLinkDDMTemplateId'] = 0;
-			data['<portlet:namespace />kaleoProcessLinkWorkflowDefinition'] =
-				event.workflowDefinition;
-			data['<portlet:namespace />kaleoProcessLinkWorkflowTaskName'] =
-				event.workflowTaskName;
+			data[taskFormPairsParamName] = 0;
 
 			A.io.request('<portlet:resourceURL id="saveInPortletSession" />', {
 				after: {

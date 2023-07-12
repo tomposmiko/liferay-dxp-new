@@ -16,7 +16,6 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.radio;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueRenderer;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
-import com.liferay.portal.kernel.util.HtmlUtil;
 
 import java.util.Locale;
 
@@ -35,9 +34,8 @@ public class RadioDDMFormFieldValueRenderer
 
 	@Override
 	public String render(DDMFormFieldValue ddmFormFieldValue, Locale locale) {
-		return HtmlUtil.escape(
-			radioDDMFormFieldValueAccessor.getOptionLabel(
-				ddmFormFieldValue, locale));
+		return radioDDMFormFieldValueAccessor.getOptionLabel(
+			ddmFormFieldValue, locale);
 	}
 
 	@Reference

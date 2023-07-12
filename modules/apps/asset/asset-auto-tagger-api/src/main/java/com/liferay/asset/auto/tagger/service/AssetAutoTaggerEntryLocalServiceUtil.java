@@ -342,10 +342,6 @@ public class AssetAutoTaggerEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AssetAutoTaggerEntryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile AssetAutoTaggerEntryLocalService _service;
 
 }

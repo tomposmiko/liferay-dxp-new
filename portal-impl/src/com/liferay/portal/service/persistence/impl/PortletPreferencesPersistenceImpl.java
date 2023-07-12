@@ -51,6 +51,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6104,7 +6105,7 @@ public class PortletPreferencesPersistenceImpl
 	@Override
 	public PortletPreferences fetchByPrimaryKey(Serializable primaryKey) {
 		if (CTPersistenceHelperUtil.isProductionMode(
-				PortletPreferences.class, primaryKey)) {
+				PortletPreferences.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -6488,7 +6489,6 @@ public class PortletPreferencesPersistenceImpl
 
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
-		Set<String> ctMergeColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -6498,11 +6498,10 @@ public class PortletPreferencesPersistenceImpl
 		ctStrictColumnNames.add("ownerType");
 		ctStrictColumnNames.add("plid");
 		ctStrictColumnNames.add("portletId");
-		ctMergeColumnNames.add("preferences");
+		ctStrictColumnNames.add("preferences");
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
-		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK,
 			Collections.singleton("portletPreferencesId"));
@@ -6742,11 +6741,11 @@ public class PortletPreferencesPersistenceImpl
 			},
 			new String[] {"ownerId", "ownerType", "plid", "portletId"}, false);
 
-		PortletPreferencesUtil.setPersistence(this);
+		_setPortletPreferencesUtilPersistence(this);
 	}
 
 	public void destroy() {
-		PortletPreferencesUtil.setPersistence(null);
+		_setPortletPreferencesUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(PortletPreferencesImpl.class.getName());
 
@@ -6756,6 +6755,22 @@ public class PortletPreferencesPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setPortletPreferencesUtilPersistence(
+		PortletPreferencesPersistence portletPreferencesPersistence) {
+
+		try {
+			Field field = PortletPreferencesUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, portletPreferencesPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -289,52 +289,46 @@ public class CountryModelImpl
 
 	private static final Map<String, Function<Country, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<Country, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Country, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", Country::getMvccVersion);
-		attributeGetterFunctions.put("countryId", Country::getCountryId);
-		attributeGetterFunctions.put("name", Country::getName);
-		attributeGetterFunctions.put("a2", Country::getA2);
-		attributeGetterFunctions.put("a3", Country::getA3);
-		attributeGetterFunctions.put("number", Country::getNumber);
-		attributeGetterFunctions.put("idd", Country::getIdd);
-		attributeGetterFunctions.put("zipRequired", Country::getZipRequired);
-		attributeGetterFunctions.put("active", Country::getActive);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<Country, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Country, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Country, Object>>();
 		Map<String, BiConsumer<Country, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Country, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Country::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Country, Long>)Country::setMvccVersion);
+		attributeGetterFunctions.put("countryId", Country::getCountryId);
 		attributeSetterBiConsumers.put(
 			"countryId", (BiConsumer<Country, Long>)Country::setCountryId);
+		attributeGetterFunctions.put("name", Country::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Country, String>)Country::setName);
+		attributeGetterFunctions.put("a2", Country::getA2);
 		attributeSetterBiConsumers.put(
 			"a2", (BiConsumer<Country, String>)Country::setA2);
+		attributeGetterFunctions.put("a3", Country::getA3);
 		attributeSetterBiConsumers.put(
 			"a3", (BiConsumer<Country, String>)Country::setA3);
+		attributeGetterFunctions.put("number", Country::getNumber);
 		attributeSetterBiConsumers.put(
 			"number", (BiConsumer<Country, String>)Country::setNumber);
+		attributeGetterFunctions.put("idd", Country::getIdd);
 		attributeSetterBiConsumers.put(
 			"idd", (BiConsumer<Country, String>)Country::setIdd);
+		attributeGetterFunctions.put("zipRequired", Country::getZipRequired);
 		attributeSetterBiConsumers.put(
 			"zipRequired",
 			(BiConsumer<Country, Boolean>)Country::setZipRequired);
+		attributeGetterFunctions.put("active", Country::getActive);
 		attributeSetterBiConsumers.put(
 			"active", (BiConsumer<Country, Boolean>)Country::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

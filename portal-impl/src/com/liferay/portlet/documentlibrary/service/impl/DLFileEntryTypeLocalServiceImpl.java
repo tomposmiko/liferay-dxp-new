@@ -669,26 +669,6 @@ public class DLFileEntryTypeLocalServiceImpl
 
 		for (Long fileEntryTypeId : fileEntryTypeIds) {
 			if (!originalFileEntryTypeIds.contains(fileEntryTypeId)) {
-				if (fileEntryTypeId ==
-						DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_ALL) {
-
-					continue;
-				}
-
-				DLFileEntryType dlFileEntryType =
-					DLFileEntryTypeLocalServiceUtil.fetchDLFileEntryType(
-						fileEntryTypeId);
-
-				if (dlFileEntryType == null) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Document library file entry type " +
-								fileEntryTypeId + " does not exist");
-					}
-
-					continue;
-				}
-
 				dlFolderPersistence.addDLFileEntryType(
 					dlFolder.getFolderId(), fileEntryTypeId);
 			}

@@ -157,9 +157,9 @@ public class NettyFabricWorkerExecutionChannelHandler
 		Map<Path, Path> mergedPaths = HashMapBuilder.<Path, Path>putAll(
 			bootstrapPaths
 		).putAll(
-			inputPaths
-		).putAll(
 			runtimePaths
+		).putAll(
+			inputPaths
 		).build();
 
 		return new NoticeableFutureConverter<LoadedPaths, Map<Path, Path>>(

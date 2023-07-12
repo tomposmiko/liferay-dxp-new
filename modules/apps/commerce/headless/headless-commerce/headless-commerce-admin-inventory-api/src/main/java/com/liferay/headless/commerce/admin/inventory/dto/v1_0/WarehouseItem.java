@@ -62,7 +62,7 @@ public class WarehouseItem implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(WarehouseItem.class, json);
 	}
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -91,7 +91,7 @@ public class WarehouseItem implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -146,7 +146,7 @@ public class WarehouseItem implements Serializable {
 	protected Date modifiedDate;
 
 	@DecimalMin("0")
-	@Schema(example = "1")
+	@Schema
 	public Integer getQuantity() {
 		return quantity;
 	}
@@ -175,7 +175,7 @@ public class WarehouseItem implements Serializable {
 	protected Integer quantity;
 
 	@DecimalMin("0")
-	@Schema(example = "2")
+	@Schema
 	public Integer getReservedQuantity() {
 		return reservedQuantity;
 	}
@@ -203,7 +203,7 @@ public class WarehouseItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer reservedQuantity;
 
-	@Schema(example = "SKU")
+	@Schema
 	public String getSku() {
 		return sku;
 	}
@@ -229,7 +229,7 @@ public class WarehouseItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String sku;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getWarehouseExternalReferenceCode() {
 		return warehouseExternalReferenceCode;
 	}
@@ -262,7 +262,7 @@ public class WarehouseItem implements Serializable {
 	protected String warehouseExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30030")
+	@Schema
 	public Long getWarehouseId() {
 		return warehouseId;
 	}

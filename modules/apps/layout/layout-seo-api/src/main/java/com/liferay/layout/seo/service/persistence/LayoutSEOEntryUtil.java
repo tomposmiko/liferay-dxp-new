@@ -760,10 +760,6 @@ public class LayoutSEOEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(LayoutSEOEntryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile LayoutSEOEntryPersistence _persistence;
 
 }

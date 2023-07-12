@@ -1110,10 +1110,6 @@ public class CPOptionValueUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CPOptionValuePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CPOptionValuePersistence _persistence;
 
 }

@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
@@ -38,6 +36,8 @@ import com.liferay.portal.kernel.service.persistence.UserFinder;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.service.persistence.WorkflowInstanceLinkPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -550,11 +550,11 @@ public abstract class LayoutRevisionServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		LayoutRevisionServiceUtil.setService(layoutRevisionService);
+		_setServiceUtilService(layoutRevisionService);
 	}
 
 	public void destroy() {
-		LayoutRevisionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -596,6 +596,22 @@ public abstract class LayoutRevisionServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		LayoutRevisionService layoutRevisionService) {
+
+		try {
+			Field field = LayoutRevisionServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutRevisionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -697,8 +713,5 @@ public abstract class LayoutRevisionServiceBaseImpl
 
 	@BeanReference(type = WorkflowInstanceLinkPersistence.class)
 	protected WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutRevisionServiceBaseImpl.class);
 
 }

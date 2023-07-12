@@ -66,6 +66,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createAreaIdSpotBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -74,7 +75,7 @@ public class Mutation {
 			_spotResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			spotResource -> spotResource.postAreaIdSpotBatch(
-				callbackURL, object));
+				id, callbackURL, object));
 	}
 
 	@GraphQLField

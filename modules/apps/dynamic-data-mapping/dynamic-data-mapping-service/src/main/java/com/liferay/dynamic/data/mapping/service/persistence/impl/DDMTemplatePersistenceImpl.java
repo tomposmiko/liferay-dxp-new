@@ -58,6 +58,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6758,7 +6759,7 @@ public class DDMTemplatePersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMTemplateModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param classPK the class pk
 	 * @param start the lower bound of the range of ddm templates
 	 * @param end the upper bound of the range of ddm templates (not inclusive)
@@ -8281,7 +8282,7 @@ public class DDMTemplatePersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMTemplateModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
 	 * @param start the lower bound of the range of ddm templates
@@ -12559,9 +12560,7 @@ public class DDMTemplatePersistenceImpl
 	 */
 	@Override
 	public DDMTemplate fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMTemplate.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMTemplate.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -13337,12 +13336,12 @@ public class DDMTemplatePersistenceImpl
 			},
 			false);
 
-		DDMTemplateUtil.setPersistence(this);
+		_setDDMTemplateUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMTemplateUtil.setPersistence(null);
+		_setDDMTemplateUtilPersistence(null);
 
 		entityCache.removeCache(DDMTemplateImpl.class.getName());
 
@@ -13352,6 +13351,22 @@ public class DDMTemplatePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMTemplateUtilPersistence(
+		DDMTemplatePersistence ddmTemplatePersistence) {
+
+		try {
+			Field field = DDMTemplateUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmTemplatePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

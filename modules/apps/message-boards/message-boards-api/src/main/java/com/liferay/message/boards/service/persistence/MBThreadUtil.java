@@ -1183,7 +1183,7 @@ public class MBThreadUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2831,7 +2831,7 @@ public class MBThreadUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
@@ -3299,7 +3299,7 @@ public class MBThreadUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
@@ -4128,10 +4128,6 @@ public class MBThreadUtil {
 
 	public static MBThreadPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(MBThreadPersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static volatile MBThreadPersistence _persistence;

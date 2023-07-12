@@ -544,14 +544,6 @@ public class ThemeDisplay
 		return _mdrRuleGroupInstance;
 	}
 
-	public List<NavItem> getNavItems() throws PortalException {
-		if (_navItems == null) {
-			_navItems = NavItem.fromLayouts(_httpServletRequest, this);
-		}
-
-		return _navItems;
-	}
-
 	public String getPathApplet() {
 		return _pathApplet;
 	}
@@ -1499,10 +1491,6 @@ public class ThemeDisplay
 		_mdrRuleGroupInstance = mdrRuleGroupInstance;
 	}
 
-	public void setNavItems(List<NavItem> navItems) {
-		_navItems = navItems;
-	}
-
 	public void setPathApplet(String pathApplet) {
 		_pathApplet = pathApplet;
 	}
@@ -1864,10 +1852,6 @@ public class ThemeDisplay
 			}
 		}
 
-		if (layout.getCtCollectionId() != 0) {
-			return layout.getFriendlyURL(_locale);
-		}
-
 		String layoutFriendlyURL = _layoutFriendlyURLs.get(layout.getPlid());
 
 		if (layoutFriendlyURL == null) {
@@ -1950,7 +1934,6 @@ public class ThemeDisplay
 	private boolean _lifecycleResource;
 	private Locale _locale;
 	private MDRRuleGroupInstance _mdrRuleGroupInstance;
-	private List<NavItem> _navItems;
 	private String _pathApplet = StringPool.BLANK;
 	private String _pathCms = StringPool.BLANK;
 	private String _pathColorSchemeImages = StringPool.BLANK;

@@ -14,12 +14,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteMobileDeviceFamily {
 		MobileDevice.openMobileDeviceAdmin(siteURLKey = "guest");
 
@@ -32,7 +32,7 @@ definition {
 		LexiconEntry.viewNoEntry(rowEntry = "Test Family Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteMobileDeviceFamilyClassificationRule {
 		MobileDevice.openMobileDeviceAdmin(siteURLKey = "guest");
 
@@ -56,7 +56,7 @@ definition {
 		LexiconEntry.viewNoEntry(rowEntry = "Test Classification Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditMobileDeviceFamily {
 		MobileDevice.openMobileDeviceAdmin(siteURLKey = "guest");
 
@@ -75,7 +75,7 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "Test Family Name Edit");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditMobileDeviceFamilyClassificationRule {
 		MobileDevice.openMobileDeviceAdmin(siteURLKey = "guest");
 
@@ -105,7 +105,7 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "Test Classification Name Edit");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test Smoke {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",

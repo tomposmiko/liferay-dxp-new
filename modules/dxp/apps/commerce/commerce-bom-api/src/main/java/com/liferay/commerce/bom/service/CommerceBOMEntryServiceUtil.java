@@ -98,10 +98,6 @@ public class CommerceBOMEntryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceBOMEntryService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceBOMEntryService _service;
 
 }

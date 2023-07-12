@@ -186,7 +186,7 @@ CommerceOrder commerceOrder = commerceOrderEditDisplayContext.getCommerceOrder()
 						elementClasses="py-3"
 						title='<%= LanguageUtil.get(request, "channel") %>'
 					>
-						<%= HtmlUtil.escape(commerceOrderEditDisplayContext.getCommerceChannelName()) %>
+						<%= commerceOrderEditDisplayContext.getCommerceChannelName() %>
 					</commerce-ui:info-box>
 				</div>
 
@@ -251,7 +251,7 @@ CommerceOrder commerceOrder = commerceOrderEditDisplayContext.getCommerceOrder()
 							elementClasses="py-3"
 							title='<%= LanguageUtil.get(request, "external-order-status") %>'
 						>
-							<%= HtmlUtil.escape(commerceOrder.getAdvanceStatus()) %>
+							<%= commerceOrder.getAdvanceStatus() %>
 						</commerce-ui:info-box>
 					</c:if>
 				</div>

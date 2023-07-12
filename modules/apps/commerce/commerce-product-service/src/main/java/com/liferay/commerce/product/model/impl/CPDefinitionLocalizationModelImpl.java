@@ -240,95 +240,89 @@ public class CPDefinitionLocalizationModelImpl
 
 	private static final Map<String, Function<CPDefinitionLocalization, Object>>
 		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CPDefinitionLocalization, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPDefinitionLocalization, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CPDefinitionLocalization, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", CPDefinitionLocalization::getMvccVersion);
-		attributeGetterFunctions.put(
-			"cpDefinitionLocalizationId",
-			CPDefinitionLocalization::getCpDefinitionLocalizationId);
-		attributeGetterFunctions.put(
-			"companyId", CPDefinitionLocalization::getCompanyId);
-		attributeGetterFunctions.put(
-			"CPDefinitionId", CPDefinitionLocalization::getCPDefinitionId);
-		attributeGetterFunctions.put(
-			"languageId", CPDefinitionLocalization::getLanguageId);
-		attributeGetterFunctions.put("name", CPDefinitionLocalization::getName);
-		attributeGetterFunctions.put(
-			"shortDescription", CPDefinitionLocalization::getShortDescription);
-		attributeGetterFunctions.put(
-			"description", CPDefinitionLocalization::getDescription);
-		attributeGetterFunctions.put(
-			"metaTitle", CPDefinitionLocalization::getMetaTitle);
-		attributeGetterFunctions.put(
-			"metaDescription", CPDefinitionLocalization::getMetaDescription);
-		attributeGetterFunctions.put(
-			"metaKeywords", CPDefinitionLocalization::getMetaKeywords);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CPDefinitionLocalization, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CPDefinitionLocalization, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CPDefinitionLocalization, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CPDefinitionLocalization::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CPDefinitionLocalization, Long>)
 				CPDefinitionLocalization::setMvccVersion);
+		attributeGetterFunctions.put(
+			"cpDefinitionLocalizationId",
+			CPDefinitionLocalization::getCpDefinitionLocalizationId);
 		attributeSetterBiConsumers.put(
 			"cpDefinitionLocalizationId",
 			(BiConsumer<CPDefinitionLocalization, Long>)
 				CPDefinitionLocalization::setCpDefinitionLocalizationId);
+		attributeGetterFunctions.put(
+			"companyId", CPDefinitionLocalization::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPDefinitionLocalization, Long>)
 				CPDefinitionLocalization::setCompanyId);
+		attributeGetterFunctions.put(
+			"CPDefinitionId", CPDefinitionLocalization::getCPDefinitionId);
 		attributeSetterBiConsumers.put(
 			"CPDefinitionId",
 			(BiConsumer<CPDefinitionLocalization, Long>)
 				CPDefinitionLocalization::setCPDefinitionId);
+		attributeGetterFunctions.put(
+			"languageId", CPDefinitionLocalization::getLanguageId);
 		attributeSetterBiConsumers.put(
 			"languageId",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setLanguageId);
+		attributeGetterFunctions.put("name", CPDefinitionLocalization::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setName);
+		attributeGetterFunctions.put(
+			"shortDescription", CPDefinitionLocalization::getShortDescription);
 		attributeSetterBiConsumers.put(
 			"shortDescription",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setShortDescription);
+		attributeGetterFunctions.put(
+			"description", CPDefinitionLocalization::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setDescription);
+		attributeGetterFunctions.put(
+			"metaTitle", CPDefinitionLocalization::getMetaTitle);
 		attributeSetterBiConsumers.put(
 			"metaTitle",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setMetaTitle);
+		attributeGetterFunctions.put(
+			"metaDescription", CPDefinitionLocalization::getMetaDescription);
 		attributeSetterBiConsumers.put(
 			"metaDescription",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setMetaDescription);
+		attributeGetterFunctions.put(
+			"metaKeywords", CPDefinitionLocalization::getMetaKeywords);
 		attributeSetterBiConsumers.put(
 			"metaKeywords",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setMetaKeywords);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

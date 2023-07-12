@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -38,42 +38,7 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-75936. The admin user should access to product menu on page with Full Page Application type."
-	@priority = 5
-	test AccessToProductMenuOnFullPageApplicationPageAsAdmin {
-		task ("Given an admin user has a page with Full Page Application type") {
-			JSONGroup.addGroup(groupName = "Test Site Name");
-
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name",
-				type = "full_page_application");
-		}
-
-		task ("When the admin user signs out via URL") {
-			var portalURL = PropsUtil.get("portal.url");
-
-			Navigator.logOutPortalURL(url = "${portalURL}/c/portal/logout");
-		}
-
-		task ("Then the admin user could access to product menu after sign in") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site name");
-
-			User._login(
-				password = "test",
-				userEmailAddress = "test@liferay.com");
-
-			ProductMenuHelper.openProductMenu();
-
-			AssertElementNotPresent(
-				locator1 = "Portlet#ERROR",
-				value1 = "You do not have the roles required to access this portlet.");
-		}
-	}
-
-	@priority = 3
+	@priority = "3"
 	test AddSitePageXSS {
 		property testray.component.names = "Site Pages Administration,XSS";
 
@@ -99,7 +64,7 @@ definition {
 
 		SitePages.openPagesAdmin(siteURLKey = "guest");
 
-		SitePages.addPublicPage(pageName = ${sitePage3Name});
+		SitePages.addPublicPage(pageName = "${sitePage3Name}");
 
 		Navigator.gotoPage(pageName = "Site Page 2");
 
@@ -109,25 +74,26 @@ definition {
 
 		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content");
 
-		Navigator.gotoPage(pageName = ${sitePage3Name});
+		Navigator.gotoPage(pageName = "${sitePage3Name}");
 
-		var key_pageName = ${sitePage3Name};
+		var key_pageName = "${sitePage3Name}";
 
 		AssertTextEquals(
 			locator1 = "Home#PAGE",
-			value1 = ${sitePage3Name});
+			value1 = "${sitePage3Name}");
 
 		AssertAlertNotPresent();
 
 		var actualScript = '''<script>alert(123);</script>''';
+
 		var escapedScript = '''&lt;script&gt;alert(123);&lt;/script&gt;''';
 
-		AssertHTMLSourceTextNotPresent(value1 = ${actualScript});
+		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
 
-		AssertHTMLSourceTextPresent(value1 = ${escapedScript});
+		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test CannotDeleteLastPublicPageOnLiferay {
 		property testray.component.names = "Site Pages Administration";
 
@@ -138,7 +104,7 @@ definition {
 		Page.assertCannotDeleteOnlyPage(pageName = "Home");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ChangingPageTypeLayoutToLinkToAPageOfThisSiteHidesChildPages {
 		property testray.component.names = "Site Pages Administration";
 
@@ -181,7 +147,7 @@ definition {
 			locator1 = "SitePages#LIST_GROUP_ITEM");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test DefaultLanguageWithEmptyFriendlyURLThrowsErrorExceptions {
 		property testray.component.names = "Site Pages Administration";
 
@@ -215,7 +181,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-71160"
-	@priority = 5
+	@priority = "5"
 	test EditPageViaControlMenu {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -260,7 +226,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-121346. The Home page is shown when access to a non existing page."
-	@priority = 3
+	@priority = "3"
 	test SitesPanelLayout {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property testray.component.names = "Site Pages Administration";
@@ -305,7 +271,7 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SitesPrivatePagesPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -422,14 +388,14 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewSecureContentAndPageAsGuest {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property test.name.skip.portal.instance = "WidgetPagesUseCase#ViewSecureContentAndPageAsGuest";
 		property test.smtp.server.enabled = "true";
 		property testray.component.names = "Message Boards,Site Pages Administration";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
@@ -506,13 +472,14 @@ definition {
 			content = "Blogs Entry Title GMB1",
 			recipient = "userfn1 userln1",
 			sender = "Joe Bloggs",
-			subject = "Test Test Published \"Blogs Entry Title GMB1\" on ${siteName} Blogs");
+			subject = "Test Test Published &quot;Blogs Entry Title GMB1&quot; on ${siteName} Blogs");
 
 		MockMock.clickBodyLink(
 			asset = "Blogs Entry Title GMB1",
 			bodyLink = "CONTINUE READING");
 
 		var blogEntryURL = selenium.getLocation();
+
 		var messageBoardsThreadURL = MockMock.getBodySpecificText(
 			asset = "MB",
 			content = "MB Thread Message Body",
@@ -540,7 +507,7 @@ definition {
 
 		AssertElementNotPresent(locator1 = "Home#ERROR_MESSAGE_ALERT_ERROR");
 
-		Navigator.openSpecificURL(url = ${blogEntryURL});
+		Navigator.openSpecificURL(url = "${blogEntryURL}");
 
 		Alert.viewRequestFailedToComplete();
 
@@ -548,7 +515,7 @@ definition {
 			locator1 = "Message#ERROR",
 			value1 = "You do not have the required permissions.");
 
-		Navigator.openSpecificURL(url = ${messageBoardsThreadURL});
+		Navigator.openSpecificURL(url = "${messageBoardsThreadURL}");
 
 		Alert.viewRequestFailedToComplete();
 
@@ -557,14 +524,14 @@ definition {
 			value1 = "You do not have the required permissions.");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewSecureContentAndPageAsSiteMember {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property test.name.skip.portal.instance = "WidgetPagesUseCase#ViewSecureContentAndPageAsSiteMember";
 		property test.smtp.server.enabled = "true";
 		property testray.component.names = "Message Boards,Site Pages Administration";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONUser.addUser(
 			userEmailAddress = PropsUtil.get("email.address.2"),
@@ -649,13 +616,14 @@ definition {
 			content = "Blogs Entry Title GMB2",
 			recipient = "userfn1 userln1",
 			sender = "Joe Bloggs",
-			subject = "Test Test Published \"Blogs Entry Title GMB2\" on ${siteName} Blogs");
+			subject = "Test Test Published &quot;Blogs Entry Title GMB2&quot; on ${siteName} Blogs");
 
 		MockMock.clickBodyLink(
 			asset = "Blogs Entry Title GMB2",
 			bodyLink = "CONTINUE READING");
 
 		var blogEntryURL = selenium.getLocation();
+
 		var messageBoardsThreadURL = MockMock.getBodySpecificText(
 			asset = "MB",
 			content = "MB Thread Message Body",
@@ -685,21 +653,21 @@ definition {
 
 		AssertElementNotPresent(locator1 = "Home#ERROR_MESSAGE_ALERT_ERROR");
 
-		Navigator.openSpecificURL(url = ${blogEntryURL});
+		Navigator.openSpecificURL(url = "${blogEntryURL}");
 
 		BlogsNavigator.gotoPG(
-			blogEntryURL = ${blogEntryURL},
+			blogEntryURL = "${blogEntryURL}",
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title GMB2");
 
 		Navigator.gotoPage(pageName = "Blog and Message Board Page");
 
-		Navigator.openSpecificURL(url = ${messageBoardsThreadURL});
+		Navigator.openSpecificURL(url = "${messageBoardsThreadURL}");
 
 		MessageboardsThread.gotoPG(
 			lastPostUserName = "Test Test",
-			messageBoardsThreadURL = ${messageBoardsThreadURL},
-			replyCount = 1,
+			messageBoardsThreadURL = "${messageBoardsThreadURL}",
+			replyCount = "1",
 			threadBody = "MB Thread Message Body",
 			threadSubject = "MB Thread Message Subject GMMB3");
 
@@ -708,14 +676,14 @@ definition {
 			threadSubject = "MB Thread Message Subject GMMB3");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewSecureContentAndPageAsUser {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property test.name.skip.portal.instance = "WidgetPagesUseCase#ViewSecureContentAndPageAsUser";
 		property test.smtp.server.enabled = "true";
 		property testray.component.names = "Message Boards,Site Pages Administration,Training";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONUser.addUser(
 			userEmailAddress = PropsUtil.get("email.address.2"),
@@ -796,13 +764,14 @@ definition {
 			content = "Blogs Entry Title GMB3",
 			recipient = "userfn1 userln1",
 			sender = "Joe Bloggs",
-			subject = "Test Test Published \"Blogs Entry Title GMB3\" on ${siteName} Blogs");
+			subject = "Test Test Published &quot;Blogs Entry Title GMB3&quot; on ${siteName} Blogs");
 
 		MockMock.clickBodyLink(
 			asset = "Blogs Entry Title GMB3",
 			bodyLink = "CONTINUE READING");
 
 		var blogEntryURL = selenium.getLocation();
+
 		var messageBoardsThreadURL = MockMock.getBodySpecificText(
 			asset = "MB",
 			content = "MB Thread Message Body",
@@ -830,7 +799,7 @@ definition {
 			locator1 = "Home#ERROR_MESSAGE_ALERT_ERROR",
 			value1 = "Not Found");
 
-		Navigator.openSpecificURL(url = ${blogEntryURL});
+		Navigator.openSpecificURL(url = "${blogEntryURL}");
 
 		Alert.viewRequestFailedToComplete();
 
@@ -840,7 +809,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Blog and Message Board Page");
 
-		Navigator.openSpecificURL(url = ${messageBoardsThreadURL});
+		Navigator.openSpecificURL(url = "${messageBoardsThreadURL}");
 
 		Alert.viewRequestFailedToComplete();
 
@@ -849,7 +818,7 @@ definition {
 			value1 = "You do not have the required permissions.");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test WebContentAdministrationSitesPagesPanel {
 		property testray.component.names = "Site Pages Administration";
 
@@ -891,18 +860,18 @@ definition {
 
 		MessageboardsThread.gotoPG(
 			lastPostUserName = "Test Test",
-			replyCount = 0,
+			replyCount = "0",
 			threadBody = "This is Message Boards Thread 1",
 			threadSubject = "Thread 1");
 
 		MessageboardsThread.viewPG(
-			replyCount = 0,
+			replyCount = "0",
 			threadBody = "This is Message Boards Thread 1",
 			threadSubject = "Thread 1",
 			userName = "Test Test");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test WebContentAdministrationSitesPageTypes {
 		property portal.release = "false";
 		property testray.component.names = "Site Pages Administration,Training";

@@ -55,7 +55,6 @@ public class RowLayoutStructureItemExporter
 				definition = new PageRowDefinition() {
 					{
 						gutters = rowStyledLayoutStructureItem.isGutters();
-						indexed = rowStyledLayoutStructureItem.isIndexed();
 						modulesPerRow =
 							rowStyledLayoutStructureItem.getModulesPerRow();
 						numberOfColumns =

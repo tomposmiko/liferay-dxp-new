@@ -17,8 +17,9 @@ import {Treeview} from 'frontend-js-components-web';
 import React, {useCallback, useMemo, useState} from 'react';
 
 import {useActiveItemId} from '../../../app/components/Controls';
-import getAllEditables from '../../../app/components/fragment-content/getAllEditables';
 import hasDropZoneChild from '../../../app/components/layout-data-items/hasDropZoneChild';
+import {BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR} from '../../../app/config/constants/backgroundImageFragmentEntryProcessor';
+import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../../../app/config/constants/editableFragmentEntryProcessor';
 import {EDITABLE_TYPES} from '../../../app/config/constants/editableTypes';
 import {ITEM_TYPES} from '../../../app/config/constants/itemTypes';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../app/config/constants/layoutDataItemTypes';
@@ -170,12 +171,19 @@ function visit(
 
 		icon = fragmentEntryLink.icon || icon;
 
-		const documentFragment = getDocumentFragment(fragmentEntryLink.content);
-		const editables = getAllEditables(documentFragment);
+		const editables =
+			{
+				...fragmentEntryLink.editableValues[
+					EDITABLE_FRAGMENT_ENTRY_PROCESSOR
+				],
+				...fragmentEntryLink.editableValues[
+					BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR
+				],
+			} || {};
 
 		const editableTypes = fragmentEntryLink.editableTypes;
 
-		editables.forEach(({editableId}) => {
+		Object.keys(editables).forEach((editableId) => {
 			const childId = `${item.config.fragmentEntryLinkId}-${editableId}`;
 			const type =
 				editableTypes[editableId] || EDITABLE_TYPES.backgroundImage;
@@ -288,13 +296,4 @@ function visit(
 		removable: !itemInMasterLayout && isRemovable(item, layoutData),
 		type: item.type,
 	};
-}
-
-function getDocumentFragment(content) {
-	const fragment = document.createDocumentFragment();
-	const div = document.createElement('div');
-
-	div.innerHTML = content;
-
-	return fragment.appendChild(div);
 }

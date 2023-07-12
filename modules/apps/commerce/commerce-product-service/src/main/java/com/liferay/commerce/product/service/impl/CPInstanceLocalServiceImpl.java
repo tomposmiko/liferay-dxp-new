@@ -184,7 +184,6 @@ public class CPInstanceLocalServiceImpl extends CPInstanceLocalServiceBaseImpl {
 			cpDefinitionId = newCPDefinition.getCPDefinitionId();
 		}
 
-		cpInstance.setExternalReferenceCode(externalReferenceCode);
 		cpInstance.setGroupId(groupId);
 		cpInstance.setCompanyId(user.getCompanyId());
 		cpInstance.setUserId(user.getUserId());
@@ -203,6 +202,7 @@ public class CPInstanceLocalServiceImpl extends CPInstanceLocalServiceBaseImpl {
 		cpInstance.setPromoPrice(promoPrice);
 		cpInstance.setCost(cost);
 		cpInstance.setPublished(published);
+		cpInstance.setExternalReferenceCode(externalReferenceCode);
 		cpInstance.setDisplayDate(displayDate);
 		cpInstance.setExpirationDate(expirationDate);
 		cpInstance.setOverrideSubscriptionInfo(overrideSubscriptionInfo);
@@ -237,15 +237,9 @@ public class CPInstanceLocalServiceImpl extends CPInstanceLocalServiceBaseImpl {
 
 		cpInstance = cpInstancePersistence.update(cpInstance);
 
-		if ((cpDefinitionOptionRelIdCPDefinitionOptionValueRelIds != null) &&
-			!cpDefinitionOptionRelIdCPDefinitionOptionValueRelIds.isEmpty()) {
-
-			cpInstanceOptionValueRelLocalService.
-				updateCPInstanceOptionValueRels(
-					groupId, user.getCompanyId(), user.getUserId(),
-					cpInstanceId,
-					cpDefinitionOptionRelIdCPDefinitionOptionValueRelIds);
-		}
+		cpInstanceOptionValueRelLocalService.updateCPInstanceOptionValueRels(
+			groupId, user.getCompanyId(), user.getUserId(), cpInstanceId,
+			cpDefinitionOptionRelIdCPDefinitionOptionValueRelIds);
 
 		reindexCPDefinition(cpDefinitionId);
 
@@ -809,19 +803,9 @@ public class CPInstanceLocalServiceImpl extends CPInstanceLocalServiceBaseImpl {
 		}
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #checkCPInstances(long)}
-	 */
-	@Deprecated
 	@Override
 	public void checkCPInstances() throws PortalException {
 		checkCPInstancesByDisplayDate(0);
-		checkCPInstancesByExpirationDate();
-	}
-
-	@Override
-	public void checkCPInstances(long cpDefinitionId) throws PortalException {
-		checkCPInstancesByDisplayDate(cpDefinitionId);
 		checkCPInstancesByExpirationDate();
 	}
 
@@ -852,18 +836,17 @@ public class CPInstanceLocalServiceImpl extends CPInstanceLocalServiceBaseImpl {
 			serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
 
 			CPDefinition cpDefinition =
-				cpDefinitionLocalService.getCPDefinition(
-					cpInstance.getCPDefinitionId());
+				cpDefinitionLocalService.getCPDefinition(cpDefinitionId);
 
 			if (cpDefinition.isIgnoreSKUCombinations()) {
 				_expireApprovedSiblingCPInstances(
-					cpInstance.getCPDefinitionId(),
-					cpInstance.getCPInstanceId(), serviceContext);
+					cpDefinitionId, cpInstance.getCPInstanceId(),
+					serviceContext);
 			}
 			else {
 				_expireApprovedSiblingMatchingCPInstances(
-					cpInstance.getCPDefinitionId(),
-					cpInstance.getCPInstanceId(), serviceContext);
+					cpDefinitionId, cpInstance.getCPInstanceId(),
+					serviceContext);
 			}
 
 			cpInstanceLocalService.updateStatus(

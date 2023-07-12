@@ -66,8 +66,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -87,6 +85,8 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -299,7 +299,13 @@ public abstract class CommerceOrderLocalServiceBaseImpl
 		return commerceOrderPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce order with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order's external reference code
+	 * @return the matching commerce order, or <code>null</code> if a matching commerce order could not be found
+	 */
 	@Override
 	public CommerceOrder fetchCommerceOrderByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -308,6 +314,9 @@ public abstract class CommerceOrderLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceOrderByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CommerceOrder fetchCommerceOrderByReferenceCode(
@@ -317,7 +326,14 @@ public abstract class CommerceOrderLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce order with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order's external reference code
+	 * @return the matching commerce order
+	 * @throws PortalException if a matching commerce order could not be found
+	 */
 	@Override
 	public CommerceOrder getCommerceOrderByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -1717,14 +1733,14 @@ public abstract class CommerceOrderLocalServiceBaseImpl
 			"com.liferay.commerce.model.CommerceOrder",
 			commerceOrderLocalService);
 
-		CommerceOrderLocalServiceUtil.setService(commerceOrderLocalService);
+		_setLocalServiceUtilService(commerceOrderLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.model.CommerceOrder");
 
-		CommerceOrderLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1766,6 +1782,22 @@ public abstract class CommerceOrderLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CommerceOrderLocalService commerceOrderLocalService) {
+
+		try {
+			Field field = CommerceOrderLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceOrderLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1993,9 +2025,6 @@ public abstract class CommerceOrderLocalServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceOrderLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

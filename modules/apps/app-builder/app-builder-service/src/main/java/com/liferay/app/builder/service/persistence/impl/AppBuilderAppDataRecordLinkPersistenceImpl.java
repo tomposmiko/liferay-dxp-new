@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1380,7 +1381,7 @@ public class AppBuilderAppDataRecordLinkPersistenceImpl
 	 * </p>
 	 *
 	 * @param appBuilderAppId the app builder app ID
-	 * @param ddlRecordIds the ddl record IDs
+	 * @param ddlRecordId the ddl record ID
 	 * @param start the lower bound of the range of app builder app data record links
 	 * @param end the upper bound of the range of app builder app data record links (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2319,12 +2320,12 @@ public class AppBuilderAppDataRecordLinkPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"appBuilderAppId", "ddlRecordId"}, false);
 
-		AppBuilderAppDataRecordLinkUtil.setPersistence(this);
+		_setAppBuilderAppDataRecordLinkUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AppBuilderAppDataRecordLinkUtil.setPersistence(null);
+		_setAppBuilderAppDataRecordLinkUtilPersistence(null);
 
 		entityCache.removeCache(
 			AppBuilderAppDataRecordLinkImpl.class.getName());
@@ -2335,6 +2336,24 @@ public class AppBuilderAppDataRecordLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAppBuilderAppDataRecordLinkUtilPersistence(
+		AppBuilderAppDataRecordLinkPersistence
+			appBuilderAppDataRecordLinkPersistence) {
+
+		try {
+			Field field =
+				AppBuilderAppDataRecordLinkUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, appBuilderAppDataRecordLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

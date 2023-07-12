@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3328,9 +3329,7 @@ public class AssetListEntryUsagePersistenceImpl
 	 */
 	@Override
 	public AssetListEntryUsage fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				AssetListEntryUsage.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(AssetListEntryUsage.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3879,12 +3878,12 @@ public class AssetListEntryUsagePersistenceImpl
 			},
 			new String[] {"classNameId", "classPK", "portletId"}, false);
 
-		AssetListEntryUsageUtil.setPersistence(this);
+		_setAssetListEntryUsageUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AssetListEntryUsageUtil.setPersistence(null);
+		_setAssetListEntryUsageUtilPersistence(null);
 
 		entityCache.removeCache(AssetListEntryUsageImpl.class.getName());
 
@@ -3894,6 +3893,22 @@ public class AssetListEntryUsagePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAssetListEntryUsageUtilPersistence(
+		AssetListEntryUsagePersistence assetListEntryUsagePersistence) {
+
+		try {
+			Field field = AssetListEntryUsageUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, assetListEntryUsagePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

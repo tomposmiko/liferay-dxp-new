@@ -712,10 +712,6 @@ public class SocialActivityCounterLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SocialActivityCounterLocalService service) {
-		_service = service;
-	}
-
 	private static volatile SocialActivityCounterLocalService _service;
 
 }

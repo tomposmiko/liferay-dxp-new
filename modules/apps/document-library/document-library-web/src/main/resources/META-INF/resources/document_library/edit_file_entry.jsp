@@ -217,7 +217,6 @@ renderResponse.setTitle(headerTitle);
 			</liferay-ui:error>
 
 			<liferay-ui:error exception="<%= FileNameException.class %>" message="please-enter-a-file-with-a-valid-file-name" />
-			<liferay-ui:error exception="<%= MissingDefaultLocaleValueException.class %>" message="please-enter-a-value-for-the-default-locale-of-custom-attributes" />
 			<liferay-ui:error exception="<%= NoSuchFolderException.class %>" message="please-enter-a-valid-folder" />
 
 			<liferay-ui:error exception="<%= SourceFileNameException.class %>">
@@ -540,7 +539,7 @@ renderResponse.setTitle(headerTitle);
 			</c:if>
 
 			<c:if test="<%= dlEditFileEntryDisplayContext.isCheckoutDocumentButtonVisible() %>">
-				<aui:button disabled="<%= dlEditFileEntryDisplayContext.isCheckoutDocumentButtonDisabled() %>" onClick='<%= liferayPortletResponse.getNamespace() + "checkOut();" %>' primary="<%= false %>" type="submit" value="checkout[document]" />
+				<aui:button disabled="<%= dlEditFileEntryDisplayContext.isCheckoutDocumentButtonDisabled() %>" onClick='<%= liferayPortletResponse.getNamespace() + "checkOut();" %>' value="checkout[document]" />
 			</c:if>
 
 			<c:if test="<%= dlEditFileEntryDisplayContext.isCheckinButtonVisible() %>">
@@ -548,7 +547,7 @@ renderResponse.setTitle(headerTitle);
 			</c:if>
 
 			<c:if test="<%= dlEditFileEntryDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
-				<aui:button disabled="<%= dlEditFileEntryDisplayContext.isCancelCheckoutDocumentButtonDisabled() %>" onClick='<%= liferayPortletResponse.getNamespace() + "cancelCheckOut();" %>' primary="<%= false %>" type="submit" value="cancel-checkout[document]" />
+				<aui:button disabled="<%= dlEditFileEntryDisplayContext.isCancelCheckoutDocumentButtonDisabled() %>" onClick='<%= liferayPortletResponse.getNamespace() + "cancelCheckOut();" %>' value="cancel-checkout[document]" />
 			</c:if>
 
 			<aui:button href="<%= redirect %>" type="cancel" />
@@ -574,39 +573,18 @@ renderResponse.setTitle(headerTitle);
 	var form = document.<portlet:namespace />fm;
 
 	function <portlet:namespace />changeFileEntryType() {
-		function updateFileEntryType() {
-			Liferay.Util.setFormValues(form, {
-				<%= Constants.CMD %>: '<%= Constants.PREVIEW %>',
-			});
+		var uri = '<%= themeDisplay.getURLCurrent() %>';
 
-			form.submit();
-		}
-		var fileElement = Liferay.Util.getFormElement(form, 'file');
-		if (
-			(fileElement && fileElement.value) ||
-			document.querySelector('.file-entry-type-fields:not(.hide)')
-		) {
-			if (
-				confirm(
-					'<liferay-ui:message key="changing-the-document-type-will-cause-data-loss" />'
-				)
-			) {
-				updateFileEntryType();
-			}
-			else {
-				Liferay.Util.setFormValues(form, {
-					fileEntryTypeId: '<%= fileEntryTypeId %>',
-				});
-			}
-		}
-		else {
-			updateFileEntryType();
-		}
+		form.<portlet:namespace />cmd.value = '<%= Constants.PREVIEW %>';
+
+		submitForm(form, uri, false, false);
 	}
 
 	function <portlet:namespace />cancelCheckOut() {
-		Liferay.Util.setFormValues(form, {
-			<%= Constants.CMD %>: '<%= Constants.CANCEL_CHECKOUT %>',
+		Liferay.Util.postForm(form, {
+			data: {
+				<%= Constants.CMD %>: '<%= Constants.CANCEL_CHECKOUT %>',
+			},
 		});
 	}
 
@@ -619,13 +597,15 @@ renderResponse.setTitle(headerTitle);
 			<portlet:namespace />showVersionDetailsDialog(form);
 		}
 		else {
-			form.submit();
+			submitForm(form);
 		}
 	}
 
 	function <portlet:namespace />checkOut() {
-		Liferay.Util.setFormValues(form, {
-			<%= Constants.CMD %>: '<%= Constants.CHECKOUT %>',
+		Liferay.Util.postForm(form, {
+			data: {
+				<%= Constants.CMD %>: '<%= Constants.CHECKOUT %>',
+			},
 		});
 	}
 
@@ -636,14 +616,10 @@ renderResponse.setTitle(headerTitle);
 			<%= HtmlUtil.escape(uploadProgressId) %>.startProgress();
 		}
 
-		var cmdElement = Liferay.Util.getFormElement(form, 'cmd');
-
-		if (cmdElement && !cmdElement.value) {
-			Liferay.Util.setFormValues(form, {
-				<%= Constants.CMD %>:
-					'<%= (fileEntry == null) ? Constants.ADD : Constants.UPDATE %>',
-			});
-		}
+		Liferay.Util.setFormValues(form, {
+			<%= Constants.CMD %>:
+				'<%= (fileEntry == null) ? Constants.ADD : Constants.UPDATE %>',
+		});
 
 		if (draft) {
 			Liferay.Util.setFormValues(form, {
@@ -659,12 +635,13 @@ renderResponse.setTitle(headerTitle);
 			'<portlet:namespace />DocumentLibraryCheckinModal'
 		).then(function (documentLibraryCheckinModal) {
 			documentLibraryCheckinModal.open(function (versionIncrease, changeLog) {
-				Liferay.Util.setFormValues(form, {
-					changeLog: changeLog,
-					updateVersionDetails: true,
-					versionIncrease: versionIncrease,
+				Liferay.Util.postForm(form, {
+					data: {
+						changeLog: changeLog,
+						updateVersionDetails: true,
+						versionIncrease: versionIncrease,
+					},
 				});
-				form.submit();
 			});
 		});
 	}

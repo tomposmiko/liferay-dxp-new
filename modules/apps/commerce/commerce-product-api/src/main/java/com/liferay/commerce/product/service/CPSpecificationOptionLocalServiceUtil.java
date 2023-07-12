@@ -417,10 +417,6 @@ public class CPSpecificationOptionLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPSpecificationOptionLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CPSpecificationOptionLocalService _service;
 
 }

@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.asset.service.persistence.impl;
 
-import com.liferay.asset.kernel.exception.DuplicateAssetCategoryExternalReferenceCodeException;
 import com.liferay.asset.kernel.exception.NoSuchCategoryException;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryTable;
@@ -65,6 +64,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -5445,7 +5445,7 @@ public class AssetCategoryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param vocabularyIds the vocabulary IDs
+	 * @param vocabularyId the vocabulary ID
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -10910,7 +10910,7 @@ public class AssetCategoryPersistenceImpl
 	 *
 	 * @param groupId the group ID
 	 * @param name the name
-	 * @param vocabularyIds the vocabulary IDs
+	 * @param vocabularyId the vocabulary ID
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -12339,35 +12339,6 @@ public class AssetCategoryPersistenceImpl
 			assetCategory.setUuid(uuid);
 		}
 
-		if (Validator.isNull(assetCategory.getExternalReferenceCode())) {
-			assetCategory.setExternalReferenceCode(assetCategory.getUuid());
-		}
-		else {
-			AssetCategory ercAssetCategory = fetchByC_ERC(
-				assetCategory.getCompanyId(),
-				assetCategory.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercAssetCategory != null) {
-					throw new DuplicateAssetCategoryExternalReferenceCodeException(
-						"Duplicate asset category with external reference code " +
-							assetCategory.getExternalReferenceCode() +
-								" and company " + assetCategory.getCompanyId());
-				}
-			}
-			else {
-				if ((ercAssetCategory != null) &&
-					(assetCategory.getCategoryId() !=
-						ercAssetCategory.getCategoryId())) {
-
-					throw new DuplicateAssetCategoryExternalReferenceCodeException(
-						"Duplicate asset category with external reference code " +
-							assetCategory.getExternalReferenceCode() +
-								" and company " + assetCategory.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -12488,9 +12459,7 @@ public class AssetCategoryPersistenceImpl
 	 */
 	@Override
 	public AssetCategory fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				AssetCategory.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(AssetCategory.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -13553,11 +13522,11 @@ public class AssetCategoryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		AssetCategoryUtil.setPersistence(this);
+		_setAssetCategoryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		AssetCategoryUtil.setPersistence(null);
+		_setAssetCategoryUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(AssetCategoryImpl.class.getName());
 
@@ -13570,6 +13539,22 @@ public class AssetCategoryPersistenceImpl
 		}
 
 		TableMapperFactory.removeTableMapper("AssetEntries_AssetCategories");
+	}
+
+	private void _setAssetCategoryUtilPersistence(
+		AssetCategoryPersistence assetCategoryPersistence) {
+
+		try {
+			Field field = AssetCategoryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, assetCategoryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@BeanReference(type = AssetEntryPersistence.class)

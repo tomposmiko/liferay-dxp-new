@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -52,6 +50,8 @@ import com.liferay.saml.persistence.service.persistence.SamlSpMessagePersistence
 import com.liferay.saml.persistence.service.persistence.SamlSpSessionPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -400,7 +400,7 @@ public abstract class SamlSpAuthRequestLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		SamlSpAuthRequestLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -415,8 +415,7 @@ public abstract class SamlSpAuthRequestLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		samlSpAuthRequestLocalService = (SamlSpAuthRequestLocalService)aopProxy;
 
-		SamlSpAuthRequestLocalServiceUtil.setService(
-			samlSpAuthRequestLocalService);
+		_setLocalServiceUtilService(samlSpAuthRequestLocalService);
 	}
 
 	/**
@@ -462,6 +461,23 @@ public abstract class SamlSpAuthRequestLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SamlSpAuthRequestLocalService samlSpAuthRequestLocalService) {
+
+		try {
+			Field field =
+				SamlSpAuthRequestLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, samlSpAuthRequestLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected SamlIdpSpConnectionPersistence samlIdpSpConnectionPersistence;
 
@@ -500,8 +516,5 @@ public abstract class SamlSpAuthRequestLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SamlSpAuthRequestLocalServiceBaseImpl.class);
 
 }

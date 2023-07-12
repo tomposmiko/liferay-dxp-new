@@ -743,10 +743,6 @@ public class PortletItemUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(PortletItemPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile PortletItemPersistence _persistence;
 
 }

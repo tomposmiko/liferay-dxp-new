@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.search.experiences.model.SXPElement",
 	service = {DTOConverter.class, SXPElementDTOConverter.class}
 )
@@ -69,17 +70,14 @@ public class SXPElementDTOConverter
 					true, sxpElement.getDescriptionMap());
 				elementDefinition = _toElementDefinition(
 					sxpElement.getElementDefinitionJSON());
-				externalReferenceCode = sxpElement.getExternalReferenceCode();
 				id = sxpElement.getSXPElementId();
 				modifiedDate = sxpElement.getModifiedDate();
 				readOnly = sxpElement.getReadOnly();
-				schemaVersion = sxpElement.getSchemaVersion();
 				title = sxpElement.getTitle(dtoConverterContext.getLocale());
 				title_i18n = LocalizedMapUtil.getI18nMap(
 					true, sxpElement.getTitleMap());
 				type = sxpElement.getType();
 				userName = sxpElement.getUserName();
-				version = sxpElement.getVersion();
 			}
 		};
 	}

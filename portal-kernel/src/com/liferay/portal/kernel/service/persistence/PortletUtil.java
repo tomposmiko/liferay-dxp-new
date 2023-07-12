@@ -502,10 +502,6 @@ public class PortletUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(PortletPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile PortletPersistence _persistence;
 
 }

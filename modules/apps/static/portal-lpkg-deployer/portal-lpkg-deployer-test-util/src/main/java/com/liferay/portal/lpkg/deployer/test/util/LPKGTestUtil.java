@@ -132,7 +132,7 @@ public class LPKGTestUtil {
 			zipOutputStream.putNextEntry(
 				new ZipEntry(
 					StringBundler.concat(
-						symbolicName, "-", jarVersion, ".jar")));
+						symbolicName, "-", jarVersion.toString(), ".jar")));
 
 			try (InputStream inputStream = createJAR(symbolicName, jarVersion);
 				OutputStream outputStream = StreamUtil.uncloseable(

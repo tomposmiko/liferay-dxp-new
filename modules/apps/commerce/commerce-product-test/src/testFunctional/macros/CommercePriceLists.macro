@@ -6,7 +6,7 @@ definition {
 		Type(
 			key_text = "Price List Price",
 			locator1 = "TextInput#ANY",
-			value1 = ${priceListEntryPrice});
+			value1 = "${priceListEntryPrice}");
 
 		Button.clickSave();
 	}

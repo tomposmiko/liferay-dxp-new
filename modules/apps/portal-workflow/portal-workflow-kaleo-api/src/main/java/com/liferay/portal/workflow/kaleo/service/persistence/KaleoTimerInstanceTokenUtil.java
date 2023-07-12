@@ -957,12 +957,6 @@ public class KaleoTimerInstanceTokenUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		KaleoTimerInstanceTokenPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile KaleoTimerInstanceTokenPersistence _persistence;
 
 }

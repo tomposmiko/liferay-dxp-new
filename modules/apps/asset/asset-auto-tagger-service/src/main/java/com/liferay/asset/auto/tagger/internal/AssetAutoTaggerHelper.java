@@ -54,7 +54,7 @@ public class AssetAutoTaggerHelper {
 		List<AssetAutoTagProvider<?>> generalAssetAutoTagProviders =
 			serviceTrackerMap.getService("*");
 
-		if (ListUtil.isNotEmpty(generalAssetAutoTagProviders)) {
+		if (!ListUtil.isEmpty(generalAssetAutoTagProviders)) {
 			assetAutoTagProviders.addAll(generalAssetAutoTagProviders);
 		}
 
@@ -62,7 +62,7 @@ public class AssetAutoTaggerHelper {
 			List<AssetAutoTagProvider<?>> classNameAssetAutoTagProviders =
 				serviceTrackerMap.getService(className);
 
-			if (ListUtil.isNotEmpty(classNameAssetAutoTagProviders)) {
+			if (!ListUtil.isEmpty(classNameAssetAutoTagProviders)) {
 				assetAutoTagProviders.addAll(classNameAssetAutoTagProviders);
 			}
 		}

@@ -495,12 +495,6 @@ public class CommerceShippingFixedOptionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceShippingFixedOptionPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceShippingFixedOptionPersistence _persistence;
 
 }

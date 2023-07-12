@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.DuplicateUserExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -67,6 +66,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -8595,33 +8595,6 @@ public class UserPersistenceImpl
 			user.setUuid(uuid);
 		}
 
-		if (Validator.isNull(user.getExternalReferenceCode())) {
-			user.setExternalReferenceCode(user.getUuid());
-		}
-		else {
-			User ercUser = fetchByC_ERC(
-				user.getCompanyId(), user.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercUser != null) {
-					throw new DuplicateUserExternalReferenceCodeException(
-						"Duplicate user with external reference code " +
-							user.getExternalReferenceCode() + " and company " +
-								user.getCompanyId());
-				}
-			}
-			else {
-				if ((ercUser != null) &&
-					(user.getUserId() != ercUser.getUserId())) {
-
-					throw new DuplicateUserExternalReferenceCodeException(
-						"Duplicate user with external reference code " +
-							user.getExternalReferenceCode() + " and company " +
-								user.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -8736,7 +8709,7 @@ public class UserPersistenceImpl
 	 */
 	@Override
 	public User fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(User.class, primaryKey)) {
+		if (CTPersistenceHelperUtil.isProductionMode(User.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -11095,11 +11068,11 @@ public class UserPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		UserUtil.setPersistence(this);
+		_setUserUtilPersistence(this);
 	}
 
 	public void destroy() {
-		UserUtil.setPersistence(null);
+		_setUserUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(UserImpl.class.getName());
 
@@ -11116,6 +11089,19 @@ public class UserPersistenceImpl
 		TableMapperFactory.removeTableMapper("Users_Roles");
 		TableMapperFactory.removeTableMapper("Users_Teams");
 		TableMapperFactory.removeTableMapper("Users_UserGroups");
+	}
+
+	private void _setUserUtilPersistence(UserPersistence userPersistence) {
+		try {
+			Field field = UserUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, userPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@BeanReference(type = GroupPersistence.class)

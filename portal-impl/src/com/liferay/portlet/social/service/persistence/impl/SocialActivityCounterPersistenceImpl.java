@@ -51,6 +51,7 @@ import com.liferay.social.kernel.service.persistence.SocialActivityCounterUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2958,7 +2959,7 @@ public class SocialActivityCounterPersistenceImpl
 	@Override
 	public SocialActivityCounter fetchByPrimaryKey(Serializable primaryKey) {
 		if (CTPersistenceHelperUtil.isProductionMode(
-				SocialActivityCounter.class, primaryKey)) {
+				SocialActivityCounter.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -3532,11 +3533,11 @@ public class SocialActivityCounterPersistenceImpl
 			},
 			false);
 
-		SocialActivityCounterUtil.setPersistence(this);
+		_setSocialActivityCounterUtilPersistence(this);
 	}
 
 	public void destroy() {
-		SocialActivityCounterUtil.setPersistence(null);
+		_setSocialActivityCounterUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(SocialActivityCounterImpl.class.getName());
 
@@ -3546,6 +3547,22 @@ public class SocialActivityCounterPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSocialActivityCounterUtilPersistence(
+		SocialActivityCounterPersistence socialActivityCounterPersistence) {
+
+		try {
+			Field field = SocialActivityCounterUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivityCounterPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

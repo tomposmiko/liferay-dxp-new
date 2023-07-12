@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class MBBanServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		MBBanServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class MBBanServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		mbBanService = (MBBanService)aopProxy;
 
-		MBBanServiceUtil.setService(mbBanService);
+		_setServiceUtilService(mbBanService);
 	}
 
 	/**
@@ -116,6 +116,19 @@ public abstract class MBBanServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(MBBanService mbBanService) {
+		try {
+			Field field = MBBanServiceUtil.class.getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mbBanService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.message.boards.service.MBBanLocalService
 		mbBanLocalService;
@@ -128,8 +141,5 @@ public abstract class MBBanServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MBBanServiceBaseImpl.class);
 
 }

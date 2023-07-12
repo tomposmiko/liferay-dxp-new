@@ -105,7 +105,7 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 	var="editor"
 >
 	<c:if test="<%= Validator.isNotNull(placeholder) %>">
-		<label class="control-label" for="<%= HtmlUtil.escapeAttribute(name) %>">
+		<label class="control-label" for="<%= name %>">
 			<liferay-ui:message key="<%= placeholder %>" />
 		</label>
 	</c:if>
@@ -617,9 +617,7 @@ name = HtmlUtil.escapeJS(name);
 
 										window['<%= name %>'].create();
 
-										CKEDITOR.instances['<%= name %>'].setData(
-											ckEditorContent
-										);
+										window['<%= name %>'].setHTML(ckEditorContent);
 
 										initialEditor =
 											CKEDITOR.instances['<%= name %>'].id;

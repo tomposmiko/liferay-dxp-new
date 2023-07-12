@@ -1,7 +1,6 @@
 {
 	"description_i18n": {
-		"en_US": "Boost the given asset type.",
-		"ja_JP": "指定されたアセットタイプをブーストする"
+		"en_US": "Boost the given asset type over others."
 	},
 	"elementDefinition": {
 		"category": "boost",
@@ -51,9 +50,7 @@
 			]
 		}
 	},
-	"externalReferenceCode": "BOOST_ASSET_TYPE",
 	"title_i18n": {
-		"en_US": "Boost Asset Type",
-		"ja_JP": "アセットタイプのブースト"
+		"en_US": "Boost Asset Type"
 	}
 }

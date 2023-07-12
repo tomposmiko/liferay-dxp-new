@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.RecentLayoutBranch;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -47,6 +45,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -504,15 +504,14 @@ public abstract class RecentLayoutBranchLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.RecentLayoutBranch",
 			recentLayoutBranchLocalService);
 
-		RecentLayoutBranchLocalServiceUtil.setService(
-			recentLayoutBranchLocalService);
+		_setLocalServiceUtilService(recentLayoutBranchLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.RecentLayoutBranch");
 
-		RecentLayoutBranchLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -558,6 +557,23 @@ public abstract class RecentLayoutBranchLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		RecentLayoutBranchLocalService recentLayoutBranchLocalService) {
+
+		try {
+			Field field =
+				RecentLayoutBranchLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, recentLayoutBranchLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = RecentLayoutBranchLocalService.class)
 	protected RecentLayoutBranchLocalService recentLayoutBranchLocalService;
 
@@ -578,9 +594,6 @@ public abstract class RecentLayoutBranchLocalServiceBaseImpl
 
 	@BeanReference(type = LayoutBranchPersistence.class)
 	protected LayoutBranchPersistence layoutBranchPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RecentLayoutBranchLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -34,6 +32,8 @@ import com.liferay.powwow.service.persistence.PowwowMeetingFinder;
 import com.liferay.powwow.service.persistence.PowwowMeetingPersistence;
 import com.liferay.powwow.service.persistence.PowwowParticipantPersistence;
 import com.liferay.powwow.service.persistence.PowwowServerPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -422,11 +422,11 @@ public abstract class PowwowMeetingServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		PowwowMeetingServiceUtil.setService(powwowMeetingService);
+		_setServiceUtilService(powwowMeetingService);
 	}
 
 	public void destroy() {
-		PowwowMeetingServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -468,6 +468,22 @@ public abstract class PowwowMeetingServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		PowwowMeetingService powwowMeetingService) {
+
+		try {
+			Field field = PowwowMeetingServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, powwowMeetingService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -548,8 +564,5 @@ public abstract class PowwowMeetingServiceBaseImpl
 
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PowwowMeetingServiceBaseImpl.class);
 
 }

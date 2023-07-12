@@ -101,10 +101,6 @@ public class CPOptionCategoryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPOptionCategoryService service) {
-		_service = service;
-	}
-
 	private static volatile CPOptionCategoryService _service;
 
 }

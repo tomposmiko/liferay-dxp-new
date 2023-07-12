@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -737,9 +738,7 @@ public class DDMFormInstanceReportPersistenceImpl
 	 */
 	@Override
 	public DDMFormInstanceReport fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMFormInstanceReport.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMFormInstanceReport.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -1187,12 +1186,12 @@ public class DDMFormInstanceReportPersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"formInstanceId"}, false);
 
-		DDMFormInstanceReportUtil.setPersistence(this);
+		_setDDMFormInstanceReportUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMFormInstanceReportUtil.setPersistence(null);
+		_setDDMFormInstanceReportUtilPersistence(null);
 
 		entityCache.removeCache(DDMFormInstanceReportImpl.class.getName());
 
@@ -1202,6 +1201,22 @@ public class DDMFormInstanceReportPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMFormInstanceReportUtilPersistence(
+		DDMFormInstanceReportPersistence ddmFormInstanceReportPersistence) {
+
+		try {
+			Field field = DDMFormInstanceReportUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmFormInstanceReportPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

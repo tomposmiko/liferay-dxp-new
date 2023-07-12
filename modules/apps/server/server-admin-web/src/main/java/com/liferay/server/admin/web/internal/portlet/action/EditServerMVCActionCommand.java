@@ -102,7 +102,6 @@ import com.liferay.portal.kernel.xuggler.XugglerUtil;
 import com.liferay.portal.util.MaintenanceUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.ShutdownUtil;
-import com.liferay.server.admin.web.internal.constants.ImageMagickResourceLimitConstants;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -596,11 +595,18 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		portletPreferences.setValue(
 			PropsKeys.XUGGLER_ENABLED, String.valueOf(xugglerEnabled));
 
-		for (String name : ImageMagickResourceLimitConstants.PROPERTY_NAMES) {
-			String propertyName = PropsKeys.IMAGEMAGICK_RESOURCE_LIMIT + name;
+		Enumeration<String> enumeration = actionRequest.getParameterNames();
 
-			portletPreferences.setValue(
-				propertyName, ParamUtil.getString(actionRequest, propertyName));
+		while (enumeration.hasMoreElements()) {
+			String name = enumeration.nextElement();
+
+			if (name.startsWith("imageMagickLimit")) {
+				String key = StringUtil.toLowerCase(name.substring(16));
+				String value = ParamUtil.getString(actionRequest, name);
+
+				portletPreferences.setValue(
+					PropsKeys.IMAGEMAGICK_RESOURCE_LIMIT + key, value);
+			}
 		}
 
 		portletPreferences.store();

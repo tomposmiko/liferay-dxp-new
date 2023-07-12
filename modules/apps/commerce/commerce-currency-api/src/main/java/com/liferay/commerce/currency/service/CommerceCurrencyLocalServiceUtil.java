@@ -467,10 +467,6 @@ public class CommerceCurrencyLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceCurrencyLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceCurrencyLocalService _service;
 
 }

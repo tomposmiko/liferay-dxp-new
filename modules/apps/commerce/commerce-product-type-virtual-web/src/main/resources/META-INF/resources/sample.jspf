@@ -43,7 +43,7 @@
 				<c:choose>
 					<c:when test="<%= sampleFileEntry != null %>">
 						<a href="<%= cpDefinitionVirtualSettingDisplayContext.getDownloadSampleFileEntryURL() %>">
-							<%= HtmlUtil.escape(sampleFileEntry.getFileName()) %>
+							<%= sampleFileEntry.getFileName() %>
 						</a>
 					</c:when>
 					<c:otherwise>
@@ -100,7 +100,7 @@
 							sampleFileEntryRemove.classList.remove('hide');
 
 							sampleFileEntryNameInput.innerHTML =
-								'<a>' + Liferay.Util.escape(value.title) + '</a>';
+								'<a>' + value.title + '</a>';
 						}
 					},
 				},
@@ -133,7 +133,7 @@
 				.querySelector('#lfr-definition-virtual-sample-button-row-message')
 				.classList.remove('hide');
 
-			sampleFileEntryNameInput.innerText =
+			sampleFileEntryNameInput.innerHTML =
 				'<liferay-ui:message key="none" />';
 
 			sampleFileEntryRemove.classList.add('hide');

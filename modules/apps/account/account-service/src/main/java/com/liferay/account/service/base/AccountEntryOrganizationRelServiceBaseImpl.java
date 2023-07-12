@@ -25,11 +25,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -59,7 +59,7 @@ public abstract class AccountEntryOrganizationRelServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		AccountEntryOrganizationRelServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -75,8 +75,7 @@ public abstract class AccountEntryOrganizationRelServiceBaseImpl
 		accountEntryOrganizationRelService =
 			(AccountEntryOrganizationRelService)aopProxy;
 
-		AccountEntryOrganizationRelServiceUtil.setService(
-			accountEntryOrganizationRelService);
+		_setServiceUtilService(accountEntryOrganizationRelService);
 	}
 
 	/**
@@ -122,6 +121,23 @@ public abstract class AccountEntryOrganizationRelServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		AccountEntryOrganizationRelService accountEntryOrganizationRelService) {
+
+		try {
+			Field field =
+				AccountEntryOrganizationRelServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, accountEntryOrganizationRelService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected
 		com.liferay.account.service.AccountEntryOrganizationRelLocalService
@@ -148,8 +164,5 @@ public abstract class AccountEntryOrganizationRelServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.OrganizationService
 		organizationService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountEntryOrganizationRelServiceBaseImpl.class);
 
 }

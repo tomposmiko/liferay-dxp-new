@@ -22,7 +22,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
@@ -38,13 +38,15 @@ definition {
 		var serverVersion = PropsUtil.get("solr.version");
 
 		SearchAdministration.assertEngineVendorAndVersions(
-			clientVersion = ${serverVersion},
+			clientVersion = "${serverVersion}",
 			engineVendor = "Solr",
-			serverVersion = ${serverVersion});
+			serverVersion = "${serverVersion}");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AssertSearchInsightsExplain {
+		property test.name.skip.portal.instance = "Solr#AssertSearchInsightsExplain";
+
 		JSONWebcontent.addWebContent(
 			content = "WC Content",
 			groupName = "Guest",
@@ -69,15 +71,15 @@ definition {
 		SearchPortlets.searchEmbedded(searchTerm = "apple");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_REQUEST_STRING",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY",
 			value1 = "debugQuery=true");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_STRING",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
 			value1 = "buckets");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_STRING",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
 			value1 = "explain");
 
 		Portlet.gotoPortletOptions(
@@ -97,15 +99,15 @@ definition {
 		SearchPortlets.searchEmbedded(searchTerm = "apple");
 
 		AssertTextNotEquals.assertNotPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_REQUEST_STRING",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY",
 			value1 = "debugQuery=true");
 
 		AssertTextNotEquals.assertNotPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_STRING",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
 			value1 = "explain");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AssertSearchTuningDisabled {
 		ApplicationsMenuHelper.openApplicationsMenu();
 
@@ -117,7 +119,7 @@ definition {
 	}
 
 	@description = "This smoke test is to ensure that Liferay is successfully running on a remote Solr by asserting the Solr administration dashboard and performing searches in portal. Note by default, an embedded Elasticsearch is deployed in portal."
-	@priority = 4
+	@priority = "4"
 	test SolrSmokeTest {
 		property test.name.skip.portal.instance = "Solr#SolrSmokeTest";
 
@@ -175,8 +177,9 @@ definition {
 	}
 
 	@description = "This smoke test is to ensure that Liferay is successfully running on a remote SolrCloud with 2 nodes by asserting console logging for ZooKeeper and performing searches in portal."
-	@priority = 4
+	@priority = "4"
 	test SolrWithSolrCloudSmokeTest {
+		property dummy.socket.proxy.disabled = "true";
 		property solr.solrcloud.enabled = "true";
 		property test.name.skip.portal.instance = "Solr#SolrWithSolrCloudSmokeTest";
 
@@ -248,7 +251,7 @@ definition {
 	}
 
 	@description = "This smoke test is to ensure that Liferay is successfully running on a remote Solr with SSL Authentication by asserting console logging for KeyStoreLoaderImpl and performing searches in portal. Note by default, an embedded Elasticsearch is deployed in portal."
-	@priority = 4
+	@priority = "4"
 	test SolrWithSSLAuthenticationSmokeTest {
 		property solr.ssl.authentication.enabled = "true";
 		property test.name.skip.portal.instance = "Solr#SolrWithSSLAuthenticationSmokeTest";

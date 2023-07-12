@@ -66,10 +66,6 @@ public class CommerceVirtualOrderItemServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceVirtualOrderItemService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceVirtualOrderItemService _service;
 
 }

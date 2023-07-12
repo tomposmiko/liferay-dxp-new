@@ -15,7 +15,7 @@ definition {
 		PortalInstances.tearDownCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddMultipleCompanies {
 		property custom.properties = "database.partition.enabled=true${line.separator}database.partition.schema.name.prefix=testPartition";
 		property database.types = "mysql";
@@ -80,10 +80,10 @@ definition {
 		SQL.assertDatabaseCount(
 			databaseFilter = "testPartition%",
 			databaseSubstring = "testPartition",
-			expectedCount = 2);
+			expectedCount = "2");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddNewCompany {
 		property custom.properties = "database.partition.enabled=true${line.separator}database.partition.schema.name.prefix=testPartition";
 		property database.types = "mysql";
@@ -122,10 +122,10 @@ definition {
 		SQL.assertDatabaseCount(
 			databaseFilter = "testPartition%",
 			databaseSubstring = "testPartition",
-			expectedCount = 1);
+			expectedCount = "1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddNewCompanyWithCluster {
 		property app.server.bundles.size = "1";
 		property cluster.enabled = "true";
@@ -136,26 +136,26 @@ definition {
 
 		Clustering.viewClusterStatusInConsole();
 
-		Page.assertNodePortPG(nodePort = 8080);
+		Page.assertNodePortPG(nodePort = "8080");
 
 		User.logoutPG(
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
 		User.loginPG(
-			nodePort = 9080,
+			nodePort = "9080",
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		Page.assertNodePortPG(nodePort = 9080);
+		Page.assertNodePortPG(nodePort = "9080");
 
 		User.logoutPG(
-			nodePort = 9080,
+			nodePort = "9080",
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
 		User.loginPG(
-			nodePort = 8080,
+			nodePort = "8080",
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -211,7 +211,7 @@ definition {
 		SQL.assertDatabaseCount(
 			databaseFilter = "testPartition%",
 			databaseSubstring = "testPartition",
-			expectedCount = 1);
+			expectedCount = "1");
 	}
 
 }

@@ -478,11 +478,6 @@ public class MasterLayoutsImporterTest {
 		}
 
 		@Override
-		public List<FragmentEntry> getFragmentEntries(int[] types) {
-			return getFragmentEntries();
-		}
-
-		@Override
 		public List<FragmentEntry> getFragmentEntries(Locale locale) {
 			return Collections.emptyList();
 		}

@@ -1076,13 +1076,13 @@ public class SubscriptionSender implements Serializable {
 		mailTemplateContextBuilder.put("[$FROM_ADDRESS$]", from.getAddress());
 		mailTemplateContextBuilder.put(
 			"[$FROM_NAME$]",
-			new EscapableObject<>(
+			HtmlUtil.escape(
 				GetterUtil.getString(from.getPersonal(), from.getAddress())));
 		mailTemplateContextBuilder.put(
-			"[$TO_ADDRESS$]", new EscapableObject<>(to.getAddress()));
+			"[$TO_ADDRESS$]", HtmlUtil.escape(to.getAddress()));
 		mailTemplateContextBuilder.put(
 			"[$TO_NAME$]",
-			new EscapableObject<>(
+			HtmlUtil.escape(
 				GetterUtil.getString(to.getPersonal(), to.getAddress())));
 
 		MailTemplateContext mailTemplateContext =

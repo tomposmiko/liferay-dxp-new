@@ -40,8 +40,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -58,6 +56,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -267,7 +267,13 @@ public abstract class CommerceAccountGroupLocalServiceBaseImpl
 			commerceAccountGroupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce account group's external reference code
+	 * @return the matching commerce account group, or <code>null</code> if a matching commerce account group could not be found
+	 */
 	@Override
 	public CommerceAccountGroup
 		fetchCommerceAccountGroupByExternalReferenceCode(
@@ -277,6 +283,9 @@ public abstract class CommerceAccountGroupLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceAccountGroupByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CommerceAccountGroup fetchCommerceAccountGroupByReferenceCode(
@@ -286,7 +295,14 @@ public abstract class CommerceAccountGroupLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce account group's external reference code
+	 * @return the matching commerce account group
+	 * @throws PortalException if a matching commerce account group could not be found
+	 */
 	@Override
 	public CommerceAccountGroup getCommerceAccountGroupByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -981,15 +997,14 @@ public abstract class CommerceAccountGroupLocalServiceBaseImpl
 			"com.liferay.commerce.account.model.CommerceAccountGroup",
 			commerceAccountGroupLocalService);
 
-		CommerceAccountGroupLocalServiceUtil.setService(
-			commerceAccountGroupLocalService);
+		_setLocalServiceUtilService(commerceAccountGroupLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.account.model.CommerceAccountGroup");
 
-		CommerceAccountGroupLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1032,6 +1047,23 @@ public abstract class CommerceAccountGroupLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CommerceAccountGroupLocalService commerceAccountGroupLocalService) {
+
+		try {
+			Field field =
+				CommerceAccountGroupLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceAccountGroupLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1149,9 +1181,6 @@ public abstract class CommerceAccountGroupLocalServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceAccountGroupLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

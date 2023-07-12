@@ -212,10 +212,6 @@ public class ExportImportServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ExportImportService service) {
-		_service = service;
-	}
-
 	private static volatile ExportImportService _service;
 
 }

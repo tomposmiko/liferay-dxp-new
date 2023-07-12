@@ -61,14 +61,6 @@ public class CPDefinitionSpecificationOptionValueServiceUtil {
 			cpDefinitionSpecificationOptionValueId);
 	}
 
-	public static void deleteCPDefinitionSpecificationOptionValues(
-			long cpDefinitionId)
-		throws PortalException {
-
-		getService().deleteCPDefinitionSpecificationOptionValues(
-			cpDefinitionId);
-	}
-
 	public static CPDefinitionSpecificationOptionValue
 			fetchCPDefinitionSpecificationOptionValue(
 				long cpDefinitionSpecificationOptionValueId)
@@ -139,12 +131,6 @@ public class CPDefinitionSpecificationOptionValueServiceUtil {
 
 	public static CPDefinitionSpecificationOptionValueService getService() {
 		return _service;
-	}
-
-	public static void setService(
-		CPDefinitionSpecificationOptionValueService service) {
-
-		_service = service;
 	}
 
 	private static volatile CPDefinitionSpecificationOptionValueService

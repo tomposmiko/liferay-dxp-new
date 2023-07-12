@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPDisplayLayoutLocalService}.
@@ -514,11 +513,6 @@ public class CPDisplayLayoutLocalServiceWrapper
 
 		return _cpDisplayLayoutLocalService.updateCPDisplayLayout(
 			cpDisplayLayoutId, layoutUuid);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpDisplayLayoutLocalService.getBasePersistence();
 	}
 
 	@Override

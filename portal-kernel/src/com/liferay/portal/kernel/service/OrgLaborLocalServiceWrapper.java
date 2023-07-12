@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link OrgLaborLocalService}.
  *
@@ -312,7 +310,7 @@ public class OrgLaborLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _orgLaborLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -356,11 +354,6 @@ public class OrgLaborLocalServiceWrapper
 		com.liferay.portal.kernel.model.OrgLabor orgLabor) {
 
 		return _orgLaborLocalService.updateOrgLabor(orgLabor);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _orgLaborLocalService.getBasePersistence();
 	}
 
 	@Override

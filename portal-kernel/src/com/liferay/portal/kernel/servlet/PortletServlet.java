@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletSession;
 import com.liferay.portal.kernel.portlet.PortletFilterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -117,11 +116,7 @@ public class PortletServlet extends HttpServlet {
 				portletRequest, portletResponse, lifecycle, filterChain);
 		}
 		catch (PortletException portletException) {
-			_log.error(
-				StringBundler.concat(
-					"Unable to process portlet ", portletId, ": ",
-					portletException.getMessage()),
-				portletException);
+			_log.error(portletException, portletException);
 
 			throw new ServletException(portletException);
 		}

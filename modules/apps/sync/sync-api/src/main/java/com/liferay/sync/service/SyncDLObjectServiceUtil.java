@@ -289,10 +289,6 @@ public class SyncDLObjectServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SyncDLObjectService service) {
-		_service = service;
-	}
-
 	private static volatile SyncDLObjectService _service;
 
 }

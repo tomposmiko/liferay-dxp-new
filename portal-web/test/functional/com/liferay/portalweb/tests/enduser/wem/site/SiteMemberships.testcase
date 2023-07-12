@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -28,7 +28,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddMember {
 		property testray.component.names = "Site Administration,Users and Organizations";
 
@@ -48,7 +48,7 @@ definition {
 			userScreenName = "usersn");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddMemberAssignSiteRole {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Administration,Training,Users and Organizations";
@@ -79,7 +79,7 @@ definition {
 			roleTitle = "Site Content Reviewer");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddMemberOrganization {
 		property testray.component.names = "Site Administration,Users and Organizations";
 
@@ -94,7 +94,7 @@ definition {
 		Site.viewMemberOrganizationCP(orgName = "Organization Name");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddMembersSiteUser {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SiteMemberships#AddMembersSiteUser";
@@ -142,7 +142,7 @@ definition {
 			userScreenName = "usersn");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddMemberUserGroup {
 		property testray.component.names = "Site Administration,User Groups";
 
@@ -159,7 +159,7 @@ definition {
 		Site.viewMemberUserGroupCP(userGroupName = "User Group Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddMemberUserGroupAssignSiteRole {
 		property testray.component.names = "Site Administration,User Groups";
 
@@ -188,7 +188,7 @@ definition {
 			roleTitle = "Site Content Reviewer");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test LimitMembershipParentSite {
 		property testray.component.names = "Site Administration";
 
@@ -266,7 +266,7 @@ definition {
 			userScreenName = "usersn");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test OrganizationsView {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SiteMemberships#OrganizationsView";
@@ -356,7 +356,7 @@ definition {
 		Site.viewMemberOrganizationCP(orgName = "Organization Name 3");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test RemoveMember {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Administration,Users and Organizations";
@@ -382,7 +382,7 @@ definition {
 			userScreenName = "usersn");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SiteMembershipSearchOrganization {
 		property testray.component.names = "Site Administration,Users and Organizations";
 
@@ -400,12 +400,12 @@ definition {
 
 		Site.searchMembershipCP(
 			emptyResults = "true",
-			searchValue = "\"Organization Name 2\"");
+			searchValue = "&quot;Organization Name 2&quot;");
 
-		Site.searchMembershipCP(searchValue = "\"Organization Name 1\"");
+		Site.searchMembershipCP(searchValue = "&quot;Organization Name 1&quot;");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SiteMembershipSearchUserGroup {
 		property testray.component.names = "Site Administration,User Groups";
 
@@ -425,21 +425,21 @@ definition {
 
 		Site.searchMembershipCP(
 			emptyResults = "true",
-			searchValue = "\"User Group Name 2\"");
+			searchValue = "&quot;User Group Name 2&quot;");
 
-		Site.searchMembershipCP(searchValue = "\"User Group Name 1\"");
+		Site.searchMembershipCP(searchValue = "&quot;User Group Name 1&quot;");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SiteMembershipsPagination {
 		property testray.component.names = "Site Administration,Users and Organizations";
 
 		for (var screenName : list "userfn1,userfn2,userfn3,userfn4,userfn5,userfn6,userfn7,userfn8,userfn9,userfn10") {
 			JSONUser.addUser(
 				userEmailAddress = "${screenName}@liferay.com",
-				userFirstName = ${screenName},
-				userLastName = ${screenName},
-				userScreenName = ${screenName});
+				userFirstName = "${screenName}",
+				userLastName = "${screenName}",
+				userScreenName = "${screenName}");
 		}
 
 		JSONGroup.addGroup(groupName = "Site Name");
@@ -463,7 +463,7 @@ definition {
 			locator1 = "Pagination#ITEMS_PER_PAGE_SELECT",
 			value1 = "20 Entries");
 
-		MenuItem.click(menuItem = 4);
+		MenuItem.click(menuItem = "4");
 
 		AssertTextEquals(
 			locator1 = "Pagination#CURRENT_PAGE_SELECT",
@@ -515,7 +515,7 @@ definition {
 		Site.viewMemberListCP(usersEmailsList = "userfn3@liferay.com,userfn4@liferay.com,userfn5@liferay.com,userfn6@liferay.com");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SiteMembershipsSearch {
 		property testray.component.names = "Site Administration,Users and Organizations";
 
@@ -595,14 +595,14 @@ definition {
 
 		Site.searchMemberCP(
 			userEmailAddress = "4568@liferay.com",
-			userEmailAddressSearchValue = 4,
+			userEmailAddressSearchValue = "4",
 			userFirstName = "userfnTest1",
 			userLastName = "One",
 			userScreenName = "user1");
 
 		Site.searchMemberCP(
 			userEmailAddress = "4568@liferay.com",
-			userEmailAddressSearchValue = 5,
+			userEmailAddressSearchValue = "5",
 			userFirstName = "userfnTest1",
 			userLastName = "One",
 			userScreenName = "user1");
@@ -619,7 +619,7 @@ definition {
 
 		Site.searchMemberCP(
 			userEmailAddress = "4568@liferay.com",
-			userEmailAddressSearchValue = 6,
+			userEmailAddressSearchValue = "6",
 			userFirstName = "userfnTest1",
 			userLastName = "One",
 			userScreenName = "user1");
@@ -631,7 +631,7 @@ definition {
 
 		Site.searchMemberCP(
 			userEmailAddress = "5670@liferay.com",
-			userEmailAddressSearchValue = 7,
+			userEmailAddressSearchValue = "7",
 			userFirstName = "userfnTest2",
 			userLastName = "Two",
 			userScreenName = "screen2");
@@ -643,7 +643,7 @@ definition {
 
 		Site.searchMemberCP(
 			userEmailAddress = "4568@liferay.com",
-			userEmailAddressSearchValue = 8,
+			userEmailAddressSearchValue = "8",
 			userFirstName = "userfnTest1",
 			userLastName = "One",
 			userScreenName = "user1");
@@ -655,14 +655,14 @@ definition {
 
 		Site.searchMemberCP(
 			userEmailAddress = "5670@liferay.com",
-			userEmailAddressSearchValue = 0,
+			userEmailAddressSearchValue = "0",
 			userFirstName = "userfnTest2",
 			userLastName = "Two",
 			userScreenName = "screen2");
 
 		Site.searchMemberCP(
 			userEmailAddress = "4568@liferay.com",
-			userEmailAddressSearchValue = 9,
+			userEmailAddressSearchValue = "9",
 			userFirstName = "userfnTest3",
 			userLastName = "Three",
 			userScreenName = "member3");
@@ -686,7 +686,7 @@ definition {
 			userScreenName = "member3");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewMembershipRequestWithSiteMembershipScope {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property testray.component.names = "Site Administration,Users and Organizations";
@@ -733,7 +733,7 @@ definition {
 		Site.viewNoSiteMembershipsRequest();
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewNoManualMembershipManagement {
 		property testray.component.names = "Site Administration";
 

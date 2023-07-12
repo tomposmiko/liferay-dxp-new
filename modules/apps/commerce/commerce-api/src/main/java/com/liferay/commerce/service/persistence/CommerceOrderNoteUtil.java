@@ -713,12 +713,6 @@ public class CommerceOrderNoteUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceOrderNotePersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceOrderNotePersistence _persistence;
 
 }

@@ -98,10 +98,6 @@ public class StagingServiceUtil {
 		return _service;
 	}
 
-	public static void setService(StagingService service) {
-		_service = service;
-	}
-
 	private static volatile StagingService _service;
 
 }

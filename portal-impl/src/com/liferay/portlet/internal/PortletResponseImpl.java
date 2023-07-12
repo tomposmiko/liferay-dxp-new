@@ -615,7 +615,7 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 				Writer writer = new UnsyncStringWriter();
 
 				TransformerFactory transformerFactory =
-					SecureXMLFactoryProviderUtil.newTransformerFactory();
+					TransformerFactory.newInstance();
 
 				Transformer transformer = transformerFactory.newTransformer();
 

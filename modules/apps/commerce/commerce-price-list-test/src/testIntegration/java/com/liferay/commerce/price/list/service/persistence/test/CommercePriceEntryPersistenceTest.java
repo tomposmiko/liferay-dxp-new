@@ -15,7 +15,6 @@
 package com.liferay.commerce.price.list.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.price.list.exception.DuplicateCommercePriceEntryExternalReferenceCodeException;
 import com.liferay.commerce.price.list.exception.NoSuchPriceEntryException;
 import com.liferay.commerce.price.list.model.CommercePriceEntry;
 import com.liferay.commerce.price.list.service.CommercePriceEntryLocalServiceUtil;
@@ -281,28 +280,6 @@ public class CommercePriceEntryPersistenceTest {
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingCommercePriceEntry.getStatusDate()),
 			Time.getShortTimestamp(newCommercePriceEntry.getStatusDate()));
-	}
-
-	@Test(
-		expected = DuplicateCommercePriceEntryExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommercePriceEntry commercePriceEntry = addCommercePriceEntry();
-
-		CommercePriceEntry newCommercePriceEntry = addCommercePriceEntry();
-
-		newCommercePriceEntry.setCompanyId(commercePriceEntry.getCompanyId());
-
-		newCommercePriceEntry = _persistence.update(newCommercePriceEntry);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommercePriceEntry);
-
-		newCommercePriceEntry.setExternalReferenceCode(
-			commercePriceEntry.getExternalReferenceCode());
-
-		_persistence.update(newCommercePriceEntry);
 	}
 
 	@Test

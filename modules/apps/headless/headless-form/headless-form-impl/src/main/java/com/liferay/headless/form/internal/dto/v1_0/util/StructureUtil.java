@@ -200,15 +200,15 @@ public class StructureUtil {
 
 				setDataType(
 					() -> {
-						if (Objects.equals(type, "date")) {
+						if (Objects.equals("date", type)) {
 							return type;
 						}
 
-						if (Objects.equals(type, "document_library")) {
+						if (Objects.equals("document_library", type)) {
 							return "document";
 						}
 
-						if (Objects.equals(type, "paragraph")) {
+						if (Objects.equals("paragraph", type)) {
 							return "string";
 						}
 
@@ -216,7 +216,7 @@ public class StructureUtil {
 					});
 				setGrid(
 					() -> {
-						if (!Objects.equals(type, "grid")) {
+						if (!Objects.equals("grid", type)) {
 							return null;
 						}
 

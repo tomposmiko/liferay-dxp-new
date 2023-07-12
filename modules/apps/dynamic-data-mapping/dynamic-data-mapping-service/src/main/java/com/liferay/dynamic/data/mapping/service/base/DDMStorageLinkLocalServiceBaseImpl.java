@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -49,6 +47,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -414,7 +414,7 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		DDMStorageLinkLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -429,7 +429,7 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddmStorageLinkLocalService = (DDMStorageLinkLocalService)aopProxy;
 
-		DDMStorageLinkLocalServiceUtil.setService(ddmStorageLinkLocalService);
+		_setLocalServiceUtilService(ddmStorageLinkLocalService);
 	}
 
 	/**
@@ -489,6 +489,22 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		DDMStorageLinkLocalService ddmStorageLinkLocalService) {
+
+		try {
+			Field field = DDMStorageLinkLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmStorageLinkLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected DDMStorageLinkLocalService ddmStorageLinkLocalService;
 
 	@Reference
@@ -497,8 +513,5 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMStorageLinkLocalServiceBaseImpl.class);
 
 }

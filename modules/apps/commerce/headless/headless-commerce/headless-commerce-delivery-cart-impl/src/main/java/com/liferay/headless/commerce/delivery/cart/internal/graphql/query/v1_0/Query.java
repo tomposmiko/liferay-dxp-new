@@ -431,7 +431,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Address> items;
@@ -464,7 +464,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Cart> items;
@@ -497,7 +497,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<CartComment> items;
@@ -530,7 +530,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<CartItem> items;
@@ -563,7 +563,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<PaymentMethod> items;
@@ -596,7 +596,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<ShippingMethod> items;

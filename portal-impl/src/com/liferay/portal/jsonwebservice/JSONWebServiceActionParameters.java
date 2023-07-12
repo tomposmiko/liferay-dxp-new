@@ -38,6 +38,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import jodd.util.NameValue;
+
 /**
  * @author Igor Spasic
  */
@@ -66,7 +68,7 @@ public class JSONWebServiceActionParameters {
 		_collectFromMap(parameterMap);
 	}
 
-	public List<Map.Entry<String, Object>> getInnerParameters(String baseName) {
+	public List<NameValue<String, Object>> getInnerParameters(String baseName) {
 		return _jsonWebServiceActionParameters.getInnerParameters(baseName);
 	}
 

@@ -14,11 +14,9 @@
 
 package com.liferay.journal.web.internal.layout.display.page;
 
-import com.liferay.asset.util.AssetHelper;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.journal.web.internal.asset.model.JournalArticleAssetRendererFactory;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -54,8 +52,7 @@ public class JournalArticleLayoutDisplayPageProvider
 		}
 
 		try {
-			return new JournalArticleLayoutDisplayPageObjectProvider(
-				article, assetHelper, journalArticleAssetRendererFactory);
+			return new JournalArticleLayoutDisplayPageObjectProvider(article);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -70,13 +67,12 @@ public class JournalArticleLayoutDisplayPageProvider
 			journalArticleLocalService.fetchArticleByUrlTitle(
 				groupId, urlTitle);
 
-		if ((article == null) || article.isExpired() || article.isInTrash()) {
+		if ((article == null) || article.isInTrash()) {
 			return null;
 		}
 
 		try {
-			return new JournalArticleLayoutDisplayPageObjectProvider(
-				article, assetHelper, journalArticleAssetRendererFactory);
+			return new JournalArticleLayoutDisplayPageObjectProvider(article);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -87,13 +83,6 @@ public class JournalArticleLayoutDisplayPageProvider
 	public String getURLSeparator() {
 		return "/w/";
 	}
-
-	@Reference
-	protected AssetHelper assetHelper;
-
-	@Reference
-	protected JournalArticleAssetRendererFactory
-		journalArticleAssetRendererFactory;
 
 	@Reference
 	protected JournalArticleLocalService journalArticleLocalService;

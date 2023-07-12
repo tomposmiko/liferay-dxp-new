@@ -20,6 +20,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.bundle.blacklist.BundleBlacklistManager;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.lpkg.deployer.test.util.LPKGTestUtil;
 import com.liferay.portal.test.rule.Inject;
@@ -105,7 +106,9 @@ public class BundleBlacklistTest {
 		bundleTracker.open();
 
 		File deploymentDir = new File(
-			PropsValues.MODULE_FRAMEWORK_MARKETPLACE_DIR);
+			GetterUtil.getString(
+				_bundleContext.getProperty("lpkg.deployer.dir"),
+				PropsValues.MODULE_FRAMEWORK_MARKETPLACE_DIR));
 
 		deploymentDir = deploymentDir.getCanonicalFile();
 

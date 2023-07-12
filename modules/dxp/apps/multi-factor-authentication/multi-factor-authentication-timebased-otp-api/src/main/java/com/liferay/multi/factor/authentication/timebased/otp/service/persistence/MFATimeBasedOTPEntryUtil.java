@@ -344,12 +344,6 @@ public class MFATimeBasedOTPEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		MFATimeBasedOTPEntryPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile MFATimeBasedOTPEntryPersistence _persistence;
 
 }

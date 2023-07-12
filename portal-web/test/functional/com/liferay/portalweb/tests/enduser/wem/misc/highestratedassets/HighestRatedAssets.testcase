@@ -15,12 +15,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewHighestRatedAsset {
 		JSONGroup.addGroup(groupName = "Site Name");
 
@@ -69,7 +69,7 @@ definition {
 			assetContent = "Web Content Content",
 			assetTitle = "Web Content Title 1");
 
-		Ratings.rateStar(ratingStarCount = 3);
+		Ratings.rateStar(ratingStarCount = "3");
 
 		Navigator.gotoSitePage(
 			pageName = "Test Page 2",
@@ -79,7 +79,7 @@ definition {
 			assetContent = "Web Content Content",
 			assetTitle = "Web Content Title 2");
 
-		Ratings.rateStar(ratingStarCount = 5);
+		Ratings.rateStar(ratingStarCount = "5");
 
 		Navigator.gotoSitePage(
 			pageName = "Test Page 2",
@@ -91,7 +91,7 @@ definition {
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "3.0",
-			ratingStarCount = 3);
+			ratingStarCount = "3");
 
 		Navigator.gotoSitePage(
 			pageName = "Test Page 2",
@@ -103,7 +103,7 @@ definition {
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "5.0",
-			ratingStarCount = 5);
+			ratingStarCount = "5");
 	}
 
 }

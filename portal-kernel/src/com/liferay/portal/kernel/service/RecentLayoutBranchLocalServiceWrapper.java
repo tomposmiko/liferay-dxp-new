@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link RecentLayoutBranchLocalService}.
  *
@@ -294,7 +292,7 @@ public class RecentLayoutBranchLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _recentLayoutBranchLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -372,11 +370,6 @@ public class RecentLayoutBranchLocalServiceWrapper
 
 		return _recentLayoutBranchLocalService.updateRecentLayoutBranch(
 			recentLayoutBranch);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _recentLayoutBranchLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -330,10 +330,6 @@ public class PluginSettingLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(PluginSettingLocalService service) {
-		_service = service;
-	}
-
 	private static volatile PluginSettingLocalService _service;
 
 }

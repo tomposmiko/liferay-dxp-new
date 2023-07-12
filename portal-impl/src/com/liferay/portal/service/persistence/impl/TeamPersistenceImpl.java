@@ -64,6 +64,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3528,7 +3529,7 @@ public class TeamPersistenceImpl
 	 */
 	@Override
 	public Team fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(Team.class, primaryKey)) {
+		if (CTPersistenceHelperUtil.isProductionMode(Team.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4694,11 +4695,11 @@ public class TeamPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "name"}, false);
 
-		TeamUtil.setPersistence(this);
+		_setTeamUtilPersistence(this);
 	}
 
 	public void destroy() {
-		TeamUtil.setPersistence(null);
+		_setTeamUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(TeamImpl.class.getName());
 
@@ -4712,6 +4713,19 @@ public class TeamPersistenceImpl
 
 		TableMapperFactory.removeTableMapper("Users_Teams");
 		TableMapperFactory.removeTableMapper("UserGroups_Teams");
+	}
+
+	private void _setTeamUtilPersistence(TeamPersistence teamPersistence) {
+		try {
+			Field field = TeamUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, teamPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@BeanReference(type = UserPersistence.class)

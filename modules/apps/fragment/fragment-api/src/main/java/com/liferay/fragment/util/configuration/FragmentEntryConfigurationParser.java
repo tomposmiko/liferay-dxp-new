@@ -39,7 +39,6 @@ public interface FragmentEntryConfigurationParser {
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *             #getConfigurationJSONObject(String, String)}
-	 *             #getContextObjects(JSONObject, String, long[])}
 	 */
 	@Deprecated
 	public JSONObject getConfigurationJSONObject(
@@ -47,17 +46,17 @@ public interface FragmentEntryConfigurationParser {
 			long[] segmentsExperienceIds)
 		throws JSONException;
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getContextObjects(JSONObject, String, long[])}
-	 */
-	@Deprecated
 	public Map<String, Object> getContextObjects(
 		JSONObject configurationValuesJSONObject, String configuration);
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getContextObjects(JSONObject, String)}
+	 */
+	@Deprecated
 	public Map<String, Object> getContextObjects(
 		JSONObject configurationValuesJSONObject, String configuration,
-		long[] segmentsEntryIds);
+		long[] segmentsExperienceIds);
 
 	public Object getFieldValue(
 		FragmentConfigurationField fragmentConfigurationField, String value);

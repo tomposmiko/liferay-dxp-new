@@ -327,10 +327,6 @@ public class SocialActivityLimitLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SocialActivityLimitLocalService service) {
-		_service = service;
-	}
-
 	private static volatile SocialActivityLimitLocalService _service;
 
 }

@@ -93,7 +93,6 @@ FolderFacetPortletInstanceConfiguration folderFacetPortletInstanceConfiguration 
 										<div class="custom-checkbox custom-control">
 											<label class="facet-checkbox-label" for="<portlet:namespace />term_<%= i %>">
 												<input
-													autocomplete="off"
 													class="custom-control-input facet-term"
 													data-term-id="<%= folderSearchFacetTermDisplayContext.getFolderId() %>"
 													disabled

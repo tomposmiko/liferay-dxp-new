@@ -316,10 +316,6 @@ public class CTPreferencesLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CTPreferencesLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CTPreferencesLocalService _service;
 
 }

@@ -174,24 +174,13 @@ const Main = ({
 		localizedValue={localizedValue}
 		name={name}
 		readOnly={readOnly}
-		style={null}
 	>
 		<Numeric
-			{...{
-				...(otherProps.tip && {
-					'aria-describedby': `${id ?? name}_fieldHelp`,
-				}),
-				...(otherProps.errorMessage && {
-					'aria-errormessage': `${id ?? name}_fieldError`,
-				}),
-				'aria-invalid': !otherProps.valid,
-				'aria-required': otherProps.required,
-			}}
 			dataType={dataType}
 			defaultLanguageId={defaultLanguageId}
 			disabled={readOnly}
 			editingLanguageId={editingLanguageId}
-			id={id ?? name}
+			id={id}
 			localizable={localizable}
 			localizedValue={localizedValue}
 			name={name}

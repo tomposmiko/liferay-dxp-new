@@ -19,7 +19,6 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.fragment.renderer.FragmentDropZoneRenderer;
-import com.liferay.layout.constants.LayoutWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.structure.LayoutStructure;
@@ -32,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -76,28 +73,19 @@ public class DropZoneFragmentEntryProcessor implements FragmentEntryProcessor {
 			return html;
 		}
 
-		HttpServletRequest httpServletRequest =
-			fragmentEntryProcessorContext.getHttpServletRequest();
+		LayoutPageTemplateStructure layoutPageTemplateStructure =
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					fragmentEntryLink.getGroupId(),
+					fragmentEntryLink.getPlid());
 
-		LayoutStructure layoutStructure =
-			(LayoutStructure)httpServletRequest.getAttribute(
-				LayoutWebKeys.LAYOUT_STRUCTURE);
-
-		if (layoutStructure == null) {
-			LayoutPageTemplateStructure layoutPageTemplateStructure =
-				_layoutPageTemplateStructureLocalService.
-					fetchLayoutPageTemplateStructure(
-						fragmentEntryLink.getGroupId(),
-						fragmentEntryLink.getPlid());
-
-			if (layoutPageTemplateStructure == null) {
-				return html;
-			}
-
-			layoutStructure = LayoutStructure.of(
-				layoutPageTemplateStructure.getData(
-					fragmentEntryLink.getSegmentsExperienceId()));
+		if (layoutPageTemplateStructure == null) {
+			return html;
 		}
+
+		LayoutStructure layoutStructure = LayoutStructure.of(
+			layoutPageTemplateStructure.getData(
+				fragmentEntryLink.getSegmentsExperienceId()));
 
 		LayoutStructureItem layoutStructureItem =
 			layoutStructure.getLayoutStructureItemByFragmentEntryLinkId(

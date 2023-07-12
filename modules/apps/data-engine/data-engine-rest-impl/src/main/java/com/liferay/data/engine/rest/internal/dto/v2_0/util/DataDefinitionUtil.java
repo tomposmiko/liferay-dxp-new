@@ -231,10 +231,6 @@ public class DataDefinitionUtil {
 							jsonObject.getString("value"),
 							LocaleUtil.fromLanguageId(entry.getKey()),
 							jsonObject.getString("label"));
-
-						ddmFormFieldOptions.addOptionReference(
-							jsonObject.getString("value"),
-							jsonObject.getString("reference"));
 					}
 					catch (JSONException jsonException) {
 						if (_log.isDebugEnabled()) {
@@ -250,11 +246,6 @@ public class DataDefinitionUtil {
 							MapUtil.getString((Map<String, ?>)option, "value"),
 							LocaleUtil.fromLanguageId(entry.getKey()),
 							MapUtil.getString((Map<String, ?>)option, "label"));
-
-						ddmFormFieldOptions.addOptionReference(
-							MapUtil.getString((Map<String, ?>)option, "value"),
-							MapUtil.getString(
-								(Map<String, ?>)option, "reference"));
 					}
 					else if (option instanceof String) {
 						try {
@@ -268,12 +259,6 @@ public class DataDefinitionUtil {
 								LocaleUtil.fromLanguageId(entry.getKey()),
 								JSONUtil.getValueAsString(
 									optionJSONObject, "Object/label"));
-
-							ddmFormFieldOptions.addOptionReference(
-								JSONUtil.getValueAsString(
-									optionJSONObject, "Object/value"),
-								JSONUtil.getValueAsString(
-									optionJSONObject, "Object/reference"));
 						}
 						catch (JSONException jsonException) {
 							if (_log.isDebugEnabled()) {
@@ -596,9 +581,6 @@ public class DataDefinitionUtil {
 	private static Map<String, List<Map<String, String>>> _toMap(
 		DDMFormFieldOptions ddmFormFieldOptions) {
 
-		Map<String, String> optionsReferences =
-			ddmFormFieldOptions.getOptionsReferences();
-
 		Set<String> optionsValues = ddmFormFieldOptions.getOptionsValues();
 
 		if (optionsValues.isEmpty()) {
@@ -621,8 +603,6 @@ public class DataDefinitionUtil {
 						HashMapBuilder.put(
 							"label", localizedValue.getString(locale)
 						).put(
-							"reference", optionsReferences.get(optionValue)
-						).put(
 							"value", optionValue
 						).build());
 				}
@@ -632,8 +612,6 @@ public class DataDefinitionUtil {
 						ListUtil.toList(
 							HashMapBuilder.put(
 								"label", localizedValue.getString(locale)
-							).put(
-								"reference", optionsReferences.get(optionValue)
 							).put(
 								"value", optionValue
 							).build()));

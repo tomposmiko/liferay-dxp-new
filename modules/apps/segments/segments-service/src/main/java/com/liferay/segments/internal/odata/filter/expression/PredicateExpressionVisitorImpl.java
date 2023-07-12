@@ -161,7 +161,7 @@ public class PredicateExpressionVisitorImpl<T extends Map>
 
 		if (entityField == null) {
 			throw new ExpressionVisitException(
-				"Invoked visitLambdaVariableExpression when no entity field " +
+				"Invoked visitlambdavariableexpression when no entity field " +
 					"is stored for lambda variable name " +
 						lambdaVariableExpression.getVariableName());
 		}
@@ -324,8 +324,9 @@ public class PredicateExpressionVisitorImpl<T extends Map>
 				_normalizeStringLiteral(
 					String.valueOf(p.get(entityField.getName()))));
 		}
-
-		return p -> fieldValue.equals(p.get(entityField.getName()));
+		else {
+			return p -> fieldValue.equals(p.get(entityField.getName()));
+		}
 	}
 
 	private Predicate<T> _getGEPredicate(

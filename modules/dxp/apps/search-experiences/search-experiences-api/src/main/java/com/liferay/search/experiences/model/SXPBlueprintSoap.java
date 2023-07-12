@@ -35,7 +35,6 @@ public class SXPBlueprintSoap implements Serializable {
 
 		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setUuid(model.getUuid());
-		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
 		soapModel.setSXPBlueprintId(model.getSXPBlueprintId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -45,9 +44,7 @@ public class SXPBlueprintSoap implements Serializable {
 		soapModel.setConfigurationJSON(model.getConfigurationJSON());
 		soapModel.setDescription(model.getDescription());
 		soapModel.setElementInstancesJSON(model.getElementInstancesJSON());
-		soapModel.setSchemaVersion(model.getSchemaVersion());
 		soapModel.setTitle(model.getTitle());
-		soapModel.setVersion(model.getVersion());
 		soapModel.setStatus(model.getStatus());
 		soapModel.setStatusByUserId(model.getStatusByUserId());
 		soapModel.setStatusByUserName(model.getStatusByUserName());
@@ -119,14 +116,6 @@ public class SXPBlueprintSoap implements Serializable {
 
 	public void setUuid(String uuid) {
 		_uuid = uuid;
-	}
-
-	public String getExternalReferenceCode() {
-		return _externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		_externalReferenceCode = externalReferenceCode;
 	}
 
 	public long getSXPBlueprintId() {
@@ -201,28 +190,12 @@ public class SXPBlueprintSoap implements Serializable {
 		_elementInstancesJSON = elementInstancesJSON;
 	}
 
-	public String getSchemaVersion() {
-		return _schemaVersion;
-	}
-
-	public void setSchemaVersion(String schemaVersion) {
-		_schemaVersion = schemaVersion;
-	}
-
 	public String getTitle() {
 		return _title;
 	}
 
 	public void setTitle(String title) {
 		_title = title;
-	}
-
-	public String getVersion() {
-		return _version;
-	}
-
-	public void setVersion(String version) {
-		_version = version;
 	}
 
 	public int getStatus() {
@@ -259,7 +232,6 @@ public class SXPBlueprintSoap implements Serializable {
 
 	private long _mvccVersion;
 	private String _uuid;
-	private String _externalReferenceCode;
 	private long _sxpBlueprintId;
 	private long _companyId;
 	private long _userId;
@@ -269,9 +241,7 @@ public class SXPBlueprintSoap implements Serializable {
 	private String _configurationJSON;
 	private String _description;
 	private String _elementInstancesJSON;
-	private String _schemaVersion;
 	private String _title;
-	private String _version;
 	private int _status;
 	private long _statusByUserId;
 	private String _statusByUserName;

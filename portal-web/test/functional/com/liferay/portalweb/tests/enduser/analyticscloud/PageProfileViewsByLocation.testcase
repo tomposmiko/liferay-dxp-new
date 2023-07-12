@@ -29,7 +29,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -41,7 +41,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8359 | Test Summary: Page profile views by location shows where views are coming from"
 	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test PageLocationCardShowsViewsByExpectedLocation {
 		property portal.upstream = "quarantine";
 
@@ -69,7 +69,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to Pages tab in Sites dashboard") {
@@ -101,7 +101,7 @@ definition {
 
 			ACCards.viewGeomapTableText(
 				cardTitle = "Views by Location",
-				leftText = ${country},
+				leftText = "${country}",
 				rightText = "1 100%");
 		}
 	}

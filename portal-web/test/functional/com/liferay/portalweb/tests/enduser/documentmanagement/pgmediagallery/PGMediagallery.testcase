@@ -18,7 +18,7 @@ definition {
 			layoutName = "Media Gallery Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 2,
+			column = "2",
 			groupName = "Guest",
 			layoutName = "Media Gallery Page",
 			widgetName = "Media Gallery");
@@ -31,7 +31,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -41,7 +41,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddFolder {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -52,7 +52,7 @@ definition {
 		DMFolder.viewPGViaMG(mgFolderName = "DM Folder Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddFolderDocument {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -76,7 +76,7 @@ definition {
 		DMDocument.viewPGViaMG(mgDocumentTitle = "DM Document Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddFolders {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -103,7 +103,7 @@ definition {
 		DMFolder.viewPGViaMG(mgFolderName = "DM Folder3 Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddSubfolderDocument {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -125,7 +125,7 @@ definition {
 			mgDocumentTitle = "DM Document Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddSubfolders {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -162,7 +162,7 @@ definition {
 		DMFolder.viewPGViaMG(mgFolderName = "DM Subfolder3 Name");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ADTDMMediaGallery {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -208,7 +208,7 @@ definition {
 		MGPortlet.viewCustomADTCarouselPG();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test DeleteFolderDocument {
 		property portal.acceptance = "true";
 
@@ -234,7 +234,7 @@ definition {
 		DMDocument.deletePGViaMG(mgDocumentTitle = "DM Document Title");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test EditFolder {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -255,7 +255,7 @@ definition {
 		DMFolder.viewPGViaMG(mgFolderName = "DM Folder Name Edit");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test EditFolderDocument {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -279,7 +279,7 @@ definition {
 			mgDocumentTitleEdit = "DM Document Title Edit");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchFolderDocument {
 		Navigator.gotoPage(pageName = "Media Gallery Page");
 
@@ -318,7 +318,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-107521. It ensures that the SVG file can be viewed."
-	@priority = 4
+	@priority = "4"
 	test ViewSVG {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Document_1.svg",
@@ -332,7 +332,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-89361. It ensures that video can be played via media gallery."
-	@priority = 4
+	@priority = "4"
 	test ViewVideoViaMediaGallery {
 		property custom.properties = "xuggler.enabled=true";
 		property dummy.socket.proxy.disabled = "true";
@@ -358,7 +358,7 @@ definition {
 			mgDocumentFile = "Document_1.mp4",
 			mgDocumentTitle = "DM Document Title");
 
-		Pause(locator1 = 120000);
+		Pause(locator1 = "120000");
 
 		Refresh();
 

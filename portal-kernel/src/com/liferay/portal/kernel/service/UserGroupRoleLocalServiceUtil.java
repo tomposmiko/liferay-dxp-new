@@ -428,10 +428,6 @@ public class UserGroupRoleLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(UserGroupRoleLocalService service) {
-		_service = service;
-	}
-
 	private static volatile UserGroupRoleLocalService _service;
 
 }

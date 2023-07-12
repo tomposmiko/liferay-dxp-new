@@ -50,6 +50,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3332,9 +3333,7 @@ public class UserGroupRolePersistenceImpl
 	 */
 	@Override
 	public UserGroupRole fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				UserGroupRole.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(UserGroupRole.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3863,11 +3862,11 @@ public class UserGroupRolePersistenceImpl
 			},
 			new String[] {"userId", "groupId", "roleId"}, false);
 
-		UserGroupRoleUtil.setPersistence(this);
+		_setUserGroupRoleUtilPersistence(this);
 	}
 
 	public void destroy() {
-		UserGroupRoleUtil.setPersistence(null);
+		_setUserGroupRoleUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(UserGroupRoleImpl.class.getName());
 
@@ -3877,6 +3876,22 @@ public class UserGroupRolePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setUserGroupRoleUtilPersistence(
+		UserGroupRolePersistence userGroupRolePersistence) {
+
+		try {
+			Field field = UserGroupRoleUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, userGroupRolePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

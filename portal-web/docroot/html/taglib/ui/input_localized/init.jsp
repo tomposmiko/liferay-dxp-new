@@ -76,6 +76,10 @@ if (!ignoreRequestValue) {
 	mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + mainLanguageId, mainLanguageValue);
 }
 
+if (Validator.isNull(mainLanguageValue)) {
+	mainLanguageValue = LocalizationUtil.getLocalization(xml, defaultLanguageId, true);
+}
+
 String fieldNamePrefix = StringPool.BLANK;
 String fieldNameSuffix = StringPool.BLANK;
 

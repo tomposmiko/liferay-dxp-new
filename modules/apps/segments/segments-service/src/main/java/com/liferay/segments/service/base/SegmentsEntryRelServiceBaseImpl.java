@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -35,6 +33,8 @@ import com.liferay.segments.service.persistence.SegmentsExperiencePersistence;
 import com.liferay.segments.service.persistence.SegmentsExperimentFinder;
 import com.liferay.segments.service.persistence.SegmentsExperimentPersistence;
 import com.liferay.segments.service.persistence.SegmentsExperimentRelPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -63,7 +63,7 @@ public abstract class SegmentsEntryRelServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		SegmentsEntryRelServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public abstract class SegmentsEntryRelServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		segmentsEntryRelService = (SegmentsEntryRelService)aopProxy;
 
-		SegmentsEntryRelServiceUtil.setService(segmentsEntryRelService);
+		_setServiceUtilService(segmentsEntryRelService);
 	}
 
 	/**
@@ -119,6 +119,22 @@ public abstract class SegmentsEntryRelServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		SegmentsEntryRelService segmentsEntryRelService) {
+
+		try {
+			Field field = SegmentsEntryRelServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, segmentsEntryRelService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -171,8 +187,5 @@ public abstract class SegmentsEntryRelServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SegmentsEntryRelServiceBaseImpl.class);
 
 }

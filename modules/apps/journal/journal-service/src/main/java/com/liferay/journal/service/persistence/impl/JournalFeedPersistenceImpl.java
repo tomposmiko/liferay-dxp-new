@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3049,9 +3050,7 @@ public class JournalFeedPersistenceImpl
 	 */
 	@Override
 	public JournalFeed fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				JournalFeed.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(JournalFeed.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3574,12 +3573,12 @@ public class JournalFeedPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "feedId"}, false);
 
-		JournalFeedUtil.setPersistence(this);
+		_setJournalFeedUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		JournalFeedUtil.setPersistence(null);
+		_setJournalFeedUtilPersistence(null);
 
 		entityCache.removeCache(JournalFeedImpl.class.getName());
 
@@ -3589,6 +3588,22 @@ public class JournalFeedPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setJournalFeedUtilPersistence(
+		JournalFeedPersistence journalFeedPersistence) {
+
+		try {
+			Field field = JournalFeedUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, journalFeedPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

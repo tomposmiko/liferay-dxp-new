@@ -17,17 +17,15 @@
 <%@ include file="/html/portal/init.jsp" %>
 
 <%
-String requestedSessionId = request.getRequestedSessionId();
+if (_log.isWarnEnabled()) {
+	String requestedSessionId = request.getRequestedSessionId();
 
-if (Validator.isNotNull(requestedSessionId) && !StringUtil.equals(requestedSessionId, session.getId())) {
-	response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	if (Validator.isNotNull(requestedSessionId) && !StringUtil.equals(requestedSessionId, session.getId())) {
+		_log.warn("Unable to extend the HTTP session. Review the portal property \"session.timeout\" if this warning is displayed frequently.");
 
-	if (_log.isWarnEnabled()) {
-		_log.warn("Unable to extend the HTTP session.");
-	}
-
-	if (_log.isDebugEnabled()) {
-		_log.debug("The requested session " + requestedSessionId + " is not the same as session " + session.getId());
+		if (_log.isDebugEnabled()) {
+			_log.debug("The requested session " + requestedSessionId + " is not the same as session " + session.getId());
+		}
 	}
 }
 

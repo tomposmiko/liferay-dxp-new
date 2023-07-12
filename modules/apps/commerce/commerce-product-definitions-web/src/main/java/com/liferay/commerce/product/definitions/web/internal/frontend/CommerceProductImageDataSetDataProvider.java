@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -73,7 +74,7 @@ public class CommerceProductImageDataSetDataProvider
 		List<CPAttachmentFileEntry> cpAttachmentFileEntries =
 			_cpAttachmentFileEntryService.getCPAttachmentFileEntries(
 				_portal.getClassNameId(CPDefinition.class), cpDefinitionId,
-				filter.getKeywords(), CPAttachmentFileEntryConstants.TYPE_IMAGE,
+				CPAttachmentFileEntryConstants.TYPE_IMAGE,
 				WorkflowConstants.STATUS_ANY, pagination.getStartPosition(),
 				pagination.getEndPosition());
 
@@ -110,7 +111,8 @@ public class CommerceProductImageDataSetDataProvider
 						CommerceMediaResolverUtil.getThumbnailURL(
 							CommerceAccountConstants.ACCOUNT_ID_GUEST,
 							cpAttachmentFileEntryId)),
-					title, fileEntry.getExtension(),
+					HtmlUtil.escape(title),
+					HtmlUtil.escape(fileEntry.getExtension()),
 					cpAttachmentFileEntry.getPriority(),
 					LanguageUtil.format(
 						httpServletRequest, "x-ago", modifiedDateDescription,
@@ -136,7 +138,7 @@ public class CommerceProductImageDataSetDataProvider
 
 		return _cpAttachmentFileEntryService.getCPAttachmentFileEntriesCount(
 			_portal.getClassNameId(CPDefinition.class), cpDefinitionId,
-			filter.getKeywords(), CPAttachmentFileEntryConstants.TYPE_IMAGE,
+			CPAttachmentFileEntryConstants.TYPE_IMAGE,
 			WorkflowConstants.STATUS_ANY);
 	}
 

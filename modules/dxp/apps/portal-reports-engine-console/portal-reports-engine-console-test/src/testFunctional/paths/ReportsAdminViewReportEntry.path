@@ -45,9 +45,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ENTRY_FILE_TABLE-->
-
 <tr>
 	<td>ENTRY_FILE_TABLE_FILE</td>
 	<td>//tr[contains(.,'${key_reportsFileName}')]/td</td>
@@ -58,9 +56,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ENTRY_FILE_MENULIST-->
-
 <tr>
 	<td>ENTRY_FILE_MENULIST_DELIVER_REPORT</td>
 	<td>//a[@role='menuitem' and contains(.,'Deliver Report')]</td>

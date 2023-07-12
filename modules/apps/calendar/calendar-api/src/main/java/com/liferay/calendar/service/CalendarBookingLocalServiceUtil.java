@@ -616,12 +616,6 @@ public class CalendarBookingLocalServiceUtil {
 			userId, calendarBookingId);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 #search(long, long[], long[], long[], long, String, long,
-	 long, TimeZone, boolean, int[], int, int, OrderByComparator)}
-	 */
-	@Deprecated
 	public static List<CalendarBooking> search(
 		long companyId, long[] groupIds, long[] calendarIds,
 		long[] calendarResourceIds, long parentCalendarBookingId,
@@ -633,21 +627,6 @@ public class CalendarBookingLocalServiceUtil {
 			companyId, groupIds, calendarIds, calendarResourceIds,
 			parentCalendarBookingId, keywords, startTime, endTime, recurring,
 			statuses, start, end, orderByComparator);
-	}
-
-	public static List<CalendarBooking> search(
-		long companyId, long[] groupIds, long[] calendarIds,
-		long[] calendarResourceIds, long parentCalendarBookingId,
-		String keywords, long startTime, long endTime,
-		java.util.TimeZone displayTimeZone, boolean recurring, int[] statuses,
-		int start, int end,
-		OrderByComparator<CalendarBooking> orderByComparator) {
-
-		return getService().search(
-			companyId, groupIds, calendarIds, calendarResourceIds,
-			parentCalendarBookingId, keywords, startTime, endTime,
-			displayTimeZone, recurring, statuses, start, end,
-			orderByComparator);
 	}
 
 	public static List<CalendarBooking> search(
@@ -845,10 +824,6 @@ public class CalendarBookingLocalServiceUtil {
 
 	public static CalendarBookingLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(CalendarBookingLocalService service) {
-		_service = service;
 	}
 
 	private static volatile CalendarBookingLocalService _service;

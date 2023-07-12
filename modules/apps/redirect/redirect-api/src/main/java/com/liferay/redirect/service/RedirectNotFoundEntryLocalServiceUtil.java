@@ -373,10 +373,6 @@ public class RedirectNotFoundEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(RedirectNotFoundEntryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile RedirectNotFoundEntryLocalService _service;
 
 }

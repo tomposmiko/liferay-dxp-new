@@ -425,12 +425,6 @@ public class DLOpenerFileEntryReferenceUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		DLOpenerFileEntryReferencePersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile DLOpenerFileEntryReferencePersistence _persistence;
 
 }

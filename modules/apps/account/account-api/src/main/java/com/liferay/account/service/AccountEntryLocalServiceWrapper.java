@@ -15,7 +15,6 @@
 package com.liferay.account.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AccountEntryLocalService}.
@@ -337,7 +336,13 @@ public class AccountEntryLocalServiceWrapper
 		return _accountEntryLocalService.fetchAccountEntry(accountEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account entry's external reference code
+	 * @return the matching account entry, or <code>null</code> if a matching account entry could not be found
+	 */
 	@Override
 	public com.liferay.account.model.AccountEntry
 		fetchAccountEntryByExternalReferenceCode(
@@ -348,6 +353,9 @@ public class AccountEntryLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.account.model.AccountEntry
@@ -418,7 +426,14 @@ public class AccountEntryLocalServiceWrapper
 		return _accountEntryLocalService.getAccountEntry(accountEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account entry's external reference code
+	 * @return the matching account entry
+	 * @throws PortalException if a matching account entry could not be found
+	 */
 	@Override
 	public com.liferay.account.model.AccountEntry
 			getAccountEntryByExternalReferenceCode(
@@ -547,11 +562,6 @@ public class AccountEntryLocalServiceWrapper
 		com.liferay.account.model.AccountEntry accountEntry, int status) {
 
 		return _accountEntryLocalService.updateStatus(accountEntry, status);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _accountEntryLocalService.getBasePersistence();
 	}
 
 	@Override

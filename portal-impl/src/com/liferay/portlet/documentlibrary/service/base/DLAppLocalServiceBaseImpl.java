@@ -24,14 +24,14 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.persistence.RepositoryPersistence;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.trash.kernel.service.persistence.TrashEntryPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -270,11 +270,11 @@ public abstract class DLAppLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		DLAppLocalServiceUtil.setService(dlAppLocalService);
+		_setLocalServiceUtilService(dlAppLocalService);
 	}
 
 	public void destroy() {
-		DLAppLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -308,6 +308,22 @@ public abstract class DLAppLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		DLAppLocalService dlAppLocalService) {
+
+		try {
+			Field field = DLAppLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlAppLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -357,8 +373,5 @@ public abstract class DLAppLocalServiceBaseImpl
 
 	@BeanReference(type = DLFolderFinder.class)
 	protected DLFolderFinder dlFolderFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLAppLocalServiceBaseImpl.class);
 
 }

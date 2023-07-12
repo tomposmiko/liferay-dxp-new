@@ -391,11 +391,20 @@ public interface CommercePriceEntryLocalService
 	public CommercePriceEntry fetchCommercePriceEntry(
 		long commercePriceListId, String cpInstanceUuid, int status);
 
-	@Deprecated
+	/**
+	 * Returns the commerce price entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price entry's external reference code
+	 * @return the matching commerce price entry, or <code>null</code> if a matching commerce price entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePriceEntry fetchCommercePriceEntryByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePriceEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePriceEntry fetchCommercePriceEntryByReferenceCode(
@@ -467,7 +476,14 @@ public interface CommercePriceEntryLocalService
 	public CommercePriceEntry getCommercePriceEntry(long commercePriceEntryId)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the commerce price entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price entry's external reference code
+	 * @return the matching commerce price entry
+	 * @throws PortalException if a matching commerce price entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePriceEntry getCommercePriceEntryByExternalReferenceCode(
 			long companyId, String externalReferenceCode)

@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Modified;
  * @author Danny Situ
  */
 @Component(
-	configurationPid = "com.liferay.commerce.talend.job.deployer.salesforce.configuration.SalesforceTalendJobConfiguration",
+	configurationPid = "com.liferay.commerce.talend.job.deployer.configuration.SalesforceTalendJobConfiguration",
 	enabled = false, immediate = true, property = "service.ranking:Integer=1",
 	service = TalendJobFileProvider.class
 )

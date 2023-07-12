@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.ThemeLocalService;
@@ -29,6 +27,8 @@ import com.liferay.portal.kernel.service.ThemeLocalServiceUtil;
 import com.liferay.portal.kernel.service.persistence.PluginSettingPersistence;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -161,11 +161,11 @@ public abstract class ThemeLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		ThemeLocalServiceUtil.setService(themeLocalService);
+		_setLocalServiceUtilService(themeLocalService);
 	}
 
 	public void destroy() {
-		ThemeLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -202,6 +202,22 @@ public abstract class ThemeLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		ThemeLocalService themeLocalService) {
+
+		try {
+			Field field = ThemeLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, themeLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = ThemeLocalService.class)
 	protected ThemeLocalService themeLocalService;
 
@@ -225,8 +241,5 @@ public abstract class ThemeLocalServiceBaseImpl
 
 	@BeanReference(type = PluginSettingPersistence.class)
 	protected PluginSettingPersistence pluginSettingPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ThemeLocalServiceBaseImpl.class);
 
 }

@@ -28,11 +28,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -61,7 +61,7 @@ public abstract class CTCollectionServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		CTCollectionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public abstract class CTCollectionServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ctCollectionService = (CTCollectionService)aopProxy;
 
-		CTCollectionServiceUtil.setService(ctCollectionService);
+		_setServiceUtilService(ctCollectionService);
 	}
 
 	/**
@@ -120,6 +120,22 @@ public abstract class CTCollectionServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		CTCollectionService ctCollectionService) {
+
+		try {
+			Field field = CTCollectionServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ctCollectionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.change.tracking.service.CTCollectionLocalService
 		ctCollectionLocalService;
@@ -144,8 +160,5 @@ public abstract class CTCollectionServiceBaseImpl
 
 	@Reference
 	protected CTProcessPersistence ctProcessPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTCollectionServiceBaseImpl.class);
 
 }

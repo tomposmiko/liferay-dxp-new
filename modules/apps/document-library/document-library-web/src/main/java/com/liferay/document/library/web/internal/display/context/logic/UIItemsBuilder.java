@@ -559,7 +559,7 @@ public class UIItemsBuilder {
 			return;
 		}
 
-		PortletURL portletURL = _getControlPanelRenderURL(
+		PortletURL portletURL = _getRenderURL(
 			"/document_library/edit_file_entry");
 
 		_addURLUIItem(

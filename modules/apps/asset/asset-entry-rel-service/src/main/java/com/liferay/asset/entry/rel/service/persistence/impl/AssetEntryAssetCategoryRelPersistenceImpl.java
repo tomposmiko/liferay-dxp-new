@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1815,7 +1816,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				AssetEntryAssetCategoryRel.class, primaryKey)) {
+				AssetEntryAssetCategoryRel.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2299,12 +2300,12 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"assetEntryId", "assetCategoryId"}, false);
 
-		AssetEntryAssetCategoryRelUtil.setPersistence(this);
+		_setAssetEntryAssetCategoryRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AssetEntryAssetCategoryRelUtil.setPersistence(null);
+		_setAssetEntryAssetCategoryRelUtilPersistence(null);
 
 		entityCache.removeCache(AssetEntryAssetCategoryRelImpl.class.getName());
 
@@ -2314,6 +2315,23 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAssetEntryAssetCategoryRelUtilPersistence(
+		AssetEntryAssetCategoryRelPersistence
+			assetEntryAssetCategoryRelPersistence) {
+
+		try {
+			Field field = AssetEntryAssetCategoryRelUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, assetEntryAssetCategoryRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

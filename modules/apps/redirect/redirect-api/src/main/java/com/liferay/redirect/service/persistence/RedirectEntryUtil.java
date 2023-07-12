@@ -1262,10 +1262,6 @@ public class RedirectEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(RedirectEntryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile RedirectEntryPersistence _persistence;
 
 }

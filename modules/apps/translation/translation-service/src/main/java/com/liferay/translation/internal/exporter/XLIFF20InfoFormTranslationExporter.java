@@ -30,11 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -76,34 +73,31 @@ public class XLIFF20InfoFormTranslationExporter
 			infoItemReference.getClassName() + StringPool.COLON +
 				infoItemReference.getClassPK());
 
-		Map<String, List<InfoFieldValue<Object>>> infoFieldValuesMap =
-			new LinkedHashMap<>();
+		Collection<InfoFieldValue<Object>> infoFieldValues =
+			infoItemFieldValues.getInfoFieldValues();
 
-		for (InfoFieldValue<Object> infoFieldValue :
-				infoItemFieldValues.getInfoFieldValues()) {
-
+		for (InfoFieldValue<Object> infoFieldValue : infoFieldValues) {
 			InfoField infoField = infoFieldValue.getInfoField();
 
-			if (_translationInfoFieldChecker.isTranslatable(infoField)) {
-				List<InfoFieldValue<Object>> infoFieldValuesList =
-					infoFieldValuesMap.computeIfAbsent(
-						infoField.getUniqueId(), uniqueId -> new ArrayList<>());
-
-				infoFieldValuesList.add(infoFieldValue);
+			if (!_translationInfoFieldChecker.isTranslatable(infoField)) {
+				continue;
 			}
-		}
-
-		for (Map.Entry<String, List<InfoFieldValue<Object>>> entry :
-				infoFieldValuesMap.entrySet()) {
 
 			Element unitElement = fileElement.addElement("unit");
 
-			unitElement.addAttribute("id", entry.getKey());
+			unitElement.addAttribute("id", infoField.getName());
 
-			for (InfoFieldValue<Object> infoFieldValue : entry.getValue()) {
-				_addInfoFieldValue(
-					infoFieldValue, unitElement, sourceLocale, targetLocale);
-			}
+			Element segmentElement = unitElement.addElement("segment");
+
+			Element sourceElement = segmentElement.addElement("source");
+
+			sourceElement.addCDATA(
+				_getStringValue(infoFieldValue.getValue(sourceLocale)));
+
+			Element targetElement = segmentElement.addElement("target");
+
+			targetElement.addCDATA(
+				_getStringValue(infoFieldValue.getValue(targetLocale)));
 		}
 
 		String formattedString = document.formattedString();
@@ -114,23 +108,6 @@ public class XLIFF20InfoFormTranslationExporter
 	@Override
 	public String getMimeType() {
 		return "application/xliff+xml";
-	}
-
-	private void _addInfoFieldValue(
-		InfoFieldValue<Object> infoFieldValue, Element unitElement,
-		Locale sourceLocale, Locale targetLocale) {
-
-		Element segmentElement = unitElement.addElement("segment");
-
-		Element sourceElement = segmentElement.addElement("source");
-
-		sourceElement.addCDATA(
-			_getStringValue(infoFieldValue.getValue(sourceLocale)));
-
-		Element targetElement = segmentElement.addElement("target");
-
-		targetElement.addCDATA(
-			_getStringValue(infoFieldValue.getValue(targetLocale)));
 	}
 
 	private String _getStringValue(Object value) {

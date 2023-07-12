@@ -455,10 +455,6 @@ public class AssetEntryUsageLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AssetEntryUsageLocalService service) {
-		_service = service;
-	}
-
 	private static volatile AssetEntryUsageLocalService _service;
 
 }

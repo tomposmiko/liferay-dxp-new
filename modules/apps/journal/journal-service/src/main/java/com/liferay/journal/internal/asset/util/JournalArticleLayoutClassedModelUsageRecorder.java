@@ -106,7 +106,7 @@ public class JournalArticleLayoutClassedModelUsageRecorder
 
 		List<JournalContentSearch> contentSearches =
 			_journalContentSearchLocalService.getArticleContentSearches(
-				article.getGroupId(), article.getArticleId());
+				article.getArticleId());
 
 		for (JournalContentSearch contentSearch : contentSearches) {
 			Layout layout = _layoutLocalService.fetchLayout(

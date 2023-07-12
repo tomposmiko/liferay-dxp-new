@@ -106,12 +106,6 @@ public class CommerceBOMFolderApplicationRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceBOMFolderApplicationRelService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceBOMFolderApplicationRelService _service;
 
 }

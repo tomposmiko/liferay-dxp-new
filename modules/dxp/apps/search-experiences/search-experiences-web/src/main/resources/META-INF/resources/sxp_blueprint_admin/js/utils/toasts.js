@@ -11,8 +11,6 @@
 
 import {openToast} from 'frontend-js-web';
 
-import {SESSION_IDS} from './sessionStorage';
-
 export function openErrorToast(config) {
 	openToast({
 		message: Liferay.Language.get('an-unexpected-error-occurred'),
@@ -29,27 +27,4 @@ export function openSuccessToast(config) {
 		type: 'success',
 		...config,
 	});
-}
-
-/**
- * Used for showing a success toast when the page first loads. For example,
- * when a new blueprint is created and redirected to the edit page.
- */
-export function openInitialSuccessToast() {
-	const successMessage = sessionStorage.getItem(SESSION_IDS.SUCCESS_MESSAGE);
-
-	if (successMessage) {
-		openSuccessToast({message: successMessage});
-
-		sessionStorage.removeItem(SESSION_IDS.SUCCESS_MESSAGE);
-	}
-}
-
-/**
- * Sets the success toast to appear on a redirected page. The redirected page
- * must use `openInitialSuccessToast` to show the success message that was set.
- * @param {String} message The success message to display in the toast.
- */
-export function setInitialSuccessToast(message) {
-	return sessionStorage.setItem(SESSION_IDS.SUCCESS_MESSAGE, message);
 }

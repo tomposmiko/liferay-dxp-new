@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -55,7 +54,6 @@ public class AttachmentUtilTest extends PowerMockito {
 		);
 	}
 
-	@Ignore
 	@Test
 	public void testGetTitleMapIfCPAttachmentFileEntryIsNull()
 		throws Exception {

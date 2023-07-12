@@ -28,8 +28,11 @@ import com.liferay.analytics.reports.web.internal.model.ReferringURL;
 import com.liferay.analytics.reports.web.internal.model.TimeRange;
 import com.liferay.analytics.reports.web.internal.model.TimeSpan;
 import com.liferay.analytics.reports.web.internal.model.TrafficChannel;
+import com.liferay.analytics.reports.web.internal.model.TrafficSource;
 import com.liferay.analytics.reports.web.internal.model.util.TrafficChannelUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
@@ -38,6 +41,7 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.AbstractMap;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -293,6 +297,9 @@ public class AnalyticsReportsDataProvider {
 		throws PortalException {
 
 		try {
+			Map<String, TrafficSource> trafficSourceMap = getTrafficSources(
+				companyId, url);
+
 			List<ReferringURL> domainReferringURLs = getDomainReferringURLs(
 				companyId, url);
 
@@ -313,7 +320,7 @@ public class AnalyticsReportsDataProvider {
 			return stream.map(
 				acquisitionChannel -> TrafficChannelUtil.toTrafficChannel(
 					acquisitionChannel, domainReferringURLs, pageReferringURLs,
-					referringSocialMediaList)
+					referringSocialMediaList, trafficSourceMap)
 			).map(
 				trafficChannel -> new AbstractMap.SimpleEntry<>(
 					trafficChannel.getName(), trafficChannel)
@@ -324,6 +331,37 @@ public class AnalyticsReportsDataProvider {
 		catch (Exception exception) {
 			throw new PortalException(
 				"Unable to get acquisition channels", exception);
+		}
+	}
+
+	public Map<String, TrafficSource> getTrafficSources(
+		long companyId, String url) {
+
+		try {
+			String response = _asahFaroBackendClient.doGet(
+				companyId, "api/seo/1.0/traffic-sources?url=" + url);
+
+			TypeFactory typeFactory = _objectMapper.getTypeFactory();
+
+			List<TrafficSource> trafficSources = _objectMapper.readValue(
+				response,
+				typeFactory.constructCollectionType(
+					List.class, TrafficSource.class));
+
+			Stream<TrafficSource> trafficSourcesStream =
+				trafficSources.stream();
+
+			return trafficSourcesStream.map(
+				trafficSource -> new AbstractMap.SimpleEntry<>(
+					trafficSource.getName(), trafficSource)
+			).collect(
+				Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+			);
+		}
+		catch (Exception exception) {
+			_log.error("Unable to get traffic sources", exception);
+
+			return Collections.emptyMap();
 		}
 	}
 
@@ -352,6 +390,9 @@ public class AnalyticsReportsDataProvider {
 
 		return value.longValue();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AnalyticsReportsDataProvider.class);
 
 	private static final ObjectMapper _objectMapper = new ObjectMapper() {
 		{

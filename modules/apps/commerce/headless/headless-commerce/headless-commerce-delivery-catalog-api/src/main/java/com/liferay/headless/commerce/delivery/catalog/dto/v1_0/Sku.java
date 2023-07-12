@@ -63,7 +63,7 @@ public class Sku implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Sku.class, json);
 	}
 
-	@Schema(example = "[10, 20, 30, 40]")
+	@Schema
 	public String[] getAllowedOrderQuantities() {
 		return allowedOrderQuantities;
 	}
@@ -122,7 +122,7 @@ public class Sku implements Serializable {
 	protected Availability availability;
 
 	@DecimalMin("0")
-	@Schema(example = "1.1")
+	@Schema
 	public Double getDepth() {
 		return depth;
 	}
@@ -150,7 +150,7 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double depth;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getDisplayDate() {
 		return displayDate;
 	}
@@ -178,7 +178,7 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date displayDate;
 
-	@Schema(example = "2017-08-21")
+	@Schema
 	public Date getExpirationDate() {
 		return expirationDate;
 	}
@@ -206,7 +206,7 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date expirationDate;
 
-	@Schema(example = "12341234")
+	@Schema
 	public String getGtin() {
 		return gtin;
 	}
@@ -233,7 +233,7 @@ public class Sku implements Serializable {
 	protected String gtin;
 
 	@DecimalMin("0")
-	@Schema(example = "20.2")
+	@Schema
 	public Double getHeight() {
 		return height;
 	}
@@ -262,7 +262,7 @@ public class Sku implements Serializable {
 	protected Double height;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -288,7 +288,7 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(example = "12341234")
+	@Schema
 	public String getManufacturerPartNumber() {
 		return manufacturerPartNumber;
 	}
@@ -373,7 +373,7 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer minOrderQuantity;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getNeverExpire() {
 		return neverExpire;
 	}
@@ -401,7 +401,7 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean neverExpire;
 
-	@Schema(example = "{color=yellow, optionKey=optionValueKey, size=xs}")
+	@Schema
 	@Valid
 	public Map<String, String> getOptions() {
 		return options;
@@ -457,7 +457,7 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Price price;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getPublished() {
 		return published;
 	}
@@ -485,7 +485,7 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean published;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getPurchasable() {
 		return purchasable;
 	}
@@ -540,7 +540,7 @@ public class Sku implements Serializable {
 	protected String sku;
 
 	@DecimalMin("0")
-	@Schema(example = "1.1")
+	@Schema
 	public Double getWeight() {
 		return weight;
 	}
@@ -569,7 +569,7 @@ public class Sku implements Serializable {
 	protected Double weight;
 
 	@DecimalMin("0")
-	@Schema(example = "20.2")
+	@Schema
 	public Double getWidth() {
 		return width;
 	}

@@ -608,10 +608,6 @@ public class CTProcessUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CTProcessPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CTProcessPersistence _persistence;
 
 }

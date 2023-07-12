@@ -44,8 +44,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -60,6 +58,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -741,7 +741,7 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		FriendlyURLEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -756,8 +756,7 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		friendlyURLEntryLocalService = (FriendlyURLEntryLocalService)aopProxy;
 
-		FriendlyURLEntryLocalServiceUtil.setService(
-			friendlyURLEntryLocalService);
+		_setLocalServiceUtilService(friendlyURLEntryLocalService);
 	}
 
 	/**
@@ -817,6 +816,23 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		FriendlyURLEntryLocalService friendlyURLEntryLocalService) {
+
+		try {
+			Field field =
+				FriendlyURLEntryLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, friendlyURLEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected FriendlyURLEntryLocalService friendlyURLEntryLocalService;
 
 	@Reference
@@ -845,8 +861,5 @@ public abstract class FriendlyURLEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FriendlyURLEntryLocalServiceBaseImpl.class);
 
 }

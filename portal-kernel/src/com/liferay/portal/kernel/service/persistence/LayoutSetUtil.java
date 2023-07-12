@@ -939,10 +939,6 @@ public class LayoutSetUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(LayoutSetPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile LayoutSetPersistence _persistence;
 
 }

@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.social.SocialActivityManagerUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -1065,7 +1066,7 @@ public class JournalFolderLocalServiceImpl
 			if (restrictedAncestorFolder != null) {
 				List<DDMStructureLink> ancestorDDMStructureLinks =
 					_ddmStructureLinkLocalService.getStructureLinks(
-						classNameLocalService.getClassNameId(
+						_classNameLocalService.getClassNameId(
 							JournalFolder.class),
 						restrictedAncestorFolder.getFolderId());
 
@@ -1528,6 +1529,9 @@ public class JournalFolderLocalServiceImpl
 
 		return _getRestrictedAncestorFolder(folder.getParentFolder());
 	}
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private DDMStructureLinkLocalService _ddmStructureLinkLocalService;

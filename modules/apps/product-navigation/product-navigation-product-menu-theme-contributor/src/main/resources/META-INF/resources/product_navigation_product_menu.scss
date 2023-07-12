@@ -91,8 +91,7 @@
 }
 
 .product-menu {
-	a:not(.layout-tree),
-	button.list-group-heading.navigation-link {
+	a {
 		color: $product-menu-nav-link-color;
 		outline: 0;
 		position: relative;

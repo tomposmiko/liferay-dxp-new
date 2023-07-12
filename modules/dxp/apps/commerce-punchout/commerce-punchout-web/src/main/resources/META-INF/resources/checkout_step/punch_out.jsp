@@ -22,12 +22,12 @@ String redirectURL = (String)request.getAttribute(PunchOutConstants.PUNCH_OUT_RE
 
 <div>
 	<c:set var="redirectLink">
-		<a href="<%= HtmlUtil.escapeHREF(redirectURL) %>"><%= HtmlUtil.escape(redirectURL) %></a>
+		<a href="<%= redirectURL %>"><%= redirectURL %></a>
 	</c:set>
 
 	<liferay-ui:message arguments="${redirectLink}" key="the-punch-out-cart-transfer-process-has-been-initiated.-you-should-be-redirected-automatically.-if-the-page-does-not-reload-within-a-few-seconds-please-click-this-link-x" />
 </div>
 
 <script>
-	window.location.href = '<%= HtmlUtil.escapeJS(themeDisplay.getURLSignOut()) %>';
+	window.location.href = '<%= themeDisplay.getURLSignOut() %>';
 </script>

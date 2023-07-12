@@ -14,6 +14,7 @@
 
 package com.liferay.change.tracking.internal.aop;
 
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.aop.AopMethodInvocation;
 import com.liferay.portal.kernel.aop.ChainableMethodAdvice;
@@ -86,8 +87,8 @@ public class CTTransactionAdvice extends ChainableMethodAdvice {
 				null)) {
 
 			try (SafeCloseable safeCloseable =
-					CTCollectionThreadLocal.
-						setProductionModeWithSafeCloseable()) {
+					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+						CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 				return aopMethodInvocation.proceed(arguments);
 			}

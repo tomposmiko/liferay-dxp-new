@@ -234,18 +234,6 @@ public class DepotPermissionCheckerWrapper extends PermissionCheckerWrapper {
 		}
 	}
 
-	private boolean _hasRole(long companyId, long[] roleIds, String roleName)
-		throws Exception {
-
-		Role role = _roleLocalService.getRole(companyId, roleName);
-
-		if (Arrays.binarySearch(roleIds, role.getRoleId()) >= 0) {
-			return true;
-		}
-
-		return false;
-	}
-
 	private boolean _isContentReviewer(Group group) throws PortalException {
 		if ((group == null) || !group.isDepot()) {
 			return false;
@@ -310,13 +298,10 @@ public class DepotPermissionCheckerWrapper extends PermissionCheckerWrapper {
 
 		long[] roleIds = getRoleIds(getUserId(), group.getGroupId());
 
-		if (_hasRole(
-				group.getCompanyId(), roleIds,
-				DepotRolesConstants.ASSET_LIBRARY_CONNECTED_SITE_MEMBER) ||
-			_hasRole(
-				group.getCompanyId(), roleIds,
-				DepotRolesConstants.ASSET_LIBRARY_MEMBER)) {
+		Role role = _roleLocalService.getRole(
+			group.getCompanyId(), DepotRolesConstants.ASSET_LIBRARY_MEMBER);
 
+		if (Arrays.binarySearch(roleIds, role.getRoleId()) >= 0) {
 			return true;
 		}
 

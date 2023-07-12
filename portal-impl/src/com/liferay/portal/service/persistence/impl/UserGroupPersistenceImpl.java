@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.DuplicateUserGroupExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -67,6 +66,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6419,34 +6419,6 @@ public class UserGroupPersistenceImpl
 			userGroup.setUuid(uuid);
 		}
 
-		if (Validator.isNull(userGroup.getExternalReferenceCode())) {
-			userGroup.setExternalReferenceCode(userGroup.getUuid());
-		}
-		else {
-			UserGroup ercUserGroup = fetchByC_ERC(
-				userGroup.getCompanyId(), userGroup.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercUserGroup != null) {
-					throw new DuplicateUserGroupExternalReferenceCodeException(
-						"Duplicate user group with external reference code " +
-							userGroup.getExternalReferenceCode() +
-								" and company " + userGroup.getCompanyId());
-				}
-			}
-			else {
-				if ((ercUserGroup != null) &&
-					(userGroup.getUserGroupId() !=
-						ercUserGroup.getUserGroupId())) {
-
-					throw new DuplicateUserGroupExternalReferenceCodeException(
-						"Duplicate user group with external reference code " +
-							userGroup.getExternalReferenceCode() +
-								" and company " + userGroup.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -6565,9 +6537,7 @@ public class UserGroupPersistenceImpl
 	 */
 	@Override
 	public UserGroup fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				UserGroup.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(UserGroup.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -8069,11 +8039,11 @@ public class UserGroupPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		UserGroupUtil.setPersistence(this);
+		_setUserGroupUtilPersistence(this);
 	}
 
 	public void destroy() {
-		UserGroupUtil.setPersistence(null);
+		_setUserGroupUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(UserGroupImpl.class.getName());
 
@@ -8088,6 +8058,21 @@ public class UserGroupPersistenceImpl
 		TableMapperFactory.removeTableMapper("Groups_UserGroups");
 		TableMapperFactory.removeTableMapper("UserGroups_Teams");
 		TableMapperFactory.removeTableMapper("Users_UserGroups");
+	}
+
+	private void _setUserGroupUtilPersistence(
+		UserGroupPersistence userGroupPersistence) {
+
+		try {
+			Field field = UserGroupUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, userGroupPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@BeanReference(type = GroupPersistence.class)

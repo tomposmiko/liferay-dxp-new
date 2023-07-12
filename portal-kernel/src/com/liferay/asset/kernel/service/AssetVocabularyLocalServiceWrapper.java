@@ -17,7 +17,6 @@ package com.liferay.asset.kernel.service;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -345,7 +344,13 @@ public class AssetVocabularyLocalServiceWrapper
 		return _assetVocabularyLocalService.fetchAssetVocabulary(vocabularyId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary, or <code>null</code> if a matching asset vocabulary could not be found
+	 */
 	@Override
 	public AssetVocabulary fetchAssetVocabularyByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -355,6 +360,9 @@ public class AssetVocabularyLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetVocabularyByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public AssetVocabulary fetchAssetVocabularyByReferenceCode(
@@ -470,7 +478,14 @@ public class AssetVocabularyLocalServiceWrapper
 		return _assetVocabularyLocalService.getAssetVocabulary(vocabularyId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary
+	 * @throws PortalException if a matching asset vocabulary could not be found
+	 */
 	@Override
 	public AssetVocabulary getAssetVocabularyByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -725,12 +740,6 @@ public class AssetVocabularyLocalServiceWrapper
 			serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #updateVocabulary(long, String, Map, Map, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
 	@Override
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, String name, String title,
@@ -743,11 +752,6 @@ public class AssetVocabularyLocalServiceWrapper
 		return _assetVocabularyLocalService.updateVocabulary(
 			vocabularyId, name, title, titleMap, descriptionMap, settings,
 			serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _assetVocabularyLocalService.getBasePersistence();
 	}
 
 	@Override

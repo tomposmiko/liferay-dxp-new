@@ -531,10 +531,6 @@ public class PortletPreferencesLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(PortletPreferencesLocalService service) {
-		_service = service;
-	}
-
 	private static volatile PortletPreferencesLocalService _service;
 
 }

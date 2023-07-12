@@ -53,6 +53,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3867,7 +3868,7 @@ public class WorkflowDefinitionLinkPersistenceImpl
 	@Override
 	public WorkflowDefinitionLink fetchByPrimaryKey(Serializable primaryKey) {
 		if (CTPersistenceHelperUtil.isProductionMode(
-				WorkflowDefinitionLink.class, primaryKey)) {
+				WorkflowDefinitionLink.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -4462,11 +4463,11 @@ public class WorkflowDefinitionLinkPersistenceImpl
 			},
 			false);
 
-		WorkflowDefinitionLinkUtil.setPersistence(this);
+		_setWorkflowDefinitionLinkUtilPersistence(this);
 	}
 
 	public void destroy() {
-		WorkflowDefinitionLinkUtil.setPersistence(null);
+		_setWorkflowDefinitionLinkUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(WorkflowDefinitionLinkImpl.class.getName());
 
@@ -4476,6 +4477,22 @@ public class WorkflowDefinitionLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setWorkflowDefinitionLinkUtilPersistence(
+		WorkflowDefinitionLinkPersistence workflowDefinitionLinkPersistence) {
+
+		try {
+			Field field = WorkflowDefinitionLinkUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, workflowDefinitionLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

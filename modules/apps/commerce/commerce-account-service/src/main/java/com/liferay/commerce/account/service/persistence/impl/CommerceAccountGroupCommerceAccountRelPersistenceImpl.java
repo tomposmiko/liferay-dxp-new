@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.account.service.persistence.impl;
 
-import com.liferay.commerce.account.exception.DuplicateCommerceAccountGroupCommerceAccountRelExternalReferenceCodeException;
 import com.liferay.commerce.account.exception.NoSuchAccountGroupCommerceAccountRelException;
 import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRel;
 import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRelTable;
@@ -46,11 +45,11 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2052,48 +2051,6 @@ public class CommerceAccountGroupCommerceAccountRelPersistenceImpl
 				(CommerceAccountGroupCommerceAccountRelModelImpl)
 					commerceAccountGroupCommerceAccountRel;
 
-		if (Validator.isNull(
-				commerceAccountGroupCommerceAccountRel.
-					getExternalReferenceCode())) {
-
-			commerceAccountGroupCommerceAccountRel.setExternalReferenceCode(
-				String.valueOf(
-					commerceAccountGroupCommerceAccountRel.getPrimaryKey()));
-		}
-		else {
-			CommerceAccountGroupCommerceAccountRel
-				ercCommerceAccountGroupCommerceAccountRel = fetchByC_ERC(
-					commerceAccountGroupCommerceAccountRel.getCompanyId(),
-					commerceAccountGroupCommerceAccountRel.
-						getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommerceAccountGroupCommerceAccountRel != null) {
-					throw new DuplicateCommerceAccountGroupCommerceAccountRelExternalReferenceCodeException(
-						"Duplicate commerce account group commerce account rel with external reference code " +
-							commerceAccountGroupCommerceAccountRel.
-								getExternalReferenceCode() + " and company " +
-									commerceAccountGroupCommerceAccountRel.
-										getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceAccountGroupCommerceAccountRel != null) &&
-					(commerceAccountGroupCommerceAccountRel.
-						getCommerceAccountGroupCommerceAccountRelId() !=
-							ercCommerceAccountGroupCommerceAccountRel.
-								getCommerceAccountGroupCommerceAccountRelId())) {
-
-					throw new DuplicateCommerceAccountGroupCommerceAccountRelExternalReferenceCodeException(
-						"Duplicate commerce account group commerce account rel with external reference code " +
-							commerceAccountGroupCommerceAccountRel.
-								getExternalReferenceCode() + " and company " +
-									commerceAccountGroupCommerceAccountRel.
-										getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -2529,11 +2486,11 @@ public class CommerceAccountGroupCommerceAccountRelPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommerceAccountGroupCommerceAccountRelUtil.setPersistence(this);
+		_setCommerceAccountGroupCommerceAccountRelUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceAccountGroupCommerceAccountRelUtil.setPersistence(null);
+		_setCommerceAccountGroupCommerceAccountRelUtilPersistence(null);
 
 		entityCache.removeCache(
 			CommerceAccountGroupCommerceAccountRelImpl.class.getName());
@@ -2544,6 +2501,24 @@ public class CommerceAccountGroupCommerceAccountRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceAccountGroupCommerceAccountRelUtilPersistence(
+		CommerceAccountGroupCommerceAccountRelPersistence
+			commerceAccountGroupCommerceAccountRelPersistence) {
+
+		try {
+			Field field =
+				CommerceAccountGroupCommerceAccountRelUtil.class.
+					getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceAccountGroupCommerceAccountRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

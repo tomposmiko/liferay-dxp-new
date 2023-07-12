@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3219,7 +3220,7 @@ public class DDMFormInstanceRecordVersionPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				DDMFormInstanceRecordVersion.class, primaryKey)) {
+				DDMFormInstanceRecordVersion.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -3774,12 +3775,12 @@ public class DDMFormInstanceRecordVersionPersistenceImpl
 			},
 			false);
 
-		DDMFormInstanceRecordVersionUtil.setPersistence(this);
+		_setDDMFormInstanceRecordVersionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMFormInstanceRecordVersionUtil.setPersistence(null);
+		_setDDMFormInstanceRecordVersionUtilPersistence(null);
 
 		entityCache.removeCache(
 			DDMFormInstanceRecordVersionImpl.class.getName());
@@ -3790,6 +3791,24 @@ public class DDMFormInstanceRecordVersionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMFormInstanceRecordVersionUtilPersistence(
+		DDMFormInstanceRecordVersionPersistence
+			ddmFormInstanceRecordVersionPersistence) {
+
+		try {
+			Field field =
+				DDMFormInstanceRecordVersionUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmFormInstanceRecordVersionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

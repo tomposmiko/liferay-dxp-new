@@ -218,17 +218,6 @@ AUI.add(
 					}
 				},
 
-				_onDialogShow(event) {
-					var dialog = event.data.definition.dialog;
-
-					var dialogSize = dialog.getSize();
-
-					var x = window.innerWidth / 2 - dialogSize.width / 2;
-					var y = window.innerHeight / 2 - dialogSize.height / 2;
-
-					dialog.move(x, y, false);
-				},
-
 				_onError(event) {
 					Liferay.Util.openToast({
 						message: event.data,
@@ -429,11 +418,6 @@ AUI.add(
 					nativeEditor.on(
 						'dataReady',
 						instance._onDataReady,
-						instance
-					);
-					nativeEditor.on(
-						'dialogShow',
-						instance._onDialogShow,
 						instance
 					);
 					nativeEditor.on('error', instance._onError, instance);

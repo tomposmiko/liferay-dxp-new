@@ -169,10 +169,6 @@ public class SiteNavigationMenuServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SiteNavigationMenuService service) {
-		_service = service;
-	}
-
 	private static volatile SiteNavigationMenuService _service;
 
 }

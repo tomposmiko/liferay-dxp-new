@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+CommerceOrderContentDisplayContext commerceOrderContentDisplayContext = (CommerceOrderContentDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+
 CommerceOrder commerceOrder = commerceOrderContentDisplayContext.getCommerceOrder();
 
 CommerceAddress billingCommerceAddress = commerceOrder.getBillingAddress();
@@ -62,7 +64,7 @@ if (commerceOrder != null) {
 		for (CommerceOrderValidatorResult commerceOrderValidatorResult : commerceOrderValidatorException.getCommerceOrderValidatorResults()) {
 		%>
 
-			<liferay-ui:message key="<%= HtmlUtil.escape(commerceOrderValidatorResult.getLocalizedMessage()) %>" />
+			<liferay-ui:message key="<%= commerceOrderValidatorResult.getLocalizedMessage() %>" />
 
 		<%
 		}
@@ -142,7 +144,7 @@ if (commerceOrder != null) {
 					<div class="row">
 						<div class="col-md-6">
 							<dl class="commerce-list">
-								<%= HtmlUtil.escape(commerceOrder.getPurchaseOrderNumber()) %>
+								<%= commerceOrder.getPurchaseOrderNumber() %>
 							</dl>
 						</div>
 					</div>

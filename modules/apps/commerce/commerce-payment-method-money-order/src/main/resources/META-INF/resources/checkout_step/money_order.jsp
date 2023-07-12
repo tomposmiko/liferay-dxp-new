@@ -21,5 +21,5 @@ MoneyOrderCheckoutStepDisplayContext moneyOrderCheckoutStepDisplayContext = (Mon
 %>
 
 <c:if test="<%= Validator.isNotNull(moneyOrderCheckoutStepDisplayContext.getMessage()) %>">
-	<%= HtmlUtil.escape(moneyOrderCheckoutStepDisplayContext.getMessage()) %>
+	<%= moneyOrderCheckoutStepDisplayContext.getMessage() %>
 </c:if>

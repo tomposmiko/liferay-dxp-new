@@ -89,7 +89,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.security.permission.RolePermissions;
 import com.liferay.portal.kernel.security.permission.UserBag;
-import com.liferay.portal.kernel.service.GroupServiceUtil;
+import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
@@ -348,30 +348,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			friendlyURL);
 
 		if (staging) {
-			int groupKeyMaxLength = ModelHintsUtil.getMaxLength(
-				Group.class.getName(), "groupKey");
-			String stagingGroupKeySuffix = "-staging";
-
-			if (groupKey.length() <=
-					(groupKeyMaxLength - stagingGroupKeySuffix.length())) {
-
-				groupKey = groupKey.concat(stagingGroupKeySuffix);
-			}
-			else {
-				int counter = 1;
-
-				groupKey = _getGroupKey(
-					counter, groupKey, groupKeyMaxLength,
-					stagingGroupKeySuffix);
-
-				while (fetchGroup(user.getCompanyId(), groupKey) != null) {
-					counter++;
-
-					groupKey = _getGroupKey(
-						counter, groupKey, groupKeyMaxLength,
-						stagingGroupKeySuffix);
-				}
-			}
+			groupKey = groupKey.concat("-staging");
 
 			for (Map.Entry<Locale, String> entry : nameMap.entrySet()) {
 				String name = entry.getValue();
@@ -5007,14 +4984,17 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		String[] languageIdsArray = StringUtil.split(languageIds);
 
 		for (String languageId : languageIdsArray) {
-			if (!LanguageUtil.isAvailableLocale(groupId, languageId)) {
+			if (!LanguageUtil.isAvailableLocale(
+					groupId, LocaleUtil.fromLanguageId(languageId))) {
+
 				LocaleException localeException = new LocaleException(
 					LocaleException.TYPE_DISPLAY_SETTINGS);
 
 				localeException.setSourceAvailableLocales(
 					LanguageUtil.getAvailableLocales());
-				localeException.setTargetAvailableLanguageIds(
-					Arrays.asList(languageIdsArray));
+				localeException.setTargetAvailableLocales(
+					Arrays.asList(
+						LocaleUtil.fromLanguageIds(languageIdsArray)));
 
 				throw localeException;
 			}
@@ -5026,8 +5006,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 			localeException.setSourceAvailableLocales(
 				LanguageUtil.getAvailableLocales());
-			localeException.setTargetAvailableLanguageIds(
-				Arrays.asList(languageIdsArray));
+			localeException.setTargetAvailableLocales(
+				Arrays.asList(LocaleUtil.fromLanguageIds(languageIdsArray)));
 
 			throw localeException;
 		}
@@ -5116,7 +5096,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 			try {
 				MethodKey methodKey = new MethodKey(
-					GroupServiceUtil.class, "checkRemoteStagingGroup",
+					GroupService.class, "checkRemoteStagingGroup",
 					_CHECK_REMOTE_STAGING_GROUP_PARAMETER_TYPES);
 
 				MethodHandler methodHandler = new MethodHandler(
@@ -5267,19 +5247,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		}
 
 		return filteredGroups;
-	}
-
-	private String _getGroupKey(
-		int counter, String groupKey, int groupKeyMaxLength,
-		String stagingGroupKeySuffix) {
-
-		String suffix = counter + stagingGroupKeySuffix;
-
-		groupKey = groupKey.substring(0, groupKeyMaxLength - suffix.length());
-
-		groupKey = groupKey.concat(suffix);
-
-		return groupKey;
 	}
 
 	private Map<Locale, String> _normalizeNameMap(Map<Locale, String> nameMap) {

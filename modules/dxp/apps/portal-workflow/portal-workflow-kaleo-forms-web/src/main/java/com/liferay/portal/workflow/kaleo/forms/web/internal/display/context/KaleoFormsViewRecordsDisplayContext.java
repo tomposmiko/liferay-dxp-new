@@ -476,13 +476,13 @@ public class KaleoFormsViewRecordsDisplayContext {
 	protected Sort getSort() {
 		boolean ascending = false;
 
-		if (Objects.equals(getOrderByType(), "asc")) {
+		if (Objects.equals("asc", getOrderByType())) {
 			ascending = true;
 		}
 
 		String fieldName = Field.MODIFIED_DATE;
 
-		if (Objects.equals(getOrderByCol(), "create-date")) {
+		if (Objects.equals("create-date", getOrderByCol())) {
 			fieldName = Field.CREATE_DATE;
 		}
 

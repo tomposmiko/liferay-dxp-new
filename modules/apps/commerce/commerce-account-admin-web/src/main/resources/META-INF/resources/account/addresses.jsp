@@ -88,7 +88,7 @@ PortletURL portletURL = commerceAccountAddressAdminDisplayContext.getPortletURL(
 				>
 					<liferay-ui:search-container-column-text
 						href="<%= commerceAccountAddressAdminDisplayContext.getEditCommerceAddressURL(commerceAddress.getCommerceAddressId()) %>"
-						value="<%= HtmlUtil.escape(commerceAddress.getName()) %>"
+						property="name"
 					/>
 
 					<liferay-ui:search-container-column-text
@@ -97,15 +97,15 @@ PortletURL portletURL = commerceAccountAddressAdminDisplayContext.getPortletURL(
 					/>
 
 					<liferay-ui:search-container-column-text
-						value="<%= HtmlUtil.escape(commerceAddress.getStreet1()) %>"
+						property="street1"
 					/>
 
 					<liferay-ui:search-container-column-text
-						value="<%= HtmlUtil.escape(commerceAddress.getCity()) %>"
+						property="city"
 					/>
 
 					<liferay-ui:search-container-column-text
-						value="<%= HtmlUtil.escape(commerceAddress.getZip()) %>"
+						property="zip"
 					/>
 
 					<liferay-ui:search-container-column-jsp

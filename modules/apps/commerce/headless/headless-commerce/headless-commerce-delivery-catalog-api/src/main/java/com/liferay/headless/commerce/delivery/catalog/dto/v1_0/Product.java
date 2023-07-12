@@ -207,7 +207,7 @@ public class Product implements Serializable {
 	protected Map<String, ?> expando;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -519,7 +519,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ProductSpecification[] productSpecifications;
 
-	@Schema(example = "simple")
+	@Schema
 	public String getProductType() {
 		return productType;
 	}
@@ -658,7 +658,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String slug;
 
-	@Schema(example = "[tag1, tag2, tag3]")
+	@Schema
 	public String[] getTags() {
 		return tags;
 	}

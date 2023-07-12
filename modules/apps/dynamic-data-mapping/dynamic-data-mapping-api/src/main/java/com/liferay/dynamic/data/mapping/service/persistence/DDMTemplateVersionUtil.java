@@ -713,12 +713,6 @@ public class DDMTemplateVersionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		DDMTemplateVersionPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile DDMTemplateVersionPersistence _persistence;
 
 }

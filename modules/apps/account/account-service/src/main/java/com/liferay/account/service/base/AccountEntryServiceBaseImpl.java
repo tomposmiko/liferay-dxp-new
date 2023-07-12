@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class AccountEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		AccountEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class AccountEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		accountEntryService = (AccountEntryService)aopProxy;
 
-		AccountEntryServiceUtil.setService(accountEntryService);
+		_setServiceUtilService(accountEntryService);
 	}
 
 	/**
@@ -116,6 +116,22 @@ public abstract class AccountEntryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		AccountEntryService accountEntryService) {
+
+		try {
+			Field field = AccountEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, accountEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.account.service.AccountEntryLocalService
 		accountEntryLocalService;
@@ -154,8 +170,5 @@ public abstract class AccountEntryServiceBaseImpl
 	@Reference
 	protected com.liferay.asset.kernel.service.AssetEntryService
 		assetEntryService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountEntryServiceBaseImpl.class);
 
 }

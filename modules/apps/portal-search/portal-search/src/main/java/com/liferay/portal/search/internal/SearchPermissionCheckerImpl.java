@@ -313,8 +313,7 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 	}
 
 	private SearchPermissionContext _createSearchPermissionContext(
-			long companyId, long[] groupIds, long userId,
-			PermissionChecker permissionChecker)
+			long companyId, long userId, PermissionChecker permissionChecker)
 		throws Exception {
 
 		UserBag userBag = permissionChecker.getUserBag();
@@ -325,17 +324,10 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 
 		Set<Role> roles = new HashSet<>();
 
-		if (permissionChecker.isSignedIn() && ArrayUtil.isNotEmpty(groupIds)) {
-			for (long groupId : groupIds) {
-				for (Role role :
-						roleLocalService.getRoles(
-							permissionChecker.getRoleIds(userId, groupId))) {
+		if (permissionChecker.isSignedIn()) {
+			roles.addAll(userBag.getRoles());
 
-					if (role.getType() == RoleConstants.TYPE_REGULAR) {
-						roles.add(role);
-					}
-				}
-			}
+			roles.add(roleLocalService.getRole(companyId, RoleConstants.GUEST));
 		}
 		else {
 			roles.addAll(
@@ -456,8 +448,8 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 	}
 
 	private BooleanFilter _getPermissionBooleanFilter(
-			long companyId, long[] groupIds, long userId, String className,
-			SearchContext searchContext)
+			long companyId, long[] searchGroupIds, long userId,
+			String className, SearchContext searchContext)
 		throws Exception {
 
 		Indexer<?> indexer = indexerRegistry.getIndexer(className);
@@ -497,7 +489,7 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 		}
 		else if (!permissionChecker.isCompanyAdmin(companyId)) {
 			searchPermissionContext = _createSearchPermissionContext(
-				companyId, groupIds, userId, permissionChecker);
+				companyId, userId, permissionChecker);
 		}
 
 		if (searchPermissionContext == null) {
@@ -511,7 +503,7 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 			"searchPermissionContext", searchPermissionContext);
 
 		return _getPermissionFilter(
-			companyId, groupIds, userId, permissionChecker,
+			companyId, searchGroupIds, userId, permissionChecker,
 			_getPermissionName(searchContext, className),
 			searchPermissionContext);
 	}

@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-75059. A user can add a link to a navigation menu."
-	@priority = 4
+	@priority = "4"
 	test AddURLNavigationMenu {
 		task ("Add a page to the site") {
 			JSONLayout.addPublicLayout(
@@ -91,7 +91,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-107833. Can not view Global Navigation Menus via Navigation Menu widget in normal site if the user without View permission."
-	@priority = 4
+	@priority = "4"
 	test CannotViewGlobalNavigationMenuWithoutPermission {
 		task ("Add a navigation menu in Global site") {
 			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "global");
@@ -174,7 +174,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-107833. Can edit Global Navigation Menu via Navigation Menu widget in normal site."
-	@priority = 4
+	@priority = "4"
 	test EditGlobalNavigationMenuViaWidgetInNormalSite {
 		task ("Select Global Navigation Menu in normal site") {
 			JSONLayout.addPublicLayout(
@@ -195,7 +195,7 @@ definition {
 		task ("Edit Global Navigation Menu via Navigation Menu widget") {
 			NavigationMenusWidget.gotoEditNavigationMenuEntry();
 
-			Pause(locator1 = 5000);
+			Pause(locator1 = "5000");
 
 			var portalURL = PropsUtil.get("portal.url");
 
@@ -208,7 +208,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-76658. A user can edit the existing page items in a navigation menu."
-	@priority = 5
+	@priority = "5"
 	test EditNavigationMenuPageItemName {
 		property portal.acceptance = "true";
 
@@ -272,7 +272,7 @@ definition {
 
 			NavigationMenusWidget.selectNavigation(menuType = "Primary Navigation");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Portlet.saveAndCloseConfig();
 		}
@@ -289,7 +289,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-107833. Can select Global Navigation Menu via Navigation Menu widget in normal site."
-	@priority = 5
+	@priority = "5"
 	test SelectGlobalNavigationMenuInNormalSite {
 		property portal.acceptance = "true";
 
@@ -312,7 +312,7 @@ definition {
 
 	@description = "This is a test for LPS-76717. The user could view warning message in preview window when no available navigation in site."
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test ViewWarningMessageInPreviewWindowWhenNoNavigationAvailable {
 		task ("Add a content page template") {
 			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
@@ -337,7 +337,7 @@ definition {
 			PageEditor.assertFragmentSidebarLoaded();
 
 			PageEditor.addWidget(
-				indexItem = 2,
+				indexItem = "2",
 				portletName = "Navigation Menu");
 		}
 

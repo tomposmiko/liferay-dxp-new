@@ -725,10 +725,6 @@ public class Validator {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean isIPv4Address(String ipAddress) {
-		if (isNull(ipAddress)) {
-			return false;
-		}
-
 		Matcher matcher = _ipv4AddressPattern.matcher(ipAddress);
 
 		return matcher.matches();

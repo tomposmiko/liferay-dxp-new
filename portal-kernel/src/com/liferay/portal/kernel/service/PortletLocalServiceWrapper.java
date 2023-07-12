@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link PortletLocalService}.
  *
@@ -48,7 +46,9 @@ public class PortletLocalServiceWrapper
 	}
 
 	@Override
-	public void addPortletCategory(long companyId, String categoryName) {
+	public void addPortletCategory(
+		long companyId, java.lang.String categoryName) {
+
 		_portletLocalService.addPortletCategory(companyId, categoryName);
 	}
 
@@ -78,7 +78,7 @@ public class PortletLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Portlet clonePortlet(
-		String portletId) {
+		java.lang.String portletId) {
 
 		return _portletLocalService.clonePortlet(portletId);
 	}
@@ -135,7 +135,8 @@ public class PortletLocalServiceWrapper
 	}
 
 	@Override
-	public void deletePortlet(long companyId, String portletId, long plid)
+	public void deletePortlet(
+			long companyId, java.lang.String portletId, long plid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_portletLocalService.deletePortlet(companyId, portletId, plid);
@@ -159,7 +160,8 @@ public class PortletLocalServiceWrapper
 	}
 
 	@Override
-	public void deletePortlets(long companyId, String[] portletIds, long plid)
+	public void deletePortlets(
+			long companyId, java.lang.String[] portletIds, long plid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_portletLocalService.deletePortlets(companyId, portletIds, plid);
@@ -167,7 +169,7 @@ public class PortletLocalServiceWrapper
 
 	@Override
 	public void deployPortlet(com.liferay.portal.kernel.model.Portlet portlet)
-		throws Exception {
+		throws java.lang.Exception {
 
 		_portletLocalService.deployPortlet(portlet);
 	}
@@ -175,7 +177,8 @@ public class PortletLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.Portlet deployRemotePortlet(
 			long[] companyIds, com.liferay.portal.kernel.model.Portlet portlet,
-			String[] categoryNames, boolean eagerDestroy, boolean clearCache)
+			java.lang.String[] categoryNames, boolean eagerDestroy,
+			boolean clearCache)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _portletLocalService.deployRemotePortlet(
@@ -185,7 +188,7 @@ public class PortletLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.Portlet deployRemotePortlet(
 			com.liferay.portal.kernel.model.Portlet portlet,
-			String categoryName)
+			java.lang.String categoryName)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _portletLocalService.deployRemotePortlet(portlet, categoryName);
@@ -194,7 +197,7 @@ public class PortletLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.Portlet deployRemotePortlet(
 			com.liferay.portal.kernel.model.Portlet portlet,
-			String[] categoryNames)
+			java.lang.String[] categoryNames)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _portletLocalService.deployRemotePortlet(portlet, categoryNames);
@@ -203,7 +206,7 @@ public class PortletLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.Portlet deployRemotePortlet(
 			com.liferay.portal.kernel.model.Portlet portlet,
-			String[] categoryNames, boolean eagerDestroy)
+			java.lang.String[] categoryNames, boolean eagerDestroy)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _portletLocalService.deployRemotePortlet(
@@ -332,7 +335,7 @@ public class PortletLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Portlet fetchPortletById(
-		long companyId, String portletId) {
+		long companyId, java.lang.String portletId) {
 
 		return _portletLocalService.fetchPortletById(companyId, portletId);
 	}
@@ -354,7 +357,7 @@ public class PortletLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PortletCategory getEARDisplay(
-		String xml) {
+		java.lang.String xml) {
 
 		return _portletLocalService.getEARDisplay(xml);
 	}
@@ -386,7 +389,7 @@ public class PortletLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _portletLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -417,28 +420,28 @@ public class PortletLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PortletApp getPortletApp(
-		String servletContextName) {
+		java.lang.String servletContextName) {
 
 		return _portletLocalService.getPortletApp(servletContextName);
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.Portlet getPortletById(
-		long companyId, String portletId) {
+		long companyId, java.lang.String portletId) {
 
 		return _portletLocalService.getPortletById(companyId, portletId);
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.Portlet getPortletById(
-		String portletId) {
+		java.lang.String portletId) {
 
 		return _portletLocalService.getPortletById(portletId);
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.Portlet getPortletByStrutsPath(
-		long companyId, String strutsPath) {
+		long companyId, java.lang.String strutsPath) {
 
 		return _portletLocalService.getPortletByStrutsPath(
 			companyId, strutsPath);
@@ -508,19 +511,19 @@ public class PortletLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PortletCategory getWARDisplay(
-		String servletContextName, String xml) {
+		java.lang.String servletContextName, java.lang.String xml) {
 
 		return _portletLocalService.getWARDisplay(servletContextName, xml);
 	}
 
 	@Override
-	public boolean hasPortlet(long companyId, String portletId) {
+	public boolean hasPortlet(long companyId, java.lang.String portletId) {
 		return _portletLocalService.hasPortlet(companyId, portletId);
 	}
 
 	@Override
 	public void initEAR(
-		javax.servlet.ServletContext servletContext, String[] xmls,
+		javax.servlet.ServletContext servletContext, java.lang.String[] xmls,
 		com.liferay.portal.kernel.plugin.PluginPackage pluginPackage) {
 
 		_portletLocalService.initEAR(servletContext, xmls, pluginPackage);
@@ -528,8 +531,8 @@ public class PortletLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Portlet> initWAR(
-		String servletContextName, javax.servlet.ServletContext servletContext,
-		String[] xmls,
+		java.lang.String servletContextName,
+		javax.servlet.ServletContext servletContext, java.lang.String[] xmls,
 		com.liferay.portal.kernel.plugin.PluginPackage pluginPackage) {
 
 		return _portletLocalService.initWAR(
@@ -537,8 +540,9 @@ public class PortletLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.Map<String, com.liferay.portal.kernel.model.Portlet>
-		loadGetPortletsMap(long companyId) {
+	public java.util.Map
+		<java.lang.String, com.liferay.portal.kernel.model.Portlet>
+			loadGetPortletsMap(long companyId) {
 
 		return _portletLocalService.loadGetPortletsMap(companyId);
 	}
@@ -550,7 +554,8 @@ public class PortletLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Portlet updatePortlet(
-		long companyId, String portletId, String roles, boolean active) {
+		long companyId, java.lang.String portletId, java.lang.String roles,
+		boolean active) {
 
 		return _portletLocalService.updatePortlet(
 			companyId, portletId, roles, active);
@@ -580,11 +585,6 @@ public class PortletLocalServiceWrapper
 			consumer) {
 
 		_portletLocalService.visitPortlets(companyId, consumer);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _portletLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -285,7 +285,7 @@ public class ConfigurationModelToDDMFormConverter {
 		ConfigurationFieldOptionsProvider configurationFieldOptionsProvider =
 			getConfigurationFieldOptionsProvider(attributeDefinition);
 
-		if (SetUtil.isNotEmpty(ddmFormFieldOptions.getOptionsValues()) ||
+		if (!SetUtil.isEmpty(ddmFormFieldOptions.getOptionsValues()) ||
 			(configurationFieldOptionsProvider != null)) {
 
 			return DDMFormFieldType.SELECT;

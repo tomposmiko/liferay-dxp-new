@@ -43,7 +43,6 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.NodeMetric;
 import com.liferay.portal.workflow.metrics.rest.client.http.HttpInvoker;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
@@ -51,7 +50,7 @@ import com.liferay.portal.workflow.metrics.rest.client.pagination.Pagination;
 import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.NodeMetricResource;
 import com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0.NodeMetricSerDes;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -60,16 +59,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -216,10 +217,7 @@ public abstract class BaseNodeMetricResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantNodeMetric),
 				(List<NodeMetric>)page.getItems());
-			assertValid(
-				page,
-				testGetProcessNodeMetricsPage_getExpectedActions(
-					irrelevantProcessId));
+			assertValid(page);
 		}
 
 		NodeMetric nodeMetric1 = testGetProcessNodeMetricsPage_addNodeMetric(
@@ -236,17 +234,7 @@ public abstract class BaseNodeMetricResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(nodeMetric1, nodeMetric2),
 			(List<NodeMetric>)page.getItems());
-		assertValid(
-			page, testGetProcessNodeMetricsPage_getExpectedActions(processId));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetProcessNodeMetricsPage_getExpectedActions(Long processId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -293,7 +281,7 @@ public abstract class BaseNodeMetricResourceTestCase {
 		testGetProcessNodeMetricsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, nodeMetric1, nodeMetric2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					nodeMetric1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -304,10 +292,8 @@ public abstract class BaseNodeMetricResourceTestCase {
 		testGetProcessNodeMetricsPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, nodeMetric1, nodeMetric2) -> {
-				BeanTestUtil.setProperty(
-					nodeMetric1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					nodeMetric2, entityField.getName(), 0.5);
+				BeanUtils.setProperty(nodeMetric1, entityField.getName(), 0.1);
+				BeanUtils.setProperty(nodeMetric2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -318,8 +304,8 @@ public abstract class BaseNodeMetricResourceTestCase {
 		testGetProcessNodeMetricsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, nodeMetric1, nodeMetric2) -> {
-				BeanTestUtil.setProperty(nodeMetric1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(nodeMetric2, entityField.getName(), 1);
+				BeanUtils.setProperty(nodeMetric1, entityField.getName(), 0);
+				BeanUtils.setProperty(nodeMetric2, entityField.getName(), 1);
 			});
 	}
 
@@ -332,27 +318,27 @@ public abstract class BaseNodeMetricResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						nodeMetric1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						nodeMetric2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						nodeMetric1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						nodeMetric2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -360,12 +346,12 @@ public abstract class BaseNodeMetricResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						nodeMetric1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						nodeMetric2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -589,13 +575,6 @@ public abstract class BaseNodeMetricResourceTestCase {
 	}
 
 	protected void assertValid(Page<NodeMetric> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<NodeMetric> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<NodeMetric> nodeMetrics = page.getItems();
@@ -610,25 +589,6 @@ public abstract class BaseNodeMetricResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		assertValid(page.getActions(), expectedActions);
-	}
-
-	protected void assertValid(
-		Map<String, Map<String, String>> actions1,
-		Map<String, Map<String, String>> actions2) {
-
-		for (String key : actions2.keySet()) {
-			Map action = actions1.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map<String, String> expectedAction = actions2.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -818,16 +778,14 @@ public abstract class BaseNodeMetricResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -844,10 +802,6 @@ public abstract class BaseNodeMetricResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -857,18 +811,18 @@ public abstract class BaseNodeMetricResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -990,115 +944,6 @@ public abstract class BaseNodeMetricResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1173,6 +1018,18 @@ public abstract class BaseNodeMetricResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseNodeMetricResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

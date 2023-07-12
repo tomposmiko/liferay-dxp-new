@@ -745,12 +745,6 @@ public class CommerceAddressRestrictionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceAddressRestrictionPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceAddressRestrictionPersistence _persistence;
 
 }

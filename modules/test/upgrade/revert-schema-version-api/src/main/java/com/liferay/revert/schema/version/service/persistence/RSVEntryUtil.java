@@ -272,10 +272,6 @@ public class RSVEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(RSVEntryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile RSVEntryPersistence _persistence;
 
 }

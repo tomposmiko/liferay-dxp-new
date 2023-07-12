@@ -39,10 +39,7 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 
 import java.util.Collection;
@@ -248,9 +245,7 @@ public class FileEntryStagedModelRepository
 
 		Collection<Long> exportableRepositoryIds = new HashSet<>();
 
-		long groupId = portletDataContext.getScopeGroupId();
-
-		exportableRepositoryIds.add(groupId);
+		exportableRepositoryIds.add(portletDataContext.getScopeGroupId());
 
 		for (DLExportableRepositoryPublisher dlExportableRepositoryPublisher :
 				_dlExportableRepositoryPublishers) {
@@ -258,13 +253,6 @@ public class FileEntryStagedModelRepository
 			dlExportableRepositoryPublisher.publish(
 				portletDataContext.getScopeGroupId(),
 				exportableRepositoryIds::add);
-		}
-
-		Repository layoutRepository = _repositoryLocalService.fetchRepository(
-			groupId, Layout.class.getName());
-
-		if (layoutRepository != null) {
-			exportableRepositoryIds.add(layoutRepository.getRepositoryId());
 		}
 
 		return exportableRepositoryIds;
@@ -279,8 +267,5 @@ public class FileEntryStagedModelRepository
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
-
-	@Reference
-	private RepositoryLocalService _repositoryLocalService;
 
 }

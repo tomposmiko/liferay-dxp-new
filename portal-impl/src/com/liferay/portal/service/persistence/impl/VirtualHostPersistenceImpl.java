@@ -51,6 +51,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1535,9 +1536,7 @@ public class VirtualHostPersistenceImpl
 	 */
 	@Override
 	public VirtualHost fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				VirtualHost.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(VirtualHost.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2005,11 +2004,11 @@ public class VirtualHostPersistenceImpl
 			new String[] {"companyId", "layoutSetId", "defaultVirtualHost"},
 			false);
 
-		VirtualHostUtil.setPersistence(this);
+		_setVirtualHostUtilPersistence(this);
 	}
 
 	public void destroy() {
-		VirtualHostUtil.setPersistence(null);
+		_setVirtualHostUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(VirtualHostImpl.class.getName());
 
@@ -2019,6 +2018,22 @@ public class VirtualHostPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setVirtualHostUtilPersistence(
+		VirtualHostPersistence virtualHostPersistence) {
+
+		try {
+			Field field = VirtualHostUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, virtualHostPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

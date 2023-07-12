@@ -525,12 +525,6 @@ public class PasswordPolicyRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		PasswordPolicyRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile PasswordPolicyRelPersistence _persistence;
 
 }

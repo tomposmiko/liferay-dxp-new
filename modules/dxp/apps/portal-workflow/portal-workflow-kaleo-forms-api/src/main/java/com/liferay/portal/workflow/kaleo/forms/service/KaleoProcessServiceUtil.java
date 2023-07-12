@@ -209,10 +209,6 @@ public class KaleoProcessServiceUtil {
 		return _service;
 	}
 
-	public static void setService(KaleoProcessService service) {
-		_service = service;
-	}
-
 	private static volatile KaleoProcessService _service;
 
 }

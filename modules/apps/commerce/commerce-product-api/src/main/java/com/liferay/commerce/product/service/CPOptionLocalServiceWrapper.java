@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPOptionLocalService}.
@@ -265,12 +264,19 @@ public class CPOptionLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.product.model.CPOption fetchCPOption(
-		long companyId, String key) {
+			long companyId, String key)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionLocalService.fetchCPOption(companyId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option, or <code>null</code> if a matching cp option could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPOption
 		fetchCPOptionByExternalReferenceCode(
@@ -280,6 +286,9 @@ public class CPOptionLocalServiceWrapper
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CPOption
@@ -347,7 +356,14 @@ public class CPOptionLocalServiceWrapper
 		return _cpOptionLocalService.getCPOption(companyId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option
+	 * @throws PortalException if a matching cp option could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPOption
 			getCPOptionByExternalReferenceCode(
@@ -501,11 +517,6 @@ public class CPOptionLocalServiceWrapper
 			userId, nameMap, descriptionMap, ddmFormFieldTypeName, facetable,
 			required, skuContributor, key, externalReferenceCode,
 			serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpOptionLocalService.getBasePersistence();
 	}
 
 	@Override

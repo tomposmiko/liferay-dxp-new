@@ -31,8 +31,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -58,6 +56,8 @@ import com.liferay.social.kernel.service.persistence.SocialActivityLimitPersiste
 import com.liferay.social.kernel.service.persistence.SocialActivitySettingPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -811,15 +811,14 @@ public abstract class SocialActivityCounterLocalServiceBaseImpl
 			"com.liferay.social.kernel.model.SocialActivityCounter",
 			socialActivityCounterLocalService);
 
-		SocialActivityCounterLocalServiceUtil.setService(
-			socialActivityCounterLocalService);
+		_setLocalServiceUtilService(socialActivityCounterLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.social.kernel.model.SocialActivityCounter");
 
-		SocialActivityCounterLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -877,6 +876,23 @@ public abstract class SocialActivityCounterLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		SocialActivityCounterLocalService socialActivityCounterLocalService) {
+
+		try {
+			Field field =
+				SocialActivityCounterLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivityCounterLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -959,9 +975,6 @@ public abstract class SocialActivityCounterLocalServiceBaseImpl
 
 	@BeanReference(type = SocialActivitySettingPersistence.class)
 	protected SocialActivitySettingPersistence socialActivitySettingPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialActivityCounterLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

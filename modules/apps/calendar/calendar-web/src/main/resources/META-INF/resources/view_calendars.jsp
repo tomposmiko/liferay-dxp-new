@@ -191,7 +191,7 @@ portletURL.setParameter("calendarResourceId", String.valueOf(calendarResource.ge
 				var buttonClose = [
 					{
 						cssClass: 'close',
-						labelHTML: '<span aria-label="close">&times;</span>',
+						label: '\u00D7',
 						on: {
 							click: function () {
 								<portlet:namespace />importDialog.hide();

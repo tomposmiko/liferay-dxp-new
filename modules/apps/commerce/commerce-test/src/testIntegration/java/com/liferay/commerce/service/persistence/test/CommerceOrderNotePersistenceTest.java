@@ -15,7 +15,6 @@
 package com.liferay.commerce.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.exception.DuplicateCommerceOrderNoteExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderNoteException;
 import com.liferay.commerce.model.CommerceOrderNote;
 import com.liferay.commerce.service.CommerceOrderNoteLocalServiceUtil;
@@ -185,28 +184,6 @@ public class CommerceOrderNotePersistenceTest {
 		Assert.assertEquals(
 			existingCommerceOrderNote.isRestricted(),
 			newCommerceOrderNote.isRestricted());
-	}
-
-	@Test(
-		expected = DuplicateCommerceOrderNoteExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceOrderNote commerceOrderNote = addCommerceOrderNote();
-
-		CommerceOrderNote newCommerceOrderNote = addCommerceOrderNote();
-
-		newCommerceOrderNote.setCompanyId(commerceOrderNote.getCompanyId());
-
-		newCommerceOrderNote = _persistence.update(newCommerceOrderNote);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceOrderNote);
-
-		newCommerceOrderNote.setExternalReferenceCode(
-			commerceOrderNote.getExternalReferenceCode());
-
-		_persistence.update(newCommerceOrderNote);
 	}
 
 	@Test

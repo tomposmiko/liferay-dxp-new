@@ -43,8 +43,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -61,6 +59,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -270,7 +270,13 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 		return assetCategoryPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset category's external reference code
+	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	 */
 	@Override
 	public AssetCategory fetchAssetCategoryByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -279,6 +285,9 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetCategoryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public AssetCategory fetchAssetCategoryByReferenceCode(
@@ -288,7 +297,14 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset category's external reference code
+	 * @return the matching asset category
+	 * @throws PortalException if a matching asset category could not be found
+	 */
 	@Override
 	public AssetCategory getAssetCategoryByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -962,14 +978,14 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 			"com.liferay.asset.kernel.model.AssetCategory",
 			assetCategoryLocalService);
 
-		AssetCategoryLocalServiceUtil.setService(assetCategoryLocalService);
+		_setLocalServiceUtilService(assetCategoryLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.asset.kernel.model.AssetCategory");
 
-		AssetCategoryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1029,6 +1045,22 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		AssetCategoryLocalService assetCategoryLocalService) {
+
+		try {
+			Field field = AssetCategoryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, assetCategoryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = AssetCategoryLocalService.class)
 	protected AssetCategoryLocalService assetCategoryLocalService;
 
@@ -1085,9 +1117,6 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 
 	@BeanReference(type = AssetEntryPersistence.class)
 	protected AssetEntryPersistence assetEntryPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetCategoryLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

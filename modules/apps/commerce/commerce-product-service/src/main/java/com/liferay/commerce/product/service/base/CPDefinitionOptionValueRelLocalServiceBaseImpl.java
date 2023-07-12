@@ -64,8 +64,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -81,6 +79,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -1749,15 +1749,14 @@ public abstract class CPDefinitionOptionValueRelLocalServiceBaseImpl
 			"com.liferay.commerce.product.model.CPDefinitionOptionValueRel",
 			cpDefinitionOptionValueRelLocalService);
 
-		CPDefinitionOptionValueRelLocalServiceUtil.setService(
-			cpDefinitionOptionValueRelLocalService);
+		_setLocalServiceUtilService(cpDefinitionOptionValueRelLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.product.model.CPDefinitionOptionValueRel");
 
-		CPDefinitionOptionValueRelLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1800,6 +1799,24 @@ public abstract class CPDefinitionOptionValueRelLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CPDefinitionOptionValueRelLocalService
+			cpDefinitionOptionValueRelLocalService) {
+
+		try {
+			Field field =
+				CPDefinitionOptionValueRelLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, cpDefinitionOptionValueRelLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -2042,9 +2059,6 @@ public abstract class CPDefinitionOptionValueRelLocalServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CPDefinitionOptionValueRelLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -849,12 +849,6 @@ public class CommerceInventoryBookedQuantityUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceInventoryBookedQuantityPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceInventoryBookedQuantityPersistence
 		_persistence;
 

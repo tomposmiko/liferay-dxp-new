@@ -55,6 +55,7 @@ import com.liferay.site.navigation.service.persistence.impl.constants.SiteNaviga
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -4741,7 +4742,7 @@ public class SiteNavigationMenuItemPersistenceImpl
 	@Override
 	public SiteNavigationMenuItem fetchByPrimaryKey(Serializable primaryKey) {
 		if (ctPersistenceHelper.isProductionMode(
-				SiteNavigationMenuItem.class, primaryKey)) {
+				SiteNavigationMenuItem.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -5345,12 +5346,12 @@ public class SiteNavigationMenuItemPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"siteNavigationMenuId", "name"}, false);
 
-		SiteNavigationMenuItemUtil.setPersistence(this);
+		_setSiteNavigationMenuItemUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		SiteNavigationMenuItemUtil.setPersistence(null);
+		_setSiteNavigationMenuItemUtilPersistence(null);
 
 		entityCache.removeCache(SiteNavigationMenuItemImpl.class.getName());
 
@@ -5360,6 +5361,22 @@ public class SiteNavigationMenuItemPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSiteNavigationMenuItemUtilPersistence(
+		SiteNavigationMenuItemPersistence siteNavigationMenuItemPersistence) {
+
+		try {
+			Field field = SiteNavigationMenuItemUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, siteNavigationMenuItemPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

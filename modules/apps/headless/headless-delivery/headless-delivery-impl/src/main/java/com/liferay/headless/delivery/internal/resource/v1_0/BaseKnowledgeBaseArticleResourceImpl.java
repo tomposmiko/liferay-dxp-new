@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortField;
-import com.liferay.portal.odata.sort.SortParser;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
@@ -51,21 +45,16 @@ import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Array;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Generated;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -240,17 +229,34 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 		KnowledgeBaseArticle existingKnowledgeBaseArticle =
 			getKnowledgeBaseArticle(knowledgeBaseArticleId);
 
+		if (knowledgeBaseArticle.getActions() != null) {
+			existingKnowledgeBaseArticle.setActions(
+				knowledgeBaseArticle.getActions());
+		}
+
 		if (knowledgeBaseArticle.getArticleBody() != null) {
 			existingKnowledgeBaseArticle.setArticleBody(
 				knowledgeBaseArticle.getArticleBody());
 		}
 
-		existingKnowledgeBaseArticle.setCustomFields(
-			knowledgeBaseArticle.getCustomFields());
+		if (knowledgeBaseArticle.getDateCreated() != null) {
+			existingKnowledgeBaseArticle.setDateCreated(
+				knowledgeBaseArticle.getDateCreated());
+		}
+
+		if (knowledgeBaseArticle.getDateModified() != null) {
+			existingKnowledgeBaseArticle.setDateModified(
+				knowledgeBaseArticle.getDateModified());
+		}
 
 		if (knowledgeBaseArticle.getDescription() != null) {
 			existingKnowledgeBaseArticle.setDescription(
 				knowledgeBaseArticle.getDescription());
+		}
+
+		if (knowledgeBaseArticle.getEncodingFormat() != null) {
+			existingKnowledgeBaseArticle.setEncodingFormat(
+				knowledgeBaseArticle.getEncodingFormat());
 		}
 
 		if (knowledgeBaseArticle.getFriendlyUrlPath() != null) {
@@ -263,9 +269,29 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 				knowledgeBaseArticle.getKeywords());
 		}
 
+		if (knowledgeBaseArticle.getNumberOfAttachments() != null) {
+			existingKnowledgeBaseArticle.setNumberOfAttachments(
+				knowledgeBaseArticle.getNumberOfAttachments());
+		}
+
+		if (knowledgeBaseArticle.getNumberOfKnowledgeBaseArticles() != null) {
+			existingKnowledgeBaseArticle.setNumberOfKnowledgeBaseArticles(
+				knowledgeBaseArticle.getNumberOfKnowledgeBaseArticles());
+		}
+
 		if (knowledgeBaseArticle.getParentKnowledgeBaseFolderId() != null) {
 			existingKnowledgeBaseArticle.setParentKnowledgeBaseFolderId(
 				knowledgeBaseArticle.getParentKnowledgeBaseFolderId());
+		}
+
+		if (knowledgeBaseArticle.getSiteId() != null) {
+			existingKnowledgeBaseArticle.setSiteId(
+				knowledgeBaseArticle.getSiteId());
+		}
+
+		if (knowledgeBaseArticle.getSubscribed() != null) {
+			existingKnowledgeBaseArticle.setSubscribed(
+				knowledgeBaseArticle.getSubscribed());
 		}
 
 		if (knowledgeBaseArticle.getTaxonomyCategoryIds() != null) {
@@ -618,11 +644,11 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "aggregationTerms"
+				name = "flatten"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "flatten"
+				name = "search"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -635,10 +661,6 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "pageSize"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "search"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -739,11 +761,11 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "aggregationTerms"
+				name = "flatten"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "flatten"
+				name = "search"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -756,10 +778,6 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "pageSize"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "search"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -918,11 +936,11 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "aggregationTerms"
+				name = "flatten"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "flatten"
+				name = "search"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -935,10 +953,6 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "pageSize"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "search"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -1140,39 +1154,22 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	@Override
 	@SuppressWarnings("PMD.UnusedLocalVariable")
 	public void create(
-			Collection<KnowledgeBaseArticle> knowledgeBaseArticles,
+			java.util.Collection<KnowledgeBaseArticle> knowledgeBaseArticles,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
 		UnsafeConsumer<KnowledgeBaseArticle, Exception>
-			knowledgeBaseArticleUnsafeConsumer = null;
-
-		String createStrategy = (String)parameters.getOrDefault(
-			"createStrategy", "INSERT");
-
-		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
-			if (parameters.containsKey("knowledgeBaseFolderId")) {
-				knowledgeBaseArticleUnsafeConsumer = knowledgeBaseArticle ->
+			knowledgeBaseArticleUnsafeConsumer =
+				knowledgeBaseArticle ->
 					postKnowledgeBaseFolderKnowledgeBaseArticle(
-						_parseLong(
+						Long.parseLong(
 							(String)parameters.get("knowledgeBaseFolderId")),
 						knowledgeBaseArticle);
-			}
-			else if (parameters.containsKey("siteId")) {
-				knowledgeBaseArticleUnsafeConsumer =
-					knowledgeBaseArticle -> postSiteKnowledgeBaseArticle(
-						(Long)parameters.get("siteId"), knowledgeBaseArticle);
-			}
-			else {
-				throw new NotSupportedException(
-					"One of the following parameters must be specified: [knowledgeBaseFolderId, siteId]");
-			}
-		}
 
-		if (knowledgeBaseArticleUnsafeConsumer == null) {
-			throw new NotSupportedException(
-				"Create strategy \"" + createStrategy +
-					"\" is not supported for KnowledgeBaseArticle");
+		if (parameters.containsKey("siteId")) {
+			knowledgeBaseArticleUnsafeConsumer =
+				knowledgeBaseArticle -> postSiteKnowledgeBaseArticle(
+					(Long)parameters.get("siteId"), knowledgeBaseArticle);
 		}
 
 		if (contextBatchUnsafeConsumer != null) {
@@ -1190,7 +1187,7 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 	@Override
 	public void delete(
-			Collection<KnowledgeBaseArticle> knowledgeBaseArticles,
+			java.util.Collection<KnowledgeBaseArticle> knowledgeBaseArticles,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
@@ -1199,14 +1196,6 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 			deleteKnowledgeBaseArticle(knowledgeBaseArticle.getId());
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray("PARTIAL_UPDATE", "UPDATE");
 	}
 
 	@Override
@@ -1237,18 +1226,14 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 		if (parameters.containsKey("siteId")) {
 			return getSiteKnowledgeBaseArticlesPage(
 				(Long)parameters.get("siteId"),
-				_parseBoolean((String)parameters.get("flatten")), search, null,
-				filter, pagination, sorts);
-		}
-		else if (parameters.containsKey("knowledgeBaseFolderId")) {
-			return getKnowledgeBaseFolderKnowledgeBaseArticlesPage(
-				_parseLong((String)parameters.get("knowledgeBaseFolderId")),
-				_parseBoolean((String)parameters.get("flatten")), search, null,
-				filter, pagination, sorts);
+				Boolean.parseBoolean((String)parameters.get("flatten")), search,
+				null, filter, pagination, sorts);
 		}
 		else {
-			throw new NotSupportedException(
-				"One of the following parameters must be specified: [siteId, knowledgeBaseFolderId]");
+			return getKnowledgeBaseFolderKnowledgeBaseArticlesPage(
+				Long.parseLong((String)parameters.get("knowledgeBaseFolderId")),
+				Boolean.parseBoolean((String)parameters.get("flatten")), search,
+				null, filter, pagination, sorts);
 		}
 	}
 
@@ -1276,71 +1261,20 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 	@Override
 	public void update(
-			Collection<KnowledgeBaseArticle> knowledgeBaseArticles,
+			java.util.Collection<KnowledgeBaseArticle> knowledgeBaseArticles,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeConsumer<KnowledgeBaseArticle, Exception>
-			knowledgeBaseArticleUnsafeConsumer = null;
+		for (KnowledgeBaseArticle knowledgeBaseArticle :
+				knowledgeBaseArticles) {
 
-		String updateStrategy = (String)parameters.getOrDefault(
-			"updateStrategy", "UPDATE");
-
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
-			knowledgeBaseArticleUnsafeConsumer =
-				knowledgeBaseArticle -> patchKnowledgeBaseArticle(
-					knowledgeBaseArticle.getId() != null ?
-						knowledgeBaseArticle.getId() :
-							_parseLong(
-								(String)parameters.get(
-									"knowledgeBaseArticleId")),
-					knowledgeBaseArticle);
+			putKnowledgeBaseArticle(
+				knowledgeBaseArticle.getId() != null ?
+					knowledgeBaseArticle.getId() :
+						Long.parseLong(
+							(String)parameters.get("knowledgeBaseArticleId")),
+				knowledgeBaseArticle);
 		}
-
-		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-			knowledgeBaseArticleUnsafeConsumer =
-				knowledgeBaseArticle -> putKnowledgeBaseArticle(
-					knowledgeBaseArticle.getId() != null ?
-						knowledgeBaseArticle.getId() :
-							_parseLong(
-								(String)parameters.get(
-									"knowledgeBaseArticleId")),
-					knowledgeBaseArticle);
-		}
-
-		if (knowledgeBaseArticleUnsafeConsumer == null) {
-			throw new NotSupportedException(
-				"Update strategy \"" + updateStrategy +
-					"\" is not supported for KnowledgeBaseArticle");
-		}
-
-		if (contextBatchUnsafeConsumer != null) {
-			contextBatchUnsafeConsumer.accept(
-				knowledgeBaseArticles, knowledgeBaseArticleUnsafeConsumer);
-		}
-		else {
-			for (KnowledgeBaseArticle knowledgeBaseArticle :
-					knowledgeBaseArticles) {
-
-				knowledgeBaseArticleUnsafeConsumer.accept(knowledgeBaseArticle);
-			}
-		}
-	}
-
-	private Boolean _parseBoolean(String value) {
-		if (value != null) {
-			return Boolean.parseBoolean(value);
-		}
-
-		return null;
-	}
-
-	private Long _parseLong(String value) {
-		if (value != null) {
-			return Long.parseLong(value);
-		}
-
-		return null;
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
@@ -1349,7 +1283,7 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 	public void setContextBatchUnsafeConsumer(
 		UnsafeBiConsumer
-			<Collection<KnowledgeBaseArticle>,
+			<java.util.Collection<KnowledgeBaseArticle>,
 			 UnsafeConsumer<KnowledgeBaseArticle, Exception>, Exception>
 				contextBatchUnsafeConsumer) {
 
@@ -1416,10 +1350,6 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 		this.roleLocalService = roleLocalService;
 	}
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider) {
-		this.sortParserProvider = sortParserProvider;
-	}
-
 	public void setVulcanBatchEngineImportTaskResource(
 		VulcanBatchEngineImportTaskResource
 			vulcanBatchEngineImportTaskResource) {
@@ -1448,49 +1378,9 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 		}
 		catch (Exception exception) {
 			_log.error("Invalid filter " + filterString, exception);
-
-			return null;
-		}
-	}
-
-	@Override
-	public Sort[] toSorts(String sortString) {
-		if (Validator.isNull(sortString)) {
-			return null;
 		}
 
-		try {
-			SortParser sortParser = sortParserProvider.provide(
-				getEntityModel(Collections.emptyMap()));
-
-			if (sortParser == null) {
-				return null;
-			}
-
-			com.liferay.portal.odata.sort.Sort oDataSort =
-				new com.liferay.portal.odata.sort.Sort(
-					sortParser.parse(sortString));
-
-			List<SortField> sortFields = oDataSort.getSortFields();
-
-			Sort[] sorts = new Sort[sortFields.size()];
-
-			for (int i = 0; i < sortFields.size(); i++) {
-				SortField sortField = sortFields.get(i);
-
-				sorts[i] = new Sort(
-					sortField.getSortableFieldName(
-						contextAcceptLanguage.getPreferredLocale()),
-					!sortField.isAscending());
-			}
-
-			return sorts;
-		}
-		catch (Exception exception) {
-			_log.error("Invalid sort " + sortString, exception);
-
-			return new Sort[0];
-		}
+		return null;
 	}
 
 	protected Map<String, String> addAction(
@@ -1532,84 +1422,37 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 		KnowledgeBaseArticle existingKnowledgeBaseArticle) {
 	}
 
-	protected <T, R, E extends Throwable> List<R> transform(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transform(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transform(collection, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> R[] transform(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz) {
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
 
 		return TransformUtil.transform(array, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> R[] transformToArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-		Class<?> clazz) {
+	protected <T, R> R[] transformToArray(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
 
 		return TransformUtil.transformToArray(
 			collection, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transformToList(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> long[] transformToLongArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
-
-		try {
-			return unsafeTransformToLongArray(collection, unsafeFunction);
-		}
-		catch (Throwable throwable) {
-			throw new RuntimeException(throwable);
-		}
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransform(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransform(collection, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransform(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransform(array, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransformToArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransformToArray(
-			collection, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransformToList(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransformToList(array, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> long[] unsafeTransformToLongArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return (long[])_unsafeTransformToPrimitiveArray(
-			collection, unsafeFunction, long[].class);
-	}
-
 	protected AcceptLanguage contextAcceptLanguage;
 	protected UnsafeBiConsumer
-		<Collection<KnowledgeBaseArticle>,
+		<java.util.Collection<KnowledgeBaseArticle>,
 		 UnsafeConsumer<KnowledgeBaseArticle, Exception>, Exception>
 			contextBatchUnsafeConsumer;
 	protected com.liferay.portal.kernel.model.Company contextCompany;
@@ -1624,26 +1467,8 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	protected ResourceActionLocalService resourceActionLocalService;
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 	protected RoleLocalService roleLocalService;
-	protected SortParserProvider sortParserProvider;
 	protected VulcanBatchEngineImportTaskResource
 		vulcanBatchEngineImportTaskResource;
-
-	private <T, R, E extends Throwable> Object _unsafeTransformToPrimitiveArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		List<R> list = unsafeTransform(collection, unsafeFunction);
-
-		Object array = clazz.cast(
-			Array.newInstance(clazz.getComponentType(), list.size()));
-
-		for (int i = 0; i < list.size(); i++) {
-			Array.set(array, i, list.get(i));
-		}
-
-		return array;
-	}
 
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseKnowledgeBaseArticleResourceImpl.class);

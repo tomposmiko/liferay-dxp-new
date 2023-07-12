@@ -17,7 +17,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ConfigureAutocompleteWithTextField {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormsDataProvider#ConfigureAutocompleteWithTextField";
@@ -82,7 +82,7 @@ definition {
 
 		Form.editDescription();
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldNameTextFieldAuto = FormFields.getFieldName();
 
@@ -110,7 +110,7 @@ definition {
 			menuItem = "Edit",
 			rowEntry = "Created Form Name");
 
-		FormsAdminNavigator.gotoEditField(fieldName = ${fieldNameTextFieldAuto});
+		FormsAdminNavigator.gotoEditField(fieldName = "${fieldNameTextFieldAuto}");
 
 		Form.gotoAutocompleteTab();
 
@@ -145,7 +145,7 @@ definition {
 		FormPortlet.waitFormRenderer(text = "Submit");
 
 		FormFields.editTextWithDataProvider(
-			fieldName = ${fieldNameTextFieldAuto},
+			fieldName = "${fieldNameTextFieldAuto}",
 			fieldValue = "Bra");
 
 		FormFields.selectAutoCompleteOption(autocompleteOption = "Brazil");
@@ -172,7 +172,7 @@ definition {
 
 		FormsAdminNavigator.gotoEditFormByName();
 
-		FormsAdminNavigator.gotoEditField(fieldName = ${fieldNameTextFieldAuto});
+		FormsAdminNavigator.gotoEditField(fieldName = "${fieldNameTextFieldAuto}");
 
 		Form.gotoAutocompleteTab();
 
@@ -197,7 +197,7 @@ definition {
 		FormPortlet.waitFormRenderer(text = "Submit");
 
 		FormFields.editText(
-			fieldName = ${fieldNameTextFieldAuto},
+			fieldName = "${fieldNameTextFieldAuto}",
 			fieldValue = "Br");
 
 		AssertElementNotPresent(
@@ -205,7 +205,7 @@ definition {
 			locator1 = "FormFields#AUTOCOMPLETE_OPTION");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ConfigureWithSelectField {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormsDataProvider#ConfigureWithSelectField";
@@ -247,7 +247,7 @@ definition {
 		Form.editDescription();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 1,
+			fieldPositionNumber = "1",
 			fieldType = "Select from List");
 
 		var fieldNameDataProvider = FormFields.getFieldName();
@@ -286,10 +286,10 @@ definition {
 
 		FormFields.viewSelectLabel(
 			fieldLabel = "Data Provider Select Field",
-			fieldName = ${fieldNameDataProvider});
+			fieldName = "${fieldNameDataProvider}");
 
 		FormFields.selectSelectOption(
-			fieldName = ${fieldNameDataProvider},
+			fieldName = "${fieldNameDataProvider}",
 			selectOption = "United States");
 
 		FormPortlet.submitSuccessfully();
@@ -308,7 +308,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-75682."
-	@priority = 5
+	@priority = "5"
 	test ViewDataRetrievedForGuestUser {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "FormsDataProvider#ViewDataRetrievedForGuestUser";
@@ -352,7 +352,7 @@ definition {
 		Form.editDescription();
 
 		Form.gotoAddField(
-			fieldPositionNumber = 1,
+			fieldPositionNumber = "1",
 			fieldType = "Select from List");
 
 		var fieldNameCountries = FormFields.getFieldName();
@@ -379,20 +379,20 @@ definition {
 
 		FormsAdminNavigator.gotoPublishCopyURLLink();
 
-		var publishedFormPublicURL = Form.getPublishedFormPublicURL(publishedFormPublicURL = ${publishedFormPublicURL});
+		var publishedFormPublicURL = Form.getPublishedFormPublicURL(publishedFormPublicURL = "${publishedFormPublicURL}");
 
-		Navigator.openSpecificURL(url = ${publishedFormPublicURL});
+		Navigator.openSpecificURL(url = "${publishedFormPublicURL}");
 
 		FormFields.viewSelectOptionsList(
-			fieldName = ${fieldNameCountries},
+			fieldName = "${fieldNameCountries}",
 			selectOption = "Afghanistan");
 
 		User.logoutPG();
 
-		Navigator.openSpecificURL(url = ${publishedFormPublicURL});
+		Navigator.openSpecificURL(url = "${publishedFormPublicURL}");
 
 		FormFields.viewSelectOptionsList(
-			fieldName = ${fieldNameCountries},
+			fieldName = "${fieldNameCountries}",
 			selectOption = "Afghanistan");
 
 		User.loginUserPG();

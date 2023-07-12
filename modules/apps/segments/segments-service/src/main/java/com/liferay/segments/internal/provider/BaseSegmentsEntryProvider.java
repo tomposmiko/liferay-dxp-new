@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -131,14 +130,13 @@ public abstract class BaseSegmentsEntryProvider
 			long groupId, String className, long classPK, Context context)
 		throws PortalException {
 
-		return getSegmentsEntryIds(
-			groupId, className, classPK, context, new long[0], new long[0]);
+		return getSegmentsEntryIds(groupId, className, classPK, context, null);
 	}
 
 	@Override
 	public long[] getSegmentsEntryIds(
 		long groupId, String className, long classPK, Context context,
-		long[] filterSegmentsEntryIds, long[] segmentsEntryIds) {
+		long[] segmentsEntryIds) {
 
 		List<SegmentsEntry> segmentsEntries =
 			segmentsEntryLocalService.getSegmentsEntries(
@@ -152,11 +150,6 @@ public abstract class BaseSegmentsEntryProvider
 		Stream<SegmentsEntry> stream = segmentsEntries.stream();
 
 		return stream.filter(
-			segmentsEntry ->
-				ArrayUtil.isEmpty(filterSegmentsEntryIds) ||
-				ArrayUtil.contains(
-					filterSegmentsEntryIds, segmentsEntry.getSegmentsEntryId())
-		).filter(
 			segmentsEntry -> isMember(
 				className, classPK, context, segmentsEntry, segmentsEntryIds)
 		).mapToLong(

@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletInstanceFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
@@ -275,8 +274,8 @@ public class MainServlet extends HttpServlet {
 
 			String timeZoneID = timeZone.getID();
 
-			if (!Objects.equals(timeZoneID, "UTC") &&
-				!Objects.equals(timeZoneID, "GMT")) {
+			if (!Objects.equals("UTC", timeZoneID) &&
+				!Objects.equals("GMT", timeZoneID)) {
 
 				StringBundler sb = new StringBundler(4);
 
@@ -332,17 +331,6 @@ public class MainServlet extends HttpServlet {
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
-		}
-
-		for (Portlet portlet : portlets) {
-			try {
-				ResourceActionsUtil.populatePortletResource(
-					portlet, MainServlet.class.getClassLoader(),
-					PropsValues.RESOURCE_ACTIONS_CONFIGS);
-			}
-			catch (Exception exception) {
-				_log.error(exception, exception);
-			}
 		}
 
 		try {
@@ -425,6 +413,18 @@ public class MainServlet extends HttpServlet {
 			_log.error(exception, exception);
 		}
 
+		if (StartupHelperUtil.isDBNew() &&
+			PropsValues.SETUP_WIZARD_ADD_SAMPLE_DATA) {
+
+			try {
+				SetupWizardSampleDataUtil.addSampleData(
+					PortalInstances.getDefaultCompanyId());
+			}
+			catch (Exception exception) {
+				_log.error(exception, exception);
+			}
+		}
+
 		if (_log.isDebugEnabled()) {
 			_log.debug("Initialize plugins");
 		}
@@ -456,18 +456,6 @@ public class MainServlet extends HttpServlet {
 				if (Validator.isNotNull(message)) {
 					_log.info(message);
 				}
-			}
-		}
-
-		if (StartupHelperUtil.isDBNew() &&
-			PropsValues.SETUP_WIZARD_ADD_SAMPLE_DATA) {
-
-			try {
-				SetupWizardSampleDataUtil.addSampleData(
-					PortalInstances.getDefaultCompanyId());
-			}
-			catch (Exception exception) {
-				_log.error(exception, exception);
 			}
 		}
 

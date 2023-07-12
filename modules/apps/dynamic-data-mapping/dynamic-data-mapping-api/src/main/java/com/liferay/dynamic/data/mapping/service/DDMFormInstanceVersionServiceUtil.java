@@ -89,10 +89,6 @@ public class DDMFormInstanceVersionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DDMFormInstanceVersionService service) {
-		_service = service;
-	}
-
 	private static volatile DDMFormInstanceVersionService _service;
 
 }

@@ -245,12 +245,6 @@ public class CommercePaymentMethodGroupRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommercePaymentMethodGroupRelService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommercePaymentMethodGroupRelService _service;
 
 }

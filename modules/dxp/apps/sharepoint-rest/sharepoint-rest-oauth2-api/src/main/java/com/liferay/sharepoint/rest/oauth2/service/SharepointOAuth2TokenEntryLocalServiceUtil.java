@@ -355,12 +355,6 @@ public class SharepointOAuth2TokenEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		SharepointOAuth2TokenEntryLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile SharepointOAuth2TokenEntryLocalService _service;
 
 }

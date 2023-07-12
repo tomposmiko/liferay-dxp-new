@@ -86,15 +86,15 @@ List<CommercePriceListCommerceAccountGroupRel> commercePriceListAccountGroupEntr
 	<aui:select label="price-type" name="netPrice">
 
 		<%
-		boolean netPrice = true;
+		boolean isNetPrice = true;
 
 		if (commercePriceList != null) {
-			netPrice = commercePriceList.isNetPrice();
+			isNetPrice = commercePriceList.isNetPrice();
 		}
 		%>
 
-		<aui:option label="net-price" selected="<%= netPrice %>" value="true" />
-		<aui:option label="gross-price" selected="<%= !netPrice %>" value="false" />
+		<aui:option label="net-price" selected="<%= isNetPrice %>" value="true" />
+		<aui:option label="gross-price" selected="<%= !isNetPrice %>" value="false" />
 	</aui:select>
 </aui:fieldset>
 

@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2637,7 +2638,7 @@ public class AssetListEntryAssetEntryRelPersistenceImpl
 	 * </p>
 	 *
 	 * @param assetListEntryId the asset list entry ID
-	 * @param segmentsEntryIds the segments entry IDs
+	 * @param segmentsEntryId the segments entry ID
 	 * @param start the lower bound of the range of asset list entry asset entry rels
 	 * @param end the upper bound of the range of asset list entry asset entry rels (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4285,7 +4286,7 @@ public class AssetListEntryAssetEntryRelPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				AssetListEntryAssetEntryRel.class, primaryKey)) {
+				AssetListEntryAssetEntryRel.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -4870,12 +4871,12 @@ public class AssetListEntryAssetEntryRelPersistenceImpl
 			new String[] {"assetListEntryId", "segmentsEntryId", "position"},
 			false);
 
-		AssetListEntryAssetEntryRelUtil.setPersistence(this);
+		_setAssetListEntryAssetEntryRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AssetListEntryAssetEntryRelUtil.setPersistence(null);
+		_setAssetListEntryAssetEntryRelUtilPersistence(null);
 
 		entityCache.removeCache(
 			AssetListEntryAssetEntryRelImpl.class.getName());
@@ -4886,6 +4887,24 @@ public class AssetListEntryAssetEntryRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAssetListEntryAssetEntryRelUtilPersistence(
+		AssetListEntryAssetEntryRelPersistence
+			assetListEntryAssetEntryRelPersistence) {
+
+		try {
+			Field field =
+				AssetListEntryAssetEntryRelUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, assetListEntryAssetEntryRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

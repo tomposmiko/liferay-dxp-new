@@ -57,10 +57,6 @@ public class AnnouncementsDeliveryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AnnouncementsDeliveryService service) {
-		_service = service;
-	}
-
 	private static volatile AnnouncementsDeliveryService _service;
 
 }

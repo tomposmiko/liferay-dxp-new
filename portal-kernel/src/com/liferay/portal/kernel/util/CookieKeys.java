@@ -64,7 +64,7 @@ public class CookieKeys {
 
 		addCookie(
 			httpServletRequest, httpServletResponse, cookie,
-			PortalUtil.isSecure(httpServletRequest));
+			httpServletRequest.isSecure());
 	}
 
 	public static void addCookie(

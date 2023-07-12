@@ -134,18 +134,11 @@ public class LayoutRevisionAssetRenderer
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return getURLViewInContext(themeDisplay, noSuchEntryRedirect);
-	}
-
-	@Override
-	public String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect) {
-
 		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)liferayPortletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
 			Layout layout = LayoutLocalServiceUtil.getLayout(
 				_layoutRevision.getPlid());
 

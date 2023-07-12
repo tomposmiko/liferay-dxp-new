@@ -72,11 +72,14 @@ public class FindEntryStrutsAction extends FindStrutsAction {
 
 		String mvcRenderCommandName = null;
 
-		if (portletId.equals(BlogsPortletKeys.BLOGS_ADMIN)) {
+		if (portletId.equals(BlogsPortletKeys.BLOGS)) {
+			mvcRenderCommandName = "/blogs/view_entry";
+		}
+		else if (portletId.equals(BlogsPortletKeys.BLOGS_ADMIN)) {
 			mvcRenderCommandName = "/blogs_admin/view_entry";
 		}
 		else {
-			mvcRenderCommandName = "/blogs/view_entry";
+			mvcRenderCommandName = "/blogs_aggregator/view";
 		}
 
 		portletURL.setParameter("mvcRenderCommandName", mvcRenderCommandName);

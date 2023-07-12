@@ -26,11 +26,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -59,7 +59,7 @@ public abstract class PollsChoiceServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		PollsChoiceServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public abstract class PollsChoiceServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		pollsChoiceService = (PollsChoiceService)aopProxy;
 
-		PollsChoiceServiceUtil.setService(pollsChoiceService);
+		_setServiceUtilService(pollsChoiceService);
 	}
 
 	/**
@@ -118,6 +118,20 @@ public abstract class PollsChoiceServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(PollsChoiceService pollsChoiceService) {
+		try {
+			Field field = PollsChoiceServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, pollsChoiceService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.polls.service.PollsChoiceLocalService
 		pollsChoiceLocalService;
@@ -143,8 +157,5 @@ public abstract class PollsChoiceServiceBaseImpl
 
 	@Reference
 	protected PollsQuestionFinder pollsQuestionFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PollsChoiceServiceBaseImpl.class);
 
 }

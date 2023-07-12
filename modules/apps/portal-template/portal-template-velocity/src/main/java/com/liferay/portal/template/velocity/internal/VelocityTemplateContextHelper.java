@@ -47,6 +47,7 @@ import org.apache.velocity.tools.generic.SortTool;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -60,7 +61,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.portal.template.velocity.configuration.VelocityEngineConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	service = {TemplateContextHelper.class, VelocityTemplateContextHelper.class}
 )
 public class VelocityTemplateContextHelper extends TemplateContextHelper {
@@ -106,19 +107,6 @@ public class VelocityTemplateContextHelper extends TemplateContextHelper {
 			// Init
 
 			contextObjects.put("init", fullTemplatesPath + "/init.vm");
-
-			// Navigation items
-
-			if (_velocityEngineConfiguration.includeNavItemsInTheContext() &&
-				(themeDisplay.getLayout() != null)) {
-
-				try {
-					contextObjects.put("navItems", themeDisplay.getNavItems());
-				}
-				catch (Exception exception) {
-					_log.error(exception);
-				}
-			}
 		}
 
 		// Insert custom vm variables

@@ -530,10 +530,6 @@ public class KaleoProcessLinkUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(KaleoProcessLinkPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile KaleoProcessLinkPersistence _persistence;
 
 }

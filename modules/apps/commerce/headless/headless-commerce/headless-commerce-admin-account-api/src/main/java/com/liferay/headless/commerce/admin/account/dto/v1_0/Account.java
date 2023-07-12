@@ -66,9 +66,7 @@ public class Account implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Account.class, json);
 	}
 
-	@Schema(
-		example = "[{city=Diamond Bar, commerceCountryId=30130, commerceRegionId=30234, defaultBilling=true, defaultShipping=true, description=right stairs, first room on the left, id=31130, latitude=33.9976884, longitude=-117.8144595, name=Alessio Antonio Rendina, phoneNumber=(123) 456 7890, street1=1400 Montefino Ave, street2=1st floor, street3=suite 200, zip=91765}]"
-	)
+	@Schema
 	@Valid
 	public AccountAddress[] getAccountAddresses() {
 		return accountAddresses;
@@ -98,9 +96,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected AccountAddress[] accountAddresses;
 
-	@Schema(
-		example = "[{description={en_US=Account Administrator Description US, hr_HR=Account Administrator Description HR, hu_HU=Account Administrator Description HU}}, {id=31256, name=Alessio Antonio Rendina, roles=null}]"
-	)
+	@Schema
 	@Valid
 	public AccountMember[] getAccountMembers() {
 		return accountMembers;
@@ -130,9 +126,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected AccountMember[] accountMembers;
 
-	@Schema(
-		example = "[{id=20546, name=Liferay Italy, organizationId=20433, treePath=/Liferay/Liferay Italy}]"
-	)
+	@Schema
 	@Valid
 	public AccountOrganization[] getAccountOrganizations() {
 		return accountOrganizations;
@@ -163,34 +157,6 @@ public class Account implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected AccountOrganization[] accountOrganizations;
-
-	@Schema(example = "true")
-	public Boolean getActive() {
-		return active;
-	}
-
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-
-	@JsonIgnore
-	public void setActive(
-		UnsafeSupplier<Boolean, Exception> activeUnsafeSupplier) {
-
-		try {
-			active = activeUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean active;
 
 	@Schema
 	@Valid
@@ -278,7 +244,7 @@ public class Account implements Serializable {
 	protected Date dateModified;
 
 	@DecimalMin("0")
-	@Schema(example = "10130")
+	@Schema
 	public Long getDefaultBillingAccountAddressId() {
 		return defaultBillingAccountAddressId;
 	}
@@ -311,7 +277,7 @@ public class Account implements Serializable {
 	protected Long defaultBillingAccountAddressId;
 
 	@DecimalMin("0")
-	@Schema(example = "10131")
+	@Schema
 	public Long getDefaultShippingAccountAddressId() {
 		return defaultShippingAccountAddressId;
 	}
@@ -343,9 +309,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long defaultShippingAccountAddressId;
 
-	@Schema(
-		example = "[joe.1@commerce.com, joe.2@commerce.com, joe.3@commerce.com]"
-	)
+	@Schema
 	public String[] getEmailAddresses() {
 		return emailAddresses;
 	}
@@ -373,7 +337,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] emailAddresses;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -403,7 +367,7 @@ public class Account implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -430,7 +394,7 @@ public class Account implements Serializable {
 	protected Long id;
 
 	@DecimalMin("0")
-	@Schema(example = "20078")
+	@Schema
 	public Long getLogoId() {
 		return logoId;
 	}
@@ -458,7 +422,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long logoId;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getLogoURL() {
 		return logoURL;
 	}
@@ -486,7 +450,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String logoURL;
 
-	@Schema(example = "Account Name")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -513,7 +477,7 @@ public class Account implements Serializable {
 	@NotEmpty
 	protected String name;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getRoot() {
 		return root;
 	}
@@ -539,7 +503,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean root;
 
-	@Schema(example = "Abcd1234")
+	@Schema
 	public String getTaxId() {
 		return taxId;
 	}
@@ -569,7 +533,7 @@ public class Account implements Serializable {
 
 	@DecimalMax("2")
 	@DecimalMin("0")
-	@Schema(example = "1")
+	@Schema
 	public Integer getType() {
 		return type;
 	}
@@ -683,16 +647,6 @@ public class Account implements Serializable {
 			}
 
 			sb.append("]");
-		}
-
-		if (active != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"active\": ");
-
-			sb.append(active);
 		}
 
 		if (customFields != null) {

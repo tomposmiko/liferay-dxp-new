@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BrowserTracker;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -46,6 +44,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -442,14 +442,14 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.BrowserTracker",
 			browserTrackerLocalService);
 
-		BrowserTrackerLocalServiceUtil.setService(browserTrackerLocalService);
+		_setLocalServiceUtilService(browserTrackerLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.BrowserTracker");
 
-		BrowserTrackerLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -494,6 +494,22 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		BrowserTrackerLocalService browserTrackerLocalService) {
+
+		try {
+			Field field = BrowserTrackerLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, browserTrackerLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = BrowserTrackerLocalService.class)
 	protected BrowserTrackerLocalService browserTrackerLocalService;
 
@@ -505,9 +521,6 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BrowserTrackerLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

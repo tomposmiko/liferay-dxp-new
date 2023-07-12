@@ -15,7 +15,6 @@
 package com.liferay.commerce.account.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.account.exception.DuplicateCommerceAccountGroupExternalReferenceCodeException;
 import com.liferay.commerce.account.exception.NoSuchAccountGroupException;
 import com.liferay.commerce.account.model.CommerceAccountGroup;
 import com.liferay.commerce.account.service.CommerceAccountGroupLocalServiceUtil;
@@ -186,30 +185,6 @@ public class CommerceAccountGroupPersistenceTest {
 		Assert.assertEquals(
 			existingCommerceAccountGroup.isSystem(),
 			newCommerceAccountGroup.isSystem());
-	}
-
-	@Test(
-		expected = DuplicateCommerceAccountGroupExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceAccountGroup commerceAccountGroup = addCommerceAccountGroup();
-
-		CommerceAccountGroup newCommerceAccountGroup =
-			addCommerceAccountGroup();
-
-		newCommerceAccountGroup.setCompanyId(
-			commerceAccountGroup.getCompanyId());
-
-		newCommerceAccountGroup = _persistence.update(newCommerceAccountGroup);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceAccountGroup);
-
-		newCommerceAccountGroup.setExternalReferenceCode(
-			commerceAccountGroup.getExternalReferenceCode());
-
-		_persistence.update(newCommerceAccountGroup);
 	}
 
 	@Test

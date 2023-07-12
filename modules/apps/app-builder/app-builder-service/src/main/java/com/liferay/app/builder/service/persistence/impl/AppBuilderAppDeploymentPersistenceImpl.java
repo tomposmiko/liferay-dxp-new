@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1513,12 +1514,12 @@ public class AppBuilderAppDeploymentPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"appBuilderAppId", "type_"}, false);
 
-		AppBuilderAppDeploymentUtil.setPersistence(this);
+		_setAppBuilderAppDeploymentUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AppBuilderAppDeploymentUtil.setPersistence(null);
+		_setAppBuilderAppDeploymentUtilPersistence(null);
 
 		entityCache.removeCache(AppBuilderAppDeploymentImpl.class.getName());
 
@@ -1528,6 +1529,22 @@ public class AppBuilderAppDeploymentPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAppBuilderAppDeploymentUtilPersistence(
+		AppBuilderAppDeploymentPersistence appBuilderAppDeploymentPersistence) {
+
+		try {
+			Field field = AppBuilderAppDeploymentUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, appBuilderAppDeploymentPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

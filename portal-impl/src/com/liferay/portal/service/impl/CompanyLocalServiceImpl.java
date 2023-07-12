@@ -1547,10 +1547,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				LocaleException localeException = new LocaleException(
 					LocaleException.TYPE_DISPLAY_SETTINGS);
 
-				localeException.setSourceAvailableLanguageIds(
-					Arrays.asList(PropsValues.LOCALES));
-				localeException.setTargetAvailableLanguageIds(
-					Arrays.asList(languageIdsArray));
+				localeException.setSourceAvailableLocales(
+					Arrays.asList(
+						LocaleUtil.fromLanguageIds(PropsValues.LOCALES)));
+				localeException.setTargetAvailableLocales(
+					Arrays.asList(
+						LocaleUtil.fromLanguageIds(languageIdsArray)));
 
 				throw localeException;
 			}
@@ -1607,20 +1609,22 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				throw new CompanyVirtualHostException(
 					"Virtual hostname is invalid");
 			}
+			else {
+				VirtualHost virtualHost =
+					virtualHostLocalService.fetchVirtualHost(virtualHostname);
 
-			VirtualHost virtualHost = virtualHostLocalService.fetchVirtualHost(
-				virtualHostname);
+				if (virtualHost == null) {
+					return;
+				}
 
-			if (virtualHost == null) {
-				return;
-			}
+				Company virtualHostnameCompany =
+					companyPersistence.findByPrimaryKey(
+						virtualHost.getCompanyId());
 
-			Company virtualHostnameCompany =
-				companyPersistence.findByPrimaryKey(virtualHost.getCompanyId());
-
-			if (!webId.equals(virtualHostnameCompany.getWebId())) {
-				throw new CompanyVirtualHostException(
-					"Duplicate virtual hostname " + virtualHostname);
+				if (!webId.equals(virtualHostnameCompany.getWebId())) {
+					throw new CompanyVirtualHostException(
+						"Duplicate virtual hostname " + virtualHostname);
+				}
 			}
 		}
 		catch (CompanyVirtualHostException companyVirtualHostException) {

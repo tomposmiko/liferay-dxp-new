@@ -832,14 +832,6 @@ public class LocalizationImpl implements Localization {
 	public String getXml(
 		Map<String, String> map, String defaultLanguageId, String key) {
 
-		return getXml(map, defaultLanguageId, key, false);
-	}
-
-	@Override
-	public String getXml(
-		Map<String, String> map, String defaultLanguageId, String key,
-		boolean cdata) {
-
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		XMLStreamWriter xmlStreamWriter = null;
@@ -880,19 +872,13 @@ public class LocalizationImpl implements Localization {
 
 			for (Map.Entry<String, String> entry : map.entrySet()) {
 				String languageId = entry.getKey();
+				String value = entry.getValue();
 
 				xmlStreamWriter.writeStartElement(key);
 
 				xmlStreamWriter.writeAttribute(_LANGUAGE_ID, languageId);
-
-				if (cdata) {
-					xmlStreamWriter.writeCData(
-						XMLUtil.stripInvalidChars(entry.getValue()));
-				}
-				else {
-					xmlStreamWriter.writeCharacters(
-						XMLUtil.stripInvalidChars(entry.getValue()));
-				}
+				xmlStreamWriter.writeCharacters(
+					XMLUtil.stripInvalidChars(value));
 
 				xmlStreamWriter.writeEndElement();
 			}
@@ -1122,15 +1108,6 @@ public class LocalizationImpl implements Localization {
 		Map<Locale, String> localizationMap, String xml, String key,
 		String defaultLanguageId) {
 
-		return updateLocalization(
-			localizationMap, xml, key, defaultLanguageId, false);
-	}
-
-	@Override
-	public String updateLocalization(
-		Map<Locale, String> localizationMap, String xml, String key,
-		String defaultLanguageId, boolean cdata) {
-
 		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
 
 		if (Validator.isBlank(xml)) {
@@ -1151,7 +1128,7 @@ public class LocalizationImpl implements Localization {
 				return StringPool.BLANK;
 			}
 
-			return getXml(map, defaultLanguageId, key, cdata);
+			return getXml(map, defaultLanguageId, key);
 		}
 
 		for (Locale locale : availableLocales) {

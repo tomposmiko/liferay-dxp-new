@@ -15,7 +15,6 @@
 package com.liferay.knowledge.base.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link KBArticleLocalService}.
@@ -920,11 +919,6 @@ public class KBArticleLocalServiceWrapper
 
 		return _kbArticleLocalService.updateStatus(
 			userId, resourcePrimKey, status, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _kbArticleLocalService.getBasePersistence();
 	}
 
 	@Override

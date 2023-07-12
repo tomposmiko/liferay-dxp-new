@@ -19,7 +19,7 @@ definition {
 		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SubmitAndApproveWorkflowAfterUpgrade625 {
 		property data.archive.type = "data-archive-portal";
 		property database.types = "mariadb,mysql,postgresql";
@@ -28,7 +28,7 @@ definition {
 		Upgrade.submitNewWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SubmitAndApproveWorkflowAfterUpgrade704 {
 		property data.archive.type = "data-archive-portal";
 		property database.types = "mariadb,mysql,postgresql";
@@ -37,7 +37,7 @@ definition {
 		Upgrade.submitNewWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SubmitAndApproveWorkflowAfterUpgrade713 {
 		property data.archive.type = "data-archive-portal";
 		property database.types = "mariadb,mysql,postgresql";
@@ -46,7 +46,7 @@ definition {
 		Upgrade.submitNewWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SubmitAndApproveWorkflowAfterUpgrade7110 {
 		property data.archive.type = "data-archive-portal";
 		property portal.version = "7.1.10";
@@ -54,7 +54,7 @@ definition {
 		Upgrade.submitNewWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SubmitAndApproveWorkflowAfterUpgrade70106 {
 		property data.archive.type = "data-archive-portal";
 		property portal.version = "7.0.10.6";
@@ -62,7 +62,7 @@ definition {
 		Upgrade.submitNewWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SubmitAndApproveWorkflowAfterUpgrade621015 {
 		property data.archive.type = "data-archive-portal";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -71,7 +71,7 @@ definition {
 		Upgrade.submitNewWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SubmitAndApproveWorkflowAfterUpgrade621021 {
 		property data.archive.type = "data-archive-portal";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -80,7 +80,7 @@ definition {
 		Upgrade.submitNewWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewWorkflowArchive625 {
 		property data.archive.type = "data-archive-workflow";
 		property database.types = "mariadb,mysql,postgresql";
@@ -89,7 +89,7 @@ definition {
 		Upgrade.approveWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewWorkflowArchive704 {
 		property data.archive.type = "data-archive-workflow";
 		property database.types = "mariadb,mysql,postgresql";
@@ -98,7 +98,7 @@ definition {
 		Upgrade.approveWorkflow();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewWorkflowArchive70106 {
 		property data.archive.type = "data-archive-workflow";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -109,7 +109,7 @@ definition {
 		Upgrade.publishWorkflowDefinition();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewWorkflowArchive621015 {
 		property data.archive.type = "data-archive-workflow";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -120,7 +120,7 @@ definition {
 		Upgrade.publishWorkflowDefinition();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewWorkflowArchive621021 {
 		property data.archive.type = "data-archive-workflow";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";

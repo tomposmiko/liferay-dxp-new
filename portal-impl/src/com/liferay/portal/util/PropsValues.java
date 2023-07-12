@@ -1539,14 +1539,6 @@ public class PropsValues {
 			PropsUtil.get(
 				PropsKeys.LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED));
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final boolean LDAP_IGNORE_USER_SEARCH_FILTER_FOR_AUTH =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.LDAP_IGNORE_USER_SEARCH_FILTER_FOR_AUTH));
-
 	public static final boolean LEARN_RESOURCES_CDN_ENABLED =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.LEARN_RESOURCES_CDN_ENABLED));
@@ -2520,10 +2512,6 @@ public class PropsValues {
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES));
 
-	public static final boolean RESOURCE_ACTIONS_STRICT_MODE_ENABLED =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.RESOURCE_ACTIONS_STRICT_MODE_ENABLED));
-
 	public static final String RESOURCE_REPOSITORIES_ROOT = PropsUtil.get(
 		PropsKeys.RESOURCE_REPOSITORIES_ROOT);
 
@@ -3141,7 +3129,7 @@ public class PropsValues {
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             com.liferay.view.count.configuration.ViewCountConfiguration
+	 *             com.liferay.view.count.configuration.ViewCountsConfiguration
 	 *             #enabled()}
 	 */
 	@Deprecated

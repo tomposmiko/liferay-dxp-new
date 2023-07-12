@@ -372,7 +372,6 @@ public class WorkflowMetricsRESTTestHelper {
 				instanceCount = 0L;
 				onTimeInstanceCount = 0L;
 				overdueInstanceCount = 0L;
-				untrackedInstanceCount = 0L;
 
 				setProcess(
 					() -> {
@@ -384,6 +383,8 @@ public class WorkflowMetricsRESTTestHelper {
 
 						return process;
 					});
+
+				untrackedInstanceCount = 0L;
 			}
 		};
 

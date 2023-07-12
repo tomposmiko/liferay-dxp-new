@@ -149,7 +149,7 @@ public class SortDisplayBuilder {
 	}
 
 	protected String getParameterValue() {
-		if (!_selectedFields.isEmpty()) {
+		if (_selectedFields.size() > 0) {
 			return _selectedFields.get(_selectedFields.size() - 1);
 		}
 

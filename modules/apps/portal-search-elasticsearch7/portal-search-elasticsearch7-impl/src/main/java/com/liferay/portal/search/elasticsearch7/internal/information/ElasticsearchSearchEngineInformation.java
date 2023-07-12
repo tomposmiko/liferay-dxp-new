@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConnectionConfiguration;
+import com.liferay.portal.search.elasticsearch7.internal.ElasticsearchSearchEngine;
 import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.configuration.OperationModeResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnection;
@@ -173,7 +174,7 @@ public class ElasticsearchSearchEngineInformation
 
 	@Override
 	public String getVendorString() {
-		String vendor = "Elasticsearch";
+		String vendor = elasticsearchSearchEngine.getVendor();
 
 		if (operationModeResolver.isDevelopmentModeEnabled()) {
 			StringBundler sb = new StringBundler(5);
@@ -374,6 +375,9 @@ public class ElasticsearchSearchEngineInformation
 
 	@Reference
 	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+
+	@Reference
+	protected ElasticsearchSearchEngine elasticsearchSearchEngine;
 
 	@Reference
 	protected NodeInformationBuilderFactory nodeInformationBuilderFactory;

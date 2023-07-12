@@ -86,12 +86,6 @@ public class CommerceNotificationQueueEntryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceNotificationQueueEntryService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceNotificationQueueEntryService _service;
 
 }

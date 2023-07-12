@@ -235,83 +235,77 @@ public class CTAutoResolutionInfoModelImpl
 
 	private static final Map<String, Function<CTAutoResolutionInfo, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CTAutoResolutionInfo, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CTAutoResolutionInfo, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CTAutoResolutionInfo, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", CTAutoResolutionInfo::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctAutoResolutionInfoId",
-			CTAutoResolutionInfo::getCtAutoResolutionInfoId);
-		attributeGetterFunctions.put(
-			"companyId", CTAutoResolutionInfo::getCompanyId);
-		attributeGetterFunctions.put(
-			"createDate", CTAutoResolutionInfo::getCreateDate);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CTAutoResolutionInfo::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"modelClassNameId", CTAutoResolutionInfo::getModelClassNameId);
-		attributeGetterFunctions.put(
-			"sourceModelClassPK", CTAutoResolutionInfo::getSourceModelClassPK);
-		attributeGetterFunctions.put(
-			"targetModelClassPK", CTAutoResolutionInfo::getTargetModelClassPK);
-		attributeGetterFunctions.put(
-			"conflictIdentifier", CTAutoResolutionInfo::getConflictIdentifier);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CTAutoResolutionInfo, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CTAutoResolutionInfo, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CTAutoResolutionInfo, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CTAutoResolutionInfo::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CTAutoResolutionInfo, Long>)
 				CTAutoResolutionInfo::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctAutoResolutionInfoId",
+			CTAutoResolutionInfo::getCtAutoResolutionInfoId);
 		attributeSetterBiConsumers.put(
 			"ctAutoResolutionInfoId",
 			(BiConsumer<CTAutoResolutionInfo, Long>)
 				CTAutoResolutionInfo::setCtAutoResolutionInfoId);
+		attributeGetterFunctions.put(
+			"companyId", CTAutoResolutionInfo::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CTAutoResolutionInfo, Long>)
 				CTAutoResolutionInfo::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", CTAutoResolutionInfo::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CTAutoResolutionInfo, Date>)
 				CTAutoResolutionInfo::setCreateDate);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTAutoResolutionInfo::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CTAutoResolutionInfo, Long>)
 				CTAutoResolutionInfo::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"modelClassNameId", CTAutoResolutionInfo::getModelClassNameId);
 		attributeSetterBiConsumers.put(
 			"modelClassNameId",
 			(BiConsumer<CTAutoResolutionInfo, Long>)
 				CTAutoResolutionInfo::setModelClassNameId);
+		attributeGetterFunctions.put(
+			"sourceModelClassPK", CTAutoResolutionInfo::getSourceModelClassPK);
 		attributeSetterBiConsumers.put(
 			"sourceModelClassPK",
 			(BiConsumer<CTAutoResolutionInfo, Long>)
 				CTAutoResolutionInfo::setSourceModelClassPK);
+		attributeGetterFunctions.put(
+			"targetModelClassPK", CTAutoResolutionInfo::getTargetModelClassPK);
 		attributeSetterBiConsumers.put(
 			"targetModelClassPK",
 			(BiConsumer<CTAutoResolutionInfo, Long>)
 				CTAutoResolutionInfo::setTargetModelClassPK);
+		attributeGetterFunctions.put(
+			"conflictIdentifier", CTAutoResolutionInfo::getConflictIdentifier);
 		attributeSetterBiConsumers.put(
 			"conflictIdentifier",
 			(BiConsumer<CTAutoResolutionInfo, String>)
 				CTAutoResolutionInfo::setConflictIdentifier);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -186,7 +186,7 @@ public class RemoteSPIProxy implements SPI {
 	@Override
 	public String toString() {
 		return StringBundler.concat(
-			_spiProviderName, StringPool.POUND, _spiConfiguration);
+			_spiProviderName, StringPool.POUND, _spiConfiguration.toString());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(RemoteSPIProxy.class);

@@ -469,10 +469,6 @@ public class SiteNavigationMenuItemLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SiteNavigationMenuItemLocalService service) {
-		_service = service;
-	}
-
 	private static volatile SiteNavigationMenuItemLocalService _service;
 
 }

@@ -213,47 +213,41 @@ public class DLSyncEventModelImpl
 
 	private static final Map<String, Function<DLSyncEvent, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DLSyncEvent, Object>>();
-
-		attributeGetterFunctions.put(
-			"syncEventId", DLSyncEvent::getSyncEventId);
-		attributeGetterFunctions.put("companyId", DLSyncEvent::getCompanyId);
-		attributeGetterFunctions.put(
-			"modifiedTime", DLSyncEvent::getModifiedTime);
-		attributeGetterFunctions.put("event", DLSyncEvent::getEvent);
-		attributeGetterFunctions.put("type", DLSyncEvent::getType);
-		attributeGetterFunctions.put("typePK", DLSyncEvent::getTypePK);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<DLSyncEvent, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DLSyncEvent, Object>>();
 		Map<String, BiConsumer<DLSyncEvent, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DLSyncEvent, ?>>();
 
+		attributeGetterFunctions.put(
+			"syncEventId", DLSyncEvent::getSyncEventId);
 		attributeSetterBiConsumers.put(
 			"syncEventId",
 			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setSyncEventId);
+		attributeGetterFunctions.put("companyId", DLSyncEvent::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setCompanyId);
+		attributeGetterFunctions.put(
+			"modifiedTime", DLSyncEvent::getModifiedTime);
 		attributeSetterBiConsumers.put(
 			"modifiedTime",
 			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setModifiedTime);
+		attributeGetterFunctions.put("event", DLSyncEvent::getEvent);
 		attributeSetterBiConsumers.put(
 			"event", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setEvent);
+		attributeGetterFunctions.put("type", DLSyncEvent::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setType);
+		attributeGetterFunctions.put("typePK", DLSyncEvent::getTypePK);
 		attributeSetterBiConsumers.put(
 			"typePK", (BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setTypePK);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

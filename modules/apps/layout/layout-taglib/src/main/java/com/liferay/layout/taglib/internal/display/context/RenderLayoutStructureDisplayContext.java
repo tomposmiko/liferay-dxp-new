@@ -16,7 +16,6 @@ package com.liferay.layout.taglib.internal.display.context;
 
 import com.liferay.asset.info.display.contributor.util.ContentAccessor;
 import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.fragment.constants.FragmentWebKeys;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.frontend.token.definition.FrontendTokenDefinition;
@@ -45,7 +44,6 @@ import com.liferay.layout.list.retriever.ListObjectReference;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactory;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactoryTracker;
 import com.liferay.layout.responsive.ResponsiveLayoutStructureUtil;
-import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
 import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
@@ -63,7 +61,6 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
@@ -79,6 +76,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.SegmentsEntryRetriever;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
+import com.liferay.segments.constants.SegmentsWebKeys;
 import com.liferay.segments.context.RequestContextMapper;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.util.DefaultStyleBookEntryUtil;
@@ -342,20 +341,6 @@ public class RenderLayoutStructureDisplayContext {
 	}
 
 	public String getCssClass(
-			FragmentEntryLink fragmentEntryLink,
-			StyledLayoutStructureItem styledLayoutStructureItem)
-		throws Exception {
-
-		if (!_checkAccessAllowedToFragmentEntryLink(
-				fragmentEntryLink.getFragmentEntryLinkId())) {
-
-			return StringPool.BLANK;
-		}
-
-		return getCssClass(styledLayoutStructureItem);
-	}
-
-	public String getCssClass(
 			StyledLayoutStructureItem styledLayoutStructureItem)
 		throws Exception {
 
@@ -519,8 +504,8 @@ public class RenderLayoutStructureDisplayContext {
 			defaultFragmentRendererContext.setPreviewType(_getPreviewType());
 			defaultFragmentRendererContext.setPreviewVersion(
 				_getPreviewVersion());
-			defaultFragmentRendererContext.setSegmentsEntryIds(
-				_getSegmentsEntryIds());
+			defaultFragmentRendererContext.setSegmentsExperienceIds(
+				_getSegmentsExperienceIds());
 		}
 
 		if (LayoutStructureItemUtil.hasAncestor(
@@ -571,20 +556,6 @@ public class RenderLayoutStructureDisplayContext {
 			layoutStructure.getLayoutStructureItem(_getMainItemId());
 
 		return layoutStructureItem.getChildrenItemIds();
-	}
-
-	public String getStyle(
-			FragmentEntryLink fragmentEntryLink,
-			StyledLayoutStructureItem styledLayoutStructureItem)
-		throws Exception {
-
-		if (!_checkAccessAllowedToFragmentEntryLink(
-				fragmentEntryLink.getFragmentEntryLinkId())) {
-
-			return StringPool.BLANK;
-		}
-
-		return getStyle(styledLayoutStructureItem);
 	}
 
 	public String getStyle(StyledLayoutStructureItem styledLayoutStructureItem)
@@ -761,21 +732,6 @@ public class RenderLayoutStructureDisplayContext {
 		return "var(--" + cssVariable + ")";
 	}
 
-	private boolean _checkAccessAllowedToFragmentEntryLink(
-		long fragmentEntryLinkId) {
-
-		try {
-			return GetterUtil.getBoolean(
-				_httpServletRequest.getAttribute(
-					FragmentWebKeys.ACCESS_ALLOWED_TO_FRAGMENT_ENTRY_LINK_ID +
-						fragmentEntryLinkId),
-				true);
-		}
-		catch (Exception exception) {
-			return false;
-		}
-	}
-
 	private String _getBackgroundImage(JSONObject rowConfigJSONObject)
 		throws Exception {
 
@@ -920,10 +876,8 @@ public class RenderLayoutStructureDisplayContext {
 				styleBookEntry.getFrontendTokensValues());
 		}
 
-		Group group = _themeDisplay.getScopeGroup();
-
 		LayoutSet layoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
-			_themeDisplay.getSiteGroupId(), group.isLayoutSetPrototype());
+			_themeDisplay.getSiteGroupId(), false);
 
 		FrontendTokenDefinition frontendTokenDefinition =
 			_frontendTokenDefinitionRegistry.getFrontendTokenDefinition(
@@ -1155,17 +1109,31 @@ public class RenderLayoutStructureDisplayContext {
 			return _segmentsEntryIds;
 		}
 
-		SegmentsEntryRetriever segmentsEntryRetriever =
-			ServletContextUtil.getSegmentsEntryRetriever();
-
-		RequestContextMapper requestContextMapper =
-			ServletContextUtil.getRequestContextMapper();
-
-		_segmentsEntryIds = segmentsEntryRetriever.getSegmentsEntryIds(
+		_segmentsEntryIds = _segmentsEntryRetriever.getSegmentsEntryIds(
 			_themeDisplay.getScopeGroupId(), _themeDisplay.getUserId(),
-			requestContextMapper.map(_httpServletRequest));
+			_requestContextMapper.map(_httpServletRequest));
 
 		return _segmentsEntryIds;
+	}
+
+	private long[] _getSegmentsExperienceIds() {
+		long[] selectedSegmentsExperienceIds = ParamUtil.getLongValues(
+			_httpServletRequest, "segmentsExperienceId");
+
+		if (selectedSegmentsExperienceIds.length > 0) {
+			return selectedSegmentsExperienceIds;
+		}
+
+		if (_segmentsExperienceIds != null) {
+			return _segmentsExperienceIds;
+		}
+
+		_segmentsExperienceIds = GetterUtil.getLongValues(
+			_httpServletRequest.getAttribute(
+				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS),
+			new long[] {SegmentsExperienceConstants.ID_DEFAULT});
+
+		return _segmentsExperienceIds;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -1194,6 +1162,7 @@ public class RenderLayoutStructureDisplayContext {
 	private final RequestContextMapper _requestContextMapper;
 	private long[] _segmentsEntryIds;
 	private final SegmentsEntryRetriever _segmentsEntryRetriever;
+	private long[] _segmentsExperienceIds;
 	private final boolean _showPreview;
 	private final ThemeDisplay _themeDisplay;
 

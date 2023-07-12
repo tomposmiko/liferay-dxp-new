@@ -15,7 +15,6 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceAvailabilityEstimateLocalService}.
@@ -455,11 +454,6 @@ public class CommerceAvailabilityEstimateLocalServiceWrapper
 		return _commerceAvailabilityEstimateLocalService.
 			updateCommerceAvailabilityEstimate(
 				commerceAvailabilityId, titleMap, priority, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceAvailabilityEstimateLocalService.getBasePersistence();
 	}
 
 	@Override

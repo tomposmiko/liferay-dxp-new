@@ -28,6 +28,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.cache.SingleVMPool;
 import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.log.Log;
@@ -107,6 +108,7 @@ import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
@@ -120,7 +122,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  */
 @Component(
 	configurationPid = "com.liferay.portal.template.freemarker.configuration.FreeMarkerEngineConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = "language.type=" + TemplateConstants.LANG_TYPE_FTL,
 	service = TemplateManager.class
 )
@@ -590,6 +592,11 @@ public class FreeMarkerManager extends BaseTemplateManager {
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setSingleVMPool(SingleVMPool singleVMPool) {
+		_singleVMPool = singleVMPool;
+	}
+
 	private String _getMacroLibrary() {
 		Class<?> clazz = getClass();
 
@@ -688,6 +695,7 @@ public class FreeMarkerManager extends BaseTemplateManager {
 	private volatile BeansWrapper _restrictedBeansWrapper;
 	private volatile ServiceRegistration<PortalExecutorConfig>
 		_serviceRegistration;
+	private SingleVMPool _singleVMPool;
 	private final Map<String, String> _taglibMappings =
 		new ConcurrentHashMap<>();
 	private TemplateClassResolver _templateClassResolver;

@@ -54,7 +54,6 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -94,7 +93,6 @@ public class ExportedMissingReferenceBackwardCompatbilityExportImportTest
 		super.tearDown();
 	}
 
-	@Ignore
 	@Test
 	public void testBackwardCompatibility() throws Exception {
 		List<PortletDataHandler> portletDataHandlers = setPortletDataHandler(

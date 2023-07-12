@@ -186,6 +186,9 @@ public class OpenIdConnectAuthenticationHandlerImpl
 			OpenIdConnectWebKeys.OPEN_ID_CONNECT_SESSION_ID);
 
 		if (openIdConnectSessionId != null) {
+			_offlineOpenIdConnectSessionManager.endOpenIdConnectSession(
+				openIdConnectSessionId);
+
 			httpSession.removeAttribute(
 				OpenIdConnectWebKeys.OPEN_ID_CONNECT_SESSION_ID);
 		}
@@ -228,7 +231,8 @@ public class OpenIdConnectAuthenticationHandlerImpl
 			throw new SystemException(
 				StringBundler.concat(
 					"Unable to send user to OpenId Connect service ",
-					authenticationRequestURI, ": ", ioException.getMessage()),
+					authenticationRequestURI.toString(), ": ",
+					ioException.getMessage()),
 				ioException);
 		}
 	}
@@ -290,8 +294,8 @@ public class OpenIdConnectAuthenticationHandlerImpl
 		catch (ParseException | URISyntaxException exception) {
 			throw new OpenIdConnectServiceException.AuthenticationException(
 				StringBundler.concat(
-					"Unable to process response from ", requestURL, ": ",
-					exception.getMessage()),
+					"Unable to process response from ", requestURL.toString(),
+					": ", exception.getMessage()),
 				exception);
 		}
 	}

@@ -340,10 +340,6 @@ public class SamlIdpSpSessionLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SamlIdpSpSessionLocalService service) {
-		_service = service;
-	}
-
 	private static volatile SamlIdpSpSessionLocalService _service;
 
 }

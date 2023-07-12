@@ -253,11 +253,20 @@ public interface CommerceAddressLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceAddress fetchCommerceAddress(long commerceAddressId);
 
-	@Deprecated
+	/**
+	 * Returns the commerce address with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce address's external reference code
+	 * @return the matching commerce address, or <code>null</code> if a matching commerce address could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceAddress fetchCommerceAddressByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceAddressByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceAddress fetchCommerceAddressByReferenceCode(
@@ -301,7 +310,14 @@ public interface CommerceAddressLocalService
 	public CommerceAddress getCommerceAddress(long commerceAddressId)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the commerce address with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce address's external reference code
+	 * @return the matching commerce address
+	 * @throws PortalException if a matching commerce address could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceAddress getCommerceAddressByExternalReferenceCode(
 			long companyId, String externalReferenceCode)

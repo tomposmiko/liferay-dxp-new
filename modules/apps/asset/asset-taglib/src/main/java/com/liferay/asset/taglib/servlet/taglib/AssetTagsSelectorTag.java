@@ -19,8 +19,7 @@ import com.liferay.asset.kernel.service.AssetTagServiceUtil;
 import com.liferay.asset.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
@@ -36,11 +35,8 @@ import com.liferay.taglib.aui.AUIUtil;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -176,24 +172,26 @@ public class AssetTagsSelectorTag extends IncludeTag {
 			return _groupIds;
 		}
 
-		try {
-			if (ArrayUtil.isEmpty(_groupIds)) {
-				ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-					WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-				return PortalUtil.getCurrentAndAncestorSiteGroupIds(
-					themeDisplay.getScopeGroupId());
-			}
+		long[] groupIds = null;
 
-			return PortalUtil.getCurrentAndAncestorSiteGroupIds(_groupIds);
+		Group group = themeDisplay.getScopeGroup();
+
+		if (group.isLayout()) {
+			groupIds = new long[] {group.getParentGroupId()};
 		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
-			}
-
-			return new long[0];
+		else {
+			groupIds = new long[] {group.getGroupId()};
 		}
+
+		if (group.getParentGroupId() != themeDisplay.getCompanyGroupId()) {
+			groupIds = ArrayUtil.append(
+				groupIds, themeDisplay.getCompanyGroupId());
+		}
+
+		return groupIds;
 	}
 
 	protected String getId() {
@@ -222,8 +220,11 @@ public class AssetTagsSelectorTag extends IncludeTag {
 				return null;
 			}
 
-			portletURL.setParameter(
-				"groupIds", StringUtil.merge(getGroupIds(), StringPool.COMMA));
+			if (_groupIds != null) {
+				portletURL.setParameter(
+					"groupIds", StringUtil.merge(_groupIds, StringPool.COMMA));
+			}
+
 			portletURL.setParameter("eventName", getEventName());
 			portletURL.setParameter("selectedTagNames", "{selectedTagNames}");
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -231,41 +232,28 @@ public class AssetTagsSelectorTag extends IncludeTag {
 			return portletURL;
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
-			}
 		}
 
 		return null;
 	}
 
 	protected List<String> getTagNames() {
-		Set<String> tagNames = new HashSet<>();
-
 		if (Validator.isNotNull(_className) && (_classPK > 0)) {
-			tagNames.addAll(
-				ListUtil.toList(
-					AssetTagServiceUtil.getTags(_className, _classPK),
-					AssetTag.NAME_ACCESSOR));
+			List<AssetTag> tags = AssetTagServiceUtil.getTags(
+				_className, _classPK);
+
+			return ListUtil.toList(tags, AssetTag.NAME_ACCESSOR);
 		}
 
 		if (!_ignoreRequestValue) {
 			String[] curTagsParam = request.getParameterValues(_hiddenInput);
 
 			if (curTagsParam != null) {
-				List<String> curTags = new ArrayList<>();
-
-				for (String tags : curTagsParam) {
-					Collections.addAll(curTags, tags.split(StringPool.COMMA));
-				}
-
-				tagNames.addAll(curTags);
+				return ListUtil.fromArray(curTagsParam);
 			}
 		}
 
-		tagNames.addAll(StringUtil.split(_tagNames));
-
-		return new ArrayList<>(tagNames);
+		return StringUtil.split(_tagNames);
 	}
 
 	@Override
@@ -359,9 +347,6 @@ public class AssetTagsSelectorTag extends IncludeTag {
 	}
 
 	private static final String _PAGE = "/asset_tags_selector/page.jsp";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetTagsSelectorTag.class);
 
 	private String _addCallback;
 	private boolean _allowAddEntry = true;

@@ -38,8 +38,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -56,6 +54,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.InputStream;
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.sql.Blob;
 
@@ -443,7 +443,7 @@ public abstract class DLContentLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		DLContentLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -458,7 +458,7 @@ public abstract class DLContentLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		dlContentLocalService = (DLContentLocalService)aopProxy;
 
-		DLContentLocalServiceUtil.setService(dlContentLocalService);
+		_setLocalServiceUtilService(dlContentLocalService);
 	}
 
 	/**
@@ -517,6 +517,22 @@ public abstract class DLContentLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		DLContentLocalService dlContentLocalService) {
+
+		try {
+			Field field = DLContentLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlContentLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected DLContentLocalService dlContentLocalService;
 
 	@Reference
@@ -525,9 +541,6 @@ public abstract class DLContentLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLContentLocalServiceBaseImpl.class);
 
 	@Reference
 	protected File _file;

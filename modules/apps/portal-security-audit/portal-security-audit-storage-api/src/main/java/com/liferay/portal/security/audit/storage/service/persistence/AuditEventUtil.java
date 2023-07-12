@@ -444,10 +444,6 @@ public class AuditEventUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(AuditEventPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile AuditEventPersistence _persistence;
 
 }

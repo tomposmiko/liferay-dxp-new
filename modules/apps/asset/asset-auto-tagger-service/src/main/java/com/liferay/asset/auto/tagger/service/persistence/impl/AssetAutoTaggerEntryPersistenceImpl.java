@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1780,9 +1781,7 @@ public class AssetAutoTaggerEntryPersistenceImpl
 	 */
 	@Override
 	public AssetAutoTaggerEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				AssetAutoTaggerEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(AssetAutoTaggerEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2264,12 +2263,12 @@ public class AssetAutoTaggerEntryPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"assetEntryId", "assetTagId"}, false);
 
-		AssetAutoTaggerEntryUtil.setPersistence(this);
+		_setAssetAutoTaggerEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AssetAutoTaggerEntryUtil.setPersistence(null);
+		_setAssetAutoTaggerEntryUtilPersistence(null);
 
 		entityCache.removeCache(AssetAutoTaggerEntryImpl.class.getName());
 
@@ -2279,6 +2278,22 @@ public class AssetAutoTaggerEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAssetAutoTaggerEntryUtilPersistence(
+		AssetAutoTaggerEntryPersistence assetAutoTaggerEntryPersistence) {
+
+		try {
+			Field field = AssetAutoTaggerEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, assetAutoTaggerEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

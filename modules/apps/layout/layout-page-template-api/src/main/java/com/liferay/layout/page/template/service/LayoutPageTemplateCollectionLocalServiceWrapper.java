@@ -17,7 +17,6 @@ package com.liferay.layout.page.template.service;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -495,11 +494,6 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 		return _layoutPageTemplateCollectionLocalService.
 			updateLayoutPageTemplateCollection(
 				layoutPageTemplateCollectionId, name, description);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _layoutPageTemplateCollectionLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPAttachmentFileEntryLocalService}.
@@ -328,7 +327,13 @@ public class CPAttachmentFileEntryLocalServiceWrapper
 			CPAttachmentFileEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry, or <code>null</code> if a matching cp attachment file entry could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPAttachmentFileEntry
 		fetchCPAttachmentFileEntryByExternalReferenceCode(
@@ -339,6 +344,9 @@ public class CPAttachmentFileEntryLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPAttachmentFileEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CPAttachmentFileEntry
@@ -433,18 +441,6 @@ public class CPAttachmentFileEntryLocalServiceWrapper
 	public java.util.List
 		<com.liferay.commerce.product.model.CPAttachmentFileEntry>
 				getCPAttachmentFileEntries(
-					long classNameId, long classPK, String keywords, int type,
-					int status, int start, int end)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpAttachmentFileEntryLocalService.getCPAttachmentFileEntries(
-			classNameId, classPK, keywords, type, status, start, end);
-	}
-
-	@Override
-	public java.util.List
-		<com.liferay.commerce.product.model.CPAttachmentFileEntry>
-				getCPAttachmentFileEntries(
 					long cpDefinitionId, String serializedDDMFormValues,
 					int type, int start, int end)
 			throws Exception {
@@ -513,17 +509,6 @@ public class CPAttachmentFileEntryLocalServiceWrapper
 			getCPAttachmentFileEntriesCount(classNameId, classPK, type, status);
 	}
 
-	@Override
-	public int getCPAttachmentFileEntriesCount(
-			long classNameId, long classPK, String keywords, int type,
-			int status)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpAttachmentFileEntryLocalService.
-			getCPAttachmentFileEntriesCount(
-				classNameId, classPK, keywords, type, status);
-	}
-
 	/**
 	 * Returns the cp attachment file entry with the primary key.
 	 *
@@ -540,7 +525,14 @@ public class CPAttachmentFileEntryLocalServiceWrapper
 			CPAttachmentFileEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry
+	 * @throws PortalException if a matching cp attachment file entry could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPAttachmentFileEntry
 			getCPAttachmentFileEntryByExternalReferenceCode(
@@ -758,11 +750,6 @@ public class CPAttachmentFileEntryLocalServiceWrapper
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			neverExpire, titleMap, json, priority, type, externalReferenceCode,
 			serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpAttachmentFileEntryLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -21,20 +21,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.LocaleThreadLocal;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.text.DateFormat;
-import java.text.Format;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import java.util.Locale;
-import java.util.Optional;
-
-import org.apache.commons.lang.StringUtils;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -60,34 +51,7 @@ public class DateDDMFormFieldValueRenderer
 	protected String render(String valueString, Locale locale) {
 		if (Validator.isNotNull(valueString)) {
 			try {
-				SimpleDateFormat simpleDateFormat =
-					(SimpleDateFormat)DateFormat.getDateInstance(
-						DateFormat.SHORT,
-						Optional.ofNullable(
-							LocaleThreadLocal.getThemeDisplayLocale()
-						).orElse(
-							locale
-						));
-
-				String pattern = simpleDateFormat.toPattern();
-
-				if (StringUtils.countMatches(pattern, "d") == 1) {
-					pattern = StringUtil.replace(pattern, 'd', "dd");
-				}
-
-				if (StringUtils.countMatches(pattern, "M") == 1) {
-					pattern = StringUtil.replace(pattern, 'M', "MM");
-				}
-
-				if (StringUtils.countMatches(pattern, "y") == 2) {
-					pattern = StringUtil.replace(pattern, 'y', "yy");
-				}
-
-				Format format = FastDateFormatFactoryUtil.getSimpleDateFormat(
-					pattern);
-
-				return format.format(
-					DateUtil.parseDate("yyyy-MM-dd", valueString, locale));
+				return DateUtil.formatDate("yyyy-MM-dd", valueString, locale);
 			}
 			catch (ParseException parseException) {
 				_log.error("Unable to parse date", parseException);

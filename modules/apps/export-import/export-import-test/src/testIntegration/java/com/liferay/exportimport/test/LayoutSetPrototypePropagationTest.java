@@ -222,8 +222,6 @@ public class LayoutSetPrototypePropagationTest
 		Assert.assertEquals(
 			_initialPrototypeLayoutsCount, getGroupLayoutCount());
 
-		MergeLayoutPrototypesThreadLocal.setSkipMerge(false);
-
 		LayoutServiceUtil.getLayouts(
 			group.getGroupId(), false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
 			false, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
@@ -320,38 +318,6 @@ public class LayoutSetPrototypePropagationTest
 	@Test
 	public void testLayoutPropagationWithLinkEnabled() throws Exception {
 		doTestLayoutPropagation(true);
-	}
-
-	@Test
-	public void testLayoutPropagationWithMasterLayout() throws Exception {
-		Layout siteTemplateMasterLayout = LayoutTestUtil.addTypeContentLayout(
-			_layoutSetPrototypeGroup, true, false);
-
-		LayoutTestUtil.addTypeContentLayout(
-			_layoutSetPrototypeGroup, true, false,
-			siteTemplateMasterLayout.getPlid());
-
-		propagateChanges(group);
-
-		LayoutTestUtil.addTypeContentLayout(
-			_layoutSetPrototypeGroup, true, false,
-			siteTemplateMasterLayout.getPlid());
-
-		propagateChanges(group);
-
-		Assert.assertEquals(
-			0,
-			LayoutLocalServiceUtil.getMasterLayoutsCount(
-				group.getGroupId(), siteTemplateMasterLayout.getPlid()));
-
-		Layout siteMasterLayout = LayoutLocalServiceUtil.getFriendlyURLLayout(
-			group.getGroupId(), false,
-			siteTemplateMasterLayout.getFriendlyURL());
-
-		Assert.assertEquals(
-			4,
-			LayoutLocalServiceUtil.getMasterLayoutsCount(
-				group.getGroupId(), siteMasterLayout.getPlid()));
 	}
 
 	@Test
@@ -883,8 +849,6 @@ public class LayoutSetPrototypePropagationTest
 
 		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
 			group.getGroupId(), false);
-
-		MergeLayoutPrototypesThreadLocal.setSkipMerge(false);
 
 		SitesUtil.mergeLayoutSetPrototypeLayouts(group, layoutSet);
 

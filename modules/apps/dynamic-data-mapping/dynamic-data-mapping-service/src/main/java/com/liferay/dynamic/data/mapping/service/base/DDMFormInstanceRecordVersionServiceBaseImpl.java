@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class DDMFormInstanceRecordVersionServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DDMFormInstanceRecordVersionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -74,8 +74,7 @@ public abstract class DDMFormInstanceRecordVersionServiceBaseImpl
 		ddmFormInstanceRecordVersionService =
 			(DDMFormInstanceRecordVersionService)aopProxy;
 
-		DDMFormInstanceRecordVersionServiceUtil.setService(
-			ddmFormInstanceRecordVersionService);
+		_setServiceUtilService(ddmFormInstanceRecordVersionService);
 	}
 
 	/**
@@ -121,6 +120,24 @@ public abstract class DDMFormInstanceRecordVersionServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		DDMFormInstanceRecordVersionService
+			ddmFormInstanceRecordVersionService) {
+
+		try {
+			Field field =
+				DDMFormInstanceRecordVersionServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmFormInstanceRecordVersionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.dynamic.data.mapping.service.
 		DDMFormInstanceRecordVersionLocalService
@@ -136,8 +153,5 @@ public abstract class DDMFormInstanceRecordVersionServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMFormInstanceRecordVersionServiceBaseImpl.class);
 
 }

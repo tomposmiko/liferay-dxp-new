@@ -57,7 +57,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -66,7 +66,7 @@ definition {
 	}
 
 	@description = "With page versioning enabled, content pages only appear in live view after being published and should appear properly."
-	@priority = 5
+	@priority = "5"
 	test PublishContentPage {
 		property portal.acceptance = "true";
 

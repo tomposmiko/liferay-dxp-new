@@ -55,6 +55,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6167,9 +6168,7 @@ public class DLFileVersionPersistenceImpl
 	 */
 	@Override
 	public DLFileVersion fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				DLFileVersion.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(DLFileVersion.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -6820,11 +6819,11 @@ public class DLFileVersionPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "title", "version"}, false);
 
-		DLFileVersionUtil.setPersistence(this);
+		_setDLFileVersionUtilPersistence(this);
 	}
 
 	public void destroy() {
-		DLFileVersionUtil.setPersistence(null);
+		_setDLFileVersionUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFileVersionImpl.class.getName());
 
@@ -6834,6 +6833,22 @@ public class DLFileVersionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDLFileVersionUtilPersistence(
+		DLFileVersionPersistence dlFileVersionPersistence) {
+
+		try {
+			Field field = DLFileVersionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileVersionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

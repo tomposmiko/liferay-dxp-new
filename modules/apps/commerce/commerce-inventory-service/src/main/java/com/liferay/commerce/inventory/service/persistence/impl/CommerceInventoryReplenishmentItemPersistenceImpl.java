@@ -48,6 +48,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -3765,11 +3766,11 @@ public class CommerceInventoryReplenishmentItemPersistenceImpl
 			new String[] {String.class.getName(), Date.class.getName()},
 			new String[] {"sku", "availabilityDate"}, false);
 
-		CommerceInventoryReplenishmentItemUtil.setPersistence(this);
+		_setCommerceInventoryReplenishmentItemUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceInventoryReplenishmentItemUtil.setPersistence(null);
+		_setCommerceInventoryReplenishmentItemUtilPersistence(null);
 
 		entityCache.removeCache(
 			CommerceInventoryReplenishmentItemImpl.class.getName());
@@ -3780,6 +3781,24 @@ public class CommerceInventoryReplenishmentItemPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceInventoryReplenishmentItemUtilPersistence(
+		CommerceInventoryReplenishmentItemPersistence
+			commerceInventoryReplenishmentItemPersistence) {
+
+		try {
+			Field field =
+				CommerceInventoryReplenishmentItemUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceInventoryReplenishmentItemPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

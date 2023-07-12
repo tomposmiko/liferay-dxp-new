@@ -14,10 +14,9 @@
 
 package com.liferay.portal.background.task.internal.messaging;
 
-import com.liferay.portal.background.task.internal.BackgroundTaskImpl;
 import com.liferay.portal.background.task.internal.lock.BackgroundTaskLockHelper;
-import com.liferay.portal.background.task.model.BackgroundTask;
-import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.log.Log;
@@ -32,10 +31,9 @@ import com.liferay.portal.kernel.util.Validator;
 public class BackgroundTaskQueuingMessageListener extends BaseMessageListener {
 
 	public BackgroundTaskQueuingMessageListener(
-		BackgroundTaskLocalService backgroundTaskLocalService,
-		LockManager lockManager) {
+		BackgroundTaskManager backgroundTaskManager, LockManager lockManager) {
 
-		_backgroundTaskLocalService = backgroundTaskLocalService;
+		_backgroundTaskManager = backgroundTaskManager;
 
 		_backgroundTaskLockHelper = new BackgroundTaskLockHelper(lockManager);
 	}
@@ -67,10 +65,11 @@ public class BackgroundTaskQueuingMessageListener extends BaseMessageListener {
 			long backgroundTaskId = (Long)message.get(
 				BackgroundTaskConstants.BACKGROUND_TASK_ID);
 
+			BackgroundTask backgroundTask =
+				_backgroundTaskManager.fetchBackgroundTask(backgroundTaskId);
+
 			if (!_backgroundTaskLockHelper.isLockedBackgroundTask(
-					new BackgroundTaskImpl(
-						_backgroundTaskLocalService.fetchBackgroundTask(
-							backgroundTaskId)))) {
+					backgroundTask)) {
 
 				_executeQueuedBackgroundTasks(taskExecutorClassName);
 			}
@@ -85,7 +84,7 @@ public class BackgroundTaskQueuingMessageListener extends BaseMessageListener {
 		}
 
 		BackgroundTask backgroundTask =
-			_backgroundTaskLocalService.fetchFirstBackgroundTask(
+			_backgroundTaskManager.fetchFirstBackgroundTask(
 				taskExecutorClassName, BackgroundTaskConstants.STATUS_QUEUED);
 
 		if (backgroundTask == null) {
@@ -98,14 +97,14 @@ public class BackgroundTaskQueuingMessageListener extends BaseMessageListener {
 			return;
 		}
 
-		_backgroundTaskLocalService.resumeBackgroundTask(
+		_backgroundTaskManager.resumeBackgroundTask(
 			backgroundTask.getBackgroundTaskId());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BackgroundTaskQueuingMessageListener.class);
 
-	private final BackgroundTaskLocalService _backgroundTaskLocalService;
 	private final BackgroundTaskLockHelper _backgroundTaskLockHelper;
+	private final BackgroundTaskManager _backgroundTaskManager;
 
 }

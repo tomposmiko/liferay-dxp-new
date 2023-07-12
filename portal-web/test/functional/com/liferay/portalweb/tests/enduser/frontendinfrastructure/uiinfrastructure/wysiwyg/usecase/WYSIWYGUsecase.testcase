@@ -17,7 +17,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,19 +25,19 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddBlogsEntryWithImageViaBlogsImages {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = ${pageName});
+		SitePages.addPublicPage(pageName = "${pageName}");
 
-		Navigator.gotoPage(pageName = ${pageName});
+		Navigator.gotoPage(pageName = "${pageName}");
 
 		Portlet.addPG(portletName = "Blogs");
 
-		Navigator.gotoPage(pageName = ${pageName});
+		Navigator.gotoPage(pageName = "${pageName}");
 
 		Blogs.addEntryWithUploadedCoverImage(
 			coverImageName = "Document_1",
@@ -47,7 +47,7 @@ definition {
 			navTab = "Blog Images",
 			uploadFileName = "Document_1.jpg");
 
-		Pause(locator1 = 1000);
+		Pause(locator1 = "1000");
 
 		BlogsEntry.saveAsDraft();
 
@@ -74,7 +74,7 @@ definition {
 		BlogsEntry.viewInlineImage(uploadFileName = "Document_1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddMBThreadWithLinkToDocument {
 		property portal.acceptance = "true";
 
@@ -113,13 +113,13 @@ definition {
 		AssertElementPresent(locator1 = "//img[contains(@src,'Document_1.jpg')]");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddMBThreadWithLinkToPage {
 		property portal.acceptance = "true";
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
-			layoutName = ${pageName});
+			layoutName = "${pageName}");
 
 		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "guest");
 
@@ -134,7 +134,7 @@ definition {
 		CKEditor.addTextWithLink(
 			displayText = "Link to Page",
 			fieldLabel = "Body",
-			pageName = ${pageName});
+			pageName = "${pageName}");
 
 		PortletEntry.publish();
 
@@ -147,22 +147,21 @@ definition {
 			locator1 = "Link#ANY");
 
 		AssertVisible(
-			key_pageName = ${pageName},
+			key_pageName = "${pageName}",
 			locator1 = "Home#PAGE_ACTIVE");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddWebContentArticleCopyPasteContent {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 
 		Open(locator1 = "http://www.standards-schmandards.com/exhibits/wysiwyg/sampledoc.htm");
 
 		var browserType = PropsUtil.get("browser.type");
 
-		if (${browserType} == "safari") {
+		if ("${browserType}" == "safari") {
 			KeyPress.keyDown(
 				locator1 = "//body",
 				value1 = "\COMMAND");
@@ -171,7 +170,7 @@ definition {
 				locator1 = "//body",
 				value1 = "a");
 
-			Pause(locator1 = 1000);
+			Pause(locator1 = "1000");
 
 			KeyPress(
 				locator1 = "//body",
@@ -182,13 +181,9 @@ definition {
 				value1 = "\COMMAND");
 		}
 		else {
-			Type.sendKeys(
-				locator1 = "//body",
-				value1 = "keys=CONTROL,a");
+			SelectFieldText(locator1 = "//body");
 
-			Type.sendKeys(
-				locator1 = "//body",
-				value1 = "keys=CONTROL,c");
+			RobotType.robotTypeShortcut(locator1 = "Ctrl + c");
 		}
 
 		Navigator.openURL();
@@ -207,7 +202,7 @@ definition {
 
 		var browserType = PropsUtil.get("browser.type");
 
-		if (${browserType} == "safari") {
+		if ("${browserType}" == "safari") {
 			KeyPress.keyDown(
 				key_editor = "content",
 				locator1 = "AlloyEditor#EDITOR",
@@ -224,12 +219,10 @@ definition {
 				value1 = "\COMMAND");
 		}
 		else {
-			Type.sendKeys(
-				locator1 = "CKEditor#BODY",
-				value1 = "keys=CONTROL,v");
+			RobotType.robotTypeShortcut(locator1 = "Ctrl + v");
 		}
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		takeScreenshot();
 
@@ -250,7 +243,7 @@ definition {
 		takeScreenshot();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddWebContentArticleWithImageViaURL {
 		Navigator.openURL();
 
@@ -277,7 +270,7 @@ definition {
 		AssertElementPresent(locator1 = "//img[contains(@src,'Document_1.jpg')]");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PreviewSourceContent {
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
@@ -310,19 +303,13 @@ definition {
 		AssertElementPresent(locator1 = "//p[normalize-space(text())='sample text']");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PreviewSourceContentEditContent {
 		Open(locator1 = "http://www.standards-schmandards.com/exhibits/wysiwyg/sampledoc.htm");
 
 		SelectFieldText(locator1 = "//body");
 
-		Type.sendKeys(
-			locator1 = "//body",
-			value1 = "keys=CONTROL,a");
-
-		Type.sendKeys(
-			locator1 = "//body",
-			value1 = "keys=CONTROL,c");
+		RobotType.robotTypeShortcut(locator1 = "Ctrl + c");
 
 		Navigator.openURL();
 
@@ -338,9 +325,7 @@ definition {
 
 		Click(locator1 = "CKEditor#BODY");
 
-		Type.sendKeys(
-			locator1 = "//body",
-			value1 = "keys=CONTROL,v");
+		RobotType.robotTypeShortcut(locator1 = "Ctrl + v");
 
 		SelectFrame(value1 = "relative=top");
 
@@ -361,7 +346,7 @@ definition {
 		AssertElementPresent(locator1 = "//h1[normalize-space(text())='Sample document for editor area test edit']");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewSourceCodeFormattedInTextView {
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
@@ -386,31 +371,31 @@ definition {
 		AssertElementPresent(locator1 = "//p[normalize-space(text())='sample text']");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewWikiFrontPageLeftToRight {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = ${pageName});
+		SitePages.addPublicPage(pageName = "${pageName}");
 
-		Navigator.gotoPage(pageName = ${pageName});
+		Navigator.gotoPage(pageName = "${pageName}");
 
 		Portlet.addPG(portletName = "Wiki");
 
-		Navigator.gotoPage(pageName = ${pageName});
+		Navigator.gotoPage(pageName = "${pageName}");
 
 		WikiPage.addLocalizedFrontPagePG(
 			emptyPageMessage = "This page is empty. Edit it to add some text.",
 			successMessage = "Your request completed successfully.",
 			wikiPageContent = "Wiki Left to Right Content");
 
-		Navigator.gotoPage(pageName = ${pageName});
+		Navigator.gotoPage(pageName = "${pageName}");
 
 		WikiPage.viewLocalizedFrontPagePG(wikiPageContent = "Wiki Left to Right Content");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewWikiFrontPageRightToLeft {
 		property test.name.skip.portal.instance = "WYSIWIGUsecase#ViewWikiFrontPageRightToLeft";
 
@@ -418,13 +403,13 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = ${pageName});
+		SitePages.addPublicPage(pageName = "${pageName}");
 
-		Navigator.gotoPage(pageName = ${pageName});
+		Navigator.gotoPage(pageName = "${pageName}");
 
 		Portlet.addPG(portletName = "Language Selector");
 
-		Navigator.gotoPage(pageName = ${pageName});
+		Navigator.gotoPage(pageName = "${pageName}");
 
 		Portlet.addPG(portletName = "Wiki");
 
@@ -438,7 +423,7 @@ definition {
 			successMessage = "نجاح:تم تنفيذ طلبك بنجاح",
 			wikiPageContent = "Wiki Right to Left يحتوى");
 
-		Navigator.gotoPage(pageName = ${pageName});
+		Navigator.gotoPage(pageName = "${pageName}");
 
 		WikiPage.viewLocalizedFrontPagePG(
 			rightToLeft = "true",

@@ -20,9 +20,7 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Set;
@@ -71,11 +69,11 @@ public class ReindexBackgroundTaskStatusMessageTranslator
 			backgroundTaskStatus.getAttribute(
 				ReindexBackgroundTaskConstants.COMPANY_IDS));
 
-		long currentCompanyId = GetterUtil.getLong(
-			backgroundTaskStatus.getAttribute(
-				ReindexBackgroundTaskConstants.COMPANY_ID));
-
 		for (long companyId : companyIds) {
+			long currentCompanyId = GetterUtil.getLong(
+				backgroundTaskStatus.getAttribute(
+					ReindexBackgroundTaskConstants.COMPANY_ID));
+
 			if (companyId == currentCompanyId) {
 				break;
 			}
@@ -86,26 +84,18 @@ public class ReindexBackgroundTaskStatusMessageTranslator
 		int percentage = 100;
 
 		if (phase.equals(ReindexBackgroundTaskConstants.PORTAL_START)) {
-			String[] pastIndexers = GetterUtil.getStringValues(
-				backgroundTaskStatus.getAttribute(
-					"pastIndexers" + currentCompanyId));
+			String lastIndexer = GetterUtil.getString(
+				backgroundTaskStatus.getAttribute("lastIndexer"));
 			int indexerCount = GetterUtil.getInteger(
-				backgroundTaskStatus.getAttribute(
-					"indexerCount" + currentCompanyId));
+				backgroundTaskStatus.getAttribute("indexerCount"));
 
-			Set<String> pastIndexersSet = SetUtil.fromArray(pastIndexers);
-
-			if (pastIndexersSet.isEmpty()) {
-				backgroundTaskStatus.setAttribute(
-					"pastIndexers" + currentCompanyId,
-					new String[] {className});
+			if (Validator.isNull(lastIndexer)) {
+				backgroundTaskStatus.setAttribute("lastIndexer", className);
 			}
-			else if (pastIndexersSet.add(className)) {
+			else if (!lastIndexer.equals(className)) {
 				backgroundTaskStatus.setAttribute(
-					"indexerCount" + currentCompanyId, ++indexerCount);
-				backgroundTaskStatus.setAttribute(
-					"pastIndexers" + currentCompanyId,
-					ArrayUtil.toStringArray(pastIndexersSet));
+					"indexerCount", ++indexerCount);
+				backgroundTaskStatus.setAttribute("lastIndexer", className);
 			}
 
 			Set<Indexer<?>> indexers = IndexerRegistryUtil.getIndexers();

@@ -40,9 +40,6 @@ import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceReference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,7 +58,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,8 +65,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.sql.DataSource;
 
 /**
  * @author Brian Wing Shun Chan
@@ -97,7 +91,7 @@ public abstract class UpgradeProcess
 
 		String message = "Completed upgrade process ";
 
-		try (Connection con = getConnection()) {
+		try (Connection con = DataAccess.getConnection()) {
 			connection = con;
 
 			if (isSkipUpgradeProcess()) {
@@ -446,41 +440,6 @@ public abstract class UpgradeProcess
 
 	protected abstract void doUpgrade() throws Exception;
 
-	protected Connection getConnection() throws Exception {
-		Registry registry = RegistryUtil.getRegistry();
-
-		String symbolicName = registry.getSymbolicName(
-			getClass().getClassLoader());
-
-		if (symbolicName != null) {
-			Collection<ServiceReference<DataSource>> serviceReferences =
-				registry.getServiceReferences(
-					DataSource.class,
-					StringBundler.concat(
-						"(origin.bundle.symbolic.name=", symbolicName, ")"));
-
-			Iterator<ServiceReference<DataSource>> iterator =
-				serviceReferences.iterator();
-
-			if (iterator.hasNext()) {
-				ServiceReference<DataSource> serviceReference = iterator.next();
-
-				DataSource dataSource = registry.getService(serviceReference);
-
-				try {
-					if (dataSource != null) {
-						return dataSource.getConnection();
-					}
-				}
-				finally {
-					registry.ungetService(serviceReference);
-				}
-			}
-		}
-
-		return DataAccess.getConnection();
-	}
-
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *             #getIndexSQLs(Class, String)}
@@ -661,12 +620,6 @@ public abstract class UpgradeProcess
 		String normalizedTableName = dbInspector.normalizeName(
 			tableName, connection.getMetaData());
 
-		if (!dbInspector.hasTable(normalizedTableName)) {
-			throw new SQLException(
-				StringBundler.concat(
-					"Table ", normalizedTableName, " does not exist"));
-		}
-
 		if ((db.getDBType() == DBType.SQLSERVER) ||
 			(db.getDBType() == DBType.SYBASE)) {
 
@@ -678,39 +631,27 @@ public abstract class UpgradeProcess
 							StringBundler.concat(
 								"select name from sys.key_constraints where ",
 								"type = 'PK' and ",
-								"OBJECT_NAME(parent_object_id) = ?"))) {
+								"OBJECT_NAME(parent_object_id) = '",
+								normalizedTableName, "'"));
+					ResultSet resultSet = preparedStatement.executeQuery()) {
 
-					preparedStatement.setString(1, normalizedTableName);
-
-					try (ResultSet resultSet =
-							preparedStatement.executeQuery()) {
-
-						if (resultSet.next()) {
-							primaryKeyConstraintName = resultSet.getString(
-								"name");
-						}
+					if (resultSet.next()) {
+						primaryKeyConstraintName = resultSet.getString("name");
 					}
 				}
 			}
 			else {
-				try (PreparedStatement preparedStatement =
-						connection.prepareStatement("sp_helpconstraint ?")) {
+				try (PreparedStatement ps = connection.prepareStatement(
+						"sp_helpconstraint " + normalizedTableName);
+					ResultSet rs = ps.executeQuery()) {
 
-					preparedStatement.setString(1, normalizedTableName);
+					while (rs.next()) {
+						String definition = rs.getString("definition");
 
-					try (ResultSet resultSet =
-							preparedStatement.executeQuery()) {
+						if (definition.startsWith("PRIMARY KEY INDEX")) {
+							primaryKeyConstraintName = rs.getString("name");
 
-						while (resultSet.next()) {
-							String definition = resultSet.getString(
-								"definition");
-
-							if (definition.startsWith("PRIMARY KEY INDEX")) {
-								primaryKeyConstraintName = resultSet.getString(
-									"name");
-
-								break;
-							}
+							break;
 						}
 					}
 				}
@@ -722,20 +663,10 @@ public abstract class UpgradeProcess
 						normalizedTableName);
 			}
 
-			if (dbInspector.hasIndex(
-					normalizedTableName, primaryKeyConstraintName)) {
-
-				runSQL(
-					StringBundler.concat(
-						"alter table ", normalizedTableName,
-						" drop constraint ", primaryKeyConstraintName));
-			}
-			else {
-				throw new SQLException(
-					StringBundler.concat(
-						"Primary key with name ", primaryKeyConstraintName,
-						" does not exist"));
-			}
+			runSQL(
+				StringBundler.concat(
+					"alter table ", normalizedTableName, " drop constraint ",
+					primaryKeyConstraintName));
 		}
 		else {
 			runSQL(

@@ -15,7 +15,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -24,7 +24,7 @@ definition {
 	}
 
 	@description = "This is a test case for LPS-120773. Check the initial stuffs included in the site initializer."
-	@priority = 5
+	@priority = "5"
 	test ViewInitialStuffs {
 		property license.required = "false";
 
@@ -55,17 +55,17 @@ definition {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Raylife");
 
 			for (var fragmentName : list "Gift,Home Cover,Sign In,Claim Steps,Dashboard Card,Payment Message,Dashboard Page Header,Product Actions,Products List,Private Footer,Dashboard Resources,Private Navbar,Claim Content,Product Resources,Page Header,Section Subscription,Section Video,Public Footer,Table Claims,Public Navbar") {
-				FragmentsAdmin.viewEntryPresent(entry = ${fragmentName});
+				FragmentsAdmin.viewEntryPresent(entry = "${fragmentName}");
 
-				LexiconCard.viewCardThumbnail(card = ${fragmentName});
+				LexiconCard.viewCardThumbnail(card = "${fragmentName}");
 			}
 
 			Click(locator1 = "Pagination#NEXT_LINK");
 
 			for (var fragmentName : list "Product Detail Page Header,Policy Content,Table Policies") {
-				FragmentsAdmin.viewEntryPresent(entry = ${fragmentName});
+				FragmentsAdmin.viewEntryPresent(entry = "${fragmentName}");
 
-				LexiconCard.viewCardThumbnail(card = ${fragmentName});
+				LexiconCard.viewCardThumbnail(card = "${fragmentName}");
 			}
 		}
 
@@ -73,11 +73,11 @@ definition {
 			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = "test-site-name");
 
 			for (var masterLayoutName : list "Customer Portal,Public") {
-				MastersPageTemplatesAdmin.viewMastersPresent(masterLayoutName = ${masterLayoutName});
+				MastersPageTemplatesAdmin.viewMastersPresent(masterLayoutName = "${masterLayoutName}");
 
-				LexiconCard.viewCardThumbnail(card = ${masterLayoutName});
+				LexiconCard.viewCardThumbnail(card = "${masterLayoutName}");
 
-				MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = ${masterLayoutName});
+				MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "${masterLayoutName}");
 
 				PageEditor.gotoTab(tabName = "Page Design Options");
 
@@ -93,26 +93,48 @@ definition {
 			LexiconCard.viewMarkAsDefault(card = "Blank");
 		}
 
-		task ("View the public and private pages") {
-			ApplicationsMenu.gotoSite(site = "Test Site Name");
+		task ("View the Raylife display page templates") {
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
+			for (var displayPageName : list "Claim,Policy") {
+				DisplayPageTemplatesAdmin.viewDisplayPagePresent(displayPageName = "${displayPageName}");
+
+				LexiconCard.viewCardThumbnail(card = "${displayPageName}");
+
+				LexiconCard.viewMarkAsDefault(card = "${displayPageName}");
+
+				DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "${displayPageName}");
+
+				PageEditor.gotoTab(tabName = "Page Design Options");
+
+				Click(locator1 = "PageEditor#MORE_LINK");
+
+				AssertChecked(
+					key_toggleSwitchLabel = "Use the same look and feel of the Public Pages",
+					locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+				DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			}
+		}
+
+		task ("View the public and private pages") {
 			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			for (var pageName : list "Home,Product,News,Contact,Sign In,Search") {
-				SitePages.viewPageItems(pageName = ${pageName});
+				SitePages.viewPageItems(pageName = "${pageName}");
 			}
 
 			SitePages.togglePrivacy(privacy = "Private Pages");
 
 			for (var pageName : list "Dashboard,Policies,Claims,Documents") {
-				SitePages.viewPageItems(pageName = ${pageName});
+				SitePages.viewPageItems(pageName = "${pageName}");
 			}
 
 			for (var pageName : list "Public Pages,Private Pages") {
-				SitePages.togglePrivacy(privacy = ${pageName});
+				SitePages.togglePrivacy(privacy = "${pageName}");
 
 				Click(
-					key_pageName = ${pageName},
+					key_pageName = "${pageName}",
 					locator1 = "Icon#COG_PAGE");
 
 				var cssCode = '''/*GENERAL*/  a {  color: var(--primary); }''';
@@ -120,7 +142,7 @@ definition {
 				AssertTextEquals.assertPartialText(
 					key_text = "regularCss",
 					locator1 = "TextArea#ANY",
-					value1 = ${cssCode});
+					value1 = "${cssCode}");
 
 				Navigator.gotoBack();
 			}
@@ -155,12 +177,12 @@ definition {
 
 			for (var pageName : list "Product,News,Contact") {
 				Click(
-					key_pageName = ${pageName},
+					key_pageName = "${pageName}",
 					locator1 = "Home#PAGE");
 
-				Pause(locator1 = 3000);
+				Pause(locator1 = "3000");
 
-				ControlMenu.viewHeaderTitle(headerTitle = ${pageName});
+				ControlMenu.viewHeaderTitle(headerTitle = "${pageName}");
 			}
 
 			Click(locator1 = "NavBar#LOGO_LINK");
@@ -187,17 +209,18 @@ definition {
 			var containerWidth = selenium.getElementWidth("//div[contains(@class,'container')][contains(@class,'pr-3 pl-3')]/div[contains(@class,'mb-lg-0')]");
 
 			TestUtils.assertNotEquals(
-				actual = ${containerWidth},
-				expected = ${screenWidth});
+				actual = "${containerWidth}",
+				expected = "${screenWidth}");
 
-			for (var cardLink : list "wk1774476306-liferay-employee,lf1774476306-david-aragon,hl1774476306-david-aragon,au1774476306-volkswagen-golf-1-6,hm1774476306-sepulveda-blvd") {
+			for (var assetTitle : list "WK1774476306 - Liferay Employee,LF1774476306 - David Aragonés,HL1774476306 - David Aragonés,AU1774476306 - Volkswagen Golf 1.6,HM1774476306 - Sepulveda Blvd") {
 				AssertElementPresent(
-					key_card = ${cardLink},
+					key_card = "${assetTitle}",
+					key_cardStyle = "mb-5",
 					locator1 = "Card#CARD_STYLE");
 			}
 
 			Click(
-				key_card = "wk1774476306-liferay-employee",
+				key_card = "WK1774476306 - Liferay Employee",
 				locator1 = "Card#CARD_LINK");
 
 			ControlMenu.viewHeaderTitle(headerTitle = "Policy");
@@ -232,18 +255,19 @@ definition {
 				var containerWidth = selenium.getElementWidth("//div[contains(@class,'container')]/div[contains(.,'${collectionTitle}')]/following-sibling::div[contains(@class,'mb-lg-0')]");
 
 				TestUtils.assertNotEquals(
-					actual = ${containerWidth},
-					expected = ${screenWidth});
+					actual = "${containerWidth}",
+					expected = "${screenWidth}");
 			}
 
-			for (var cardLink : list "sepulveda-blvd-chm2546333,volkswagen-golf-cau5846990,david-aragones-che3326955,volkswagen-golf-cau4536398,volkswagen-golf-cau6821256,sepulveda-blvd-chm2371402,david-aragones-chl22214389,sepulveda-blvd-chm6821402") {
+			for (var assetTitle : list "Sepulveda Blvd - CHM2546333,Volkswagen Golf - CAU5846990,David Aragonés - CHE3326955,Volkswagen Golf - CAU4536398,Volkswagen Golf - CAU6821256,Sepulveda Blvd - CHM2371402,David Aragonés - CHL22214389,Sepulveda Blvd - CHM6821402") {
 				AssertElementPresent(
-					key_card = ${cardLink},
+					key_card = "${assetTitle}",
+					key_cardStyle = "mb-5",
 					locator1 = "Card#CARD_STYLE");
 			}
 
 			Click(
-				key_card = "sepulveda-blvd-chm2546333",
+				key_card = "Sepulveda Blvd - CHM2546333",
 				locator1 = "Card#CARD_LINK");
 
 			ControlMenu.viewHeaderTitle(headerTitle = "Claim");
@@ -265,7 +289,7 @@ definition {
 			ControlMenu.viewHeaderTitle(headerTitle = "Claims");
 
 			Click(
-				key_card = "volkswagen-golf-cau4536398",
+				key_card = "Volkswagen Golf - CAU4536398",
 				locator1 = "Card#CARD_LINK");
 
 			ControlMenu.viewHeaderTitle(headerTitle = "Claim");
@@ -305,7 +329,7 @@ definition {
 			NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
 
 			for (var navigationMenu : list "Customer Portal Menu,Public Menu") {
-				NavigationMenusAdmin.viewMenuTitle(navigationMenu = ${navigationMenu});
+				NavigationMenusAdmin.viewMenuTitle(navigationMenu = "${navigationMenu}");
 			}
 		}
 
@@ -314,22 +338,22 @@ definition {
 
 			for (var collectionTitle : list "Policies,Closed Claims,Open Claims") {
 				AssertTextEquals.assertPartialText(
-					key_title = ${collectionTitle},
+					key_title = "${collectionTitle}",
 					locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE",
-					value1 = ${collectionTitle});
+					value1 = "${collectionTitle}");
 
 				LexiconList.viewListEntrySubtitle(
-					listEntry = ${collectionTitle},
+					listEntry = "${collectionTitle}",
 					listEntrySubtitle = "Dynamic");
 
-				if (${collectionTitle} == "Policies") {
+				if ("${collectionTitle}" == "Policies") {
 					LexiconList.viewListEntrySubtitle(
-						listEntry = ${collectionTitle},
+						listEntry = "${collectionTitle}",
 						listEntrySubtitle = "Web Content Article - Policy");
 				}
 				else {
 					LexiconList.viewListEntrySubtitle(
-						listEntry = ${collectionTitle},
+						listEntry = "${collectionTitle}",
 						listEntrySubtitle = "Web Content Article - Claim");
 				}
 			}
@@ -338,7 +362,7 @@ definition {
 
 			AssetListsAdmin.viewCollectionItems(
 				assetListTitle = "Policies",
-				assetTitleList = ${assetTitleList});
+				assetTitleList = "${assetTitleList}");
 
 			Navigator.gotoBack();
 
@@ -346,7 +370,7 @@ definition {
 
 			AssetListsAdmin.viewCollectionItems(
 				assetListTitle = "Closed Claims",
-				assetTitleList = ${assetTitleList});
+				assetTitleList = "${assetTitleList}");
 
 			Panel.expandPanel(panel = "Filter");
 
@@ -361,7 +385,7 @@ definition {
 
 			AssetListsAdmin.viewCollectionItems(
 				assetListTitle = "Open Claims",
-				assetTitleList = ${assetTitleList});
+				assetTitleList = "${assetTitleList}");
 
 			Panel.expandPanel(panel = "Filter");
 
@@ -379,7 +403,7 @@ definition {
 				locator1 = "WC#ENTRY_LIST_TITLE");
 
 			for (var entryTitle : list "WK1774476306 - Liferay Employee,LF1774476306 - David Aragonés,HL1774476306 - David Aragonés,AU1774476306 - Volkswagen Golf 1.6,HM1774476306 - Sepulveda Blvd") {
-				WebContentAdmin.viewEntryTitle(entry = ${entryTitle});
+				WebContentAdmin.viewEntryTitle(entry = "${entryTitle}");
 			}
 
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -389,7 +413,7 @@ definition {
 				locator1 = "WC#ENTRY_LIST_TITLE");
 
 			for (var entryTitle : list "Sepulveda Blvd - CHM2546333,Volkswagen Golf - CAU5846990,David Aragonés - CHE3326955,Volkswagen Golf - CAU4536398,Volkswagen Golf - CAU6821256,Sepulveda Blvd - CHM2371402,David Aragonés - CHL22214389,Sepulveda Blvd - CHM6821402") {
-				WebContentAdmin.viewEntryTitle(entry = ${entryTitle});
+				WebContentAdmin.viewEntryTitle(entry = "${entryTitle}");
 			}
 
 			Search.searchCP(searchTerm = "closed");
@@ -399,7 +423,7 @@ definition {
 				value1 = "5 Results for closed");
 
 			for (var entryTitle : list "Volkswagen Golf - CAU4536398,Volkswagen Golf - CAU6821256,Sepulveda Blvd - CHM2371402,David Aragonés - CHL22214389,Sepulveda Blvd - CHM6821402") {
-				WebContentAdmin.viewEntryTitle(entry = ${entryTitle});
+				WebContentAdmin.viewEntryTitle(entry = "${entryTitle}");
 			}
 
 			Search.searchCP(searchTerm = "open");
@@ -409,7 +433,7 @@ definition {
 				value1 = "3 Results for open");
 
 			for (var entryTitle : list "Sepulveda Blvd - CHM2546333,Volkswagen Golf - CAU5846990,David Aragonés - CHE3326955") {
-				WebContentAdmin.viewEntryTitle(entry = ${entryTitle});
+				WebContentAdmin.viewEntryTitle(entry = "${entryTitle}");
 			}
 		}
 
@@ -418,11 +442,11 @@ definition {
 
 			LexiconTable.viewTableEntryText(
 				tableEntry = "closed",
-				tableEntryText = 5);
+				tableEntryText = "5");
 
 			LexiconTable.viewTableEntryText(
 				tableEntry = "open",
-				tableEntryText = 3);
+				tableEntryText = "3");
 		}
 
 		task ("View Sign In and Sign Out") {

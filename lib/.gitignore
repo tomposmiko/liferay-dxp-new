@@ -4,7 +4,6 @@
 /development/ant-apache-bsf.jar
 /development/ant-compress.jar
 /development/appium.jar
-/development/asm-commons.jar
 /development/catalina.jar
 /development/com.liferay.jenkins.results.parser.jar
 /development/com.liferay.poshi.core.jar
@@ -64,7 +63,6 @@
 /development/powermock-module-junit4-common.jar
 /development/powermock-reflect.jar
 /development/qdox.jar
-/development/reflections.jar
 /development/saxpath.jar
 /development/sdk-addon-api-0.2.jar
 /development/servlet-api.jar
@@ -100,6 +98,8 @@
 /portal/axiom-impl.jar
 /portal/axis-ant.jar
 /portal/axis.jar
+/portal/bcmail.jar
+/portal/bcprov.jar
 /portal/boilerpipe.jar
 /portal/bsf.jar
 /portal/c3p0.jar
@@ -132,6 +132,7 @@
 /portal/crypt.jar
 /portal/curvesapi.jar
 /portal/daisydiff.jar
+/portal/displaytag.jar
 /portal/dom4j.jar
 /portal/eclipse-core-runtime.jar
 /portal/ecs.jar
@@ -174,6 +175,7 @@
 /portal/jcifs.jar
 /portal/jcl-over-slf4j.jar
 /portal/jcommon.jar
+/portal/jdom.jar
 /portal/jdom2.jar
 /portal/jempbox.jar
 /portal/jena.jar
@@ -185,9 +187,13 @@
 /portal/jmatio.jar
 /portal/jna.jar
 /portal/jodconverter.jar
+/portal/jodd-bean.jar
+/portal/jodd-core.jar
+/portal/jodd-http.jar
 /portal/jodd-json.jar
 /portal/jodd-proxetta.jar
-/portal/jodd-util.jar
+/portal/jodd-servlet.jar
+/portal/jodd-upload.jar
 /portal/json-java.jar
 /portal/jrcs-diff.jar
 /portal/jsr107cache.jar
@@ -207,6 +213,7 @@
 /portal/mimepull.jar
 /portal/monte-cc.jar
 /portal/mp4parser.jar
+/portal/nekohtml.jar
 /portal/netcdf.jar
 /portal/netty-all.jar
 /portal/netty-buffer.jar
@@ -229,6 +236,7 @@
 /portal/reload4j.jar
 /portal/rhino.jar
 /portal/rmi-api.jar
+/portal/rome.jar
 /portal/rometools-utils.jar
 /portal/rometools.jar
 /portal/saaj-api.jar
@@ -237,7 +245,7 @@
 /portal/serializer.jar
 /portal/simplecaptcha.jar
 /portal/slf4j-api.jar
-/portal/neko-htmlunit.jar
+/portal/soap.jar
 /portal/soap-api.jar
 /portal/sparse-bit-set.jar
 /portal/spring-aop.jar

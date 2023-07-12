@@ -60,7 +60,7 @@
 				"content_${context.language_id}": {
 					"fragment_offset": 10
 				},
-				"name_${context.language_id}": {
+				"name{context.language_id}": {
 					"fragment_offset": 10
 				},
 				"title_${context.language_id}": {

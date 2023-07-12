@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -395,34 +396,26 @@ public class DataLayoutSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "dataLayoutPages")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					DataLayoutPage[] dataLayoutPagesArray =
-						new DataLayoutPage[jsonParserFieldValues.length];
-
-					for (int i = 0; i < dataLayoutPagesArray.length; i++) {
-						dataLayoutPagesArray[i] = DataLayoutPageSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					dataLayout.setDataLayoutPages(dataLayoutPagesArray);
+					dataLayout.setDataLayoutPages(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> DataLayoutPageSerDes.toDTO((String)object)
+						).toArray(
+							size -> new DataLayoutPage[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dataRules")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					DataRule[] dataRulesArray =
-						new DataRule[jsonParserFieldValues.length];
-
-					for (int i = 0; i < dataRulesArray.length; i++) {
-						dataRulesArray[i] = DataRuleSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					dataLayout.setDataRules(dataRulesArray);
+					dataLayout.setDataRules(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> DataRuleSerDes.toDTO((String)object)
+						).toArray(
+							size -> new DataRule[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {

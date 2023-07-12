@@ -15,7 +15,6 @@
 package com.liferay.chat.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link StatusLocalService}.
@@ -369,11 +368,6 @@ public class StatusLocalServiceWrapper
 		com.liferay.chat.model.Status status) {
 
 		return _statusLocalService.updateStatus(status);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _statusLocalService.getBasePersistence();
 	}
 
 	@Override

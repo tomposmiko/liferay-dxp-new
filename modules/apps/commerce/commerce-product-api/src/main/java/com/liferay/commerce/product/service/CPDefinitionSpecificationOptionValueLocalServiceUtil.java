@@ -525,12 +525,6 @@ public class CPDefinitionSpecificationOptionValueLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CPDefinitionSpecificationOptionValueLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile CPDefinitionSpecificationOptionValueLocalService
 		_service;
 

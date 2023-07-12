@@ -68,8 +68,19 @@ public class LayoutStructure {
 
 				layoutStructureItems.put(key, layoutStructureItem);
 
-				_updateLayoutStructureItemMaps(
-					fragmentLayoutStructureItems, layoutStructureItem);
+				if (layoutStructureItem instanceof
+						FragmentStyledLayoutStructureItem) {
+
+					FragmentStyledLayoutStructureItem
+						fragmentStyledLayoutStructureItem =
+							(FragmentStyledLayoutStructureItem)
+								layoutStructureItem;
+
+					fragmentLayoutStructureItems.put(
+						fragmentStyledLayoutStructureItem.
+							getFragmentEntryLinkId(),
+						fragmentStyledLayoutStructureItem);
+				}
 			}
 
 			JSONArray deletedLayoutStructureItemJSONArray = Optional.ofNullable(
@@ -239,9 +250,6 @@ public class LayoutStructure {
 
 		_layoutStructureItems.put(
 			layoutStructureItem.getItemId(), layoutStructureItem);
-
-		_updateLayoutStructureItemMaps(
-			_fragmentLayoutStructureItems, layoutStructureItem);
 
 		return layoutStructureItem;
 	}
@@ -680,21 +688,6 @@ public class LayoutStructure {
 		return deletedLayoutStructureItems;
 	}
 
-	private static void _updateLayoutStructureItemMaps(
-		Map<Long, LayoutStructureItem> fragmentLayoutStructureItems,
-		LayoutStructureItem layoutStructureItem) {
-
-		if (layoutStructureItem instanceof FragmentStyledLayoutStructureItem) {
-			FragmentStyledLayoutStructureItem
-				fragmentStyledLayoutStructureItem =
-					(FragmentStyledLayoutStructureItem)layoutStructureItem;
-
-			fragmentLayoutStructureItems.put(
-				fragmentStyledLayoutStructureItem.getFragmentEntryLinkId(),
-				fragmentStyledLayoutStructureItem);
-		}
-	}
-
 	private LayoutStructure(
 		Map<String, DeletedLayoutStructureItem> deletedLayoutStructureItems,
 		Map<Long, LayoutStructureItem> fragmentLayoutStructureItems,
@@ -714,9 +707,6 @@ public class LayoutStructure {
 			new ColumnLayoutStructureItem(parentItemId);
 
 		columnLayoutStructureItem.setSize(size);
-		columnLayoutStructureItem.setViewportConfiguration(
-			ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
-			JSONUtil.put("size", 12));
 
 		_updateLayoutStructure(columnLayoutStructureItem, position);
 	}
@@ -798,17 +788,6 @@ public class LayoutStructure {
 				continue;
 			}
 
-			if (!updateEmpty &&
-				Objects.equals(
-					ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
-					viewportSizeId)) {
-
-				columnLayoutStructureItem.setViewportConfiguration(
-					viewportSizeId, JSONUtil.put("size", 12));
-
-				continue;
-			}
-
 			Map<String, JSONObject> columnViewportConfigurations =
 				columnLayoutStructureItem.getViewportConfigurations();
 
@@ -821,17 +800,6 @@ public class LayoutStructure {
 
 			if (!columnViewportConfigurationJSONObject.has("size") &&
 				!updateEmpty) {
-
-				continue;
-			}
-
-			if (columnViewportConfigurationJSONObject.has("size") &&
-				!updateEmpty &&
-				Objects.equals(
-					ViewportSize.PORTRAIT_MOBILE.getViewportSizeId(),
-					viewportSizeId)) {
-
-				columnViewportConfigurationJSONObject.remove("size");
 
 				continue;
 			}
@@ -876,20 +844,7 @@ public class LayoutStructure {
 
 		viewportConfigurationJSONObject.put("numberOfColumns", numberOfColumns);
 
-		if (Objects.equals(
-				ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
-				viewportSizeId)) {
-
-			viewportConfigurationJSONObject.put("modulesPerRow", 1);
-		}
-		else if (Objects.equals(
-					ViewportSize.PORTRAIT_MOBILE.getViewportSizeId(),
-					viewportSizeId) &&
-				 viewportConfigurationJSONObject.has("modulesPerRow")) {
-
-			viewportConfigurationJSONObject.remove("modulesPerRow");
-		}
-		else if (viewportConfigurationJSONObject.has("modulesPerRow")) {
+		if (viewportConfigurationJSONObject.has("modulesPerRow")) {
 			viewportConfigurationJSONObject.put(
 				"modulesPerRow", numberOfColumns);
 		}

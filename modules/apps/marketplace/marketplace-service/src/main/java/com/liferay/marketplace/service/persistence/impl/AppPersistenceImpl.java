@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -3084,12 +3085,12 @@ public class AppPersistenceImpl
 			new String[] {String.class.getName()}, new String[] {"category"},
 			false);
 
-		AppUtil.setPersistence(this);
+		_setAppUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AppUtil.setPersistence(null);
+		_setAppUtilPersistence(null);
 
 		entityCache.removeCache(AppImpl.class.getName());
 
@@ -3099,6 +3100,19 @@ public class AppPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAppUtilPersistence(AppPersistence appPersistence) {
+		try {
+			Field field = AppUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, appPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

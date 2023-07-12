@@ -73,10 +73,6 @@ public class ERUserLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ERUserLocalService service) {
-		_service = service;
-	}
-
 	private static volatile ERUserLocalService _service;
 
 }

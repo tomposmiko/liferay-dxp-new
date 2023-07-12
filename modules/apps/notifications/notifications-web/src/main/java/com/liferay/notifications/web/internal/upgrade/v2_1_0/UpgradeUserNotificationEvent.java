@@ -53,15 +53,15 @@ public class UpgradeUserNotificationEvent extends UpgradeProcess {
 			StringBundler sb = new StringBundler(5);
 
 			sb.append("update UserNotificationEvent set actionRequired = ");
-			sb.append("[$TRUE$] where userNotificationEventId in (select ");
+			sb.append("TRUE where userNotificationEventId in (select ");
 			sb.append("userNotificationEventId from ");
 			sb.append("Notifications_UserNotificationEvent where ");
-			sb.append("actionRequired = [$TRUE$])");
+			sb.append("actionRequired = TRUE)");
 
 			runSQL(sb.toString());
 
 			runSQL(
-				"update UserNotificationEvent set actionRequired = [$FALSE$] " +
+				"update UserNotificationEvent set actionRequired = FALSE " +
 					"where actionRequired IS NULL");
 		}
 	}
@@ -79,7 +79,7 @@ public class UpgradeUserNotificationEvent extends UpgradeProcess {
 						"actionRequired = ? where userNotificationEventId = ?");
 			ResultSet rs = ps1.executeQuery()) {
 
-			runSQL("update UserNotificationEvent set delivered = [$TRUE$]");
+			runSQL("update UserNotificationEvent set delivered = TRUE");
 
 			runSQL(
 				StringBundler.concat(

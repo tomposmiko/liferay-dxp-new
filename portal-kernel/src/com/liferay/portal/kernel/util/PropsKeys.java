@@ -1774,13 +1774,6 @@ public interface PropsKeys {
 	public static final String LDAP_ATTRS_TRANSFORMER_IMPL =
 		"ldap.attrs.transformer.impl";
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String LDAP_IGNORE_USER_SEARCH_FILTER_FOR_AUTH =
-		"ldap.ignore.user.search.filter.for.auth";
-
 	public static final String LEARN_RESOURCES_CDN_ENABLED =
 		"learn.resources.cdn.enabled";
 
@@ -2794,9 +2787,6 @@ public interface PropsKeys {
 	public static final String RESOURCE_ACTIONS_READ_PORTLET_RESOURCES =
 		"resource.actions.read.portlet.resources";
 
-	public static final String RESOURCE_ACTIONS_STRICT_MODE_ENABLED =
-		"resource.actions.strict.mode.enabled";
-
 	public static final String RESOURCE_REPOSITORIES_ROOT =
 		"resource.repositories.root";
 
@@ -3019,9 +3009,6 @@ public interface PropsKeys {
 
 	public static final String SETUP_DATABASE_JAR_NAME =
 		"setup.database.jar.name";
-
-	public static final String SETUP_DATABASE_JAR_SHA1 =
-		"setup.database.jar.sha1";
 
 	public static final String SETUP_DATABASE_JAR_URL =
 		"setup.database.jar.url";

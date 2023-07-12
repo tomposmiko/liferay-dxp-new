@@ -1258,10 +1258,6 @@ public class ModuleUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(ModulePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile ModulePersistence _persistence;
 
 }

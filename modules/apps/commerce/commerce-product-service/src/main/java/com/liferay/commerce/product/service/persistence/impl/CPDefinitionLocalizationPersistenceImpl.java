@@ -30,17 +30,11 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.sanitizer.Sanitizer;
-import com.liferay.portal.kernel.sanitizer.SanitizerException;
-import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -51,6 +45,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1147,34 +1142,6 @@ public class CPDefinitionLocalizationPersistenceImpl
 		CPDefinitionLocalizationModelImpl cpDefinitionLocalizationModelImpl =
 			(CPDefinitionLocalizationModelImpl)cpDefinitionLocalization;
 
-		long userId = GetterUtil.getLong(PrincipalThreadLocal.getName());
-
-		if (userId > 0) {
-			long companyId = cpDefinitionLocalization.getCompanyId();
-
-			long groupId = 0;
-
-			long cpDefinitionLocalizationId = 0;
-
-			if (!isNew) {
-				cpDefinitionLocalizationId =
-					cpDefinitionLocalization.getPrimaryKey();
-			}
-
-			try {
-				cpDefinitionLocalization.setDescription(
-					SanitizerUtil.sanitize(
-						companyId, groupId, userId,
-						CPDefinitionLocalization.class.getName(),
-						cpDefinitionLocalizationId, ContentTypes.TEXT_HTML,
-						Sanitizer.MODE_ALL,
-						cpDefinitionLocalization.getDescription(), null));
-			}
-			catch (SanitizerException sanitizerException) {
-				throw new SystemException(sanitizerException);
-			}
-		}
-
 		Session session = null;
 
 		try {
@@ -1527,11 +1494,11 @@ public class CPDefinitionLocalizationPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"CPDefinitionId", "languageId"}, false);
 
-		CPDefinitionLocalizationUtil.setPersistence(this);
+		_setCPDefinitionLocalizationUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CPDefinitionLocalizationUtil.setPersistence(null);
+		_setCPDefinitionLocalizationUtilPersistence(null);
 
 		entityCache.removeCache(CPDefinitionLocalizationImpl.class.getName());
 
@@ -1541,6 +1508,23 @@ public class CPDefinitionLocalizationPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCPDefinitionLocalizationUtilPersistence(
+		CPDefinitionLocalizationPersistence
+			cpDefinitionLocalizationPersistence) {
+
+		try {
+			Field field = CPDefinitionLocalizationUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, cpDefinitionLocalizationPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

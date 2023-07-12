@@ -58,6 +58,7 @@ import com.liferay.site.navigation.service.persistence.impl.constants.SiteNaviga
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2503,7 +2504,7 @@ public class SiteNavigationMenuPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SiteNavigationMenuModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of site navigation menus
 	 * @param end the upper bound of the range of site navigation menus (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4773,7 +4774,7 @@ public class SiteNavigationMenuPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SiteNavigationMenuModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param name the name
 	 * @param start the lower bound of the range of site navigation menus
 	 * @param end the upper bound of the range of site navigation menus (not inclusive)
@@ -7618,9 +7619,7 @@ public class SiteNavigationMenuPersistenceImpl
 	 */
 	@Override
 	public SiteNavigationMenu fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				SiteNavigationMenu.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(SiteNavigationMenu.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -8216,12 +8215,12 @@ public class SiteNavigationMenuPersistenceImpl
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"groupId", "auto_"}, false);
 
-		SiteNavigationMenuUtil.setPersistence(this);
+		_setSiteNavigationMenuUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		SiteNavigationMenuUtil.setPersistence(null);
+		_setSiteNavigationMenuUtilPersistence(null);
 
 		entityCache.removeCache(SiteNavigationMenuImpl.class.getName());
 
@@ -8231,6 +8230,22 @@ public class SiteNavigationMenuPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSiteNavigationMenuUtilPersistence(
+		SiteNavigationMenuPersistence siteNavigationMenuPersistence) {
+
+		try {
+			Field field = SiteNavigationMenuUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, siteNavigationMenuPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

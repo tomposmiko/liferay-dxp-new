@@ -15,7 +15,6 @@
 package com.liferay.contacts.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link EntryLocalService}.
@@ -373,11 +372,6 @@ public class EntryLocalServiceWrapper
 
 		return _entryLocalService.updateEntry(
 			entryId, fullName, emailAddress, comments);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _entryLocalService.getBasePersistence();
 	}
 
 	@Override

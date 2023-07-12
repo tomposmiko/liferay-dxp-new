@@ -123,12 +123,6 @@ public class ManagementToolbarTag extends BaseClayTag {
 			setContentRenderer(contentRenderer);
 		}
 
-		if (_managementToolbarDisplayContext != null) {
-			setSearchActionURL(
-				HtmlUtil.escapeAttribute(
-					_managementToolbarDisplayContext.getSearchActionURL()));
-		}
-
 		String searchValue = (String)context.get("searchValue");
 
 		if (Validator.isNull(searchValue) &&

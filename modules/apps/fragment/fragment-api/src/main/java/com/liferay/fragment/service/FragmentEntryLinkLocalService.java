@@ -15,7 +15,6 @@
 package com.liferay.fragment.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
@@ -304,10 +303,6 @@ public interface FragmentEntryLinkLocalService
 	public FragmentEntryLink getFragmentEntryLink(long fragmentEntryLinkId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public FragmentEntryLink getFragmentEntryLink(
-		long groupId, long originalFragmentEntryLinkId, long plid);
-
 	/**
 	 * Returns the fragment entry link matching the UUID and group.
 	 *
@@ -382,14 +377,6 @@ public interface FragmentEntryLinkLocalService
 	public List<FragmentEntryLink> getFragmentEntryLinks(
 		long groupId, long fragmentEntryId, long classNameId, int start,
 		int end, OrderByComparator<FragmentEntryLink> orderByComparator);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String rendererKey);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String[] rendererKeys);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<FragmentEntryLink> getFragmentEntryLinks(String rendererKey);
@@ -603,10 +590,6 @@ public interface FragmentEntryLinkLocalService
 
 	public void updateFragmentEntryLinks(
 			Map<Long, String> fragmentEntryLinksEditableValuesMap)
-		throws PortalException;
-
-	public void updateLatestChanges(
-			FragmentEntry fragmentEntry, FragmentEntryLink fragmentEntryLink)
 		throws PortalException;
 
 	public void updateLatestChanges(long fragmentEntryLinkId)

@@ -25,8 +25,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
@@ -55,6 +53,8 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.service.persistence.WorkflowDefinitionLinkPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -1400,11 +1400,11 @@ public abstract class LayoutServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		LayoutServiceUtil.setService(layoutService);
+		_setServiceUtilService(layoutService);
 	}
 
 	public void destroy() {
-		LayoutServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -1446,6 +1446,19 @@ public abstract class LayoutServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(LayoutService layoutService) {
+		try {
+			Field field = LayoutServiceUtil.class.getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1732,8 +1745,5 @@ public abstract class LayoutServiceBaseImpl
 	@BeanReference(type = WorkflowDefinitionLinkPersistence.class)
 	protected WorkflowDefinitionLinkPersistence
 		workflowDefinitionLinkPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutServiceBaseImpl.class);
 
 }

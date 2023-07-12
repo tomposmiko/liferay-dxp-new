@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -88,8 +87,6 @@ public class RedirectEntryLocalServiceImpl
 			boolean permanent, String sourceURL, ServiceContext serviceContext)
 		throws PortalException {
 
-		sourceURL = _friendlyURLNormalizer.normalizeWithEncoding(sourceURL);
-
 		_validate(destinationURL, sourceURL);
 
 		if (redirectEntryPersistence.fetchByG_S(groupId, sourceURL) != null) {
@@ -143,8 +140,6 @@ public class RedirectEntryLocalServiceImpl
 			String groupBaseURL, boolean permanent, String sourceURL,
 			boolean updateChainedRedirectEntries, ServiceContext serviceContext)
 		throws PortalException {
-
-		sourceURL = _friendlyURLNormalizer.normalizeWithEncoding(sourceURL);
 
 		_checkDestinationURLMustNotBeEqualToSourceURL(
 			destinationURL, groupBaseURL, sourceURL);
@@ -254,8 +249,6 @@ public class RedirectEntryLocalServiceImpl
 			boolean permanent, String sourceURL)
 		throws PortalException {
 
-		sourceURL = _friendlyURLNormalizer.normalizeWithEncoding(sourceURL);
-
 		_validate(destinationURL, sourceURL);
 
 		RedirectEntry redirectEntry = getRedirectEntry(redirectEntryId);
@@ -285,8 +278,6 @@ public class RedirectEntryLocalServiceImpl
 			String groupBaseURL, boolean permanent, String sourceURL,
 			boolean updateChainedRedirectEntries)
 		throws PortalException {
-
-		sourceURL = _friendlyURLNormalizer.normalizeWithEncoding(sourceURL);
 
 		_checkDestinationURLMustNotBeEqualToSourceURL(
 			destinationURL, groupBaseURL, sourceURL);
@@ -460,9 +451,6 @@ public class RedirectEntryLocalServiceImpl
 			throw new LayoutFriendlyURLException(exceptionType);
 		}
 	}
-
-	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
 
 	@Reference
 	private RedirectNotFoundEntryLocalService

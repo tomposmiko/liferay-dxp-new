@@ -780,12 +780,6 @@ public class CommercePricingClassCPDefinitionRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommercePricingClassCPDefinitionRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommercePricingClassCPDefinitionRelPersistence
 		_persistence;
 

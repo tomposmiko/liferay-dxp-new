@@ -38,8 +38,6 @@ public class BlogsEntryReadingTimeInfoItemFieldReader
 		return InfoField.builder(
 		).infoFieldType(
 			TextInfoFieldType.INSTANCE
-		).namespace(
-			BlogsEntry.class.getSimpleName()
 		).name(
 			"readingTime"
 		).labelInfoLocalizedValue(

@@ -351,7 +351,7 @@ public class IndividualSegmentsChecker {
 			Collections.emptyList()
 		);
 
-		if (ListUtil.isNotEmpty(individualUuids)) {
+		if (!ListUtil.isEmpty(individualUuids)) {
 			Stream<String> individualUuidsStream = individualUuids.stream();
 
 			userIdOptional = individualUuidsStream.map(

@@ -230,7 +230,7 @@ public class CommerceSearchResource {
 
 		for (Order order : orderList.getOrders()) {
 			SearchItemModel searchItemModel = new SearchItemModel(
-				"item", String.valueOf(order.getId()));
+				"item", HtmlUtil.escape(String.valueOf(order.getId())));
 
 			searchItemModel.setIcon("document");
 

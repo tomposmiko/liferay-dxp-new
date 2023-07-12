@@ -526,12 +526,6 @@ public class SamlIdpSsoSessionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		SamlIdpSsoSessionPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile SamlIdpSsoSessionPersistence _persistence;
 
 }

@@ -2,7 +2,7 @@ definition {
 
 	macro activatePaymentMethod {
 		Click(
-			key_entryName = ${paymentMethod},
+			key_entryName = "${paymentMethod}",
 			key_table = "Payment Methods",
 			locator1 = "CommerceEntry#TABLE_ENTRY_EDIT_BUTTON");
 
@@ -10,7 +10,7 @@ definition {
 
 		Type(
 			locator1 = "TextInput#NAME",
-			value1 = ${paymentMethod});
+			value1 = "${paymentMethod}");
 
 		Type(
 			locator1 = "TextInput#DESCRIPTION",

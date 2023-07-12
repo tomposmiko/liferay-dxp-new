@@ -107,7 +107,7 @@ public class DocumentToRankingTranslatorImpl
 		if (Validator.isBlank(string)) {
 			List<String> strings = _getAliases(document);
 
-			if (ListUtil.isNotEmpty(strings)) {
+			if (!ListUtil.isEmpty(strings)) {
 				return strings.get(0);
 			}
 		}

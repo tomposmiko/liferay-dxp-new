@@ -57,7 +57,7 @@ public class SegmentsCriteriaContributorRegistryImpl
 				classNameSegmentsCriteriaContributors =
 					_serviceTrackerMap.getService(className);
 
-			if (ListUtil.isNotEmpty(classNameSegmentsCriteriaContributors)) {
+			if (!ListUtil.isEmpty(classNameSegmentsCriteriaContributors)) {
 				segmentsCriteriaContributors.addAll(
 					classNameSegmentsCriteriaContributors);
 			}
@@ -66,7 +66,7 @@ public class SegmentsCriteriaContributorRegistryImpl
 		List<SegmentsCriteriaContributor> generalSegmentsCriteriaContributors =
 			_serviceTrackerMap.getService("*");
 
-		if (ListUtil.isNotEmpty(generalSegmentsCriteriaContributors)) {
+		if (!ListUtil.isEmpty(generalSegmentsCriteriaContributors)) {
 			segmentsCriteriaContributors.addAll(
 				generalSegmentsCriteriaContributors);
 		}

@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.discount.service.persistence.impl;
 
-import com.liferay.commerce.discount.exception.DuplicateCommerceDiscountExternalReferenceCodeException;
 import com.liferay.commerce.discount.exception.NoSuchDiscountException;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountTable;
@@ -54,6 +53,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -6870,38 +6870,6 @@ public class CommerceDiscountPersistenceImpl
 			commerceDiscount.setUuid(uuid);
 		}
 
-		if (Validator.isNull(commerceDiscount.getExternalReferenceCode())) {
-			commerceDiscount.setExternalReferenceCode(
-				commerceDiscount.getUuid());
-		}
-		else {
-			CommerceDiscount ercCommerceDiscount = fetchByC_ERC(
-				commerceDiscount.getCompanyId(),
-				commerceDiscount.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommerceDiscount != null) {
-					throw new DuplicateCommerceDiscountExternalReferenceCodeException(
-						"Duplicate commerce discount with external reference code " +
-							commerceDiscount.getExternalReferenceCode() +
-								" and company " +
-									commerceDiscount.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceDiscount != null) &&
-					(commerceDiscount.getCommerceDiscountId() !=
-						ercCommerceDiscount.getCommerceDiscountId())) {
-
-					throw new DuplicateCommerceDiscountExternalReferenceCodeException(
-						"Duplicate commerce discount with external reference code " +
-							commerceDiscount.getExternalReferenceCode() +
-								" and company " +
-									commerceDiscount.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -7375,11 +7343,11 @@ public class CommerceDiscountPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommerceDiscountUtil.setPersistence(this);
+		_setCommerceDiscountUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceDiscountUtil.setPersistence(null);
+		_setCommerceDiscountUtilPersistence(null);
 
 		entityCache.removeCache(CommerceDiscountImpl.class.getName());
 
@@ -7389,6 +7357,22 @@ public class CommerceDiscountPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceDiscountUtilPersistence(
+		CommerceDiscountPersistence commerceDiscountPersistence) {
+
+		try {
+			Field field = CommerceDiscountUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceDiscountPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

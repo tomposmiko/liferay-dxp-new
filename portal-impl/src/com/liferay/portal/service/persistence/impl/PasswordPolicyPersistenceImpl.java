@@ -56,6 +56,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -4140,11 +4141,11 @@ public class PasswordPolicyPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "name"}, false);
 
-		PasswordPolicyUtil.setPersistence(this);
+		_setPasswordPolicyUtilPersistence(this);
 	}
 
 	public void destroy() {
-		PasswordPolicyUtil.setPersistence(null);
+		_setPasswordPolicyUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(PasswordPolicyImpl.class.getName());
 
@@ -4154,6 +4155,22 @@ public class PasswordPolicyPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setPasswordPolicyUtilPersistence(
+		PasswordPolicyPersistence passwordPolicyPersistence) {
+
+		try {
+			Field field = PasswordPolicyUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, passwordPolicyPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

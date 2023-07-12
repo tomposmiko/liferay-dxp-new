@@ -204,6 +204,16 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 				httpServletRequest,
 				"content-source-selected-for-this-display-page-template")
 		).put(
+			"type",
+			HashMapBuilder.<String, Object>put(
+				"groupTypeTitle",
+				LanguageUtil.get(httpServletRequest, "content-type")
+			).put(
+				"id", layoutPageTemplateEntry.getClassNameId()
+			).put(
+				"label", _getMappingTypeLabel()
+			).build()
+		).put(
 			"subtype",
 			() -> {
 				String subtypeLabel = _getMappingSubtypeLabel();
@@ -221,16 +231,6 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 					"label", subtypeLabel
 				).build();
 			}
-		).put(
-			"type",
-			HashMapBuilder.<String, Object>put(
-				"groupTypeTitle",
-				LanguageUtil.get(httpServletRequest, "content-type")
-			).put(
-				"id", layoutPageTemplateEntry.getClassNameId()
-			).put(
-				"label", _getMappingTypeLabel()
-			).build()
 		).build();
 	}
 

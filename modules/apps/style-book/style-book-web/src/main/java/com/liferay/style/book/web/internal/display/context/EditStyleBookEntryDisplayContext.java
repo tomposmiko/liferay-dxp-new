@@ -119,10 +119,8 @@ public class EditStyleBookEntryDisplayContext {
 	private JSONObject _getFrontendTokenDefinitionJSONObject()
 		throws Exception {
 
-		Group group = _themeDisplay.getScopeGroup();
-
 		LayoutSet layoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
-			_themeDisplay.getSiteGroupId(), group.isLayoutSetPrototype());
+			_themeDisplay.getSiteGroupId(), false);
 
 		FrontendTokenDefinition frontendTokenDefinition =
 			_frontendTokenDefinitionRegistry.getFrontendTokenDefinition(
@@ -217,10 +215,8 @@ public class EditStyleBookEntryDisplayContext {
 	}
 
 	private String _getThemeName() {
-		Group group = _themeDisplay.getScopeGroup();
-
 		LayoutSet layoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
-			_themeDisplay.getSiteGroupId(), group.isLayoutSetPrototype());
+			_themeDisplay.getSiteGroupId(), false);
 
 		Theme theme = layoutSet.getTheme();
 

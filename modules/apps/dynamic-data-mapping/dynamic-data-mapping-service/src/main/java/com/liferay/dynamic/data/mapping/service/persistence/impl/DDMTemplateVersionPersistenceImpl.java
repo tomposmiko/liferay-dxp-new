@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1821,9 +1822,7 @@ public class DDMTemplateVersionPersistenceImpl
 	 */
 	@Override
 	public DDMTemplateVersion fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMTemplateVersion.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMTemplateVersion.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2312,12 +2311,12 @@ public class DDMTemplateVersionPersistenceImpl
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"templateId", "status"}, false);
 
-		DDMTemplateVersionUtil.setPersistence(this);
+		_setDDMTemplateVersionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMTemplateVersionUtil.setPersistence(null);
+		_setDDMTemplateVersionUtilPersistence(null);
 
 		entityCache.removeCache(DDMTemplateVersionImpl.class.getName());
 
@@ -2327,6 +2326,22 @@ public class DDMTemplateVersionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMTemplateVersionUtilPersistence(
+		DDMTemplateVersionPersistence ddmTemplateVersionPersistence) {
+
+		try {
+			Field field = DDMTemplateVersionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmTemplateVersionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

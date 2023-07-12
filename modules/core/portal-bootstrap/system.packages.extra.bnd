@@ -101,25 +101,24 @@ Export-Package:\
 	\
 	com.liferay.ibm.icu.*;version='4.0.1',\
 	\
-	com.rometools.rome;version='1.16.0',\
-	com.rometools.rome.feed;version='1.16.0',\
-	com.rometools.rome.feed.atom;version='1.16.0',\
-	com.rometools.rome.feed.impl;version='1.16.0',\
-	com.rometools.rome.feed.module;version='1.16.0',\
-	com.rometools.rome.feed.rss;version='1.16.0',\
-	com.rometools.rome.feed.synd;version='1.16.0',\
-	com.rometools.rome.io;version='1.16.0',\
-	com.rometools.utils;version='1.16.0',\
-	\
 	com.sun.security.auth.module,\
+	com.sun.syndication;version='1.0',\
+	com.sun.syndication.feed;version='1.0',\
+	com.sun.syndication.feed.atom;version='1.0',\
+	com.sun.syndication.feed.impl;version='1.0',\
+	com.sun.syndication.feed.module;version='1.0',\
+	com.sun.syndication.feed.module.impl;version='1.0',\
+	com.sun.syndication.feed.rss;version='1.0',\
+	com.sun.syndication.feed.synd;version='1.0',\
+	com.sun.syndication.feed.synd.impl;version='1.0',\
+	com.sun.syndication.io;version='1.0',\
+	com.sun.syndication.io.impl;version='1.0',\
 	\
-	com.thoughtworks.xstream.*;version='1.4.20',\
+	com.thoughtworks.xstream.*;version='1.4.19',\
 	\
 	io.netty.*;version='4.1',\
 	\
 	java_cup.runtime.*;version='2.7.1',\
-	\
-	javassist.util.proxy;version='3.29.0.GA',\
 	\
 	javax.jms.*;version='1.1',\
 	\
@@ -168,17 +167,15 @@ Export-Package:\
 	javax.xml.ws.wsaddressing;version='2.4.0',\
 	javax.xml.xpath.*;version='1.4',\
 	\
-	jodd.bean.*;version='6.0.1',\
+	jodd.bean.*;version='3.6.4',\
 	\
-	jodd.exception.*;version='6.0.1',\
+	jodd.exception.*;version='3.6.4',\
 	\
-	jodd.io.*;version='6.0.1',\
+	jodd.http.*;version='3.6.4',\
 	\
-	jodd.net.*;version='6.0.1',\
+	jodd.io.*;version='3.6.4',\
 	\
-	jodd.time.*;version='6.0.1',\
-	\
-	jodd.util.*;version='6.0.1',\
+	jodd.util.*;version='3.6.4',\
 	\
 	org.apache.bcel.*;version='2.7.1',\
 	org.apache.commons.beanutils;version='1.9.4',\
@@ -254,9 +251,9 @@ Export-Package:\
 	\
 	org.jaxen.*;version='1.1.6',\
 	\
-	org.jdom2.*;version='2.0.6',\
+	org.jdom.*;version='1.1.3',\
 	\
-	org.json.*;version='20230227',\
+	org.json.*;version='20180813',\
 	\
 	org.objectweb.asm;version='7.0',\
 	org.objectweb.asm.commons;version='7.0',\
@@ -336,13 +333,16 @@ Provide-Capability:\
 	@../../../lib/portal/dom4j.jar,\
 	@../../../lib/portal/hibernate-commons-annotations.jar,\
 	@../../../lib/portal/hibernate-core.jar,\
-	@../../../lib/portal/javassist.jar,\
 	@../../../lib/portal/jaxen.jar,\
 	@../../../lib/portal/jaxrpc.jar,\
-	@../../../lib/portal/jdom2.jar!/org/**,\
+	@../../../lib/portal/jdom.jar!/org/**,\
+	@../../../lib/portal/jodd-bean.jar,\
+	@../../../lib/portal/jodd-core.jar,\
+	@../../../lib/portal/jodd-http.jar,\
 	@../../../lib/portal/jodd-json.jar,\
 	@../../../lib/portal/jodd-proxetta.jar,\
-	@../../../lib/portal/jodd-util.jar,\
+	@../../../lib/portal/jodd-servlet.jar,\
+	@../../../lib/portal/jodd-upload.jar,\
 	@../../../lib/portal/json-java.jar,\
 	@../../../lib/portal/liferay-icu4j.jar,\
 	@../../../lib/portal/log4j-extras.jar,\
@@ -355,8 +355,7 @@ Provide-Capability:\
 	@../../../lib/portal/netty-transport.jar,\
 	@../../../lib/portal/portletmvc4spring-framework.jar,\
 	@../../../lib/portal/reload4j.jar,\
-	@../../../lib/portal/rometools-utils.jar,\
-	@../../../lib/portal/rometools.jar,\
+	@../../../lib/portal/rome.jar,\
 	@../../../lib/portal/slf4j-api.jar,\
 	@../../../lib/portal/spring-aop.jar,\
 	@../../../lib/portal/spring-aspects.jar,\

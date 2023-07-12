@@ -818,12 +818,6 @@ public class CommerceBOMFolderUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceBOMFolderPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceBOMFolderPersistence _persistence;
 
 }

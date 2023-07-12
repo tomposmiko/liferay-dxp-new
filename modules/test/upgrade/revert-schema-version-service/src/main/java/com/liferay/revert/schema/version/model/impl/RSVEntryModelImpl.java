@@ -202,34 +202,28 @@ public class RSVEntryModelImpl
 
 	private static final Map<String, Function<RSVEntry, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<RSVEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<RSVEntry, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", RSVEntry::getMvccVersion);
-		attributeGetterFunctions.put("rsvEntryId", RSVEntry::getRsvEntryId);
-		attributeGetterFunctions.put("companyId", RSVEntry::getCompanyId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<RSVEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<RSVEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<RSVEntry, Object>>();
 		Map<String, BiConsumer<RSVEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<RSVEntry, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", RSVEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<RSVEntry, Long>)RSVEntry::setMvccVersion);
+		attributeGetterFunctions.put("rsvEntryId", RSVEntry::getRsvEntryId);
 		attributeSetterBiConsumers.put(
 			"rsvEntryId", (BiConsumer<RSVEntry, Long>)RSVEntry::setRsvEntryId);
+		attributeGetterFunctions.put("companyId", RSVEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<RSVEntry, Long>)RSVEntry::setCompanyId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

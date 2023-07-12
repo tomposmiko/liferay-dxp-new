@@ -42,25 +42,23 @@ import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutFriendlyURLComposite;
-import com.liferay.portal.kernel.model.LayoutQueryStringComposite;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -168,7 +166,12 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 		Layout layout = _getLayoutDisplayPageObjectProviderLayout(
 			layoutDisplayPageObjectProvider);
 
-		Locale locale = getLocale(requestContext);
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest)requestContext.get("request");
+
+		HttpSession httpSession = httpServletRequest.getSession();
+
+		Locale locale = (Locale)httpSession.getAttribute(WebKeys.LOCALE);
 
 		if (locale != null) {
 			String urlTitle = layoutDisplayPageObjectProvider.getURLTitle(
@@ -180,25 +183,6 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 		}
 
 		return new LayoutFriendlyURLComposite(layout, friendlyURL);
-	}
-
-	protected Locale getLocale(Map<String, Object> requestContext) {
-		Locale locale = (Locale)requestContext.get(WebKeys.LOCALE);
-
-		if (locale == null) {
-			HttpServletRequest httpServletRequest =
-				(HttpServletRequest)requestContext.get("request");
-
-			HttpSession httpSession = httpServletRequest.getSession();
-
-			locale = (Locale)httpSession.getAttribute(WebKeys.LOCALE);
-
-			if (locale == null) {
-				locale = portal.getLocale(httpServletRequest);
-			}
-		}
-
-		return locale;
 	}
 
 	@Reference
@@ -281,9 +265,9 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 			Map<String, String[]> params)
 		throws NoSuchInfoItemException {
 
-		String version = _getVersion(params);
+		long classPK = _getVersionClassPK(params);
 
-		if (Validator.isNull(version)) {
+		if (classPK <= 0) {
 			return layoutDisplayPageObjectProvider.getDisplayObject();
 		}
 
@@ -297,7 +281,7 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 		InfoItemIdentifier infoItemIdentifier = new ClassPKInfoItemIdentifier(
 			layoutDisplayPageObjectProvider.getClassPK());
 
-		infoItemIdentifier.setVersion(version);
+		infoItemIdentifier.setVersion(InfoItemIdentifier.VERSION_LATEST);
 
 		return infoItemObjectProvider.getInfoItem(infoItemIdentifier);
 	}
@@ -398,31 +382,17 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 	private String _getUrlTitle(String friendlyURL) {
 		String urlSeparator = _getURLSeparator(friendlyURL);
 
-		LayoutQueryStringComposite layoutQueryStringComposite =
-			portal.getPortletFriendlyURLMapperLayoutQueryStringComposite(
-				friendlyURL, new HashMap<>(), new HashMap<>());
-
-		String newFriendlyURL = layoutQueryStringComposite.getFriendlyURL();
-
-		if (newFriendlyURL.startsWith(urlSeparator)) {
-			return newFriendlyURL.substring(urlSeparator.length());
-		}
-
-		if (friendlyURL.startsWith(urlSeparator)) {
-			return friendlyURL.substring(urlSeparator.length());
-		}
-
-		return StringPool.BLANK;
+		return friendlyURL.substring(urlSeparator.length());
 	}
 
-	private String _getVersion(Map<String, String[]> params) {
+	private long _getVersionClassPK(Map<String, String[]> params) {
 		String[] versions = params.get("version");
 
 		if (ArrayUtil.isEmpty(versions)) {
-			return StringPool.BLANK;
+			return 0;
 		}
 
-		return versions[0];
+		return GetterUtil.getLong(versions[0]);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

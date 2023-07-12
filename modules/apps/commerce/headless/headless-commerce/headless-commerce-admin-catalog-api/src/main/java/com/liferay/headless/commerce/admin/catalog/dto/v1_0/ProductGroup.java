@@ -88,9 +88,7 @@ public class ProductGroup implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, ?> customFields;
 
-	@Schema(
-		example = "{hu_HU=Description HU, hr_HR=Description HR, en_US=Description}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getDescription() {
 		return description;
@@ -120,7 +118,7 @@ public class ProductGroup implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> description;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -149,7 +147,7 @@ public class ProductGroup implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -206,7 +204,7 @@ public class ProductGroup implements Serializable {
 	protected ProductGroupProduct[] products;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	public Integer getProductsCount() {
 		return productsCount;
 	}
@@ -234,7 +232,7 @@ public class ProductGroup implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer productsCount;
 
-	@Schema(example = "{en_US=Title, hr_HR=Title HR, hu_HU=Title HU}")
+	@Schema
 	@Valid
 	public Map<String, String> getTitle() {
 		return title;

@@ -79,10 +79,6 @@ public class DDMTemplateVersionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DDMTemplateVersionService service) {
-		_service = service;
-	}
-
 	private static volatile DDMTemplateVersionService _service;
 
 }

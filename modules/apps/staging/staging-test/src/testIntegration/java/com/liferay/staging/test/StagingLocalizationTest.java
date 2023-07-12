@@ -66,7 +66,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -137,7 +136,6 @@ public class StagingLocalizationTest {
 			nameMap, LocaleUtil.US, LocaleUtil.SPAIN);
 	}
 
-	@Ignore
 	@Test(expected = LocaleException.class)
 	public void testRemoveSupportedLocale() throws Exception {
 		testUpdateLocales("es_ES", "de_DE,es_ES", "en_US");

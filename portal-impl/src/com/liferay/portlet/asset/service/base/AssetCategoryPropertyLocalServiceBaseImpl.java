@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -49,6 +47,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -495,15 +495,14 @@ public abstract class AssetCategoryPropertyLocalServiceBaseImpl
 			"com.liferay.asset.kernel.model.AssetCategoryProperty",
 			assetCategoryPropertyLocalService);
 
-		AssetCategoryPropertyLocalServiceUtil.setService(
-			assetCategoryPropertyLocalService);
+		_setLocalServiceUtilService(assetCategoryPropertyLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.asset.kernel.model.AssetCategoryProperty");
 
-		AssetCategoryPropertyLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -564,6 +563,23 @@ public abstract class AssetCategoryPropertyLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		AssetCategoryPropertyLocalService assetCategoryPropertyLocalService) {
+
+		try {
+			Field field =
+				AssetCategoryPropertyLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, assetCategoryPropertyLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = AssetCategoryPropertyLocalService.class)
 	protected AssetCategoryPropertyLocalService
 		assetCategoryPropertyLocalService;
@@ -579,9 +595,6 @@ public abstract class AssetCategoryPropertyLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetCategoryPropertyLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -242,81 +242,75 @@ public class AppBuilderWorkflowTaskLinkModelImpl
 	private static final Map
 		<String, Function<AppBuilderWorkflowTaskLink, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<AppBuilderWorkflowTaskLink, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AppBuilderWorkflowTaskLink, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AppBuilderWorkflowTaskLink, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AppBuilderWorkflowTaskLink::getMvccVersion);
-		attributeGetterFunctions.put(
-			"appBuilderWorkflowTaskLinkId",
-			AppBuilderWorkflowTaskLink::getAppBuilderWorkflowTaskLinkId);
-		attributeGetterFunctions.put(
-			"companyId", AppBuilderWorkflowTaskLink::getCompanyId);
-		attributeGetterFunctions.put(
-			"appBuilderAppId", AppBuilderWorkflowTaskLink::getAppBuilderAppId);
-		attributeGetterFunctions.put(
-			"appBuilderAppVersionId",
-			AppBuilderWorkflowTaskLink::getAppBuilderAppVersionId);
-		attributeGetterFunctions.put(
-			"ddmStructureLayoutId",
-			AppBuilderWorkflowTaskLink::getDdmStructureLayoutId);
-		attributeGetterFunctions.put(
-			"readOnly", AppBuilderWorkflowTaskLink::getReadOnly);
-		attributeGetterFunctions.put(
-			"workflowTaskName",
-			AppBuilderWorkflowTaskLink::getWorkflowTaskName);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<AppBuilderWorkflowTaskLink, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AppBuilderWorkflowTaskLink, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<AppBuilderWorkflowTaskLink, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AppBuilderWorkflowTaskLink::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AppBuilderWorkflowTaskLink, Long>)
 				AppBuilderWorkflowTaskLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"appBuilderWorkflowTaskLinkId",
+			AppBuilderWorkflowTaskLink::getAppBuilderWorkflowTaskLinkId);
 		attributeSetterBiConsumers.put(
 			"appBuilderWorkflowTaskLinkId",
 			(BiConsumer<AppBuilderWorkflowTaskLink, Long>)
 				AppBuilderWorkflowTaskLink::setAppBuilderWorkflowTaskLinkId);
+		attributeGetterFunctions.put(
+			"companyId", AppBuilderWorkflowTaskLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AppBuilderWorkflowTaskLink, Long>)
 				AppBuilderWorkflowTaskLink::setCompanyId);
+		attributeGetterFunctions.put(
+			"appBuilderAppId", AppBuilderWorkflowTaskLink::getAppBuilderAppId);
 		attributeSetterBiConsumers.put(
 			"appBuilderAppId",
 			(BiConsumer<AppBuilderWorkflowTaskLink, Long>)
 				AppBuilderWorkflowTaskLink::setAppBuilderAppId);
+		attributeGetterFunctions.put(
+			"appBuilderAppVersionId",
+			AppBuilderWorkflowTaskLink::getAppBuilderAppVersionId);
 		attributeSetterBiConsumers.put(
 			"appBuilderAppVersionId",
 			(BiConsumer<AppBuilderWorkflowTaskLink, Long>)
 				AppBuilderWorkflowTaskLink::setAppBuilderAppVersionId);
+		attributeGetterFunctions.put(
+			"ddmStructureLayoutId",
+			AppBuilderWorkflowTaskLink::getDdmStructureLayoutId);
 		attributeSetterBiConsumers.put(
 			"ddmStructureLayoutId",
 			(BiConsumer<AppBuilderWorkflowTaskLink, Long>)
 				AppBuilderWorkflowTaskLink::setDdmStructureLayoutId);
+		attributeGetterFunctions.put(
+			"readOnly", AppBuilderWorkflowTaskLink::getReadOnly);
 		attributeSetterBiConsumers.put(
 			"readOnly",
 			(BiConsumer<AppBuilderWorkflowTaskLink, Boolean>)
 				AppBuilderWorkflowTaskLink::setReadOnly);
+		attributeGetterFunctions.put(
+			"workflowTaskName",
+			AppBuilderWorkflowTaskLink::getWorkflowTaskName);
 		attributeSetterBiConsumers.put(
 			"workflowTaskName",
 			(BiConsumer<AppBuilderWorkflowTaskLink, String>)
 				AppBuilderWorkflowTaskLink::setWorkflowTaskName);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

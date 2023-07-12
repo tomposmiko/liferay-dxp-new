@@ -1030,10 +1030,6 @@ public class DDMContentUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(DDMContentPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile DDMContentPersistence _persistence;
 
 }

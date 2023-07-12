@@ -16,7 +16,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,9 +25,9 @@ definition {
 	}
 
 	@description = "This is use case for LPS-107776. Can add collection items in a collection page based on dynamic collection with all types."
-	@priority = 5
+	@priority = "5"
 	test AddCollectionItemsInCollectionPageBasedOnDynamicCollection {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 		property portal.acceptance = "true";
 
 		task ("Add a dynamic collection with All Types") {
@@ -48,10 +48,10 @@ definition {
 
 		task ("Assert there is no collection items shown in Collection Display") {
 			AssertVisible(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_entryTitle = "Title",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 			AssertTextEquals(
@@ -73,10 +73,10 @@ definition {
 
 		task ("Assert the web content article is shown in Collection Display") {
 			AssertVisible(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_entryTitle = "Web Content Title",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 			AssertTextEquals(
@@ -97,14 +97,14 @@ definition {
 		}
 
 		task ("Assert the Blogs entry is shown in Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Blogs Entry Title,Web Content Title") {
 				AssertVisible(
-					key_colPosition = 1,
-					key_entryTitle = ${title},
+					key_colPosition = "1",
+					key_entryTitle = "${title}",
 					key_fragmentName = "Collection Display",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 				var n = ${n} + 1;
@@ -128,14 +128,14 @@ definition {
 		}
 
 		task ("Assert the document is shown in Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title,Blogs Entry Title,Web Content Title") {
 				AssertVisible(
-					key_colPosition = 1,
-					key_entryTitle = ${title},
+					key_colPosition = "1",
+					key_entryTitle = "${title}",
 					key_fragmentName = "Collection Display",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 				var n = ${n} + 1;
@@ -148,7 +148,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-107775. Can add new collections when add a collection page from pages admin."
-	@priority = 5
+	@priority = "5"
 	test AddcollectionViaAddingCollectionPage {
 		property portal.acceptance = "true";
 
@@ -182,7 +182,7 @@ definition {
 	}
 
 	@description = "This is for LPS-110108. Add a Draft page and check label."
-	@priority = 4
+	@priority = "4"
 	test AddDraftPageAndViewLabel {
 		property testray.component.names = "Site Pages Administration";
 
@@ -199,7 +199,7 @@ definition {
 	}
 
 	@description = "This is for LPS-110108. Adding a fourth level child page and viewing it on Page admin."
-	@priority = 5
+	@priority = "5"
 	test AddPageWithFourthLevelChildPagesToSite {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Pages Administration";
@@ -231,28 +231,28 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		Page.view(
-			depth = 2,
+			depth = "2",
 			pageName = "First Level Child Page",
 			privacy = "Public Pages");
 
 		Page.view(
-			depth = 3,
+			depth = "3",
 			pageName = "Second Level Child Page",
 			privacy = "Public Pages");
 
 		Page.view(
-			depth = 4,
+			depth = "4",
 			pageName = "Third Level Child Page",
 			privacy = "Public Pages");
 
 		Page.view(
-			depth = 5,
+			depth = "5",
 			pageName = "Fourth Level Child Page",
 			privacy = "Public Pages");
 	}
 
 	@description = "This is use case for LPS-107776. Only can add specific type collection items in a collection page based on manual collection with single item type."
-	@priority = 4
+	@priority = "4"
 	test AddSingleTypeCollectionItemsInCollectionPageBasedOnManualCollectionWithSingleItemType {
 		task ("Add a manual collection with Web Content Article item type") {
 			JSONAssetlist.addManualAssetListEntry(
@@ -279,10 +279,10 @@ definition {
 
 		task ("Assert there is no collection items shown in Collection Display") {
 			AssertVisible(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_entryTitle = "Title",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 			AssertTextEquals(
@@ -302,10 +302,10 @@ definition {
 
 		task ("Assert the web content article is shown in Collection Display") {
 			AssertVisible(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_entryTitle = "Web Content Title",
 				key_fragmentName = "Collection Display",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 			AssertTextEquals(
@@ -315,7 +315,7 @@ definition {
 	}
 
 	@description = "This is for LPS-110108. Management Toolbar shows count of selected items and all visible items are selected after checking the Select All checkbox."
-	@priority = 5
+	@priority = "5"
 	test CheckAndViewCountViaManagementToolbar {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Pages Administration";
@@ -346,35 +346,8 @@ definition {
 		SitePages.viewCheckboxChecked(pageName = "Test Content Page");
 	}
 
-	@description = "This is for LPS-150849."
-	@priority = 5
-	test ChooseColumnTypeAndViewSelectedIcon {
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
-
-		SitePages.addPublicPage(
-			pageName = "Test Widget Page",
-			sitePageType = "Widget Page");
-
-		Click(
-			key_columnName = "1 Column",
-			locator1 = "SitePagesEditPage#LAYOUT_CARD");
-
-		var backgroundColorStyle = Css.getPseudoElementCssValue(
-			attribute = "background-color",
-			element = "//div[contains(@class,'card') and contains(@class,'card-type-template active')]",
-			pseudo = "::after");
-
-		echo("background color: ${backgroundColorStyle} ");
-
-		if (${backgroundColorStyle} != "rgb(11, 95, 255)") {
-			fail("Select icon is not shown");
-		}
-	}
-
 	@description = "This is a test for LPS-110183. Can access to display page in Collection Items modal when the collection item has associated display page template."
-	@priority = 5
+	@priority = "5"
 	test GoToCollectionItemDisplayPage {
 		property portal.acceptance = "true";
 
@@ -444,15 +417,13 @@ definition {
 				menuItem = "View Collection Items",
 				pageName = "Content Collection Page Name");
 
-			Pause(locator1 = 5000);
+			Pause(locator1 = "5000");
 
 			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 			Page.gotoCollectionEntryEllipsisItem(
 				item = "View Display Page",
 				tableEntry = "WC WebContent Title ${i}");
-
-			SelectFrameTop();
 
 			AssertVisible(
 				key_content = "WC WebContent Content ${i}",
@@ -476,15 +447,13 @@ definition {
 				item = "View Collection Items",
 				pageName = "Content Collection Page Name");
 
-			Pause(locator1 = 5000);
+			Pause(locator1 = "5000");
 
 			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 			Page.gotoCollectionEntryEllipsisItem(
 				item = "View Display Page",
 				tableEntry = "WC WebContent Title ${i}");
-
-			SelectFrameTop();
 
 			AssertVisible(
 				key_content = "WC WebContent Content ${i}",
@@ -497,7 +466,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-110183. Can access to edition of collection items in Collection Items modal."
-	@priority = 4
+	@priority = "4"
 	test GoToCollectionItemEditMode {
 		JSONWebcontent.addWebContent(
 			content = "Webcontent Content",
@@ -532,15 +501,13 @@ definition {
 			menuItem = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		Page.gotoCollectionEntryEllipsisItem(
 			item = "Edit Content",
 			tableEntry = "Webcontent Title");
-
-		SelectFrameTop();
 
 		AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
 
@@ -552,15 +519,13 @@ definition {
 			menuItem = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		Page.gotoCollectionEntryEllipsisItem(
 			item = "Edit Content",
 			tableEntry = "Blogs Entry Title");
-
-		SelectFrameTop();
 
 		AssertTextEquals(
 			key_text = "Title",
@@ -575,15 +540,13 @@ definition {
 			menuItem = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		Page.gotoCollectionEntryEllipsisItem(
 			item = "Edit Content",
 			tableEntry = "Document Title");
-
-		SelectFrameTop();
 
 		AssertTextEquals(
 			locator1 = "TextInput#TITLE",
@@ -605,15 +568,13 @@ definition {
 			item = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		Page.gotoCollectionEntryEllipsisItem(
 			item = "Edit Content",
 			tableEntry = "Webcontent Title");
-
-		SelectFrameTop();
 
 		AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
 
@@ -627,15 +588,13 @@ definition {
 			item = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		Page.gotoCollectionEntryEllipsisItem(
 			item = "Edit Content",
 			tableEntry = "Blogs Entry Title");
-
-		SelectFrameTop();
 
 		AssertTextEquals(
 			key_text = "Title",
@@ -652,15 +611,13 @@ definition {
 			item = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		Page.gotoCollectionEntryEllipsisItem(
 			item = "Edit Content",
 			tableEntry = "Document Title");
-
-		SelectFrameTop();
 
 		AssertTextEquals(
 			locator1 = "TextInput#TITLE",
@@ -674,7 +631,7 @@ definition {
 	}
 
 	@description = "This is for LPS-110108. The hovered item shows Add Page quick action and a Kebab menu with the actions available for that item. Clicking on item title navigates to the content."
-	@priority = 5
+	@priority = "5"
 	test MouseOverNonRootPageAndViewPage {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Pages Administration";
@@ -706,7 +663,7 @@ definition {
 
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.expandPageTree(depth = 2);
+		SitePages.expandPageTree(depth = "2");
 
 		SitePages.checkPage(pageName = "Test Content Page Name 1");
 
@@ -736,7 +693,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-106469. Reorder Child pages in the same level via drag and drop."
-	@priority = 4
+	@priority = "4"
 	test MoveChildPageInSameLevel {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -760,7 +717,7 @@ definition {
 
 		for (var n : list "1,2,3") {
 			Page.view(
-				depth = 3,
+				depth = "3",
 				pageName = "Child Page Name ${n}",
 				privacy = "Public Pages");
 		}
@@ -771,7 +728,7 @@ definition {
 
 		for (var n : list "2,1,3") {
 			Page.view(
-				depth = 3,
+				depth = "3",
 				pageName = "Child Page Name ${n}",
 				privacy = "Public Pages");
 		}
@@ -780,7 +737,7 @@ definition {
 	}
 
 	@description = "This is for LPS-110108. Move child page to parent page level via drag and drop."
-	@priority = 4
+	@priority = "4"
 	test MoveChildPageToParentLevel {
 		property testray.component.names = "Site Pages Administration";
 
@@ -796,7 +753,7 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		Page.view(
-			depth = 2,
+			depth = "2",
 			pageName = "Child Page Name",
 			privacy = "Public Pages");
 
@@ -810,7 +767,7 @@ definition {
 	}
 
 	@description = "This is for LPS-114527. Can move multiple different level pages to the same level via dragging in Pages admin."
-	@priority = 4
+	@priority = "4"
 	test MoveMultipleDifferentLevelsPagesToTheSameLevel {
 		task ("Add a widget page") {
 			JSONLayout.addPublicLayout(
@@ -869,7 +826,7 @@ definition {
 
 		task ("Assert Test Page Name 2 and Child Child Page Name 1 are moved to the same level with Child Page Name 1") {
 			Page.viewPagesOrder(
-				depth = 3,
+				depth = "3",
 				pageName1 = "Test Page Name 2",
 				pageName2 = "Child Child Page Name 1",
 				pageName3 = "Child Page Name 1");
@@ -877,7 +834,7 @@ definition {
 	}
 
 	@description = "This is for LPS-114527. Can move multiple same level pages at the same level via dragging in Pages admin."
-	@priority = 5
+	@priority = "5"
 	test MoveMultiplePagesInSameLevel {
 		property portal.acceptance = "true";
 
@@ -906,7 +863,7 @@ definition {
 			WaitForPageLoad();
 
 			Page.viewPagesOrder(
-				depth = 2,
+				depth = "2",
 				pageName1 = "Test Page Name 1",
 				pageName2 = "Test Page Name 2",
 				pageName3 = "Test Page Name 3");
@@ -924,7 +881,7 @@ definition {
 
 		task ("Assert Test Page Name 2 and 3 are moved to top of Test Page Name 1") {
 			Page.viewPagesOrder(
-				depth = 2,
+				depth = "2",
 				pageName1 = "Test Page Name 2",
 				pageName2 = "Test Page Name 3",
 				pageName3 = "Test Page Name 1");
@@ -932,7 +889,7 @@ definition {
 	}
 
 	@description = "This is for LPS-114527. Can move multiple same level pages to different level via dragging in Pages admin."
-	@priority = 4
+	@priority = "4"
 	test MoveMultipleSameLevelPagesToChildLevel {
 		task ("Add 2 widget page and 1 content page in the same level") {
 			for (var n : list "1,2") {
@@ -975,14 +932,14 @@ definition {
 
 		task ("Assert Test Page Name 1 and 2 are moved to child level of Test Page Name 3") {
 			Page.viewPagesOrder(
-				depth = 3,
+				depth = "3",
 				pageName1 = "Test Page Name 1",
 				pageName2 = "Test Page Name 2");
 		}
 	}
 
 	@description = "This is for LPS-110108. Reorder pages in same level via drag and drop."
-	@priority = 5
+	@priority = "5"
 	test MovePageInSameLevel {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Pages Administration";
@@ -1012,7 +969,7 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		Page.viewPagesOrder(
-			depth = 2,
+			depth = "2",
 			pageName1 = "Test Content Page Name 1",
 			pageName2 = "Test Content Page Name 2");
 
@@ -1021,13 +978,13 @@ definition {
 			pageNameTo = "Test Content Page Name 1");
 
 		Page.viewPagesOrder(
-			depth = 2,
+			depth = "2",
 			pageName1 = "Test Content Page Name 2",
 			pageName2 = "Test Content Page Name 1");
 	}
 
 	@description = "This is for LPS-110108. Move parent page to child page level via drag and drop."
-	@priority = 4
+	@priority = "4"
 	test MoveParentPageToChildLevel {
 		property testray.component.names = "Site Pages Administration";
 
@@ -1068,7 +1025,7 @@ definition {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		Page.view(
-			depth = 2,
+			depth = "2",
 			pageName = "Child Content Page Name 1",
 			privacy = "Public Pages");
 
@@ -1077,13 +1034,13 @@ definition {
 			pageNameTo = "Child Content Page Name 1");
 
 		Page.view(
-			depth = 2,
+			depth = "2",
 			pageName = "Test Content Page Name 2",
 			privacy = "Public Pages");
 	}
 
 	@description = "This is a test for LPS-76825. A user can search for a page from pages admin."
-	@priority = 5
+	@priority = "5"
 	test SearchPages {
 		property portal.acceptance = "true";
 
@@ -1168,7 +1125,7 @@ definition {
 	}
 
 	@description = "This is for LPS-110108. Select non root item, it shows Add Page quick action and a Kebab menu with the actions available for that item."
-	@priority = 4
+	@priority = "4"
 	test SelectNonRootPageAndViewPage {
 		property testray.component.names = "Site Pages Administration";
 
@@ -1197,7 +1154,7 @@ definition {
 
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.expandPageTree(depth = 2);
+		SitePages.expandPageTree(depth = "2");
 
 		SitePages.checkPage(pageName = "Child Content Page Name");
 
@@ -1213,9 +1170,9 @@ definition {
 	}
 
 	@description = "This is a test for LPS-110183. Can view information about collection items of collection page."
-	@priority = 5
+	@priority = "5"
 	test ViewCollectionItemViaPageFinderAndPageAdmin {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 		property portal.acceptance = "true";
 
 		JSONWebcontent.addWebContent(
@@ -1256,13 +1213,13 @@ definition {
 			item = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		for (var tableHeader : list "Title,Type,Author,Modified Date,Create Date") {
 			AssertElementPresent(
-				key_tableHeader = ${tableHeader},
+				key_tableHeader = "${tableHeader}",
 				locator1 = "LexiconTable#TABLE_HEADER");
 		}
 
@@ -1270,11 +1227,11 @@ definition {
 
 		Page.viewCollectionItem(
 			itemName = "Blogs Entry Title",
-			key_rowNumber = 2);
+			key_rowNumber = "2");
 
 		Page.viewCollectionItem(
 			itemName = "Webcontent Title",
-			key_rowNumber = 3);
+			key_rowNumber = "3");
 
 		IFrame.closeFrame();
 
@@ -1288,13 +1245,13 @@ definition {
 			menuItem = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		for (var tableHeader : list "Title,Type,Author,Modified Date,Create Date") {
 			AssertElementPresent(
-				key_tableHeader = ${tableHeader},
+				key_tableHeader = "${tableHeader}",
 				locator1 = "LexiconTable#TABLE_HEADER");
 		}
 
@@ -1302,15 +1259,15 @@ definition {
 
 		Page.viewCollectionItem(
 			itemName = "Blogs Entry Title",
-			key_rowNumber = 2);
+			key_rowNumber = "2");
 
 		Page.viewCollectionItem(
 			itemName = "Webcontent Title",
-			key_rowNumber = 3);
+			key_rowNumber = "3");
 	}
 
 	@description = "This is a test for LPS-110183. Can view more collection items use pagination in Collection Items modal."
-	@priority = 4
+	@priority = "4"
 	test ViewCollectionItemWithPagination {
 		for (var entryTitle : list "5,4,3,2,1") {
 			JSONWebcontent.addWebContent(
@@ -1336,22 +1293,22 @@ definition {
 			menuItem = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		for (var rowNumber : list "1,2,3,4,5") {
 			Page.viewCollectionItem(
 				itemName = "Web Content Title ${rowNumber}",
-				key_rowNumber = ${rowNumber});
+				key_rowNumber = "${rowNumber}");
 		}
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		for (var rowNumber : list "1,2,3,4") {
 			Page.viewCollectionItem(
 				itemName = "Web Content Title ${rowNumber}",
-				key_rowNumber = ${rowNumber});
+				key_rowNumber = "${rowNumber}");
 		}
 
 		LexiconTable.viewTableEntryNotPresent(tableEntry = "Web Content Title 5");

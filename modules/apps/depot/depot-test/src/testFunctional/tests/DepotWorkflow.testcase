@@ -28,7 +28,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -45,7 +45,7 @@ definition {
 	}
 
 	@description = "This ensures that the approved image from a depot is available to use in its connected site."
-	@priority = 5
+	@priority = "5"
 	test ApproveImage {
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
@@ -73,7 +73,7 @@ definition {
 
 		BlogsNavigator.gotoAddEntry();
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -134,7 +134,7 @@ definition {
 	}
 
 	@description = "This ensures that the approved WC article from a depot is available to use in its connected site."
-	@priority = 5
+	@priority = "5"
 	test ApproveWCArticle {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -232,7 +232,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-113392. It ensures that an asset library WC article can be approved by the content reviewer."
-	@priority = 5
+	@priority = "5"
 	test ApproveWCArticleByContentReviewer {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -333,7 +333,7 @@ definition {
 	}
 
 	@description = "This ensures that a single approver workflow of web content can be defined for the asset library."
-	@priority = 5
+	@priority = "5"
 	test ApproveWCArticleWithinDepot {
 		DepotNavigator.openDepotAdmin();
 
@@ -382,7 +382,7 @@ definition {
 	}
 
 	@description = "This ensures that the approved WC article in folder from a depot is available to use in its connected site."
-	@priority = 5
+	@priority = "5"
 	test ApproveWCInFolder {
 		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
 
@@ -488,7 +488,7 @@ definition {
 	}
 
 	@description = "This ensures that the resubmitted document from a depot is available to use in its connected site."
-	@priority = 5
+	@priority = "5"
 	test RejectAndResubmitDocument {
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
@@ -607,7 +607,7 @@ definition {
 	}
 
 	@description = "This ensures that the resubmitted WC article from a depot is available to use in its connected site."
-	@priority = 5
+	@priority = "5"
 	test RejectAndResubmitWC {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -726,7 +726,7 @@ definition {
 	}
 
 	@description = "This ensures that the resubmitted web content can be approved in an asset library."
-	@priority = 5
+	@priority = "5"
 	test RejectandResubmitWCArticleWithinDepot {
 		DepotNavigator.openDepotAdmin();
 
@@ -807,7 +807,7 @@ definition {
 	}
 
 	@description = "This ensures that an asset library WC article can be rejected by the content reviewer."
-	@priority = 5
+	@priority = "5"
 	test RejectWCArticleByContentReviewer {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -897,7 +897,7 @@ definition {
 	}
 
 	@description = "This ensures that a DM folder workflow can be restored to default from other settings."
-	@priority = 4
+	@priority = "4"
 	test RestoreDMFolderWorkflowToDefault {
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
@@ -937,7 +937,7 @@ definition {
 	}
 
 	@description = "This ensures that a WC folder workflow can be restored to default from other settings."
-	@priority = 4
+	@priority = "4"
 	test RestoreWCFolderWorkflowToDefault {
 		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
 
@@ -978,7 +978,7 @@ definition {
 	}
 
 	@description = "This ensures that the workflow can be set in an asset library."
-	@priority = 5
+	@priority = "5"
 	test Smoke {
 		DepotNavigator.openDepotAdmin();
 

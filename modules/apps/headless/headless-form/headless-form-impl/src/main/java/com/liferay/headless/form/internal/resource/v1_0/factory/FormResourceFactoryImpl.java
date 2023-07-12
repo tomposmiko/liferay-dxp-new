@@ -14,7 +14,6 @@
 
 package com.liferay.headless.form.internal.resource.v1_0.factory;
 
-import com.liferay.headless.form.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.form.resource.v1_0.FormResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-form/v1.0/Form",
-	service = FormResource.Factory.class
-)
+@Component(immediate = true, service = FormResource.Factory.class)
 @Generated("")
 public class FormResourceFactoryImpl implements FormResource.Factory {
 
@@ -137,6 +134,16 @@ public class FormResourceFactoryImpl implements FormResource.Factory {
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		FormResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		FormResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, FormResource>
 		_getProxyProviderFunction() {
 
@@ -184,7 +191,7 @@ public class FormResourceFactoryImpl implements FormResource.Factory {
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		FormResource formResource = _componentServiceObjects.getService();
@@ -206,7 +213,6 @@ public class FormResourceFactoryImpl implements FormResource.Factory {
 		formResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		formResource.setRoleLocalService(_roleLocalService);
-		formResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(formResource, arguments);
@@ -246,6 +252,9 @@ public class FormResourceFactoryImpl implements FormResource.Factory {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -254,9 +263,6 @@ public class FormResourceFactoryImpl implements FormResource.Factory {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

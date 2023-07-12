@@ -35,14 +35,14 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -881,12 +881,11 @@ public abstract class CommercePriceListAccountRelServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		CommercePriceListAccountRelServiceUtil.setService(
-			commercePriceListAccountRelService);
+		_setServiceUtilService(commercePriceListAccountRelService);
 	}
 
 	public void destroy() {
-		CommercePriceListAccountRelServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -929,6 +928,23 @@ public abstract class CommercePriceListAccountRelServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		CommercePriceListAccountRelService commercePriceListAccountRelService) {
+
+		try {
+			Field field =
+				CommercePriceListAccountRelServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commercePriceListAccountRelService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1120,8 +1136,5 @@ public abstract class CommercePriceListAccountRelServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommercePriceListAccountRelServiceBaseImpl.class);
 
 }

@@ -15,7 +15,6 @@
 package com.liferay.layout.taglib.servlet.taglib;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
-import com.liferay.layout.constants.LayoutWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
@@ -159,7 +158,7 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 		}
 
 		_layoutStructure = (LayoutStructure)httpServletRequest.getAttribute(
-			LayoutWebKeys.LAYOUT_STRUCTURE);
+			RenderLayoutStructureTag.LAYOUT_STRUCTURE);
 
 		if (_layoutStructure != null) {
 			return _layoutStructure;

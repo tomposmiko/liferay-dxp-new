@@ -53,8 +53,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -70,6 +68,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -627,7 +627,7 @@ public abstract class JournalArticleLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		JournalArticleLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -642,7 +642,7 @@ public abstract class JournalArticleLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		journalArticleLocalService = (JournalArticleLocalService)aopProxy;
 
-		JournalArticleLocalServiceUtil.setService(journalArticleLocalService);
+		_setLocalServiceUtilService(journalArticleLocalService);
 	}
 
 	/**
@@ -699,6 +699,22 @@ public abstract class JournalArticleLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		JournalArticleLocalService journalArticleLocalService) {
+
+		try {
+			Field field = JournalArticleLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, journalArticleLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -787,8 +803,5 @@ public abstract class JournalArticleLocalServiceBaseImpl
 
 	@Reference
 	protected JournalFolderFinder journalFolderFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		JournalArticleLocalServiceBaseImpl.class);
 
 }

@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link LayoutBranchLocalService}.
  *
@@ -52,8 +50,9 @@ public class LayoutBranchLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutBranch addLayoutBranch(
-			long layoutSetBranchId, long plid, String name, String description,
-			boolean master, ServiceContext serviceContext)
+			long layoutSetBranchId, long plid, java.lang.String name,
+			java.lang.String description, boolean master,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutBranchLocalService.addLayoutBranch(
@@ -62,8 +61,9 @@ public class LayoutBranchLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutBranch addLayoutBranch(
-			long layoutRevisionId, String name, String description,
-			boolean master, ServiceContext serviceContext)
+			long layoutRevisionId, java.lang.String name,
+			java.lang.String description, boolean master,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutBranchLocalService.addLayoutBranch(
@@ -359,7 +359,7 @@ public class LayoutBranchLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _layoutBranchLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -393,17 +393,12 @@ public class LayoutBranchLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutBranch updateLayoutBranch(
-			long layoutBranchId, String name, String description,
-			ServiceContext serviceContext)
+			long layoutBranchId, java.lang.String name,
+			java.lang.String description, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutBranchLocalService.updateLayoutBranch(
 			layoutBranchId, name, description, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _layoutBranchLocalService.getBasePersistence();
 	}
 
 	@Override

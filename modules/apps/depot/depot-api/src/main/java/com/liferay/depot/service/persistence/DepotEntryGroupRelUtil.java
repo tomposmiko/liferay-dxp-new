@@ -1494,12 +1494,6 @@ public class DepotEntryGroupRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		DepotEntryGroupRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile DepotEntryGroupRelPersistence _persistence;
 
 }

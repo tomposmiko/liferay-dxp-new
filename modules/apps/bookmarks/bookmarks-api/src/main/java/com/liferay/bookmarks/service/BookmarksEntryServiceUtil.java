@@ -201,10 +201,6 @@ public class BookmarksEntryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(BookmarksEntryService service) {
-		_service = service;
-	}
-
 	private static volatile BookmarksEntryService _service;
 
 }

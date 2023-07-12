@@ -125,10 +125,6 @@ public class AssetDisplayPageEntryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AssetDisplayPageEntryService service) {
-		_service = service;
-	}
-
 	private static volatile AssetDisplayPageEntryService _service;
 
 }

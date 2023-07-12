@@ -1227,10 +1227,6 @@ public class UserGroupRoleUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(UserGroupRolePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile UserGroupRolePersistence _persistence;
 
 }

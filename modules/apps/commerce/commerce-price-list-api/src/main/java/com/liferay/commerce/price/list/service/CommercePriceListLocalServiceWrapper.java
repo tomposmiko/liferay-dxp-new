@@ -15,7 +15,6 @@
 package com.liferay.commerce.price.list.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommercePriceListLocalService}.
@@ -543,7 +542,13 @@ public class CommercePriceListLocalServiceWrapper
 			commercePriceListId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce price list with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price list's external reference code
+	 * @return the matching commerce price list, or <code>null</code> if a matching commerce price list could not be found
+	 */
 	@Override
 	public com.liferay.commerce.price.list.model.CommercePriceList
 		fetchCommercePriceListByExternalReferenceCode(
@@ -554,6 +559,9 @@ public class CommercePriceListLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePriceListByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.price.list.model.CommercePriceList
@@ -709,7 +717,14 @@ public class CommercePriceListLocalServiceWrapper
 			groupId, type, commerceChannelId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce price list with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price list's external reference code
+	 * @return the matching commerce price list
+	 * @throws PortalException if a matching commerce price list could not be found
+	 */
 	@Override
 	public com.liferay.commerce.price.list.model.CommercePriceList
 			getCommercePriceListByExternalReferenceCode(
@@ -1256,11 +1271,6 @@ public class CommercePriceListLocalServiceWrapper
 			displayDateMinute, expirationDateMonth, expirationDateDay,
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			externalReferenceCode, neverExpire, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commercePriceListLocalService.getBasePersistence();
 	}
 
 	@Override

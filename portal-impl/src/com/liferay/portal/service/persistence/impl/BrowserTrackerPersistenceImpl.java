@@ -48,6 +48,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -840,11 +841,11 @@ public class BrowserTrackerPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"userId"},
 			false);
 
-		BrowserTrackerUtil.setPersistence(this);
+		_setBrowserTrackerUtilPersistence(this);
 	}
 
 	public void destroy() {
-		BrowserTrackerUtil.setPersistence(null);
+		_setBrowserTrackerUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(BrowserTrackerImpl.class.getName());
 
@@ -854,6 +855,22 @@ public class BrowserTrackerPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setBrowserTrackerUtilPersistence(
+		BrowserTrackerPersistence browserTrackerPersistence) {
+
+		try {
+			Field field = BrowserTrackerUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, browserTrackerPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

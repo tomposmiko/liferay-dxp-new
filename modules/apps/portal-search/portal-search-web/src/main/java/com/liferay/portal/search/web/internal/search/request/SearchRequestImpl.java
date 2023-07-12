@@ -60,8 +60,6 @@ public class SearchRequestImpl {
 		SearchRequestBuilder searchRequestBuilder =
 			_searchRequestBuilderFactory.builder(searchContext);
 
-		searchRequestBuilder.fetchSource(true);
-
 		SearchSettingsImpl searchSettingsImpl = buildSettings(
 			searchRequestBuilder, searchContext);
 

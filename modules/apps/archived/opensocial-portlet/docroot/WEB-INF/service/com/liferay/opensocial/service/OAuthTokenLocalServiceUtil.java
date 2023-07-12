@@ -336,10 +336,6 @@ public class OAuthTokenLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(OAuthTokenLocalService service) {
-		_service = service;
-	}
-
 	private static volatile OAuthTokenLocalService _service;
 
 }

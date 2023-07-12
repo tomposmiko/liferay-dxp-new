@@ -1851,12 +1851,6 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
-		<attribute>
-			<description></description>
-			<name>translated</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
 		<dynamic-attributes>true</dynamic-attributes>
 	</tag>
 	<tag>
@@ -1918,12 +1912,6 @@
 		<name>link</name>
 		<tag-class>com.liferay.frontend.taglib.clay.servlet.taglib.LinkTag</tag-class>
 		<body-content>empty</body-content>
-		<attribute>
-			<description></description>
-			<name>additionalProps</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
 		<attribute>
 			<description>Deprecated as of 7.3.0, with no direct replacement.</description>
 			<name>ariaLabel</name>
@@ -2035,18 +2023,6 @@
 		<attribute>
 			<description></description>
 			<name>outline</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<description></description>
-			<name>propsTransformer</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<description></description>
-			<name>propsTransformerServletContext</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

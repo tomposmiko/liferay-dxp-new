@@ -93,8 +93,7 @@ public class DLEditFileShortcutDisplayContextTest {
 
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withAttribute(
+				new MockHttpServletRequestBuilder().withAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT, fileShortcut
 				).build());
 
@@ -123,8 +122,7 @@ public class DLEditFileShortcutDisplayContextTest {
 
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withAttribute(
+				new MockHttpServletRequestBuilder().withAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT, fileShortcut
 				).build());
 
@@ -162,8 +160,7 @@ public class DLEditFileShortcutDisplayContextTest {
 
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withAttribute(
+				new MockHttpServletRequestBuilder().withAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT, fileShortcut
 				).withParameter(
 					"fileShortcutId", "12356"
@@ -189,8 +186,7 @@ public class DLEditFileShortcutDisplayContextTest {
 	public void testGetFieldsWithParametersAndWithoutAttributes() {
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withParameter(
+				new MockHttpServletRequestBuilder().withParameter(
 					"fileShortcutId", "12356"
 				).withParameter(
 					"folderId", "23567"
@@ -216,8 +212,7 @@ public class DLEditFileShortcutDisplayContextTest {
 
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withAttribute(
+				new MockHttpServletRequestBuilder().withAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT, fileShortcut
 				).build());
 

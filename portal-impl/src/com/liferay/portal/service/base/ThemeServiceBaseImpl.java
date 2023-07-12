@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.ThemeService;
@@ -29,6 +27,8 @@ import com.liferay.portal.kernel.service.ThemeServiceUtil;
 import com.liferay.portal.kernel.service.persistence.PluginSettingPersistence;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -205,11 +205,11 @@ public abstract class ThemeServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		ThemeServiceUtil.setService(themeService);
+		_setServiceUtilService(themeService);
 	}
 
 	public void destroy() {
-		ThemeServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -243,6 +243,19 @@ public abstract class ThemeServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(ThemeService themeService) {
+		try {
+			Field field = ThemeServiceUtil.class.getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, themeService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -281,8 +294,5 @@ public abstract class ThemeServiceBaseImpl
 
 	@BeanReference(type = PluginSettingPersistence.class)
 	protected PluginSettingPersistence pluginSettingPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ThemeServiceBaseImpl.class);
 
 }

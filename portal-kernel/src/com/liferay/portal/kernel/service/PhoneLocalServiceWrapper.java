@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link PhoneLocalService}.
  *
@@ -32,9 +30,9 @@ public class PhoneLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Phone addPhone(
-			long userId, String className, long classPK, String number,
-			String extension, long typeId, boolean primary,
-			ServiceContext serviceContext)
+			long userId, java.lang.String className, long classPK,
+			java.lang.String number, java.lang.String extension, long typeId,
+			boolean primary, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _phoneLocalService.addPhone(
@@ -128,7 +126,9 @@ public class PhoneLocalServiceWrapper
 	}
 
 	@Override
-	public void deletePhones(long companyId, String className, long classPK) {
+	public void deletePhones(
+		long companyId, java.lang.String className, long classPK) {
+
 		_phoneLocalService.deletePhones(companyId, className, classPK);
 	}
 
@@ -247,7 +247,7 @@ public class PhoneLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Phone fetchPhoneByUuidAndCompanyId(
-		String uuid, long companyId) {
+		java.lang.String uuid, long companyId) {
 
 		return _phoneLocalService.fetchPhoneByUuidAndCompanyId(uuid, companyId);
 	}
@@ -282,7 +282,7 @@ public class PhoneLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _phoneLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -321,7 +321,7 @@ public class PhoneLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Phone getPhoneByUuidAndCompanyId(
-			String uuid, long companyId)
+			java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _phoneLocalService.getPhoneByUuidAndCompanyId(uuid, companyId);
@@ -352,7 +352,7 @@ public class PhoneLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Phone> getPhones(
-		long companyId, String className, long classPK) {
+		long companyId, java.lang.String className, long classPK) {
 
 		return _phoneLocalService.getPhones(companyId, className, classPK);
 	}
@@ -369,8 +369,8 @@ public class PhoneLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Phone updatePhone(
-			long phoneId, String number, String extension, long typeId,
-			boolean primary)
+			long phoneId, java.lang.String number, java.lang.String extension,
+			long typeId, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _phoneLocalService.updatePhone(
@@ -392,11 +392,6 @@ public class PhoneLocalServiceWrapper
 		com.liferay.portal.kernel.model.Phone phone) {
 
 		return _phoneLocalService.updatePhone(phone);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _phoneLocalService.getBasePersistence();
 	}
 
 	@Override

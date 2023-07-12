@@ -157,7 +157,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<App> items;

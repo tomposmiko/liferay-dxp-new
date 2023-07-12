@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.service.persistence.impl;
 
-import com.liferay.commerce.exception.DuplicateCommerceAddressExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchAddressException;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceAddressTable;
@@ -46,11 +45,11 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -5227,38 +5226,6 @@ public class CommerceAddressPersistenceImpl
 		CommerceAddressModelImpl commerceAddressModelImpl =
 			(CommerceAddressModelImpl)commerceAddress;
 
-		if (Validator.isNull(commerceAddress.getExternalReferenceCode())) {
-			commerceAddress.setExternalReferenceCode(
-				String.valueOf(commerceAddress.getPrimaryKey()));
-		}
-		else {
-			CommerceAddress ercCommerceAddress = fetchByC_ERC(
-				commerceAddress.getCompanyId(),
-				commerceAddress.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommerceAddress != null) {
-					throw new DuplicateCommerceAddressExternalReferenceCodeException(
-						"Duplicate commerce address with external reference code " +
-							commerceAddress.getExternalReferenceCode() +
-								" and company " +
-									commerceAddress.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceAddress != null) &&
-					(commerceAddress.getCommerceAddressId() !=
-						ercCommerceAddress.getCommerceAddressId())) {
-
-					throw new DuplicateCommerceAddressExternalReferenceCodeException(
-						"Duplicate commerce address with external reference code " +
-							commerceAddress.getExternalReferenceCode() +
-								" and company " +
-									commerceAddress.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -5814,11 +5781,11 @@ public class CommerceAddressPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommerceAddressUtil.setPersistence(this);
+		_setCommerceAddressUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceAddressUtil.setPersistence(null);
+		_setCommerceAddressUtilPersistence(null);
 
 		entityCache.removeCache(CommerceAddressImpl.class.getName());
 
@@ -5828,6 +5795,22 @@ public class CommerceAddressPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceAddressUtilPersistence(
+		CommerceAddressPersistence commerceAddressPersistence) {
+
+		try {
+			Field field = CommerceAddressUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceAddressPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

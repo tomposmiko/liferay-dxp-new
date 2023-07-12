@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -57,6 +56,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface AccountGroupResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Page<AccountGroup> getAccountGroupsPage(
 			Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception;
@@ -81,7 +84,8 @@ public interface AccountGroupResource {
 
 	public Response deleteAccountGroup(Long id) throws Exception;
 
-	public Response deleteAccountGroupBatch(String callbackURL, Object object)
+	public Response deleteAccountGroupBatch(
+			Long id, String callbackURL, Object object)
 		throws Exception;
 
 	public AccountGroup getAccountGroup(Long id) throws Exception;
@@ -126,8 +130,6 @@ public interface AccountGroupResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
 	public void setVulcanBatchEngineImportTaskResource(
 		VulcanBatchEngineImportTaskResource
 			vulcanBatchEngineImportTaskResource);
@@ -143,8 +145,10 @@ public interface AccountGroupResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

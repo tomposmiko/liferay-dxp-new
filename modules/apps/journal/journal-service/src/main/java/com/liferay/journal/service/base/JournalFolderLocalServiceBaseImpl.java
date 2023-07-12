@@ -50,8 +50,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -67,6 +65,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -589,7 +589,7 @@ public abstract class JournalFolderLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		JournalFolderLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -604,7 +604,7 @@ public abstract class JournalFolderLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		journalFolderLocalService = (JournalFolderLocalService)aopProxy;
 
-		JournalFolderLocalServiceUtil.setService(journalFolderLocalService);
+		_setLocalServiceUtilService(journalFolderLocalService);
 	}
 
 	/**
@@ -664,6 +664,22 @@ public abstract class JournalFolderLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		JournalFolderLocalService journalFolderLocalService) {
+
+		try {
+			Field field = JournalFolderLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, journalFolderLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected JournalFolderLocalService journalFolderLocalService;
 
 	@Reference
@@ -718,8 +734,5 @@ public abstract class JournalFolderLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
 		ratingsStatsLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		JournalFolderLocalServiceBaseImpl.class);
 
 }

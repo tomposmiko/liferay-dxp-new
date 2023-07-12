@@ -1067,10 +1067,6 @@ public class DEDataListViewUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(DEDataListViewPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile DEDataListViewPersistence _persistence;
 
 }

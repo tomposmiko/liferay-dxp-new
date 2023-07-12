@@ -294,8 +294,9 @@ public class AtomCollectionAdapterWrapper<E>
 		else if (atomEntryContentType == AtomEntryContent.Type.XML) {
 			return factory.newContent(Content.Type.XML);
 		}
-
-		throw new IllegalArgumentException();
+		else {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	private final AtomCollectionAdapter<E> _atomCollectionAdapter;

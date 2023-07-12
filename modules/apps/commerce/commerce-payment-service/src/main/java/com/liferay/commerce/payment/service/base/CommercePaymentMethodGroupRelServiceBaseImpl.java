@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -33,6 +31,8 @@ import com.liferay.portal.kernel.service.persistence.ImagePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -363,12 +363,11 @@ public abstract class CommercePaymentMethodGroupRelServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		CommercePaymentMethodGroupRelServiceUtil.setService(
-			commercePaymentMethodGroupRelService);
+		_setServiceUtilService(commercePaymentMethodGroupRelService);
 	}
 
 	public void destroy() {
-		CommercePaymentMethodGroupRelServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -411,6 +410,24 @@ public abstract class CommercePaymentMethodGroupRelServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		CommercePaymentMethodGroupRelService
+			commercePaymentMethodGroupRelService) {
+
+		try {
+			Field field =
+				CommercePaymentMethodGroupRelServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commercePaymentMethodGroupRelService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -483,8 +500,5 @@ public abstract class CommercePaymentMethodGroupRelServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommercePaymentMethodGroupRelServiceBaseImpl.class);
 
 }

@@ -931,12 +931,6 @@ public class CommerceNotificationAttachmentUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceNotificationAttachmentPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceNotificationAttachmentPersistence
 		_persistence;
 

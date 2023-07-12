@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -47,6 +45,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -245,7 +245,13 @@ public abstract class AccountGroupLocalServiceBaseImpl
 		return accountGroupPersistence.fetchByPrimaryKey(accountGroupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
+	 * @return the matching account group, or <code>null</code> if a matching account group could not be found
+	 */
 	@Override
 	public AccountGroup fetchAccountGroupByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -254,6 +260,9 @@ public abstract class AccountGroupLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountGroupByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public AccountGroup fetchAccountGroupByReferenceCode(
@@ -263,7 +272,14 @@ public abstract class AccountGroupLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
+	 * @return the matching account group
+	 * @throws PortalException if a matching account group could not be found
+	 */
 	@Override
 	public AccountGroup getAccountGroupByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -408,7 +424,7 @@ public abstract class AccountGroupLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		AccountGroupLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -423,7 +439,7 @@ public abstract class AccountGroupLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		accountGroupLocalService = (AccountGroupLocalService)aopProxy;
 
-		AccountGroupLocalServiceUtil.setService(accountGroupLocalService);
+		_setLocalServiceUtilService(accountGroupLocalService);
 	}
 
 	/**
@@ -468,6 +484,22 @@ public abstract class AccountGroupLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		AccountGroupLocalService accountGroupLocalService) {
+
+		try {
+			Field field = AccountGroupLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, accountGroupLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected AccountGroupLocalService accountGroupLocalService;
 
 	@Reference
@@ -484,8 +516,5 @@ public abstract class AccountGroupLocalServiceBaseImpl
 	@Reference
 	protected AccountGroupAccountEntryRelPersistence
 		accountGroupAccountEntryRelPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountGroupLocalServiceBaseImpl.class);
 
 }

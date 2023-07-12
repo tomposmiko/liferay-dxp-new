@@ -17,14 +17,12 @@ import {CREATE_SEGMENTS_EXPERIENCE} from '../actions';
 export default function createExperience({
 	fragmentEntryLinks,
 	layoutData,
-	portletIds,
 	segmentsExperience,
 }) {
 	return {
 		payload: {
 			fragmentEntryLinks,
 			layoutData,
-			portletIds,
 			segmentsExperience,
 		},
 		type: CREATE_SEGMENTS_EXPERIENCE,

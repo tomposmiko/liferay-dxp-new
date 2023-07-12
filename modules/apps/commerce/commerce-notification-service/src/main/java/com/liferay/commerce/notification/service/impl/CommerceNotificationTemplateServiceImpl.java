@@ -107,8 +107,14 @@ public class CommerceNotificationTemplateServiceImpl
 			OrderByComparator<CommerceNotificationTemplate> orderByComparator)
 		throws PortalException {
 
-		return commerceNotificationTemplatePersistence.filterFindByG_E(
-			groupId, enabled, start, end, orderByComparator);
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			CommerceNotificationActionKeys.
+				VIEW_COMMERCE_NOTIFICATION_TEMPLATES);
+
+		return commerceNotificationTemplateLocalService.
+			getCommerceNotificationTemplates(
+				groupId, enabled, start, end, orderByComparator);
 	}
 
 	@Override
@@ -117,16 +123,27 @@ public class CommerceNotificationTemplateServiceImpl
 			OrderByComparator<CommerceNotificationTemplate> orderByComparator)
 		throws PortalException {
 
-		return commerceNotificationTemplatePersistence.filterFindByGroupId(
-			groupId, start, end, orderByComparator);
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			CommerceNotificationActionKeys.
+				VIEW_COMMERCE_NOTIFICATION_TEMPLATES);
+
+		return commerceNotificationTemplateLocalService.
+			getCommerceNotificationTemplates(
+				groupId, start, end, orderByComparator);
 	}
 
 	@Override
 	public int getCommerceNotificationTemplatesCount(long groupId)
 		throws PortalException {
 
-		return commerceNotificationTemplatePersistence.filterCountByGroupId(
-			groupId);
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			CommerceNotificationActionKeys.
+				VIEW_COMMERCE_NOTIFICATION_TEMPLATES);
+
+		return commerceNotificationTemplateLocalService.
+			getCommerceNotificationTemplatesCount(groupId);
 	}
 
 	@Override
@@ -134,8 +151,13 @@ public class CommerceNotificationTemplateServiceImpl
 			long groupId, boolean enabled)
 		throws PortalException {
 
-		return commerceNotificationTemplatePersistence.filterCountByG_E(
-			groupId, enabled);
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			CommerceNotificationActionKeys.
+				VIEW_COMMERCE_NOTIFICATION_TEMPLATES);
+
+		return commerceNotificationTemplateLocalService.
+			getCommerceNotificationTemplatesCount(groupId, enabled);
 	}
 
 	@Override

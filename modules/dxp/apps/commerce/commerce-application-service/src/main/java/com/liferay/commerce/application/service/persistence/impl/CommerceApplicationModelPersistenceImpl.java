@@ -49,6 +49,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2559,11 +2560,11 @@ public class CommerceApplicationModelPersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"commerceApplicationBrandId"}, false);
 
-		CommerceApplicationModelUtil.setPersistence(this);
+		_setCommerceApplicationModelUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceApplicationModelUtil.setPersistence(null);
+		_setCommerceApplicationModelUtilPersistence(null);
 
 		entityCache.removeCache(CommerceApplicationModelImpl.class.getName());
 
@@ -2573,6 +2574,23 @@ public class CommerceApplicationModelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceApplicationModelUtilPersistence(
+		CommerceApplicationModelPersistence
+			commerceApplicationModelPersistence) {
+
+		try {
+			Field field = CommerceApplicationModelUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceApplicationModelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -17,7 +17,6 @@ package com.liferay.portal.workflow.kaleo.definition.internal.parser;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionFileException;
 import com.liferay.portal.kernel.workflow.WorkflowException;
@@ -115,8 +114,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 		Element rootElement = document.getRootElement();
 
 		String name = rootElement.elementTextTrim("name");
-		String description = StringUtil.trim(
-			rootElement.elementText("description"));
+		String description = rootElement.elementTextTrim("description");
 		int version = GetterUtil.getInteger(
 			rootElement.elementTextTrim("version"));
 
@@ -190,12 +188,10 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 
 		for (Element actionElement : actionElements) {
 			String name = actionElement.elementTextTrim("name");
-			String description = StringUtil.trim(
-				actionElement.elementText("description"));
+			String description = actionElement.elementTextTrim("description");
 			String executionType = actionElement.elementTextTrim(
 				"execution-type");
-			String script = StringUtil.trim(
-				actionElement.elementText("script"));
+			String script = actionElement.elementText("script");
 			String scriptLanguage = actionElement.elementTextTrim(
 				"script-language");
 			String scriptRequiredContexts = actionElement.elementTextTrim(
@@ -295,8 +291,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 			"scripted-assignment");
 
 		for (Element scriptedAssignmentElement : scriptedAssignmentElements) {
-			String script = StringUtil.trim(
-				scriptedAssignmentElement.elementText("script"));
+			String script = scriptedAssignmentElement.elementText("script");
 			String scriptLanguage = scriptedAssignmentElement.elementTextTrim(
 				"script-language");
 			String scriptRequiredContexts =
@@ -333,8 +328,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 		throws KaleoDefinitionValidationException {
 
 		String name = conditionElement.elementTextTrim("name");
-		String description = StringUtil.trim(
-			conditionElement.elementText("description"));
+		String description = conditionElement.elementTextTrim("description");
 		String script = conditionElement.elementText("script");
 		String scriptLanguage = conditionElement.elementTextTrim(
 			"script-language");
@@ -376,8 +370,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 		throws KaleoDefinitionValidationException {
 
 		String name = forkElement.elementTextTrim("name");
-		String description = StringUtil.trim(
-			forkElement.elementText("description"));
+		String description = forkElement.elementTextTrim("description");
 
 		Fork fork = new Fork(name, description);
 
@@ -398,8 +391,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 		throws KaleoDefinitionValidationException {
 
 		String name = joinElement.elementTextTrim("name");
-		String description = StringUtil.trim(
-			joinElement.elementText("description"));
+		String description = joinElement.elementTextTrim("description");
 
 		Join join = new Join(name, description);
 
@@ -420,8 +412,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 		throws KaleoDefinitionValidationException {
 
 		String name = joinXorElement.elementTextTrim("name");
-		String description = StringUtil.trim(
-			joinXorElement.elementText("description"));
+		String description = joinXorElement.elementTextTrim("description");
 
 		JoinXor joinXor = new JoinXor(name, description);
 
@@ -451,12 +442,11 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 
 		for (Element notificationElement : notificationElements) {
 			String name = notificationElement.elementTextTrim("name");
-			String description = StringUtil.trim(
-				notificationElement.elementText("description"));
+			String description = notificationElement.elementTextTrim(
+				"description");
 			String executionType = notificationElement.elementTextTrim(
 				"execution-type");
-			String template = StringUtil.trim(
-				notificationElement.elementText("template"));
+			String template = notificationElement.elementTextTrim("template");
 			String templateLanguage = notificationElement.elementTextTrim(
 				"template-language");
 
@@ -603,8 +593,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 		throws KaleoDefinitionValidationException {
 
 		String name = stateElement.elementTextTrim("name");
-		String description = StringUtil.trim(
-			stateElement.elementText("description"));
+		String description = stateElement.elementTextTrim("description");
 		boolean initial = GetterUtil.getBoolean(
 			stateElement.elementTextTrim("initial"));
 
@@ -627,8 +616,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 		throws KaleoDefinitionValidationException {
 
 		String name = taskElement.elementTextTrim("name");
-		String description = StringUtil.trim(
-			taskElement.elementText("description"));
+		String description = taskElement.elementTextTrim("description");
 
 		Task task = new Task(name, description);
 
@@ -674,8 +662,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 
 			TaskForm taskForm = new TaskForm(name, priority);
 
-			String description = StringUtil.trim(
-				taskFormElement.elementText("description"));
+			String description = taskFormElement.elementTextTrim("description");
 
 			if (Validator.isNotNull(description)) {
 				taskForm.setDescription(description);
@@ -782,8 +769,7 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 		throws KaleoDefinitionValidationException {
 
 		String name = timerElement.elementTextTrim("name");
-		String description = StringUtil.trim(
-			timerElement.elementText("description"));
+		String description = timerElement.elementTextTrim("description");
 		boolean blocking = GetterUtil.getBoolean(
 			timerElement.elementTextTrim("blocking"), !taskTimer);
 

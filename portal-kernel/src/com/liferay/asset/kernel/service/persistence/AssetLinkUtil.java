@@ -1220,10 +1220,6 @@ public class AssetLinkUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(AssetLinkPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile AssetLinkPersistence _persistence;
 
 }

@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2594,12 +2595,12 @@ public class MDRRulePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"ruleGroupId"},
 			false);
 
-		MDRRuleUtil.setPersistence(this);
+		_setMDRRuleUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		MDRRuleUtil.setPersistence(null);
+		_setMDRRuleUtilPersistence(null);
 
 		entityCache.removeCache(MDRRuleImpl.class.getName());
 
@@ -2609,6 +2610,21 @@ public class MDRRulePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setMDRRuleUtilPersistence(
+		MDRRulePersistence mdrRulePersistence) {
+
+		try {
+			Field field = MDRRuleUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, mdrRulePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

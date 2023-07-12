@@ -14,12 +14,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 3
+	@priority = "3"
 	test CustomizeFileFilter {
 		property custom.properties = "module.framework.properties.file.install.filter=^(?!test-theme).*\\..*";
 		property test.name.skip.portal.instance = "FileInstall#CustomizeFileFilter";
@@ -37,20 +37,19 @@ definition {
 		GogoShell.viewNoOutput(outputContent = "Active");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test CustomizeNewWatchedDirectory {
 		property custom.properties = "module.framework.properties.file.install.dir=${liferay.home}/daploy,${liferay.home}/osgi/modules,${liferay.home}/osgi/war,${liferay.home}/osgi/configs,${liferay.home}/osgi/marketplace";
 		property test.name.skip.portal.instance = "FileInstall#CustomizeNewWatchedDirectory";
 
 		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
 		var deployDir = "${liferayHome}/daploy";
 		var testBaseDirName = PropsUtil.get("test.base.dir.name");
 		var testDependenciesDirName = PropsUtil.get("test.dependencies.dir.name");
 
 		ArchiveUtil.archive("${testBaseDirName}/${testDependenciesDirName}/com.liferay.cluster.test.module.jar", "${deployDir}/com.liferay.cluster.test.module.jar");
 
-		Pause(locator1 = 10000);
+		Pause(locator1 = "10000");
 
 		GogoShell.openGogoShellAdmin();
 
@@ -61,20 +60,19 @@ definition {
 		GogoShell.viewOutput(outputContent = "Active");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test CustomizeRecursiveSubdirectoryMode {
 		property custom.properties = "module.framework.properties.file.install.subdir.mode=recurse";
 		property test.name.skip.portal.instance = "FileInstall#CustomizeRecursiveSubdirectoryMode";
 
 		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
 		var deployDir = "${liferayHome}/osgi/modules/recurse";
 		var testBaseDirName = PropsUtil.get("test.base.dir.name");
 		var testDependenciesDirName = PropsUtil.get("test.dependencies.dir.name");
 
 		ArchiveUtil.archive("${testBaseDirName}/${testDependenciesDirName}/com.liferay.cluster.test.module.jar", "${deployDir}/com.liferay.cluster.test.module.jar");
 
-		Pause(locator1 = 10000);
+		Pause(locator1 = "10000");
 
 		AssertConsoleTextPresent(value1 = "STARTED com.liferay.cluster.test.module_");
 
@@ -87,20 +85,19 @@ definition {
 		GogoShell.viewOutput(outputContent = "Active");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test CustomizeSkipSubdirectoryMode {
 		property custom.properties = "module.framework.properties.file.install.subdir.mode=skip";
 		property test.name.skip.portal.instance = "FileInstall#CustomizeSkipSubdirectoryMode";
 
 		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
 		var deployDir = "${liferayHome}/deploy/recurse";
 		var testBaseDirName = PropsUtil.get("test.base.dir.name");
 		var testDependenciesDirName = PropsUtil.get("test.dependencies.dir.name");
 
 		ArchiveUtil.archive("${testBaseDirName}/${testDependenciesDirName}/com.liferay.cluster.test.module.jar", "${deployDir}/com.liferay.cluster.test.module.jar");
 
-		Pause(locator1 = 10000);
+		Pause(locator1 = "10000");
 
 		GogoShell.openGogoShellAdmin();
 
@@ -115,7 +112,7 @@ definition {
 		GogoShell.viewNoOutput(outputContent = "Active");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test InstallOSGiConfigWithHiddenFile {
 		property create.osgi.hidden.file = "true";
 		property test.assert.warning.exceptions = "true";
@@ -133,40 +130,7 @@ definition {
 
 	@description = "This will be ignored until LPS-122119 is fixed."
 	@ignore = "true"
-	@priority = 4
-	test RestartingPortalDuplicatesOSGiConfiguration {
-		property test.name.skip.portal.instance = "FileInstall#RestartingPortalDuplicatesOSGiConfiguration";
-
-		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
-		var symbolicLink = "${liferayHome}/osgi/config/com.liferay.portal.security.auth.verifier.internal.tunnel.configuration.TunnelAuthVerifierConfiguration-abc.config";
-		var symbolicLinkResource = "${liferayHome}/osgi/temp/abc.config";
-
-		FileUtil.write(${symbolicLinkResource}, "urlsIncludes=\"abc\"");
-
-		AntCommand(
-			locator1 = "build-test.xml",
-			value1 = "create-symbolic-link -Dsymbolic.link=${symbolicLink} -Dsymbolic.link.resource=${symbolicLinkResource}");
-
-		var mysqlStatement = '''
-			SELECT COUNT(*) FROM lportal.Configuration_
-			WHERE configurationId LIKE 'com.liferay.portal.security.auth.verifier.internal.tunnel.configuration.TunnelAuthVerifierConfiguration%';
-		''';
-
-		var originalCount = SQL.executeMySQLStatement(mysqlStatement = ${mysqlStatement});
-
-		Portlet.shutdownServer();
-
-		Portlet.startServer(keepOSGiState = "true");
-
-		var actualCount = SQL.executeMySQLStatement(mysqlStatement = ${mysqlStatement});
-
-		if (${originalCount} != ${actualCount}) {
-			fail("Expected MYSQL entries=${originalCount}, after restarting portal MYSQL entries=${actualCount}");
-		}
-	}
-
-	@priority = 4
+	@priority = "4"
 	test UninstallJarOffline {
 		property test.name.skip.portal.instance = "FileInstall#UninstallJarOffline";
 
@@ -203,7 +167,7 @@ definition {
 
 	@description = "This will be ignored until LPS-122119 is fixed."
 	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	test UninstallWarOffline {
 		property test.name.skip.portal.instance = "FileInstall#UninstallWarOffline";
 

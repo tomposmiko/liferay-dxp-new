@@ -336,10 +336,6 @@ public class MFAEmailOTPEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(MFAEmailOTPEntryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile MFAEmailOTPEntryPersistence _persistence;
 
 }

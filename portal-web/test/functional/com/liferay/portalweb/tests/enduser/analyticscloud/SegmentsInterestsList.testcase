@@ -52,7 +52,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -65,9 +65,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8613 | Test Summary: Assert no interest found in segment"
-	@priority = 3
+	@priority = "3"
 	test AssertNoInterestFoundInSegment {
-		property analytics.cloud.upstream = "false";
+		property custom.properties = "jsonws.web.service.paths.excludes=";
 
 		task ("Add new user") {
 			JSONUser.addUser(
@@ -100,7 +100,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -130,13 +130,13 @@ definition {
 		}
 
 		task ("View no interest results") {
-			ACUtils.viewGenericText(textValueList = "There are no results found.,Please try a different search term.");
+			ACInterests.viewNoInterestResults();
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8614 | Test Summary: Assert top interest shown in segment profile"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertTopInterestShownInSegmentProfile {
 		property portal.upstream = "quarantine";
 
@@ -174,7 +174,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -239,7 +239,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -295,7 +295,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8606 | Test Summary: Order the Details of a Segment's Interest"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test OrderSegmentInterestDetails {
 		property portal.upstream = "quarantine";
 
@@ -351,7 +351,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -390,27 +390,27 @@ definition {
 
 		task ("View individuals in order") {
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 1,
+				positionValue = "1",
 				userName = "ac ac");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 2,
+				positionValue = "2",
 				userName = "usera usera");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 3,
+				positionValue = "3",
 				userName = "userb userb");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 4,
+				positionValue = "4",
 				userName = "userc userc");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 5,
+				positionValue = "5",
 				userName = "userd userd");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 6,
+				positionValue = "6",
 				userName = "usere usere");
 		}
 
@@ -420,31 +420,31 @@ definition {
 
 		task ("View individuals in order") {
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 1,
+				positionValue = "1",
 				userName = "userf userf");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 2,
+				positionValue = "2",
 				userName = "usere usere");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 3,
+				positionValue = "3",
 				userName = "userd userd");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 4,
+				positionValue = "4",
 				userName = "userc userc");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 5,
+				positionValue = "5",
 				userName = "userb userb");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 6,
+				positionValue = "6",
 				userName = "usera usera");
 
 			ACInterests.viewInterestUserViaPosition(
-				positionValue = 7,
+				positionValue = "7",
 				userName = "ac ac");
 		}
 
@@ -459,23 +459,23 @@ definition {
 		task ("View pages in order") {
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Blogs AC Title - Site Name - Liferay DXP",
-				positionValue = 2);
+				positionValue = "2");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Blogs Second Page - Site Name - Liferay DXP",
-				positionValue = 3);
+				positionValue = "3");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Documents Page - Site Name - Liferay DXP",
-				positionValue = 4);
+				positionValue = "4");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Documents Second Page - Site Name - Liferay DXP",
-				positionValue = 5);
+				positionValue = "5");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Web Content Second Page - Site Name - Liferay DXP",
-				positionValue = 6);
+				positionValue = "6");
 		}
 
 		task ("Order list by Page Title") {
@@ -485,33 +485,33 @@ definition {
 		task ("View pages in order") {
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Web Content Second Page - Site Name - Liferay DXP",
-				positionValue = 1);
+				positionValue = "1");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Documents Second Page - Site Name - Liferay DXP",
-				positionValue = 2);
+				positionValue = "2");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Documents Page - Site Name - Liferay DXP",
-				positionValue = 3);
+				positionValue = "3");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Blogs Second Page - Site Name - Liferay DXP",
-				positionValue = 4);
+				positionValue = "4");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Blogs AC Title - Site Name - Liferay DXP",
-				positionValue = 5);
+				positionValue = "5");
 
 			ACInterests.viewInterestPageViaPosition(
 				pageName = "Blogs AC Second Title - Site Name - Liferay DXP",
-				positionValue = 6);
+				positionValue = "6");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8616 | Test Summary: Order the Segment Profile Engagement List"
 	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	test OrderSegmentProfileEngagementScoreList {
 		property portal.upstream = "quarantine";
 
@@ -549,7 +549,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -581,31 +581,31 @@ definition {
 		task ("View order of segment interests") {
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "liferay dxp",
-				positionValue = 1);
+				positionValue = "1");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "site",
-				positionValue = 2);
+				positionValue = "2");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "ac",
-				positionValue = 3);
+				positionValue = "3");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "ac title",
-				positionValue = 4);
+				positionValue = "4");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blog test",
-				positionValue = 5);
+				positionValue = "5");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blogs",
-				positionValue = 6);
+				positionValue = "6");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blogs ac title",
-				positionValue = 7);
+				positionValue = "7");
 		}
 
 		task ("Click Order by Topics link") {
@@ -615,37 +615,37 @@ definition {
 		task ("View order of segment interests") {
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blogs ac title",
-				positionValue = 1);
+				positionValue = "1");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blogs",
-				positionValue = 2);
+				positionValue = "2");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blog test",
-				positionValue = 3);
+				positionValue = "3");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "ac title",
-				positionValue = 4);
+				positionValue = "4");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "ac",
-				positionValue = 5);
+				positionValue = "5");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "site",
-				positionValue = 6);
+				positionValue = "6");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "liferay dxp",
-				positionValue = 7);
+				positionValue = "7");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8607 | Test Summary: Order a Segment Profile's Interest"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test OrderSegmentProfileInterests {
 		property portal.upstream = "quarantine";
 
@@ -683,7 +683,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -715,35 +715,35 @@ definition {
 		task ("View order of segment interests") {
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "ac",
-				positionValue = 1);
+				positionValue = "1");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "ac title",
-				positionValue = 2);
+				positionValue = "2");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blog test",
-				positionValue = 3);
+				positionValue = "3");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blogs",
-				positionValue = 4);
+				positionValue = "4");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blogs ac title",
-				positionValue = 5);
+				positionValue = "5");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "liferay dxp",
-				positionValue = 6);
+				positionValue = "6");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "page",
-				positionValue = 7);
+				positionValue = "7");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "site",
-				positionValue = 8);
+				positionValue = "8");
 		}
 
 		task ("Click Order by Topics link") {
@@ -753,41 +753,41 @@ definition {
 		task ("View order of segment interests") {
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "site",
-				positionValue = 1);
+				positionValue = "1");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "page",
-				positionValue = 2);
+				positionValue = "2");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "liferay dxp",
-				positionValue = 3);
+				positionValue = "3");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blogs ac title",
-				positionValue = 4);
+				positionValue = "4");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blogs",
-				positionValue = 5);
+				positionValue = "5");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "blog test",
-				positionValue = 6);
+				positionValue = "6");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "ac title",
-				positionValue = 7);
+				positionValue = "7");
 
 			ACInterests.viewInterestViaPosition(
 				interestTopic = "ac",
-				positionValue = 8);
+				positionValue = "8");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8608 | Test Summary: Paginate Segment Profile in an Interest detail"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test PaginateSegmentProfileInterestDetail {
 		property portal.upstream = "quarantine";
 
@@ -894,7 +894,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -928,7 +928,7 @@ definition {
 		}
 
 		task ("Change pagination") {
-			ACUtils.changePagination(itemsPerPage = 5);
+			ACUtils.changePagination(itemsPerPage = "5");
 		}
 
 		task ("Order list by Name") {
@@ -980,7 +980,7 @@ definition {
 		}
 
 		task ("Navigate to page 2") {
-			ACUtils.checkAnyPage(pageNumber = 2);
+			ACUtils.checkAnyPage(pageNumber = "2");
 		}
 
 		task ("View individuals on page 2") {
@@ -996,7 +996,7 @@ definition {
 		}
 
 		task ("Navigate to page 1") {
-			ACUtils.checkAnyPage(pageNumber = 2);
+			ACUtils.checkAnyPage(pageNumber = "2");
 		}
 
 		task ("View individuals on page 1") {
@@ -1016,7 +1016,7 @@ definition {
 		}
 
 		task ("Change pagination") {
-			ACUtils.changePagination(itemsPerPage = 5);
+			ACUtils.changePagination(itemsPerPage = "5");
 		}
 
 		task ("Order list by Page Title") {
@@ -1058,7 +1058,7 @@ definition {
 		}
 
 		task ("Navigate to page 2") {
-			ACUtils.checkAnyPage(pageNumber = 2);
+			ACUtils.checkAnyPage(pageNumber = "2");
 		}
 
 		task ("View pages on page 2") {
@@ -1068,7 +1068,7 @@ definition {
 		}
 
 		task ("Navigate to page 1") {
-			ACUtils.checkAnyPage(pageNumber = 2);
+			ACUtils.checkAnyPage(pageNumber = "2");
 		}
 
 		task ("View pages on page 1") {
@@ -1084,7 +1084,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8609 | Test Summary: Search a Segment Profile's Interest"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test SearchSegmentProfilesInterest {
 		property portal.upstream = "quarantine";
 
@@ -1122,7 +1122,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -1176,7 +1176,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8610 | Test Summary: Segment interest details has a tab that shows active pages"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test SegmentInterestDetailsTabShowsActivePages {
 		property portal.upstream = "quarantine";
 
@@ -1214,7 +1214,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -1254,7 +1254,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8612 | Test Summary: Segment interest details has a tab that shows inactive pages"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test SegmentInterestDetailsTabShowsInactivePages {
 		property portal.upstream = "quarantine";
 
@@ -1265,12 +1265,12 @@ definition {
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com,user4@liferay.com,user5@liferay.com";
 
 		task ("Add 5 more new users") {
-			for (var name : list ${usernameList}) {
+			for (var name : list "${usernameList}") {
 				JSONUser.addUser(
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = ${name},
-					userLastName = ${name},
-					userScreenName = ${name});
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 
 				JSONUser.setFirstPassword(
 					agreeToTermsAndAnswerReminderQuery = "true",
@@ -1286,7 +1286,7 @@ definition {
 		task ("View the blogs page as different users") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "${username}@liferay.com",
-				userLoginFullName = ${fullName});
+				userLoginFullName = "${fullName}");
 
 			ACUtils.navigateToSitePage(
 				actionType = "View Blog",
@@ -1316,7 +1316,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -1356,7 +1356,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8611 | Test Summary: Interest details are shown"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test ViewInterestDetails {
 		property portal.upstream = "quarantine";
 
@@ -1394,7 +1394,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -1444,7 +1444,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8604 | Test Summary: Top interests for the workspace are shown in a list"
 	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test ViewSegmentsTopInterestsList {
 		property portal.upstream = "quarantine";
 
@@ -1455,12 +1455,12 @@ definition {
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com,user4@liferay.com,user5@liferay.com";
 
 		task ("Add 5 more new users") {
-			for (var name : list ${usernameList}) {
+			for (var name : list "${usernameList}") {
 				JSONUser.addUser(
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = ${name},
-					userLastName = ${name},
-					userScreenName = ${name});
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 
 				JSONUser.setFirstPassword(
 					agreeToTermsAndAnswerReminderQuery = "true",
@@ -1487,7 +1487,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Add a new static segment") {

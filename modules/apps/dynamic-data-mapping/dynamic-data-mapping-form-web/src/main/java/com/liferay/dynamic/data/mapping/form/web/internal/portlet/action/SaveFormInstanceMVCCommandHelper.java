@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.InetAddressUtil;
@@ -78,10 +77,6 @@ public class SaveFormInstanceMVCCommandHelper {
 	public DDMFormInstance saveFormInstance(
 			PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception {
-
-		AuthTokenUtil.checkCSRFToken(
-			_portal.getHttpServletRequest(portletRequest),
-			SaveFormInstanceMVCCommandHelper.class.getName());
 
 		return saveFormInstance(portletRequest, portletResponse, false);
 	}

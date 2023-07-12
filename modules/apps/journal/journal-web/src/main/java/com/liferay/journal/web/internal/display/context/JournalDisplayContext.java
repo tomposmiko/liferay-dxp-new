@@ -1491,7 +1491,7 @@ public class JournalDisplayContext {
 	private JSONArray _getFoldersJSONArray(long groupId, long folderId) {
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		List<JournalFolder> folders = JournalFolderServiceUtil.getFolders(
+		List<JournalFolder> folders = JournalFolderLocalServiceUtil.getFolders(
 			groupId, folderId);
 
 		for (JournalFolder folder : folders) {

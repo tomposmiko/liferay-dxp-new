@@ -4,25 +4,26 @@ definition {
 		Variables.assertDefined(parameterList = "${groupName},${formName}");
 
 		var portalURL = JSONCompany.getPortalURL();
+
 		var companyId = JSONCompany.getCompanyId();
-		var groupId = JSONDDMFormSetter.setGroupId(groupName = ${groupName});
+
+		var groupId = JSONDDMFormSetter.setGroupId(groupName = "${groupName}");
 
 		var curl = '''
 			${portalURL}/api/jsonws/ddm.ddmforminstance/get-form-instances \
-				-u test@liferay.com:test \
-				-d companyId=${companyId} \
-				-d groupId=${groupId} \
-				-d "start=-1" \
-				-d "end=-1"
+			  -u test@liferay.com:test \
+			  -d companyId=${companyId} \
+			  -d groupId=${groupId} \
+			  -d "start=-1" \
+			  -d "end=-1"
 		''';
+		var formInstanceId = JSONCurlUtil.post("${curl}", "$.[?(@['nameCurrentValue'] == '${formName}')]['formInstanceId']");
 
-		var formInstanceId = JSONCurlUtil.post(${curl}, "$.[?(@['nameCurrentValue'] == '${formName}')]['formInstanceId']");
-
-		if (${formInstanceId} == "") {
+		if ("${formInstanceId}" == "") {
 			fail("FAIL. Cannot find formInstanceId.");
 		}
 
-		return ${formInstanceId};
+		return "${formInstanceId}";
 	}
 
 	macro _getFormInstanceRecordId {
@@ -30,17 +31,16 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/ddm.ddmforminstancerecord/get-form-instance-records \
-				-u test@liferay.com:test \
-				-d ddmFormInstanceId=${formInstanceId}
+			  -u test@liferay.com:test \
+			  -d ddmFormInstanceId=${formInstanceId}
 		''';
+		var formInstanceRecordId = JSONCurlUtil.post("${curl}", "$.[?(@['formInstanceId'] == '${formInstanceId}')]['formInstanceRecordId']");
 
-		var formInstanceRecordId = JSONCurlUtil.post(${curl}, "$.[?(@['formInstanceId'] == '${formInstanceId}')]['formInstanceRecordId']");
-
-		if (${formInstanceRecordId} == "") {
+		if ("${formInstanceRecordId}" == "") {
 			fail("FAIL. Cannot find formInstanceRecordId.");
 		}
 
-		return ${formInstanceRecordId};
+		return "${formInstanceRecordId}";
 	}
 
 }

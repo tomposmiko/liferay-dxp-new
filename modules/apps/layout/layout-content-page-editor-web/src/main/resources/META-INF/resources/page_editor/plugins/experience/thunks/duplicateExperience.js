@@ -13,7 +13,8 @@
  */
 
 import ExperienceService from '../../../app/services/ExperienceService';
-import createExperienceAction from '../actions/createExperience';
+import duplicateExperienceAction from '../actions/duplicateExperience';
+import selectExperienceAction from '../actions/selectExperience';
 
 export default function duplicateExperience({segmentsExperienceId}) {
 	return (dispatch) => {
@@ -23,7 +24,7 @@ export default function duplicateExperience({segmentsExperienceId}) {
 			},
 			dispatch,
 		}).then(({fragmentEntryLinks, layoutData, segmentsExperience}) => {
-			return ExperienceService.selectExperience({
+			ExperienceService.selectExperience({
 				body: {
 					segmentsExperienceId:
 						segmentsExperience.segmentsExperienceId,
@@ -32,17 +33,24 @@ export default function duplicateExperience({segmentsExperienceId}) {
 			})
 				.then((portletIds) => {
 					return dispatch(
-						createExperienceAction({
-							fragmentEntryLinks,
-							layoutData,
+						selectExperienceAction({
 							portletIds,
-							segmentsExperience,
+							segmentsExperienceId:
+								segmentsExperience.segmentsExperienceId,
 						})
 					);
 				})
 				.catch((error) => {
 					return error;
 				});
+
+			return dispatch(
+				duplicateExperienceAction({
+					fragmentEntryLinks,
+					layoutData,
+					segmentsExperience,
+				})
+			);
 		});
 	};
 }

@@ -17,19 +17,14 @@ package com.liferay.dynamic.data.mapping.storage.constants;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
 import java.math.BigDecimal;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -97,10 +92,7 @@ public class FieldConstants {
 		if (isNumericType(type)) {
 			NumberFormat numberFormat = null;
 
-			if (StringUtil.equals(locale.getLanguage(), "ar")) {
-				numberFormat = _getArabicDecimalFormat(locale);
-			}
-			else if (locale.equals(LocaleUtil.ROOT)) {
+			if (locale.equals(LocaleUtil.ROOT)) {
 				numberFormat = NumberFormat.getInstance(defaultLocale);
 			}
 			else {
@@ -150,32 +142,14 @@ public class FieldConstants {
 		else if (type.equals(FieldConstants.DATE)) {
 			return values.toArray(new String[0]);
 		}
-		else if (type.equals(FieldConstants.DOUBLE) ||
-				 type.equals(FieldConstants.INTEGER)) {
-
-			return ListUtil.toArray(
-				values,
-				new Accessor<Object, Number>() {
-
-					@Override
-					public Number get(Object value) {
-						return GetterUtil.getNumber(value);
-					}
-
-					@Override
-					public Class<Number> getAttributeClass() {
-						return Number.class;
-					}
-
-					@Override
-					public Class<Object> getTypeClass() {
-						return Object.class;
-					}
-
-				});
+		else if (type.equals(FieldConstants.DOUBLE)) {
+			return values.toArray(new Double[0]);
 		}
 		else if (type.equals(FieldConstants.FLOAT)) {
 			return values.toArray(new Float[0]);
+		}
+		else if (type.equals(FieldConstants.INTEGER)) {
+			return values.toArray(new Integer[0]);
 		}
 		else if (type.equals(FieldConstants.LONG)) {
 			return values.toArray(new Long[0]);
@@ -212,18 +186,8 @@ public class FieldConstants {
 			return value;
 		}
 		else if (type.equals(DOUBLE)) {
-			if (StringUtil.containsIgnoreCase(
-					String.valueOf(GetterUtil.getDouble(value)), "E",
-					StringPool.BLANK)) {
-
-				try {
-					return new BigDecimal(value.trim());
-				}
-				catch (NumberFormatException numberFormatException) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(numberFormatException);
-					}
-				}
+			if (value.matches(_SCIENTIFIC_NOTATION_PATTERN)) {
+				return new BigDecimal(value.trim());
 			}
 
 			return GetterUtil.getDouble(value);
@@ -257,23 +221,8 @@ public class FieldConstants {
 		return false;
 	}
 
-	private static DecimalFormat _getArabicDecimalFormat(Locale locale) {
-		DecimalFormat decimalFormat = (DecimalFormat)DecimalFormat.getInstance(
-			locale);
-
-		DecimalFormatSymbols decimalFormatSymbols =
-			decimalFormat.getDecimalFormatSymbols();
-
-		decimalFormatSymbols.setZeroDigit('0');
-
-		decimalFormat.setDecimalFormatSymbols(decimalFormatSymbols);
-
-		decimalFormat.setGroupingUsed(false);
-		decimalFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
-		decimalFormat.setParseBigDecimal(true);
-
-		return decimalFormat;
-	}
+	private static final String _SCIENTIFIC_NOTATION_PATTERN =
+		"^[+-]?\\d+(?:\\.\\d*(?:[eE][+-]?\\d+)+)+$";
 
 	private static final Log _log = LogFactoryUtil.getLog(FieldConstants.class);
 

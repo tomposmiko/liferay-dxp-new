@@ -150,10 +150,8 @@ renderResponse.setTitle(journalTranslateDisplayContext.getTitle());
 								>
 
 									<%
-									List<String> sourceContents = journalTranslateDisplayContext.getSourceStringValues(infoField, journalTranslateDisplayContext.getSourceLocale());
+									String sourceContent = journalTranslateDisplayContext.getSourceStringValue(infoField, journalTranslateDisplayContext.getSourceLocale());
 									String sourceContentDir = LanguageUtil.get(journalTranslateDisplayContext.getSourceLocale(), "lang.dir");
-
-									for (String sourceContent : sourceContents) {
 									%>
 
 									<c:choose>
@@ -167,33 +165,18 @@ renderResponse.setTitle(journalTranslateDisplayContext.getTitle());
 											</div>
 										</c:when>
 										<c:otherwise>
-											<aui:input dir="<%= sourceContentDir %>" label="<%= label %>" name="<%= infoField.getUniqueId() %>" readonly="true" tabIndex="-1" type='<%= multiline ? "textarea" : "text" %>' value="<%= sourceContent %>" />
+											<aui:input dir="<%= sourceContentDir %>" label="<%= label %>" name="<%= label %>" readonly="true" tabIndex="-1" type='<%= multiline ? "textarea" : "text" %>' value="<%= sourceContent %>" />
 										</c:otherwise>
 									</c:choose>
 								</clay:col>
-
-								<%
-								}
-								%>
 
 								<clay:col
 									md="6"
 								>
 
 									<%
-									List<String> targetContents = journalTranslateDisplayContext.getTargetStringValues(infoField, journalTranslateDisplayContext.getTargetLocale());
-									int iterator = 0;
-
-									for (String targetContent : targetContents) {
-										String id = StringPool.BLANK;
-
-										if (targetContents.size() > 1) {
-											id = "infoField--" + infoField.getUniqueId() + "_repeatable_" + iterator + "--";
-											iterator++;
-										}
-										else {
-											id = "infoField--" + infoField.getUniqueId() + "--";
-										}
+									String id = "infoField--" + infoField.getName() + "--";
+									String targetContent = journalTranslateDisplayContext.getTargetStringValue(infoField, journalTranslateDisplayContext.getTargetLocale());
 									%>
 
 									<c:choose>
@@ -216,7 +199,6 @@ renderResponse.setTitle(journalTranslateDisplayContext.getTitle());
 							</clay:row>
 
 					<%
-							}
 						}
 					}
 					%>

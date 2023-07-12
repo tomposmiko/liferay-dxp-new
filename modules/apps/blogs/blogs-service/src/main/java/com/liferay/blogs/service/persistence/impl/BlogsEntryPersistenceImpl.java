@@ -62,6 +62,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -10761,7 +10762,7 @@ public class BlogsEntryPersistenceImpl
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of blogs entries
 	 * @param end the upper bound of the range of blogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -22081,12 +22082,12 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "displayDate", "status"}, false);
 
-		BlogsEntryUtil.setPersistence(this);
+		_setBlogsEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		BlogsEntryUtil.setPersistence(null);
+		_setBlogsEntryUtilPersistence(null);
 
 		entityCache.removeCache(BlogsEntryImpl.class.getName());
 
@@ -22096,6 +22097,21 @@ public class BlogsEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setBlogsEntryUtilPersistence(
+		BlogsEntryPersistence blogsEntryPersistence) {
+
+		try {
+			Field field = BlogsEntryUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, blogsEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -550,12 +550,6 @@ public class CommerceApplicationBrandUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceApplicationBrandPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceApplicationBrandPersistence _persistence;
 
 }

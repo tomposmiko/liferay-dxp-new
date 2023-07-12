@@ -55,6 +55,7 @@ import com.liferay.portal.security.service.access.policy.service.persistence.imp
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -4791,12 +4792,12 @@ public class SAPEntryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "name"}, false);
 
-		SAPEntryUtil.setPersistence(this);
+		_setSAPEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		SAPEntryUtil.setPersistence(null);
+		_setSAPEntryUtilPersistence(null);
 
 		entityCache.removeCache(SAPEntryImpl.class.getName());
 
@@ -4806,6 +4807,21 @@ public class SAPEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSAPEntryUtilPersistence(
+		SAPEntryPersistence sapEntryPersistence) {
+
+		try {
+			Field field = SAPEntryUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, sapEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

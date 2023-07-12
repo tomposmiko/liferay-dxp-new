@@ -103,7 +103,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 							</div>
 
 							<c:if test="<%= userCalendarResource != null %>">
-								<span aria-controls="<portlet:namespace />calendarsMenu" aria-expanded="false" aria-label="<liferay-ui:message arguments='<%= LanguageUtil.get(request, "my-calendars") %>' key="manage-calendar-x" />" class="calendar-list-item-arrow calendar-resource-arrow" data-calendarResourceId="<%= userCalendarResource.getCalendarResourceId() %>" role="button" tabindex="0"><clay:icon symbol="caret-bottom" /></span>
+								<span aria-label="<liferay-ui:message key="manage-calendars" />" class="calendar-list-item-arrow calendar-resource-arrow" data-calendarResourceId="<%= userCalendarResource.getCalendarResourceId() %>" tabindex="0"><clay:icon symbol="caret-bottom" /></span>
 							</c:if>
 						</c:if>
 
@@ -119,7 +119,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 							</div>
 
 							<c:if test="<%= CalendarResourcePermission.contains(permissionChecker, groupCalendarResource, CalendarActionKeys.ADD_CALENDAR) %>">
-								<span aria-expanded="false" aria-label="<liferay-ui:message arguments="<%= HtmlUtil.escape(groupCalendarResource.getName(locale)) %>" key="manage-calendar-x" />" class="calendar-list-item-arrow calendar-resource-arrow" data-calendarResourceId="<%= groupCalendarResource.getCalendarResourceId() %>" role="button" tabindex="0"><clay:icon symbol="caret-bottom" /></span>
+								<span class="calendar-list-item-arrow calendar-resource-arrow" data-calendarResourceId="<%= groupCalendarResource.getCalendarResourceId() %>" tabindex="0"><clay:icon symbol="caret-bottom" /></span>
 							</c:if>
 
 							<div class="calendar-portlet-calendar-list" id="<portlet:namespace />siteCalendarList"></div>
@@ -264,7 +264,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 			boundingBox: '#<portlet:namespace />myCalendarList',
 
 			<%
-			updateCalendarsJSONArray(userCalendarsJSONArray, enableRSS, request, false);
+			updateCalendarsJSONArray(request, userCalendarsJSONArray);
 			%>
 
 			calendars: <%= userCalendarsJSONArray %>,
@@ -305,7 +305,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 			boundingBox: '#<portlet:namespace />otherCalendarList',
 
 			<%
-			updateCalendarsJSONArray(otherCalendarsJSONArray, enableRSS, request, true);
+			updateCalendarsJSONArray(request, otherCalendarsJSONArray);
 			%>
 
 			calendars: <%= otherCalendarsJSONArray %>,
@@ -328,7 +328,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 			boundingBox: '#<portlet:namespace />siteCalendarList',
 
 			<%
-			updateCalendarsJSONArray(groupCalendarsJSONArray, enableRSS, request, false);
+			updateCalendarsJSONArray(request, groupCalendarsJSONArray);
 			%>
 
 			calendars: <%= groupCalendarsJSONArray %>,
@@ -372,15 +372,6 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 			.attr(
 				'title',
 				Liferay.Util.unescapeHTML(schedulerEvent.get('content'))
-			);
-
-		schedulerEvent
-			.get('node')
-			.attr(
-				'calendarResourceName',
-				Liferay.Util.unescapeHTML(
-					schedulerEvent.get('calendarResourceName')
-				)
 			);
 	};
 
@@ -444,32 +435,13 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 </aui:script>
 
 <%!
-protected boolean hasMenuItems(JSONObject calendarJSONObject, boolean enableRSS, boolean otherCalendar) {
-	if (enableRSS || otherCalendar) {
-		return true;
-	}
-
-	JSONObject permissionsJSONObject = calendarJSONObject.getJSONObject("permissions");
-
-	if ((permissionsJSONObject.getBoolean(ActionKeys.DELETE) && !calendarJSONObject.getBoolean("defaultCalendar")) ||
-		permissionsJSONObject.getBoolean(CalendarActionKeys.MANAGE_BOOKINGS) ||
-		permissionsJSONObject.getBoolean(ActionKeys.PERMISSIONS) ||
-		permissionsJSONObject.getBoolean(ActionKeys.UPDATE)) {
-
-		return true;
-	}
-
-	return false;
-}
-
-protected void updateCalendarsJSONArray(JSONArray calendarsJSONArray, boolean enableRSS, HttpServletRequest request, boolean otherCalendar) {
+protected void updateCalendarsJSONArray(HttpServletRequest request, JSONArray calendarsJSONArray) {
 	for (int i = 0; i < calendarsJSONArray.length(); i++) {
 		JSONObject jsonObject = calendarsJSONArray.getJSONObject(i);
 
 		long calendarId = jsonObject.getLong("calendarId");
 
 		jsonObject.put("color", GetterUtil.getString(SessionClicks.get(request, "com.liferay.calendar.web_calendar" + calendarId + "Color", jsonObject.getString("color"))));
-		jsonObject.put("hasMenuItems", hasMenuItems(jsonObject, enableRSS, otherCalendar));
 		jsonObject.put("visible", GetterUtil.getBoolean(SessionClicks.get(request, "com.liferay.calendar.web_calendar" + calendarId + "Visible", "true")));
 	}
 }

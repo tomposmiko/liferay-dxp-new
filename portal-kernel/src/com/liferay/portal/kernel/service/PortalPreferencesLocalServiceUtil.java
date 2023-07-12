@@ -348,10 +348,6 @@ public class PortalPreferencesLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(PortalPreferencesLocalService service) {
-		_service = service;
-	}
-
 	private static volatile PortalPreferencesLocalService _service;
 
 }

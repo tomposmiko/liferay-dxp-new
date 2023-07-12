@@ -534,6 +534,7 @@ AUI.add(
 					instance._updateManageUploadDisplay();
 					instance._updateMetadataContainer();
 					instance._updatePendingInfoContainer();
+					instance._updateWarningContainer();
 
 					Liferay.fire('tempFileRemoved');
 
@@ -1311,6 +1312,24 @@ AUI.add(
 
 					if (!totalFiles.size()) {
 						instance._pendingFileInfo.hide();
+					}
+				},
+
+				_updateWarningContainer() {
+					var instance = this;
+
+					var totalFiles = instance._fileList.all(
+						'li input[name=' +
+							instance._selectUploadedFileCheckboxId +
+							']'
+					);
+
+					var warningContainer = instance._fileList.one(
+						'.upload-error'
+					);
+
+					if (!totalFiles.size() && warningContainer) {
+						warningContainer.hide();
 					}
 				},
 

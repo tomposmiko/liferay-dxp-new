@@ -318,8 +318,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		layoutLocalServiceHelper.validate(
-			groupId, privateLayout, layoutId, parentLayoutId, classNameId,
-			classPK, name, type, friendlyURLMap, serviceContext);
+			groupId, privateLayout, layoutId, parentLayoutId, name, type,
+			hidden, friendlyURLMap, serviceContext);
 
 		Date now = new Date();
 
@@ -1747,54 +1747,10 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			long groupId, boolean privateLayout, String type)
 		throws PortalException {
 
-		return getLayouts(groupId, privateLayout, new String[] {type});
-	}
-
-	/**
-	 * Returns a range of all the layouts belonging to the group.
-	 *
-	 * @param  groupId the primary key of the group
-	 * @param  privateLayout whether the layout is private to the group
-	 * @param  keywords keywords
-	 * @param  types layout types
-	 * @param  start the lower bound of the range of layouts
-	 * @param  end the upper bound of the range of layouts (not inclusive)
-	 * @param  orderByComparator the comparator to order the layouts
-	 * @return the matching layouts, or <code>null</code> if no matches were
-	 *         found
-	 */
-	@Override
-	public List<Layout> getLayouts(
-			long groupId, boolean privateLayout, String keywords,
-			String[] types, int start, int end,
-			OrderByComparator<Layout> orderByComparator)
-		throws PortalException {
-
-		return getLayouts(
-			groupId, 0, privateLayout, keywords, types, start, end,
-			orderByComparator);
-	}
-
-	/**
-	 * Returns all the layouts that match the type and belong to the group.
-	 *
-	 * @param  groupId the primary key of the group
-	 * @param  privateLayout whether the layout is private to the group
-	 * @param  types the layout's type (optionally {@link
-	 *         LayoutConstants#TYPE_PORTLET}). The possible types can be found
-	 *         in {@link LayoutConstants}.
-	 * @return the matching layouts, or <code>null</code> if no matches were
-	 *         found
-	 */
-	@Override
-	public List<Layout> getLayouts(
-			long groupId, boolean privateLayout, String[] types)
-		throws PortalException {
-
 		Group group = groupPersistence.findByPrimaryKey(groupId);
 
 		List<Layout> layouts = layoutPersistence.findByG_P_T(
-			groupId, privateLayout, types);
+			groupId, privateLayout, type);
 
 		if (!group.isUser()) {
 			return layouts;
@@ -1829,6 +1785,31 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		return layouts;
+	}
+
+	/**
+	 * Returns a range of all the layouts belonging to the group.
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  privateLayout whether the layout is private to the group
+	 * @param  keywords keywords
+	 * @param  types layout types
+	 * @param  start the lower bound of the range of layouts
+	 * @param  end the upper bound of the range of layouts (not inclusive)
+	 * @param  orderByComparator the comparator to order the layouts
+	 * @return the matching layouts, or <code>null</code> if no matches were
+	 *         found
+	 */
+	@Override
+	public List<Layout> getLayouts(
+			long groupId, boolean privateLayout, String keywords,
+			String[] types, int start, int end,
+			OrderByComparator<Layout> orderByComparator)
+		throws PortalException {
+
+		return getLayouts(
+			groupId, 0, privateLayout, keywords, types, start, end,
+			orderByComparator);
 	}
 
 	/**
@@ -2831,23 +2812,24 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
 			groupId, privateLayout, parentLayoutId);
 
-		Layout layout = layoutPersistence.findByG_P_L(
-			groupId, privateLayout, layoutId);
-
 		String name = nameMap.get(LocaleUtil.getSiteDefault());
 
 		friendlyURLMap = layoutLocalServiceHelper.getFriendlyURLMap(
 			groupId, privateLayout, layoutId, name, friendlyURLMap);
 
+		String friendlyURL = friendlyURLMap.get(LocaleUtil.getSiteDefault());
+
 		layoutLocalServiceHelper.validate(
-			groupId, privateLayout, layoutId, parentLayoutId,
-			layout.getClassNameId(), layout.getClassPK(), name, type,
-			friendlyURLMap, serviceContext);
+			groupId, privateLayout, layoutId, parentLayoutId, name, type,
+			hidden, friendlyURLMap, serviceContext);
 
 		layoutLocalServiceHelper.validateParentLayoutId(
 			groupId, privateLayout, layoutId, parentLayoutId);
 
 		Date now = new Date();
+
+		Layout layout = layoutPersistence.findByG_P_L(
+			groupId, privateLayout, layoutId);
 
 		if (parentLayoutId != layout.getParentLayoutId()) {
 			layout.setParentPlid(
@@ -2869,7 +2851,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layout.setRobotsMap(robotsMap);
 		layout.setType(type);
 		layout.setHidden(hidden);
-		layout.setFriendlyURL(friendlyURLMap.get(LocaleUtil.getSiteDefault()));
+		layout.setFriendlyURL(friendlyURL);
 
 		PortalUtil.updateImageId(
 			layout, hasIconImage, iconBytes, "iconImageId", 0, 0, 0);

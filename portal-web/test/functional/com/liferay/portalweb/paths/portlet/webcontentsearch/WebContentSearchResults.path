@@ -12,12 +12,12 @@
 <tbody>
 <tr>
 	<td>TITLE</td>
-	<td>//*[@data-qa-id='row' and contains(.,'${key_webContentTitle}')]//h5 | //a[contains(.,'${key_webContentTitle}')]</td>
+	<td>//*[@data-qa-id='row' and contains(.,'${key_webContentTitle}')]//h5</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CONTENT</td>
-	<td>//*[@data-qa-id='row' and contains(.,'${key_webContentContent}')]//h6[2] | //span[contains(.,'${key_webContentContent}')]</td>
+	<td>//*[@data-qa-id='row' and contains(.,'${key_webContentTitle}')]//h6[2]</td>
 	<td></td>
 </tr>
 </tbody>

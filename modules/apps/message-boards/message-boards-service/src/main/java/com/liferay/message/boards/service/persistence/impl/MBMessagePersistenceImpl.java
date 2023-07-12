@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -9110,7 +9111,7 @@ public class MBMessagePersistenceImpl
 	 * </p>
 	 *
 	 * @param userId the user ID
-	 * @param classNameIds the class name IDs
+	 * @param classNameId the class name ID
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -17435,7 +17436,7 @@ public class MBMessagePersistenceImpl
 	 * </p>
 	 *
 	 * @param userId the user ID
-	 * @param classNameIds the class name IDs
+	 * @param classNameId the class name ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -21546,7 +21547,7 @@ public class MBMessagePersistenceImpl
 	 */
 	@Override
 	public MBMessage fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(MBMessage.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(MBMessage.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -22624,12 +22625,12 @@ public class MBMessagePersistenceImpl
 			},
 			new String[] {"userId", "classNameId", "classPK", "status"}, false);
 
-		MBMessageUtil.setPersistence(this);
+		_setMBMessageUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		MBMessageUtil.setPersistence(null);
+		_setMBMessageUtilPersistence(null);
 
 		entityCache.removeCache(MBMessageImpl.class.getName());
 
@@ -22639,6 +22640,21 @@ public class MBMessagePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setMBMessageUtilPersistence(
+		MBMessagePersistence mbMessagePersistence) {
+
+		try {
+			Field field = MBMessageUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, mbMessagePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

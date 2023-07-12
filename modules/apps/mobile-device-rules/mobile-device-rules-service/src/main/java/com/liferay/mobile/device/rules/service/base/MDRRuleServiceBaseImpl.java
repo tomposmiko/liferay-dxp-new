@@ -26,11 +26,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -59,7 +59,7 @@ public abstract class MDRRuleServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		MDRRuleServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public abstract class MDRRuleServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		mdrRuleService = (MDRRuleService)aopProxy;
 
-		MDRRuleServiceUtil.setService(mdrRuleService);
+		_setServiceUtilService(mdrRuleService);
 	}
 
 	/**
@@ -118,6 +118,19 @@ public abstract class MDRRuleServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(MDRRuleService mdrRuleService) {
+		try {
+			Field field = MDRRuleServiceUtil.class.getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mdrRuleService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.mobile.device.rules.service.MDRRuleLocalService
 		mdrRuleLocalService;
@@ -143,8 +156,5 @@ public abstract class MDRRuleServiceBaseImpl
 
 	@Reference
 	protected MDRRuleGroupFinder mdrRuleGroupFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MDRRuleServiceBaseImpl.class);
 
 }

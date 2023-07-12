@@ -54,6 +54,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2665,9 +2666,7 @@ public class LayoutSetPersistenceImpl
 	 */
 	@Override
 	public LayoutSet fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				LayoutSet.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(LayoutSet.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3182,11 +3181,11 @@ public class LayoutSetPersistenceImpl
 			new String[] {Boolean.class.getName(), Long.class.getName()},
 			new String[] {"privateLayout", "logoId"}, false);
 
-		LayoutSetUtil.setPersistence(this);
+		_setLayoutSetUtilPersistence(this);
 	}
 
 	public void destroy() {
-		LayoutSetUtil.setPersistence(null);
+		_setLayoutSetUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(LayoutSetImpl.class.getName());
 
@@ -3196,6 +3195,21 @@ public class LayoutSetPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setLayoutSetUtilPersistence(
+		LayoutSetPersistence layoutSetPersistence) {
+
+		try {
+			Field field = LayoutSetUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutSetPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

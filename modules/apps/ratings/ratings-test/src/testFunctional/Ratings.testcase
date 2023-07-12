@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -22,14 +22,14 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ChangeBlogsRatingType {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Blogs Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Blogs Page",
 			widgetName = "Blogs");
@@ -57,7 +57,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-74621."
-	@priority = 3
+	@priority = "3"
 	test CommentAndRateBlogsEntryOnLiveSite {
 		JSONGroup.addGroup(groupName = "Site Name");
 
@@ -104,7 +104,7 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		Ratings.rateThumb(ratingResult = "Rate this as good");
 
@@ -120,10 +120,10 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		Comments.viewPG(
-			commentCount = 1,
+			commentCount = "1",
 			entryComment = "Blogs Entry Comment",
 			userFullName = "Test Test (You)");
 
@@ -182,16 +182,16 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		Comments.viewPG(
-			commentCount = 1,
+			commentCount = "1",
 			entryComment = "Blogs Entry Comment",
 			userFullName = "Test Test (You)");
 	}
 
 	@description = "This is a use case for LPS-74621."
-	@priority = 3
+	@priority = "3"
 	test CommentAndRateWikiFrontPageOnLiveSite {
 		JSONGroup.addGroup(groupName = "Site Name");
 
@@ -229,7 +229,7 @@ definition {
 			wikiPageContent = "Wiki FrontPage Content",
 			wikiPageTitle = "FrontPage");
 
-		Ratings.rateStar(ratingStarCount = 2);
+		Ratings.rateStar(ratingStarCount = "2");
 
 		Comments.addPG(entryComment = "Wiki FrontPage Comment");
 
@@ -239,10 +239,10 @@ definition {
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "2.0",
-			ratingStarCount = 2);
+			ratingStarCount = "2");
 
 		Comments.viewPG(
-			commentCount = 1,
+			commentCount = "1",
 			entryComment = "Wiki FrontPage Comment",
 			userFullName = "Test Test (You)");
 
@@ -277,7 +277,7 @@ definition {
 			layoutName = "Wiki Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Second Site",
 			layoutName = "Wiki Page",
 			widgetName = "Wiki");
@@ -298,23 +298,23 @@ definition {
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "2.0",
-			ratingStarCount = 2);
+			ratingStarCount = "2");
 
 		Comments.viewPG(
-			commentCount = 1,
+			commentCount = "1",
 			entryComment = "Wiki FrontPage Comment",
 			userFullName = "Test Test (You)");
 	}
 
 	@description = "This is a use case for LPS-96470."
-	@priority = 3
+	@priority = "3"
 	test ExportImportSiteWithCommentsAndRatingsUnderBlogsEntry {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Blogs Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Blogs Page",
 			widgetName = "Blogs");
@@ -345,17 +345,17 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		Comments.viewPG(
-			commentCount = 1,
+			commentCount = "1",
 			entryComment = "Blogs Entry Comment",
 			userFullName = "Test Test (You)");
 
 		Ratings.viewRateThumb(
 			commentRating = "true",
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		LAR.openExportAdmin(siteScopeName = "Guest");
 
@@ -367,7 +367,7 @@ definition {
 			locator1 = "SitePagesExport#EXPORT_BUTTON",
 			value1 = "Export");
 
-		var key_larFileName = ${larFileName};
+		var key_larFileName = "${larFileName}";
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "SitePagesExport#CURRENT_AND_PREVIOUS_STATUS",
@@ -380,7 +380,7 @@ definition {
 		JSONGroup.addGroup(groupName = "Second Site");
 
 		LAR.importSiteCP(
-			larFileName = ${larFileName},
+			larFileName = "${larFileName}",
 			siteName = "Second Site");
 
 		Navigator.gotoSitePage(
@@ -397,27 +397,27 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		Comments.viewPG(
-			commentCount = 1,
+			commentCount = "1",
 			entryComment = "Blogs Entry Comment",
 			userFullName = "Test Test (You)");
 
 		Ratings.viewRateThumb(
 			commentRating = "true",
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test RateAndEditWikiPageComment {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Wiki Test Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Wiki Test Page",
 			widgetName = "Wiki");
@@ -465,15 +465,15 @@ definition {
 		Ratings.viewRateThumb(
 			commentRating = "true",
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		Ratings.viewRateThumb(
 			commentRating = "true",
 			ratingResult = "Rate this as bad",
-			voteCount = 0);
+			voteCount = "0");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RateBlogsEntry {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -498,7 +498,7 @@ definition {
 			layoutName = "Blogs Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Blogs Page",
 			widgetName = "Blogs");
@@ -519,11 +519,11 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "Rate this as good",
-			voteCount = 0);
+			voteCount = "0");
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as bad",
-			voteCount = 1);
+			voteCount = "1");
 
 		Ratings.rateThumb(
 			blogRating = "true",
@@ -531,11 +531,11 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		Ratings.viewRateThumb(
 			ratingResult = "Rate this as bad",
-			voteCount = 0);
+			voteCount = "0");
 
 		User.logoutPG();
 
@@ -555,11 +555,11 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 2);
+			voteCount = "2");
 
 		Ratings.viewRateThumb(
 			ratingResult = "Rate this as bad",
-			voteCount = 0);
+			voteCount = "0");
 
 		Ratings.rateThumb(
 			blogRating = "true",
@@ -567,21 +567,21 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "Rate this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as bad",
-			voteCount = 1);
+			voteCount = "1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RateKBArticleWithoutSuggestions {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page",
 			widgetName = "Knowledge Base Display");
@@ -598,17 +598,17 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RateMBThreadAndReply {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Message Boards Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Message Boards Page",
 			widgetName = "Message Boards");
@@ -634,7 +634,7 @@ definition {
 
 		MessageboardsThread.gotoPG(
 			lastPostUserName = "Test Test",
-			replyCount = 0,
+			replyCount = "0",
 			threadBody = "",
 			threadSubject = "MB Thread Message Subject");
 
@@ -642,7 +642,7 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		Navigator.gotoPage(pageName = "Message Boards Page");
 
@@ -658,17 +658,17 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as bad",
-			voteCount = 1);
+			voteCount = "1");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test RateWikiPage {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Wiki Test Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Wiki Test Page",
 			widgetName = "Wiki");
@@ -693,7 +693,7 @@ definition {
 
 		WikiEntry.viewPageContentBody(wikiPageContent = "Wiki Page Content 1");
 
-		Ratings.rateStar(ratingStarCount = 4);
+		Ratings.rateStar(ratingStarCount = "4");
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -705,11 +705,11 @@ definition {
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "4.0",
-			ratingStarCount = 4);
+			ratingStarCount = "4");
 	}
 
 	@description = "This test covers LPS-117741. It ensures that the rated stacked stars can be removed from the blog entry."
-	@priority = 4
+	@priority = "4"
 	test RemoveRatedStackedStarsFromBlogsEntry {
 		Ratings.configureRatingType(
 			applications = "Blogs",
@@ -720,7 +720,7 @@ definition {
 			layoutName = "Blogs Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Blogs Page",
 			widgetName = "Blogs");
@@ -731,13 +731,13 @@ definition {
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
-		Ratings.rateStackedStars(ratingStarCount = 3);
+		Ratings.rateStackedStars(ratingStarCount = "3");
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
 		Ratings.viewRateStackedStar(
 			averageStarCount = "3.0",
-			ratingStarCount = 3);
+			ratingStarCount = "3");
 
 		Ratings.revokeStackedStarsRating();
 
@@ -745,7 +745,7 @@ definition {
 	}
 
 	@description = "This ensures that the stars rating can be revoked."
-	@priority = 5
+	@priority = "5"
 	test RevokeBlogsStarsRating {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -754,7 +754,7 @@ definition {
 			layoutName = "Blogs Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Blogs Page",
 			widgetName = "Blogs");
@@ -789,11 +789,11 @@ definition {
 
 		Ratings.rateStar(
 			checkDeleteButton = "true",
-			ratingStarCount = 3);
+			ratingStarCount = "3");
 
 		Ratings.revokeStarsRating();
 
-		Ratings.rateStar(ratingStarCount = 4);
+		Ratings.rateStar(ratingStarCount = "4");
 
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "userea@liferay.com",
@@ -801,14 +801,14 @@ definition {
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
-		Ratings.rateStar(ratingStarCount = 5);
+		Ratings.rateStar(ratingStarCount = "5");
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "4.5 (2 Votes)",
-			ratingStarCount = 5);
+			ratingStarCount = "5");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewKBArticleWithEditedStarRatings {
 		property test.name.skip.portal.instance = "Ratings#ViewKBArticleWithEditedStarRatings";
 
@@ -817,7 +817,7 @@ definition {
 			layoutName = "Knowledge Base Display Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page",
 			widgetName = "Knowledge Base Display");
@@ -851,20 +851,20 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		Ratings.rateStar(ratingStarCount = 2);
+		Ratings.rateStar(ratingStarCount = "2");
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "2.0",
-			ratingStarCount = 2);
+			ratingStarCount = "2");
 
-		Ratings.rateStar(ratingStarCount = 5);
+		Ratings.rateStar(ratingStarCount = "5");
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "5.0",
-			ratingStarCount = 5);
+			ratingStarCount = "5");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewKBArticleWithStarRatings {
 		property test.name.skip.portal.instance = "Ratings#ViewKBArticleWithStarRatings";
 
@@ -873,7 +873,7 @@ definition {
 			layoutName = "Knowledge Base Display Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page",
 			widgetName = "Knowledge Base Display");
@@ -894,7 +894,7 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "Community Tools",
@@ -915,7 +915,7 @@ definition {
 
 		Ratings.viewRateStar(
 			averageRatingStarCount = "5.0",
-			ratingStarCount = 5);
+			ratingStarCount = "5");
 
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "Community Tools",
@@ -936,10 +936,10 @@ definition {
 
 		Ratings.viewRateThumb(
 			ratingResult = "You have rated this as good",
-			voteCount = 1);
+			voteCount = "1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewLikeCountForDocument {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -952,7 +952,7 @@ definition {
 			layoutName = "Documents and Media Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Documents and Media Page",
 			widgetName = "Documents and Media");
@@ -976,7 +976,7 @@ definition {
 
 		Ratings.rateLike();
 
-		Ratings.viewRateLike(ratingLikeCount = 1);
+		Ratings.viewRateLike(ratingLikeCount = "1");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -1007,7 +1007,7 @@ definition {
 
 		Ratings.rateLike();
 
-		Ratings.viewRateLike(ratingLikeCount = 2);
+		Ratings.viewRateLike(ratingLikeCount = "2");
 	}
 
 }

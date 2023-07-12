@@ -93,10 +93,6 @@ public class OAuthApplicationServiceUtil {
 		return _service;
 	}
 
-	public static void setService(OAuthApplicationService service) {
-		_service = service;
-	}
-
 	private static volatile OAuthApplicationService _service;
 
 }

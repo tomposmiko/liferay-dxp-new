@@ -6,25 +6,15 @@
 />
 
 <#if stringUtil.equals(language, "ftl")>
-${r"<#if"} (${variableData})?? && (${variableFriendlyUrl})??>
-	${r"<#assign"}
-		webContentData = jsonFactoryUtil.createJSONObject(${variableData})
-	${r"/>"}
-
-	<#if webContentData?? && webContentData.title>
-		<a href="${getVariableReferenceCode(variableFriendlyUrl)}">
-			${r"${webContentData.title}"}
-		</a>
-	</#if>
-${r"</#if>"}
+${r"<#assign"}
+	webContentData = jsonFactoryUtil.createJSONObject(${variableData})
+${r"/>"}
 <#else>
-#if (($${variableData})?? && ($${variableFriendlyUrl})??)
-	#set ($webContentData = $jsonFactoryUtil.createJSONObject($${variableData}))
+#set ($webContentData = $jsonFactoryUtil.createJSONObject($${variableData}))
+</#if>
 
-	<#if webContentData?? && webContentData.title>
-		<a href="${getVariableReferenceCode(variableFriendlyUrl)}">
-			${r"${webContentData.title}"}
-		</a>
-	</#if>
-#end
+<#if webContentData?? && webContentData.title>
+	<a href="${getVariableReferenceCode(variableFriendlyUrl)}">
+		${r"${webContentData.title}"}
+	</a>
 </#if>

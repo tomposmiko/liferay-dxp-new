@@ -53,6 +53,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3375,9 +3376,7 @@ public class AssetLinkPersistenceImpl
 	 */
 	@Override
 	public AssetLink fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				AssetLink.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(AssetLink.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3915,11 +3914,11 @@ public class AssetLinkPersistenceImpl
 			},
 			new String[] {"entryId1", "entryId2", "type_"}, false);
 
-		AssetLinkUtil.setPersistence(this);
+		_setAssetLinkUtilPersistence(this);
 	}
 
 	public void destroy() {
-		AssetLinkUtil.setPersistence(null);
+		_setAssetLinkUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(AssetLinkImpl.class.getName());
 
@@ -3929,6 +3928,21 @@ public class AssetLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAssetLinkUtilPersistence(
+		AssetLinkPersistence assetLinkPersistence) {
+
+		try {
+			Field field = AssetLinkUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, assetLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

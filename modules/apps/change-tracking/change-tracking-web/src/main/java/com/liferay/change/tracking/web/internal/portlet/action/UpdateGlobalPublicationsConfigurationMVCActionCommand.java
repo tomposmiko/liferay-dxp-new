@@ -116,16 +116,12 @@ public class UpdateGlobalPublicationsConfigurationMVCActionCommand
 						).or(
 							GroupTable.INSTANCE.typeSettings.like(
 								"%staged=true%")
-						).or(
-							GroupTable.INSTANCE.remoteStagingGroupCount.gt(0)
 						).withParentheses()
 					)
 				));
 
 			for (Group group : groups) {
-				if (group.hasRemoteStagingGroup() || group.isStaged() ||
-					group.isStagingGroup()) {
-
+				if (group.isStaged() || group.isStagingGroup()) {
 					SessionErrors.add(actionRequest, "stagingEnabled");
 
 					return;

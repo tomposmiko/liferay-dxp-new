@@ -52,6 +52,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1145,7 +1146,7 @@ public class ResourcePermissionPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourcePermissionModelImpl</code>.
 	 * </p>
 	 *
-	 * @param scopes the scopes
+	 * @param scope the scope
 	 * @param start the lower bound of the range of resource permissions
 	 * @param end the upper bound of the range of resource permissions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4654,7 +4655,7 @@ public class ResourcePermissionPersistenceImpl
 	 * @param name the name
 	 * @param scope the scope
 	 * @param primKey the prim key
-	 * @param roleIds the role IDs
+	 * @param roleId the role ID
 	 * @param start the lower bound of the range of resource permissions
 	 * @param end the upper bound of the range of resource permissions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -6105,7 +6106,7 @@ public class ResourcePermissionPersistenceImpl
 	 * @param name the name
 	 * @param scope the scope
 	 * @param primKeyId the prim key ID
-	 * @param roleIds the role IDs
+	 * @param roleId the role ID
 	 * @param viewActionId the view action ID
 	 * @param start the lower bound of the range of resource permissions
 	 * @param end the upper bound of the range of resource permissions (not inclusive)
@@ -6997,7 +6998,7 @@ public class ResourcePermissionPersistenceImpl
 	@Override
 	public ResourcePermission fetchByPrimaryKey(Serializable primaryKey) {
 		if (CTPersistenceHelperUtil.isProductionMode(
-				ResourcePermission.class, primaryKey)) {
+				ResourcePermission.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -7688,11 +7689,11 @@ public class ResourcePermissionPersistenceImpl
 			},
 			false);
 
-		ResourcePermissionUtil.setPersistence(this);
+		_setResourcePermissionUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ResourcePermissionUtil.setPersistence(null);
+		_setResourcePermissionUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(ResourcePermissionImpl.class.getName());
 
@@ -7702,6 +7703,22 @@ public class ResourcePermissionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setResourcePermissionUtilPersistence(
+		ResourcePermissionPersistence resourcePermissionPersistence) {
+
+		try {
+			Field field = ResourcePermissionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, resourcePermissionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

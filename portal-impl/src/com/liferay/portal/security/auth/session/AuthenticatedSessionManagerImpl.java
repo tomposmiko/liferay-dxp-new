@@ -503,11 +503,21 @@ public class AuthenticatedSessionManagerImpl
 				headerMap, parameterMap, resultsMap);
 		}
 
+		User user = (User)resultsMap.get("user");
+
 		if (authResult != Authenticator.SUCCESS) {
+			if (user != null) {
+				user = UserLocalServiceUtil.fetchUser(user.getUserId());
+			}
+
+			if (user != null) {
+				UserLocalServiceUtil.checkLockout(user);
+			}
+
 			throw new AuthException();
 		}
 
-		return (User)resultsMap.get("user");
+		return user;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3948,7 +3949,7 @@ public class CalendarResourcePersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CalendarResourceModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param code the code
 	 * @param start the lower bound of the range of calendar resources
 	 * @param end the upper bound of the range of calendar resources (not inclusive)
@@ -6981,12 +6982,12 @@ public class CalendarResourcePersistenceImpl
 			},
 			new String[] {"companyId", "code_", "active_"}, false);
 
-		CalendarResourceUtil.setPersistence(this);
+		_setCalendarResourceUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		CalendarResourceUtil.setPersistence(null);
+		_setCalendarResourceUtilPersistence(null);
 
 		entityCache.removeCache(CalendarResourceImpl.class.getName());
 
@@ -6996,6 +6997,22 @@ public class CalendarResourcePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCalendarResourceUtilPersistence(
+		CalendarResourcePersistence calendarResourcePersistence) {
+
+		try {
+			Field field = CalendarResourceUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, calendarResourcePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -948,10 +948,6 @@ public class KaleoTransitionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(KaleoTransitionPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile KaleoTransitionPersistence _persistence;
 
 }

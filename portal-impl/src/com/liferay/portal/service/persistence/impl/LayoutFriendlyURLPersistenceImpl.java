@@ -57,6 +57,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3735,7 +3736,7 @@ public class LayoutFriendlyURLPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutFriendlyURLModelImpl</code>.
 	 * </p>
 	 *
-	 * @param plids the plids
+	 * @param plid the plid
 	 * @param languageId the language ID
 	 * @param start the lower bound of the range of layout friendly urls
 	 * @param end the upper bound of the range of layout friendly urls (not inclusive)
@@ -5753,9 +5754,7 @@ public class LayoutFriendlyURLPersistenceImpl
 	 */
 	@Override
 	public LayoutFriendlyURL fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				LayoutFriendlyURL.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(LayoutFriendlyURL.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -6140,7 +6139,6 @@ public class LayoutFriendlyURLPersistenceImpl
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
 		Set<String> ctIgnoreColumnNames = new HashSet<String>();
-		Set<String> ctMergeColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -6154,7 +6152,7 @@ public class LayoutFriendlyURLPersistenceImpl
 		ctIgnoreColumnNames.add("modifiedDate");
 		ctStrictColumnNames.add("plid");
 		ctStrictColumnNames.add("privateLayout");
-		ctMergeColumnNames.add("friendlyURL");
+		ctStrictColumnNames.add("friendlyURL");
 		ctStrictColumnNames.add("languageId");
 		ctStrictColumnNames.add("lastPublishDate");
 
@@ -6162,7 +6160,6 @@ public class LayoutFriendlyURLPersistenceImpl
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
-		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK,
 			Collections.singleton("layoutFriendlyURLId"));
@@ -6401,11 +6398,11 @@ public class LayoutFriendlyURLPersistenceImpl
 			},
 			false);
 
-		LayoutFriendlyURLUtil.setPersistence(this);
+		_setLayoutFriendlyURLUtilPersistence(this);
 	}
 
 	public void destroy() {
-		LayoutFriendlyURLUtil.setPersistence(null);
+		_setLayoutFriendlyURLUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(LayoutFriendlyURLImpl.class.getName());
 
@@ -6415,6 +6412,22 @@ public class LayoutFriendlyURLPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setLayoutFriendlyURLUtilPersistence(
+		LayoutFriendlyURLPersistence layoutFriendlyURLPersistence) {
+
+		try {
+			Field field = LayoutFriendlyURLUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutFriendlyURLPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

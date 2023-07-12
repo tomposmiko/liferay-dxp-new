@@ -17,10 +17,8 @@ package com.liferay.journal.web.internal.item.selector;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
-import com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
-import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.journal.constants.JournalWebKeys;
 import com.liferay.journal.item.selector.criterion.JournalItemSelectorCriterion;
 import com.liferay.journal.model.JournalArticle;
@@ -114,38 +112,6 @@ public class JournalItemSelectorHelper {
 			requestBackedPortletURLFactory,
 			liferayRenderResponse.getNamespace() + "selectDocumentLibrary",
 			journalItemSelectorCriterion, fileItemSelectorCriterion);
-	}
-
-	public PortletURL getWebContentSelectorURL() {
-		LiferayRenderRequest liferayRenderRequest =
-			(LiferayRenderRequest)LiferayPortletUtil.getLiferayPortletRequest(
-				_renderRequest);
-
-		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
-			RequestBackedPortletURLFactoryUtil.create(liferayRenderRequest);
-
-		LiferayRenderResponse liferayRenderResponse =
-			(LiferayRenderResponse)LiferayPortletUtil.getLiferayPortletResponse(
-				_renderResponse);
-
-		InfoItemItemSelectorCriterion infoItemItemSelectorCriterion =
-			new InfoItemItemSelectorCriterion();
-
-		infoItemItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			new JournalArticleItemSelectorReturnType());
-
-		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
-			requestBackedPortletURLFactory,
-			liferayRenderResponse.getNamespace() + "selectJournalArticle",
-			infoItemItemSelectorCriterion);
-
-		if (_article != null) {
-			itemSelectorURL.setParameter(
-				"refererClassPK",
-				String.valueOf(_article.getResourcePrimKey()));
-		}
-
-		return itemSelectorURL;
 	}
 
 	private final JournalArticle _article;

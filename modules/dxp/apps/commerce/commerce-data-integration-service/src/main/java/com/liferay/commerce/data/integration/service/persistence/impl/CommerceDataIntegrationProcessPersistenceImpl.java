@@ -50,6 +50,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3008,11 +3009,11 @@ public class CommerceDataIntegrationProcessPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "type_"}, false);
 
-		CommerceDataIntegrationProcessUtil.setPersistence(this);
+		_setCommerceDataIntegrationProcessUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceDataIntegrationProcessUtil.setPersistence(null);
+		_setCommerceDataIntegrationProcessUtilPersistence(null);
 
 		entityCache.removeCache(
 			CommerceDataIntegrationProcessImpl.class.getName());
@@ -3023,6 +3024,24 @@ public class CommerceDataIntegrationProcessPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceDataIntegrationProcessUtilPersistence(
+		CommerceDataIntegrationProcessPersistence
+			commerceDataIntegrationProcessPersistence) {
+
+		try {
+			Field field =
+				CommerceDataIntegrationProcessUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceDataIntegrationProcessPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

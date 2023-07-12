@@ -332,110 +332,104 @@ public class DepotEntryGroupRelModelImpl
 
 	private static final Map<String, Function<DepotEntryGroupRel, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DepotEntryGroupRel, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DepotEntryGroupRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DepotEntryGroupRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DepotEntryGroupRel::getMvccVersion);
-		attributeGetterFunctions.put("uuid", DepotEntryGroupRel::getUuid);
-		attributeGetterFunctions.put(
-			"depotEntryGroupRelId",
-			DepotEntryGroupRel::getDepotEntryGroupRelId);
-		attributeGetterFunctions.put("groupId", DepotEntryGroupRel::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", DepotEntryGroupRel::getCompanyId);
-		attributeGetterFunctions.put("userId", DepotEntryGroupRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", DepotEntryGroupRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", DepotEntryGroupRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DepotEntryGroupRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"ddmStructuresAvailable",
-			DepotEntryGroupRel::getDdmStructuresAvailable);
-		attributeGetterFunctions.put(
-			"depotEntryId", DepotEntryGroupRel::getDepotEntryId);
-		attributeGetterFunctions.put(
-			"searchable", DepotEntryGroupRel::getSearchable);
-		attributeGetterFunctions.put(
-			"toGroupId", DepotEntryGroupRel::getToGroupId);
-		attributeGetterFunctions.put(
-			"lastPublishDate", DepotEntryGroupRel::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<DepotEntryGroupRel, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DepotEntryGroupRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<DepotEntryGroupRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DepotEntryGroupRel::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DepotEntryGroupRel, Long>)
 				DepotEntryGroupRel::setMvccVersion);
+		attributeGetterFunctions.put("uuid", DepotEntryGroupRel::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<DepotEntryGroupRel, String>)
 				DepotEntryGroupRel::setUuid);
+		attributeGetterFunctions.put(
+			"depotEntryGroupRelId",
+			DepotEntryGroupRel::getDepotEntryGroupRelId);
 		attributeSetterBiConsumers.put(
 			"depotEntryGroupRelId",
 			(BiConsumer<DepotEntryGroupRel, Long>)
 				DepotEntryGroupRel::setDepotEntryGroupRelId);
+		attributeGetterFunctions.put("groupId", DepotEntryGroupRel::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<DepotEntryGroupRel, Long>)
 				DepotEntryGroupRel::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", DepotEntryGroupRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DepotEntryGroupRel, Long>)
 				DepotEntryGroupRel::setCompanyId);
+		attributeGetterFunctions.put("userId", DepotEntryGroupRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<DepotEntryGroupRel, Long>)
 				DepotEntryGroupRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", DepotEntryGroupRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DepotEntryGroupRel, String>)
 				DepotEntryGroupRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", DepotEntryGroupRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DepotEntryGroupRel, Date>)
 				DepotEntryGroupRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DepotEntryGroupRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DepotEntryGroupRel, Date>)
 				DepotEntryGroupRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"ddmStructuresAvailable",
+			DepotEntryGroupRel::getDdmStructuresAvailable);
 		attributeSetterBiConsumers.put(
 			"ddmStructuresAvailable",
 			(BiConsumer<DepotEntryGroupRel, Boolean>)
 				DepotEntryGroupRel::setDdmStructuresAvailable);
+		attributeGetterFunctions.put(
+			"depotEntryId", DepotEntryGroupRel::getDepotEntryId);
 		attributeSetterBiConsumers.put(
 			"depotEntryId",
 			(BiConsumer<DepotEntryGroupRel, Long>)
 				DepotEntryGroupRel::setDepotEntryId);
+		attributeGetterFunctions.put(
+			"searchable", DepotEntryGroupRel::getSearchable);
 		attributeSetterBiConsumers.put(
 			"searchable",
 			(BiConsumer<DepotEntryGroupRel, Boolean>)
 				DepotEntryGroupRel::setSearchable);
+		attributeGetterFunctions.put(
+			"toGroupId", DepotEntryGroupRel::getToGroupId);
 		attributeSetterBiConsumers.put(
 			"toGroupId",
 			(BiConsumer<DepotEntryGroupRel, Long>)
 				DepotEntryGroupRel::setToGroupId);
+		attributeGetterFunctions.put(
+			"lastPublishDate", DepotEntryGroupRel::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<DepotEntryGroupRel, Date>)
 				DepotEntryGroupRel::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

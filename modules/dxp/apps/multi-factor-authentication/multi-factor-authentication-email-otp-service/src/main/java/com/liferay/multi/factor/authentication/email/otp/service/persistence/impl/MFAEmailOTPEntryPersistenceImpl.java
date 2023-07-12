@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -880,12 +881,12 @@ public class MFAEmailOTPEntryPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"userId"},
 			false);
 
-		MFAEmailOTPEntryUtil.setPersistence(this);
+		_setMFAEmailOTPEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		MFAEmailOTPEntryUtil.setPersistence(null);
+		_setMFAEmailOTPEntryUtilPersistence(null);
 
 		entityCache.removeCache(MFAEmailOTPEntryImpl.class.getName());
 
@@ -895,6 +896,22 @@ public class MFAEmailOTPEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setMFAEmailOTPEntryUtilPersistence(
+		MFAEmailOTPEntryPersistence mfaEmailOTPEntryPersistence) {
+
+		try {
+			Field field = MFAEmailOTPEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, mfaEmailOTPEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

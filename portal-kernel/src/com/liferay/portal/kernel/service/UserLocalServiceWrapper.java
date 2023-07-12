@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -1300,7 +1299,13 @@ public class UserLocalServiceWrapper
 			companyId, emailAddress);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user's external reference code
+	 * @return the matching user, or <code>null</code> if a matching user could not be found
+	 */
 	@Override
 	public User fetchUserByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -1377,6 +1382,9 @@ public class UserLocalServiceWrapper
 		return _userLocalService.fetchUserByPortraitId(portraitId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public User fetchUserByReferenceCode(
@@ -2053,7 +2061,14 @@ public class UserLocalServiceWrapper
 		return _userLocalService.getUserByEmailAddress(companyId, emailAddress);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user's external reference code
+	 * @return the matching user
+	 * @throws PortalException if a matching user could not be found
+	 */
 	@Override
 	public User getUserByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -3767,13 +3782,6 @@ public class UserLocalServiceWrapper
 		return _userLocalService.updateUser(user);
 	}
 
-	@Override
-	public void validateMaxUsers(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_userLocalService.validateMaxUsers(companyId);
-	}
-
 	/**
 	 * Verifies the email address of the ticket.
 	 *
@@ -3784,11 +3792,6 @@ public class UserLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_userLocalService.verifyEmailAddress(ticketKey);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _userLocalService.getBasePersistence();
 	}
 
 	@Override

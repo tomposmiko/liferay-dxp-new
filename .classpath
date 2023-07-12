@@ -41,7 +41,6 @@
 	<classpathentry kind="lib" path="lib/development/ant-contrib.jar"/>
 	<classpathentry kind="lib" path="lib/development/antelope.jar"/>
 	<classpathentry kind="lib" path="lib/development/appium.jar"/>
-	<classpathentry kind="lib" path="lib/development/asm-commons.jar"/>
 	<classpathentry kind="lib" path="lib/development/bsh.jar"/>
 	<classpathentry kind="lib" path="lib/development/catalina.jar"/>
 	<classpathentry kind="lib" path="lib/development/com.liferay.ant.beanshell.jar"/>
@@ -101,7 +100,6 @@
 	<classpathentry kind="lib" path="lib/development/powermock-module-junit4.jar"/>
 	<classpathentry kind="lib" path="lib/development/powermock-reflect.jar"/>
 	<classpathentry kind="lib" path="lib/development/qdox.jar"/>
-	<classpathentry kind="lib" path="lib/development/reflections.jar"/>
 	<classpathentry kind="lib" path="lib/development/saxpath.jar"/>
 	<classpathentry kind="lib" path="lib/development/sdk-addon-api-0.2.jar"/>
 	<classpathentry kind="lib" path="lib/development/servlet-api.jar"/>
@@ -137,6 +135,8 @@
 	<classpathentry kind="lib" path="lib/portal/axiom-impl.jar"/>
 	<classpathentry kind="lib" path="lib/portal/axis.jar"/>
 	<classpathentry kind="lib" path="lib/portal/axis-ant.jar"/>
+	<classpathentry kind="lib" path="lib/portal/bcmail.jar"/>
+	<classpathentry kind="lib" path="lib/portal/bcprov.jar"/>
 	<classpathentry kind="lib" path="lib/portal/boilerpipe.jar"/>
 	<classpathentry kind="lib" path="lib/portal/bsf.jar"/>
 	<classpathentry kind="lib" path="lib/portal/c3p0.jar"/>
@@ -169,6 +169,7 @@
 	<classpathentry kind="lib" path="lib/portal/crypt.jar"/>
 	<classpathentry kind="lib" path="lib/portal/curvesapi.jar"/>
 	<classpathentry kind="lib" path="lib/portal/daisydiff.jar"/>
+	<classpathentry kind="lib" path="lib/portal/displaytag.jar"/>
 	<classpathentry kind="lib" path="lib/portal/dom4j.jar"/>
 	<classpathentry kind="lib" path="lib/portal/eclipse-core-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/portal/ecs.jar"/>
@@ -207,6 +208,7 @@
 	<classpathentry kind="lib" path="lib/portal/jcifs.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jcommon.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jcl-over-slf4j.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jdom2.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jempbox.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jena.jar"/>
@@ -217,9 +219,13 @@
 	<classpathentry kind="lib" path="lib/portal/jmatio.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jna.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jodconverter.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jodd-bean.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jodd-core.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jodd-http.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jodd-json.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jodd-proxetta.jar"/>
-	<classpathentry kind="lib" path="lib/portal/jodd-util.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jodd-servlet.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jodd-upload.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jrcs-diff.jar"/>
 	<classpathentry kind="lib" path="lib/portal/json-java.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jsr107cache.jar"/>
@@ -239,7 +245,7 @@
 	<classpathentry kind="lib" path="lib/portal/mimepull.jar"/>
 	<classpathentry kind="lib" path="lib/portal/monte-cc.jar"/>
 	<classpathentry kind="lib" path="lib/portal/mp4parser.jar"/>
-	<classpathentry kind="lib" path="lib/portal/neko-htmlunit.jar"/>
+	<classpathentry kind="lib" path="lib/portal/nekohtml.jar"/>
 	<classpathentry kind="lib" path="lib/portal/netcdf.jar"/>
 	<classpathentry kind="lib" path="lib/portal/netty-all.jar"/>
 	<classpathentry kind="lib" path="lib/portal/netty-buffer.jar"/>
@@ -262,6 +268,7 @@
 	<classpathentry kind="lib" path="lib/portal/rhino.jar"/>
 	<classpathentry kind="lib" path="lib/portal/ridl.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rmi-api.jar"/>
+	<classpathentry kind="lib" path="lib/portal/rome.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rometools-utils.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rometools.jar"/>
 	<classpathentry kind="lib" path="lib/portal/saaj-api.jar"/>
@@ -269,6 +276,7 @@
 	<classpathentry kind="lib" path="lib/portal/scribe.jar"/>
 	<classpathentry kind="lib" path="lib/portal/serializer.jar"/>
 	<classpathentry kind="lib" path="lib/portal/slf4j-api.jar"/>
+	<classpathentry kind="lib" path="lib/portal/soap.jar"/>
 	<classpathentry kind="lib" path="lib/portal/soap-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/sparse-bit-set.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-aop.jar"/>

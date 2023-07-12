@@ -921,10 +921,6 @@ public class SegmentsEntryRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(SegmentsEntryRelPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile SegmentsEntryRelPersistence _persistence;
 
 }

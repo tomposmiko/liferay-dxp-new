@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4538,7 +4539,7 @@ public class CalendarBookingPersistenceImpl
 	 * </p>
 	 *
 	 * @param calendarId the calendar ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of calendar bookings
 	 * @param end the upper bound of the range of calendar bookings (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -6197,12 +6198,12 @@ public class CalendarBookingPersistenceImpl
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"parentCalendarBookingId", "status"}, false);
 
-		CalendarBookingUtil.setPersistence(this);
+		_setCalendarBookingUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		CalendarBookingUtil.setPersistence(null);
+		_setCalendarBookingUtilPersistence(null);
 
 		entityCache.removeCache(CalendarBookingImpl.class.getName());
 
@@ -6212,6 +6213,22 @@ public class CalendarBookingPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCalendarBookingUtilPersistence(
+		CalendarBookingPersistence calendarBookingPersistence) {
+
+		try {
+			Field field = CalendarBookingUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, calendarBookingPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

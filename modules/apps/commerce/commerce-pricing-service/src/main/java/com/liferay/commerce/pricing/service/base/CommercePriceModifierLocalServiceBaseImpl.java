@@ -54,8 +54,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -73,6 +71,8 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -296,7 +296,13 @@ public abstract class CommercePriceModifierLocalServiceBaseImpl
 		return commercePriceModifierPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce price modifier with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price modifier's external reference code
+	 * @return the matching commerce price modifier, or <code>null</code> if a matching commerce price modifier could not be found
+	 */
 	@Override
 	public CommercePriceModifier
 		fetchCommercePriceModifierByExternalReferenceCode(
@@ -306,6 +312,9 @@ public abstract class CommercePriceModifierLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePriceModifierByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CommercePriceModifier fetchCommercePriceModifierByReferenceCode(
@@ -315,7 +324,14 @@ public abstract class CommercePriceModifierLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce price modifier with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price modifier's external reference code
+	 * @return the matching commerce price modifier
+	 * @throws PortalException if a matching commerce price modifier could not be found
+	 */
 	@Override
 	public CommercePriceModifier
 			getCommercePriceModifierByExternalReferenceCode(
@@ -1151,15 +1167,14 @@ public abstract class CommercePriceModifierLocalServiceBaseImpl
 			"com.liferay.commerce.pricing.model.CommercePriceModifier",
 			commercePriceModifierLocalService);
 
-		CommercePriceModifierLocalServiceUtil.setService(
-			commercePriceModifierLocalService);
+		_setLocalServiceUtilService(commercePriceModifierLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.pricing.model.CommercePriceModifier");
 
-		CommercePriceModifierLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1202,6 +1217,23 @@ public abstract class CommercePriceModifierLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CommercePriceModifierLocalService commercePriceModifierLocalService) {
+
+		try {
+			Field field =
+				CommercePriceModifierLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commercePriceModifierLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1305,9 +1337,6 @@ public abstract class CommercePriceModifierLocalServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommercePriceModifierLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

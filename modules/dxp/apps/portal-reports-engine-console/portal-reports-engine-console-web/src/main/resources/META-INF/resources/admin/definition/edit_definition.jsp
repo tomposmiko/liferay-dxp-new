@@ -207,7 +207,7 @@ else {
 	</aui:button-row>
 </aui:form>
 
-<aui:script>
+<script type="text/javascript">
 	AUI().ready(function (A) {
 		Liferay.Report.initialize({
 			namespace: '<portlet:namespace />',
@@ -242,4 +242,4 @@ else {
 			);
 		}
 	}
-</aui:script>
+</script>

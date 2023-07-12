@@ -26,7 +26,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,7 +35,7 @@ definition {
 	}
 
 	@description = "User can only administrate display pages in staging view."
-	@priority = 5
+	@priority = "5"
 	test AssertDisplayPagesAreOnlyEditableInStagingView {
 		property portal.acceptance = "true";
 
@@ -57,7 +57,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-86193. Can export display page template and import to Staging site via UI."
-	@priority = 3
+	@priority = "3"
 	test ExportImportDisplayPageTemplateInStagingSite {
 		task ("Add a display page template with Web Content Article type and Basic Web Content subtype") {
 			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
@@ -133,7 +133,7 @@ definition {
 	}
 
 	@description = "This tests one of the workarounds of LPS-92522."
-	@priority = 5
+	@priority = "5"
 	test PublishDisplayPageWithFragment {
 		property portal.acceptance = "true";
 

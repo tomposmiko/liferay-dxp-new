@@ -118,7 +118,6 @@ export interface Config {
 	getInfoItemFieldValueURL: string;
 	getInfoItemMappingFieldsURL: string;
 	getPageContentsURL: string;
-	getWidgetsURL: string;
 	imageSelectorURL: string;
 	infoItemSelectorURL: string;
 

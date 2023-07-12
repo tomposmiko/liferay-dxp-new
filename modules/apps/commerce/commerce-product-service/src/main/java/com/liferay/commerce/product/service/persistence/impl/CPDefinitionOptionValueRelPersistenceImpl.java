@@ -50,6 +50,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -5801,11 +5802,11 @@ public class CPDefinitionOptionValueRelPersistenceImpl
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"CPDefinitionOptionRelId", "preselected"}, false);
 
-		CPDefinitionOptionValueRelUtil.setPersistence(this);
+		_setCPDefinitionOptionValueRelUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CPDefinitionOptionValueRelUtil.setPersistence(null);
+		_setCPDefinitionOptionValueRelUtilPersistence(null);
 
 		entityCache.removeCache(CPDefinitionOptionValueRelImpl.class.getName());
 
@@ -5815,6 +5816,23 @@ public class CPDefinitionOptionValueRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCPDefinitionOptionValueRelUtilPersistence(
+		CPDefinitionOptionValueRelPersistence
+			cpDefinitionOptionValueRelPersistence) {
+
+		try {
+			Field field = CPDefinitionOptionValueRelUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, cpDefinitionOptionValueRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

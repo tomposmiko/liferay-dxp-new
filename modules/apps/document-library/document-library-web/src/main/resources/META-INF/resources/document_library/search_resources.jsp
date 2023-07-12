@@ -42,7 +42,6 @@ if (searchFolderId > 0) {
 String keywords = ParamUtil.getString(request, "keywords");
 
 DLAdminDisplayContext dlAdminDisplayContext = (DLAdminDisplayContext)request.getAttribute(DLAdminDisplayContext.class.getName());
-DLAdminManagementToolbarDisplayContext dlAdminManagementToolbarDisplayContext = (DLAdminManagementToolbarDisplayContext)request.getAttribute(DLAdminManagementToolbarDisplayContext.class.getName());
 
 EntriesChecker entriesChecker = new EntriesChecker(liferayPortletRequest, liferayPortletResponse);
 
@@ -94,10 +93,6 @@ entriesChecker.setRememberCheckBoxStateURLRegex("^(?!.*" + liferayPortletRespons
 
 						String thumbnailSrc = DLURLHelperUtil.getThumbnailSrc(fileEntry, latestFileVersion, themeDisplay);
 
-						row.setData(
-							HashMapBuilder.<String, Object>put(
-								"actions", StringUtil.merge(dlAdminManagementToolbarDisplayContext.getAvailableActions(fileEntry))
-							).build());
 						row.setPrimaryKey(String.valueOf(fileEntry.getFileEntryId()));
 						%>
 
@@ -173,7 +168,7 @@ entriesChecker.setRememberCheckBoxStateURLRegex("^(?!.*" + liferayPortletRespons
 	</div>
 </liferay-util:buffer>
 
-<div class="repository-search-results" data-repositoryId="<%= searchRepositoryId %>" id="<portlet:namespace />searchResultsContainer<%= searchRepositoryId %>">
+<div class="repository-search-results" data-repositoryId="<%= searchRepositoryId %>" id="<%= liferayPortletResponse.getNamespace() + "searchResultsContainer" + searchRepositoryId %>">
 	<%= searchResults %>
 </div>
 

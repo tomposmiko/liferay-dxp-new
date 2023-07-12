@@ -116,7 +116,7 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 					addParams(
 						{
 							[this.namespace +
-							'ddmStructureKey']: selectedItem.ddmstructurekey,
+							'ddmStructureKey']: selectedItem.ddmStructureKey,
 						},
 						this.viewDDMStructureArticlesURL
 					)

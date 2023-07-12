@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -35,6 +33,8 @@ import com.liferay.ratings.kernel.service.RatingsEntryService;
 import com.liferay.ratings.kernel.service.RatingsEntryServiceUtil;
 import com.liferay.ratings.kernel.service.persistence.RatingsEntryPersistence;
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -438,11 +438,11 @@ public abstract class RatingsEntryServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		RatingsEntryServiceUtil.setService(ratingsEntryService);
+		_setServiceUtilService(ratingsEntryService);
 	}
 
 	public void destroy() {
-		RatingsEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -484,6 +484,22 @@ public abstract class RatingsEntryServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		RatingsEntryService ratingsEntryService) {
+
+		try {
+			Field field = RatingsEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ratingsEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -567,8 +583,5 @@ public abstract class RatingsEntryServiceBaseImpl
 
 	@BeanReference(type = AssetEntryFinder.class)
 	protected AssetEntryFinder assetEntryFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RatingsEntryServiceBaseImpl.class);
 
 }

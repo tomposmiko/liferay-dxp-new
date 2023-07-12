@@ -26,8 +26,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
@@ -40,6 +38,8 @@ import com.liferay.portal.kernel.service.persistence.RepositoryPersistence;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -648,11 +648,11 @@ public abstract class RepositoryServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		RepositoryServiceUtil.setService(repositoryService);
+		_setServiceUtilService(repositoryService);
 	}
 
 	public void destroy() {
-		RepositoryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -694,6 +694,20 @@ public abstract class RepositoryServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(RepositoryService repositoryService) {
+		try {
+			Field field = RepositoryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, repositoryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -821,8 +835,5 @@ public abstract class RepositoryServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RepositoryServiceBaseImpl.class);
 
 }

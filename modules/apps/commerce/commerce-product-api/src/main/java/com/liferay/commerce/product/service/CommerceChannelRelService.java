@@ -93,14 +93,12 @@ public interface CommerceChannelRelService extends BaseService {
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceChannelRel> getCommerceChannelRels(
-			String className, long classPK, int start, int end,
-			OrderByComparator<CommerceChannelRel> orderByComparator)
-		throws PortalException;
+		String className, long classPK, int start, int end,
+		OrderByComparator<CommerceChannelRel> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceChannelRel> getCommerceChannelRels(
-			String className, long classPK, String name, int start, int end)
-		throws PortalException;
+		String className, long classPK, String name, int start, int end);
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x)
@@ -116,13 +114,11 @@ public interface CommerceChannelRelService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCommerceChannelRelsCount(String className, long classPK)
-		throws PortalException;
+	public int getCommerceChannelRelsCount(String className, long classPK);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCommerceChannelRelsCount(
-			String className, long classPK, String name)
-		throws PortalException;
+		String className, long classPK, String name);
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x)

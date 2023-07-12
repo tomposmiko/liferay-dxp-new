@@ -125,8 +125,6 @@ public class RSSMVCResourceCommand extends BaseRSSMVCResourceCommand {
 				new Date(socialActivitySet.getCreateDate()));
 			syndEntry.setTitle(
 				HtmlUtil.extractText(socialActivityFeedEntry.getTitle()));
-			syndEntry.setUpdatedDate(
-				new Date(socialActivitySet.getModifiedDate()));
 			syndEntry.setUri(socialActivityFeedEntry.getLink());
 
 			syndEntries.add(syndEntry);

@@ -3,7 +3,7 @@ definition {
 	macro enableSectionCustomizableCP {
 		SitePages.gotoPageMenuItem(
 			menuItem = "Configure",
-			pageName = ${pageName});
+			pageName = "${pageName}");
 
 		Navigator.gotoNavTab(navTab = "Advanced");
 
@@ -12,15 +12,15 @@ definition {
 		Check.checkToggleSwitch(locator1 = "SitePagesEditPage#CUSTOMIZATION_SETTINGS_SHOW_CUSTOMIZABLE_SECTIONS");
 
 		if (isSet(columnIdList)) {
-			for (var columnId : list ${columnIdList}) {
+			for (var columnId : list "${columnIdList}") {
 				Check.toggleSwitch(
-					key_columnId = ${columnId},
+					key_columnId = "${columnId}",
 					locator1 = "SitePagesEditPage#CUSTOMIZATION_SETTINGS_CUSTOMIZABLE_COLUMN_CHECKBOX");
 			}
 		}
 		else {
 			Check.toggleSwitch(
-				key_columnId = ${columnId},
+				key_columnId = "${columnId}",
 				locator1 = "SitePagesEditPage#CUSTOMIZATION_SETTINGS_CUSTOMIZABLE_COLUMN_CHECKBOX");
 		}
 

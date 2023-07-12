@@ -314,6 +314,9 @@ public class CommerceDataIntegrationProcessLogModelImpl
 	private static final Map
 		<String, Function<CommerceDataIntegrationProcessLog, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceDataIntegrationProcessLog, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceDataIntegrationProcessLog, Object>>
@@ -321,101 +324,92 @@ public class CommerceDataIntegrationProcessLogModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceDataIntegrationProcessLog, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceDataIntegrationProcessLogId",
-			CommerceDataIntegrationProcessLog::
-				getCommerceDataIntegrationProcessLogId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceDataIntegrationProcessLog::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceDataIntegrationProcessLog::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceDataIntegrationProcessLog::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceDataIntegrationProcessLog::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceDataIntegrationProcessLog::getModifiedDate);
-		attributeGetterFunctions.put(
-			"CDataIntegrationProcessId",
-			CommerceDataIntegrationProcessLog::getCDataIntegrationProcessId);
-		attributeGetterFunctions.put(
-			"error", CommerceDataIntegrationProcessLog::getError);
-		attributeGetterFunctions.put(
-			"output", CommerceDataIntegrationProcessLog::getOutput);
-		attributeGetterFunctions.put(
-			"startDate", CommerceDataIntegrationProcessLog::getStartDate);
-		attributeGetterFunctions.put(
-			"endDate", CommerceDataIntegrationProcessLog::getEndDate);
-		attributeGetterFunctions.put(
-			"status", CommerceDataIntegrationProcessLog::getStatus);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceDataIntegrationProcessLog, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceDataIntegrationProcessLog, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String,
 					 BiConsumer<CommerceDataIntegrationProcessLog, ?>>();
 
+		attributeGetterFunctions.put(
+			"commerceDataIntegrationProcessLogId",
+			CommerceDataIntegrationProcessLog::
+				getCommerceDataIntegrationProcessLogId);
 		attributeSetterBiConsumers.put(
 			"commerceDataIntegrationProcessLogId",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Long>)
 				CommerceDataIntegrationProcessLog::
 					setCommerceDataIntegrationProcessLogId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceDataIntegrationProcessLog::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Long>)
 				CommerceDataIntegrationProcessLog::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceDataIntegrationProcessLog::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Long>)
 				CommerceDataIntegrationProcessLog::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceDataIntegrationProcessLog::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceDataIntegrationProcessLog, String>)
 				CommerceDataIntegrationProcessLog::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceDataIntegrationProcessLog::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Date>)
 				CommerceDataIntegrationProcessLog::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceDataIntegrationProcessLog::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Date>)
 				CommerceDataIntegrationProcessLog::setModifiedDate);
+		attributeGetterFunctions.put(
+			"CDataIntegrationProcessId",
+			CommerceDataIntegrationProcessLog::getCDataIntegrationProcessId);
 		attributeSetterBiConsumers.put(
 			"CDataIntegrationProcessId",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Long>)
 				CommerceDataIntegrationProcessLog::
 					setCDataIntegrationProcessId);
+		attributeGetterFunctions.put(
+			"error", CommerceDataIntegrationProcessLog::getError);
 		attributeSetterBiConsumers.put(
 			"error",
 			(BiConsumer<CommerceDataIntegrationProcessLog, String>)
 				CommerceDataIntegrationProcessLog::setError);
+		attributeGetterFunctions.put(
+			"output", CommerceDataIntegrationProcessLog::getOutput);
 		attributeSetterBiConsumers.put(
 			"output",
 			(BiConsumer<CommerceDataIntegrationProcessLog, String>)
 				CommerceDataIntegrationProcessLog::setOutput);
+		attributeGetterFunctions.put(
+			"startDate", CommerceDataIntegrationProcessLog::getStartDate);
 		attributeSetterBiConsumers.put(
 			"startDate",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Date>)
 				CommerceDataIntegrationProcessLog::setStartDate);
+		attributeGetterFunctions.put(
+			"endDate", CommerceDataIntegrationProcessLog::getEndDate);
 		attributeSetterBiConsumers.put(
 			"endDate",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Date>)
 				CommerceDataIntegrationProcessLog::setEndDate);
+		attributeGetterFunctions.put(
+			"status", CommerceDataIntegrationProcessLog::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<CommerceDataIntegrationProcessLog, Integer>)
 				CommerceDataIntegrationProcessLog::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -1756,7 +1756,7 @@ public class AssetCategoryUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param vocabularyIds the vocabulary IDs
+	 * @param vocabularyId the vocabulary ID
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3379,7 +3379,7 @@ public class AssetCategoryUtil {
 	 *
 	 * @param groupId the group ID
 	 * @param name the name
-	 * @param vocabularyIds the vocabulary IDs
+	 * @param vocabularyId the vocabulary ID
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3980,10 +3980,6 @@ public class AssetCategoryUtil {
 
 	public static AssetCategoryPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(AssetCategoryPersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static volatile AssetCategoryPersistence _persistence;

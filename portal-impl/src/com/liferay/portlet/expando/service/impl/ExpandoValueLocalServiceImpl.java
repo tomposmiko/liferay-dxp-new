@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.expando.service.impl;
 
-import com.liferay.expando.kernel.exception.MissingDefaultLocaleValueException;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoRow;
@@ -28,7 +27,6 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.typeconverter.DateArrayConverter;
 import com.liferay.portal.typeconverter.NumberArrayConverter;
 import com.liferay.portal.typeconverter.NumberConverter;
@@ -49,6 +47,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import jodd.typeconverter.TypeConverterManager;
+import jodd.typeconverter.TypeConverterManagerBean;
 
 /**
  * @author Raymond Augé
@@ -59,12 +58,19 @@ public class ExpandoValueLocalServiceImpl
 	extends ExpandoValueLocalServiceBaseImpl {
 
 	public ExpandoValueLocalServiceImpl() {
-		TypeConverterManager typeConverterManager = TypeConverterManager.get();
+		TypeConverterManagerBean defaultTypeConverterManager =
+			TypeConverterManager.getDefaultTypeConverterManager();
 
-		typeConverterManager.register(Date[].class, new DateArrayConverter());
-		typeConverterManager.register(Number.class, new NumberConverter());
-		typeConverterManager.register(
-			Number[].class, new NumberArrayConverter());
+		defaultTypeConverterManager.register(
+			Date[].class,
+			new DateArrayConverter(
+				defaultTypeConverterManager.getConvertBean()));
+		defaultTypeConverterManager.register(
+			Number.class, new NumberConverter());
+		defaultTypeConverterManager.register(
+			Number[].class,
+			new NumberArrayConverter(
+				defaultTypeConverterManager.getConvertBean()));
 	}
 
 	@Override
@@ -582,7 +588,7 @@ public class ExpandoValueLocalServiceImpl
 
 		return expandoValueLocalService.addValue(
 			companyId, className, tableName, columnName, classPK,
-			(Map<Locale, ?>)data, LocaleUtil.getSiteDefault());
+			(Map<Locale, ?>)data, LocaleUtil.getDefault());
 	}
 
 	@Override
@@ -746,8 +752,6 @@ public class ExpandoValueLocalServiceImpl
 			Map<String, Serializable> attributes)
 		throws PortalException {
 
-		Map<String, String> data = new HashMap<>();
-
 		ExpandoTable table = expandoTableLocalService.getTable(
 			companyId, classNameId, tableName);
 
@@ -822,32 +826,18 @@ public class ExpandoValueLocalServiceImpl
 				value.setStringArray((String[])attributeValue);
 			}
 			else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
-				Map<Locale, String> defaultValuesMap =
-					(Map<Locale, String>)attributeValue;
-
-				Locale defaultLocale = LocaleUtil.getSiteDefault();
-
-				if (Validator.isNull(defaultValuesMap.get(defaultLocale))) {
-					for (String defaultValue : defaultValuesMap.values()) {
-						if (Validator.isNotNull(defaultValue)) {
-							throw new MissingDefaultLocaleValueException(
-								defaultLocale);
-						}
-					}
-				}
-
 				value.setStringMap(
-					(Map<Locale, String>)attributeValue, defaultLocale);
+					(Map<Locale, String>)attributeValue,
+					LocaleUtil.getDefault());
 			}
 			else {
 				value.setString((String)attributeValue);
 			}
 
-			data.put(column.getName(), value.getData());
+			doAddValue(
+				companyId, classNameId, table.getTableId(),
+				column.getColumnId(), classPK, value.getData());
 		}
-
-		addValues(
-			table.getClassNameId(), table.getTableId(), columns, classPK, data);
 	}
 
 	@Override
@@ -1654,58 +1644,56 @@ public class ExpandoValueLocalServiceImpl
 		data = handleCollections(type, data);
 		data = handleStrings(type, data);
 
-		TypeConverterManager typeConverterManager = TypeConverterManager.get();
-
 		if (type == ExpandoColumnConstants.BOOLEAN) {
-			data = typeConverterManager.convertType(data, Boolean.TYPE);
+			data = TypeConverterManager.convertType(data, Boolean.TYPE);
 		}
 		else if (type == ExpandoColumnConstants.BOOLEAN_ARRAY) {
-			data = typeConverterManager.convertType(data, boolean[].class);
+			data = TypeConverterManager.convertType(data, boolean[].class);
 		}
 		else if (type == ExpandoColumnConstants.DATE) {
-			data = typeConverterManager.convertType(data, Date.class);
+			data = TypeConverterManager.convertType(data, Date.class);
 		}
 		else if (type == ExpandoColumnConstants.DATE_ARRAY) {
-			data = typeConverterManager.convertType(data, Date[].class);
+			data = TypeConverterManager.convertType(data, Date[].class);
 		}
 		else if (type == ExpandoColumnConstants.DOUBLE) {
-			data = typeConverterManager.convertType(data, Double.TYPE);
+			data = TypeConverterManager.convertType(data, Double.TYPE);
 		}
 		else if (type == ExpandoColumnConstants.DOUBLE_ARRAY) {
-			data = typeConverterManager.convertType(data, double[].class);
+			data = TypeConverterManager.convertType(data, double[].class);
 		}
 		else if (type == ExpandoColumnConstants.FLOAT) {
-			data = typeConverterManager.convertType(data, Float.TYPE);
+			data = TypeConverterManager.convertType(data, Float.TYPE);
 		}
 		else if (type == ExpandoColumnConstants.FLOAT_ARRAY) {
-			data = typeConverterManager.convertType(data, float[].class);
+			data = TypeConverterManager.convertType(data, float[].class);
 		}
 		else if (type == ExpandoColumnConstants.INTEGER) {
-			data = typeConverterManager.convertType(data, Integer.TYPE);
+			data = TypeConverterManager.convertType(data, Integer.TYPE);
 		}
 		else if (type == ExpandoColumnConstants.INTEGER_ARRAY) {
-			data = typeConverterManager.convertType(data, int[].class);
+			data = TypeConverterManager.convertType(data, int[].class);
 		}
 		else if (type == ExpandoColumnConstants.LONG) {
-			data = typeConverterManager.convertType(data, Long.TYPE);
+			data = TypeConverterManager.convertType(data, Long.TYPE);
 		}
 		else if (type == ExpandoColumnConstants.LONG_ARRAY) {
-			data = typeConverterManager.convertType(data, long[].class);
+			data = TypeConverterManager.convertType(data, long[].class);
 		}
 		else if (type == ExpandoColumnConstants.NUMBER) {
-			data = typeConverterManager.convertType(data, Number.class);
+			data = TypeConverterManager.convertType(data, Number.class);
 		}
 		else if (type == ExpandoColumnConstants.NUMBER_ARRAY) {
-			data = typeConverterManager.convertType(data, Number[].class);
+			data = TypeConverterManager.convertType(data, Number[].class);
 		}
 		else if (type == ExpandoColumnConstants.SHORT) {
-			data = typeConverterManager.convertType(data, Short.TYPE);
+			data = TypeConverterManager.convertType(data, Short.TYPE);
 		}
 		else if (type == ExpandoColumnConstants.SHORT_ARRAY) {
-			data = typeConverterManager.convertType(data, short[].class);
+			data = TypeConverterManager.convertType(data, short[].class);
 		}
 		else if (type == ExpandoColumnConstants.STRING_ARRAY) {
-			data = typeConverterManager.convertType(data, String[].class);
+			data = TypeConverterManager.convertType(data, String[].class);
 		}
 
 		return (T)data;
@@ -1715,26 +1703,31 @@ public class ExpandoValueLocalServiceImpl
 		long companyId, long classNameId, long tableId, long columnId,
 		long classPK, String data) {
 
-		ExpandoValue value = expandoValuePersistence.fetchByT_C_C(
-			tableId, columnId, classPK);
+		ExpandoRow row = expandoRowPersistence.fetchByT_C(tableId, classPK);
+
+		ExpandoValue value = null;
+
+		if (row == null) {
+			long rowId = counterLocalService.increment();
+
+			row = expandoRowPersistence.create(rowId);
+
+			row.setCompanyId(companyId);
+			row.setModifiedDate(new Date());
+			row.setTableId(tableId);
+			row.setClassPK(classPK);
+
+			row = expandoRowPersistence.update(row);
+		}
+		else {
+			value = expandoValuePersistence.fetchByC_R(
+				columnId, row.getRowId());
+		}
 
 		if (value == null) {
-			ExpandoRow row = expandoRowPersistence.fetchByT_C(tableId, classPK);
+			long valueId = counterLocalService.increment();
 
-			if (row == null) {
-				row = expandoRowPersistence.create(
-					counterLocalService.increment());
-
-				row.setCompanyId(companyId);
-				row.setModifiedDate(new Date());
-				row.setTableId(tableId);
-				row.setClassPK(classPK);
-
-				row = expandoRowPersistence.update(row);
-			}
-
-			value = expandoValuePersistence.create(
-				counterLocalService.increment());
+			value = expandoValuePersistence.create(valueId);
 
 			value.setCompanyId(companyId);
 			value.setTableId(tableId);
@@ -1751,8 +1744,6 @@ public class ExpandoValueLocalServiceImpl
 			value.setData(data);
 
 			value = expandoValuePersistence.update(value);
-
-			ExpandoRow row = expandoRowPersistence.fetchByT_C(tableId, classPK);
 
 			row.setModifiedDate(new Date());
 

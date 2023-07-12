@@ -50,6 +50,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1252,11 +1253,11 @@ public class PowwowServerPersistenceImpl
 			new String[] {String.class.getName(), Boolean.class.getName()},
 			new String[] {"providerType", "active_"}, false);
 
-		PowwowServerUtil.setPersistence(this);
+		_setPowwowServerUtilPersistence(this);
 	}
 
 	public void destroy() {
-		PowwowServerUtil.setPersistence(null);
+		_setPowwowServerUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(PowwowServerImpl.class.getName());
 
@@ -1266,6 +1267,22 @@ public class PowwowServerPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setPowwowServerUtilPersistence(
+		PowwowServerPersistence powwowServerPersistence) {
+
+		try {
+			Field field = PowwowServerUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, powwowServerPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

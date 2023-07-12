@@ -30,11 +30,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -63,7 +63,7 @@ public abstract class CalendarServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		CalendarServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public abstract class CalendarServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		calendarService = (CalendarService)aopProxy;
 
-		CalendarServiceUtil.setService(calendarService);
+		_setServiceUtilService(calendarService);
 	}
 
 	/**
@@ -119,6 +119,20 @@ public abstract class CalendarServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(CalendarService calendarService) {
+		try {
+			Field field = CalendarServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, calendarService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -179,8 +193,5 @@ public abstract class CalendarServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CalendarServiceBaseImpl.class);
 
 }

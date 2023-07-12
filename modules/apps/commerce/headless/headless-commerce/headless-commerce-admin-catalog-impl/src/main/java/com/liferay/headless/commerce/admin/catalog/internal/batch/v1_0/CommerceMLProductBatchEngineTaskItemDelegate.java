@@ -80,8 +80,7 @@ public class CommerceMLProductBatchEngineTaskItemDelegate
 						document.get(Field.ENTRY_CLASS_PK));
 
 					return _toProduct(productId, contextUser.getLocale());
-				},
-				null);
+				});
 
 		return Page.of(
 			productsPage.getItems(),

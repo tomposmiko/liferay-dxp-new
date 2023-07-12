@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.internal.configuration.ConfigurationUtil;
-import com.liferay.portal.spring.extender.internal.upgrade.InitialUpgradeExtender.InitialUpgradeExtension;
-import com.liferay.portal.spring.hibernate.DialectDetector;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,16 +42,15 @@ import java.util.Dictionary;
 
 import javax.sql.DataSource;
 
-import org.apache.felix.dm.DependencyManager;
-import org.apache.felix.dm.ServiceDependency;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 
@@ -62,10 +59,10 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  */
 @Component(immediate = true, service = {})
 public class InitialUpgradeExtender
-	implements BundleTrackerCustomizer<InitialUpgradeExtension> {
+	implements BundleTrackerCustomizer<ServiceRegistration<?>> {
 
 	@Override
-	public InitialUpgradeExtension addingBundle(
+	public ServiceRegistration<?> addingBundle(
 		Bundle bundle, BundleEvent bundleEvent) {
 
 		Dictionary<String, String> headers = bundle.getHeaders(
@@ -75,112 +72,27 @@ public class InitialUpgradeExtender
 			return null;
 		}
 
-		InitialUpgradeExtension initialUpgradeExtension =
-			new InitialUpgradeExtension(bundle);
-
-		initialUpgradeExtension.start();
-
-		return initialUpgradeExtension;
+		return _processInitialUpgrade(_bundleContext, bundle, _dataSource);
 	}
 
 	@Override
 	public void modifiedBundle(
 		Bundle bundle, BundleEvent bundleEvent,
-		InitialUpgradeExtension initialUpgradeExtension) {
+		ServiceRegistration<?> serviceRegistration) {
 	}
 
 	@Override
 	public void removedBundle(
 		Bundle bundle, BundleEvent bundleEvent,
-		InitialUpgradeExtension initialUpgradeExtension) {
+		ServiceRegistration<?> serviceRegistration) {
 
-		initialUpgradeExtension.destroy();
-	}
-
-	public class InitialUpgradeExtension {
-
-		public InitialUpgradeExtension(Bundle bundle) {
-			_bundle = bundle;
-
-			_dependencyManager = new DependencyManager(
-				bundle.getBundleContext());
-		}
-
-		public void destroy() {
-			if (_component != null) {
-				_dependencyManager.remove(_component);
-			}
-		}
-
-		public void start() {
-			_component = _dependencyManager.createComponent();
-
-			_component.setInterface(
-				UpgradeStep.class, _buildServiceProperties());
-
-			_component.setImplementation(new InitialUpgradeStep(_bundle));
-
-			ServiceDependency serviceDependency =
-				_dependencyManager.createServiceDependency();
-
-			serviceDependency.setCallbacks("setDataSource", null);
-
-			serviceDependency.setRequired(true);
-
-			serviceDependency.setService(
-				DataSource.class,
-				StringBundler.concat(
-					"(origin.bundle.symbolic.name=", _bundle.getSymbolicName(),
-					")"));
-
-			_component.add(serviceDependency);
-
-			_dependencyManager.add(_component);
-		}
-
-		private Dictionary<String, Object> _buildServiceProperties() {
-			Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-			BundleWiring bundleWiring = _bundle.adapt(BundleWiring.class);
-
-			Configuration configuration = ConfigurationUtil.getConfiguration(
-				bundleWiring.getClassLoader(), "service");
-
-			if (configuration != null) {
-				String buildNumber = configuration.get("build.number");
-
-				if (buildNumber != null) {
-					properties.put("build.number", buildNumber);
-				}
-			}
-
-			properties.put("upgrade.initial.database.creation", "true");
-
-			properties.put(
-				"upgrade.bundle.symbolic.name", _bundle.getSymbolicName());
-			properties.put("upgrade.db.type", "any");
-			properties.put("upgrade.from.schema.version", "0.0.0");
-
-			Dictionary<String, String> headers = _bundle.getHeaders(
-				StringPool.BLANK);
-
-			String upgradeToSchemaVersion = GetterUtil.getString(
-				headers.get("Liferay-Require-SchemaVersion"),
-				headers.get("Bundle-Version"));
-
-			properties.put("upgrade.to.schema.version", upgradeToSchemaVersion);
-
-			return properties;
-		}
-
-		private final Bundle _bundle;
-		private org.apache.felix.dm.Component _component;
-		private final DependencyManager _dependencyManager;
-
+		serviceRegistration.unregister();
 	}
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
+
 		_bundleTracker = new BundleTracker<>(
 			bundleContext, Bundle.ACTIVE, this);
 
@@ -192,16 +104,55 @@ public class InitialUpgradeExtender
 		_bundleTracker.close();
 	}
 
+	private ServiceRegistration<UpgradeStep> _processInitialUpgrade(
+		BundleContext bundleContext, Bundle bundle, DataSource dataSource) {
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+
+		Configuration configuration = ConfigurationUtil.getConfiguration(
+			bundleWiring.getClassLoader(), "service");
+
+		if (configuration != null) {
+			String buildNumber = configuration.get("build.number");
+
+			if (buildNumber != null) {
+				properties.put("build.number", buildNumber);
+			}
+		}
+
+		properties.put("upgrade.initial.database.creation", "true");
+
+		properties.put(
+			"upgrade.bundle.symbolic.name", bundle.getSymbolicName());
+		properties.put("upgrade.db.type", "any");
+		properties.put("upgrade.from.schema.version", "0.0.0");
+
+		Dictionary<String, String> headers = bundle.getHeaders(
+			StringPool.BLANK);
+
+		String upgradeToSchemaVersion = GetterUtil.getString(
+			headers.get("Liferay-Require-SchemaVersion"),
+			headers.get("Bundle-Version"));
+
+		properties.put("upgrade.to.schema.version", upgradeToSchemaVersion);
+
+		return bundleContext.registerService(
+			UpgradeStep.class, new InitialUpgradeStep(bundle, dataSource),
+			properties);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		InitialUpgradeExtender.class);
 
+	private BundleContext _bundleContext;
 	private BundleTracker<?> _bundleTracker;
 
-	private static class InitialUpgradeStep implements UpgradeStep {
+	@Reference(target = "(&(bean.id=liferayDataSource)(original.bean=true))")
+	private DataSource _dataSource;
 
-		public void setDataSource(DataSource dataSource) {
-			_dataSource = dataSource;
-		}
+	private static class InitialUpgradeStep implements UpgradeStep {
 
 		@Override
 		public String toString() {
@@ -216,9 +167,7 @@ public class InitialUpgradeExtender
 
 			DBManager dbManager = dbContext.getDBManager();
 
-			DB db = dbManager.getDB(
-				dbManager.getDBType(DialectDetector.getDialect(_dataSource)),
-				_dataSource);
+			DB db = dbManager.getDB();
 
 			String tablesSQL = _getSQLTemplateString("tables.sql");
 			String sequencesSQL = _getSQLTemplateString("sequences.sql");
@@ -272,8 +221,9 @@ public class InitialUpgradeExtender
 			}
 		}
 
-		private InitialUpgradeStep(Bundle bundle) {
+		private InitialUpgradeStep(Bundle bundle, DataSource dataSource) {
 			_bundle = bundle;
+			_dataSource = dataSource;
 		}
 
 		private String _getSQLTemplateString(String templateName)
@@ -299,7 +249,7 @@ public class InitialUpgradeExtender
 		}
 
 		private final Bundle _bundle;
-		private DataSource _dataSource;
+		private final DataSource _dataSource;
 
 	}
 

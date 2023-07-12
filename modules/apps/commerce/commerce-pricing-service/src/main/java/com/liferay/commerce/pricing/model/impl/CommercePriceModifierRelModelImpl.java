@@ -311,85 +311,79 @@ public class CommercePriceModifierRelModelImpl
 
 	private static final Map<String, Function<CommercePriceModifierRel, Object>>
 		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommercePriceModifierRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommercePriceModifierRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommercePriceModifierRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"commercePriceModifierRelId",
-			CommercePriceModifierRel::getCommercePriceModifierRelId);
-		attributeGetterFunctions.put(
-			"companyId", CommercePriceModifierRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommercePriceModifierRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommercePriceModifierRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommercePriceModifierRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommercePriceModifierRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commercePriceModifierId",
-			CommercePriceModifierRel::getCommercePriceModifierId);
-		attributeGetterFunctions.put(
-			"classNameId", CommercePriceModifierRel::getClassNameId);
-		attributeGetterFunctions.put(
-			"classPK", CommercePriceModifierRel::getClassPK);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommercePriceModifierRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommercePriceModifierRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommercePriceModifierRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"commercePriceModifierRelId",
+			CommercePriceModifierRel::getCommercePriceModifierRelId);
 		attributeSetterBiConsumers.put(
 			"commercePriceModifierRelId",
 			(BiConsumer<CommercePriceModifierRel, Long>)
 				CommercePriceModifierRel::setCommercePriceModifierRelId);
+		attributeGetterFunctions.put(
+			"companyId", CommercePriceModifierRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommercePriceModifierRel, Long>)
 				CommercePriceModifierRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommercePriceModifierRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommercePriceModifierRel, Long>)
 				CommercePriceModifierRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommercePriceModifierRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommercePriceModifierRel, String>)
 				CommercePriceModifierRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommercePriceModifierRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommercePriceModifierRel, Date>)
 				CommercePriceModifierRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommercePriceModifierRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommercePriceModifierRel, Date>)
 				CommercePriceModifierRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commercePriceModifierId",
+			CommercePriceModifierRel::getCommercePriceModifierId);
 		attributeSetterBiConsumers.put(
 			"commercePriceModifierId",
 			(BiConsumer<CommercePriceModifierRel, Long>)
 				CommercePriceModifierRel::setCommercePriceModifierId);
+		attributeGetterFunctions.put(
+			"classNameId", CommercePriceModifierRel::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<CommercePriceModifierRel, Long>)
 				CommercePriceModifierRel::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", CommercePriceModifierRel::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<CommercePriceModifierRel, Long>)
 				CommercePriceModifierRel::setClassPK);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

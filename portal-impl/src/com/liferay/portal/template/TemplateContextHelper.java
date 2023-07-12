@@ -59,6 +59,7 @@ import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
+import com.liferay.portal.kernel.theme.NavItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil_IW;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
@@ -323,6 +324,20 @@ public class TemplateContextHelper {
 			contextObjects.put("themeDisplay", themeDisplay);
 			contextObjects.put("timeZone", themeDisplay.getTimeZone());
 			contextObjects.put("user", themeDisplay.getUser());
+
+			// Navigation items
+
+			if (layout != null) {
+				try {
+					List<NavItem> navItems = NavItem.fromLayouts(
+						httpServletRequest, themeDisplay, contextObjects);
+
+					contextObjects.put("navItems", navItems);
+				}
+				catch (Exception exception) {
+					_log.error(exception, exception);
+				}
+			}
 
 			// Deprecated
 
@@ -1350,7 +1365,7 @@ public class TemplateContextHelper {
 			if (!HTTP.equals(protocol) && !HTTPS.equals(protocol)) {
 				throw new IOException(
 					StringBundler.concat(
-						"Denied access to resource ", url,
+						"Denied access to resource ", url.toString(),
 						". $httpUtil template variable supports only HTTP and ",
 						"HTTPS protocols."));
 			}
@@ -1358,7 +1373,7 @@ public class TemplateContextHelper {
 			if (isLocationAccessDenied(url.toString())) {
 				throw new IOException(
 					StringBundler.concat(
-						"Denied access to resource ", url,
+						"Denied access to resource ", url.toString(),
 						" using $httpUtil variable from a template. Please ",
 						"use restricted variable $httpUtilUnsafe to access ",
 						"local network."));

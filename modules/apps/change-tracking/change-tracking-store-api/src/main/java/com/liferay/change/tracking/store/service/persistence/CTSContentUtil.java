@@ -1023,10 +1023,6 @@ public class CTSContentUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CTSContentPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CTSContentPersistence _persistence;
 
 }

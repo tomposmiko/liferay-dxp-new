@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1792,9 +1793,7 @@ public class DDMStructureLinkPersistenceImpl
 	 */
 	@Override
 	public DDMStructureLink fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMStructureLink.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMStructureLink.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2272,12 +2271,12 @@ public class DDMStructureLinkPersistenceImpl
 			},
 			new String[] {"classNameId", "classPK", "structureId"}, false);
 
-		DDMStructureLinkUtil.setPersistence(this);
+		_setDDMStructureLinkUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMStructureLinkUtil.setPersistence(null);
+		_setDDMStructureLinkUtilPersistence(null);
 
 		entityCache.removeCache(DDMStructureLinkImpl.class.getName());
 
@@ -2287,6 +2286,22 @@ public class DDMStructureLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMStructureLinkUtilPersistence(
+		DDMStructureLinkPersistence ddmStructureLinkPersistence) {
+
+		try {
+			Field field = DDMStructureLinkUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmStructureLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

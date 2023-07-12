@@ -369,10 +369,6 @@ public class KBArticleServiceUtil {
 		return _service;
 	}
 
-	public static void setService(KBArticleService service) {
-		_service = service;
-	}
-
 	private static volatile KBArticleService _service;
 
 }

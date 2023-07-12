@@ -171,7 +171,12 @@ export const duplicateField = (
 						duplicatedField.fieldName,
 					]);
 
-					pages = FormSupport.addRow(pages, rowIndex + 1, 0, newRow);
+					pages = FormSupport.addRow(
+						pages,
+						rowIndex + 1,
+						activePage,
+						newRow
+					);
 
 					return updateField(props, field, 'rows', pages[0].rows);
 				}

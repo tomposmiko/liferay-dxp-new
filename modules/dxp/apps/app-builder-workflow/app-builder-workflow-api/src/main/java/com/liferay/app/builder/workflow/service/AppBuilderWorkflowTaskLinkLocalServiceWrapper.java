@@ -15,7 +15,6 @@
 package com.liferay.app.builder.workflow.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AppBuilderWorkflowTaskLinkLocalService}.
@@ -412,11 +411,6 @@ public class AppBuilderWorkflowTaskLinkLocalServiceWrapper
 
 		return _appBuilderWorkflowTaskLinkLocalService.
 			updateAppBuilderWorkflowTaskLink(appBuilderWorkflowTaskLink);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _appBuilderWorkflowTaskLinkLocalService.getBasePersistence();
 	}
 
 	@Override

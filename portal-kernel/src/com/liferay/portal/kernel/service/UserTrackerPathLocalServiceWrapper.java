@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
-
 /**
  * Provides a wrapper for {@link UserTrackerPathLocalService}.
  *
@@ -258,7 +256,7 @@ public class UserTrackerPathLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _userTrackerPathLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -342,11 +340,6 @@ public class UserTrackerPathLocalServiceWrapper
 
 		return _userTrackerPathLocalService.updateUserTrackerPath(
 			userTrackerPath);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _userTrackerPathLocalService.getBasePersistence();
 	}
 
 	@Override

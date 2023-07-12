@@ -155,8 +155,7 @@ public class SecurityTest extends BaseClientTestCase {
 
 		Assert.assertEquals(400, getStatus(response));
 		Assert.assertEquals(
-			"{\"error\":\"invalid_request\",\"error_description\":\"Client " +
-				"Redirect Uri is invalid\"}",
+			"<html><body>HTTP 400 Bad Request</body></html>",
 			getBodyAsString(response));
 	}
 

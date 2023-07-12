@@ -1410,7 +1410,7 @@ public interface AssetCategoryPersistence
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param vocabularyIds the vocabulary IDs
+	 * @param vocabularyId the vocabulary ID
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2748,7 +2748,7 @@ public interface AssetCategoryPersistence
 	 *
 	 * @param groupId the group ID
 	 * @param name the name
-	 * @param vocabularyIds the vocabulary IDs
+	 * @param vocabularyId the vocabulary ID
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)

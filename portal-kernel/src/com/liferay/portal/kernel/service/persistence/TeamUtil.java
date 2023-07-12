@@ -1564,10 +1564,6 @@ public class TeamUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(TeamPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile TeamPersistence _persistence;
 
 }

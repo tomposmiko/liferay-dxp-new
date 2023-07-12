@@ -4,32 +4,32 @@ definition {
 		var portletName = "Web Content Display";
 
 		if (isSet(portletNameScoped)) {
-			var portletName = ${portletNameScoped};
+			var portletName = "${portletNameScoped}";
 		}
 
 		if (isSet(portletNameTranslation)) {
-			var portletName = ${portletNameTranslation};
+			var portletName = "${portletNameTranslation}";
 		}
 
-		Portlet.clickPortletPlusIconPG(portletName = ${portletName});
+		Portlet.clickPortletPlusIconPG(portletName = "${portletName}");
 
 		if (isSet(structureName)) {
-			var structureName = ${structureName};
+			var structureName = "${structureName}";
 		}
 		else {
 			var structureName = "Basic Web Content";
 		}
 
-		var key_structureName = ${structureName};
+		var key_structureName = "${structureName}";
 
 		AssertClick(
 			locator1 = "WCD#ADD_STRUCTURED_WEB_CONTENT",
-			value1 = ${structureName});
+			value1 = "${structureName}");
 
 		AssertVisible(locator1 = "TextInput#TITLE");
 
 		while (IsElementNotPresent(locator1 = "WCEditWebContent#SIDEBAR")) {
-			Pause(locator1 = 1000);
+			Pause(locator1 = "1000");
 		}
 	}
 
@@ -39,18 +39,18 @@ definition {
 		}
 
 		MouseOver.mouseOverNotVisible(
-			key_webContentTitle = ${webContentTitle},
+			key_webContentTitle = "${webContentTitle}",
 			locator1 = "WCD#ARTICLE_ELLIPSIS_ICON");
 
 		Click(
-			key_webContentTitle = ${webContentTitle},
+			key_webContentTitle = "${webContentTitle}",
 			locator1 = "WCD#ARTICLE_ELLIPSIS_ICON");
 	}
 
 	macro gotoEdit {
-		WebContentDisplayPortletNavigator.gotoArticleEllipsisMenu(webContentTitle = ${webContentTitle});
+		WebContentDisplayPortletNavigator.gotoArticleEllipsisMenu(webContentTitle = "${webContentTitle}");
 
-		MenuItem.click(menuItem = ${menuItem});
+		MenuItem.click(menuItem = "${menuItem}");
 
 		AssertVisible(locator1 = "TextInput#TITLE");
 	}

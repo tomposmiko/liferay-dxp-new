@@ -351,12 +351,6 @@ public class DDMFormInstanceReportUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		DDMFormInstanceReportPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile DDMFormInstanceReportPersistence _persistence;
 
 }

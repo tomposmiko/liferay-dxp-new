@@ -81,10 +81,6 @@ public class LinkTag extends BaseContainerTag {
 		return _ariaLabel;
 	}
 
-	public boolean getBlock() {
-		return _block;
-	}
-
 	public boolean getBorderless() {
 		return _borderless;
 	}
@@ -175,10 +171,6 @@ public class LinkTag extends BaseContainerTag {
 		_ariaLabel = ariaLabel;
 	}
 
-	public void setBlock(boolean block) {
-		_block = block;
-	}
-
 	public void setBorderless(boolean borderless) {
 		_borderless = borderless;
 	}
@@ -267,7 +259,6 @@ public class LinkTag extends BaseContainerTag {
 		super.cleanUp();
 
 		_ariaLabel = null;
-		_block = false;
 		_borderless = false;
 		_displayType = null;
 		_download = null;
@@ -284,38 +275,6 @@ public class LinkTag extends BaseContainerTag {
 	}
 
 	@Override
-	protected String getHydratedModuleName() {
-		if ((getAdditionalProps() != null) || (getPropsTransformer() != null)) {
-			return "frontend-taglib-clay/Link";
-		}
-
-		return null;
-	}
-
-	@Override
-	protected Map<String, Object> prepareProps(Map<String, Object> props) {
-		props.put("block", _block);
-		props.put("borderless", _borderless);
-		props.put("button", _type.equals("button"));
-		props.put("displayType", _displayType);
-		props.put("icon", _icon);
-
-		if (Validator.isNotNull(_label)) {
-			props.put(
-				"label",
-				LanguageUtil.get(
-					TagResourceBundleUtil.getResourceBundle(pageContext),
-					_label));
-		}
-
-		props.put("monospaced", _monospaced);
-		props.put("outline", _outline);
-		props.put("small", _small);
-
-		return super.prepareProps(props);
-	}
-
-	@Override
 	protected String processCssClasses(Set<String> cssClasses) {
 		String cssPrefix = "link-";
 
@@ -323,10 +282,6 @@ public class LinkTag extends BaseContainerTag {
 			cssPrefix = "btn-";
 
 			cssClasses.add("btn");
-		}
-
-		if (_block) {
-			cssClasses.add(cssPrefix + "block");
 		}
 
 		if (_borderless) {
@@ -388,7 +343,6 @@ public class LinkTag extends BaseContainerTag {
 	private static final String _ATTRIBUTE_NAMESPACE = "clay:link:";
 
 	private String _ariaLabel;
-	private boolean _block;
 	private boolean _borderless;
 	private String _displayType;
 	private String _download;

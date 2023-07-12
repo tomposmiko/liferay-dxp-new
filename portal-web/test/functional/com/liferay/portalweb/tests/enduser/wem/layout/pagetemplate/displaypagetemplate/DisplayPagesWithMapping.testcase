@@ -22,7 +22,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98031."
-	@priority = 5
+	@priority = "5"
 	test MapManualURLToLinkFragment {
 		property portal.acceptance = "true";
 
@@ -63,7 +63,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-118979. The mappable fields are grouped by fieldset in display page template."
-	@priority = 4
+	@priority = "4"
 	test ViewMappableFieldsAreGroupedByFieldset {
 		task ("Add a custom Document type") {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
@@ -101,7 +101,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -127,7 +127,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -135,7 +135,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Schedule",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
@@ -172,7 +172,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -180,7 +180,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Content",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -188,7 +188,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Configuration",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -196,7 +196,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
@@ -231,7 +231,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -239,7 +239,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "File Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -253,14 +253,14 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
 	}
 
 	@description = "This is a test for LPS-120504. View mapped image after sort documents in display page template."
-	@priority = 4
+	@priority = "4"
 	test ViewMappedImageAfterSortDocumentsInDisplayPageTemplate {
 		task ("Add a display page template based on Document and Basic Document") {
 			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
@@ -336,9 +336,9 @@ definition {
 
 			for (var title : list "Document Title 1,Document Title 2") {
 				AssertTextEquals(
-					key_assetTitle = ${title},
+					key_assetTitle = "${title}",
 					locator1 = "AP#ASSET_ABSTRACT_TITLE",
-					value1 = ${title});
+					value1 = "${title}");
 			}
 
 			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Document Title 1");
@@ -347,18 +347,18 @@ definition {
 		task ("Assert the image of the Document Title 1 is shown in Image fragment") {
 			AssertVisible(
 				id = "image-square",
-				key_image = "Document%20Title%201.jpg",
+				key_image = "Document+Title+1.jpg",
 				key_imageDescription = "",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_IMAGE_PROPERTIES");
 		}
 
 		task ("Assert the order of documents in Documents and Media") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title 2,Document Title 1") {
 				LexiconCard.viewCardOrder(
-					card = ${title},
-					index = ${n});
+					card = "${title}",
+					index = "${n}");
 
 				var n = ${n} + 1;
 			}
@@ -369,12 +369,12 @@ definition {
 		}
 
 		task ("Assert the order of documents in Documents and Media") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title 1,Document Title 2") {
 				LexiconCard.viewCardOrder(
-					card = ${title},
-					index = ${n});
+					card = "${title}",
+					index = "${n}");
 
 				var n = ${n} + 1;
 			}
@@ -383,16 +383,16 @@ definition {
 		task ("Assert the image of the Document Title 1 is still shown in Image fragment") {
 			AssertVisible(
 				id = "image-square",
-				key_image = "Document%20Title%201.jpg",
+				key_image = "Document+Title+1.jpg",
 				key_imageDescription = "",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_IMAGE_PROPERTIES");
 		}
 	}
 
 	@description = "This is a test for LPS-118060. The contributed content types and their subtypes are available when creating a display page template."
-	@priority = 5
+	@priority = "5"
 	test ViewTypesDuringCreation {
-		property osgi.modules.includes = "document-library-google-docs";
+		property osgi.app.includes = "document-library-google-docs";
 
 		task ("Add a custom Web Content structure") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -434,7 +434,7 @@ definition {
 			for (var contentType : list "Web Content Article,Document,Blogs Entry") {
 				AssertElementPresent(
 					key_fieldLabel = "Content Type",
-					key_value = ${contentType},
+					key_value = "${contentType}",
 					locator1 = "Select#GENERIC_SELECT_VALUE");
 			}
 
@@ -448,12 +448,12 @@ definition {
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Web Content Article");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			for (var subtype : list "Basic Web Content,WC Structure Name") {
 				AssertElementPresent(
 					key_fieldLabel = "Subtype",
-					key_value = ${subtype},
+					key_value = "${subtype}",
 					locator1 = "Select#GENERIC_SELECT_VALUE");
 			}
 
@@ -462,12 +462,12 @@ definition {
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Document");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			for (var subtype : list "Basic Document,Google Drive Shortcut,DM Document Type Name") {
 				AssertElementPresent(
 					key_fieldLabel = "Subtype",
-					key_value = ${subtype},
+					key_value = "${subtype}",
 					locator1 = "Select#GENERIC_SELECT_VALUE");
 			}
 		}

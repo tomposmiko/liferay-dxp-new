@@ -51,6 +51,7 @@ import com.liferay.segments.service.persistence.impl.constants.SegmentsPersisten
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2422,9 +2423,7 @@ public class SegmentsEntryRelPersistenceImpl
 	 */
 	@Override
 	public SegmentsEntryRel fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				SegmentsEntryRel.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(SegmentsEntryRel.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2933,12 +2932,12 @@ public class SegmentsEntryRelPersistenceImpl
 			},
 			new String[] {"segmentsEntryId", "classNameId", "classPK"}, false);
 
-		SegmentsEntryRelUtil.setPersistence(this);
+		_setSegmentsEntryRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		SegmentsEntryRelUtil.setPersistence(null);
+		_setSegmentsEntryRelUtilPersistence(null);
 
 		entityCache.removeCache(SegmentsEntryRelImpl.class.getName());
 
@@ -2948,6 +2947,22 @@ public class SegmentsEntryRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSegmentsEntryRelUtilPersistence(
+		SegmentsEntryRelPersistence segmentsEntryRelPersistence) {
+
+		try {
+			Field field = SegmentsEntryRelUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, segmentsEntryRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

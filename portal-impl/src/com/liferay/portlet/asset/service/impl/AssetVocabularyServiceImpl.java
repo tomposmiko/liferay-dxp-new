@@ -245,7 +245,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 	public List<AssetVocabulary> getGroupVocabularies(
 		long groupId, int visibilityType) {
 
-		return assetVocabularyPersistence.filterFindByG_V(
+		return assetVocabularyLocalService.getGroupVocabularies(
 			groupId, visibilityType);
 	}
 
@@ -276,7 +276,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 	public List<AssetVocabulary> getGroupVocabularies(
 		long[] groupIds, int[] visibilityTypes) {
 
-		return assetVocabularyPersistence.filterFindByG_V(
+		return assetVocabularyLocalService.getGroupVocabularies(
 			groupIds, visibilityTypes);
 	}
 
@@ -438,12 +438,6 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateVocabulary(long, String, Map, Map, String,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
 	@Override
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, String name, String title,

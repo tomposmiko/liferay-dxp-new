@@ -15,7 +15,6 @@
 package com.liferay.document.library.sync.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link DLSyncEventLocalService}.
@@ -352,11 +351,6 @@ public class DLSyncEventLocalServiceWrapper
 			com.liferay.document.library.sync.model.DLSyncEvent dlSyncEvent) {
 
 		return _dlSyncEventLocalService.updateDLSyncEvent(dlSyncEvent);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _dlSyncEventLocalService.getBasePersistence();
 	}
 
 	@Override

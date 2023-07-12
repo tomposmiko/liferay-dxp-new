@@ -720,12 +720,6 @@ public class AssetEntryAssetCategoryRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		AssetEntryAssetCategoryRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile AssetEntryAssetCategoryRelPersistence _persistence;
 
 }

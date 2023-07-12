@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2045,9 +2046,7 @@ public class DLFileVersionPreviewPersistenceImpl
 	 */
 	@Override
 	public DLFileVersionPreview fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DLFileVersionPreview.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DLFileVersionPreview.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2546,12 +2545,12 @@ public class DLFileVersionPreviewPersistenceImpl
 			new String[] {"fileEntryId", "fileVersionId", "previewStatus"},
 			false);
 
-		DLFileVersionPreviewUtil.setPersistence(this);
+		_setDLFileVersionPreviewUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DLFileVersionPreviewUtil.setPersistence(null);
+		_setDLFileVersionPreviewUtilPersistence(null);
 
 		entityCache.removeCache(DLFileVersionPreviewImpl.class.getName());
 
@@ -2561,6 +2560,22 @@ public class DLFileVersionPreviewPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDLFileVersionPreviewUtilPersistence(
+		DLFileVersionPreviewPersistence dlFileVersionPreviewPersistence) {
+
+		try {
+			Field field = DLFileVersionPreviewUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileVersionPreviewPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

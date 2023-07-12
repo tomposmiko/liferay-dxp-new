@@ -42,6 +42,14 @@ AUI.add(
 					A.bind(instance.filter, instance)
 				);
 			}
+
+			if (instance.fromInput) {
+				instance.fromInput.on('keydown', instance._onDateInputKeyDown);
+			}
+
+			if (instance.toInput) {
+				instance.toInput.on('keydown', instance._onDateInputKeyDown);
+			}
 		};
 
 		var ModifiedFacetFilterUtil = {
@@ -168,6 +176,12 @@ AUI.add(
 						'selectionChange',
 						onRangeSelectionChange
 					);
+				}
+			},
+
+			_onDateInputKeyDown(event) {
+				if (!event.isKey('TAB')) {
+					event.preventDefault();
 				}
 			},
 

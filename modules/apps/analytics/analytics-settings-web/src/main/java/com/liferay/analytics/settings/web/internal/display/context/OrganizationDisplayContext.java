@@ -139,7 +139,7 @@ public class OrganizationDisplayContext {
 	}
 
 	private boolean _isOrderByAscending() {
-		if (Objects.equals(getOrderByType(), "asc")) {
+		if (Objects.equals("asc", getOrderByType())) {
 			return true;
 		}
 

@@ -14,7 +14,6 @@
 
 package com.liferay.blogs.web.internal.layout.display.page;
 
-import com.liferay.asset.util.AssetHelper;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryService;
 import com.liferay.info.item.InfoItemReference;
@@ -50,8 +49,7 @@ public class BlogsLayoutDisplayPageProvider
 				return null;
 			}
 
-			return new BlogsLayoutDisplayPageObjectProvider(
-				blogsEntry, _assetHelper);
+			return new BlogsLayoutDisplayPageObjectProvider(blogsEntry);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -70,8 +68,7 @@ public class BlogsLayoutDisplayPageProvider
 				return null;
 			}
 
-			return new BlogsLayoutDisplayPageObjectProvider(
-				blogsEntry, _assetHelper);
+			return new BlogsLayoutDisplayPageObjectProvider(blogsEntry);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -82,9 +79,6 @@ public class BlogsLayoutDisplayPageProvider
 	public String getURLSeparator() {
 		return "/b/";
 	}
-
-	@Reference
-	private AssetHelper _assetHelper;
 
 	@Reference
 	private BlogsEntryService _blogsEntryService;

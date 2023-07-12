@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -14715,9 +14716,7 @@ public class FragmentEntryPersistenceImpl
 	 */
 	@Override
 	public FragmentEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				FragmentEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(FragmentEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -15716,12 +15715,12 @@ public class FragmentEntryPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"headId"},
 			false);
 
-		FragmentEntryUtil.setPersistence(this);
+		_setFragmentEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		FragmentEntryUtil.setPersistence(null);
+		_setFragmentEntryUtilPersistence(null);
 
 		entityCache.removeCache(FragmentEntryImpl.class.getName());
 
@@ -15731,6 +15730,22 @@ public class FragmentEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setFragmentEntryUtilPersistence(
+		FragmentEntryPersistence fragmentEntryPersistence) {
+
+		try {
+			Field field = FragmentEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, fragmentEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

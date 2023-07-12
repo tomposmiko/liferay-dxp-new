@@ -272,91 +272,85 @@ public class AppBuilderAppModelImpl
 
 	private static final Map<String, Function<AppBuilderApp, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<AppBuilderApp, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AppBuilderApp, Object>>();
-
-		attributeGetterFunctions.put("uuid", AppBuilderApp::getUuid);
-		attributeGetterFunctions.put(
-			"appBuilderAppId", AppBuilderApp::getAppBuilderAppId);
-		attributeGetterFunctions.put("groupId", AppBuilderApp::getGroupId);
-		attributeGetterFunctions.put("companyId", AppBuilderApp::getCompanyId);
-		attributeGetterFunctions.put("userId", AppBuilderApp::getUserId);
-		attributeGetterFunctions.put("userName", AppBuilderApp::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", AppBuilderApp::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AppBuilderApp::getModifiedDate);
-		attributeGetterFunctions.put("active", AppBuilderApp::getActive);
-		attributeGetterFunctions.put(
-			"ddlRecordSetId", AppBuilderApp::getDdlRecordSetId);
-		attributeGetterFunctions.put(
-			"ddmStructureId", AppBuilderApp::getDdmStructureId);
-		attributeGetterFunctions.put(
-			"ddmStructureLayoutId", AppBuilderApp::getDdmStructureLayoutId);
-		attributeGetterFunctions.put(
-			"deDataListViewId", AppBuilderApp::getDeDataListViewId);
-		attributeGetterFunctions.put("name", AppBuilderApp::getName);
-		attributeGetterFunctions.put("scope", AppBuilderApp::getScope);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<AppBuilderApp, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AppBuilderApp, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AppBuilderApp, Object>>();
 		Map<String, BiConsumer<AppBuilderApp, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AppBuilderApp, ?>>();
 
+		attributeGetterFunctions.put("uuid", AppBuilderApp::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<AppBuilderApp, String>)AppBuilderApp::setUuid);
+		attributeGetterFunctions.put(
+			"appBuilderAppId", AppBuilderApp::getAppBuilderAppId);
 		attributeSetterBiConsumers.put(
 			"appBuilderAppId",
 			(BiConsumer<AppBuilderApp, Long>)AppBuilderApp::setAppBuilderAppId);
+		attributeGetterFunctions.put("groupId", AppBuilderApp::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<AppBuilderApp, Long>)AppBuilderApp::setGroupId);
+		attributeGetterFunctions.put("companyId", AppBuilderApp::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AppBuilderApp, Long>)AppBuilderApp::setCompanyId);
+		attributeGetterFunctions.put("userId", AppBuilderApp::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<AppBuilderApp, Long>)AppBuilderApp::setUserId);
+		attributeGetterFunctions.put("userName", AppBuilderApp::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AppBuilderApp, String>)AppBuilderApp::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AppBuilderApp::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AppBuilderApp, Date>)AppBuilderApp::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AppBuilderApp::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AppBuilderApp, Date>)AppBuilderApp::setModifiedDate);
+		attributeGetterFunctions.put("active", AppBuilderApp::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<AppBuilderApp, Boolean>)AppBuilderApp::setActive);
+		attributeGetterFunctions.put(
+			"ddlRecordSetId", AppBuilderApp::getDdlRecordSetId);
 		attributeSetterBiConsumers.put(
 			"ddlRecordSetId",
 			(BiConsumer<AppBuilderApp, Long>)AppBuilderApp::setDdlRecordSetId);
+		attributeGetterFunctions.put(
+			"ddmStructureId", AppBuilderApp::getDdmStructureId);
 		attributeSetterBiConsumers.put(
 			"ddmStructureId",
 			(BiConsumer<AppBuilderApp, Long>)AppBuilderApp::setDdmStructureId);
+		attributeGetterFunctions.put(
+			"ddmStructureLayoutId", AppBuilderApp::getDdmStructureLayoutId);
 		attributeSetterBiConsumers.put(
 			"ddmStructureLayoutId",
 			(BiConsumer<AppBuilderApp, Long>)
 				AppBuilderApp::setDdmStructureLayoutId);
+		attributeGetterFunctions.put(
+			"deDataListViewId", AppBuilderApp::getDeDataListViewId);
 		attributeSetterBiConsumers.put(
 			"deDataListViewId",
 			(BiConsumer<AppBuilderApp, Long>)
 				AppBuilderApp::setDeDataListViewId);
+		attributeGetterFunctions.put("name", AppBuilderApp::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<AppBuilderApp, String>)AppBuilderApp::setName);
+		attributeGetterFunctions.put("scope", AppBuilderApp::getScope);
 		attributeSetterBiConsumers.put(
 			"scope",
 			(BiConsumer<AppBuilderApp, String>)AppBuilderApp::setScope);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

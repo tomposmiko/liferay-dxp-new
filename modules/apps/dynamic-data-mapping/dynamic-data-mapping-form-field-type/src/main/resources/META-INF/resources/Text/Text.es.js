@@ -23,7 +23,6 @@ import {FieldBase} from '../FieldBase/ReactFieldBase.es';
 import {useSyncValue} from '../hooks/useSyncValue.es';
 
 const Text = ({
-	accessibleProps,
 	defaultLanguageId,
 	disabled,
 	editingLanguageId,
@@ -84,7 +83,6 @@ const Text = ({
 
 	return (
 		<ClayInput
-			{...accessibleProps}
 			className="ddm-field-text"
 			disabled={disabled}
 			id={id}
@@ -115,7 +113,6 @@ const Text = ({
 };
 
 const Textarea = ({
-	accessibleProps,
 	disabled,
 	id,
 	name,
@@ -130,7 +127,6 @@ const Textarea = ({
 
 	return (
 		<textarea
-			{...accessibleProps}
 			className="ddm-field-text form-control"
 			disabled={disabled}
 			id={id}
@@ -142,13 +138,13 @@ const Textarea = ({
 			}}
 			onFocus={onFocus}
 			placeholder={placeholder}
+			type="text"
 			value={value}
 		/>
 	);
 };
 
 const Autocomplete = ({
-	accessibleProps,
 	disabled,
 	id,
 	name,
@@ -226,7 +222,6 @@ const Autocomplete = ({
 	return (
 		<ClayAutocomplete>
 			<ClayAutocomplete.Input
-				{...accessibleProps}
 				disabled={disabled}
 				id={id}
 				name={name}
@@ -350,24 +345,13 @@ const Main = ({
 			localizedValue={localizedValue}
 			name={name}
 			readOnly={readOnly}
-			style={null}
 		>
 			<Component
-				accessibleProps={{
-					...(otherProps.tip && {
-						'aria-describedby': `${id ?? name}_fieldHelp`,
-					}),
-					...(otherProps.errorMessage && {
-						'aria-errormessage': `${id ?? name}_fieldError`,
-					}),
-					'aria-invalid': !otherProps.valid,
-					'aria-required': otherProps.required,
-				}}
 				defaultLanguageId={defaultLanguageId}
 				disabled={readOnly}
 				editingLanguageId={editingLanguageId}
 				fieldName={fieldName}
-				id={id ?? name}
+				id={id}
 				localizable={localizable}
 				localizedValue={localizedValue}
 				name={name}

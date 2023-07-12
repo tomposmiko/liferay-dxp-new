@@ -32,7 +32,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -44,7 +44,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddAnnouncementsEntry {
 		property test.name.skip.portal.instance = "PGAnnouncements#AddAnnouncementsEntry";
 
@@ -65,7 +65,7 @@ definition {
 			entryURL = "http://www.liferay.com");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddAnnouncementsEntryFutureDate {
 		Navigator.gotoPage(pageName = "Announcements Page");
 
@@ -75,7 +75,7 @@ definition {
 			entryTitle = "Announcements Entry Title",
 			entryURL = "http://www.liferay.com");
 
-		Pause(locator1 = 10000);
+		Pause(locator1 = "10000");
 
 		AssertClick(
 			locator1 = "Announcements#NAVIGATION_ENTRIES_UNREAD",
@@ -83,7 +83,7 @@ definition {
 
 		AssertTextNotPresent(value1 = "Announcements Entry Title");
 
-		Pause(locator1 = 120000);
+		Pause(locator1 = "120000");
 
 		Navigator.gotoPage(pageName = "Announcements Page");
 
@@ -94,7 +94,7 @@ definition {
 			entryURL = "http://www.liferay.com");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddAnnouncementsEntryPastExpirationDate {
 		Navigator.gotoPage(pageName = "Announcements Page");
 
@@ -120,7 +120,7 @@ definition {
 			value1 = "No entries were found.");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddAnnouncementsEntryPriorityImportant {
 		JSONAnnouncement.addAnnouncement(
 			announcementContent = "Announcements Entry Content",
@@ -136,7 +136,7 @@ definition {
 			entryTitle = "Announcements Entry Title");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddAnnouncementsEntrySite {
 		JSONGroup.addGroup(groupName = "Site Name");
 
@@ -169,7 +169,7 @@ definition {
 			entryTitle = "Announcements Entry Title");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test DeleteAnnouncementsEntry {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "PGAnnouncements#DeleteAnnouncementsEntry";
@@ -191,7 +191,7 @@ definition {
 			entryTitle = "Announcements Entry Title");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test EditAnnouncementsEntry {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "PGAnnouncements#EditAnnouncementsEntry";
@@ -219,7 +219,7 @@ definition {
 			entryTitle = "Announcements Entry Title Edit");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewPreviousAnnouncementEntries {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "PGAnnouncements#ViewPreviousAnnouncementEntries";
@@ -247,26 +247,6 @@ definition {
 			value1 = "Unread");
 
 		AnnouncementsEntry.viewNoPG(entryTitle = "Announcements Entry Title");
-	}
-
-	@description = "This test covers LPS-147716. It checks that the javascript in the user name will not be executed when viewing an announcement on page."
-	@priority = 3
-	test XSSIsNotExecutedWhenViewingAnnouncementUser {
-		Navigator.openURL();
-
-		UserBar.gotoDropdownItem(dropdownItem = "Account Settings");
-
-		User.editUserInformation(userLastNameEdit = '''Test<script>alert('hello!')</script>''');
-
-		Navigator.gotoPage(pageName = "Announcements Page");
-
-		AnnouncementsEntry.addPG(
-			distributionScope = "General",
-			entryContent = "Announcements Entry Content",
-			entryTitle = '''<script>alert('hello!')</script>''',
-			entryURL = "http://www.liferay.com");
-
-		AssertAlertNotPresent();
 	}
 
 }

@@ -38,7 +38,6 @@ import javax.portlet.PortletURL;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -161,10 +160,7 @@ public class GroupURLProvider {
 		Group group, PortletRequest portletRequest) {
 
 		try {
-			DepotEntryLocalService depotEntryLocalService =
-				_depotEntryLocalService;
-
-			if (depotEntryLocalService == null) {
+			if (_depotEntryLocalService == null) {
 				return null;
 			}
 
@@ -175,7 +171,7 @@ public class GroupURLProvider {
 			portletURL.setParameter(
 				"mvcRenderCommandName", "/depot/view_depot_dashboard");
 
-			DepotEntry depotEntry = depotEntryLocalService.getGroupDepotEntry(
+			DepotEntry depotEntry = _depotEntryLocalService.getGroupDepotEntry(
 				group.getGroupId());
 
 			portletURL.setParameter(
@@ -198,10 +194,9 @@ public class GroupURLProvider {
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private volatile DepotEntryLocalService _depotEntryLocalService;
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference
 	private Http _http;

@@ -181,9 +181,6 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 						<c:when test="<%= eicve.getType() == ExportImportContentValidationException.FILE_ENTRY_NOT_FOUND %>">
 							<liferay-ui:message arguments="<%= new String[] {MapUtil.toString(eicve.getDlReferenceParameters()), eicve.getDlReference()} %>" key="unable-to-validate-referenced-document-because-it-cannot-be-found-with-the-following-parameters-x-when-analyzing-link-x" />
 						</c:when>
-						<c:when test="<%= eicve.getType() == ExportImportContentValidationException.JOURNAL_FEED_NOT_FOUND %>">
-							<liferay-ui:message arguments="<%= eicve.getJournalArticleFeedURL() %>" key="unable-to-validate-referenced-journal-feed-because-it-cannot-be-found-with-url-x" />
-						</c:when>
 						<c:when test="<%= eicve.getType() == ExportImportContentValidationException.LAYOUT_GROUP_NOT_FOUND %>">
 							<liferay-ui:message arguments="<%= new String[] {eicve.getLayoutURL(), eicve.getGroupFriendlyURL()} %>" key="unable-to-validate-referenced-page-with-url-x-because-the-page-group-with-url-x-cannot-be-found" />
 						</c:when>
@@ -216,7 +213,7 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 					%>
 
 					<c:if test="<%= le.getType() == LocaleException.TYPE_CONTENT %>">
-						<liferay-ui:message arguments="<%= new String[] {StringUtil.merge(le.getSourceAvailableLanguageIds(), StringPool.COMMA_AND_SPACE), StringUtil.merge(le.getTargetAvailableLanguageIds(), StringPool.COMMA_AND_SPACE)} %>" key="the-default-language-x-does-not-match-the-portal's-available-languages-x" />
+						<liferay-ui:message arguments="<%= new String[] {StringUtil.merge(le.getSourceAvailableLocales(), StringPool.COMMA_AND_SPACE), StringUtil.merge(le.getTargetAvailableLocales(), StringPool.COMMA_AND_SPACE)} %>" key="the-default-language-x-does-not-match-the-portal's-available-languages-x" />
 					</c:if>
 				</liferay-ui:error>
 
@@ -280,7 +277,6 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 								ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
 								imageSelectorURL="<%= String.valueOf(journalItemSelectorHelper.getImageSelectorURL()) %>"
 								requestedLocale="<%= locale %>"
-								webContentSelectorURL="<%= String.valueOf(journalItemSelectorHelper.getWebContentSelectorURL()) %>"
 							/>
 						</c:otherwise>
 					</c:choose>

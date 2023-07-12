@@ -3,19 +3,20 @@ definition {
 	@summary = "This calls the JSON WS API to add a MB category"
 	macro addCategory {
 		var portalURL = JSONCompany.getPortalURL();
-		var userId = JSONUserAPI._getUserIdByEmailAddress(userEmailAddress = ${userEmailAddress});
+
+		var userId = JSONUserAPI._getUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		if (!(isSet(parentCategoryId))) {
-			var parentCategoryId = 0;
+			var parentCategoryId = "0";
 		}
 
 		var curl = '''
 			${portalURL}/api/jsonws/mb.mbcategory/add-category \
-				-u test@liferay.com:test \
-				-d userId=${userId} \
-				-d parentCategoryId=${parentCategoryId} \
-				-d name=${categoryName} \
-				-d description=${categoryDescription}
+			-u test@liferay.com:test \
+			-d userId=${userId} \
+			-d parentCategoryId=${parentCategoryId} \
+			-d name=${categoryName} \
+			-d description=${categoryDescription}
 		''';
 
 		echo("## Adding a 'Category' with the following info using JSONWS:");
@@ -24,7 +25,7 @@ definition {
 
 		echo("## * Description: ${categoryDescription}");
 
-		var messageId = JSONCurlUtil.post(${curl});
+		var messageId = JSONCurlUtil.post("${curl}");
 	}
 
 	@summary = "This calls the JSON WS API to add a MB thread"
@@ -34,8 +35,9 @@ definition {
 		}
 
 		var groupId = JSONGroupAPI._getGroupIdByName(
-			groupName = ${groupName},
-			site = ${site});
+			groupName = "${groupName}",
+			site = "${site}");
+
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (!(isSet(addGuestPermissions))) {
@@ -44,12 +46,12 @@ definition {
 
 		var serviceContext = JSONServiceContextUtil.setServiceContext(
 			addGroupPermissions = "true",
-			addGuestPermissions = ${addGuestPermissions},
-			assetTagNames = ${assetTagNames},
-			workflowAction = ${workflowAction});
+			addGuestPermissions = "${addGuestPermissions}",
+			assetTagNames = "${assetTagNames}",
+			workflowAction = "${workflowAction}");
 
 		if (!(isSet(categoryId))) {
-			var categoryId = 0;
+			var categoryId = "0";
 		}
 
 		if (!(isSet(userEmailAddress))) {
@@ -62,17 +64,17 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/mb.mbmessage/add-message \
-				-u ${userEmailAddress}:${userPassword} \
-				-d groupId=${groupId} \
-				-d categoryId=${categoryId} \
-				-d subject=${threadSubject} \
-				-d body=${threadBody} \
-				-d format='bbcode' \
-				-d inputStreamOVPs= \
-				-d anonymous=false \
-				-d priority=0 \
-				-d allowPingbacks=true \
-				-d serviceContext=${serviceContext}
+			-u ${userEmailAddress}:${userPassword} \
+			-d groupId=${groupId} \
+			-d categoryId=${categoryId} \
+			-d subject=${threadSubject} \
+			-d body=${threadBody} \
+			-d format='bbcode' \
+			-d inputStreamOVPs= \
+			-d anonymous=false \
+			-d priority=0 \
+			-d allowPingbacks=true \
+			-d serviceContext=${serviceContext}
 		''';
 
 		echo("## Adding a 'Message' with the following info using JSONWS:");
@@ -81,13 +83,13 @@ definition {
 
 		echo("## * Body: ${threadBody}");
 
-		var messageId = JSONCurlUtil.post(${curl}, "$['messageId']");
+		var messageId = JSONCurlUtil.post("${curl}", "$['messageId']");
 	}
 
 	@summary = "This calls the JSON WS API to add a MB reply"
 	macro addMessageReply {
 		if (isSet(messageId)) {
-			var messageId = ${messageId};
+			var messageId = "${messageId}";
 		}
 		else {
 			var messageId = JSONMBMessage.getmessageId();
@@ -116,17 +118,16 @@ definition {
 
 		echo("## * Body: ${threadBody}");
 
-		var messageId = JSONCurlUtil.post(${curl}, "$['messageId']");
+		var messageId = JSONCurlUtil.post("${curl}", "$['messageId']");
 	}
 
 	@summary = "This calls the JSON WS API to get the ID of a MB category through the URL"
 	macro getCategoryId {
 		var messageBoardsCategoryURL = selenium.getLocation();
 		var portalURL = PropsUtil.get("portal.url");
+		var categoryId = StringUtil.replace("${messageBoardsCategoryURL}", "${portalURL}/web/guest/message-boards-page/-/message_boards/category/", "");
 
-		var categoryId = StringUtil.replace(${messageBoardsCategoryURL}, "${portalURL}/web/guest/message-boards-page/-/message_boards/category/", "");
-
-		return ${categoryId};
+		return "${categoryId}";
 	}
 
 	@summary = "Get the categoryId by using categoryName and groupName"
@@ -134,64 +135,64 @@ definition {
 		Variables.assertDefined(parameterList = "${categoryName},${groupName}");
 
 		var portalURL = JSONCompany.getPortalURL();
-		var groupId = JSONGroupSetter.setGroupId(groupName = ${groupName});
+
+		var groupId = JSONGroupSetter.setGroupId(groupName = "${groupName}");
 
 		var curl = '''
 			${portalURL}/api/jsonws/mb.mbcategory/get-categories \
-				-u test@liferay.com:test \
-				-d groupId=${groupId}
+			-u test@liferay.com:test \
+			-d groupId=${groupId}
 		''';
+		var categoryId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${categoryName}')]['categoryId']");
 
-		var categoryId = JSONCurlUtil.post(${curl}, "$.[?(@['name'] == '${categoryName}')]['categoryId']");
-
-		if (${categoryId} == "") {
+		if ("${categoryId}" == "") {
 			fail("FAIL. Cannot find category.");
 		}
 
-		return ${categoryId};
+		return "${categoryId}";
 	}
 
 	@summary = "This calls the JSON WS API to get the ID of a MB thread through the URL"
 	macro getmessageId {
 		var messageBoardsThreadURL = selenium.getLocation();
 		var portalURL = PropsUtil.get("portal.url");
+		var messageId = StringUtil.replace("${messageBoardsThreadURL}", "${portalURL}/web/guest/message-boards-page/-/message_boards/message/", "");
 
-		var messageId = StringUtil.replace(${messageBoardsThreadURL}, "${portalURL}/web/guest/message-boards-page/-/message_boards/message/", "");
-
-		return ${messageId};
+		return "${messageId}";
 	}
 
 	@summary = "Get the messageId by using both categoryName and groupName"
 	macro getMessageIdByName {
 		if (isSet(categoryName)) {
 			var categoryId = JSONMBMessage.getCategoryIdByName(
-				categoryName = ${categoryName},
-				groupName = ${groupName});
+				categoryName = "${categoryName}",
+				groupName = "${groupName}");
 		}
 		else {
-			var categoryId = 0;
+			var categoryId = "0";
 		}
 
 		var portalURL = JSONCompany.getPortalURL();
-		var groupId = JSONGroupSetter.setGroupId(groupName = ${groupName});
+
+		var groupId = JSONGroupSetter.setGroupId(groupName = "${groupName}");
 
 		var curl = '''
 			${portalURL}/api/jsonws/mb.mbthread/get-threads \
-				-u test@liferay.com:test \
-				-d groupId=${groupId} \
-				-d categoryId=${categoryId} \
-				-d status=0 \
-				-d "start=-1" \
-				-d "end=-1"
+			-u test@liferay.com:test \
+			-d groupId=${groupId} \
+			-d categoryId=${categoryId} \
+			-d status=0 \
+			-d "start=-1" \
+			-d "end=-1"
+
 		''';
+		var messageId = JSONCurlUtil.post("${curl}", "$.[?(@['title'] == '${threadSubject}')]['rootMessageId']");
 
-		var messageId = JSONCurlUtil.post(${curl}, "$.[?(@['title'] == '${threadSubject}')]['rootMessageId']");
-
-		if (${messageId} == "") {
+		if ("${messageId}" == "") {
 			fail("FAIL. Cannot find category.");
 		}
 
-		return ${messageId};
+		return "${messageId}";
 	}
 
 	@summary = "This calls the JSON WS API to subscribe to a message"
@@ -199,9 +200,10 @@ definition {
 		Variables.assertDefined(parameterList = "${threadSubject},${groupName}");
 
 		var messageId = JSONMBMessage.getMessageIdByName(
-			categoryName = ${categoryName},
-			groupName = ${groupName},
-			threadSubject = ${threadSubject});
+			categoryName = "${categoryName}",
+			groupName = "${groupName}",
+			threadSubject = "${threadSubject}");
+
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (!(isSet(userEmailAddress))) {
@@ -218,7 +220,7 @@ definition {
 				-d messageId=${messageId} \
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 }

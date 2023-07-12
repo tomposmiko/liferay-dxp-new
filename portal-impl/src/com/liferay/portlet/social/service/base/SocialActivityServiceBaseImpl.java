@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -45,6 +43,8 @@ import com.liferay.social.kernel.service.persistence.SocialActivityPersistence;
 import com.liferay.social.kernel.service.persistence.SocialActivitySetFinder;
 import com.liferay.social.kernel.service.persistence.SocialActivitySetPersistence;
 import com.liferay.social.kernel.service.persistence.SocialActivitySettingPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -827,11 +827,11 @@ public abstract class SocialActivityServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		SocialActivityServiceUtil.setService(socialActivityService);
+		_setServiceUtilService(socialActivityService);
 	}
 
 	public void destroy() {
-		SocialActivityServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -873,6 +873,22 @@ public abstract class SocialActivityServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		SocialActivityService socialActivityService) {
+
+		try {
+			Field field = SocialActivityServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivityService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1031,8 +1047,5 @@ public abstract class SocialActivityServiceBaseImpl
 
 	@BeanReference(type = SocialActivitySettingPersistence.class)
 	protected SocialActivitySettingPersistence socialActivitySettingPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialActivityServiceBaseImpl.class);
 
 }

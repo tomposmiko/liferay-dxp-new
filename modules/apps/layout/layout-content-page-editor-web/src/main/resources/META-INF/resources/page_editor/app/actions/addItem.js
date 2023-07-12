@@ -14,14 +14,8 @@
 
 import {ADD_ITEM} from './types';
 
-export default function addItem({
-	itemId,
-	layoutData,
-	fragmentEntryLinkIds,
-	portletIds = [],
-}) {
+export default function addItem({itemId, layoutData, portletIds = []}) {
 	return {
-		fragmentEntryLinkIds,
 		itemId,
 		layoutData,
 		portletIds,

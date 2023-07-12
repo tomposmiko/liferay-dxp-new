@@ -1876,13 +1876,13 @@ class ChangeTrackingChangesView extends React.Component {
 				<div className="panel panel-secondary">
 					<div className="panel-body">
 						<ClayRadioGroup
-							onChange={(filterClass) =>
+							onSelectedValueChange={(filterClass) =>
 								this._handleNavigationUpdate({
 									filterClass,
 									nodeId: 0,
 								})
 							}
-							value={this.state.filterClass}
+							selectedValue={this.state.filterClass}
 						>
 							{this._getRootDisplayOptions()}
 						</ClayRadioGroup>

@@ -16,8 +16,8 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.checkbox;
 
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
-import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
@@ -54,10 +54,7 @@ public class CheckboxDDMFormFieldTemplateContextContributor
 		return HashMapBuilder.<String, Object>put(
 			"predefinedValue",
 			GetterUtil.getBoolean(
-				DDMFormFieldTypeUtil.getValue(
-					DDMFormFieldTypeUtil.getPropertyValue(
-						ddmFormField, ddmFormFieldRenderingContext.getLocale(),
-						"predefinedValue")))
+				getPredefinedValue(ddmFormField, ddmFormFieldRenderingContext))
 		).put(
 			"showAsSwitcher",
 			GetterUtil.getBoolean(ddmFormField.getProperty("showAsSwitcher"))
@@ -80,10 +77,22 @@ public class CheckboxDDMFormFieldTemplateContextContributor
 			}
 		).put(
 			"value",
-			GetterUtil.getBoolean(
-				DDMFormFieldTypeUtil.getValue(
-					ddmFormFieldRenderingContext.getValue()))
+			GetterUtil.getBoolean(ddmFormFieldRenderingContext.getValue())
 		).build();
+	}
+
+	protected String getPredefinedValue(
+		DDMFormField ddmFormField,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		LocalizedValue predefinedValue = ddmFormField.getPredefinedValue();
+
+		if (predefinedValue == null) {
+			return null;
+		}
+
+		return predefinedValue.getString(
+			ddmFormFieldRenderingContext.getLocale());
 	}
 
 	private String _getSystemSettingsURL(

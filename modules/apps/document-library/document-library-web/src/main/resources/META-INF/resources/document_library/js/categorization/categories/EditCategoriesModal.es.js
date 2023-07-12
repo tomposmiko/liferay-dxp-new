@@ -277,8 +277,10 @@ const EditCategoriesModal = ({
 					{multiple && (
 						<ClayRadioGroup
 							name="add-replace"
-							onChange={handleMultiSelectOptionChange}
-							value={selectedRadioGroupValue}
+							onSelectedValueChange={
+								handleMultiSelectOptionChange
+							}
+							selectedValue={selectedRadioGroupValue}
 						>
 							<ClayRadio
 								checked="true"

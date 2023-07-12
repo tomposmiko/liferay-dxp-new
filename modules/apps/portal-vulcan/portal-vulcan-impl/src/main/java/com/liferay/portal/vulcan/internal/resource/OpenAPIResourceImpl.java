@@ -14,8 +14,6 @@
 
 package com.liferay.portal.vulcan.internal.resource;
 
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.resource.OpenAPIResource;
 import com.liferay.portal.vulcan.util.UriInfoUtil;
@@ -34,15 +32,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Javier Gamarra
@@ -51,8 +45,14 @@ import org.osgi.service.component.annotations.Reference;
 public class OpenAPIResourceImpl implements OpenAPIResource {
 
 	@Override
+	public Response getOpenAPI(Set<Class<?>> resourceClasses, String type)
+		throws Exception {
+
+		return getOpenAPI(resourceClasses, type, null);
+	}
+
+	@Override
 	public Response getOpenAPI(
-			HttpServletRequest httpServletRequest,
 			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
 		throws Exception {
 
@@ -97,7 +97,7 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 		if (uriInfo != null) {
 			Server server = new Server();
 
-			server.setUrl(_getBasePath(httpServletRequest, uriInfo));
+			server.setUrl(UriInfoUtil.getBasePath(uriInfo));
 
 			openAPI.setServers(Collections.singletonList(server));
 		}
@@ -120,51 +120,5 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			MediaType.APPLICATION_JSON_TYPE
 		).build();
 	}
-
-	@Override
-	public Response getOpenAPI(Set<Class<?>> resourceClasses, String type)
-		throws Exception {
-
-		return getOpenAPI(resourceClasses, type, null);
-	}
-
-	@Override
-	public Response getOpenAPI(
-			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
-		throws Exception {
-
-		return getOpenAPI(null, resourceClasses, type, uriInfo);
-	}
-
-	private String _getBasePath(
-		HttpServletRequest httpServletRequest, UriInfo uriInfo) {
-
-		if (uriInfo == null) {
-			return null;
-		}
-
-		if (httpServletRequest == null) {
-			return UriInfoUtil.getBasePath(uriInfo);
-		}
-
-		String scheme = Http.HTTP;
-
-		if (_portal.isSecure(httpServletRequest)) {
-			scheme = Http.HTTPS;
-		}
-
-		UriBuilder uriBuilder = UriInfoUtil.getBaseUriBuilder(uriInfo);
-
-		uriBuilder.host(
-			_portal.getForwardedHost(httpServletRequest)
-		).scheme(
-			scheme
-		);
-
-		return String.valueOf(uriBuilder.build());
-	}
-
-	@Reference
-	private Portal _portal;
 
 }

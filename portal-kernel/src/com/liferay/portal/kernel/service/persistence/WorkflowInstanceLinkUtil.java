@@ -716,12 +716,6 @@ public class WorkflowInstanceLinkUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		WorkflowInstanceLinkPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile WorkflowInstanceLinkPersistence _persistence;
 
 }

@@ -16,11 +16,12 @@ package com.liferay.journal.web.internal.info.display.contributor;
 
 import com.liferay.asset.info.display.contributor.util.ContentAccessor;
 import com.liferay.asset.info.display.field.AssetEntryInfoDisplayFieldProvider;
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.BaseDDMStructureClassTypeReader;
 import com.liferay.asset.kernel.model.ClassType;
-import com.liferay.asset.util.AssetHelper;
 import com.liferay.dynamic.data.mapping.info.display.field.DDMFormValuesInfoDisplayFieldProvider;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -38,7 +39,6 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.util.JournalContent;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.journal.web.internal.asset.JournalArticleDDMFormValuesReader;
-import com.liferay.journal.web.internal.asset.model.JournalArticleAssetRendererFactory;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -177,8 +177,7 @@ public class JournalArticleInfoDisplayContributor
 			return null;
 		}
 
-		return new JournalArticleInfoDisplayObjectProvider(
-			article, assetHelper, journalArticleAssetRendererFactory);
+		return new JournalArticleInfoDisplayObjectProvider(article);
 	}
 
 	@Override
@@ -194,8 +193,7 @@ public class JournalArticleInfoDisplayContributor
 			return null;
 		}
 
-		return new JournalArticleInfoDisplayObjectProvider(
-			article, assetHelper, journalArticleAssetRendererFactory);
+		return new JournalArticleInfoDisplayObjectProvider(article);
 	}
 
 	@Override
@@ -208,8 +206,14 @@ public class JournalArticleInfoDisplayContributor
 			getPreviewInfoDisplayObjectProvider(long classPK, int type)
 		throws PortalException {
 
+		AssetRendererFactory<JournalArticle> assetRendererFactory =
+			(AssetRendererFactory<JournalArticle>)
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(
+						JournalArticle.class.getName());
+
 		AssetRenderer<JournalArticle> assetRenderer =
-			journalArticleAssetRendererFactory.getAssetRenderer(classPK, type);
+			assetRendererFactory.getAssetRenderer(classPK, type);
 
 		JournalArticle article = assetRenderer.getAssetObject();
 
@@ -217,8 +221,7 @@ public class JournalArticleInfoDisplayContributor
 			return null;
 		}
 
-		return new JournalArticleInfoDisplayObjectProvider(
-			article, assetHelper, journalArticleAssetRendererFactory);
+		return new JournalArticleInfoDisplayObjectProvider(article);
 	}
 
 	@Override
@@ -226,8 +229,14 @@ public class JournalArticleInfoDisplayContributor
 			JournalArticle article, long versionClassPK, Locale locale)
 		throws PortalException {
 
+		AssetRendererFactory<JournalArticle> assetRendererFactory =
+			(AssetRendererFactory<JournalArticle>)
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(
+						JournalArticle.class.getName());
+
 		AssetRenderer<JournalArticle> assetRenderer =
-			journalArticleAssetRendererFactory.getAssetRenderer(versionClassPK);
+			assetRendererFactory.getAssetRenderer(versionClassPK);
 
 		return getInfoDisplayFieldsValues(
 			assetRenderer.getAssetObject(), locale);
@@ -236,9 +245,6 @@ public class JournalArticleInfoDisplayContributor
 	@Reference
 	protected AssetEntryInfoDisplayFieldProvider
 		assetEntryInfoDisplayFieldProvider;
-
-	@Reference
-	protected AssetHelper assetHelper;
 
 	@Reference
 	protected ClassTypesInfoDisplayFieldProvider
@@ -259,10 +265,6 @@ public class JournalArticleInfoDisplayContributor
 
 	@Reference
 	protected InfoDisplayFieldProvider infoDisplayFieldProvider;
-
-	@Reference
-	protected JournalArticleAssetRendererFactory
-		journalArticleAssetRendererFactory;
 
 	@Reference
 	protected JournalArticleLocalService journalArticleLocalService;

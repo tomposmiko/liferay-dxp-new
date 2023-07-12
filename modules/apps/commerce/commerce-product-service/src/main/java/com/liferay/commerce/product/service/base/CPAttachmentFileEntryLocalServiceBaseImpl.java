@@ -73,8 +73,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -91,6 +89,8 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -314,7 +314,13 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 		return cpAttachmentFileEntryPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry, or <code>null</code> if a matching cp attachment file entry could not be found
+	 */
 	@Override
 	public CPAttachmentFileEntry
 		fetchCPAttachmentFileEntryByExternalReferenceCode(
@@ -324,6 +330,9 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPAttachmentFileEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CPAttachmentFileEntry fetchCPAttachmentFileEntryByReferenceCode(
@@ -333,7 +342,14 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry
+	 * @throws PortalException if a matching cp attachment file entry could not be found
+	 */
 	@Override
 	public CPAttachmentFileEntry
 			getCPAttachmentFileEntryByExternalReferenceCode(
@@ -1930,15 +1946,14 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 			"com.liferay.commerce.product.model.CPAttachmentFileEntry",
 			cpAttachmentFileEntryLocalService);
 
-		CPAttachmentFileEntryLocalServiceUtil.setService(
-			cpAttachmentFileEntryLocalService);
+		_setLocalServiceUtilService(cpAttachmentFileEntryLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.product.model.CPAttachmentFileEntry");
 
-		CPAttachmentFileEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1981,6 +1996,23 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CPAttachmentFileEntryLocalService cpAttachmentFileEntryLocalService) {
+
+		try {
+			Field field =
+				CPAttachmentFileEntryLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, cpAttachmentFileEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -2240,9 +2272,6 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CPAttachmentFileEntryLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

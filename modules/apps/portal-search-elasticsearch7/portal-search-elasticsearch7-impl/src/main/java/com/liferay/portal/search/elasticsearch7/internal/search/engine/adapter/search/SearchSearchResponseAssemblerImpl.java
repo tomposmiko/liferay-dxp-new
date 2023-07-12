@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 import org.apache.lucene.search.TotalHits;
 
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
@@ -212,7 +212,7 @@ public class SearchSearchResponseAssemblerImpl
 			searchResponse.getHits();
 
 		SearchHits searchHits = searchHitsTranslator.translate(
-			elasticsearchSearchHits,
+			searchSearchRequest, elasticsearchSearchHits,
 			searchSearchRequest.getAlternateUidFieldName());
 
 		searchSearchResponse.setSearchHits(searchHits);

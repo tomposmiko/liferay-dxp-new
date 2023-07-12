@@ -793,8 +793,9 @@ public class NestedFieldsWriterInterceptorTest {
 
 				return (ContextProvider<T>)new ThemeDisplayContextProvider();
 			}
-
-			return null;
+			else {
+				return null;
+			}
 		}
 
 		@Override
@@ -951,8 +952,9 @@ public class NestedFieldsWriterInterceptorTest {
 				return Arrays.asList(
 					_toProductOptionValue(400L), _toProductOptionValue(500L));
 			}
-
-			return Collections.emptyList();
+			else {
+				return Collections.emptyList();
+			}
 		}
 
 		@GET

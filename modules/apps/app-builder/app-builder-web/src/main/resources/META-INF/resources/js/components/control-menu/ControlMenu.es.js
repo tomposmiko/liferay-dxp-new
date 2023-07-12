@@ -147,7 +147,7 @@ export const PortalControlMenu = ({backURL, title, url}) => {
 	useEffect(() => {
 		document.querySelector(
 			'.tools-control-group .control-menu-level-1-heading'
-		).innerHTML = Liferay.Util.escapeHTML(title);
+		).innerHTML = title;
 	}, [title]);
 
 	return <>{backURL && <BackButton backURL={backURL} />}</>;

@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3386,7 +3387,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				LayoutPageTemplateStructureRel.class, primaryKey)) {
+				LayoutPageTemplateStructureRel.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -3784,7 +3785,6 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
 		Set<String> ctIgnoreColumnNames = new HashSet<String>();
-		Set<String> ctMergeColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -3798,13 +3798,12 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		ctIgnoreColumnNames.add("modifiedDate");
 		ctStrictColumnNames.add("layoutPageTemplateStructureId");
 		ctStrictColumnNames.add("segmentsExperienceId");
-		ctMergeColumnNames.add("data_");
+		ctStrictColumnNames.add("data_");
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
-		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK,
 			Collections.singleton("lPageTemplateStructureRelId"));
@@ -3955,12 +3954,12 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 			},
 			false);
 
-		LayoutPageTemplateStructureRelUtil.setPersistence(this);
+		_setLayoutPageTemplateStructureRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		LayoutPageTemplateStructureRelUtil.setPersistence(null);
+		_setLayoutPageTemplateStructureRelUtilPersistence(null);
 
 		entityCache.removeCache(
 			LayoutPageTemplateStructureRelImpl.class.getName());
@@ -3971,6 +3970,24 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setLayoutPageTemplateStructureRelUtilPersistence(
+		LayoutPageTemplateStructureRelPersistence
+			layoutPageTemplateStructureRelPersistence) {
+
+		try {
+			Field field =
+				LayoutPageTemplateStructureRelUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutPageTemplateStructureRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -46,7 +46,7 @@ definition {
 			CommerceEntry.deleteCommerceEntry();
 		}
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		if (isSet(userScreenName)) {
 			ApplicationsMenu.gotoPortlet(
@@ -54,8 +54,8 @@ definition {
 				panel = "Control Panel",
 				portlet = "Users and Organizations");
 
-			if (IsElementPresent(key_rowEntry = ${userScreenName}, locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME")) {
-				User.tearDownSpecificUser(userScreenName = ${userScreenName});
+			if (IsElementPresent(key_rowEntry = "${userScreenName}", locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME")) {
+				User.tearDownSpecificUser(userScreenName = "${userScreenName}");
 			}
 		}
 
@@ -76,7 +76,7 @@ definition {
 			category = "Product Management",
 			portlet = "Products");
 
-		while ((IsElementPresent(locator1 = "CommerceEntry#BODY_VERTICAL_ELLIPSIS")) && (maxIterations = "50")) {
+		while (IsElementPresent(locator1 = "CommerceEntry#BODY_VERTICAL_ELLIPSIS") && (maxIterations = "50")) {
 			CommerceEntry.deleteCommerceEntry();
 		}
 
@@ -144,7 +144,7 @@ definition {
 			category = "Inventory Management",
 			portlet = "Inventory");
 
-		while ((IsElementPresent(locator1 = "CommerceEntry#BODY_VERTICAL_ELLIPSIS")) && (maxIterations = "100")) {
+		while (IsElementPresent(locator1 = "CommerceEntry#BODY_VERTICAL_ELLIPSIS") && (maxIterations = "100")) {
 			CommerceEntry.deleteCommerceEntry();
 		}
 
@@ -162,7 +162,7 @@ definition {
 
 		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
 			if (IsElementPresent(locator1 = "Pagination#ITEMS_PER_PAGE_SELECT")) {
-				Pagination.changePagination(itemsPerPage = 60);
+				Pagination.changePagination(itemsPerPage = "60");
 			}
 
 			while (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
@@ -215,23 +215,23 @@ definition {
 
 	macro commerceCatalogsTearDown {
 		var catalogsList = "";
-		var count = 1;
+		var count = "1";
 
-		while (IsElementPresent(key_rowNumber = ${count}, locator1 = "CommerceNavigation#ENTRY_NAME_N")) {
-			var key_rowNumber = ${count};
+		while (IsElementPresent(key_rowNumber = "${count}", locator1 = "CommerceNavigation#ENTRY_NAME_N")) {
+			var key_rowNumber = "${count}";
 			var entryName = selenium.getText("CommerceNavigation#ENTRY_NAME_N");
 
-			if (${entryName} != "Master") {
-				var catalogsList = StringUtil.add(${catalogsList}, ${entryName});
+			if ("${entryName}" != "Master") {
+				var catalogsList = StringUtil.add("${catalogsList}", "${entryName}");
 			}
 
 			var count = ${count} + 1;
 		}
 
-		if (${catalogsList} != "") {
-			for (var catalogName : list ${catalogsList}) {
+		if ("${catalogsList}" != "") {
+			for (var catalogName : list "${catalogsList}") {
 				ClickNoError(
-					key_entryName = ${catalogName},
+					key_entryName = "${catalogName}",
 					locator1 = "CommerceEntry#ENTRY_NAME_BODY_VERTICAL_ELLIPSIS");
 
 				CommerceEntry.clickNoError(menuItem = "Delete");
@@ -268,12 +268,12 @@ definition {
 		for (var buttonRowNumber : list "1,2,3,4,5") {
 			if (!(IsElementPresent(key_buttonStatus = "disabled", locator1 = "CommerceEntry#FIX_ISSUE_BUTTON_N"))) {
 				Click(
-					key_buttonRowNumber = ${buttonRowNumber},
+					key_buttonRowNumber = "${buttonRowNumber}",
 					key_buttonStatus = "",
 					locator1 = "CommerceEntry#FIX_ISSUE_BUTTON_N");
 
 				WaitForElementPresent(
-					key_value = ${buttonRowNumber},
+					key_value = "${buttonRowNumber}",
 					locator1 = "CommerceEntry#HEALTH_CHECK_ICON_CHECK_N");
 			}
 		}
@@ -310,7 +310,7 @@ definition {
 			category = "Settings",
 			portlet = "Options");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		CommerceOptions.deleteOptionsEntries();
 

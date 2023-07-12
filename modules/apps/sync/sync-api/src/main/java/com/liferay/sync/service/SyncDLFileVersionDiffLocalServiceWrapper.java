@@ -15,7 +15,6 @@
 package com.liferay.sync.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link SyncDLFileVersionDiffLocalService}.
@@ -392,11 +391,6 @@ public class SyncDLFileVersionDiffLocalServiceWrapper
 
 		return _syncDLFileVersionDiffLocalService.updateSyncDLFileVersionDiff(
 			syncDLFileVersionDiff);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _syncDLFileVersionDiffLocalService.getBasePersistence();
 	}
 
 	@Override

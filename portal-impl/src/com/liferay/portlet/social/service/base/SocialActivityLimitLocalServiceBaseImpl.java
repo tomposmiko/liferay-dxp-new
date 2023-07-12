@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -50,6 +48,8 @@ import com.liferay.social.kernel.service.SocialActivityLimitLocalServiceUtil;
 import com.liferay.social.kernel.service.persistence.SocialActivityLimitPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -520,15 +520,14 @@ public abstract class SocialActivityLimitLocalServiceBaseImpl
 			"com.liferay.social.kernel.model.SocialActivityLimit",
 			socialActivityLimitLocalService);
 
-		SocialActivityLimitLocalServiceUtil.setService(
-			socialActivityLimitLocalService);
+		_setLocalServiceUtilService(socialActivityLimitLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.social.kernel.model.SocialActivityLimit");
 
-		SocialActivityLimitLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -589,6 +588,23 @@ public abstract class SocialActivityLimitLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SocialActivityLimitLocalService socialActivityLimitLocalService) {
+
+		try {
+			Field field =
+				SocialActivityLimitLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivityLimitLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = SocialActivityLimitLocalService.class)
 	protected SocialActivityLimitLocalService socialActivityLimitLocalService;
 
@@ -612,9 +628,6 @@ public abstract class SocialActivityLimitLocalServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialActivityLimitLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

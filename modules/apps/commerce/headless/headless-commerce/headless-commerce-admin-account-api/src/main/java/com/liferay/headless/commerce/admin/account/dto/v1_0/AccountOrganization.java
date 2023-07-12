@@ -60,7 +60,7 @@ public class AccountOrganization implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getAccountId() {
 		return accountId;
 	}
@@ -88,7 +88,7 @@ public class AccountOrganization implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long accountId;
 
-	@Schema(example = "Organization Name")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -114,7 +114,7 @@ public class AccountOrganization implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
-	@Schema(example = "UAB-34098-789-N")
+	@Schema
 	public String getOrganizationExternalReferenceCode() {
 		return organizationExternalReferenceCode;
 	}
@@ -148,7 +148,7 @@ public class AccountOrganization implements Serializable {
 	protected String organizationExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30002")
+	@Schema
 	public Long getOrganizationId() {
 		return organizationId;
 	}
@@ -176,7 +176,7 @@ public class AccountOrganization implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long organizationId;
 
-	@Schema(example = "/Parent Organization/Organization Name")
+	@Schema
 	public String getTreePath() {
 		return treePath;
 	}

@@ -14,9 +14,12 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter;
 
+import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.cluster.ClusterRequestExecutorFixture;
@@ -30,6 +33,7 @@ import com.liferay.portal.search.engine.adapter.cluster.StateClusterResponse;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterRequest;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterResponse;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PropsImpl;
 
 import java.io.IOException;
 
@@ -60,6 +64,8 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 
 	@BeforeClass
 	public static void setUpClass() {
+		PropsUtil.setProps(new PropsImpl());
+
 		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
 			ElasticsearchConnectionFixture.builder(
 			).clusterName(
@@ -78,6 +84,8 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 
 	@Before
 	public void setUp() {
+		setUpJSONFactoryUtil();
+
 		_searchEngineAdapter = createSearchEngineAdapter(
 			_elasticsearchConnectionFixture);
 
@@ -190,7 +198,7 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 
 	protected JSONObject createJSONObject(String message) {
 		try {
-			return JSONFactoryUtil.createJSONObject(message);
+			return _jsonFactory.createJSONObject(message);
 		}
 		catch (JSONException jsonException) {
 			throw new RuntimeException(jsonException);
@@ -207,6 +215,12 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 		assertHealthy(statsClusterResponse.getClusterHealthStatus());
 
 		assertOneIndex(statsClusterResponse.getStatsMessage());
+	}
+
+	protected void setUpJSONFactoryUtil() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(_jsonFactory);
 	}
 
 	private void _createIndex() {
@@ -245,6 +259,7 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 		_elasticsearchConnectionFixture;
 
 	private IndicesClient _indicesClient;
+	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 	private SearchEngineAdapter _searchEngineAdapter;
 
 }

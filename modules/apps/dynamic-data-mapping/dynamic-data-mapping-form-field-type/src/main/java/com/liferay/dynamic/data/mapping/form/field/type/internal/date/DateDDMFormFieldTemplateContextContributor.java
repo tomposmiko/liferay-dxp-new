@@ -63,9 +63,8 @@ public class DateDDMFormFieldTemplateContextContributor
 					LocaleThreadLocal.getThemeDisplayLocale()))
 		).put(
 			"predefinedValue",
-			DDMFormFieldTypeUtil.getPropertyValue(
-				ddmFormField, ddmFormFieldRenderingContext.getLocale(),
-				"predefinedValue")
+			DDMFormFieldTypeUtil.getPredefinedValue(
+				ddmFormField, ddmFormFieldRenderingContext)
 		).put(
 			"weekdaysShort",
 			Stream.of(

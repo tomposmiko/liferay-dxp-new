@@ -22,15 +22,9 @@
 String redirect = ParamUtil.getString(request, "redirect");
 
 if (Validator.isNull(redirect)) {
-	String mvcRenderCommandName = "/blogs/view";
-
 	PortletURL portletURL = renderResponse.createRenderURL();
 
-	if (Objects.equals(portletName, BlogsPortletKeys.BLOGS_AGGREGATOR)) {
-		mvcRenderCommandName = "/blogs_aggregator/view";
-	}
-
-	portletURL.setParameter("mvcRenderCommandName", mvcRenderCommandName);
+	portletURL.setParameter("mvcRenderCommandName", "/blogs/view");
 
 	redirect = portletURL.toString();
 }
@@ -132,7 +126,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 			cssClass="col-md-offset-2"
 			md="8"
 		>
-			<c:if test="<%= !layout.isTypeAssetDisplay() && blogsPortletInstanceConfiguration.enableComments() %>">
+			<c:if test="<%= blogsPortletInstanceConfiguration.enableComments() %>">
 
 				<%
 				Discussion discussion = CommentManagerUtil.getDiscussion(user.getUserId(), scopeGroupId, BlogsEntry.class.getName(), entry.getEntryId(), new ServiceContextFunction(request));

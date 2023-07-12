@@ -17,7 +17,6 @@ package com.liferay.site.admin.web.internal.portlet;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
-import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.layout.seo.service.LayoutSEOSiteLocalService;
 import com.liferay.petra.string.StringPool;
@@ -359,8 +358,6 @@ public class SiteAdminPortlet extends MVCPortlet {
 			groupId, privateLayoutSet);
 
 		SitesUtil.resetPrototype(layoutSet);
-
-		MergeLayoutPrototypesThreadLocal.setSkipMerge(false);
 
 		SitesUtil.mergeLayoutSetPrototypeLayouts(
 			groupLocalService.getGroup(groupId), layoutSet);

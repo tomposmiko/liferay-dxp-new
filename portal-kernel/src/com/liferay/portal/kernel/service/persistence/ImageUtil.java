@@ -427,10 +427,6 @@ public class ImageUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(ImagePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile ImagePersistence _persistence;
 
 }

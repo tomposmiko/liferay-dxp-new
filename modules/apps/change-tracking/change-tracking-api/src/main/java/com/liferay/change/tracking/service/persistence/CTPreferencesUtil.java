@@ -698,10 +698,6 @@ public class CTPreferencesUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CTPreferencesPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CTPreferencesPersistence _persistence;
 
 }

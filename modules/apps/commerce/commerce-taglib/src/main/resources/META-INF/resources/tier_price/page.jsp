@@ -80,9 +80,7 @@ String randomNamespace = StringUtil.randomId() + StringPool.UNDERLINE;
 
 	<aui:script use="aui-base">
 		Liferay.provide(window, '<%= randomNamespace %>setQuantity', function (qt) {
-			var quantityNode = document.querySelector(
-				'#<%= HtmlUtil.escapeJS(taglibQuantityInputId) %>'
-			);
+			var quantityNode = document.querySelector('#<%= taglibQuantityInputId %>');
 
 			if (quantityNode) {
 				quantityNode.value = qt;

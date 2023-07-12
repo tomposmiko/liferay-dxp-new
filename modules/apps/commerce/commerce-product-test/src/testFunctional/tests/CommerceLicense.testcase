@@ -16,13 +16,13 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
 	@description = "This is a test for covering the following LPS-121306 and LPS-128094."
-	@priority = 5
+	@priority = "5"
 	test CommerceRemainsActiveOnRestarts {
 		property commerce.enabled = "true";
 		property test.name.skip.portal.instance = "CommerceLicense#CommerceRemainsActiveOnRestarts";
@@ -40,7 +40,7 @@ definition {
 		CommerceLicense.viewCommerceAvailable();
 	}
 
-	@priority = 3
+	@priority = "3"
 	test DeactivateCommerce {
 		property commerce.enabled = "true";
 		property test.name.skip.portal.instance = "CommerceLicense#DeactivateCommerce";
@@ -53,7 +53,7 @@ definition {
 
 		AntCommand(
 			locator1 = "build-test.xml",
-			value1 = "portal-ext-properties-update -Dupdate.properties=enterprise.product.commerce.enabled=false -Dupdate.properties.original=enterprise.product.commerce.enabled=true");
+			value1 = "portal-ext-properties-update -Dupdate.properties.original=enterprise.product.commerce.enabled=true -Dupdate.properties=enterprise.product.commerce.enabled=false");
 
 		Portlet.startServer(commerceEnabled = "false");
 
@@ -62,7 +62,7 @@ definition {
 		CommerceLicense.viewCommerceMissing();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteEnterpriseLicenseModule {
 		property commerce.enabled = "true";
 		property test.name.skip.portal.instance = "CommerceLicense#DeleteEnterpriseLicenseModule";
@@ -92,7 +92,7 @@ definition {
 		CommerceLicense.viewCommerceMissing();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test EnableCommerceAfterPortalStarts {
 		property commerce.enabled = "false";
 		property test.name.skip.portal.instance = "CommerceLicense#EnableCommerceAfterPortalStarts";
@@ -110,7 +110,7 @@ definition {
 		CommerceLicense.executeSmoke();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewCommerceEnabled {
 		property commerce.enabled = "true";
 

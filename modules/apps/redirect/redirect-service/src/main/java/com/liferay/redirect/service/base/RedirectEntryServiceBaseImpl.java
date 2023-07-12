@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,6 +27,8 @@ import com.liferay.redirect.model.RedirectEntry;
 import com.liferay.redirect.service.RedirectEntryService;
 import com.liferay.redirect.service.RedirectEntryServiceUtil;
 import com.liferay.redirect.service.persistence.RedirectEntryPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class RedirectEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		RedirectEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class RedirectEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		redirectEntryService = (RedirectEntryService)aopProxy;
 
-		RedirectEntryServiceUtil.setService(redirectEntryService);
+		_setServiceUtilService(redirectEntryService);
 	}
 
 	/**
@@ -116,6 +116,22 @@ public abstract class RedirectEntryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		RedirectEntryService redirectEntryService) {
+
+		try {
+			Field field = RedirectEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, redirectEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.redirect.service.RedirectEntryLocalService
 		redirectEntryLocalService;
@@ -132,8 +148,5 @@ public abstract class RedirectEntryServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.ResourceLocalService
 		resourceLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RedirectEntryServiceBaseImpl.class);
 
 }

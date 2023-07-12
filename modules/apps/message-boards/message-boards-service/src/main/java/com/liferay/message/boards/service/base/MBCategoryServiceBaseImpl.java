@@ -25,11 +25,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class MBCategoryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		MBCategoryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class MBCategoryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		mbCategoryService = (MBCategoryService)aopProxy;
 
-		MBCategoryServiceUtil.setService(mbCategoryService);
+		_setServiceUtilService(mbCategoryService);
 	}
 
 	/**
@@ -117,6 +117,20 @@ public abstract class MBCategoryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(MBCategoryService mbCategoryService) {
+		try {
+			Field field = MBCategoryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mbCategoryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.message.boards.service.MBCategoryLocalService
 		mbCategoryLocalService;
@@ -151,8 +165,5 @@ public abstract class MBCategoryServiceBaseImpl
 	@Reference
 	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
 		ratingsStatsLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MBCategoryServiceBaseImpl.class);
 
 }

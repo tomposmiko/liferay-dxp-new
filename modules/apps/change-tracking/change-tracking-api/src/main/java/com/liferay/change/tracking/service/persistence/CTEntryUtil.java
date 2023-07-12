@@ -813,7 +813,7 @@ public class CTEntryUtil {
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 * @param modelClassNameId the model class name ID
-	 * @param modelClassPKs the model class pks
+	 * @param modelClassPK the model class pk
 	 * @param start the lower bound of the range of ct entries
 	 * @param end the upper bound of the range of ct entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1023,10 +1023,6 @@ public class CTEntryUtil {
 
 	public static CTEntryPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(CTEntryPersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static volatile CTEntryPersistence _persistence;

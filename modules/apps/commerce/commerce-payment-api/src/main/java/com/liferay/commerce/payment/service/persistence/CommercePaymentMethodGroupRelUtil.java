@@ -730,12 +730,6 @@ public class CommercePaymentMethodGroupRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommercePaymentMethodGroupRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommercePaymentMethodGroupRelPersistence
 		_persistence;
 

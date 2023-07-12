@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -32,6 +30,8 @@ import com.liferay.wiki.service.persistence.WikiNodePersistence;
 import com.liferay.wiki.service.persistence.WikiPageFinder;
 import com.liferay.wiki.service.persistence.WikiPagePersistence;
 import com.liferay.wiki.service.persistence.WikiPageResourcePersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -60,7 +60,7 @@ public abstract class WikiPageServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		WikiPageServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public abstract class WikiPageServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		wikiPageService = (WikiPageService)aopProxy;
 
-		WikiPageServiceUtil.setService(wikiPageService);
+		_setServiceUtilService(wikiPageService);
 	}
 
 	/**
@@ -116,6 +116,20 @@ public abstract class WikiPageServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(WikiPageService wikiPageService) {
+		try {
+			Field field = WikiPageServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, wikiPageService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -194,8 +208,5 @@ public abstract class WikiPageServiceBaseImpl
 
 	@Reference
 	protected WikiPageResourcePersistence wikiPageResourcePersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WikiPageServiceBaseImpl.class);
 
 }

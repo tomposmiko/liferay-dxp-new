@@ -832,13 +832,6 @@ public class CommerceNotificationTemplateCommerceAccountGroupRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceNotificationTemplateCommerceAccountGroupRelPersistence
-			persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile
 		CommerceNotificationTemplateCommerceAccountGroupRelPersistence
 			_persistence;

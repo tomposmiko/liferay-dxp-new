@@ -54,13 +54,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.RoleLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -103,6 +99,7 @@ import javax.servlet.http.HttpServletRequest;
 public class DDMFormDisplayContext {
 
 	public DDMFormDisplayContext(
+		RenderRequest renderRequest, RenderResponse renderResponse,
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker,
 		DDMFormInstanceLocalService ddmFormInstanceLocalService,
 		DDMFormInstanceRecordService ddmFormInstanceRecordService,
@@ -116,11 +113,11 @@ public class DDMFormDisplayContext {
 		DDMFormWebConfiguration ddmFormWebConfiguration,
 		DDMStorageAdapterTracker ddmStorageAdapterTracker,
 		GroupLocalService groupLocalService, JSONFactory jsonFactory,
-		Portal portal, RenderRequest renderRequest,
-		RenderResponse renderResponse, RoleLocalService roleLocalService,
-		UserLocalService userLocalService,
-		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService) {
+		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService,
+		Portal portal) {
 
+		_renderRequest = renderRequest;
+		_renderResponse = renderResponse;
 		_ddmFormFieldTypeServicesTracker = ddmFormFieldTypeServicesTracker;
 		_ddmFormInstanceLocalService = ddmFormInstanceLocalService;
 		_ddmFormInstanceRecordService = ddmFormInstanceRecordService;
@@ -136,13 +133,9 @@ public class DDMFormDisplayContext {
 		_ddmStorageAdapterTracker = ddmStorageAdapterTracker;
 		_groupLocalService = groupLocalService;
 		_jsonFactory = jsonFactory;
-		_portal = portal;
-		_renderRequest = renderRequest;
-		_renderResponse = renderResponse;
-		_roleLocalService = roleLocalService;
-		_userLocalService = userLocalService;
 		_workflowDefinitionLinkLocalService =
 			workflowDefinitionLinkLocalService;
+		_portal = portal;
 
 		_containerId = "ddmForm".concat(StringUtil.randomString());
 
@@ -252,7 +245,7 @@ public class DDMFormDisplayContext {
 
 		if (ddmFormInstanceRecordVersion != null) {
 			DDMFormValues mergedDDMFormValues = _ddmFormValuesMerger.merge(
-				ddmForm, ddmFormInstanceRecordVersion.getDDMFormValues(),
+				ddmFormInstanceRecordVersion.getDDMFormValues(),
 				ddmFormRenderingContext.getDDMFormValues());
 
 			ddmFormRenderingContext.setDDMFormValues(mergedDDMFormValues);
@@ -308,19 +301,8 @@ public class DDMFormDisplayContext {
 				DDMFormInstanceVersion latestApprovedDDMFormInstanceVersion =
 					_getLatestApprovedDDMFormInstanceVersion();
 
-				if (Validator.isNotNull(
-						latestApprovedDDMFormInstanceVersion.getSettings())) {
-
-					_ddmFormInstance.setSettings(
-						latestApprovedDDMFormInstanceVersion.getSettings());
-
-					DDMStructureVersion ddmStructureVersion =
-						latestApprovedDDMFormInstanceVersion.
-							getStructureVersion();
-
-					_ddmFormInstance.setStructureId(
-						ddmStructureVersion.getStructureId());
-				}
+				_ddmFormInstance.setSettings(
+					latestApprovedDDMFormInstanceVersion.getSettings());
 			}
 		}
 		catch (PortalException portalException) {
@@ -525,15 +507,10 @@ public class DDMFormDisplayContext {
 			if ((group != null) && group.isStagedRemotely()) {
 				ThemeDisplay themeDisplay = getThemeDisplay();
 
-				Role role = _roleLocalService.getRole(
-					themeDisplay.getCompanyId(), RoleConstants.ADMINISTRATOR);
-
-				List<User> users = _userLocalService.getRoleUsers(
-					role.getRoleId());
-
 				if (!DDMFormInstanceStagingUtil.
 						isFormInstancePublishedToRemoteLive(
-							group, users.get(0), formInstance.getUuid())) {
+							group, themeDisplay.getUser(),
+							formInstance.getUuid())) {
 
 					return false;
 				}
@@ -754,13 +731,13 @@ public class DDMFormDisplayContext {
 			ddmForm = latestStructureVersion.getDDMForm();
 		}
 		else {
-			DDMFormInstanceVersion latestDDMFormInstanceVersion =
+			DDMFormInstanceVersion latestFormInstanceVersion =
 				_getLatestApprovedDDMFormInstanceVersion();
 
-			DDMStructureVersion ddmStructureVersion =
-				latestDDMFormInstanceVersion.getStructureVersion();
+			DDMStructureVersion structureVersion =
+				latestFormInstanceVersion.getStructureVersion();
 
-			ddmForm = ddmStructureVersion.getDDMForm();
+			ddmForm = structureVersion.getDDMForm();
 		}
 
 		if (requireCaptcha) {
@@ -791,13 +768,13 @@ public class DDMFormDisplayContext {
 			ddmFormLayout = latestStructureVersion.getDDMFormLayout();
 		}
 		else {
-			DDMFormInstanceVersion latestDDMFormInstanceVersion =
+			DDMFormInstanceVersion latestFormInstanceVersion =
 				_getLatestApprovedDDMFormInstanceVersion();
 
-			DDMStructureVersion ddmStructureVersion =
-				latestDDMFormInstanceVersion.getStructureVersion();
+			DDMStructureVersion structureVersion =
+				latestFormInstanceVersion.getStructureVersion();
 
-			ddmFormLayout = ddmStructureVersion.getDDMFormLayout();
+			ddmFormLayout = structureVersion.getDDMFormLayout();
 		}
 
 		if (requireCaptcha) {
@@ -993,9 +970,7 @@ public class DDMFormDisplayContext {
 	private final Portal _portal;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final RoleLocalService _roleLocalService;
 	private Boolean _showConfigurationIcon;
-	private final UserLocalService _userLocalService;
 	private final WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;
 

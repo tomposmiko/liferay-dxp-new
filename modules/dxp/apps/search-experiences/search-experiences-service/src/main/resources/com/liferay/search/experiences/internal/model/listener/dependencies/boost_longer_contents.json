@@ -1,7 +1,6 @@
 {
 	"description_i18n": {
-		"en_US": "Boost contents with longer content in the user's current language.",
-		"ja_JP": "ユーザーの現在使用中の言語で、より長いコンテンツをブースト。"
+		"en_US": "Boost contents with longer content translation for the current language."
 	},
 	"elementDefinition": {
 		"category": "boost",
@@ -18,15 +17,14 @@
 										"boost": "${configuration.boost}",
 										"field_value_factor": {
 											"factor": "${configuration.factor}",
-											"field": "contentLength_${context.language_id}_sortable",
+											"field": "content_${context.language_id}_length_sortable",
 											"missing": 1,
 											"modifier": "${configuration.modifier}"
 										}
 									}
 								}
 							}
-						],
-						"enabled": true
+						]
 					}
 				]
 			}
@@ -109,9 +107,7 @@
 			]
 		}
 	},
-	"externalReferenceCode": "BOOST_LONGER_CONTENTS",
 	"title_i18n": {
-		"en_US": "Boost Longer Contents",
-		"ja_JP": "長いコンテンツをブースト"
+		"en_US": "Boost Longer Contents"
 	}
 }

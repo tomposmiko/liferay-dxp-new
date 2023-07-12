@@ -1058,12 +1058,6 @@ public class CalendarBookingLocalServiceImpl
 		return calendarBooking;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 *             #search(long, long[], long[], long[], long, String, long,
-	 *             long, TimeZone, boolean, int[], int, int, OrderByComparator)}
-	 */
-	@Deprecated
 	@Override
 	public List<CalendarBooking> search(
 		long companyId, long[] groupIds, long[] calendarIds,
@@ -1081,28 +1075,6 @@ public class CalendarBookingLocalServiceImpl
 		if (recurring) {
 			calendarBookings = RecurrenceUtil.expandCalendarBookings(
 				calendarBookings, startTime, endTime);
-		}
-
-		return calendarBookings;
-	}
-
-	@Override
-	public List<CalendarBooking> search(
-		long companyId, long[] groupIds, long[] calendarIds,
-		long[] calendarResourceIds, long parentCalendarBookingId,
-		String keywords, long startTime, long endTime, TimeZone displayTimeZone,
-		boolean recurring, int[] statuses, int start, int end,
-		OrderByComparator<CalendarBooking> orderByComparator) {
-
-		List<CalendarBooking> calendarBookings =
-			calendarBookingFinder.findByKeywords(
-				companyId, groupIds, calendarIds, calendarResourceIds,
-				parentCalendarBookingId, keywords, startTime, endTime,
-				recurring, statuses, start, end, orderByComparator);
-
-		if (recurring) {
-			calendarBookings = RecurrenceUtil.expandCalendarBookings(
-				calendarBookings, startTime, endTime, displayTimeZone);
 		}
 
 		return calendarBookings;
@@ -1952,11 +1924,13 @@ public class CalendarBookingLocalServiceImpl
 	}
 
 	protected TimeZone getTimeZone(Calendar calendar, boolean allDay) {
+		TimeZone timeZone = calendar.getTimeZone();
+
 		if (allDay) {
-			return TimeZoneUtil.getTimeZone(StringPool.UTC);
+			timeZone = TimeZoneUtil.getTimeZone(StringPool.UTC);
 		}
 
-		return calendar.getTimeZone();
+		return timeZone;
 	}
 
 	protected List<String> getUnmodifiedAttributesNames(

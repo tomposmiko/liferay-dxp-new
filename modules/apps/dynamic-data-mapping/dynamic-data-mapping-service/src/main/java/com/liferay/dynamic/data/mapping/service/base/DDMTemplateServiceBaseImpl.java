@@ -27,11 +27,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -60,7 +60,7 @@ public abstract class DDMTemplateServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DDMTemplateServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public abstract class DDMTemplateServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddmTemplateService = (DDMTemplateService)aopProxy;
 
-		DDMTemplateServiceUtil.setService(ddmTemplateService);
+		_setServiceUtilService(ddmTemplateService);
 	}
 
 	/**
@@ -119,6 +119,20 @@ public abstract class DDMTemplateServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(DDMTemplateService ddmTemplateService) {
+		try {
+			Field field = DDMTemplateServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmTemplateService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService
 		ddmTemplateLocalService;
@@ -158,8 +172,5 @@ public abstract class DDMTemplateServiceBaseImpl
 
 	@Reference
 	protected DDMTemplateVersionPersistence ddmTemplateVersionPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMTemplateServiceBaseImpl.class);
 
 }

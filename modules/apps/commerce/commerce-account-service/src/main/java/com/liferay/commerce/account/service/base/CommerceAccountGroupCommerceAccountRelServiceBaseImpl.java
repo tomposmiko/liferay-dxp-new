@@ -31,14 +31,14 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -704,12 +704,11 @@ public abstract class CommerceAccountGroupCommerceAccountRelServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		CommerceAccountGroupCommerceAccountRelServiceUtil.setService(
-			commerceAccountGroupCommerceAccountRelService);
+		_setServiceUtilService(commerceAccountGroupCommerceAccountRelService);
 	}
 
 	public void destroy() {
-		CommerceAccountGroupCommerceAccountRelServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -753,6 +752,24 @@ public abstract class CommerceAccountGroupCommerceAccountRelServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		CommerceAccountGroupCommerceAccountRelService
+			commerceAccountGroupCommerceAccountRelService) {
+
+		try {
+			Field field =
+				CommerceAccountGroupCommerceAccountRelServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceAccountGroupCommerceAccountRelService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -904,8 +921,5 @@ public abstract class CommerceAccountGroupCommerceAccountRelServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceAccountGroupCommerceAccountRelServiceBaseImpl.class);
 
 }

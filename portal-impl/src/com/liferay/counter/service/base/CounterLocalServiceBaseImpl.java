@@ -19,10 +19,10 @@ import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 import com.liferay.counter.kernel.service.persistence.CounterFinder;
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
+
+import java.lang.reflect.Field;
 
 /**
  * Provides the base implementation for the counter local service.
@@ -84,11 +84,11 @@ public abstract class CounterLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		CounterLocalServiceUtil.setService(counterLocalService);
+		_setLocalServiceUtilService(counterLocalService);
 	}
 
 	public void destroy() {
-		CounterLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -109,13 +109,26 @@ public abstract class CounterLocalServiceBaseImpl
 		return Counter.class.getName();
 	}
 
+	private void _setLocalServiceUtilService(
+		CounterLocalService counterLocalService) {
+
+		try {
+			Field field = CounterLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, counterLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = CounterLocalService.class)
 	protected CounterLocalService counterLocalService;
 
 	@BeanReference(type = CounterFinder.class)
 	protected CounterFinder counterFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CounterLocalServiceBaseImpl.class);
 
 }

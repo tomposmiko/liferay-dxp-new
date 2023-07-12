@@ -144,14 +144,8 @@ public class LayoutSEOCanonicalURLProviderImpl
 				canonicalURL, LocaleUtil.getDefault());
 		}
 
-		String mappedFriendlyURL = friendlyURLMapper.getMappedFriendlyURL(
+		return friendlyURLMapper.getMappedFriendlyURL(
 			alternateURLs.get(locale), locale);
-
-		if (Validator.isNull(mappedFriendlyURL)) {
-			mappedFriendlyURL = canonicalURL;
-		}
-
-		return mappedFriendlyURL;
 	}
 
 	private HttpServletRequest _getHttpServletRequest() {

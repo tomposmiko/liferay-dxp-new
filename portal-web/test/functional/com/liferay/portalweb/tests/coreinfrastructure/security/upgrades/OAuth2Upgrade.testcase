@@ -20,7 +20,7 @@ definition {
 		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewOAuth2ApplicationInInstanceLevelAfterUpgrade713 {
 		property data.archive.type = "data-archive-oauth2-instance-level";
 		property database.types = "mariadb,mysql,postgresql";
@@ -45,13 +45,13 @@ definition {
 			callbackURI = "http://www.liferay.com",
 			checkboxCheckList = "Authorization Code,Client Credentials,Refresh Token,Resource Owner Password Credentials",
 			clientProfile = "Web Application",
-			clientSecret = ${generatedClientSecret},
+			clientSecret = "${generatedClientSecret}",
 			description = "Registering a new application",
 			privacyPolicyURL = "http://www.liferay.com",
 			websiteURL = "http://www.liferay.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewOAuth2ApplicationInInstanceLevelAfterUpgrade720 {
 		property data.archive.type = "data-archive-oauth2-instance-level";
 		property database.types = "mariadb,mysql,postgresql";
@@ -76,13 +76,13 @@ definition {
 			callbackURI = "http://www.liferay.com",
 			checkboxCheckList = "Authorization Code,Client Credentials,Refresh Token,Resource Owner Password Credentials",
 			clientProfile = "Web Application",
-			clientSecret = ${generatedClientSecret},
+			clientSecret = "${generatedClientSecret}",
 			description = "Registering a new application",
 			privacyPolicyURL = "http://www.liferay.com",
 			websiteURL = "http://www.liferay.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewOAuth2ApplicationInInstanceLevelAfterUpgrade71103 {
 		property data.archive.type = "data-archive-oauth2-instance-level";
 		property portal.version = "7.1.10.3";
@@ -106,13 +106,13 @@ definition {
 			callbackURI = "http://www.liferay.com",
 			checkboxCheckList = "Authorization Code,Client Credentials,Refresh Token,Resource Owner Password Credentials",
 			clientProfile = "Web Application",
-			clientSecret = ${generatedClientSecret},
+			clientSecret = "${generatedClientSecret}",
 			description = "Registering a new application",
 			privacyPolicyURL = "http://www.liferay.com",
 			websiteURL = "http://www.liferay.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewOAuth2ApplicationInInstanceLevelAfterUpgrade72101 {
 		property data.archive.type = "data-archive-oauth2-instance-level";
 		property portal.version = "7.2.10.1";
@@ -136,13 +136,13 @@ definition {
 			callbackURI = "http://www.liferay.com",
 			checkboxCheckList = "Authorization Code,Client Credentials,Refresh Token,Resource Owner Password Credentials",
 			clientProfile = "Web Application",
-			clientSecret = ${generatedClientSecret},
+			clientSecret = "${generatedClientSecret}",
 			description = "Registering a new application",
 			privacyPolicyURL = "http://www.liferay.com",
 			websiteURL = "http://www.liferay.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewOAuth2ApplicationInSystemLevelAfterUpgrade713 {
 		property data.archive.type = "data-archive-oauth2-system-level";
 		property database.types = "mariadb,mysql,postgresql";
@@ -162,13 +162,13 @@ definition {
 			callbackURI = "http://www.liferay.com",
 			checkboxCheckList = "Authorization Code,Client Credentials,Refresh Token,Resource Owner Password Credentials",
 			clientProfile = "Web Application",
-			clientSecret = ${generatedClientSecret},
+			clientSecret = "${generatedClientSecret}",
 			description = "Registering a new application",
 			privacyPolicyURL = "http://www.liferay.com",
 			websiteURL = "http://www.liferay.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewOAuth2ApplicationInSystemLevelAfterUpgrade720 {
 		property data.archive.type = "data-archive-oauth2-system-level";
 		property database.types = "mariadb,mysql,postgresql";
@@ -188,13 +188,13 @@ definition {
 			callbackURI = "http://www.liferay.com",
 			checkboxCheckList = "Authorization Code,Client Credentials,Refresh Token,Resource Owner Password Credentials",
 			clientProfile = "Web Application",
-			clientSecret = ${generatedClientSecret},
+			clientSecret = "${generatedClientSecret}",
 			description = "Registering a new application",
 			privacyPolicyURL = "http://www.liferay.com",
 			websiteURL = "http://www.liferay.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewOAuth2ApplicationInSystemLevelAfterUpgrade71103 {
 		property data.archive.type = "data-archive-oauth2-system-level";
 		property portal.version = "7.1.10.3";
@@ -213,13 +213,13 @@ definition {
 			callbackURI = "http://www.liferay.com",
 			checkboxCheckList = "Authorization Code,Client Credentials,Refresh Token,Resource Owner Password Credentials",
 			clientProfile = "Web Application",
-			clientSecret = ${generatedClientSecret},
+			clientSecret = "${generatedClientSecret}",
 			description = "Registering a new application",
 			privacyPolicyURL = "http://www.liferay.com",
 			websiteURL = "http://www.liferay.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewOAuth2ApplicationInSystemLevelAfterUpgrade72101 {
 		property data.archive.type = "data-archive-oauth2-system-level";
 		property portal.version = "7.2.10.1";
@@ -238,7 +238,7 @@ definition {
 			callbackURI = "http://www.liferay.com",
 			checkboxCheckList = "Authorization Code,Client Credentials,Refresh Token,Resource Owner Password Credentials",
 			clientProfile = "Web Application",
-			clientSecret = ${generatedClientSecret},
+			clientSecret = "${generatedClientSecret}",
 			description = "Registering a new application",
 			privacyPolicyURL = "http://www.liferay.com",
 			websiteURL = "http://www.liferay.com");

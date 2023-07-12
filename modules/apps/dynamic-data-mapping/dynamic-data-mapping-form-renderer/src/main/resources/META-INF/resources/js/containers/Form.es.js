@@ -29,7 +29,7 @@ import formValidate from '../thunks/formValidate.es';
 import pageLanguageUpdate from '../thunks/pageLanguageUpdate.es';
 import {getConnectedReactComponentAdapter} from '../util/ReactComponentAdapter.es';
 import {evaluate} from '../util/evaluation.es';
-import {getFormId, getFormNode, getFormTitle} from '../util/formId.es';
+import {getFormId, getFormNode} from '../util/formId.es';
 import templates from './Form.soy';
 
 const Form = React.forwardRef(
@@ -100,22 +100,6 @@ const Form = React.forwardRef(
 								if (!validLiferayForm) {
 									return;
 								}
-
-								event.target
-									.querySelectorAll('input[type=checkbox]')
-									.forEach((node) => {
-										if (!node.hasAttribute('value')) {
-											if (node.checked) {
-												node.value = 'true';
-											}
-											else {
-												const cloneNode = node.cloneNode();
-												cloneNode.type = 'hidden';
-												cloneNode.value = 'false';
-												node.after(cloneNode);
-											}
-										}
-									});
 
 								Liferay.Util.submitForm(event.target);
 
@@ -198,9 +182,8 @@ const Form = React.forwardRef(
 			if (containerRef.current) {
 				Liferay.fire('ddmFormPageShow', {
 					formId: getFormId(getFormNode(containerRef.current)),
-					formPageTitle: pages[activePage].title,
 					page: activePage,
-					title: getFormTitle(),
+					title: pages[activePage].title,
 				});
 			}
 			// eslint-disable-next-line react-hooks/exhaustive-deps

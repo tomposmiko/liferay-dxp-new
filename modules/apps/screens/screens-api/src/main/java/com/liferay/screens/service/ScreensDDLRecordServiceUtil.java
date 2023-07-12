@@ -89,10 +89,6 @@ public class ScreensDDLRecordServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ScreensDDLRecordService service) {
-		_service = service;
-	}
-
 	private static volatile ScreensDDLRecordService _service;
 
 }

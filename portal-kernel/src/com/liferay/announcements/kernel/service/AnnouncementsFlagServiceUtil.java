@@ -63,10 +63,6 @@ public class AnnouncementsFlagServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AnnouncementsFlagService service) {
-		_service = service;
-	}
-
 	private static volatile AnnouncementsFlagService _service;
 
 }

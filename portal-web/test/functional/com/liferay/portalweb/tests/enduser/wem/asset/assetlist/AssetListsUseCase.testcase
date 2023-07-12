@@ -16,7 +16,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-115236. Configure Filter by Field."
-	@priority = 5
+	@priority = "5"
 	test ConfigureFilterByField {
 		property portal.acceptance = "true";
 
@@ -55,13 +55,13 @@ definition {
 				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
 				value1 = "Web Content Article");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			Select(
 				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
 				value1 = "WC Structure Name");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 		}
 
 		task ("Enable Filter by Field and Choose Select field") {
@@ -72,7 +72,7 @@ definition {
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "option 2");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			AssertSelectedLabel(
 				key_fieldLabel = "Select",

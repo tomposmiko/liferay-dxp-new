@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -159,7 +160,7 @@ public class JournalFolderStagedModelDataHandler
 
 		Map<Long, Long> journalFolderIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				JournalFolder.class);
+				Folder.class);
 
 		journalFolderIds.put(folderId, existingJournalFolder.getFolderId());
 	}

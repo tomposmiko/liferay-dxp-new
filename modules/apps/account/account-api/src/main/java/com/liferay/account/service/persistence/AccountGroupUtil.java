@@ -509,10 +509,6 @@ public class AccountGroupUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(AccountGroupPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile AccountGroupPersistence _persistence;
 
 }

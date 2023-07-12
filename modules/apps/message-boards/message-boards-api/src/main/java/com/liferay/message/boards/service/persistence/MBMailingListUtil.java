@@ -912,10 +912,6 @@ public class MBMailingListUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(MBMailingListPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile MBMailingListPersistence _persistence;
 
 }

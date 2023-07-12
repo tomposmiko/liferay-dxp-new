@@ -1650,12 +1650,6 @@ public class SiteNavigationMenuItemUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		SiteNavigationMenuItemPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile SiteNavigationMenuItemPersistence _persistence;
 
 }

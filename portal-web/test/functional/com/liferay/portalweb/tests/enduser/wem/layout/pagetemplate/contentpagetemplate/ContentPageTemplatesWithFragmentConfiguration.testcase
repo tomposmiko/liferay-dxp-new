@@ -31,7 +31,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -40,20 +40,21 @@ definition {
 	}
 
 	@description = "This is a test for LPS-99377. User can add a checkbox configuration fragment to a content page template."
-	@priority = 5
+	@priority = "5"
 	test AddCheckboxConfigurationFragmentToContentPageTemplate {
 		property portal.acceptance = "true";
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "checkbox_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "checkbox_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = ${jsonSnippet},
+				configuration = "${jsonSnippet}",
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = ${htmlSnippet},
+				html = "${htmlSnippet}",
 				name = "Checkbox Fragment Example");
 		}
 
@@ -94,50 +95,59 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-100545. The user can map the content field from web content to a fragment via the content display."
-	@priority = 4
-	test AddContentDisplayConfigurationFragmentToContentPageTemplate {
-		task ("Add a Web Content via JSON") {
-			JSONWebcontent.addWebContent(
-				content = "WC WebContent Content",
+	@description = "This is a test for LPS-100545. An itemSelector fragment configuration can select an asset in a content page template"
+	@priority = "4"
+	test AddItemSelectorConfigurationFragmentToContentPageTemplate {
+		task ("Add a section fragment to the fragment collection via JSON") {
+			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.html");
+
+			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.json");
+
+			JSONFragment.addSection(
+				collectionName = "Collection Name",
+				configuration = "${jsonSnippet}",
+				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				title = "WebContent Title");
+				html = "${htmlSnippet}",
+				name = "itemSelector Fragment Example");
 		}
 
-		task ("Add a Content Display to page template") {
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Test Site Name",
+			title = "WebContent Title");
 
-			Navigator.gotoNavNested(navNested = "Page Template Collection");
+		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
-			PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
+		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-			PageEditor.assertFragmentSidebarLoaded();
+		PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
 
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				fragmentName = "Content Display");
-		}
+		PageEditor.assertFragmentSidebarLoaded();
 
-		task ("Select WC to display in Content Display") {
-			PageEditor.editContentDisplay(
-				fragmentName = "Content Display",
-				webcontent = "true",
-				webContentContent = "WC WebContent Content",
-				webContentTitle = "WebContent Title");
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "itemSelector Fragment Example");
 
-			PageEditor.clickPublish();
-		}
+		PageEditor.editContentDisplay(
+			fragmentName = "itemSelector Fragment Example",
+			webcontent = "true",
+			webContentContent = "WC WebContent Content",
+			webContentTitle = "WebContent Title");
 
-		task ("View the content of web content shown in Content Display") {
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
+		PageEditor.clickPublish();
 
-			Navigator.gotoNavNested(navNested = "Page Template Collection");
+		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
-			PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
+		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-			AssertTextEquals.assertPartialTextAceEditor(
-				locator1 = "PageEditor#CONTENT_PAGE_WEB_CONTENT_CONTENT",
-				value1 = "WC WebContent Content");
+		PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
+
+		task ("Assert correct content is visible") {
+			AssertVisible(
+				key_content = "WC WebContent Content",
+				key_fragmentClass = "configuration",
+				locator1 = "Fragment#FRAGMENT");
 		}
 	}
 
@@ -147,14 +157,15 @@ definition {
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "select_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "select_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = ${jsonSnippet},
+				configuration = "${jsonSnippet}",
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = ${htmlSnippet},
+				html = "${htmlSnippet}",
 				name = "Text Fragment Example");
 		}
 
@@ -188,20 +199,21 @@ definition {
 	}
 
 	@description = "This is a test for LPS-99543. User can change text fragment configuration in a content page template."
-	@priority = 5
+	@priority = "5"
 	test AddTextConfigurationFragmentToContentPageTemplate {
 		property portal.acceptance = "true";
 
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "text_configuration.html");
+
 			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "text_configuration.json");
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = ${jsonSnippet},
+				configuration = "${jsonSnippet}",
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = ${htmlSnippet},
+				html = "${htmlSnippet}",
 				name = "Text Fragment Example");
 		}
 

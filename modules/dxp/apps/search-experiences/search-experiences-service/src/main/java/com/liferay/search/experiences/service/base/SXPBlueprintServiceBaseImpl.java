@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,6 +27,8 @@ import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.service.SXPBlueprintService;
 import com.liferay.search.experiences.service.SXPBlueprintServiceUtil;
 import com.liferay.search.experiences.service.persistence.SXPBlueprintPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class SXPBlueprintServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		SXPBlueprintServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class SXPBlueprintServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		sxpBlueprintService = (SXPBlueprintService)aopProxy;
 
-		SXPBlueprintServiceUtil.setService(sxpBlueprintService);
+		_setServiceUtilService(sxpBlueprintService);
 	}
 
 	/**
@@ -116,6 +116,22 @@ public abstract class SXPBlueprintServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		SXPBlueprintService sxpBlueprintService) {
+
+		try {
+			Field field = SXPBlueprintServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, sxpBlueprintService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.search.experiences.service.SXPBlueprintLocalService
 		sxpBlueprintLocalService;
@@ -128,8 +144,5 @@ public abstract class SXPBlueprintServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SXPBlueprintServiceBaseImpl.class);
 
 }

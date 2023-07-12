@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3622,7 +3623,7 @@ public class MBBanPersistenceImpl
 	 */
 	@Override
 	public MBBan fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(MBBan.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(MBBan.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4165,12 +4166,12 @@ public class MBBanPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "banUserId"}, false);
 
-		MBBanUtil.setPersistence(this);
+		_setMBBanUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		MBBanUtil.setPersistence(null);
+		_setMBBanUtilPersistence(null);
 
 		entityCache.removeCache(MBBanImpl.class.getName());
 
@@ -4180,6 +4181,19 @@ public class MBBanPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setMBBanUtilPersistence(MBBanPersistence mbBanPersistence) {
+		try {
+			Field field = MBBanUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, mbBanPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

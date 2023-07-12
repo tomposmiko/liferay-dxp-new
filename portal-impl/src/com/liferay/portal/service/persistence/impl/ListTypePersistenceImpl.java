@@ -49,6 +49,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1486,11 +1487,11 @@ public class ListTypePersistenceImpl
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"name", "type_"}, false);
 
-		ListTypeUtil.setPersistence(this);
+		_setListTypeUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ListTypeUtil.setPersistence(null);
+		_setListTypeUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(ListTypeImpl.class.getName());
 
@@ -1500,6 +1501,21 @@ public class ListTypePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setListTypeUtilPersistence(
+		ListTypePersistence listTypePersistence) {
+
+		try {
+			Field field = ListTypeUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, listTypePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

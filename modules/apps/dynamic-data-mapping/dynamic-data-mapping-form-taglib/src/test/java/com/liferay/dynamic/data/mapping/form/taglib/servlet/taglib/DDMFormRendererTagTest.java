@@ -96,6 +96,7 @@ public class DDMFormRendererTagTest extends PowerMockito {
 		setUpDDMFormValuesFactory();
 		setUpHttpServletRequest();
 		setUpLanguageUtil();
+		setUpLocaleUtil();
 		setUpPortalUtil();
 	}
 
@@ -410,6 +411,16 @@ public class DDMFormRendererTagTest extends PowerMockito {
 		LanguageUtil languageUtil = new LanguageUtil();
 
 		languageUtil.setLanguage(_language);
+	}
+
+	protected void setUpLocaleUtil() {
+		mockStatic(LocaleUtil.class);
+
+		when(
+			LocaleUtil.fromLanguageId("en_US")
+		).thenReturn(
+			LocaleUtil.US
+		);
 	}
 
 	protected void setUpPortalUtil() {

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -830,18 +831,14 @@ public class CartSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "cartItems")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CartItem[] cartItemsArray =
-						new CartItem[jsonParserFieldValues.length];
-
-					for (int i = 0; i < cartItemsArray.length; i++) {
-						cartItemsArray[i] = CartItemSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					cart.setCartItems(cartItemsArray);
+					cart.setCartItems(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CartItemSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CartItem[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "channelId")) {
@@ -897,18 +894,14 @@ public class CartSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "notes")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CartComment[] notesArray =
-						new CartComment[jsonParserFieldValues.length];
-
-					for (int i = 0; i < notesArray.length; i++) {
-						notesArray[i] = CartCommentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					cart.setNotes(notesArray);
+					cart.setNotes(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CartCommentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CartComment[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "orderStatusInfo")) {

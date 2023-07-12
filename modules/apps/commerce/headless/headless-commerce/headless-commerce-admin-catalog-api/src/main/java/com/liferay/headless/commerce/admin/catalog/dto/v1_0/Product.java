@@ -96,7 +96,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getActive() {
 		return active;
 	}
@@ -184,7 +184,7 @@ public class Product implements Serializable {
 	protected Catalog catalog;
 
 	@DecimalMin("0")
-	@Schema(example = "30054")
+	@Schema
 	public Long getCatalogId() {
 		return catalogId;
 	}
@@ -272,7 +272,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ProductConfiguration configuration;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -329,7 +329,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CustomField[] customFields;
 
-	@Schema(example = "Blue handle, 00001l, 70cm, lifetime warranty")
+	@Schema
 	public String getDefaultSku() {
 		return defaultSku;
 	}
@@ -357,9 +357,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String defaultSku;
 
-	@Schema(
-		example = "{hu_HU=Product Description HU, hr_HR=Product Description HR, en_US=Professional hand stainless steel saw for wood. Made to last and saw forever. Made of best steel}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getDescription() {
 		return description;
@@ -389,7 +387,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> description;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getDisplayDate() {
 		return displayDate;
 	}
@@ -446,7 +444,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, ?> expando;
 
-	@Schema(example = "2017-08-21")
+	@Schema
 	public Date getExpirationDate() {
 		return expirationDate;
 	}
@@ -474,7 +472,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date expirationDate;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -503,7 +501,7 @@ public class Product implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -558,9 +556,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Attachment[] images;
 
-	@Schema(
-		example = "{en_US=Meta description HU, hr_HR=Meta description HU, hu_HU=Meta description HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getMetaDescription() {
 		return metaDescription;
@@ -590,9 +586,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> metaDescription;
 
-	@Schema(
-		example = "{en_US=Meta keyword HU, hr_HR=Meta keyword HU, hu_HU=Meta keyword HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getMetaKeyword() {
 		return metaKeyword;
@@ -622,9 +616,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> metaKeyword;
 
-	@Schema(
-		example = "{en_US=Meta title HU, hr_HR=Meta title HU, hu_HU=Meta title HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getMetaTitle() {
 		return metaTitle;
@@ -654,7 +646,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> metaTitle;
 
-	@Schema(example = "2017-08-21")
+	@Schema
 	public Date getModifiedDate() {
 		return modifiedDate;
 	}
@@ -682,9 +674,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date modifiedDate;
 
-	@Schema(
-		example = "{en_US=Hand Saw, hr_HR=Product Name HR, hu_HU=Product Name HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getName() {
 		return name;
@@ -714,7 +704,7 @@ public class Product implements Serializable {
 	@NotNull
 	protected Map<String, String> name;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getNeverExpire() {
 		return neverExpire;
 	}
@@ -741,128 +731,6 @@ public class Product implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean neverExpire;
-
-	@Schema(example = "true")
-	public Boolean getProductAccountGroupFilter() {
-		return productAccountGroupFilter;
-	}
-
-	public void setProductAccountGroupFilter(
-		Boolean productAccountGroupFilter) {
-
-		this.productAccountGroupFilter = productAccountGroupFilter;
-	}
-
-	@JsonIgnore
-	public void setProductAccountGroupFilter(
-		UnsafeSupplier<Boolean, Exception>
-			productAccountGroupFilterUnsafeSupplier) {
-
-		try {
-			productAccountGroupFilter =
-				productAccountGroupFilterUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean productAccountGroupFilter;
-
-	@Schema
-	@Valid
-	public ProductAccountGroup[] getProductAccountGroups() {
-		return productAccountGroups;
-	}
-
-	public void setProductAccountGroups(
-		ProductAccountGroup[] productAccountGroups) {
-
-		this.productAccountGroups = productAccountGroups;
-	}
-
-	@JsonIgnore
-	public void setProductAccountGroups(
-		UnsafeSupplier<ProductAccountGroup[], Exception>
-			productAccountGroupsUnsafeSupplier) {
-
-		try {
-			productAccountGroups = productAccountGroupsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ProductAccountGroup[] productAccountGroups;
-
-	@Schema(example = "true")
-	public Boolean getProductChannelFilter() {
-		return productChannelFilter;
-	}
-
-	public void setProductChannelFilter(Boolean productChannelFilter) {
-		this.productChannelFilter = productChannelFilter;
-	}
-
-	@JsonIgnore
-	public void setProductChannelFilter(
-		UnsafeSupplier<Boolean, Exception> productChannelFilterUnsafeSupplier) {
-
-		try {
-			productChannelFilter = productChannelFilterUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean productChannelFilter;
-
-	@Schema
-	@Valid
-	public ProductChannel[] getProductChannels() {
-		return productChannels;
-	}
-
-	public void setProductChannels(ProductChannel[] productChannels) {
-		this.productChannels = productChannels;
-	}
-
-	@JsonIgnore
-	public void setProductChannels(
-		UnsafeSupplier<ProductChannel[], Exception>
-			productChannelsUnsafeSupplier) {
-
-		try {
-			productChannels = productChannelsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ProductChannel[] productChannels;
 
 	@Schema
 	public Long getProductId() {
@@ -979,10 +847,10 @@ public class Product implements Serializable {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer productStatus;
 
-	@Schema(example = "simple")
+	@Schema
 	public String getProductType() {
 		return productType;
 	}
@@ -1011,7 +879,7 @@ public class Product implements Serializable {
 	@NotEmpty
 	protected String productType;
 
-	@Schema(example = "simple")
+	@Schema
 	public String getProductTypeI18n() {
 		return productTypeI18n;
 	}
@@ -1101,9 +969,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ProductShippingConfiguration shippingConfiguration;
 
-	@Schema(
-		example = "{en_US=Hand stainless steel saw for wood, hr_HR=Product Short Description HR, hu_HU=Product Short Description HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getShortDescription() {
 		return shortDescription;
@@ -1133,7 +999,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> shortDescription;
 
-	@Schema(example = "default")
+	@Schema
 	public String getSkuFormatted() {
 		return skuFormatted;
 	}
@@ -1221,7 +1087,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ProductSubscriptionConfiguration subscriptionConfiguration;
 
-	@Schema(example = "[tag1, tag2, tag3]")
+	@Schema
 	public String[] getTags() {
 		return tags;
 	}
@@ -1279,7 +1145,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ProductTaxConfiguration taxConfiguration;
 
-	@Schema(example = "simple")
+	@Schema
 	public String getThumbnail() {
 		return thumbnail;
 	}
@@ -1307,9 +1173,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String thumbnail;
 
-	@Schema(
-		example = "{en_US=product-url-us, hr_HR=product-url-hr, hu_HU=product-url-hu}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getUrls() {
 		return urls;
@@ -1689,66 +1553,6 @@ public class Product implements Serializable {
 			sb.append("\"neverExpire\": ");
 
 			sb.append(neverExpire);
-		}
-
-		if (productAccountGroupFilter != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productAccountGroupFilter\": ");
-
-			sb.append(productAccountGroupFilter);
-		}
-
-		if (productAccountGroups != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productAccountGroups\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < productAccountGroups.length; i++) {
-				sb.append(String.valueOf(productAccountGroups[i]));
-
-				if ((i + 1) < productAccountGroups.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (productChannelFilter != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productChannelFilter\": ");
-
-			sb.append(productChannelFilter);
-		}
-
-		if (productChannels != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productChannels\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < productChannels.length; i++) {
-				sb.append(String.valueOf(productChannels[i]));
-
-				if ((i + 1) < productChannels.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
 		}
 
 		if (productId != null) {

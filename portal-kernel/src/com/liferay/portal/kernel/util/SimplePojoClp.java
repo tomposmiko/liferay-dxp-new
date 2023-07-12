@@ -27,9 +27,7 @@ import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
  *
  * @author Micha Kiener
  * @author Brian Wing Shun Chan
- * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
  */
-@Deprecated
 public class SimplePojoClp<T> {
 
 	public SimplePojoClp(

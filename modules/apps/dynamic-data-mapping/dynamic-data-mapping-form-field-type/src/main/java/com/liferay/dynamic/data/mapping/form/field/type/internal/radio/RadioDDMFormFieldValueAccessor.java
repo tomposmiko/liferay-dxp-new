@@ -20,6 +20,7 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
+import com.liferay.portal.kernel.util.HtmlUtil;
 
 import java.util.Locale;
 import java.util.function.IntFunction;
@@ -90,7 +91,7 @@ public class RadioDDMFormFieldValueAccessor
 			return optionValue;
 		}
 
-		return optionLabel.getString(locale);
+		return HtmlUtil.escape(optionLabel.getString(locale));
 	}
 
 	protected String getOptionValue(

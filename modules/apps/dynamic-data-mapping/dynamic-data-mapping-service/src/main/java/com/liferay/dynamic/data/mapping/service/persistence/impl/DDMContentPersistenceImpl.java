@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2904,9 +2905,7 @@ public class DDMContentPersistenceImpl
 	 */
 	@Override
 	public DDMContent fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMContent.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMContent.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3423,12 +3422,12 @@ public class DDMContentPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		DDMContentUtil.setPersistence(this);
+		_setDDMContentUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMContentUtil.setPersistence(null);
+		_setDDMContentUtilPersistence(null);
 
 		entityCache.removeCache(DDMContentImpl.class.getName());
 
@@ -3438,6 +3437,21 @@ public class DDMContentPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMContentUtilPersistence(
+		DDMContentPersistence ddmContentPersistence) {
+
+		try {
+			Field field = DDMContentUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmContentPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

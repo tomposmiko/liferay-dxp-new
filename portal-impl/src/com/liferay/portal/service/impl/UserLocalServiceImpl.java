@@ -117,9 +117,9 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
-import com.liferay.portal.kernel.util.EscapableObject;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -446,13 +446,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			}
 		}
 
+		if (roleIdSet.isEmpty()) {
+			return false;
+		}
+
 		long[] roleIds = ArrayUtil.toArray(roleIdSet.toArray(new Long[0]));
 
 		roleIds = UsersAdminUtil.addRequiredRoles(user, roleIds);
-
-		if (ArrayUtil.containsAll(userRoleIds, roleIds)) {
-			return false;
-		}
 
 		userPersistence.addRoles(user.getUserId(), roleIds);
 
@@ -3934,29 +3934,27 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			"[$COMPANY_ID$]", String.valueOf(company.getCompanyId()));
 		mailTemplateContextBuilder.put("[$COMPANY_MX$]", company.getMx());
 		mailTemplateContextBuilder.put(
-			"[$COMPANY_NAME$]", new EscapableObject<>(company.getName()));
+			"[$COMPANY_NAME$]", HtmlUtil.escape(company.getName()));
 		mailTemplateContextBuilder.put(
-			"[$EMAIL_VERIFICATION_CODE$]",
-			new EscapableObject<>(ticket.getKey()));
+			"[$EMAIL_VERIFICATION_CODE$]", HtmlUtil.escape(ticket.getKey()));
 		mailTemplateContextBuilder.put(
 			"[$EMAIL_VERIFICATION_URL$]", verifyEmailAddressURL);
 		mailTemplateContextBuilder.put("[$FROM_ADDRESS$]", fromAddress);
 		mailTemplateContextBuilder.put(
-			"[$FROM_NAME$]", new EscapableObject<>(fromName));
+			"[$FROM_NAME$]", HtmlUtil.escape(fromName));
 		mailTemplateContextBuilder.put(
 			"[$PORTAL_URL$]", serviceContext.getPortalURL());
 		mailTemplateContextBuilder.put(
 			"[$REMOTE_ADDRESS$]", serviceContext.getRemoteAddr());
 		mailTemplateContextBuilder.put(
-			"[$REMOTE_HOST$]",
-			new EscapableObject<>(serviceContext.getRemoteHost()));
+			"[$REMOTE_HOST$]", HtmlUtil.escape(serviceContext.getRemoteHost()));
 		mailTemplateContextBuilder.put("[$TO_ADDRESS$]", emailAddress);
 		mailTemplateContextBuilder.put(
-			"[$TO_NAME$]", new EscapableObject<>(user.getFullName()));
+			"[$TO_NAME$]", HtmlUtil.escape(user.getFullName()));
 		mailTemplateContextBuilder.put(
 			"[$USER_ID$]", String.valueOf(user.getUserId()));
 		mailTemplateContextBuilder.put(
-			"[$USER_SCREENNAME$]", new EscapableObject<>(user.getScreenName()));
+			"[$USER_SCREENNAME$]", HtmlUtil.escape(user.getScreenName()));
 
 		_sendNotificationEmail(
 			fromAddress, fromName, emailAddress, user, subject, body,
@@ -5390,6 +5388,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
+		if ((status == WorkflowConstants.STATUS_APPROVED) &&
+			(user.getStatus() != WorkflowConstants.STATUS_APPROVED)) {
+
+			validateCompanyMaxUsers(user.getCompanyId());
+		}
+
 		String passwordUnencrypted = (String)serviceContext.getAttribute(
 			"passwordUnencrypted");
 
@@ -5804,21 +5808,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		return userLocalService.updateUser(user);
 	}
 
-	public void validateMaxUsers(long companyId) throws PortalException {
-		Company company = companyPersistence.findByPrimaryKey(companyId);
-
-		if (company.isSystem() || (company.getMaxUsers() == 0)) {
-			return;
-		}
-
-		int userCount = searchCount(
-			companyId, null, WorkflowConstants.STATUS_APPROVED, null);
-
-		if (userCount >= company.getMaxUsers()) {
-			throw new CompanyMaxUsersException();
-		}
-	}
-
 	/**
 	 * Verifies the email address of the ticket.
 	 *
@@ -6059,18 +6048,14 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		if (user == null) {
-			if ((authResult == Authenticator.SUCCESS) &&
-				PropsValues.AUTH_PIPELINE_ENABLE_LIFERAY_CHECK) {
-
-				PwdAuthenticator.pretendToAuthenticate();
-			}
-
 			return Authenticator.DNE;
 		}
 
 		if (!isUserAllowedToAuthenticate(user)) {
 			return Authenticator.FAILURE;
 		}
+
+		user = _checkPasswordPolicy(user);
 
 		if (!user.isPasswordEncrypted()) {
 			user.setPassword(PasswordEncryptorUtil.encrypt(user.getPassword()));
@@ -6123,15 +6108,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		if (authResult == Authenticator.SUCCESS) {
-			try {
-				user = _checkPasswordPolicy(user);
-			}
-			catch (PortalException portalException) {
-				handleAuthenticationFailure(
-					login, authType, user, headerMap, parameterMap);
-
-				throw portalException;
-			}
 
 			// Update digest
 
@@ -6146,8 +6122,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				String newDigest = user.getDigest(password);
 
 				if (!newDigest.equals(digest)) {
-					user = userPersistence.fetchByPrimaryKey(user.getUserId());
-
 					user.setDigest(newDigest);
 
 					user = userPersistence.update(user);
@@ -6607,18 +6581,18 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		mailTemplateContextBuilder.put("[$FROM_ADDRESS$]", fromAddress);
 		mailTemplateContextBuilder.put(
-			"[$FROM_NAME$]", new EscapableObject<>(fromName));
+			"[$FROM_NAME$]", HtmlUtil.escape(fromName));
 		mailTemplateContextBuilder.put("[$PORTAL_URL$]", portalURL);
 		mailTemplateContextBuilder.put(
 			"[$TO_ADDRESS$]", user.getEmailAddress());
 		mailTemplateContextBuilder.put(
-			"[$TO_NAME$]", new EscapableObject<>(user.getFullName()));
+			"[$TO_NAME$]", HtmlUtil.escape(user.getFullName()));
 		mailTemplateContextBuilder.put(
 			"[$PASSWORD_SETUP_URL$]", passwordResetURL);
 		mailTemplateContextBuilder.put(
 			"[$USER_ID$]", String.valueOf(user.getUserId()));
 		mailTemplateContextBuilder.put(
-			"[$USER_SCREENNAME$]", new EscapableObject<>(user.getScreenName()));
+			"[$USER_SCREENNAME$]", HtmlUtil.escape(user.getScreenName()));
 
 		MailTemplateContext mailTemplateContext =
 			mailTemplateContextBuilder.build();
@@ -6775,7 +6749,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		mailTemplateContextBuilder.put("[$FROM_ADDRESS$]", fromAddress);
 		mailTemplateContextBuilder.put(
-			"[$FROM_NAME$]", new EscapableObject<>(fromName));
+			"[$FROM_NAME$]", HtmlUtil.escape(fromName));
 		mailTemplateContextBuilder.put(
 			"[$PASSWORD_RESET_URL$]", passwordResetURL);
 		mailTemplateContextBuilder.put(
@@ -6783,15 +6757,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		mailTemplateContextBuilder.put(
 			"[$REMOTE_ADDRESS$]", serviceContext.getRemoteAddr());
 		mailTemplateContextBuilder.put(
-			"[$REMOTE_HOST$]",
-			new EscapableObject<>(serviceContext.getRemoteHost()));
+			"[$REMOTE_HOST$]", HtmlUtil.escape(serviceContext.getRemoteHost()));
 		mailTemplateContextBuilder.put("[$TO_ADDRESS$]", toAddress);
-		mailTemplateContextBuilder.put(
-			"[$TO_NAME$]", new EscapableObject<>(toName));
+		mailTemplateContextBuilder.put("[$TO_NAME$]", HtmlUtil.escape(toName));
 		mailTemplateContextBuilder.put(
 			"[$USER_ID$]", String.valueOf(user.getUserId()));
 		mailTemplateContextBuilder.put(
-			"[$USER_SCREENNAME$]", new EscapableObject<>(user.getScreenName()));
+			"[$USER_SCREENNAME$]", HtmlUtil.escape(user.getScreenName()));
 
 		MailTemplateContext mailTemplateContext =
 			mailTemplateContextBuilder.build();
@@ -7072,7 +7044,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			Locale locale)
 		throws PortalException {
 
-		validateMaxUsers(companyId);
+		validateCompanyMaxUsers(companyId);
 
 		if (!autoScreenName) {
 			validateScreenName(companyId, userId, screenName);
@@ -7150,6 +7122,23 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		if (Validator.isNotNull(smsSn) && !Validator.isEmailAddress(smsSn)) {
 			throw new UserSmsException.MustBeEmailAddress(smsSn);
+		}
+	}
+
+	protected void validateCompanyMaxUsers(long companyId)
+		throws PortalException {
+
+		Company company = companyPersistence.findByPrimaryKey(companyId);
+
+		if (company.isSystem() || (company.getMaxUsers() == 0)) {
+			return;
+		}
+
+		int userCount = searchCount(
+			companyId, null, WorkflowConstants.STATUS_APPROVED, null);
+
+		if (userCount >= company.getMaxUsers()) {
+			throw new CompanyMaxUsersException();
 		}
 	}
 

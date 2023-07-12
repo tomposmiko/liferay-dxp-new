@@ -99,30 +99,12 @@ public class CPAttachmentFileEntryServiceUtil {
 			classNameId, classPK, type, status, start, end, orderByComparator);
 	}
 
-	public static List<CPAttachmentFileEntry> getCPAttachmentFileEntries(
-			long classNameId, long classPK, String keywords, int type,
-			int status, int start, int end)
-		throws PortalException {
-
-		return getService().getCPAttachmentFileEntries(
-			classNameId, classPK, keywords, type, status, start, end);
-	}
-
 	public static int getCPAttachmentFileEntriesCount(
 			long classNameId, long classPK, int type, int status)
 		throws PortalException {
 
 		return getService().getCPAttachmentFileEntriesCount(
 			classNameId, classPK, type, status);
-	}
-
-	public static int getCPAttachmentFileEntriesCount(
-			long classNameId, long classPK, String keywords, int type,
-			int status)
-		throws PortalException {
-
-		return getService().getCPAttachmentFileEntriesCount(
-			classNameId, classPK, keywords, type, status);
 	}
 
 	public static CPAttachmentFileEntry getCPAttachmentFileEntry(
@@ -232,10 +214,6 @@ public class CPAttachmentFileEntryServiceUtil {
 
 	public static CPAttachmentFileEntryService getService() {
 		return _service;
-	}
-
-	public static void setService(CPAttachmentFileEntryService service) {
-		_service = service;
 	}
 
 	private static volatile CPAttachmentFileEntryService _service;

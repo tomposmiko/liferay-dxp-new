@@ -364,72 +364,66 @@ public class RoleModelImpl extends BaseModelImpl<Role> implements RoleModel {
 
 	private static final Map<String, Function<Role, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<Role, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Role, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", Role::getMvccVersion);
-		attributeGetterFunctions.put("ctCollectionId", Role::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", Role::getUuid);
-		attributeGetterFunctions.put("roleId", Role::getRoleId);
-		attributeGetterFunctions.put("companyId", Role::getCompanyId);
-		attributeGetterFunctions.put("userId", Role::getUserId);
-		attributeGetterFunctions.put("userName", Role::getUserName);
-		attributeGetterFunctions.put("createDate", Role::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Role::getModifiedDate);
-		attributeGetterFunctions.put("classNameId", Role::getClassNameId);
-		attributeGetterFunctions.put("classPK", Role::getClassPK);
-		attributeGetterFunctions.put("name", Role::getName);
-		attributeGetterFunctions.put("title", Role::getTitle);
-		attributeGetterFunctions.put("description", Role::getDescription);
-		attributeGetterFunctions.put("type", Role::getType);
-		attributeGetterFunctions.put("subtype", Role::getSubtype);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<Role, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Role, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Role, Object>>();
 		Map<String, BiConsumer<Role, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Role, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Role::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Role, Long>)Role::setMvccVersion);
+		attributeGetterFunctions.put("ctCollectionId", Role::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId", (BiConsumer<Role, Long>)Role::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", Role::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Role, String>)Role::setUuid);
+		attributeGetterFunctions.put("roleId", Role::getRoleId);
 		attributeSetterBiConsumers.put(
 			"roleId", (BiConsumer<Role, Long>)Role::setRoleId);
+		attributeGetterFunctions.put("companyId", Role::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Role, Long>)Role::setCompanyId);
+		attributeGetterFunctions.put("userId", Role::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Role, Long>)Role::setUserId);
+		attributeGetterFunctions.put("userName", Role::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Role, String>)Role::setUserName);
+		attributeGetterFunctions.put("createDate", Role::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Role, Date>)Role::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Role::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Role, Date>)Role::setModifiedDate);
+		attributeGetterFunctions.put("classNameId", Role::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId", (BiConsumer<Role, Long>)Role::setClassNameId);
+		attributeGetterFunctions.put("classPK", Role::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<Role, Long>)Role::setClassPK);
+		attributeGetterFunctions.put("name", Role::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Role, String>)Role::setName);
+		attributeGetterFunctions.put("title", Role::getTitle);
 		attributeSetterBiConsumers.put(
 			"title", (BiConsumer<Role, String>)Role::setTitle);
+		attributeGetterFunctions.put("description", Role::getDescription);
 		attributeSetterBiConsumers.put(
 			"description", (BiConsumer<Role, String>)Role::setDescription);
+		attributeGetterFunctions.put("type", Role::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<Role, Integer>)Role::setType);
+		attributeGetterFunctions.put("subtype", Role::getSubtype);
 		attributeSetterBiConsumers.put(
 			"subtype", (BiConsumer<Role, String>)Role::setSubtype);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

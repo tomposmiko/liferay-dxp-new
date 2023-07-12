@@ -17,8 +17,6 @@ package com.liferay.portal.template.freemarker.internal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -41,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -53,7 +52,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.portal.template.freemarker.configuration.FreeMarkerEngineConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	service = {
 		FreeMarkerTemplateContextHelper.class, TemplateContextHelper.class
 	}
@@ -101,19 +100,6 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 			// Init
 
 			contextObjects.put("init", fullTemplatesPath + "/init.ftl");
-
-			// Navigation items
-
-			if (_freeMarkerEngineConfiguration.includeNavItemsInTheContext() &&
-				(themeDisplay.getLayout() != null)) {
-
-				try {
-					contextObjects.put("navItems", themeDisplay.getNavItems());
-				}
-				catch (Exception exception) {
-					_log.error(exception);
-				}
-			}
 		}
 
 		// Insert custom ftl variables
@@ -206,9 +192,6 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 
 		_templateContextContributors.remove(templateContextContributor);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FreeMarkerTemplateContextHelper.class);
 
 	private BeansWrapper _defaultBeansWrapper;
 	private volatile FreeMarkerEngineConfiguration

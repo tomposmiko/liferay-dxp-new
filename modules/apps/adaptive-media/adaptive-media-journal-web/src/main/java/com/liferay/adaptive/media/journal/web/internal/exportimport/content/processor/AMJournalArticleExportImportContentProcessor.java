@@ -17,17 +17,13 @@ package com.liferay.adaptive.media.journal.web.internal.exportimport.content.pro
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.StagedModel;
-import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.Portal;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -59,7 +55,7 @@ public class AMJournalArticleExportImportContentProcessor
 					portletDataContext, stagedModel, content,
 					exportReferencedContent, escapeContent);
 
-		if (!_hasTextHTMLDDMFormField(portletDataContext, stagedModel)) {
+		if (!_hasTextHTMLDDMFormField(stagedModel)) {
 			return replacedContent;
 		}
 
@@ -83,7 +79,7 @@ public class AMJournalArticleExportImportContentProcessor
 				replaceImportContentReferences(
 					portletDataContext, stagedModel, content);
 
-		if (!_hasTextHTMLDDMFormField(portletDataContext, stagedModel)) {
+		if (!_hasTextHTMLDDMFormField(stagedModel)) {
 			return replacedContent;
 		}
 
@@ -117,23 +113,10 @@ public class AMJournalArticleExportImportContentProcessor
 		}
 	}
 
-	private boolean _hasTextHTMLDDMFormField(
-		PortletDataContext portletDataContext, StagedModel stagedModel) {
-
+	private boolean _hasTextHTMLDDMFormField(StagedModel stagedModel) {
 		JournalArticle journalArticle = (JournalArticle)stagedModel;
 
-		Map<String, String> ddmStructureKeys =
-			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
-				DDMStructure.class + ".ddmStructureKey");
-
-		String ddmStructureKey = MapUtil.getString(
-			ddmStructureKeys, journalArticle.getDDMStructureKey(),
-			journalArticle.getDDMStructureKey());
-
-		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
-			portletDataContext.getScopeGroupId(),
-			_portal.getClassNameId(JournalArticle.class), ddmStructureKey,
-			true);
+		DDMStructure ddmStructure = journalArticle.getDDMStructure();
 
 		if (ddmStructure == null) {
 			return true;
@@ -157,9 +140,6 @@ public class AMJournalArticleExportImportContentProcessor
 	private AMJournalArticleContentHTMLReplacer
 		_amJournalArticleContentHTMLReplacer;
 
-	@Reference
-	private DDMStructureLocalService _ddmStructureLocalService;
-
 	@Reference(target = "(adaptive.media.format=html)")
 	private ExportImportContentProcessor<String>
 		_htmlExportImportContentProcessor;
@@ -169,8 +149,5 @@ public class AMJournalArticleExportImportContentProcessor
 	)
 	private ExportImportContentProcessor<String>
 		_journalArticleExportImportContentProcessor;
-
-	@Reference
-	private Portal _portal;
 
 }

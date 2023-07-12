@@ -59,7 +59,7 @@ public class Model implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -85,7 +85,7 @@ public class Model implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "Brand 1")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -111,7 +111,7 @@ public class Model implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
-	@Schema(example = "2019")
+	@Schema
 	public String getYear() {
 		return year;
 	}

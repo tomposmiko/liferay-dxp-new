@@ -28,12 +28,9 @@ import com.liferay.search.experiences.internal.configuration.IpstackConfiguratio
 import com.liferay.search.experiences.internal.web.cache.IpstackWebCacheItem;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 
-import java.beans.ExceptionListener;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -49,8 +46,8 @@ public class IpstackSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public void contribute(
-		ExceptionListener exceptionListener, SearchContext searchContext,
-		SXPBlueprint sxpBlueprint, Set<SXPParameter> sxpParameters) {
+		SearchContext searchContext, SXPBlueprint sxpBlueprint,
+		Set<SXPParameter> sxpParameters) {
 
 		IpstackConfiguration ipstackConfiguration = _getIpstackConfiguration(
 			searchContext.getCompanyId());
@@ -67,7 +64,7 @@ public class IpstackSXPParameterContributor implements SXPParameterContributor {
 		}
 
 		JSONObject jsonObject = IpstackWebCacheItem.get(
-			exceptionListener, ipAddress, ipstackConfiguration);
+			ipAddress, ipstackConfiguration);
 
 		if (jsonObject.length() == 0) {
 			return;
@@ -118,7 +115,7 @@ public class IpstackSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public List<SXPParameterContributorDefinition>
-		getSXPParameterContributorDefinitions(long companyId, Locale locale) {
+		getSXPParameterContributorDefinitions(long companyId) {
 
 		IpstackConfiguration ipstackConfiguration = _getIpstackConfiguration(
 			companyId);

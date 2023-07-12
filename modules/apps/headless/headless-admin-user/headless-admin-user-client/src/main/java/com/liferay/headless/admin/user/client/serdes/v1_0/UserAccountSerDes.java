@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -666,18 +667,14 @@ public class UserAccountSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					userAccount.setCustomFields(customFieldsArray);
+					userAccount.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dashboardURL")) {
@@ -755,19 +752,15 @@ public class UserAccountSerDes {
 						jsonParserFieldName, "organizationBriefs")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					OrganizationBrief[] organizationBriefsArray =
-						new OrganizationBrief[jsonParserFieldValues.length];
-
-					for (int i = 0; i < organizationBriefsArray.length; i++) {
-						organizationBriefsArray[i] =
-							OrganizationBriefSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
-					userAccount.setOrganizationBriefs(organizationBriefsArray);
+					userAccount.setOrganizationBriefs(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> OrganizationBriefSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new OrganizationBrief[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "profileURL")) {
@@ -777,34 +770,26 @@ public class UserAccountSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "roleBriefs")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					RoleBrief[] roleBriefsArray =
-						new RoleBrief[jsonParserFieldValues.length];
-
-					for (int i = 0; i < roleBriefsArray.length; i++) {
-						roleBriefsArray[i] = RoleBriefSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					userAccount.setRoleBriefs(roleBriefsArray);
+					userAccount.setRoleBriefs(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RoleBriefSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RoleBrief[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "siteBriefs")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					SiteBrief[] siteBriefsArray =
-						new SiteBrief[jsonParserFieldValues.length];
-
-					for (int i = 0; i < siteBriefsArray.length; i++) {
-						siteBriefsArray[i] = SiteBriefSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					userAccount.setSiteBriefs(siteBriefsArray);
+					userAccount.setSiteBriefs(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> SiteBriefSerDes.toDTO((String)object)
+						).toArray(
+							size -> new SiteBrief[size]
+						));
 				}
 			}
 			else if (Objects.equals(

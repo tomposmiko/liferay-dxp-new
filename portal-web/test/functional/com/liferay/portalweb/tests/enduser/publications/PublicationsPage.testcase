@@ -17,7 +17,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -30,7 +30,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ConflictingPublicationsNeedManualResolution {
 
 		// Wrokaround LPS-127348
@@ -124,7 +124,7 @@ definition {
 			value1 = "Web Content Content");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DiscardConflictingChangesOnContentPage {
 
 		// Wrokaround LPS-127348
@@ -219,7 +219,7 @@ definition {
 		AssertElementNotPresent(locator1 = "Publications#NEEDS_MANUAL_RESOLUTION_TABLE");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PublishDeletedPageWithTag {
 
 		// Wrokaround LPS-129546
@@ -281,12 +281,13 @@ definition {
 		Page.viewNoPG(pageName = "Test Page");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PublishPrivateContentPageWithFragment {
 
 		// Wrokaround LPS-127348
 
 		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
+		property test.assert.warning.exceptions = "true";
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
@@ -303,12 +304,13 @@ definition {
 		FragmentsAdmin.addFragment(fragmentName = "Fragment Name");
 
 		var fragmentHTML = '''<lfr-widget-asset-list>''';
+
 		var htmlSnippet = '''<lfr-''';
 
 		FragmentsEditor.autocompleteFragmentHTML(
 			autocompleteField = "lfr-widget-asset-list",
-			fragmentHTML = ${fragmentHTML},
-			htmlSnippet = ${htmlSnippet});
+			fragmentHTML = "${fragmentHTML}",
+			htmlSnippet = "${htmlSnippet}");
 
 		PortletEntry.publish();
 
@@ -357,7 +359,7 @@ definition {
 			webContentTitle = "WC WebContent Title");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewPageFriendlyURLAfterRevertingPublication {
 
 		// Wrokaround LPS-127348

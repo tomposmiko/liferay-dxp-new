@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPInstanceLocalService}.
@@ -611,22 +610,11 @@ public class CPInstanceLocalServiceWrapper
 			cpDefinitionId, serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #checkCPInstances(long)}
-	 */
-	@Deprecated
 	@Override
 	public void checkCPInstances()
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_cpInstanceLocalService.checkCPInstances();
-	}
-
-	@Override
-	public void checkCPInstances(long cpDefinitionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_cpInstanceLocalService.checkCPInstances(cpDefinitionId);
 	}
 
 	@Override
@@ -834,7 +822,13 @@ public class CPInstanceLocalServiceWrapper
 		return _cpInstanceLocalService.fetchCPInstance(CPInstanceId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp instance with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp instance's external reference code
+	 * @return the matching cp instance, or <code>null</code> if a matching cp instance could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPInstance
 		fetchCPInstanceByExternalReferenceCode(
@@ -844,6 +838,9 @@ public class CPInstanceLocalServiceWrapper
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPInstanceByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CPInstance
@@ -968,7 +965,14 @@ public class CPInstanceLocalServiceWrapper
 		return _cpInstanceLocalService.getCPInstance(cpDefinitionId, sku);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp instance with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp instance's external reference code
+	 * @return the matching cp instance
+	 * @throws PortalException if a matching cp instance could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPInstance
 			getCPInstanceByExternalReferenceCode(
@@ -1478,11 +1482,6 @@ public class CPInstanceLocalServiceWrapper
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, neverExpire, unspsc,
 			serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpInstanceLocalService.getBasePersistence();
 	}
 
 	@Override

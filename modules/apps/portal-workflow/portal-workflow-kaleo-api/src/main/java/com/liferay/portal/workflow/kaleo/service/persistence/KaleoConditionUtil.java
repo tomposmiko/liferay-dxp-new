@@ -692,10 +692,6 @@ public class KaleoConditionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(KaleoConditionPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile KaleoConditionPersistence _persistence;
 
 }

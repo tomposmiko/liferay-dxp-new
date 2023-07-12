@@ -61,9 +61,8 @@ public class RadioDDMFormFieldTemplateContextContributor
 			"predefinedValue",
 			getValue(
 				GetterUtil.getString(
-					DDMFormFieldTypeUtil.getPropertyValue(
-						ddmFormField, ddmFormFieldRenderingContext.getLocale(),
-						"predefinedValue"),
+					DDMFormFieldTypeUtil.getPredefinedValue(
+						ddmFormField, ddmFormFieldRenderingContext),
 					"[]"))
 		).put(
 			"value",

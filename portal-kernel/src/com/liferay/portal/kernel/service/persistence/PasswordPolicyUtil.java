@@ -1177,10 +1177,6 @@ public class PasswordPolicyUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(PasswordPolicyPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile PasswordPolicyPersistence _persistence;
 
 }

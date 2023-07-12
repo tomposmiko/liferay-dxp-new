@@ -74,7 +74,7 @@ public class CommerceProductAttachmentDataSetDataProvider
 		List<CPAttachmentFileEntry> cpAttachmentFileEntries =
 			_cpAttachmentFileEntryService.getCPAttachmentFileEntries(
 				_portal.getClassNameId(CPDefinition.class), cpDefinitionId,
-				filter.getKeywords(), CPAttachmentFileEntryConstants.TYPE_OTHER,
+				CPAttachmentFileEntryConstants.TYPE_OTHER,
 				WorkflowConstants.STATUS_ANY, pagination.getStartPosition(),
 				pagination.getEndPosition());
 
@@ -111,7 +111,8 @@ public class CommerceProductAttachmentDataSetDataProvider
 						CommerceMediaResolverUtil.getThumbnailURL(
 							CommerceAccountConstants.ACCOUNT_ID_GUEST,
 							cpAttachmentFileEntryId)),
-					title, HtmlUtil.escape(fileEntry.getExtension()),
+					HtmlUtil.escape(title),
+					HtmlUtil.escape(fileEntry.getExtension()),
 					cpAttachmentFileEntry.getPriority(),
 					LanguageUtil.format(
 						httpServletRequest, "x-ago", modifiedDateDescription,
@@ -137,7 +138,7 @@ public class CommerceProductAttachmentDataSetDataProvider
 
 		return _cpAttachmentFileEntryService.getCPAttachmentFileEntriesCount(
 			_portal.getClassNameId(CPDefinition.class), cpDefinitionId,
-			filter.getKeywords(), CPAttachmentFileEntryConstants.TYPE_OTHER,
+			CPAttachmentFileEntryConstants.TYPE_OTHER,
 			WorkflowConstants.STATUS_ANY);
 	}
 

@@ -103,9 +103,8 @@ class CollapseProvider {
 			dom.once(panel, this._transitionEndEvent, onHidden);
 
 			panel.classList.add(CssClass.COLLAPSING);
+			panel.style[dimension] = 0;
 		}
-
-		panel.style.removeProperty(dimension);
 	};
 
 	show = ({panel, trigger}) => {

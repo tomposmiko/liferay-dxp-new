@@ -31,7 +31,6 @@ exports[`Field Checkbox has a helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
-      id="undefined_fieldHelp"
     >
       Type something
     </span>
@@ -109,13 +108,7 @@ exports[`Field Checkbox has a label 1`] = `
         </span>
       </span>
     </label>
-    <span
-      class="sr-only"
-      id="undefined_fieldDetails"
-    >
-      label
-      <br />
-    </span>
+    
   </div>
 </div>
 `;
@@ -405,13 +398,7 @@ exports[`Field Checkbox renders Label if showLabel is true 1`] = `
         />
       </span>
     </label>
-    <span
-      class="sr-only"
-      id="undefined_fieldDetails"
-    >
-      true
-      <br />
-    </span>
+    
   </div>
 </div>
 `;

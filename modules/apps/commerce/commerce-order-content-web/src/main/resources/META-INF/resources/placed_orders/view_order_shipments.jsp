@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+CommerceOrderContentDisplayContext commerceOrderContentDisplayContext = (CommerceOrderContentDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+
 long commerceOrderItemId = ParamUtil.getLong(request, "commerceOrderItemId");
 
 List<CommerceShipmentItem> commerceShipmentItems = commerceOrderContentDisplayContext.getCommerceShipmentItems(commerceOrderItemId);
@@ -60,12 +62,12 @@ List<CommerceShipmentItem> commerceShipmentItems = commerceOrderContentDisplayCo
 
 			<liferay-ui:search-container-column-text
 				name="carrier"
-				value="<%= HtmlUtil.escape(commerceShipment.getCarrier()) %>"
+				value="<%= commerceShipment.getCarrier() %>"
 			/>
 
 			<liferay-ui:search-container-column-text
 				name="tracking-number"
-				value="<%= HtmlUtil.escape(commerceShipment.getTrackingNumber()) %>"
+				value="<%= commerceShipment.getTrackingNumber() %>"
 			/>
 
 			<liferay-ui:search-container-column-text

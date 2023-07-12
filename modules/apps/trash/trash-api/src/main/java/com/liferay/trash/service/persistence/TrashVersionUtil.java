@@ -685,10 +685,6 @@ public class TrashVersionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(TrashVersionPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile TrashVersionPersistence _persistence;
 
 }

@@ -1201,24 +1201,6 @@ public class LayoutLocalServiceUtil {
 	}
 
 	/**
-	 * Returns all the layouts that match the type and belong to the group.
-	 *
-	 * @param groupId the primary key of the group
-	 * @param privateLayout whether the layout is private to the group
-	 * @param types the layout's type (optionally {@link
-	 LayoutConstants#TYPE_PORTLET}). The possible types can be found
-	 in {@link LayoutConstants}.
-	 * @return the matching layouts, or <code>null</code> if no matches were
-	 found
-	 */
-	public static List<Layout> getLayouts(
-			long groupId, boolean privateLayout, String[] types)
-		throws PortalException {
-
-		return getService().getLayouts(groupId, privateLayout, types);
-	}
-
-	/**
 	 * Returns a range of all the layouts belonging to the group.
 	 *
 	 * @param groupId the primary key of the group
@@ -2244,10 +2226,6 @@ public class LayoutLocalServiceUtil {
 
 	public static LayoutLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(LayoutLocalService service) {
-		_service = service;
 	}
 
 	private static volatile LayoutLocalService _service;

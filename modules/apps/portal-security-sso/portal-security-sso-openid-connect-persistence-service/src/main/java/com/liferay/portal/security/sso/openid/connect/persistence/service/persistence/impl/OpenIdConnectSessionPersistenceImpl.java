@@ -49,6 +49,7 @@ import com.liferay.portal.security.sso.openid.connect.persistence.service.persis
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2046,12 +2047,12 @@ public class OpenIdConnectSessionPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"userId", "configurationPid"}, false);
 
-		OpenIdConnectSessionUtil.setPersistence(this);
+		_setOpenIdConnectSessionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		OpenIdConnectSessionUtil.setPersistence(null);
+		_setOpenIdConnectSessionUtilPersistence(null);
 
 		entityCache.removeCache(OpenIdConnectSessionImpl.class.getName());
 
@@ -2061,6 +2062,22 @@ public class OpenIdConnectSessionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setOpenIdConnectSessionUtilPersistence(
+		OpenIdConnectSessionPersistence openIdConnectSessionPersistence) {
+
+		try {
+			Field field = OpenIdConnectSessionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, openIdConnectSessionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

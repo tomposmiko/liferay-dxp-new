@@ -15,7 +15,6 @@
 package com.liferay.adaptive.media.image.internal.validator.test;
 
 import com.liferay.adaptive.media.image.mime.type.AMImageMimeTypeProvider;
-import com.liferay.adaptive.media.image.size.AMImageSizeProvider;
 import com.liferay.adaptive.media.image.validator.AMImageValidator;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.repository.model.FileVersion;
@@ -73,10 +72,6 @@ public class AMImageValidatorTest {
 	private FileVersion _getFileVersion(String mimeType) {
 		return new FileVersionWrapper(null) {
 
-			public long getCompanyId() {
-				return 0;
-			}
-
 			@Override
 			public String getMimeType() {
 				return mimeType;
@@ -92,9 +87,6 @@ public class AMImageValidatorTest {
 
 	@Inject
 	private AMImageMimeTypeProvider _amImageMimeTypeProvider;
-
-	@Inject
-	private AMImageSizeProvider _amImageSizeProvider;
 
 	@Inject
 	private AMImageValidator _amImageValidator;

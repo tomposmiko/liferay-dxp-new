@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -5597,9 +5598,7 @@ public class JournalContentSearchPersistenceImpl
 	 */
 	@Override
 	public JournalContentSearch fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				JournalContentSearch.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(JournalContentSearch.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -6229,12 +6228,12 @@ public class JournalContentSearchPersistenceImpl
 			},
 			false);
 
-		JournalContentSearchUtil.setPersistence(this);
+		_setJournalContentSearchUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		JournalContentSearchUtil.setPersistence(null);
+		_setJournalContentSearchUtilPersistence(null);
 
 		entityCache.removeCache(JournalContentSearchImpl.class.getName());
 
@@ -6244,6 +6243,22 @@ public class JournalContentSearchPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setJournalContentSearchUtilPersistence(
+		JournalContentSearchPersistence journalContentSearchPersistence) {
+
+		try {
+			Field field = JournalContentSearchUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, journalContentSearchPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

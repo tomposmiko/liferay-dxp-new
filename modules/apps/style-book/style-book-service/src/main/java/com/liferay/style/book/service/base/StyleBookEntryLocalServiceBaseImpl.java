@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -59,6 +57,8 @@ import com.liferay.style.book.service.persistence.StyleBookEntryPersistence;
 import com.liferay.style.book.service.persistence.StyleBookEntryVersionPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.Collections;
 import java.util.List;
@@ -470,7 +470,7 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 	 * <strong>Important:</strong> Inspect StyleBookEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftStyleBookEntry the style book entry
+	 * @param styleBookEntry the style book entry
 	 * @return the style book entry that was updated
 	 */
 	@Indexable(type = IndexableType.REINDEX)
@@ -484,7 +484,7 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		StyleBookEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -499,7 +499,7 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		styleBookEntryLocalService = (StyleBookEntryLocalService)aopProxy;
 
-		StyleBookEntryLocalServiceUtil.setService(styleBookEntryLocalService);
+		_setLocalServiceUtilService(styleBookEntryLocalService);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -971,6 +971,22 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		StyleBookEntryLocalService styleBookEntryLocalService) {
+
+		try {
+			Field field = StyleBookEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, styleBookEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected StyleBookEntryLocalService styleBookEntryLocalService;
 
 	@Reference
@@ -986,8 +1002,5 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 
 	@Reference
 	protected StyleBookEntryVersionPersistence styleBookEntryVersionPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		StyleBookEntryLocalServiceBaseImpl.class);
 
 }

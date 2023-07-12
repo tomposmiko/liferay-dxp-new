@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1784,12 +1785,12 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 			"countByOAuth2ApplicationId", new String[] {Long.class.getName()},
 			new String[] {"oAuth2ApplicationId"}, false);
 
-		OAuth2ApplicationScopeAliasesUtil.setPersistence(this);
+		_setOAuth2ApplicationScopeAliasesUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		OAuth2ApplicationScopeAliasesUtil.setPersistence(null);
+		_setOAuth2ApplicationScopeAliasesUtilPersistence(null);
 
 		entityCache.removeCache(
 			OAuth2ApplicationScopeAliasesImpl.class.getName());
@@ -1800,6 +1801,24 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setOAuth2ApplicationScopeAliasesUtilPersistence(
+		OAuth2ApplicationScopeAliasesPersistence
+			oAuth2ApplicationScopeAliasesPersistence) {
+
+		try {
+			Field field =
+				OAuth2ApplicationScopeAliasesUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, oAuth2ApplicationScopeAliasesPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -127,12 +127,6 @@ const getInitialValue = (
 	return date;
 };
 
-const getFirstDayOfWeek = (locale) => {
-	const momentLocale = moment().locale(locale);
-
-	return momentLocale.localeData().firstDayOfWeek();
-};
-
 const getValueForHidden = (value, locale) => {
 	const momentLocale = moment().locale(locale);
 
@@ -248,6 +242,8 @@ const DatePicker = ({
 			else {
 				inputRef.current.value = '';
 			}
+
+			maskInstance.current.update(inputRef.current.value);
 		}
 	}, [
 		dateMask,
@@ -279,7 +275,6 @@ const DatePicker = ({
 				dateFormat={dateMask}
 				disabled={disabled}
 				expanded={expanded}
-				firstDayOfWeek={getFirstDayOfWeek(locale)}
 				initialMonth={getInitialMonth(value)}
 				months={Months}
 				onBlur={onBlur}
@@ -356,7 +351,6 @@ const Main = ({
 		name={name}
 		readOnly={readOnly}
 		spritemap={spritemap}
-		style={null}
 	>
 		<DatePicker
 			defaultLanguageId={defaultLanguageId}

@@ -696,12 +696,6 @@ public class AccountEntryUserRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		AccountEntryUserRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile AccountEntryUserRelPersistence _persistence;
 
 }

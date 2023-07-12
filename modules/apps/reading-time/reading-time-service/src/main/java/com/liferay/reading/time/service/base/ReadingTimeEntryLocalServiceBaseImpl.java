@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -54,6 +52,8 @@ import com.liferay.reading.time.service.ReadingTimeEntryLocalServiceUtil;
 import com.liferay.reading.time.service.persistence.ReadingTimeEntryPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -551,7 +551,7 @@ public abstract class ReadingTimeEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		ReadingTimeEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -566,8 +566,7 @@ public abstract class ReadingTimeEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		readingTimeEntryLocalService = (ReadingTimeEntryLocalService)aopProxy;
 
-		ReadingTimeEntryLocalServiceUtil.setService(
-			readingTimeEntryLocalService);
+		_setLocalServiceUtilService(readingTimeEntryLocalService);
 	}
 
 	/**
@@ -612,6 +611,23 @@ public abstract class ReadingTimeEntryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		ReadingTimeEntryLocalService readingTimeEntryLocalService) {
+
+		try {
+			Field field =
+				ReadingTimeEntryLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, readingTimeEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected ReadingTimeEntryLocalService readingTimeEntryLocalService;
 
 	@Reference
@@ -620,8 +636,5 @@ public abstract class ReadingTimeEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ReadingTimeEntryLocalServiceBaseImpl.class);
 
 }

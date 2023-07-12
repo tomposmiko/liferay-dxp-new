@@ -14,6 +14,7 @@
 
 package com.liferay.search.experiences.validator;
 
+import com.liferay.search.experiences.exception.SXPBlueprintConfigurationJSONException;
 import com.liferay.search.experiences.exception.SXPBlueprintTitleException;
 
 import java.util.Locale;
@@ -24,7 +25,11 @@ import java.util.Map;
  */
 public interface SXPBlueprintValidator {
 
-	public void validate(Map<Locale, String> titleMap)
-		throws SXPBlueprintTitleException;
+	public void validate(String configurationJSON)
+		throws SXPBlueprintConfigurationJSONException;
+
+	public void validate(String configurationJSON, Map<Locale, String> titleMap)
+		throws SXPBlueprintConfigurationJSONException,
+			   SXPBlueprintTitleException;
 
 }

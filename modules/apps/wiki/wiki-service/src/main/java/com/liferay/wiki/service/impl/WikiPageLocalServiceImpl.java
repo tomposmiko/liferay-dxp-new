@@ -199,7 +199,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			user.getCompanyId(), node.getGroupId(), userId,
 			WikiPage.class.getName(), pageId, "text/" + format, content);
 
-		title = _normalizeSpace(title);
+		title = StringUtil.replace(
+			title, CharPool.NO_BREAK_SPACE, CharPool.SPACE);
 
 		_validate(title, nodeId, content, format);
 
@@ -2895,21 +2896,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		indexer.reindex(page);
 	}
 
-	private String _normalizeSpace(String title) {
-		if (title == null) {
-			return null;
-		}
-
-		title = StringUtil.replace(
-			title, CharPool.NO_BREAK_SPACE, CharPool.SPACE);
-
-		title = title.trim();
-
-		title = title.replaceAll("\\s+", " ");
-
-		return title;
-	}
-
 	private void _notifySubscribers(
 			long userId, WikiPage page, String pageURL,
 			ServiceContext serviceContext)
@@ -3271,7 +3257,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		page.setResourcePrimKey(resourcePrimKey);
 		page.setGroupId(oldPage.getGroupId());
 		page.setCompanyId(user.getCompanyId());
-		page.setUserId(oldPage.getUserId());
+		page.setUserId(user.getUserId());
 		page.setUserName(user.getFullName());
 		page.setCreateDate(oldPage.getCreateDate());
 		page.setNodeId(nodeId);
@@ -3319,9 +3305,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			serviceContext.getAssetPriority());
 
 		// Workflow
-
-		page = wikiPagePersistence.findByN_T_First(
-			nodeId, page.getTitle(), null);
 
 		return _startWorkflowInstance(userId, page, serviceContext);
 	}

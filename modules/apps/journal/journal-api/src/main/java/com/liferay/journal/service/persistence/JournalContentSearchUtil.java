@@ -1903,12 +1903,6 @@ public class JournalContentSearchUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		JournalContentSearchPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile JournalContentSearchPersistence _persistence;
 
 }

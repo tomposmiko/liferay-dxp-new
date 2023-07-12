@@ -22,7 +22,7 @@
 </tr>
 <tr>
 	<td>PUBLICATIONS_INDICATOR_TITLE</td>
-	<td>//span[contains(@class,'change-tracking-indicator-title') and contains(.,'${key_publicationName}')]</td>
+	<td>//button[contains(@class,'change-tracking-indicator-title')] and contains(.,'${key_publicationName}')</td>
 	<td></td>
 </tr>
 <tr>
@@ -47,7 +47,7 @@
 </tr>
 <tr>
 	<td>CONFLICTING_CHANGES_DIFF_IFRAME_TITLE</td>
-	<td>//div[contains(@class,'modal-header')]/*[@class='modal-title' and contains(.,'${key_iframeTitle}')]</td>
+	<td>//div[contains(@class,'modal-header')]/div[@class='modal-title' and contains(.,'${key_iframeTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -106,16 +106,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>NEEDS_MANUAL_RESOLUTION_HEADER_COLLAPSED</td>
-	<td>//button[contains(@class,'collapse-icon') and contains(.,'Needs Manual Resolution')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NEEDS_MANUAL_RESOLUTION_HEADER_EXPANDED</td>
-	<td>//button[contains(@class,'collapse-icon') and contains(@aria-expanded,'true') and contains(.,'Needs Manual Resolution')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>NEEDS_MANUAL_RESOLUTION_TABLE</td>
 	<td>//div[contains(@class,'publications-conflicts-container')]//span[contains(.,'Needs Manual Resolution')]</td>
 	<td></td>
@@ -133,16 +123,6 @@
 <tr>
 	<td>PUBLICATION_NAME_IN_DIFF</td>
 	<td>//td[contains(@class,'publications-diff-td') and contains(.,'${key_publicationName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PUBLICATION_NAME_IN_ONGOING</td>
-	<td>//div[contains(@class,'publication-name') and contains(.,'${key_publicationName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PUBLICATION_ORDER_IN_HISTORY</td>
-	<td>//dl//dd[${resultOrder}]//div[contains(.,'${key_publicationName}')]</td>
 	<td></td>
 </tr>
 <tr>

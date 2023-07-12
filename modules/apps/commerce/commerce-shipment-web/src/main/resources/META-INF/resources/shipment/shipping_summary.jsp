@@ -68,7 +68,7 @@ Format dateFormat = FastDateFormatFactoryUtil.getDate(DateFormat.MEDIUM, locale,
 							<span class="text-muted"><liferay-ui:message key="click-edit-to-insert" /></span>
 						</c:when>
 						<c:otherwise>
-							<b><%= HtmlUtil.escape(carrier) %></b>
+							<b><%= carrier %></b>
 						</c:otherwise>
 					</c:choose>
 				</div>
@@ -83,7 +83,7 @@ Format dateFormat = FastDateFormatFactoryUtil.getDate(DateFormat.MEDIUM, locale,
 							<span class="text-muted"><liferay-ui:message key="click-edit-to-insert" /></span>
 						</c:when>
 						<c:otherwise>
-							<b><%= HtmlUtil.escape(trackingNumber) %></b>
+							<b><%= trackingNumber %></b>
 						</c:otherwise>
 					</c:choose>
 				</div>
@@ -110,7 +110,7 @@ Format dateFormat = FastDateFormatFactoryUtil.getDate(DateFormat.MEDIUM, locale,
 				title='<%= LanguageUtil.get(request, "shipping-address") %>'
 			>
 				<div class="item">
-					<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(commerceShipmentDisplayContext.getDescriptiveShippingAddress())) %>
+					<%= HtmlUtil.replaceNewLine(commerceShipmentDisplayContext.getDescriptiveShippingAddress()) %>
 				</div>
 			</commerce-ui:info-box>
 
@@ -118,7 +118,7 @@ Format dateFormat = FastDateFormatFactoryUtil.getDate(DateFormat.MEDIUM, locale,
 				title='<%= LanguageUtil.get(request, "channel") %>'
 			>
 				<div class="item">
-					<%= HtmlUtil.escape(commerceShipmentDisplayContext.getCommerceChannelName()) %>
+					<%= commerceShipmentDisplayContext.getCommerceChannelName() %>
 				</div>
 			</commerce-ui:info-box>
 		</div>

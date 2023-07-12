@@ -15,11 +15,8 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.checkbox;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,11 +29,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
  */
 @RunWith(PowerMockRunner.class)
 public class CheckboxDDMFormFieldValueRequestParameterRetrieverTest {
-
-	@Before
-	public void setUp() throws Exception {
-		setUpJSONFactoryUtil();
-	}
 
 	@Test
 	public void testGetRequestParameterValueFalse() {
@@ -83,12 +75,6 @@ public class CheckboxDDMFormFieldValueRequestParameterRetrieverTest {
 				request, "ddmFormFieldCheckbox", defaultParameterValue);
 
 		Assert.assertEquals(parameterValue, defaultParameterValue);
-	}
-
-	protected void setUpJSONFactoryUtil() {
-		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
-
-		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
 	private final CheckboxDDMFormFieldValueRequestParameterRetriever

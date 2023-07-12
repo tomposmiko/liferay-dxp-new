@@ -50,6 +50,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -646,11 +647,11 @@ public class AccountPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		AccountUtil.setPersistence(this);
+		_setAccountUtilPersistence(this);
 	}
 
 	public void destroy() {
-		AccountUtil.setPersistence(null);
+		_setAccountUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(AccountImpl.class.getName());
 
@@ -660,6 +661,21 @@ public class AccountPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAccountUtilPersistence(
+		AccountPersistence accountPersistence) {
+
+		try {
+			Field field = AccountUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, accountPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

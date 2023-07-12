@@ -121,6 +121,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
@@ -1545,21 +1546,21 @@ public class PortletImportControllerImpl implements PortletImportController {
 		// Available locales
 
 		if (portletDataHandler.isDataLocalized()) {
-			String[] sourceAvailableLanguageIds = StringUtil.split(
-				headerElement.attributeValue("available-locales"));
+			List<Locale> sourceAvailableLocales = Arrays.asList(
+				LocaleUtil.fromLanguageIds(
+					StringUtil.split(
+						headerElement.attributeValue("available-locales"))));
 
-			for (String sourceAvailableLanguageId :
-					sourceAvailableLanguageIds) {
-
+			for (Locale sourceAvailableLocale : sourceAvailableLocales) {
 				if (!LanguageUtil.isAvailableLocale(
 						_portal.getSiteGroupId(groupId),
-						sourceAvailableLanguageId)) {
+						sourceAvailableLocale)) {
 
 					LocaleException localeException = new LocaleException(
 						LocaleException.TYPE_EXPORT_IMPORT);
 
-					localeException.setSourceAvailableLanguageIds(
-						Arrays.asList(sourceAvailableLanguageIds));
+					localeException.setSourceAvailableLocales(
+						sourceAvailableLocales);
 					localeException.setTargetAvailableLocales(
 						LanguageUtil.getAvailableLocales(
 							_portal.getSiteGroupId(groupId)));

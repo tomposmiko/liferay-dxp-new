@@ -60,24 +60,20 @@ public class UploadServletRequestConfigurationModelListener
 	public void onBeforeSave(String pid, Dictionary<String, Object> properties)
 		throws ConfigurationModelListenerException {
 
-		Object maxSizeObject = properties.get("maxSize");
+		long maxSize = (long)properties.get("maxSize");
 
-		if (maxSizeObject != null) {
-			long maxSize = (long)maxSizeObject;
+		if (maxSize < _MINIMUM_MAX_SIZE) {
+			ResourceBundle resourceBundle = _getResourceBundle();
 
-			if (maxSize < _MINIMUM_MAX_SIZE) {
-				ResourceBundle resourceBundle = _getResourceBundle();
-
-				throw new ConfigurationModelListenerException(
-					LanguageUtil.format(
-						resourceBundle,
-						"the-maximum-upload-request-size-cannot-be-less-than-x",
-						LanguageUtil.formatStorageSize(
-							GetterUtil.getDouble(_MINIMUM_MAX_SIZE),
-							resourceBundle.getLocale())),
-					UploadServletRequestConfiguration.class, getClass(),
-					properties);
-			}
+			throw new ConfigurationModelListenerException(
+				LanguageUtil.format(
+					resourceBundle,
+					"the-maximum-upload-request-size-cannot-be-less-than-x",
+					LanguageUtil.formatStorageSize(
+						GetterUtil.getDouble(_MINIMUM_MAX_SIZE),
+						resourceBundle.getLocale())),
+				UploadServletRequestConfiguration.class, getClass(),
+				properties);
 		}
 
 		String tempDir = (String)properties.get("tempDir");

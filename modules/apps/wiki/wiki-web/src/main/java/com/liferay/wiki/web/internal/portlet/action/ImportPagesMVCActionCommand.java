@@ -14,7 +14,6 @@
 
 package com.liferay.wiki.web.internal.portlet.action;
 
-import com.liferay.petra.io.StreamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -96,10 +95,13 @@ public class ImportPagesMVCActionCommand extends BaseMVCActionCommand {
 		long nodeId = ParamUtil.getLong(uploadPortletRequest, "nodeId");
 		String importer = ParamUtil.getString(uploadPortletRequest, "importer");
 
-		InputStream[] inputStreams = new InputStream[_MAX_FILE_COUNT];
+		int filesCount = ParamUtil.getInteger(
+			uploadPortletRequest, "filesCount", 10);
+
+		InputStream[] inputStreams = new InputStream[filesCount];
 
 		try {
-			for (int i = 0; i < _MAX_FILE_COUNT; i++) {
+			for (int i = 0; i < filesCount; i++) {
 				inputStreams[i] = uploadPortletRequest.getFileAsStream(
 					"file" + i);
 			}
@@ -109,12 +111,16 @@ public class ImportPagesMVCActionCommand extends BaseMVCActionCommand {
 				actionRequest.getParameterMap());
 		}
 		finally {
-			try {
-				StreamUtil.cleanUp(inputStreams);
-			}
-			catch (IOException ioException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(ioException);
+			for (InputStream inputStream : inputStreams) {
+				if (inputStream != null) {
+					try {
+						inputStream.close();
+					}
+					catch (IOException ioException) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(ioException, ioException);
+						}
+					}
 				}
 			}
 		}
@@ -126,8 +132,6 @@ public class ImportPagesMVCActionCommand extends BaseMVCActionCommand {
 	protected void setWikiNodeService(WikiNodeService wikiNodeService) {
 		_wikiNodeService = wikiNodeService;
 	}
-
-	private static final int _MAX_FILE_COUNT = 3;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ImportPagesMVCActionCommand.class);

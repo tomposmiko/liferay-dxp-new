@@ -207,6 +207,9 @@ public class Mutation {
 		experimentRunResource.setContextUser(_user);
 		experimentRunResource.setGroupLocalService(_groupLocalService);
 		experimentRunResource.setRoleLocalService(_roleLocalService);
+
+		experimentRunResource.setVulcanBatchEngineImportTaskResource(
+			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(StatusResource statusResource)

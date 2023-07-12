@@ -174,10 +174,6 @@ public class KBCommentServiceUtil {
 		return _service;
 	}
 
-	public static void setService(KBCommentService service) {
-		_service = service;
-	}
-
 	private static volatile KBCommentService _service;
 
 }

@@ -55,7 +55,6 @@ import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserService;
-import com.liferay.portal.kernel.service.permission.RolePermission;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -88,7 +87,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.portlet.ActionRequest;
@@ -149,15 +147,8 @@ public class RolesAdminPortlet extends MVCPortlet {
 		long roleId = ParamUtil.getLong(actionRequest, "roleId");
 		String name = ParamUtil.getString(actionRequest, "name");
 		int scope = ParamUtil.getInteger(actionRequest, "scope");
-		String[] primKeys = ParamUtil.getStringValues(
-			actionRequest, "primKeys");
+		String primKey = ParamUtil.getString(actionRequest, "primKey");
 		String actionId = ParamUtil.getString(actionRequest, "actionId");
-
-		for (String primKey : primKeys) {
-			_resourcePermissionService.removeResourcePermission(
-				themeDisplay.getScopeGroupId(), themeDisplay.getCompanyId(),
-				name, scope, primKey, roleId, actionId);
-		}
 
 		Role role = _roleLocalService.getRole(roleId);
 
@@ -172,6 +163,10 @@ public class RolesAdminPortlet extends MVCPortlet {
 
 			throw new RolePermissionsException(roleName);
 		}
+
+		_resourcePermissionService.removeResourcePermission(
+			themeDisplay.getScopeGroupId(), themeDisplay.getCompanyId(), name,
+			scope, primKey, roleId, actionId);
 
 		// Send redirect
 
@@ -245,20 +240,17 @@ public class RolesAdminPortlet extends MVCPortlet {
 				roleTypeContributor.getClassName(), 0, name, titleMap,
 				descriptionMap, type, subtype, serviceContext);
 
-			String redirect = _portal.escapeRedirect(
-				ParamUtil.getString(actionRequest, "redirect"));
+			String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+			redirect = _http.setParameter(
+				redirect, actionResponse.getNamespace() + "roleId",
+				role.getRoleId());
+
+			actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
 
 			SessionMessages.add(actionRequest, "roleCreated");
 
-			if (Validator.isNotNull(redirect)) {
-				redirect = _http.setParameter(
-					redirect, actionResponse.getNamespace() + "roleId",
-					role.getRoleId());
-
-				actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
-
-				actionResponse.sendRedirect(redirect);
-			}
+			actionResponse.sendRedirect(redirect);
 
 			return role;
 		}
@@ -543,26 +535,6 @@ public class RolesAdminPortlet extends MVCPortlet {
 				bundleContext, PanelCategoryRoleTypeMapper.class);
 	}
 
-	@Override
-	protected void checkPermissions(PortletRequest portletRequest)
-		throws Exception {
-
-		String mvcPath = ParamUtil.getString(portletRequest, "mvcPath");
-
-		if (Objects.equals(mvcPath, "/edit_role_assignments.jsp")) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)portletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			_rolePermission.check(
-				themeDisplay.getPermissionChecker(),
-				ParamUtil.getLong(portletRequest, "roleId"),
-				ActionKeys.ASSIGN_MEMBERS);
-		}
-
-		super.checkPermissions(portletRequest);
-	}
-
 	@Deactivate
 	protected void deactivate() {
 		_personalMenuEntryServiceTrackerList.close();
@@ -573,13 +545,6 @@ public class RolesAdminPortlet extends MVCPortlet {
 	protected void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
-
-		try {
-			checkPermissions(renderRequest);
-		}
-		catch (Exception exception) {
-			SessionErrors.add(renderRequest, exception.getClass(), exception);
-		}
 
 		setAttributes(renderRequest);
 
@@ -905,11 +870,6 @@ public class RolesAdminPortlet extends MVCPortlet {
 
 	private ResourcePermissionService _resourcePermissionService;
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private RolePermission _rolePermission;
-
-	@Reference
 	private RoleService _roleService;
 
 	@Reference

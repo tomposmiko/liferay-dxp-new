@@ -29,9 +29,7 @@ import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsDescriptor;
 import com.liferay.portal.kernel.settings.SettingsFactory;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -228,29 +226,17 @@ public class AnalyticsMessageSenderClientImpl
 
 			StatusLine statusLine = closeableHttpResponse.getStatusLine();
 
-			boolean disconnected = false;
-			JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject();
-
-			String response = EntityUtils.toString(
-				closeableHttpResponse.getEntity(), Charset.defaultCharset());
-
-			if ((response != null) && response.startsWith("{")) {
-				responseJSONObject = JSONFactoryUtil.createJSONObject(response);
-
-				disconnected = StringUtil.equals(
-					GetterUtil.getString(responseJSONObject.getString("state")),
-					"DISCONNECTED");
-			}
-
-			if ((statusLine.getStatusCode() != HttpStatus.SC_FORBIDDEN) &&
-				!disconnected) {
-
+			if (statusLine.getStatusCode() != HttpStatus.SC_FORBIDDEN) {
 				return closeableHttpResponse;
 			}
 
+			JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(
+				EntityUtils.toString(
+					closeableHttpResponse.getEntity(),
+					Charset.defaultCharset()));
+
 			processInvalidTokenMessage(
-				companyId, disconnected,
-				responseJSONObject.getString("message"));
+				companyId, responseJSONObject.getString("message"));
 
 			return closeableHttpResponse;
 		}

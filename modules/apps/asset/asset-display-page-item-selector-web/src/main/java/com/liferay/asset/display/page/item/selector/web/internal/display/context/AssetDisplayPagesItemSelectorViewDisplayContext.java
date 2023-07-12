@@ -93,7 +93,7 @@ public class AssetDisplayPagesItemSelectorViewDisplayContext {
 			layoutPageTemplateEntriesCount =
 				LayoutPageTemplateEntryServiceUtil.
 					getLayoutPageTemplateEntriesCount(
-						_getGroupId(),
+						_themeDisplay.getScopeGroupId(),
 						_assetDisplayPageSelectorCriterion.getClassNameId(),
 						_assetDisplayPageSelectorCriterion.getClassTypeId(),
 						_getKeywords(),
@@ -102,7 +102,7 @@ public class AssetDisplayPagesItemSelectorViewDisplayContext {
 
 			layoutPageTemplateEntries =
 				LayoutPageTemplateEntryServiceUtil.getLayoutPageTemplateEntries(
-					_getGroupId(),
+					_themeDisplay.getScopeGroupId(),
 					_assetDisplayPageSelectorCriterion.getClassNameId(),
 					_assetDisplayPageSelectorCriterion.getClassTypeId(),
 					_getKeywords(),
@@ -116,7 +116,7 @@ public class AssetDisplayPagesItemSelectorViewDisplayContext {
 			layoutPageTemplateEntriesCount =
 				LayoutPageTemplateEntryServiceUtil.
 					getLayoutPageTemplateEntriesCount(
-						_getGroupId(),
+						_themeDisplay.getScopeGroupId(),
 						_assetDisplayPageSelectorCriterion.getClassNameId(),
 						_assetDisplayPageSelectorCriterion.getClassTypeId(),
 						LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE,
@@ -124,7 +124,7 @@ public class AssetDisplayPagesItemSelectorViewDisplayContext {
 
 			layoutPageTemplateEntries =
 				LayoutPageTemplateEntryServiceUtil.getLayoutPageTemplateEntries(
-					_getGroupId(),
+					_themeDisplay.getScopeGroupId(),
 					_assetDisplayPageSelectorCriterion.getClassNameId(),
 					_assetDisplayPageSelectorCriterion.getClassTypeId(),
 					LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE,
@@ -156,17 +156,6 @@ public class AssetDisplayPagesItemSelectorViewDisplayContext {
 			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
-	}
-
-	private long _getGroupId() {
-		if (_groupId != null) {
-			return _groupId;
-		}
-
-		_groupId = ParamUtil.getLong(
-			_httpServletRequest, "groupId", _themeDisplay.getScopeGroupId());
-
-		return _groupId;
 	}
 
 	private String _getKeywords() {
@@ -229,7 +218,6 @@ public class AssetDisplayPagesItemSelectorViewDisplayContext {
 		_assetDisplayPageSearchContainer;
 	private final AssetDisplayPageSelectorCriterion
 		_assetDisplayPageSelectorCriterion;
-	private Long _groupId;
 	private final HttpServletRequest _httpServletRequest;
 	private final String _itemSelectedEventName;
 	private String _keywords;

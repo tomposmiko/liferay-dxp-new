@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -56,7 +56,7 @@ public abstract class ERUserLocalServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		ERUserLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public abstract class ERUserLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		erUserLocalService = (ERUserLocalService)aopProxy;
 
-		ERUserLocalServiceUtil.setService(erUserLocalService);
+		_setLocalServiceUtilService(erUserLocalService);
 	}
 
 	/**
@@ -107,6 +107,22 @@ public abstract class ERUserLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		ERUserLocalService erUserLocalService) {
+
+		try {
+			Field field = ERUserLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, erUserLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected ERUserLocalService erUserLocalService;
 
 	@Reference
@@ -116,8 +132,5 @@ public abstract class ERUserLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ERUserLocalServiceBaseImpl.class);
 
 }

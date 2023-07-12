@@ -50,6 +50,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2669,11 +2670,11 @@ public class CPDAvailabilityEstimatePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"CProductId"},
 			false);
 
-		CPDAvailabilityEstimateUtil.setPersistence(this);
+		_setCPDAvailabilityEstimateUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CPDAvailabilityEstimateUtil.setPersistence(null);
+		_setCPDAvailabilityEstimateUtilPersistence(null);
 
 		entityCache.removeCache(CPDAvailabilityEstimateImpl.class.getName());
 
@@ -2683,6 +2684,22 @@ public class CPDAvailabilityEstimatePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCPDAvailabilityEstimateUtilPersistence(
+		CPDAvailabilityEstimatePersistence cpdAvailabilityEstimatePersistence) {
+
+		try {
+			Field field = CPDAvailabilityEstimateUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, cpdAvailabilityEstimatePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -15,7 +15,6 @@
 package com.liferay.oauth.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link OAuthApplicationLocalService}.
@@ -448,11 +447,6 @@ public class OAuthApplicationLocalServiceWrapper
 
 		return _oAuthApplicationLocalService.updateOAuthApplication(
 			oAuthApplication);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _oAuthApplicationLocalService.getBasePersistence();
 	}
 
 	@Override

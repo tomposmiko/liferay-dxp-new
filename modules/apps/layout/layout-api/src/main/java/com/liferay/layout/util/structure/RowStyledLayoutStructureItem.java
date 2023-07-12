@@ -72,8 +72,6 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		jsonObject.put(
 			"gutters", _gutters
 		).put(
-			"indexed", _indexed
-		).put(
 			"modulesPerRow", getModulesPerRow()
 		).put(
 			"numberOfColumns", _numberOfColumns
@@ -174,20 +172,12 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		return _gutters;
 	}
 
-	public boolean isIndexed() {
-		return _indexed;
-	}
-
 	public boolean isReverseOrder() {
 		return _reverseOrder;
 	}
 
 	public void setGutters(boolean gutters) {
 		_gutters = gutters;
-	}
-
-	public void setIndexed(boolean indexed) {
-		_indexed = indexed;
 	}
 
 	public void setModulesPerRow(int modulesPerRow) {
@@ -258,10 +248,6 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 			setModulesPerRow(itemConfigJSONObject.getInt("modulesPerRow"));
 		}
 
-		if (itemConfigJSONObject.has("indexed")) {
-			setIndexed(itemConfigJSONObject.getBoolean("indexed"));
-		}
-
 		if (itemConfigJSONObject.has("numberOfColumns")) {
 			setNumberOfColumns(itemConfigJSONObject.getInt("numberOfColumns"));
 		}
@@ -290,7 +276,6 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 	}
 
 	private boolean _gutters = true;
-	private boolean _indexed = true;
 	private Integer _modulesPerRow;
 	private int _numberOfColumns;
 	private boolean _reverseOrder;

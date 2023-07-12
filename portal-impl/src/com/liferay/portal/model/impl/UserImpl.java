@@ -887,12 +887,7 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public void setLanguageId(String languageId) {
-		if (isDefaultUser()) {
-			_locale = LocaleUtil.fromLanguageId(languageId, false);
-		}
-		else {
-			_locale = LocaleUtil.fromLanguageId(languageId);
-		}
+		_locale = LocaleUtil.fromLanguageId(languageId);
 
 		super.setLanguageId(LocaleUtil.toLanguageId(_locale));
 	}

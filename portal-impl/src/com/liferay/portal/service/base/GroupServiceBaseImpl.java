@@ -31,8 +31,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
@@ -75,6 +73,8 @@ import com.liferay.social.kernel.service.persistence.SocialActivityFinder;
 import com.liferay.social.kernel.service.persistence.SocialActivityPersistence;
 import com.liferay.social.kernel.service.persistence.SocialActivitySettingPersistence;
 import com.liferay.social.kernel.service.persistence.SocialRequestPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -2465,11 +2465,11 @@ public abstract class GroupServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		GroupServiceUtil.setService(groupService);
+		_setServiceUtilService(groupService);
 	}
 
 	public void destroy() {
-		GroupServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -2511,6 +2511,19 @@ public abstract class GroupServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(GroupService groupService) {
+		try {
+			Field field = GroupServiceUtil.class.getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, groupService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -3025,8 +3038,5 @@ public abstract class GroupServiceBaseImpl
 	@BeanReference(type = WorkflowDefinitionLinkPersistence.class)
 	protected WorkflowDefinitionLinkPersistence
 		workflowDefinitionLinkPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		GroupServiceBaseImpl.class);
 
 }

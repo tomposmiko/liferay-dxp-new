@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class DDLRecordSetVersionServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DDLRecordSetVersionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class DDLRecordSetVersionServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddlRecordSetVersionService = (DDLRecordSetVersionService)aopProxy;
 
-		DDLRecordSetVersionServiceUtil.setService(ddlRecordSetVersionService);
+		_setServiceUtilService(ddlRecordSetVersionService);
 	}
 
 	/**
@@ -117,6 +117,22 @@ public abstract class DDLRecordSetVersionServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		DDLRecordSetVersionService ddlRecordSetVersionService) {
+
+		try {
+			Field field = DDLRecordSetVersionServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddlRecordSetVersionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected
 		com.liferay.dynamic.data.lists.service.DDLRecordSetVersionLocalService
@@ -130,8 +146,5 @@ public abstract class DDLRecordSetVersionServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDLRecordSetVersionServiceBaseImpl.class);
 
 }

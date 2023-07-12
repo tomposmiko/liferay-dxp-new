@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DDMFormInstanceVersionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -72,8 +72,7 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddmFormInstanceVersionService = (DDMFormInstanceVersionService)aopProxy;
 
-		DDMFormInstanceVersionServiceUtil.setService(
-			ddmFormInstanceVersionService);
+		_setServiceUtilService(ddmFormInstanceVersionService);
 	}
 
 	/**
@@ -119,6 +118,23 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		DDMFormInstanceVersionService ddmFormInstanceVersionService) {
+
+		try {
+			Field field =
+				DDMFormInstanceVersionServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmFormInstanceVersionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected
 		com.liferay.dynamic.data.mapping.service.
@@ -134,8 +150,5 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMFormInstanceVersionServiceBaseImpl.class);
 
 }

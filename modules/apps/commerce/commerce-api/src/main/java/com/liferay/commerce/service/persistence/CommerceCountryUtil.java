@@ -1527,10 +1527,6 @@ public class CommerceCountryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CommerceCountryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceCountryPersistence _persistence;
 
 }

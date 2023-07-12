@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.service.persistence.impl;
 
-import com.liferay.commerce.exception.DuplicateCommerceOrderItemExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceOrderItemTable;
@@ -46,11 +45,11 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -4013,38 +4012,6 @@ public class CommerceOrderItemPersistenceImpl
 		CommerceOrderItemModelImpl commerceOrderItemModelImpl =
 			(CommerceOrderItemModelImpl)commerceOrderItem;
 
-		if (Validator.isNull(commerceOrderItem.getExternalReferenceCode())) {
-			commerceOrderItem.setExternalReferenceCode(
-				String.valueOf(commerceOrderItem.getPrimaryKey()));
-		}
-		else {
-			CommerceOrderItem ercCommerceOrderItem = fetchByC_ERC(
-				commerceOrderItem.getCompanyId(),
-				commerceOrderItem.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommerceOrderItem != null) {
-					throw new DuplicateCommerceOrderItemExternalReferenceCodeException(
-						"Duplicate commerce order item with external reference code " +
-							commerceOrderItem.getExternalReferenceCode() +
-								" and company " +
-									commerceOrderItem.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceOrderItem != null) &&
-					(commerceOrderItem.getCommerceOrderItemId() !=
-						ercCommerceOrderItem.getCommerceOrderItemId())) {
-
-					throw new DuplicateCommerceOrderItemExternalReferenceCodeException(
-						"Duplicate commerce order item with external reference code " +
-							commerceOrderItem.getExternalReferenceCode() +
-								" and company " +
-									commerceOrderItem.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -4526,11 +4493,11 @@ public class CommerceOrderItemPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommerceOrderItemUtil.setPersistence(this);
+		_setCommerceOrderItemUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceOrderItemUtil.setPersistence(null);
+		_setCommerceOrderItemUtilPersistence(null);
 
 		entityCache.removeCache(CommerceOrderItemImpl.class.getName());
 
@@ -4540,6 +4507,22 @@ public class CommerceOrderItemPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceOrderItemUtilPersistence(
+		CommerceOrderItemPersistence commerceOrderItemPersistence) {
+
+		try {
+			Field field = CommerceOrderItemUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceOrderItemPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -23,8 +23,6 @@ String url = GetterUtil.getString((String)request.getAttribute("liferay-social-b
 %>
 
 <clay:link
-	additionalProps='<%= (HashMap)request.getAttribute("liferay-social-bookmarks:bookmark:additionalProps") %>'
-	aria-label="<%= socialBookmark.getName(request.getLocale()) %>"
 	borderless="<%= true %>"
 	cssClass="lfr-portal-tooltip"
 	displayType="secondary"
@@ -32,7 +30,6 @@ String url = GetterUtil.getString((String)request.getAttribute("liferay-social-b
 	icon="social-facebook"
 	monospaced="<%= true %>"
 	outline="<%= true %>"
-	propsTransformer="js/OpenSocialBookmarkPropsTransformer"
 	small="<%= true %>"
 	title="<%= socialBookmark.getName(request.getLocale()) %>"
 	type="button"

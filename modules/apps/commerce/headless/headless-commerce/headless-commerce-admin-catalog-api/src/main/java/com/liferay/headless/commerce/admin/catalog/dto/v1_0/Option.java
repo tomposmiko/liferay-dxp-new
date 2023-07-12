@@ -92,9 +92,7 @@ public class Option implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long catalogId;
 
-	@Schema(
-		example = "{hu_HU=Description HU, hr_HR=Description HR, en_US=Description}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getDescription() {
 		return description;
@@ -124,7 +122,7 @@ public class Option implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> description;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -152,7 +150,7 @@ public class Option implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getFacetable() {
 		return facetable;
 	}
@@ -180,7 +178,7 @@ public class Option implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean facetable;
 
-	@Schema(example = "select")
+	@Schema
 	@Valid
 	public FieldType getFieldType() {
 		return fieldType;
@@ -220,7 +218,7 @@ public class Option implements Serializable {
 	protected FieldType fieldType;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -246,7 +244,7 @@ public class Option implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(example = "color")
+	@Schema
 	public String getKey() {
 		return key;
 	}
@@ -273,7 +271,7 @@ public class Option implements Serializable {
 	@NotEmpty
 	protected String key;
 
-	@Schema(example = "{en_US=Color, hr_HR=Color HR, hu_HU=Color HU}")
+	@Schema
 	@Valid
 	public Map<String, String> getName() {
 		return name;
@@ -332,7 +330,7 @@ public class Option implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected OptionValue[] optionValues;
 
-	@Schema(example = "1.2")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}
@@ -360,7 +358,7 @@ public class Option implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double priority;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getRequired() {
 		return required;
 	}
@@ -388,7 +386,7 @@ public class Option implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean required;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getSkuContributor() {
 		return skuContributor;
 	}

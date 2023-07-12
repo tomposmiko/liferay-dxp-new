@@ -33,13 +33,13 @@ CommerceHealthStatusDisplayContext commerceHealthStatusDisplayContext = (Commerc
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-content"
 					name="name"
-					value="<%= HtmlUtil.escape(commerceHealthStatus.getName(locale)) %>"
+					value="<%= commerceHealthStatus.getName(locale) %>"
 				/>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-content"
 					name="description"
-					value="<%= HtmlUtil.escape(commerceHealthStatus.getDescription(locale)) %>"
+					value="<%= commerceHealthStatus.getDescription(locale) %>"
 				/>
 
 				<liferay-ui:search-container-column-text

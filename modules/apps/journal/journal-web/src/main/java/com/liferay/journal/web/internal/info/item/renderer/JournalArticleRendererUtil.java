@@ -38,9 +38,7 @@ public class JournalArticleRendererUtil {
 			PortalUtil.getOriginalServletRequest(originalHttpServletRequest),
 			"p_l_mode", Constants.VIEW);
 
-		if (Objects.equals(Constants.EDIT, mode) ||
-			Objects.equals(Constants.PREVIEW, mode)) {
-
+		if (Objects.equals(Constants.EDIT, mode)) {
 			return true;
 		}
 

@@ -909,12 +909,6 @@ public class CPDAvailabilityEstimateUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CPDAvailabilityEstimatePersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CPDAvailabilityEstimatePersistence _persistence;
 
 }

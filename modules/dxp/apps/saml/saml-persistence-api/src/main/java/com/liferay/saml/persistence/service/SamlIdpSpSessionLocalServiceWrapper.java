@@ -15,7 +15,6 @@
 package com.liferay.saml.persistence.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link SamlIdpSpSessionLocalService}.
@@ -380,11 +379,6 @@ public class SamlIdpSpSessionLocalServiceWrapper
 
 		return _samlIdpSpSessionLocalService.updateSamlIdpSpSession(
 			samlIdpSpSession);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _samlIdpSpSessionLocalService.getBasePersistence();
 	}
 
 	@Override

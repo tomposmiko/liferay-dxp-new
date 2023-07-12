@@ -15,7 +15,6 @@
 package com.liferay.change.tracking.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CTCollectionLocalService}.
@@ -155,26 +154,6 @@ public class CTCollectionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ctCollectionLocalService.deletePersistedModel(persistedModel);
-	}
-
-	@Override
-	public void discardCTEntries(
-			long ctCollectionId, long modelClassNameId, long modelClassPK,
-			boolean force)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_ctCollectionLocalService.discardCTEntries(
-			ctCollectionId, modelClassNameId, modelClassPK, force);
-	}
-
-	@Override
-	public void discardCTEntry(
-			long ctCollectionId, long modelClassNameId, long modelClassPK,
-			boolean force)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_ctCollectionLocalService.discardCTEntry(
-			ctCollectionId, modelClassNameId, modelClassPK, force);
 	}
 
 	@Override
@@ -426,11 +405,6 @@ public class CTCollectionLocalServiceWrapper
 
 		return _ctCollectionLocalService.updateCTCollection(
 			userId, ctCollectionId, name, description);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _ctCollectionLocalService.getBasePersistence();
 	}
 
 	@Override

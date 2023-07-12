@@ -15,7 +15,6 @@
 package com.liferay.change.tracking.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CTEntryLocalService}.
@@ -379,14 +378,6 @@ public class CTEntryLocalServiceWrapper
 			ctCollectionId, modelClassNameId);
 	}
 
-	@Override
-	public boolean hasCTEntry(
-		long ctCollectionId, long modelClassNameId, long modelClassPK) {
-
-		return _ctEntryLocalService.hasCTEntry(
-			ctCollectionId, modelClassNameId, modelClassPK);
-	}
-
 	/**
 	 * Updates the ct entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -402,11 +393,6 @@ public class CTEntryLocalServiceWrapper
 		com.liferay.change.tracking.model.CTEntry ctEntry) {
 
 		return _ctEntryLocalService.updateCTEntry(ctEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _ctEntryLocalService.getBasePersistence();
 	}
 
 	@Override

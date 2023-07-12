@@ -221,10 +221,6 @@ public class CPDefinitionOptionRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPDefinitionOptionRelService service) {
-		_service = service;
-	}
-
 	private static volatile CPDefinitionOptionRelService _service;
 
 }

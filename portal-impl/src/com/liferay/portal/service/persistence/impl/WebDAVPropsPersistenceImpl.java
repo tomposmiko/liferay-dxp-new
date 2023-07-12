@@ -50,6 +50,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -891,11 +892,11 @@ public class WebDAVPropsPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
 
-		WebDAVPropsUtil.setPersistence(this);
+		_setWebDAVPropsUtilPersistence(this);
 	}
 
 	public void destroy() {
-		WebDAVPropsUtil.setPersistence(null);
+		_setWebDAVPropsUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(WebDAVPropsImpl.class.getName());
 
@@ -905,6 +906,22 @@ public class WebDAVPropsPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setWebDAVPropsUtilPersistence(
+		WebDAVPropsPersistence webDAVPropsPersistence) {
+
+		try {
+			Field field = WebDAVPropsUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, webDAVPropsPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

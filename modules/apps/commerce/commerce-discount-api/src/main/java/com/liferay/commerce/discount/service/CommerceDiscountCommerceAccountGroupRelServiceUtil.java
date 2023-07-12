@@ -132,12 +132,6 @@ public class CommerceDiscountCommerceAccountGroupRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceDiscountCommerceAccountGroupRelService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceDiscountCommerceAccountGroupRelService
 		_service;
 

@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -47,6 +45,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -411,7 +411,7 @@ public abstract class AccountEntryOrganizationRelLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		AccountEntryOrganizationRelLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -427,8 +427,7 @@ public abstract class AccountEntryOrganizationRelLocalServiceBaseImpl
 		accountEntryOrganizationRelLocalService =
 			(AccountEntryOrganizationRelLocalService)aopProxy;
 
-		AccountEntryOrganizationRelLocalServiceUtil.setService(
-			accountEntryOrganizationRelLocalService);
+		_setLocalServiceUtilService(accountEntryOrganizationRelLocalService);
 	}
 
 	/**
@@ -474,6 +473,24 @@ public abstract class AccountEntryOrganizationRelLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		AccountEntryOrganizationRelLocalService
+			accountEntryOrganizationRelLocalService) {
+
+		try {
+			Field field =
+				AccountEntryOrganizationRelLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, accountEntryOrganizationRelLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected AccountEntryOrganizationRelLocalService
 		accountEntryOrganizationRelLocalService;
 
@@ -491,8 +508,5 @@ public abstract class AccountEntryOrganizationRelLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.OrganizationLocalService
 		organizationLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountEntryOrganizationRelLocalServiceBaseImpl.class);
 
 }

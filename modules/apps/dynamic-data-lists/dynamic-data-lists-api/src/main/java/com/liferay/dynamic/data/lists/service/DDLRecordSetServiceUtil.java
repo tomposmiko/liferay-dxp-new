@@ -383,10 +383,6 @@ public class DDLRecordSetServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DDLRecordSetService service) {
-		_service = service;
-	}
-
 	private static volatile DDLRecordSetService _service;
 
 }

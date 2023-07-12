@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.util.PropsValues;
 
 import java.util.Dictionary;
 
@@ -103,20 +102,11 @@ public class PortletConfigurationExtender
 
 		public void start() {
 			try {
-				String[] sources = StringUtil.split(
-					_portletConfiguration.get(
-						PropsKeys.RESOURCE_ACTIONS_CONFIGS));
-
-				_resourceActions.populateModelResources(_classLoader, sources);
-
-				String bundleSymbolicName = _bundle.getSymbolicName();
-
-				if (!PropsValues.RESOURCE_ACTIONS_STRICT_MODE_ENABLED ||
-					bundleSymbolicName.contains("commerce")) {
-
-					_resourceActions.populatePortletResources(
-						_classLoader, sources);
-				}
+				_resourceActions.readAndCheck(
+					_classLoader,
+					StringUtil.split(
+						_portletConfiguration.get(
+							PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
 			}
 			catch (Exception exception) {
 				_log.error(

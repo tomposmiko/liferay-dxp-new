@@ -136,7 +136,7 @@ if (fixedHeader) {
 							headerNameValue = LanguageUtil.get(resourceBundle, HtmlUtil.escape(headerName));
 						}
 						else {
-							headerNameValue = HtmlUtil.escape(headerName);
+							headerNameValue = headerName;
 						}
 
 						if (Validator.isNull(headerNameValue)) {

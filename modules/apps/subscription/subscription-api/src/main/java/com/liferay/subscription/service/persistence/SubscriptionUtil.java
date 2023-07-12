@@ -1099,7 +1099,7 @@ public class SubscriptionUtil {
 	 * @param companyId the company ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPKs the class pks
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of subscriptions
 	 * @param end the upper bound of the range of subscriptions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1366,10 +1366,6 @@ public class SubscriptionUtil {
 
 	public static SubscriptionPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(SubscriptionPersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static volatile SubscriptionPersistence _persistence;

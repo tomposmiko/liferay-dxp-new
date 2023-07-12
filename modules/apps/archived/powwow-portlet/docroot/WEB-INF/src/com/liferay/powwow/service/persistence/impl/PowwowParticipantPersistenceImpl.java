@@ -51,6 +51,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2323,11 +2324,11 @@ public class PowwowParticipantPersistenceImpl
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"powwowMeetingId", "type_"}, false);
 
-		PowwowParticipantUtil.setPersistence(this);
+		_setPowwowParticipantUtilPersistence(this);
 	}
 
 	public void destroy() {
-		PowwowParticipantUtil.setPersistence(null);
+		_setPowwowParticipantUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(PowwowParticipantImpl.class.getName());
 
@@ -2337,6 +2338,22 @@ public class PowwowParticipantPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setPowwowParticipantUtilPersistence(
+		PowwowParticipantPersistence powwowParticipantPersistence) {
+
+		try {
+			Field field = PowwowParticipantUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, powwowParticipantPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

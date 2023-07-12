@@ -53,8 +53,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -72,6 +70,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.Collections;
 import java.util.List;
@@ -544,7 +544,7 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 	 * <strong>Important:</strong> Inspect FragmentEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftFragmentEntry the fragment entry
+	 * @param fragmentEntry the fragment entry
 	 * @return the fragment entry that was updated
 	 * @throws PortalException
 	 */
@@ -558,7 +558,7 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		FragmentEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -573,7 +573,7 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		fragmentEntryLocalService = (FragmentEntryLocalService)aopProxy;
 
-		FragmentEntryLocalServiceUtil.setService(fragmentEntryLocalService);
+		_setLocalServiceUtilService(fragmentEntryLocalService);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1056,6 +1056,22 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		FragmentEntryLocalService fragmentEntryLocalService) {
+
+		try {
+			Field field = FragmentEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, fragmentEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected FragmentEntryLocalService fragmentEntryLocalService;
 
 	@Reference
@@ -1087,8 +1103,5 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 
 	@Reference
 	protected FragmentEntryLinkFinder fragmentEntryLinkFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FragmentEntryLocalServiceBaseImpl.class);
 
 }

@@ -52,6 +52,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2331,7 +2332,7 @@ public class SubscriptionPersistenceImpl
 	 * @param companyId the company ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPKs the class pks
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of subscriptions
 	 * @param end the upper bound of the range of subscriptions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3538,11 +3539,11 @@ public class SubscriptionPersistenceImpl
 			new String[] {"companyId", "userId", "classNameId", "classPK"},
 			false);
 
-		SubscriptionUtil.setPersistence(this);
+		_setSubscriptionUtilPersistence(this);
 	}
 
 	public void destroy() {
-		SubscriptionUtil.setPersistence(null);
+		_setSubscriptionUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(SubscriptionImpl.class.getName());
 
@@ -3552,6 +3553,22 @@ public class SubscriptionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSubscriptionUtilPersistence(
+		SubscriptionPersistence subscriptionPersistence) {
+
+		try {
+			Field field = SubscriptionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, subscriptionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -1112,10 +1112,6 @@ public class CPOptionCategoryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CPOptionCategoryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CPOptionCategoryPersistence _persistence;
 
 }

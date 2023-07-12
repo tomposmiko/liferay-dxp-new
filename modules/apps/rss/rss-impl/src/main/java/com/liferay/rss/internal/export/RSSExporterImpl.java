@@ -23,18 +23,18 @@ import com.liferay.rss.model.SyndEntry;
 import com.liferay.rss.model.SyndFeed;
 import com.liferay.rss.model.SyndLink;
 
-import com.rometools.rome.feed.synd.SyndContentImpl;
-import com.rometools.rome.feed.synd.SyndEnclosureImpl;
-import com.rometools.rome.feed.synd.SyndEntryImpl;
-import com.rometools.rome.feed.synd.SyndFeedImpl;
-import com.rometools.rome.feed.synd.SyndLinkImpl;
-import com.rometools.rome.io.FeedException;
-import com.rometools.rome.io.SyndFeedOutput;
+import com.sun.syndication.feed.synd.SyndContentImpl;
+import com.sun.syndication.feed.synd.SyndEnclosureImpl;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.feed.synd.SyndLinkImpl;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedOutput;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom2.IllegalDataException;
+import org.jdom.IllegalDataException;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -46,7 +46,7 @@ public class RSSExporterImpl implements RSSExporter {
 
 	@Override
 	public String export(SyndFeed syndFeed) {
-		com.rometools.rome.feed.synd.SyndFeed realSyndFeed = _toRealSyndFeed(
+		com.sun.syndication.feed.synd.SyndFeed realSyndFeed = _toRealSyndFeed(
 			syndFeed);
 
 		SyndFeedOutput output = new SyndFeedOutput();
@@ -89,29 +89,29 @@ public class RSSExporterImpl implements RSSExporter {
 	}
 
 	private static void _regexpStrip(
-		com.rometools.rome.feed.synd.SyndFeed syndFeed) {
+		com.sun.syndication.feed.synd.SyndFeed syndFeed) {
 
 		syndFeed.setTitle(_regexpStrip(syndFeed.getTitle()));
 		syndFeed.setDescription(_regexpStrip(syndFeed.getDescription()));
 
 		@SuppressWarnings("unchecked")
-		List<com.rometools.rome.feed.synd.SyndEntry> syndEntries =
+		List<com.sun.syndication.feed.synd.SyndEntry> syndEntries =
 			syndFeed.getEntries();
 
-		for (com.rometools.rome.feed.synd.SyndEntry syndEntry : syndEntries) {
+		for (com.sun.syndication.feed.synd.SyndEntry syndEntry : syndEntries) {
 			syndEntry.setTitle(_regexpStrip(syndEntry.getTitle()));
 
-			com.rometools.rome.feed.synd.SyndContent syndContent =
+			com.sun.syndication.feed.synd.SyndContent syndContent =
 				syndEntry.getDescription();
 
 			syndContent.setValue(_regexpStrip(syndContent.getValue()));
 		}
 	}
 
-	private com.rometools.rome.feed.synd.SyndContent _toRealSyncContent(
+	private com.sun.syndication.feed.synd.SyndContent _toRealSyncContent(
 		SyndContent syndContent) {
 
-		com.rometools.rome.feed.synd.SyndContent realSyndContent =
+		com.sun.syndication.feed.synd.SyndContent realSyndContent =
 			new SyndContentImpl();
 
 		realSyndContent.setType(syndContent.getType());
@@ -120,18 +120,18 @@ public class RSSExporterImpl implements RSSExporter {
 		return realSyndContent;
 	}
 
-	private List<com.rometools.rome.feed.synd.SyndEnclosure>
+	private List<com.sun.syndication.feed.synd.SyndEnclosure>
 		_toRealSyndEnclosures(List<SyndEnclosure> syndEnclosures) {
 
 		if (syndEnclosures == null) {
 			return null;
 		}
 
-		List<com.rometools.rome.feed.synd.SyndEnclosure> realSyndEnclosures =
+		List<com.sun.syndication.feed.synd.SyndEnclosure> realSyndEnclosures =
 			new ArrayList<>();
 
 		for (SyndEnclosure syndEnclosure : syndEnclosures) {
-			com.rometools.rome.feed.synd.SyndEnclosure realSyndEnclosure =
+			com.sun.syndication.feed.synd.SyndEnclosure realSyndEnclosure =
 				new SyndEnclosureImpl();
 
 			realSyndEnclosure.setLength(syndEnclosure.getLength());
@@ -144,18 +144,18 @@ public class RSSExporterImpl implements RSSExporter {
 		return realSyndEnclosures;
 	}
 
-	private List<com.rometools.rome.feed.synd.SyndEntry> _toRealSyndEntries(
+	private List<com.sun.syndication.feed.synd.SyndEntry> _toRealSyndEntries(
 		List<SyndEntry> syndEntries) {
 
 		if (syndEntries == null) {
 			return null;
 		}
 
-		List<com.rometools.rome.feed.synd.SyndEntry> realSyndEntries =
+		List<com.sun.syndication.feed.synd.SyndEntry> realSyndEntries =
 			new ArrayList<>();
 
 		for (SyndEntry syndEntry : syndEntries) {
-			com.rometools.rome.feed.synd.SyndEntry realSyndEntry =
+			com.sun.syndication.feed.synd.SyndEntry realSyndEntry =
 				new SyndEntryImpl();
 
 			realSyndEntry.setAuthor(syndEntry.getAuthor());
@@ -176,10 +176,11 @@ public class RSSExporterImpl implements RSSExporter {
 		return realSyndEntries;
 	}
 
-	private com.rometools.rome.feed.synd.SyndFeed _toRealSyndFeed(
+	private com.sun.syndication.feed.synd.SyndFeed _toRealSyndFeed(
 		SyndFeed syndFeed) {
 
-		com.rometools.rome.feed.synd.SyndFeed realSyndFeed = new SyndFeedImpl();
+		com.sun.syndication.feed.synd.SyndFeed realSyndFeed =
+			new SyndFeedImpl();
 
 		realSyndFeed.setDescription(syndFeed.getDescription());
 		realSyndFeed.setEntries(_toRealSyndEntries(syndFeed.getEntries()));
@@ -192,18 +193,18 @@ public class RSSExporterImpl implements RSSExporter {
 		return realSyndFeed;
 	}
 
-	private List<com.rometools.rome.feed.synd.SyndLink> _toRealSyndLinks(
+	private List<com.sun.syndication.feed.synd.SyndLink> _toRealSyndLinks(
 		List<SyndLink> syndLinks) {
 
 		if (syndLinks == null) {
 			return null;
 		}
 
-		List<com.rometools.rome.feed.synd.SyndLink> realSyndLinks =
+		List<com.sun.syndication.feed.synd.SyndLink> realSyndLinks =
 			new ArrayList<>();
 
 		for (SyndLink syndLink : syndLinks) {
-			com.rometools.rome.feed.synd.SyndLink realSyndLink =
+			com.sun.syndication.feed.synd.SyndLink realSyndLink =
 				new SyndLinkImpl();
 
 			realSyndLink.setHref(syndLink.getHref());

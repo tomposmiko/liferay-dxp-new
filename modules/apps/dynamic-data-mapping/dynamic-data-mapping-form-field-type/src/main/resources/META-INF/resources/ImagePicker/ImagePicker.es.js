@@ -278,7 +278,6 @@ const Main = ({
 			id={id}
 			name={name}
 			readOnly={isSignedIn ? readOnly : true}
-			style={null}
 			valid={isSignedIn ? valid : false}
 		>
 			<ImagePicker

@@ -567,7 +567,7 @@ public class CTAutoResolutionInfoUtil {
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 * @param modelClassNameId the model class name ID
-	 * @param sourceModelClassPKs the source model class pks
+	 * @param sourceModelClassPK the source model class pk
 	 * @param start the lower bound of the range of ct auto resolution infos
 	 * @param end the upper bound of the range of ct auto resolution infos (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -790,12 +790,6 @@ public class CTAutoResolutionInfoUtil {
 
 	public static CTAutoResolutionInfoPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(
-		CTAutoResolutionInfoPersistence persistence) {
-
-		_persistence = persistence;
 	}
 
 	private static volatile CTAutoResolutionInfoPersistence _persistence;

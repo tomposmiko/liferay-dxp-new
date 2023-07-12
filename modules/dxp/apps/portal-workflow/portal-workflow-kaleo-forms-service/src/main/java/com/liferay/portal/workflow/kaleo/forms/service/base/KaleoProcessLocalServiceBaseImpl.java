@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -54,6 +52,8 @@ import com.liferay.portal.workflow.kaleo.forms.service.persistence.KaleoProcessL
 import com.liferay.portal.workflow.kaleo.forms.service.persistence.KaleoProcessPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -519,7 +519,7 @@ public abstract class KaleoProcessLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		KaleoProcessLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -534,7 +534,7 @@ public abstract class KaleoProcessLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		kaleoProcessLocalService = (KaleoProcessLocalService)aopProxy;
 
-		KaleoProcessLocalServiceUtil.setService(kaleoProcessLocalService);
+		_setLocalServiceUtilService(kaleoProcessLocalService);
 	}
 
 	/**
@@ -576,6 +576,22 @@ public abstract class KaleoProcessLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		KaleoProcessLocalService kaleoProcessLocalService) {
+
+		try {
+			Field field = KaleoProcessLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, kaleoProcessLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -622,8 +638,5 @@ public abstract class KaleoProcessLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
 		workflowInstanceLinkLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		KaleoProcessLocalServiceBaseImpl.class);
 
 }

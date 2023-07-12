@@ -61,9 +61,7 @@ public class AccountRole implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(AccountRole.class, json);
 	}
 
-	@Schema(
-		example = "{en_US=Role Description US, hr_HR=Role Description HR, hu_HU=Role Description HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getDescription() {
 		return description;
@@ -93,7 +91,7 @@ public class AccountRole implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> description;
 
-	@Schema(example = "Role Name")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -121,7 +119,7 @@ public class AccountRole implements Serializable {
 	protected String name;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getRoleId() {
 		return roleId;
 	}
@@ -149,9 +147,7 @@ public class AccountRole implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long roleId;
 
-	@Schema(
-		example = "{en_US=Role Title US, hr_HR=Role Title HR, hu_HU=Role Title HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getTitle() {
 		return title;

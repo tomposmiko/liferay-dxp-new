@@ -15,7 +15,6 @@
 package com.liferay.announcements.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AnnouncementsDeliveryLocalService}.
@@ -412,11 +411,6 @@ public class AnnouncementsDeliveryLocalServiceWrapper
 
 		return _announcementsDeliveryLocalService.updateDelivery(
 			userId, type, email, sms);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _announcementsDeliveryLocalService.getBasePersistence();
 	}
 
 	@Override

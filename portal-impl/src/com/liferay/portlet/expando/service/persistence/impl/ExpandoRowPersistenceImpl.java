@@ -53,6 +53,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1701,9 +1702,7 @@ public class ExpandoRowPersistenceImpl
 	 */
 	@Override
 	public ExpandoRow fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				ExpandoRow.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(ExpandoRow.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2177,11 +2176,11 @@ public class ExpandoRowPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"tableId", "classPK"}, false);
 
-		ExpandoRowUtil.setPersistence(this);
+		_setExpandoRowUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ExpandoRowUtil.setPersistence(null);
+		_setExpandoRowUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(ExpandoRowImpl.class.getName());
 
@@ -2191,6 +2190,21 @@ public class ExpandoRowPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setExpandoRowUtilPersistence(
+		ExpandoRowPersistence expandoRowPersistence) {
+
+		try {
+			Field field = ExpandoRowUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, expandoRowPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

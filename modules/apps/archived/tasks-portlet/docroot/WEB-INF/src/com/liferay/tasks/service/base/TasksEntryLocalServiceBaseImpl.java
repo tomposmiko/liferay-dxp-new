@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -51,6 +49,8 @@ import com.liferay.tasks.service.persistence.TasksEntryFinder;
 import com.liferay.tasks.service.persistence.TasksEntryPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -691,14 +691,14 @@ public abstract class TasksEntryLocalServiceBaseImpl
 		PersistedModelLocalServiceRegistryUtil.register(
 			"com.liferay.tasks.model.TasksEntry", tasksEntryLocalService);
 
-		TasksEntryLocalServiceUtil.setService(tasksEntryLocalService);
+		_setLocalServiceUtilService(tasksEntryLocalService);
 	}
 
 	public void destroy() {
 		PersistedModelLocalServiceRegistryUtil.unregister(
 			"com.liferay.tasks.model.TasksEntry");
 
-		TasksEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -740,6 +740,22 @@ public abstract class TasksEntryLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		TasksEntryLocalService tasksEntryLocalService) {
+
+		try {
+			Field field = TasksEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, tasksEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -809,8 +825,5 @@ public abstract class TasksEntryLocalServiceBaseImpl
 
 	@BeanReference(type = SocialActivityPersistence.class)
 	protected SocialActivityPersistence socialActivityPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		TasksEntryLocalServiceBaseImpl.class);
 
 }

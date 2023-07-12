@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -22,7 +22,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddAccountWithMultiDomains {
 		AccountConfiguration.enableAccountEmailDomain();
 
@@ -46,12 +46,12 @@ definition {
 
 		for (var domainName : list "liferay.com,Google.com,si-na.com,9teen.com") {
 			AssertElementPresent(
-				key_domainName = ${domainName},
+				key_domainName = "${domainName}",
 				locator1 = "Account#DOMAIN_TABLE_NAME");
 		}
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddBlockedEmailDomain {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -118,7 +118,7 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "userfn userln");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddNewUserViaPersonAccount {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -160,7 +160,7 @@ definition {
 			accountUserName = "userfn1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddPersonAccount {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -185,7 +185,7 @@ definition {
 			accountType = "Person");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddUserWithDifferentDomain {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -250,7 +250,7 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "userfn userln");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddUserWithSameDomain {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -315,7 +315,7 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "userfn userln");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AssignOrganizationToAccount {
 		JSONOrganization.addOrganization(
 			organizationName = "Organization for Account",
@@ -349,7 +349,7 @@ definition {
 		Accounts.viewAssignee(assigneeName = "Organization for Account");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AssignUserToAccountWithDomain {
 		AccountConfiguration.enableAccountEmailDomain();
 
@@ -405,7 +405,7 @@ definition {
 		Accounts.gotoAssigneeTab(assigneeTab = "Users");
 
 		for (var assigneeName : list "userfn1,userfn2") {
-			Accounts.viewAssignee(assigneeName = ${assigneeName});
+			Accounts.viewAssignee(assigneeName = "${assigneeName}");
 		}
 
 		ApplicationsMenu.gotoPortlet(
@@ -419,7 +419,7 @@ definition {
 
 		LexiconEntry.gotoAdd();
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		SelectFrame(
 			key_accountName = "Account with Domain",
@@ -458,7 +458,7 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "userfn2 userln2");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test CancelAccountCreation {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -517,7 +517,7 @@ definition {
 		LexiconEntry.viewNoEntry(rowEntry = "Back Icon Account");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteAccount {
 		property portal.acceptance = "true";
 
@@ -576,7 +576,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-101315."
-	@priority = 4
+	@priority = "4"
 	test DeleteInactiveAccount {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -602,7 +602,7 @@ definition {
 		LexiconEntry.viewNoEntry(rowEntry = "Accounts Name for Test");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditAccount {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -680,7 +680,7 @@ definition {
 		LexiconEntry.viewNoEntry(rowEntry = "Update Accounts Name for Test");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test FilterByType {
 		for (var accountType : list "Business,Person") {
 			ApplicationsMenu.gotoPortlet(
@@ -691,7 +691,7 @@ definition {
 			Accounts.addCP(
 				accountDescription = "This is a ${accountType} Account.",
 				accountName = "${accountType} Account",
-				accountType = ${accountType});
+				accountType = "${accountType}");
 		}
 
 		ApplicationsMenu.gotoPortlet(
@@ -718,7 +718,7 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "Person Account");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test InactiveAccount {
 		for (var accountNumber : list "1,2,3") {
 			ApplicationsMenu.gotoPortlet(
@@ -764,7 +764,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-117171."
-	@priority = 3
+	@priority = "3"
 	test NoFilterByNavigationForPersonAccount {
 		for (var accountType : list "Business,Person") {
 			ApplicationsMenu.gotoPortlet(
@@ -775,7 +775,7 @@ definition {
 			Accounts.addCP(
 				accountDescription = "This is a ${accountType} Account.",
 				accountName = "${accountType} Account",
-				accountType = ${accountType});
+				accountType = "${accountType}");
 		}
 
 		for (var accountUser : list "1,2") {
@@ -808,7 +808,7 @@ definition {
 		ManagementBar.viewNoSubheaderInFilterAndOrder(subheaderItem = "Filter by Navigation");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PersonAccountSmoke {
 		for (var accountType : list "Business,Person") {
 			ApplicationsMenu.gotoPortlet(
@@ -819,7 +819,7 @@ definition {
 			Accounts.addCP(
 				accountDescription = "This is a ${accountType} Account.",
 				accountName = "${accountType} Account",
-				accountType = ${accountType});
+				accountType = "${accountType}");
 		}
 
 		for (var accountUser : list "1,2") {
@@ -839,7 +839,7 @@ definition {
 		Accounts.gotoEdit(accountName = "Person Account");
 
 		for (var navTab : list "Details,Organizations,Roles") {
-			Accounts.viewAssigneeTab(navTab = ${navTab});
+			Accounts.viewAssigneeTab(navTab = "${navTab}");
 		}
 
 		Accounts.viewNoAssigneeTab(navTab = "Users");
@@ -860,7 +860,7 @@ definition {
 			locator1 = "Account#USER_TABLE_NAME");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RemoveDomain {
 		AccountConfiguration.enableAccountEmailDomain();
 
@@ -900,14 +900,14 @@ definition {
 			locator1 = "Account#DOMAIN_TABLE_NAME");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RemoveDomainFromBlacklist {
 		AccountConfiguration.addBlockedEmailDomain(settingValues = "yahoo.com,blocked.com,google.com");
 
 		for (var settingValue : list "yahoo.com,blocked.com,google.com") {
 			SystemSettings.viewTextareaPartialText(
 				settingName = "Blocked Email Domains",
-				settingValue = ${settingValue});
+				settingValue = "${settingValue}");
 		}
 
 		SystemSettings.editTextAreaSetting(
@@ -921,7 +921,7 @@ definition {
 			fieldValue = "blocked.com");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test Smoke {
 		property portal.acceptance = "true";
 
@@ -952,7 +952,7 @@ definition {
 			accountTaxID = "Z9870654786390342199899Y");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test UnassignOrganizationFromAccount {
 		property portal.acceptance = "true";
 
@@ -1000,7 +1000,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-101221."
-	@priority = 4
+	@priority = "4"
 	test UpdateInactiveAccountViaNameLink {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -1050,7 +1050,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-101893."
-	@priority = 4
+	@priority = "4"
 	test ViewAccountPagination {
 		for (var accountNum : list "1,2,3,4,5,6") {
 			ApplicationsMenu.gotoPortlet(
@@ -1066,7 +1066,7 @@ definition {
 			panel = "Applications",
 			portlet = "Accounts");
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		for (var accountNum : list "1,2,3,4") {
 			LexiconEntry.viewEntryName(rowEntry = "Accounts Name ${accountNum}");

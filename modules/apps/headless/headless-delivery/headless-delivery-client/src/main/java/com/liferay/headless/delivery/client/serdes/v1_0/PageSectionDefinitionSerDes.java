@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -139,16 +140,6 @@ public class PageSectionDefinitionSerDes {
 			sb.append("]");
 		}
 
-		if (pageSectionDefinition.getIndexed() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"indexed\": ");
-
-			sb.append(pageSectionDefinition.getIndexed());
-		}
-
 		if (pageSectionDefinition.getLayout() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -235,14 +226,6 @@ public class PageSectionDefinitionSerDes {
 				String.valueOf(pageSectionDefinition.getFragmentViewports()));
 		}
 
-		if (pageSectionDefinition.getIndexed() == null) {
-			map.put("indexed", null);
-		}
-		else {
-			map.put(
-				"indexed", String.valueOf(pageSectionDefinition.getIndexed()));
-		}
-
 		if (pageSectionDefinition.getLayout() == null) {
 			map.put("layout", null);
 		}
@@ -309,26 +292,15 @@ public class PageSectionDefinitionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "fragmentViewports")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					FragmentViewport[] fragmentViewportsArray =
-						new FragmentViewport[jsonParserFieldValues.length];
-
-					for (int i = 0; i < fragmentViewportsArray.length; i++) {
-						fragmentViewportsArray[i] =
-							FragmentViewportSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					pageSectionDefinition.setFragmentViewports(
-						fragmentViewportsArray);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "indexed")) {
-				if (jsonParserFieldValue != null) {
-					pageSectionDefinition.setIndexed(
-						(Boolean)jsonParserFieldValue);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> FragmentViewportSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new FragmentViewport[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "layout")) {

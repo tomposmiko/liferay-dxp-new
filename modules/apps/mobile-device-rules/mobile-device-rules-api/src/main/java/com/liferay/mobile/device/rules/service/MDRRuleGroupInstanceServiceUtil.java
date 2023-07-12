@@ -99,10 +99,6 @@ public class MDRRuleGroupInstanceServiceUtil {
 		return _service;
 	}
 
-	public static void setService(MDRRuleGroupInstanceService service) {
-		_service = service;
-	}
-
 	private static volatile MDRRuleGroupInstanceService _service;
 
 }

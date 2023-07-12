@@ -278,10 +278,6 @@ public class ViewCountEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(ViewCountEntryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile ViewCountEntryPersistence _persistence;
 
 }

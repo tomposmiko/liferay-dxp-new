@@ -13,7 +13,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -21,28 +21,21 @@ definition {
 	}
 
 	@description = "Automation ID: LRAC-8129 | Test Summary: Show data source lists"
-	@priority = 5
+	@priority = "5"
 	test DataSourceListShowsAllDataSources {
 		var dataSourceList = "";
 
 		for (var n : list "1,2,3") {
-			ACSettings.goToDataSources();
-
-			Click(locator1 = "ACDXPSettings#AC_GENERIC_ADD_OR_CONFIRMATION_BUTTON");
-
-			Click(locator1 = "ACSettings#DXP_DATA_SOURCE_OPTION");
-
-			var token = selenium.getElementValue("ACSettings#TOKEN_INPUT_FIELD");
+			ACSettings.takeTokenFromAnalyticsCloud();
 
 			TestCase.setUpPortalInstance();
 
 			ACUtils.launchDXP();
 
-			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(acToken = ${token});
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 
-			var dataSource = StringUtil.replace(${propertyName}, " Combined Property", "");
-
-			var dataSourceList = StringUtil.add(${dataSourceList}, ${dataSource});
+			var dataSource = StringUtil.replace("${propertyName}", " Combined Property", "");
+			var dataSourceList = StringUtil.add("${dataSourceList}", "${dataSource}");
 
 			ACDXPSettings.disconnectDXPFromAnalyticsCloud();
 
@@ -50,11 +43,11 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			ACUtils.assertDataSourceName(dataSourceName = ${dataSource});
+			ACUtils.assertDataSourceName(dataSourceName = "${dataSource}");
 		}
 
-		for (var dataSourceName : list ${dataSourceList}) {
-			ACUtils.assertDataSourceName(dataSourceName = ${dataSourceName});
+		for (var dataSourceName : list "${dataSourceList}") {
+			ACUtils.assertDataSourceName(dataSourceName = "${dataSourceName}");
 		}
 	}
 

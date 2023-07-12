@@ -15,7 +15,6 @@
 package com.liferay.sync.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link SyncDeviceLocalService}.
@@ -411,11 +410,6 @@ public class SyncDeviceLocalServiceWrapper
 		com.liferay.sync.model.SyncDevice syncDevice) {
 
 		return _syncDeviceLocalService.updateSyncDevice(syncDevice);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _syncDeviceLocalService.getBasePersistence();
 	}
 
 	@Override

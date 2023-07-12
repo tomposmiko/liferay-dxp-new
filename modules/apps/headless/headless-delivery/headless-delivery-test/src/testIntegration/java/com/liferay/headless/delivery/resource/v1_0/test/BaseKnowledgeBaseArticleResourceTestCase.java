@@ -53,9 +53,8 @@ import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -64,16 +63,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -373,8 +374,8 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		KnowledgeBaseArticle expectedPatchKnowledgeBaseArticle =
 			postKnowledgeBaseArticle.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchKnowledgeBaseArticle, expectedPatchKnowledgeBaseArticle);
+		_beanUtilsBean.copyProperties(
+			expectedPatchKnowledgeBaseArticle, randomPatchKnowledgeBaseArticle);
 
 		KnowledgeBaseArticle getKnowledgeBaseArticle =
 			knowledgeBaseArticleResource.getKnowledgeBaseArticle(
@@ -542,10 +543,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKnowledgeBaseArticle),
 				(List<KnowledgeBaseArticle>)page.getItems());
-			assertValid(
-				page,
-				testGetKnowledgeBaseArticleKnowledgeBaseArticlesPage_getExpectedActions(
-					irrelevantParentKnowledgeBaseArticleId));
+			assertValid(page);
 		}
 
 		KnowledgeBaseArticle knowledgeBaseArticle1 =
@@ -567,26 +565,13 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(knowledgeBaseArticle1, knowledgeBaseArticle2),
 			(List<KnowledgeBaseArticle>)page.getItems());
-		assertValid(
-			page,
-			testGetKnowledgeBaseArticleKnowledgeBaseArticlesPage_getExpectedActions(
-				parentKnowledgeBaseArticleId));
+		assertValid(page);
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle1.getId());
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetKnowledgeBaseArticleKnowledgeBaseArticlesPage_getExpectedActions(
-				Long parentKnowledgeBaseArticleId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -768,7 +753,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetKnowledgeBaseArticleKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -781,9 +766,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetKnowledgeBaseArticleKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle2, entityField.getName(), 0.5);
 			});
 	}
@@ -795,9 +780,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetKnowledgeBaseArticleKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle2, entityField.getName(), 1);
 			});
 	}
@@ -813,27 +798,27 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -841,12 +826,12 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -998,10 +983,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKnowledgeBaseArticle),
 				(List<KnowledgeBaseArticle>)page.getItems());
-			assertValid(
-				page,
-				testGetKnowledgeBaseFolderKnowledgeBaseArticlesPage_getExpectedActions(
-					irrelevantKnowledgeBaseFolderId));
+			assertValid(page);
 		}
 
 		KnowledgeBaseArticle knowledgeBaseArticle1 =
@@ -1023,37 +1005,13 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(knowledgeBaseArticle1, knowledgeBaseArticle2),
 			(List<KnowledgeBaseArticle>)page.getItems());
-		assertValid(
-			page,
-			testGetKnowledgeBaseFolderKnowledgeBaseArticlesPage_getExpectedActions(
-				knowledgeBaseFolderId));
+		assertValid(page);
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle1.getId());
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetKnowledgeBaseFolderKnowledgeBaseArticlesPage_getExpectedActions(
-				Long knowledgeBaseFolderId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles/batch".
-				replace(
-					"{knowledgeBaseFolderId}",
-					String.valueOf(knowledgeBaseFolderId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -1235,7 +1193,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetKnowledgeBaseFolderKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -1248,9 +1206,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetKnowledgeBaseFolderKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle2, entityField.getName(), 0.5);
 			});
 	}
@@ -1262,9 +1220,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetKnowledgeBaseFolderKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle2, entityField.getName(), 1);
 			});
 	}
@@ -1280,27 +1238,27 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1308,12 +1266,12 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1458,10 +1416,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKnowledgeBaseArticle),
 				(List<KnowledgeBaseArticle>)page.getItems());
-			assertValid(
-				page,
-				testGetSiteKnowledgeBaseArticlesPage_getExpectedActions(
-					irrelevantSiteId));
+			assertValid(page);
 		}
 
 		KnowledgeBaseArticle knowledgeBaseArticle1 =
@@ -1480,33 +1435,13 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(knowledgeBaseArticle1, knowledgeBaseArticle2),
 			(List<KnowledgeBaseArticle>)page.getItems());
-		assertValid(
-			page,
-			testGetSiteKnowledgeBaseArticlesPage_getExpectedActions(siteId));
+		assertValid(page);
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle1.getId());
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetSiteKnowledgeBaseArticlesPage_getExpectedActions(Long siteId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/batch".
-				replace("{siteId}", String.valueOf(siteId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -1673,7 +1608,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetSiteKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -1686,9 +1621,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetSiteKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle2, entityField.getName(), 0.5);
 			});
 	}
@@ -1700,9 +1635,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		testGetSiteKnowledgeBaseArticlesPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, knowledgeBaseArticle1, knowledgeBaseArticle2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					knowledgeBaseArticle2, entityField.getName(), 1);
 			});
 	}
@@ -1718,27 +1653,27 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1746,12 +1681,12 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						knowledgeBaseArticle2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -2433,13 +2368,6 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 	}
 
 	protected void assertValid(Page<KnowledgeBaseArticle> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<KnowledgeBaseArticle> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<KnowledgeBaseArticle> knowledgeBaseArticles =
@@ -2455,25 +2383,6 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		assertValid(page.getActions(), expectedActions);
-	}
-
-	protected void assertValid(
-		Map<String, Map<String, String>> actions1,
-		Map<String, Map<String, String>> actions2) {
-
-		for (String key : actions2.keySet()) {
-			Map action = actions1.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map<String, String> expectedAction = actions2.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected void assertValid(Rating rating) {
@@ -3013,16 +2922,14 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -3039,10 +2946,6 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -3052,18 +2955,18 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -3377,115 +3280,6 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -3560,6 +3354,18 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseKnowledgeBaseArticleResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

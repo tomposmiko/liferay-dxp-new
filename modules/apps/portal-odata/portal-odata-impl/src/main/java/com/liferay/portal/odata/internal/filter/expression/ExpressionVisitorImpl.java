@@ -169,7 +169,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 				literal.getText(), LiteralExpression.Type.STRING);
 		}
 		else if ((edmType == null) ||
-				 Objects.equals(literal.getText(), "null")) {
+				 Objects.equals("null", literal.getText())) {
 
 			return new NullLiteralExpression();
 		}

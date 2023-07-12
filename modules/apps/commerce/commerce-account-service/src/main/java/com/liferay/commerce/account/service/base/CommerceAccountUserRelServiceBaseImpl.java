@@ -31,8 +31,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -41,6 +39,8 @@ import com.liferay.portal.kernel.service.persistence.UserGroupRolePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -830,12 +830,11 @@ public abstract class CommerceAccountUserRelServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		CommerceAccountUserRelServiceUtil.setService(
-			commerceAccountUserRelService);
+		_setServiceUtilService(commerceAccountUserRelService);
 	}
 
 	public void destroy() {
-		CommerceAccountUserRelServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -878,6 +877,23 @@ public abstract class CommerceAccountUserRelServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		CommerceAccountUserRelService commerceAccountUserRelService) {
+
+		try {
+			Field field =
+				CommerceAccountUserRelServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceAccountUserRelService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1058,8 +1074,5 @@ public abstract class CommerceAccountUserRelServiceBaseImpl
 
 	@ServiceReference(type = UserGroupRolePersistence.class)
 	protected UserGroupRolePersistence userGroupRolePersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceAccountUserRelServiceBaseImpl.class);
 
 }

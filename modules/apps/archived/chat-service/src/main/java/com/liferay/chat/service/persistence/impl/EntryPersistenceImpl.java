@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -5033,12 +5034,12 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"fromUserId", "toUserId", "content"}, false);
 
-		EntryUtil.setPersistence(this);
+		_setEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		EntryUtil.setPersistence(null);
+		_setEntryUtilPersistence(null);
 
 		entityCache.removeCache(EntryImpl.class.getName());
 
@@ -5048,6 +5049,19 @@ public class EntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setEntryUtilPersistence(EntryPersistence entryPersistence) {
+		try {
+			Field field = EntryUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, entryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

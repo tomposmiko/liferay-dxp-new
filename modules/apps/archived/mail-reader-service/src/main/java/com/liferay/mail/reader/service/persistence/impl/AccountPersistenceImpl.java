@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1451,12 +1452,12 @@ public class AccountPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"userId", "address"}, false);
 
-		AccountUtil.setPersistence(this);
+		_setAccountUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AccountUtil.setPersistence(null);
+		_setAccountUtilPersistence(null);
 
 		entityCache.removeCache(AccountImpl.class.getName());
 
@@ -1466,6 +1467,21 @@ public class AccountPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAccountUtilPersistence(
+		AccountPersistence accountPersistence) {
+
+		try {
+			Field field = AccountUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, accountPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -216,30 +216,6 @@ public class RoleServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.kernel.model.RoleSoap[]
-			getGroupRolesAndTeamRoles(
-				long companyId, String name,
-				java.util.List<String> excludedNames, String title,
-				String description, int[] types, long excludedTeamRoleId,
-				long teamGroupId, int start, int end)
-		throws RemoteException {
-
-		try {
-			java.util.List<com.liferay.portal.kernel.model.Role> returnValue =
-				RoleServiceUtil.getGroupRolesAndTeamRoles(
-					companyId, name, excludedNames, title, description, types,
-					excludedTeamRoleId, teamGroupId, start, end);
-
-			return com.liferay.portal.kernel.model.RoleSoap.toSoapModels(
-				returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
 	public static int getGroupRolesAndTeamRolesCount(
 			long companyId, String keywords,
 			java.util.List<String> excludedNames, int[] types,
@@ -250,26 +226,6 @@ public class RoleServiceSoap {
 			int returnValue = RoleServiceUtil.getGroupRolesAndTeamRolesCount(
 				companyId, keywords, excludedNames, types, excludedTeamRoleId,
 				teamGroupId);
-
-			return returnValue;
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static int getGroupRolesAndTeamRolesCount(
-			long companyId, String name, java.util.List<String> excludedNames,
-			String title, String description, int[] types,
-			long excludedTeamRoleId, long teamGroupId)
-		throws RemoteException {
-
-		try {
-			int returnValue = RoleServiceUtil.getGroupRolesAndTeamRolesCount(
-				companyId, name, excludedNames, title, description, types,
-				excludedTeamRoleId, teamGroupId);
 
 			return returnValue;
 		}

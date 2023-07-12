@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4566,12 +4567,12 @@ public class DepotEntryGroupRelPersistenceImpl
 			new String[] {Boolean.class.getName(), Long.class.getName()},
 			new String[] {"searchable", "toGroupId"}, false);
 
-		DepotEntryGroupRelUtil.setPersistence(this);
+		_setDepotEntryGroupRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DepotEntryGroupRelUtil.setPersistence(null);
+		_setDepotEntryGroupRelUtilPersistence(null);
 
 		entityCache.removeCache(DepotEntryGroupRelImpl.class.getName());
 
@@ -4581,6 +4582,22 @@ public class DepotEntryGroupRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDepotEntryGroupRelUtilPersistence(
+		DepotEntryGroupRelPersistence depotEntryGroupRelPersistence) {
+
+		try {
+			Field field = DepotEntryGroupRelUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, depotEntryGroupRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

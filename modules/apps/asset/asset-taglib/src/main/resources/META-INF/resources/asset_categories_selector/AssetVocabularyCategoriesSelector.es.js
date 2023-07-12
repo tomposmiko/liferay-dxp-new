@@ -194,7 +194,7 @@ function AssetVocabulariesCategoriesSelector({
 				)}
 
 				{label && (
-					<label htmlFor={inputName + '_MultiSelect'}>
+					<label>
 						{label}
 
 						{required && (
@@ -212,8 +212,8 @@ function AssetVocabulariesCategoriesSelector({
 				<ClayInput.Group>
 					<ClayInput.GroupItem>
 						<ClayMultiSelect
-							id={inputName + '_MultiSelect'}
 							inputName={inputName}
+							inputValue={inputValue}
 							items={selectedItems}
 							onChange={setInputValue}
 							onItemsChange={handleItemsChange}
@@ -228,12 +228,11 @@ function AssetVocabulariesCategoriesSelector({
 									  })
 									: []
 							}
-							value={inputValue}
 						/>
 
 						{invalidItems && invalidItems.length > 0 && (
 							<ClayForm.FeedbackGroup>
-								<ClayForm.FeedbackItem aria-live="polite">
+								<ClayForm.FeedbackItem>
 									<ClayForm.FeedbackIndicator symbol="info-circle" />
 
 									{Lang.sub(

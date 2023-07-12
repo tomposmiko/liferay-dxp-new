@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -47,6 +45,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
 import com.liferay.trash.kernel.service.persistence.TrashEntryPersistence;
 import com.liferay.trash.kernel.service.persistence.TrashVersionPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -815,11 +815,11 @@ public abstract class DLAppHelperLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		DLAppHelperLocalServiceUtil.setService(dlAppHelperLocalService);
+		_setLocalServiceUtilService(dlAppHelperLocalService);
 	}
 
 	public void destroy() {
-		DLAppHelperLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -853,6 +853,22 @@ public abstract class DLAppHelperLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		DLAppHelperLocalService dlAppHelperLocalService) {
+
+		try {
+			Field field = DLAppHelperLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlAppHelperLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1010,8 +1026,5 @@ public abstract class DLAppHelperLocalServiceBaseImpl
 
 	@BeanReference(type = DLFolderFinder.class)
 	protected DLFolderFinder dlFolderFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLAppHelperLocalServiceBaseImpl.class);
 
 }

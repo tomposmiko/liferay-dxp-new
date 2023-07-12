@@ -67,7 +67,6 @@ for (AssetVocabulary vocabulary : vocabularies) {
 									displayType="dark"
 									label="<%= HtmlUtil.escape(category.getTitle(themeDisplay.getLocale())) %>"
 									large="<%= true %>"
-									translated="<%= false %>"
 								/>
 
 							<%

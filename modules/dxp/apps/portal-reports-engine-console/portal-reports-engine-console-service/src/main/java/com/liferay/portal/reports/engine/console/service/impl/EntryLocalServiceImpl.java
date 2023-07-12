@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -595,5 +596,8 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

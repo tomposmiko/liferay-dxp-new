@@ -17,7 +17,6 @@ package com.liferay.asset.kernel.service;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -378,7 +377,13 @@ public class AssetCategoryLocalServiceWrapper
 		return _assetCategoryLocalService.fetchAssetCategory(categoryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset category's external reference code
+	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	 */
 	@Override
 	public AssetCategory fetchAssetCategoryByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -388,6 +393,9 @@ public class AssetCategoryLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetCategoryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public AssetCategory fetchAssetCategoryByReferenceCode(
@@ -509,7 +517,14 @@ public class AssetCategoryLocalServiceWrapper
 		return _assetCategoryLocalService.getAssetCategory(categoryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset category's external reference code
+	 * @return the matching asset category
+	 * @throws PortalException if a matching asset category could not be found
+	 */
 	@Override
 	public AssetCategory getAssetCategoryByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -889,11 +904,6 @@ public class AssetCategoryLocalServiceWrapper
 		return _assetCategoryLocalService.updateCategory(
 			userId, categoryId, parentCategoryId, titleMap, descriptionMap,
 			vocabularyId, categoryProperties, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _assetCategoryLocalService.getBasePersistence();
 	}
 
 	@Override

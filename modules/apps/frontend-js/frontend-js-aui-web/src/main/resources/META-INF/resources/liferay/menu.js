@@ -437,9 +437,7 @@ AUI.add(
 			},
 
 			_setARIARoles(trigger, menu) {
-				var links = menu
-					.all(SELECTOR_ANCHOR)
-					.filter(':not([aria-haspopup="dialog"]');
+				var links = menu.all(SELECTOR_ANCHOR);
 
 				var searchContainer = menu.one(SELECTOR_SEARCH_CONTAINER);
 
@@ -449,14 +447,12 @@ AUI.add(
 				var ariaListNodeAttr = 'menu';
 
 				if (searchContainer) {
-					ariaLinksAttr = 'option';
 					ariaListNodeAttr = 'listbox';
+					ariaListNodeAttr = 'option';
 				}
 
-				if (links.size() > 0) {
-					listNode.setAttribute(ARIA_ATTR_ROLE, ariaListNodeAttr);
-					links.set(ARIA_ATTR_ROLE, ariaLinksAttr);
-				}
+				listNode.setAttribute(ARIA_ATTR_ROLE, ariaListNodeAttr);
+				links.set(ARIA_ATTR_ROLE, ariaLinksAttr);
 
 				trigger.attr({
 					'aria-haspopup': true,
@@ -587,10 +583,6 @@ AUI.add(
 					});
 
 					menuInstance._focusManager = focusManager;
-
-					Liferay.once('beforeScreenFlip', () => {
-						menuInstance._focusManager = null;
-					});
 				}
 
 				focusManager.refresh();

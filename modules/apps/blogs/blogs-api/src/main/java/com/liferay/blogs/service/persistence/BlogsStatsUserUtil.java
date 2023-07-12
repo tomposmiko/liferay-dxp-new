@@ -1226,10 +1226,6 @@ public class BlogsStatsUserUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(BlogsStatsUserPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile BlogsStatsUserPersistence _persistence;
 
 }

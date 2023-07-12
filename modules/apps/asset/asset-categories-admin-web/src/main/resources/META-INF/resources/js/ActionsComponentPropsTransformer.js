@@ -52,9 +52,10 @@ const ACTIONS = {
 };
 
 export default function propsTransformer({
-	additionalProps: {deleteVocabulariesURL, viewVocabulariesURL},
+	deleteVocabulariesURL,
 	items,
 	portletNamespace,
+	viewVocabulariesURL,
 	...otherProps
 }) {
 	return {

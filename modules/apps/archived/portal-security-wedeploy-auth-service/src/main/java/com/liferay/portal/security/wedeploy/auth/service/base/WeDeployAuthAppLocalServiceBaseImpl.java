@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -47,6 +45,8 @@ import com.liferay.portal.security.wedeploy.auth.service.persistence.WeDeployAut
 import com.liferay.portal.security.wedeploy.auth.service.persistence.WeDeployAuthTokenPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -385,7 +385,7 @@ public abstract class WeDeployAuthAppLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		WeDeployAuthAppLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -400,7 +400,7 @@ public abstract class WeDeployAuthAppLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		weDeployAuthAppLocalService = (WeDeployAuthAppLocalService)aopProxy;
 
-		WeDeployAuthAppLocalServiceUtil.setService(weDeployAuthAppLocalService);
+		_setLocalServiceUtilService(weDeployAuthAppLocalService);
 	}
 
 	/**
@@ -445,6 +445,23 @@ public abstract class WeDeployAuthAppLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		WeDeployAuthAppLocalService weDeployAuthAppLocalService) {
+
+		try {
+			Field field =
+				WeDeployAuthAppLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, weDeployAuthAppLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected WeDeployAuthAppLocalService weDeployAuthAppLocalService;
 
 	@Reference
@@ -468,8 +485,5 @@ public abstract class WeDeployAuthAppLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WeDeployAuthAppLocalServiceBaseImpl.class);
 
 }

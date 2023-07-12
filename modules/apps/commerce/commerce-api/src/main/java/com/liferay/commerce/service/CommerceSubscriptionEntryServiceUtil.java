@@ -185,10 +185,6 @@ public class CommerceSubscriptionEntryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceSubscriptionEntryService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceSubscriptionEntryService _service;
 
 }

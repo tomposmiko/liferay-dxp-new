@@ -278,52 +278,46 @@ public class CTProcessModelImpl
 
 	private static final Map<String, Function<CTProcess, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CTProcess, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", CTProcess::getMvccVersion);
-		attributeGetterFunctions.put("ctProcessId", CTProcess::getCtProcessId);
-		attributeGetterFunctions.put("companyId", CTProcess::getCompanyId);
-		attributeGetterFunctions.put("userId", CTProcess::getUserId);
-		attributeGetterFunctions.put("createDate", CTProcess::getCreateDate);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CTProcess::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"backgroundTaskId", CTProcess::getBackgroundTaskId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<CTProcess, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTProcess, Object>>();
 		Map<String, BiConsumer<CTProcess, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CTProcess, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", CTProcess::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CTProcess, Long>)CTProcess::setMvccVersion);
+		attributeGetterFunctions.put("ctProcessId", CTProcess::getCtProcessId);
 		attributeSetterBiConsumers.put(
 			"ctProcessId",
 			(BiConsumer<CTProcess, Long>)CTProcess::setCtProcessId);
+		attributeGetterFunctions.put("companyId", CTProcess::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<CTProcess, Long>)CTProcess::setCompanyId);
+		attributeGetterFunctions.put("userId", CTProcess::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<CTProcess, Long>)CTProcess::setUserId);
+		attributeGetterFunctions.put("createDate", CTProcess::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CTProcess, Date>)CTProcess::setCreateDate);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTProcess::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CTProcess, Long>)CTProcess::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"backgroundTaskId", CTProcess::getBackgroundTaskId);
 		attributeSetterBiConsumers.put(
 			"backgroundTaskId",
 			(BiConsumer<CTProcess, Long>)CTProcess::setBackgroundTaskId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

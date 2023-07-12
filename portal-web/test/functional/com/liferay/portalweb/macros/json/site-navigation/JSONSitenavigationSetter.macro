@@ -1,45 +1,45 @@
 definition {
 
 	macro setGroupId {
-		Variables.assertDefined(parameterList = ${groupName});
+		Variables.assertDefined(parameterList = "${groupName}");
 
 		if (!(isSet(site))) {
 			var site = "true";
 		}
 
 		var groupId = JSONGroupAPI._getGroupIdByName(
-			groupName = ${groupName},
-			site = ${site});
+			groupName = "${groupName}",
+			site = "${site}");
 
-		return ${groupId};
+		return "${groupId}";
 	}
 
 	macro setSiteNavigationMenuId {
 		Variables.assertDefined(parameterList = "${groupName},${siteNavigationMenuName}");
 
-		var groupId = JSONSitenavigationSetter.setGroupId(groupName = ${groupName});
+		var groupId = JSONSitenavigationSetter.setGroupId(groupName = "${groupName}");
 
 		var siteNavigationMenuId = JSONSitenavigationAPI._getSiteNavigationMenuIdByName(
-			groupId = ${groupId},
-			siteNavigationMenuName = ${siteNavigationMenuName});
+			groupId = "${groupId}",
+			siteNavigationMenuName = "${siteNavigationMenuName}");
 
-		return ${siteNavigationMenuId};
+		return "${siteNavigationMenuId}";
 	}
 
 	macro setSiteNavigationMenuItemId {
 		Variables.assertDefined(parameterList = "${groupName},${siteNavigationMenuItemName},${siteNavigationMenuName}");
 
-		var groupId = JSONSitenavigationSetter.setGroupId(groupName = ${groupName});
+		var groupId = JSONSitenavigationSetter.setGroupId(groupName = "${groupName}");
 
 		var siteNavigationMenuId = JSONSitenavigationAPI._getSiteNavigationMenuIdByName(
-			groupId = ${groupId},
-			siteNavigationMenuName = ${siteNavigationMenuName});
+			groupId = "${groupId}",
+			siteNavigationMenuName = "${siteNavigationMenuName}");
 
 		var siteNavigationMenuItemId = JSONSitenavigationAPI._getSiteNavigationMenuItemIdByName(
-			siteNavigationMenuId = ${siteNavigationMenuId},
-			siteNavigationMenuItemName = ${siteNavigationMenuItemName});
+			siteNavigationMenuId = "${siteNavigationMenuId}",
+			siteNavigationMenuItemName = "${siteNavigationMenuItemName}");
 
-		return ${siteNavigationMenuItemId};
+		return "${siteNavigationMenuItemId}";
 	}
 
 }

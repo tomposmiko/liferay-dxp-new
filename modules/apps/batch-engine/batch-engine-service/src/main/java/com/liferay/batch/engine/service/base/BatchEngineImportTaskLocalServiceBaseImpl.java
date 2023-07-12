@@ -43,8 +43,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -59,6 +57,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.InputStream;
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.sql.Blob;
 
@@ -581,7 +581,7 @@ public abstract class BatchEngineImportTaskLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		BatchEngineImportTaskLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -597,8 +597,7 @@ public abstract class BatchEngineImportTaskLocalServiceBaseImpl
 		batchEngineImportTaskLocalService =
 			(BatchEngineImportTaskLocalService)aopProxy;
 
-		BatchEngineImportTaskLocalServiceUtil.setService(
-			batchEngineImportTaskLocalService);
+		_setLocalServiceUtilService(batchEngineImportTaskLocalService);
 	}
 
 	/**
@@ -644,6 +643,23 @@ public abstract class BatchEngineImportTaskLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		BatchEngineImportTaskLocalService batchEngineImportTaskLocalService) {
+
+		try {
+			Field field =
+				BatchEngineImportTaskLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, batchEngineImportTaskLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected BatchEngineImportTaskLocalService
 		batchEngineImportTaskLocalService;
 
@@ -653,9 +669,6 @@ public abstract class BatchEngineImportTaskLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BatchEngineImportTaskLocalServiceBaseImpl.class);
 
 	@Reference
 	protected File _file;

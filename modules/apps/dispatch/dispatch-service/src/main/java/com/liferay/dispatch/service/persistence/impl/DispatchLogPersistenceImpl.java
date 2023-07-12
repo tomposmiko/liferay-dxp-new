@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1744,12 +1745,12 @@ public class DispatchLogPersistenceImpl
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"dispatchTriggerId", "status"}, false);
 
-		DispatchLogUtil.setPersistence(this);
+		_setDispatchLogUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DispatchLogUtil.setPersistence(null);
+		_setDispatchLogUtilPersistence(null);
 
 		entityCache.removeCache(DispatchLogImpl.class.getName());
 
@@ -1759,6 +1760,22 @@ public class DispatchLogPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDispatchLogUtilPersistence(
+		DispatchLogPersistence dispatchLogPersistence) {
+
+		try {
+			Field field = DispatchLogUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dispatchLogPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

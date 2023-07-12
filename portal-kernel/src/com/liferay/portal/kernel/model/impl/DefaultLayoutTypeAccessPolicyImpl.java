@@ -60,7 +60,6 @@ public class DefaultLayoutTypeAccessPolicyImpl
 		throws PortalException {
 
 		String checkAccessAllowedToPortletCacheKey = StringBundler.concat(
-			"LIFERAY_SHARED_",
 			DefaultLayoutTypeAccessPolicyImpl.class.getName(), "#",
 			layout.getPlid(), "#", portlet.getPortletId());
 

@@ -915,12 +915,6 @@ public class CommercePriceListDiscountRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommercePriceListDiscountRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommercePriceListDiscountRelPersistence
 		_persistence;
 

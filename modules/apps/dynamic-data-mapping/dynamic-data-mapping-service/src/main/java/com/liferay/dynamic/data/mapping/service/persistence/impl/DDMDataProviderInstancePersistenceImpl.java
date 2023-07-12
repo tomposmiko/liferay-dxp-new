@@ -58,6 +58,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2527,7 +2528,7 @@ public class DDMDataProviderInstancePersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMDataProviderInstanceModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of ddm data provider instances
 	 * @param end the upper bound of the range of ddm data provider instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3857,7 +3858,7 @@ public class DDMDataProviderInstancePersistenceImpl
 	@Override
 	public DDMDataProviderInstance fetchByPrimaryKey(Serializable primaryKey) {
 		if (ctPersistenceHelper.isProductionMode(
-				DDMDataProviderInstance.class, primaryKey)) {
+				DDMDataProviderInstance.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -4397,12 +4398,12 @@ public class DDMDataProviderInstancePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		DDMDataProviderInstanceUtil.setPersistence(this);
+		_setDDMDataProviderInstanceUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMDataProviderInstanceUtil.setPersistence(null);
+		_setDDMDataProviderInstanceUtilPersistence(null);
 
 		entityCache.removeCache(DDMDataProviderInstanceImpl.class.getName());
 
@@ -4412,6 +4413,22 @@ public class DDMDataProviderInstancePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMDataProviderInstanceUtilPersistence(
+		DDMDataProviderInstancePersistence ddmDataProviderInstancePersistence) {
+
+		try {
+			Field field = DDMDataProviderInstanceUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmDataProviderInstancePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -14,12 +14,10 @@
 
 package com.liferay.change.tracking.web.internal.upgrade;
 
-import com.liferay.change.tracking.service.CTCollectionLocalService;
+import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.web.internal.constants.CTPortletKeys;
-import com.liferay.change.tracking.web.internal.upgrade.v1_0_2.CleanUpPDFPreviewsUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.BaseUpgradePortletId;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.component.annotations.Component;
@@ -33,7 +31,7 @@ public class PublicationsWebUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
-		registry.register("0.0.0", "1.0.2", new DummyUpgradeStep());
+		registry.register("0.0.0", "1.0.1", new DummyUpgradeStep());
 
 		registry.register(
 			"1.0.0", "1.0.1",
@@ -56,17 +54,9 @@ public class PublicationsWebUpgrade implements UpgradeStepRegistrator {
 				}
 
 			});
-
-		registry.register(
-			"1.0.1", "1.0.2",
-			new CleanUpPDFPreviewsUpgradeProcess(
-				_ctCollectionLocalService, _portal));
 	}
 
 	@Reference
-	private CTCollectionLocalService _ctCollectionLocalService;
-
-	@Reference
-	private Portal _portal;
+	private CTEntryLocalService _ctEntryLocalService;
 
 }

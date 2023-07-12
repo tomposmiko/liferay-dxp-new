@@ -283,7 +283,7 @@ public class DepotAdminSelectRoleDisplayContext {
 				_themeDisplay.getLocale(), getClass());
 
 			return StringBundler.concat(
-				"<a href=\"", portletURL, "\">",
+				"<a href=\"", portletURL.toString(), "\">",
 				ResourceBundleUtil.getString(resourceBundle, "asset-libraries"),
 				"</a> &raquo; ",
 				HtmlUtil.escape(

@@ -14,7 +14,6 @@
 
 package com.liferay.account.service.persistence.impl;
 
-import com.liferay.account.exception.DuplicateAccountGroupExternalReferenceCodeException;
 import com.liferay.account.exception.NoSuchGroupException;
 import com.liferay.account.model.AccountGroup;
 import com.liferay.account.model.AccountGroupTable;
@@ -48,10 +47,10 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1114,36 +1113,6 @@ public class AccountGroupPersistenceImpl
 		AccountGroupModelImpl accountGroupModelImpl =
 			(AccountGroupModelImpl)accountGroup;
 
-		if (Validator.isNull(accountGroup.getExternalReferenceCode())) {
-			accountGroup.setExternalReferenceCode(
-				String.valueOf(accountGroup.getPrimaryKey()));
-		}
-		else {
-			AccountGroup ercAccountGroup = fetchByC_ERC(
-				accountGroup.getCompanyId(),
-				accountGroup.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercAccountGroup != null) {
-					throw new DuplicateAccountGroupExternalReferenceCodeException(
-						"Duplicate account group with external reference code " +
-							accountGroup.getExternalReferenceCode() +
-								" and company " + accountGroup.getCompanyId());
-				}
-			}
-			else {
-				if ((ercAccountGroup != null) &&
-					(accountGroup.getAccountGroupId() !=
-						ercAccountGroup.getAccountGroupId())) {
-
-					throw new DuplicateAccountGroupExternalReferenceCodeException(
-						"Duplicate account group with external reference code " +
-							accountGroup.getExternalReferenceCode() +
-								" and company " + accountGroup.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -1505,12 +1474,12 @@ public class AccountGroupPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		AccountGroupUtil.setPersistence(this);
+		_setAccountGroupUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AccountGroupUtil.setPersistence(null);
+		_setAccountGroupUtilPersistence(null);
 
 		entityCache.removeCache(AccountGroupImpl.class.getName());
 
@@ -1520,6 +1489,22 @@ public class AccountGroupPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAccountGroupUtilPersistence(
+		AccountGroupPersistence accountGroupPersistence) {
+
+		try {
+			Field field = AccountGroupUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, accountGroupPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

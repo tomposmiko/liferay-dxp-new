@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
@@ -30,6 +28,8 @@ import com.liferay.portal.kernel.service.RegionServiceUtil;
 import com.liferay.portal.kernel.service.persistence.CountryPersistence;
 import com.liferay.portal.kernel.service.persistence.RegionPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -153,11 +153,11 @@ public abstract class RegionServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		RegionServiceUtil.setService(regionService);
+		_setServiceUtilService(regionService);
 	}
 
 	public void destroy() {
-		RegionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -202,6 +202,19 @@ public abstract class RegionServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(RegionService regionService) {
+		try {
+			Field field = RegionServiceUtil.class.getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, regionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = RegionService.class)
 	protected RegionService regionService;
 
@@ -221,8 +234,5 @@ public abstract class RegionServiceBaseImpl
 
 	@BeanReference(type = CountryPersistence.class)
 	protected CountryPersistence countryPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RegionServiceBaseImpl.class);
 
 }

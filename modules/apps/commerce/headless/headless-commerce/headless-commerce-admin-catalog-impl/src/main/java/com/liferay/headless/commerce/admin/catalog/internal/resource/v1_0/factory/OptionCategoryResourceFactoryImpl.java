@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.admin.catalog.internal.resource.v1_0.factory;
 
-import com.liferay.headless.commerce.admin.catalog.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionCategoryResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Zoltán Takács
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-commerce-admin-catalog/v1.0/OptionCategory",
-	service = OptionCategoryResource.Factory.class
-)
+@Component(immediate = true, service = OptionCategoryResource.Factory.class)
 @Generated("")
 public class OptionCategoryResourceFactoryImpl
 	implements OptionCategoryResource.Factory {
@@ -138,6 +135,16 @@ public class OptionCategoryResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		OptionCategoryResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		OptionCategoryResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, OptionCategoryResource>
 		_getProxyProviderFunction() {
 
@@ -186,7 +193,7 @@ public class OptionCategoryResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		OptionCategoryResource optionCategoryResource =
@@ -211,7 +218,6 @@ public class OptionCategoryResourceFactoryImpl
 		optionCategoryResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		optionCategoryResource.setRoleLocalService(_roleLocalService);
-		optionCategoryResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(optionCategoryResource, arguments);
@@ -253,6 +259,9 @@ public class OptionCategoryResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -261,9 +270,6 @@ public class OptionCategoryResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

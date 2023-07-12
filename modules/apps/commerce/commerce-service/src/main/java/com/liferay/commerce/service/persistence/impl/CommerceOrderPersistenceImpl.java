@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.service.persistence.impl;
 
-import com.liferay.commerce.exception.DuplicateCommerceOrderExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderTable;
@@ -52,6 +51,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -8101,35 +8101,6 @@ public class CommerceOrderPersistenceImpl
 			commerceOrder.setUuid(uuid);
 		}
 
-		if (Validator.isNull(commerceOrder.getExternalReferenceCode())) {
-			commerceOrder.setExternalReferenceCode(commerceOrder.getUuid());
-		}
-		else {
-			CommerceOrder ercCommerceOrder = fetchByC_ERC(
-				commerceOrder.getCompanyId(),
-				commerceOrder.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommerceOrder != null) {
-					throw new DuplicateCommerceOrderExternalReferenceCodeException(
-						"Duplicate commerce order with external reference code " +
-							commerceOrder.getExternalReferenceCode() +
-								" and company " + commerceOrder.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceOrder != null) &&
-					(commerceOrder.getCommerceOrderId() !=
-						ercCommerceOrder.getCommerceOrderId())) {
-
-					throw new DuplicateCommerceOrderExternalReferenceCodeException(
-						"Duplicate commerce order with external reference code " +
-							commerceOrder.getExternalReferenceCode() +
-								" and company " + commerceOrder.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -8742,11 +8713,11 @@ public class CommerceOrderPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommerceOrderUtil.setPersistence(this);
+		_setCommerceOrderUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceOrderUtil.setPersistence(null);
+		_setCommerceOrderUtilPersistence(null);
 
 		entityCache.removeCache(CommerceOrderImpl.class.getName());
 
@@ -8756,6 +8727,22 @@ public class CommerceOrderPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceOrderUtilPersistence(
+		CommerceOrderPersistence commerceOrderPersistence) {
+
+		try {
+			Field field = CommerceOrderUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceOrderPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

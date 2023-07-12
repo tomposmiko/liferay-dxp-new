@@ -7,7 +7,7 @@ definition {
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (isSet(description)) {
-			var description = ${description};
+			var description = "${description}";
 		}
 		else {
 			var description = "";
@@ -15,13 +15,13 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/fragment.fragmentcollection/add-fragment-collection \
-				-u test@liferay.com:test \
-				-d groupId=${groupId} \
-				-d name=${name} \
-				-d description=${description}
+			-u test@liferay.com:test \
+			-d groupId=${groupId} \
+			-d name=${name} \
+			-d description=${description}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	@summary = "Directly calls the JSON WS API to add a fragment (default type is section)"
@@ -32,21 +32,21 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/fragment.fragmententry/add-fragment-entry \
-				-u test@liferay.com:test \
-				-d groupId=${groupId} \
-				-d fragmentCollectionId=${collectionId} \
-				-d fragmentEntryKey= \
-				-d name=${name} \
-				-d css= \
-				-d html=${html} \
-				-d js= \
-				-d configuration=${configuration} \
-				-d previewFileEntryId=0 \
-				-d type=${type} \
-				-d status=${status}
+			-u test@liferay.com:test \
+			-d groupId=${groupId} \
+			-d fragmentCollectionId=${collectionId} \
+			-d fragmentEntryKey= \
+			-d name=${name} \
+			-d css= \
+			-d html=${html} \
+			-d js= \
+			-d configuration=${configuration} \
+			-d previewFileEntryId=0 \
+			-d type=${type} \
+			-d status=${status}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	@summary = "Get the collectionId from a collection by using collectionName and groupId"
@@ -57,25 +57,22 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/fragment.fragmentcollection/get-fragment-collections \
-				-u test@liferay.com:test \
-				-d groupId=${groupId} \
-				-d name=${collectionName} \
-				-d <CURL_DATA[start=-1]CURL_DATA> \
-				-d <CURL_DATA[end=-1]CURL_DATA> \
-				-d -orderByComparator=
+			-u test@liferay.com:test \
+			-d groupId=${groupId} \
+			-d name=${collectionName} \
+			-d <CURL_DATA[start=-1]CURL_DATA> \
+			-d <CURL_DATA[end=-1]CURL_DATA> \
+			-d -orderByComparator=
 		''';
+		var collectionId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${collectionName}')]['fragmentCollectionId']");
+		var collectionId = StringUtil.replace("${collectionId}", "[\"", "");
+		var collectionId = StringUtil.replace("${collectionId}", "\"]", "");
 
-		var collectionId = JSONCurlUtil.post(${curl}, "$.[?(@['name'] == '${collectionName}')]['fragmentCollectionId']");
-
-		var collectionId = StringUtil.replace(${collectionId}, "[\"", "");
-
-		var collectionId = StringUtil.replace(${collectionId}, "\"]", "");
-
-		if (${collectionId} == "") {
+		if ("${collectionId}" == "") {
 			fail("FAIL. Cannot find collection.");
 		}
 
-		return ${collectionId};
+		return "${collectionId}";
 	}
 
 	@summary = "Get the collectionName by using collectionName"
@@ -84,17 +81,16 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/fragment.fragmentcollection/get-fragment-collections \
-				-u test@liferay.com:test \
-				-d groupId=${groupId} \
-				-d name=${collectionName} \
-				-d <CURL_DATA[start=-1]CURL_DATA> \
-				-d <CURL_DATA[end=-1]CURL_DATA> \
-				-d -orderByComparator=
+			-u test@liferay.com:test \
+			-d groupId=${groupId} \
+			-d name=${collectionName} \
+			-d <CURL_DATA[start=-1]CURL_DATA> \
+			-d <CURL_DATA[end=-1]CURL_DATA> \
+			-d -orderByComparator=
 		''';
+		var collectionNameResult = JSONCurlUtil.post("${curl}", "$..[?(@['name'] == '${collectionName}')]");
 
-		var collectionNameResult = JSONCurlUtil.post(${curl}, "$..[?(@['name'] == '${collectionName}')]");
-
-		return ${collectionNameResult};
+		return "${collectionNameResult}";
 	}
 
 	@summary = "Get the fragmentName from a fragmentCollection by using fragmentName "
@@ -103,16 +99,15 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/fragment.fragmententry/get-fragment-entries \
-				-u test@liferay.com:test \
-				-d groupId=${groupId} \
-				-d fragmentCollectionId=${fragmentCollectionId} \
-				-d <CURL_DATA[start=-1]CURL_DATA> \
-				-d <CURL_DATA[end=-1]CURL_DATA>
+			-u test@liferay.com:test \
+			-d groupId=${groupId} \
+			-d fragmentCollectionId=${fragmentCollectionId} \
+			-d <CURL_DATA[start=-1]CURL_DATA> \
+			-d <CURL_DATA[end=-1]CURL_DATA>
 		''';
+		var fragmentNameResult = JSONCurlUtil.post("${curl}", "$..[?(@['name'] == '${fragmentName}')]");
 
-		var fragmentNameResult = JSONCurlUtil.post(${curl}, "$..[?(@['name'] == '${fragmentName}')]");
-
-		return ${fragmentNameResult};
+		return "${fragmentNameResult}";
 	}
 
 }

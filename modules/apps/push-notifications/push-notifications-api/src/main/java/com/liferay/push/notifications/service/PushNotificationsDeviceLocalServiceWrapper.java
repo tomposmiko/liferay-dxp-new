@@ -15,7 +15,6 @@
 package com.liferay.push.notifications.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link PushNotificationsDeviceLocalService}.
@@ -407,11 +406,6 @@ public class PushNotificationsDeviceLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_pushNotificationsDeviceLocalService.updateToken(oldToken, newToken);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _pushNotificationsDeviceLocalService.getBasePersistence();
 	}
 
 	@Override

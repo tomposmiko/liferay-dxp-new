@@ -20,14 +20,14 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.screens.service.ScreensDDLRecordService;
 import com.liferay.screens.service.ScreensDDLRecordServiceUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -56,7 +56,7 @@ public abstract class ScreensDDLRecordServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		ScreensDDLRecordServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public abstract class ScreensDDLRecordServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		screensDDLRecordService = (ScreensDDLRecordService)aopProxy;
 
-		ScreensDDLRecordServiceUtil.setService(screensDDLRecordService);
+		_setServiceUtilService(screensDDLRecordService);
 	}
 
 	/**
@@ -107,6 +107,22 @@ public abstract class ScreensDDLRecordServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		ScreensDDLRecordService screensDDLRecordService) {
+
+		try {
+			Field field = ScreensDDLRecordServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, screensDDLRecordService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected ScreensDDLRecordService screensDDLRecordService;
 
 	@Reference
@@ -139,8 +155,5 @@ public abstract class ScreensDDLRecordServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ScreensDDLRecordServiceBaseImpl.class);
 
 }

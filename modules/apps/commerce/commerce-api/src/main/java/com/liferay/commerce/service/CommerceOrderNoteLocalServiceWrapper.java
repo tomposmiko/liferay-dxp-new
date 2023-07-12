@@ -15,7 +15,6 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceOrderNoteLocalService}.
@@ -276,7 +275,13 @@ public class CommerceOrderNoteLocalServiceWrapper
 			commerceOrderNoteId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce order note with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order note's external reference code
+	 * @return the matching commerce order note, or <code>null</code> if a matching commerce order note could not be found
+	 */
 	@Override
 	public com.liferay.commerce.model.CommerceOrderNote
 		fetchCommerceOrderNoteByExternalReferenceCode(
@@ -287,6 +292,9 @@ public class CommerceOrderNoteLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceOrderNoteByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.model.CommerceOrderNote
@@ -321,7 +329,14 @@ public class CommerceOrderNoteLocalServiceWrapper
 			commerceOrderNoteId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce order note with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order note's external reference code
+	 * @return the matching commerce order note
+	 * @throws PortalException if a matching commerce order note could not be found
+	 */
 	@Override
 	public com.liferay.commerce.model.CommerceOrderNote
 			getCommerceOrderNoteByExternalReferenceCode(
@@ -467,11 +482,6 @@ public class CommerceOrderNoteLocalServiceWrapper
 		return _commerceOrderNoteLocalService.upsertCommerceOrderNote(
 			commerceOrderNoteId, commerceOrderId, content, restricted,
 			externalReferenceCode, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceOrderNoteLocalService.getBasePersistence();
 	}
 
 	@Override

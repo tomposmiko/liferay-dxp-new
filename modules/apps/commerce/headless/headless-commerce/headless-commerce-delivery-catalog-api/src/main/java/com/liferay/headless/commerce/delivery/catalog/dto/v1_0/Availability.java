@@ -56,7 +56,7 @@ public class Availability implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Availability.class, json);
 	}
 
-	@Schema(example = "Available")
+	@Schema
 	public String getLabel() {
 		return label;
 	}

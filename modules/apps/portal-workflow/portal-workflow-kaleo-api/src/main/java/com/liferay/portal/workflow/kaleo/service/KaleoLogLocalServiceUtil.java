@@ -488,10 +488,6 @@ public class KaleoLogLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(KaleoLogLocalService service) {
-		_service = service;
-	}
-
 	private static volatile KaleoLogLocalService _service;
 
 }

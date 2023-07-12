@@ -15,7 +15,6 @@
 package com.liferay.commerce.inventory.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceInventoryWarehouseItemLocalService}.
@@ -339,7 +338,13 @@ public class CommerceInventoryWarehouseItemLocalServiceWrapper
 				commerceInventoryWarehouseId, sku);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse item with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse item's external reference code
+	 * @return the matching commerce inventory warehouse item, or <code>null</code> if a matching commerce inventory warehouse item could not be found
+	 */
 	@Override
 	public com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
 		fetchCommerceInventoryWarehouseItemByExternalReferenceCode(
@@ -350,6 +355,9 @@ public class CommerceInventoryWarehouseItemLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceInventoryWarehouseItemByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
@@ -386,7 +394,14 @@ public class CommerceInventoryWarehouseItemLocalServiceWrapper
 			getCommerceInventoryWarehouseItem(commerceInventoryWarehouseItemId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse item with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse item's external reference code
+	 * @return the matching commerce inventory warehouse item
+	 * @throws PortalException if a matching commerce inventory warehouse item could not be found
+	 */
 	@Override
 	public com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
 			getCommerceInventoryWarehouseItemByExternalReferenceCode(
@@ -710,11 +725,6 @@ public class CommerceInventoryWarehouseItemLocalServiceWrapper
 			upsertCommerceInventoryWarehouseItem(
 				externalReferenceCode, companyId, userId,
 				commerceInventoryWarehouseId, sku, quantity);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceInventoryWarehouseItemLocalService.getBasePersistence();
 	}
 
 	@Override

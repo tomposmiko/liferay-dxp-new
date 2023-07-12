@@ -427,17 +427,14 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		ddmFormInstanceRecord.setModifiedDate(
 			serviceContext.getModifiedDate(null));
 
-		DDMFormInstance ddmFormInstance =
-			ddmFormInstanceRecord.getFormInstance();
-
-		ddmFormInstanceRecord.setFormInstanceVersion(
-			ddmFormInstance.getVersion());
-
 		ddmFormInstanceRecord = ddmFormInstanceRecordPersistence.update(
 			ddmFormInstanceRecord);
 
 		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
 			ddmFormInstanceRecord.getLatestFormInstanceRecordVersion();
+
+		DDMFormInstance ddmFormInstance =
+			ddmFormInstanceRecord.getFormInstance();
 
 		if (ddmFormInstanceRecordVersion.isApproved()) {
 			long ddmStorageId = createDDMContent(
@@ -460,7 +457,6 @@ public class DDMFormInstanceRecordLocalServiceImpl
 
 			updateFormInstanceRecordVersion(
 				user, ddmFormInstanceRecordVersion,
-				ddmFormInstance.getVersion(),
 				ddmFormInstanceRecordVersion.getStatus(), version,
 				serviceContext);
 
@@ -589,6 +585,11 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			}
 			else if (formInstanceRecord.getStatus() ==
 						WorkflowConstants.STATUS_APPROVED) {
+
+				updateFormInstanceRecordVersion(
+					user, formInstanceRecordVersion,
+					WorkflowConstants.STATUS_APPROVED,
+					formInstanceRecordVersion.getVersion(), serviceContext);
 
 				formInstanceRecord.setVersion(
 					formInstanceRecordVersion.getVersion());
@@ -927,13 +928,10 @@ public class DDMFormInstanceRecordLocalServiceImpl
 
 	protected void updateFormInstanceRecordVersion(
 		User user, DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion,
-		String formInstanceVersion, int status, String version,
-		ServiceContext serviceContext) {
+		int status, String version, ServiceContext serviceContext) {
 
 		ddmFormInstanceRecordVersion.setUserId(user.getUserId());
 		ddmFormInstanceRecordVersion.setUserName(user.getFullName());
-		ddmFormInstanceRecordVersion.setFormInstanceVersion(
-			formInstanceVersion);
 		ddmFormInstanceRecordVersion.setVersion(version);
 		ddmFormInstanceRecordVersion.setStatus(status);
 		ddmFormInstanceRecordVersion.setStatusByUserId(user.getUserId());

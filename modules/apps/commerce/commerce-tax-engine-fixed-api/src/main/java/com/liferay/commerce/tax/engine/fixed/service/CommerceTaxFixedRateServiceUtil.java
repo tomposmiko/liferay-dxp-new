@@ -121,10 +121,6 @@ public class CommerceTaxFixedRateServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceTaxFixedRateService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceTaxFixedRateService _service;
 
 }

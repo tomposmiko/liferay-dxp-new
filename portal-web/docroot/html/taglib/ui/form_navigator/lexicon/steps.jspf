@@ -104,7 +104,7 @@
 					}
 
 					int step = 1;
-					boolean foundActiveStep = false;
+					boolean isFoundActiveStep = false;
 
 					for (int j = 0; j < sectionKeys.length; j++) {
 						String sectionIcon = "live";
@@ -129,11 +129,11 @@
 
 						if (curSection.equals(sectionKey) || curSection.equals(sectionId)) {
 							cssClass += " active";
-							foundActiveStep = true;
+							isFoundActiveStep = true;
 							sectionIcon = "circle";
 						}
 
-						if (!foundActiveStep) {
+						if (!isFoundActiveStep) {
 							cssClass += " complete";
 							sectionIcon = "check";
 						}

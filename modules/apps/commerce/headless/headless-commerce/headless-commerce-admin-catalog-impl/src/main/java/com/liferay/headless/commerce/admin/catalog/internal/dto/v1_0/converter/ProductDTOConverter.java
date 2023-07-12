@@ -14,12 +14,8 @@
 
 package com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter;
 
-import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetTag;
-import com.liferay.asset.kernel.model.AssetVocabulary;
-import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagService;
-import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CProduct;
@@ -28,7 +24,6 @@ import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.product.type.CPType;
 import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.expando.kernel.model.ExpandoBridge;
-import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Category;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Status;
 import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.util.CustomFieldsUtil;
@@ -39,14 +34,10 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
@@ -98,12 +89,6 @@ public class ProductDTOConverter
 				actions = dtoConverterContext.getActions();
 				active = !cpDefinition.isInactive();
 				catalogId = _getCommerceCatalogId(cpDefinition);
-				categories = TransformUtil.transformToArray(
-					_assetCategoryLocalService.getCategories(
-						cpDefinition.getModelClassName(),
-						cpDefinition.getCPDefinitionId()),
-					assetCategory -> _toCategory(assetCategory),
-					Category.class);
 				createDate = cpDefinition.getCreateDate();
 				customFields = CustomFieldsUtil.toCustomFields(
 					dtoConverterContext.isAcceptAllLanguages(),
@@ -127,9 +112,6 @@ public class ProductDTOConverter
 				modifiedDate = cpDefinition.getModifiedDate();
 				name = LanguageUtils.getLanguageIdMap(
 					cpDefinition.getNameMap());
-				productAccountGroupFilter =
-					cpDefinition.isAccountGroupFilterEnabled();
-				productChannelFilter = cpDefinition.isChannelFilterEnabled();
 				productId = cProduct.getCProductId();
 				productStatus = cpDefinition.getStatus();
 				productType = cpType.getName();
@@ -140,9 +122,6 @@ public class ProductDTOConverter
 					cpDefinition, dtoConverterContext.getLocale());
 				tags = _getTags(cpDefinition);
 				thumbnail = cpDefinition.getDefaultImageThumbnailSrc();
-				urls = _getUrlTitleMap(
-					_cpDefinitionService.getUrlTitleMap(
-						cpDefinition.getCPDefinitionId()));
 				workflowStatusInfo = _getWorkflowStatusInfo(
 					cpDefinition.getStatus(), productStatusLabel,
 					productStatusLabelI18n);
@@ -193,23 +172,6 @@ public class ProductDTOConverter
 		);
 	}
 
-	private Map<String, String> _getUrlTitleMap(
-		Map<Locale, String> urlTitleMap) {
-
-		Set<Map.Entry<Locale, String>> entries = urlTitleMap.entrySet();
-
-		Stream<Map.Entry<Locale, String>> stream = entries.stream();
-
-		return stream.collect(
-			Collectors.toMap(
-				entry -> {
-					Locale locale = entry.getKey();
-
-					return locale.toString();
-				},
-				Map.Entry::getValue));
-	}
-
 	private Status _getWorkflowStatusInfo(
 		int statusCode, String productStatusLabel,
 		String productStatusLabelI18n) {
@@ -223,38 +185,8 @@ public class ProductDTOConverter
 		};
 	}
 
-	private Category _toCategory(AssetCategory assetCategory) {
-		return new Category() {
-			{
-				externalReferenceCode =
-					assetCategory.getExternalReferenceCode();
-				id = assetCategory.getCategoryId();
-				name = assetCategory.getName();
-
-				setVocabulary(
-					() -> {
-						AssetVocabulary assetVocabulary =
-							_assetVocabularyLocalService.fetchAssetVocabulary(
-								assetCategory.getVocabularyId());
-
-						if (assetVocabulary == null) {
-							return null;
-						}
-
-						return assetVocabulary.getName();
-					});
-			}
-		};
-	}
-
-	@Reference
-	private AssetCategoryLocalService _assetCategoryLocalService;
-
 	@Reference
 	private AssetTagService _assetTagService;
-
-	@Reference
-	private AssetVocabularyLocalService _assetVocabularyLocalService;
 
 	@Reference
 	private CPDefinitionService _cpDefinitionService;

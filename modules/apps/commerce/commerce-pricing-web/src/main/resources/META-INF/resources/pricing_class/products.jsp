@@ -38,7 +38,7 @@ boolean hasPermission = commercePricingClassCPDefinitionDisplayContext.hasPermis
 
 				var id = <%= commercePricingClass.getCommercePricingClassId() %>;
 				var pricingClassExternalReferenceCode =
-					'<%= HtmlUtil.escapeJS(commercePricingClass.getExternalReferenceCode()) %>';
+					'<%= commercePricingClass.getExternalReferenceCode() %>';
 
 				function selectItem(product) {
 					var productData = {
@@ -59,7 +59,7 @@ boolean hasPermission = commercePricingClassCPDefinitionDisplayContext.hasPermis
 							});
 						})
 						.catch(function (error) {
-							return Promise.reject(error.errorDescription);
+							return Promise.reject(error);
 						});
 				}
 

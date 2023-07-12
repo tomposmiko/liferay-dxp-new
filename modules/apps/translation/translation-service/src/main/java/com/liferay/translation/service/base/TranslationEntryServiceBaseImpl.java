@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,6 +27,8 @@ import com.liferay.translation.model.TranslationEntry;
 import com.liferay.translation.service.TranslationEntryService;
 import com.liferay.translation.service.TranslationEntryServiceUtil;
 import com.liferay.translation.service.persistence.TranslationEntryPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class TranslationEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		TranslationEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class TranslationEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		translationEntryService = (TranslationEntryService)aopProxy;
 
-		TranslationEntryServiceUtil.setService(translationEntryService);
+		_setServiceUtilService(translationEntryService);
 	}
 
 	/**
@@ -116,6 +116,22 @@ public abstract class TranslationEntryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		TranslationEntryService translationEntryService) {
+
+		try {
+			Field field = TranslationEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, translationEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.translation.service.TranslationEntryLocalService
 		translationEntryLocalService;
@@ -128,8 +144,5 @@ public abstract class TranslationEntryServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		TranslationEntryServiceBaseImpl.class);
 
 }

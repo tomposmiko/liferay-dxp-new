@@ -141,10 +141,6 @@ public class CPDefinitionLinkServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPDefinitionLinkService service) {
-		_service = service;
-	}
-
 	private static volatile CPDefinitionLinkService _service;
 
 }

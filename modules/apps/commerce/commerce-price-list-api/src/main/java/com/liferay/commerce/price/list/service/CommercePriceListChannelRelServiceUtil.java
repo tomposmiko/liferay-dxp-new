@@ -135,10 +135,6 @@ public class CommercePriceListChannelRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommercePriceListChannelRelService service) {
-		_service = service;
-	}
-
 	private static volatile CommercePriceListChannelRelService _service;
 
 }

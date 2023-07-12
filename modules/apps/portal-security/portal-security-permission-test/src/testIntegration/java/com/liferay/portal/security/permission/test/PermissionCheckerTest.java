@@ -92,12 +92,13 @@ public class PermissionCheckerTest {
 
 		String packageName = pkg.getName();
 
-		_source =
+		_resourceActions.read(
+			PermissionCheckerTest.class.getClassLoader(),
 			StringUtil.replace(packageName, '.', '/') +
-				"/dependencies/resource-actions.xml";
+				"/dependencies/resource-actions.xml");
 
-		_resourceActions.populateModelResources(
-			PermissionCheckerTest.class.getClassLoader(), _source);
+		_resourceActions.check(_PORTLET_RESOURCE_NAME);
+		_resourceActions.check(_NONSITE_PORTLET_RESOURCE_NAME);
 	}
 
 	@AfterClass
@@ -1190,9 +1191,6 @@ public class PermissionCheckerTest {
 		portlet.setCompanyId(companyId);
 		portlet.setPortletId(portletName);
 
-		_resourceActions.populatePortletResource(
-			portlet, PermissionCheckerTest.class.getClassLoader(), _source);
-
 		_portletLocalService.deployRemotePortlet(portlet, "category.hidden");
 	}
 
@@ -1246,8 +1244,6 @@ public class PermissionCheckerTest {
 
 	@Inject
 	private static ResourceActions _resourceActions;
-
-	private static String _source;
 
 	@DeleteAfterTestRun
 	private Company _company;

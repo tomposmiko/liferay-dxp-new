@@ -93,6 +93,12 @@ public class GetFragmentEntryLinkMVCResourceCommand
 			defaultFragmentRendererContext.setMode(
 				FragmentEntryLinkConstants.EDIT);
 
+			long segmentsExperienceId = ParamUtil.getLong(
+				resourceRequest, "segmentsExperienceId");
+
+			defaultFragmentRendererContext.setSegmentsExperienceIds(
+				new long[] {segmentsExperienceId});
+
 			String collectionItemClassName = ParamUtil.getString(
 				resourceRequest, "collectionItemClassName");
 			long collectionItemClassPK = ParamUtil.getLong(

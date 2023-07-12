@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1845,9 +1846,7 @@ public class DDMStructureVersionPersistenceImpl
 	 */
 	@Override
 	public DDMStructureVersion fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMStructureVersion.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMStructureVersion.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2342,12 +2341,12 @@ public class DDMStructureVersionPersistenceImpl
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"structureId", "status"}, false);
 
-		DDMStructureVersionUtil.setPersistence(this);
+		_setDDMStructureVersionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMStructureVersionUtil.setPersistence(null);
+		_setDDMStructureVersionUtilPersistence(null);
 
 		entityCache.removeCache(DDMStructureVersionImpl.class.getName());
 
@@ -2357,6 +2356,22 @@ public class DDMStructureVersionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMStructureVersionUtilPersistence(
+		DDMStructureVersionPersistence ddmStructureVersionPersistence) {
+
+		try {
+			Field field = DDMStructureVersionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmStructureVersionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

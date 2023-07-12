@@ -51,7 +51,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -67,7 +67,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewWebsiteNotificationForNewWikiPage {
 		Navigator.openURL();
 
@@ -77,7 +77,7 @@ definition {
 
 		WikiPortlet.subscribeToNodeCP(wikiNodeName = "Main");
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
 
 		User.logoutPG();
 
@@ -93,7 +93,7 @@ definition {
 			wikiPageContent = "Wiki Page Content",
 			wikiPageTitle = "Wiki Page Title");
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
 
 		User.logoutPG();
 
@@ -101,7 +101,7 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		Notifications.viewBadgeCount(notificationCount = 1);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
 		Notifications.gotoNotifications();
 
@@ -116,10 +116,10 @@ definition {
 			wikiPageContent = "Wiki Page Content",
 			wikiPageTitle = "Wiki Page Title");
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewWebsiteNotificationForUpdatedWikiPage {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -137,7 +137,7 @@ definition {
 
 		WikiPortlet.subscribeToNodeCP(wikiNodeName = "Main");
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
 
 		User.logoutPG();
 
@@ -154,7 +154,7 @@ definition {
 			wikiPageContentEdit = "Wiki Page Content Edit",
 			wikiPageTitle = "Wiki Page Title");
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
 
 		User.logoutPG();
 
@@ -162,7 +162,7 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		Notifications.viewBadgeCount(notificationCount = 1);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
 		Notifications.gotoNotifications();
 
@@ -177,7 +177,7 @@ definition {
 			wikiPageContent = "Wiki Page Content Edit",
 			wikiPageTitle = "Wiki Page Title");
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
 	}
 
 }

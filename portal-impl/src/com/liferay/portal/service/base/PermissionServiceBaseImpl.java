@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.PermissionService;
@@ -34,6 +32,8 @@ import com.liferay.portal.kernel.service.persistence.TeamFinder;
 import com.liferay.portal.kernel.service.persistence.TeamPersistence;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -342,11 +342,11 @@ public abstract class PermissionServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		PermissionServiceUtil.setService(permissionService);
+		_setServiceUtilService(permissionService);
 	}
 
 	public void destroy() {
-		PermissionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -380,6 +380,20 @@ public abstract class PermissionServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(PermissionService permissionService) {
+		try {
+			Field field = PermissionServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, permissionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -439,8 +453,5 @@ public abstract class PermissionServiceBaseImpl
 
 	@BeanReference(type = TeamFinder.class)
 	protected TeamFinder teamFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PermissionServiceBaseImpl.class);
 
 }

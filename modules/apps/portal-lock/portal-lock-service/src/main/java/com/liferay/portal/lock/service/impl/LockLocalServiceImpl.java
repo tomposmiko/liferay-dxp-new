@@ -20,6 +20,7 @@ import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.change.tracking.CTAware;
+import com.liferay.portal.kernel.dao.jdbc.aop.MasterDataSource;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lock.LockListener;
@@ -79,7 +80,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		Lock lock = lockPersistence.fetchByC_K(className, key);
 
 		if ((lock != null) && lock.isExpired()) {
-			_expireLock(lock);
+			expireLock(lock);
 
 			lock = null;
 		}
@@ -104,7 +105,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		Lock lock = lockPersistence.findByC_K(className, key);
 
 		if (lock.isExpired()) {
-			_expireLock(lock);
+			expireLock(lock);
 
 			throw new ExpiredLockException();
 		}
@@ -186,7 +187,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
 		if (lock != null) {
 			if (lock.isExpired()) {
-				_expireLock(lock);
+				expireLock(lock);
 
 				lock = null;
 			}
@@ -238,11 +239,13 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		return lock;
 	}
 
+	@MasterDataSource
 	@Override
 	public Lock lock(String className, String key, String owner) {
 		return lock(className, key, null, owner);
 	}
 
+	@MasterDataSource
 	@Override
 	public Lock lock(
 		final String className, final String key, final String expectedOwner,
@@ -377,6 +380,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		}
 	}
 
+	@MasterDataSource
 	@Override
 	public void unlock(
 		final String className, final String key, final String owner) {
@@ -439,38 +443,24 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		}
 	}
 
-	private void _expireLock(Lock lock) {
-		try {
-			TransactionInvokerUtil.invoke(
-				_transactionConfig,
-				() -> {
-					LockListener lockListener = _getLockListener(
-						lock.getClassName());
+	protected void expireLock(Lock lock) {
+		LockListener lockListener = _getLockListener(lock.getClassName());
 
-					String key = lock.getKey();
+		String key = lock.getKey();
 
-					if (lockListener != null) {
-						lockListener.onBeforeExpire(key);
-					}
-
-					try {
-						lockPersistence.remove(lock);
-
-						lockPersistence.flush();
-					}
-					finally {
-						if (lockListener != null) {
-							lockListener.onAfterExpire(key);
-						}
-					}
-
-					return null;
-				});
+		if (lockListener != null) {
+			lockListener.onBeforeExpire(key);
 		}
-		catch (Throwable throwable) {
-			_log.error("Unable to expire lock", throwable);
 
-			ReflectionUtil.throwException(throwable);
+		try {
+			lockPersistence.remove(lock);
+
+			lockPersistence.flush();
+		}
+		finally {
+			if (lockListener != null) {
+				lockListener.onAfterExpire(key);
+			}
 		}
 	}
 

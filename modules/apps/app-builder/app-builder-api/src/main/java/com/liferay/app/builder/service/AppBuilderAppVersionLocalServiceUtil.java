@@ -415,10 +415,6 @@ public class AppBuilderAppVersionLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AppBuilderAppVersionLocalService service) {
-		_service = service;
-	}
-
 	private static volatile AppBuilderAppVersionLocalService _service;
 
 }

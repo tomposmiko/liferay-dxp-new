@@ -18,7 +18,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This ensures that the expired entries can be removed automatically in the recycle bin."
-	@priority = 5
+	@priority = "5"
 	test CheckExpiredEntries {
 		property custom.properties = "trash.entry.check.interval=1${line.separator}trash.entries.max.age=1";
 
@@ -76,7 +76,7 @@ definition {
 			customMaxAge = "1 minute",
 			deleteUser = "Test Test");
 
-		Pause(locator1 = 120000);
+		Pause(locator1 = "120000");
 
 		Refresh();
 
@@ -84,7 +84,7 @@ definition {
 	}
 
 	@description = "This ensures that the document can be deleted after the recycle bin is disabled."
-	@priority = 5
+	@priority = "5"
 	test DeleteDocumentAfterDisabling {
 		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
@@ -111,7 +111,7 @@ definition {
 	}
 
 	@description = "This ensures that the web content can be deleted after the recycle bin is disabled."
-	@priority = 5
+	@priority = "5"
 	test DeleteWCAfterDisabling {
 		DepotNavigator.openDepotAdmin();
 
@@ -143,7 +143,7 @@ definition {
 	}
 
 	@description = "This ensures that the documents can be restored from recycle bin."
-	@priority = 5
+	@priority = "5"
 	test RestoreDocuments {
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
@@ -179,16 +179,16 @@ definition {
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
 		for (var dmDocumentTitle : list "Document_1.doc,Document_2.jpg") {
-			DMNavigator.gotoDocumentCP(dmDocumentTitle = ${dmDocumentTitle});
+			DMNavigator.gotoDocumentCP(dmDocumentTitle = "${dmDocumentTitle}");
 
-			DMDocument.viewCP(dmDocumentTitle = ${dmDocumentTitle});
+			DMDocument.viewCP(dmDocumentTitle = "${dmDocumentTitle}");
 
 			DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 		}
 	}
 
 	@description = "This ensures that the web content can be restored from recycle bin."
-	@priority = 5
+	@priority = "5"
 	test RestoreWebContent {
 		property portal.acceptance = "true";
 

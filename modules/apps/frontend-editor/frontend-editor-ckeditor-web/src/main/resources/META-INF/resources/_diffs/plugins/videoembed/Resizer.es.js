@@ -73,8 +73,7 @@
 
 		init() {
 			this.container = this.document.createElement('div');
-			this.container.classList.add('ckimgrszwrapper');
-			this.container.id = 'ckimgrsz' + this.editor.id;
+			this.container.id = 'ckimgrsz';
 
 			this.preview = this.document.createElement('span');
 
@@ -91,10 +90,6 @@
 			for (let i = 0; i < keys.length; i++) {
 				this.container.appendChild(this.handles[keys[i]]);
 			}
-
-			this.editor.on('destroy', () => {
-				this.container.remove();
-			});
 		}
 
 		createHandle(name) {

@@ -379,10 +379,6 @@ public class MessageLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(MessageLocalService service) {
-		_service = service;
-	}
-
 	private static volatile MessageLocalService _service;
 
 }

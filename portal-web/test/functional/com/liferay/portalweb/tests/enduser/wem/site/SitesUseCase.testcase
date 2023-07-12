@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -32,7 +32,7 @@ definition {
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddChildSiteFromImportedSiteTemplate {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -91,7 +91,7 @@ definition {
 
 		for (var pageName : list "Courses,Student Boards,Materials") {
 			SiteTemplates.addSitePageViaSiteTemplateCP(
-				pageName = ${pageName},
+				pageName = "${pageName}",
 				siteTemplateName = "Digital Class Room");
 		}
 
@@ -137,7 +137,7 @@ definition {
 
 		for (var pageName : list "Courses,Student Boards,Materials") {
 			Navigator.gotoPrivateSitePage(
-				pageName = ${pageName},
+				pageName = "${pageName}",
 				siteName = "Moon Rocks 101");
 		}
 
@@ -145,12 +145,12 @@ definition {
 
 		for (var pageName : list "Courses,Student Boards,Materials") {
 			Navigator.gotoPrivateSitePage(
-				pageName = ${pageName},
+				pageName = "${pageName}",
 				siteName = "Moon Rocks 202");
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddOrganizationSitesAndDeactivate {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -278,7 +278,7 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test MySitesDropDownDoesNotShowUserOrganizationOnTop {
 		property testray.component.names = "Site Administration,Users and Organization";
 
@@ -288,7 +288,7 @@ definition {
 			Site.openSitesAdmin();
 
 			Site.addCP(
-				siteName = ${siteNameListsCount},
+				siteName = "${siteNameListsCount}",
 				siteTemplateName = "Site Template Name",
 				siteType = "Site Template");
 		}
@@ -317,12 +317,12 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Organization Name");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test OnlySiteOwnersCanAssignSiteRolesToUserGroups {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property testray.component.names = "Site Administration,User Groups";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRole.addSiteRole(
 			roleKey = "Roles Siterole Name",
@@ -342,14 +342,14 @@ definition {
 
 		for (var resourceActionIndex : list "ASSIGN_MEMBERS,ASSIGN_USER_ROLES,VIEW_MEMBERS,VIEW_SITE_ADMINISTRATION") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = ${resourceActionIndex},
+				resourceAction = "${resourceActionIndex}",
 				resourceName = "com.liferay.portal.kernel.model.Group",
 				roleTitle = "Roles Regrole Name");
 		}
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "VIEW_CONTROL_PANEL",
-			resourceName = 90,
+			resourceName = "90",
 			roleTitle = "Roles Regrole Name");
 
 		Permissions.definePermissionViaJSONAPI(
@@ -371,7 +371,7 @@ definition {
 		User.openUsersAdmin();
 
 		User.editUserSiteCP(
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			userScreenName = "usersn");
 
 		JSONRole.assignRoleToUser(
@@ -399,12 +399,12 @@ definition {
 			userLoginFullName = "test test");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PrivateVirtualHostUrlDoesNotRedirectUserToLoginPage {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property testray.component.names = "Site Administration";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		Site.openSiteSettingsAdmin(siteURLKey = "guest");
 
@@ -440,7 +440,7 @@ definition {
 		User.openUsersAdmin();
 
 		User.editUserSiteCP(
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			userScreenName = "usersn");
 
 		User.firstLoginPG(
@@ -457,11 +457,13 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ReturnWrongLayoutForSignedInUserWithVirtualHostsConfigured {
 		property custom.properties = "layout.default.template.id=2_columns_iii${line.separator}layout.user.private.layouts.enabled=false${line.separator}layout.user.private.layouts.auto.create=false${line.separator}layout.user.private.layouts.power.user.required=true${line.separator}layout.user.public.layouts.enabled=false${line.separator}layout.user.public.layouts.auto.create=false${line.separator}layout.user.public.layouts.power.user.required=true";
 		property test.name.skip.portal.instance = "SitesUsecase#ReturnWrongLayoutForSignedInUserWithVirtualHostsConfigured";
-		property test.smtp.server.enabled = "true";
+		property testray.component.names = "Site Administration";
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "Instance Configuration",
@@ -477,6 +479,8 @@ definition {
 
 		PortalSettings.editConfigurationAuthenticationGeneral(enableRequireStrangers = "true");
 
+		PortalSettings.editConfigurationUsersEmailNotificationsCP();
+
 		PortalSettings.editConfigurationUsersEmailVerificationNotificationsCP();
 
 		JSONGroup.addGroup(groupName = "Site Name");
@@ -491,25 +495,25 @@ definition {
 
 		SitePages.addPublicPage(pageName = "Site Page Name");
 
-		User.firstLoginUI(specificURL = "http://www.baker.com:8080");
+		ServerAdministration.openServerAdmin();
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations");
+		ServerAdministration.configureMailServerSettings(
+			userName = PropsUtil.get("email.address.2"),
+			userPassword = PropsUtil.get("email.password.2"));
+
+		Navigator.openSpecificURL(url = "http://www.able.com:8080/");
+
+		Navigator.openSpecificURL(url = "http://www.baker.com:8080/");
+
+		User.openUsersAdmin();
 
 		User.addCP(
-			userEmailAddress = "userea@liferay.com",
+			userEmailAddress = PropsUtil.get("email.address.3"),
 			userFirstName = "userfn",
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		Navigator.openSpecificURL(url = "http://www.baker.com:8080");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations");
+		User.openUsersAdmin();
 
 		UserNavigator.gotoUser(userScreenName = "usersn");
 
@@ -523,95 +527,78 @@ definition {
 			locator1 = "UsersAndOrganizationsEditUser#PASSWORD_ENTER_AGAIN_FIELD",
 			value1 = "password");
 
-		Check(
-			checkboxName = "Require Password Reset",
-			locator1 = "Checkbox#ANY_CHECKBOX");
-
 		PortletEntry.save();
 
-		UserBar.signOut();
+		User.logoutPG();
 
-		User.firstLoginUI(
-			password = "password",
-			specificURL = "http://www.baker.com:8080",
-			userEmailAddress = "userea@liferay.com");
+		Pause(locator1 = "30000");
 
-		Button.click(button = "Send New Verification Code");
+		Gmail.login(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"));
 
-		var emailVerification = MockMock.getHTMLBodyFormattedText(
-			newTab = "true",
-			recipient = "userfn userln",
-			sender = "Joe Bloggs",
-			subject = "http://www.baker.com:8080: Email Address Verification");
+		Gmail.gotoHtmlMode();
 
-		Close.closeWindow();
+		Gmail.gotoMail(
+			emailFromUserName = "Joe Bloggs",
+			gmailAssetType = "Address Verification",
+			gmailMessageTitle = "Email Address Verification");
 
-		Type(
-			locator1 = "SignInCreateAccount#EMAIL_VERIFICATION_CODE_FIELD",
-			value1 = ${emailVerification});
+		var emailVerification = selenium.getText("Gmail#EMAIL_VERIFICATION_CODE");
 
-		Button.clickVerifyButton();
+		Gmail.gotoHtmlMode();
 
-		User.resetPassword();
+		Gmail.deleteSpecificMail(gmailMessageTitleList = "Email Address Verification,Your New Account,Your New Password");
 
-		User.answerPasswordReminder();
+		Navigator.openSpecificURL(url = "http://www.baker.com:8080/");
 
-		AssertElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE");
+		User.signInPG(
+			emailPassword = "password",
+			emailVerification = "${emailVerification}",
+			userEmailAddress = PropsUtil.get("email.address.3"));
 
-		UserBar.signOut();
+		User.firstLoginPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
 
-		MockMock.deleteMail(
-			asset = "http://www.baker.com:8080: Email Address Verification",
-			newTab = "true");
-
-		Close.closeWindow();
-
-		User.firstLoginUI(specificURL = "http://www.able.com:8080");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Instance Settings");
-
-		SystemSettings.gotoConfiguration(
+		PortalSettings.gotoConfiguration(
 			configurationCategory = "Email",
 			configurationName = "Email Verification Notification",
 			configurationScope = "Virtual Instance Scope");
 
-		Type.typeEditor(
-			locator1 = "CKEditor#BODY_FIELD",
-			value1 = "[$EMAIL_VERIFICATION_URL$]");
+		PortalSettings.editConfigurationUsersEmailVerificationNotificationsCP(emailVerificationURL = "true");
 
-		PortletEntry.save();
-
-		UserBar.signOut();
-
-		User.firstLoginUI(
-			specificURL = "http://www.baker.com:8080",
-			userEmailAddress = "userea@liferay.com");
+		Navigator.openSpecificURL(url = "http://www.baker.com:8080/");
 
 		Navigator.gotoAccountSettings();
 
-		User.editUserInformation(userEmailAddressEdit = "user2@liferay.com");
+		User.editUserInformation(userEmailAddressEdit = PropsUtil.get("email.address.4"));
 
-		var emailAddressVerificationURL = MockMock.getHTMLBodyFormattedText(
-			newTab = "true",
-			recipient = "user2@",
-			sender = "Joe Bloggs",
-			subject = "http://www.baker.com:8080: Email Address Verification");
+		Gmail.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("email.address.4"),
+			userPassword = PropsUtil.get("email.password.4"));
 
-		Close.closeWindow();
+		Gmail.gotoHtmlMode();
 
-		Navigator.openSpecificURL(url = ${emailAddressVerificationURL});
+		Gmail.gotoMail(
+			emailFromUserName = "Joe Bloggs",
+			gmailAssetType = "Address Verification",
+			gmailMessageTitle = "Email Address Verification");
 
-		Button.clickVerifyButton();
+		var emailAddressVerificationURL = selenium.getText("Gmail#EMAIL_ADDRESS_VERIFICATION_URL");
 
-		AssertElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE");
+		Click(locator1 = "Gmail#EMAIL_ADDRESS_VERIFICATION_URL");
 
-		MockMock.deleteMail(asset = "http://www.baker.com:8080: Email Address Verification");
+		SelectWindow(locator1 = "title=Verify Email Address - Site Name - ${siteName}");
+
+		AssertLocation(value1 = "${emailAddressVerificationURL}");
+
+		Gmail.gotoHtmlMode();
+
+		Gmail.deleteSpecificMail(gmailMessageTitleList = "Email Address Verification,Your New Account,Your New Password");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SiteFriendlyURLLayoutImporter {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property testray.component.names = "Site Administration";
@@ -678,7 +665,7 @@ definition {
 		Site.editFriendlyURLCP(siteFriendlyURLEdit = "/guest");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SitesDeactivated {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property test.name.skip.portal.instance = "SitesUsecase#SitesDeactivated";
@@ -764,7 +751,7 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SitesDemoSiteManagement {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.release = "true";
@@ -782,7 +769,7 @@ definition {
 			siteName = "World Cup - Russia 2018");
 
 		for (var tagName : list "World Cup,Russia,2018") {
-			Tag.addViaSiteCP(tagName = ${tagName});
+			Tag.addViaSiteCP(tagName = "${tagName}");
 		}
 
 		Site.addVirtualHostsURLCP(
@@ -796,20 +783,20 @@ definition {
 		for (var publicPageName : list "Home,Arenas") {
 			JSONLayout.addPublicLayout(
 				groupName = "World Cup - Russia 2018",
-				layoutName = ${publicPageName});
+				layoutName = "${publicPageName}");
 		}
 
 		for (var childPageName : list "Arena Baltika,Zenit Arena,Kazan Arena") {
 			JSONLayout.addPublicLayout(
 				groupName = "World Cup - Russia 2018",
-				layoutName = ${childPageName},
+				layoutName = "${childPageName}",
 				parentLayoutName = "Arenas");
 		}
 
 		for (var privatePageName : list "Accomodations,Maps") {
 			JSONLayout.addPrivateLayout(
 				groupName = "World Cup - Russia 2018",
-				layoutName = ${privatePageName});
+				layoutName = "${privatePageName}");
 		}
 
 		SitePages.openPagesAdmin(siteURLKey = "russia2018");
@@ -844,7 +831,7 @@ definition {
 
 		for (var childPageName : list "Arena Baltika,Zenit Arena,Kazan Arena") {
 			Page.viewChildPageDropdown(
-				childPageName = ${childPageName},
+				childPageName = "${childPageName}",
 				javaScriptPage = "Welcome to Russia.",
 				pageName = "Arenas",
 				viewChildPageDropdown = "PAGE_2");
@@ -883,21 +870,17 @@ definition {
 			siteRoleName = "Site Administrator",
 			userScreenName = "usersn");
 
-		User.logoutPG();
-
-		User.viewLoggedOutPG();
-
-		User.firstLoginUI(
+		User.firstLoginPG(
 			password = "test",
-			specificURL = "http://www.baker.com:8080/group/russia2018",
-			userEmailAddress = "userea@liferay.com");
+			samlEnabled = "true",
+			userEmailAddress = "userea@liferay.com",
+			virtualHostsURL = "www.baker.com:8080/group/russia2018");
+
+		Navigator.openSpecificURL(url = "http://www.baker.com:8080/group/russia2018");
 
 		Page.viewSpecificPG(pageNameList = "Accomodations,Maps");
 
-		User.firstLoginUI(
-			password = "test",
-			specificURL = "${portalURL}/web/russia2018",
-			userEmailAddress = "userea@liferay.com");
+		Navigator.openSpecificURL(url = "${portalURL}/web/russia2018");
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
@@ -922,7 +905,7 @@ definition {
 		JSONGroup.addGroup(groupName = "Site Name");
 
 		LAR.importSiteCP(
-			larFileName = ${larFileName},
+			larFileName = "${larFileName}",
 			siteName = "Site Name");
 
 		for (var childPageName : list "Arena Baltika,Zenit Arena,Kazan Arena") {
@@ -931,13 +914,13 @@ definition {
 				siteName = "Site Name");
 
 			Page.viewChildPageDropdown(
-				childPageName = ${childPageName},
+				childPageName = "${childPageName}",
 				pageName = "Arenas",
 				viewChildPageDropdown = "PAGE_2");
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SiteTeamsPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property testray.component.names = "Permissions,Site Administration";
@@ -1019,7 +1002,7 @@ definition {
 
 		for (var permissionsInLineUncheckListsCount : list "CONTENT_PERMISSIONS_ADD_DISCUSSION_CHECKBOX,CONTENT_PERMISSIONS_VIEW_CHECKBOX") {
 			Role.removePermissionPG(
-				permissionDefinitionKey = ${permissionsInLineUncheckListsCount},
+				permissionDefinitionKey = "${permissionsInLineUncheckListsCount}",
 				roleTitle = "Site Member");
 		}
 
@@ -1033,7 +1016,7 @@ definition {
 
 		for (var permissionsInLineCheckListsCount : list "ACTION_ADD_DISCUSSION,ACTION_ADD_LAYOUT,ACTION_CONFIGURE_PORTLETS,ACTION_CUSTOMIZE,ACTION_DELETE,ACTION_DELETE_DISCUSSION,ACTION_PERMISSIONS,ACTION_UPDATE,ACTION_UPDATE_DISCUSSION,ACTION_VIEW") {
 			Team.definePermissionPG(
-				permissionDefinitionKey = ${permissionsInLineCheckListsCount},
+				permissionDefinitionKey = "${permissionsInLineCheckListsCount}",
 				teamName = "Site Team Name");
 		}
 
@@ -1062,7 +1045,7 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SiteTeamsXSS {
 		property testray.component.names = "Site Administration,XSS";
 
@@ -1081,15 +1064,16 @@ definition {
 		AssertAlertNotPresent();
 
 		var actualScript = '''<script>alert(123);</script>''';
+
 		var escapedScript = '''&lt;script&gt;alert(123);&lt;/script&gt;''';
 
-		AssertHTMLSourceTextNotPresent(value1 = ${actualScript});
+		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
 
-		AssertHTMLSourceTextPresent(value1 = ${escapedScript});
+		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
 	}
 
 	@description = "This ensures that the custom site logo can be viewed in cards and list views."
-	@priority = 4
+	@priority = "4"
 	test ViewSiteLogo {
 		property portal.upstream = "true";
 

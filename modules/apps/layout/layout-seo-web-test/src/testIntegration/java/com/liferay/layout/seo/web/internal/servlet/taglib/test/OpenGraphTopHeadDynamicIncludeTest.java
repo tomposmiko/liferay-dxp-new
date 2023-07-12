@@ -51,7 +51,6 @@ import com.liferay.layout.seo.service.LayoutSEOSiteLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
@@ -1367,8 +1366,6 @@ public class OpenGraphTopHeadDynamicIncludeTest {
 					InfoField.builder(
 					).infoFieldType(
 						TextInfoFieldType.INSTANCE
-					).namespace(
-						StringPool.BLANK
 					).name(
 						"description"
 					).build(),
@@ -1378,8 +1375,6 @@ public class OpenGraphTopHeadDynamicIncludeTest {
 					InfoField.builder(
 					).infoFieldType(
 						TextInfoFieldType.INSTANCE
-					).namespace(
-						StringPool.BLANK
 					).name(
 						"title"
 					).build(),
@@ -1389,8 +1384,6 @@ public class OpenGraphTopHeadDynamicIncludeTest {
 					InfoField.builder(
 					).infoFieldType(
 						TextInfoFieldType.INSTANCE
-					).namespace(
-						StringPool.BLANK
 					).name(
 						"mappedDescriptionFieldName"
 					).build(),
@@ -1400,8 +1393,6 @@ public class OpenGraphTopHeadDynamicIncludeTest {
 					InfoField.builder(
 					).infoFieldType(
 						TextInfoFieldType.INSTANCE
-					).namespace(
-						StringPool.BLANK
 					).name(
 						"mappedTitleFieldName"
 					).build(),
@@ -1411,8 +1402,6 @@ public class OpenGraphTopHeadDynamicIncludeTest {
 					InfoField.builder(
 					).infoFieldType(
 						TextInfoFieldType.INSTANCE
-					).namespace(
-						StringPool.BLANK
 					).name(
 						"mappedTitleFieldName"
 					).build(),
@@ -1422,8 +1411,6 @@ public class OpenGraphTopHeadDynamicIncludeTest {
 					InfoField.builder(
 					).infoFieldType(
 						ImageInfoFieldType.INSTANCE
-					).namespace(
-						StringPool.BLANK
 					).name(
 						"mappedImageFieldName"
 					).build(),
@@ -1433,8 +1420,6 @@ public class OpenGraphTopHeadDynamicIncludeTest {
 					InfoField.builder(
 					).infoFieldType(
 						TextInfoFieldType.INSTANCE
-					).namespace(
-						StringPool.BLANK
 					).name(
 						"mappedImageAltFieldName"
 					).build(),

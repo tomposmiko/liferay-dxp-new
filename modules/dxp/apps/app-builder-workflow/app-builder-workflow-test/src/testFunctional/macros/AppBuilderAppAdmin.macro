@@ -6,8 +6,8 @@ definition {
 
 	macro assertWorkflowAppVersion {
 		AssertElementPresent(
-			key_versionNumber = ${versionNumber},
-			key_workflowAppName = ${workflowAppName},
+			key_versionNumber = "${versionNumber}",
+			key_workflowAppName = "${workflowAppName}",
 			locator1 = "AppBuilderAppAdmin#WORKFLOW_APP_VERSION");
 	}
 
@@ -30,23 +30,23 @@ definition {
 	macro createBasicWorkflowApp {
 		AppBuilderAppAdmin.goToWorkflowPoweredTab();
 
-		if (${isCreatingViaPlusIcon} == "true") {
+		if ("${isCreatingViaPlusIcon}" == "true") {
 			AppBuilderAppAdmin.clickOnPlusButton();
 		}
 		else {
 			AppBuilderAppAdmin.clickOnCreateNewAppButton();
 		}
 
-		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = ${workflowAppName});
+		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = "${workflowAppName}");
 
 		AppBuilderWorkflow.selectStartStepDataAndViews(
-			formViewName = ${formViewName},
-			objectName = ${objectName},
-			tableViewName = ${tableViewName});
+			formViewName = "${formViewName}",
+			objectName = "${objectName}",
+			tableViewName = "${tableViewName}");
 
 		Button.click(button = "Deploy");
 
-		App.toggleDeploy(deployOption = ${deployOption});
+		App.toggleDeploy(deployOption = "${deployOption}");
 
 		Button.click(button = "Done");
 
@@ -56,29 +56,29 @@ definition {
 	macro createBasicWorkflowAppWith1ExtraStep {
 		AppBuilderAppAdmin.goToWorkflowPoweredTab();
 
-		if (${isCreatingViaPlusIcon} == "true") {
+		if ("${isCreatingViaPlusIcon}" == "true") {
 			AppBuilderAppAdmin.clickOnPlusButton();
 		}
 		else {
 			AppBuilderAppAdmin.clickOnCreateNewAppButton();
 		}
 
-		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = ${workflowAppName});
+		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = "${workflowAppName}");
 
 		AppBuilderWorkflow.selectStartStepDataAndViews(
-			formViewName = ${formViewName},
-			objectName = ${objectName},
-			tableViewName = ${tableViewName});
+			formViewName = "${formViewName}",
+			objectName = "${objectName}",
+			tableViewName = "${tableViewName}");
 
 		AppBuilderWorkflow.addNewStep();
 
 		AppBuilderWorkflow.selectStepAssignee(
-			assignee = ${assignee},
-			step = 1);
+			assignee = "${assignee}",
+			step = "1");
 
 		Button.click(button = "Deploy");
 
-		App.toggleDeploy(deployOption = ${deployOption});
+		App.toggleDeploy(deployOption = "${deployOption}");
 
 		Button.click(button = "Done");
 
@@ -100,12 +100,12 @@ definition {
 	macro searchItem {
 		Type(
 			locator1 = "AppBuilderAppAdmin#SEARCH_BOX",
-			value1 = ${itemName});
+			value1 = "${itemName}");
 	}
 
 	macro selectObject {
 		Click(
-			key_objectName = ${objectName},
+			key_objectName = "${objectName}",
 			locator1 = "AppBuilderAppAdmin#OBJECT_ITEM");
 
 		Button.click(button = "Continue");
@@ -123,13 +123,13 @@ definition {
 
 	macro validateObjectResultNotPresent {
 		AssertElementNotPresent(
-			key_objectName = ${objectName},
+			key_objectName = "${objectName}",
 			locator1 = "AppBuilderAppAdmin#OBJECT_ITEM");
 	}
 
 	macro validateObjectResultPresent {
 		AssertElementPresent(
-			key_objectName = ${objectName},
+			key_objectName = "${objectName}",
 			locator1 = "AppBuilderAppAdmin#OBJECT_ITEM");
 	}
 
@@ -216,8 +216,8 @@ definition {
 	}
 
 	macro waitForItemPresentOnTable {
-		while (IsElementNotPresent(locator1 = "AppBuilder#ITEM_ON_THE_TABLE", value1 = ${itemName})) {
-			Pause(locator1 = 3000);
+		while (IsElementNotPresent(locator1 = "AppBuilder#ITEM_ON_THE_TABLE", value1 = "${itemName}")) {
+			Pause(locator1 = "3000");
 
 			Refresh();
 		}

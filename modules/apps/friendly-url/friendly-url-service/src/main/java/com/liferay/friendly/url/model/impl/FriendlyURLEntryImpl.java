@@ -18,7 +18,6 @@ import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collection;
@@ -54,13 +53,6 @@ public class FriendlyURLEntryImpl extends FriendlyURLEntryBaseImpl {
 		}
 
 		return StringPool.BLANK;
-	}
-
-	@Override
-	public String getUrlTitleMapAsXML() {
-		return LocalizationUtil.getXml(
-			getLanguageIdToUrlTitleMap(), getDefaultLanguageId(), "UrlTitle",
-			true);
 	}
 
 	@Override

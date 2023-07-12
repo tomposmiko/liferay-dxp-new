@@ -384,10 +384,6 @@ public class LayoutSEOSiteLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(LayoutSEOSiteLocalService service) {
-		_service = service;
-	}
-
 	private static volatile LayoutSEOSiteLocalService _service;
 
 }

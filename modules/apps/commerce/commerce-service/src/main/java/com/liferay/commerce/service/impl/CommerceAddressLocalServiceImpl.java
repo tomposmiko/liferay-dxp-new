@@ -133,7 +133,6 @@ public class CommerceAddressLocalServiceImpl
 		commerceAddress.setUserId(user.getUserId());
 		commerceAddress.setUserName(user.getFullName());
 		commerceAddress.setClassName(className);
-		commerceAddress.setExternalReferenceCode(externalReferenceCode);
 		commerceAddress.setClassPK(classPK);
 		commerceAddress.setName(name);
 		commerceAddress.setDescription(description);
@@ -146,6 +145,7 @@ public class CommerceAddressLocalServiceImpl
 		commerceAddress.setCommerceCountryId(commerceCountryId);
 		commerceAddress.setPhoneNumber(phoneNumber);
 		commerceAddress.setType(type);
+		commerceAddress.setExternalReferenceCode(externalReferenceCode);
 
 		return commerceAddressPersistence.update(commerceAddress);
 	}
@@ -159,14 +159,26 @@ public class CommerceAddressLocalServiceImpl
 		CommerceAddress commerceAddress =
 			commerceAddressPersistence.findByPrimaryKey(commerceAddressId);
 
-		return commerceAddressLocalService.addCommerceAddress(
-			className, classPK, commerceAddress.getName(),
-			commerceAddress.getDescription(), commerceAddress.getStreet1(),
-			commerceAddress.getStreet2(), commerceAddress.getStreet3(),
-			commerceAddress.getCity(), commerceAddress.getZip(),
-			commerceAddress.getCommerceRegionId(),
-			commerceAddress.getCommerceCountryId(),
-			commerceAddress.getPhoneNumber(), false, false, serviceContext);
+		CommerceAddress copiedCommerceAddress =
+			commerceAddressLocalService.addCommerceAddress(
+				className, classPK, commerceAddress.getName(),
+				commerceAddress.getDescription(), commerceAddress.getStreet1(),
+				commerceAddress.getStreet2(), commerceAddress.getStreet3(),
+				commerceAddress.getCity(), commerceAddress.getZip(),
+				commerceAddress.getCommerceRegionId(),
+				commerceAddress.getCommerceCountryId(),
+				commerceAddress.getPhoneNumber(), false, false, serviceContext);
+
+		if (Validator.isNotNull(commerceAddress.getExternalReferenceCode())) {
+			copiedCommerceAddress.setExternalReferenceCode(
+				commerceAddress.getExternalReferenceCode());
+
+			copiedCommerceAddress =
+				commerceAddressLocalService.updateCommerceAddress(
+					copiedCommerceAddress);
+		}
+
+		return copiedCommerceAddress;
 	}
 
 	@Indexable(type = IndexableType.DELETE)

@@ -84,10 +84,6 @@ public class DLFileVersionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DLFileVersionService service) {
-		_service = service;
-	}
-
 	private static volatile DLFileVersionService _service;
 
 }

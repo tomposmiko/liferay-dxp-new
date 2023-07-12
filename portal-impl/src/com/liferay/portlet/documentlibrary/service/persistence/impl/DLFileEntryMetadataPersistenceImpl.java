@@ -53,6 +53,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2921,7 +2922,7 @@ public class DLFileEntryMetadataPersistenceImpl
 	@Override
 	public DLFileEntryMetadata fetchByPrimaryKey(Serializable primaryKey) {
 		if (CTPersistenceHelperUtil.isProductionMode(
-				DLFileEntryMetadata.class, primaryKey)) {
+				DLFileEntryMetadata.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -3445,11 +3446,11 @@ public class DLFileEntryMetadataPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"DDMStructureId", "fileVersionId"}, false);
 
-		DLFileEntryMetadataUtil.setPersistence(this);
+		_setDLFileEntryMetadataUtilPersistence(this);
 	}
 
 	public void destroy() {
-		DLFileEntryMetadataUtil.setPersistence(null);
+		_setDLFileEntryMetadataUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFileEntryMetadataImpl.class.getName());
 
@@ -3459,6 +3460,22 @@ public class DLFileEntryMetadataPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDLFileEntryMetadataUtilPersistence(
+		DLFileEntryMetadataPersistence dlFileEntryMetadataPersistence) {
+
+		try {
+			Field field = DLFileEntryMetadataUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileEntryMetadataPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

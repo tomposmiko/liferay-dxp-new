@@ -452,10 +452,6 @@ public class UserTrackerPathUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(UserTrackerPathPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile UserTrackerPathPersistence _persistence;
 
 }

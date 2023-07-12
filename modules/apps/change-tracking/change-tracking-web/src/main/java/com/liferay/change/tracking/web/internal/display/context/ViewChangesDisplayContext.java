@@ -44,9 +44,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupedModel;
-import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.WorkflowedModel;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -710,12 +708,6 @@ public class ViewChangesDisplayContext {
 			CTEntry ctEntry = ctEntryMap.get(classPK);
 
 			if (ctEntry == null) {
-				if (modelClassNameId == _portal.getClassNameId(
-						PortletPreferences.class)) {
-
-					continue;
-				}
-
 				if (baseModelMap == null) {
 					baseModelMap = _basePersistenceRegistry.fetchBaseModelMap(
 						modelClassNameId, classPKs);
@@ -803,16 +795,6 @@ public class ViewChangesDisplayContext {
 					}
 
 					continue;
-				}
-
-				if (model instanceof WorkflowedModel) {
-					WorkflowedModel workflowedModel = (WorkflowedModel)model;
-
-					if (workflowedModel.getStatus() ==
-							WorkflowConstants.STATUS_IN_TRASH) {
-
-						changeType = "deleted";
-					}
 				}
 
 				Date modifiedDate = ctEntry.getModifiedDate();

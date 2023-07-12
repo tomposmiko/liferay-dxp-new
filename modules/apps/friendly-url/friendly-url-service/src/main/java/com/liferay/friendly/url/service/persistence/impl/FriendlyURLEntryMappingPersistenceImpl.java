@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -717,7 +718,7 @@ public class FriendlyURLEntryMappingPersistenceImpl
 	@Override
 	public FriendlyURLEntryMapping fetchByPrimaryKey(Serializable primaryKey) {
 		if (ctPersistenceHelper.isProductionMode(
-				FriendlyURLEntryMapping.class, primaryKey)) {
+				FriendlyURLEntryMapping.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -1105,7 +1106,6 @@ public class FriendlyURLEntryMappingPersistenceImpl
 
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
-		Set<String> ctMergeColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -1113,11 +1113,10 @@ public class FriendlyURLEntryMappingPersistenceImpl
 		ctStrictColumnNames.add("companyId");
 		ctStrictColumnNames.add("classNameId");
 		ctStrictColumnNames.add("classPK");
-		ctMergeColumnNames.add("friendlyURLEntryId");
+		ctStrictColumnNames.add("friendlyURLEntryId");
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
-		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK,
 			Collections.singleton("friendlyURLEntryMappingId"));
@@ -1165,12 +1164,12 @@ public class FriendlyURLEntryMappingPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
 
-		FriendlyURLEntryMappingUtil.setPersistence(this);
+		_setFriendlyURLEntryMappingUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		FriendlyURLEntryMappingUtil.setPersistence(null);
+		_setFriendlyURLEntryMappingUtilPersistence(null);
 
 		entityCache.removeCache(FriendlyURLEntryMappingImpl.class.getName());
 
@@ -1180,6 +1179,22 @@ public class FriendlyURLEntryMappingPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setFriendlyURLEntryMappingUtilPersistence(
+		FriendlyURLEntryMappingPersistence friendlyURLEntryMappingPersistence) {
+
+		try {
+			Field field = FriendlyURLEntryMappingUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, friendlyURLEntryMappingPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

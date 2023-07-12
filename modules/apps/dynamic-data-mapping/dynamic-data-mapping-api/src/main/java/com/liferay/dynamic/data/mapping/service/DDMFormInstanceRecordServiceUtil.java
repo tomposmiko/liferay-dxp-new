@@ -129,10 +129,6 @@ public class DDMFormInstanceRecordServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DDMFormInstanceRecordService service) {
-		_service = service;
-	}
-
 	private static volatile DDMFormInstanceRecordService _service;
 
 }

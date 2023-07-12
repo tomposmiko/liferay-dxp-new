@@ -131,7 +131,8 @@ public class AssetCategoryDocumentContributor
 			String[] titlesArray = titles.toArray(new String[0]);
 
 			document.addText(
-				StringBundler.concat(field, StringPool.UNDERLINE, locale),
+				StringBundler.concat(
+					field, StringPool.UNDERLINE, locale.toString()),
 				titlesArray);
 		}
 	}

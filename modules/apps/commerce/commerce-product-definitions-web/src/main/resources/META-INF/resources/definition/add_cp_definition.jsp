@@ -35,7 +35,6 @@
 		var <portlet:namespace />defaultLanguageId = null;
 		var <portlet:namespace />productData = {
 			active: true,
-			productStatus: <%= WorkflowConstants.STATUS_DRAFT %>,
 			productType: '<%= ParamUtil.getString(request, "productTypeName") %>',
 		};
 

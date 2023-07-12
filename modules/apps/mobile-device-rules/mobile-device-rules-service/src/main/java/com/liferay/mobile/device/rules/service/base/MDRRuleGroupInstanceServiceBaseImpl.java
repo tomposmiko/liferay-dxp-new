@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class MDRRuleGroupInstanceServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		MDRRuleGroupInstanceServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class MDRRuleGroupInstanceServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		mdrRuleGroupInstanceService = (MDRRuleGroupInstanceService)aopProxy;
 
-		MDRRuleGroupInstanceServiceUtil.setService(mdrRuleGroupInstanceService);
+		_setServiceUtilService(mdrRuleGroupInstanceService);
 	}
 
 	/**
@@ -115,6 +115,23 @@ public abstract class MDRRuleGroupInstanceServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		MDRRuleGroupInstanceService mdrRuleGroupInstanceService) {
+
+		try {
+			Field field =
+				MDRRuleGroupInstanceServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mdrRuleGroupInstanceService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -165,8 +182,5 @@ public abstract class MDRRuleGroupInstanceServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MDRRuleGroupInstanceServiceBaseImpl.class);
 
 }

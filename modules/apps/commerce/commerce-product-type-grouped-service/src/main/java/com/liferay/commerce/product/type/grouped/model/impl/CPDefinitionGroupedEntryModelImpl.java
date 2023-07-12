@@ -327,101 +327,95 @@ public class CPDefinitionGroupedEntryModelImpl
 
 	private static final Map<String, Function<CPDefinitionGroupedEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CPDefinitionGroupedEntry, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPDefinitionGroupedEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CPDefinitionGroupedEntry, Object>>();
-
-		attributeGetterFunctions.put("uuid", CPDefinitionGroupedEntry::getUuid);
-		attributeGetterFunctions.put(
-			"CPDefinitionGroupedEntryId",
-			CPDefinitionGroupedEntry::getCPDefinitionGroupedEntryId);
-		attributeGetterFunctions.put(
-			"groupId", CPDefinitionGroupedEntry::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CPDefinitionGroupedEntry::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CPDefinitionGroupedEntry::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CPDefinitionGroupedEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPDefinitionGroupedEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPDefinitionGroupedEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"CPDefinitionId", CPDefinitionGroupedEntry::getCPDefinitionId);
-		attributeGetterFunctions.put(
-			"entryCProductId", CPDefinitionGroupedEntry::getEntryCProductId);
-		attributeGetterFunctions.put(
-			"priority", CPDefinitionGroupedEntry::getPriority);
-		attributeGetterFunctions.put(
-			"quantity", CPDefinitionGroupedEntry::getQuantity);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CPDefinitionGroupedEntry, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CPDefinitionGroupedEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CPDefinitionGroupedEntry, ?>>();
 
+		attributeGetterFunctions.put("uuid", CPDefinitionGroupedEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CPDefinitionGroupedEntry, String>)
 				CPDefinitionGroupedEntry::setUuid);
+		attributeGetterFunctions.put(
+			"CPDefinitionGroupedEntryId",
+			CPDefinitionGroupedEntry::getCPDefinitionGroupedEntryId);
 		attributeSetterBiConsumers.put(
 			"CPDefinitionGroupedEntryId",
 			(BiConsumer<CPDefinitionGroupedEntry, Long>)
 				CPDefinitionGroupedEntry::setCPDefinitionGroupedEntryId);
+		attributeGetterFunctions.put(
+			"groupId", CPDefinitionGroupedEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CPDefinitionGroupedEntry, Long>)
 				CPDefinitionGroupedEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CPDefinitionGroupedEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPDefinitionGroupedEntry, Long>)
 				CPDefinitionGroupedEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CPDefinitionGroupedEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPDefinitionGroupedEntry, Long>)
 				CPDefinitionGroupedEntry::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CPDefinitionGroupedEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPDefinitionGroupedEntry, String>)
 				CPDefinitionGroupedEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPDefinitionGroupedEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPDefinitionGroupedEntry, Date>)
 				CPDefinitionGroupedEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPDefinitionGroupedEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPDefinitionGroupedEntry, Date>)
 				CPDefinitionGroupedEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"CPDefinitionId", CPDefinitionGroupedEntry::getCPDefinitionId);
 		attributeSetterBiConsumers.put(
 			"CPDefinitionId",
 			(BiConsumer<CPDefinitionGroupedEntry, Long>)
 				CPDefinitionGroupedEntry::setCPDefinitionId);
+		attributeGetterFunctions.put(
+			"entryCProductId", CPDefinitionGroupedEntry::getEntryCProductId);
 		attributeSetterBiConsumers.put(
 			"entryCProductId",
 			(BiConsumer<CPDefinitionGroupedEntry, Long>)
 				CPDefinitionGroupedEntry::setEntryCProductId);
+		attributeGetterFunctions.put(
+			"priority", CPDefinitionGroupedEntry::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CPDefinitionGroupedEntry, Double>)
 				CPDefinitionGroupedEntry::setPriority);
+		attributeGetterFunctions.put(
+			"quantity", CPDefinitionGroupedEntry::getQuantity);
 		attributeSetterBiConsumers.put(
 			"quantity",
 			(BiConsumer<CPDefinitionGroupedEntry, Integer>)
 				CPDefinitionGroupedEntry::setQuantity);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

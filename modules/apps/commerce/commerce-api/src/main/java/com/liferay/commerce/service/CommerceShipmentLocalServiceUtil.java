@@ -545,10 +545,6 @@ public class CommerceShipmentLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceShipmentLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceShipmentLocalService _service;
 
 }

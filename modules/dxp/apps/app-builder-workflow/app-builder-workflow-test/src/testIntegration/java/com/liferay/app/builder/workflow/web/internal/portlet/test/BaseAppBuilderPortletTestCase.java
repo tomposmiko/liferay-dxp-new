@@ -243,13 +243,10 @@ public abstract class BaseAppBuilderPortletTestCase {
 	}
 
 	protected AppWorkflow getAppWorkflow(App app) throws Exception {
-		AppWorkflowResource.Builder appWorkflowResourceBuilder =
-			_appWorkflowResourceFactory.create();
-
-		AppWorkflowResource appWorkflowResource =
-			appWorkflowResourceBuilder.user(
-				TestPropsValues.getUser()
-			).build();
+		AppWorkflowResource appWorkflowResource = AppWorkflowResource.builder(
+		).user(
+			TestPropsValues.getUser()
+		).build();
 
 		return appWorkflowResource.getAppWorkflow(app.getId());
 	}
@@ -475,9 +472,6 @@ public abstract class BaseAppBuilderPortletTestCase {
 
 	@Inject(filter = "mvc.command.name=/app_builder/add_data_record")
 	private MVCResourceCommand _addDataRecordMVCResourceCommand;
-
-	@Inject
-	private AppWorkflowResource.Factory _appWorkflowResourceFactory;
 
 	private Company _company;
 

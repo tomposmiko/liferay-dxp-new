@@ -57,6 +57,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -6532,9 +6533,7 @@ public class DLFileShortcutPersistenceImpl
 	 */
 	@Override
 	public DLFileShortcut fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				DLFileShortcut.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(DLFileShortcut.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -7145,11 +7144,11 @@ public class DLFileShortcutPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "active_", "status"}, false);
 
-		DLFileShortcutUtil.setPersistence(this);
+		_setDLFileShortcutUtilPersistence(this);
 	}
 
 	public void destroy() {
-		DLFileShortcutUtil.setPersistence(null);
+		_setDLFileShortcutUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFileShortcutImpl.class.getName());
 
@@ -7159,6 +7158,22 @@ public class DLFileShortcutPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDLFileShortcutUtilPersistence(
+		DLFileShortcutPersistence dlFileShortcutPersistence) {
+
+		try {
+			Field field = DLFileShortcutUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileShortcutPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

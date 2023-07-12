@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.UserGroup;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -414,7 +413,13 @@ public class UserGroupLocalServiceWrapper
 		return _userGroupLocalService.fetchUserGroup(companyId, name);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
+	 */
 	@Override
 	public UserGroup fetchUserGroupByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -423,6 +428,9 @@ public class UserGroupLocalServiceWrapper
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserGroupByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public UserGroup fetchUserGroupByReferenceCode(
@@ -604,7 +612,14 @@ public class UserGroupLocalServiceWrapper
 		return _userGroupLocalService.getUserGroup(companyId, name);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group
+	 * @throws PortalException if a matching user group could not be found
+	 */
 	@Override
 	public UserGroup getUserGroupByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -1068,11 +1083,6 @@ public class UserGroupLocalServiceWrapper
 	@Override
 	public UserGroup updateUserGroup(UserGroup userGroup) {
 		return _userGroupLocalService.updateUserGroup(userGroup);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _userGroupLocalService.getBasePersistence();
 	}
 
 	@Override

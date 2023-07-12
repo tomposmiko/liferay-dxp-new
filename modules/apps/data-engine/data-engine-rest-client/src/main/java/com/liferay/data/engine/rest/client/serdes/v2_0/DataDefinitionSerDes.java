@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -463,20 +464,15 @@ public class DataDefinitionSerDes {
 						jsonParserFieldName, "dataDefinitionFields")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					DataDefinitionField[] dataDefinitionFieldsArray =
-						new DataDefinitionField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < dataDefinitionFieldsArray.length; i++) {
-						dataDefinitionFieldsArray[i] =
-							DataDefinitionFieldSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					dataDefinition.setDataDefinitionFields(
-						dataDefinitionFieldsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> DataDefinitionFieldSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new DataDefinitionField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dataDefinitionKey")) {
@@ -487,18 +483,14 @@ public class DataDefinitionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "dataRules")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					DataRule[] dataRulesArray =
-						new DataRule[jsonParserFieldValues.length];
-
-					for (int i = 0; i < dataRulesArray.length; i++) {
-						dataRulesArray[i] = DataRuleSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					dataDefinition.setDataRules(dataRulesArray);
+					dataDefinition.setDataRules(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> DataRuleSerDes.toDTO((String)object)
+						).toArray(
+							size -> new DataRule[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {

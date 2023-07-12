@@ -18,8 +18,6 @@ import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Attachment;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Category;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.CustomField;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Product;
-import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductAccountGroup;
-import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductChannel;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductOption;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductSpecification;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.RelatedProduct;
@@ -34,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -362,66 +361,6 @@ public class ProductSerDes {
 			sb.append("\"neverExpire\": ");
 
 			sb.append(product.getNeverExpire());
-		}
-
-		if (product.getProductAccountGroupFilter() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productAccountGroupFilter\": ");
-
-			sb.append(product.getProductAccountGroupFilter());
-		}
-
-		if (product.getProductAccountGroups() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productAccountGroups\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < product.getProductAccountGroups().length; i++) {
-				sb.append(String.valueOf(product.getProductAccountGroups()[i]));
-
-				if ((i + 1) < product.getProductAccountGroups().length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (product.getProductChannelFilter() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productChannelFilter\": ");
-
-			sb.append(product.getProductChannelFilter());
-		}
-
-		if (product.getProductChannels() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productChannels\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < product.getProductChannels().length; i++) {
-				sb.append(String.valueOf(product.getProductChannels()[i]));
-
-				if ((i + 1) < product.getProductChannels().length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
 		}
 
 		if (product.getProductId() != null) {
@@ -862,42 +801,6 @@ public class ProductSerDes {
 			map.put("neverExpire", String.valueOf(product.getNeverExpire()));
 		}
 
-		if (product.getProductAccountGroupFilter() == null) {
-			map.put("productAccountGroupFilter", null);
-		}
-		else {
-			map.put(
-				"productAccountGroupFilter",
-				String.valueOf(product.getProductAccountGroupFilter()));
-		}
-
-		if (product.getProductAccountGroups() == null) {
-			map.put("productAccountGroups", null);
-		}
-		else {
-			map.put(
-				"productAccountGroups",
-				String.valueOf(product.getProductAccountGroups()));
-		}
-
-		if (product.getProductChannelFilter() == null) {
-			map.put("productChannelFilter", null);
-		}
-		else {
-			map.put(
-				"productChannelFilter",
-				String.valueOf(product.getProductChannelFilter()));
-		}
-
-		if (product.getProductChannels() == null) {
-			map.put("productChannels", null);
-		}
-		else {
-			map.put(
-				"productChannels",
-				String.valueOf(product.getProductChannels()));
-		}
-
 		if (product.getProductId() == null) {
 			map.put("productId", null);
 		}
@@ -1068,18 +971,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "attachments")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Attachment[] attachmentsArray =
-						new Attachment[jsonParserFieldValues.length];
-
-					for (int i = 0; i < attachmentsArray.length; i++) {
-						attachmentsArray[i] = AttachmentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setAttachments(attachmentsArray);
+					product.setAttachments(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AttachmentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Attachment[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "catalog")) {
@@ -1096,18 +995,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "categories")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Category[] categoriesArray =
-						new Category[jsonParserFieldValues.length];
-
-					for (int i = 0; i < categoriesArray.length; i++) {
-						categoriesArray[i] = CategorySerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setCategories(categoriesArray);
+					product.setCategories(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CategorySerDes.toDTO((String)object)
+						).toArray(
+							size -> new Category[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "configuration")) {
@@ -1124,18 +1019,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setCustomFields(customFieldsArray);
+					product.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "defaultSku")) {
@@ -1182,18 +1073,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "images")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Attachment[] imagesArray =
-						new Attachment[jsonParserFieldValues.length];
-
-					for (int i = 0; i < imagesArray.length; i++) {
-						imagesArray[i] = AttachmentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setImages(imagesArray);
+					product.setImages(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AttachmentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Attachment[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "metaDescription")) {
@@ -1231,57 +1118,6 @@ public class ProductSerDes {
 					product.setNeverExpire((Boolean)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(
-						jsonParserFieldName, "productAccountGroupFilter")) {
-
-				if (jsonParserFieldValue != null) {
-					product.setProductAccountGroupFilter(
-						(Boolean)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "productAccountGroups")) {
-
-				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ProductAccountGroup[] productAccountGroupsArray =
-						new ProductAccountGroup[jsonParserFieldValues.length];
-
-					for (int i = 0; i < productAccountGroupsArray.length; i++) {
-						productAccountGroupsArray[i] =
-							ProductAccountGroupSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
-					product.setProductAccountGroups(productAccountGroupsArray);
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "productChannelFilter")) {
-
-				if (jsonParserFieldValue != null) {
-					product.setProductChannelFilter(
-						(Boolean)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "productChannels")) {
-				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ProductChannel[] productChannelsArray =
-						new ProductChannel[jsonParserFieldValues.length];
-
-					for (int i = 0; i < productChannelsArray.length; i++) {
-						productChannelsArray[i] = ProductChannelSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setProductChannels(productChannelsArray);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "productId")) {
 				if (jsonParserFieldValue != null) {
 					product.setProductId(
@@ -1290,40 +1126,29 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "productOptions")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ProductOption[] productOptionsArray =
-						new ProductOption[jsonParserFieldValues.length];
-
-					for (int i = 0; i < productOptionsArray.length; i++) {
-						productOptionsArray[i] = ProductOptionSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setProductOptions(productOptionsArray);
+					product.setProductOptions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ProductOptionSerDes.toDTO((String)object)
+						).toArray(
+							size -> new ProductOption[size]
+						));
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "productSpecifications")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ProductSpecification[] productSpecificationsArray =
-						new ProductSpecification[jsonParserFieldValues.length];
-
-					for (int i = 0; i < productSpecificationsArray.length;
-						 i++) {
-
-						productSpecificationsArray[i] =
-							ProductSpecificationSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					product.setProductSpecifications(
-						productSpecificationsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ProductSpecificationSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new ProductSpecification[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "productStatus")) {
@@ -1344,18 +1169,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "relatedProducts")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					RelatedProduct[] relatedProductsArray =
-						new RelatedProduct[jsonParserFieldValues.length];
-
-					for (int i = 0; i < relatedProductsArray.length; i++) {
-						relatedProductsArray[i] = RelatedProductSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setRelatedProducts(relatedProductsArray);
+					product.setRelatedProducts(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RelatedProductSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RelatedProduct[size]
+						));
 				}
 			}
 			else if (Objects.equals(
@@ -1380,17 +1201,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "skus")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Sku[] skusArray = new Sku[jsonParserFieldValues.length];
-
-					for (int i = 0; i < skusArray.length; i++) {
-						skusArray[i] = SkuSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setSkus(skusArray);
+					product.setSkus(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> SkuSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Sku[size]
+						));
 				}
 			}
 			else if (Objects.equals(

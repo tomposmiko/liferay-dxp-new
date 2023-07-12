@@ -24,16 +24,16 @@ definition {
 
 		DMDocument.addCP(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = ${dmDocumentFile},
-			dmDocumentTitle = ${dmDocumentTitle});
+			dmDocumentFile = "${dmDocumentFile}",
+			dmDocumentTitle = "${dmDocumentTitle}");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = ${dmDocumentTitle});
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "${dmDocumentTitle}");
 
-		DMDocument.viewCP(dmDocumentTitle = ${dmDocumentTitle});
+		DMDocument.viewCP(dmDocumentTitle = "${dmDocumentTitle}");
 
-		AutoTagging.assertAutoTagPresent(tagName = ${tagName});
+		AutoTagging.assertAutoTagPresent(tagName = "${tagName}");
 	}
 
 	macro addAutoTaggedWebContent {
@@ -190,7 +190,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
 			portlet = "Dynamic Data Lists",
-			site = ${site});
+			site = "${site}");
 
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_INFO",
@@ -199,7 +199,7 @@ definition {
 		DDLNavigator.gotoManageDataDefinitions();
 
 		for (var ddlDataDefinitionName : list "Contacts,Events,Inventory,Issues Tracking,Meeting Minutes,To Do") {
-			DDLDataDefinition.viewName(ddlDataDefinitionName = ${ddlDataDefinitionName});
+			DDLDataDefinition.viewName(ddlDataDefinitionName = "${ddlDataDefinitionName}");
 		}
 
 		AssertConsoleTextNotPresent(value1 = "SQLCODE=-134");
@@ -240,7 +240,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
 			portlet = "Forms",
-			site = ${site});
+			site = "${site}");
 
 		AssertElementPresent(locator1 = "Message#EMPTY_INFO_TAGLIB");
 
@@ -250,7 +250,7 @@ definition {
 
 		Form.editDescription(formDescription = "Form Description");
 
-		Form.addTextField(fieldPositionNumber = 1);
+		Form.addTextField(fieldPositionNumber = "1");
 
 		var fieldName = FormFields.getFieldName();
 
@@ -290,7 +290,7 @@ definition {
 
 		FormFields.viewTextField(
 			fieldLabel = "Text Field",
-			fieldName = ${fieldName});
+			fieldName = "${fieldName}");
 	}
 
 	macro addMessageBoards {
@@ -306,11 +306,11 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = ${dmDocumentTypeName});
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "${dmDocumentTypeName}");
 
 		OneDrive.AddDocument(
 			dmDocumentTitle = "${dmDocumentTypeName} Title After Upgrade",
-			dmDocumentTypeName = ${dmDocumentTypeName});
+			dmDocumentTypeName = "${dmDocumentTypeName}");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
@@ -810,12 +810,12 @@ definition {
 
 			AssertElementPresent(
 				key_elementType = "Container",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#LAYOUT_ELEMENTS_HEADER");
 
 			AssertElementPresent(
 				key_elementType = "Grid",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#LAYOUT_ELEMENTS_HEADER");
 		}
 
@@ -858,7 +858,7 @@ definition {
 
 			PortletEntry.inputTitle(title = "Webcontent Title Edit");
 
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "content",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = "Webcontent Content Edit");
@@ -946,7 +946,7 @@ definition {
 	macro publishWorkflowDefinition {
 		var testRunEnvironment = PropsUtil.get("test.run.environment");
 
-		if (${testRunEnvironment} == "EE") {
+		if ("${testRunEnvironment}" == "EE") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Workflow",
 				panel = "Applications",
@@ -965,7 +965,7 @@ definition {
 	macro resetTestUserPassword {
 		Type(
 			locator1 = "TextInput#EMAIL",
-			value1 = ${administratorEmail});
+			value1 = "${administratorEmail}");
 
 		SetupWizard.finishConfigurationPG();
 
@@ -1014,9 +1014,9 @@ definition {
 		Publications.revertPublication(publicationName = "Publication 1 Name");
 
 		AssertTextPresent(
-			key_publicationName = "Revert \"Publication 1 Name\"",
+			key_publicationName = "Revert &quot;Publication 1 Name&quot;",
 			locator1 = "Publications#PUBLICATIONS_INDICATOR_TITLE",
-			value1 = "Revert \"Publication 1 Name\"");
+			value1 = "Revert &quot;Publication 1 Name&quot;");
 
 		Publications.selectPublication(publicationName = "Publication 2 Name");
 
@@ -1156,15 +1156,15 @@ definition {
 	macro viewAndDeleteAutoTaggedDM {
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = ${dmDocumentTitle});
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "${dmDocumentTitle}");
 
-		DMDocument.viewCP(dmDocumentTitle = ${dmDocumentTitle});
+		DMDocument.viewCP(dmDocumentTitle = "${dmDocumentTitle}");
 
-		AutoTagging.assertAutoTagPresent(tagName = ${tagName});
+		AutoTagging.assertAutoTagPresent(tagName = "${tagName}");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
-		DMDocument.deleteCP(dmDocumentTitle = ${dmDocumentTitle});
+		DMDocument.deleteCP(dmDocumentTitle = "${dmDocumentTitle}");
 	}
 
 	macro viewAndDeleteAutoTaggedWebContent {
@@ -1372,7 +1372,7 @@ definition {
 			newCustomContent = "custom Tag 1 content edit",
 			newCustomProperty = "custom Tag 1 property edit");
 
-		CustomMetaTags.removeTag(tagNum = 2);
+		CustomMetaTags.removeTag(tagNum = "2");
 
 		CustomMetaTags.addMultipleTags(customTagsList = "custom Tag 3");
 
@@ -1445,7 +1445,8 @@ definition {
 
 	macro viewAndEditOpenGraph {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -1460,7 +1461,7 @@ definition {
 			htmlTitle = "This is a custom title - Test Site Name - ${siteName}",
 			key_imageName = "Document_1.jpg",
 			openGraph = "true",
-			portalURL = ${portalURL},
+			portalURL = "${portalURL}",
 			siteNameURL = "test-site-name");
 
 		var siteID = Site.getSiteId();
@@ -1495,7 +1496,7 @@ definition {
 			htmlTitle = "This is a custom title edit - Test Site Name - ${siteName}",
 			key_imageName = "Document_2.jpg",
 			openGraph = "true",
-			portalURL = ${portalURL},
+			portalURL = "${portalURL}",
 			siteNameURL = "test-site-name");
 
 		User.logoutPG();
@@ -1507,7 +1508,8 @@ definition {
 
 	macro viewAndEditSERPPreview {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		Navigator.gotoPage(pageName = "Test Page");
 
@@ -1519,7 +1521,7 @@ definition {
 			description = "Page Description",
 			htmlTitle = "Page HTML Title - ${siteName}",
 			pageName = "Test Page",
-			portalURL = ${portalURL});
+			portalURL = "${portalURL}");
 
 		PortletEntry.inputText(
 			fieldLabel = "HTML Title",
@@ -1535,7 +1537,7 @@ definition {
 			description = "Page Description Edit",
 			htmlTitle = "Page HTML Title Edit - ${siteName}",
 			pageName = "Test Page",
-			portalURL = ${portalURL});
+			portalURL = "${portalURL}");
 	}
 
 	macro viewAndEditUser {
@@ -1565,18 +1567,18 @@ definition {
 
 		var testName = TestCase.getTestName();
 
-		if (contains(${testName}, 72)) {
-			var postalCode = 91765;
+		if (contains("${testName}", "72")) {
+			var postalCode = "91765";
 		}
 		else {
-			var postalCode = 91789;
+			var postalCode = "91789";
 		}
 
 		User.viewAddress(
 			addressType = "Business",
 			city = "Walnut",
 			country = "United States",
-			postalCode = ${postalCode},
+			postalCode = "${postalCode}",
 			region = "California",
 			street1 = "1220 Brea Canyon Rd");
 
@@ -1588,7 +1590,7 @@ definition {
 			searchContainerType = "phonesSearchContainer");
 
 		User.viewContactInformation(
-			addressCount = 10,
+			addressCount = "10",
 			addressPrefix = "test",
 			searchContainerType = "emailAddressesSearchContainer");
 
@@ -1604,10 +1606,10 @@ definition {
 
 		// Ignore these steps for 73 due to LPS-121271
 
-		if (!(contains(${testName}, 73))) {
+		if (!(contains("${testName}", "73"))) {
 			for (var announcementType : list "General,News,Test") {
 				AssertChecked(
-					key_announcementType = ${announcementType},
+					key_announcementType = "${announcementType}",
 					key_notificationType = "Email",
 					locator1 = "UsersAndOrganizationsEditUser#ALERTS_AND_ANNOUNCEMENTS_DELIVERY_CHECKBOX");
 			}
@@ -1715,7 +1717,7 @@ definition {
 		User.editAddressCP(
 			addressType = "Personal",
 			city = "Diamond Bar",
-			postalCode = 91765,
+			postalCode = "91765",
 			street1 = "1400 Montefino Ave");
 
 		UserNavigator.gotoDisplaySettings();
@@ -1745,7 +1747,7 @@ definition {
 			addressType = "Personal",
 			city = "Diamond Bar",
 			country = "United States",
-			postalCode = 91765,
+			postalCode = "91765",
 			region = "California",
 			street1 = "1400 Montefino Ave");
 
@@ -1844,7 +1846,7 @@ definition {
 			assetTitle = "Web Content Title");
 
 		if (isSet(categoryName)) {
-			AssetPublisherPortlet.viewAssetMetadataPG(categoryName = ${categoryName});
+			AssetPublisherPortlet.viewAssetMetadataPG(categoryName = "${categoryName}");
 		}
 
 		if (IsElementPresent(locator1 = "Home#PAGE_4")) {
@@ -1941,7 +1943,7 @@ definition {
 
 			Navigator._gotoPage(pageName = "Test Fragment Content Page");
 
-			Pause(locator1 = 5000);
+			Pause(locator1 = "5000");
 
 			Refresh();
 
@@ -1953,15 +1955,15 @@ definition {
 			var containerWidth = selenium.getElementWidth("//div[contains(@class,'container')][contains(@class,'pb-3 pt-3')]");
 
 			TestUtils.assertNotEquals(
-				actual = ${containerWidth},
-				expected = ${screenWidth});
+				actual = "${containerWidth}",
+				expected = "${screenWidth}");
 
 			var screenWidth = selenium.getElementWidth("//body");
 			var containerWidth = selenium.getElementWidth("//div[contains(@class,'container')][contains(@class,'pb-3 pt-3')]");
 
 			TestUtils.assertNotEquals(
-				actual = ${containerWidth},
-				expected = ${screenWidth});
+				actual = "${containerWidth}",
+				expected = "${screenWidth}");
 
 			AssertVisible(locator1 = "//div[contains(@class,'container')][contains(@class,'pb-3 pt-3')]");
 
@@ -1993,14 +1995,14 @@ definition {
 
 			AssertElementPresent(
 				key_fragmentName = "button",
-				key_marginBottom = 1,
+				key_marginBottom = "1",
 				locator1 = "Fragment#FRAGMENT_CONFIGURATION_MARGIN_BOTTOM_IN_VIEW_MODE");
 		}
 
 		task ("Assert styles of Card in view mode") {
 			PageEditor.viewFragmentStyle(
 				fragmentName = "card",
-				imageSize = 0);
+				imageSize = "0");
 
 			AssertElementPresent(
 				key_borderRadius = "0.375rem",
@@ -2019,7 +2021,7 @@ definition {
 
 			AssertElementPresent(
 				key_fragmentName = "card",
-				key_marginBottom = 1,
+				key_marginBottom = "1",
 				locator1 = "Fragment#FRAGMENT_CONFIGURATION_MARGIN_BOTTOM_IN_VIEW_MODE");
 		}
 
@@ -2040,21 +2042,21 @@ definition {
 
 			AssertElementPresent(
 				key_fragmentName = "heading",
-				key_marginBottom = 1,
+				key_marginBottom = "1",
 				locator1 = "Fragment#FRAGMENT_CONFIGURATION_MARGIN_BOTTOM_IN_VIEW_MODE");
 		}
 
 		task ("Assert styles of HTML in view mode") {
 			AssertElementPresent(
 				key_fragmentName = "html",
-				key_marginBottom = 1,
+				key_marginBottom = "1",
 				locator1 = "Fragment#FRAGMENT_CONFIGURATION_MARGIN_BOTTOM_IN_VIEW_MODE");
 		}
 
 		task ("Assert styles of Image in view mode") {
 			PageEditor.viewFragmentStyle(
 				fragmentName = "image",
-				imageSize = 0);
+				imageSize = "0");
 
 			AssertElementPresent(
 				key_alignment = "center",
@@ -2063,7 +2065,7 @@ definition {
 
 			AssertElementPresent(
 				key_fragmentName = "image",
-				key_marginBottom = 1,
+				key_marginBottom = "1",
 				locator1 = "Fragment#FRAGMENT_CONFIGURATION_MARGIN_BOTTOM_IN_VIEW_MODE");
 		}
 
@@ -2080,18 +2082,18 @@ definition {
 
 			AssertElementPresent(
 				key_fragmentName = "paragraph",
-				key_marginBottom = 1,
+				key_marginBottom = "1",
 				locator1 = "Fragment#FRAGMENT_CONFIGURATION_MARGIN_BOTTOM_IN_VIEW_MODE");
 		}
 
 		task ("Assert styles of Separator in view mode") {
 			PageEditor.viewFragmentStyle(
-				bottomSpacing = 1,
+				bottomSpacing = "1",
 				separatorColor = "dark");
 		}
 
 		task ("Assert styles of Spacer in view mode") {
-			PageEditor.viewFragmentStyle(height = 5);
+			PageEditor.viewFragmentStyle(height = "5");
 		}
 
 		task ("Assert styles of Video in view mode") {
@@ -2117,12 +2119,12 @@ definition {
 		task ("Assert styles of Container in edit mode") {
 			PageEditor.viewContainerStyle(
 				containerWidth = "Fixed Width",
-				paddingBottom = 3,
-				paddingTop = 3,
-				position = 2);
+				paddingBottom = "3",
+				paddingTop = "3",
+				position = "2");
 
 			AssertCssValue(
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#CONTAINER_CONTAINER",
 				locator2 = "background-color",
 				value1 = "rgba(46, 90, 172, 1)");
@@ -2132,7 +2134,7 @@ definition {
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
 				fragmentName = "button",
-				marginBottom = 1,
+				marginBottom = "1",
 				size = "lg",
 				type = "link");
 		}
@@ -2141,8 +2143,8 @@ definition {
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
 				fragmentName = "card",
-				imageSize = 0,
-				marginBottom = 1);
+				imageSize = "0",
+				marginBottom = "1");
 
 			AssertElementPresent(
 				key_borderRadius = "0.375rem",
@@ -2160,7 +2162,7 @@ definition {
 				alignment = "center",
 				fragmentName = "heading",
 				headingLevel = "h2",
-				marginBottom = 1);
+				marginBottom = "1");
 
 			AssertElementPresent(
 				key_fragmentName = "heading",
@@ -2171,7 +2173,7 @@ definition {
 		task ("Assert styles of HTML in edit mode") {
 			AssertElementPresent(
 				key_fragmentName = "html",
-				key_marginBottom = 1,
+				key_marginBottom = "1",
 				locator1 = "Fragment#FRAGMENT_CONFIGURATION_MARGIN_BOTTOM_IN_VIEW_MODE");
 		}
 
@@ -2179,8 +2181,8 @@ definition {
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
 				fragmentName = "image",
-				imageSize = 0,
-				marginBottom = 1);
+				imageSize = "0",
+				marginBottom = "1");
 		}
 
 		task ("Assert styles of Paragraph in edit mode") {
@@ -2192,17 +2194,17 @@ definition {
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
 				fragmentName = "paragraph",
-				marginBottom = 1);
+				marginBottom = "1");
 		}
 
 		task ("Assert styles of Separator in edit mode") {
 			PageEditor.viewFragmentStyle(
-				bottomSpacing = 1,
+				bottomSpacing = "1",
 				separatorColor = "dark");
 		}
 
 		task ("Assert styles of Spacer in edit mode") {
-			PageEditor.viewFragmentStyle(height = 5);
+			PageEditor.viewFragmentStyle(height = "5");
 		}
 
 		task ("Assert styles of Video in edit mode") {
@@ -2482,11 +2484,11 @@ definition {
 			AssertVisible(
 				key_content = "Submit",
 				key_fragmentClass = "footer",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "Fragment#PAGE_EDITOR_FRAGMENT");
 
 			for (var button : list "Submit,Cancel") {
-				Button.viewPresent(button = ${button});
+				Button.viewPresent(button = "${button}");
 			}
 		}
 
@@ -2503,7 +2505,7 @@ definition {
 				locator1 = "Fragment#FRAGMENT");
 
 			for (var button : list "Submit,Cancel") {
-				Button.viewPresent(button = ${button});
+				Button.viewPresent(button = "${button}");
 			}
 
 			Click(
@@ -2583,7 +2585,7 @@ definition {
 			value1 = "Drag applications below to nest them.");
 
 		NestedPortlets.viewPG(
-			portletColumnNumberTo = 1,
+			portletColumnNumberTo = "1",
 			portletName = "Web Content Display");
 	}
 
@@ -2605,7 +2607,7 @@ definition {
 
 		Notifications.viewBadgeCount(
 			activePanel = "Notifications",
-			notificationCount = 2);
+			notificationCount = "2");
 
 		Notifications.gotoNotifications();
 
@@ -2622,7 +2624,7 @@ definition {
 
 		Notifications.viewBadgeCount(
 			activePanel = "Notifications",
-			notificationCount = 1);
+			notificationCount = "1");
 
 		Notifications.gotoNotifications();
 
@@ -2655,25 +2657,25 @@ definition {
 
 		Polls.viewVotedPollPG(
 			pollsQuestionChoice = "Yes",
-			pollsQuestionTotalVotes = 1,
-			pollsQuestionVoteCount = 1,
+			pollsQuestionTotalVotes = "1",
+			pollsQuestionVoteCount = "1",
 			pollsQuestionVotePercent = "100%");
 	}
 
 	macro viewPortalCORS {
 		LexiconEntry.gotoEntryMenuItem(
 			menuItem = "Edit",
-			rowEntry = ${name});
+			rowEntry = "${name}");
 
 		AssertTextEquals(
 			key_configurationValue = "filter.mapping.url.pattern",
 			locator1 = "SystemSettings#CORS_CONFIGURATION",
-			value1 = ${urlPattern});
+			value1 = "${urlPattern}");
 
 		AssertTextEquals(
 			key_configurationValue = "header",
 			locator1 = "SystemSettings#CORS_CONFIGURATION",
-			value1 = ${header});
+			value1 = "${header}");
 	}
 
 	macro ViewPortletsPermissions {
@@ -2687,7 +2689,7 @@ definition {
 
 		MessageboardsThread.gotoPG(
 			lastPostUserName = "Test Test",
-			replyCount = 0,
+			replyCount = "0",
 			threadSubject = "Message Boards Subject");
 
 		MessageboardsThread.viewPG(
@@ -2756,7 +2758,7 @@ definition {
 		if (isSet(samlRoleType)) {
 			AssertTextEquals(
 				locator1 = "CPSAMLAdmin#SAML_SELECTED_ROLE",
-				value1 = ${samlRoleType});
+				value1 = "${samlRoleType}");
 		}
 
 		AssertTextEquals(
@@ -2821,7 +2823,7 @@ definition {
 
 		FormFields.viewTextValue(
 			fieldName = "paginationDelta",
-			fieldValue = 2);
+			fieldValue = "2");
 
 		IFrame.closeFrame();
 
@@ -2881,7 +2883,7 @@ definition {
 			password = "test",
 			userEmailAddress = "user2@liferay.com");
 
-		Notifications.viewBadgeCount(notificationCount = 2);
+		Notifications.viewBadgeCount(notificationCount = "2");
 
 		Notifications.gotoNotifications();
 
@@ -2904,7 +2906,7 @@ definition {
 			password = "test",
 			userEmailAddress = "user1@liferay.com");
 
-		Notifications.viewBadgeCount(notificationCount = 2);
+		Notifications.viewBadgeCount(notificationCount = "2");
 
 		Notifications.gotoNotifications();
 
@@ -2944,127 +2946,12 @@ definition {
 			value1 = "Drag applications below to nest them.");
 
 		NestedPortlets.viewPG(
-			portletColumnNumberTo = 1,
+			portletColumnNumberTo = "1",
 			portletName = "Web Content Display");
 
 		NestedPortlets.viewPG(
-			portletColumnNumberTo = 1,
+			portletColumnNumberTo = "1",
 			portletName = "Blogs");
-	}
-
-	macro viewSXPBlueprintAndElements {
-		Blueprints.openBlueprintsAdmin();
-
-		Navigator.gotoNavItem(navItem = "Elements");
-
-		while (IsElementNotPresent(locator1 = "Pagination#RESULTS")) {
-			Refresh();
-		}
-
-		var paginationResults = selenium.getText("Pagination#RESULTS");
-
-		var totalElements = StringUtil.extractLast(${paginationResults}, " ");
-
-		var difference = ${totalElements} - 39;
-
-		if (${difference} != 0) {
-			TestUtils.fail(message = "FAILED: Actual total elements '${totalElements}' is not equal to expected total elements of 39");
-		}
-
-		Search.searchCP(searchTerm = "Test Element");
-
-		AssertElementPresent(
-			entryTitle = "Test Element",
-			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_TITLE");
-
-		Search.searchCP(searchTerm = "Boost Contents in a Category for User Segments");
-
-		AssertElementPresent(
-			entryTitle = "Boost Contents in a Category for User Segments",
-			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_TITLE");
-
-		AssertTextEquals(
-			entryTitle = "Boost Contents in a Category for User Segments",
-			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_DESCRIPTION",
-			value1 = "Boost contents in a category for users belonging to the given user segments.");
-
-		Search.searchCP(searchTerm = "Search with Query String Syntax");
-
-		AssertElementPresent(
-			entryTitle = "Search with Query String Syntax",
-			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_TITLE");
-
-		Navigator.gotoNavItem(navItem = "Blueprints");
-
-		Blueprints.gotoBlueprint(title = "Test Blueprint");
-
-		AssertElementPresent(
-			index = 40,
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_NTH_ELEMENT");
-
-		AssertElementPresent(
-			element = "Test Element",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
-
-		AssertElementPresent(
-			element = "Boost Contents in a Category for the Time of Day",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
-
-		AssertElementPresent(
-			element = "Boost Contents in a Category for User Segments",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
-
-		AssertElementPresent(
-			element = "Boost Contents in a Category for a Period of Time",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
-
-		AssertElementPresent(
-			element = "Search with Query String Syntax",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
-
-		AssertElementPresent(
-			elementName = "Boost Contents in a Category for the Time of Day",
-			fieldLabel = "Asset Category ID",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
-			value1 = 12345);
-
-		AssertElementPresent(
-			dropdownName = "Time of Day",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_GENERIC_DROPDOWN_OPTION",
-			option = "Morning (4am - 12pm)");
-
-		AssertTextPresent(
-			element = "Boost Contents in a Category for User Segments",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT",
-			value1 = "Boost contents in a category for users belonging to the given user segments.");
-
-		AssertElementPresent(
-			elementName = "Boost Contents in a Category for a Period of Time",
-			fieldName = "Date: From",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
-
-		AssertElementNotPresent(
-			elementName = "Boost Contents in a Category for a Period of Time",
-			fieldName = "Create Date: From",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
-
-		AssertElementPresent(
-			elementName = "Boost Contents in a Category for a Period of Time",
-			fieldName = "Date: To",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
-
-		AssertElementNotPresent(
-			elementName = "Boost Contents in a Category for a Period of Time",
-			fieldName = "Create Date: To",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
-
-		AssertNotChecked.assertNotCheckedNotVisible(
-			elementName = "Boost Proximity",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_ENABLE_DISABLE_TOGGLE");
-
-		Blueprints.searchBlueprintsPreview(searchTerm = "test");
-
-		AssertElementNotPresent(locator1 = "Message#ERROR");
 	}
 
 	macro viewSystemSettings {
@@ -3098,7 +2985,7 @@ definition {
 
 		FormFields.viewTextValue(
 			fieldName = "checkInterval",
-			fieldValue = 5);
+			fieldValue = "5");
 
 		SystemSettings.viewTextareaValue(
 			fieldName = "customTokenNames",
@@ -3200,7 +3087,7 @@ definition {
 
 		FormFields.viewTextValue(
 			fieldName = "rssAbstractLength",
-			fieldValue = 500);
+			fieldValue = "500");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
@@ -3300,7 +3187,7 @@ definition {
 
 		MessageboardsThread.gotoPG(
 			lastPostUserName = "Test Test",
-			replyCount = 0,
+			replyCount = "0",
 			startedByUserName = "Test Test",
 			threadBody = "Message Boards Body",
 			threadSubject = "Message Boards Subject");
@@ -3370,7 +3257,7 @@ definition {
 
 		MessageboardsThread.gotoPG(
 			lastPostUserName = "Test Test",
-			replyCount = 0,
+			replyCount = "0",
 			startedByUserName = "Test Test",
 			threadBody = "Message Boards Body",
 			threadSubject = "Message Boards Subject");
@@ -3403,12 +3290,12 @@ definition {
 	}
 
 	macro viewWebContentWithAllFields {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
 			portlet = "Web Content",
-			site = ${siteName});
+			site = "${siteName}");
 
 		for (var fieldName : list "Boolean,Date,Decimal,Documents and Media,HTML,Image,Integer,Link to Page,Number,Radio,Select,Separator,Text,Text Box") {
 			WebContentAdmin.viewEntryWorkflowStatus(
@@ -3448,7 +3335,7 @@ definition {
 		Navigator.gotoBack();
 
 		WebContent.viewWithStructureCP(
-			webContentInteger = 9,
+			webContentInteger = "9",
 			webContentTitle = "Integer Web Content");
 
 		Navigator.gotoBack();
@@ -3506,7 +3393,7 @@ definition {
 		var imageFieldValue = selenium.getElementValue("//input[contains(@id,'Image')][contains(@readonly,'readonly')]");
 
 		TestUtils.assertNotEquals(
-			actual = ${imageFieldValue},
+			actual = "${imageFieldValue}",
 			expected = "");
 
 		AssertVisible(locator1 = "WCEditWebContent#IMAGE_FIELD_CLEAR");
@@ -3515,16 +3402,16 @@ definition {
 	}
 
 	macro viewWebContentWithPredefinedValueInWebContentField {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
 			portlet = "Web Content",
-			site = ${siteName});
+			site = "${siteName}");
 
 		for (var webContentTitle : list "Web Content Title,Web Content With Predefined Value") {
 			WebContentAdmin.viewEntryWorkflowStatus(
-				entry = ${webContentTitle},
+				entry = "${webContentTitle}",
 				workflowStatus = "Approved");
 		}
 
@@ -3537,12 +3424,12 @@ definition {
 	macro viewWebContextsCORS {
 		LexiconEntry.gotoEntryMenuItem(
 			menuItem = "Edit",
-			rowEntry = ${filter});
+			rowEntry = "${filter}");
 
 		AssertTextEquals(
 			key_configurationValue = "filter.mapping.url.pattern",
 			locator1 = "SystemSettings#CORS_CONFIGURATION",
-			value1 = ${urlPattern});
+			value1 = "${urlPattern}");
 	}
 
 }

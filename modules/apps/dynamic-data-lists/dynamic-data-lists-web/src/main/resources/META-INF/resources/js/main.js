@@ -32,11 +32,6 @@ AUI.add(
 
 		var SpreadSheet = A.Component.create({
 			ATTRS: {
-				addRecordURL: {
-					validator: Lang.isString,
-					value: STR_EMPTY,
-				},
-
 				portletNamespace: {
 					validator: Lang.isString,
 					value: STR_EMPTY,
@@ -90,22 +85,16 @@ AUI.add(
 				textarea: A.TextAreaCellEditor,
 			},
 
-			addRecord(
-				addRecordURL,
-				callback,
-				ddmFormValues,
-				displayIndex,
-				portletNamespace,
-				recordsetId
-			) {
+			addRecord(recordsetId, displayIndex, fieldsMap, callback) {
 				var instance = this;
 
 				callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
 
-				A.io.request(addRecordURL, {
-					data: Liferay.Util.ns(portletNamespace, {
-						ddmFormValues: JSON.stringify(ddmFormValues),
+				Liferay.Service(
+					'/ddl.ddlrecord/add-record',
+					{
 						displayIndex,
+						fieldsMap: JSON.stringify(fieldsMap),
 						groupId: themeDisplay.getScopeGroupId(),
 						recordSetId: recordsetId,
 						serviceContext: JSON.stringify({
@@ -113,15 +102,9 @@ AUI.add(
 							userId: themeDisplay.getUserId(),
 							workflowAction: Liferay.Workflow.ACTION_PUBLISH,
 						}),
-					}),
-					dataType: 'JSON',
-					method: 'POST',
-					on: {
-						success() {
-							callback();
-						},
 					},
-				});
+					callback
+				);
 			},
 
 			buildDataTableColumns(columns, locale, structure, editable) {
@@ -546,7 +529,7 @@ AUI.add(
 
 					if (item.localizable) {
 						fieldValue['value'] = {
-							[themeDisplay.getLanguageId()]: value.toString(),
+							[themeDisplay.getLanguageId()]: value,
 						};
 					}
 					else {
@@ -669,18 +652,16 @@ AUI.add(
 						}
 						else {
 							SpreadSheet.addRecord(
-								instance.get('addRecordURL'),
+								recordsetId,
+								recordIndex,
+								fieldsMap,
 								(json) => {
 									if (json.recordId > 0) {
 										record.set('recordId', json.recordId, {
 											silent: true,
 										});
 									}
-								},
-								fieldsMap,
-								recordIndex,
-								instance.get('portletNamespace'),
-								recordsetId
+								}
 							);
 						}
 					}

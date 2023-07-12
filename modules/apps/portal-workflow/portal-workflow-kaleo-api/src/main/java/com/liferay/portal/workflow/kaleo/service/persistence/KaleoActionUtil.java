@@ -1488,10 +1488,6 @@ public class KaleoActionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(KaleoActionPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile KaleoActionPersistence _persistence;
 
 }

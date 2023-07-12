@@ -750,12 +750,6 @@ public class CommerceAccountGroupRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceAccountGroupRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceAccountGroupRelPersistence _persistence;
 
 }

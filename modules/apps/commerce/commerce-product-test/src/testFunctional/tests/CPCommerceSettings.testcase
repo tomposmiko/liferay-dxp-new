@@ -13,7 +13,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -53,7 +53,7 @@ definition {
 		Click(locator1 = "Button#PLUS");
 
 		CommerceEntry.addNewCountriesEntry(
-			entryIsoNumber = 020,
+			entryIsoNumber = "020",
 			entryIsoThreeLetters = "TCO",
 			entryIsoTwoLetters = "TC",
 			entryName = "Test Country");
@@ -105,7 +105,6 @@ definition {
 
 	test ViewInstanceCurrenciesAvailable {
 		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property test.name.skip.portal.instance = "CommerceSmoke#ViewAvailableCurrencies";
 
 		CommerceNavigator.gotoPortlet(

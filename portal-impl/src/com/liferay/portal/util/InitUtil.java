@@ -59,7 +59,7 @@ import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
 
-import com.rometools.rome.io.XmlReader;
+import com.sun.syndication.io.XmlReader;
 
 import java.lang.reflect.Field;
 

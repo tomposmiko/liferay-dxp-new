@@ -523,10 +523,6 @@ public class PluginSettingUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(PluginSettingPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile PluginSettingPersistence _persistence;
 
 }

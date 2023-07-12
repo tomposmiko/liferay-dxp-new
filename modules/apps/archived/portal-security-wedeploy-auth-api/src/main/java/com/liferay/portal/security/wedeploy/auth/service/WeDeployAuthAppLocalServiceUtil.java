@@ -319,10 +319,6 @@ public class WeDeployAuthAppLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(WeDeployAuthAppLocalService service) {
-		_service = service;
-	}
-
 	private static volatile WeDeployAuthAppLocalService _service;
 
 }

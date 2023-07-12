@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -52,6 +50,8 @@ import com.liferay.search.experiences.service.SXPElementLocalServiceUtil;
 import com.liferay.search.experiences.service.persistence.SXPElementPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -265,34 +265,6 @@ public abstract class SXPElementLocalServiceBaseImpl
 		String uuid, long companyId) {
 
 		return sxpElementPersistence.fetchByUuid_C_First(uuid, companyId, null);
-	}
-
-	@Deprecated
-	@Override
-	public SXPElement fetchSXPElementByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return sxpElementPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
-	}
-
-	@Deprecated
-	@Override
-	public SXPElement fetchSXPElementByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return fetchSXPElementByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	@Deprecated
-	@Override
-	public SXPElement getSXPElementByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException {
-
-		return sxpElementPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -509,7 +481,7 @@ public abstract class SXPElementLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		SXPElementLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -524,7 +496,7 @@ public abstract class SXPElementLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		sxpElementLocalService = (SXPElementLocalService)aopProxy;
 
-		SXPElementLocalServiceUtil.setService(sxpElementLocalService);
+		_setLocalServiceUtilService(sxpElementLocalService);
 	}
 
 	/**
@@ -569,6 +541,22 @@ public abstract class SXPElementLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SXPElementLocalService sxpElementLocalService) {
+
+		try {
+			Field field = SXPElementLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, sxpElementLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected SXPElementLocalService sxpElementLocalService;
 
 	@Reference
@@ -577,8 +565,5 @@ public abstract class SXPElementLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SXPElementLocalServiceBaseImpl.class);
 
 }

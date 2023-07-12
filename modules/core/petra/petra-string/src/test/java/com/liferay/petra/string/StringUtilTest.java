@@ -62,38 +62,6 @@ public class StringUtilTest {
 	}
 
 	@Test
-	public void testEqualsIgnoreCase() {
-
-		// char
-
-		Assert.assertFalse(StringUtil.equalsIgnoreCase('!', 'a'));
-		Assert.assertFalse(StringUtil.equalsIgnoreCase('B', 'a'));
-		Assert.assertFalse(StringUtil.equalsIgnoreCase('a', '!'));
-		Assert.assertFalse(StringUtil.equalsIgnoreCase('a', '{'));
-		Assert.assertFalse(StringUtil.equalsIgnoreCase('a', 'ⴀ'));
-		Assert.assertFalse(StringUtil.equalsIgnoreCase('{', 'a'));
-		Assert.assertTrue(StringUtil.equalsIgnoreCase('A', 'a'));
-		Assert.assertTrue(StringUtil.equalsIgnoreCase('a', 'A'));
-		Assert.assertTrue(StringUtil.equalsIgnoreCase('a', 'a'));
-		Assert.assertTrue(StringUtil.equalsIgnoreCase('ⴀ', 'Ⴀ'));
-		Assert.assertTrue(StringUtil.equalsIgnoreCase((char)305, 'i'));
-
-		// java.lang.String
-
-		Assert.assertFalse(StringUtil.equalsIgnoreCase("!", "A"));
-		Assert.assertFalse(
-			StringUtil.equalsIgnoreCase("HELLO WORLD", "HELLO WORLD1"));
-		Assert.assertFalse(StringUtil.equalsIgnoreCase("HELLO WORLD", null));
-		Assert.assertFalse(StringUtil.equalsIgnoreCase(null, "HELLO WORLD"));
-		Assert.assertTrue(
-			StringUtil.equalsIgnoreCase("Hello \n World", "hello \n worlD"));
-
-		String string = "HELLO WORLD";
-
-		Assert.assertTrue(StringUtil.equalsIgnoreCase(string, string));
-	}
-
-	@Test
 	public void testMerge() {
 		Assert.assertNull(StringUtil.merge((boolean[])null, null));
 		Assert.assertNull(StringUtil.merge((byte[])null, null));

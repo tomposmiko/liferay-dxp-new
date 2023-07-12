@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1956,7 +1957,7 @@ public class CTEntryPersistenceImpl
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 * @param modelClassNameId the model class name ID
-	 * @param modelClassPKs the model class pks
+	 * @param modelClassPK the model class pk
 	 * @param start the lower bound of the range of ct entries
 	 * @param end the upper bound of the range of ct entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2905,12 +2906,12 @@ public class CTEntryPersistenceImpl
 			new String[] {"ctCollectionId", "modelClassNameId", "modelClassPK"},
 			false);
 
-		CTEntryUtil.setPersistence(this);
+		_setCTEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		CTEntryUtil.setPersistence(null);
+		_setCTEntryUtilPersistence(null);
 
 		entityCache.removeCache(CTEntryImpl.class.getName());
 
@@ -2920,6 +2921,21 @@ public class CTEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCTEntryUtilPersistence(
+		CTEntryPersistence ctEntryPersistence) {
+
+		try {
+			Field field = CTEntryUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ctEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

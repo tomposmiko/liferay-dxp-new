@@ -852,12 +852,6 @@ public class CommerceTaxFixedRateAddressRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceTaxFixedRateAddressRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceTaxFixedRateAddressRelPersistence
 		_persistence;
 

@@ -534,12 +534,6 @@ public class SamlSpAuthRequestUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		SamlSpAuthRequestPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile SamlSpAuthRequestPersistence _persistence;
 
 }

@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.VirtualHost;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -52,6 +50,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -589,14 +589,14 @@ public abstract class VirtualHostLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.VirtualHost",
 			virtualHostLocalService);
 
-		VirtualHostLocalServiceUtil.setService(virtualHostLocalService);
+		_setLocalServiceUtilService(virtualHostLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.VirtualHost");
 
-		VirtualHostLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -656,6 +656,22 @@ public abstract class VirtualHostLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		VirtualHostLocalService virtualHostLocalService) {
+
+		try {
+			Field field = VirtualHostLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, virtualHostLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = VirtualHostLocalService.class)
 	protected VirtualHostLocalService virtualHostLocalService;
 
@@ -697,9 +713,6 @@ public abstract class VirtualHostLocalServiceBaseImpl
 
 	@BeanReference(type = LayoutSetPersistence.class)
 	protected LayoutSetPersistence layoutSetPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		VirtualHostLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

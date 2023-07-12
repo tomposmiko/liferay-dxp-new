@@ -514,10 +514,6 @@ public class AnnouncementsEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AnnouncementsEntryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile AnnouncementsEntryLocalService _service;
 
 }

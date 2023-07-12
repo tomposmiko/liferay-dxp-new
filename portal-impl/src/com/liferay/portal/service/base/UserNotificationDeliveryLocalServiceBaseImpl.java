@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.UserNotificationDelivery;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -48,6 +46,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -540,15 +540,14 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.UserNotificationDelivery",
 			userNotificationDeliveryLocalService);
 
-		UserNotificationDeliveryLocalServiceUtil.setService(
-			userNotificationDeliveryLocalService);
+		_setLocalServiceUtilService(userNotificationDeliveryLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.UserNotificationDelivery");
 
-		UserNotificationDeliveryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -594,6 +593,24 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		UserNotificationDeliveryLocalService
+			userNotificationDeliveryLocalService) {
+
+		try {
+			Field field =
+				UserNotificationDeliveryLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, userNotificationDeliveryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = UserNotificationDeliveryLocalService.class)
 	protected UserNotificationDeliveryLocalService
 		userNotificationDeliveryLocalService;
@@ -619,9 +636,6 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		UserNotificationDeliveryLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

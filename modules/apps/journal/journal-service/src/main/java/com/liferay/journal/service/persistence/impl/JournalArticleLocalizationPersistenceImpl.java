@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2247,7 +2248,7 @@ public class JournalArticleLocalizationPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				JournalArticleLocalization.class, primaryKey)) {
+				JournalArticleLocalization.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2766,12 +2767,12 @@ public class JournalArticleLocalizationPersistenceImpl
 			new String[] {"companyId", "articlePK", "title", "languageId"},
 			false);
 
-		JournalArticleLocalizationUtil.setPersistence(this);
+		_setJournalArticleLocalizationUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		JournalArticleLocalizationUtil.setPersistence(null);
+		_setJournalArticleLocalizationUtilPersistence(null);
 
 		entityCache.removeCache(JournalArticleLocalizationImpl.class.getName());
 
@@ -2781,6 +2782,23 @@ public class JournalArticleLocalizationPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setJournalArticleLocalizationUtilPersistence(
+		JournalArticleLocalizationPersistence
+			journalArticleLocalizationPersistence) {
+
+		try {
+			Field field = JournalArticleLocalizationUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, journalArticleLocalizationPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

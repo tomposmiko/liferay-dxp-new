@@ -41,8 +41,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -57,6 +55,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -557,7 +557,7 @@ public abstract class DDMStructureLayoutLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		DDMStructureLayoutLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -573,8 +573,7 @@ public abstract class DDMStructureLayoutLocalServiceBaseImpl
 		ddmStructureLayoutLocalService =
 			(DDMStructureLayoutLocalService)aopProxy;
 
-		DDMStructureLayoutLocalServiceUtil.setService(
-			ddmStructureLayoutLocalService);
+		_setLocalServiceUtilService(ddmStructureLayoutLocalService);
 	}
 
 	/**
@@ -635,6 +634,23 @@ public abstract class DDMStructureLayoutLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		DDMStructureLayoutLocalService ddmStructureLayoutLocalService) {
+
+		try {
+			Field field =
+				DDMStructureLayoutLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmStructureLayoutLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected DDMStructureLayoutLocalService ddmStructureLayoutLocalService;
 
 	@Reference
@@ -647,8 +663,5 @@ public abstract class DDMStructureLayoutLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMStructureLayoutLocalServiceBaseImpl.class);
 
 }

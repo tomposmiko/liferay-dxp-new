@@ -222,50 +222,44 @@ public class TodoListModelImpl
 
 	private static final Map<String, Function<TodoList, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<TodoList, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<TodoList, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", TodoList::getMvccVersion);
-		attributeGetterFunctions.put("todoListId", TodoList::getTodoListId);
-		attributeGetterFunctions.put("companyId", TodoList::getCompanyId);
-		attributeGetterFunctions.put("userId", TodoList::getUserId);
-		attributeGetterFunctions.put("userName", TodoList::getUserName);
-		attributeGetterFunctions.put("createDate", TodoList::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", TodoList::getModifiedDate);
-		attributeGetterFunctions.put("name", TodoList::getName);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<TodoList, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<TodoList, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<TodoList, Object>>();
 		Map<String, BiConsumer<TodoList, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<TodoList, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", TodoList::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<TodoList, Long>)TodoList::setMvccVersion);
+		attributeGetterFunctions.put("todoListId", TodoList::getTodoListId);
 		attributeSetterBiConsumers.put(
 			"todoListId", (BiConsumer<TodoList, Long>)TodoList::setTodoListId);
+		attributeGetterFunctions.put("companyId", TodoList::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<TodoList, Long>)TodoList::setCompanyId);
+		attributeGetterFunctions.put("userId", TodoList::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<TodoList, Long>)TodoList::setUserId);
+		attributeGetterFunctions.put("userName", TodoList::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<TodoList, String>)TodoList::setUserName);
+		attributeGetterFunctions.put("createDate", TodoList::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<TodoList, Date>)TodoList::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", TodoList::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<TodoList, Date>)TodoList::setModifiedDate);
+		attributeGetterFunctions.put("name", TodoList::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<TodoList, String>)TodoList::setName);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

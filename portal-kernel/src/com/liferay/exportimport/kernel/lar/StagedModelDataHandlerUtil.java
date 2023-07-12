@@ -80,14 +80,6 @@ public class StagedModelDataHandlerUtil {
 		Portlet referrerPortlet = PortletLocalServiceUtil.getPortletById(
 			referrerPortletId);
 
-		if (!ExportImportHelperUtil.isPublishDisplayedContent(
-				portletDataContext, referrerPortlet)) {
-
-			return portletDataContext.addReferenceElement(
-				referrerPortlet, portletDataContext.getExportDataRootElement(),
-				stagedModel, PortletDataContext.REFERENCE_TYPE_WEAK, true);
-		}
-
 		if (!ExportImportHelperUtil.isAlwaysIncludeReference(
 				portletDataContext, stagedModel) ||
 			!ExportImportHelperUtil.isReferenceWithinExportScope(

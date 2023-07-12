@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -459,18 +460,14 @@ public class TaxonomyVocabularySerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "assetTypes")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AssetType[] assetTypesArray =
-						new AssetType[jsonParserFieldValues.length];
-
-					for (int i = 0; i < assetTypesArray.length; i++) {
-						assetTypesArray[i] = AssetTypeSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					taxonomyVocabulary.setAssetTypes(assetTypesArray);
+					taxonomyVocabulary.setAssetTypes(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AssetTypeSerDes.toDTO((String)object)
+						).toArray(
+							size -> new AssetType[size]
+						));
 				}
 			}
 			else if (Objects.equals(

@@ -430,10 +430,6 @@ public class DefinitionLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DefinitionLocalService service) {
-		_service = service;
-	}
-
 	private static volatile DefinitionLocalService _service;
 
 }

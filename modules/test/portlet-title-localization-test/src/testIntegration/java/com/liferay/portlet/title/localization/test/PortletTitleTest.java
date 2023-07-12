@@ -74,7 +74,7 @@ public class PortletTitleTest {
 		Assert.assertTrue(
 			StringBundler.concat(
 				"Please update the Language.properties files for the ",
-				"following portlets: ", portletIdsWithMissingTitles),
+				"following portlets: ", portletIdsWithMissingTitles.toString()),
 			portletIdsWithMissingTitles.isEmpty());
 	}
 

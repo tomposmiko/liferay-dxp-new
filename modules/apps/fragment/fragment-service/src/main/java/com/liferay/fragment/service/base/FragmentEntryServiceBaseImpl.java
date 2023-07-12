@@ -29,11 +29,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -62,7 +62,7 @@ public abstract class FragmentEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		FragmentEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public abstract class FragmentEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		fragmentEntryService = (FragmentEntryService)aopProxy;
 
-		FragmentEntryServiceUtil.setService(fragmentEntryService);
+		_setServiceUtilService(fragmentEntryService);
 	}
 
 	/**
@@ -121,6 +121,22 @@ public abstract class FragmentEntryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		FragmentEntryService fragmentEntryService) {
+
+		try {
+			Field field = FragmentEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, fragmentEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.fragment.service.FragmentEntryLocalService
 		fragmentEntryLocalService;
@@ -159,8 +175,5 @@ public abstract class FragmentEntryServiceBaseImpl
 
 	@Reference
 	protected FragmentEntryLinkFinder fragmentEntryLinkFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FragmentEntryServiceBaseImpl.class);
 
 }

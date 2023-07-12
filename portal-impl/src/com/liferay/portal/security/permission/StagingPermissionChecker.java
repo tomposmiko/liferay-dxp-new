@@ -223,7 +223,7 @@ public class StagingPermissionChecker implements PermissionChecker {
 			actionId.equals("VIEW") &&
 			(name.equals(Folder.class.getName()) ||
 			 name.equals(DLFolder.class.getName()) ||
-			 Objects.equals(name, "com.liferay.document.library"))) {
+			 Objects.equals("com.liferay.document.library", name))) {
 
 			return true;
 		}

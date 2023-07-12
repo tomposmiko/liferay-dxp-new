@@ -27,11 +27,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -60,7 +60,7 @@ public abstract class JournalFolderServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		JournalFolderServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public abstract class JournalFolderServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		journalFolderService = (JournalFolderService)aopProxy;
 
-		JournalFolderServiceUtil.setService(journalFolderService);
+		_setServiceUtilService(journalFolderService);
 	}
 
 	/**
@@ -116,6 +116,22 @@ public abstract class JournalFolderServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		JournalFolderService journalFolderService) {
+
+		try {
+			Field field = JournalFolderServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, journalFolderService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -192,8 +208,5 @@ public abstract class JournalFolderServiceBaseImpl
 	@Reference
 	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
 		ratingsStatsLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		JournalFolderServiceBaseImpl.class);
 
 }

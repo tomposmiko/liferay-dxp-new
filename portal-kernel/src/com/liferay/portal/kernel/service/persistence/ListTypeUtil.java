@@ -494,10 +494,6 @@ public class ListTypeUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(ListTypePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile ListTypePersistence _persistence;
 
 }

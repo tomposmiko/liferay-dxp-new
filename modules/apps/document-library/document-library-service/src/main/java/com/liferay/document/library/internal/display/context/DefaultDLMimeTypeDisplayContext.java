@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 
 /**
@@ -29,6 +30,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.document.library.configuration.DLConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = DLMimeTypeDisplayContext.class
 )
 public class DefaultDLMimeTypeDisplayContext

@@ -238,12 +238,21 @@ public interface CommerceInventoryWarehouseLocalService
 	public CommerceInventoryWarehouse fetchCommerceInventoryWarehouse(
 		long commerceInventoryWarehouseId);
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
+	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceInventoryWarehouse
 		fetchCommerceInventoryWarehouseByExternalReferenceCode(
 			long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceInventoryWarehouseByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceInventoryWarehouse
@@ -271,7 +280,14 @@ public interface CommerceInventoryWarehouseLocalService
 			long commerceInventoryWarehouseId)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
+	 * @return the matching commerce inventory warehouse
+	 * @throws PortalException if a matching commerce inventory warehouse could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceInventoryWarehouse
 			getCommerceInventoryWarehouseByExternalReferenceCode(

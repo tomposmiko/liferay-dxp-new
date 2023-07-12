@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.Website;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -58,6 +56,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -706,14 +706,14 @@ public abstract class WebsiteLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.Website", websiteLocalService);
 
-		WebsiteLocalServiceUtil.setService(websiteLocalService);
+		_setLocalServiceUtilService(websiteLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.Website");
 
-		WebsiteLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -758,6 +758,22 @@ public abstract class WebsiteLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		WebsiteLocalService websiteLocalService) {
+
+		try {
+			Field field = WebsiteLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, websiteLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = WebsiteLocalService.class)
 	protected WebsiteLocalService websiteLocalService;
 
@@ -799,9 +815,6 @@ public abstract class WebsiteLocalServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WebsiteLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -21,13 +21,15 @@ import {PropTypes} from 'prop-types';
 import React, {useContext, useEffect, useState} from 'react';
 
 import {DEFAULT_SXP_ELEMENT_ICON} from '../../utils/data';
-import isDefined from '../../utils/functions/is_defined';
-import cleanUIConfiguration from '../../utils/sxp_element/clean_ui_configuration';
-import getSXPElementJSON from '../../utils/sxp_element/get_sxp_element_json';
-import getSXPElementTitleAndDescription from '../../utils/sxp_element/get_sxp_element_title_and_description';
-import {INPUT_TYPES} from '../../utils/types/inputTypes';
+import {INPUT_TYPES} from '../../utils/inputTypes';
+import {
+	cleanUIConfiguration,
+	getConfigurationEntry,
+	isDefined,
+} from '../../utils/utils';
 import {PreviewModalWithCopyDownload} from '../PreviewModal';
 import ThemeContext from '../ThemeContext';
+import {getLocalizedText} from './../../utils/language';
 import DateInput from './DateInput';
 import FieldInput from './FieldInput';
 import FieldListInput from './FieldListInput';
@@ -75,10 +77,8 @@ function SXPElement({
 	const [collapse, setCollapse] = useState(false);
 	const [active, setActive] = useState(false);
 
-	const [title, description] = getSXPElementTitleAndDescription(
-		sxpElement,
-		locale
-	);
+	const description = getLocalizedText(sxpElement.description_i18n, locale);
+	const title = getLocalizedText(sxpElement.title_i18n, locale);
 
 	const fieldSets = cleanUIConfiguration(
 		sxpElement.elementDefinition?.uiConfiguration
@@ -355,10 +355,10 @@ function SXPElement({
 								fileName="sxpElement.json"
 								size="lg"
 								text={JSON.stringify(
-									getSXPElementJSON(
+									getConfigurationEntry({
 										sxpElement,
-										uiConfigurationValues
-									),
+										uiConfigurationValues,
+									}),
 									null,
 									'\t'
 								)}

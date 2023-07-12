@@ -88,7 +88,7 @@ public class DefaultFacetTranslator implements FacetTranslator {
 			);
 		}
 
-		if (ListUtil.isNotEmpty(postFilterQueryBuilders)) {
+		if (!ListUtil.isEmpty(postFilterQueryBuilders)) {
 			searchSourceBuilder.postFilter(
 				getPostFilter(postFilterQueryBuilders));
 		}

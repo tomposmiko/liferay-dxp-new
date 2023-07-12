@@ -197,14 +197,9 @@ public class I18nFilter extends BasePortalFilter {
 			Group group = layoutSet.getGroup();
 
 			if (groupFriendlyURL.equals(group.getFriendlyURL())) {
-				String layoutURL = requestURI.substring(friendlyURLEnd);
-
-				if (Validator.isNull(layoutURL)) {
-					redirect = contextPath + i18nPath + StringPool.SLASH;
-				}
-				else {
-					redirect = contextPath + i18nPath + layoutURL;
-				}
+				redirect =
+					contextPath + i18nPath +
+						requestURI.substring(friendlyURLEnd);
 			}
 		}
 

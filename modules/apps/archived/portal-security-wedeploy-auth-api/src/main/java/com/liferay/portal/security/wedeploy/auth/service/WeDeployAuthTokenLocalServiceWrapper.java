@@ -15,7 +15,6 @@
 package com.liferay.portal.security.wedeploy.auth.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link WeDeployAuthTokenLocalService}.
@@ -385,11 +384,6 @@ public class WeDeployAuthTokenLocalServiceWrapper
 
 		return _weDeployAuthTokenLocalService.updateWeDeployAuthToken(
 			weDeployAuthToken);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _weDeployAuthTokenLocalService.getBasePersistence();
 	}
 
 	@Override

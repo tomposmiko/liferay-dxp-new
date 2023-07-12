@@ -149,37 +149,6 @@ const ExperienceSelector = ({
 		}
 	}, []);
 
-	useEffect(() => {
-		if (open) {
-			const element = document.querySelector(
-				'.dropdown-menu__experience--active'
-			);
-
-			element?.scrollIntoView?.({
-				behavior: 'auto',
-				block: 'center',
-				inline: 'nearest',
-			});
-		}
-	}, [open]);
-
-	useEffect(() => {
-		const element = document.querySelector(
-			'.dropdown-menu__experience--active'
-		);
-
-		element?.scrollIntoView?.({
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'nearest',
-		});
-	}, [
-
-		//LPS-127205
-
-		experiences.length,
-	]);
-
 	const handleExperienceCreation = ({
 		name,
 		segmentsEntryId,
@@ -231,7 +200,7 @@ const ExperienceSelector = ({
 						type: 'success',
 					});
 				})
-				.catch(() => {
+				.catch((_error) => {
 					if (isMounted()) {
 						setEditingExperience({
 							error: Liferay.Language.get(
@@ -318,7 +287,6 @@ const ExperienceSelector = ({
 
 		dispatch(updateExperiencePriority(target));
 	};
-
 	const increasePriority = (id) => {
 		const target = getUpdateExperiencePriorityTargets(
 			experiences,

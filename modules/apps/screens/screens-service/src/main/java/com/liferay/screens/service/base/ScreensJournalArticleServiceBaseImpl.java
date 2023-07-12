@@ -20,14 +20,14 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.screens.service.ScreensJournalArticleService;
 import com.liferay.screens.service.ScreensJournalArticleServiceUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class ScreensJournalArticleServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		ScreensJournalArticleServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,8 +71,7 @@ public abstract class ScreensJournalArticleServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		screensJournalArticleService = (ScreensJournalArticleService)aopProxy;
 
-		ScreensJournalArticleServiceUtil.setService(
-			screensJournalArticleService);
+		_setServiceUtilService(screensJournalArticleService);
 	}
 
 	/**
@@ -106,6 +105,23 @@ public abstract class ScreensJournalArticleServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		ScreensJournalArticleService screensJournalArticleService) {
+
+		try {
+			Field field =
+				ScreensJournalArticleServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, screensJournalArticleService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -145,8 +161,5 @@ public abstract class ScreensJournalArticleServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ScreensJournalArticleServiceBaseImpl.class);
 
 }

@@ -83,8 +83,4 @@ body.portlet {
 	@include media-breakpoint-down(sm) {
 		display: none;
 	}
-
-	.portlet-topper {
-		display: none !important;
-	}
 }

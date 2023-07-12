@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4278,7 +4279,7 @@ public class DispatchTriggerPersistenceImpl
 	 * </p>
 	 *
 	 * @param active the active
-	 * @param dispatchTaskClusterModes the dispatch task cluster modes
+	 * @param dispatchTaskClusterMode the dispatch task cluster mode
 	 * @param start the lower bound of the range of dispatch triggers
 	 * @param end the upper bound of the range of dispatch triggers (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5382,12 +5383,12 @@ public class DispatchTriggerPersistenceImpl
 			new String[] {Boolean.class.getName(), Integer.class.getName()},
 			new String[] {"active_", "dispatchTaskClusterMode"}, false);
 
-		DispatchTriggerUtil.setPersistence(this);
+		_setDispatchTriggerUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DispatchTriggerUtil.setPersistence(null);
+		_setDispatchTriggerUtilPersistence(null);
 
 		entityCache.removeCache(DispatchTriggerImpl.class.getName());
 
@@ -5397,6 +5398,22 @@ public class DispatchTriggerPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDispatchTriggerUtilPersistence(
+		DispatchTriggerPersistence dispatchTriggerPersistence) {
+
+		try {
+			Field field = DispatchTriggerUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dispatchTriggerPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

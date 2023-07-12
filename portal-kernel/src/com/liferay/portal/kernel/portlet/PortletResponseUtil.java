@@ -72,21 +72,8 @@ public class PortletResponseUtil {
 		throws IOException {
 
 		setHeaders(
-			portletRequest, mimeResponse, null, contentDispositionType,
-			contentType, fileName);
-
-		write(mimeResponse, bytes);
-	}
-
-	public static void sendFile(
-			PortletRequest portletRequest, MimeResponse mimeResponse,
-			String fileName, byte[] bytes, String contentType,
-			String contentDispositionType, String cacheControlValue)
-		throws IOException {
-
-		setHeaders(
-			portletRequest, mimeResponse, cacheControlValue,
-			contentDispositionType, contentType, fileName);
+			portletRequest, mimeResponse, fileName, contentType,
+			contentDispositionType);
 
 		write(mimeResponse, bytes);
 	}
@@ -117,8 +104,8 @@ public class PortletResponseUtil {
 		throws IOException {
 
 		setHeaders(
-			portletRequest, mimeResponse, null, contentDispositionType,
-			contentType, fileName);
+			portletRequest, mimeResponse, fileName, contentType,
+			contentDispositionType);
 
 		write(mimeResponse, inputStream, contentLength);
 	}
@@ -270,16 +257,6 @@ public class PortletResponseUtil {
 		PortletRequest portletRequest, MimeResponse mimeResponse,
 		String fileName, String contentType, String contentDispositionType) {
 
-		setHeaders(
-			portletRequest, mimeResponse, null, contentDispositionType,
-			contentType, fileName);
-	}
-
-	protected static void setHeaders(
-		PortletRequest portletRequest, MimeResponse mimeResponse,
-		String cacheControlValue, String contentDispositionType,
-		String contentType, String fileName) {
-
 		if (_log.isDebugEnabled()) {
 			_log.debug("Sending file of type " + contentType);
 		}
@@ -290,15 +267,8 @@ public class PortletResponseUtil {
 			mimeResponse.setContentType(contentType);
 		}
 
-		if (Validator.isNull(cacheControlValue)) {
-			mimeResponse.setProperty(
-				HttpHeaders.CACHE_CONTROL,
-				HttpHeaders.CACHE_CONTROL_PRIVATE_VALUE);
-		}
-		else {
-			mimeResponse.setProperty(
-				HttpHeaders.CACHE_CONTROL, cacheControlValue);
-		}
+		mimeResponse.setProperty(
+			HttpHeaders.CACHE_CONTROL, HttpHeaders.CACHE_CONTROL_PRIVATE_VALUE);
 
 		if (Validator.isNull(fileName)) {
 			return;

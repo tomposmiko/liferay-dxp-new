@@ -12,7 +12,7 @@ definition {
 			value1 = "Add New");
 
 		Click(
-			key_assetItem = ${assetType},
+			key_assetItem = "${assetType}",
 			locator1 = "ControlMenuAddPanel#ASSET_ITEM");
 	}
 
@@ -23,14 +23,14 @@ definition {
 
 		Navigator.gotoNavTab(navTab = "Content");
 
-		var key_assetTitle = ${assetTitle};
+		var key_assetTitle = "${assetTitle}";
 
 		Type(
 			locator1 = "NavBar#APPLICATION_SEARCH_FIELD",
-			value1 = ${assetTitle});
+			value1 = "${assetTitle}");
 
 		Click.clickNoWaitForVisible(
-			key_portletName = ${assetTitle},
+			key_portletName = "${assetTitle}",
 			locator1 = "ControlMenuAddPanel#ADD_PORTLET_LINK");
 	}
 

@@ -30,14 +30,7 @@
 	<td>//div[contains(@class,'container-view')]</td>
 	<td></td>
 </tr>
-<tr>
-	<td>DATE_INPUT</td>
-	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'form-group')]//input[@type='text']</td>
-	<td></td>
-</tr>
-
 <!--SIDEBAR-->
-
 <tr>
 	<td>DEFAULT_LANGUAGE</td>
 	<td>//div[contains(@class,'article-default-language')]//p[normalize-space()='Default Language: ${defaultLanguage}']</td>
@@ -128,9 +121,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--VIEW_HISTORY-->
-
 <tr>
 	<td>VIEW_HISTORY_VERSION_CHECKBOX</td>
 	<td>//tr[contains(.,'${key_webContentTitle}')]/td//input</td>
@@ -151,9 +142,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DISPLAY_PAGE-->
-
 <tr>
 	<td>DISPLAY_PAGE_SELECT</td>
 	<td>//select[contains(@id,'displayPageType')]</td>
@@ -184,9 +173,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--IMAGE_FIELD-->
-
 <tr>
 	<td>IMAGE_FIELD_CLEAR</td>
 	<td>//div[contains(@id, JournalPortlet_Image)]//div[contains(@class, 'button-holder')]//span[contains(text(), 'Clear')]</td>

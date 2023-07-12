@@ -50,9 +50,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DUE_DATE-->
-
 <tr>
 	<td>DUE_DATE_FIELD</td>
 	<td>//input[@name='_1_WAR_tasksportlet_dueDate']</td>

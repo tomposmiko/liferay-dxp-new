@@ -306,7 +306,13 @@ public class CommercePriceModifierLocalServiceUtil {
 		return getService().fetchCommercePriceModifier(commercePriceModifierId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce price modifier with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price modifier's external reference code
+	 * @return the matching commerce price modifier, or <code>null</code> if a matching commerce price modifier could not be found
+	 */
 	public static CommercePriceModifier
 		fetchCommercePriceModifierByExternalReferenceCode(
 			long companyId, String externalReferenceCode) {
@@ -315,6 +321,9 @@ public class CommercePriceModifierLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePriceModifierByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CommercePriceModifier
 		fetchCommercePriceModifierByReferenceCode(
@@ -358,7 +367,14 @@ public class CommercePriceModifierLocalServiceUtil {
 		return getService().getCommercePriceModifier(commercePriceModifierId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce price modifier with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price modifier's external reference code
+	 * @return the matching commerce price modifier
+	 * @throws PortalException if a matching commerce price modifier could not be found
+	 */
 	public static CommercePriceModifier
 			getCommercePriceModifierByExternalReferenceCode(
 				long companyId, String externalReferenceCode)
@@ -581,10 +597,6 @@ public class CommercePriceModifierLocalServiceUtil {
 
 	public static CommercePriceModifierLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(CommercePriceModifierLocalService service) {
-		_service = service;
 	}
 
 	private static volatile CommercePriceModifierLocalService _service;

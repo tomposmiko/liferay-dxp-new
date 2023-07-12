@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1810,7 +1811,7 @@ public class DDMDataProviderInstanceLinkPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				DDMDataProviderInstanceLink.class, primaryKey)) {
+				DDMDataProviderInstanceLink.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2301,12 +2302,12 @@ public class DDMDataProviderInstanceLinkPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"dataProviderInstanceId", "structureId"}, false);
 
-		DDMDataProviderInstanceLinkUtil.setPersistence(this);
+		_setDDMDataProviderInstanceLinkUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMDataProviderInstanceLinkUtil.setPersistence(null);
+		_setDDMDataProviderInstanceLinkUtilPersistence(null);
 
 		entityCache.removeCache(
 			DDMDataProviderInstanceLinkImpl.class.getName());
@@ -2317,6 +2318,24 @@ public class DDMDataProviderInstanceLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMDataProviderInstanceLinkUtilPersistence(
+		DDMDataProviderInstanceLinkPersistence
+			ddmDataProviderInstanceLinkPersistence) {
+
+		try {
+			Field field =
+				DDMDataProviderInstanceLinkUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmDataProviderInstanceLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

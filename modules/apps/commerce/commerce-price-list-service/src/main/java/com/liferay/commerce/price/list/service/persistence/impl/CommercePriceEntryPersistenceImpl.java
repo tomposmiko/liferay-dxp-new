@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.price.list.service.persistence.impl;
 
-import com.liferay.commerce.price.list.exception.DuplicateCommercePriceEntryExternalReferenceCodeException;
 import com.liferay.commerce.price.list.exception.NoSuchPriceEntryException;
 import com.liferay.commerce.price.list.model.CommercePriceEntry;
 import com.liferay.commerce.price.list.model.CommercePriceEntryTable;
@@ -52,6 +51,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -5058,38 +5058,6 @@ public class CommercePriceEntryPersistenceImpl
 			commercePriceEntry.setUuid(uuid);
 		}
 
-		if (Validator.isNull(commercePriceEntry.getExternalReferenceCode())) {
-			commercePriceEntry.setExternalReferenceCode(
-				commercePriceEntry.getUuid());
-		}
-		else {
-			CommercePriceEntry ercCommercePriceEntry = fetchByC_ERC(
-				commercePriceEntry.getCompanyId(),
-				commercePriceEntry.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommercePriceEntry != null) {
-					throw new DuplicateCommercePriceEntryExternalReferenceCodeException(
-						"Duplicate commerce price entry with external reference code " +
-							commercePriceEntry.getExternalReferenceCode() +
-								" and company " +
-									commercePriceEntry.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommercePriceEntry != null) &&
-					(commercePriceEntry.getCommercePriceEntryId() !=
-						ercCommercePriceEntry.getCommercePriceEntryId())) {
-
-					throw new DuplicateCommercePriceEntryExternalReferenceCodeException(
-						"Duplicate commerce price entry with external reference code " +
-							commercePriceEntry.getExternalReferenceCode() +
-								" and company " +
-									commercePriceEntry.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -5596,11 +5564,11 @@ public class CommercePriceEntryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommercePriceEntryUtil.setPersistence(this);
+		_setCommercePriceEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommercePriceEntryUtil.setPersistence(null);
+		_setCommercePriceEntryUtilPersistence(null);
 
 		entityCache.removeCache(CommercePriceEntryImpl.class.getName());
 
@@ -5610,6 +5578,22 @@ public class CommercePriceEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommercePriceEntryUtilPersistence(
+		CommercePriceEntryPersistence commercePriceEntryPersistence) {
+
+		try {
+			Field field = CommercePriceEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commercePriceEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

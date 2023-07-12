@@ -43,8 +43,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -65,6 +63,8 @@ import com.liferay.wiki.service.persistence.WikiPagePersistence;
 import com.liferay.wiki.service.persistence.WikiPageResourcePersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -592,7 +592,7 @@ public abstract class WikiPageLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		WikiPageLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -607,7 +607,7 @@ public abstract class WikiPageLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		wikiPageLocalService = (WikiPageLocalService)aopProxy;
 
-		WikiPageLocalServiceUtil.setService(wikiPageLocalService);
+		_setLocalServiceUtilService(wikiPageLocalService);
 	}
 
 	/**
@@ -649,6 +649,22 @@ public abstract class WikiPageLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		WikiPageLocalService wikiPageLocalService) {
+
+		try {
+			Field field = WikiPageLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, wikiPageLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -709,8 +725,5 @@ public abstract class WikiPageLocalServiceBaseImpl
 
 	@Reference
 	protected WikiPageResourcePersistence wikiPageResourcePersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WikiPageLocalServiceBaseImpl.class);
 
 }

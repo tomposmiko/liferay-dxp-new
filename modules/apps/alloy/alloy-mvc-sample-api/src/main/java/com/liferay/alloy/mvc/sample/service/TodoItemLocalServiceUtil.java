@@ -293,10 +293,6 @@ public class TodoItemLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(TodoItemLocalService service) {
-		_service = service;
-	}
-
 	private static volatile TodoItemLocalService _service;
 
 }

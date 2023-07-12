@@ -26,7 +26,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -47,7 +47,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-90999. A user with permissions has access to edit the web content article or display page while viewing the article through its display page."
-	@priority = 5
+	@priority = "5"
 	test EditWhenViewingInDisplayPageAsUser {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -193,7 +193,7 @@ definition {
 
 			PortletEntry.inputTitle(title = "Webcontent Title Edit");
 
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "content",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = "Webcontent Content Edit");
@@ -234,7 +234,7 @@ definition {
 	}
 
 	@description = "This ensures that images can be added to the fragment background via the file URL when mapping a document."
-	@priority = 5
+	@priority = "5"
 	test MapDMImageToFragmentBackground {
 		property portal.acceptance = "true";
 
@@ -263,7 +263,7 @@ definition {
 			entryTitle = "Document_1.jpg",
 			fieldName = "File URL",
 			navItem = "Documents and Media",
-			paddingTop = 2,
+			paddingTop = "2",
 			panel = "Styles");
 
 		PageEditor.clickPublish();
@@ -276,10 +276,9 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86550. Users should be able to map author name and author profile image to a fragment editable field in a display page."
-	@priority = 5
+	@priority = "5"
 	test MapWebContentAuthor {
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 
 		task ("Add a display page with author name and profile fields mapped") {
 			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
@@ -360,7 +359,7 @@ definition {
 	}
 
 	@description = "This case ensures a user can map the editable background image of a fragment to an existing image content."
-	@priority = 5
+	@priority = "5"
 	test MapWebContentImageToFragmentBackground {
 		property portal.acceptance = "true";
 
@@ -447,7 +446,7 @@ definition {
 	}
 
 	@description = "This case ensures a user can map the layout of a fragment to an existing image content."
-	@priority = 5
+	@priority = "5"
 	test MapWebContentImageToLayoutSection {
 		property portal.acceptance = "true";
 
@@ -519,7 +518,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86550. Users should be able to map last editor name and author profile image to a fragment editable field in a display page."
-	@priority = 5
+	@priority = "5"
 	test MapWebContentLastEditor {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -660,7 +659,7 @@ definition {
 	}
 
 	@description = "Add a fragment with multiple editable fields in it."
-	@priority = 4
+	@priority = "4"
 	test ViewDisplayPageWithComplexRichTextFragments {
 		property testray.component.names = "Training";
 
@@ -762,14 +761,14 @@ definition {
 
 			for (var content : list "Webcontent Title,Webcontent Content,tag1,tag2,tag3") {
 				AssertVisible(
-					key_text = ${content},
+					key_text = "${content}",
 					locator1 = "Fragment#EDITABLE_FIELD_CONTENT");
 			}
 		}
 	}
 
 	@description = "Add a fragment with new added structure in it."
-	@priority = 4
+	@priority = "4"
 	test ViewDisplayPageWithNewStructureMapInFragments {
 		property testray.component.names = "Training";
 
@@ -880,7 +879,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-96187. When there is a Language Selector widget on a display page template, selecting a different language should not redirect the user to a different place."
-	@priority = 4
+	@priority = "4"
 	test ViewlanguageSelectorRedirect {
 		property test.name.skip.portal.instance = "DisplayPagesUseCase#ViewlanguageSelectorRedirect";
 

@@ -147,9 +147,9 @@ public class MessageListenerImpl implements MessageListener {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						StringBundler.concat(
-							"Cannot deliver message ", message,
+							"Cannot deliver message ", message.toString(),
 							", none of the recipients contain a message ID: ",
-							recipients));
+							recipients.toString()));
 				}
 
 				return;

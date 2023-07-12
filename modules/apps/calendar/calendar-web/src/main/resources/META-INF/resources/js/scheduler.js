@@ -719,21 +719,6 @@ AUI.add(
 
 				queue: null,
 
-				renderButtonGroup() {
-					const instance = this;
-
-					Scheduler.superclass.renderButtonGroup.apply(
-						this,
-						arguments
-					);
-
-					instance.viewsNode.setAttribute('role', 'tablist');
-
-					instance.viewsNode
-						.all('button')
-						.setAttribute('role', 'tab');
-				},
-
 				renderUI() {
 					var instance = this;
 

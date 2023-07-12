@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -32,6 +30,8 @@ import com.liferay.social.kernel.model.SocialActivitySetting;
 import com.liferay.social.kernel.service.SocialActivitySettingService;
 import com.liferay.social.kernel.service.SocialActivitySettingServiceUtil;
 import com.liferay.social.kernel.service.persistence.SocialActivitySettingPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -290,12 +290,11 @@ public abstract class SocialActivitySettingServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		SocialActivitySettingServiceUtil.setService(
-			socialActivitySettingService);
+		_setServiceUtilService(socialActivitySettingService);
 	}
 
 	public void destroy() {
-		SocialActivitySettingServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -338,6 +337,23 @@ public abstract class SocialActivitySettingServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		SocialActivitySettingService socialActivitySettingService) {
+
+		try {
+			Field field =
+				SocialActivitySettingServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivitySettingService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -389,8 +405,5 @@ public abstract class SocialActivitySettingServiceBaseImpl
 
 	@BeanReference(type = GroupFinder.class)
 	protected GroupFinder groupFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialActivitySettingServiceBaseImpl.class);
 
 }

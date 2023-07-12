@@ -14,14 +14,12 @@
 
 package com.liferay.adaptive.media.journal.web.internal.exportimport.content.processor;
 
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
@@ -50,17 +48,12 @@ public class AMJournalArticleExportImportContentProcessorTest {
 			_amJournalArticleContentHTMLReplacer);
 		ReflectionTestUtil.setFieldValue(
 			_amJournalArticleExportImportContentProcessor,
-			"_ddmStructureLocalService", _ddmStructureLocalService);
-		ReflectionTestUtil.setFieldValue(
-			_amJournalArticleExportImportContentProcessor,
 			"_htmlExportImportContentProcessor",
 			_htmlExportImportContentProcessor);
 		ReflectionTestUtil.setFieldValue(
 			_amJournalArticleExportImportContentProcessor,
 			"_journalArticleExportImportContentProcessor",
 			_journalArticleExportImportContentProcessor);
-		ReflectionTestUtil.setFieldValue(
-			_amJournalArticleExportImportContentProcessor, "_portal", _portal);
 
 		Mockito.when(
 			_amJournalArticleContentHTMLReplacer.replace(
@@ -194,8 +187,6 @@ public class AMJournalArticleExportImportContentProcessorTest {
 	private final AMJournalArticleExportImportContentProcessor
 		_amJournalArticleExportImportContentProcessor =
 			new AMJournalArticleExportImportContentProcessor();
-	private final DDMStructureLocalService _ddmStructureLocalService =
-		Mockito.mock(DDMStructureLocalService.class);
 	private final ExportImportContentProcessor<String>
 		_htmlExportImportContentProcessor = Mockito.mock(
 			ExportImportContentProcessor.class);
@@ -204,7 +195,6 @@ public class AMJournalArticleExportImportContentProcessorTest {
 	private final ExportImportContentProcessor<String>
 		_journalArticleExportImportContentProcessor = Mockito.mock(
 			ExportImportContentProcessor.class);
-	private final Portal _portal = Mockito.mock(Portal.class);
 	private final PortletDataContext _portletDataContext = Mockito.mock(
 		PortletDataContext.class);
 

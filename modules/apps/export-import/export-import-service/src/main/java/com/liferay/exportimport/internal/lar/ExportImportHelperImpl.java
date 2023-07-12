@@ -34,8 +34,6 @@ import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.portlet.data.handler.provider.PortletDataHandlerProvider;
 import com.liferay.exportimport.portlet.data.handler.util.ExportImportGroupedModelUtil;
-import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
-import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessorRegistryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -112,12 +110,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
@@ -598,16 +594,16 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	public String getSelectedLayoutsJSON(
 		long groupId, boolean privateLayout, String selectedNodes) {
 
-		List<Layout> layouts = _layoutLocalService.getLayouts(
-			groupId, privateLayout);
-
-		Node root = _buildTree(new Node(null), new LinkedList<Layout>(layouts));
-
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		List<Layout> layouts = _layoutLocalService.getLayouts(
+			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
 		long[] selectedPlids = StringUtil.split(selectedNodes, 0L);
 
-		populateLayoutsJSON(jsonArray, root, selectedPlids);
+		for (Layout layout : layouts) {
+			populateLayoutsJSON(jsonArray, layout, selectedPlids);
+		}
 
 		if (ArrayUtil.contains(selectedPlids, 0)) {
 			jsonArray.put(
@@ -737,35 +733,6 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean isPublishDisplayedContent(
-		PortletDataContext portletDataContext, Portlet portlet) {
-
-		try {
-			if (!ExportImportThreadLocal.isLayoutStagingInProcess()) {
-				return true;
-			}
-
-			if (_exportImportServiceConfiguration.publishDisplayedContent()) {
-				return true;
-			}
-
-			ExportImportPortletPreferencesProcessor
-				exportImportPortletPreferencesProcessor =
-					ExportImportPortletPreferencesProcessorRegistryUtil.
-						getExportImportPortletPreferencesProcessor(
-							portlet.getRootPortletId());
-
-			return exportImportPortletPreferencesProcessor.
-				isPublishDisplayedContent();
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-
-			return true;
-		}
 	}
 
 	@Override
@@ -1302,42 +1269,39 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	}
 
 	protected boolean populateLayoutsJSON(
-		JSONArray layoutsJSONArray, Node node, long[] selectedLayoutIds) {
+		JSONArray layoutsJSONArray, Layout layout, long[] selectedLayoutIds) {
 
-		List<Node> childNodes = node.getChildNodes();
+		List<Layout> childLayouts = layout.getChildren();
 		JSONArray childLayoutsJSONArray = null;
 		boolean includeChildren = true;
 
-		if (ListUtil.isNotEmpty(childNodes)) {
+		if (ListUtil.isNotEmpty(childLayouts)) {
 			childLayoutsJSONArray = JSONFactoryUtil.createJSONArray();
 
-			for (Node childNode : childNodes) {
+			for (Layout childLayout : childLayouts) {
 				if (!populateLayoutsJSON(
-						childLayoutsJSONArray, childNode, selectedLayoutIds)) {
+						childLayoutsJSONArray, childLayout,
+						selectedLayoutIds)) {
 
 					includeChildren = false;
 				}
 			}
 		}
 
-		Layout layout = node.getLayout();
+		boolean checked = ArrayUtil.contains(
+			selectedLayoutIds, layout.getLayoutId());
 
-		if (layout != null) {
-			boolean checked = ArrayUtil.contains(
-				selectedLayoutIds, layout.getLayoutId());
+		if (checked) {
+			layoutsJSONArray.put(
+				JSONUtil.put(
+					"includeChildren", includeChildren
+				).put(
+					"plid", layout.getPlid()
+				));
+		}
 
-			if (checked) {
-				layoutsJSONArray.put(
-					JSONUtil.put(
-						"includeChildren", includeChildren
-					).put(
-						"plid", layout.getPlid()
-					));
-			}
-
-			if (checked && includeChildren) {
-				return true;
-			}
+		if (checked && includeChildren) {
+			return true;
 		}
 
 		if (childLayoutsJSONArray != null) {
@@ -1417,8 +1381,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
 				className);
 
-		if ((stagedModelDataHandler == null) ||
-			!stagedModelDataHandler.validateReference(
+		if (!stagedModelDataHandler.validateReference(
 				portletDataContext, element)) {
 
 			MissingReference missingReference = new MissingReference(element);
@@ -1437,39 +1400,6 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		return null;
-	}
-
-	private Node _buildTree(Node parentNode, List<Layout> layouts) {
-		Layout parentLayout = parentNode.getLayout();
-
-		long parentLayoutId =
-			(parentLayout != null) ? parentLayout.getLayoutId() : 0;
-
-		Stream<Layout> layoutsStream = layouts.stream();
-
-		List<Layout> childLayouts = layoutsStream.filter(
-			layout -> layout.getParentLayoutId() == parentLayoutId
-		).collect(
-			Collectors.toList()
-		);
-
-		layouts.removeAll(childLayouts);
-
-		Stream<Layout> childLayoutsStream = childLayouts.stream();
-
-		List<Node> childNodes = childLayoutsStream.map(
-			layout -> new Node(layout)
-		).collect(
-			Collectors.toList()
-		);
-
-		parentNode.addChildNodes(childNodes);
-
-		for (Node childNode : childNodes) {
-			_buildTree(childNode, layouts);
-		}
-
-		return parentNode;
 	}
 
 	private Map<String, Boolean> _createAllPortletSetupControlsMap(
@@ -1672,29 +1602,6 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		private final Group _group;
 		private final ManifestSummary _manifestSummary;
-
-	}
-
-	private class Node {
-
-		public Node(Layout layout) {
-			_layout = layout;
-		}
-
-		public void addChildNodes(List<Node> childNodes) {
-			_childNodes = childNodes;
-		}
-
-		public List<Node> getChildNodes() {
-			return _childNodes;
-		}
-
-		public Layout getLayout() {
-			return _layout;
-		}
-
-		private List<Node> _childNodes = new LinkedList<>();
-		private final Layout _layout;
 
 	}
 

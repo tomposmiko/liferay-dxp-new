@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.bom.internal.resource.v1_0.factory;
 
-import com.liferay.headless.commerce.bom.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.commerce.bom.resource.v1_0.FolderResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Alessio Antonio Rendina
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/commerce-bom/1.0/Folder",
-	service = FolderResource.Factory.class
-)
+@Component(immediate = true, service = FolderResource.Factory.class)
 @Generated("")
 public class FolderResourceFactoryImpl implements FolderResource.Factory {
 
@@ -137,6 +134,16 @@ public class FolderResourceFactoryImpl implements FolderResource.Factory {
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		FolderResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		FolderResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, FolderResource>
 		_getProxyProviderFunction() {
 
@@ -184,7 +191,7 @@ public class FolderResourceFactoryImpl implements FolderResource.Factory {
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		FolderResource folderResource = _componentServiceObjects.getService();
@@ -207,7 +214,6 @@ public class FolderResourceFactoryImpl implements FolderResource.Factory {
 		folderResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		folderResource.setRoleLocalService(_roleLocalService);
-		folderResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(folderResource, arguments);
@@ -247,6 +253,9 @@ public class FolderResourceFactoryImpl implements FolderResource.Factory {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -255,9 +264,6 @@ public class FolderResourceFactoryImpl implements FolderResource.Factory {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

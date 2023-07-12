@@ -31,12 +31,12 @@
 
 			<div class="col-md-6">
 				<div class="row-fluid">
-					<img class="w-100" src="${htmlUtil.escapeAttribute(image)}">
+					<img class="w-100" src="${image}">
 				</div>
 
 				<div class="row-fluid">
-					<a href="${htmlUtil.escapeAttribute(productURL)}">
-						<strong>${htmlUtil.escape(name)}</strong>
+					<a href="${productURL}">
+						<strong>${name}</strong>
 					</a>
 
 					<div class="commerce-price-section d-inline float-right">

@@ -50,7 +50,6 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -290,6 +289,30 @@ public class CommerceOrderContentDisplayContext {
 			getCommerceOrder(), _commerceContext);
 	}
 
+	public List<CommerceOrder> getCommerceOrders() throws PortalException {
+		if (_commerceOrders != null) {
+			return _commerceOrders;
+		}
+
+		String keywords = ParamUtil.getString(_httpServletRequest, "keywords");
+
+		if (isOpenOrderContentPortlet()) {
+			_commerceOrders =
+				_commerceOrderService.getUserPendingCommerceOrders(
+					_cpRequestHelper.getCompanyId(),
+					_cpRequestHelper.getChannelGroupId(), keywords,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		}
+		else {
+			_commerceOrders = _commerceOrderService.getUserPlacedCommerceOrders(
+				_cpRequestHelper.getCompanyId(),
+				_cpRequestHelper.getChannelGroupId(), keywords,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		}
+
+		return _commerceOrders;
+	}
+
 	public String getCommerceOrderStatus(CommerceOrder commerceOrder) {
 		return LanguageUtil.get(
 			_httpServletRequest,
@@ -466,51 +489,6 @@ public class CommerceOrderContentDisplayContext {
 		return portletURL;
 	}
 
-	public SearchContainer<CommerceOrder> getSearchContainer()
-		throws PortalException {
-
-		if (_searchContainer != null) {
-			return _searchContainer;
-		}
-
-		_searchContainer = new SearchContainer<>(
-			_cpRequestHelper.getLiferayPortletRequest(), getPortletURL(), null,
-			"no-orders-were-found");
-
-		List<CommerceOrder> commerceOrders = null;
-		long commerceOrdersTotal = 0;
-
-		String keywords = ParamUtil.getString(_httpServletRequest, "keywords");
-
-		if (isOpenOrderContentPortlet()) {
-			commerceOrders = _commerceOrderService.getUserPendingCommerceOrders(
-				_cpRequestHelper.getCompanyId(),
-				_cpRequestHelper.getChannelGroupId(), keywords,
-				_searchContainer.getStart(), _searchContainer.getEnd());
-
-			commerceOrdersTotal =
-				_commerceOrderService.getUserPendingCommerceOrdersCount(
-					_cpRequestHelper.getCompanyId(),
-					_cpRequestHelper.getChannelGroupId(), keywords);
-		}
-		else {
-			commerceOrders = _commerceOrderService.getUserPlacedCommerceOrders(
-				_cpRequestHelper.getCompanyId(),
-				_cpRequestHelper.getChannelGroupId(), keywords,
-				_searchContainer.getStart(), _searchContainer.getEnd());
-
-			commerceOrdersTotal =
-				_commerceOrderService.getUserPlacedCommerceOrdersCount(
-					_cpRequestHelper.getCompanyId(),
-					_cpRequestHelper.getChannelGroupId(), keywords);
-		}
-
-		_searchContainer.setResults(commerceOrders);
-		_searchContainer.setTotal((int)commerceOrdersTotal);
-
-		return _searchContainer;
-	}
-
 	public List<CommerceAddress> getShippingCommerceAddresses(
 			long commerceAccountId, long companyId)
 		throws PortalException {
@@ -588,6 +566,7 @@ public class CommerceOrderContentDisplayContext {
 	private final long _commerceOrderNoteId;
 	private final CommerceOrderNoteService _commerceOrderNoteService;
 	private final CommerceOrderPriceCalculation _commerceOrderPriceCalculation;
+	private List<CommerceOrder> _commerceOrders;
 	private final CommerceOrderService _commerceOrderService;
 	private final CommercePaymentMethodGroupRelService
 		_commercePaymentMethodGroupRelService;
@@ -599,6 +578,5 @@ public class CommerceOrderContentDisplayContext {
 	private final PercentageFormatter _percentageFormatter;
 	private final PortletDisplay _portletDisplay;
 	private final PortletResourcePermission _portletResourcePermission;
-	private SearchContainer<CommerceOrder> _searchContainer;
 
 }

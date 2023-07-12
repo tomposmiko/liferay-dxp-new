@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelperUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -57,11 +55,11 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1064,7 +1062,7 @@ public class ExpandoColumnPersistenceImpl
 	 * </p>
 	 *
 	 * @param tableId the table ID
-	 * @param names the names
+	 * @param name the name
 	 * @param start the lower bound of the range of expando columns
 	 * @param end the upper bound of the range of expando columns (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1992,21 +1990,6 @@ public class ExpandoColumnPersistenceImpl
 		ExpandoColumnModelImpl expandoColumnModelImpl =
 			(ExpandoColumnModelImpl)expandoColumn;
 
-		if (!expandoColumnModelImpl.hasSetModifiedDate()) {
-			ServiceContext serviceContext =
-				ServiceContextThreadLocal.getServiceContext();
-
-			Date date = new Date();
-
-			if (serviceContext == null) {
-				expandoColumn.setModifiedDate(date);
-			}
-			else {
-				expandoColumn.setModifiedDate(
-					serviceContext.getModifiedDate(date));
-			}
-		}
-
 		Session session = null;
 
 		try {
@@ -2103,9 +2086,7 @@ public class ExpandoColumnPersistenceImpl
 	 */
 	@Override
 	public ExpandoColumn fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				ExpandoColumn.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(ExpandoColumn.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2487,13 +2468,11 @@ public class ExpandoColumnPersistenceImpl
 
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
-		Set<String> ctIgnoreColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
 		ctControlColumnNames.add("ctCollectionId");
 		ctStrictColumnNames.add("companyId");
-		ctIgnoreColumnNames.add("modifiedDate");
 		ctStrictColumnNames.add("tableId");
 		ctStrictColumnNames.add("name");
 		ctStrictColumnNames.add("type_");
@@ -2502,8 +2481,6 @@ public class ExpandoColumnPersistenceImpl
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
-		_ctColumnNamesMap.put(
-			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK, Collections.singleton("columnId"));
 		_ctColumnNamesMap.put(
@@ -2586,11 +2563,11 @@ public class ExpandoColumnPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"tableId", "name"}, false);
 
-		ExpandoColumnUtil.setPersistence(this);
+		_setExpandoColumnUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ExpandoColumnUtil.setPersistence(null);
+		_setExpandoColumnUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(ExpandoColumnImpl.class.getName());
 
@@ -2600,6 +2577,22 @@ public class ExpandoColumnPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setExpandoColumnUtilPersistence(
+		ExpandoColumnPersistence expandoColumnPersistence) {
+
+		try {
+			Field field = ExpandoColumnUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, expandoColumnPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

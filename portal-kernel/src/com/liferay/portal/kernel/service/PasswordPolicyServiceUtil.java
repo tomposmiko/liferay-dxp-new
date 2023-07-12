@@ -117,10 +117,6 @@ public class PasswordPolicyServiceUtil {
 		return _service;
 	}
 
-	public static void setService(PasswordPolicyService service) {
-		_service = service;
-	}
-
 	private static volatile PasswordPolicyService _service;
 
 }

@@ -91,10 +91,6 @@ public class UpdateConfigurationValuesMVCActionCommand
 				editableValuesJSONObject.getJSONObject(
 					fragmentEntryProcessorKey);
 
-			if (editableFragmentEntryProcessorJSONObject == null) {
-				continue;
-			}
-
 			JSONObject defaultEditableFragmentEntryProcessorJSONObject =
 				defaultEditableValuesJSONObject.getJSONObject(
 					fragmentEntryProcessorKey);

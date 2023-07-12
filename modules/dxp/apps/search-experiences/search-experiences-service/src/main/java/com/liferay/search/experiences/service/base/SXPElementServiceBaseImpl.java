@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,6 +27,8 @@ import com.liferay.search.experiences.model.SXPElement;
 import com.liferay.search.experiences.service.SXPElementService;
 import com.liferay.search.experiences.service.SXPElementServiceUtil;
 import com.liferay.search.experiences.service.persistence.SXPElementPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class SXPElementServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		SXPElementServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class SXPElementServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		sxpElementService = (SXPElementService)aopProxy;
 
-		SXPElementServiceUtil.setService(sxpElementService);
+		_setServiceUtilService(sxpElementService);
 	}
 
 	/**
@@ -116,6 +116,20 @@ public abstract class SXPElementServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(SXPElementService sxpElementService) {
+		try {
+			Field field = SXPElementServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, sxpElementService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.search.experiences.service.SXPElementLocalService
 		sxpElementLocalService;
@@ -128,8 +142,5 @@ public abstract class SXPElementServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SXPElementServiceBaseImpl.class);
 
 }

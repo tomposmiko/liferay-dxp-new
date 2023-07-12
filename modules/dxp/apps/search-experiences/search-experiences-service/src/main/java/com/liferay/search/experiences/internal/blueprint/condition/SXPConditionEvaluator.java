@@ -16,7 +16,6 @@ package com.liferay.search.experiences.internal.blueprint.condition;
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.search.experiences.blueprint.exception.InvalidParameterException;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterData;
 import com.liferay.search.experiences.rest.dto.v1_0.Condition;
@@ -169,11 +168,12 @@ public class SXPConditionEvaluator {
 		SXPParameter sxpParameter = _sxpParameterData.getSXPParameterByName(
 			name);
 
-		if (sxpParameter != null) {
-			return sxpParameter;
+		if (sxpParameter == null) {
+			throw new IllegalArgumentException(
+				"Invalid parameter name " + name);
 		}
 
-		throw InvalidParameterException.with(name);
+		return sxpParameter;
 	}
 
 	private Object _getValue(Object value) {

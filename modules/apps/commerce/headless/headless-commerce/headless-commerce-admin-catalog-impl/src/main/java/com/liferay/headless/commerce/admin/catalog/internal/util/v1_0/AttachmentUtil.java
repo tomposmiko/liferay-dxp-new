@@ -68,7 +68,7 @@ public class AttachmentUtil {
 		if (Validator.isNotNull(attachment.getSrc())) {
 			URL url = new URL(attachment.getSrc());
 
-			if (Objects.equals(url.getProtocol(), "file")) {
+			if (Objects.equals("file", url.getProtocol())) {
 				throw new CPAttachmentFileEntryProtocolException(
 					"Unsupported URL protocol");
 			}

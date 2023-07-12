@@ -332,10 +332,6 @@ public class DepotAppCustomizationLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DepotAppCustomizationLocalService service) {
-		_service = service;
-	}
-
 	private static volatile DepotAppCustomizationLocalService _service;
 
 }

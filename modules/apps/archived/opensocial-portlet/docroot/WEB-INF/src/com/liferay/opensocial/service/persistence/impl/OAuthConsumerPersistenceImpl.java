@@ -50,6 +50,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1529,11 +1530,11 @@ public class OAuthConsumerPersistenceImpl
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"gadgetKey", "serviceName"}, false);
 
-		OAuthConsumerUtil.setPersistence(this);
+		_setOAuthConsumerUtilPersistence(this);
 	}
 
 	public void destroy() {
-		OAuthConsumerUtil.setPersistence(null);
+		_setOAuthConsumerUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(OAuthConsumerImpl.class.getName());
 
@@ -1543,6 +1544,22 @@ public class OAuthConsumerPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setOAuthConsumerUtilPersistence(
+		OAuthConsumerPersistence oAuthConsumerPersistence) {
+
+		try {
+			Field field = OAuthConsumerUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, oAuthConsumerPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

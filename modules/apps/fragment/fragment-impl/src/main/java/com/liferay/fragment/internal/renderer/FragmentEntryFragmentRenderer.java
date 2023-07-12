@@ -28,6 +28,7 @@ import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -49,6 +50,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -102,6 +104,12 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		catch (PortalException portalException) {
 			throw new IOException(portalException);
 		}
+	}
+
+	@Activate
+	protected void activate() {
+		_portalCache = (PortalCache<String, String>)_multiVMPool.getPortalCache(
+			FragmentEntryLink.class.getName());
 	}
 
 	private FragmentEntry _getContributedFragmentEntry(
@@ -233,20 +241,19 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			HttpServletResponse httpServletResponse)
 		throws PortalException {
 
-		PortalCache<String, String> portalCache =
-			(PortalCache<String, String>)_multiVMPool.getPortalCache(
-				FragmentEntryLink.class.getName());
-
 		FragmentEntryLink fragmentEntryLink = _getFragmentEntryLink(
 			fragmentRendererContext);
 
-		StringBundler portalCacheKeySB = new StringBundler(5);
+		StringBundler cacheKeySB = new StringBundler(5);
 
-		portalCacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
-		portalCacheKeySB.append(StringPool.DASH);
-		portalCacheKeySB.append(fragmentRendererContext.getLocale());
-		portalCacheKeySB.append(StringPool.DASH);
-		portalCacheKeySB.append(fragmentEntryLink.getSegmentsExperienceId());
+		cacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
+		cacheKeySB.append(StringPool.DASH);
+		cacheKeySB.append(fragmentRendererContext.getLocale());
+		cacheKeySB.append(StringPool.DASH);
+		cacheKeySB.append(
+			StringUtil.merge(
+				fragmentRendererContext.getSegmentsExperienceIds(),
+				StringPool.SEMICOLON));
 
 		String content = StringPool.BLANK;
 
@@ -257,7 +264,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentRendererContext.isUseCachedContent() &&
 			_isCacheable(fragmentEntryLink)) {
 
-			content = portalCache.get(portalCacheKeySB.toString());
+			content = _portalCache.get(cacheKeySB.toString());
 
 			if (Validator.isNotNull(content)) {
 				return content;
@@ -291,8 +298,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentRendererContext.getPreviewType());
 		defaultFragmentEntryProcessorContext.setPreviewVersion(
 			fragmentRendererContext.getPreviewVersion());
-		defaultFragmentEntryProcessorContext.setSegmentsEntryIds(
-			fragmentRendererContext.getSegmentsEntryIds());
+		defaultFragmentEntryProcessorContext.setSegmentsExperienceIds(
+			fragmentRendererContext.getSegmentsExperienceIds());
 
 		String css = StringPool.BLANK;
 
@@ -339,7 +346,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 				FragmentEntryLinkConstants.VIEW) &&
 			_isCacheable(fragmentEntryLink)) {
 
-			portalCache.put(portalCacheKeySB.toString(), content);
+			_portalCache.put(cacheKeySB.toString(), content);
 		}
 
 		return content;
@@ -361,6 +368,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 		return unsyncStringWriter.toString();
 	}
+
+	private static PortalCache<String, String> _portalCache;
 
 	@Reference
 	private FragmentCollectionContributorTracker

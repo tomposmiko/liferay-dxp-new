@@ -48,8 +48,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -65,6 +63,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -581,7 +581,7 @@ public abstract class MBCategoryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		MBCategoryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -596,7 +596,7 @@ public abstract class MBCategoryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		mbCategoryLocalService = (MBCategoryLocalService)aopProxy;
 
-		MBCategoryLocalServiceUtil.setService(mbCategoryLocalService);
+		_setLocalServiceUtilService(mbCategoryLocalService);
 	}
 
 	/**
@@ -656,6 +656,22 @@ public abstract class MBCategoryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		MBCategoryLocalService mbCategoryLocalService) {
+
+		try {
+			Field field = MBCategoryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, mbCategoryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected MBCategoryLocalService mbCategoryLocalService;
 
 	@Reference
@@ -683,8 +699,5 @@ public abstract class MBCategoryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
 		ratingsStatsLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MBCategoryLocalServiceBaseImpl.class);
 
 }

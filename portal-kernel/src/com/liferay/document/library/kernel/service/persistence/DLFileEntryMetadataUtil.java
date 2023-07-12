@@ -1067,12 +1067,6 @@ public class DLFileEntryMetadataUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		DLFileEntryMetadataPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile DLFileEntryMetadataPersistence _persistence;
 
 }

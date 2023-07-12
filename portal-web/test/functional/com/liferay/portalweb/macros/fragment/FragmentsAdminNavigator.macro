@@ -3,7 +3,7 @@ definition {
 	macro gotoAddCollection {
 		var browserType = PropsUtil.get("browser.type");
 
-		if (${browserType} == "internetexplorer") {
+		if ("${browserType}" == "internetexplorer") {
 			Click(locator1 = "NavNested#NAV_NESTED_PLUS_IE");
 		}
 		else {
@@ -19,27 +19,25 @@ definition {
 	}
 
 	macro gotoCollection {
-		SelectFrameTop();
-
 		AssertClick.assertPartialTextClickAt(
 			locator1 = "FragmentAdmin#FRAGMENT_COLLECTION",
-			value1 = ${collectionName});
+			value1 = "${collectionName}");
 	}
 
 	macro gotoEntry {
-		LexiconCard.clickCardTitle(card = ${entry});
+		LexiconCard.clickCardTitle(card = "${entry}");
 	}
 
 	macro gotoEntryEllipsisItem {
 		LexiconCard.clickEllipsisItem(
-			card = ${entry},
-			item = ${item});
+			card = "${entry}",
+			item = "${item}");
 	}
 
 	macro gotoExportCollection {
 		var browserType = PropsUtil.get("browser.type");
 
-		if (${browserType} == "internetexplorer") {
+		if ("${browserType}" == "internetexplorer") {
 			Click(locator1 = "NavNested#NAV_NESTED_ELLIPSIS_IE");
 		}
 		else {
@@ -48,7 +46,7 @@ definition {
 
 		DropdownMenuItem.click(menuItem = "Export");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
 	}
@@ -56,7 +54,7 @@ definition {
 	macro gotoImportCollection {
 		var browserType = PropsUtil.get("browser.type");
 
-		if (${browserType} == "internetexplorer") {
+		if ("${browserType}" == "internetexplorer") {
 			Click(locator1 = "NavNested#NAV_NESTED_ELLIPSIS_IE");
 		}
 		else {
@@ -70,7 +68,7 @@ definition {
 
 		DropdownMenuItem.click(menuItem = "Import");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
 	}
@@ -78,12 +76,12 @@ definition {
 	macro gotoSpecificScopeCollection {
 		AssertClick.assertPartialTextClickAt(
 			locator1 = "FragmentAdmin#FRAGMENT_COLLECTION_SPECIFIC_SCOPE",
-			value1 = ${collectionName});
+			value1 = "${collectionName}");
 	}
 
 	macro openFragmentsAdmin {
 		Navigator.openWithAppendToBaseURL(
-			baseURL = ${baseURL},
+			baseURL = "${baseURL}",
 			urlAppend = "group/${siteURLKey}/~/control_panel/manage/-/fragments");
 	}
 

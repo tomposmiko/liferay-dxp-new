@@ -244,17 +244,17 @@ public class CPDefinitionsImporter {
 			locale, description);
 
 		return _cpDefinitionLocalService.addCPDefinition(
-			externalReferenceCode, catalogGroupId, user.getUserId(), nameMap,
-			shortDescriptionMap, descriptionMap, nameMap, null, null, null,
-			"simple", true, shippable, false, false, 0D, width, height, depth,
-			weight, _getCPTaxCategoryId(taxCategory, serviceContext), false,
-			false, null, true, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, true, sku,
-			subscriptionEnabled, subscriptionLength, subscriptionType,
+			catalogGroupId, user.getUserId(), nameMap, shortDescriptionMap,
+			descriptionMap, nameMap, null, null, null, "simple", true,
+			shippable, false, false, 0D, width, height, depth, weight,
+			_getCPTaxCategoryId(taxCategory, serviceContext), false, false,
+			null, true, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, true, sku, subscriptionEnabled,
+			subscriptionLength, subscriptionType,
 			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
-			WorkflowConstants.STATUS_DRAFT, serviceContext);
+			externalReferenceCode, serviceContext);
 	}
 
 	private void _addWarehouseQuantities(
@@ -529,6 +529,12 @@ public class CPDefinitionsImporter {
 
 				cpInstance.setManufacturerPartNumber(manufacturerPartNumber);
 
+				String cpInstanceExternalReferenceCode =
+					FriendlyURLNormalizerUtil.normalize(sku);
+
+				cpInstance.setExternalReferenceCode(
+					cpInstanceExternalReferenceCode);
+
 				_cpInstanceLocalService.updateCPInstance(cpInstance);
 
 				// Commerce warehouse items
@@ -802,8 +808,6 @@ public class CPDefinitionsImporter {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		String externalReferenceCode = skuJSONObject.getString(
-			"ExternalReferenceCode");
 		String sku = skuJSONObject.getString("Sku");
 		String manufacturerPartNumber = skuJSONObject.getString(
 			"ManufacturerPartNumber");
@@ -870,6 +874,8 @@ public class CPDefinitionsImporter {
 
 		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
 			cpDefinitionId);
+
+		String externalReferenceCode = FriendlyURLNormalizerUtil.normalize(sku);
 
 		boolean overrideSubscriptionInfo = false;
 		boolean subscriptionEnabled = false;

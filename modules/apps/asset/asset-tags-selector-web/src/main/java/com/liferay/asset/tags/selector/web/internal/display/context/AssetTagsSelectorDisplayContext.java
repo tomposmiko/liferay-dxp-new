@@ -19,14 +19,11 @@ import com.liferay.asset.kernel.service.AssetTagServiceUtil;
 import com.liferay.asset.tags.selector.web.internal.search.EntriesChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -167,40 +164,16 @@ public class AssetTagsSelectorDisplayContext {
 			return _groupIds;
 		}
 
-		long[] groupIds = StringUtil.split(
+		_groupIds = StringUtil.split(
 			ParamUtil.getString(_httpServletRequest, "groupIds"), 0L);
 
-		if (ArrayUtil.isEmpty(groupIds)) {
+		if (ArrayUtil.isEmpty(_groupIds)) {
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)_httpServletRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
 
-			groupIds = new long[] {themeDisplay.getScopeGroupId()};
+			_groupIds = new long[] {themeDisplay.getScopeGroupId()};
 		}
-
-		for (long groupId : groupIds) {
-			Group group = GroupLocalServiceUtil.fetchGroup(groupId);
-
-			if ((group == null) || !group.isLayout() ||
-				ArrayUtil.contains(groupIds, group.getParentGroupId())) {
-
-				continue;
-			}
-
-			try {
-				groupIds = ArrayUtil.append(
-					groupIds,
-					PortalUtil.getCurrentAndAncestorSiteGroupIds(
-						group.getParentGroupId()));
-			}
-			catch (PortalException portalException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
-				}
-			}
-		}
-
-		_groupIds = groupIds;
 
 		return _groupIds;
 	}
@@ -236,9 +209,6 @@ public class AssetTagsSelectorDisplayContext {
 
 		return _orderByCol;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetTagsSelectorDisplayContext.class);
 
 	private String _eventName;
 	private long[] _groupIds;

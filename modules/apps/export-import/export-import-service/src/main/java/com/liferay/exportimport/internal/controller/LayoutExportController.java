@@ -301,7 +301,7 @@ public class LayoutExportController implements ExportController {
 			portletDataContext.getParameterMap(),
 			PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_SETTINGS);
 
-		if (Validator.isNotNull(layoutSetPrototypeUuid) &&
+		if (!group.isStaged() && Validator.isNotNull(layoutSetPrototypeUuid) &&
 			layoutSetPrototypeSettings) {
 
 			LayoutSetPrototype layoutSetPrototype =
@@ -328,12 +328,10 @@ public class LayoutExportController implements ExportController {
 		_portletExportController.exportAssetLinks(portletDataContext);
 		_portletExportController.exportLocks(portletDataContext);
 
-		if (Objects.equals(portletDataContext.getType(), "layout-set")) {
-			portletDataContext.addDeletionSystemEventStagedModelTypes(
-				new StagedModelType(SegmentsExperience.class, Layout.class));
-			portletDataContext.addDeletionSystemEventStagedModelTypes(
-				new StagedModelType(StagedAssetLink.class));
-		}
+		portletDataContext.addDeletionSystemEventStagedModelTypes(
+			new StagedModelType(SegmentsExperience.class, Layout.class));
+		portletDataContext.addDeletionSystemEventStagedModelTypes(
+			new StagedModelType(StagedAssetLink.class));
 
 		_deletionSystemEventExporter.exportDeletionSystemEvents(
 			portletDataContext);

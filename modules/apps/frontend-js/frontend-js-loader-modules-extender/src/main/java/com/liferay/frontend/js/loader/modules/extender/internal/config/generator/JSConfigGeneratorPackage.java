@@ -288,7 +288,8 @@ public class JSConfigGeneratorPackage {
 				Constants.VERSION_ATTRIBUTE);
 
 			dependencyName = StringBundler.concat(
-				dependencyName, StringPool.AT, version, dependencyPath);
+				dependencyName, StringPool.AT, version.toString(),
+				dependencyPath);
 
 			jsonArray.put(index, dependencyName);
 

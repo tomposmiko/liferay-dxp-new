@@ -742,10 +742,6 @@ public class LayoutSEOSiteUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(LayoutSEOSitePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile LayoutSEOSitePersistence _persistence;
 
 }

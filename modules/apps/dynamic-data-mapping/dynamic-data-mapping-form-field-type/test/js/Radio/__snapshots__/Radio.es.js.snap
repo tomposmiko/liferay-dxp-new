@@ -59,7 +59,6 @@ exports[`Field Radio has a helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
-      id="radioField_fieldHelp"
     >
       Type something
     </span>
@@ -81,8 +80,8 @@ exports[`Field Radio has a label 1`] = `
     data-field-name="radioField"
   >
     <label
-      aria-labelledby="radioField_fieldDetails"
       class="ddm-label"
+      for="radioField"
       tabindex="0"
     >
       label
@@ -135,13 +134,7 @@ exports[`Field Radio has a label 1`] = `
         </label>
       </div>
     </div>
-    <span
-      class="sr-only"
-      id="radioField_fieldDetails"
-    >
-      label
-      <br />
-    </span>
+    
   </div>
 </div>
 `;
@@ -460,8 +453,8 @@ exports[`Field Radio renders Label if showLabel is true 1`] = `
     data-field-name="radioField"
   >
     <label
-      aria-labelledby="radioField_fieldDetails"
       class="ddm-label"
+      for="radioField"
       tabindex="0"
     >
       text
@@ -514,13 +507,7 @@ exports[`Field Radio renders Label if showLabel is true 1`] = `
         </label>
       </div>
     </div>
-    <span
-      class="sr-only"
-      id="radioField_fieldDetails"
-    >
-      text
-      <br />
-    </span>
+    
   </div>
 </div>
 `;

@@ -1264,7 +1264,7 @@ public interface CalendarBookingPersistence
 	 * </p>
 	 *
 	 * @param calendarId the calendar ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of calendar bookings
 	 * @param end the upper bound of the range of calendar bookings (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)

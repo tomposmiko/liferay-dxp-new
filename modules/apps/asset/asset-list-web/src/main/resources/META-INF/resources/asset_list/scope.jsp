@@ -192,8 +192,6 @@ List<Group> selectedGroups = editAssetListDisplayContext.getSelectedGroups();
 			var searchContainerData = searchContainer.getData();
 
 			groupIds.setAttribute('value', searchContainerData.split(','));
-
-			<portlet:namespace />saveSelectBoxes();
 		}
 	}
 </aui:script>

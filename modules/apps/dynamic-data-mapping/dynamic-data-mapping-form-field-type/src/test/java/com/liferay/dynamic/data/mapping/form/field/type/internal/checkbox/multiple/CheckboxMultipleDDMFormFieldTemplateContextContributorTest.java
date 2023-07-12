@@ -69,13 +69,7 @@ public class CheckboxMultipleDDMFormFieldTemplateContextContributorTest {
 					_createDDMFormFieldRenderingContext(true));
 
 		Assert.assertEquals(
-			new ArrayList<String>() {
-				{
-					add("Option1");
-					add("Option2");
-				}
-			},
-			parameters.get("predefinedValue"));
+			"[]", String.valueOf(parameters.get("predefinedValue")));
 	}
 
 	private DDMFormField _createDDMFormField() {

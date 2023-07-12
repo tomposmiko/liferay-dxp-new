@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -55,7 +55,7 @@ definition {
 
 		CommerceEntry.addNewDiscountsEntry(
 			channelsEligibility = "Minium Portal",
-			discountAmount = 25,
+			discountAmount = "25",
 			discountName = "Test Discount",
 			discountTarget = "Products",
 			discountType = "Percentage");
@@ -120,11 +120,11 @@ definition {
 		Click(locator1 = "Button#PLUS");
 
 		CommerceEntry.addNewDiscountsEntry(
-			discountAmount = 15,
+			discountAmount = "15",
 			discountName = "Test Discount",
 			discountTarget = "Products",
 			discountType = "Percentage",
-			maximumDiscountAmount = 10);
+			maximumDiscountAmount = "10");
 
 		CommerceEntry.gotoMenuTab(menuTab = "Eligibility");
 

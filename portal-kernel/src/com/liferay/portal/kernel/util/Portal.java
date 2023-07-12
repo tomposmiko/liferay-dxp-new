@@ -908,11 +908,6 @@ public interface Portal {
 
 	public String getPortletDescription(String portletId, User user);
 
-	public LayoutQueryStringComposite
-		getPortletFriendlyURLMapperLayoutQueryStringComposite(
-			String url, Map<String, String[]> params,
-			Map<String, Object> requestContext);
-
 	public String getPortletId(HttpServletRequest httpServletRequest);
 
 	public String getPortletId(PortletRequest portletRequest);
@@ -1161,8 +1156,6 @@ public interface Portal {
 	public boolean isForwardedSecure(HttpServletRequest httpServletRequest);
 
 	public boolean isGroupAdmin(User user, long groupId) throws Exception;
-
-	public boolean isGroupControlPanelPath(String path);
 
 	public boolean isGroupFriendlyURL(
 		String fullURL, String groupFriendlyURL, String layoutFriendlyURL);

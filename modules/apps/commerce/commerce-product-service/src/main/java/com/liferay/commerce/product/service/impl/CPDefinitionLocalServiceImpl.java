@@ -76,8 +76,6 @@ import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.MultiValueFacet;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.settings.SystemSettingsLocator;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
@@ -127,10 +125,6 @@ import javax.servlet.http.HttpServletRequest;
 public class CPDefinitionLocalServiceImpl
 	extends CPDefinitionLocalServiceBaseImpl {
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CPDefinition addCPDefinition(
@@ -157,100 +151,6 @@ public class CPDefinitionLocalServiceImpl
 			int deliverySubscriptionLength, String deliverySubscriptionType,
 			UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties,
 			long deliveryMaxSubscriptionCycles, String externalReferenceCode,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		return cpDefinitionLocalService.addCPDefinition(
-			externalReferenceCode, groupId, userId, nameMap,
-			shortDescriptionMap, descriptionMap, urlTitleMap, metaTitleMap,
-			metaDescriptionMap, metaKeywordsMap, productTypeName,
-			ignoreSKUCombinations, shippable, freeShipping, shipSeparately,
-			shippingExtraPrice, width, height, depth, weight, cpTaxCategoryId,
-			taxExempt, telcoOrElectronics, ddmStructureKey, published,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
-			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, deliverySubscriptionEnabled,
-			deliverySubscriptionLength, deliverySubscriptionType,
-			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, WorkflowConstants.STATUS_DRAFT,
-			serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	@Override
-	public CPDefinition addCPDefinition(
-			long groupId, long userId, Map<Locale, String> nameMap,
-			Map<Locale, String> shortDescriptionMap,
-			Map<Locale, String> descriptionMap, Map<Locale, String> urlTitleMap,
-			Map<Locale, String> metaTitleMap,
-			Map<Locale, String> metaDescriptionMap,
-			Map<Locale, String> metaKeywordsMap, String productTypeName,
-			boolean ignoreSKUCombinations, boolean shippable,
-			boolean freeShipping, boolean shipSeparately,
-			double shippingExtraPrice, double width, double height,
-			double depth, double weight, long cpTaxCategoryId,
-			boolean taxExempt, boolean telcoOrElectronics,
-			String ddmStructureKey, boolean published, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
-			int subscriptionLength, String subscriptionType,
-			UnicodeProperties subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, String externalReferenceCode,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		return cpDefinitionLocalService.addCPDefinition(
-			externalReferenceCode, groupId, userId, nameMap,
-			shortDescriptionMap, descriptionMap, urlTitleMap, metaTitleMap,
-			metaDescriptionMap, metaKeywordsMap, productTypeName,
-			ignoreSKUCombinations, shippable, freeShipping, shipSeparately,
-			shippingExtraPrice, width, height, depth, weight, cpTaxCategoryId,
-			taxExempt, telcoOrElectronics, ddmStructureKey, published,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
-			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, false, 1, null, null, 0,
-			WorkflowConstants.STATUS_DRAFT, serviceContext);
-	}
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public CPDefinition addCPDefinition(
-			String externalReferenceCode, long groupId, long userId,
-			Map<Locale, String> nameMap,
-			Map<Locale, String> shortDescriptionMap,
-			Map<Locale, String> descriptionMap, Map<Locale, String> urlTitleMap,
-			Map<Locale, String> metaTitleMap,
-			Map<Locale, String> metaDescriptionMap,
-			Map<Locale, String> metaKeywordsMap, String productTypeName,
-			boolean ignoreSKUCombinations, boolean shippable,
-			boolean freeShipping, boolean shipSeparately,
-			double shippingExtraPrice, double width, double height,
-			double depth, double weight, long cpTaxCategoryId,
-			boolean taxExempt, boolean telcoOrElectronics,
-			String ddmStructureKey, boolean published, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
-			int subscriptionLength, String subscriptionType,
-			UnicodeProperties subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, boolean deliverySubscriptionEnabled,
-			int deliverySubscriptionLength, String deliverySubscriptionType,
-			UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties,
-			long deliveryMaxSubscriptionCycles, int status,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -330,7 +230,7 @@ public class CPDefinitionLocalServiceImpl
 		cpDefinition.setVersion(1);
 
 		if ((expirationDate == null) || expirationDate.after(now)) {
-			cpDefinition.setStatus(status);
+			cpDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
 		}
 		else {
 			cpDefinition.setStatus(WorkflowConstants.STATUS_EXPIRED);
@@ -364,9 +264,8 @@ public class CPDefinitionLocalServiceImpl
 				externalReferenceCode, displayDateMonth, displayDateDay,
 				displayDateYear, displayDateHour, displayDateMinute,
 				expirationDateMonth, expirationDateDay, expirationDateYear,
-				expirationDateHour, expirationDateMinute, neverExpire, false,
-				false, 1, StringPool.BLANK, null, 0, false, 1, null, null, 0,
-				null, cpInstanceServiceContext);
+				expirationDateHour, expirationDateMinute, neverExpire,
+				cpInstanceServiceContext);
 		}
 
 		// Friendly URL
@@ -399,22 +298,14 @@ public class CPDefinitionLocalServiceImpl
 
 		// Workflow
 
-		if (_workflowDefinitionLinkLocalService.hasWorkflowDefinitionLink(
-				serviceContext.getCompanyId(), serviceContext.getScopeGroupId(),
-				CPDefinition.class.getName(), 0)) {
-
-			serviceContext.setWorkflowAction(
-				WorkflowConstants.ACTION_SAVE_DRAFT);
-		}
-
 		return startWorkflowInstance(
 			user.getUserId(), cpDefinition, serviceContext);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CPDefinition addCPDefinition(
-			String externalReferenceCode, long groupId, long userId,
-			Map<Locale, String> nameMap,
+			long groupId, long userId, Map<Locale, String> nameMap,
 			Map<Locale, String> shortDescriptionMap,
 			Map<Locale, String> descriptionMap, Map<Locale, String> urlTitleMap,
 			Map<Locale, String> metaTitleMap,
@@ -433,148 +324,23 @@ public class CPDefinitionLocalServiceImpl
 			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
 			int subscriptionLength, String subscriptionType,
 			UnicodeProperties subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, int status,
+			long maxSubscriptionCycles, String externalReferenceCode,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return cpDefinitionLocalService.addCPDefinition(
-			externalReferenceCode, groupId, userId, nameMap,
-			shortDescriptionMap, descriptionMap, urlTitleMap, metaTitleMap,
-			metaDescriptionMap, metaKeywordsMap, productTypeName,
-			ignoreSKUCombinations, shippable, freeShipping, shipSeparately,
-			shippingExtraPrice, width, height, depth, weight, cpTaxCategoryId,
-			taxExempt, telcoOrElectronics, ddmStructureKey, published,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
-			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, false, 1, null, null, 0, status,
-			serviceContext);
-	}
-
-	@Override
-	public CPDefinition addOrUpdateCPDefinition(
-			String externalReferenceCode, long groupId, long userId,
-			Map<Locale, String> nameMap,
-			Map<Locale, String> shortDescriptionMap,
-			Map<Locale, String> descriptionMap, Map<Locale, String> urlTitleMap,
-			Map<Locale, String> metaTitleMap,
-			Map<Locale, String> metaDescriptionMap,
-			Map<Locale, String> metaKeywordsMap, String productTypeName,
-			boolean ignoreSKUCombinations, boolean shippable,
-			boolean freeShipping, boolean shipSeparately,
-			double shippingExtraPrice, double width, double height,
-			double depth, double weight, long cpTaxCategoryId,
-			boolean taxExempt, boolean telcoOrElectronics,
-			String ddmStructureKey, boolean published, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
-			int subscriptionLength, String subscriptionType,
-			UnicodeProperties subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, boolean deliverySubscriptionEnabled,
-			int deliverySubscriptionLength, String deliverySubscriptionType,
-			UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties,
-			long deliveryMaxSubscriptionCycles, int status,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		if (Validator.isBlank(externalReferenceCode)) {
-			externalReferenceCode = null;
-		}
-		else {
-			CProduct cProduct =
-				cProductLocalService.fetchCProductByReferenceCode(
-					serviceContext.getCompanyId(), externalReferenceCode);
-
-			if (cProduct != null) {
-				CPDefinition cpDefinition =
-					cpDefinitionLocalService.updateCPDefinition(
-						cProduct.getPublishedCPDefinitionId(), nameMap,
-						shortDescriptionMap, descriptionMap, urlTitleMap,
-						metaTitleMap, metaDescriptionMap, metaKeywordsMap,
-						ignoreSKUCombinations, shippable, freeShipping,
-						shipSeparately, shippingExtraPrice, width, height,
-						depth, weight, cpTaxCategoryId, taxExempt,
-						telcoOrElectronics, ddmStructureKey, published,
-						displayDateMonth, displayDateDay, displayDateYear,
-						displayDateHour, displayDateMinute, expirationDateMonth,
-						expirationDateDay, expirationDateYear,
-						expirationDateHour, expirationDateMinute, neverExpire,
-						serviceContext);
-
-				return cpDefinitionLocalService.updateSubscriptionInfo(
-					cpDefinition.getCPDefinitionId(), subscriptionEnabled,
-					subscriptionLength, subscriptionType,
-					subscriptionTypeSettingsUnicodeProperties,
-					maxSubscriptionCycles, deliverySubscriptionEnabled,
-					deliverySubscriptionLength, deliverySubscriptionType,
-					deliverySubscriptionTypeSettingsUnicodeProperties,
-					deliveryMaxSubscriptionCycles);
-			}
-		}
-
-		return cpDefinitionLocalService.addCPDefinition(
-			externalReferenceCode, groupId, userId, nameMap,
-			shortDescriptionMap, descriptionMap, urlTitleMap, metaTitleMap,
-			metaDescriptionMap, metaKeywordsMap, productTypeName,
-			ignoreSKUCombinations, shippable, freeShipping, shipSeparately,
-			shippingExtraPrice, width, height, depth, weight, cpTaxCategoryId,
-			taxExempt, telcoOrElectronics, ddmStructureKey, published,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
-			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, deliverySubscriptionEnabled,
-			deliverySubscriptionLength, deliverySubscriptionType,
-			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, status, serviceContext);
-	}
-
-	@Override
-	public CPDefinition addOrUpdateCPDefinition(
-			String externalReferenceCode, long groupId, long userId,
-			Map<Locale, String> nameMap,
-			Map<Locale, String> shortDescriptionMap,
-			Map<Locale, String> descriptionMap, Map<Locale, String> urlTitleMap,
-			Map<Locale, String> metaTitleMap,
-			Map<Locale, String> metaDescriptionMap,
-			Map<Locale, String> metaKeywordsMap, String productTypeName,
-			boolean ignoreSKUCombinations, boolean shippable,
-			boolean freeShipping, boolean shipSeparately,
-			double shippingExtraPrice, double width, double height,
-			double depth, double weight, long cpTaxCategoryId,
-			boolean taxExempt, boolean telcoOrElectronics,
-			String ddmStructureKey, boolean published, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
-			int subscriptionLength, String subscriptionType,
-			UnicodeProperties subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, int status,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		return cpDefinitionLocalService.addOrUpdateCPDefinition(
-			externalReferenceCode, groupId, userId, nameMap,
-			shortDescriptionMap, descriptionMap, urlTitleMap, metaTitleMap,
-			metaDescriptionMap, metaKeywordsMap, productTypeName,
-			ignoreSKUCombinations, shippable, freeShipping, shipSeparately,
-			shippingExtraPrice, width, height, depth, weight, cpTaxCategoryId,
-			taxExempt, telcoOrElectronics, ddmStructureKey, published,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
-			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, false, 1, null, null, 0, status,
-			serviceContext);
+			groupId, userId, nameMap, shortDescriptionMap, descriptionMap,
+			urlTitleMap, metaTitleMap, metaDescriptionMap, metaKeywordsMap,
+			productTypeName, ignoreSKUCombinations, shippable, freeShipping,
+			shipSeparately, shippingExtraPrice, width, height, depth, weight,
+			cpTaxCategoryId, taxExempt, telcoOrElectronics, ddmStructureKey,
+			published, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, defaultSku, subscriptionEnabled,
+			subscriptionLength, subscriptionType,
+			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
+			false, 1, null, null, 0, externalReferenceCode, serviceContext);
 	}
 
 	@Override
@@ -590,8 +356,7 @@ public class CPDefinitionLocalServiceImpl
 		CPDefinition cpDefinition = cpDefinitionLocalService.getCPDefinition(
 			cpDefinitionId);
 
-		return cpDefinitionLocalService.copyCPDefinition(
-			cpDefinitionId, cpDefinition.getGroupId());
+		return copyCPDefinition(cpDefinitionId, cpDefinition.getGroupId());
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -599,10 +364,7 @@ public class CPDefinitionLocalServiceImpl
 	public CPDefinition copyCPDefinition(long cpDefinitionId, long groupId)
 		throws PortalException {
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		User user = userLocalService.getUser(serviceContext.getUserId());
+		// CPDefinition
 
 		CPDefinition originalCPDefinition =
 			cpDefinitionLocalService.getCPDefinition(cpDefinitionId);
@@ -610,15 +372,9 @@ public class CPDefinitionLocalServiceImpl
 		CPDefinition newCPDefinition =
 			(CPDefinition)originalCPDefinition.clone();
 
-		newCPDefinition.setUuid(PortalUUIDUtil.generate());
-
 		long newCPDefinitionId = counterLocalService.increment();
 
 		newCPDefinition.setCPDefinitionId(newCPDefinitionId);
-
-		newCPDefinition.setGroupId(groupId);
-		newCPDefinition.setUserId(user.getUserId());
-		newCPDefinition.setUserName(user.getFullName());
 
 		if (originalCPDefinition.isPublished() &&
 			cpDefinitionLocalService.isVersionable(originalCPDefinition)) {
@@ -637,12 +393,8 @@ public class CPDefinitionLocalServiceImpl
 
 			CProduct newCProduct = (CProduct)originalCProduct.clone();
 
-			newCProduct.setUuid(PortalUUIDUtil.generate());
-			newCProduct.setExternalReferenceCode(
-				String.valueOf(newCProduct.getCProductId()));
 			newCProduct.setCProductId(counterLocalService.increment());
-			newCProduct.setUserId(user.getUserId());
-			newCProduct.setUserName(user.getFullName());
+			newCProduct.setUuid(PortalUUIDUtil.generate());
 			newCProduct.setPublishedCPDefinitionId(newCPDefinitionId);
 
 			newCPDefinition.setCProductId(newCProduct.getCProductId());
@@ -650,9 +402,12 @@ public class CPDefinitionLocalServiceImpl
 			cProductPersistence.update(newCProduct);
 		}
 
-		newCPDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
+		newCPDefinition.setGroupId(groupId);
+		newCPDefinition.setUuid(PortalUUIDUtil.generate());
 
 		newCPDefinition = cpDefinitionPersistence.update(newCPDefinition);
+
+		// AssetEntry
 
 		long cpDefinitionClassNameId = classNameLocalService.getClassNameId(
 			CPDefinition.class);
@@ -669,6 +424,8 @@ public class CPDefinitionLocalServiceImpl
 
 			assetEntryLocalService.addAssetEntry(newAssetEntry);
 		}
+
+		// CPDefinitionLocalization
 
 		List<CPDefinitionLocalization> cpDefinitionLocalizations =
 			cpDefinitionLocalizationPersistence.findByCPDefinitionId(
@@ -698,6 +455,8 @@ public class CPDefinitionLocalServiceImpl
 				newCPDefinitionLocalization);
 		}
 
+		// CPAttachmentFileEntry
+
 		List<CPAttachmentFileEntry> cpAttachmentFileEntries =
 			cpAttachmentFileEntryPersistence.findByC_C(
 				cpDefinitionClassNameId, cpDefinitionId);
@@ -709,9 +468,6 @@ public class CPDefinitionLocalServiceImpl
 				(CPAttachmentFileEntry)cpAttachmentFileEntry.clone();
 
 			newCPAttachmentFileEntry.setUuid(PortalUUIDUtil.generate());
-			newCPAttachmentFileEntry.setExternalReferenceCode(
-				String.valueOf(
-					newCPAttachmentFileEntry.getCPAttachmentFileEntryId()));
 			newCPAttachmentFileEntry.setCPAttachmentFileEntryId(
 				counterLocalService.increment());
 
@@ -719,6 +475,8 @@ public class CPDefinitionLocalServiceImpl
 
 			cpAttachmentFileEntryPersistence.update(newCPAttachmentFileEntry);
 		}
+
+		// CPDefinitionLink
 
 		List<CPDefinitionLink> cpDefinitionLinks =
 			cpDefinitionLinkPersistence.findByCPDefinitionId(cpDefinitionId);
@@ -735,6 +493,8 @@ public class CPDefinitionLocalServiceImpl
 
 			cpDefinitionLinkPersistence.update(newCPDefinitionLink);
 		}
+
+		// CPDefinitionOptionRel
 
 		List<CPDefinitionOptionRel> cpDefinitionOptionRels =
 			cpDefinitionOptionRelPersistence.findByCPDefinitionId(
@@ -755,8 +515,9 @@ public class CPDefinitionLocalServiceImpl
 
 			newCPDefinitionOptionRel.setCPDefinitionId(newCPDefinitionId);
 
-			newCPDefinitionOptionRel = cpDefinitionOptionRelPersistence.update(
-				newCPDefinitionOptionRel);
+			cpDefinitionOptionRelPersistence.update(newCPDefinitionOptionRel);
+
+			// CPDefinitionOptionValueRel
 
 			List<CPDefinitionOptionValueRel> cpDefinitionOptionValueRels =
 				cpDefinitionOptionValueRelPersistence.
@@ -781,11 +542,7 @@ public class CPDefinitionLocalServiceImpl
 				cpDefinitionOptionValueRelPersistence.update(
 					newCPDefinitionOptionValueRel);
 			}
-
-			reindexCPDefinitionOptionValueRels(newCPDefinitionOptionRel);
 		}
-
-		reindexCPDefinitionOptionRels(newCPDefinition);
 
 		// CPDefinitionSpecificationOptionValue
 
@@ -816,6 +573,8 @@ public class CPDefinitionLocalServiceImpl
 				newCPDefinitionSpecificationOptionValue);
 		}
 
+		// CPDisplayLayout
+
 		CPDisplayLayout cpDisplayLayout = cpDisplayLayoutPersistence.fetchByC_C(
 			cpDefinitionClassNameId, cpDefinitionId);
 
@@ -832,6 +591,8 @@ public class CPDefinitionLocalServiceImpl
 			cpDisplayLayoutPersistence.update(newCPDisplayLayout);
 		}
 
+		// CPInstance
+
 		List<CPInstance> cpInstances =
 			cpInstancePersistence.findByCPDefinitionId(cpDefinitionId);
 
@@ -839,14 +600,14 @@ public class CPDefinitionLocalServiceImpl
 			CPInstance newCPInstance = (CPInstance)cpInstance.clone();
 
 			newCPInstance.setUuid(PortalUUIDUtil.generate());
-			newCPInstance.setExternalReferenceCode(
-				String.valueOf(newCPInstance.getCPInstanceId()));
 			newCPInstance.setCPInstanceId(counterLocalService.increment());
 
 			newCPInstance.setCPDefinitionId(newCPDefinitionId);
 
 			cpInstancePersistence.update(newCPInstance);
 		}
+
+		// CPVersionContributors
 
 		List<CPVersionContributor> cpVersionContributors =
 			CPVersionContributorRegistryUtil.getCPVersionContributors();
@@ -856,6 +617,8 @@ public class CPDefinitionLocalServiceImpl
 
 			cpVersionContributor.onUpdate(cpDefinitionId, newCPDefinitionId);
 		}
+
+		// CProduct
 
 		if (cpDefinitionLocalService.isVersionable(originalCPDefinition)) {
 			cProductLocalService.updatePublishedCPDefinitionId(
@@ -1906,20 +1669,6 @@ public class CPDefinitionLocalServiceImpl
 		}
 	}
 
-	@Override
-	public CPDefinition updateExternalReferenceCode(
-			long cpDefinitionId, String externalReferenceCode)
-		throws PortalException {
-
-		CPDefinition cpDefinition = cpDefinitionLocalService.getCPDefinition(
-			cpDefinitionId);
-
-		cProductLocalService.updateCProductExternalReferenceCode(
-			cpDefinition.getCProductId(), externalReferenceCode);
-
-		return cpDefinitionLocalService.getCPDefinition(cpDefinitionId);
-	}
-
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CPDefinition updateShippingInfo(
@@ -2099,11 +1848,6 @@ public class CPDefinitionLocalServiceImpl
 		return cpDefinitionPersistence.update(cpDefinition);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced with
-	 *             addOrUpdateCPDefinition
-	 */
-	@Deprecated
 	@Override
 	public CPDefinition upsertCPDefinition(
 			long groupId, long userId, Map<Locale, String> nameMap,
@@ -2132,30 +1876,60 @@ public class CPDefinitionLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		return cpDefinitionLocalService.addOrUpdateCPDefinition(
-			externalReferenceCode, groupId, userId, nameMap,
-			shortDescriptionMap, descriptionMap, urlTitleMap, metaTitleMap,
-			metaDescriptionMap, metaKeywordsMap, productTypeName,
-			ignoreSKUCombinations, shippable, freeShipping, shipSeparately,
-			shippingExtraPrice, width, height, depth, weight, cpTaxCategoryId,
-			taxExempt, telcoOrElectronics, ddmStructureKey, published,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
-			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, deliverySubscriptionEnabled,
-			deliverySubscriptionLength, deliverySubscriptionType,
+		if (Validator.isBlank(externalReferenceCode)) {
+			externalReferenceCode = null;
+		}
+		else {
+			CProduct cProduct =
+				cProductLocalService.fetchCProductByReferenceCode(
+					serviceContext.getCompanyId(), externalReferenceCode);
+
+			if (cProduct != null) {
+				CPDefinition cpDefinition =
+					cpDefinitionLocalService.updateCPDefinition(
+						cProduct.getPublishedCPDefinitionId(), nameMap,
+						shortDescriptionMap, descriptionMap, urlTitleMap,
+						metaTitleMap, metaDescriptionMap, metaKeywordsMap,
+						ignoreSKUCombinations, shippable, freeShipping,
+						shipSeparately, shippingExtraPrice, width, height,
+						depth, weight, cpTaxCategoryId, taxExempt,
+						telcoOrElectronics, ddmStructureKey, published,
+						displayDateMonth, displayDateDay, displayDateYear,
+						displayDateHour, displayDateMinute, expirationDateMonth,
+						expirationDateDay, expirationDateYear,
+						expirationDateHour, expirationDateMinute, neverExpire,
+						serviceContext);
+
+				return cpDefinitionLocalService.updateSubscriptionInfo(
+					cpDefinition.getCPDefinitionId(), subscriptionEnabled,
+					subscriptionLength, subscriptionType,
+					subscriptionTypeSettingsUnicodeProperties,
+					maxSubscriptionCycles, deliverySubscriptionEnabled,
+					deliverySubscriptionLength, deliverySubscriptionType,
+					deliverySubscriptionTypeSettingsUnicodeProperties,
+					deliveryMaxSubscriptionCycles);
+			}
+		}
+
+		return cpDefinitionLocalService.addCPDefinition(
+			groupId, userId, nameMap, shortDescriptionMap, descriptionMap,
+			urlTitleMap, metaTitleMap, metaDescriptionMap, metaKeywordsMap,
+			productTypeName, ignoreSKUCombinations, shippable, freeShipping,
+			shipSeparately, shippingExtraPrice, width, height, depth, weight,
+			cpTaxCategoryId, taxExempt, telcoOrElectronics, ddmStructureKey,
+			published, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, defaultSku, subscriptionEnabled,
+			subscriptionLength, subscriptionType,
+			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
+			deliverySubscriptionEnabled, deliverySubscriptionLength,
+			deliverySubscriptionType,
 			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, WorkflowConstants.STATUS_DRAFT,
+			deliveryMaxSubscriptionCycles, externalReferenceCode,
 			serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced with
-	 *             addOrUpdateCPDefinition
-	 */
-	@Deprecated
 	@Override
 	public CPDefinition upsertCPDefinition(
 			long groupId, long userId, Map<Locale, String> nameMap,
@@ -2181,20 +1955,19 @@ public class CPDefinitionLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		return cpDefinitionLocalService.addOrUpdateCPDefinition(
-			externalReferenceCode, groupId, userId, nameMap,
-			shortDescriptionMap, descriptionMap, urlTitleMap, metaTitleMap,
-			metaDescriptionMap, metaKeywordsMap, productTypeName,
-			ignoreSKUCombinations, shippable, freeShipping, shipSeparately,
-			shippingExtraPrice, width, height, depth, weight, cpTaxCategoryId,
-			taxExempt, telcoOrElectronics, ddmStructureKey, published,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
-			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, false, 1, null, null, 0,
-			WorkflowConstants.STATUS_DRAFT, serviceContext);
+		return cpDefinitionLocalService.upsertCPDefinition(
+			groupId, userId, nameMap, shortDescriptionMap, descriptionMap,
+			urlTitleMap, metaTitleMap, metaDescriptionMap, metaKeywordsMap,
+			productTypeName, ignoreSKUCombinations, shippable, freeShipping,
+			shipSeparately, shippingExtraPrice, width, height, depth, weight,
+			cpTaxCategoryId, taxExempt, telcoOrElectronics, ddmStructureKey,
+			published, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, defaultSku, subscriptionEnabled,
+			subscriptionLength, subscriptionType,
+			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
+			false, 1, null, null, 0, externalReferenceCode, serviceContext);
 	}
 
 	protected SearchContext buildSearchContext(
@@ -2375,26 +2148,6 @@ public class CPDefinitionLocalServiceImpl
 		}
 
 		return cpDefinitions;
-	}
-
-	protected void reindexCPDefinitionOptionRels(CPDefinition cpDefinition)
-		throws PortalException {
-
-		Indexer<CPDefinitionOptionRel> indexer =
-			IndexerRegistryUtil.nullSafeGetIndexer(CPDefinitionOptionRel.class);
-
-		indexer.reindex(cpDefinition.getCPDefinitionOptionRels());
-	}
-
-	protected void reindexCPDefinitionOptionValueRels(
-			CPDefinitionOptionRel cpDefinitionOptionRel)
-		throws PortalException {
-
-		Indexer<CPDefinitionOptionValueRel> indexer =
-			IndexerRegistryUtil.nullSafeGetIndexer(
-				CPDefinitionOptionValueRel.class);
-
-		indexer.reindex(cpDefinitionOptionRel.getCPDefinitionOptionValueRels());
 	}
 
 	protected void reindexCPInstances(CPDefinition cpDefinition)
@@ -2618,13 +2371,13 @@ public class CPDefinitionLocalServiceImpl
 
 			cpDefinitionLocalization.setCompanyId(companyId);
 			cpDefinitionLocalization.setCPDefinitionId(cpDefinitionId);
-			cpDefinitionLocalization.setLanguageId(languageId);
 			cpDefinitionLocalization.setName(name);
 			cpDefinitionLocalization.setShortDescription(shortDescription);
 			cpDefinitionLocalization.setDescription(description);
 			cpDefinitionLocalization.setMetaTitle(metaTitle);
 			cpDefinitionLocalization.setMetaDescription(metaDescription);
 			cpDefinitionLocalization.setMetaKeywords(metaKeywords);
+			cpDefinitionLocalization.setLanguageId(languageId);
 		}
 		else {
 			cpDefinitionLocalization.setName(name);
@@ -2740,9 +2493,5 @@ public class CPDefinitionLocalServiceImpl
 
 	@ServiceReference(type = GroupLocalService.class)
 	private GroupLocalService _groupLocalService;
-
-	@ServiceReference(type = WorkflowDefinitionLinkLocalService.class)
-	private WorkflowDefinitionLinkLocalService
-		_workflowDefinitionLinkLocalService;
 
 }

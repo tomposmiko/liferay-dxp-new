@@ -47,6 +47,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1474,11 +1475,11 @@ public class ResourceActionPersistenceImpl
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"name", "actionId"}, false);
 
-		ResourceActionUtil.setPersistence(this);
+		_setResourceActionUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ResourceActionUtil.setPersistence(null);
+		_setResourceActionUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(ResourceActionImpl.class.getName());
 
@@ -1488,6 +1489,22 @@ public class ResourceActionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setResourceActionUtilPersistence(
+		ResourceActionPersistence resourceActionPersistence) {
+
+		try {
+			Field field = ResourceActionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, resourceActionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2189,9 +2190,7 @@ public class LayoutSEOEntryPersistenceImpl
 	 */
 	@Override
 	public LayoutSEOEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				LayoutSEOEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(LayoutSEOEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2704,12 +2703,12 @@ public class LayoutSEOEntryPersistenceImpl
 			},
 			new String[] {"groupId", "privateLayout", "layoutId"}, false);
 
-		LayoutSEOEntryUtil.setPersistence(this);
+		_setLayoutSEOEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		LayoutSEOEntryUtil.setPersistence(null);
+		_setLayoutSEOEntryUtilPersistence(null);
 
 		entityCache.removeCache(LayoutSEOEntryImpl.class.getName());
 
@@ -2719,6 +2718,22 @@ public class LayoutSEOEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setLayoutSEOEntryUtilPersistence(
+		LayoutSEOEntryPersistence layoutSEOEntryPersistence) {
+
+		try {
+			Field field = LayoutSEOEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutSEOEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

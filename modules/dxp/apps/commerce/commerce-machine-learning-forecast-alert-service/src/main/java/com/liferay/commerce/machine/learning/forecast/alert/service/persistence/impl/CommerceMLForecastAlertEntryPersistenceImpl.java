@@ -52,6 +52,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -2127,7 +2128,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param commerceAccountIds the commerce account IDs
+	 * @param commerceAccountId the commerce account ID
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce ml forecast alert entries
 	 * @param end the upper bound of the range of commerce ml forecast alert entries (not inclusive)
@@ -3066,7 +3067,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param commerceAccountIds the commerce account IDs
+	 * @param commerceAccountId the commerce account ID
 	 * @param relativeChange the relative change
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce ml forecast alert entries
@@ -4033,7 +4034,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param commerceAccountIds the commerce account IDs
+	 * @param commerceAccountId the commerce account ID
 	 * @param relativeChange the relative change
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce ml forecast alert entries
@@ -5171,11 +5172,11 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			false);
 
-		CommerceMLForecastAlertEntryUtil.setPersistence(this);
+		_setCommerceMLForecastAlertEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceMLForecastAlertEntryUtil.setPersistence(null);
+		_setCommerceMLForecastAlertEntryUtilPersistence(null);
 
 		entityCache.removeCache(
 			CommerceMLForecastAlertEntryImpl.class.getName());
@@ -5186,6 +5187,24 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceMLForecastAlertEntryUtilPersistence(
+		CommerceMLForecastAlertEntryPersistence
+			commerceMLForecastAlertEntryPersistence) {
+
+		try {
+			Field field =
+				CommerceMLForecastAlertEntryUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceMLForecastAlertEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

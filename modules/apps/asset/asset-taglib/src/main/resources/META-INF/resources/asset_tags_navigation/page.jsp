@@ -26,7 +26,9 @@ boolean showZeroAssetCount = GetterUtil.getBoolean((String)request.getAttribute(
 
 String tag = ParamUtil.getString(request, "tag");
 
-String tagsNavigation = _buildTagsNavigation(scopeGroupId, tag, classNameId, displayStyle, maxAssetTags, renderResponse, showAssetCount, showZeroAssetCount);
+PortletURL portletURL = renderResponse.createRenderURL();
+
+String tagsNavigation = _buildTagsNavigation(scopeGroupId, tag, portletURL, classNameId, displayStyle, maxAssetTags, showAssetCount, showZeroAssetCount);
 %>
 
 <c:choose>
@@ -60,7 +62,7 @@ if (Validator.isNotNull(tag)) {
 %>
 
 <%!
-private String _buildTagsNavigation(long scopeGroupId, String selectedTagName, long classNameId, String displayStyle, int maxAssetTags, RenderResponse renderResponse, boolean showAssetCount, boolean showZeroAssetCount) throws Exception {
+private String _buildTagsNavigation(long scopeGroupId, String selectedTagName, PortletURL portletURL, long classNameId, String displayStyle, int maxAssetTags, boolean showAssetCount, boolean showZeroAssetCount) throws Exception {
 	List<AssetTag> tags = null;
 
 	if (showAssetCount && (classNameId > 0)) {
@@ -118,6 +120,10 @@ private String _buildTagsNavigation(long scopeGroupId, String selectedTagName, l
 		multiplier = (double)5 / (maxCount - minCount);
 	}
 
+	portletURL.setParameter("tag", StringPool.BLANK);
+
+	String originalPortletURLString = portletURL.toString();
+
 	for (AssetTag tag : tags) {
 		String tagName = tag.getName();
 
@@ -142,20 +148,12 @@ private String _buildTagsNavigation(long scopeGroupId, String selectedTagName, l
 
 		if (tagName.equals(selectedTagName)) {
 			sb.append("<a class=\"tag-selected\" href=\"");
-
-			PortletURL portletURL = renderResponse.createRenderURL();
-
-			portletURL.setParameter("tag", StringPool.BLANK);
-
-			sb.append(HtmlUtil.escape(portletURL.toString()));
+			sb.append(HtmlUtil.escape(originalPortletURLString));
 		}
 		else {
-			sb.append("<a href=\"");
-
-			PortletURL portletURL = renderResponse.createRenderURL();
-
 			portletURL.setParameter("tag", tagName);
 
+			sb.append("<a href=\"");
 			sb.append(HtmlUtil.escape(portletURL.toString()));
 		}
 

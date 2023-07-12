@@ -18,6 +18,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.annotation.ImplementationClassName;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -165,6 +166,12 @@ public class JSONWebServiceNaming {
 	}
 
 	public boolean isIncludedPath(String contextPath, String path) {
+		String portalContextPath = PortalUtil.getPathContext();
+
+		if (!contextPath.equals(portalContextPath)) {
+			path = contextPath + StringPool.PERIOD + path.substring(1);
+		}
+
 		for (String excludedPath : excludedPaths) {
 			if (StringUtil.wildcardMatches(
 					path, excludedPath, '?', '*', '\\', false)) {

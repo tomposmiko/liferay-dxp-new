@@ -174,9 +174,7 @@ public abstract class BasePortalCacheManager<K extends Serializable, V>
 
 	@Override
 	public void removePortalCache(String portalCacheName) {
-		if (portalCaches.remove(portalCacheName) == null) {
-			return;
-		}
+		portalCaches.remove(portalCacheName);
 
 		doRemovePortalCache(portalCacheName);
 	}

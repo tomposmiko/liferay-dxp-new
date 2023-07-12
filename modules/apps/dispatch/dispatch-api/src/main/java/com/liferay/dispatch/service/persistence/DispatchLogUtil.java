@@ -634,10 +634,6 @@ public class DispatchLogUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(DispatchLogPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile DispatchLogPersistence _persistence;
 
 }

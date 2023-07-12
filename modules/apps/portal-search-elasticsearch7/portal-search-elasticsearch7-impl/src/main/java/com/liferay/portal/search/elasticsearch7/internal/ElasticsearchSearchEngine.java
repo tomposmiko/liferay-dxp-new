@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch7.internal;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -29,14 +28,9 @@ import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.search.ccr.CrossClusterReplicationHelper;
-import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch7.internal.index.IndexFactory;
-import com.liferay.portal.search.engine.ConnectionInformation;
-import com.liferay.portal.search.engine.NodeInformation;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.cluster.ClusterHealthStatus;
 import com.liferay.portal.search.engine.adapter.cluster.HealthClusterRequest;
@@ -65,7 +59,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -126,11 +119,8 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 
 		waitForYellowStatus();
 
-		CrossClusterReplicationHelper crossClusterReplicationHelper =
-			_crossClusterReplicationHelper;
-
-		if (crossClusterReplicationHelper != null) {
-			crossClusterReplicationHelper.follow(
+		if (_crossClusterReplicationHelper != null) {
+			_crossClusterReplicationHelper.follow(
 				_indexNameBuilder.getIndexName(companyId));
 		}
 	}
@@ -151,11 +141,8 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 	public void removeCompany(long companyId) {
 		super.removeCompany(companyId);
 
-		CrossClusterReplicationHelper crossClusterReplicationHelper =
-			_crossClusterReplicationHelper;
-
-		if (crossClusterReplicationHelper != null) {
-			crossClusterReplicationHelper.unfollow(
+		if (_crossClusterReplicationHelper != null) {
+			_crossClusterReplicationHelper.unfollow(
 				_indexNameBuilder.getIndexName(companyId));
 		}
 
@@ -218,6 +205,12 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 		super.setIndexWriter(indexWriter);
 	}
 
+	public void unsetCrossClusterReplicationHelper(
+		CrossClusterReplicationHelper crossClusterReplicationHelper) {
+
+		_crossClusterReplicationHelper = null;
+	}
+
 	public void unsetElasticsearchConnectionManager(
 		ElasticsearchConnectionManager elasticsearchConnectionManager) {
 
@@ -230,8 +223,6 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 
 	@Activate
 	protected void activate(Map<String, Object> properties) {
-		_checkNodeVersions();
-
 		setVendor(MapUtil.getString(properties, "search.engine.impl"));
 	}
 
@@ -264,23 +255,14 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 		return true;
 	}
 
-	protected boolean meetsMinimumVersionRequirement(
-		Version minimumVersion, String versionString) {
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void setCrossClusterReplicationHelper(
+		CrossClusterReplicationHelper crossClusterReplicationHelper) {
 
-		if (minimumVersion.compareTo(Version.parseVersion(versionString)) <=
-				0) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Reference(unbind = "-")
-	protected void setElasticsearchConfigurationWrapper(
-		ElasticsearchConfigurationWrapper elasticsearchConfigurationWrapper) {
-
-		_elasticsearchConfigurationWrapper = elasticsearchConfigurationWrapper;
+		_crossClusterReplicationHelper = crossClusterReplicationHelper;
 	}
 
 	@Reference
@@ -305,13 +287,6 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 		SearchEngineAdapter searchEngineAdapter) {
 
 		_searchEngineAdapter = searchEngineAdapter;
-	}
-
-	@Reference(unbind = "-")
-	protected void setSearchEngineInformation(
-		SearchEngineInformation searchEngineInformation) {
-
-		_searchEngineInformation = searchEngineInformation;
 	}
 
 	protected void validateBackupName(String backupName)
@@ -377,64 +352,15 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 		}
 	}
 
-	private void _checkNodeVersions() {
-		String minimumVersionString =
-			_elasticsearchConfigurationWrapper.minimumRequiredNodeVersion();
-
-		if (minimumVersionString.equals("0.0.0")) {
-			String clientVersion =
-				_searchEngineInformation.getClientVersionString();
-
-			minimumVersionString = clientVersion.substring(
-				0, clientVersion.lastIndexOf("."));
-		}
-
-		Version minimumVersion = Version.parseVersion(minimumVersionString);
-
-		List<ConnectionInformation> connectionInformationList =
-			_searchEngineInformation.getConnectionInformationList();
-
-		for (ConnectionInformation connectionInformation :
-				connectionInformationList) {
-
-			List<NodeInformation> nodeInformationList =
-				connectionInformation.getNodeInformationList();
-
-			for (NodeInformation nodeInformation : nodeInformationList) {
-				if (!meetsMinimumVersionRequirement(
-						minimumVersion, nodeInformation.getVersion())) {
-
-					_log.error(
-						StringBundler.concat(
-							"Elasticsearch node ", nodeInformation.getName(),
-							" does not meet the minimum version requirement ",
-							"of ", minimumVersionString));
-
-					System.exit(1);
-				}
-			}
-		}
-	}
-
 	private static final String _BACKUP_REPOSITORY_NAME = "liferay_backup";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ElasticsearchSearchEngine.class);
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile CrossClusterReplicationHelper
-		_crossClusterReplicationHelper;
-
-	private volatile ElasticsearchConfigurationWrapper
-		_elasticsearchConfigurationWrapper;
+	private CrossClusterReplicationHelper _crossClusterReplicationHelper;
 	private ElasticsearchConnectionManager _elasticsearchConnectionManager;
 	private IndexFactory _indexFactory;
 	private IndexNameBuilder _indexNameBuilder;
 	private SearchEngineAdapter _searchEngineAdapter;
-	private SearchEngineInformation _searchEngineInformation;
 
 }

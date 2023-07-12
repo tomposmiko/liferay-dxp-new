@@ -39,8 +39,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -56,6 +54,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -269,7 +269,13 @@ public abstract class CommerceInventoryWarehouseLocalServiceBaseImpl
 			commerceInventoryWarehouseId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
+	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
+	 */
 	@Override
 	public CommerceInventoryWarehouse
 		fetchCommerceInventoryWarehouseByExternalReferenceCode(
@@ -279,6 +285,9 @@ public abstract class CommerceInventoryWarehouseLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceInventoryWarehouseByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CommerceInventoryWarehouse
@@ -289,7 +298,14 @@ public abstract class CommerceInventoryWarehouseLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
+	 * @return the matching commerce inventory warehouse
+	 * @throws PortalException if a matching commerce inventory warehouse could not be found
+	 */
 	@Override
 	public CommerceInventoryWarehouse
 			getCommerceInventoryWarehouseByExternalReferenceCode(
@@ -919,15 +935,14 @@ public abstract class CommerceInventoryWarehouseLocalServiceBaseImpl
 			"com.liferay.commerce.inventory.model.CommerceInventoryWarehouse",
 			commerceInventoryWarehouseLocalService);
 
-		CommerceInventoryWarehouseLocalServiceUtil.setService(
-			commerceInventoryWarehouseLocalService);
+		_setLocalServiceUtilService(commerceInventoryWarehouseLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.inventory.model.CommerceInventoryWarehouse");
 
-		CommerceInventoryWarehouseLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -970,6 +985,24 @@ public abstract class CommerceInventoryWarehouseLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CommerceInventoryWarehouseLocalService
+			commerceInventoryWarehouseLocalService) {
+
+		try {
+			Field field =
+				CommerceInventoryWarehouseLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceInventoryWarehouseLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1071,9 +1104,6 @@ public abstract class CommerceInventoryWarehouseLocalServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceInventoryWarehouseLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

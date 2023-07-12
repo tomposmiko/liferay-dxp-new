@@ -517,10 +517,6 @@ public class CPTaxCategoryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CPTaxCategoryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CPTaxCategoryPersistence _persistence;
 
 }

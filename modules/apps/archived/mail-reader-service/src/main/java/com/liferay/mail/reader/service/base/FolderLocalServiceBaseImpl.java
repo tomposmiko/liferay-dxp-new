@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -49,6 +47,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -374,7 +374,7 @@ public abstract class FolderLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		FolderLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -389,7 +389,7 @@ public abstract class FolderLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		folderLocalService = (FolderLocalService)aopProxy;
 
-		FolderLocalServiceUtil.setService(folderLocalService);
+		_setLocalServiceUtilService(folderLocalService);
 	}
 
 	/**
@@ -434,6 +434,22 @@ public abstract class FolderLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		FolderLocalService folderLocalService) {
+
+		try {
+			Field field = FolderLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, folderLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected AccountPersistence accountPersistence;
 
@@ -463,8 +479,5 @@ public abstract class FolderLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FolderLocalServiceBaseImpl.class);
 
 }

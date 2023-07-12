@@ -111,10 +111,6 @@ public class DefinitionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DefinitionService service) {
-		_service = service;
-	}
-
 	private static volatile DefinitionService _service;
 
 }

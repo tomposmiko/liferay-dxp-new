@@ -328,10 +328,6 @@ public class CompanyInfoUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CompanyInfoPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CompanyInfoPersistence _persistence;
 
 }

@@ -51,6 +51,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3485,11 +3486,11 @@ public class ExportImportConfigurationPersistenceImpl
 			},
 			new String[] {"groupId", "type_", "status"}, false);
 
-		ExportImportConfigurationUtil.setPersistence(this);
+		_setExportImportConfigurationUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ExportImportConfigurationUtil.setPersistence(null);
+		_setExportImportConfigurationUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(
 			ExportImportConfigurationImpl.class.getName());
@@ -3500,6 +3501,23 @@ public class ExportImportConfigurationPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setExportImportConfigurationUtilPersistence(
+		ExportImportConfigurationPersistence
+			exportImportConfigurationPersistence) {
+
+		try {
+			Field field = ExportImportConfigurationUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, exportImportConfigurationPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -121,32 +121,19 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 			return content;
 		}
 
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-
-		currentThread.setContextClassLoader(
-			AntiSamySanitizerImpl.class.getClassLoader());
+		AntiSamy antiSamy = new AntiSamy();
 
 		try {
-			CleanResults cleanResults = null;
-
-			AntiSamy antiSamy = new AntiSamy();
-
 			if (isConfigured(className, classPK)) {
 				Policy policy = _policies.get(className);
 
-				cleanResults = antiSamy.scan(content, policy, AntiSamy.SAX);
-			}
-			else {
-				cleanResults = antiSamy.scan(content, _policy);
+				CleanResults cleanResults = antiSamy.scan(
+					content, policy, AntiSamy.SAX);
+
+				return cleanResults.getCleanHTML();
 			}
 
-			if (_log.isWarnEnabled()) {
-				for (String errorMessage : cleanResults.getErrorMessages()) {
-					_log.warn(errorMessage);
-				}
-			}
+			CleanResults cleanResults = antiSamy.scan(content, _policy);
 
 			return cleanResults.getCleanHTML();
 		}
@@ -154,9 +141,6 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 			_log.error("Unable to sanitize input", exception);
 
 			throw new SanitizerException(exception);
-		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
 		}
 	}
 

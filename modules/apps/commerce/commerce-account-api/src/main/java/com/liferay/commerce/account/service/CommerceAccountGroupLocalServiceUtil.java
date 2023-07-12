@@ -244,7 +244,13 @@ public class CommerceAccountGroupLocalServiceUtil {
 		return getService().fetchCommerceAccountGroup(commerceAccountGroupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce account group's external reference code
+	 * @return the matching commerce account group, or <code>null</code> if a matching commerce account group could not be found
+	 */
 	public static CommerceAccountGroup
 		fetchCommerceAccountGroupByExternalReferenceCode(
 			long companyId, String externalReferenceCode) {
@@ -253,6 +259,9 @@ public class CommerceAccountGroupLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceAccountGroupByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CommerceAccountGroup fetchCommerceAccountGroupByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -281,7 +290,14 @@ public class CommerceAccountGroupLocalServiceUtil {
 		return getService().getCommerceAccountGroup(commerceAccountGroupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce account group's external reference code
+	 * @return the matching commerce account group
+	 * @throws PortalException if a matching commerce account group could not be found
+	 */
 	public static CommerceAccountGroup
 			getCommerceAccountGroupByExternalReferenceCode(
 				long companyId, String externalReferenceCode)
@@ -412,10 +428,6 @@ public class CommerceAccountGroupLocalServiceUtil {
 
 	public static CommerceAccountGroupLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(CommerceAccountGroupLocalService service) {
-		_service = service;
 	}
 
 	private static volatile CommerceAccountGroupLocalService _service;

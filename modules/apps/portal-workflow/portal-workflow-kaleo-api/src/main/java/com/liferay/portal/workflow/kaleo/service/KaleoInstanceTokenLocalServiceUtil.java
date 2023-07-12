@@ -432,10 +432,6 @@ public class KaleoInstanceTokenLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(KaleoInstanceTokenLocalService service) {
-		_service = service;
-	}
-
 	private static volatile KaleoInstanceTokenLocalService _service;
 
 }

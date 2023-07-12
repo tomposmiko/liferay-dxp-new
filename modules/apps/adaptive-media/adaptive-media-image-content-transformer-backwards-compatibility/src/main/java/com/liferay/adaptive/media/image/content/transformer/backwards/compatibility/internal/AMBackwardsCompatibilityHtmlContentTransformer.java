@@ -67,8 +67,7 @@ public class AMBackwardsCompatibilityHtmlContentTransformer
 		for (Element imgElement : document.select("img:not(picture > img)")) {
 			String imgElementString = imgElement.toString();
 
-			String replacement = _transform(
-				imgElementString, imgElement.attr("src"));
+			String replacement = super.transform(imgElementString);
 
 			imgElement.replaceWith(_parseNode(replacement));
 		}
@@ -80,6 +79,14 @@ public class AMBackwardsCompatibilityHtmlContentTransformer
 
 	@Override
 	protected FileEntry getFileEntry(Matcher matcher) throws PortalException {
+		String imgTag = matcher.group(0);
+
+		if (imgTag.contains(
+				AMImageHTMLConstants.ATTRIBUTE_NAME_FILE_ENTRY_ID)) {
+
+			return null;
+		}
+
 		if (matcher.group(4) != null) {
 			long groupId = Long.valueOf(matcher.group(1));
 
@@ -133,67 +140,9 @@ public class AMBackwardsCompatibilityHtmlContentTransformer
 		return bodyNode.childNode(0);
 	}
 
-	private String _transform(String imgElementString, String src)
-		throws PortalException {
-
-		// Check if the src starts with "data:image/" first because "data:image"
-		// indicates a Base64 URL which can potentially be millions of
-		// characters. So it is faster to run startsWith first to return early
-		// on these Strings first so that we don't have to do a 'contains' over
-		// a very long string.
-
-		if (src.startsWith("data:image/")) {
-			return imgElementString;
-		}
-
-		// If we got past the above check, we have a URL. Now we can do a quick
-		// check if the URL contains "/documents" as a crude way of bypassing
-		// most non-Liferay URLs before we have to get into the less performant
-		// regex logic.
-
-		if (!src.contains("/documents")) {
-			return imgElementString;
-		}
-
-		String replacement = imgElementString;
-
-		StringBuffer sb = null;
-
-		Pattern pattern = getPattern();
-
-		Matcher matcher = pattern.matcher(src);
-
-		while (matcher.find()) {
-			if (sb == null) {
-				sb = new StringBuffer(imgElementString.length());
-			}
-
-			FileEntry fileEntry = null;
-
-			if (!imgElementString.contains(
-					AMImageHTMLConstants.ATTRIBUTE_NAME_FILE_ENTRY_ID)) {
-
-				fileEntry = getFileEntry(matcher);
-			}
-
-			replacement = getReplacement(imgElementString, fileEntry);
-
-			matcher.appendReplacement(
-				sb, Matcher.quoteReplacement(replacement));
-		}
-
-		if (sb != null) {
-			matcher.appendTail(sb);
-
-			replacement = sb.toString();
-		}
-
-		return replacement;
-	}
-
 	private static final Pattern _pattern = Pattern.compile(
-		"(?:/?[^\\s]*)/documents/(\\d+)/(\\d+)/([^/?]+)(?:/([-0-9a-fA-F]+))?" +
-			"(?:\\?t=\\d+)?");
+		"<img\\s+(?:[^>]*\\s)*src=['\"](?:/?[^\\s]*)/documents/(\\d+)/(\\d+)" +
+			"/([^/?]+)(?:/([-0-9a-fA-F]+))?(?:\\?t=\\d+)?['\"][^>]*/>");
 
 	@Reference
 	private AMImageHTMLTagFactory _amImageHTMLTagFactory;

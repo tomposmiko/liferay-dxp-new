@@ -361,6 +361,9 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	private static final Map
 		<String, Function<CPDefinitionSpecificationOptionValue, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CPDefinitionSpecificationOptionValue, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPDefinitionSpecificationOptionValue, Object>>
@@ -368,117 +371,108 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CPDefinitionSpecificationOptionValue, Object>>();
-
-		attributeGetterFunctions.put(
-			"uuid", CPDefinitionSpecificationOptionValue::getUuid);
-		attributeGetterFunctions.put(
-			"CPDefinitionSpecificationOptionValueId",
-			CPDefinitionSpecificationOptionValue::
-				getCPDefinitionSpecificationOptionValueId);
-		attributeGetterFunctions.put(
-			"groupId", CPDefinitionSpecificationOptionValue::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CPDefinitionSpecificationOptionValue::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CPDefinitionSpecificationOptionValue::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CPDefinitionSpecificationOptionValue::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPDefinitionSpecificationOptionValue::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate",
-			CPDefinitionSpecificationOptionValue::getModifiedDate);
-		attributeGetterFunctions.put(
-			"CPDefinitionId",
-			CPDefinitionSpecificationOptionValue::getCPDefinitionId);
-		attributeGetterFunctions.put(
-			"CPSpecificationOptionId",
-			CPDefinitionSpecificationOptionValue::getCPSpecificationOptionId);
-		attributeGetterFunctions.put(
-			"CPOptionCategoryId",
-			CPDefinitionSpecificationOptionValue::getCPOptionCategoryId);
-		attributeGetterFunctions.put(
-			"value", CPDefinitionSpecificationOptionValue::getValue);
-		attributeGetterFunctions.put(
-			"priority", CPDefinitionSpecificationOptionValue::getPriority);
-		attributeGetterFunctions.put(
-			"lastPublishDate",
-			CPDefinitionSpecificationOptionValue::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CPDefinitionSpecificationOptionValue, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CPDefinitionSpecificationOptionValue, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String,
 					 BiConsumer<CPDefinitionSpecificationOptionValue, ?>>();
 
+		attributeGetterFunctions.put(
+			"uuid", CPDefinitionSpecificationOptionValue::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
 				CPDefinitionSpecificationOptionValue::setUuid);
+		attributeGetterFunctions.put(
+			"CPDefinitionSpecificationOptionValueId",
+			CPDefinitionSpecificationOptionValue::
+				getCPDefinitionSpecificationOptionValueId);
 		attributeSetterBiConsumers.put(
 			"CPDefinitionSpecificationOptionValueId",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::
 					setCPDefinitionSpecificationOptionValueId);
+		attributeGetterFunctions.put(
+			"groupId", CPDefinitionSpecificationOptionValue::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CPDefinitionSpecificationOptionValue::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CPDefinitionSpecificationOptionValue::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CPDefinitionSpecificationOptionValue::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
 				CPDefinitionSpecificationOptionValue::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPDefinitionSpecificationOptionValue::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
 				CPDefinitionSpecificationOptionValue::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate",
+			CPDefinitionSpecificationOptionValue::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
 				CPDefinitionSpecificationOptionValue::setModifiedDate);
+		attributeGetterFunctions.put(
+			"CPDefinitionId",
+			CPDefinitionSpecificationOptionValue::getCPDefinitionId);
 		attributeSetterBiConsumers.put(
 			"CPDefinitionId",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::setCPDefinitionId);
+		attributeGetterFunctions.put(
+			"CPSpecificationOptionId",
+			CPDefinitionSpecificationOptionValue::getCPSpecificationOptionId);
 		attributeSetterBiConsumers.put(
 			"CPSpecificationOptionId",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::
 					setCPSpecificationOptionId);
+		attributeGetterFunctions.put(
+			"CPOptionCategoryId",
+			CPDefinitionSpecificationOptionValue::getCPOptionCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPOptionCategoryId",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::setCPOptionCategoryId);
+		attributeGetterFunctions.put(
+			"value", CPDefinitionSpecificationOptionValue::getValue);
 		attributeSetterBiConsumers.put(
 			"value",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
 				CPDefinitionSpecificationOptionValue::setValue);
+		attributeGetterFunctions.put(
+			"priority", CPDefinitionSpecificationOptionValue::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Double>)
 				CPDefinitionSpecificationOptionValue::setPriority);
+		attributeGetterFunctions.put(
+			"lastPublishDate",
+			CPDefinitionSpecificationOptionValue::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
 				CPDefinitionSpecificationOptionValue::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

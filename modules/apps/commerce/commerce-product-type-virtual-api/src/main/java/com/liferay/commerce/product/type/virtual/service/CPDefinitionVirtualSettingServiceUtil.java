@@ -126,10 +126,6 @@ public class CPDefinitionVirtualSettingServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPDefinitionVirtualSettingService service) {
-		_service = service;
-	}
-
 	private static volatile CPDefinitionVirtualSettingService _service;
 
 }

@@ -34,61 +34,21 @@ export const AutoFocus = ({children}) => {
 				setTimeout(() => setIncrement((value) => value + 1), 5);
 			}
 			else {
-				if (
-					!document.activeElement ||
-					(!Liferay.ThemeDisplay.isControlPanel() &&
-						document.activeElement.querySelector('input') &&
-						document.activeElement.querySelector('input').type ===
-							'hidden') ||
-					containerElement?.current.parentNode.className.includes(
-						'ddm-form-builder-app'
-					)
-				) {
-					removeTabs();
-
-					const currentTitle = containerElement?.current.parentNode.getElementsByClassName(
-						'ddm-form-name'
-					)[0];
-
-					scrollComponentToTop(currentTitle);
-
-					const componentTitle = currentTitle?.innerHTML;
-
-					const currentDescription = containerElement?.current.parentNode.getElementsByClassName(
-						'.ddm-form-description'
-					)[0];
-
-					const componentDescription = currentDescription?.innerHTML;
-
-					const currentPage = document.activeElement.querySelector(
-						'.ddm-layout-builder:not(.hide)'
-					);
-
-					const firstInput = currentPage?.querySelector(
-						'input:not([type="hidden"])'
-					);
-
-					const defaultTitle = Liferay.Language.get('untitled-form');
+				if (!document.activeElement) {
+					const firstInput = childRef.current.querySelector('input');
 
 					if (
-						(!componentTitle || componentTitle === defaultTitle) &&
-						!componentDescription &&
 						firstInput &&
 						!containerElement.current.contains(
 							document.activeElement
 						)
 					) {
-						firstInput.focus({
-							behavior: 'smooth',
-							preventScroll: false,
-						});
+						firstInput.focus();
 
 						if (firstInput.select) {
 							firstInput.select();
 						}
 					}
-
-					scrollComponentToTop(currentTitle);
 				}
 			}
 		}
@@ -100,33 +60,3 @@ export const AutoFocus = ({children}) => {
 		},
 	});
 };
-
-function scrollComponentToTop(currentTitle) {
-	if (currentTitle) {
-		const containerPosition = currentTitle.getBoundingClientRect();
-
-		const menuSize = document.querySelector('.control-menu-container')
-			?.clientHeight;
-
-		window.scroll(
-			containerPosition.x - menuSize,
-			containerPosition.y - menuSize
-		);
-	}
-}
-
-function removeTabs() {
-	const firstPageComponent = document.querySelector(
-		'div[class^="lfr-layout-structure-item'
-	);
-
-	const formPortlet = firstPageComponent?.querySelector('.portlet-forms');
-
-	if (!formPortlet) {
-		document
-			.querySelectorAll(
-				'.ddm-form-name,.ddm-form-description,.lfr-ddm-form-page-title,.lfr-ddm-form-page-description'
-			)
-			?.forEach((element) => element.removeAttribute('tabindex'));
-	}
-}

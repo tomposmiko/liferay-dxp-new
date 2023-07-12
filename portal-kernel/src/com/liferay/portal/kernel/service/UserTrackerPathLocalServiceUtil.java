@@ -311,10 +311,6 @@ public class UserTrackerPathLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(UserTrackerPathLocalService service) {
-		_service = service;
-	}
-
 	private static volatile UserTrackerPathLocalService _service;
 
 }

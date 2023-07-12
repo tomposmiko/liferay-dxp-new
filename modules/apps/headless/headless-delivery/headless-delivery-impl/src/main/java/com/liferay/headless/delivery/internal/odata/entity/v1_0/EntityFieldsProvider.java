@@ -127,10 +127,7 @@ public class EntityFieldsProvider {
 					ddmFormField.getDataType(), DDMFormFieldType.RADIO) ||
 				 (Objects.equals(ddmFormField.getIndexType(), "keyword") &&
 				  (Objects.equals(
-					  ddmFormField.getType(),
-					  DDMFormFieldType.CHECKBOX_MULTIPLE) ||
-				   Objects.equals(
-					   ddmFormField.getType(), DDMFormFieldType.SELECT) ||
+					  ddmFormField.getType(), DDMFormFieldType.SELECT) ||
 				   Objects.equals(
 					   ddmFormField.getType(), DDMFormFieldType.TEXT)))) {
 

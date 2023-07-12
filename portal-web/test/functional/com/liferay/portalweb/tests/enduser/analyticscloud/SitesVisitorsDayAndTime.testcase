@@ -51,7 +51,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -59,7 +59,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8531 | Test Summary: Site overview visitors by day and time card shows when individuals are viewing the site"
-	@priority = 5
+	@priority = "5"
 	test ShowsWhenIndividualsViewingSite {
 		task ("Sign in as new user") {
 			User.logoutAndLoginPG(
@@ -80,7 +80,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Navigate to the Overview in Sites dashboard") {

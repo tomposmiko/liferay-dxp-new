@@ -18,9 +18,7 @@ import com.liferay.dispatch.scheduler.SchedulerResponseManager;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
-import com.liferay.portal.kernel.scheduler.SchedulerEngine;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.StorageType;
@@ -137,16 +135,9 @@ public class SchedulerResponseManagerImpl implements SchedulerResponseManager {
 			_schedulerEngineHelper.getScheduledJob(
 				jobName, groupName, storageType);
 
-		Message message = schedulerResponse.getMessage();
-
-		message.put(
-			SchedulerEngine.DESTINATION_NAME,
-			schedulerResponse.getDestinationName());
-		message.put(SchedulerEngine.GROUP_NAME, groupName);
-		message.put(SchedulerEngine.JOB_NAME, jobName);
-
 		_messageBus.sendMessage(
-			schedulerResponse.getDestinationName(), message);
+			schedulerResponse.getDestinationName(),
+			schedulerResponse.getMessage());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -299,97 +299,91 @@ public class CommerceBOMEntryModelImpl
 
 	private static final Map<String, Function<CommerceBOMEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceBOMEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceBOMEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CommerceBOMEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceBOMEntryId", CommerceBOMEntry::getCommerceBOMEntryId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceBOMEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceBOMEntry::getUserId);
-		attributeGetterFunctions.put("userName", CommerceBOMEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceBOMEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceBOMEntry::getModifiedDate);
-		attributeGetterFunctions.put("number", CommerceBOMEntry::getNumber);
-		attributeGetterFunctions.put(
-			"CPInstanceUuid", CommerceBOMEntry::getCPInstanceUuid);
-		attributeGetterFunctions.put(
-			"CProductId", CommerceBOMEntry::getCProductId);
-		attributeGetterFunctions.put(
-			"commerceBOMDefinitionId",
-			CommerceBOMEntry::getCommerceBOMDefinitionId);
-		attributeGetterFunctions.put(
-			"positionX", CommerceBOMEntry::getPositionX);
-		attributeGetterFunctions.put(
-			"positionY", CommerceBOMEntry::getPositionY);
-		attributeGetterFunctions.put("radius", CommerceBOMEntry::getRadius);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceBOMEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceBOMEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommerceBOMEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"commerceBOMEntryId", CommerceBOMEntry::getCommerceBOMEntryId);
 		attributeSetterBiConsumers.put(
 			"commerceBOMEntryId",
 			(BiConsumer<CommerceBOMEntry, Long>)
 				CommerceBOMEntry::setCommerceBOMEntryId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceBOMEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceBOMEntry, Long>)CommerceBOMEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceBOMEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceBOMEntry, Long>)CommerceBOMEntry::setUserId);
+		attributeGetterFunctions.put("userName", CommerceBOMEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceBOMEntry, String>)
 				CommerceBOMEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceBOMEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceBOMEntry, Date>)
 				CommerceBOMEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceBOMEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceBOMEntry, Date>)
 				CommerceBOMEntry::setModifiedDate);
+		attributeGetterFunctions.put("number", CommerceBOMEntry::getNumber);
 		attributeSetterBiConsumers.put(
 			"number",
 			(BiConsumer<CommerceBOMEntry, Integer>)CommerceBOMEntry::setNumber);
+		attributeGetterFunctions.put(
+			"CPInstanceUuid", CommerceBOMEntry::getCPInstanceUuid);
 		attributeSetterBiConsumers.put(
 			"CPInstanceUuid",
 			(BiConsumer<CommerceBOMEntry, String>)
 				CommerceBOMEntry::setCPInstanceUuid);
+		attributeGetterFunctions.put(
+			"CProductId", CommerceBOMEntry::getCProductId);
 		attributeSetterBiConsumers.put(
 			"CProductId",
 			(BiConsumer<CommerceBOMEntry, Long>)
 				CommerceBOMEntry::setCProductId);
+		attributeGetterFunctions.put(
+			"commerceBOMDefinitionId",
+			CommerceBOMEntry::getCommerceBOMDefinitionId);
 		attributeSetterBiConsumers.put(
 			"commerceBOMDefinitionId",
 			(BiConsumer<CommerceBOMEntry, Long>)
 				CommerceBOMEntry::setCommerceBOMDefinitionId);
+		attributeGetterFunctions.put(
+			"positionX", CommerceBOMEntry::getPositionX);
 		attributeSetterBiConsumers.put(
 			"positionX",
 			(BiConsumer<CommerceBOMEntry, Double>)
 				CommerceBOMEntry::setPositionX);
+		attributeGetterFunctions.put(
+			"positionY", CommerceBOMEntry::getPositionY);
 		attributeSetterBiConsumers.put(
 			"positionY",
 			(BiConsumer<CommerceBOMEntry, Double>)
 				CommerceBOMEntry::setPositionY);
+		attributeGetterFunctions.put("radius", CommerceBOMEntry::getRadius);
 		attributeSetterBiConsumers.put(
 			"radius",
 			(BiConsumer<CommerceBOMEntry, Double>)CommerceBOMEntry::setRadius);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

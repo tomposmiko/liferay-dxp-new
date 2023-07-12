@@ -50,6 +50,7 @@ import com.liferay.saml.persistence.service.persistence.impl.constants.SamlPersi
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -1507,12 +1508,12 @@ public class SamlIdpSsoSessionPersistenceImpl
 			new String[] {String.class.getName()},
 			new String[] {"samlIdpSsoSessionKey"}, false);
 
-		SamlIdpSsoSessionUtil.setPersistence(this);
+		_setSamlIdpSsoSessionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		SamlIdpSsoSessionUtil.setPersistence(null);
+		_setSamlIdpSsoSessionUtilPersistence(null);
 
 		entityCache.removeCache(SamlIdpSsoSessionImpl.class.getName());
 
@@ -1522,6 +1523,22 @@ public class SamlIdpSsoSessionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSamlIdpSsoSessionUtilPersistence(
+		SamlIdpSsoSessionPersistence samlIdpSsoSessionPersistence) {
+
+		try {
+			Field field = SamlIdpSsoSessionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, samlIdpSsoSessionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

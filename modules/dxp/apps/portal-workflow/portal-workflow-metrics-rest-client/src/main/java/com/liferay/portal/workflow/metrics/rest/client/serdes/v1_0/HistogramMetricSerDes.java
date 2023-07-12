@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -164,18 +165,14 @@ public class HistogramMetricSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "histograms")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Histogram[] histogramsArray =
-						new Histogram[jsonParserFieldValues.length];
-
-					for (int i = 0; i < histogramsArray.length; i++) {
-						histogramsArray[i] = HistogramSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					histogramMetric.setHistograms(histogramsArray);
+					histogramMetric.setHistograms(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> HistogramSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Histogram[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "unit")) {

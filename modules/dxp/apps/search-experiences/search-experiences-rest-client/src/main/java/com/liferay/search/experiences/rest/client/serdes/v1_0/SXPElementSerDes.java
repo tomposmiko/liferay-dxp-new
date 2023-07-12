@@ -59,16 +59,6 @@ public class SXPElementSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ssXX");
 
-		if (sxpElement.getActions() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"actions\": ");
-
-			sb.append(_toJSON(sxpElement.getActions()));
-		}
-
 		if (sxpElement.getCreateDate() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -118,20 +108,6 @@ public class SXPElementSerDes {
 			sb.append(String.valueOf(sxpElement.getElementDefinition()));
 		}
 
-		if (sxpElement.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(sxpElement.getExternalReferenceCode()));
-
-			sb.append("\"");
-		}
-
 		if (sxpElement.getHidden() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -175,20 +151,6 @@ public class SXPElementSerDes {
 			sb.append("\"readOnly\": ");
 
 			sb.append(sxpElement.getReadOnly());
-		}
-
-		if (sxpElement.getSchemaVersion() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"schemaVersion\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(sxpElement.getSchemaVersion()));
-
-			sb.append("\"");
 		}
 
 		if (sxpElement.getTitle() != null) {
@@ -239,20 +201,6 @@ public class SXPElementSerDes {
 			sb.append("\"");
 		}
 
-		if (sxpElement.getVersion() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"version\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(sxpElement.getVersion()));
-
-			sb.append("\"");
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -273,13 +221,6 @@ public class SXPElementSerDes {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ssXX");
-
-		if (sxpElement.getActions() == null) {
-			map.put("actions", null);
-		}
-		else {
-			map.put("actions", String.valueOf(sxpElement.getActions()));
-		}
 
 		if (sxpElement.getCreateDate() == null) {
 			map.put("createDate", null);
@@ -315,15 +256,6 @@ public class SXPElementSerDes {
 				String.valueOf(sxpElement.getElementDefinition()));
 		}
 
-		if (sxpElement.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(sxpElement.getExternalReferenceCode()));
-		}
-
 		if (sxpElement.getHidden() == null) {
 			map.put("hidden", null);
 		}
@@ -354,14 +286,6 @@ public class SXPElementSerDes {
 			map.put("readOnly", String.valueOf(sxpElement.getReadOnly()));
 		}
 
-		if (sxpElement.getSchemaVersion() == null) {
-			map.put("schemaVersion", null);
-		}
-		else {
-			map.put(
-				"schemaVersion", String.valueOf(sxpElement.getSchemaVersion()));
-		}
-
 		if (sxpElement.getTitle() == null) {
 			map.put("title", null);
 		}
@@ -390,13 +314,6 @@ public class SXPElementSerDes {
 			map.put("userName", String.valueOf(sxpElement.getUserName()));
 		}
 
-		if (sxpElement.getVersion() == null) {
-			map.put("version", null);
-		}
-		else {
-			map.put("version", String.valueOf(sxpElement.getVersion()));
-		}
-
 		return map;
 	}
 
@@ -418,14 +335,7 @@ public class SXPElementSerDes {
 			SXPElement sxpElement, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "actions")) {
-				if (jsonParserFieldValue != null) {
-					sxpElement.setActions(
-						(Map)SXPElementSerDes.toMap(
-							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "createDate")) {
+			if (Objects.equals(jsonParserFieldName, "createDate")) {
 				if (jsonParserFieldValue != null) {
 					sxpElement.setCreateDate(
 						toDate((String)jsonParserFieldValue));
@@ -450,14 +360,6 @@ public class SXPElementSerDes {
 							(String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					sxpElement.setExternalReferenceCode(
-						(String)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "hidden")) {
 				if (jsonParserFieldValue != null) {
 					sxpElement.setHidden((Boolean)jsonParserFieldValue);
@@ -478,11 +380,6 @@ public class SXPElementSerDes {
 			else if (Objects.equals(jsonParserFieldName, "readOnly")) {
 				if (jsonParserFieldValue != null) {
 					sxpElement.setReadOnly((Boolean)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "schemaVersion")) {
-				if (jsonParserFieldValue != null) {
-					sxpElement.setSchemaVersion((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {
@@ -506,11 +403,6 @@ public class SXPElementSerDes {
 			else if (Objects.equals(jsonParserFieldName, "userName")) {
 				if (jsonParserFieldValue != null) {
 					sxpElement.setUserName((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "version")) {
-				if (jsonParserFieldValue != null) {
-					sxpElement.setVersion((String)jsonParserFieldValue);
 				}
 			}
 		}

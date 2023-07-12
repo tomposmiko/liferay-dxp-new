@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class ERAssetVocabularyLocalServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		ERAssetVocabularyLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -71,8 +71,7 @@ public abstract class ERAssetVocabularyLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		erAssetVocabularyLocalService = (ERAssetVocabularyLocalService)aopProxy;
 
-		ERAssetVocabularyLocalServiceUtil.setService(
-			erAssetVocabularyLocalService);
+		_setLocalServiceUtilService(erAssetVocabularyLocalService);
 	}
 
 	/**
@@ -109,6 +108,23 @@ public abstract class ERAssetVocabularyLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		ERAssetVocabularyLocalService erAssetVocabularyLocalService) {
+
+		try {
+			Field field =
+				ERAssetVocabularyLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, erAssetVocabularyLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected ERAssetVocabularyLocalService erAssetVocabularyLocalService;
 
 	@Reference
@@ -122,8 +138,5 @@ public abstract class ERAssetVocabularyLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.asset.kernel.service.AssetVocabularyLocalService
 		assetVocabularyLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ERAssetVocabularyLocalServiceBaseImpl.class);
 
 }

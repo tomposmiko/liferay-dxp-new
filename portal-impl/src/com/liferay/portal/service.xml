@@ -263,15 +263,8 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
-		<finder name="UserId" return-type="Collection">
-			<finder-column name="userId" />
-		</finder>
 		<finder name="AccountId" return-type="Collection">
 			<finder-column name="accountId" />
-		</finder>
-		<finder name="C_U" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="userId" />
 		</finder>
 		<finder name="C_C" return-type="Collection">
 			<finder-column name="classNameId" />
@@ -639,16 +632,16 @@
 		<column localized="true" name="keywords" type="String" />
 		<column localized="true" name="robots" type="String" />
 		<column name="type" type="String" />
-		<column change-tracking-resolution-type="merge" name="typeSettings" type="String" />
+		<column name="typeSettings" type="String" />
 		<column name="hidden" type="boolean" />
 		<column name="system" type="boolean" />
-		<column change-tracking-resolution-type="merge" name="friendlyURL" type="String" />
+		<column name="friendlyURL" type="String" />
 		<column name="iconImageId" type="long" />
 		<column name="themeId" type="String" />
 		<column name="colorSchemeId" type="String" />
 		<column name="styleBookEntryId" type="long" />
 		<column name="css" type="String" />
-		<column change-tracking-resolution-type="merge" name="priority" type="int" />
+		<column name="priority" type="int" />
 		<column name="masterLayoutPlid" type="long" />
 		<column name="layoutPrototypeUuid" type="String" />
 		<column name="layoutPrototypeLinkEnabled" type="boolean" />
@@ -658,7 +651,7 @@
 		<column name="status" type="int" />
 		<column name="statusByUserId" type="long" />
 		<column name="statusByUserName" type="String" />
-		<column change-tracking-resolution-type="merge" name="statusDate" type="Date" />
+		<column name="statusDate" type="Date" />
 
 		<!-- Order -->
 
@@ -724,7 +717,7 @@
 		<finder name="G_P_T" return-type="Collection" where="system = [$FALSE$]">
 			<finder-column name="groupId" />
 			<finder-column name="privateLayout" />
-			<finder-column arrayable-operator="OR" name="type" />
+			<finder-column name="type" />
 		</finder>
 		<finder name="G_P_F" return-type="Layout" unique="true">
 			<finder-column name="groupId" />
@@ -856,7 +849,7 @@
 
 		<column name="plid" type="long" />
 		<column name="privateLayout" type="boolean" />
-		<column change-tracking-resolution-type="merge" name="friendlyURL" type="String" />
+		<column name="friendlyURL" type="String" />
 		<column name="languageId" type="String" />
 		<column name="lastPublishDate" type="Date" />
 
@@ -1830,7 +1823,7 @@
 		<column name="ownerType" type="int" />
 		<column name="plid" type="long" />
 		<column name="portletId" type="String" />
-		<column change-tracking-resolution-type="merge" name="preferences" type="String" />
+		<column name="preferences" type="String" />
 
 		<!-- Finder methods -->
 

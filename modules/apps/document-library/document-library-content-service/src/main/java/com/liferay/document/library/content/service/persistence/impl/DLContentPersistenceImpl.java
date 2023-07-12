@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2612,7 +2613,7 @@ public class DLContentPersistenceImpl
 	 */
 	@Override
 	public DLContent fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(DLContent.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(DLContent.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3119,12 +3120,12 @@ public class DLContentPersistenceImpl
 			new String[] {"companyId", "repositoryId", "path_", "version"},
 			false);
 
-		DLContentUtil.setPersistence(this);
+		_setDLContentUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DLContentUtil.setPersistence(null);
+		_setDLContentUtilPersistence(null);
 
 		entityCache.removeCache(DLContentImpl.class.getName());
 
@@ -3134,6 +3135,21 @@ public class DLContentPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDLContentUtilPersistence(
+		DLContentPersistence dlContentPersistence) {
+
+		try {
+			Field field = DLContentUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlContentPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

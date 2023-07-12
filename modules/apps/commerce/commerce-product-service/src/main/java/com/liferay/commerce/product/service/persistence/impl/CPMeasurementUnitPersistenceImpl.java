@@ -51,6 +51,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -4114,11 +4115,11 @@ public class CPMeasurementUnitPersistenceImpl
 			},
 			new String[] {"companyId", "primary_", "type_"}, false);
 
-		CPMeasurementUnitUtil.setPersistence(this);
+		_setCPMeasurementUnitUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CPMeasurementUnitUtil.setPersistence(null);
+		_setCPMeasurementUnitUtilPersistence(null);
 
 		entityCache.removeCache(CPMeasurementUnitImpl.class.getName());
 
@@ -4128,6 +4129,22 @@ public class CPMeasurementUnitPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCPMeasurementUnitUtilPersistence(
+		CPMeasurementUnitPersistence cpMeasurementUnitPersistence) {
+
+		try {
+			Field field = CPMeasurementUnitUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, cpMeasurementUnitPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

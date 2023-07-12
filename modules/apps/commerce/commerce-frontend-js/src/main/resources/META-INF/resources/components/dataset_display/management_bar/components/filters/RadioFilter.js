@@ -74,8 +74,8 @@ function RadioFilter(props) {
 			<ClayDropDown.Caption>
 				<div className="inline-scroller mb-n2 mx-n2 px-2">
 					<ClayRadioGroup
-						onChange={setItemValue}
-						value={isDefined(itemValue) ? itemValue : ''}
+						onSelectedValueChange={setItemValue}
+						selectedValue={isDefined(itemValue) ? itemValue : ''}
 					>
 						{props.items.map((item) => (
 							<ClayRadio

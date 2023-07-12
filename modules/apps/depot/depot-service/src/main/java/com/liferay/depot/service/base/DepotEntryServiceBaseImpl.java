@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class DepotEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DepotEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class DepotEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		depotEntryService = (DepotEntryService)aopProxy;
 
-		DepotEntryServiceUtil.setService(depotEntryService);
+		_setServiceUtilService(depotEntryService);
 	}
 
 	/**
@@ -116,6 +116,20 @@ public abstract class DepotEntryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(DepotEntryService depotEntryService) {
+		try {
+			Field field = DepotEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, depotEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.depot.service.DepotEntryLocalService
 		depotEntryLocalService;
@@ -132,8 +146,5 @@ public abstract class DepotEntryServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.ResourceLocalService
 		resourceLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DepotEntryServiceBaseImpl.class);
 
 }

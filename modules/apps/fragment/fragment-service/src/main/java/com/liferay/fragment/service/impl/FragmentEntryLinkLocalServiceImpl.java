@@ -23,11 +23,10 @@ import com.liferay.fragment.processor.DefaultFragmentEntryProcessorContext;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.base.FragmentEntryLinkLocalServiceBaseImpl;
-import com.liferay.layout.content.page.editor.listener.ContentPageEditorListener;
-import com.liferay.layout.content.page.editor.listener.ContentPageEditorListenerTracker;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -59,7 +58,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -301,14 +299,6 @@ public class FragmentEntryLinkLocalServiceImpl
 	}
 
 	@Override
-	public FragmentEntryLink getFragmentEntryLink(
-		long groupId, long originalFragmentEntryLinkId, long plid) {
-
-		return fragmentEntryLinkPersistence.fetchByG_OFELI_P_First(
-			groupId, originalFragmentEntryLinkId, plid, null);
-	}
-
-	@Override
 	public List<FragmentEntryLink> getFragmentEntryLinks(
 		int type, int start, int end,
 		OrderByComparator<FragmentEntryLink> orderByComparator) {
@@ -376,20 +366,6 @@ public class FragmentEntryLinkLocalServiceImpl
 		return fragmentEntryLinkFinder.findByG_F_C(
 			groupId, fragmentEntryId, classNameId, start, end,
 			orderByComparator);
-	}
-
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String rendererKey) {
-
-		return fragmentEntryLinkPersistence.findByC_R(companyId, rendererKey);
-	}
-
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String[] rendererKeys) {
-
-		return fragmentEntryLinkPersistence.findByC_R(companyId, rendererKeys);
 	}
 
 	@Override
@@ -721,94 +697,6 @@ public class FragmentEntryLinkLocalServiceImpl
 	}
 
 	@Override
-	public void updateLatestChanges(
-			FragmentEntry fragmentEntry, FragmentEntryLink fragmentEntryLink)
-		throws PortalException {
-
-		long fragmentEntryId = fragmentEntryLink.getFragmentEntryId();
-
-		if ((fragmentEntryId != fragmentEntry.getFragmentEntryId()) ||
-			((fragmentEntryId == 0) &&
-			 !Objects.equals(
-				 fragmentEntry.getFragmentEntryKey(),
-				 fragmentEntryLink.getRendererKey()))) {
-
-			throw new UnsupportedOperationException(
-				"Unable to propagate fragment entry " + fragmentEntryId);
-		}
-
-		boolean modified = false;
-
-		// LPS-132154 Set configuration before processing the HTML
-
-		if (!Objects.equals(
-				fragmentEntryLink.getConfiguration(),
-				fragmentEntry.getConfiguration())) {
-
-			fragmentEntryLink.setConfiguration(
-				fragmentEntry.getConfiguration());
-
-			modified = true;
-		}
-
-		if (!Objects.equals(
-				fragmentEntryLink.getHtml(), fragmentEntry.getHtml())) {
-
-			fragmentEntryLink.setHtml(
-				_replaceResources(
-					fragmentEntry.getFragmentEntryId(),
-					fragmentEntry.getHtml()));
-
-			String defaultEditableValues = String.valueOf(
-				_fragmentEntryProcessorRegistry.
-					getDefaultEditableValuesJSONObject(
-						_getProcessedHTML(
-							fragmentEntryLink,
-							ServiceContextThreadLocal.getServiceContext()),
-						fragmentEntryLink.getConfiguration()));
-
-			String newEditableValues = _mergeEditableValues(
-				defaultEditableValues, fragmentEntryLink.getEditableValues());
-
-			fragmentEntryLink.setEditableValues(newEditableValues);
-
-			modified = true;
-		}
-
-		if (!Objects.equals(
-				fragmentEntryLink.getCss(), fragmentEntry.getCss())) {
-
-			fragmentEntryLink.setCss(fragmentEntry.getCss());
-
-			modified = true;
-		}
-
-		if (!Objects.equals(fragmentEntryLink.getJs(), fragmentEntry.getJs())) {
-			fragmentEntryLink.setJs(fragmentEntry.getJs());
-
-			modified = true;
-		}
-
-		if (modified) {
-			fragmentEntryLink.setLastPropagationDate(new Date());
-
-			fragmentEntryLink = fragmentEntryLinkPersistence.update(
-				fragmentEntryLink);
-
-			_updateFragmentEntryLinkLayout(fragmentEntryLink);
-
-			for (ContentPageEditorListener contentPageEditorListener :
-					_contentPageEditorListenerTracker.
-						getContentPageEditorListeners()) {
-
-				contentPageEditorListener.
-					onUpdateFragmentEntryLinkConfigurationValues(
-						fragmentEntryLink);
-			}
-		}
-	}
-
-	@Override
 	public void updateLatestChanges(long fragmentEntryLinkId)
 		throws PortalException {
 
@@ -818,7 +706,33 @@ public class FragmentEntryLinkLocalServiceImpl
 		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
 			fragmentEntryLink.getFragmentEntryId());
 
-		updateLatestChanges(fragmentEntry, fragmentEntryLink);
+		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
+
+		// LPS-132154 Set configuration before processing the HTML
+
+		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
+
+		String processedHTML = _getProcessedHTML(
+			fragmentEntryLink, ServiceContextThreadLocal.getServiceContext());
+
+		String defaultEditableValues = String.valueOf(
+			_fragmentEntryProcessorRegistry.getDefaultEditableValuesJSONObject(
+				processedHTML, fragmentEntryLink.getConfiguration()));
+
+		fragmentEntryLink.setCss(fragmentEntry.getCss());
+		fragmentEntryLink.setJs(fragmentEntry.getJs());
+
+		String newEditableValues = _mergeEditableValues(
+			defaultEditableValues, fragmentEntryLink.getEditableValues());
+
+		fragmentEntryLink.setEditableValues(newEditableValues);
+
+		fragmentEntryLink.setLastPropagationDate(new Date());
+
+		fragmentEntryLink = fragmentEntryLinkPersistence.update(
+			fragmentEntryLink);
+
+		_updateFragmentEntryLinkLayout(fragmentEntryLink);
 	}
 
 	private String _getProcessedHTML(
@@ -875,30 +789,13 @@ public class FragmentEntryLinkLocalServiceImpl
 					continue;
 				}
 
-				Iterator<String> defaultEditableValuesIterator =
+				Iterator<String> iterator =
 					defaultEditableFragmentEntryProcessorJSONObject.keys();
 
-				while (defaultEditableValuesIterator.hasNext()) {
-					String key = defaultEditableValuesIterator.next();
+				while (iterator.hasNext()) {
+					String key = iterator.next();
 
 					if (editableFragmentEntryProcessorJSONObject.has(key)) {
-						defaultEditableFragmentEntryProcessorJSONObject.put(
-							key,
-							_replaceDefaultValue(
-								editableFragmentEntryProcessorJSONObject.
-									getJSONObject(key)));
-					}
-				}
-
-				Iterator<String> editableValuesIterator =
-					editableFragmentEntryProcessorJSONObject.keys();
-
-				while (editableValuesIterator.hasNext()) {
-					String key = editableValuesIterator.next();
-
-					if (!defaultEditableFragmentEntryProcessorJSONObject.has(
-							key)) {
-
 						defaultEditableFragmentEntryProcessorJSONObject.put(
 							key,
 							editableFragmentEntryProcessorJSONObject.get(key));
@@ -912,68 +809,13 @@ public class FragmentEntryLinkLocalServiceImpl
 
 			return editableValuesJSONObject.toString();
 		}
-		catch (PortalException portalException) {
+		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException, portalException);
+				_log.debug(jsonException, jsonException);
 			}
 		}
 
 		return editableValues;
-	}
-
-	private JSONObject _replaceDefaultValue(JSONObject jsonObject) {
-		String defaultValue = jsonObject.getString("defaultValue");
-
-		Matcher matcher = _dlDownloadURLPattern.matcher(defaultValue);
-
-		while (matcher.find()) {
-			long groupId = Long.valueOf(matcher.group(1));
-			String uuid = matcher.group(4);
-			FileEntry fileEntry = null;
-
-			try {
-				fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
-					uuid, groupId);
-			}
-			catch (PortalException portalException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to get file entry with uuid " + uuid,
-						portalException);
-				}
-			}
-
-			if (fileEntry == null) {
-				long folderId = Long.valueOf(matcher.group(2));
-				String title = matcher.group(3);
-
-				fileEntry = PortletFileRepositoryUtil.fetchPortletFileEntry(
-					groupId, folderId, title);
-			}
-
-			if (fileEntry != null) {
-				try {
-					String fileEntryURL = _dlURLHelper.getDownloadURL(
-						fileEntry, fileEntry.getFileVersion(), null,
-						StringPool.BLANK, false, false);
-
-					jsonObject.put(
-						"defaultValue",
-						StringUtil.replace(
-							defaultValue, matcher.group(), fileEntryURL));
-				}
-				catch (PortalException portalException) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Unable to get file version for file entry " +
-								fileEntry.getFileEntryId(),
-							portalException);
-					}
-				}
-			}
-		}
-
-		return jsonObject;
 	}
 
 	private String _replaceResources(long fragmentEntryId, String html)
@@ -1036,17 +878,11 @@ public class FragmentEntryLinkLocalServiceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		FragmentEntryLinkLocalServiceImpl.class);
 
-	private static final Pattern _dlDownloadURLPattern = Pattern.compile(
-		"(?:/?[^\\s]*)/documents/(\\d+)/(\\d+)/([^/?]+)(?:/([-0-9a-fA-F]+))?" +
-			"(?:\\?t=\\d+)?\\&download=true");
 	private static final Pattern _pattern = Pattern.compile(
 		"\\[resources:(.+?)\\]");
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private ContentPageEditorListenerTracker _contentPageEditorListenerTracker;
 
 	@Reference
 	private DLURLHelper _dlURLHelper;

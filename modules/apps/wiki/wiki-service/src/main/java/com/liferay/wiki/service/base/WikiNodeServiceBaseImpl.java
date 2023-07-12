@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -31,6 +29,8 @@ import com.liferay.wiki.service.WikiNodeServiceUtil;
 import com.liferay.wiki.service.persistence.WikiNodePersistence;
 import com.liferay.wiki.service.persistence.WikiPageFinder;
 import com.liferay.wiki.service.persistence.WikiPagePersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -59,7 +59,7 @@ public abstract class WikiNodeServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		WikiNodeServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public abstract class WikiNodeServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		wikiNodeService = (WikiNodeService)aopProxy;
 
-		WikiNodeServiceUtil.setService(wikiNodeService);
+		_setServiceUtilService(wikiNodeService);
 	}
 
 	/**
@@ -118,6 +118,20 @@ public abstract class WikiNodeServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(WikiNodeService wikiNodeService) {
+		try {
+			Field field = WikiNodeServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, wikiNodeService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.wiki.service.WikiNodeLocalService
 		wikiNodeLocalService;
@@ -154,8 +168,5 @@ public abstract class WikiNodeServiceBaseImpl
 
 	@Reference
 	protected WikiPageFinder wikiPageFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WikiNodeServiceBaseImpl.class);
 
 }

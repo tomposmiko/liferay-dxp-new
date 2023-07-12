@@ -679,10 +679,6 @@ public class KaleoTimerUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(KaleoTimerPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile KaleoTimerPersistence _persistence;
 
 }

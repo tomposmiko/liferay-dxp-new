@@ -668,12 +668,6 @@ public class CommerceAccountOrganizationRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceAccountOrganizationRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceAccountOrganizationRelPersistence
 		_persistence;
 

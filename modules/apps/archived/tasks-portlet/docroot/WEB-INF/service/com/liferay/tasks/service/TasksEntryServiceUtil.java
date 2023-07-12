@@ -100,10 +100,6 @@ public class TasksEntryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(TasksEntryService service) {
-		_service = service;
-	}
-
 	private static volatile TasksEntryService _service;
 
 }

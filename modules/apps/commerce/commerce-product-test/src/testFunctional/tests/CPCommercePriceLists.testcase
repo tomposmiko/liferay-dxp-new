@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -91,8 +91,6 @@ definition {
 			locator1 = "Button#SUBMIT",
 			value1 = "Submit");
 
-		SelectFrameTop();
-
 		Click(locator1 = "Icon#ANGLE_LEFT_BACK");
 
 		Click(locator1 = "Button#PLUS");
@@ -105,8 +103,6 @@ definition {
 		AssertClickNoError(
 			locator1 = "Button#SUBMIT",
 			value1 = "Submit");
-
-		SelectFrameTop();
 
 		CommerceNavigator.gotoPortlet(
 			category = "Pricing",
@@ -122,8 +118,6 @@ definition {
 		AssertClickNoError(
 			locator1 = "Button#SUBMIT",
 			value1 = "Submit");
-
-		SelectFrameTop();
 
 		CommerceNavigator.gotoPortlet(
 			category = "Product Management",
@@ -273,8 +267,6 @@ definition {
 			locator1 = "Button#SUBMIT",
 			value1 = "Submit");
 
-		SelectFrameTop();
-
 		CommerceNavigator.gotoEntry(entryName = "Test Price List");
 
 		AssertElementPresent(
@@ -326,13 +318,11 @@ definition {
 
 		Click(locator1 = "Icon#CLOSE");
 
-		SelectFrameTop();
-
 		Click(locator1 = "Button#PLUS");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		Type(
 			locator1 = "TextInput#NAME",
@@ -388,8 +378,6 @@ definition {
 		AssertClickNoError(
 			locator1 = "Button#SUBMIT",
 			value1 = "Submit");
-
-		SelectFrameTop();
 
 		CommerceNavigator.gotoEntry(entryName = "Test Price List");
 
@@ -504,8 +492,6 @@ definition {
 			locator1 = "Button#SUBMIT",
 			value1 = "Submit");
 
-		SelectFrameTop();
-
 		Click(locator1 = "Icon#ANGLE_LEFT_BACK");
 
 		Click(locator1 = "Button#PLUS");
@@ -518,8 +504,6 @@ definition {
 		AssertClickNoError(
 			locator1 = "Button#SUBMIT",
 			value1 = "Submit");
-
-		SelectFrameTop();
 
 		CommerceNavigator.gotoPortlet(
 			category = "Pricing",
@@ -535,8 +519,6 @@ definition {
 		AssertClickNoError(
 			locator1 = "Button#SUBMIT",
 			value1 = "Submit");
-
-		SelectFrameTop();
 
 		CommerceNavigator.gotoPortlet(
 			category = "Product Management",

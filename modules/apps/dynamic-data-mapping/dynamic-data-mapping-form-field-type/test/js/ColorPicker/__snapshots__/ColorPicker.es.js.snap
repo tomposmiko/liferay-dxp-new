@@ -116,7 +116,6 @@ exports[`Field Color Picker renders field with helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
-      id="colorPicker_fieldHelp"
     >
       Helptext
     </span>
@@ -140,6 +139,7 @@ exports[`Field Color Picker renders field with label 1`] = `
     <label
       aria-labelledby="colorPicker_fieldDetails"
       class="ddm-label"
+      for="colorPicker"
       tabindex="0"
     >
       label
@@ -192,7 +192,6 @@ exports[`Field Color Picker renders field with label 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
-      id="colorPicker_fieldHelp"
     >
       Helptext
     </span>
@@ -200,8 +199,6 @@ exports[`Field Color Picker renders field with label 1`] = `
       class="sr-only"
       id="colorPicker_fieldDetails"
     >
-      label
-      <br />
       Helptext
       <br />
     </span>

@@ -55,10 +55,6 @@ public class ScreensDDMStructureVersionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ScreensDDMStructureVersionService service) {
-		_service = service;
-	}
-
 	private static volatile ScreensDDMStructureVersionService _service;
 
 }

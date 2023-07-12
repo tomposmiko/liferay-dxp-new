@@ -46,8 +46,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -63,6 +61,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -287,7 +287,13 @@ public abstract class CommercePricingClassLocalServiceBaseImpl
 			uuid, companyId, null);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce pricing class with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce pricing class's external reference code
+	 * @return the matching commerce pricing class, or <code>null</code> if a matching commerce pricing class could not be found
+	 */
 	@Override
 	public CommercePricingClass
 		fetchCommercePricingClassByExternalReferenceCode(
@@ -297,6 +303,9 @@ public abstract class CommercePricingClassLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePricingClassByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CommercePricingClass fetchCommercePricingClassByReferenceCode(
@@ -306,7 +315,14 @@ public abstract class CommercePricingClassLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce pricing class with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce pricing class's external reference code
+	 * @return the matching commerce pricing class
+	 * @throws PortalException if a matching commerce pricing class could not be found
+	 */
 	@Override
 	public CommercePricingClass getCommercePricingClassByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -1001,15 +1017,14 @@ public abstract class CommercePricingClassLocalServiceBaseImpl
 			"com.liferay.commerce.pricing.model.CommercePricingClass",
 			commercePricingClassLocalService);
 
-		CommercePricingClassLocalServiceUtil.setService(
-			commercePricingClassLocalService);
+		_setLocalServiceUtilService(commercePricingClassLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.pricing.model.CommercePricingClass");
 
-		CommercePricingClassLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -1052,6 +1067,23 @@ public abstract class CommercePricingClassLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CommercePricingClassLocalService commercePricingClassLocalService) {
+
+		try {
+			Field field =
+				CommercePricingClassLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commercePricingClassLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1145,9 +1177,6 @@ public abstract class CommercePricingClassLocalServiceBaseImpl
 
 	@ServiceReference(type = ExpandoRowPersistence.class)
 	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommercePricingClassLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

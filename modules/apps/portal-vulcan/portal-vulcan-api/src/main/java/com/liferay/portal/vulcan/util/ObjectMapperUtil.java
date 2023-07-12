@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -62,8 +61,6 @@ public class ObjectMapperUtil {
 	static {
 		_objectMapper = new ObjectMapper() {
 			{
-				configure(
-					DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
 				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
 				configure(
 					SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);

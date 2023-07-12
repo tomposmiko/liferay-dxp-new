@@ -15,7 +15,6 @@
 package com.liferay.akismet.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AkismetEntryLocalService}.
@@ -353,11 +352,6 @@ public class AkismetEntryLocalServiceWrapper
 		return _akismetEntryLocalService.updateAkismetEntry(
 			className, classPK, type, permalink, referrer, userAgent, userIP,
 			userURL);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _akismetEntryLocalService.getBasePersistence();
 	}
 
 	@Override

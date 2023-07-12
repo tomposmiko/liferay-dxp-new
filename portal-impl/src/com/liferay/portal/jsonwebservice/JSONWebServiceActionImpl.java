@@ -43,17 +43,9 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.TemporalAccessor;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -63,14 +55,11 @@ import java.util.Objects;
 import jodd.bean.BeanCopy;
 import jodd.bean.BeanUtil;
 
-import jodd.time.TimeUtil;
-
 import jodd.typeconverter.TypeConversionException;
-import jodd.typeconverter.TypeConverter;
 import jodd.typeconverter.TypeConverterManager;
 
-import jodd.util.ClassUtil;
-import jodd.util.StringUtil;
+import jodd.util.NameValue;
+import jodd.util.ReflectUtil;
 
 /**
  * @author Igor Spasic
@@ -132,7 +121,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 			return;
 		}
 
-		if (!ClassUtil.isTypeOf(parameterType, targetClass)) {
+		if (!ReflectUtil.isTypeOf(parameterType, targetClass)) {
 			throw new IllegalArgumentException(
 				StringBundler.concat(
 					"Unmatched argument type ", parameterTypeName,
@@ -202,12 +191,10 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 			return inputObject;
 		}
 
-		TypeConverterManager typeConverterManager = TypeConverterManager.get();
-
 		Object outputObject = null;
 
 		try {
-			outputObject = typeConverterManager.convertType(
+			outputObject = TypeConverterManager.convertType(
 				inputObject, targetType);
 		}
 		catch (TypeConversionException typeConversionException) {
@@ -237,7 +224,8 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 
 					outputObject = targetType.newInstance();
 
-					BeanCopy beanCopy = new BeanCopy(inputObject, outputObject);
+					BeanCopy beanCopy = BeanCopy.beans(
+						inputObject, outputObject);
 
 					beanCopy.copy();
 
@@ -359,46 +347,47 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 
 			return _generifyMap(map, genericParameterTypes);
 		}
+		else {
+			Object parameterValue = null;
 
-		Object parameterValue = null;
-
-		try {
-			parameterValue = _convertType(value, parameterType);
-		}
-		catch (Exception exception1) {
-			if (value instanceof Map) {
-				try {
-					parameterValue = _createDefaultParameterValue(
-						null, parameterType);
-				}
-				catch (Exception exception2) {
-					ClassCastException classCastException =
-						new ClassCastException(exception1.getMessage());
-
-					classCastException.addSuppressed(exception2);
-
-					throw classCastException;
-				}
-
-				BeanCopy beanCopy = new BeanCopy(value, parameterValue);
-
-				beanCopy.copy();
+			try {
+				parameterValue = _convertType(value, parameterType);
 			}
-			else {
-				String valueString = value.toString();
+			catch (Exception exception1) {
+				if (value instanceof Map) {
+					try {
+						parameterValue = _createDefaultParameterValue(
+							null, parameterType);
+					}
+					catch (Exception exception2) {
+						ClassCastException classCastException =
+							new ClassCastException(exception1.getMessage());
 
-				valueString = valueString.trim();
+						classCastException.addSuppressed(exception2);
 
-				if (!valueString.startsWith(StringPool.OPEN_CURLY_BRACE)) {
-					throw new ClassCastException(exception1.getMessage());
+						throw classCastException;
+					}
+
+					BeanCopy beanCopy = BeanCopy.beans(value, parameterValue);
+
+					beanCopy.copy();
 				}
+				else {
+					String valueString = value.toString();
 
-				parameterValue = JSONFactoryUtil.looseDeserialize(
-					valueString, parameterType);
+					valueString = valueString.trim();
+
+					if (!valueString.startsWith(StringPool.OPEN_CURLY_BRACE)) {
+						throw new ClassCastException(exception1.getMessage());
+					}
+
+					parameterValue = JSONFactoryUtil.looseDeserialize(
+						valueString, parameterType);
+				}
 			}
-		}
 
-		return parameterValue;
+			return parameterValue;
+		}
 	}
 
 	private Object _createDefaultParameterValue(
@@ -476,17 +465,17 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 			return;
 		}
 
-		List<Map.Entry<String, Object>> innerParameters =
+		List<NameValue<String, Object>> innerParameters =
 			_jsonWebServiceActionParameters.getInnerParameters(parameterName);
 
 		if (innerParameters == null) {
 			return;
 		}
 
-		for (Map.Entry<String, Object> innerParameter : innerParameters) {
+		for (NameValue<String, Object> innerParameter : innerParameters) {
 			try {
-				BeanUtil.pojo.setProperty(
-					parameterValue, innerParameter.getKey(),
+				BeanUtil.setProperty(
+					parameterValue, innerParameter.getName(),
 					innerParameter.getValue());
 			}
 			catch (Exception exception) {
@@ -494,7 +483,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 					_log.debug(
 						StringBundler.concat(
 							"Unable to set inner parameter ", parameterName,
-							".", innerParameter.getKey()),
+							".", innerParameter.getName()),
 						exception);
 				}
 			}
@@ -597,120 +586,6 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 
 	private static final ServiceTracker<Object, Object> _serviceTracker;
 
-	private final JSONWebServiceActionConfig _jsonWebServiceActionConfig;
-	private final JSONWebServiceActionParameters
-		_jsonWebServiceActionParameters;
-	private final JSONWebServiceNaming _jsonWebServiceNaming;
-
-	private static class DateTypeConverter implements TypeConverter<Date> {
-
-		@Override
-		public Date convert(Object object) {
-			if (object == null) {
-				return null;
-			}
-
-			if (object instanceof Calendar) {
-				Calendar calendar = (Calendar)object;
-
-				return new Date(calendar.getTimeInMillis());
-			}
-
-			if (object instanceof Date) {
-				return (Date)object;
-			}
-
-			if (object instanceof LocalDate) {
-				return TimeUtil.toDate((LocalDate)object);
-			}
-
-			if (object instanceof LocalDateTime) {
-				return TimeUtil.toDate((LocalDateTime)object);
-			}
-
-			if (object instanceof Number) {
-				Number number = (Number)object;
-
-				return new Date(number.longValue());
-			}
-
-			String stringValue = object.toString();
-
-			stringValue = stringValue.trim();
-
-			if (!StringUtil.containsOnlyDigits(stringValue)) {
-				TemporalAccessor temporalAccessor =
-					_dateTimeFormatter.parseBest(
-						stringValue, ZonedDateTime::from, LocalDateTime::from,
-						LocalDate::from);
-
-				if (temporalAccessor instanceof LocalDate) {
-					return TimeUtil.toDate((LocalDate)temporalAccessor);
-				}
-
-				if (temporalAccessor instanceof LocalDateTime) {
-					return TimeUtil.toDate((LocalDateTime)temporalAccessor);
-				}
-
-				if (temporalAccessor instanceof ZonedDateTime) {
-					ZonedDateTime zonedDateTime =
-						(ZonedDateTime)temporalAccessor;
-
-					return Date.from(zonedDateTime.toInstant());
-				}
-
-				throw new TypeConversionException(object);
-			}
-
-			try {
-				return new Date(Long.parseLong(stringValue));
-			}
-			catch (NumberFormatException numberFormatException) {
-				throw new TypeConversionException(
-					object, numberFormatException);
-			}
-		}
-
-		// May 1 is "5-1" with "M-d" while "05-01" with "MM-dd". See
-		// java.time.format.DateTimeFormatterBuilder#appendPattern(String).
-
-		private static final DateTimeFormatter _dateTimeFormatter =
-			new DateTimeFormatterBuilder(
-			).parseCaseInsensitive(
-			).appendPattern(
-				"yyyy-[MM][M]-[dd][d]"
-			).optionalStart(
-			).optionalStart(
-			).appendLiteral(
-				' '
-			).optionalEnd(
-			).optionalStart(
-			).appendLiteral(
-				'T'
-			).optionalEnd(
-			).appendOptional(
-				DateTimeFormatter.ISO_TIME
-			).toFormatter();
-
-	}
-
-	private static class LocaleTypeConverter implements TypeConverter<Locale> {
-
-		@Override
-		public Locale convert(Object object) {
-			if (object == null) {
-				return null;
-			}
-
-			if (object instanceof Locale) {
-				return (Locale)object;
-			}
-
-			return LocaleUtil.fromLanguageId(String.valueOf(object), false);
-		}
-
-	}
-
 	static {
 		Registry registry = RegistryUtil.getRegistry();
 
@@ -723,11 +598,11 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 					"=*)")));
 
 		_serviceTracker.open();
-
-		TypeConverterManager typeConverterManager = TypeConverterManager.get();
-
-		typeConverterManager.register(Date.class, new DateTypeConverter());
-		typeConverterManager.register(Locale.class, new LocaleTypeConverter());
 	}
+
+	private final JSONWebServiceActionConfig _jsonWebServiceActionConfig;
+	private final JSONWebServiceActionParameters
+		_jsonWebServiceActionParameters;
+	private final JSONWebServiceNaming _jsonWebServiceNaming;
 
 }

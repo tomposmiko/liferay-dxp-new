@@ -85,16 +85,12 @@ function toArray(value = '') {
 }
 
 function normalizeValue({
-	localizedValueEdited,
 	multiple,
 	normalizedOptions,
 	predefinedValueArray,
 	valueArray,
 }) {
-	const assertValue =
-		valueArray.length || (valueArray.length === 0 && localizedValueEdited)
-			? valueArray
-			: predefinedValueArray;
+	const assertValue = valueArray.length ? valueArray : predefinedValueArray;
 
 	const valueWithoutMultiple = assertValue.filter((_, index) => {
 		return multiple ? true : index === 0;
@@ -559,7 +555,6 @@ const Main = ({
 	fixedOptions = [],
 	label,
 	localizedValue = {},
-	localizedValueEdited,
 	multiple,
 	name,
 	onBlur = () => {},
@@ -590,29 +585,21 @@ const Main = ({
 	value = useMemo(
 		() =>
 			normalizeValue({
-				localizedValueEdited,
 				multiple,
 				normalizedOptions,
 				predefinedValueArray,
 				valueArray,
 			}),
-		[
-			localizedValueEdited,
-			multiple,
-			normalizedOptions,
-			predefinedValueArray,
-			valueArray,
-		]
+		[multiple, normalizedOptions, predefinedValueArray, valueArray]
 	);
 
 	return (
 		<FieldBase
-			{...otherProps}
 			label={label}
 			localizedValue={localizedValue}
 			name={name}
 			readOnly={readOnly}
-			style={null}
+			{...otherProps}
 		>
 			<Select
 				multiple={multiple}

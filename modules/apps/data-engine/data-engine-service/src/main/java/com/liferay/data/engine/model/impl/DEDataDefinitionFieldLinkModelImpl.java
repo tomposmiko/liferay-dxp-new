@@ -265,96 +265,90 @@ public class DEDataDefinitionFieldLinkModelImpl
 	private static final Map
 		<String, Function<DEDataDefinitionFieldLink, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<DEDataDefinitionFieldLink, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DEDataDefinitionFieldLink, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DEDataDefinitionFieldLink, Object>>();
-
-		attributeGetterFunctions.put(
-			"uuid", DEDataDefinitionFieldLink::getUuid);
-		attributeGetterFunctions.put(
-			"deDataDefinitionFieldLinkId",
-			DEDataDefinitionFieldLink::getDeDataDefinitionFieldLinkId);
-		attributeGetterFunctions.put(
-			"groupId", DEDataDefinitionFieldLink::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", DEDataDefinitionFieldLink::getCompanyId);
-		attributeGetterFunctions.put(
-			"createDate", DEDataDefinitionFieldLink::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DEDataDefinitionFieldLink::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", DEDataDefinitionFieldLink::getClassNameId);
-		attributeGetterFunctions.put(
-			"classPK", DEDataDefinitionFieldLink::getClassPK);
-		attributeGetterFunctions.put(
-			"ddmStructureId", DEDataDefinitionFieldLink::getDdmStructureId);
-		attributeGetterFunctions.put(
-			"fieldName", DEDataDefinitionFieldLink::getFieldName);
-		attributeGetterFunctions.put(
-			"lastPublishDate", DEDataDefinitionFieldLink::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<DEDataDefinitionFieldLink, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DEDataDefinitionFieldLink, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<DEDataDefinitionFieldLink, ?>>();
 
+		attributeGetterFunctions.put(
+			"uuid", DEDataDefinitionFieldLink::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<DEDataDefinitionFieldLink, String>)
 				DEDataDefinitionFieldLink::setUuid);
+		attributeGetterFunctions.put(
+			"deDataDefinitionFieldLinkId",
+			DEDataDefinitionFieldLink::getDeDataDefinitionFieldLinkId);
 		attributeSetterBiConsumers.put(
 			"deDataDefinitionFieldLinkId",
 			(BiConsumer<DEDataDefinitionFieldLink, Long>)
 				DEDataDefinitionFieldLink::setDeDataDefinitionFieldLinkId);
+		attributeGetterFunctions.put(
+			"groupId", DEDataDefinitionFieldLink::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<DEDataDefinitionFieldLink, Long>)
 				DEDataDefinitionFieldLink::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", DEDataDefinitionFieldLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DEDataDefinitionFieldLink, Long>)
 				DEDataDefinitionFieldLink::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", DEDataDefinitionFieldLink::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DEDataDefinitionFieldLink, Date>)
 				DEDataDefinitionFieldLink::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DEDataDefinitionFieldLink::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DEDataDefinitionFieldLink, Date>)
 				DEDataDefinitionFieldLink::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", DEDataDefinitionFieldLink::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<DEDataDefinitionFieldLink, Long>)
 				DEDataDefinitionFieldLink::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", DEDataDefinitionFieldLink::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<DEDataDefinitionFieldLink, Long>)
 				DEDataDefinitionFieldLink::setClassPK);
+		attributeGetterFunctions.put(
+			"ddmStructureId", DEDataDefinitionFieldLink::getDdmStructureId);
 		attributeSetterBiConsumers.put(
 			"ddmStructureId",
 			(BiConsumer<DEDataDefinitionFieldLink, Long>)
 				DEDataDefinitionFieldLink::setDdmStructureId);
+		attributeGetterFunctions.put(
+			"fieldName", DEDataDefinitionFieldLink::getFieldName);
 		attributeSetterBiConsumers.put(
 			"fieldName",
 			(BiConsumer<DEDataDefinitionFieldLink, String>)
 				DEDataDefinitionFieldLink::setFieldName);
+		attributeGetterFunctions.put(
+			"lastPublishDate", DEDataDefinitionFieldLink::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<DEDataDefinitionFieldLink, Date>)
 				DEDataDefinitionFieldLink::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

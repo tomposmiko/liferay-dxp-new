@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -48,6 +46,8 @@ import com.liferay.portal.kernel.service.persistence.WebDAVPropsPersistence;
 import com.liferay.portal.kernel.service.persistence.WorkflowDefinitionLinkPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -1047,11 +1047,11 @@ public abstract class DLFolderServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		DLFolderServiceUtil.setService(dlFolderService);
+		_setServiceUtilService(dlFolderService);
 	}
 
 	public void destroy() {
-		DLFolderServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -1093,6 +1093,20 @@ public abstract class DLFolderServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(DLFolderService dlFolderService) {
+		try {
+			Field field = DLFolderServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFolderService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1308,8 +1322,5 @@ public abstract class DLFolderServiceBaseImpl
 
 	@BeanReference(type = RatingsStatsPersistence.class)
 	protected RatingsStatsPersistence ratingsStatsPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLFolderServiceBaseImpl.class);
 
 }

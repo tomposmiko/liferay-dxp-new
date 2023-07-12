@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!-- HEADER ELEMENTS -->
-
 <tr>
 	<td>HEADER_TITLE</td>
 	<td>//header//h1</td>

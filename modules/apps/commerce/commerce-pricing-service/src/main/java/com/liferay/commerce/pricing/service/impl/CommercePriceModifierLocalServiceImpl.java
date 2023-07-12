@@ -155,7 +155,6 @@ public class CommercePriceModifierLocalServiceImpl
 		CommercePriceModifier commercePriceModifier =
 			commercePriceModifierPersistence.create(commercePriceModifierId);
 
-		commercePriceModifier.setExternalReferenceCode(externalReferenceCode);
 		commercePriceModifier.setGroupId(groupId);
 		commercePriceModifier.setCompanyId(user.getCompanyId());
 		commercePriceModifier.setUserId(user.getUserId());
@@ -169,6 +168,7 @@ public class CommercePriceModifierLocalServiceImpl
 		commercePriceModifier.setActive(active);
 		commercePriceModifier.setDisplayDate(displayDate);
 		commercePriceModifier.setExpirationDate(expirationDate);
+		commercePriceModifier.setExternalReferenceCode(externalReferenceCode);
 
 		if ((expirationDate == null) || expirationDate.after(now)) {
 			commercePriceModifier.setStatus(WorkflowConstants.STATUS_DRAFT);

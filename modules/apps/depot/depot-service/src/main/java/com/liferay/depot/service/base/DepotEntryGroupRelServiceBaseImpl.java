@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class DepotEntryGroupRelServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DepotEntryGroupRelServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class DepotEntryGroupRelServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		depotEntryGroupRelService = (DepotEntryGroupRelService)aopProxy;
 
-		DepotEntryGroupRelServiceUtil.setService(depotEntryGroupRelService);
+		_setServiceUtilService(depotEntryGroupRelService);
 	}
 
 	/**
@@ -117,6 +117,22 @@ public abstract class DepotEntryGroupRelServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		DepotEntryGroupRelService depotEntryGroupRelService) {
+
+		try {
+			Field field = DepotEntryGroupRelServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, depotEntryGroupRelService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.depot.service.DepotEntryGroupRelLocalService
 		depotEntryGroupRelLocalService;
@@ -129,8 +145,5 @@ public abstract class DepotEntryGroupRelServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DepotEntryGroupRelServiceBaseImpl.class);
 
 }

@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -23,7 +23,7 @@ definition {
 	}
 
 	@description = "This ensures that the reviewer can view the translation in the side by side interface and approve it individually."
-	@priority = 5
+	@priority = "5"
 	test ApproveEntry {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -133,7 +133,7 @@ definition {
 	}
 
 	@description = "This ensures that a new version of a published WC can be created and submitted for publication once a new translation is approved."
-	@priority = 5
+	@priority = "5"
 	test ApproveNewTranslationForPublishedWC {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -234,14 +234,14 @@ definition {
 	}
 
 	@description = "This ensures that a rejected translation does not appear in a WC."
-	@priority = 5
+	@priority = "5"
 	test RejectTranslationsForDraftAndApprovedWC {
 		for (var resourceValue : list "Translation,Web Content Article") {
 			Workflow.openWorkflowAdmin(siteURLKey = "guest");
 
 			Workflow.configureWorkflow(
 				workflowDefinition = "Single Approver",
-				workflowResourceValue = ${resourceValue});
+				workflowResourceValue = "${resourceValue}");
 		}
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
@@ -302,14 +302,14 @@ definition {
 
 		Workflow.assignToMeTaskByActions(
 			multipleTasks = "true",
-			taskPosition = 3,
+			taskPosition = "3",
 			workflowAssetTitle = "WC WebContent Title",
 			workflowAssetType = "Web Content Article",
 			workflowTask = "Review");
 
 		Workflow.approveTaskByActions(
 			multipleTasks = "true",
-			taskPosition = 3,
+			taskPosition = "3",
 			workflowAssetTitle = "WC WebContent Title",
 			workflowAssetType = "Web Content Article",
 			workflowTask = "Review");
@@ -338,7 +338,7 @@ definition {
 
 		Workflow.assignToMeTaskByActions(
 			multipleTasks = "true",
-			taskPosition = 3,
+			taskPosition = "3",
 			workflowAssetTitle = "Translation of WC WebContent Title to ja-JP",
 			workflowAssetType = "Translation",
 			workflowTask = "Review");
@@ -362,7 +362,7 @@ definition {
 	}
 
 	@description = "This ensures that the reviewer can receive different translations notifications and reject them individually."
-	@priority = 5
+	@priority = "5"
 	test ResubmitRejectedEntries {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -567,7 +567,7 @@ definition {
 	}
 
 	@description = "This ensures that a user cannot submit a translation with the same language that is pending review."
-	@priority = 5
+	@priority = "5"
 	test UpdateSameTranslationAsAnotherUser {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -656,14 +656,14 @@ definition {
 	}
 
 	@description = "This ensures that a pending WC can be updated with a newly added translation once the translation is approved."
-	@priority = 5
+	@priority = "5"
 	test ViewUpdatedWCSubmissionAfterApprovedTranslation {
 		for (var resourceValue : list "Translation,Web Content Article") {
 			Workflow.openWorkflowAdmin(siteURLKey = "guest");
 
 			Workflow.configureWorkflow(
 				workflowDefinition = "Single Approver",
-				workflowResourceValue = ${resourceValue});
+				workflowResourceValue = "${resourceValue}");
 		}
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");

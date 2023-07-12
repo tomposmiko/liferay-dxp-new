@@ -326,10 +326,6 @@ public class ClassNameUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(ClassNamePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile ClassNamePersistence _persistence;
 
 }

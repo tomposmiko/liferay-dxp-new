@@ -66,7 +66,6 @@ public class CommerceOrderNoteLocalServiceImpl
 		CommerceOrderNote commerceOrderNote =
 			commerceOrderNotePersistence.create(commerceOrderNoteId);
 
-		commerceOrderNote.setExternalReferenceCode(externalReferenceCode);
 		commerceOrderNote.setGroupId(commerceOrder.getGroupId());
 		commerceOrderNote.setCompanyId(user.getCompanyId());
 		commerceOrderNote.setUserId(user.getUserId());
@@ -75,6 +74,7 @@ public class CommerceOrderNoteLocalServiceImpl
 			commerceOrder.getCommerceOrderId());
 		commerceOrderNote.setContent(content);
 		commerceOrderNote.setRestricted(restricted);
+		commerceOrderNote.setExternalReferenceCode(externalReferenceCode);
 
 		return commerceOrderNotePersistence.update(commerceOrderNote);
 	}

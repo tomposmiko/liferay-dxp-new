@@ -67,12 +67,6 @@ public class CommerceInventoryBookedQuantityServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceInventoryBookedQuantityService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceInventoryBookedQuantityService _service;
 
 }

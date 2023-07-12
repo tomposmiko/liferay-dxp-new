@@ -343,10 +343,6 @@ public class ResourceActionLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ResourceActionLocalService service) {
-		_service = service;
-	}
-
 	private static volatile ResourceActionLocalService _service;
 
 }

@@ -460,10 +460,6 @@ public class DepotEntryGroupRelLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DepotEntryGroupRelLocalService service) {
-		_service = service;
-	}
-
 	private static volatile DepotEntryGroupRelLocalService _service;
 
 }

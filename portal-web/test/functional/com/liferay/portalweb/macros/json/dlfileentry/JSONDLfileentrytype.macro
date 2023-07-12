@@ -8,21 +8,18 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/dlfileentrytype/get-file-entry-types \
-				-u test@liferay.com:test \
-				-d groupIds=[${groupId}]
+			  -u test@liferay.com:test \
+			  -d groupIds=[${groupId}]
 		''';
+		var fileEntryTypeId = JSONCurlUtil.post("${curl}", "$.[?(@['nameCurrentValue'] == '${fileEntryTypeName}')]['fileEntryTypeId']");
+		var fileEntryTypeId = StringUtil.replace("${fileEntryTypeId}", "[\"", "");
+		var fileEntryTypeId = StringUtil.replace("${fileEntryTypeId}", "\"]", "");
 
-		var fileEntryTypeId = JSONCurlUtil.post(${curl}, "$.[?(@['nameCurrentValue'] == '${fileEntryTypeName}')]['fileEntryTypeId']");
-
-		var fileEntryTypeId = StringUtil.replace(${fileEntryTypeId}, "[\"", "");
-
-		var fileEntryTypeId = StringUtil.replace(${fileEntryTypeId}, "\"]", "");
-
-		if (${fileEntryTypeId} == "") {
+		if ("${fileEntryTypeId}" == "") {
 			fail("FAIL. Cannot find fileEntryTypeId.");
 		}
 
-		return ${fileEntryTypeId};
+		return "${fileEntryTypeId}";
 	}
 
 }

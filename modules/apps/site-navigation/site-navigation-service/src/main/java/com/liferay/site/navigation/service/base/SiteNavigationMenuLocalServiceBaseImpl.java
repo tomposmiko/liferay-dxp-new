@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -55,6 +53,8 @@ import com.liferay.site.navigation.service.SiteNavigationMenuLocalServiceUtil;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -542,7 +542,7 @@ public abstract class SiteNavigationMenuLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		SiteNavigationMenuLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -558,8 +558,7 @@ public abstract class SiteNavigationMenuLocalServiceBaseImpl
 		siteNavigationMenuLocalService =
 			(SiteNavigationMenuLocalService)aopProxy;
 
-		SiteNavigationMenuLocalServiceUtil.setService(
-			siteNavigationMenuLocalService);
+		_setLocalServiceUtilService(siteNavigationMenuLocalService);
 	}
 
 	/**
@@ -620,6 +619,23 @@ public abstract class SiteNavigationMenuLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SiteNavigationMenuLocalService siteNavigationMenuLocalService) {
+
+		try {
+			Field field =
+				SiteNavigationMenuLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, siteNavigationMenuLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected SiteNavigationMenuLocalService siteNavigationMenuLocalService;
 
 	@Reference
@@ -636,8 +652,5 @@ public abstract class SiteNavigationMenuLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SiteNavigationMenuLocalServiceBaseImpl.class);
 
 }

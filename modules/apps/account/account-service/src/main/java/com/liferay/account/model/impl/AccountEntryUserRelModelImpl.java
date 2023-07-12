@@ -280,58 +280,52 @@ public class AccountEntryUserRelModelImpl
 
 	private static final Map<String, Function<AccountEntryUserRel, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AccountEntryUserRel, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AccountEntryUserRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AccountEntryUserRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AccountEntryUserRel::getMvccVersion);
-		attributeGetterFunctions.put(
-			"accountEntryUserRelId",
-			AccountEntryUserRel::getAccountEntryUserRelId);
-		attributeGetterFunctions.put(
-			"companyId", AccountEntryUserRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"accountEntryId", AccountEntryUserRel::getAccountEntryId);
-		attributeGetterFunctions.put(
-			"accountUserId", AccountEntryUserRel::getAccountUserId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<AccountEntryUserRel, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AccountEntryUserRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<AccountEntryUserRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AccountEntryUserRel::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"accountEntryUserRelId",
+			AccountEntryUserRel::getAccountEntryUserRelId);
 		attributeSetterBiConsumers.put(
 			"accountEntryUserRelId",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setAccountEntryUserRelId);
+		attributeGetterFunctions.put(
+			"companyId", AccountEntryUserRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"accountEntryId", AccountEntryUserRel::getAccountEntryId);
 		attributeSetterBiConsumers.put(
 			"accountEntryId",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setAccountEntryId);
+		attributeGetterFunctions.put(
+			"accountUserId", AccountEntryUserRel::getAccountUserId);
 		attributeSetterBiConsumers.put(
 			"accountUserId",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setAccountUserId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -63,7 +63,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -72,7 +72,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86191. A user can configure the page settings for each individual display page. This test will test 'Show Header' and 'Show Footer'. This test has been extended to also cover LPS-96438."
-	@priority = 4
+	@priority = "4"
 	test ConfigureDisplayPageShowHeaderAndFooter {
 		task ("Add a couple pages to the site so the navigation menu will appear in the display page template header") {
 			JSONLayout.addPublicLayout(
@@ -203,7 +203,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86191. A user can configure the page settings for each individual display page. This test changes the theme."
-	@priority = 4
+	@priority = "4"
 	test ConfigureDisplayPageTheme {
 		property test.name.skip.portal.instance = "DisplayPagesWithWebContent#ConfigureDisplayPageTheme";
 
@@ -278,7 +278,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-90999. A user has access to edit a display page while viewing the article through its display page."
-	@priority = 5
+	@priority = "5"
 	test EditDisplayPageWhenViewingInDisplayPage {
 		property portal.acceptance = "true";
 
@@ -340,7 +340,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-90999. A user has access to edit the web content article while viewing the article through its display page."
-	@priority = 5
+	@priority = "5"
 	test EditWebContentWhenViewingInDisplayPage {
 		property portal.acceptance = "true";
 
@@ -375,7 +375,7 @@ definition {
 
 			PortletEntry.inputTitle(title = "Webcontent Title Edit");
 
-			Type.typeEditorWaitForEditor(
+			Type.typeCKEditorWaitForCKEditor(
 				key_fieldLabel = "content",
 				locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 				value1 = "Webcontent Content Edit");
@@ -397,7 +397,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86221. A user can preview a draft status web content article within its display page."
-	@priority = 5
+	@priority = "5"
 	test PreviewDraftWebContent {
 		property portal.acceptance = "true";
 
@@ -449,7 +449,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86221. A user can preview a pending status web content article within its display page."
-	@priority = 5
+	@priority = "5"
 	test PreviewPendingWebContent {
 		property portal.acceptance = "true";
 
@@ -509,7 +509,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86221. A user can preview a published web content article within its display page."
-	@priority = 5
+	@priority = "5"
 	test PreviewPublishedWebContent {
 		property portal.acceptance = "true";
 
@@ -561,7 +561,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-96438. Guests should be able to view web content articles through display page templates."
-	@priority = 5
+	@priority = "5"
 	test ViewDisplayPageAsGuest {
 		property portal.acceptance = "true";
 
@@ -596,15 +596,10 @@ definition {
 		}
 
 		task ("Add a web content article") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			WebContentNavigator.gotoAddCP();
-
-			WebContent.addCP(
-				webContentContent = "Webcontent Content",
-				webContentTitle = "Webcontent Title");
-
-			PortletEntry.publish();
+			JSONWebcontent.addWebContent(
+				content = "Webcontent Content",
+				groupName = "Test Site Name",
+				title = "Webcontent Title");
 
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
@@ -671,7 +666,7 @@ definition {
 	}
 
 	@description = "When a display page is marked as default, associated assets will be displayed through the display page by default without need for additional configuration."
-	@priority = 5
+	@priority = "5"
 	test ViewDisplayPageMarkedAsDefault {
 		property portal.acceptance = "true";
 
@@ -682,15 +677,10 @@ definition {
 		}
 
 		task ("Add a web content article") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			WebContentNavigator.gotoAddCP();
-
-			WebContent.addCP(
-				webContentContent = "Webcontent Content",
-				webContentTitle = "Webcontent Title");
-
-			PortletEntry.publish();
+			JSONWebcontent.addWebContent(
+				content = "Webcontent Content",
+				groupName = "Test Site Name",
+				title = "Webcontent Title");
 
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
@@ -731,7 +721,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86190. Asset metadata should appear in page source."
-	@priority = 4
+	@priority = "4"
 	test ViewDisplayPageMetadata {
 		task ("Add a vocabulary and category") {
 			JSONCategory.addVocabulary(
@@ -751,7 +741,7 @@ definition {
 				vocabularyName = "Vocabulary Name");
 
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				assetTagNames = "test tag",
 				content = "Webcontent Content",
 				groupName = "Test Site Name",
@@ -775,12 +765,12 @@ definition {
 		}
 
 		task ("Assert the display page contains the web content article's tag and category") {
-			AssertTextPresent(value1 = "meta content=\"test tag,category name\"");
+			AssertTextPresent(value1 = "meta content=&quot;test tag,category name&quot;");
 		}
 	}
 
 	@description = "Display pages can be viewed through the asset publisher widget."
-	@priority = 5
+	@priority = "5"
 	test ViewDisplayPageViaAssetPublisher {
 		property portal.acceptance = "true";
 
@@ -846,7 +836,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-121195. Display pages can be viewed through friendly URL."
-	@priority = 5
+	@priority = "5"
 	test ViewDisplayPageViaFriendlyURL {
 		property portal.acceptance = "true";
 
@@ -885,7 +875,7 @@ definition {
 	}
 
 	@description = "A selected display page should override the default display page."
-	@priority = 5
+	@priority = "5"
 	test ViewNonDefaultDisplayPage {
 		property portal.acceptance = "true";
 
@@ -967,7 +957,7 @@ definition {
 	}
 
 	@description = "When no display page is selected, assets should not be displayed through the default display page."
-	@priority = 4
+	@priority = "4"
 	test ViewNoSelectedDisplayPage {
 		task ("Mark the display page as default") {
 			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");

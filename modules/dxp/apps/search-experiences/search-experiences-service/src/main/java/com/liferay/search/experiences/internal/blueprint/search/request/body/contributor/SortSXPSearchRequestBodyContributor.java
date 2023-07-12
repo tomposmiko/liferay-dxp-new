@@ -218,13 +218,10 @@ public class SortSXPSearchRequestBodyContributor
 	}
 
 	private NestedSort _toNestedSort(JSONObject jsonObject) {
-		NestedSort nestedSort = _sorts.nested(
-			jsonObject.getString("nested_path"));
+		NestedSort nestedSort = _sorts.nested(jsonObject.getString("path"));
 
-		if (jsonObject.has("nested_filter")) {
-			nestedSort.setFilterQuery(
-				_queryConverter.toQuery(
-					jsonObject.getJSONObject("nested_filter")));
+		if (jsonObject.has("filter")) {
+			nestedSort.setFilterQuery(_queryConverter.toQuery(jsonObject));
 		}
 
 		if (jsonObject.has("nested")) {

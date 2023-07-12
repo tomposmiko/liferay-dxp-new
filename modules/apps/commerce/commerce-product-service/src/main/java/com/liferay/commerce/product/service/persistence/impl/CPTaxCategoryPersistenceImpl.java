@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
-import com.liferay.commerce.product.exception.DuplicateCPTaxCategoryExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPTaxCategoryException;
 import com.liferay.commerce.product.model.CPTaxCategory;
 import com.liferay.commerce.product.model.CPTaxCategoryTable;
@@ -45,11 +44,11 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1109,36 +1108,6 @@ public class CPTaxCategoryPersistenceImpl
 		CPTaxCategoryModelImpl cpTaxCategoryModelImpl =
 			(CPTaxCategoryModelImpl)cpTaxCategory;
 
-		if (Validator.isNull(cpTaxCategory.getExternalReferenceCode())) {
-			cpTaxCategory.setExternalReferenceCode(
-				String.valueOf(cpTaxCategory.getPrimaryKey()));
-		}
-		else {
-			CPTaxCategory ercCPTaxCategory = fetchByC_ERC(
-				cpTaxCategory.getCompanyId(),
-				cpTaxCategory.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCPTaxCategory != null) {
-					throw new DuplicateCPTaxCategoryExternalReferenceCodeException(
-						"Duplicate cp tax category with external reference code " +
-							cpTaxCategory.getExternalReferenceCode() +
-								" and company " + cpTaxCategory.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCPTaxCategory != null) &&
-					(cpTaxCategory.getCPTaxCategoryId() !=
-						ercCPTaxCategory.getCPTaxCategoryId())) {
-
-					throw new DuplicateCPTaxCategoryExternalReferenceCodeException(
-						"Duplicate cp tax category with external reference code " +
-							cpTaxCategory.getExternalReferenceCode() +
-								" and company " + cpTaxCategory.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -1503,11 +1472,11 @@ public class CPTaxCategoryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CPTaxCategoryUtil.setPersistence(this);
+		_setCPTaxCategoryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CPTaxCategoryUtil.setPersistence(null);
+		_setCPTaxCategoryUtilPersistence(null);
 
 		entityCache.removeCache(CPTaxCategoryImpl.class.getName());
 
@@ -1517,6 +1486,22 @@ public class CPTaxCategoryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCPTaxCategoryUtilPersistence(
+		CPTaxCategoryPersistence cpTaxCategoryPersistence) {
+
+		try {
+			Field field = CPTaxCategoryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, cpTaxCategoryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

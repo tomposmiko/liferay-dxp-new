@@ -39,11 +39,6 @@ window.Liferay = {
 			sv_SE: 'Swedish (Sweden)',
 			zh_CN: 'Chinese (China)',
 		},
-		get: (title) => title,
 	},
 	ThemeDisplay: window.themeDisplay,
-	Util: {
-		...window.Liferay.Util,
-		escapeHTML: (title) => title,
-	},
 };

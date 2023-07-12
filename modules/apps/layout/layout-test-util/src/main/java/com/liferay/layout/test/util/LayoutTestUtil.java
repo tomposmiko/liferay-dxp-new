@@ -41,7 +41,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -310,68 +309,6 @@ public class LayoutTestUtil {
 		portletPreferences.store();
 
 		return newPortletId;
-	}
-
-	public static Layout addTypeContentLayout(Group group) throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
-
-		return LayoutLocalServiceUtil.addLayout(
-			TestPropsValues.getUserId(), group.getGroupId(), false,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
-			LayoutConstants.TYPE_CONTENT, false, StringPool.BLANK,
-			serviceContext);
-	}
-
-	public static Layout addTypeContentLayout(
-			Group group, boolean privateLayout, boolean system)
-		throws Exception {
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
-
-		return LayoutLocalServiceUtil.addLayout(
-			TestPropsValues.getUserId(), group.getGroupId(), privateLayout,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
-			LayoutConstants.TYPE_CONTENT, false, system, StringPool.BLANK,
-			serviceContext);
-	}
-
-	public static Layout addTypeContentLayout(
-			Group group, boolean privateLayout, boolean system,
-			long masterLayoutPlid)
-		throws Exception {
-
-		return LayoutLocalServiceUtil.addLayout(
-			TestPropsValues.getUserId(), group.getGroupId(), privateLayout,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, 0, 0,
-			HashMapBuilder.put(
-				LocaleUtil.US, RandomTestUtil.randomString()
-			).build(),
-			Collections.emptyMap(), Collections.emptyMap(),
-			Collections.emptyMap(), Collections.emptyMap(),
-			LayoutConstants.TYPE_CONTENT, StringPool.BLANK, false, system,
-			Collections.emptyMap(), masterLayoutPlid,
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), TestPropsValues.getUserId()));
-	}
-
-	public static Layout addTypeContentLayout(Group group, String title)
-		throws Exception {
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
-
-		return LayoutLocalServiceUtil.addLayout(
-			TestPropsValues.getUserId(), group.getGroupId(), false,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, title, StringPool.BLANK,
-			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
-			StringPool.BLANK, serviceContext);
 	}
 
 	public static Layout addTypeLinkToLayoutLayout(

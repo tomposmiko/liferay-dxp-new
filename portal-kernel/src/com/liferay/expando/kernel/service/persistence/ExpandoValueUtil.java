@@ -1842,10 +1842,6 @@ public class ExpandoValueUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(ExpandoValuePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile ExpandoValuePersistence _persistence;
 
 }

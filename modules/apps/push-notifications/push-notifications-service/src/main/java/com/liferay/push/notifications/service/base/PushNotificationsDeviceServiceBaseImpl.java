@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,6 +27,8 @@ import com.liferay.push.notifications.model.PushNotificationsDevice;
 import com.liferay.push.notifications.service.PushNotificationsDeviceService;
 import com.liferay.push.notifications.service.PushNotificationsDeviceServiceUtil;
 import com.liferay.push.notifications.service.persistence.PushNotificationsDevicePersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class PushNotificationsDeviceServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		PushNotificationsDeviceServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -73,8 +73,7 @@ public abstract class PushNotificationsDeviceServiceBaseImpl
 		pushNotificationsDeviceService =
 			(PushNotificationsDeviceService)aopProxy;
 
-		PushNotificationsDeviceServiceUtil.setService(
-			pushNotificationsDeviceService);
+		_setServiceUtilService(pushNotificationsDeviceService);
 	}
 
 	/**
@@ -120,6 +119,23 @@ public abstract class PushNotificationsDeviceServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		PushNotificationsDeviceService pushNotificationsDeviceService) {
+
+		try {
+			Field field =
+				PushNotificationsDeviceServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, pushNotificationsDeviceService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected
 		com.liferay.push.notifications.service.
@@ -154,8 +170,5 @@ public abstract class PushNotificationsDeviceServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PushNotificationsDeviceServiceBaseImpl.class);
 
 }

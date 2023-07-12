@@ -53,6 +53,7 @@ import com.liferay.tasks.service.persistence.TasksEntryUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -5767,7 +5768,7 @@ public class TasksEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param userId the user ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of tasks entries
 	 * @param end the upper bound of the range of tasks entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -6575,7 +6576,7 @@ public class TasksEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param assigneeUserId the assignee user ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of tasks entries
 	 * @param end the upper bound of the range of tasks entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -7930,7 +7931,7 @@ public class TasksEntryPersistenceImpl
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of tasks entries
 	 * @param end the upper bound of the range of tasks entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -9447,7 +9448,7 @@ public class TasksEntryPersistenceImpl
 	 *
 	 * @param groupId the group ID
 	 * @param assigneeUserId the assignee user ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of tasks entries
 	 * @param end the upper bound of the range of tasks entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -10674,11 +10675,11 @@ public class TasksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "assigneeUserId", "status"}, false);
 
-		TasksEntryUtil.setPersistence(this);
+		_setTasksEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		TasksEntryUtil.setPersistence(null);
+		_setTasksEntryUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(TasksEntryImpl.class.getName());
 
@@ -10688,6 +10689,21 @@ public class TasksEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setTasksEntryUtilPersistence(
+		TasksEntryPersistence tasksEntryPersistence) {
+
+		try {
+			Field field = TasksEntryUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, tasksEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

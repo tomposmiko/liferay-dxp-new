@@ -426,7 +426,7 @@ public class ExpandoColumnUtil {
 	 * </p>
 	 *
 	 * @param tableId the table ID
-	 * @param names the names
+	 * @param name the name
 	 * @param start the lower bound of the range of expando columns
 	 * @param end the upper bound of the range of expando columns (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -688,10 +688,6 @@ public class ExpandoColumnUtil {
 
 	public static ExpandoColumnPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(ExpandoColumnPersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static volatile ExpandoColumnPersistence _persistence;

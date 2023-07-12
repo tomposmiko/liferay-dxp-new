@@ -52,6 +52,7 @@ public class StagingProcessesWebToolbarDisplayContext {
 
 		_httpServletRequest = httpServletRequest;
 		_pageContext = pageContext;
+
 		_liferayPortletResponse = liferayPortletResponse;
 
 		Portlet portlet = liferayPortletResponse.getPortlet();

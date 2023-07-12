@@ -32,9 +32,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.workflow.metrics.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.HistogramMetricResource;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Rafael Praxedes
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/portal-workflow-metrics/v1.0/HistogramMetric",
-	service = HistogramMetricResource.Factory.class
-)
+@Component(immediate = true, service = HistogramMetricResource.Factory.class)
 @Generated("")
 public class HistogramMetricResourceFactoryImpl
 	implements HistogramMetricResource.Factory {
@@ -138,6 +135,16 @@ public class HistogramMetricResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		HistogramMetricResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		HistogramMetricResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, HistogramMetricResource>
 		_getProxyProviderFunction() {
 
@@ -186,7 +193,7 @@ public class HistogramMetricResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		HistogramMetricResource histogramMetricResource =
@@ -212,7 +219,6 @@ public class HistogramMetricResourceFactoryImpl
 		histogramMetricResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		histogramMetricResource.setRoleLocalService(_roleLocalService);
-		histogramMetricResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(histogramMetricResource, arguments);
@@ -254,6 +260,9 @@ public class HistogramMetricResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -262,9 +271,6 @@ public class HistogramMetricResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

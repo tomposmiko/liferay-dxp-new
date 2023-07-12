@@ -313,10 +313,6 @@ public class DLSyncEventLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DLSyncEventLocalService service) {
-		_service = service;
-	}
-
 	private static volatile DLSyncEventLocalService _service;
 
 }

@@ -59,9 +59,8 @@ public class CommerceProductChannelDataSetDataProvider
 
 		List<CommerceChannelRel> commerceChannelRels =
 			_commerceChannelRelService.getCommerceChannelRels(
-				CPDefinition.class.getName(), cpDefinitionId,
-				filter.getKeywords(), pagination.getStartPosition(),
-				pagination.getEndPosition());
+				CPDefinition.class.getName(), cpDefinitionId, null,
+				pagination.getStartPosition(), pagination.getEndPosition());
 
 		for (CommerceChannelRel commerceChannelRel : commerceChannelRels) {
 			CommerceChannel commerceChannel =
@@ -85,7 +84,7 @@ public class CommerceProductChannelDataSetDataProvider
 			httpServletRequest, "cpDefinitionId");
 
 		return _commerceChannelRelService.getCommerceChannelRelsCount(
-			CPDefinition.class.getName(), cpDefinitionId, filter.getKeywords());
+			CPDefinition.class.getName(), cpDefinitionId);
 	}
 
 	@Reference

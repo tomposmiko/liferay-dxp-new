@@ -64,6 +64,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -14543,9 +14544,7 @@ public class DLFolderPersistenceImpl
 	 */
 	@Override
 	public DLFolder fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				DLFolder.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(DLFolder.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -15263,8 +15262,6 @@ public class DLFolderPersistenceImpl
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
 		Set<String> ctIgnoreColumnNames = new HashSet<String>();
-		Set<String> ctMaxColumnNames = new HashSet<String>();
-		Set<String> ctMergeColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -15281,8 +15278,8 @@ public class DLFolderPersistenceImpl
 		ctStrictColumnNames.add("parentFolderId");
 		ctStrictColumnNames.add("treePath");
 		ctStrictColumnNames.add("name");
-		ctMergeColumnNames.add("description");
-		ctMaxColumnNames.add("lastPostDate");
+		ctStrictColumnNames.add("description");
+		ctStrictColumnNames.add("lastPostDate");
 		ctStrictColumnNames.add("defaultFileEntryTypeId");
 		ctStrictColumnNames.add("hidden_");
 		ctStrictColumnNames.add("restrictionType");
@@ -15297,8 +15294,6 @@ public class DLFolderPersistenceImpl
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
-		_ctColumnNamesMap.put(CTColumnResolutionType.MAX, ctMaxColumnNames);
-		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK, Collections.singleton("folderId"));
 		_ctColumnNamesMap.put(
@@ -15743,11 +15738,11 @@ public class DLFolderPersistenceImpl
 			},
 			false);
 
-		DLFolderUtil.setPersistence(this);
+		_setDLFolderUtilPersistence(this);
 	}
 
 	public void destroy() {
-		DLFolderUtil.setPersistence(null);
+		_setDLFolderUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFolderImpl.class.getName());
 
@@ -15760,6 +15755,21 @@ public class DLFolderPersistenceImpl
 		}
 
 		TableMapperFactory.removeTableMapper("DLFileEntryTypes_DLFolders");
+	}
+
+	private void _setDLFolderUtilPersistence(
+		DLFolderPersistence dlFolderPersistence) {
+
+		try {
+			Field field = DLFolderUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFolderPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@BeanReference(type = DLFileEntryTypePersistence.class)

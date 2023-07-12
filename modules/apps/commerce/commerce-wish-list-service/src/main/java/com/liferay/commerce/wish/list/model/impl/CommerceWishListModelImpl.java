@@ -322,76 +322,70 @@ public class CommerceWishListModelImpl
 
 	private static final Map<String, Function<CommerceWishList, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceWishList, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceWishList, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CommerceWishList, Object>>();
-
-		attributeGetterFunctions.put("uuid", CommerceWishList::getUuid);
-		attributeGetterFunctions.put(
-			"commerceWishListId", CommerceWishList::getCommerceWishListId);
-		attributeGetterFunctions.put("groupId", CommerceWishList::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceWishList::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceWishList::getUserId);
-		attributeGetterFunctions.put("userName", CommerceWishList::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceWishList::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceWishList::getModifiedDate);
-		attributeGetterFunctions.put("name", CommerceWishList::getName);
-		attributeGetterFunctions.put(
-			"defaultWishList", CommerceWishList::getDefaultWishList);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceWishList, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceWishList, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommerceWishList, ?>>();
 
+		attributeGetterFunctions.put("uuid", CommerceWishList::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommerceWishList, String>)CommerceWishList::setUuid);
+		attributeGetterFunctions.put(
+			"commerceWishListId", CommerceWishList::getCommerceWishListId);
 		attributeSetterBiConsumers.put(
 			"commerceWishListId",
 			(BiConsumer<CommerceWishList, Long>)
 				CommerceWishList::setCommerceWishListId);
+		attributeGetterFunctions.put("groupId", CommerceWishList::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceWishList, Long>)CommerceWishList::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceWishList::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceWishList, Long>)CommerceWishList::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceWishList::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceWishList, Long>)CommerceWishList::setUserId);
+		attributeGetterFunctions.put("userName", CommerceWishList::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceWishList, String>)
 				CommerceWishList::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceWishList::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceWishList, Date>)
 				CommerceWishList::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceWishList::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceWishList, Date>)
 				CommerceWishList::setModifiedDate);
+		attributeGetterFunctions.put("name", CommerceWishList::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceWishList, String>)CommerceWishList::setName);
+		attributeGetterFunctions.put(
+			"defaultWishList", CommerceWishList::getDefaultWishList);
 		attributeSetterBiConsumers.put(
 			"defaultWishList",
 			(BiConsumer<CommerceWishList, Boolean>)
 				CommerceWishList::setDefaultWishList);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

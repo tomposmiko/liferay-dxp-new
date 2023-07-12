@@ -60,7 +60,7 @@ public class ProductGroupProduct implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -86,7 +86,7 @@ public class ProductGroupProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "PAB-34098-789-N")
+	@Schema
 	public String getProductExternalReferenceCode() {
 		return productExternalReferenceCode;
 	}
@@ -118,7 +118,7 @@ public class ProductGroupProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String productExternalReferenceCode;
 
-	@Schema(example = "DAB-34098-789-N")
+	@Schema
 	public String getProductGroupExternalReferenceCode() {
 		return productGroupExternalReferenceCode;
 	}
@@ -152,7 +152,7 @@ public class ProductGroupProduct implements Serializable {
 	protected String productGroupExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30324")
+	@Schema
 	public Long getProductGroupId() {
 		return productGroupId;
 	}
@@ -181,7 +181,7 @@ public class ProductGroupProduct implements Serializable {
 	protected Long productGroupId;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getProductId() {
 		return productId;
 	}
@@ -237,7 +237,7 @@ public class ProductGroupProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String productName;
 
-	@Schema(example = "BL500IC")
+	@Schema
 	public String getSku() {
 		return sku;
 	}

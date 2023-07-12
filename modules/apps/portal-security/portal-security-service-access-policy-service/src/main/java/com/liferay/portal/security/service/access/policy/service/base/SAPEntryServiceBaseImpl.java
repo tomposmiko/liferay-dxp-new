@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,6 +27,8 @@ import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryService;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryServiceUtil;
 import com.liferay.portal.security.service.access.policy.service.persistence.SAPEntryPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class SAPEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		SAPEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class SAPEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		sapEntryService = (SAPEntryService)aopProxy;
 
-		SAPEntryServiceUtil.setService(sapEntryService);
+		_setServiceUtilService(sapEntryService);
 	}
 
 	/**
@@ -113,6 +113,20 @@ public abstract class SAPEntryServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(SAPEntryService sapEntryService) {
+		try {
+			Field field = SAPEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, sapEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -162,8 +176,5 @@ public abstract class SAPEntryServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SAPEntryServiceBaseImpl.class);
 
 }

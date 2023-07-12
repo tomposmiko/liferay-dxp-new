@@ -82,20 +82,18 @@ if (size != null) {
 	</c:choose>
 
 	<%
-	PortletURL portletURL = PortletURLFactoryUtil.create(request, PersonalMenuPortletKeys.PERSONAL_MENU, PortletRequest.RESOURCE_PHASE);
+	ResourceURL resourceURL = PortletURLFactoryUtil.create(request, PersonalMenuPortletKeys.PERSONAL_MENU, PortletRequest.RESOURCE_PHASE);
 
-	portletURL.setParameter("currentURL", themeDisplay.getURLCurrent());
-
-	portletURL.setParameter("p_p_resource_id", "/product_navigation_personal_menu/get_personal_menu_items");
-	portletURL.setParameter("portletId", themeDisplay.getPpid());
-	portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
+	resourceURL.setParameter("currentURL", themeDisplay.getURLCurrent());
+	resourceURL.setParameter("portletId", themeDisplay.getPpid());
+	resourceURL.setResourceID("/product_navigation_personal_menu/get_personal_menu_items");
 
 	Map<String, Object> props = HashMapBuilder.<String, Object>put(
 		"color", color
 	).put(
 		"isImpersonated", themeDisplay.isImpersonated()
 	).put(
-		"itemsURL", portletURL.toString()
+		"itemsURL", resourceURL.toString()
 	).put(
 		"label", label
 	).put(

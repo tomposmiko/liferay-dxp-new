@@ -12,7 +12,7 @@
  * details.
  */
 
-import {fireEvent, waitForElement} from '@testing-library/react';
+import {fireEvent} from '@testing-library/react';
 
 export function testControlledInput({
 	element,
@@ -33,7 +33,7 @@ export function testControlledInput({
 		newValueExpected ? {value: newValueExpected} : {value: newValue}
 	);
 
-	waitForElement(() => expect(element.value).toBe(value));
+	expect(element.value).toBe(value);
 }
 
 export function testControlledDateInput({

@@ -4,41 +4,43 @@ definition {
 		Variables.assertDefined(parameterList = "${groupName},${title}");
 
 		var groupId = JSONAssetlistSetter.setGroupId(
-			groupName = ${groupName},
-			site = ${site});
+			groupName = "${groupName}",
+			site = "${site}");
+
 		var type = JSONAssetlistSetter.setType(selectionType = "dynamic");
 
 		JSONAssetlistAPI._addAssetListEntry(
-			groupId = ${groupId},
-			title = ${title},
-			type = ${type});
+			groupId = "${groupId}",
+			title = "${title}",
+			type = "${type}");
 	}
 
 	macro addDynamicAssetListEntryWithItemType {
 		Variables.assertDefined(parameterList = "${groupName},${itemType},${title}");
 
 		var groupId = JSONAssetlistSetter.setGroupId(
-			groupName = ${groupName},
-			site = ${site});
+			groupName = "${groupName}",
+			site = "${site}");
 
 		JSONAssetlistAPI._addDynamicAssetListEntry(
-			groupId = ${groupId},
-			itemType = ${itemType},
-			title = ${title});
+			groupId = "${groupId}",
+			itemType = "${itemType}",
+			title = "${title}");
 	}
 
 	macro addManualAssetListEntry {
 		Variables.assertDefined(parameterList = "${groupName},${title}");
 
 		var groupId = JSONAssetlistSetter.setGroupId(
-			groupName = ${groupName},
-			site = ${site});
+			groupName = "${groupName}",
+			site = "${site}");
+
 		var type = JSONAssetlistSetter.setType(selectionType = "manual");
 
 		JSONAssetlistAPI._addAssetListEntry(
-			groupId = ${groupId},
-			title = ${title},
-			type = ${type});
+			groupId = "${groupId}",
+			title = "${title}",
+			type = "${type}");
 	}
 
 }

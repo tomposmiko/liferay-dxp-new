@@ -93,19 +93,20 @@ public class RequiredWorkflowDefinitionExceptionMapper
 				StringPool.BLANK
 			};
 		}
+		else {
+			int moreAssets = workflowDefinitionLinks.size() - 2;
 
-		int moreAssets = workflowDefinitionLinks.size() - 2;
+			WorkflowDefinitionLink workflowDefinitionLink1 =
+				workflowDefinitionLinks.get(0);
+			WorkflowDefinitionLink workflowDefinitionLink2 =
+				workflowDefinitionLinks.get(1);
 
-		WorkflowDefinitionLink workflowDefinitionLink1 =
-			workflowDefinitionLinks.get(0);
-		WorkflowDefinitionLink workflowDefinitionLink2 =
-			workflowDefinitionLinks.get(1);
-
-		return new Object[] {
-			_getModelResource(workflowDefinitionLink1.getClassName()),
-			_getModelResource(workflowDefinitionLink2.getClassName()),
-			moreAssets, StringPool.BLANK
-		};
+			return new Object[] {
+				_getModelResource(workflowDefinitionLink1.getClassName()),
+				_getModelResource(workflowDefinitionLink2.getClassName()),
+				moreAssets, StringPool.BLANK
+			};
+		}
 	}
 
 	private String _getMessageKey(

@@ -1,4 +1,6 @@
 {
+	"com.liferay.fragment.entry.processor.background.image.BackgroundImageFragmentEntryProcessor": {
+	},
 	"com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor": {
 		"title1": {
 			"config": {
@@ -6,5 +8,7 @@
 			"defaultValue": "Example Rich Text 1",
 			"en_US": "Custom Rich Text 1"
 		}
+	},
+	"com.liferay.fragment.entry.processor.freemarker.FreeMarkerFragmentEntryProcessor": {
 	}
 }

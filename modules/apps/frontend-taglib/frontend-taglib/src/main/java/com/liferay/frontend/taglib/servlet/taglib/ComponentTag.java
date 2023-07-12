@@ -79,8 +79,7 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 			namespace = NPMResolvedPackageNameUtil.get(servletContext);
 		}
 		else {
-			namespace = NPMResolvedPackageNameUtil.get(
-				pageContext.getServletContext());
+			namespace = NPMResolvedPackageNameUtil.get(request);
 		}
 
 		return namespace + "/" + _module;

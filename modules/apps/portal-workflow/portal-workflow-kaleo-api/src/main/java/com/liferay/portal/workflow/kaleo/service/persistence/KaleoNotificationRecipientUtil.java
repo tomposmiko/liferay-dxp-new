@@ -848,12 +848,6 @@ public class KaleoNotificationRecipientUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		KaleoNotificationRecipientPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile KaleoNotificationRecipientPersistence _persistence;
 
 }

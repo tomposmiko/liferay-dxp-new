@@ -32,9 +32,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.search.experiences.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.search.experiences.rest.resource.v1_0.FieldMappingInfoResource;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/search-experiences-rest/v1.0/FieldMappingInfo",
-	service = FieldMappingInfoResource.Factory.class
-)
+@Component(immediate = true, service = FieldMappingInfoResource.Factory.class)
 @Generated("")
 public class FieldMappingInfoResourceFactoryImpl
 	implements FieldMappingInfoResource.Factory {
@@ -138,6 +135,16 @@ public class FieldMappingInfoResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		FieldMappingInfoResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		FieldMappingInfoResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, FieldMappingInfoResource>
 		_getProxyProviderFunction() {
 
@@ -186,7 +193,7 @@ public class FieldMappingInfoResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		FieldMappingInfoResource fieldMappingInfoResource =
@@ -212,7 +219,6 @@ public class FieldMappingInfoResourceFactoryImpl
 		fieldMappingInfoResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		fieldMappingInfoResource.setRoleLocalService(_roleLocalService);
-		fieldMappingInfoResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(fieldMappingInfoResource, arguments);
@@ -254,6 +260,9 @@ public class FieldMappingInfoResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -262,9 +271,6 @@ public class FieldMappingInfoResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

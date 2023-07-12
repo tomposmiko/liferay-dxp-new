@@ -26,11 +26,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -59,7 +59,7 @@ public abstract class DDLRecordSetServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DDLRecordSetServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public abstract class DDLRecordSetServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddlRecordSetService = (DDLRecordSetService)aopProxy;
 
-		DDLRecordSetServiceUtil.setService(ddlRecordSetService);
+		_setServiceUtilService(ddlRecordSetService);
 	}
 
 	/**
@@ -115,6 +115,22 @@ public abstract class DDLRecordSetServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		DDLRecordSetService ddlRecordSetService) {
+
+		try {
+			Field field = DDLRecordSetServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddlRecordSetService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -160,8 +176,5 @@ public abstract class DDLRecordSetServiceBaseImpl
 
 	@Reference
 	protected DDLRecordSetVersionPersistence ddlRecordSetVersionPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDLRecordSetServiceBaseImpl.class);
 
 }

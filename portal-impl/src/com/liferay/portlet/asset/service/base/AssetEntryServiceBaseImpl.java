@@ -31,8 +31,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -43,6 +41,8 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.social.kernel.service.persistence.SocialActivityCounterFinder;
 import com.liferay.social.kernel.service.persistence.SocialActivityCounterPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -688,11 +688,11 @@ public abstract class AssetEntryServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		AssetEntryServiceUtil.setService(assetEntryService);
+		_setServiceUtilService(assetEntryService);
 	}
 
 	public void destroy() {
-		AssetEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -734,6 +734,20 @@ public abstract class AssetEntryServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(AssetEntryService assetEntryService) {
+		try {
+			Field field = AssetEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, assetEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -862,8 +876,5 @@ public abstract class AssetEntryServiceBaseImpl
 
 	@BeanReference(type = AssetTagFinder.class)
 	protected AssetTagFinder assetTagFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetEntryServiceBaseImpl.class);
 
 }

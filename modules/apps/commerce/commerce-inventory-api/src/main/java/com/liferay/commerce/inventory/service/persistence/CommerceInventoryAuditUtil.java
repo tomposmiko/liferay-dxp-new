@@ -656,12 +656,6 @@ public class CommerceInventoryAuditUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		CommerceInventoryAuditPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile CommerceInventoryAuditPersistence _persistence;
 
 }

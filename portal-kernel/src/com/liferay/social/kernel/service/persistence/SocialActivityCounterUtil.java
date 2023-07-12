@@ -1076,12 +1076,6 @@ public class SocialActivityCounterUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		SocialActivityCounterPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile SocialActivityCounterPersistence _persistence;
 
 }

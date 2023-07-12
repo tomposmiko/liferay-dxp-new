@@ -25,7 +25,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
@@ -33,7 +32,6 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
@@ -43,8 +41,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.RoleLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -55,7 +51,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsImpl;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderRequest;
@@ -70,8 +65,6 @@ import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.hamcrest.CoreMatchers;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -246,35 +239,6 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 
 		Assert.assertEquals(
 			LocaleUtil.SPAIN, ddmFormRenderingContext.getLocale());
-	}
-
-	@Test
-	public void testGetFormInstanceWithMissingSettings() throws Exception {
-		DDMFormDisplayContext ddmFormDisplayContext =
-			createDDMFormDisplayContext();
-
-		DDMFormInstance ddmFormInstance = spy(new DDMFormInstanceImpl());
-
-		String expectedSettings = StringUtil.randomString();
-
-		ddmFormInstance.setSettings(expectedSettings);
-
-		when(
-			_ddmFormInstanceService.fetchFormInstance(Matchers.anyLong())
-		).thenReturn(
-			ddmFormInstance
-		);
-
-		when(
-			_ddmFormInstanceVersion.getSettings()
-		).thenReturn(
-			StringPool.BLANK
-		);
-
-		ddmFormInstance = ddmFormDisplayContext.getFormInstance();
-
-		Assert.assertThat(
-			ddmFormInstance.getSettings(), CoreMatchers.is(expectedSettings));
 	}
 
 	@Test
@@ -458,6 +422,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		throws PortalException {
 
 		return new DDMFormDisplayContext(
+			renderRequest, new MockRenderResponse(),
 			mock(DDMFormFieldTypeServicesTracker.class),
 			_ddmFormInstanceLocalService,
 			mock(DDMFormInstanceRecordService.class),
@@ -466,10 +431,8 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 			mock(DDMFormRenderer.class), mock(DDMFormValuesFactory.class),
 			mock(DDMFormValuesMerger.class), _ddmFormWebConfiguration,
 			mock(DDMStorageAdapterTracker.class), mock(GroupLocalService.class),
-			new JSONFactoryImpl(), mock(Portal.class), renderRequest,
-			new MockRenderResponse(), mock(RoleLocalService.class),
-			mock(UserLocalService.class),
-			mock(WorkflowDefinitionLinkLocalService.class));
+			new JSONFactoryImpl(),
+			mock(WorkflowDefinitionLinkLocalService.class), mock(Portal.class));
 	}
 
 	protected DDMFormDisplayContext createSpy(
@@ -639,9 +602,6 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 			"es_ES"
 		);
 
-		_whenLanguageIsAvailableLocale(LocaleUtil.BRAZIL);
-		_whenLanguageIsAvailableLocale(LocaleUtil.SPAIN);
-
 		LanguageUtil languageUtil = new LanguageUtil();
 
 		languageUtil.setLanguage(_language);
@@ -712,14 +672,20 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 			_mockDDMFormInstanceVersionLocalService()
 		throws PortalException {
 
+		DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService =
+			mock(DDMFormInstanceVersionLocalService.class);
+
+		DDMFormInstanceVersion ddmFormInstanceVersion = mock(
+			DDMFormInstanceVersion.class);
+
 		when(
-			_ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
+			ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
 				Matchers.anyLong(), Matchers.anyInt())
 		).thenReturn(
-			_ddmFormInstanceVersion
+			ddmFormInstanceVersion
 		);
 
-		return _ddmFormInstanceVersionLocalService;
+		return ddmFormInstanceVersionLocalService;
 	}
 
 	private DDMStructure _mockDDMStructure() throws Exception {
@@ -739,21 +705,6 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		return ddmStructure;
 	}
 
-	private void _whenLanguageIsAvailableLocale(Locale locale) {
-		when(
-			_language.isAvailableLocale(Matchers.eq(locale))
-		).thenReturn(
-			true
-		);
-
-		when(
-			_language.isAvailableLocale(
-				Matchers.eq(LocaleUtil.toLanguageId(locale)))
-		).thenReturn(
-			true
-		);
-	}
-
 	private static final String _DEFAULT_LANGUAGE_ID = "es_ES";
 
 	@Mock
@@ -761,13 +712,6 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 
 	@Mock
 	private DDMFormInstanceService _ddmFormInstanceService;
-
-	@Mock
-	private DDMFormInstanceVersion _ddmFormInstanceVersion;
-
-	@Mock
-	private DDMFormInstanceVersionLocalService
-		_ddmFormInstanceVersionLocalService;
 
 	@Mock
 	private DDMFormWebConfiguration _ddmFormWebConfiguration;

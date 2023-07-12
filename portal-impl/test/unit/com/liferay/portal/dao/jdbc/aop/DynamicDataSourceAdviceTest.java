@@ -17,6 +17,7 @@ package com.liferay.portal.dao.jdbc.aop;
 import com.liferay.portal.kernel.aop.AopMethodInvocation;
 import com.liferay.portal.kernel.aop.ChainableMethodAdvice;
 import com.liferay.portal.kernel.dao.jdbc.aop.DynamicDataSourceTargetSource;
+import com.liferay.portal.kernel.dao.jdbc.aop.MasterDataSource;
 import com.liferay.portal.kernel.dao.jdbc.aop.Operation;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -120,7 +121,7 @@ public class DynamicDataSourceAdviceTest {
 
 	@Test
 	public void testDynamicDataSourceAdvice() throws Throwable {
-		for (int i = 1; i <= 4; i++) {
+		for (int i = 1; i <= 6; i++) {
 			AopMethodInvocation aopMethodInvocation = createMethodInvocation(
 				"method" + i);
 
@@ -152,6 +153,8 @@ public class DynamicDataSourceAdviceTest {
 			Assert.assertTrue(_testMethod2);
 			Assert.assertTrue(_testMethod3);
 			Assert.assertTrue(_testMethod4);
+			Assert.assertTrue(_testMethod5);
+			Assert.assertTrue(_testMethod6);
 		}
 
 		@SuppressWarnings("unused")
@@ -198,8 +201,30 @@ public class DynamicDataSourceAdviceTest {
 			_testMethod3 = true;
 		}
 
+		@MasterDataSource
+		@Transactional
+		public void method4() throws Exception {
+			Assert.assertEquals(
+				Operation.WRITE, _dynamicDataSourceTargetSource.getOperation());
+			Assert.assertSame(
+				_writeDataSource, _dynamicDataSourceTargetSource.getTarget());
+
+			_testMethod4 = true;
+		}
+
+		@MasterDataSource
 		@Transactional(readOnly = true)
-		public void method4() throws Throwable {
+		public void method5() throws Exception {
+			Assert.assertEquals(
+				Operation.WRITE, _dynamicDataSourceTargetSource.getOperation());
+			Assert.assertSame(
+				_writeDataSource, _dynamicDataSourceTargetSource.getTarget());
+
+			_testMethod5 = true;
+		}
+
+		@Transactional(readOnly = true)
+		public void method6() throws Throwable {
 			AopMethodInvocation aopMethodInvocation = createMethodInvocation(
 				"method3");
 
@@ -241,7 +266,7 @@ public class DynamicDataSourceAdviceTest {
 			Assert.assertSame(
 				_readDataSource, _dynamicDataSourceTargetSource.getTarget());
 
-			_testMethod4 = true;
+			_testMethod6 = true;
 		}
 
 		private final ThreadLocal<Operation> _callerOperation =
@@ -250,6 +275,8 @@ public class DynamicDataSourceAdviceTest {
 		private boolean _testMethod2;
 		private boolean _testMethod3;
 		private boolean _testMethod4;
+		private boolean _testMethod5;
+		private boolean _testMethod6;
 
 	}
 

@@ -33,7 +33,7 @@ CommerceVirtualOrderItemContentDisplayContext commerceVirtualOrderItemContentDis
 			"commerceVirtualOrderItemContentDisplayContext", commerceVirtualOrderItemContentDisplayContext
 		).build();
 
-		SearchContainer<CommerceVirtualOrderItem> commerceVirtualOrderItemContentDisplayContextSearchContainer = commerceVirtualOrderItemContentDisplayContext.getSearchContainer();
+		SearchContainer<CommerceVirtualOrderItem> commerceVirtualOrderContentDisplayContextSearchContainer = commerceVirtualOrderItemContentDisplayContext.getSearchContainer();
 		%>
 
 		<liferay-ddm:template-renderer
@@ -41,14 +41,14 @@ CommerceVirtualOrderItemContentDisplayContext commerceVirtualOrderItemContentDis
 			contextObjects="<%= contextObjects %>"
 			displayStyle="<%= commerceVirtualOrderItemContentDisplayContext.getDisplayStyle() %>"
 			displayStyleGroupId="<%= commerceVirtualOrderItemContentDisplayContext.getDisplayStyleGroupId() %>"
-			entries="<%= commerceVirtualOrderItemContentDisplayContextSearchContainer.getResults() %>"
+			entries="<%= commerceVirtualOrderContentDisplayContextSearchContainer.getResults() %>"
 		>
 			<div class="container-fluid-1280" id="<portlet:namespace />virtualOrderItemsContainer">
 				<div class="commerce-virtual-order-items-container" id="<portlet:namespace />entriesContainer">
 					<liferay-ui:search-container
 						id="commerceVirtualOrderItems"
 						iteratorURL="<%= currentURLObj %>"
-						searchContainer="<%= commerceVirtualOrderItemContentDisplayContextSearchContainer %>"
+						searchContainer="<%= commerceVirtualOrderContentDisplayContextSearchContainer %>"
 					>
 						<liferay-ui:search-container-row
 							className="com.liferay.commerce.product.type.virtual.order.model.CommerceVirtualOrderItem"

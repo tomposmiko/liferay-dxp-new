@@ -15,7 +15,6 @@
 package com.liferay.oauth2.provider.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link OAuth2ScopeGrantLocalService}.
@@ -575,11 +574,6 @@ public class OAuth2ScopeGrantLocalServiceWrapper
 
 		return _oAuth2ScopeGrantLocalService.updateOAuth2ScopeGrant(
 			oAuth2ScopeGrant);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _oAuth2ScopeGrantLocalService.getBasePersistence();
 	}
 
 	@Override

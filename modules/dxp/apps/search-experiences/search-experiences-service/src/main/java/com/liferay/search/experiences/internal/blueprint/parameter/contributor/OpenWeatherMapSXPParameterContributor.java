@@ -16,7 +16,6 @@ package com.liferay.search.experiences.internal.blueprint.parameter.contributor;
 
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -32,12 +31,9 @@ import com.liferay.search.experiences.internal.web.cache.IpstackWebCacheItem;
 import com.liferay.search.experiences.internal.web.cache.OpenWeatherMapWebCacheItem;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 
-import java.beans.ExceptionListener;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -54,8 +50,8 @@ public class OpenWeatherMapSXPParameterContributor
 
 	@Override
 	public void contribute(
-		ExceptionListener exceptionListener, SearchContext searchContext,
-		SXPBlueprint sxpBlueprint, Set<SXPParameter> sxpParameters) {
+		SearchContext searchContext, SXPBlueprint sxpBlueprint,
+		Set<SXPParameter> sxpParameters) {
 
 		OpenWeatherMapConfiguration openWeatherMapConfiguration =
 			_getOpenWeatherMapConfiguration(searchContext.getCompanyId());
@@ -72,19 +68,17 @@ public class OpenWeatherMapSXPParameterContributor
 		}
 
 		JSONObject jsonObject = IpstackWebCacheItem.get(
-			exceptionListener, ipAddress,
-			_getIpstackConfiguration(searchContext.getCompanyId()));
+			ipAddress, _getIpstackConfiguration(searchContext.getCompanyId()));
 
 		if (jsonObject.length() == 0) {
 			return;
 		}
 
-		String latitude = jsonObject.getString("latitude");
-		String longitude = jsonObject.getString("longitude");
+		String latitude = jsonObject.getString("ipstack.latitude");
+		String longitude = jsonObject.getString("ipstack.longitude");
 
 		jsonObject = OpenWeatherMapWebCacheItem.get(
-			exceptionListener, latitude, longitude,
-			openWeatherMapConfiguration);
+			latitude, longitude, openWeatherMapConfiguration);
 
 		if (jsonObject.length() == 0) {
 			return;
@@ -92,32 +86,16 @@ public class OpenWeatherMapSXPParameterContributor
 
 		sxpParameters.add(
 			new DoubleSXPParameter(
-				"openweathermap.temp", true,
-				JSONUtil.getValueAsDouble(
-					jsonObject, "JSONObject/main", "Object/temp")));
-		sxpParameters.add(
-			new StringSXPParameter(
-				"openweathermap.weather_description", true,
-				JSONUtil.getValueAsString(
-					jsonObject, "JSONArray/weather", "JSONObject/0",
-					"Object/description")));
+				"openweathermap.temperature", true,
+				jsonObject.getDouble("temp")));
 		sxpParameters.add(
 			new IntegerSXPParameter(
-				"openweathermap.weather_id", true,
-				JSONUtil.getValueAsInt(
-					jsonObject, "JSONArray/weather", "JSONObject/0",
-					"Object/id")));
+				"openweathermap.weather_condition_id", true,
+				jsonObject.getInt("id")));
 		sxpParameters.add(
 			new StringSXPParameter(
-				"openweathermap.weather_main", true,
-				JSONUtil.getValueAsString(
-					jsonObject, "JSONArray/weather", "JSONObject/0",
-					"Object/main")));
-		sxpParameters.add(
-			new DoubleSXPParameter(
-				"openweathermap.wind_speed", true,
-				JSONUtil.getValueAsDouble(
-					jsonObject, "JSONObject/wind", "Object/speed")));
+				"openweathermap.weather_condition_name", true,
+				jsonObject.getString("main")));
 	}
 
 	@Override
@@ -127,7 +105,7 @@ public class OpenWeatherMapSXPParameterContributor
 
 	@Override
 	public List<SXPParameterContributorDefinition>
-		getSXPParameterContributorDefinitions(long companyId, Locale locale) {
+		getSXPParameterContributorDefinitions(long companyId) {
 
 		OpenWeatherMapConfiguration openWeatherMapConfiguration =
 			_getOpenWeatherMapConfiguration(companyId);
@@ -138,19 +116,14 @@ public class OpenWeatherMapSXPParameterContributor
 
 		return Arrays.asList(
 			new SXPParameterContributorDefinition(
-				DoubleSXPParameter.class, "temperature", "openweathermap.temp"),
-			new SXPParameterContributorDefinition(
-				StringSXPParameter.class, "description",
-				"openweathermap.weather_description"),
+				DoubleSXPParameter.class, "temperature",
+				"openweathermap.temperature"),
 			new SXPParameterContributorDefinition(
 				IntegerSXPParameter.class, "weather-condition-id",
 				"openweathermap.weather_id"),
 			new SXPParameterContributorDefinition(
 				StringSXPParameter.class, "weather-condition-name",
-				"openweathermap.weather_main"),
-			new SXPParameterContributorDefinition(
-				DoubleSXPParameter.class, "wind-speed",
-				"openweathermap.wind_speed"));
+				"openweathermap.weather_name"));
 	}
 
 	private IpstackConfiguration _getIpstackConfiguration(long companyId) {

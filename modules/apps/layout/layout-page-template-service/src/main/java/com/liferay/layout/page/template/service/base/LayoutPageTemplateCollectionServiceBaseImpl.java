@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class LayoutPageTemplateCollectionServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		LayoutPageTemplateCollectionServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -74,8 +74,7 @@ public abstract class LayoutPageTemplateCollectionServiceBaseImpl
 		layoutPageTemplateCollectionService =
 			(LayoutPageTemplateCollectionService)aopProxy;
 
-		LayoutPageTemplateCollectionServiceUtil.setService(
-			layoutPageTemplateCollectionService);
+		_setServiceUtilService(layoutPageTemplateCollectionService);
 	}
 
 	/**
@@ -121,6 +120,24 @@ public abstract class LayoutPageTemplateCollectionServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		LayoutPageTemplateCollectionService
+			layoutPageTemplateCollectionService) {
+
+		try {
+			Field field =
+				LayoutPageTemplateCollectionServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutPageTemplateCollectionService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.layout.page.template.service.
 		LayoutPageTemplateCollectionLocalService
@@ -147,8 +164,5 @@ public abstract class LayoutPageTemplateCollectionServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutPageTemplateCollectionServiceBaseImpl.class);
 
 }

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -439,40 +440,29 @@ public class PriceListSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "priceEntries")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					PriceEntry[] priceEntriesArray =
-						new PriceEntry[jsonParserFieldValues.length];
-
-					for (int i = 0; i < priceEntriesArray.length; i++) {
-						priceEntriesArray[i] = PriceEntrySerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					priceList.setPriceEntries(priceEntriesArray);
+					priceList.setPriceEntries(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> PriceEntrySerDes.toDTO((String)object)
+						).toArray(
+							size -> new PriceEntry[size]
+						));
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "priceListAccountGroups")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					PriceListAccountGroup[] priceListAccountGroupsArray =
-						new PriceListAccountGroup[jsonParserFieldValues.length];
-
-					for (int i = 0; i < priceListAccountGroupsArray.length;
-						 i++) {
-
-						priceListAccountGroupsArray[i] =
-							PriceListAccountGroupSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					priceList.setPriceListAccountGroups(
-						priceListAccountGroupsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> PriceListAccountGroupSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new PriceListAccountGroup[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "priority")) {

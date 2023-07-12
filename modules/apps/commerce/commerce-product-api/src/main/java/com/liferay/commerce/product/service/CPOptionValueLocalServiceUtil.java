@@ -247,7 +247,13 @@ public class CPOptionValueLocalServiceUtil {
 		return getService().fetchCPOptionValue(CPOptionValueId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value, or <code>null</code> if a matching cp option value could not be found
+	 */
 	public static CPOptionValue fetchCPOptionValueByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -255,6 +261,9 @@ public class CPOptionValueLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionValueByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CPOptionValue fetchCPOptionValueByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -302,7 +311,14 @@ public class CPOptionValueLocalServiceUtil {
 		return getService().getCPOptionValue(cpOptionId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value
+	 * @throws PortalException if a matching cp option value could not be found
+	 */
 	public static CPOptionValue getCPOptionValueByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -456,10 +472,6 @@ public class CPOptionValueLocalServiceUtil {
 
 	public static CPOptionValueLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(CPOptionValueLocalService service) {
-		_service = service;
 	}
 
 	private static volatile CPOptionValueLocalService _service;

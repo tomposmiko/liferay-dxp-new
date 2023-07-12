@@ -532,10 +532,6 @@ public class ExpandoTableUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(ExpandoTablePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile ExpandoTablePersistence _persistence;
 
 }

@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -47,6 +45,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -374,7 +374,7 @@ public abstract class CTProcessLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		CTProcessLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -389,7 +389,7 @@ public abstract class CTProcessLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ctProcessLocalService = (CTProcessLocalService)aopProxy;
 
-		CTProcessLocalServiceUtil.setService(ctProcessLocalService);
+		_setLocalServiceUtilService(ctProcessLocalService);
 	}
 
 	/**
@@ -434,6 +434,22 @@ public abstract class CTProcessLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		CTProcessLocalService ctProcessLocalService) {
+
+		try {
+			Field field = CTProcessLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ctProcessLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected CTProcessLocalService ctProcessLocalService;
 
 	@Reference
@@ -449,8 +465,5 @@ public abstract class CTProcessLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.CompanyLocalService
 		companyLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTProcessLocalServiceBaseImpl.class);
 
 }

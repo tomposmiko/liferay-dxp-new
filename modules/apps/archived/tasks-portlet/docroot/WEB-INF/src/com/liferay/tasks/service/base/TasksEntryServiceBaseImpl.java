@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
@@ -35,6 +33,8 @@ import com.liferay.tasks.service.TasksEntryService;
 import com.liferay.tasks.service.TasksEntryServiceUtil;
 import com.liferay.tasks.service.persistence.TasksEntryFinder;
 import com.liferay.tasks.service.persistence.TasksEntryPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -488,11 +488,11 @@ public abstract class TasksEntryServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		TasksEntryServiceUtil.setService(tasksEntryService);
+		_setServiceUtilService(tasksEntryService);
 	}
 
 	public void destroy() {
-		TasksEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	/**
@@ -534,6 +534,20 @@ public abstract class TasksEntryServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(TasksEntryService tasksEntryService) {
+		try {
+			Field field = TasksEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, tasksEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -630,8 +644,5 @@ public abstract class TasksEntryServiceBaseImpl
 
 	@BeanReference(type = SocialActivityPersistence.class)
 	protected SocialActivityPersistence socialActivityPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		TasksEntryServiceBaseImpl.class);
 
 }

@@ -76,7 +76,7 @@ public class GetRedirectEntryChainCauseMVCResourceCommand
 				RedirectUtil.getGroupBaseURL(themeDisplay) +
 					StringPool.FORWARD_SLASH + sourceURL);
 
-		if (ListUtil.isNotEmpty(redirectEntries)) {
+		if (!ListUtil.isEmpty(redirectEntries)) {
 			return "sourceURL";
 		}
 

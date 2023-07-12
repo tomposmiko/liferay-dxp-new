@@ -698,12 +698,6 @@ public class AssetAutoTaggerEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		AssetAutoTaggerEntryPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile AssetAutoTaggerEntryPersistence _persistence;
 
 }

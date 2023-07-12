@@ -38,8 +38,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -56,6 +54,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.InputStream;
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.sql.Blob;
 
@@ -447,7 +447,7 @@ public abstract class CTSContentLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		CTSContentLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -462,7 +462,7 @@ public abstract class CTSContentLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ctsContentLocalService = (CTSContentLocalService)aopProxy;
 
-		CTSContentLocalServiceUtil.setService(ctsContentLocalService);
+		_setLocalServiceUtilService(ctsContentLocalService);
 	}
 
 	/**
@@ -522,6 +522,22 @@ public abstract class CTSContentLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		CTSContentLocalService ctsContentLocalService) {
+
+		try {
+			Field field = CTSContentLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ctsContentLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected CTSContentLocalService ctsContentLocalService;
 
 	@Reference
@@ -530,9 +546,6 @@ public abstract class CTSContentLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTSContentLocalServiceBaseImpl.class);
 
 	@Reference
 	protected File _file;

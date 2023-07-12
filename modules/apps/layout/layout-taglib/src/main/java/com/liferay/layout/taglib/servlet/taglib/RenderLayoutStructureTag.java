@@ -15,7 +15,6 @@
 package com.liferay.layout.taglib.servlet.taglib;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
-import com.liferay.layout.constants.LayoutWebKeys;
 import com.liferay.layout.taglib.internal.display.context.RenderLayoutStructureDisplayContext;
 import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.layout.util.structure.LayoutStructure;
@@ -34,10 +33,6 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
-		_previousRenderLayoutStructureDisplayContext =
-			(RenderLayoutStructureDisplayContext)request.getAttribute(
-				RenderLayoutStructureDisplayContext.class.getName());
-
 		request.setAttribute(
 			RenderLayoutStructureDisplayContext.class.getName(),
 			new RenderLayoutStructureDisplayContext(
@@ -56,7 +51,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				ServletContextUtil.getSegmentsEntryRetriever(),
 				isShowPreview()));
 
-		request.setAttribute(LayoutWebKeys.LAYOUT_STRUCTURE, _layoutStructure);
+		request.setAttribute(LAYOUT_STRUCTURE, _layoutStructure);
 
 		return super.doStartTag();
 	}
@@ -112,21 +107,10 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
-		if (_previousRenderLayoutStructureDisplayContext != null) {
-			request.setAttribute(
-				RenderLayoutStructureDisplayContext.class.getName(),
-				_previousRenderLayoutStructureDisplayContext);
-		}
-		else {
-			request.removeAttribute(
-				RenderLayoutStructureDisplayContext.class.getName());
-		}
-
 		_fieldValues = null;
 		_layoutStructure = null;
 		_mainItemId = null;
 		_mode = FragmentEntryLinkConstants.VIEW;
-		_previousRenderLayoutStructureDisplayContext = null;
 		_showPreview = false;
 	}
 
@@ -135,11 +119,6 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		return _PAGE;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             LayoutWebKeys.LAYOUT_STRUCTURE}
-	 */
-	@Deprecated
 	protected static final String LAYOUT_STRUCTURE =
 		RenderLayoutStructureTag.class.getName() + "#LAYOUT_STRUCTURE";
 
@@ -149,8 +128,6 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	private LayoutStructure _layoutStructure;
 	private String _mainItemId;
 	private String _mode = FragmentEntryLinkConstants.VIEW;
-	private RenderLayoutStructureDisplayContext
-		_previousRenderLayoutStructureDisplayContext;
 	private boolean _showPreview;
 
 }

@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.admin.site.setting.internal.resource.v1_0.factory;
 
-import com.liferay.headless.commerce.admin.site.setting.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.commerce.admin.site.setting.resource.v1_0.MeasurementUnitResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Zoltán Takács
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-commerce-admin-site-setting/v1.0/MeasurementUnit",
-	service = MeasurementUnitResource.Factory.class
-)
+@Component(immediate = true, service = MeasurementUnitResource.Factory.class)
 @Generated("")
 public class MeasurementUnitResourceFactoryImpl
 	implements MeasurementUnitResource.Factory {
@@ -138,6 +135,16 @@ public class MeasurementUnitResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		MeasurementUnitResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		MeasurementUnitResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, MeasurementUnitResource>
 		_getProxyProviderFunction() {
 
@@ -186,7 +193,7 @@ public class MeasurementUnitResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		MeasurementUnitResource measurementUnitResource =
@@ -212,7 +219,6 @@ public class MeasurementUnitResourceFactoryImpl
 		measurementUnitResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		measurementUnitResource.setRoleLocalService(_roleLocalService);
-		measurementUnitResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(measurementUnitResource, arguments);
@@ -254,6 +260,9 @@ public class MeasurementUnitResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -262,9 +271,6 @@ public class MeasurementUnitResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

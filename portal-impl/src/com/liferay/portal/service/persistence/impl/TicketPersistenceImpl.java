@@ -52,6 +52,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2743,11 +2744,11 @@ public class TicketPersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "type_"},
 			false);
 
-		TicketUtil.setPersistence(this);
+		_setTicketUtilPersistence(this);
 	}
 
 	public void destroy() {
-		TicketUtil.setPersistence(null);
+		_setTicketUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(TicketImpl.class.getName());
 
@@ -2757,6 +2758,21 @@ public class TicketPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setTicketUtilPersistence(
+		TicketPersistence ticketPersistence) {
+
+		try {
+			Field field = TicketUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ticketPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

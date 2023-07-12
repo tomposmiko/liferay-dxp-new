@@ -14,7 +14,6 @@
 
 package com.liferay.account.service.persistence.impl;
 
-import com.liferay.account.exception.DuplicateAccountEntryExternalReferenceCodeException;
 import com.liferay.account.exception.NoSuchEntryException;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryTable;
@@ -51,10 +50,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2437,36 +2436,6 @@ public class AccountEntryPersistenceImpl
 		AccountEntryModelImpl accountEntryModelImpl =
 			(AccountEntryModelImpl)accountEntry;
 
-		if (Validator.isNull(accountEntry.getExternalReferenceCode())) {
-			accountEntry.setExternalReferenceCode(
-				String.valueOf(accountEntry.getPrimaryKey()));
-		}
-		else {
-			AccountEntry ercAccountEntry = fetchByC_ERC(
-				accountEntry.getCompanyId(),
-				accountEntry.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercAccountEntry != null) {
-					throw new DuplicateAccountEntryExternalReferenceCodeException(
-						"Duplicate account entry with external reference code " +
-							accountEntry.getExternalReferenceCode() +
-								" and company " + accountEntry.getCompanyId());
-				}
-			}
-			else {
-				if ((ercAccountEntry != null) &&
-					(accountEntry.getAccountEntryId() !=
-						ercAccountEntry.getAccountEntryId())) {
-
-					throw new DuplicateAccountEntryExternalReferenceCodeException(
-						"Duplicate account entry with external reference code " +
-							accountEntry.getExternalReferenceCode() +
-								" and company " + accountEntry.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -2852,12 +2821,12 @@ public class AccountEntryPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		AccountEntryUtil.setPersistence(this);
+		_setAccountEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		AccountEntryUtil.setPersistence(null);
+		_setAccountEntryUtilPersistence(null);
 
 		entityCache.removeCache(AccountEntryImpl.class.getName());
 
@@ -2867,6 +2836,22 @@ public class AccountEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAccountEntryUtilPersistence(
+		AccountEntryPersistence accountEntryPersistence) {
+
+		try {
+			Field field = AccountEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, accountEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

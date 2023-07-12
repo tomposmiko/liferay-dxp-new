@@ -333,6 +333,9 @@ public class CommerceShippingFixedOptionRelModelImpl
 	private static final Map
 		<String, Function<CommerceShippingFixedOptionRel, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceShippingFixedOptionRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceShippingFixedOptionRel, Object>>
@@ -340,143 +343,134 @@ public class CommerceShippingFixedOptionRelModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceShippingFixedOptionRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceShippingFixedOptionRelId",
-			CommerceShippingFixedOptionRel::
-				getCommerceShippingFixedOptionRelId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceShippingFixedOptionRel::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceShippingFixedOptionRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceShippingFixedOptionRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceShippingFixedOptionRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceShippingFixedOptionRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceShippingFixedOptionRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceShippingMethodId",
-			CommerceShippingFixedOptionRel::getCommerceShippingMethodId);
-		attributeGetterFunctions.put(
-			"commerceShippingFixedOptionId",
-			CommerceShippingFixedOptionRel::getCommerceShippingFixedOptionId);
-		attributeGetterFunctions.put(
-			"commerceInventoryWarehouseId",
-			CommerceShippingFixedOptionRel::getCommerceInventoryWarehouseId);
-		attributeGetterFunctions.put(
-			"commerceCountryId",
-			CommerceShippingFixedOptionRel::getCommerceCountryId);
-		attributeGetterFunctions.put(
-			"commerceRegionId",
-			CommerceShippingFixedOptionRel::getCommerceRegionId);
-		attributeGetterFunctions.put(
-			"zip", CommerceShippingFixedOptionRel::getZip);
-		attributeGetterFunctions.put(
-			"weightFrom", CommerceShippingFixedOptionRel::getWeightFrom);
-		attributeGetterFunctions.put(
-			"weightTo", CommerceShippingFixedOptionRel::getWeightTo);
-		attributeGetterFunctions.put(
-			"fixedPrice", CommerceShippingFixedOptionRel::getFixedPrice);
-		attributeGetterFunctions.put(
-			"rateUnitWeightPrice",
-			CommerceShippingFixedOptionRel::getRateUnitWeightPrice);
-		attributeGetterFunctions.put(
-			"ratePercentage",
-			CommerceShippingFixedOptionRel::getRatePercentage);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceShippingFixedOptionRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceShippingFixedOptionRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceShippingFixedOptionRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"commerceShippingFixedOptionRelId",
+			CommerceShippingFixedOptionRel::
+				getCommerceShippingFixedOptionRelId);
 		attributeSetterBiConsumers.put(
 			"commerceShippingFixedOptionRelId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::
 					setCommerceShippingFixedOptionRelId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceShippingFixedOptionRel::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceShippingFixedOptionRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceShippingFixedOptionRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceShippingFixedOptionRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceShippingFixedOptionRel, String>)
 				CommerceShippingFixedOptionRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceShippingFixedOptionRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceShippingFixedOptionRel, Date>)
 				CommerceShippingFixedOptionRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceShippingFixedOptionRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceShippingFixedOptionRel, Date>)
 				CommerceShippingFixedOptionRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceShippingMethodId",
+			CommerceShippingFixedOptionRel::getCommerceShippingMethodId);
 		attributeSetterBiConsumers.put(
 			"commerceShippingMethodId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::setCommerceShippingMethodId);
+		attributeGetterFunctions.put(
+			"commerceShippingFixedOptionId",
+			CommerceShippingFixedOptionRel::getCommerceShippingFixedOptionId);
 		attributeSetterBiConsumers.put(
 			"commerceShippingFixedOptionId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::
 					setCommerceShippingFixedOptionId);
+		attributeGetterFunctions.put(
+			"commerceInventoryWarehouseId",
+			CommerceShippingFixedOptionRel::getCommerceInventoryWarehouseId);
 		attributeSetterBiConsumers.put(
 			"commerceInventoryWarehouseId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::
 					setCommerceInventoryWarehouseId);
+		attributeGetterFunctions.put(
+			"commerceCountryId",
+			CommerceShippingFixedOptionRel::getCommerceCountryId);
 		attributeSetterBiConsumers.put(
 			"commerceCountryId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::setCommerceCountryId);
+		attributeGetterFunctions.put(
+			"commerceRegionId",
+			CommerceShippingFixedOptionRel::getCommerceRegionId);
 		attributeSetterBiConsumers.put(
 			"commerceRegionId",
 			(BiConsumer<CommerceShippingFixedOptionRel, Long>)
 				CommerceShippingFixedOptionRel::setCommerceRegionId);
+		attributeGetterFunctions.put(
+			"zip", CommerceShippingFixedOptionRel::getZip);
 		attributeSetterBiConsumers.put(
 			"zip",
 			(BiConsumer<CommerceShippingFixedOptionRel, String>)
 				CommerceShippingFixedOptionRel::setZip);
+		attributeGetterFunctions.put(
+			"weightFrom", CommerceShippingFixedOptionRel::getWeightFrom);
 		attributeSetterBiConsumers.put(
 			"weightFrom",
 			(BiConsumer<CommerceShippingFixedOptionRel, Double>)
 				CommerceShippingFixedOptionRel::setWeightFrom);
+		attributeGetterFunctions.put(
+			"weightTo", CommerceShippingFixedOptionRel::getWeightTo);
 		attributeSetterBiConsumers.put(
 			"weightTo",
 			(BiConsumer<CommerceShippingFixedOptionRel, Double>)
 				CommerceShippingFixedOptionRel::setWeightTo);
+		attributeGetterFunctions.put(
+			"fixedPrice", CommerceShippingFixedOptionRel::getFixedPrice);
 		attributeSetterBiConsumers.put(
 			"fixedPrice",
 			(BiConsumer<CommerceShippingFixedOptionRel, BigDecimal>)
 				CommerceShippingFixedOptionRel::setFixedPrice);
+		attributeGetterFunctions.put(
+			"rateUnitWeightPrice",
+			CommerceShippingFixedOptionRel::getRateUnitWeightPrice);
 		attributeSetterBiConsumers.put(
 			"rateUnitWeightPrice",
 			(BiConsumer<CommerceShippingFixedOptionRel, BigDecimal>)
 				CommerceShippingFixedOptionRel::setRateUnitWeightPrice);
+		attributeGetterFunctions.put(
+			"ratePercentage",
+			CommerceShippingFixedOptionRel::getRatePercentage);
 		attributeSetterBiConsumers.put(
 			"ratePercentage",
 			(BiConsumer<CommerceShippingFixedOptionRel, Double>)
 				CommerceShippingFixedOptionRel::setRatePercentage);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

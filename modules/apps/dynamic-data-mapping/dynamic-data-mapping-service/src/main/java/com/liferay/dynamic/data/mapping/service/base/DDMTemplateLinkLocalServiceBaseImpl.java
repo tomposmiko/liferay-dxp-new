@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -49,6 +47,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -387,7 +387,7 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		DDMTemplateLinkLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -402,7 +402,7 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddmTemplateLinkLocalService = (DDMTemplateLinkLocalService)aopProxy;
 
-		DDMTemplateLinkLocalServiceUtil.setService(ddmTemplateLinkLocalService);
+		_setLocalServiceUtilService(ddmTemplateLinkLocalService);
 	}
 
 	/**
@@ -462,6 +462,23 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		DDMTemplateLinkLocalService ddmTemplateLinkLocalService) {
+
+		try {
+			Field field =
+				DDMTemplateLinkLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmTemplateLinkLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected DDMTemplateLinkLocalService ddmTemplateLinkLocalService;
 
 	@Reference
@@ -470,8 +487,5 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMTemplateLinkLocalServiceBaseImpl.class);
 
 }

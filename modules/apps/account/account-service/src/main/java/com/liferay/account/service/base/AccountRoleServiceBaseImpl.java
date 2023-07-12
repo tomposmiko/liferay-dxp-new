@@ -25,11 +25,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class AccountRoleServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		AccountRoleServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class AccountRoleServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		accountRoleService = (AccountRoleService)aopProxy;
 
-		AccountRoleServiceUtil.setService(accountRoleService);
+		_setServiceUtilService(accountRoleService);
 	}
 
 	/**
@@ -117,6 +117,20 @@ public abstract class AccountRoleServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(AccountRoleService accountRoleService) {
+		try {
+			Field field = AccountRoleServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, accountRoleService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.account.service.AccountRoleLocalService
 		accountRoleLocalService;
@@ -154,8 +168,5 @@ public abstract class AccountRoleServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserGroupRoleService
 		userGroupRoleService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountRoleServiceBaseImpl.class);
 
 }

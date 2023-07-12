@@ -140,10 +140,6 @@ public class DDLRecordVersionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DDLRecordVersionService service) {
-		_service = service;
-	}
-
 	private static volatile DDLRecordVersionService _service;
 
 }

@@ -17,13 +17,10 @@ package com.liferay.portal.upgrade.internal.release;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.upgrade.internal.model.listener.ReleaseModelListener;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -44,10 +41,16 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra Andrés
  */
 @Component(immediate = true, service = ReleasePublisher.class)
-public class ReleasePublisher {
+public final class ReleasePublisher {
 
-	public ServiceRegistration<Release> publish(
-		Release release, boolean initialRelease) {
+	public void publish(Release release, boolean initialRelease) {
+		ServiceRegistration<Release> oldServiceRegistration =
+			_serviceConfiguratorRegistrations.get(
+				release.getServletContextName());
+
+		if (oldServiceRegistration != null) {
+			oldServiceRegistration.unregister();
+		}
 
 		Dictionary<String, Object> properties = new Hashtable<>();
 
@@ -74,29 +77,14 @@ public class ReleasePublisher {
 		ServiceRegistration<Release> newServiceRegistration =
 			_bundleContext.registerService(Release.class, release, properties);
 
-		return _serviceConfiguratorRegistrations.put(
+		_serviceConfiguratorRegistrations.put(
 			release.getServletContextName(), newServiceRegistration);
 	}
 
-	public ServiceRegistration<Release> publishInProgress(Release release) {
+	public void publishInProgress(Release release) {
 		release.setState(_STATE_IN_PROGRESS);
 
-		return publish(release, false);
-	}
-
-	public void unpublish(Release release) {
-		TransactionCommitCallbackUtil.registerCallback(
-			() -> {
-				ServiceRegistration<Release> serviceRegistration =
-					_serviceConfiguratorRegistrations.remove(
-						release.getServletContextName());
-
-				if (serviceRegistration != null) {
-					serviceRegistration.unregister();
-				}
-
-				return null;
-			});
+		publish(release, false);
 	}
 
 	@Activate
@@ -109,15 +97,10 @@ public class ReleasePublisher {
 		for (Release release : releases) {
 			publish(release, false);
 		}
-
-		_serviceRegistration = bundleContext.registerService(
-			ModelListener.class, new ReleaseModelListener(this), null);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceRegistration.unregister();
-
 		for (ServiceRegistration<Release> serviceRegistration :
 				_serviceConfiguratorRegistrations.values()) {
 
@@ -146,6 +129,5 @@ public class ReleasePublisher {
 	private ReleaseLocalService _releaseLocalService;
 	private final Map<String, ServiceRegistration<Release>>
 		_serviceConfiguratorRegistrations = new HashMap<>();
-	private ServiceRegistration<?> _serviceRegistration;
 
 }

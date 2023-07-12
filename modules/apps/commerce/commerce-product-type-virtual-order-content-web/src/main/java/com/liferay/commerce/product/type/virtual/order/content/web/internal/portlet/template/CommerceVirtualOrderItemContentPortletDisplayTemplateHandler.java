@@ -94,7 +94,7 @@ public class CommerceVirtualOrderItemContentPortletDisplayTemplateHandler
 		templateVariableGroup.addVariable(
 			"commerce-virtual-order-item-content-display-context",
 			CommerceVirtualOrderItemContentDisplayContext.class,
-			"commerceVirtualOrderItemContentDisplayContext");
+			"commerceVirtualOrderContentDisplayContext");
 		templateVariableGroup.addCollectionVariable(
 			"commerce-virtual-order-items", List.class,
 			PortletDisplayTemplateConstants.ENTRIES, "commerceVitualOrderItem",

@@ -15,8 +15,7 @@
 --%>
 
 <%@ include file="/init.jsp" %>
-<%@ taglib uri="http://liferay.com/tld/learn" prefix="liferay-learn" %><%@
-taglib uri="http://liferay.com/tld/react" prefix="react" %>
+<%@ taglib uri="http://liferay.com/tld/react" prefix="react" %>
 
 <%@ page import="com.liferay.bulk.selection.BulkSelectionRunner" %><%@
 page import="com.liferay.document.library.configuration.DLConfiguration" %><%@
@@ -35,7 +34,6 @@ page import="com.liferay.document.library.web.internal.util.DLAssetHelperUtil" %
 page import="com.liferay.document.library.web.internal.util.RepositoryClassDefinitionUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.exception.RequiredStructureException" %><%@
 page import="com.liferay.dynamic.data.mapping.util.DDMFormValuesToMapConverter" %><%@
-page import="com.liferay.expando.kernel.exception.MissingDefaultLocaleValueException" %><%@
 page import="com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList" %><%@
 page import="com.liferay.portal.kernel.lock.Lock" %><%@
 page import="com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil" %><%@

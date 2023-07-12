@@ -51,6 +51,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -8682,11 +8683,11 @@ public class LayoutRevisionPersistenceImpl
 			},
 			false);
 
-		LayoutRevisionUtil.setPersistence(this);
+		_setLayoutRevisionUtilPersistence(this);
 	}
 
 	public void destroy() {
-		LayoutRevisionUtil.setPersistence(null);
+		_setLayoutRevisionUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(LayoutRevisionImpl.class.getName());
 
@@ -8696,6 +8697,22 @@ public class LayoutRevisionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setLayoutRevisionUtilPersistence(
+		LayoutRevisionPersistence layoutRevisionPersistence) {
+
+		try {
+			Field field = LayoutRevisionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutRevisionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

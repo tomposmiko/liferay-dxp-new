@@ -118,12 +118,6 @@ public class CommerceInventoryReplenishmentItemServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceInventoryReplenishmentItemService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceInventoryReplenishmentItemService _service;
 
 }

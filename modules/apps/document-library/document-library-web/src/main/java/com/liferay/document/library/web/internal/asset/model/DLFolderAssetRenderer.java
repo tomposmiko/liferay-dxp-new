@@ -174,15 +174,6 @@ public class DLFolderAssetRenderer
 	}
 
 	@Override
-	public String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect) {
-
-		return getURLViewInContext(
-			themeDisplay, noSuchEntryRedirect, "/document_library/find_folder",
-			"folderId", _folder.getFolderId());
-	}
-
-	@Override
 	public long getUserId() {
 		return _folder.getUserId();
 	}

@@ -568,7 +568,7 @@ public class JournalArticleActionDropdownItemsProvider {
 				previewURL, "p_l_mode", Constants.PREVIEW);
 
 			return HttpUtil.addParameter(
-				previewURL, "version", _article.getVersion());
+				previewURL, "version", _article.getId());
 		}
 
 		if (Validator.isNull(_article.getDDMTemplateKey())) {

@@ -182,7 +182,7 @@
 	<sql id="com.liferay.commerce.service.persistence.CommerceOrderItemFinder.countByG_A_O">
 		<![CDATA[
 			SELECT
-				COUNT(CommerceOrderItem.commerceOrderItemId) AS COUNT_VALUE
+				COUNT(DISTINCT CommerceOrderItem.commerceOrderItemId) AS COUNT_VALUE
 			FROM
 				CommerceOrderItem
 			INNER JOIN
@@ -257,7 +257,7 @@
 	<sql id="com.liferay.commerce.service.persistence.CommerceShipmentFinder.countByCommerceOrderId">
 		<![CDATA[
 			SELECT
-				COUNT(CommerceShipment.commerceShipmentId) AS COUNT_VALUE
+				COUNT(DISTINCT CommerceShipment.commerceShipmentId) AS COUNT_VALUE
 			FROM
 				CommerceShipment
 			LEFT JOIN
@@ -273,7 +273,7 @@
 	<sql id="com.liferay.commerce.service.persistence.CommerceShipmentFinder.findByCommerceOrderId">
 		<![CDATA[
 			SELECT
-				{CommerceShipment.*}
+				DISTINCT {CommerceShipment.*}
 			FROM
 				CommerceShipment
 			LEFT JOIN

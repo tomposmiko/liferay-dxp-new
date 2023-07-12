@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-114438. Only can edit inline content, mapped content and comments of elements when select Content Editing."
-	@priority = 5
+	@priority = "5"
 	test OnlyCanEditContentWhenSelectContentEdition {
 		property portal.acceptance = "true";
 
@@ -105,7 +105,7 @@ definition {
 				fragmentClass = "content",
 				fragmentComment = "This is a fragment comment.",
 				fragmentName = "Heading",
-				position = 1);
+				position = "1");
 		}
 
 		task ("Map title of Web Content Article to Paragraph") {
@@ -162,13 +162,13 @@ definition {
 		task ("Assert only Selection, Contents and Comments are shown in sidebar") {
 			for (var tabName : list "Selection,Contents,Comments") {
 				AssertVisible(
-					key_tabName = ${tabName},
+					key_tabName = "${tabName}",
 					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB_BUTTON");
 			}
 
 			for (var tabName : list "Fragments and Widgets,Page Design Options") {
 				AssertElementNotPresent(
-					key_tabName = ${tabName},
+					key_tabName = "${tabName}",
 					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB_BUTTON");
 			}
 		}
@@ -176,7 +176,7 @@ definition {
 		task ("Assert topper of elements are hidden") {
 			for (var elementName : list "Heading,Paragraph,Image,Asset Publisher") {
 				AssertElementNotPresent(
-					key_fragmentName = ${elementName},
+					key_fragmentName = "${elementName}",
 					locator1 = "Fragment#FRAGMENT_HEADER");
 			}
 		}
@@ -225,8 +225,6 @@ definition {
 				imageFileName = "Document Title",
 				navTab = "Documents and Media");
 
-			SelectFrameTop();
-
 			PageEditor.clickManagementBar();
 		}
 
@@ -240,12 +238,12 @@ definition {
 
 				LexiconEntry.gotoFragmentPageContentEllipsisMenuItem(
 					menuItem = "Edit",
-					rowEntry = ${title});
+					rowEntry = "${title}");
 
-				if (${title} == "Web Content Title") {
+				if ("${title}" == "Web Content Title") {
 					WebContent.addCP(webContentTitle = "Web Content Title Edit");
 
-					Type.typeEditorWaitForEditor(
+					Type.typeCKEditorWaitForCKEditor(
 						key_fieldLabel = "content",
 						locator1 = "CKEditor#BODY_FIELD_WEB_CONTENT_ARTICLE",
 						value1 = "Web Content Content Edit");
@@ -253,7 +251,7 @@ definition {
 					PortletEntry.publish();
 				}
 
-				if (${title} == "Blogs Entry Title") {
+				if ("${title}" == "Blogs Entry Title") {
 					BlogsEntry.editEntryContent(
 						entryContent = "Blogs Entry Content",
 						entryContentEdit = "Blogs Entry Content Edit",
@@ -269,7 +267,7 @@ definition {
 
 				MenuItem.click(menuItem = "Content Editing");
 
-				Pause(locator1 = 3000);
+				Pause(locator1 = "3000");
 			}
 		}
 

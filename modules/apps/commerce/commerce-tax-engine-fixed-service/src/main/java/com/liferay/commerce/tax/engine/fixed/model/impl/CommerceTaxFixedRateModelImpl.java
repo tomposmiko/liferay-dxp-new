@@ -301,88 +301,82 @@ public class CommerceTaxFixedRateModelImpl
 
 	private static final Map<String, Function<CommerceTaxFixedRate, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceTaxFixedRate, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceTaxFixedRate, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceTaxFixedRate, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceTaxFixedRateId",
-			CommerceTaxFixedRate::getCommerceTaxFixedRateId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceTaxFixedRate::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceTaxFixedRate::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceTaxFixedRate::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceTaxFixedRate::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceTaxFixedRate::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceTaxFixedRate::getModifiedDate);
-		attributeGetterFunctions.put(
-			"CPTaxCategoryId", CommerceTaxFixedRate::getCPTaxCategoryId);
-		attributeGetterFunctions.put(
-			"commerceTaxMethodId",
-			CommerceTaxFixedRate::getCommerceTaxMethodId);
-		attributeGetterFunctions.put("rate", CommerceTaxFixedRate::getRate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceTaxFixedRate, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceTaxFixedRate, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceTaxFixedRate, ?>>();
 
+		attributeGetterFunctions.put(
+			"commerceTaxFixedRateId",
+			CommerceTaxFixedRate::getCommerceTaxFixedRateId);
 		attributeSetterBiConsumers.put(
 			"commerceTaxFixedRateId",
 			(BiConsumer<CommerceTaxFixedRate, Long>)
 				CommerceTaxFixedRate::setCommerceTaxFixedRateId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceTaxFixedRate::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceTaxFixedRate, Long>)
 				CommerceTaxFixedRate::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceTaxFixedRate::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceTaxFixedRate, Long>)
 				CommerceTaxFixedRate::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceTaxFixedRate::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceTaxFixedRate, Long>)
 				CommerceTaxFixedRate::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceTaxFixedRate::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceTaxFixedRate, String>)
 				CommerceTaxFixedRate::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceTaxFixedRate::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceTaxFixedRate, Date>)
 				CommerceTaxFixedRate::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceTaxFixedRate::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceTaxFixedRate, Date>)
 				CommerceTaxFixedRate::setModifiedDate);
+		attributeGetterFunctions.put(
+			"CPTaxCategoryId", CommerceTaxFixedRate::getCPTaxCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPTaxCategoryId",
 			(BiConsumer<CommerceTaxFixedRate, Long>)
 				CommerceTaxFixedRate::setCPTaxCategoryId);
+		attributeGetterFunctions.put(
+			"commerceTaxMethodId",
+			CommerceTaxFixedRate::getCommerceTaxMethodId);
 		attributeSetterBiConsumers.put(
 			"commerceTaxMethodId",
 			(BiConsumer<CommerceTaxFixedRate, Long>)
 				CommerceTaxFixedRate::setCommerceTaxMethodId);
+		attributeGetterFunctions.put("rate", CommerceTaxFixedRate::getRate);
 		attributeSetterBiConsumers.put(
 			"rate",
 			(BiConsumer<CommerceTaxFixedRate, Double>)
 				CommerceTaxFixedRate::setRate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

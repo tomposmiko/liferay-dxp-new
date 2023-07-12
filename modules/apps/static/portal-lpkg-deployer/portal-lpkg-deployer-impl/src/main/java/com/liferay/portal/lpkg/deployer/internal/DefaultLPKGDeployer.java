@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.license.util.LicenseManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.ThrowableCollector;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
@@ -289,7 +290,7 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 		Set<Bundle> removalPendingBundles = new HashSet<>();
 
-		_deploymentDirPath = _getDeploymentDirPath();
+		_deploymentDirPath = _getDeploymentDirPath(bundleContext);
 
 		Path overrideDirPath = _deploymentDirPath.resolve("override");
 
@@ -350,7 +351,7 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 			File lpkgFile = iterator.next();
 
 			List<File> innerLPKGFiles = ContainerLPKGUtil.deploy(
-				lpkgFile, null);
+				lpkgFile, bundleContext, null);
 
 			if (innerLPKGFiles != null) {
 				iterator.remove();
@@ -411,9 +412,13 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 		}
 	}
 
-	private Path _getDeploymentDirPath() throws Exception {
+	private Path _getDeploymentDirPath(BundleContext bundleContext)
+		throws Exception {
+
 		File deploymentDir = new File(
-			PropsValues.MODULE_FRAMEWORK_MARKETPLACE_DIR);
+			GetterUtil.getString(
+				bundleContext.getProperty("lpkg.deployer.dir"),
+				PropsValues.MODULE_FRAMEWORK_MARKETPLACE_DIR));
 
 		deploymentDir = deploymentDir.getCanonicalFile();
 

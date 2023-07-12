@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -56,7 +56,7 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		EROrganizationLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		erOrganizationLocalService = (EROrganizationLocalService)aopProxy;
 
-		EROrganizationLocalServiceUtil.setService(erOrganizationLocalService);
+		_setLocalServiceUtilService(erOrganizationLocalService);
 	}
 
 	/**
@@ -107,6 +107,22 @@ public abstract class EROrganizationLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		EROrganizationLocalService erOrganizationLocalService) {
+
+		try {
+			Field field = EROrganizationLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, erOrganizationLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected EROrganizationLocalService erOrganizationLocalService;
 
 	@Reference
@@ -120,8 +136,5 @@ public abstract class EROrganizationLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		EROrganizationLocalServiceBaseImpl.class);
 
 }

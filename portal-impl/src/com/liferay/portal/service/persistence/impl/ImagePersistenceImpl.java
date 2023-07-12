@@ -53,6 +53,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -916,7 +917,7 @@ public class ImagePersistenceImpl
 	 */
 	@Override
 	public Image fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(Image.class, primaryKey)) {
+		if (CTPersistenceHelperUtil.isProductionMode(Image.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -1355,11 +1356,11 @@ public class ImagePersistenceImpl
 			new String[] {Integer.class.getName()}, new String[] {"size_"},
 			false);
 
-		ImageUtil.setPersistence(this);
+		_setImageUtilPersistence(this);
 	}
 
 	public void destroy() {
-		ImageUtil.setPersistence(null);
+		_setImageUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(ImageImpl.class.getName());
 
@@ -1369,6 +1370,19 @@ public class ImagePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setImageUtilPersistence(ImagePersistence imagePersistence) {
+		try {
+			Field field = ImageUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, imagePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

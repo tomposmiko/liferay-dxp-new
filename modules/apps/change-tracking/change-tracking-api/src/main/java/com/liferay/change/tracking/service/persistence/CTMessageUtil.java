@@ -440,10 +440,6 @@ public class CTMessageUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CTMessagePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CTMessagePersistence _persistence;
 
 }

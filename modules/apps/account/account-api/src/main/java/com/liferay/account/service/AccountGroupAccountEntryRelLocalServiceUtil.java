@@ -369,12 +369,6 @@ public class AccountGroupAccountEntryRelLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		AccountGroupAccountEntryRelLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile AccountGroupAccountEntryRelLocalService _service;
 
 }

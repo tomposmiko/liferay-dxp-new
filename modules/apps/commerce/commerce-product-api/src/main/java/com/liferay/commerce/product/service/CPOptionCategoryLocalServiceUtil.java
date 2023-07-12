@@ -405,10 +405,6 @@ public class CPOptionCategoryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPOptionCategoryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CPOptionCategoryLocalService _service;
 
 }

@@ -16,7 +16,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 	}
 
 	@description = "Assert that the UI works correctly for adding Asset Lists."
-	@priority = 5
+	@priority = "5"
 	test AddAssetList {
 		property portal.acceptance = "true";
 
@@ -55,7 +55,7 @@ definition {
 	}
 
 	@description = "Assert that the UI correctly displays a useful error message when an Asset List is added with a duplicate name."
-	@priority = 3
+	@priority = "3"
 	test AddDuplicateAssetList {
 		task ("Create a manual asset list") {
 			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
@@ -83,9 +83,9 @@ definition {
 	}
 
 	@description = "Assert that the UI works correctly for deleting Asset Lists."
-	@priority = 5
+	@priority = "5"
 	test DeleteAssetList {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 		property portal.acceptance = "true";
 
 		task ("Create a manual asset list") {
@@ -115,7 +115,7 @@ definition {
 	}
 
 	@description = "Assert that the UI works correctly for renaming Asset Lists."
-	@priority = 5
+	@priority = "5"
 	test RenameAssetList {
 		property portal.acceptance = "true";
 
@@ -141,7 +141,7 @@ definition {
 	}
 
 	@description = "Assert that Asset Lists correctly display their selected content."
-	@priority = 4
+	@priority = "4"
 	test ViewAssetListContent {
 		task ("Create a web content article") {
 			JSONWebcontent.addWebContent(
@@ -178,7 +178,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-84331. Assert that Asset Lists correctly display where they are used."
-	@priority = 4
+	@priority = "4"
 	test ViewAssetListUsages {
 		task ("Create a public page") {
 			JSONLayout.addPublicLayout(
@@ -212,15 +212,15 @@ definition {
 
 			AssetListsAdmin.viewUsages(
 				assetListTitle = "Manual Asset List Test",
-				usageAmount = 1,
+				usageAmount = "1",
 				usageType = "All");
 		}
 	}
 
 	@description = "This is for LPS-101228. Validate if web content articles matching with content sets based on grouped keywords displayed correctly in Asset Publisher."
-	@priority = 4
+	@priority = "4"
 	test ViewWCViaAPWithAssetListBasedOnGroupedKeywords {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 
 		task ("Create public page") {
 			JSONLayout.addPublicLayout(
@@ -245,7 +245,7 @@ definition {
 		}
 
 		for (var rule : list "Contains All,Contains Any,Does Not Contain All,Does Not Contain Any") {
-			if (${rule} == "Contains All") {
+			if ("${rule}" == "Contains All") {
 				var queryAndOperator = "All";
 				var queryContains = "Contains";
 
@@ -262,9 +262,9 @@ definition {
 					AssetListsAdmin.editAssetList(assetListTitle = "Dynamic Asset List ${queryContains} ${queryAndOperator}");
 
 					AssetListsAdmin.addKeywordsFilter(
-						keyWords = "\"2 3\" \"3 4\"",
-						queryAndOperator = ${queryAndOperator},
-						queryContains = ${queryContains});
+						keyWords = "&quot;2 3&quot; &quot;3 4&quot;",
+						queryAndOperator = "${queryAndOperator}",
+						queryContains = "${queryContains}");
 				}
 
 				task ("Select the created dynamic asset list to be used in the asset publisher portlet") {
@@ -303,7 +303,7 @@ definition {
 					}
 				}
 			}
-			else if (${rule} == "Contains Any") {
+			else if ("${rule}" == "Contains Any") {
 				var queryAndOperator = "Any";
 				var queryContains = "Contains";
 
@@ -320,9 +320,9 @@ definition {
 					AssetListsAdmin.editAssetList(assetListTitle = "Dynamic Asset List ${queryContains} ${queryAndOperator}");
 
 					AssetListsAdmin.addKeywordsFilter(
-						keyWords = "\"2 3\" \"3 4\"",
-						queryAndOperator = ${queryAndOperator},
-						queryContains = ${queryContains});
+						keyWords = "&quot;2 3&quot; &quot;3 4&quot;",
+						queryAndOperator = "${queryAndOperator}",
+						queryContains = "${queryContains}");
 				}
 
 				task ("Select the created dynamic asset list to be used in the asset publisher portlet") {
@@ -361,7 +361,7 @@ definition {
 					}
 				}
 			}
-			else if (${rule} == "Does Not Contain All") {
+			else if ("${rule}" == "Does Not Contain All") {
 				var queryAndOperator = "All";
 				var queryContains = "Does Not Contain";
 
@@ -378,9 +378,9 @@ definition {
 					AssetListsAdmin.editAssetList(assetListTitle = "Dynamic Asset List ${queryContains} ${queryAndOperator}");
 
 					AssetListsAdmin.addKeywordsFilter(
-						keyWords = "\"2 3\" \"3 4\"",
-						queryAndOperator = ${queryAndOperator},
-						queryContains = ${queryContains});
+						keyWords = "&quot;2 3&quot; &quot;3 4&quot;",
+						queryAndOperator = "${queryAndOperator}",
+						queryContains = "${queryContains}");
 				}
 
 				task ("Select the created dynamic asset list to be used in the asset publisher portlet") {
@@ -419,7 +419,7 @@ definition {
 					}
 				}
 			}
-			else if (${rule} == "Does Not Contain Any") {
+			else if ("${rule}" == "Does Not Contain Any") {
 				var queryAndOperator = "Any";
 				var queryContains = "Does Not Contain";
 
@@ -436,9 +436,9 @@ definition {
 					AssetListsAdmin.editAssetList(assetListTitle = "Dynamic Asset List ${queryContains} ${queryAndOperator}");
 
 					AssetListsAdmin.addKeywordsFilter(
-						keyWords = "\"2 3\" \"3 4\"",
-						queryAndOperator = ${queryAndOperator},
-						queryContains = ${queryContains});
+						keyWords = "&quot;2 3&quot; &quot;3 4&quot;",
+						queryAndOperator = "${queryAndOperator}",
+						queryContains = "${queryContains}");
 				}
 
 				task ("Select the created dynamic asset list to be used in the asset publisher portlet") {
@@ -481,9 +481,9 @@ definition {
 	}
 
 	@description = "This is for LPS-101228. Validate if web content articles matching with content sets based on keywords displayed correctly in Asset Publisher."
-	@priority = 5
+	@priority = "5"
 	test ViewWebContentViaAssetPublisherWithAssetListBasedOnKeywords {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 		property portal.acceptance = "true";
 
 		task ("Create public page") {
@@ -509,7 +509,7 @@ definition {
 		}
 
 		for (var rule : list "Contains All,Contains Any,Does Not Contain All,Does Not Contain Any") {
-			if (${rule} == "Contains All") {
+			if ("${rule}" == "Contains All") {
 				var queryAndOperator = "All";
 				var queryContains = "Contains";
 
@@ -527,8 +527,8 @@ definition {
 
 					AssetListsAdmin.addKeywordsFilter(
 						keyWords = "2 3",
-						queryAndOperator = ${queryAndOperator},
-						queryContains = ${queryContains});
+						queryAndOperator = "${queryAndOperator}",
+						queryContains = "${queryContains}");
 				}
 
 				task ("Select the created dynamic asset list to be used in the asset publisher portlet") {
@@ -567,7 +567,7 @@ definition {
 					}
 				}
 			}
-			else if (${rule} == "Contains Any") {
+			else if ("${rule}" == "Contains Any") {
 				var queryAndOperator = "Any";
 				var queryContains = "Contains";
 
@@ -585,8 +585,8 @@ definition {
 
 					AssetListsAdmin.addKeywordsFilter(
 						keyWords = "2 3",
-						queryAndOperator = ${queryAndOperator},
-						queryContains = ${queryContains});
+						queryAndOperator = "${queryAndOperator}",
+						queryContains = "${queryContains}");
 				}
 
 				task ("Select the created dynamic asset list to be used in the asset publisher portlet") {
@@ -625,7 +625,7 @@ definition {
 					}
 				}
 			}
-			else if (${rule} == "Does Not Contain All") {
+			else if ("${rule}" == "Does Not Contain All") {
 				var queryAndOperator = "All";
 				var queryContains = "Does Not Contain";
 
@@ -643,8 +643,8 @@ definition {
 
 					AssetListsAdmin.addKeywordsFilter(
 						keyWords = "2 3",
-						queryAndOperator = ${queryAndOperator},
-						queryContains = ${queryContains});
+						queryAndOperator = "${queryAndOperator}",
+						queryContains = "${queryContains}");
 				}
 
 				task ("Select the created dynamic asset list to be used in the asset publisher portlet") {
@@ -683,7 +683,7 @@ definition {
 					}
 				}
 			}
-			else if (${rule} == "Does Not Contain Any") {
+			else if ("${rule}" == "Does Not Contain Any") {
 				var queryAndOperator = "Any";
 				var queryContains = "Does Not Contain";
 
@@ -701,8 +701,8 @@ definition {
 
 					AssetListsAdmin.addKeywordsFilter(
 						keyWords = "2 3",
-						queryAndOperator = ${queryAndOperator},
-						queryContains = ${queryContains});
+						queryAndOperator = "${queryAndOperator}",
+						queryContains = "${queryContains}");
 				}
 
 				task ("Select the created dynamic asset list to be used in the asset publisher portlet") {

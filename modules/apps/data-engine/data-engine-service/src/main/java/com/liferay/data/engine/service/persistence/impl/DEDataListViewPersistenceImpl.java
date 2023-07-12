@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3243,12 +3244,12 @@ public class DEDataListViewPersistenceImpl
 			},
 			new String[] {"groupId", "companyId", "ddmStructureId"}, false);
 
-		DEDataListViewUtil.setPersistence(this);
+		_setDEDataListViewUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DEDataListViewUtil.setPersistence(null);
+		_setDEDataListViewUtilPersistence(null);
 
 		entityCache.removeCache(DEDataListViewImpl.class.getName());
 
@@ -3258,6 +3259,22 @@ public class DEDataListViewPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDEDataListViewUtilPersistence(
+		DEDataListViewPersistence deDataListViewPersistence) {
+
+		try {
+			Field field = DEDataListViewUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, deDataListViewPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

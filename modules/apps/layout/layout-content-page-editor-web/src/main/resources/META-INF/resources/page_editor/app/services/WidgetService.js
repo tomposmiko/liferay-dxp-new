@@ -51,8 +51,4 @@ export default {
 			{requestGenerateDraft: true}
 		);
 	},
-
-	getWidgets() {
-		return serviceFetch(config.getWidgetsURL, {}, () => {});
-	},
 };

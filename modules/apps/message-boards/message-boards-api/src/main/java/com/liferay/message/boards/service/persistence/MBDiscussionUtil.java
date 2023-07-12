@@ -803,10 +803,6 @@ public class MBDiscussionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(MBDiscussionPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile MBDiscussionPersistence _persistence;
 
 }

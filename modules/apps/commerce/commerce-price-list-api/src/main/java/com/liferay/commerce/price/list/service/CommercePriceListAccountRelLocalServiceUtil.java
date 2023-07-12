@@ -427,12 +427,6 @@ public class CommercePriceListAccountRelLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommercePriceListAccountRelLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommercePriceListAccountRelLocalService _service;
 
 }

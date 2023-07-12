@@ -32,9 +32,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.workflow.metrics.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.NodeMetricResource;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Rafael Praxedes
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/portal-workflow-metrics/v1.0/NodeMetric",
-	service = NodeMetricResource.Factory.class
-)
+@Component(immediate = true, service = NodeMetricResource.Factory.class)
 @Generated("")
 public class NodeMetricResourceFactoryImpl
 	implements NodeMetricResource.Factory {
@@ -138,6 +135,16 @@ public class NodeMetricResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		NodeMetricResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		NodeMetricResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, NodeMetricResource>
 		_getProxyProviderFunction() {
 
@@ -186,7 +193,7 @@ public class NodeMetricResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		NodeMetricResource nodeMetricResource =
@@ -210,7 +217,6 @@ public class NodeMetricResourceFactoryImpl
 		nodeMetricResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		nodeMetricResource.setRoleLocalService(_roleLocalService);
-		nodeMetricResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(nodeMetricResource, arguments);
@@ -251,6 +257,9 @@ public class NodeMetricResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -259,9 +268,6 @@ public class NodeMetricResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

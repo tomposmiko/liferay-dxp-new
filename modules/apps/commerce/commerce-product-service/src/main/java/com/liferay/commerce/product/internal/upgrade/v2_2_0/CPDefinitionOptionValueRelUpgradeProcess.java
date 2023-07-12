@@ -31,12 +31,15 @@ public class CPDefinitionOptionValueRelUpgradeProcess
 			CPDefinitionOptionValueRelTable.class,
 			CPDefinitionOptionValueRelTable.TABLE_NAME, "CPInstanceUuid",
 			"VARCHAR(75)");
+
 		addColumn(
 			CPDefinitionOptionValueRelTable.class,
 			CPDefinitionOptionValueRelTable.TABLE_NAME, "CProductId", "LONG");
+
 		addColumn(
 			CPDefinitionOptionValueRelTable.class,
 			CPDefinitionOptionValueRelTable.TABLE_NAME, "quantity", "INTEGER");
+
 		addColumn(
 			CPDefinitionOptionValueRelTable.class,
 			CPDefinitionOptionValueRelTable.TABLE_NAME, "price",

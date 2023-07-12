@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2727,7 +2728,7 @@ public class JournalArticleResourcePersistenceImpl
 	@Override
 	public JournalArticleResource fetchByPrimaryKey(Serializable primaryKey) {
 		if (ctPersistenceHelper.isProductionMode(
-				JournalArticleResource.class, primaryKey)) {
+				JournalArticleResource.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -3242,12 +3243,12 @@ public class JournalArticleResourcePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "articleId"}, false);
 
-		JournalArticleResourceUtil.setPersistence(this);
+		_setJournalArticleResourceUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		JournalArticleResourceUtil.setPersistence(null);
+		_setJournalArticleResourceUtilPersistence(null);
 
 		entityCache.removeCache(JournalArticleResourceImpl.class.getName());
 
@@ -3257,6 +3258,22 @@ public class JournalArticleResourcePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setJournalArticleResourceUtilPersistence(
+		JournalArticleResourcePersistence journalArticleResourcePersistence) {
+
+		try {
+			Field field = JournalArticleResourceUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, journalArticleResourcePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

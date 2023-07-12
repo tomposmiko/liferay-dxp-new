@@ -314,91 +314,85 @@ public class CommerceAddressRestrictionModelImpl
 	private static final Map
 		<String, Function<CommerceAddressRestriction, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceAddressRestriction, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceAddressRestriction, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceAddressRestriction, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceAddressRestrictionId",
-			CommerceAddressRestriction::getCommerceAddressRestrictionId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceAddressRestriction::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceAddressRestriction::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceAddressRestriction::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceAddressRestriction::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceAddressRestriction::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceAddressRestriction::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", CommerceAddressRestriction::getClassNameId);
-		attributeGetterFunctions.put(
-			"classPK", CommerceAddressRestriction::getClassPK);
-		attributeGetterFunctions.put(
-			"commerceCountryId",
-			CommerceAddressRestriction::getCommerceCountryId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceAddressRestriction, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceAddressRestriction, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceAddressRestriction, ?>>();
 
+		attributeGetterFunctions.put(
+			"commerceAddressRestrictionId",
+			CommerceAddressRestriction::getCommerceAddressRestrictionId);
 		attributeSetterBiConsumers.put(
 			"commerceAddressRestrictionId",
 			(BiConsumer<CommerceAddressRestriction, Long>)
 				CommerceAddressRestriction::setCommerceAddressRestrictionId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceAddressRestriction::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceAddressRestriction, Long>)
 				CommerceAddressRestriction::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceAddressRestriction::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceAddressRestriction, Long>)
 				CommerceAddressRestriction::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceAddressRestriction::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceAddressRestriction, Long>)
 				CommerceAddressRestriction::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceAddressRestriction::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceAddressRestriction, String>)
 				CommerceAddressRestriction::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceAddressRestriction::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceAddressRestriction, Date>)
 				CommerceAddressRestriction::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceAddressRestriction::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceAddressRestriction, Date>)
 				CommerceAddressRestriction::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", CommerceAddressRestriction::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<CommerceAddressRestriction, Long>)
 				CommerceAddressRestriction::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", CommerceAddressRestriction::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<CommerceAddressRestriction, Long>)
 				CommerceAddressRestriction::setClassPK);
+		attributeGetterFunctions.put(
+			"commerceCountryId",
+			CommerceAddressRestriction::getCommerceCountryId);
 		attributeSetterBiConsumers.put(
 			"commerceCountryId",
 			(BiConsumer<CommerceAddressRestriction, Long>)
 				CommerceAddressRestriction::setCommerceCountryId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

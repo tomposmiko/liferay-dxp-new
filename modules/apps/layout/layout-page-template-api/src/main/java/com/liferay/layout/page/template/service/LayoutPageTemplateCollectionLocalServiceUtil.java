@@ -448,12 +448,6 @@ public class LayoutPageTemplateCollectionLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		LayoutPageTemplateCollectionLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile LayoutPageTemplateCollectionLocalService _service;
 
 }

@@ -320,10 +320,6 @@ public class AkismetEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AkismetEntryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile AkismetEntryLocalService _service;
 
 }

@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
-import com.liferay.commerce.product.exception.DuplicateCommerceChannelExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchChannelException;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelTable;
@@ -48,11 +47,11 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1732,38 +1731,6 @@ public class CommerceChannelPersistenceImpl
 		CommerceChannelModelImpl commerceChannelModelImpl =
 			(CommerceChannelModelImpl)commerceChannel;
 
-		if (Validator.isNull(commerceChannel.getExternalReferenceCode())) {
-			commerceChannel.setExternalReferenceCode(
-				String.valueOf(commerceChannel.getPrimaryKey()));
-		}
-		else {
-			CommerceChannel ercCommerceChannel = fetchByC_ERC(
-				commerceChannel.getCompanyId(),
-				commerceChannel.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommerceChannel != null) {
-					throw new DuplicateCommerceChannelExternalReferenceCodeException(
-						"Duplicate commerce channel with external reference code " +
-							commerceChannel.getExternalReferenceCode() +
-								" and company " +
-									commerceChannel.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceChannel != null) &&
-					(commerceChannel.getCommerceChannelId() !=
-						ercCommerceChannel.getCommerceChannelId())) {
-
-					throw new DuplicateCommerceChannelExternalReferenceCodeException(
-						"Duplicate commerce channel with external reference code " +
-							commerceChannel.getExternalReferenceCode() +
-								" and company " +
-									commerceChannel.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -2147,11 +2114,11 @@ public class CommerceChannelPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommerceChannelUtil.setPersistence(this);
+		_setCommerceChannelUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceChannelUtil.setPersistence(null);
+		_setCommerceChannelUtilPersistence(null);
 
 		entityCache.removeCache(CommerceChannelImpl.class.getName());
 
@@ -2161,6 +2128,22 @@ public class CommerceChannelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceChannelUtilPersistence(
+		CommerceChannelPersistence commerceChannelPersistence) {
+
+		try {
+			Field field = CommerceChannelUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceChannelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

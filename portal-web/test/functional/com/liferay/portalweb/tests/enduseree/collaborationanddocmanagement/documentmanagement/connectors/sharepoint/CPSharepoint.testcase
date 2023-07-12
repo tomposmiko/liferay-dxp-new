@@ -4,7 +4,7 @@ definition {
 	property cmis.repository.type = "sharepoint2010";
 	property custom.properties = "session.store.password=true${line.separator}company.security.auth.type=screenName";
 	property dummy.socket.proxy.disabled = "true";
-	property osgi.modules.includes = "sharepoint-soap";
+	property osgi.app.includes = "sharepoint-soap";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property test.run.environment = "EE";
@@ -65,7 +65,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -96,9 +96,8 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test CheckinDocument {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#CheckinDocument";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -107,7 +106,7 @@ definition {
 			dmDocumentFile = "Document_3.txt",
 			dmDocumentTitle = "Document_3.txt");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		DMDocument.checkoutCP(
 			dmDocumentTitle = "Document_3.txt",
@@ -125,7 +124,7 @@ definition {
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_3.txt");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		DMDocument.viewCheckedoutCP(dmRepositoryName = "true");
 
@@ -139,7 +138,7 @@ definition {
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		var key_dmDocumentTitle = "Document_3.txt";
 
@@ -152,10 +151,8 @@ definition {
 			dmRepositoryName = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteDocumentInSubfolder {
-		property portal.upstream = "quarantine";
-
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
 		DMFolder.addCP(dmFolderName = "DM Folder3 Name");
@@ -209,9 +206,8 @@ definition {
 		DMDocument.viewDefaultCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteSubfolder {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#DeleteSubfolder";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -235,9 +231,8 @@ definition {
 		DMFolder.viewDefaultCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditDocumentFile {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#EditDocumentFile";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -287,9 +282,8 @@ definition {
 			metadataLabel = "Content Encoding");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditRepository {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#EditRepository";
 
 		Navigator.openURL();
@@ -356,9 +350,8 @@ definition {
 			value1 = "Sharepoint Repository Name Edit");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test MoveCheckedoutDocumentToFolder {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#MoveCheckedoutDocumentToFolder";
 
 		Navigator.openURL();
@@ -427,9 +420,8 @@ definition {
 		DMDocument.viewCheckedoutCP(dmRepositoryName = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test MoveDocumentToHome {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#MoveDocumentToHome";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -463,9 +455,8 @@ definition {
 		DMDocument.cannotViewCP(dmDocumentTitle = "Document_1.odt");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchDocumentViaHome {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#SearchDocumentViaHome";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -487,9 +478,8 @@ definition {
 			dmRepositoryName = "Sharepoint Repository Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewEditedCheckedoutDocument {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#ViewEditedCheckedoutDocument";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -537,9 +527,8 @@ definition {
 		DMDocument.viewCheckedoutCP(dmRepositoryName = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewOriginalFileExtensionAfterUnsuccessfulExtensionChange {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#ViewOriginalFileExtensionAfterUnsuccessfulExtensionChange";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -575,9 +564,8 @@ definition {
 		DMDocument.viewCP(dmDocumentTitle = "Document_1.docx");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewOriginalFileExtensionAfterUnsuccessfulExtensionRemoval {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPSharepoint#ViewOriginalFileExtensionAfterUnsuccessfulExtensionRemoval";
 
 		Navigator.openURL();

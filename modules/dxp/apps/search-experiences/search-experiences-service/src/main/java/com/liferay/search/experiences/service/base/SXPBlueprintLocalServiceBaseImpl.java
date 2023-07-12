@@ -41,8 +41,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -60,6 +58,8 @@ import com.liferay.search.experiences.service.SXPBlueprintLocalServiceUtil;
 import com.liferay.search.experiences.service.persistence.SXPBlueprintPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -274,34 +274,6 @@ public abstract class SXPBlueprintLocalServiceBaseImpl
 
 		return sxpBlueprintPersistence.fetchByUuid_C_First(
 			uuid, companyId, null);
-	}
-
-	@Deprecated
-	@Override
-	public SXPBlueprint fetchSXPBlueprintByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return sxpBlueprintPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
-	}
-
-	@Deprecated
-	@Override
-	public SXPBlueprint fetchSXPBlueprintByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return fetchSXPBlueprintByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	@Deprecated
-	@Override
-	public SXPBlueprint getSXPBlueprintByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException {
-
-		return sxpBlueprintPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -557,7 +529,7 @@ public abstract class SXPBlueprintLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		SXPBlueprintLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -572,7 +544,7 @@ public abstract class SXPBlueprintLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		sxpBlueprintLocalService = (SXPBlueprintLocalService)aopProxy;
 
-		SXPBlueprintLocalServiceUtil.setService(sxpBlueprintLocalService);
+		_setLocalServiceUtilService(sxpBlueprintLocalService);
 	}
 
 	/**
@@ -617,6 +589,22 @@ public abstract class SXPBlueprintLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SXPBlueprintLocalService sxpBlueprintLocalService) {
+
+		try {
+			Field field = SXPBlueprintLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, sxpBlueprintLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected SXPBlueprintLocalService sxpBlueprintLocalService;
 
 	@Reference
@@ -625,8 +613,5 @@ public abstract class SXPBlueprintLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SXPBlueprintLocalServiceBaseImpl.class);
 
 }

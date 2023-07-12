@@ -426,34 +426,14 @@ public class JournalFeedReferencesExportImportContentProcessor
 								class.getName(),
 							new NoSuchFeedException());
 
-				exportImportContentValidationException.setJournalArticleFeedURL(
-					_getJournalFeedReferenceURL(content, beginPos, endPos));
-
 				exportImportContentValidationException.setStagedModelClassName(
 					JournalFeed.class.getName());
-
-				exportImportContentValidationException.setType(
-					ExportImportContentValidationException.
-						JOURNAL_FEED_NOT_FOUND);
 
 				throw exportImportContentValidationException;
 			}
 
 			endPos = beginPos - 1;
 		}
-	}
-
-	private String _getJournalFeedReferenceURL(
-		String content, int beginPos, int endPos) {
-
-		endPos = StringUtil.indexOfAny(
-			content, _JOURNAL_FEED_REFERENCE_STOP_CHARS, beginPos, endPos);
-
-		if (endPos == -1) {
-			return null;
-		}
-
-		return content.substring(beginPos, endPos);
 	}
 
 	private static final String _JOURNAL_FEED_FRIENDLY_URL = "/-/journal/rss/";

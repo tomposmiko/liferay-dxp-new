@@ -405,10 +405,6 @@ public class WikiPageResourceLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(WikiPageResourceLocalService service) {
-		_service = service;
-	}
-
 	private static volatile WikiPageResourceLocalService _service;
 
 }

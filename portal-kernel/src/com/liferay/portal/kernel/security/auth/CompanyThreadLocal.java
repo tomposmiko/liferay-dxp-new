@@ -113,7 +113,7 @@ public class CompanyThreadLocal {
 		_setCompanyId(companyId);
 
 		SafeCloseable ctCollectionSafeCloseable =
-			CTCollectionThreadLocal.setProductionModeWithSafeCloseable();
+			CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(0);
 
 		return () -> {
 			_companyId.set(currentCompanyId);

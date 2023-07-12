@@ -401,10 +401,6 @@ public class DispatchTriggerLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DispatchTriggerLocalService service) {
-		_service = service;
-	}
-
 	private static volatile DispatchTriggerLocalService _service;
 
 }

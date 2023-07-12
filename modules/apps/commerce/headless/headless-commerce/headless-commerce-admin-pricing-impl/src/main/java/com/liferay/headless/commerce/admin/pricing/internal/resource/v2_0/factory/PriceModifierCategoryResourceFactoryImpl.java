@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.resource.v2_0.factory;
 
-import com.liferay.headless.commerce.admin.pricing.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceModifierCategoryResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -62,8 +62,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @generated
  */
 @Component(
-	property = "resource.locator.key=/headless-commerce-admin-pricing/v2.0/PriceModifierCategory",
-	service = PriceModifierCategoryResource.Factory.class
+	immediate = true, service = PriceModifierCategoryResource.Factory.class
 )
 @Generated("")
 public class PriceModifierCategoryResourceFactoryImpl
@@ -139,6 +138,16 @@ public class PriceModifierCategoryResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		PriceModifierCategoryResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		PriceModifierCategoryResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, PriceModifierCategoryResource>
 		_getProxyProviderFunction() {
 
@@ -187,7 +196,7 @@ public class PriceModifierCategoryResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		PriceModifierCategoryResource priceModifierCategoryResource =
@@ -214,8 +223,6 @@ public class PriceModifierCategoryResourceFactoryImpl
 		priceModifierCategoryResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		priceModifierCategoryResource.setRoleLocalService(_roleLocalService);
-		priceModifierCategoryResource.setSortParserProvider(
-			_sortParserProvider);
 
 		try {
 			return method.invoke(priceModifierCategoryResource, arguments);
@@ -259,6 +266,9 @@ public class PriceModifierCategoryResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -267,9 +277,6 @@ public class PriceModifierCategoryResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

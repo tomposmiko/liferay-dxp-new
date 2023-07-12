@@ -50,6 +50,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2840,11 +2841,11 @@ public class MembershipRequestPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "statusId"}, false);
 
-		MembershipRequestUtil.setPersistence(this);
+		_setMembershipRequestUtilPersistence(this);
 	}
 
 	public void destroy() {
-		MembershipRequestUtil.setPersistence(null);
+		_setMembershipRequestUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(MembershipRequestImpl.class.getName());
 
@@ -2854,6 +2855,22 @@ public class MembershipRequestPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setMembershipRequestUtilPersistence(
+		MembershipRequestPersistence membershipRequestPersistence) {
+
+		try {
+			Field field = MembershipRequestUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, membershipRequestPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

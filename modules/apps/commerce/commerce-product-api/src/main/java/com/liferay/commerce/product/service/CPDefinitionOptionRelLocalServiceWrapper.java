@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPDefinitionOptionRelLocalService}.
@@ -680,11 +679,6 @@ public class CPDefinitionOptionRelLocalServiceWrapper
 			cpDefinitionOptionRelId, cpOptionId, nameMap, descriptionMap,
 			ddmFormFieldTypeName, priority, facetable, required, skuContributor,
 			priceType, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpDefinitionOptionRelLocalService.getBasePersistence();
 	}
 
 	@Override

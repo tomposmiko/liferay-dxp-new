@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1436,12 +1437,12 @@ public class FolderPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"accountId", "fullName"}, false);
 
-		FolderUtil.setPersistence(this);
+		_setFolderUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		FolderUtil.setPersistence(null);
+		_setFolderUtilPersistence(null);
 
 		entityCache.removeCache(FolderImpl.class.getName());
 
@@ -1451,6 +1452,21 @@ public class FolderPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setFolderUtilPersistence(
+		FolderPersistence folderPersistence) {
+
+		try {
+			Field field = FolderUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, folderPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

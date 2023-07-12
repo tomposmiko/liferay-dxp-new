@@ -14,11 +14,12 @@
 
 package com.liferay.app.builder.rest.client.http;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -79,13 +80,7 @@ public class HttpInvoker {
 
 		HttpURLConnection httpURLConnection = _openHttpURLConnection();
 
-		byte[] binaryContent = _readResponse(httpURLConnection);
-
-		httpResponse.setBinaryContent(binaryContent);
-		httpResponse.setContent(new String(binaryContent));
-
-		httpResponse.setContentType(
-			httpURLConnection.getHeaderField("Content-Type"));
+		httpResponse.setContent(_readResponse(httpURLConnection));
 		httpResponse.setMessage(httpURLConnection.getResponseMessage());
 		httpResponse.setStatusCode(httpURLConnection.getResponseCode());
 
@@ -168,16 +163,8 @@ public class HttpInvoker {
 
 	public class HttpResponse {
 
-		public byte[] getBinaryContent() {
-			return _binaryContent;
-		}
-
 		public String getContent() {
 			return _content;
-		}
-
-		public String getContentType() {
-			return _contentType;
 		}
 
 		public String getMessage() {
@@ -188,16 +175,8 @@ public class HttpInvoker {
 			return _statusCode;
 		}
 
-		public void setBinaryContent(byte[] binaryContent) {
-			_binaryContent = binaryContent;
-		}
-
 		public void setContent(String content) {
 			_content = content;
-		}
-
-		public void setContentType(String contentType) {
-			_contentType = contentType;
 		}
 
 		public void setMessage(String message) {
@@ -208,9 +187,7 @@ public class HttpInvoker {
 			_statusCode = statusCode;
 		}
 
-		private byte[] _binaryContent;
 		private String _content;
-		private String _contentType;
 		private String _message;
 		private int _statusCode;
 
@@ -263,7 +240,7 @@ public class HttpInvoker {
 			File file = (File)value;
 
 			printWriter.append(" filename=\"");
-			printWriter.append(_filter(file.getName()));
+			printWriter.append(file.getName());
 			printWriter.append("\"\r\nContent-Type: ");
 			printWriter.append(
 				URLConnection.guessContentTypeFromName(file.getName()));
@@ -289,14 +266,6 @@ public class HttpInvoker {
 		}
 
 		printWriter.append("\r\n");
-	}
-
-	private String _filter(String fileName) {
-		fileName = fileName.replaceAll("\"", "");
-		fileName = fileName.replaceAll("\n", "");
-		fileName = fileName.replaceAll("\r", "");
-
-		return fileName;
 	}
 
 	private String _getQueryString() throws IOException {
@@ -374,15 +343,14 @@ public class HttpInvoker {
 		return httpURLConnection;
 	}
 
-	private byte[] _readResponse(HttpURLConnection httpURLConnection)
+	private String _readResponse(HttpURLConnection httpURLConnection)
 		throws IOException {
 
-		ByteArrayOutputStream byteArrayOutputStream =
-			new ByteArrayOutputStream();
-
-		InputStream inputStream = null;
+		StringBuilder sb = new StringBuilder();
 
 		int responseCode = httpURLConnection.getResponseCode();
+
+		InputStream inputStream = null;
 
 		if (responseCode > 299) {
 			inputStream = httpURLConnection.getErrorStream();
@@ -391,21 +359,22 @@ public class HttpInvoker {
 			inputStream = httpURLConnection.getInputStream();
 		}
 
-		byte[] bytes = new byte[8192];
+		BufferedReader bufferedReader = new BufferedReader(
+			new InputStreamReader(inputStream));
 
 		while (true) {
-			int read = inputStream.read(bytes, 0, bytes.length);
+			String line = bufferedReader.readLine();
 
-			if (read == -1) {
+			if (line == null) {
 				break;
 			}
 
-			byteArrayOutputStream.write(bytes, 0, read);
+			sb.append(line);
 		}
 
-		byteArrayOutputStream.flush();
+		bufferedReader.close();
 
-		return byteArrayOutputStream.toByteArray();
+		return sb.toString();
 	}
 
 	private void _writeBody(HttpURLConnection httpURLConnection)

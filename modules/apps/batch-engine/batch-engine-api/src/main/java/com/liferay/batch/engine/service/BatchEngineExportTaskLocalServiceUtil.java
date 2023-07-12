@@ -382,10 +382,6 @@ public class BatchEngineExportTaskLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(BatchEngineExportTaskLocalService service) {
-		_service = service;
-	}
-
 	private static volatile BatchEngineExportTaskLocalService _service;
 
 }

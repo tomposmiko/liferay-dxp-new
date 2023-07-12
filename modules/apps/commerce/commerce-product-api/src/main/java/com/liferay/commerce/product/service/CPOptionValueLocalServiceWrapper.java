@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPOptionValueLocalService}.
@@ -273,7 +272,13 @@ public class CPOptionValueLocalServiceWrapper
 		return _cpOptionValueLocalService.fetchCPOptionValue(CPOptionValueId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value, or <code>null</code> if a matching cp option value could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPOptionValue
 		fetchCPOptionValueByExternalReferenceCode(
@@ -284,6 +289,9 @@ public class CPOptionValueLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionValueByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CPOptionValue
@@ -339,7 +347,14 @@ public class CPOptionValueLocalServiceWrapper
 		return _cpOptionValueLocalService.getCPOptionValue(cpOptionId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value
+	 * @throws PortalException if a matching cp option value could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPOptionValue
 			getCPOptionValueByExternalReferenceCode(
@@ -516,11 +531,6 @@ public class CPOptionValueLocalServiceWrapper
 		return _cpOptionValueLocalService.upsertCPOptionValue(
 			cpOptionId, nameMap, priority, key, externalReferenceCode,
 			serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpOptionValueLocalService.getBasePersistence();
 	}
 
 	@Override

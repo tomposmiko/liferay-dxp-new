@@ -120,12 +120,6 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 		String[] devices = StringUtil.split(
 			ParamUtil.getString(actionRequest, "devices"));
 
-		long groupId = liveGroupId;
-
-		if (stagingGroupId > 0) {
-			groupId = stagingGroupId;
-		}
-
 		for (String device : devices) {
 			String deviceThemeId = ParamUtil.getString(
 				actionRequest, device + "ThemeId");
@@ -135,14 +129,18 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 				actionRequest, device + "Css");
 
 			if (Validator.isNotNull(deviceThemeId)) {
-				long layoutId = ParamUtil.getLong(actionRequest, "layoutId");
 				deviceColorSchemeId = ActionUtil.getColorSchemeId(
 					companyId, deviceThemeId, deviceColorSchemeId);
 
 				ActionUtil.updateThemeSettingsProperties(
-					actionRequest, companyId, groupId, layoutId, privateLayout,
-					typeSettingsUnicodeProperties, device, deviceThemeId,
-					false);
+					actionRequest, companyId, typeSettingsUnicodeProperties,
+					device, deviceThemeId, false);
+			}
+
+			long groupId = liveGroupId;
+
+			if (stagingGroupId > 0) {
+				groupId = stagingGroupId;
 			}
 
 			_layoutSetService.updateLookAndFeel(

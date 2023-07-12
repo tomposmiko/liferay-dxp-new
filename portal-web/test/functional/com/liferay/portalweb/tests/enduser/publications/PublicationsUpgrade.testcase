@@ -19,7 +19,7 @@ definition {
 		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test PublishAndRevertPublicationsArchive735 {
 		property data.archive.type = "data-archive-publications";
 		property database.types = "mariadb,mysql,postgresql";
@@ -28,7 +28,7 @@ definition {
 		Upgrade.revertAndPublishPublications();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test PublishAndRevertPublicationsArchive7310 {
 		property data.archive.type = "data-archive-publications";
 		property database.types = "mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -38,7 +38,7 @@ definition {
 		Upgrade.revertAndPublishPublications();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test PublishAndRevertPublicationsArchive73101 {
 		property data.archive.type = "data-archive-publications";
 		property database.types = "mariadb,mysql,oracle,postgresql,sqlserver";

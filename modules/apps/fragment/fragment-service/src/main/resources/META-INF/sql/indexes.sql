@@ -42,7 +42,6 @@ create index IX_4606AFC on FragmentEntry (uuid_[$COLUMN_LENGTH:75$], groupId, ct
 create unique index IX_E5D3F650 on FragmentEntry (uuid_[$COLUMN_LENGTH:75$], groupId, head, ctCollectionId);
 create index IX_6FD3C0BE on FragmentEntry (uuid_[$COLUMN_LENGTH:75$], head, ctCollectionId);
 
-create index IX_7B88E4C4 on FragmentEntryLink (companyId, rendererKey[$COLUMN_LENGTH:200$], ctCollectionId);
 create index IX_6AFFBB89 on FragmentEntryLink (fragmentEntryId, ctCollectionId);
 create index IX_932B7FDB on FragmentEntryLink (groupId, classNameId, classPK, ctCollectionId);
 create index IX_7AB5A586 on FragmentEntryLink (groupId, ctCollectionId);
@@ -50,7 +49,6 @@ create index IX_B7BFD778 on FragmentEntryLink (groupId, fragmentEntryId, classNa
 create index IX_4C1EB947 on FragmentEntryLink (groupId, fragmentEntryId, classNameId, ctCollectionId);
 create index IX_25790E3 on FragmentEntryLink (groupId, fragmentEntryId, ctCollectionId);
 create index IX_1A46116E on FragmentEntryLink (groupId, fragmentEntryId, plid, ctCollectionId);
-create index IX_7D730C77 on FragmentEntryLink (groupId, originalFragmentEntryLinkId, plid, ctCollectionId);
 create index IX_FF5CDFD1 on FragmentEntryLink (groupId, plid, ctCollectionId);
 create index IX_56DF5B4 on FragmentEntryLink (groupId, segmentsExperienceId, classNameId, classPK, ctCollectionId);
 create index IX_BB1027AA on FragmentEntryLink (groupId, segmentsExperienceId, plid, ctCollectionId);

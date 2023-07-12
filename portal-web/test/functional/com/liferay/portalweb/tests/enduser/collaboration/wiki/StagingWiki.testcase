@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -32,7 +32,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddWikiAndCreateContentWithStagingThenPublishAfterDelete {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -110,7 +110,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-73992."
-	@priority = 5
+	@priority = "5"
 	test RemoveStagedWikiAttachment {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -182,7 +182,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-73471."
-	@priority = 5
+	@priority = "5"
 	test RenameChildPageNameCP {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -269,7 +269,7 @@ definition {
 		WikiNavigator.gotoNode(wikiNodeName = "Main");
 
 		for (var wikiPageTitle : list "Child Page Title,Rename Page Title,Rename Page Title 1") {
-			LexiconEntry.viewEntryName(rowEntry = ${wikiPageTitle});
+			LexiconEntry.viewEntryName(rowEntry = "${wikiPageTitle}");
 		}
 	}
 

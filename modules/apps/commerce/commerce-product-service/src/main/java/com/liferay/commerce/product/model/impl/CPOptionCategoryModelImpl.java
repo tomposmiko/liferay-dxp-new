@@ -323,87 +323,81 @@ public class CPOptionCategoryModelImpl
 
 	private static final Map<String, Function<CPOptionCategory, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CPOptionCategory, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPOptionCategory, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CPOptionCategory, Object>>();
-
-		attributeGetterFunctions.put("uuid", CPOptionCategory::getUuid);
-		attributeGetterFunctions.put(
-			"CPOptionCategoryId", CPOptionCategory::getCPOptionCategoryId);
-		attributeGetterFunctions.put(
-			"companyId", CPOptionCategory::getCompanyId);
-		attributeGetterFunctions.put("userId", CPOptionCategory::getUserId);
-		attributeGetterFunctions.put("userName", CPOptionCategory::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPOptionCategory::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPOptionCategory::getModifiedDate);
-		attributeGetterFunctions.put("title", CPOptionCategory::getTitle);
-		attributeGetterFunctions.put(
-			"description", CPOptionCategory::getDescription);
-		attributeGetterFunctions.put("priority", CPOptionCategory::getPriority);
-		attributeGetterFunctions.put("key", CPOptionCategory::getKey);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CPOptionCategory::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CPOptionCategory, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CPOptionCategory, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CPOptionCategory, ?>>();
 
+		attributeGetterFunctions.put("uuid", CPOptionCategory::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CPOptionCategory, String>)CPOptionCategory::setUuid);
+		attributeGetterFunctions.put(
+			"CPOptionCategoryId", CPOptionCategory::getCPOptionCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPOptionCategoryId",
 			(BiConsumer<CPOptionCategory, Long>)
 				CPOptionCategory::setCPOptionCategoryId);
+		attributeGetterFunctions.put(
+			"companyId", CPOptionCategory::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPOptionCategory, Long>)CPOptionCategory::setCompanyId);
+		attributeGetterFunctions.put("userId", CPOptionCategory::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPOptionCategory, Long>)CPOptionCategory::setUserId);
+		attributeGetterFunctions.put("userName", CPOptionCategory::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPOptionCategory, String>)
 				CPOptionCategory::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPOptionCategory::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPOptionCategory, Date>)
 				CPOptionCategory::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPOptionCategory::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPOptionCategory, Date>)
 				CPOptionCategory::setModifiedDate);
+		attributeGetterFunctions.put("title", CPOptionCategory::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<CPOptionCategory, String>)CPOptionCategory::setTitle);
+		attributeGetterFunctions.put(
+			"description", CPOptionCategory::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CPOptionCategory, String>)
 				CPOptionCategory::setDescription);
+		attributeGetterFunctions.put("priority", CPOptionCategory::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CPOptionCategory, Double>)
 				CPOptionCategory::setPriority);
+		attributeGetterFunctions.put("key", CPOptionCategory::getKey);
 		attributeSetterBiConsumers.put(
 			"key",
 			(BiConsumer<CPOptionCategory, String>)CPOptionCategory::setKey);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CPOptionCategory::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CPOptionCategory, Date>)
 				CPOptionCategory::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

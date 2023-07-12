@@ -375,10 +375,6 @@ public class KaleoTaskFormInstanceLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(KaleoTaskFormInstanceLocalService service) {
-		_service = service;
-	}
-
 	private static volatile KaleoTaskFormInstanceLocalService _service;
 
 }

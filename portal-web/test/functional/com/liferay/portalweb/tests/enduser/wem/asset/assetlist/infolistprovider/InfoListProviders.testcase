@@ -16,7 +16,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-110191. The related assets should be in AP when select Related Assets as Collection Provider."
-	@priority = 5
+	@priority = "5"
 	test DisplayRelatedAssetsInAssetPublisher {
 		property portal.acceptance = "true";
 
@@ -88,13 +88,13 @@ definition {
 				layoutName = "Test Page Name");
 
 			JSONLayout.addWidgetToPublicLayout(
-				column = 1,
+				column = "1",
 				groupName = "Test Site Name",
 				layoutName = "Test Page Name",
 				widgetName = "Asset Publisher");
 
 			JSONLayout.addWidgetToPublicLayout(
-				column = 2,
+				column = "2",
 				groupName = "Test Site Name",
 				layoutName = "Test Page Name",
 				widgetName = "Asset Publisher");
@@ -108,12 +108,12 @@ definition {
 
 		task ("Select Related Assets as Collection Provider for Asset Publisher in Column 2") {
 			MouseOver.mouseOverNotVisible(
-				key_columnNumber = 2,
+				key_columnNumber = "2",
 				key_portletName = "Asset Publisher",
 				locator1 = "Home#PAGE_COLUMN_PORTLET_HEADER_ELLIPSIS");
 
 			Click.waitForMenuToggleJSClick(
-				key_columnNumber = 2,
+				key_columnNumber = "2",
 				key_portletName = "Asset Publisher",
 				locator1 = "Home#PAGE_COLUMN_PORTLET_HEADER_ELLIPSIS");
 
@@ -135,7 +135,7 @@ definition {
 				locator1 = "APConfiguration#SELECT_COLLECTION_PROVIDER_FIELD",
 				value1 = "Related Assets");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 
 			PortletEntry.save();
 

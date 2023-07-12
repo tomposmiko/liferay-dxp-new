@@ -427,10 +427,6 @@ public class DLFileVersionLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DLFileVersionLocalService service) {
-		_service = service;
-	}
-
 	private static volatile DLFileVersionLocalService _service;
 
 }

@@ -294,7 +294,7 @@ public class SearchSolrQueryAssemblerImpl implements SearchSolrQueryAssembler {
 
 		Map<String, Stats> statsMap = searchSearchRequest.getStats();
 
-		if (MapUtil.isNotEmpty(statsMap)) {
+		if (!MapUtil.isEmpty(statsMap)) {
 			for (Stats stats : statsMap.values()) {
 				StatsRequestBuilder statsRequestBuilder =
 					_statsRequestBuilderFactory.getStatsRequestBuilder(stats);

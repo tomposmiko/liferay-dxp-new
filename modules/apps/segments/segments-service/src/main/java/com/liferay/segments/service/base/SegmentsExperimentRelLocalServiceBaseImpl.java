@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -55,6 +53,8 @@ import com.liferay.segments.service.persistence.SegmentsExperimentPersistence;
 import com.liferay.segments.service.persistence.SegmentsExperimentRelPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -414,7 +414,7 @@ public abstract class SegmentsExperimentRelLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		SegmentsExperimentRelLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -431,8 +431,7 @@ public abstract class SegmentsExperimentRelLocalServiceBaseImpl
 		segmentsExperimentRelLocalService =
 			(SegmentsExperimentRelLocalService)aopProxy;
 
-		SegmentsExperimentRelLocalServiceUtil.setService(
-			segmentsExperimentRelLocalService);
+		_setLocalServiceUtilService(segmentsExperimentRelLocalService);
 	}
 
 	/**
@@ -493,6 +492,23 @@ public abstract class SegmentsExperimentRelLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SegmentsExperimentRelLocalService segmentsExperimentRelLocalService) {
+
+		try {
+			Field field =
+				SegmentsExperimentRelLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, segmentsExperimentRelLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected SegmentsEntryPersistence segmentsEntryPersistence;
 
@@ -532,8 +548,5 @@ public abstract class SegmentsExperimentRelLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SegmentsExperimentRelLocalServiceBaseImpl.class);
 
 }

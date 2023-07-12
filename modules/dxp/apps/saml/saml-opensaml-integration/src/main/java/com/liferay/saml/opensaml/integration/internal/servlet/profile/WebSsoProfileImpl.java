@@ -163,6 +163,7 @@ import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
@@ -172,7 +173,8 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.saml.runtime.configuration.SamlConfiguration",
-	immediate = true, service = WebSsoProfile.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = WebSsoProfile.class
 )
 public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
@@ -1953,8 +1955,9 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 		throw new AssertionException(
 			StringBundler.concat(
-				"Date ", nowDateTime, " is before ", lowerBoundDateTime,
-				" including clock skew ", clockSkew));
+				"Date ", nowDateTime.toString(), " is before ",
+				lowerBoundDateTime.toString(), " including clock skew ",
+				clockSkew));
 	}
 
 	protected void verifyNotOnOrAfterDateTime(
@@ -1971,8 +1974,9 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 		throw new ExpiredException(
 			StringBundler.concat(
-				"Date ", nowDateTime, " is after ", upperBoundDateTime,
-				" including clock skew ", clockSkew));
+				"Date ", nowDateTime.toString(), " is after ",
+				upperBoundDateTime.toString(), " including clock skew ",
+				clockSkew));
 	}
 
 	protected void verifyReplay(

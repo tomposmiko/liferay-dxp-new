@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3682,7 +3683,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 	 * </p>
 	 *
 	 * @param ddmStructureId the ddm structure ID
-	 * @param fieldNames the field names
+	 * @param fieldName the field name
 	 * @param start the lower bound of the range of de data definition field links
 	 * @param end the upper bound of the range of de data definition field links (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4634,7 +4635,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 	 *
 	 * @param classNameId the class name ID
 	 * @param ddmStructureId the ddm structure ID
-	 * @param fieldNames the field names
+	 * @param fieldName the field name
 	 * @param start the lower bound of the range of de data definition field links
 	 * @param end the upper bound of the range of de data definition field links (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -6271,12 +6272,12 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 			},
 			false);
 
-		DEDataDefinitionFieldLinkUtil.setPersistence(this);
+		_setDEDataDefinitionFieldLinkUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DEDataDefinitionFieldLinkUtil.setPersistence(null);
+		_setDEDataDefinitionFieldLinkUtilPersistence(null);
 
 		entityCache.removeCache(DEDataDefinitionFieldLinkImpl.class.getName());
 
@@ -6286,6 +6287,23 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDEDataDefinitionFieldLinkUtilPersistence(
+		DEDataDefinitionFieldLinkPersistence
+			deDataDefinitionFieldLinkPersistence) {
+
+		try {
+			Field field = DEDataDefinitionFieldLinkUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, deDataDefinitionFieldLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

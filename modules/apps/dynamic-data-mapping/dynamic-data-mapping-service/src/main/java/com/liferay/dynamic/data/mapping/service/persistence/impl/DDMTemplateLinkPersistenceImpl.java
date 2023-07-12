@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -1204,9 +1205,7 @@ public class DDMTemplateLinkPersistenceImpl
 	 */
 	@Override
 	public DDMTemplateLink fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMTemplateLink.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMTemplateLink.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -1659,12 +1658,12 @@ public class DDMTemplateLinkPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
 
-		DDMTemplateLinkUtil.setPersistence(this);
+		_setDDMTemplateLinkUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMTemplateLinkUtil.setPersistence(null);
+		_setDDMTemplateLinkUtilPersistence(null);
 
 		entityCache.removeCache(DDMTemplateLinkImpl.class.getName());
 
@@ -1674,6 +1673,22 @@ public class DDMTemplateLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMTemplateLinkUtilPersistence(
+		DDMTemplateLinkPersistence ddmTemplateLinkPersistence) {
+
+		try {
+			Field field = DDMTemplateLinkUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmTemplateLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2491,7 +2492,7 @@ public class DDMStorageLinkPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMStorageLinkModelImpl</code>.
 	 * </p>
 	 *
-	 * @param structureVersionIds the structure version IDs
+	 * @param structureVersionId the structure version ID
 	 * @param start the lower bound of the range of ddm storage links
 	 * @param end the upper bound of the range of ddm storage links (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3140,9 +3141,7 @@ public class DDMStorageLinkPersistenceImpl
 	 */
 	@Override
 	public DDMStorageLink fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMStorageLink.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMStorageLink.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3661,12 +3660,12 @@ public class DDMStorageLinkPersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"structureVersionId"}, false);
 
-		DDMStorageLinkUtil.setPersistence(this);
+		_setDDMStorageLinkUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DDMStorageLinkUtil.setPersistence(null);
+		_setDDMStorageLinkUtilPersistence(null);
 
 		entityCache.removeCache(DDMStorageLinkImpl.class.getName());
 
@@ -3676,6 +3675,22 @@ public class DDMStorageLinkPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDDMStorageLinkUtilPersistence(
+		DDMStorageLinkPersistence ddmStorageLinkPersistence) {
+
+		try {
+			Field field = DDMStorageLinkUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmStorageLinkPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

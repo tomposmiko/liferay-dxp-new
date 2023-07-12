@@ -110,10 +110,6 @@ public class PortalInstancesLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(PortalInstancesLocalService service) {
-		_service = service;
-	}
-
 	private static volatile PortalInstancesLocalService _service;
 
 }

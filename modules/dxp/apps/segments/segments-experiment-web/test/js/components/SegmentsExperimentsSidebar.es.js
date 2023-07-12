@@ -13,6 +13,7 @@ import '@testing-library/jest-dom/extend-expect';
 import {
 	cleanup,
 	fireEvent,
+	wait,
 	waitForDomChange,
 	waitForElement,
 	waitForElementToBeRemoved,
@@ -175,12 +176,7 @@ describe('Variants', () => {
 	});
 
 	it('Create variant button', async () => {
-		const {
-			APIServiceMocks,
-			findByText,
-			getByLabelText,
-			getByText,
-		} = renderApp({
+		const {APIServiceMocks, getByLabelText, getByText} = renderApp({
 			initialSegmentsExperiment: segmentsExperiment,
 			initialSegmentsVariants: segmentsVariants,
 			selectedSegmentsExperienceId:
@@ -195,18 +191,17 @@ describe('Variants', () => {
 
 		await waitForElement(() => getByText('create-new-variant'));
 
-		const variantNameInput = getByLabelText(/name/);
+		const variantNameInput = getByLabelText('name');
 		expect(variantNameInput.value).toBe('');
 
-		fireEvent.focus(variantNameInput);
 		await userEvent.type(variantNameInput, 'Variant Name');
 
 		const saveButton = getByText('save');
 
-		fireEvent.click(saveButton);
+		userEvent.click(saveButton);
 
-		await waitForElementToBeRemoved(() => getByLabelText(/name/));
-		await findByText('Variant Name');
+		await waitForElementToBeRemoved(() => getByLabelText('name'));
+		await wait(() => getByText('Variant Name'));
 
 		expect(createVariant).toHaveBeenCalledWith(
 			expect.objectContaining({

@@ -101,13 +101,7 @@ AUI.add(
 					instance.set('timestamp');
 
 					if (event.src == SRC) {
-						Liferay.Util.fetch(URL_BASE + 'extend_session').then(
-							(response) => {
-								if (response.status === 500) {
-									instance.expire();
-								}
-							}
-						);
+						Liferay.Util.fetch(URL_BASE + 'extend_session');
 					}
 				},
 
@@ -381,7 +375,7 @@ AUI.add(
 					var instance = this;
 
 					instance._cookieKey =
-						'LFR_SESSION_STATE_' + themeDisplay.getRealUserId();
+						'LFR_SESSION_STATE_' + themeDisplay.getUserId();
 
 					instance._cookieOptions = {
 						path: '/',

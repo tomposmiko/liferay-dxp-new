@@ -64,7 +64,7 @@ public class ProductContentRecommendation implements Serializable {
 			ProductContentRecommendation.class, json);
 	}
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getCreateDate() {
 		return createDate;
 	}

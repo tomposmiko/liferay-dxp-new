@@ -82,10 +82,6 @@ public class ScreensCommentServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ScreensCommentService service) {
-		_service = service;
-	}
-
 	private static volatile ScreensCommentService _service;
 
 }

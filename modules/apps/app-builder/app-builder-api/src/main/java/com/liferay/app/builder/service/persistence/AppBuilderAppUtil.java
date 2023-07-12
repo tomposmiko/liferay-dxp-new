@@ -2741,10 +2741,6 @@ public class AppBuilderAppUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(AppBuilderAppPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile AppBuilderAppPersistence _persistence;
 
 }

@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -52,6 +50,8 @@ import com.liferay.remote.app.service.RemoteAppEntryLocalServiceUtil;
 import com.liferay.remote.app.service.persistence.RemoteAppEntryPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -483,7 +483,7 @@ public abstract class RemoteAppEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		RemoteAppEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -498,7 +498,7 @@ public abstract class RemoteAppEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		remoteAppEntryLocalService = (RemoteAppEntryLocalService)aopProxy;
 
-		RemoteAppEntryLocalServiceUtil.setService(remoteAppEntryLocalService);
+		_setLocalServiceUtilService(remoteAppEntryLocalService);
 	}
 
 	/**
@@ -543,6 +543,22 @@ public abstract class RemoteAppEntryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		RemoteAppEntryLocalService remoteAppEntryLocalService) {
+
+		try {
+			Field field = RemoteAppEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, remoteAppEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected RemoteAppEntryLocalService remoteAppEntryLocalService;
 
 	@Reference
@@ -555,8 +571,5 @@ public abstract class RemoteAppEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RemoteAppEntryLocalServiceBaseImpl.class);
 
 }

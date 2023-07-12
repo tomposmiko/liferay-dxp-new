@@ -29,6 +29,7 @@ public class CommerceOrderUpgradeProcess
 		addColumn(
 			CommerceOrderModelImpl.class, CommerceOrderModelImpl.TABLE_NAME,
 			"couponCode", "VARCHAR(75)");
+
 		addColumn(
 			CommerceOrderModelImpl.class, CommerceOrderModelImpl.TABLE_NAME,
 			"lastPriceUpdateDate", "DATE");

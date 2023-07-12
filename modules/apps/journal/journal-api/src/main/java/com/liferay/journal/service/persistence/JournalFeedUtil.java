@@ -987,10 +987,6 @@ public class JournalFeedUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(JournalFeedPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile JournalFeedPersistence _persistence;
 
 }

@@ -335,10 +335,6 @@ public class MFATimeBasedOTPEntryLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(MFATimeBasedOTPEntryLocalService service) {
-		_service = service;
-	}
-
 	private static volatile MFATimeBasedOTPEntryLocalService _service;
 
 }

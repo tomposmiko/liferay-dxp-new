@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -3154,12 +3155,12 @@ public class ChangesetCollectionPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "name"}, false);
 
-		ChangesetCollectionUtil.setPersistence(this);
+		_setChangesetCollectionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		ChangesetCollectionUtil.setPersistence(null);
+		_setChangesetCollectionUtilPersistence(null);
 
 		entityCache.removeCache(ChangesetCollectionImpl.class.getName());
 
@@ -3169,6 +3170,22 @@ public class ChangesetCollectionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setChangesetCollectionUtilPersistence(
+		ChangesetCollectionPersistence changesetCollectionPersistence) {
+
+		try {
+			Field field = ChangesetCollectionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, changesetCollectionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

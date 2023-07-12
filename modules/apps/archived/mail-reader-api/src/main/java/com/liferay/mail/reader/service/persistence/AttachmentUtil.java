@@ -439,10 +439,6 @@ public class AttachmentUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(AttachmentPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile AttachmentPersistence _persistence;
 
 }

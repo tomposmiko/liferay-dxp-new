@@ -1039,10 +1039,6 @@ public class TrashEntryUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(TrashEntryPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile TrashEntryPersistence _persistence;
 
 }

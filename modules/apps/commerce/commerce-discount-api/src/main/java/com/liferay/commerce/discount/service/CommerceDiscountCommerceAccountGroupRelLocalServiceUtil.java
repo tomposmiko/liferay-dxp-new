@@ -404,12 +404,6 @@ public class CommerceDiscountCommerceAccountGroupRelLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceDiscountCommerceAccountGroupRelLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceDiscountCommerceAccountGroupRelLocalService
 		_service;
 

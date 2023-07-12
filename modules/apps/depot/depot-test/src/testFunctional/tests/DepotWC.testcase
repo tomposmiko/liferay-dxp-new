@@ -18,7 +18,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This ensures that a web content folder can be deleted in a depot."
-	@priority = 4
+	@priority = "4"
 	test DeleteFolder {
 		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
 
@@ -45,7 +45,7 @@ definition {
 	}
 
 	@description = "This test deletes multiple web content in a depot."
-	@priority = 5
+	@priority = "5"
 	test DeleteMultipleWebContent {
 		for (var i : list "1,2,3") {
 			JSONWebcontent.addWebContent(
@@ -61,7 +61,7 @@ definition {
 
 		for (var rowEntry : list "WC WebContent Title 1,WC WebContent Title 2,WC WebContent Title 3") {
 			Check(
-				key_rowEntry = ${rowEntry},
+				key_rowEntry = "${rowEntry}",
 				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_CHECKBOX");
 		}
 
@@ -75,7 +75,7 @@ definition {
 	}
 
 	@description = "This test deletes template and structure in a depot."
-	@priority = 5
+	@priority = "5"
 	test DeleteTemplateAndStructure {
 		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
 
@@ -124,7 +124,7 @@ definition {
 	}
 
 	@description = "This ensures that a web content folder can be edited in a depot."
-	@priority = 3
+	@priority = "3"
 	test EditFolder {
 		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
 
@@ -147,7 +147,7 @@ definition {
 	}
 
 	@description = "This test edits template and structure in a depot."
-	@priority = 5
+	@priority = "5"
 	test EditTemplateAndStructure {
 		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
 
@@ -192,7 +192,7 @@ definition {
 	}
 
 	@description = "This ensures that a web content can be edited in a depot."
-	@priority = 5
+	@priority = "5"
 	test EditWebContent {
 		property portal.acceptance = "true";
 
@@ -228,7 +228,7 @@ definition {
 	}
 
 	@description = "This ensures that a web content can be expired in a depot."
-	@priority = 3
+	@priority = "3"
 	test ExpireWebContent {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -251,7 +251,7 @@ definition {
 	}
 
 	@description = "This ensures that a LAR file consisting of web content can be imported in a depot."
-	@priority = 4
+	@priority = "4"
 	test ImportWebContent {
 		JSONWebcontent.addWebContent(
 			content = "Web Content Content",
@@ -272,7 +272,7 @@ definition {
 	}
 
 	@description = "This ensures that web content can be moved to a folder in a depot."
-	@priority = 3
+	@priority = "3"
 	test MoveWebContentToFolder {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -298,7 +298,7 @@ definition {
 	}
 
 	@description = "This ensures that web content with structure can be restored to a depot."
-	@priority = 5
+	@priority = "5"
 	test RestoreWebContentWithStructure {
 		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
 

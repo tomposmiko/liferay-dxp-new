@@ -15,7 +15,6 @@
 package com.liferay.commerce.account.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceAccountLocalService}.
@@ -305,7 +304,13 @@ public class CommerceAccountLocalServiceWrapper
 			commerceAccountId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce account with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce account's external reference code
+	 * @return the matching commerce account, or <code>null</code> if a matching commerce account could not be found
+	 */
 	@Override
 	public com.liferay.commerce.account.model.CommerceAccount
 		fetchCommerceAccountByExternalReferenceCode(
@@ -316,6 +321,9 @@ public class CommerceAccountLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceAccountByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.account.model.CommerceAccount
@@ -367,7 +375,14 @@ public class CommerceAccountLocalServiceWrapper
 			userId, commerceAccountId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce account with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce account's external reference code
+	 * @return the matching commerce account
+	 * @throws PortalException if a matching commerce account could not be found
+	 */
 	@Override
 	public com.liferay.commerce.account.model.CommerceAccount
 			getCommerceAccountByExternalReferenceCode(
@@ -648,11 +663,6 @@ public class CommerceAccountLocalServiceWrapper
 		return _commerceAccountLocalService.upsertCommerceAccount(
 			name, parentCommerceAccountId, logo, logoBytes, email, taxId, type,
 			active, externalReferenceCode, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceAccountLocalService.getBasePersistence();
 	}
 
 	@Override

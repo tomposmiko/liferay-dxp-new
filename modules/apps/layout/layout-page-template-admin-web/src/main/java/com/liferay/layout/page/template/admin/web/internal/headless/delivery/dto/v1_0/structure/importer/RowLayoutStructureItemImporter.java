@@ -55,79 +55,76 @@ public class RowLayoutStructureItemImporter
 		Map<String, Object> definitionMap = getDefinitionMap(
 			pageElement.getDefinition());
 
-		if (definitionMap == null) {
-			return rowStyledLayoutStructureItem;
-		}
+		if (definitionMap != null) {
+			rowStyledLayoutStructureItem.setGutters(
+				(Boolean)definitionMap.get("gutters"));
 
-		rowStyledLayoutStructureItem.setGutters(
-			(Boolean)definitionMap.get("gutters"));
-
-		if (definitionMap.containsKey("indexed")) {
-			rowStyledLayoutStructureItem.setIndexed(
-				GetterUtil.getBoolean(definitionMap.get("indexed")));
-		}
-
-		rowStyledLayoutStructureItem.setNumberOfColumns(
-			(Integer)definitionMap.get("numberOfColumns"));
-
-		if (definitionMap.containsKey("reverseOrder")) {
-			rowStyledLayoutStructureItem.setModulesPerRow(
-				(Integer)definitionMap.get("modulesPerRow"));
-			rowStyledLayoutStructureItem.setReverseOrder(
-				(Boolean)definitionMap.get("reverseOrder"));
-		}
-
-		if (definitionMap.containsKey("verticalAlignment")) {
-			rowStyledLayoutStructureItem.setVerticalAlignment(
-				(String)definitionMap.get("verticalAlignment"));
-		}
-
-		if (definitionMap.containsKey("rowViewports")) {
-			List<Map<String, Object>> rowViewports =
-				(List<Map<String, Object>>)definitionMap.get("rowViewports");
-
-			for (Map<String, Object> rowViewport : rowViewports) {
-				_processRowViewportDefinition(
-					rowStyledLayoutStructureItem,
-					(Map<String, Object>)rowViewport.get(
-						"rowViewportDefinition"),
-					(String)rowViewport.get("id"));
+			if (definitionMap.containsKey("reverseOrder")) {
+				rowStyledLayoutStructureItem.setModulesPerRow(
+					(Integer)definitionMap.get("modulesPerRow"));
 			}
-		}
-		else if (definitionMap.containsKey("rowViewportConfig")) {
-			Map<String, Object> rowViewportConfigurations =
-				(Map<String, Object>)definitionMap.get("rowViewportConfig");
 
-			for (Map.Entry<String, Object> entry :
-					rowViewportConfigurations.entrySet()) {
+			rowStyledLayoutStructureItem.setNumberOfColumns(
+				(Integer)definitionMap.get("numberOfColumns"));
 
-				_processRowViewportDefinition(
-					rowStyledLayoutStructureItem,
-					(Map<String, Object>)entry.getValue(), entry.getKey());
+			if (definitionMap.containsKey("reverseOrder")) {
+				rowStyledLayoutStructureItem.setReverseOrder(
+					(Boolean)definitionMap.get("reverseOrder"));
 			}
-		}
 
-		Map<String, Object> fragmentStyleMap =
-			(Map<String, Object>)definitionMap.get("fragmentStyle");
+			if (definitionMap.containsKey("verticalAlignment")) {
+				rowStyledLayoutStructureItem.setVerticalAlignment(
+					(String)definitionMap.get("verticalAlignment"));
+			}
 
-		if (fragmentStyleMap != null) {
-			JSONObject jsonObject = JSONUtil.put(
-				"styles", toStylesJSONObject(fragmentStyleMap));
+			if (definitionMap.containsKey("rowViewports")) {
+				List<Map<String, Object>> rowViewports =
+					(List<Map<String, Object>>)definitionMap.get(
+						"rowViewports");
 
-			rowStyledLayoutStructureItem.updateItemConfig(jsonObject);
-		}
+				for (Map<String, Object> rowViewport : rowViewports) {
+					_processRowViewportDefinition(
+						rowStyledLayoutStructureItem,
+						(Map<String, Object>)rowViewport.get(
+							"rowViewportDefinition"),
+						(String)rowViewport.get("id"));
+				}
+			}
+			else if (definitionMap.containsKey("rowViewportConfig")) {
+				Map<String, Object> rowViewportConfigurations =
+					(Map<String, Object>)definitionMap.get("rowViewportConfig");
 
-		if (definitionMap.containsKey("fragmentViewports")) {
-			List<Map<String, Object>> fragmentViewports =
-				(List<Map<String, Object>>)definitionMap.get(
-					"fragmentViewports");
+				for (Map.Entry<String, Object> entry :
+						rowViewportConfigurations.entrySet()) {
 
-			for (Map<String, Object> fragmentViewport : fragmentViewports) {
+					_processRowViewportDefinition(
+						rowStyledLayoutStructureItem,
+						(Map<String, Object>)entry.getValue(), entry.getKey());
+				}
+			}
+
+			Map<String, Object> fragmentStyleMap =
+				(Map<String, Object>)definitionMap.get("fragmentStyle");
+
+			if (fragmentStyleMap != null) {
 				JSONObject jsonObject = JSONUtil.put(
-					(String)fragmentViewport.get("id"),
-					toFragmentViewportStylesJSONObject(fragmentViewport));
+					"styles", toStylesJSONObject(fragmentStyleMap));
 
 				rowStyledLayoutStructureItem.updateItemConfig(jsonObject);
+			}
+
+			if (definitionMap.containsKey("fragmentViewports")) {
+				List<Map<String, Object>> fragmentViewports =
+					(List<Map<String, Object>>)definitionMap.get(
+						"fragmentViewports");
+
+				for (Map<String, Object> fragmentViewport : fragmentViewports) {
+					JSONObject jsonObject = JSONUtil.put(
+						(String)fragmentViewport.get("id"),
+						toFragmentViewportStylesJSONObject(fragmentViewport));
+
+					rowStyledLayoutStructureItem.updateItemConfig(jsonObject);
+				}
 			}
 		}
 

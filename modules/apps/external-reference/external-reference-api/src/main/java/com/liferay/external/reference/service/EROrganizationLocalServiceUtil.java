@@ -63,10 +63,6 @@ public class EROrganizationLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(EROrganizationLocalService service) {
-		_service = service;
-	}
-
 	private static volatile EROrganizationLocalService _service;
 
 }

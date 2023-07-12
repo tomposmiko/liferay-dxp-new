@@ -58,8 +58,6 @@ function resetInputQuantity() {
 }
 
 function doSubmit() {
-	this.disabled = true;
-
 	const formData = new FormData();
 
 	formData.append('commerceAccountId', this.accountId);
@@ -118,8 +116,6 @@ function doSubmit() {
 					showNotification(jsonresponse.error, 'danger');
 				}
 			}
-
-			this.disabled = false;
 		})
 		.catch((_weShouldHandleErrors) => {});
 }

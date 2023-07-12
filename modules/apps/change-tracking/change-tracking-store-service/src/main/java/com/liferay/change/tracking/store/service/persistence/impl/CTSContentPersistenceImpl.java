@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2923,9 +2924,7 @@ public class CTSContentPersistenceImpl
 	 */
 	@Override
 	public CTSContent fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				CTSContent.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(CTSContent.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3454,12 +3453,12 @@ public class CTSContentPersistenceImpl
 			},
 			false);
 
-		CTSContentUtil.setPersistence(this);
+		_setCTSContentUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		CTSContentUtil.setPersistence(null);
+		_setCTSContentUtilPersistence(null);
 
 		entityCache.removeCache(CTSContentImpl.class.getName());
 
@@ -3469,6 +3468,21 @@ public class CTSContentPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCTSContentUtilPersistence(
+		CTSContentPersistence ctsContentPersistence) {
+
+		try {
+			Field field = CTSContentUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ctsContentPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

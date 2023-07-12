@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -48,6 +46,8 @@ import com.liferay.view.count.service.persistence.ViewCountEntryPK;
 import com.liferay.view.count.service.persistence.ViewCountEntryPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -388,7 +388,7 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		ViewCountEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -403,7 +403,7 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		viewCountEntryLocalService = (ViewCountEntryLocalService)aopProxy;
 
-		ViewCountEntryLocalServiceUtil.setService(viewCountEntryLocalService);
+		_setLocalServiceUtilService(viewCountEntryLocalService);
 	}
 
 	/**
@@ -448,6 +448,22 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		ViewCountEntryLocalService viewCountEntryLocalService) {
+
+		try {
+			Field field = ViewCountEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, viewCountEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected ViewCountEntryLocalService viewCountEntryLocalService;
 
 	@Reference
@@ -459,8 +475,5 @@ public abstract class ViewCountEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ViewCountEntryLocalServiceBaseImpl.class);
 
 }

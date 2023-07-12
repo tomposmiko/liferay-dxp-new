@@ -220,41 +220,35 @@ public class ViewCountEntryModelImpl
 
 	private static final Map<String, Function<ViewCountEntry, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<ViewCountEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<ViewCountEntry, Object>>();
-
-		attributeGetterFunctions.put("companyId", ViewCountEntry::getCompanyId);
-		attributeGetterFunctions.put(
-			"classNameId", ViewCountEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", ViewCountEntry::getClassPK);
-		attributeGetterFunctions.put("viewCount", ViewCountEntry::getViewCount);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<ViewCountEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<ViewCountEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ViewCountEntry, Object>>();
 		Map<String, BiConsumer<ViewCountEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<ViewCountEntry, ?>>();
 
+		attributeGetterFunctions.put("companyId", ViewCountEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<ViewCountEntry, Long>)ViewCountEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"classNameId", ViewCountEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<ViewCountEntry, Long>)ViewCountEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", ViewCountEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<ViewCountEntry, Long>)ViewCountEntry::setClassPK);
+		attributeGetterFunctions.put("viewCount", ViewCountEntry::getViewCount);
 		attributeSetterBiConsumers.put(
 			"viewCount",
 			(BiConsumer<ViewCountEntry, Long>)ViewCountEntry::setViewCount);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

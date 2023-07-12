@@ -56,10 +56,6 @@ public class ClassNameServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ClassNameService service) {
-		_service = service;
-	}
-
 	private static volatile ClassNameService _service;
 
 }

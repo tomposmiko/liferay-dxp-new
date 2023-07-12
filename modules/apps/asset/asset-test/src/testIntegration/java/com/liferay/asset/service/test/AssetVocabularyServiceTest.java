@@ -440,42 +440,30 @@ public class AssetVocabularyServiceTest {
 			StringUtil.toLowerCase(title), vocabulary.getName());
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	@Test
+	@Test(expected = DuplicateVocabularyException.class)
 	public void testUpdateDuplicateVocabulary() throws Exception {
 		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
 			_group.getGroupId(), "test1");
 
 		AssetTestUtil.addVocabulary(_group.getGroupId(), "test2");
 
-		vocabulary = _assetVocabularyLocalService.updateVocabulary(
+		_assetVocabularyLocalService.updateVocabulary(
 			vocabulary.getVocabularyId(), "test2", vocabulary.getTitle(),
 			vocabulary.getTitleMap(), vocabulary.getDescriptionMap(),
 			vocabulary.getSettings(),
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
-
-		Assert.assertEquals("test1", vocabulary.getName());
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	@Test
+	@Test(expected = VocabularyNameException.class)
 	public void testUpdateEmptyNameVocabulary() throws Exception {
 		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
 			_group.getGroupId(), "test");
 
-		vocabulary = _assetVocabularyLocalService.updateVocabulary(
+		_assetVocabularyLocalService.updateVocabulary(
 			vocabulary.getVocabularyId(), StringPool.BLANK,
 			vocabulary.getTitle(), vocabulary.getTitleMap(),
 			vocabulary.getDescriptionMap(), vocabulary.getSettings(),
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
-
-		Assert.assertEquals("test", vocabulary.getName());
 	}
 
 	@Rule

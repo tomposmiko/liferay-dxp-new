@@ -16,13 +16,8 @@ package com.liferay.app.builder.rest.internal.graphql.servlet.v1_0;
 
 import com.liferay.app.builder.rest.internal.graphql.mutation.v1_0.Mutation;
 import com.liferay.app.builder.rest.internal.graphql.query.v1_0.Query;
-import com.liferay.app.builder.rest.internal.resource.v1_0.AppResourceImpl;
 import com.liferay.app.builder.rest.resource.v1_0.AppResource;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.vulcan.graphql.servlet.ServletData;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Generated;
 
@@ -37,7 +32,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Gabriel Albuquerque
  * @generated
  */
-@Component(service = ServletData.class)
+@Component(immediate = true, service = ServletData.class)
 @Generated("")
 public class ServletDataImpl implements ServletData {
 
@@ -48,10 +43,6 @@ public class ServletDataImpl implements ServletData {
 
 		Query.setAppResourceComponentServiceObjects(
 			_appResourceComponentServiceObjects);
-	}
-
-	public String getApplicationName() {
-		return "Liferay.App.Builder.REST";
 	}
 
 	@Override
@@ -68,68 +59,6 @@ public class ServletDataImpl implements ServletData {
 	public Query getQuery() {
 		return new Query();
 	}
-
-	public ObjectValuePair<Class<?>, String> getResourceMethodObjectValuePair(
-		String methodName, boolean mutation) {
-
-		if (mutation) {
-			return _resourceMethodObjectValuePairs.get(
-				"mutation#" + methodName);
-		}
-
-		return _resourceMethodObjectValuePairs.get("query#" + methodName);
-	}
-
-	private static final Map<String, ObjectValuePair<Class<?>, String>>
-		_resourceMethodObjectValuePairs =
-			new HashMap<String, ObjectValuePair<Class<?>, String>>() {
-				{
-					put(
-						"mutation#deleteApp",
-						new ObjectValuePair<>(
-							AppResourceImpl.class, "deleteApp"));
-					put(
-						"mutation#deleteAppBatch",
-						new ObjectValuePair<>(
-							AppResourceImpl.class, "deleteAppBatch"));
-					put(
-						"mutation#updateApp",
-						new ObjectValuePair<>(AppResourceImpl.class, "putApp"));
-					put(
-						"mutation#updateAppBatch",
-						new ObjectValuePair<>(
-							AppResourceImpl.class, "putAppBatch"));
-					put(
-						"mutation#updateAppDeploy",
-						new ObjectValuePair<>(
-							AppResourceImpl.class, "putAppDeploy"));
-					put(
-						"mutation#updateAppUndeploy",
-						new ObjectValuePair<>(
-							AppResourceImpl.class, "putAppUndeploy"));
-					put(
-						"mutation#createDataDefinitionApp",
-						new ObjectValuePair<>(
-							AppResourceImpl.class, "postDataDefinitionApp"));
-
-					put(
-						"query#apps",
-						new ObjectValuePair<>(
-							AppResourceImpl.class, "getAppsPage"));
-					put(
-						"query#app",
-						new ObjectValuePair<>(AppResourceImpl.class, "getApp"));
-					put(
-						"query#dataDefinitionApps",
-						new ObjectValuePair<>(
-							AppResourceImpl.class,
-							"getDataDefinitionAppsPage"));
-					put(
-						"query#siteApps",
-						new ObjectValuePair<>(
-							AppResourceImpl.class, "getSiteAppsPage"));
-				}
-			};
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<AppResource>

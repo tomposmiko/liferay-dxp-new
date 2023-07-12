@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -251,18 +252,14 @@ public class FieldSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "fieldMappings")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					FieldMapping[] fieldMappingsArray =
-						new FieldMapping[jsonParserFieldValues.length];
-
-					for (int i = 0; i < fieldMappingsArray.length; i++) {
-						fieldMappingsArray[i] = FieldMappingSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					field.setFieldMappings(fieldMappingsArray);
+					field.setFieldMappings(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> FieldMappingSerDes.toDTO((String)object)
+						).toArray(
+							size -> new FieldMapping[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "helpText")) {

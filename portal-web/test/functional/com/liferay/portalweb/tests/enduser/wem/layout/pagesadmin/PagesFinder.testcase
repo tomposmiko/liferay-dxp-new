@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is the test for LPS-103104. Can add a child page via page tree panel."
-	@priority = 5
+	@priority = "5"
 	test AddChildPageViaPageFinder {
 		property portal.acceptance = "true";
 
@@ -51,16 +51,16 @@ definition {
 	}
 
 	@description = "This is the test for LPS-107774. Can create a Collection Page based on Collections or Collection Providers in Pages Tree panel."
-	@priority = 5
+	@priority = "5"
 	test AddCollectionPageViaPageFinder {
-		property osgi.modules.includes = "bookmarks,document-library-google-docs";
+		property osgi.app.includes = "bookmarks,document-library-google-docs";
 
 		task ("Add three Web Content Articles based on Basic Web Content") {
 			for (var entryTitle : list "First Web Content,Second Web Content,Third Web Content") {
 				JSONWebcontent.addWebContent(
 					content = "Web Content Content",
 					groupName = "Test Site Name",
-					title = ${entryTitle});
+					title = "${entryTitle}");
 			}
 		}
 
@@ -87,17 +87,17 @@ definition {
 
 			AssertVisible(
 				key_elementHeader = "//div[contains(.,'Dynamic Collection') and contains(@id,'fragment-')]",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Third Web Content,Second Web Content,First Web Content") {
 				AssertVisible(
-					key_colPosition = 1,
-					key_entryTitle = ${title},
+					key_colPosition = "1",
+					key_entryTitle = "${title}",
 					key_fragmentName = "Collection Display",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 				var n = ${n} + 1;
@@ -120,17 +120,17 @@ definition {
 
 			AssertVisible(
 				key_elementHeader = "//div[contains(.,'Highest Rated Assets') and contains(@id,'fragment-')]",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Third Web Content,Second Web Content,First Web Content") {
 				AssertVisible(
-					key_colPosition = 1,
-					key_entryTitle = ${title},
+					key_colPosition = "1",
+					key_entryTitle = "${title}",
 					key_fragmentName = "Collection Display",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 				var n = ${n} + 1;
@@ -141,7 +141,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-107775. Can add new collections when add a collection page from page tree panel."
-	@priority = 5
+	@priority = "5"
 	test AddcollectionViaAddingCollectionPage {
 		ProductMenu.gotoSite(site = "Test Site Name");
 
@@ -171,7 +171,7 @@ definition {
 	}
 
 	@description = "This is the test for LPS-103104. Can add pages of different types via page tree panel."
-	@priority = 3
+	@priority = "3"
 	test AddPagesOfDifferentTypesViaPageFinder {
 		ProductMenu.gotoSite(site = "Test Site Name");
 
@@ -218,7 +218,7 @@ definition {
 		PagesFinder.selectPageType(optionValue = "Public Pages");
 
 		for (var pageName : list "Content Page,Embedded,Link to a Page of This Site,Link to URL,Page Set,Panel") {
-			PagesFinder.viewPageNameInPagesFinder(pageName = ${pageName});
+			PagesFinder.viewPageNameInPagesFinder(pageName = "${pageName}");
 		}
 
 		PagesFinder.selectPageType(optionValue = "Private Pages");
@@ -227,7 +227,7 @@ definition {
 	}
 
 	@description = "This is the test for LPS-103104. Can add a widget page via page tree panel."
-	@priority = 5
+	@priority = "5"
 	test AddPageViaPageFinder {
 		property portal.acceptance = "true";
 
@@ -241,7 +241,7 @@ definition {
 	}
 
 	@description = "This is the test for LPS-116618. Configure page via Page Tree panel."
-	@priority = 4
+	@priority = "4"
 	test ConfigurePageViaPageFinder {
 		task ("Assert Test Page Name is shown in Pages admin") {
 			JSONLayout.addPublicLayout(
@@ -285,7 +285,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-102544. Can navigate to both public and private pages from pages finder."
-	@priority = 5
+	@priority = "5"
 	test NavigateToBothPageTypesViaPageFinder {
 		property portal.acceptance = "true";
 
@@ -315,7 +315,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-102544. Can quickly browse and go to different pages with sidebar tree."
-	@priority = 4
+	@priority = "4"
 	test NavigateToDifferentPageViaPageFinder {
 		task ("Add layouts of various types for the pages finder") {
 			JSONLayout.addPublicLayout(
@@ -357,14 +357,14 @@ definition {
 		PagesFinder.goToFindAPage();
 
 		for (var pageName : list "Test Portlet Page,Test Embedded Page,Test Full Page Application,Test Panel Page,Test Default Page 1,Test Default Page 2,Test Default Page 3,Test Default Page 4") {
-			PagesFinder.navigateToPage(pageName = ${pageName});
+			PagesFinder.navigateToPage(pageName = "${pageName}");
 		}
 
 		PagesFinder.navigateToUnpublishedContentPage(pageName = "Test Content Page");
 	}
 
 	@description = "This is a test for LPS-116428. Can reorganize the pages via Page Tree panel."
-	@priority = 4
+	@priority = "4"
 	test ReorganizePagesViaPageFinder {
 		task ("Access to Page Tree panel in Test Site Name") {
 			JSONLayout.addPublicLayout(
@@ -388,12 +388,12 @@ definition {
 		}
 
 		task ("Assert the order of Pages in Page Tree panel") {
-			var n = 1;
+			var n = "1";
 
 			for (var pageName : list "Test Portlet Page,Test Content Page,Test Embedded Page") {
 				AssertVisible(
-					key_index = ${n},
-					key_pageName = ${pageName},
+					key_index = "${n}",
+					key_pageName = "${pageName}",
 					locator1 = "PagesFinder#TREE_NODE_ITEM");
 
 				var n = ${n} + 1;
@@ -408,12 +408,12 @@ definition {
 		}
 
 		task ("Assert the order of Pages in Page Tree panel") {
-			var n = 1;
+			var n = "1";
 
 			for (var pageName : list "Test Content Page,Test Portlet Page,Test Embedded Page") {
 				AssertVisible(
-					key_index = ${n},
-					key_pageName = ${pageName},
+					key_index = "${n}",
+					key_pageName = "${pageName}",
 					locator1 = "PagesFinder#TREE_NODE_ITEM");
 
 				var n = ${n} + 1;
@@ -422,7 +422,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-90363. Assert that all page types can be found and counted in the pages finder."
-	@priority = 5
+	@priority = "5"
 	test SearchAllPageTypes {
 		property portal.acceptance = "true";
 
@@ -479,7 +479,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-102544. Can search for a page in sidebar."
-	@priority = 4
+	@priority = "4"
 	test SearchPageAndViewViaSidebar {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",

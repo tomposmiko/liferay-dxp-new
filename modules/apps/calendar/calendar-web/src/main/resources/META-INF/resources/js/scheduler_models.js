@@ -77,12 +77,6 @@ AUI.add(
 					value: 0,
 				},
 
-				calendarResourceName: {
-					setter: String,
-					validator: isValue,
-					value: STR_BLANK,
-				},
-
 				content: {
 					getter(val) {
 						var content = val;
@@ -524,11 +518,6 @@ AUI.add(
 				groupId: {
 					setter: toInt,
 					value: 0,
-				},
-
-				hasMenuItems: {
-					setter: A.DataType.Boolean.parse,
-					value: true,
 				},
 
 				manageable: {

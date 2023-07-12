@@ -46,13 +46,13 @@ else {
 
 PluginPackage selPluginPackage = selTheme.getPluginPackage();
 
-String styleBookWarningMessage = layoutsAdminDisplayContext.getStyleBookWarningMessage();
+String stylebookWarningMessage = layoutsAdminDisplayContext.getStyleBookWarningMessage();
 %>
 
-<c:if test="<%= Validator.isNotNull(styleBookWarningMessage) %>">
+<c:if test="<%= Validator.isNotNull(stylebookWarningMessage) %>">
 	<clay:alert
 		displayType="info"
-		message="<%= styleBookWarningMessage %>"
+		message="<%= stylebookWarningMessage %>"
 	/>
 </c:if>
 

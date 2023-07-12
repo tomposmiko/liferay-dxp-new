@@ -14,9 +14,10 @@
 
 import {DELETE_SEGMENTS_EXPERIENCE} from '../actions';
 
-export default function deleteExperience({segmentsExperienceId}) {
+export default function deleteExperience({portletIds, segmentsExperienceId}) {
 	return {
 		payload: {
+			portletIds,
 			segmentsExperienceId,
 		},
 		type: DELETE_SEGMENTS_EXPERIENCE,

@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -51,6 +49,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.trash.kernel.service.persistence.TrashEntryPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -722,15 +722,14 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 			"com.liferay.exportimport.kernel.model.ExportImportConfiguration",
 			exportImportConfigurationLocalService);
 
-		ExportImportConfigurationLocalServiceUtil.setService(
-			exportImportConfigurationLocalService);
+		_setLocalServiceUtilService(exportImportConfigurationLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.exportimport.kernel.model.ExportImportConfiguration");
 
-		ExportImportConfigurationLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -773,6 +772,24 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		ExportImportConfigurationLocalService
+			exportImportConfigurationLocalService) {
+
+		try {
+			Field field =
+				ExportImportConfigurationLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, exportImportConfigurationLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -841,9 +858,6 @@ public abstract class ExportImportConfigurationLocalServiceBaseImpl
 
 	@BeanReference(type = TrashEntryPersistence.class)
 	protected TrashEntryPersistence trashEntryPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ExportImportConfigurationLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class LayoutSEOEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		LayoutSEOEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class LayoutSEOEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		layoutSEOEntryService = (LayoutSEOEntryService)aopProxy;
 
-		LayoutSEOEntryServiceUtil.setService(layoutSEOEntryService);
+		_setServiceUtilService(layoutSEOEntryService);
 	}
 
 	/**
@@ -116,6 +116,22 @@ public abstract class LayoutSEOEntryServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		LayoutSEOEntryService layoutSEOEntryService) {
+
+		try {
+			Field field = LayoutSEOEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, layoutSEOEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.layout.seo.service.LayoutSEOEntryLocalService
 		layoutSEOEntryLocalService;
@@ -142,8 +158,5 @@ public abstract class LayoutSEOEntryServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.LayoutService layoutService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutSEOEntryServiceBaseImpl.class);
 
 }

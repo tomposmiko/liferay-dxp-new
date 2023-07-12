@@ -15,7 +15,6 @@
 package com.liferay.data.engine.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link DEDataDefinitionFieldLinkLocalService}.
@@ -566,11 +565,6 @@ public class DEDataDefinitionFieldLinkLocalServiceWrapper
 
 		return _deDataDefinitionFieldLinkLocalService.
 			updateDEDataDefinitionFieldLink(deDataDefinitionFieldLink);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _deDataDefinitionFieldLinkLocalService.getBasePersistence();
 	}
 
 	@Override

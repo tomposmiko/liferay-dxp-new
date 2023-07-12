@@ -27,8 +27,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -50,6 +48,8 @@ import com.liferay.powwow.service.persistence.PowwowParticipantPersistence;
 import com.liferay.powwow.service.persistence.PowwowServerPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -649,14 +649,14 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 			"com.liferay.powwow.model.PowwowMeeting",
 			powwowMeetingLocalService);
 
-		PowwowMeetingLocalServiceUtil.setService(powwowMeetingLocalService);
+		_setLocalServiceUtilService(powwowMeetingLocalService);
 	}
 
 	public void destroy() {
 		PersistedModelLocalServiceRegistryUtil.unregister(
 			"com.liferay.powwow.model.PowwowMeeting");
 
-		PowwowMeetingLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -698,6 +698,22 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		PowwowMeetingLocalService powwowMeetingLocalService) {
+
+		try {
+			Field field = PowwowMeetingLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, powwowMeetingLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -757,8 +773,5 @@ public abstract class PowwowMeetingLocalServiceBaseImpl
 
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PowwowMeetingLocalServiceBaseImpl.class);
 
 }

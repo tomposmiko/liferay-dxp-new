@@ -32,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -46,6 +44,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -247,7 +247,13 @@ public abstract class AccountEntryLocalServiceBaseImpl
 		return accountEntryPersistence.fetchByPrimaryKey(accountEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account entry's external reference code
+	 * @return the matching account entry, or <code>null</code> if a matching account entry could not be found
+	 */
 	@Override
 	public AccountEntry fetchAccountEntryByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -256,6 +262,9 @@ public abstract class AccountEntryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public AccountEntry fetchAccountEntryByReferenceCode(
@@ -265,7 +274,14 @@ public abstract class AccountEntryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account entry's external reference code
+	 * @return the matching account entry
+	 * @throws PortalException if a matching account entry could not be found
+	 */
 	@Override
 	public AccountEntry getAccountEntryByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -410,7 +426,7 @@ public abstract class AccountEntryLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		AccountEntryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -425,7 +441,7 @@ public abstract class AccountEntryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		accountEntryLocalService = (AccountEntryLocalService)aopProxy;
 
-		AccountEntryLocalServiceUtil.setService(accountEntryLocalService);
+		_setLocalServiceUtilService(accountEntryLocalService);
 	}
 
 	/**
@@ -470,6 +486,22 @@ public abstract class AccountEntryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		AccountEntryLocalService accountEntryLocalService) {
+
+		try {
+			Field field = AccountEntryLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, accountEntryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected AccountEntryLocalService accountEntryLocalService;
 
 	@Reference
@@ -494,8 +526,5 @@ public abstract class AccountEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.asset.kernel.service.AssetEntryLocalService
 		assetEntryLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountEntryLocalServiceBaseImpl.class);
 
 }

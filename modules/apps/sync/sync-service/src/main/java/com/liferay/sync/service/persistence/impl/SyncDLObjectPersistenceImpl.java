@@ -50,6 +50,7 @@ import com.liferay.sync.service.persistence.impl.constants.SyncPersistenceConsta
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -4912,7 +4913,7 @@ public class SyncDLObjectPersistenceImpl
 	 *
 	 * @param modifiedTime the modified time
 	 * @param repositoryId the repository ID
-	 * @param events the events
+	 * @param event the event
 	 * @param start the lower bound of the range of sync dl objects
 	 * @param end the upper bound of the range of sync dl objects (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5870,7 +5871,7 @@ public class SyncDLObjectPersistenceImpl
 	 *
 	 * @param repositoryId the repository ID
 	 * @param parentFolderId the parent folder ID
-	 * @param types the types
+	 * @param type the type
 	 * @param start the lower bound of the range of sync dl objects
 	 * @param end the upper bound of the range of sync dl objects (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -6957,12 +6958,12 @@ public class SyncDLObjectPersistenceImpl
 			},
 			new String[] {"repositoryId", "parentFolderId", "type_"}, false);
 
-		SyncDLObjectUtil.setPersistence(this);
+		_setSyncDLObjectUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		SyncDLObjectUtil.setPersistence(null);
+		_setSyncDLObjectUtilPersistence(null);
 
 		entityCache.removeCache(SyncDLObjectImpl.class.getName());
 
@@ -6972,6 +6973,22 @@ public class SyncDLObjectPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSyncDLObjectUtilPersistence(
+		SyncDLObjectPersistence syncDLObjectPersistence) {
+
+		try {
+			Field field = SyncDLObjectUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, syncDLObjectPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

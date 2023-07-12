@@ -50,7 +50,6 @@ window.Liferay = {
 	},
 	Util: {
 		...window.Liferay.Util,
-		escapeHTML: (title) => title,
 		getLexiconIconTpl: (icon) => icon,
 	},
 	component: () => {},

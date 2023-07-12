@@ -48,6 +48,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2102,11 +2103,11 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"groupId", "active_"}, false);
 
-		CommercePaymentMethodGroupRelUtil.setPersistence(this);
+		_setCommercePaymentMethodGroupRelUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommercePaymentMethodGroupRelUtil.setPersistence(null);
+		_setCommercePaymentMethodGroupRelUtilPersistence(null);
 
 		entityCache.removeCache(
 			CommercePaymentMethodGroupRelImpl.class.getName());
@@ -2117,6 +2118,24 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommercePaymentMethodGroupRelUtilPersistence(
+		CommercePaymentMethodGroupRelPersistence
+			commercePaymentMethodGroupRelPersistence) {
+
+		try {
+			Field field =
+				CommercePaymentMethodGroupRelUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commercePaymentMethodGroupRelPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

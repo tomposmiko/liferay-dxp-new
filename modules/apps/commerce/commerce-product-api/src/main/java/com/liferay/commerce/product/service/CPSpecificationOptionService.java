@@ -82,11 +82,6 @@ public interface CPSpecificationOptionService extends BaseService {
 			long cpSpecificationOptionId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPSpecificationOption getCPSpecificationOption(
-			long companyId, String key)
-		throws PortalException;
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *

@@ -427,10 +427,6 @@ public class DLContentLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DLContentLocalService service) {
-		_service = service;
-	}
-
 	private static volatile DLContentLocalService _service;
 
 }

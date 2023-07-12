@@ -24,14 +24,14 @@
 	</div>
 </c:if>
 
-<aui:script require="metal-dom/src/all/dom as dom">
-	window['<portlet:namespace />saveRuleGroupsPriorities'] = function (dialog) {
+<aui:script>
+	function <portlet:namespace />saveRuleGroupsPriorities(dialog) {
 		dialog.hide();
 
 		<portlet:namespace />updateRuleGroupInstances();
-	};
+	}
 
-	window['<portlet:namespace />updateRuleGroupInstances'] = function () {
+	function <portlet:namespace />updateRuleGroupInstances() {
 		Liferay.Util.fetch(
 			<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/mobile_device_rules/rule_group_instances" var="viewRuleGroupInstancesURL">
 				<portlet:param name="<%= SearchContainer.DEFAULT_CUR_PARAM %>" value="<%= ParamUtil.getString(request, SearchContainer.DEFAULT_CUR_PARAM) %>" />
@@ -53,17 +53,11 @@
 
 				if (uniqueRuleGroupInstancesContainer) {
 					uniqueRuleGroupInstancesContainer.innerHTML = response;
-
-					dom.globalEval.runScriptsInElement(
-						uniqueRuleGroupInstancesContainer
-					);
 				}
 			});
-	};
+	}
 
-	window['<portlet:namespace />deleteRuleGroupInstance'] = function (
-		ruleGroupInstanceId
-	) {
+	function <portlet:namespace />deleteRuleGroupInstance(ruleGroupInstanceId) {
 		Liferay.Service(
 			'/mdr.mdrrulegroupinstance/delete-rule-group-instance',
 			{
@@ -77,9 +71,9 @@
 				<portlet:namespace />updateRuleGroupInstances();
 			}
 		);
-	};
+	}
 
-	window['<portlet:namespace />saveRuleGroupInstance'] = function (
+	function <portlet:namespace />saveRuleGroupInstance(
 		ruleGroupId,
 		ruleGroupName
 	) {
@@ -99,7 +93,7 @@
 				<portlet:namespace />updateRuleGroupInstances();
 			}
 		);
-	};
+	}
 </aui:script>
 
 <aui:script sandbox="<%= true %>">
@@ -140,9 +134,6 @@
 	if (managePrioritiesButton) {
 		managePrioritiesButton.addEventListener('click', function (event) {
 			Liferay.Util.openWindow({
-				dialog: {
-					destroyOnHide: true,
-				},
 				dialogIframe: {
 					bodyCssClass: 'dialog-with-footer',
 				},

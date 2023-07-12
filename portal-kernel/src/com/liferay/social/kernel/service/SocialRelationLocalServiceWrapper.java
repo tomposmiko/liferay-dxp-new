@@ -16,7 +16,6 @@ package com.liferay.social.kernel.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.social.kernel.model.SocialRelation;
 
@@ -617,11 +616,6 @@ public class SocialRelationLocalServiceWrapper
 	@Override
 	public SocialRelation updateSocialRelation(SocialRelation socialRelation) {
 		return _socialRelationLocalService.updateSocialRelation(socialRelation);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _socialRelationLocalService.getBasePersistence();
 	}
 
 	@Override

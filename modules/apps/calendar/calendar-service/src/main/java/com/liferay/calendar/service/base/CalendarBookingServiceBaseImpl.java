@@ -30,11 +30,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -63,7 +63,7 @@ public abstract class CalendarBookingServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		CalendarBookingServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public abstract class CalendarBookingServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		calendarBookingService = (CalendarBookingService)aopProxy;
 
-		CalendarBookingServiceUtil.setService(calendarBookingService);
+		_setServiceUtilService(calendarBookingService);
 	}
 
 	/**
@@ -119,6 +119,22 @@ public abstract class CalendarBookingServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		CalendarBookingService calendarBookingService) {
+
+		try {
+			Field field = CalendarBookingServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, calendarBookingService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -219,8 +235,5 @@ public abstract class CalendarBookingServiceBaseImpl
 	protected
 		com.liferay.social.kernel.service.SocialActivityCounterLocalService
 			socialActivityCounterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CalendarBookingServiceBaseImpl.class);
 
 }

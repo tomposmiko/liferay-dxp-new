@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -7888,9 +7889,7 @@ public class JournalFolderPersistenceImpl
 	 */
 	@Override
 	public JournalFolder fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				JournalFolder.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(JournalFolder.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -8541,12 +8540,12 @@ public class JournalFolderPersistenceImpl
 			new String[] {"folderId", "companyId", "parentFolderId", "status"},
 			false);
 
-		JournalFolderUtil.setPersistence(this);
+		_setJournalFolderUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		JournalFolderUtil.setPersistence(null);
+		_setJournalFolderUtilPersistence(null);
 
 		entityCache.removeCache(JournalFolderImpl.class.getName());
 
@@ -8556,6 +8555,22 @@ public class JournalFolderPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setJournalFolderUtilPersistence(
+		JournalFolderPersistence journalFolderPersistence) {
+
+		try {
+			Field field = JournalFolderUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, journalFolderPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

@@ -45,18 +45,14 @@ const fetchMock = new FetchMock({
 });
 
 describe('The instance list table should', () => {
-	let getAllByRole;
-
 	afterEach(() => {
 		fetchMock.reset();
 
 		cleanup();
 	});
 
-	beforeEach(() => {
-		fetchMock.mock();
-
-		const renderResult = render(
+	test('Be rendered with two items', () => {
+		const {getAllByRole} = render(
 			<MockRouter>
 				<InstanceListContext.Provider
 					value={{setInstanceId: jest.fn()}}
@@ -70,10 +66,6 @@ describe('The instance list table should', () => {
 			</MockRouter>
 		);
 
-		getAllByRole = renderResult.getAllByRole;
-	});
-
-	test('Be rendered with two items', () => {
 		const instanceRows = getAllByRole('row');
 
 		expect(instanceRows.length).toBe(3);

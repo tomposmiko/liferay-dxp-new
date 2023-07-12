@@ -174,16 +174,21 @@ public class SearchResultsPortlet extends MVCPortlet {
 			isRenderNothing(renderRequest, searchRequest));
 
 		int paginationDelta = Optional.ofNullable(
-			portletSharedSearchResponse.getPaginationDelta()
+			searchRequest.getSize()
 		).orElse(
 			SearchContainer.DEFAULT_DELTA
 		);
+		int paginationStart = 0;
 
-		int paginationStart = Optional.ofNullable(
-			portletSharedSearchResponse.getPaginationStart()
+		int from = Optional.ofNullable(
+			searchRequest.getFrom()
 		).orElse(
 			0
 		);
+
+		if (from > 0) {
+			paginationStart = (from / paginationDelta) + 1;
+		}
 
 		searchResultsPortletDisplayContext.setSearchContainer(
 			buildSearchContainer(
@@ -306,9 +311,7 @@ public class SearchResultsPortlet extends MVCPortlet {
 					portletURLFactory, searchResultsPortletPreferences,
 					searchResultPreferences);
 
-			if ((searchResultSummaryDisplayContext != null) &&
-				!searchResultSummaryDisplayContext.isTemporarilyUnavailable()) {
-
+			if (searchResultSummaryDisplayContext != null) {
 				searchResultsSummariesHolder.put(
 					document, searchResultSummaryDisplayContext);
 			}

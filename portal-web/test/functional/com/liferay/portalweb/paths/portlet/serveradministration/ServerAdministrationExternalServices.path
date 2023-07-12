@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!--OPEN_OFFICE_INTEGRATION-->
-
 <tr>
 	<td>OPEN_OFFICE_ENABLED_CHECKBOX</td>
 	<td>//input[contains(@id,'openOfficeEnabled')]</td>
@@ -23,9 +21,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--XUGGLER-->
-
 <tr>
 	<td>XUGGLER_JAR_FILE_SELECT</td>
 	<td>//select[contains(@id,'jarName')]</td>

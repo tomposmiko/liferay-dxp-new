@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -236,35 +237,28 @@ public class AppWorkflowSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "appWorkflowStates")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AppWorkflowState[] appWorkflowStatesArray =
-						new AppWorkflowState[jsonParserFieldValues.length];
-
-					for (int i = 0; i < appWorkflowStatesArray.length; i++) {
-						appWorkflowStatesArray[i] =
-							AppWorkflowStateSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
-					appWorkflow.setAppWorkflowStates(appWorkflowStatesArray);
+					appWorkflow.setAppWorkflowStates(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AppWorkflowStateSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new AppWorkflowState[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "appWorkflowTasks")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AppWorkflowTask[] appWorkflowTasksArray =
-						new AppWorkflowTask[jsonParserFieldValues.length];
-
-					for (int i = 0; i < appWorkflowTasksArray.length; i++) {
-						appWorkflowTasksArray[i] = AppWorkflowTaskSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					appWorkflow.setAppWorkflowTasks(appWorkflowTasksArray);
+					appWorkflow.setAppWorkflowTasks(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AppWorkflowTaskSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new AppWorkflowTask[size]
+						));
 				}
 			}
 		}

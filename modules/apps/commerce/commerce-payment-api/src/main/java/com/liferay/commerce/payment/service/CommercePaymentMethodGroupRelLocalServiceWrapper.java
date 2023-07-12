@@ -15,7 +15,6 @@
 package com.liferay.commerce.payment.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommercePaymentMethodGroupRelLocalService}.
@@ -568,11 +567,6 @@ public class CommercePaymentMethodGroupRelLocalServiceWrapper
 			updateCommercePaymentMethodGroupRel(
 				commercePaymentMethodGroupRelId, nameMap, descriptionMap,
 				imageFile, priority, active);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commercePaymentMethodGroupRelLocalService.getBasePersistence();
 	}
 
 	@Override

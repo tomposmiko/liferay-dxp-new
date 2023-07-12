@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.lists.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dynamic.data.lists.constants.DDLRecordConstants;
+import com.liferay.dynamic.data.lists.exception.RecordGroupIdException;
 import com.liferay.dynamic.data.lists.helper.DDLRecordSetTestHelper;
 import com.liferay.dynamic.data.lists.helper.DDLRecordTestHelper;
 import com.liferay.dynamic.data.lists.helper.DDLRecordTestUtil;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -174,6 +176,22 @@ public class DDLRecordServiceTest {
 
 		Assert.assertEquals(
 			recordSet.getVersion(), recordVersion.getRecordSetVersion());
+	}
+
+	@Test(expected = RecordGroupIdException.class)
+	public void testAddRecordWithDifferentGroupIdFromRecordSet()
+		throws Exception {
+
+		long groupId = RandomTestUtil.nextLong();
+
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm("Field");
+
+		DDLRecordSet ddlRecordSet = addRecordSet(ddmForm);
+
+		DDLRecordTestHelper ddlRecordTestHelper = new DDLRecordTestHelper(
+			GroupTestUtil.addGroup(groupId), ddlRecordSet);
+
+		ddlRecordTestHelper.addRecord();
 	}
 
 	@Test(expected = StorageException.class)

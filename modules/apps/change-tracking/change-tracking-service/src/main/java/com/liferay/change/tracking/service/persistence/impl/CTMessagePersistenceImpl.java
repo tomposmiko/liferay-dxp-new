@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashSet;
@@ -1132,12 +1133,12 @@ public class CTMessagePersistenceImpl
 			new String[] {Long.class.getName()},
 			new String[] {"ctCollectionId"}, false);
 
-		CTMessageUtil.setPersistence(this);
+		_setCTMessageUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		CTMessageUtil.setPersistence(null);
+		_setCTMessageUtilPersistence(null);
 
 		entityCache.removeCache(CTMessageImpl.class.getName());
 
@@ -1147,6 +1148,21 @@ public class CTMessagePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCTMessageUtilPersistence(
+		CTMessagePersistence ctMessagePersistence) {
+
+		try {
+			Field field = CTMessageUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ctMessagePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

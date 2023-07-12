@@ -52,6 +52,15 @@ class ProductCard extends Component {
 		}
 	}
 
+	_handleCheckboxCompareUpdate(newCompareState) {
+		this.compareState = {
+			checkboxVisible: this.compareState.checkboxVisible,
+			...newCompareState,
+		};
+
+		return this.compareState;
+	}
+
 	_handleRemoveProduct() {
 		const formData = new FormData();
 

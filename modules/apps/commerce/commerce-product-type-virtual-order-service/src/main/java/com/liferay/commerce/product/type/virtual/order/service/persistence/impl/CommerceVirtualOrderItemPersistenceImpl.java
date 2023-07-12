@@ -50,6 +50,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2401,11 +2402,11 @@ public class CommerceVirtualOrderItemPersistenceImpl
 			"countByCommerceOrderItemId", new String[] {Long.class.getName()},
 			new String[] {"commerceOrderItemId"}, false);
 
-		CommerceVirtualOrderItemUtil.setPersistence(this);
+		_setCommerceVirtualOrderItemUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceVirtualOrderItemUtil.setPersistence(null);
+		_setCommerceVirtualOrderItemUtilPersistence(null);
 
 		entityCache.removeCache(CommerceVirtualOrderItemImpl.class.getName());
 
@@ -2415,6 +2416,23 @@ public class CommerceVirtualOrderItemPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceVirtualOrderItemUtilPersistence(
+		CommerceVirtualOrderItemPersistence
+			commerceVirtualOrderItemPersistence) {
+
+		try {
+			Field field = CommerceVirtualOrderItemUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceVirtualOrderItemPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

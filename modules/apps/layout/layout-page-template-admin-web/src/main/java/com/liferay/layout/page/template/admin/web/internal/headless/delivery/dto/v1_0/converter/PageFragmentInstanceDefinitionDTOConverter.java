@@ -62,7 +62,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -129,7 +128,6 @@ public class PageFragmentInstanceDefinitionDTOConverter {
 				fragmentStyle = pageFragmentInstanceDefinitionFragmentStyle;
 				fragmentViewports =
 					pageFragmentInstanceDefinitionFragmentViewports;
-				indexed = fragmentStyledLayoutStructureItem.isIndexed();
 				widgetInstances = _getWidgetInstances(fragmentEntryLink);
 			}
 		};
@@ -149,10 +147,6 @@ public class PageFragmentInstanceDefinitionDTOConverter {
 
 	private List<FragmentField> _getBackgroundImageFragmentFields(
 		JSONObject jsonObject, boolean saveMapping) {
-
-		if (jsonObject == null) {
-			return Collections.emptyList();
-		}
 
 		List<FragmentField> fragmentFields = new ArrayList<>();
 
@@ -187,7 +181,8 @@ public class PageFragmentInstanceDefinitionDTOConverter {
 						_fragmentEntryConfigurationParser.
 							getConfigurationJSONObject(
 								fragmentEntryLink.getConfiguration(),
-								fragmentEntryLink.getEditableValues());
+								fragmentEntryLink.getEditableValues(),
+								new long[] {0L});
 
 					Set<String> keys = jsonObject.keySet();
 

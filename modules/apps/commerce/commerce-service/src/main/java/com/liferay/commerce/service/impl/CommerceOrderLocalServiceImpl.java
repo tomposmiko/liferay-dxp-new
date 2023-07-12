@@ -752,9 +752,8 @@ public class CommerceOrderLocalServiceImpl
 		CommerceOrder commerceOrder = commerceOrderPersistence.findByPrimaryKey(
 			commerceOrderId);
 
-		if ((commerceOrder.getOrderStatus() !=
-				CommerceOrderConstants.ORDER_STATUS_OPEN) ||
-			commerceOrder.isManuallyAdjusted()) {
+		if (commerceOrder.getOrderStatus() !=
+				CommerceOrderConstants.ORDER_STATUS_OPEN) {
 
 			return commerceOrder;
 		}
@@ -806,23 +805,28 @@ public class CommerceOrderLocalServiceImpl
 				totalWithTaxAmountCommerceMoney.getPrice());
 		}
 
-		_setCommerceOrderSubtotalDiscountValue(
-			commerceOrder, commerceOrderPrice.getSubtotalDiscountValue(),
-			false);
-		_setCommerceOrderShippingDiscountValue(
-			commerceOrder, commerceOrderPrice.getShippingDiscountValue(),
-			false);
-		_setCommerceOrderTotalDiscountValue(
-			commerceOrder, commerceOrderPrice.getTotalDiscountValue(), false);
-		_setCommerceOrderSubtotalDiscountValue(
-			commerceOrder,
-			commerceOrderPrice.getSubtotalDiscountValueWithTaxAmount(), true);
-		_setCommerceOrderShippingDiscountValue(
-			commerceOrder,
-			commerceOrderPrice.getShippingDiscountValueWithTaxAmount(), true);
-		_setCommerceOrderTotalDiscountValue(
-			commerceOrder,
-			commerceOrderPrice.getTotalDiscountValueWithTaxAmount(), true);
+		if (!commerceOrder.isManuallyAdjusted()) {
+			_setCommerceOrderSubtotalDiscountValue(
+				commerceOrder, commerceOrderPrice.getSubtotalDiscountValue(),
+				false);
+			_setCommerceOrderShippingDiscountValue(
+				commerceOrder, commerceOrderPrice.getShippingDiscountValue(),
+				false);
+			_setCommerceOrderTotalDiscountValue(
+				commerceOrder, commerceOrderPrice.getTotalDiscountValue(),
+				false);
+			_setCommerceOrderSubtotalDiscountValue(
+				commerceOrder,
+				commerceOrderPrice.getSubtotalDiscountValueWithTaxAmount(),
+				true);
+			_setCommerceOrderShippingDiscountValue(
+				commerceOrder,
+				commerceOrderPrice.getShippingDiscountValueWithTaxAmount(),
+				true);
+			_setCommerceOrderTotalDiscountValue(
+				commerceOrder,
+				commerceOrderPrice.getTotalDiscountValueWithTaxAmount(), true);
+		}
 
 		return commerceOrderPersistence.update(commerceOrder);
 	}
@@ -1083,10 +1087,10 @@ public class CommerceOrderLocalServiceImpl
 			}
 		}
 
-		commerceOrder.setExternalReferenceCode(externalReferenceCode);
 		commerceOrder.setTotal(total);
 		commerceOrder.setTotalWithTaxAmount(totalWithTaxAmount);
 		commerceOrder.setAdvanceStatus(advanceStatus);
+		commerceOrder.setExternalReferenceCode(externalReferenceCode);
 
 		return commerceOrderPersistence.update(commerceOrder);
 	}
@@ -1168,9 +1172,9 @@ public class CommerceOrderLocalServiceImpl
 			}
 		}
 
-		commerceOrder.setExternalReferenceCode(externalReferenceCode);
 		commerceOrder.setTotal(total);
 		commerceOrder.setAdvanceStatus(advanceStatus);
+		commerceOrder.setExternalReferenceCode(externalReferenceCode);
 
 		return commerceOrderPersistence.update(commerceOrder);
 	}

@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.ResourcePermission;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -1170,11 +1169,6 @@ public class ResourcePermissionLocalServiceWrapper
 
 		_resourcePermissionLocalService.updateResourcePermissions(
 			companyId, name, scope, primKey, newPrimKey);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _resourcePermissionLocalService.getBasePersistence();
 	}
 
 	@Override

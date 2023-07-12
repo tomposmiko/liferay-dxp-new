@@ -27,7 +27,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -45,7 +45,7 @@ definition {
 
 	@description = "This will be ignored until LPS-129727 is fixed."
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AddFormTemplate {
 		Navigator.gotoPage(pageName = "Dynamic Data Lists Display Page");
 
@@ -111,7 +111,7 @@ definition {
 		PortletEntry.publish();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddList {
 		Navigator.openURL();
 
@@ -143,7 +143,7 @@ definition {
 		Portlet.viewPortletOptionsMenulist();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddListRecord {
 		var ddlDataDefinitionName = "Data Definition Name";
 		var ddlListName = "List Name";
@@ -196,7 +196,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-58893."
-	@priority = 3
+	@priority = "3"
 	test AddListWithDocumentsAndMediaField {
 		Navigator.openURL();
 
@@ -250,7 +250,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-59565."
-	@priority = 3
+	@priority = "3"
 	test AddRecordNested {
 		Navigator.openURL();
 
@@ -295,7 +295,7 @@ definition {
 			fieldName = "Text");
 
 		DDLRecord.populateFieldInteger(
-			ddlRecordFieldData = 123,
+			ddlRecordFieldData = "123",
 			fieldName = "Integer");
 
 		PortletEntry.publish();
@@ -305,12 +305,12 @@ definition {
 		DDLRecord.viewViaDDLDisplayPG(
 			ddlListName = "DDL List",
 			ddlRecordFieldData = "Text",
-			ddlRecordNestedFieldData = 123,
+			ddlRecordNestedFieldData = "123",
 			fieldFieldLabel = "Text",
 			nestedFieldFieldLabel = "Integer");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddVelocityDisplayTemplate {
 		property custom.properties = "freemarker.engine.restricted.variables=${line.separator}restricted.variables=";
 
@@ -347,7 +347,7 @@ definition {
 
 		DDLRecord.addViaDDLDisplayPG();
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		DDLRecord.populateFieldText(
 			ddlRecordFieldData = "Name1",
@@ -361,7 +361,7 @@ definition {
 		DDLTemplate.addDisplayTemplateTemplateViaDDLDisplayPG(
 			ddlDisplayTemplateLanguage = "Velocity (.vm)",
 			ddlDisplayTemplateName = "Velocity Template",
-			ddlDisplayTemplateScript = ${ddlDisplayTemplateScript});
+			ddlDisplayTemplateScript = "${ddlDisplayTemplateScript}");
 
 		Navigator.gotoPage(pageName = "Dynamic Data Lists Display Page");
 
@@ -376,7 +376,7 @@ definition {
 			value1 = "Name1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ConfigureEditableListPG {
 		Navigator.openURL();
 
@@ -413,7 +413,7 @@ definition {
 		AssertElementNotPresent(locator1 = "DDL#TOOLBAR_ADD");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ConfigureSpreadsheetListPG {
 		property portal.acceptance = "true";
 
@@ -452,7 +452,7 @@ definition {
 		AssertElementPresent(locator1 = "DDLSpreadsheet#SPREADSHEET_CONTAINER");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteListRecord {
 		Navigator.openURL();
 
@@ -494,7 +494,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-58319."
-	@priority = 2
+	@priority = "2"
 	test EditFormTemplateLabelAndViewRecord {
 		Navigator.openURL();
 
@@ -563,7 +563,7 @@ definition {
 			fieldFieldLabel = "Text Label Edit");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditList {
 		Navigator.openURL();
 
@@ -602,7 +602,7 @@ definition {
 		DDLList.viewViaDDLDisplayPG(ddlListName = "List Name Edit");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditListRecord {
 		Navigator.openURL();
 
@@ -658,7 +658,7 @@ definition {
 			fieldFieldLabel = "Text");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditListRecordViaRecordView {
 		property portal.upstream = "quarantine";
 
@@ -724,7 +724,7 @@ definition {
 			fieldFieldLabel = "Text");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchDynamicDataListsRecords {
 		Navigator.openURL();
 
@@ -765,7 +765,7 @@ definition {
 			ddlListName = "DDL List Name");
 
 		DDLRecord.populateFieldNumber(
-			ddlRecordFieldData = 123,
+			ddlRecordFieldData = "123",
 			fieldName = "Number");
 
 		DDLRecord.populateFieldText(
@@ -795,7 +795,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Dynamic Data Lists Display Page");
 
-		SearchPortlets.searchEmbedded(searchTerm = 123);
+		SearchPortlets.searchEmbedded(searchTerm = "123");
 
 		SearchResultPortlet.viewSearchResults(
 			searchAssetTitle = "Record for Dynamic Data List:",
@@ -805,11 +805,11 @@ definition {
 
 		DDLRecord.viewSecondRecordSearchResult(
 			ddlListName = "DDL List Name",
-			ddlRecordFieldData = 123,
+			ddlRecordFieldData = "123",
 			field = "Number");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchDynamicDataListsRecordsAsUserWithNoPermissions {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -930,7 +930,7 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "Record Text");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SelectList {
 		Navigator.openURL();
 
@@ -966,7 +966,7 @@ definition {
 		DDLList.viewViaDDLDisplayPG(ddlListName = "List Name");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SwitchListsViaDDLDisplayAndAssertEditableStillChecked {
 		DDLList.addViaDDLDisplayPG(ddlListName = "List 1 Name");
 
@@ -993,7 +993,7 @@ definition {
 		FormFields.viewCheckboxChecked(fieldName = "editable");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewBooleanFieldPredefinedValue {
 		Navigator.openURL();
 
@@ -1070,16 +1070,14 @@ definition {
 			fieldFieldLabel = "Boolean");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewDateFieldPredefinedValue {
 		property custom.properties = "default.layout.template.id=1_column";
 		property portal.upstream = "quarantine";
 
 		var currentDateYear = DateUtil.getCurrentYear();
-
 		var currentDatelastYear = ${currentDateYear} - 1;
-
-		var currentDatelastYearShort = StringUtil.substring(${currentDatelastYear}, 2, 4);
+		var currentDatelastYearShort = StringUtil.substring("${currentDatelastYear}", "2", "4");
 
 		Navigator.openURL();
 
@@ -1099,9 +1097,9 @@ definition {
 			fieldFieldLabel = "Date",
 			fieldName = "Date",
 			fieldPredefinedValue = "09/01/${currentDatelastYear}",
-			fieldPredefinedValueDay = 1,
+			fieldPredefinedValueDay = "1",
 			fieldPredefinedValueMonth = "September",
-			fieldPredefinedValueYear = ${currentDatelastYear});
+			fieldPredefinedValueYear = "${currentDatelastYear}");
 
 		DDLDataDefinition.save();
 
@@ -1161,7 +1159,7 @@ definition {
 			fieldFieldLabel = "Date");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewDecimalFieldPredefinedValue {
 		Navigator.openURL();
 
@@ -1238,7 +1236,7 @@ definition {
 			fieldFieldLabel = "Decimal");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewDefaultGuestViewPermissions {
 		Navigator.openURL();
 
@@ -1312,7 +1310,7 @@ definition {
 			userRole = "Guest");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewIntegerFieldPredefinedValue {
 		Navigator.openURL();
 
@@ -1331,7 +1329,7 @@ definition {
 			field = "Integer",
 			fieldFieldLabel = "Integer",
 			fieldName = "Integer",
-			fieldPredefinedValue = 5678);
+			fieldPredefinedValue = "5678");
 
 		DDLDataDefinition.save();
 
@@ -1353,13 +1351,13 @@ definition {
 			field = "Integer",
 			fieldFieldLabel = "Integer",
 			fieldName = "Integer",
-			fieldPredefinedValue = 5678);
+			fieldPredefinedValue = "5678");
 
 		PortletEntry.publish();
 
 		DDLRecord.viewViaDDLDisplayPG(
 			ddlListName = "List Name",
-			ddlRecordFieldData = 5678,
+			ddlRecordFieldData = "5678",
 			ddlRecordFieldDataTableDisplay = "5,678",
 			field = "Integer",
 			fieldFieldLabel = "Integer");
@@ -1374,10 +1372,10 @@ definition {
 			field = "Integer",
 			fieldFieldLabel = "Integer",
 			fieldName = "Integer",
-			fieldPredefinedValue = 5678);
+			fieldPredefinedValue = "5678");
 
 		DDLRecord.populateFieldInteger(
-			ddlRecordFieldData = 4421,
+			ddlRecordFieldData = "4421",
 			fieldFieldLabel = "Integer",
 			fieldName = "Integer");
 
@@ -1385,13 +1383,13 @@ definition {
 
 		DDLRecord.viewViaDDLDisplayPG(
 			ddlListName = "List Name",
-			ddlRecordFieldData = 4421,
+			ddlRecordFieldData = "4421",
 			ddlRecordFieldDataTableDisplay = "4,421",
 			field = "Integer",
 			fieldFieldLabel = "Integer");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewListRecordAndAssertAnchorLink {
 		Navigator.openURL();
 
@@ -1434,7 +1432,7 @@ definition {
 			fieldFieldLabel = "Text");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewListRecordWithUploadedFreeMarkerDisplayTemplate {
 		property custom.properties = "freemarker.engine.restricted.variables=${line.separator}restricted.variables=";
 		property portal.acceptance = "true";
@@ -1526,7 +1524,7 @@ definition {
 		DDLDisplayPortlet.viewDDLTemplateRecordFieldData(ddlRecordFieldData = "Name2");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewListRecordWithUploadedVelocityDisplayTemplate {
 		property custom.properties = "freemarker.engine.restricted.variables=${line.separator}restricted.variables=";
 
@@ -1620,7 +1618,7 @@ definition {
 			value1 = "Name2");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewListRecordWithVelocityDisplayTemplate {
 		property custom.properties = "freemarker.engine.restricted.variables=${line.separator}restricted.variables=";
 
@@ -1664,7 +1662,7 @@ definition {
 			ddlDataDefinitionName = "Data Definition",
 			ddlDisplayTemplateLanguage = "Velocity (.vm)",
 			ddlDisplayTemplateName = "Data Definition Velocity Display Template Name",
-			ddlDisplayTemplateScript = ${ddlDisplayTemplateScript});
+			ddlDisplayTemplateScript = "${ddlDisplayTemplateScript}");
 
 		Navigator.openURL();
 
@@ -1731,7 +1729,7 @@ definition {
 			value1 = "Name2");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewNumberFieldPredefinedValue {
 		Navigator.openURL();
 
@@ -1750,7 +1748,7 @@ definition {
 			field = "Number",
 			fieldFieldLabel = "Number",
 			fieldName = "Number",
-			fieldPredefinedValue = 9011);
+			fieldPredefinedValue = "9011");
 
 		DDLDataDefinition.save();
 
@@ -1772,13 +1770,13 @@ definition {
 			field = "Number",
 			fieldFieldLabel = "Number",
 			fieldName = "Number",
-			fieldPredefinedValue = 9011);
+			fieldPredefinedValue = "9011");
 
 		PortletEntry.publish();
 
 		DDLRecord.viewViaDDLDisplayPG(
 			ddlListName = "List Name",
-			ddlRecordFieldData = 9011,
+			ddlRecordFieldData = "9011",
 			ddlRecordFieldDataTableDisplay = "9,011",
 			field = "Number",
 			fieldFieldLabel = "Number");
@@ -1793,10 +1791,10 @@ definition {
 			field = "Number",
 			fieldFieldLabel = "Number",
 			fieldName = "Number",
-			fieldPredefinedValue = 9011);
+			fieldPredefinedValue = "9011");
 
 		DDLRecord.populateFieldNumber(
-			ddlRecordFieldData = 5553,
+			ddlRecordFieldData = "5553",
 			fieldFieldLabel = "Number",
 			fieldName = "Number");
 
@@ -1804,14 +1802,14 @@ definition {
 
 		DDLRecord.viewViaDDLDisplayPG(
 			ddlListName = "List Name",
-			ddlRecordFieldData = 5553,
+			ddlRecordFieldData = "5553",
 			ddlRecordFieldDataTableDisplay = "5,553",
 			field = "Number",
 			fieldFieldLabel = "Number");
 	}
 
 	@description = "This is a use case for LPS-59146."
-	@priority = 4
+	@priority = "4"
 	test ViewPortletWithSpreadsheetViewDisabled {
 		Navigator.gotoPage(pageName = "Dynamic Data Lists Display Page");
 
@@ -1842,7 +1840,7 @@ definition {
 		DDLRecord.viewNoRecords();
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewTextBoxFieldPredefinedValue {
 		Navigator.openURL();
 
@@ -1919,7 +1917,7 @@ definition {
 			fieldFieldLabel = "Text Box");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewTextFieldPredefinedValue {
 		Navigator.openURL();
 

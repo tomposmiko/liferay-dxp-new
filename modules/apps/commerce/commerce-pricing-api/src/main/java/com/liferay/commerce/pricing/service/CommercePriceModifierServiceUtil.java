@@ -194,10 +194,6 @@ public class CommercePriceModifierServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommercePriceModifierService service) {
-		_service = service;
-	}
-
 	private static volatile CommercePriceModifierService _service;
 
 }

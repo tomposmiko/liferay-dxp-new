@@ -55,7 +55,7 @@ public class NavItemUtil {
 
 		if (layout.isRootLayout()) {
 			return Collections.singletonList(
-				new NavItem(httpServletRequest, themeDisplay, layout));
+				new NavItem(httpServletRequest, themeDisplay, layout, null));
 		}
 
 		List<Layout> ancestorLayouts = layout.getAncestors();
@@ -66,10 +66,12 @@ public class NavItemUtil {
 			Layout ancestorLayout = ancestorLayouts.get(i);
 
 			navItems.add(
-				new NavItem(httpServletRequest, themeDisplay, ancestorLayout));
+				new NavItem(
+					httpServletRequest, themeDisplay, ancestorLayout, null));
 		}
 
-		navItems.add(new NavItem(httpServletRequest, themeDisplay, layout));
+		navItems.add(
+			new NavItem(httpServletRequest, themeDisplay, layout, null));
 
 		return navItems;
 	}
@@ -146,7 +148,8 @@ public class NavItemUtil {
 
 		if (rootLayoutType.equals("absolute")) {
 			if (rootLayoutLevel == 0) {
-				navItems = themeDisplay.getNavItems();
+				navItems = NavItem.fromLayouts(
+					httpServletRequest, themeDisplay, null);
 			}
 			else if (branchNavItems.size() >= rootLayoutLevel) {
 				rootNavItem = branchNavItems.get(rootLayoutLevel - 1);
@@ -159,7 +162,8 @@ public class NavItemUtil {
 				int absoluteLevel = branchNavItems.size() - 1 - rootLayoutLevel;
 
 				if (absoluteLevel == -1) {
-					navItems = themeDisplay.getNavItems();
+					navItems = NavItem.fromLayouts(
+						httpServletRequest, themeDisplay, null);
 				}
 				else if ((absoluteLevel >= 0) &&
 						 (absoluteLevel < branchNavItems.size())) {
@@ -173,22 +177,16 @@ public class NavItemUtil {
 				Layout layout = themeDisplay.getLayout();
 
 				Layout rootLayout =
-					_layoutLocalService.fetchLayoutByUuidAndGroupId(
-						rootLayoutUuid, layout.getGroupId(), false);
+					_layoutLocalService.getLayoutByUuidAndGroupId(
+						rootLayoutUuid, layout.getGroupId(),
+						layout.isPrivateLayout());
 
-				if (rootLayout == null) {
-					rootLayout =
-						_layoutLocalService.fetchLayoutByUuidAndGroupId(
-							rootLayoutUuid, layout.getGroupId(), true);
-				}
-
-				if (rootLayout != null) {
-					rootNavItem = new NavItem(
-						httpServletRequest, themeDisplay, rootLayout);
-				}
+				rootNavItem = new NavItem(
+					httpServletRequest, themeDisplay, rootLayout, null);
 			}
 			else {
-				navItems = themeDisplay.getNavItems();
+				navItems = NavItem.fromLayouts(
+					httpServletRequest, themeDisplay, null);
 			}
 		}
 

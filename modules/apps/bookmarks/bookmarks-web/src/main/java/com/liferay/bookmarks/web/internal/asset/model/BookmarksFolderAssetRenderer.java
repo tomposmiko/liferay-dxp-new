@@ -188,15 +188,6 @@ public class BookmarksFolderAssetRenderer
 	}
 
 	@Override
-	public String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect) {
-
-		return getURLViewInContext(
-			themeDisplay, noSuchEntryRedirect, "/bookmarks/find_folder",
-			"folderId", _folder.getFolderId());
-	}
-
-	@Override
 	public long getUserId() {
 		return _folder.getUserId();
 	}

@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -134,7 +135,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		long oAuth2ApplicationId = counterLocalService.increment(
 			OAuth2Application.class.getName());
 
-		User user = userLocalService.getUser(clientCredentialUserId);
+		User user = _userLocalService.getUser(clientCredentialUserId);
 
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationPersistence.create(oAuth2ApplicationId);
@@ -220,7 +221,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		long oAuth2ApplicationId = counterLocalService.increment(
 			OAuth2Application.class.getName());
 
-		User user = userLocalService.getUser(clientCredentialUserId);
+		User user = _userLocalService.getUser(clientCredentialUserId);
 
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationPersistence.create(oAuth2ApplicationId);
@@ -460,7 +461,7 @@ public class OAuth2ApplicationLocalServiceImpl
 			allowedGrantTypesList, clientId, clientProfile, clientSecret,
 			homePageURL, name, privacyPolicyURL, redirectURIsList);
 
-		User user = userLocalService.getUser(clientCredentialUserId);
+		User user = _userLocalService.getUser(clientCredentialUserId);
 
 		oAuth2Application.setModifiedDate(new Date());
 		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
@@ -783,5 +784,8 @@ public class OAuth2ApplicationLocalServiceImpl
 		target = "(class.name=com.liferay.portal.repository.portletrepository.PortletRepository)"
 	)
 	private RepositoryFactory _repositoryFactory;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

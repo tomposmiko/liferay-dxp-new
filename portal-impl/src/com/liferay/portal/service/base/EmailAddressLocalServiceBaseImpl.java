@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.EmailAddress;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -58,6 +56,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -721,14 +721,14 @@ public abstract class EmailAddressLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.EmailAddress",
 			emailAddressLocalService);
 
-		EmailAddressLocalServiceUtil.setService(emailAddressLocalService);
+		_setLocalServiceUtilService(emailAddressLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.EmailAddress");
 
-		EmailAddressLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -773,6 +773,22 @@ public abstract class EmailAddressLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		EmailAddressLocalService emailAddressLocalService) {
+
+		try {
+			Field field = EmailAddressLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, emailAddressLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = EmailAddressLocalService.class)
 	protected EmailAddressLocalService emailAddressLocalService;
 
@@ -814,9 +830,6 @@ public abstract class EmailAddressLocalServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		EmailAddressLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

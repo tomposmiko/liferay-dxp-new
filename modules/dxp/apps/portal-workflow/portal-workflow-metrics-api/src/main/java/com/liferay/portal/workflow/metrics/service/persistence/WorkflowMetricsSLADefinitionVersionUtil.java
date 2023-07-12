@@ -1038,12 +1038,6 @@ public class WorkflowMetricsSLADefinitionVersionUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		WorkflowMetricsSLADefinitionVersionPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile WorkflowMetricsSLADefinitionVersionPersistence
 		_persistence;
 

@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.inventory.service.persistence.impl;
 
-import com.liferay.commerce.inventory.exception.DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException;
 import com.liferay.commerce.inventory.exception.NoSuchInventoryWarehouseItemException;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemTable;
@@ -46,11 +45,11 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -2605,45 +2604,6 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 				(CommerceInventoryWarehouseItemModelImpl)
 					commerceInventoryWarehouseItem;
 
-		if (Validator.isNull(
-				commerceInventoryWarehouseItem.getExternalReferenceCode())) {
-
-			commerceInventoryWarehouseItem.setExternalReferenceCode(
-				String.valueOf(commerceInventoryWarehouseItem.getPrimaryKey()));
-		}
-		else {
-			CommerceInventoryWarehouseItem ercCommerceInventoryWarehouseItem =
-				fetchByC_ERC(
-					commerceInventoryWarehouseItem.getCompanyId(),
-					commerceInventoryWarehouseItem.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommerceInventoryWarehouseItem != null) {
-					throw new DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException(
-						"Duplicate commerce inventory warehouse item with external reference code " +
-							commerceInventoryWarehouseItem.
-								getExternalReferenceCode() + " and company " +
-									commerceInventoryWarehouseItem.
-										getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceInventoryWarehouseItem != null) &&
-					(commerceInventoryWarehouseItem.
-						getCommerceInventoryWarehouseItemId() !=
-							ercCommerceInventoryWarehouseItem.
-								getCommerceInventoryWarehouseItemId())) {
-
-					throw new DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException(
-						"Duplicate commerce inventory warehouse item with external reference code " +
-							commerceInventoryWarehouseItem.
-								getExternalReferenceCode() + " and company " +
-									commerceInventoryWarehouseItem.
-										getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -3082,11 +3042,11 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommerceInventoryWarehouseItemUtil.setPersistence(this);
+		_setCommerceInventoryWarehouseItemUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceInventoryWarehouseItemUtil.setPersistence(null);
+		_setCommerceInventoryWarehouseItemUtilPersistence(null);
 
 		entityCache.removeCache(
 			CommerceInventoryWarehouseItemImpl.class.getName());
@@ -3097,6 +3057,24 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceInventoryWarehouseItemUtilPersistence(
+		CommerceInventoryWarehouseItemPersistence
+			commerceInventoryWarehouseItemPersistence) {
+
+		try {
+			Field field =
+				CommerceInventoryWarehouseItemUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceInventoryWarehouseItemPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

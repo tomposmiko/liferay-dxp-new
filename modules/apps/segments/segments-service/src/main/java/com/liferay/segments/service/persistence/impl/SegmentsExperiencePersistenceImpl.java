@@ -58,6 +58,7 @@ import com.liferay.segments.service.persistence.impl.constants.SegmentsPersisten
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -10092,7 +10093,7 @@ public class SegmentsExperiencePersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param segmentsEntryIds the segments entry IDs
+	 * @param segmentsEntryId the segments entry ID
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
 	 * @param active the active
@@ -11089,9 +11090,7 @@ public class SegmentsExperiencePersistenceImpl
 	 */
 	@Override
 	public SegmentsExperience fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				SegmentsExperience.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(SegmentsExperience.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -11836,12 +11835,12 @@ public class SegmentsExperiencePersistenceImpl
 			},
 			false);
 
-		SegmentsExperienceUtil.setPersistence(this);
+		_setSegmentsExperienceUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		SegmentsExperienceUtil.setPersistence(null);
+		_setSegmentsExperienceUtilPersistence(null);
 
 		entityCache.removeCache(SegmentsExperienceImpl.class.getName());
 
@@ -11851,6 +11850,22 @@ public class SegmentsExperiencePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSegmentsExperienceUtilPersistence(
+		SegmentsExperiencePersistence segmentsExperiencePersistence) {
+
+		try {
+			Field field = SegmentsExperienceUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, segmentsExperiencePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

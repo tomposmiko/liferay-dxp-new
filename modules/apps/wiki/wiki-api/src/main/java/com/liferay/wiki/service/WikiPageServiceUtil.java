@@ -399,10 +399,6 @@ public class WikiPageServiceUtil {
 		return _service;
 	}
 
-	public static void setService(WikiPageService service) {
-		_service = service;
-	}
-
 	private static volatile WikiPageService _service;
 
 }

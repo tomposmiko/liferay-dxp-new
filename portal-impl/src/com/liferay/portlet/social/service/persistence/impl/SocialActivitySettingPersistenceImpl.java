@@ -51,6 +51,7 @@ import com.liferay.social.kernel.service.persistence.SocialActivitySettingUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -3052,7 +3053,7 @@ public class SocialActivitySettingPersistenceImpl
 	@Override
 	public SocialActivitySetting fetchByPrimaryKey(Serializable primaryKey) {
 		if (CTPersistenceHelperUtil.isProductionMode(
-				SocialActivitySetting.class, primaryKey)) {
+				SocialActivitySetting.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -3584,11 +3585,11 @@ public class SocialActivitySettingPersistenceImpl
 			new String[] {"groupId", "classNameId", "activityType", "name"},
 			false);
 
-		SocialActivitySettingUtil.setPersistence(this);
+		_setSocialActivitySettingUtilPersistence(this);
 	}
 
 	public void destroy() {
-		SocialActivitySettingUtil.setPersistence(null);
+		_setSocialActivitySettingUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(SocialActivitySettingImpl.class.getName());
 
@@ -3598,6 +3599,22 @@ public class SocialActivitySettingPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setSocialActivitySettingUtilPersistence(
+		SocialActivitySettingPersistence socialActivitySettingPersistence) {
+
+		try {
+			Field field = SocialActivitySettingUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivitySettingPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

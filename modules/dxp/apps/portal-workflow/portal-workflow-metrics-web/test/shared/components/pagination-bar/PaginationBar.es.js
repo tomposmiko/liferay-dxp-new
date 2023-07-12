@@ -48,17 +48,18 @@ describe('The PaginationBar component should', () => {
 
 		expect(pageSizeOptions.length).toBe(6);
 
-		let pageLinks = baseElement.querySelectorAll('.page-link');
+		let pageLinks = baseElement.querySelectorAll('button.page-link');
 
 		expect(pageLinks.length).toBe(3);
 
 		expect(pageLinks[0]).toHaveAttribute('disabled');
+		expect(pageLinks[1]).not.toHaveAttribute('disabled');
 		expect(pageLinks[1]).toHaveTextContent('1');
 		expect(pageLinks[2]).toHaveAttribute('disabled');
 
 		fireEvent.click(pageSizeOptions[0]);
 
-		pageLinks = baseElement.querySelectorAll('.page-link');
+		pageLinks = baseElement.querySelectorAll('button.page-link');
 		let pageItems = baseElement.querySelectorAll('.page-item');
 
 		expect(pageLinks.length).toBe(6);
@@ -95,7 +96,7 @@ describe('The PaginationBar component should', () => {
 
 		expect(pageSizeOptions.length).toBe(6);
 
-		let pageLinks = baseElement.querySelectorAll('.page-link');
+		let pageLinks = baseElement.querySelectorAll('button.page-link');
 		let pageItems = baseElement.querySelectorAll('.page-item');
 
 		expect(pageLinks.length).toBe(5);
@@ -121,7 +122,7 @@ describe('The PaginationBar component should', () => {
 
 		fireEvent.click(pageSizeOptions[4]);
 
-		pageLinks = baseElement.querySelectorAll('.page-link');
+		pageLinks = baseElement.querySelectorAll('button.page-link');
 		pageItems = baseElement.querySelectorAll('.page-item');
 
 		expect(pageLinks.length).toBe(3);

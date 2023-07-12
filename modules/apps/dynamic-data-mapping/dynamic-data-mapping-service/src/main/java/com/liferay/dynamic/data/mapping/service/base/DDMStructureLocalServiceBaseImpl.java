@@ -49,8 +49,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -65,6 +63,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -555,7 +555,7 @@ public abstract class DDMStructureLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		DDMStructureLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -570,7 +570,7 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		ddmStructureLocalService = (DDMStructureLocalService)aopProxy;
 
-		DDMStructureLocalServiceUtil.setService(ddmStructureLocalService);
+		_setLocalServiceUtilService(ddmStructureLocalService);
 	}
 
 	/**
@@ -630,6 +630,22 @@ public abstract class DDMStructureLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		DDMStructureLocalService ddmStructureLocalService) {
+
+		try {
+			Field field = DDMStructureLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, ddmStructureLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected DDMStructureLocalService ddmStructureLocalService;
 
 	@Reference
@@ -675,8 +691,5 @@ public abstract class DDMStructureLocalServiceBaseImpl
 
 	@Reference
 	protected DDMTemplateFinder ddmTemplateFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMStructureLocalServiceBaseImpl.class);
 
 }

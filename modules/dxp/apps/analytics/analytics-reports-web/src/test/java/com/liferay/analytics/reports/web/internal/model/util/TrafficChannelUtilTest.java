@@ -15,10 +15,17 @@
 package com.liferay.analytics.reports.web.internal.model.util;
 
 import com.liferay.analytics.reports.web.internal.model.AcquisitionChannel;
+import com.liferay.analytics.reports.web.internal.model.CountrySearchKeywords;
 import com.liferay.analytics.reports.web.internal.model.DirectTrafficChannelImpl;
+import com.liferay.analytics.reports.web.internal.model.OrganicTrafficChannelImpl;
+import com.liferay.analytics.reports.web.internal.model.PaidTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.ReferralTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.ReferringURL;
+import com.liferay.analytics.reports.web.internal.model.SearchKeyword;
 import com.liferay.analytics.reports.web.internal.model.SocialTrafficChannelImpl;
+import com.liferay.analytics.reports.web.internal.model.TrafficSource;
+import com.liferay.portal.json.JSONFactoryImpl;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -27,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,6 +48,13 @@ public class TrafficChannelUtilTest {
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
+
+	@BeforeClass
+	public static void setUpClass() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
+	}
 
 	@Test
 	public void testToJSONObject() {
@@ -94,7 +109,7 @@ public class TrafficChannelUtilTest {
 
 		DirectTrafficChannelImpl directTrafficChannelImpl =
 			(DirectTrafficChannelImpl)TrafficChannelUtil.toTrafficChannel(
-				acquisitionChannel, null, null, null);
+				acquisitionChannel, null, null, null, null);
 
 		Assert.assertEquals(
 			acquisitionChannel.getTrafficAmount(),
@@ -110,7 +125,78 @@ public class TrafficChannelUtilTest {
 			new AcquisitionChannel(
 				"invalid", RandomTestUtil.randomInt(),
 				RandomTestUtil.randomDouble()),
-			null, null, null);
+			null, null, null, null);
+	}
+
+	@Test
+	public void testToTrafficChannelWithOrganicName() {
+		AcquisitionChannel acquisitionChannel = new AcquisitionChannel(
+			"organic", RandomTestUtil.randomInt(),
+			RandomTestUtil.randomDouble());
+
+		TrafficSource trafficSource = new TrafficSource(
+			Collections.singletonList(
+				new CountrySearchKeywords(
+					RandomTestUtil.randomString(),
+					Collections.singletonList(
+						new SearchKeyword(
+							RandomTestUtil.randomString(),
+							RandomTestUtil.randomInt(),
+							RandomTestUtil.randomInt(),
+							RandomTestUtil.randomInt())))),
+			RandomTestUtil.randomString(), RandomTestUtil.randomInt(),
+			RandomTestUtil.randomDouble());
+
+		OrganicTrafficChannelImpl organicTrafficChannelImpl =
+			(OrganicTrafficChannelImpl)TrafficChannelUtil.toTrafficChannel(
+				acquisitionChannel, null, null, null,
+				Collections.singletonMap(
+					acquisitionChannel.getName(), trafficSource));
+
+		Assert.assertEquals(
+			trafficSource.getCountrySearchKeywordsList(),
+			organicTrafficChannelImpl.getCountrySearchKeywordsList());
+		Assert.assertEquals(
+			acquisitionChannel.getTrafficAmount(),
+			organicTrafficChannelImpl.getTrafficAmount());
+		Assert.assertEquals(
+			acquisitionChannel.getTrafficShare(),
+			organicTrafficChannelImpl.getTrafficShare(), 0);
+	}
+
+	@Test
+	public void testToTrafficChannelWithPaidName() {
+		AcquisitionChannel acquisitionChannel = new AcquisitionChannel(
+			"paid", RandomTestUtil.randomInt(), RandomTestUtil.randomDouble());
+
+		TrafficSource trafficSource = new TrafficSource(
+			Collections.singletonList(
+				new CountrySearchKeywords(
+					RandomTestUtil.randomString(),
+					Collections.singletonList(
+						new SearchKeyword(
+							RandomTestUtil.randomString(),
+							RandomTestUtil.randomInt(),
+							RandomTestUtil.randomInt(),
+							RandomTestUtil.randomInt())))),
+			RandomTestUtil.randomString(), RandomTestUtil.randomInt(),
+			RandomTestUtil.randomDouble());
+
+		PaidTrafficChannelImpl paidTrafficChannelImpl =
+			(PaidTrafficChannelImpl)TrafficChannelUtil.toTrafficChannel(
+				acquisitionChannel, null, null, null,
+				Collections.singletonMap(
+					acquisitionChannel.getName(), trafficSource));
+
+		Assert.assertEquals(
+			trafficSource.getCountrySearchKeywordsList(),
+			paidTrafficChannelImpl.getCountrySearchKeywordsList());
+		Assert.assertEquals(
+			acquisitionChannel.getTrafficAmount(),
+			paidTrafficChannelImpl.getTrafficAmount());
+		Assert.assertEquals(
+			acquisitionChannel.getTrafficShare(),
+			paidTrafficChannelImpl.getTrafficShare(), 0);
 	}
 
 	@Test
@@ -125,7 +211,7 @@ public class TrafficChannelUtilTest {
 				Collections.singletonList(new ReferringURL(1, "liferay.com")),
 				Collections.singletonList(
 					new ReferringURL(1, "http://liferay.com/")),
-				null);
+				null, null);
 
 		Assert.assertEquals(
 			acquisitionChannel.getTrafficAmount(),
@@ -156,7 +242,7 @@ public class TrafficChannelUtilTest {
 
 		SocialTrafficChannelImpl socialTrafficChannelImpl =
 			(SocialTrafficChannelImpl)TrafficChannelUtil.toTrafficChannel(
-				acquisitionChannel, null, null, null);
+				acquisitionChannel, null, null, null, null);
 
 		Assert.assertEquals(
 			acquisitionChannel.getTrafficAmount(),

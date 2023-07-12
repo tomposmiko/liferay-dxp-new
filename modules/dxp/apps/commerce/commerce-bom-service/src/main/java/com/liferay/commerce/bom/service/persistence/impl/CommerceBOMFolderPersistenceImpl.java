@@ -49,6 +49,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2553,11 +2554,11 @@ public class CommerceBOMFolderPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "parentCommerceBOMFolderId"}, false);
 
-		CommerceBOMFolderUtil.setPersistence(this);
+		_setCommerceBOMFolderUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommerceBOMFolderUtil.setPersistence(null);
+		_setCommerceBOMFolderUtilPersistence(null);
 
 		entityCache.removeCache(CommerceBOMFolderImpl.class.getName());
 
@@ -2567,6 +2568,22 @@ public class CommerceBOMFolderPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommerceBOMFolderUtilPersistence(
+		CommerceBOMFolderPersistence commerceBOMFolderPersistence) {
+
+		try {
+			Field field = CommerceBOMFolderUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceBOMFolderPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

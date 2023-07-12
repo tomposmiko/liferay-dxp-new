@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot image can be used through Blogs on a connected site."
-	@priority = 5
+	@priority = "5"
 	test AddImageViaBlogs {
 		DepotNavigator.openDepotAdmin();
 
@@ -60,7 +60,7 @@ definition {
 
 		BlogsNavigator.gotoAddEntry();
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -78,7 +78,7 @@ definition {
 
 		Button.clickPublish();
 
-		Pause(locator1 = 10000);
+		Pause(locator1 = "10000");
 
 		BlogsNavigator.gotoEntryCP(entryTitle = "Blogs Entry Title");
 
@@ -90,7 +90,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot image can be used through page creation on a connected site."
-	@priority = 5
+	@priority = "5"
 	test AddImageViaContentPage {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -119,7 +119,7 @@ definition {
 			backgroundImage = "Manual Selection",
 			depotName = "Test Depot Name",
 			imageFileName = "Document_1.jpeg",
-			paddingTop = 2,
+			paddingTop = "2",
 			panel = "Styles");
 
 		PageEditor.clickPublish();
@@ -132,7 +132,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot image can be used through web content on a connected site."
-	@priority = 5
+	@priority = "5"
 	test AddImageViaWebContent {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -209,7 +209,7 @@ definition {
 	}
 
 	@description = "This ensures that a document using a type stored in AL can be removed on a connected site."
-	@priority = 5
+	@priority = "5"
 	test RemoveDMWithDocumentType {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -268,7 +268,7 @@ definition {
 	}
 
 	@description = "This ensures that a document using a type stored in AL can be viewed on the connected site widgets."
-	@priority = 4
+	@priority = "4"
 	test ViewDMwithDocumentTypeOnSiteWidgets {
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -337,7 +337,7 @@ definition {
 	}
 
 	@description = "This ensures that a document using a type stored in AL can be viewed in related assets on a connected site."
-	@priority = 4
+	@priority = "4"
 	test ViewDocumentTypeInRelatedAssets {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -399,7 +399,7 @@ definition {
 	}
 
 	@description = "This ensures that the depot assets can be used through Related Assets on a connected site."
-	@priority = 4
+	@priority = "4"
 	test ViewRelatedAssets {
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",

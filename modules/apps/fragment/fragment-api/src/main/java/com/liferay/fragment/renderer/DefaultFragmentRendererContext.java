@@ -77,17 +77,8 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 	}
 
 	@Override
-	public long[] getSegmentsEntryIds() {
-		return _segmentsSegmentsEntryIds;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
 	public long[] getSegmentsExperienceIds() {
-		return null;
+		return _segmentsExperienceIds;
 	}
 
 	@Override
@@ -127,15 +118,8 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 		_previewVersion = previewVersion;
 	}
 
-	public void setSegmentsEntryIds(long[] segmentsSegmentsEntryIds) {
-		_segmentsSegmentsEntryIds = segmentsSegmentsEntryIds;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
 	public void setSegmentsExperienceIds(long[] segmentsExperienceIds) {
+		_segmentsExperienceIds = segmentsExperienceIds;
 	}
 
 	public void setUseCachedContent(boolean useCachedContent) {
@@ -151,7 +135,7 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 	private long _previewClassPK;
 	private int _previewType;
 	private String _previewVersion;
-	private long[] _segmentsSegmentsEntryIds = new long[0];
+	private long[] _segmentsExperienceIds = new long[0];
 	private boolean _useCachedContent = true;
 
 }

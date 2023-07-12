@@ -43,7 +43,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -210,15 +209,11 @@ public class ElasticsearchConnectionManager
 	}
 
 	public boolean isCrossClusterReplicationEnabled() {
-		CrossClusterReplicationConfigurationHelper
-			currentCrossClusterReplicationConfigurationHelper =
-				crossClusterReplicationConfigurationHelper;
-
-		if (currentCrossClusterReplicationConfigurationHelper == null) {
+		if (crossClusterReplicationConfigurationHelper == null) {
 			return false;
 		}
 
-		return currentCrossClusterReplicationConfigurationHelper.
+		return crossClusterReplicationConfigurationHelper.
 			isCrossClusterReplicationEnabled();
 	}
 
@@ -364,10 +359,9 @@ public class ElasticsearchConnectionManager
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	protected volatile CrossClusterReplicationConfigurationHelper
+	protected CrossClusterReplicationConfigurationHelper
 		crossClusterReplicationConfigurationHelper;
 
 	@Reference

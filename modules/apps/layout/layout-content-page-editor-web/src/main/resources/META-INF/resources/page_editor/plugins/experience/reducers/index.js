@@ -15,6 +15,7 @@
 import {
 	CREATE_SEGMENTS_EXPERIENCE,
 	DELETE_SEGMENTS_EXPERIENCE,
+	DUPLICATE_SEGMENTS_EXPERIENCE,
 	SELECT_SEGMENTS_EXPERIENCE,
 	UPDATE_SEGMENTS_EXPERIENCE,
 	UPDATE_SEGMENTS_EXPERIENCES_LIST,
@@ -30,36 +31,22 @@ const reducer = (state, action) => {
 
 	switch (action.type) {
 		case CREATE_SEGMENTS_EXPERIENCE:
-			nextState = createExperienceReducer(nextState, {
-				fragmentEntryLinks: action.payload.fragmentEntryLinks,
-				layoutData: action.payload.layoutData,
-				segmentsExperience: action.payload.segmentsExperience,
-			});
-			nextState = selectExperienceReducer(nextState, {
-				segmentsExperienceId:
-					action.payload.segmentsExperience.segmentsExperienceId,
-			});
+			nextState = createExperienceReducer(nextState, action.payload);
 			break;
 		case DELETE_SEGMENTS_EXPERIENCE:
-			nextState = deleteExperienceReducer(nextState, {
-				segmentsExperienceId: action.payload.segmentsExperienceId,
-			});
+			nextState = deleteExperienceReducer(nextState, action.payload);
+			break;
+		case DUPLICATE_SEGMENTS_EXPERIENCE:
+			nextState = createExperienceReducer(nextState, action.payload);
 			break;
 		case SELECT_SEGMENTS_EXPERIENCE:
-			nextState = selectExperienceReducer(nextState, {
-				segmentsExperienceId: action.payload.segmentsExperienceId,
-			});
+			nextState = selectExperienceReducer(nextState, action.payload);
 			break;
 		case UPDATE_SEGMENTS_EXPERIENCE:
-			nextState = updateExperienceReducer(nextState, {
-				updatedExperience: action.payload,
-			});
+			nextState = updateExperienceReducer(nextState, action.payload);
 			break;
 		case UPDATE_SEGMENTS_EXPERIENCES_LIST:
-			nextState = updateExperiencesListReducer(nextState, {
-				availableSegmentsExperiences:
-					action.payload.availableSegmentsExperiences,
-			});
+			nextState = updateExperiencesListReducer(nextState, action.payload);
 			break;
 		default:
 			break;

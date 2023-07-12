@@ -45,8 +45,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -59,6 +57,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -543,7 +543,7 @@ public abstract class KBCommentLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		KBCommentLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -558,7 +558,7 @@ public abstract class KBCommentLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		kbCommentLocalService = (KBCommentLocalService)aopProxy;
 
-		KBCommentLocalServiceUtil.setService(kbCommentLocalService);
+		_setLocalServiceUtilService(kbCommentLocalService);
 	}
 
 	/**
@@ -600,6 +600,22 @@ public abstract class KBCommentLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		KBCommentLocalService kbCommentLocalService) {
+
+		try {
+			Field field = KBCommentLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, kbCommentLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -646,8 +662,5 @@ public abstract class KBCommentLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.social.kernel.service.SocialActivityLocalService
 		socialActivityLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		KBCommentLocalServiceBaseImpl.class);
 
 }

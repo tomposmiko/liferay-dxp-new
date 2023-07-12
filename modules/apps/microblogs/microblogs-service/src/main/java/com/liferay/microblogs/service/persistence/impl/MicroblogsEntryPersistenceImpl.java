@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -3859,7 +3860,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
-	 * @param creatorClassPKs the creator class pks
+	 * @param creatorClassPK the creator class pk
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -7297,7 +7298,7 @@ public class MicroblogsEntryPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param creatorClassNameId the creator class name ID
-	 * @param creatorClassPKs the creator class pks
+	 * @param creatorClassPK the creator class pk
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -9883,7 +9884,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
-	 * @param creatorClassPKs the creator class pks
+	 * @param creatorClassPK the creator class pk
 	 * @param type the type
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
@@ -11522,7 +11523,7 @@ public class MicroblogsEntryPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param creatorClassNameId the creator class name ID
-	 * @param creatorClassPKs the creator class pks
+	 * @param creatorClassPK the creator class pk
 	 * @param type the type
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
@@ -14035,12 +14036,12 @@ public class MicroblogsEntryPersistenceImpl
 			},
 			false);
 
-		MicroblogsEntryUtil.setPersistence(this);
+		_setMicroblogsEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		MicroblogsEntryUtil.setPersistence(null);
+		_setMicroblogsEntryUtilPersistence(null);
 
 		entityCache.removeCache(MicroblogsEntryImpl.class.getName());
 
@@ -14050,6 +14051,22 @@ public class MicroblogsEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setMicroblogsEntryUtilPersistence(
+		MicroblogsEntryPersistence microblogsEntryPersistence) {
+
+		try {
+			Field field = MicroblogsEntryUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, microblogsEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

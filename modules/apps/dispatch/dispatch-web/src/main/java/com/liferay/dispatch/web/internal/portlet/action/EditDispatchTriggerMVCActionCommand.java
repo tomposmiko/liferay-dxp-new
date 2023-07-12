@@ -17,7 +17,6 @@ package com.liferay.dispatch.web.internal.portlet.action;
 import com.liferay.dispatch.constants.DispatchConstants;
 import com.liferay.dispatch.constants.DispatchPortletKeys;
 import com.liferay.dispatch.executor.DispatchTaskClusterMode;
-import com.liferay.dispatch.executor.DispatchTaskStatus;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.service.DispatchTriggerService;
 import com.liferay.dispatch.web.internal.security.permisison.resource.DispatchTriggerPermission;
@@ -147,23 +146,13 @@ public class EditDispatchTriggerMVCActionCommand extends BaseMVCActionCommand {
 			_log.error(exception, exception);
 
 			jsonObject.put(
-				"cssClass", DispatchTaskStatus.FAILED.getCssClass()
-			).put(
 				"error", exception.getMessage()
-			).put(
-				"status", DispatchTaskStatus.FAILED.getLabel()
 			).put(
 				"success", false
 			);
 		}
 
-		jsonObject.put(
-			"cssClass", DispatchTaskStatus.IN_PROGRESS.getCssClass()
-		).put(
-			"status", DispatchTaskStatus.IN_PROGRESS.getLabel()
-		).put(
-			"success", true
-		);
+		jsonObject.put("success", true);
 
 		return jsonObject;
 	}

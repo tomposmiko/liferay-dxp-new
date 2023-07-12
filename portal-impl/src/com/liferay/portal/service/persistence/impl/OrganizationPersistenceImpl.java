@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.DuplicateOrganizationExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchOrganizationException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -66,6 +65,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -9499,35 +9499,6 @@ public class OrganizationPersistenceImpl
 			organization.setUuid(uuid);
 		}
 
-		if (Validator.isNull(organization.getExternalReferenceCode())) {
-			organization.setExternalReferenceCode(organization.getUuid());
-		}
-		else {
-			Organization ercOrganization = fetchByC_ERC(
-				organization.getCompanyId(),
-				organization.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercOrganization != null) {
-					throw new DuplicateOrganizationExternalReferenceCodeException(
-						"Duplicate organization with external reference code " +
-							organization.getExternalReferenceCode() +
-								" and company " + organization.getCompanyId());
-				}
-			}
-			else {
-				if ((ercOrganization != null) &&
-					(organization.getOrganizationId() !=
-						ercOrganization.getOrganizationId())) {
-
-					throw new DuplicateOrganizationExternalReferenceCodeException(
-						"Duplicate organization with external reference code " +
-							organization.getExternalReferenceCode() +
-								" and company " + organization.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -9648,9 +9619,7 @@ public class OrganizationPersistenceImpl
 	 */
 	@Override
 	public Organization fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				Organization.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(Organization.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -10902,11 +10871,11 @@ public class OrganizationPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		OrganizationUtil.setPersistence(this);
+		_setOrganizationUtilPersistence(this);
 	}
 
 	public void destroy() {
-		OrganizationUtil.setPersistence(null);
+		_setOrganizationUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(OrganizationImpl.class.getName());
 
@@ -10920,6 +10889,22 @@ public class OrganizationPersistenceImpl
 
 		TableMapperFactory.removeTableMapper("Groups_Orgs");
 		TableMapperFactory.removeTableMapper("Users_Orgs");
+	}
+
+	private void _setOrganizationUtilPersistence(
+		OrganizationPersistence organizationPersistence) {
+
+		try {
+			Field field = OrganizationUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, organizationPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@BeanReference(type = GroupPersistence.class)

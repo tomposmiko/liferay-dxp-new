@@ -133,7 +133,8 @@ public class AssetCategoryModelDocumentContributor
 			}
 
 			document.addText(
-				StringBundler.concat(field, StringPool.UNDERLINE, locale),
+				StringBundler.concat(
+					field, StringPool.UNDERLINE, locale.toString()),
 				titlesArray);
 		}
 	}

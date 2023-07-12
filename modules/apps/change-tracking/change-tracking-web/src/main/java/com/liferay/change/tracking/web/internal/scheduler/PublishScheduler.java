@@ -15,6 +15,7 @@
 package com.liferay.change.tracking.web.internal.scheduler;
 
 import com.liferay.change.tracking.constants.CTActionKeys;
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
@@ -117,7 +118,8 @@ public class PublishScheduler {
 		throws PortalException {
 
 		try (SafeCloseable safeCloseable =
-				CTCollectionThreadLocal.setProductionModeWithSafeCloseable()) {
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 			TransactionInvokerUtil.invoke(
 				_transactionConfig,

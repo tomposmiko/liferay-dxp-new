@@ -47,10 +47,6 @@ public class ReadingTimeEntryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ReadingTimeEntryService service) {
-		_service = service;
-	}
-
 	private static volatile ReadingTimeEntryService _service;
 
 }

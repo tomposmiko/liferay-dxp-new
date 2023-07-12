@@ -101,7 +101,7 @@ public class IndexedFieldsFixture {
 	}
 
 	public void populatePriority(String priority, Map<String, String> map) {
-		populatePriority(priority, map, true);
+		populatePriority(priority, map, false);
 	}
 
 	public void populatePriority(

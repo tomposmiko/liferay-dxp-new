@@ -335,10 +335,6 @@ public class AppBuilderAppDeploymentLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AppBuilderAppDeploymentLocalService service) {
-		_service = service;
-	}
-
 	private static volatile AppBuilderAppDeploymentLocalService _service;
 
 }

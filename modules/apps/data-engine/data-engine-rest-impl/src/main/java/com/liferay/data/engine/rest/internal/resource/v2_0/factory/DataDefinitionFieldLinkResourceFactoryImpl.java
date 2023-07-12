@@ -14,7 +14,6 @@
 
 package com.liferay.data.engine.rest.internal.resource.v2_0.factory;
 
-import com.liferay.data.engine.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.data.engine.rest.resource.v2_0.DataDefinitionFieldLinkResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -62,8 +62,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @generated
  */
 @Component(
-	property = "resource.locator.key=/data-engine/v2.0/DataDefinitionFieldLink",
-	service = DataDefinitionFieldLinkResource.Factory.class
+	immediate = true, service = DataDefinitionFieldLinkResource.Factory.class
 )
 @Generated("")
 public class DataDefinitionFieldLinkResourceFactoryImpl
@@ -139,6 +138,16 @@ public class DataDefinitionFieldLinkResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		DataDefinitionFieldLinkResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		DataDefinitionFieldLinkResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, DataDefinitionFieldLinkResource>
 		_getProxyProviderFunction() {
 
@@ -187,7 +196,7 @@ public class DataDefinitionFieldLinkResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		DataDefinitionFieldLinkResource dataDefinitionFieldLinkResource =
@@ -216,8 +225,6 @@ public class DataDefinitionFieldLinkResourceFactoryImpl
 		dataDefinitionFieldLinkResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		dataDefinitionFieldLinkResource.setRoleLocalService(_roleLocalService);
-		dataDefinitionFieldLinkResource.setSortParserProvider(
-			_sortParserProvider);
 
 		try {
 			return method.invoke(dataDefinitionFieldLinkResource, arguments);
@@ -261,6 +268,9 @@ public class DataDefinitionFieldLinkResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -269,9 +279,6 @@ public class DataDefinitionFieldLinkResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

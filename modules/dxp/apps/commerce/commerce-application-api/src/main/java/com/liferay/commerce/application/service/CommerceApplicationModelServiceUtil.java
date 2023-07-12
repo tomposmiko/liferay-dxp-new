@@ -112,10 +112,6 @@ public class CommerceApplicationModelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceApplicationModelService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceApplicationModelService _service;
 
 }

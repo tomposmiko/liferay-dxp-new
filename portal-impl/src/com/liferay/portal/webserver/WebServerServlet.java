@@ -440,7 +440,7 @@ public class WebServerServlet extends HttpServlet {
 			long groupId = GetterUtil.getLong(pathArray[0]);
 			long folderId = GetterUtil.getLong(pathArray[1]);
 
-			String fileName = pathArray[2];
+			String fileName = HttpUtil.decodeURL(pathArray[2]);
 
 			if (fileName.contains(StringPool.QUESTION)) {
 				fileName = fileName.substring(
@@ -449,12 +449,13 @@ public class WebServerServlet extends HttpServlet {
 
 			return DLAppServiceUtil.getFileEntry(groupId, folderId, fileName);
 		}
+		else {
+			long groupId = GetterUtil.getLong(pathArray[0]);
 
-		long groupId = GetterUtil.getLong(pathArray[0]);
+			String uuid = pathArray[3];
 
-		String uuid = pathArray[3];
-
-		return DLAppServiceUtil.getFileEntryByUuidAndGroupId(uuid, groupId);
+			return DLAppServiceUtil.getFileEntryByUuidAndGroupId(uuid, groupId);
+		}
 	}
 
 	protected Image getImage(
@@ -1140,18 +1141,11 @@ public class WebServerServlet extends HttpServlet {
 
 		// Send file
 
-		String cacheControlValue = HttpHeaders.CACHE_CONTROL_PRIVATE_VALUE;
-
-		boolean download = ParamUtil.getBoolean(httpServletRequest, "download");
-
-		if (download) {
-			cacheControlValue = HttpHeaders.CACHE_CONTROL_NO_CACHE_VALUE;
-		}
-
 		httpServletResponse.addHeader(
 			HttpHeaders.CACHE_CONTROL,
 			FileEntryHttpHeaderCustomizerUtil.getHttpHeaderValue(
-				fileEntry, HttpHeaders.CACHE_CONTROL, cacheControlValue));
+				fileEntry, HttpHeaders.CACHE_CONTROL,
+				HttpHeaders.CACHE_CONTROL_PRIVATE_VALUE));
 
 		if (isSupportsRangeHeader(contentType)) {
 			ServletResponseUtil.sendFileWithRangeHeader(
@@ -1159,6 +1153,9 @@ public class WebServerServlet extends HttpServlet {
 				contentLength, contentType);
 		}
 		else {
+			boolean download = ParamUtil.getBoolean(
+				httpServletRequest, "download");
+
 			if (download) {
 				ServletResponseUtil.sendFile(
 					httpServletRequest, httpServletResponse, fileName,
@@ -1189,7 +1186,8 @@ public class WebServerServlet extends HttpServlet {
 
 		ServletResponseUtil.sendFile(
 			null, httpServletResponse, title, fileEntry.getContentStream(),
-			fileEntry.getSize(), fileEntry.getMimeType());
+			fileEntry.getSize(), fileEntry.getMimeType(),
+			HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
 	}
 
 	protected void sendGroups(
@@ -1261,7 +1259,7 @@ public class WebServerServlet extends HttpServlet {
 			return;
 		}
 
-		String fileName = HtmlUtil.escape(pathArray[2]);
+		String fileName = HttpUtil.decodeURL(HtmlUtil.escape(pathArray[2]));
 
 		if (fileEntry.isInTrash()) {
 			fileName = TrashUtil.getOriginalTitle(fileName);
@@ -1364,13 +1362,14 @@ public class WebServerServlet extends HttpServlet {
 			DLAppLocalServiceUtil.getFileEntry(fileShortcut.getToFileEntryId());
 		}
 		else if (pathArray.length == 2) {
-			DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
-				pathArray[1], GetterUtil.getLong(pathArray[0]));
+
+			// Unable to check with UUID because of multiple repositories
+
 		}
 		else if (pathArray.length == 3) {
 			long groupId = GetterUtil.getLong(pathArray[0]);
 			long folderId = GetterUtil.getLong(pathArray[1]);
-			String fileName = pathArray[2];
+			String fileName = HttpUtil.decodeURL(pathArray[2]);
 
 			try {
 				DLAppLocalServiceUtil.getFileEntry(groupId, folderId, fileName);

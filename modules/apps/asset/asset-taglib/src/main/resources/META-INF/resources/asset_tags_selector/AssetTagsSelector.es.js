@@ -178,15 +178,13 @@ function AssetTagsSelector({
 	return (
 		<div className="lfr-tags-selector-content" id={id}>
 			<ClayForm.Group>
-				<label htmlFor={inputName + '_MultiSelect'}>
-					{label || Liferay.Language.get('tags')}
-				</label>
+				<label>{label || Liferay.Language.get('tags')}</label>
 
 				<ClayInput.Group>
 					<ClayInput.GroupItem>
 						<ClayMultiSelect
-							id={inputName + '_MultiSelect'}
 							inputName={inputName}
+							inputValue={inputValue}
 							items={selectedItems}
 							onBlur={handleInputBlur}
 							onChange={onInputValueChange}
@@ -201,7 +199,6 @@ function AssetTagsSelector({
 									  })
 									: []
 							}
-							value={inputValue}
 						/>
 					</ClayInput.GroupItem>
 

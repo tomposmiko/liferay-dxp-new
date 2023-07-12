@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is for LPS-106813. Widgets inherited from content page template will inherit permissions set in content page template."
-	@priority = 4
+	@priority = "4"
 	test APWithPermissionsInheritedFromContentPageTemplateTogether {
 		task ("Add a content page template") {
 			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
@@ -121,7 +121,7 @@ definition {
 	}
 
 	@description = "This is for LPS-106813. Widgets inherited from custom master will inherit permissions set in custom master."
-	@priority = 4
+	@priority = "4"
 	test APWithPermissionsInheritedFromMasterPageTemplateTogether {
 		task ("Add a WC") {
 			JSONWebcontent.addWebContent(
@@ -215,7 +215,7 @@ definition {
 	}
 
 	@description = "This is for LPS-106813. Can set permissions for widgets in content page."
-	@priority = 5
+	@priority = "5"
 	test ConfigurePermissionsOfAP {
 		property portal.acceptance = "true";
 
@@ -286,7 +286,7 @@ definition {
 	}
 
 	@description = "An asset publisher widget can be added to a content page and used to display a web content article."
-	@priority = 5
+	@priority = "5"
 	test ViewWebContentArticleInAP {
 		property portal.acceptance = "true";
 
@@ -328,7 +328,7 @@ definition {
 	}
 
 	@description = "A web content display widget can be added to a content page and used to display a web content article."
-	@priority = 5
+	@priority = "5"
 	test ViewWebContentArticleInWCD {
 		property portal.acceptance = "true";
 

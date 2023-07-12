@@ -66,10 +66,6 @@ public class CommerceInventoryAuditServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceInventoryAuditService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceInventoryAuditService _service;
 
 }

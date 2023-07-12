@@ -77,14 +77,12 @@ public class SXPBlueprintCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(39);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
 		sb.append(", uuid=");
 		sb.append(uuid);
-		sb.append(", externalReferenceCode=");
-		sb.append(externalReferenceCode);
 		sb.append(", sxpBlueprintId=");
 		sb.append(sxpBlueprintId);
 		sb.append(", companyId=");
@@ -103,12 +101,8 @@ public class SXPBlueprintCacheModel
 		sb.append(description);
 		sb.append(", elementInstancesJSON=");
 		sb.append(elementInstancesJSON);
-		sb.append(", schemaVersion=");
-		sb.append(schemaVersion);
 		sb.append(", title=");
 		sb.append(title);
-		sb.append(", version=");
-		sb.append(version);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -133,13 +127,6 @@ public class SXPBlueprintCacheModel
 		}
 		else {
 			sxpBlueprintImpl.setUuid(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			sxpBlueprintImpl.setExternalReferenceCode("");
-		}
-		else {
-			sxpBlueprintImpl.setExternalReferenceCode(externalReferenceCode);
 		}
 
 		sxpBlueprintImpl.setSXPBlueprintId(sxpBlueprintId);
@@ -188,25 +175,11 @@ public class SXPBlueprintCacheModel
 			sxpBlueprintImpl.setElementInstancesJSON(elementInstancesJSON);
 		}
 
-		if (schemaVersion == null) {
-			sxpBlueprintImpl.setSchemaVersion("");
-		}
-		else {
-			sxpBlueprintImpl.setSchemaVersion(schemaVersion);
-		}
-
 		if (title == null) {
 			sxpBlueprintImpl.setTitle("");
 		}
 		else {
 			sxpBlueprintImpl.setTitle(title);
-		}
-
-		if (version == null) {
-			sxpBlueprintImpl.setVersion("");
-		}
-		else {
-			sxpBlueprintImpl.setVersion(version);
 		}
 
 		sxpBlueprintImpl.setStatus(status);
@@ -237,7 +210,6 @@ public class SXPBlueprintCacheModel
 
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
-		externalReferenceCode = objectInput.readUTF();
 
 		sxpBlueprintId = objectInput.readLong();
 
@@ -250,9 +222,7 @@ public class SXPBlueprintCacheModel
 		configurationJSON = (String)objectInput.readObject();
 		description = objectInput.readUTF();
 		elementInstancesJSON = (String)objectInput.readObject();
-		schemaVersion = objectInput.readUTF();
 		title = objectInput.readUTF();
-		version = objectInput.readUTF();
 
 		status = objectInput.readInt();
 
@@ -270,13 +240,6 @@ public class SXPBlueprintCacheModel
 		}
 		else {
 			objectOutput.writeUTF(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(externalReferenceCode);
 		}
 
 		objectOutput.writeLong(sxpBlueprintId);
@@ -316,25 +279,11 @@ public class SXPBlueprintCacheModel
 			objectOutput.writeObject(elementInstancesJSON);
 		}
 
-		if (schemaVersion == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(schemaVersion);
-		}
-
 		if (title == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(title);
-		}
-
-		if (version == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(version);
 		}
 
 		objectOutput.writeInt(status);
@@ -353,7 +302,6 @@ public class SXPBlueprintCacheModel
 
 	public long mvccVersion;
 	public String uuid;
-	public String externalReferenceCode;
 	public long sxpBlueprintId;
 	public long companyId;
 	public long userId;
@@ -363,9 +311,7 @@ public class SXPBlueprintCacheModel
 	public String configurationJSON;
 	public String description;
 	public String elementInstancesJSON;
-	public String schemaVersion;
 	public String title;
-	public String version;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

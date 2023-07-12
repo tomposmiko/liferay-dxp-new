@@ -216,10 +216,6 @@ public class CommerceCountryServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceCountryService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceCountryService _service;
 
 }

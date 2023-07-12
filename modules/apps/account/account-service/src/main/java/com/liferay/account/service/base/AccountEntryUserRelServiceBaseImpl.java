@@ -25,11 +25,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class AccountEntryUserRelServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		AccountEntryUserRelServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class AccountEntryUserRelServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		accountEntryUserRelService = (AccountEntryUserRelService)aopProxy;
 
-		AccountEntryUserRelServiceUtil.setService(accountEntryUserRelService);
+		_setServiceUtilService(accountEntryUserRelService);
 	}
 
 	/**
@@ -118,6 +118,22 @@ public abstract class AccountEntryUserRelServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		AccountEntryUserRelService accountEntryUserRelService) {
+
+		try {
+			Field field = AccountEntryUserRelServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, accountEntryUserRelService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected com.liferay.account.service.AccountEntryUserRelLocalService
 		accountEntryUserRelLocalService;
@@ -140,8 +156,5 @@ public abstract class AccountEntryUserRelServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountEntryUserRelServiceBaseImpl.class);
 
 }

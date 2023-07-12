@@ -15,12 +15,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ConfigureLookAndFeelSettingsSinglePage {
 		property portal.acceptance = "true";
 
@@ -64,7 +64,7 @@ definition {
 
 		var htmlSourceText = '''body{background-color:#42f4c5}''';
 
-		AssertHTMLSourceTextPresent(value1 = ${htmlSourceText});
+		AssertHTMLSourceTextPresent(value1 = "${htmlSourceText}");
 
 		takeScreenshot();
 

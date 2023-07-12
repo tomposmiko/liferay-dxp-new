@@ -20,14 +20,14 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.screens.service.ScreensRatingsEntryService;
 import com.liferay.screens.service.ScreensRatingsEntryServiceUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -56,7 +56,7 @@ public abstract class ScreensRatingsEntryServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		ScreensRatingsEntryServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public abstract class ScreensRatingsEntryServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		screensRatingsEntryService = (ScreensRatingsEntryService)aopProxy;
 
-		ScreensRatingsEntryServiceUtil.setService(screensRatingsEntryService);
+		_setServiceUtilService(screensRatingsEntryService);
 	}
 
 	/**
@@ -104,6 +104,22 @@ public abstract class ScreensRatingsEntryServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setServiceUtilService(
+		ScreensRatingsEntryService screensRatingsEntryService) {
+
+		try {
+			Field field = ScreensRatingsEntryServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, screensRatingsEntryService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -147,8 +163,5 @@ public abstract class ScreensRatingsEntryServiceBaseImpl
 	@Reference
 	protected com.liferay.ratings.kernel.service.RatingsEntryService
 		ratingsEntryService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ScreensRatingsEntryServiceBaseImpl.class);
 
 }

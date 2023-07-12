@@ -326,109 +326,103 @@ public class CommercePaymentMethodGroupRelModelImpl
 	private static final Map
 		<String, Function<CommercePaymentMethodGroupRel, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommercePaymentMethodGroupRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommercePaymentMethodGroupRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommercePaymentMethodGroupRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"commercePaymentMethodGroupRelId",
-			CommercePaymentMethodGroupRel::getCommercePaymentMethodGroupRelId);
-		attributeGetterFunctions.put(
-			"groupId", CommercePaymentMethodGroupRel::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommercePaymentMethodGroupRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommercePaymentMethodGroupRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommercePaymentMethodGroupRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommercePaymentMethodGroupRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommercePaymentMethodGroupRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"name", CommercePaymentMethodGroupRel::getName);
-		attributeGetterFunctions.put(
-			"description", CommercePaymentMethodGroupRel::getDescription);
-		attributeGetterFunctions.put(
-			"imageId", CommercePaymentMethodGroupRel::getImageId);
-		attributeGetterFunctions.put(
-			"engineKey", CommercePaymentMethodGroupRel::getEngineKey);
-		attributeGetterFunctions.put(
-			"priority", CommercePaymentMethodGroupRel::getPriority);
-		attributeGetterFunctions.put(
-			"active", CommercePaymentMethodGroupRel::getActive);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommercePaymentMethodGroupRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommercePaymentMethodGroupRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommercePaymentMethodGroupRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"commercePaymentMethodGroupRelId",
+			CommercePaymentMethodGroupRel::getCommercePaymentMethodGroupRelId);
 		attributeSetterBiConsumers.put(
 			"commercePaymentMethodGroupRelId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::
 					setCommercePaymentMethodGroupRelId);
+		attributeGetterFunctions.put(
+			"groupId", CommercePaymentMethodGroupRel::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommercePaymentMethodGroupRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommercePaymentMethodGroupRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommercePaymentMethodGroupRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommercePaymentMethodGroupRel, String>)
 				CommercePaymentMethodGroupRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommercePaymentMethodGroupRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommercePaymentMethodGroupRel, Date>)
 				CommercePaymentMethodGroupRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommercePaymentMethodGroupRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommercePaymentMethodGroupRel, Date>)
 				CommercePaymentMethodGroupRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"name", CommercePaymentMethodGroupRel::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommercePaymentMethodGroupRel, String>)
 				CommercePaymentMethodGroupRel::setName);
+		attributeGetterFunctions.put(
+			"description", CommercePaymentMethodGroupRel::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CommercePaymentMethodGroupRel, String>)
 				CommercePaymentMethodGroupRel::setDescription);
+		attributeGetterFunctions.put(
+			"imageId", CommercePaymentMethodGroupRel::getImageId);
 		attributeSetterBiConsumers.put(
 			"imageId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::setImageId);
+		attributeGetterFunctions.put(
+			"engineKey", CommercePaymentMethodGroupRel::getEngineKey);
 		attributeSetterBiConsumers.put(
 			"engineKey",
 			(BiConsumer<CommercePaymentMethodGroupRel, String>)
 				CommercePaymentMethodGroupRel::setEngineKey);
+		attributeGetterFunctions.put(
+			"priority", CommercePaymentMethodGroupRel::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CommercePaymentMethodGroupRel, Double>)
 				CommercePaymentMethodGroupRel::setPriority);
+		attributeGetterFunctions.put(
+			"active", CommercePaymentMethodGroupRel::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CommercePaymentMethodGroupRel, Boolean>)
 				CommercePaymentMethodGroupRel::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

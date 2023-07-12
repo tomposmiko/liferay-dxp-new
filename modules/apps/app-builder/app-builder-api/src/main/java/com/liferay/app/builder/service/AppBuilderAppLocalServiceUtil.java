@@ -528,10 +528,6 @@ public class AppBuilderAppLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AppBuilderAppLocalService service) {
-		_service = service;
-	}
-
 	private static volatile AppBuilderAppLocalService _service;
 
 }

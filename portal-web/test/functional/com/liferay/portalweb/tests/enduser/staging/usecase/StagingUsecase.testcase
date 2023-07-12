@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -32,7 +32,7 @@ definition {
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ActivateStagingForSiteWithTheme {
 		property test.name.skip.portal.instance = "Theme#ActivateStagingForSiteWithTheme";
 
@@ -50,11 +50,11 @@ definition {
 
 		Staging.openStagingAdmin(siteURLKey = "guest");
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		Staging.activateStagingCP(
 			pageVersioningEnabled = "true",
-			siteName = ${siteName});
+			siteName = "${siteName}");
 
 		Navigator.openStagingSiteURL(defaultSite = "true");
 
@@ -72,7 +72,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-98170"
-	@priority = 4
+	@priority = "4"
 	test AssertAssetPriorityNotBeResetAfterPublication {
 		SitePages.openPagesAdmin(siteURLKey = "site-name-staging");
 
@@ -217,7 +217,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-71786"
-	@priority = 3
+	@priority = "3"
 	test AssertDeletedAssetLinkRemovedFromLiveSite {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -273,7 +273,7 @@ definition {
 
 		for (var assetTitle : list "DM Document Title 1,DM Document Title 2") {
 			BlogsEntry.viewRelatedAssetPG(
-				assetTitle = ${assetTitle},
+				assetTitle = "${assetTitle}",
 				assetType = "Basic Document",
 				entryTitle = "Blogs Entry Title");
 		}
@@ -315,7 +315,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-72145."
-	@priority = 4
+	@priority = "4"
 	test AssertDeletedPollsOnLivingSiteWithoutPublishToLive {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -348,8 +348,8 @@ definition {
 		Polls.viewPollOnLivingSite(
 			pollsQuestion = "Test Poll Display",
 			pollsQuestionChoiceList = "Yes,No",
-			pollsQuestionTotalVotes = 0,
-			pollsQuestionVoteCount = 0,
+			pollsQuestionTotalVotes = "0",
+			pollsQuestionVoteCount = "0",
 			pollsQuestionVotePercent = "0%");
 
 		ProductMenu.gotoStagingSite(site = "Site Name");
@@ -367,13 +367,13 @@ definition {
 		Polls.viewPollOnLivingSite(
 			pollsQuestion = "Test Poll Display",
 			pollsQuestionChoiceList = "Yes,No",
-			pollsQuestionTotalVotes = 0,
-			pollsQuestionVoteCount = 0,
+			pollsQuestionTotalVotes = "0",
+			pollsQuestionVoteCount = "0",
 			pollsQuestionVotePercent = "0%");
 	}
 
 	@description = "This is a use case for LPS-95516."
-	@priority = 3
+	@priority = "3"
 	test AssertWebContentNotBeDeletedOnLiveViaSAP {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
@@ -429,7 +429,7 @@ definition {
 			webContentTitle = "WC WebContent Title 2");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ContentCannotBeCreatedOnLive {
 		property portal.acceptance = "true";
 
@@ -460,7 +460,7 @@ definition {
 		Staging.viewAddButtonDoesNotExist();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test DeleteLivePage {
 		property portal.acceptance = "true";
 
@@ -491,7 +491,7 @@ definition {
 		Page.viewNoPG(pageName = "Delete Live Page");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditPublishTemplate {
 		property test.name.skip.portal.instance = "StagingUsecase#EditPublishTemplate";
 
@@ -608,7 +608,7 @@ definition {
 		BlogsEntry.viewContent(entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ImportLARsOnStagedSite {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Pages Administration,Training,Web Content Administration";
@@ -648,7 +648,7 @@ definition {
 		for (var webContentTitle : list "Meet and Greet,Orientation,Physicals") {
 			WebContent.viewTitle(
 				onLive = "true",
-				webContentTitle = ${webContentTitle});
+				webContentTitle = "${webContentTitle}");
 		}
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
@@ -736,11 +736,11 @@ definition {
 		for (var webContentTitle : list "Meet and Greet,Orientation,Physicals,Enrollment Features,The SPACE Family") {
 			WebContent.viewTitle(
 				onLive = "true",
-				webContentTitle = ${webContentTitle});
+				webContentTitle = "${webContentTitle}");
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test MoveToTheRecycleBinAndRestorePublishTemplate {
 		Staging.openStagingAdmin(siteURLKey = "site-name-staging");
 
@@ -785,7 +785,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-128305."
-	@priority = 3
+	@priority = "3"
 	test PublishContentPageWithDLReference {
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name-staging");
 
@@ -814,7 +814,7 @@ definition {
 			text = "DL Image");
 
 		PageEditor.addEntryWithLink(
-			entryExternalURL = ${dmDocumentURL},
+			entryExternalURL = "${dmDocumentURL}",
 			fragmentName = "Paragraph",
 			id = "element-text");
 
@@ -843,13 +843,13 @@ definition {
 
 		Click(
 			key_append = "",
-			key_URL = "/DM%20Document%20Title.jpg",
+			key_URL = "/DM+Document+Title.jpg",
 			locator1 = "Fragment#FRAGMENT_LINK");
 
-		AssertElementPresent(locator1 = "//img[contains(@src,'DM%20Document%20Title.jpg')]");
+		AssertElementPresent(locator1 = "//img[contains(@src,'DM+Document+Title.jpg')]");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test PublishPortlet {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -867,7 +867,7 @@ definition {
 		Staging.publishToLiveNowViaPortletCP();
 	}
 
-	@priority = 3
+	@priority = "3"
 	test PublishSiteTeams {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -900,7 +900,7 @@ definition {
 
 	@description = "This will be ignored until LPS-110206 is fixed."
 	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test PublishThemeFromStagedToLive {
 		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "StagingUsecase#PublishThemeFromStagedToLive";
@@ -913,11 +913,11 @@ definition {
 
 		Staging.openStagingAdmin(siteURLKey = "guest");
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		Staging.activateStagingCP(
 			pageVersioningEnabled = "true",
-			siteName = ${siteName});
+			siteName = "${siteName}");
 
 		Navigator.openStagingSiteURL(defaultSite = "true");
 
@@ -949,7 +949,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-127207. Verified that publishing Web Content Folder with child Folders results not in OutOfMemory."
-	@priority = 4
+	@priority = "4"
 	test PublishWebContentFolderWithChildFolders {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
@@ -975,7 +975,7 @@ definition {
 		AssertConsoleTextNotPresent(value1 = "java.lang.OutOfMemoryError");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test PublishWebContentFriendlyURLEncoding {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
@@ -1009,7 +1009,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-82757."
-	@priority = 3
+	@priority = "3"
 	test PublishWebContentWithFeeds {
 		property test.name.skip.portal.instance = "StagingUsecase#PublishWebContentWithFeeds";
 		property testray.component.names = "Web Content Administration";
@@ -1076,9 +1076,8 @@ definition {
 		WebContentNavigator.gotoEditFeed(feedName = "Web Content Feed");
 
 		var webContentFeedUrl = selenium.getAttribute("//a[contains(@href,'rss') and contains(.,'Preview')]@href");
-
-		var stagingFeedId = StringUtil.extractLast(${webContentFeedUrl}, "/");
-		var entryExternalURL = StringUtil.replace(${webContentFeedUrl}, "http://", "");
+		var stagingFeedId = StringUtil.extractLast("${webContentFeedUrl}", "/");
+		var entryExternalURL = StringUtil.replace("${webContentFeedUrl}", "http://", "");
 
 		echo("## * Staging FeedId: ${stagingFeedId}");
 
@@ -1089,8 +1088,8 @@ definition {
 		PortletEntry.inputTitle(title = "Web Content Title");
 
 		CKEditor.addEntryExternalURL(
-			displayText = ${webContentFeedUrl},
-			entryExternalURL = ${entryExternalURL},
+			displayText = "${webContentFeedUrl}",
+			entryExternalURL = "${entryExternalURL}",
 			fieldLabel = "content");
 
 		Button.clickPublish();
@@ -1114,18 +1113,17 @@ definition {
 			siteName = "Site Name");
 
 		var webContentFeedUrl = selenium.getAttribute("//div[contains(@class,'journal-content-article')]//a[contains(@href,'rss')]@href");
-
-		var liveFeedId = StringUtil.extractLast(${webContentFeedUrl}, "/");
+		var liveFeedId = StringUtil.extractLast("${webContentFeedUrl}", "/");
 
 		echo("## * Live FeedId: ${liveFeedId}");
 
-		if (${liveFeedId} == ${stagingFeedId}) {
+		if ("${liveFeedId}" == "${stagingFeedId}") {
 			fail("The feedID should be different in live site.");
 		}
 	}
 
 	@description = "This is a use case for LPS-84418 and LPS-117578."
-	@priority = 5
+	@priority = "5"
 	test PublishWithImpossibleDateRange {
 		property portal.acceptance = "true";
 
@@ -1137,7 +1135,7 @@ definition {
 			scheduleTitleName = "Event Monthly Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchPublishTemplate {
 		Staging.openStagingAdmin(siteURLKey = "site-name-staging");
 
@@ -1169,7 +1167,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-82028."
-	@priority = 4
+	@priority = "4"
 	test SingleAssetPublishLayoutScopedContent {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -1202,7 +1200,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-82689."
-	@priority = 3
+	@priority = "3"
 	test StagingPublishAssetPublisherConfiguredTagsFilter {
 		ProductMenu.gotoPortlet(
 			category = "Categorization",
@@ -1285,7 +1283,7 @@ definition {
 			webContentTitle = "Web Content Title 2");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test StagingPublishChildSiteWithReference {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
@@ -1328,7 +1326,7 @@ definition {
 		Staging.activateStagingCP(siteName = "Child Site");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test StagingPublishOnlySelectedPage {
 		SitePages.openPagesAdmin(siteURLKey = "site-name-staging");
 
@@ -1360,7 +1358,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-91017, LPS-89646."
-	@priority = 4
+	@priority = "4"
 	test StagingPublishWCWithWebContentFieldViaAP {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -1444,7 +1442,7 @@ definition {
 			webContentTitle = "WC WebContent 1 Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test StagingWithPublishTemplateSmoke {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -1489,7 +1487,7 @@ definition {
 		WebContent.viewPGViaWCD(webContentContent = "Web Content Content");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test TrashEntryReferencePublishing {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "StagingUsecase#TrashEntryReferencePublishing";
@@ -1597,7 +1595,7 @@ definition {
 		DMDocument.viewPG(dmDocumentTitle = "DM Document Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewPublishDMWithModifiedTitle {
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -1645,7 +1643,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-96664."
-	@priority = 3
+	@priority = "3"
 	test ViewPublishTemplateDateRange {
 		Staging.openStagingAdmin(siteURLKey = "site-name-staging");
 

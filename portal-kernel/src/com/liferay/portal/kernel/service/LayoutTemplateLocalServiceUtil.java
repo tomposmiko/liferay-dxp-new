@@ -119,10 +119,6 @@ public class LayoutTemplateLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(LayoutTemplateLocalService service) {
-		_service = service;
-	}
-
 	private static volatile LayoutTemplateLocalService _service;
 
 }

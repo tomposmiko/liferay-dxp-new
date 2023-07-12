@@ -128,12 +128,6 @@ public class CommerceTaxFixedRateAddressRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceTaxFixedRateAddressRelService service) {
-
-		_service = service;
-	}
-
 	private static volatile CommerceTaxFixedRateAddressRelService _service;
 
 }

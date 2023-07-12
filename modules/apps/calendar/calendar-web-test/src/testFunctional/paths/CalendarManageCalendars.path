@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!--CALENDAR_TABLE-->
-
 <tr>
 	<td>CALENDAR_TABLE_NAME</td>
 	<td>//tr[contains(.,'${key_calendarName}')]/td[1]</td>

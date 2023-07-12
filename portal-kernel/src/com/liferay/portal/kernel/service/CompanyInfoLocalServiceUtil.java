@@ -299,10 +299,6 @@ public class CompanyInfoLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CompanyInfoLocalService service) {
-		_service = service;
-	}
-
 	private static volatile CompanyInfoLocalService _service;
 
 }

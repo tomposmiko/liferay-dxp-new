@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -5751,9 +5752,7 @@ public class FragmentCompositionPersistenceImpl
 	 */
 	@Override
 	public FragmentComposition fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				FragmentComposition.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(FragmentComposition.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -6385,12 +6384,12 @@ public class FragmentCompositionPersistenceImpl
 			new String[] {"groupId", "fragmentCollectionId", "name", "status"},
 			false);
 
-		FragmentCompositionUtil.setPersistence(this);
+		_setFragmentCompositionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		FragmentCompositionUtil.setPersistence(null);
+		_setFragmentCompositionUtilPersistence(null);
 
 		entityCache.removeCache(FragmentCompositionImpl.class.getName());
 
@@ -6400,6 +6399,22 @@ public class FragmentCompositionPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setFragmentCompositionUtilPersistence(
+		FragmentCompositionPersistence fragmentCompositionPersistence) {
+
+		try {
+			Field field = FragmentCompositionUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, fragmentCompositionPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

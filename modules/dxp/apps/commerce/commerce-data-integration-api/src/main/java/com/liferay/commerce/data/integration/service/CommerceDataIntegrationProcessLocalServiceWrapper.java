@@ -15,7 +15,6 @@
 package com.liferay.commerce.data.integration.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceDataIntegrationProcessLocalService}.
@@ -451,11 +450,6 @@ public class CommerceDataIntegrationProcessLocalServiceWrapper
 				startDateMonth, startDateDay, startDateYear, startDateHour,
 				startDateMinute, endDateMonth, endDateDay, endDateYear,
 				endDateHour, endDateMinute, neverEnd);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceDataIntegrationProcessLocalService.getBasePersistence();
 	}
 
 	@Override

@@ -59,12 +59,8 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.security.permission.UserBag;
-import com.liferay.portal.kernel.security.permission.UserBagFactoryUtil;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ContactLocalService;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.RoleService;
@@ -269,7 +265,7 @@ public class UserAccountResourceImpl
 			_userService.updateUser(
 				userAccountId, null, null, null, false, null, null,
 				userAccount.getAlternateName(), userAccount.getEmailAddress(),
-				true, null, user.getLanguageId(), user.getTimeZoneId(),
+				false, null, user.getLanguageId(), user.getTimeZoneId(),
 				user.getGreeting(), user.getComments(),
 				userAccount.getGivenName(), userAccount.getAdditionalName(),
 				userAccount.getFamilyName(), _getPrefixId(userAccount),
@@ -593,6 +589,9 @@ public class UserAccountResourceImpl
 					user.getOrganizations(),
 					organization -> _toOrganizationBrief(organization),
 					OrganizationBrief.class);
+				roleBriefs = transformToArray(
+					_roleService.getUserRoles(user.getUserId()),
+					role -> _toRoleBrief(role), RoleBrief.class);
 				siteBriefs = transformToArray(
 					_groupService.getGroups(
 						contextCompany.getCompanyId(),
@@ -662,26 +661,6 @@ public class UserAccountResourceImpl
 
 						return group.getDisplayURL(_getThemeDisplay(group));
 					});
-				setRoleBriefs(
-					() -> {
-						UserBag userBag = UserBagFactoryUtil.create(
-							user.getUserId());
-
-						return transformToArray(
-							userBag.getRoles(),
-							role -> {
-								if (!_roleModelResourcePermission.contains(
-										PermissionThreadLocal.
-											getPermissionChecker(),
-										role, ActionKeys.VIEW)) {
-
-									return null;
-								}
-
-								return _toRoleBrief(role);
-							},
-							RoleBrief.class);
-					});
 			}
 		};
 	}
@@ -707,11 +686,6 @@ public class UserAccountResourceImpl
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.portal.kernel.model.Role)"
-	)
-	private ModelResourcePermission<Role> _roleModelResourcePermission;
 
 	@Reference
 	private RoleService _roleService;

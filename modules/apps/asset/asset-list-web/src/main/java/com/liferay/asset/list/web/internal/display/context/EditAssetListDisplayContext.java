@@ -56,8 +56,6 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -89,12 +87,8 @@ import com.liferay.segments.service.SegmentsEntryServiceUtil;
 import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 
-import java.io.IOException;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -171,17 +165,11 @@ public class EditAssetListDisplayContext {
 			return _assetListEntrySegmentsEntryRels;
 		}
 
-		List<AssetListEntrySegmentsEntryRel> assetListEntrySegmentsEntryRels =
+		_assetListEntrySegmentsEntryRels =
 			AssetListEntrySegmentsEntryRelLocalServiceUtil.
 				getAssetListEntrySegmentsEntryRels(
 					getAssetListEntryId(), QueryUtil.ALL_POS,
 					QueryUtil.ALL_POS);
-
-		_assetListEntrySegmentsEntryRels = ListUtil.sort(
-			assetListEntrySegmentsEntryRels,
-			Comparator.comparing(
-				AssetListEntrySegmentsEntryRel::getCreateDate,
-				Comparator.reverseOrder()));
 
 		return _assetListEntrySegmentsEntryRels;
 	}
@@ -473,7 +461,7 @@ public class EditAssetListDisplayContext {
 	}
 
 	public String getClassName(AssetRendererFactory<?> assetRendererFactory) {
-		Class<? extends AssetRendererFactory<?>> clazz =
+		Class<? extends AssetRendererFactory> clazz =
 			_assetRendererFactoryClassProvider.getClass(assetRendererFactory);
 
 		String className = clazz.getName();
@@ -650,12 +638,6 @@ public class EditAssetListDisplayContext {
 
 			AssetListEntry assetListEntry = getAssetListEntry();
 
-			if (!curRendererFactory.isActive(_themeDisplay.getCompanyId()) ||
-				!curRendererFactory.isSelectable()) {
-
-				continue;
-			}
-
 			if (!Objects.equals(
 					assetListEntry.getAssetEntryType(),
 					AssetEntry.class.getName()) &&
@@ -695,53 +677,6 @@ public class EditAssetListDisplayContext {
 						String.valueOf(
 							assetAvailableClassType.getClassTypeId()))) {
 
-					continue;
-				}
-
-				Stream<AssetListEntrySegmentsEntryRel> stream =
-					_assetListEntrySegmentsEntryRels.stream();
-
-				boolean assetEntrySubtype = stream.anyMatch(
-					assetListEntrySegmentsEntryRel -> {
-						UnicodeProperties typeSettingsUnicodeProperties =
-							new UnicodeProperties(true);
-
-						try {
-							typeSettingsUnicodeProperties.load(
-								assetListEntrySegmentsEntryRel.
-									getTypeSettings());
-						}
-						catch (IOException ioException) {
-							_log.error(ioException, ioException);
-						}
-
-						String anyClassType =
-							"anyClassType" +
-								curRendererFactory.getClassSimpleName();
-
-						if (GetterUtil.getBoolean(
-								typeSettingsUnicodeProperties.getProperty(
-									anyClassType),
-								true)) {
-
-							return true;
-						}
-
-						String classTypeIds =
-							typeSettingsUnicodeProperties.getProperty(
-								"classTypeIds" +
-									curRendererFactory.getClassSimpleName());
-
-						Stream<String> classTypeIdsStream = Arrays.stream(
-							classTypeIds.split(","));
-
-						return classTypeIdsStream.anyMatch(
-							classTypeId -> classTypeId.equals(
-								String.valueOf(
-									assetAvailableClassType.getClassTypeId())));
-					});
-
-				if (!assetEntrySubtype) {
 					continue;
 				}
 
@@ -856,7 +791,7 @@ public class EditAssetListDisplayContext {
 		}
 
 		SearchContainer<AssetListEntryAssetEntryRel> searchContainer =
-			new SearchContainer<>(
+			new SearchContainer(
 				_portletRequest, getPortletURL(), null,
 				"there-are-no-asset-entries");
 
@@ -874,6 +809,17 @@ public class EditAssetListDisplayContext {
 		_searchContainer = searchContainer;
 
 		return _searchContainer;
+	}
+
+	public SegmentsEntry getSegmentsEntry() {
+		if (_segmentsEntry != null) {
+			return _segmentsEntry;
+		}
+
+		_segmentsEntry = SegmentsEntryLocalServiceUtil.fetchSegmentsEntry(
+			getSegmentsEntryId());
+
+		return _segmentsEntry;
 	}
 
 	public long getSegmentsEntryId() {
@@ -1276,9 +1222,6 @@ public class EditAssetListDisplayContext {
 
 	private static final long _DEFAULT_SUBTYPE_SELECTION_ID = 0;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		EditAssetListDisplayContext.class);
-
 	private AssetListEntry _assetListEntry;
 	private Long _assetListEntryId;
 	private List<AssetListEntrySegmentsEntryRel>
@@ -1306,6 +1249,7 @@ public class EditAssetListDisplayContext {
 	private String _redirect;
 	private long[] _referencedModelsGroupIds;
 	private SearchContainer<AssetListEntryAssetEntryRel> _searchContainer;
+	private SegmentsEntry _segmentsEntry;
 	private Long _segmentsEntryId;
 	private long[] _selectedSegmentsEntryIds;
 	private String _selectSegmentsEntryURL;

@@ -14,7 +14,6 @@
 
 package com.liferay.headless.admin.user.internal.resource.v1_0.factory;
 
-import com.liferay.headless.admin.user.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.admin.user.resource.v1_0.EmailAddressResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-admin-user/v1.0/EmailAddress",
-	service = EmailAddressResource.Factory.class
-)
+@Component(immediate = true, service = EmailAddressResource.Factory.class)
 @Generated("")
 public class EmailAddressResourceFactoryImpl
 	implements EmailAddressResource.Factory {
@@ -138,6 +135,16 @@ public class EmailAddressResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		EmailAddressResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		EmailAddressResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, EmailAddressResource>
 		_getProxyProviderFunction() {
 
@@ -186,7 +193,7 @@ public class EmailAddressResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		EmailAddressResource emailAddressResource =
@@ -210,7 +217,6 @@ public class EmailAddressResourceFactoryImpl
 		emailAddressResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		emailAddressResource.setRoleLocalService(_roleLocalService);
-		emailAddressResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(emailAddressResource, arguments);
@@ -252,6 +258,9 @@ public class EmailAddressResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -260,9 +269,6 @@ public class EmailAddressResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

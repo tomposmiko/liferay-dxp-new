@@ -670,10 +670,6 @@ public class MessageUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(MessagePersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile MessagePersistence _persistence;
 
 }

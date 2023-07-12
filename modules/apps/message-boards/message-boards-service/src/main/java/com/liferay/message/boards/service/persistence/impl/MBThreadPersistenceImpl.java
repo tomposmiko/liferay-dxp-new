@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -3639,7 +3640,7 @@ public class MBThreadPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -9243,7 +9244,7 @@ public class MBThreadPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
@@ -10781,7 +10782,7 @@ public class MBThreadPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards threads
 	 * @param end the upper bound of the range of message boards threads (not inclusive)
@@ -13650,7 +13651,7 @@ public class MBThreadPersistenceImpl
 	 */
 	@Override
 	public MBThread fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(MBThread.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(MBThread.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -14369,12 +14370,12 @@ public class MBThreadPersistenceImpl
 			},
 			new String[] {"groupId", "categoryId", "status"}, false);
 
-		MBThreadUtil.setPersistence(this);
+		_setMBThreadUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		MBThreadUtil.setPersistence(null);
+		_setMBThreadUtilPersistence(null);
 
 		entityCache.removeCache(MBThreadImpl.class.getName());
 
@@ -14384,6 +14385,21 @@ public class MBThreadPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setMBThreadUtilPersistence(
+		MBThreadPersistence mbThreadPersistence) {
+
+		try {
+			Field field = MBThreadUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, mbThreadPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

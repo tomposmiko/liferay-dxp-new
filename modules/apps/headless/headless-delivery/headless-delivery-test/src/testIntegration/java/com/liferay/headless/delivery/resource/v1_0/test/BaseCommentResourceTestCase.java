@@ -51,9 +51,8 @@ import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -62,16 +61,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -220,10 +221,7 @@ public abstract class BaseCommentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantComment),
 				(List<Comment>)page.getItems());
-			assertValid(
-				page,
-				testGetBlogPostingCommentsPage_getExpectedActions(
-					irrelevantBlogPostingId));
+			assertValid(page);
 		}
 
 		Comment comment1 = testGetBlogPostingCommentsPage_addComment(
@@ -239,32 +237,11 @@ public abstract class BaseCommentResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(comment1, comment2), (List<Comment>)page.getItems());
-		assertValid(
-			page,
-			testGetBlogPostingCommentsPage_getExpectedActions(blogPostingId));
+		assertValid(page);
 
 		commentResource.deleteComment(comment1.getId());
 
 		commentResource.deleteComment(comment2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetBlogPostingCommentsPage_getExpectedActions(
-				Long blogPostingId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments/batch".
-				replace("{blogPostingId}", String.valueOf(blogPostingId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -407,7 +384,7 @@ public abstract class BaseCommentResourceTestCase {
 		testGetBlogPostingCommentsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					comment1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -420,8 +397,8 @@ public abstract class BaseCommentResourceTestCase {
 		testGetBlogPostingCommentsPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(comment1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(comment2, entityField.getName(), 0.5);
+				BeanUtils.setProperty(comment1, entityField.getName(), 0.1);
+				BeanUtils.setProperty(comment2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -432,8 +409,8 @@ public abstract class BaseCommentResourceTestCase {
 		testGetBlogPostingCommentsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(comment1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(comment2, entityField.getName(), 1);
+				BeanUtils.setProperty(comment1, entityField.getName(), 0);
+				BeanUtils.setProperty(comment2, entityField.getName(), 1);
 			});
 	}
 
@@ -448,27 +425,27 @@ public abstract class BaseCommentResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -476,12 +453,12 @@ public abstract class BaseCommentResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -735,10 +712,7 @@ public abstract class BaseCommentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantComment),
 				(List<Comment>)page.getItems());
-			assertValid(
-				page,
-				testGetCommentCommentsPage_getExpectedActions(
-					irrelevantParentCommentId));
+			assertValid(page);
 		}
 
 		Comment comment1 = testGetCommentCommentsPage_addComment(
@@ -754,22 +728,11 @@ public abstract class BaseCommentResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(comment1, comment2), (List<Comment>)page.getItems());
-		assertValid(
-			page,
-			testGetCommentCommentsPage_getExpectedActions(parentCommentId));
+		assertValid(page);
 
 		commentResource.deleteComment(comment1.getId());
 
 		commentResource.deleteComment(comment2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetCommentCommentsPage_getExpectedActions(Long parentCommentId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -908,7 +871,7 @@ public abstract class BaseCommentResourceTestCase {
 		testGetCommentCommentsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					comment1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -919,8 +882,8 @@ public abstract class BaseCommentResourceTestCase {
 		testGetCommentCommentsPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(comment1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(comment2, entityField.getName(), 0.5);
+				BeanUtils.setProperty(comment1, entityField.getName(), 0.1);
+				BeanUtils.setProperty(comment2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -929,8 +892,8 @@ public abstract class BaseCommentResourceTestCase {
 		testGetCommentCommentsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(comment1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(comment2, entityField.getName(), 1);
+				BeanUtils.setProperty(comment1, entityField.getName(), 0);
+				BeanUtils.setProperty(comment2, entityField.getName(), 1);
 			});
 	}
 
@@ -943,27 +906,27 @@ public abstract class BaseCommentResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -971,12 +934,12 @@ public abstract class BaseCommentResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1092,10 +1055,7 @@ public abstract class BaseCommentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantComment),
 				(List<Comment>)page.getItems());
-			assertValid(
-				page,
-				testGetDocumentCommentsPage_getExpectedActions(
-					irrelevantDocumentId));
+			assertValid(page);
 		}
 
 		Comment comment1 = testGetDocumentCommentsPage_addComment(
@@ -1111,30 +1071,11 @@ public abstract class BaseCommentResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(comment1, comment2), (List<Comment>)page.getItems());
-		assertValid(
-			page, testGetDocumentCommentsPage_getExpectedActions(documentId));
+		assertValid(page);
 
 		commentResource.deleteComment(comment1.getId());
 
 		commentResource.deleteComment(comment2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDocumentCommentsPage_getExpectedActions(Long documentId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}/comments/batch".
-				replace("{documentId}", String.valueOf(documentId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -1272,7 +1213,7 @@ public abstract class BaseCommentResourceTestCase {
 		testGetDocumentCommentsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					comment1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -1283,8 +1224,8 @@ public abstract class BaseCommentResourceTestCase {
 		testGetDocumentCommentsPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(comment1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(comment2, entityField.getName(), 0.5);
+				BeanUtils.setProperty(comment1, entityField.getName(), 0.1);
+				BeanUtils.setProperty(comment2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -1293,8 +1234,8 @@ public abstract class BaseCommentResourceTestCase {
 		testGetDocumentCommentsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(comment1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(comment2, entityField.getName(), 1);
+				BeanUtils.setProperty(comment1, entityField.getName(), 0);
+				BeanUtils.setProperty(comment2, entityField.getName(), 1);
 			});
 	}
 
@@ -1307,27 +1248,27 @@ public abstract class BaseCommentResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1335,12 +1276,12 @@ public abstract class BaseCommentResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1456,10 +1397,7 @@ public abstract class BaseCommentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantComment),
 				(List<Comment>)page.getItems());
-			assertValid(
-				page,
-				testGetStructuredContentCommentsPage_getExpectedActions(
-					irrelevantStructuredContentId));
+			assertValid(page);
 		}
 
 		Comment comment1 = testGetStructuredContentCommentsPage_addComment(
@@ -1475,35 +1413,11 @@ public abstract class BaseCommentResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(comment1, comment2), (List<Comment>)page.getItems());
-		assertValid(
-			page,
-			testGetStructuredContentCommentsPage_getExpectedActions(
-				structuredContentId));
+		assertValid(page);
 
 		commentResource.deleteComment(comment1.getId());
 
 		commentResource.deleteComment(comment2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetStructuredContentCommentsPage_getExpectedActions(
-				Long structuredContentId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments/batch".
-				replace(
-					"{structuredContentId}",
-					String.valueOf(structuredContentId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -1653,7 +1567,7 @@ public abstract class BaseCommentResourceTestCase {
 		testGetStructuredContentCommentsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					comment1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -1666,8 +1580,8 @@ public abstract class BaseCommentResourceTestCase {
 		testGetStructuredContentCommentsPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(comment1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(comment2, entityField.getName(), 0.5);
+				BeanUtils.setProperty(comment1, entityField.getName(), 0.1);
+				BeanUtils.setProperty(comment2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -1678,8 +1592,8 @@ public abstract class BaseCommentResourceTestCase {
 		testGetStructuredContentCommentsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, comment1, comment2) -> {
-				BeanTestUtil.setProperty(comment1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(comment2, entityField.getName(), 1);
+				BeanUtils.setProperty(comment1, entityField.getName(), 0);
+				BeanUtils.setProperty(comment2, entityField.getName(), 1);
 			});
 	}
 
@@ -1694,27 +1608,27 @@ public abstract class BaseCommentResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1722,12 +1636,12 @@ public abstract class BaseCommentResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						comment2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1964,12 +1878,6 @@ public abstract class BaseCommentResourceTestCase {
 	}
 
 	protected void assertValid(Page<Comment> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Comment> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Comment> comments = page.getItems();
@@ -1984,25 +1892,6 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		assertValid(page.getActions(), expectedActions);
-	}
-
-	protected void assertValid(
-		Map<String, Map<String, String>> actions1,
-		Map<String, Map<String, String>> actions2) {
-
-		for (String key : actions2.keySet()) {
-			Map action = actions1.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map<String, String> expectedAction = actions2.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -2189,16 +2078,14 @@ public abstract class BaseCommentResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -2215,10 +2102,6 @@ public abstract class BaseCommentResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -2228,18 +2111,18 @@ public abstract class BaseCommentResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -2420,115 +2303,6 @@ public abstract class BaseCommentResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -2603,6 +2377,18 @@ public abstract class BaseCommentResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseCommentResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

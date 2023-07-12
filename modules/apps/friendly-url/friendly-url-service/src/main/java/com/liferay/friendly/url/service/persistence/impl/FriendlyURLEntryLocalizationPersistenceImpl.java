@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2339,7 +2340,7 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				FriendlyURLEntryLocalization.class, primaryKey)) {
+				FriendlyURLEntryLocalization.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2861,12 +2862,12 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 			new String[] {"groupId", "classNameId", "classPK", "languageId"},
 			false);
 
-		FriendlyURLEntryLocalizationUtil.setPersistence(this);
+		_setFriendlyURLEntryLocalizationUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		FriendlyURLEntryLocalizationUtil.setPersistence(null);
+		_setFriendlyURLEntryLocalizationUtilPersistence(null);
 
 		entityCache.removeCache(
 			FriendlyURLEntryLocalizationImpl.class.getName());
@@ -2877,6 +2878,24 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setFriendlyURLEntryLocalizationUtilPersistence(
+		FriendlyURLEntryLocalizationPersistence
+			friendlyURLEntryLocalizationPersistence) {
+
+		try {
+			Field field =
+				FriendlyURLEntryLocalizationUtil.class.getDeclaredField(
+					"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, friendlyURLEntryLocalizationPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

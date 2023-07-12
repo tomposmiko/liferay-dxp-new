@@ -34,7 +34,6 @@
 						"textAlign": "none",
 						"width": "w-auto"
 					},
-					"indexed": true,
 					"layout": {
 						"borderWidth": 0,
 						"marginBottom": 0,

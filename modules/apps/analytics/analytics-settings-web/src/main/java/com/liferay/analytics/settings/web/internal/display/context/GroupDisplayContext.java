@@ -20,7 +20,6 @@ import com.liferay.analytics.settings.web.internal.search.GroupChecker;
 import com.liferay.analytics.settings.web.internal.search.GroupSearch;
 import com.liferay.analytics.settings.web.internal.util.AnalyticsSettingsUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -99,7 +98,7 @@ public class GroupDisplayContext {
 		try {
 			groups = GroupServiceUtil.search(
 				_getCompanyId(), _getClassNameIds(), _getKeywords(),
-				_getGroupParams(), QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				_getGroupParams(), groupSearch.getStart(), groupSearch.getEnd(),
 				new GroupNameComparator(_isOrderByAscending()));
 		}
 		catch (PortalException portalException) {
@@ -267,7 +266,7 @@ public class GroupDisplayContext {
 	}
 
 	private boolean _isOrderByAscending() {
-		if (Objects.equals(getOrderByType(), "asc")) {
+		if (Objects.equals("asc", getOrderByType())) {
 			return true;
 		}
 

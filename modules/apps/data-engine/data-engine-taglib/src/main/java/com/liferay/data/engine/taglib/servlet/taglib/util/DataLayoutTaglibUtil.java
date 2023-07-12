@@ -751,9 +751,6 @@ public class DataLayoutTaglibUtil {
 				DDMFormFieldOptions ddmFormFieldOptions)
 			throws Exception {
 
-			Map<String, String> optionsReferences =
-				ddmFormFieldOptions.getOptionsReferences();
-
 			JSONObject jsonObject = _jsonFactory.createJSONObject();
 
 			for (Locale availableLocale : availableLocales) {
@@ -769,8 +766,6 @@ public class DataLayoutTaglibUtil {
 							return JSONUtil.put(
 								"label",
 								localizedValue.getString(availableLocale)
-							).put(
-								"reference", optionsReferences.get(optionValue)
 							).put(
 								"value", optionValue
 							);

@@ -38,8 +38,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -55,6 +53,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -858,7 +858,7 @@ public abstract class CommerceInventoryReplenishmentItemLocalServiceBaseImpl
 			"com.liferay.commerce.inventory.model.CommerceInventoryReplenishmentItem",
 			commerceInventoryReplenishmentItemLocalService);
 
-		CommerceInventoryReplenishmentItemLocalServiceUtil.setService(
+		_setLocalServiceUtilService(
 			commerceInventoryReplenishmentItemLocalService);
 	}
 
@@ -866,7 +866,7 @@ public abstract class CommerceInventoryReplenishmentItemLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.inventory.model.CommerceInventoryReplenishmentItem");
 
-		CommerceInventoryReplenishmentItemLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -909,6 +909,24 @@ public abstract class CommerceInventoryReplenishmentItemLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CommerceInventoryReplenishmentItemLocalService
+			commerceInventoryReplenishmentItemLocalService) {
+
+		try {
+			Field field =
+				CommerceInventoryReplenishmentItemLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceInventoryReplenishmentItemLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1001,9 +1019,6 @@ public abstract class CommerceInventoryReplenishmentItemLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceInventoryReplenishmentItemLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

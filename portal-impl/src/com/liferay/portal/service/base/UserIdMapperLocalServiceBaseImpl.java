@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.UserIdMapper;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -46,6 +44,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -442,14 +442,14 @@ public abstract class UserIdMapperLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.UserIdMapper",
 			userIdMapperLocalService);
 
-		UserIdMapperLocalServiceUtil.setService(userIdMapperLocalService);
+		_setLocalServiceUtilService(userIdMapperLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.UserIdMapper");
 
-		UserIdMapperLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -494,6 +494,22 @@ public abstract class UserIdMapperLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		UserIdMapperLocalService userIdMapperLocalService) {
+
+		try {
+			Field field = UserIdMapperLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, userIdMapperLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = UserIdMapperLocalService.class)
 	protected UserIdMapperLocalService userIdMapperLocalService;
 
@@ -505,9 +521,6 @@ public abstract class UserIdMapperLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		UserIdMapperLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

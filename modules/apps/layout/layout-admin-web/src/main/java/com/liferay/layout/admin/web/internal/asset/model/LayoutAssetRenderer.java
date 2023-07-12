@@ -57,7 +57,7 @@ public class LayoutAssetRenderer extends BaseJSPAssetRenderer<Layout> {
 
 	@Override
 	public long getClassPK() {
-		return _layout.getPlid();
+		return _layout.getLayoutId();
 	}
 
 	@Override
@@ -112,13 +112,6 @@ public class LayoutAssetRenderer extends BaseJSPAssetRenderer<Layout> {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
-
-		return getURLViewInContext(themeDisplay, noSuchEntryRedirect);
-	}
-
-	@Override
-	public String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect) {
 
 		try {
 			if (_layout.getStatus() != WorkflowConstants.STATUS_PENDING) {

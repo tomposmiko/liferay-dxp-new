@@ -20,7 +20,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-138634. Relaunch export process for default site."
-	@priority = 5
+	@priority = "5"
 	test DefaultSiteCanBeExportedAfterUpgrade71103 {
 		property data.archive.type = "data-archive-default-site-export";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -36,7 +36,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-138634. Relaunch export process for default site."
-	@priority = 5
+	@priority = "5"
 	test DefaultSiteCanBeExportedAfterUpgrade72101 {
 		property data.archive.type = "data-archive-default-site-export";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -52,7 +52,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-138634. Relaunch export process for default site."
-	@priority = 5
+	@priority = "5"
 	test DefaultSiteCanBeExportedAfterUpgrade701016 {
 		property data.archive.type = "data-archive-default-site-export";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -68,7 +68,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-138634. Modify contents of export template after upgrading."
-	@priority = 5
+	@priority = "5"
 	test ExportTemplateCanBeEditedAfterUpgrade71103 {
 		property data.archive.type = "data-archive-edit-export-template";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -117,7 +117,7 @@ definition {
 			JSONGroup.addGroup(groupName = "Site Name");
 
 			LAR.importSiteCP(
-				larFileName = ${larFileName},
+				larFileName = "${larFileName}",
 				siteName = "site-name");
 		}
 
@@ -137,7 +137,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-138634. Modify contents of export template after upgrading."
-	@priority = 5
+	@priority = "5"
 	test ExportTemplateCanBeEditedAfterUpgrade72101 {
 		property data.archive.type = "data-archive-edit-export-template";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -186,7 +186,7 @@ definition {
 			JSONGroup.addGroup(groupName = "Site Name");
 
 			LAR.importSiteCP(
-				larFileName = ${larFileName},
+				larFileName = "${larFileName}",
 				siteName = "site-name");
 		}
 
@@ -206,7 +206,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-138634. Modify contents of export template after upgrading."
-	@priority = 5
+	@priority = "5"
 	test ExportTemplateCanBeEditedAfterUpgrade701016 {
 		property data.archive.type = "data-archive-edit-export-template";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sybase";
@@ -255,7 +255,7 @@ definition {
 			JSONGroup.addGroup(groupName = "Site Name");
 
 			LAR.importSiteCP(
-				larFileName = ${larFileName},
+				larFileName = "${larFileName}",
 				siteName = "site-name");
 		}
 
@@ -275,7 +275,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-98651."
-	@priority = 4
+	@priority = "4"
 	test PublishArticleCreatedByDeletedUserAfterUpgrade704 {
 		property data.archive.type = "data-archive-staging-with-deleted-user";
 		property database.types = "mariadb,mysql,postgresql";
@@ -303,7 +303,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-98651."
-	@priority = 4
+	@priority = "4"
 	test PublishArticleCreatedByDeletedUserAfterUpgrade70106 {
 		property data.archive.type = "data-archive-staging-with-deleted-user";
 		property portal.version = "7.0.10.6";
@@ -330,7 +330,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-98651."
-	@priority = 4
+	@priority = "4"
 	test PublishArticleCreatedByDeletedUserAfterUpgrade621021 {
 		property data.archive.type = "data-archive-staging-with-deleted-user";
 		property database.types = "db2,mysql,oracle,postgresql";
@@ -358,7 +358,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-132493."
-	@priority = 5
+	@priority = "5"
 	test PublishPageVersioningAfterUpgrade71103 {
 		property data.archive.type = "data-archive-local-staging-with-page-versioning";
 		property portal.version = "7.1.10.3";
@@ -390,7 +390,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-132493."
-	@priority = 5
+	@priority = "5"
 	test PublishPageVersioningAfterUpgrade72101 {
 		property data.archive.type = "data-archive-local-staging-with-page-versioning";
 		property portal.version = "7.2.10.1";
@@ -422,7 +422,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-132493."
-	@priority = 5
+	@priority = "5"
 	test PublishPageVersioningAfterUpgrade701016 {
 		property data.archive.type = "data-archive-local-staging-with-page-versioning";
 		property portal.version = "7.0.10.16";
@@ -454,7 +454,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-132491."
-	@priority = 5
+	@priority = "5"
 	test PublishPageVersioningViaRemoteStagingAfterUpgrade71103 {
 		property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
 		property data.archive.type = "data-archive-remote-staging-with-page-versioning";
@@ -480,7 +480,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-132491."
-	@priority = 5
+	@priority = "5"
 	test PublishPageVersioningViaRemoteStagingAfterUpgrade72101 {
 		property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
 		property data.archive.type = "data-archive-remote-staging-with-page-versioning";
@@ -506,7 +506,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-132491."
-	@priority = 5
+	@priority = "5"
 	test PublishPageVersioningViaRemoteStagingAfterUpgrade701016 {
 		property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
 		property data.archive.type = "data-archive-remote-staging-with-page-versioning";
@@ -533,7 +533,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-138633. User can edit the name and the status of a template after upgrade."
-	@priority = 5
+	@priority = "5"
 	test TemplateNameAndStatusCanBeEditedAfterUpgrade71103 {
 		property data.archive.type = "data-archive-deactivated-template";
 		property database.types = "db2,mysql,oracle,postgresql,sybase";
@@ -561,7 +561,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-138633. User can edit the name and the status of a template after upgrade."
-	@priority = 5
+	@priority = "5"
 	test TemplateNameAndStatusCanBeEditedAfterUpgrade72101 {
 		property data.archive.type = "data-archive-deactivated-template";
 		property database.types = "db2,mysql,oracle,postgresql,sybase";
@@ -589,7 +589,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-138633. User can edit the name and the status of a template after upgrade."
-	@priority = 5
+	@priority = "5"
 	test TemplateNameAndStatusCanBeEditedAfterUpgrade701016 {
 		property data.archive.type = "data-archive-deactivated-template";
 		property database.types = "db2,mysql,oracle,postgresql,sybase";
@@ -617,7 +617,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade704 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property database.types = "mariadb,mysql,postgresql";
@@ -630,7 +630,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade713 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property database.types = "mariadb,mysql,postgresql";
@@ -643,7 +643,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade721 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property database.types = "mariadb,mysql,postgresql";
@@ -656,7 +656,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade730 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property database.types = "mariadb,mysql,postgresql";
@@ -669,7 +669,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade70106 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property portal.upstream = "true";
@@ -681,7 +681,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade71103 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property portal.upstream = "true";
@@ -693,7 +693,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade72101 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property portal.upstream = "true";
@@ -705,7 +705,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade73101 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property portal.upstream = "true";
@@ -717,7 +717,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87237."
-	@priority = 5
+	@priority = "5"
 	test ViewStagingDefaultSettingAfterUpgrade621021 {
 		property data.archive.type = "data-archive-staging-with-default-setting";
 		property database.types = "db2,mysql,oracle,postgresql,sybase";

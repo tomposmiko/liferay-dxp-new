@@ -609,7 +609,7 @@ public class AppBuilderAppDataRecordLinkUtil {
 	 * </p>
 	 *
 	 * @param appBuilderAppId the app builder app ID
-	 * @param ddlRecordIds the ddl record IDs
+	 * @param ddlRecordId the ddl record ID
 	 * @param start the lower bound of the range of app builder app data record links
 	 * @param end the upper bound of the range of app builder app data record links (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -826,12 +826,6 @@ public class AppBuilderAppDataRecordLinkUtil {
 
 	public static AppBuilderAppDataRecordLinkPersistence getPersistence() {
 		return _persistence;
-	}
-
-	public static void setPersistence(
-		AppBuilderAppDataRecordLinkPersistence persistence) {
-
-		_persistence = persistence;
 	}
 
 	private static volatile AppBuilderAppDataRecordLinkPersistence _persistence;

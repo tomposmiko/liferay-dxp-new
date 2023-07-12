@@ -64,6 +64,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2489,7 +2490,7 @@ public class DLFileEntryTypePersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileEntryTypeModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of document library file entry types
 	 * @param end the upper bound of the range of document library file entry types (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3815,9 +3816,7 @@ public class DLFileEntryTypePersistenceImpl
 	 */
 	@Override
 	public DLFileEntryType fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				DLFileEntryType.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(DLFileEntryType.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4693,11 +4692,11 @@ public class DLFileEntryTypePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "fileEntryTypeKey"}, false);
 
-		DLFileEntryTypeUtil.setPersistence(this);
+		_setDLFileEntryTypeUtilPersistence(this);
 	}
 
 	public void destroy() {
-		DLFileEntryTypeUtil.setPersistence(null);
+		_setDLFileEntryTypeUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(DLFileEntryTypeImpl.class.getName());
 
@@ -4710,6 +4709,22 @@ public class DLFileEntryTypePersistenceImpl
 		}
 
 		TableMapperFactory.removeTableMapper("DLFileEntryTypes_DLFolders");
+	}
+
+	private void _setDLFileEntryTypeUtilPersistence(
+		DLFileEntryTypePersistence dlFileEntryTypePersistence) {
+
+		try {
+			Field field = DLFileEntryTypeUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileEntryTypePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
 	}
 
 	@BeanReference(type = DLFolderPersistence.class)

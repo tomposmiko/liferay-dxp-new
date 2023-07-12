@@ -361,10 +361,6 @@ public class PhoneLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(PhoneLocalService service) {
-		_service = service;
-	}
-
 	private static volatile PhoneLocalService _service;
 
 }

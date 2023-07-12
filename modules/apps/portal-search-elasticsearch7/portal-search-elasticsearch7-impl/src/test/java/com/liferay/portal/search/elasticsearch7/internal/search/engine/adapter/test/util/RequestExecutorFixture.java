@@ -123,8 +123,8 @@ public class RequestExecutorFixture {
 
 		_deleteIndexRequestExecutor = new DeleteIndexRequestExecutorImpl() {
 			{
-				setElasticsearchClientResolver(_elasticsearchClientResolver);
 				setIndicesOptionsTranslator(indicesOptionsTranslator);
+				setElasticsearchClientResolver(_elasticsearchClientResolver);
 			}
 		};
 
@@ -144,8 +144,8 @@ public class RequestExecutorFixture {
 			{
 				setBulkableDocumentRequestTranslator(
 					elasticsearchBulkableDocumentRequestTranslator);
-				setDocumentBuilderFactory(documentBuilderFactory);
 				setElasticsearchClientResolver(_elasticsearchClientResolver);
+				setDocumentBuilderFactory(documentBuilderFactory);
 			}
 		};
 

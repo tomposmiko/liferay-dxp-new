@@ -51,6 +51,7 @@ import com.liferay.trash.service.persistence.impl.constants.TrashPersistenceCons
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -2842,9 +2843,7 @@ public class TrashEntryPersistenceImpl
 	 */
 	@Override
 	public TrashEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				TrashEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(TrashEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3349,12 +3348,12 @@ public class TrashEntryPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
 
-		TrashEntryUtil.setPersistence(this);
+		_setTrashEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		TrashEntryUtil.setPersistence(null);
+		_setTrashEntryUtilPersistence(null);
 
 		entityCache.removeCache(TrashEntryImpl.class.getName());
 
@@ -3364,6 +3363,21 @@ public class TrashEntryPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setTrashEntryUtilPersistence(
+		TrashEntryPersistence trashEntryPersistence) {
+
+		try {
+			Field field = TrashEntryUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, trashEntryPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

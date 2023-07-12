@@ -32,6 +32,8 @@ import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.model.Layout;
@@ -56,7 +58,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -94,12 +95,15 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			sourceLayout, targetLayout);
 
 		boolean copyLayout = CopyLayoutThreadLocal.isCopyLayout();
+		boolean stagingAdvicesThreadLocalEnabled =
+			StagingAdvicesThreadLocal.isEnabled();
 
 		ServiceContext currentServiceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
 		try {
 			CopyLayoutThreadLocal.setCopyLayout(true);
+			StagingAdvicesThreadLocal.setEnabled(false);
 
 			return TransactionInvokerUtil.invoke(_transactionConfig, callable);
 		}
@@ -108,6 +112,8 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 		}
 		finally {
 			CopyLayoutThreadLocal.setCopyLayout(copyLayout);
+			StagingAdvicesThreadLocal.setEnabled(
+				stagingAdvicesThreadLocalEnabled);
 
 			ServiceContextThreadLocal.pushServiceContext(currentServiceContext);
 		}
@@ -248,34 +254,11 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 					targetLayoutLayoutClassedModelUsages,
 					sourceLayoutLayoutClassedModelUsage)) {
 
-				String containerKey =
-					sourceLayoutLayoutClassedModelUsage.getContainerKey();
-
-				long containerType =
-					sourceLayoutLayoutClassedModelUsage.getContainerType();
-
-				if (containerType == _portal.getClassNameId(
-						FragmentEntryLink.class.getName())) {
-
-					long fragmentEntryLinkId = GetterUtil.getLong(
-						sourceLayoutLayoutClassedModelUsage.getContainerKey());
-
-					FragmentEntryLink fragmentEntryLink =
-						_fragmentEntryLinkLocalService.getFragmentEntryLink(
-							sourceLayout.getGroupId(), fragmentEntryLinkId,
-							targetLayout.getPlid());
-
-					if (fragmentEntryLink != null) {
-						containerKey = String.valueOf(
-							fragmentEntryLink.getFragmentEntryLinkId());
-					}
-				}
-
 				_layoutClassedModelUsageLocalService.addLayoutClassedModelUsage(
 					sourceLayoutLayoutClassedModelUsage.getGroupId(),
 					sourceLayoutLayoutClassedModelUsage.getClassNameId(),
 					sourceLayoutLayoutClassedModelUsage.getClassPK(),
-					containerKey,
+					sourceLayoutLayoutClassedModelUsage.getContainerKey(),
 					sourceLayoutLayoutClassedModelUsage.getContainerType(),
 					targetLayout.getPlid(), serviceContext);
 			}
@@ -360,59 +343,75 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			Layout sourceLayout, Layout targetLayout)
 		throws Exception {
 
-		boolean stagingAdvicesThreadLocalEnabled =
-			StagingAdvicesThreadLocal.isEnabled();
+		List<PortletPreferences> portletPreferencesList =
+			_portletPreferencesLocalService.getPortletPreferences(
+				PortletKeys.PREFS_OWNER_ID_DEFAULT,
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, sourceLayout.getPlid());
 
-		try {
-			StagingAdvicesThreadLocal.setEnabled(false);
+		List<PortletPreferences> targetPortletPreferencesList =
+			_portletPreferencesLocalService.getPortletPreferences(
+				PortletKeys.PREFS_OWNER_ID_DEFAULT,
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, targetLayout.getPlid());
 
-			List<PortletPreferences> portletPreferencesList =
-				_portletPreferencesLocalService.getPortletPreferences(
+		Stream<PortletPreferences> targetPortletPreferencesStream =
+			targetPortletPreferencesList.stream();
+
+		List<String> targetPortletIds = targetPortletPreferencesStream.map(
+			PortletPreferences::getPortletId
+		).collect(
+			Collectors.toList()
+		);
+
+		for (PortletPreferences portletPreferences : portletPreferencesList) {
+			Portlet portlet = _portletLocalService.getPortletById(
+				portletPreferences.getPortletId());
+
+			if ((portlet == null) || portlet.isUndeployedPortlet()) {
+				continue;
+			}
+
+			targetPortletIds.remove(portletPreferences.getPortletId());
+
+			PortletPreferences targetPortletPreferences =
+				_portletPreferencesLocalService.fetchPortletPreferences(
 					PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-					sourceLayout.getPlid());
-
-			for (PortletPreferences portletPreferences :
-					portletPreferencesList) {
-
-				Portlet portlet = _portletLocalService.getPortletById(
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, targetLayout.getPlid(),
 					portletPreferences.getPortletId());
 
-				if ((portlet == null) || portlet.isUndeployedPortlet()) {
-					continue;
-				}
+			if (targetPortletPreferences != null) {
+				targetPortletPreferences.setPreferences(
+					portletPreferences.getPreferences());
 
-				PortletPreferences targetPortletPreferences =
-					_portletPreferencesLocalService.fetchPortletPreferences(
-						PortletKeys.PREFS_OWNER_ID_DEFAULT,
-						PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-						targetLayout.getPlid(),
-						portletPreferences.getPortletId());
-
-				if (targetPortletPreferences != null) {
-					_portletPreferencesLocalService.updatePreferences(
-						targetPortletPreferences.getOwnerId(),
-						targetPortletPreferences.getOwnerType(),
-						targetPortletPreferences.getPlid(),
-						targetPortletPreferences.getPortletId(),
-						portletPreferences.getPreferences());
-				}
-				else {
-					_portletPreferencesLocalService.addPortletPreferences(
-						targetLayout.getCompanyId(),
-						PortletKeys.PREFS_OWNER_ID_DEFAULT,
-						PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-						targetLayout.getPlid(),
-						portletPreferences.getPortletId(),
-						_portletLocalService.getPortletById(
-							portletPreferences.getPortletId()),
-						portletPreferences.getPreferences());
-				}
+				_portletPreferencesLocalService.updatePortletPreferences(
+					targetPortletPreferences);
+			}
+			else {
+				_portletPreferencesLocalService.addPortletPreferences(
+					targetLayout.getCompanyId(),
+					PortletKeys.PREFS_OWNER_ID_DEFAULT,
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, targetLayout.getPlid(),
+					portletPreferences.getPortletId(),
+					_portletLocalService.getPortletById(
+						portletPreferences.getPortletId()),
+					portletPreferences.getPreferences());
 			}
 		}
-		finally {
-			StagingAdvicesThreadLocal.setEnabled(
-				stagingAdvicesThreadLocalEnabled);
+
+		for (String portletId : targetPortletIds) {
+			try {
+				_portletPreferencesLocalService.deletePortletPreferences(
+					PortletKeys.PREFS_OWNER_ID_DEFAULT,
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, targetLayout.getPlid(),
+					portletId);
+			}
+			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Unable to delete portlet preferences for portlet " +
+							portletId,
+						exception);
+				}
+			}
 		}
 	}
 
@@ -615,8 +614,6 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				serviceContext.getCreateDate(new Date()));
 			newFragmentEntryLink.setModifiedDate(
 				serviceContext.getModifiedDate(new Date()));
-			newFragmentEntryLink.setOriginalFragmentEntryLinkId(
-				fragmentEntryLink.getFragmentEntryLinkId());
 			newFragmentEntryLink.setSegmentsExperienceId(
 				targetSegmentsExperienceId);
 			newFragmentEntryLink.setClassNameId(
@@ -643,6 +640,9 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 
 		return layoutStructure.toJSONObject();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutCopyHelperImpl.class);
 
 	private static final TransactionConfig _transactionConfig =
 		TransactionConfig.Factory.create(

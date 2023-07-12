@@ -77,10 +77,6 @@ public class DLTrashLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(DLTrashLocalService service) {
-		_service = service;
-	}
-
 	private static volatile DLTrashLocalService _service;
 
 }

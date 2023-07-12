@@ -686,12 +686,6 @@ public class SegmentsEntryRoleUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		SegmentsEntryRolePersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile SegmentsEntryRolePersistence _persistence;
 
 }

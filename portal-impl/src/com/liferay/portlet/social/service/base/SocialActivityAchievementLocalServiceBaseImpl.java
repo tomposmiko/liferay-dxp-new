@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -52,6 +50,8 @@ import com.liferay.social.kernel.service.persistence.SocialActivityCounterFinder
 import com.liferay.social.kernel.service.persistence.SocialActivityCounterPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -611,15 +611,14 @@ public abstract class SocialActivityAchievementLocalServiceBaseImpl
 			"com.liferay.social.kernel.model.SocialActivityAchievement",
 			socialActivityAchievementLocalService);
 
-		SocialActivityAchievementLocalServiceUtil.setService(
-			socialActivityAchievementLocalService);
+		_setLocalServiceUtilService(socialActivityAchievementLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.social.kernel.model.SocialActivityAchievement");
 
-		SocialActivityAchievementLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -680,6 +679,24 @@ public abstract class SocialActivityAchievementLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SocialActivityAchievementLocalService
+			socialActivityAchievementLocalService) {
+
+		try {
+			Field field =
+				SocialActivityAchievementLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivityAchievementLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = SocialActivityAchievementLocalService.class)
 	protected SocialActivityAchievementLocalService
 		socialActivityAchievementLocalService;
@@ -718,9 +735,6 @@ public abstract class SocialActivityAchievementLocalServiceBaseImpl
 
 	@BeanReference(type = SocialActivityCounterFinder.class)
 	protected SocialActivityCounterFinder socialActivityCounterFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialActivityAchievementLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

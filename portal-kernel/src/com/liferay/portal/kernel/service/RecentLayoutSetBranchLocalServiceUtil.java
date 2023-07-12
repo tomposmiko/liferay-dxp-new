@@ -332,10 +332,6 @@ public class RecentLayoutSetBranchLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(RecentLayoutSetBranchLocalService service) {
-		_service = service;
-	}
-
 	private static volatile RecentLayoutSetBranchLocalService _service;
 
 }

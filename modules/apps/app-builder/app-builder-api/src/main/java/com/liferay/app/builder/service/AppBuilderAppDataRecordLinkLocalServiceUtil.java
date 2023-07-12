@@ -367,12 +367,6 @@ public class AppBuilderAppDataRecordLinkLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		AppBuilderAppDataRecordLinkLocalService service) {
-
-		_service = service;
-	}
-
 	private static volatile AppBuilderAppDataRecordLinkLocalService _service;
 
 }

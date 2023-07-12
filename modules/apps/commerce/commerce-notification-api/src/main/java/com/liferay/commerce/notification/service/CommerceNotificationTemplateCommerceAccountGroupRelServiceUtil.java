@@ -100,12 +100,6 @@ public class CommerceNotificationTemplateCommerceAccountGroupRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(
-		CommerceNotificationTemplateCommerceAccountGroupRelService service) {
-
-		_service = service;
-	}
-
 	private static volatile
 		CommerceNotificationTemplateCommerceAccountGroupRelService _service;
 

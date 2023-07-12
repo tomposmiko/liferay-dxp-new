@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -3120,12 +3121,12 @@ public class DLFileRankPersistenceImpl
 			},
 			new String[] {"companyId", "userId", "fileEntryId"}, false);
 
-		DLFileRankUtil.setPersistence(this);
+		_setDLFileRankUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		DLFileRankUtil.setPersistence(null);
+		_setDLFileRankUtilPersistence(null);
 
 		entityCache.removeCache(DLFileRankImpl.class.getName());
 
@@ -3135,6 +3136,21 @@ public class DLFileRankPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setDLFileRankUtilPersistence(
+		DLFileRankPersistence dlFileRankPersistence) {
+
+		try {
+			Field field = DLFileRankUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, dlFileRankPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

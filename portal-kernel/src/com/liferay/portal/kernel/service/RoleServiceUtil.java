@@ -119,16 +119,6 @@ public class RoleServiceUtil {
 			teamGroupId, start, end);
 	}
 
-	public static List<Role> getGroupRolesAndTeamRoles(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId, int start, int end) {
-
-		return getService().getGroupRolesAndTeamRoles(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId, start, end);
-	}
-
 	public static int getGroupRolesAndTeamRolesCount(
 		long companyId, String keywords, List<String> excludedNames,
 		int[] types, long excludedTeamRoleId, long teamGroupId) {
@@ -136,16 +126,6 @@ public class RoleServiceUtil {
 		return getService().getGroupRolesAndTeamRolesCount(
 			companyId, keywords, excludedNames, types, excludedTeamRoleId,
 			teamGroupId);
-	}
-
-	public static int getGroupRolesAndTeamRolesCount(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId) {
-
-		return getService().getGroupRolesAndTeamRolesCount(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId);
 	}
 
 	/**
@@ -341,10 +321,6 @@ public class RoleServiceUtil {
 
 	public static RoleService getService() {
 		return _service;
-	}
-
-	public static void setService(RoleService service) {
-		_service = service;
 	}
 
 	private static volatile RoleService _service;

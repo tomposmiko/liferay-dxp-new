@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
-import com.liferay.commerce.product.exception.DuplicateCPInstanceExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPInstanceException;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CPInstanceTable;
@@ -52,6 +51,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -6802,35 +6802,6 @@ public class CPInstancePersistenceImpl
 			cpInstance.setUuid(uuid);
 		}
 
-		if (Validator.isNull(cpInstance.getExternalReferenceCode())) {
-			cpInstance.setExternalReferenceCode(cpInstance.getUuid());
-		}
-		else {
-			CPInstance ercCPInstance = fetchByC_ERC(
-				cpInstance.getCompanyId(),
-				cpInstance.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCPInstance != null) {
-					throw new DuplicateCPInstanceExternalReferenceCodeException(
-						"Duplicate cp instance with external reference code " +
-							cpInstance.getExternalReferenceCode() +
-								" and company " + cpInstance.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCPInstance != null) &&
-					(cpInstance.getCPInstanceId() !=
-						ercCPInstance.getCPInstanceId())) {
-
-					throw new DuplicateCPInstanceExternalReferenceCodeException(
-						"Duplicate cp instance with external reference code " +
-							cpInstance.getExternalReferenceCode() +
-								" and company " + cpInstance.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -7389,11 +7360,11 @@ public class CPInstancePersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CPInstanceUtil.setPersistence(this);
+		_setCPInstanceUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CPInstanceUtil.setPersistence(null);
+		_setCPInstanceUtilPersistence(null);
 
 		entityCache.removeCache(CPInstanceImpl.class.getName());
 
@@ -7403,6 +7374,21 @@ public class CPInstancePersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCPInstanceUtilPersistence(
+		CPInstancePersistence cpInstancePersistence) {
+
+		try {
+			Field field = CPInstanceUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, cpInstancePersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

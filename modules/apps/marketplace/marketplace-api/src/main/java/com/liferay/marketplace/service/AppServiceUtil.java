@@ -65,10 +65,6 @@ public class AppServiceUtil {
 		return _service;
 	}
 
-	public static void setService(AppService service) {
-		_service = service;
-	}
-
 	private static volatile AppService _service;
 
 }

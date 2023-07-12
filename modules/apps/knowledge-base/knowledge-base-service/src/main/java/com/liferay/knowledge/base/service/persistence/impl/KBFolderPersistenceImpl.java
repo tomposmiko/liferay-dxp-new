@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -4204,12 +4205,12 @@ public class KBFolderPersistenceImpl
 			},
 			new String[] {"groupId", "parentKBFolderId", "urlTitle"}, false);
 
-		KBFolderUtil.setPersistence(this);
+		_setKBFolderUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		KBFolderUtil.setPersistence(null);
+		_setKBFolderUtilPersistence(null);
 
 		entityCache.removeCache(KBFolderImpl.class.getName());
 
@@ -4219,6 +4220,21 @@ public class KBFolderPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setKBFolderUtilPersistence(
+		KBFolderPersistence kbFolderPersistence) {
+
+		try {
+			Field field = KBFolderUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, kbFolderPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

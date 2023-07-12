@@ -91,7 +91,7 @@ public class Catalog implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
-	@Schema(example = "USD")
+	@Schema
 	public String getCurrencyCode() {
 		return currencyCode;
 	}
@@ -119,7 +119,7 @@ public class Catalog implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String currencyCode;
 
-	@Schema(example = "en_US")
+	@Schema
 	public String getDefaultLanguageId() {
 		return defaultLanguageId;
 	}
@@ -147,7 +147,7 @@ public class Catalog implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String defaultLanguageId;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -176,7 +176,7 @@ public class Catalog implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -229,7 +229,7 @@ public class Catalog implements Serializable {
 	@NotEmpty
 	protected String name;
 
-	@Schema(example = "false")
+	@Schema
 	public Boolean getSystem() {
 		return system;
 	}

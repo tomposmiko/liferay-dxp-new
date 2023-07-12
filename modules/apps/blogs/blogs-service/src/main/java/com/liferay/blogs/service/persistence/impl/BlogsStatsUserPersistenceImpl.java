@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -3585,12 +3586,12 @@ public class BlogsStatsUserPersistenceImpl
 			new String[] {Long.class.getName(), Date.class.getName()},
 			new String[] {"userId", "lastPostDate"}, false);
 
-		BlogsStatsUserUtil.setPersistence(this);
+		_setBlogsStatsUserUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		BlogsStatsUserUtil.setPersistence(null);
+		_setBlogsStatsUserUtilPersistence(null);
 
 		entityCache.removeCache(BlogsStatsUserImpl.class.getName());
 
@@ -3600,6 +3601,22 @@ public class BlogsStatsUserPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setBlogsStatsUserUtilPersistence(
+		BlogsStatsUserPersistence blogsStatsUserPersistence) {
+
+		try {
+			Field field = BlogsStatsUserUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, blogsStatsUserPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

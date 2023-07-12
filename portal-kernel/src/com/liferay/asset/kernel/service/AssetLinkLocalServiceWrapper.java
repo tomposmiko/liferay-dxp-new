@@ -17,7 +17,6 @@ package com.liferay.asset.kernel.service;
 import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
@@ -539,11 +538,6 @@ public class AssetLinkLocalServiceWrapper
 
 		_assetLinkLocalService.updateLinks(
 			userId, entryId, linkEntryIds, typeId);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _assetLinkLocalService.getBasePersistence();
 	}
 
 	@Override

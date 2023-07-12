@@ -15,7 +15,6 @@ import ClayLink from '@clayui/link';
 import ClayModal, {useModal} from '@clayui/modal';
 import React, {useState} from 'react';
 
-import {COPY_BUTTON_CSS_CLASS} from '../utils/constants';
 import {openSuccessToast} from '../utils/toasts';
 import CodeMirrorEditor from './CodeMirrorEditor';
 
@@ -29,7 +28,7 @@ const PreviewModal = ({body, children, size = 'md', title}) => {
 		<>
 			{visible && (
 				<ClayModal
-					className="sxp-preview-modal-root"
+					className="preview-modal"
 					observer={observer}
 					size={size}
 				>
@@ -55,15 +54,22 @@ export function PreviewModalWithCopyDownload({
 	title,
 	type = 'application/json',
 }) {
+	const _handleCopyToClipboard = () => {
+		navigator.clipboard.writeText(text);
+
+		openSuccessToast({
+			message: Liferay.Language.get('copied-to-clipboard'),
+		});
+	};
+
 	return (
 		<PreviewModal
 			body={
 				<>
 					<ClayButton.Group spaced>
 						<ClayButton
-							className={COPY_BUTTON_CSS_CLASS}
-							data-clipboard-text={text}
 							displayType="secondary"
+							onClick={_handleCopyToClipboard}
 							small
 						>
 							<span className="inline-item inline-item-before">

@@ -457,10 +457,6 @@ public class KBFolderLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(KBFolderLocalService service) {
-		_service = service;
-	}
-
 	private static volatile KBFolderLocalService _service;
 
 }

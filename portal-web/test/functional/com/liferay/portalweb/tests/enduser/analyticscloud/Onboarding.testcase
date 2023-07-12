@@ -21,7 +21,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "Feature ID: LRAC-8720 | Automation ID: LRAC-10622 | Test Summary: Modal is displayed on first access to a new workspace"
-	@priority = 5
+	@priority = "5"
 	test ModalDisplayedWhenFirstAccessToWorkspace {
 		var supportedFPVersionList = "DXP 7.3 Fix Pack 1,DXP 7.2 Fix Pack 11,DXP 7.1 Fix Pack 22,DXP 7.0 Fix Pack 98";
 
@@ -55,7 +55,7 @@ definition {
 			}
 
 			task ("Check fix pack versions") {
-				for (var key_version : list ${versionList}) {
+				for (var key_version : list "${versionList}") {
 					AssertElementPresent(locator1 = "ACSettings#FIX_PACK_DROPDOWN");
 				}
 			}
@@ -82,13 +82,13 @@ definition {
 		}
 
 		task ("Copy the token from AC") {
-			var token = selenium.getElementValue("ACSettings#TOKEN_INPUT_FIELD");
+			Copy(locator1 = "ACSettings#TOKEN_INPUT_FIELD");
 		}
 
 		task ("Go to DXP and connect the DXP to AC") {
 			ACUtils.launchDXP();
 
-			ACDXPSettings.connectDXPtoAnalyticsCloud(acToken = ${token});
+			ACDXPSettings.connectDXPtoAnalyticsCloud();
 		}
 
 		// Now we are going to add a new DXP Data Source and validate the info shown in the connection modal from Settings.
@@ -115,7 +115,7 @@ definition {
 			}
 
 			task ("Check fix pack versions") {
-				for (var key_version : list ${versionList}) {
+				for (var key_version : list "${versionList}") {
 					AssertElementPresent(locator1 = "ACSettings#FIX_PACK_DROPDOWN");
 				}
 			}

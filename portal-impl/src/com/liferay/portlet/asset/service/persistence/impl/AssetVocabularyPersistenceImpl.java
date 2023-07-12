@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.asset.service.persistence.impl;
 
-import com.liferay.asset.kernel.exception.DuplicateAssetVocabularyExternalReferenceCodeException;
 import com.liferay.asset.kernel.exception.NoSuchVocabularyException;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyTable;
@@ -60,6 +59,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -2485,7 +2485,7 @@ public class AssetVocabularyPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetVocabularyModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of asset vocabularies
 	 * @param end the upper bound of the range of asset vocabularies (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5745,8 +5745,8 @@ public class AssetVocabularyPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetVocabularyModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
-	 * @param visibilityTypes the visibility types
+	 * @param groupId the group ID
+	 * @param visibilityType the visibility type
 	 * @param start the lower bound of the range of asset vocabularies
 	 * @param end the upper bound of the range of asset vocabularies (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -6825,37 +6825,6 @@ public class AssetVocabularyPersistenceImpl
 			assetVocabulary.setUuid(uuid);
 		}
 
-		if (Validator.isNull(assetVocabulary.getExternalReferenceCode())) {
-			assetVocabulary.setExternalReferenceCode(assetVocabulary.getUuid());
-		}
-		else {
-			AssetVocabulary ercAssetVocabulary = fetchByC_ERC(
-				assetVocabulary.getCompanyId(),
-				assetVocabulary.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercAssetVocabulary != null) {
-					throw new DuplicateAssetVocabularyExternalReferenceCodeException(
-						"Duplicate asset vocabulary with external reference code " +
-							assetVocabulary.getExternalReferenceCode() +
-								" and company " +
-									assetVocabulary.getCompanyId());
-				}
-			}
-			else {
-				if ((ercAssetVocabulary != null) &&
-					(assetVocabulary.getVocabularyId() !=
-						ercAssetVocabulary.getVocabularyId())) {
-
-					throw new DuplicateAssetVocabularyExternalReferenceCodeException(
-						"Duplicate asset vocabulary with external reference code " +
-							assetVocabulary.getExternalReferenceCode() +
-								" and company " +
-									assetVocabulary.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -6978,9 +6947,7 @@ public class AssetVocabularyPersistenceImpl
 	 */
 	@Override
 	public AssetVocabulary fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				AssetVocabulary.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(AssetVocabulary.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -7571,11 +7538,11 @@ public class AssetVocabularyPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		AssetVocabularyUtil.setPersistence(this);
+		_setAssetVocabularyUtilPersistence(this);
 	}
 
 	public void destroy() {
-		AssetVocabularyUtil.setPersistence(null);
+		_setAssetVocabularyUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(AssetVocabularyImpl.class.getName());
 
@@ -7585,6 +7552,22 @@ public class AssetVocabularyPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setAssetVocabularyUtilPersistence(
+		AssetVocabularyPersistence assetVocabularyPersistence) {
+
+		try {
+			Field field = AssetVocabularyUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, assetVocabularyPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

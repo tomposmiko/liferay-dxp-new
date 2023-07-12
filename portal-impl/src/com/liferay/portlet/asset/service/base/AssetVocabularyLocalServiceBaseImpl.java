@@ -42,8 +42,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -61,6 +59,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -272,7 +272,13 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 		return assetVocabularyPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary, or <code>null</code> if a matching asset vocabulary could not be found
+	 */
 	@Override
 	public AssetVocabulary fetchAssetVocabularyByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -281,6 +287,9 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetVocabularyByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public AssetVocabulary fetchAssetVocabularyByReferenceCode(
@@ -290,7 +299,14 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary
+	 * @throws PortalException if a matching asset vocabulary could not be found
+	 */
 	@Override
 	public AssetVocabulary getAssetVocabularyByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -843,14 +859,14 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 			"com.liferay.asset.kernel.model.AssetVocabulary",
 			assetVocabularyLocalService);
 
-		AssetVocabularyLocalServiceUtil.setService(assetVocabularyLocalService);
+		_setLocalServiceUtilService(assetVocabularyLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.asset.kernel.model.AssetVocabulary");
 
-		AssetVocabularyLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -910,6 +926,23 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		AssetVocabularyLocalService assetVocabularyLocalService) {
+
+		try {
+			Field field =
+				AssetVocabularyLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, assetVocabularyLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = AssetVocabularyLocalService.class)
 	protected AssetVocabularyLocalService assetVocabularyLocalService;
 
@@ -966,9 +999,6 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 
 	@BeanReference(type = AssetCategoryFinder.class)
 	protected AssetCategoryFinder assetCategoryFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetVocabularyLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

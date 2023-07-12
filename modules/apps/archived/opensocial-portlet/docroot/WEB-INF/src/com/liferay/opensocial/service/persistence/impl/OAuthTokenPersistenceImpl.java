@@ -50,6 +50,7 @@ import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
@@ -1727,11 +1728,11 @@ public class OAuthTokenPersistenceImpl
 			},
 			false);
 
-		OAuthTokenUtil.setPersistence(this);
+		_setOAuthTokenUtilPersistence(this);
 	}
 
 	public void destroy() {
-		OAuthTokenUtil.setPersistence(null);
+		_setOAuthTokenUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(OAuthTokenImpl.class.getName());
 
@@ -1741,6 +1742,21 @@ public class OAuthTokenPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setOAuthTokenUtilPersistence(
+		OAuthTokenPersistence oAuthTokenPersistence) {
+
+		try {
+			Field field = OAuthTokenUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, oAuthTokenPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

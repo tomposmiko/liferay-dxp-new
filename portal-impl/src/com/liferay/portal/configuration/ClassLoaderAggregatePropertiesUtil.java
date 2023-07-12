@@ -44,11 +44,7 @@ public class ClassLoaderAggregatePropertiesUtil {
 			new ClassLoaderAggregateProperties(
 				classLoader, companyId, componentName);
 
-		if (!GetterUtil.getBoolean(
-				System.getProperty(
-					"class.loader.aggregate.properties.util.quiet")) &&
-			_log.isInfoEnabled()) {
-
+		if (_log.isInfoEnabled()) {
 			_log.info(
 				StringBundler.concat(
 					"Properties for ", componentName, " loaded from ",

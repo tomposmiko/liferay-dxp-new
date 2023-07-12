@@ -20,9 +20,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--RULE_PANEL-->
-
 <tr>
 	<td>RULE_PANEL_CAMPAIGN_SELECT</td>
 	<td>xpath=(//select[contains(@id,'PortletConfigurationPortlet')])[${key_rowNumber}]</td>

@@ -13,18 +13,18 @@ definition {
 
 		Type(
 			locator1 = "TextInput#REDIRECT_SOURCE_URL",
-			value1 = ${sourceURL});
+			value1 = "${sourceURL}");
 
 		Type(
 			locator1 = "TextInput#REDIRECT_DESTINATION_URL",
-			value1 = ${destinationURL});
+			value1 = "${destinationURL}");
 
 		if (isSet(checkDestinationURL)) {
 			Click(locator1 = "Button#TRY_REDIRECTION");
 
 			SelectWindow(locator1 = "title=${destinationPageName} - ${groupName} - ${portalName}");
 
-			AssertLocation(value1 = ${destinationURL});
+			AssertLocation(value1 = "${destinationURL}");
 
 			Close.closeWindow(locator1 = "title=${destinationPageName} - ${groupName} - ${portalName}");
 		}
@@ -32,40 +32,40 @@ definition {
 		if (isSet(redirectType)) {
 			Select(
 				locator1 = "Select#REDIRECT_TYPE",
-				value1 = ${redirectType});
+				value1 = "${redirectType}");
 		}
 
 		if (isSet(expirationDate)) {
 			Type.sendKeys(
 				locator1 = "TextInput#EXPIRATION_DATE",
-				value1 = ${expirationDate});
+				value1 = "${expirationDate}");
 		}
 
 		Button.click(button = "Create");
 
-		if (${redirectURLVariation} == "Null") {
+		if ("${redirectURLVariation}" == "Null") {
 			Alert.viewRequiredField();
 		}
-		else if (${sourceURLVariation} == "Duplicate") {
+		else if ("${sourceURLVariation}" == "Duplicate") {
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR",
 				value1 = "Error:There is already a redirect set for the same source URL.");
 		}
-		else if (${sourceURLVariation} == "Invalid") {
+		else if ("${sourceURLVariation}" == "Invalid") {
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR",
-				value1 = "Please enter a source URL that does not begins with a slash.");
+				value1 = "Please enter a source URL with valid characters.");
 		}
-		else if ((${destinationURLVariation} == "Space") || (${destinationURLVariation} == "RelativeURL")) {
+		else if (("${destinationURLVariation}" == "Space") || ("${destinationURLVariation}" == "RelativeURL")) {
 			AssertTextEquals.assertPartialText(
 				locator1 = "TextInput#ALERT",
 				value1 = "This URL is not supported");
 		}
-		else if (${redirectChain} == "true") {
+		else if ("${redirectChain}" == "true") {
 			Redirect.configureRedirectChain(
-				noUpdateRedirect = ${noUpdateRedirect},
-				noUpdateReferences = ${noUpdateReferences},
-				updateRedirect = ${updateRedirect});
+				noUpdateRedirect = "${noUpdateRedirect}",
+				noUpdateReferences = "${noUpdateReferences}",
+				updateRedirect = "${updateRedirect}");
 
 			Alert.viewSuccessMessage();
 		}
@@ -89,7 +89,7 @@ definition {
 
 			Redirect.gotoEntryMenuItem(
 				item = "Create Redirect",
-				sourceURL = ${ignoredURL});
+				sourceURL = "${ignoredURL}");
 		}
 		else {
 			AssertClick(
@@ -103,7 +103,7 @@ definition {
 
 			Redirect.gotoEntryMenuItem(
 				item = "Create Redirect",
-				sourceURL = ${activeIgnoreURL});
+				sourceURL = "${activeIgnoreURL}");
 		}
 
 		AssertTextEquals(
@@ -112,27 +112,27 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "TextInput#REDIRECT_SOURCE_URL",
-			value1 = ${sourceURL});
+			value1 = "${sourceURL}");
 
 		Type(
 			locator1 = "TextInput#REDIRECT_DESTINATION_URL",
-			value1 = ${destinationURL});
+			value1 = "${destinationURL}");
 
 		if (isSet(redirectType)) {
 			Select(
 				locator1 = "Select#REDIRECT_TYPE",
-				value1 = ${redirectType});
+				value1 = "${redirectType}");
 		}
 
 		if (isSet(expirationDate)) {
 			Type.sendKeys(
 				locator1 = "TextInput#EXPIRATION_DATE",
-				value1 = ${expirationDate});
+				value1 = "${expirationDate}");
 		}
 
 		Button.click(button = "Create");
 
-		Redirect.configureRedirectChain(noUpdateReferences = ${noUpdateReferences});
+		Redirect.configureRedirectChain(noUpdateReferences = "${noUpdateReferences}");
 
 		Alert.viewSuccessMessage();
 	}
@@ -149,7 +149,7 @@ definition {
 				locator1 = "Checkbox#ANY_CHECKBOX");
 		}
 
-		if (${noUpdateReferences} == "true") {
+		if ("${noUpdateReferences}" == "true") {
 			if (isSet(noUpdateRedirect)) {
 				FormFields.disableCheckbox(fieldName = "Update Redirect");
 			}
@@ -177,7 +177,7 @@ definition {
 		else {
 			Redirect.gotoEntryMenuItem(
 				item = "Delete",
-				sourceURL = ${sourceURL});
+				sourceURL = "${sourceURL}");
 		}
 
 		Alert.viewSuccessMessage();
@@ -186,7 +186,7 @@ definition {
 	macro editEntry {
 		Redirect.gotoEntryMenuItem(
 			item = "Edit",
-			sourceURL = ${sourceURL});
+			sourceURL = "${sourceURL}");
 
 		if (isSet(toolTip)) {
 			MouseOver(locator1 = "Icon#TOOLTIP");
@@ -199,19 +199,19 @@ definition {
 		if (isSet(sourceURLEdit)) {
 			Type(
 				locator1 = "TextInput#REDIRECT_SOURCE_URL",
-				value1 = ${sourceURLEdit});
+				value1 = "${sourceURLEdit}");
 		}
 
 		if (isSet(destinationURLEdit)) {
 			Type(
 				locator1 = "TextInput#REDIRECT_DESTINATION_URL",
-				value1 = ${destinationURLEdit});
+				value1 = "${destinationURLEdit}");
 		}
 
 		if (isSet(redirectTypeEdit)) {
 			Select(
 				locator1 = "Select#REDIRECT_TYPE",
-				value1 = ${redirectTypeEdit});
+				value1 = "${redirectTypeEdit}");
 		}
 
 		if (isSet(permanentEntryEdit)) {
@@ -223,17 +223,17 @@ definition {
 		if (isSet(expirationDate)) {
 			Type.sendKeys(
 				locator1 = "TextInput#EXPIRATION_DATE",
-				value1 = ${expirationDate});
+				value1 = "${expirationDate}");
 		}
 
 		Button.clickSave();
 
 		if (isSet(redirectChain)) {
 			Redirect.configureRedirectChain(
-				destinationURLEdit = ${destinationURLEdit},
-				noUpdateRedirect = ${noUpdateRedirect},
-				noUpdateReferences = ${noUpdateReferences},
-				updateRedirect = ${updateRedirect});
+				destinationURLEdit = "${destinationURLEdit}",
+				noUpdateRedirect = "${noUpdateRedirect}",
+				noUpdateReferences = "${noUpdateReferences}",
+				updateRedirect = "${updateRedirect}");
 
 			Alert.viewSuccessMessage();
 		}
@@ -241,12 +241,12 @@ definition {
 
 	macro gotoEntryMenuItem {
 		LexiconTable.clickEllipsisItem(
-			item = ${item},
-			tableEntry = ${sourceURL});
+			item = "${item}",
+			tableEntry = "${sourceURL}");
 	}
 
 	macro ignoreEntry {
-		if (${unignore} == "true") {
+		if ("${unignore}" == "true") {
 			AssertClick(
 				key_navItem = "404 URLs",
 				locator1 = "NavBar#NAV_ITEM_REDIRECTION",
@@ -256,7 +256,7 @@ definition {
 
 			MenuItem.click(menuItem = "Ignored URLs");
 
-			if (${unignoreAllEntries} == "true") {
+			if ("${unignoreAllEntries}" == "true") {
 				PortletEntry.selectAll();
 
 				Click(locator1 = "Button#UNIGNORE_REDIRECT_URLS");
@@ -264,7 +264,7 @@ definition {
 			else {
 				Redirect.gotoEntryMenuItem(
 					item = "Unignore",
-					sourceURL = ${ignoreURL});
+					sourceURL = "${ignoreURL}");
 			}
 
 			Alert.viewSuccessMessage();
@@ -279,7 +279,7 @@ definition {
 
 			MenuItem.click(menuItem = "Active URLs");
 
-			if (${ignoreAllEntries} == "true") {
+			if ("${ignoreAllEntries}" == "true") {
 				PortletEntry.selectAll();
 
 				Click(locator1 = "Button#IGNORE_REDIRECT_URLS");
@@ -287,25 +287,15 @@ definition {
 			else {
 				Redirect.gotoEntryMenuItem(
 					item = "Ignore",
-					sourceURL = ${ignoreURL});
+					sourceURL = "${ignoreURL}");
 			}
 
 			Alert.viewSuccessMessage();
 		}
 	}
 
-	macro open404URLsAdmin {
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_redirect_web_internal_portlet_RedirectPortlet&_com_liferay_redirect_web_internal_portlet_RedirectPortlet_navigation=404-urls");
-	}
-
 	macro openRedirectAdmin {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_redirect_web_internal_portlet_RedirectPortlet");
-	}
-
-	macro openToConfigInSystemSettings {
-		var baseURL = PropsUtil.get("portal.url");
-
-		Open(locator1 = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_factoryPid=com.liferay.redirect.internal.configuration.RedirectConfiguration&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_mvcRenderCommandName=%2Fconfiguration_admin%2Fedit_configuration");
 	}
 
 	macro view404URLs {
@@ -316,22 +306,22 @@ definition {
 				value1 = "404 URLs");
 		}
 
-		if (${multipleURLs} == "true") {
+		if ("${multipleURLs}" == "true") {
 			AssertTextEquals.assertPartialText(
-				key_rowEntry = ${ignoreURL},
+				key_rowEntry = "${ignoreURL}",
 				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-				value1 = ${ignoreURL});
+				value1 = "${ignoreURL}");
 		}
 		else {
 			AssertTextEquals.assertPartialText(
-				key_rowEntry = ${ignoreURL},
+				key_rowEntry = "${ignoreURL}",
 				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-				value1 = ${ignoreURL});
+				value1 = "${ignoreURL}");
 
 			AssertTextEquals.assertPartialText(
-				key_rowEntry = ${requestNumber},
+				key_rowEntry = "${requestNumber}",
 				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-				value1 = ${requestNumber});
+				value1 = "${requestNumber}");
 		}
 	}
 
@@ -345,19 +335,6 @@ definition {
 			value1 = "All your pages are connected or redirected.");
 	}
 
-	macro view404URLsTab {
-		if (isSet(disabled404Tracking)) {
-			AssertElementNotPresent(
-				key_navItem = "404 URLs",
-				locator1 = "NavBar#NAV_ITEM_REDIRECTION");
-		}
-		else {
-			AssertElementPresent(
-				key_navItem = "404 URLs",
-				locator1 = "NavBar#NAV_ITEM_REDIRECTION");
-		}
-	}
-
 	macro viewDefault {
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_INFO_TAGLIB",
@@ -366,37 +343,37 @@ definition {
 
 	macro viewEntry {
 		AssertTextEquals.assertPartialText(
-			key_rowEntry = ${sourceURL},
+			key_rowEntry = "${sourceURL}",
 			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-			value1 = ${sourceURL});
+			value1 = "${sourceURL}");
 
 		AssertTextEquals.assertPartialText(
-			key_rowEntry = ${destinationURL},
+			key_rowEntry = "${destinationURL}",
 			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-			value1 = ${destinationURL});
+			value1 = "${destinationURL}");
 
 		if (isSet(redirectType)) {
 			AssertTextEquals(
-				key_rowEntry = ${redirectType},
+				key_rowEntry = "${redirectType}",
 				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-				value1 = ${redirectType});
+				value1 = "${redirectType}");
 		}
 
 		if (isSet(expirationDate)) {
 			AssertTextEquals(
-				key_rowEntry = ${expirationDate},
+				key_rowEntry = "${expirationDate}",
 				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-				value1 = ${expirationDate});
+				value1 = "${expirationDate}");
 		}
 	}
 
 	macro viewEntryFloatingURL {
 		MouseOver(
-			key_rowEntry = ${redirectURL},
+			key_rowEntry = "${redirectURL}",
 			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME");
 
 		AssertElementPresent(
-			key_redirectURL = ${redirectURL},
+			key_redirectURL = "${redirectURL}",
 			locator1 = "Redirect#FLOATING_TOOLTIP_URL");
 	}
 
@@ -429,23 +406,23 @@ definition {
 
 	macro viewOrderedURLs {
 		AssertTextEquals(
-			key_rowNumber = 1,
+			key_rowNumber = "1",
 			locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER_TD_3",
-			value1 = ${entry1});
+			value1 = "${entry1}");
 
 		AssertTextEquals(
-			key_rowNumber = 2,
+			key_rowNumber = "2",
 			locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER_TD_3",
-			value1 = ${entry2});
+			value1 = "${entry2}");
 	}
 
 	macro viewResultEntryTitle {
-		Search.searchCP(searchTerm = ${searchTerm});
+		Search.searchCP(searchTerm = "${searchTerm}");
 
 		AssertTextEquals(
-			key_rowEntry = ${searchEntryTitle},
+			key_rowEntry = "${searchEntryTitle}",
 			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-			value1 = ${searchEntryTitle});
+			value1 = "${searchEntryTitle}");
 	}
 
 }

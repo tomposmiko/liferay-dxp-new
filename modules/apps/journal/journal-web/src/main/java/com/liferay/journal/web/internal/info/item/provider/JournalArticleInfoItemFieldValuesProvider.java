@@ -161,8 +161,6 @@ public class JournalArticleInfoItemFieldValuesProvider
 				InfoField infoField = InfoField.builder(
 				).infoFieldType(
 					TextInfoFieldType.INSTANCE
-				).namespace(
-					StringPool.BLANK
 				).name(
 					fieldName
 				).labelInfoLocalizedValue(
@@ -343,7 +341,7 @@ public class JournalArticleInfoItemFieldValuesProvider
 			}
 
 			User lastEditorUser = _userLocalService.fetchUser(
-				journalArticle.getStatusByUserId());
+				journalArticle.getUserId());
 
 			if (lastEditorUser != null) {
 				journalArticleFieldValues.add(

@@ -242,61 +242,55 @@ public class AssetLinkModelImpl
 
 	private static final Map<String, Function<AssetLink, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<AssetLink, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AssetLink, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", AssetLink::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", AssetLink::getCtCollectionId);
-		attributeGetterFunctions.put("linkId", AssetLink::getLinkId);
-		attributeGetterFunctions.put("companyId", AssetLink::getCompanyId);
-		attributeGetterFunctions.put("userId", AssetLink::getUserId);
-		attributeGetterFunctions.put("userName", AssetLink::getUserName);
-		attributeGetterFunctions.put("createDate", AssetLink::getCreateDate);
-		attributeGetterFunctions.put("entryId1", AssetLink::getEntryId1);
-		attributeGetterFunctions.put("entryId2", AssetLink::getEntryId2);
-		attributeGetterFunctions.put("type", AssetLink::getType);
-		attributeGetterFunctions.put("weight", AssetLink::getWeight);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<AssetLink, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AssetLink, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetLink, Object>>();
 		Map<String, BiConsumer<AssetLink, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AssetLink, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", AssetLink::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AssetLink, Long>)AssetLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetLink::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<AssetLink, Long>)AssetLink::setCtCollectionId);
+		attributeGetterFunctions.put("linkId", AssetLink::getLinkId);
 		attributeSetterBiConsumers.put(
 			"linkId", (BiConsumer<AssetLink, Long>)AssetLink::setLinkId);
+		attributeGetterFunctions.put("companyId", AssetLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<AssetLink, Long>)AssetLink::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetLink::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<AssetLink, Long>)AssetLink::setUserId);
+		attributeGetterFunctions.put("userName", AssetLink::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<AssetLink, String>)AssetLink::setUserName);
+		attributeGetterFunctions.put("createDate", AssetLink::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AssetLink, Date>)AssetLink::setCreateDate);
+		attributeGetterFunctions.put("entryId1", AssetLink::getEntryId1);
 		attributeSetterBiConsumers.put(
 			"entryId1", (BiConsumer<AssetLink, Long>)AssetLink::setEntryId1);
+		attributeGetterFunctions.put("entryId2", AssetLink::getEntryId2);
 		attributeSetterBiConsumers.put(
 			"entryId2", (BiConsumer<AssetLink, Long>)AssetLink::setEntryId2);
+		attributeGetterFunctions.put("type", AssetLink::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<AssetLink, Integer>)AssetLink::setType);
+		attributeGetterFunctions.put("weight", AssetLink::getWeight);
 		attributeSetterBiConsumers.put(
 			"weight", (BiConsumer<AssetLink, Integer>)AssetLink::setWeight);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

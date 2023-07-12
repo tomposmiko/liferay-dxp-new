@@ -115,13 +115,13 @@ PortletURL portletURL = cpDefinitionItemSelectorViewDisplayContext.getPortletURL
 				cssClass="table-cell-content"
 				name="type"
 			>
-				<%= HtmlUtil.escapeAttribute(cpType.getLabel(locale)) %>
+				<%= cpType.getLabel(locale) %>
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-content"
 				name="sku"
-				value="<%= HtmlUtil.escape(cpDefinitionItemSelectorViewDisplayContext.getSku(cpDefinition, locale)) %>"
+				value="<%= cpDefinitionItemSelectorViewDisplayContext.getSku(cpDefinition, locale) %>"
 			/>
 
 			<liferay-ui:search-container-column-date

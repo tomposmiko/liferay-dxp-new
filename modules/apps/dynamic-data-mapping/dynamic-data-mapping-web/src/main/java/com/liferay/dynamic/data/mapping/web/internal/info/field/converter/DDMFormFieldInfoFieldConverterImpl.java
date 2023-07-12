@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.web.internal.info.field.converter;
 import com.liferay.dynamic.data.mapping.info.field.converter.DDMFormFieldInfoFieldConverter;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.BooleanInfoFieldType;
@@ -52,8 +51,6 @@ public class DDMFormFieldInfoFieldConverterImpl
 			InfoField.builder(
 			).infoFieldType(
 				_getInfoFieldType(ddmFormField)
-			).namespace(
-				DDMStructure.class.getSimpleName()
 			).name(
 				ddmFormField.getName()
 			)

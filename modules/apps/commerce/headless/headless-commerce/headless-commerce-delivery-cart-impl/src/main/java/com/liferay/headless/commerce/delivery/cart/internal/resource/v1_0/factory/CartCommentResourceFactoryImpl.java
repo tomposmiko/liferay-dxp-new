@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.delivery.cart.internal.resource.v1_0.factory;
 
-import com.liferay.headless.commerce.delivery.cart.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.commerce.delivery.cart.resource.v1_0.CartCommentResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Andrea Sbarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-commerce-delivery-cart/v1.0/CartComment",
-	service = CartCommentResource.Factory.class
-)
+@Component(immediate = true, service = CartCommentResource.Factory.class)
 @Generated("")
 public class CartCommentResourceFactoryImpl
 	implements CartCommentResource.Factory {
@@ -138,6 +135,16 @@ public class CartCommentResourceFactoryImpl
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		CartCommentResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		CartCommentResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, CartCommentResource>
 		_getProxyProviderFunction() {
 
@@ -186,7 +193,7 @@ public class CartCommentResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		CartCommentResource cartCommentResource =
@@ -210,7 +217,6 @@ public class CartCommentResourceFactoryImpl
 		cartCommentResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		cartCommentResource.setRoleLocalService(_roleLocalService);
-		cartCommentResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(cartCommentResource, arguments);
@@ -251,6 +257,9 @@ public class CartCommentResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -259,9 +268,6 @@ public class CartCommentResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

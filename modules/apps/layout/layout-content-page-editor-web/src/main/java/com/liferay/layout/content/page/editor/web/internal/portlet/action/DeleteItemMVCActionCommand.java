@@ -74,7 +74,8 @@ public class DeleteItemMVCActionCommand
 					deletedLayoutStructureItems)) {
 
 			FragmentEntryLinkUtil.deleteFragmentEntryLink(
-				_contentPageEditorListenerTracker, fragmentEntryLinkId, plid);
+				companyId, _contentPageEditorListenerTracker,
+				fragmentEntryLinkId, plid, _portletRegistry);
 
 			deletedFragmentEntryLinkIds.add(fragmentEntryLinkId);
 		}

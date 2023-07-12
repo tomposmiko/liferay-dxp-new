@@ -295,75 +295,69 @@ public class DispatchLogModelImpl
 
 	private static final Map<String, Function<DispatchLog, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<DispatchLog, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DispatchLog, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DispatchLog::getMvccVersion);
-		attributeGetterFunctions.put(
-			"dispatchLogId", DispatchLog::getDispatchLogId);
-		attributeGetterFunctions.put("companyId", DispatchLog::getCompanyId);
-		attributeGetterFunctions.put("userId", DispatchLog::getUserId);
-		attributeGetterFunctions.put("userName", DispatchLog::getUserName);
-		attributeGetterFunctions.put("createDate", DispatchLog::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DispatchLog::getModifiedDate);
-		attributeGetterFunctions.put(
-			"dispatchTriggerId", DispatchLog::getDispatchTriggerId);
-		attributeGetterFunctions.put("endDate", DispatchLog::getEndDate);
-		attributeGetterFunctions.put("error", DispatchLog::getError);
-		attributeGetterFunctions.put("output", DispatchLog::getOutput);
-		attributeGetterFunctions.put("startDate", DispatchLog::getStartDate);
-		attributeGetterFunctions.put("status", DispatchLog::getStatus);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<DispatchLog, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DispatchLog, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DispatchLog, Object>>();
 		Map<String, BiConsumer<DispatchLog, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DispatchLog, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DispatchLog::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DispatchLog, Long>)DispatchLog::setMvccVersion);
+		attributeGetterFunctions.put(
+			"dispatchLogId", DispatchLog::getDispatchLogId);
 		attributeSetterBiConsumers.put(
 			"dispatchLogId",
 			(BiConsumer<DispatchLog, Long>)DispatchLog::setDispatchLogId);
+		attributeGetterFunctions.put("companyId", DispatchLog::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DispatchLog, Long>)DispatchLog::setCompanyId);
+		attributeGetterFunctions.put("userId", DispatchLog::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<DispatchLog, Long>)DispatchLog::setUserId);
+		attributeGetterFunctions.put("userName", DispatchLog::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DispatchLog, String>)DispatchLog::setUserName);
+		attributeGetterFunctions.put("createDate", DispatchLog::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DispatchLog, Date>)DispatchLog::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DispatchLog::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DispatchLog, Date>)DispatchLog::setModifiedDate);
+		attributeGetterFunctions.put(
+			"dispatchTriggerId", DispatchLog::getDispatchTriggerId);
 		attributeSetterBiConsumers.put(
 			"dispatchTriggerId",
 			(BiConsumer<DispatchLog, Long>)DispatchLog::setDispatchTriggerId);
+		attributeGetterFunctions.put("endDate", DispatchLog::getEndDate);
 		attributeSetterBiConsumers.put(
 			"endDate", (BiConsumer<DispatchLog, Date>)DispatchLog::setEndDate);
+		attributeGetterFunctions.put("error", DispatchLog::getError);
 		attributeSetterBiConsumers.put(
 			"error", (BiConsumer<DispatchLog, String>)DispatchLog::setError);
+		attributeGetterFunctions.put("output", DispatchLog::getOutput);
 		attributeSetterBiConsumers.put(
 			"output", (BiConsumer<DispatchLog, String>)DispatchLog::setOutput);
+		attributeGetterFunctions.put("startDate", DispatchLog::getStartDate);
 		attributeSetterBiConsumers.put(
 			"startDate",
 			(BiConsumer<DispatchLog, Date>)DispatchLog::setStartDate);
+		attributeGetterFunctions.put("status", DispatchLog::getStatus);
 		attributeSetterBiConsumers.put(
 			"status", (BiConsumer<DispatchLog, Integer>)DispatchLog::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

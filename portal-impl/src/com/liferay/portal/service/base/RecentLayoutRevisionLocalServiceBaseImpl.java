@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.RecentLayoutRevision;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -47,6 +45,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -514,15 +514,14 @@ public abstract class RecentLayoutRevisionLocalServiceBaseImpl
 			"com.liferay.portal.kernel.model.RecentLayoutRevision",
 			recentLayoutRevisionLocalService);
 
-		RecentLayoutRevisionLocalServiceUtil.setService(
-			recentLayoutRevisionLocalService);
+		_setLocalServiceUtilService(recentLayoutRevisionLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.RecentLayoutRevision");
 
-		RecentLayoutRevisionLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -568,6 +567,23 @@ public abstract class RecentLayoutRevisionLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		RecentLayoutRevisionLocalService recentLayoutRevisionLocalService) {
+
+		try {
+			Field field =
+				RecentLayoutRevisionLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, recentLayoutRevisionLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = RecentLayoutRevisionLocalService.class)
 	protected RecentLayoutRevisionLocalService recentLayoutRevisionLocalService;
 
@@ -588,9 +604,6 @@ public abstract class RecentLayoutRevisionLocalServiceBaseImpl
 
 	@BeanReference(type = LayoutRevisionPersistence.class)
 	protected LayoutRevisionPersistence layoutRevisionPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RecentLayoutRevisionLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

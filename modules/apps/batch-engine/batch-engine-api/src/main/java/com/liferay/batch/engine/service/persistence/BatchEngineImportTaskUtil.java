@@ -813,12 +813,6 @@ public class BatchEngineImportTaskUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		BatchEngineImportTaskPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile BatchEngineImportTaskPersistence _persistence;
 
 }

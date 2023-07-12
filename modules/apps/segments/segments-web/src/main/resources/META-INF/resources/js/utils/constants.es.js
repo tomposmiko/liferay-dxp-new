@@ -30,6 +30,8 @@ export const NOT_OPERATORS = {
 	NOT_EQ: 'not-eq',
 };
 
+export const GROUP = 'GROUP';
+
 export const RELATIONAL_OPERATORS = {
 	EQ: 'eq',
 	GE: 'ge',
@@ -135,11 +137,11 @@ export const SUPPORTED_PROPERTY_TYPES = {
 
 export const BOOLEAN_OPTIONS = [
 	{
-		label: Liferay.Language.get('true'),
+		label: 'TRUE',
 		value: 'true',
 	},
 	{
-		label: Liferay.Language.get('false'),
+		label: 'FALSE',
 		value: 'false',
 	},
 ];

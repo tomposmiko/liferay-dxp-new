@@ -63,10 +63,6 @@ public class ERAssetVocabularyLocalServiceUtil {
 		return _service;
 	}
 
-	public static void setService(ERAssetVocabularyLocalService service) {
-		_service = service;
-	}
-
 	private static volatile ERAssetVocabularyLocalService _service;
 
 }

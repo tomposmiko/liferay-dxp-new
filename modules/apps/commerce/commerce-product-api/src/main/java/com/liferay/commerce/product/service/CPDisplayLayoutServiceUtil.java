@@ -108,10 +108,6 @@ public class CPDisplayLayoutServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CPDisplayLayoutService service) {
-		_service = service;
-	}
-
 	private static volatile CPDisplayLayoutService _service;
 
 }

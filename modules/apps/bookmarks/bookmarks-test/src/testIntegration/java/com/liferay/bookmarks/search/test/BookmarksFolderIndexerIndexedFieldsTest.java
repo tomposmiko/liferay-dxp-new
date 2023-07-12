@@ -136,8 +136,6 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 					BookmarksFolder.class
 				).queryString(
 					searchTerm
-				).fetchSourceIncludes(
-					new String[] {"*_sortable"}
 				).build()));
 	}
 

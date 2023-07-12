@@ -46,13 +46,6 @@ public class CTProcessServiceUtil {
 			companyId, userId, keywords, status, start, end, orderByComparator);
 	}
 
-	public static int getCTProcessesCount(
-		long companyId, long userId, String keywords, int status) {
-
-		return getService().getCTProcessesCount(
-			companyId, userId, keywords, status);
-	}
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -64,10 +57,6 @@ public class CTProcessServiceUtil {
 
 	public static CTProcessService getService() {
 		return _service;
-	}
-
-	public static void setService(CTProcessService service) {
-		_service = service;
 	}
 
 	private static volatile CTProcessService _service;

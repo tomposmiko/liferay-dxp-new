@@ -38,8 +38,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -55,6 +53,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -267,7 +267,13 @@ public abstract class CommerceInventoryWarehouseItemLocalServiceBaseImpl
 			commerceInventoryWarehouseItemId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse item with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse item's external reference code
+	 * @return the matching commerce inventory warehouse item, or <code>null</code> if a matching commerce inventory warehouse item could not be found
+	 */
 	@Override
 	public CommerceInventoryWarehouseItem
 		fetchCommerceInventoryWarehouseItemByExternalReferenceCode(
@@ -277,6 +283,9 @@ public abstract class CommerceInventoryWarehouseItemLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceInventoryWarehouseItemByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CommerceInventoryWarehouseItem
@@ -287,7 +296,14 @@ public abstract class CommerceInventoryWarehouseItemLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse item with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse item's external reference code
+	 * @return the matching commerce inventory warehouse item
+	 * @throws PortalException if a matching commerce inventory warehouse item could not be found
+	 */
 	@Override
 	public CommerceInventoryWarehouseItem
 			getCommerceInventoryWarehouseItemByExternalReferenceCode(
@@ -878,15 +894,14 @@ public abstract class CommerceInventoryWarehouseItemLocalServiceBaseImpl
 			"com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem",
 			commerceInventoryWarehouseItemLocalService);
 
-		CommerceInventoryWarehouseItemLocalServiceUtil.setService(
-			commerceInventoryWarehouseItemLocalService);
+		_setLocalServiceUtilService(commerceInventoryWarehouseItemLocalService);
 	}
 
 	public void destroy() {
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem");
 
-		CommerceInventoryWarehouseItemLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -929,6 +944,24 @@ public abstract class CommerceInventoryWarehouseItemLocalServiceBaseImpl
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
+		}
+	}
+
+	private void _setLocalServiceUtilService(
+		CommerceInventoryWarehouseItemLocalService
+			commerceInventoryWarehouseItemLocalService) {
+
+		try {
+			Field field =
+				CommerceInventoryWarehouseItemLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, commerceInventoryWarehouseItemLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 
@@ -1021,9 +1054,6 @@ public abstract class CommerceInventoryWarehouseItemLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceInventoryWarehouseItemLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

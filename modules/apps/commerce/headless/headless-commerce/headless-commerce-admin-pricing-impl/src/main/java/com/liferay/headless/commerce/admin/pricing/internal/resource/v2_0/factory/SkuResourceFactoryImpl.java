@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.resource.v2_0.factory;
 
-import com.liferay.headless.commerce.admin.pricing.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.SkuResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Zoltán Takács
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-commerce-admin-pricing/v2.0/Sku",
-	service = SkuResource.Factory.class
-)
+@Component(immediate = true, service = SkuResource.Factory.class)
 @Generated("")
 public class SkuResourceFactoryImpl implements SkuResource.Factory {
 
@@ -135,6 +132,16 @@ public class SkuResourceFactoryImpl implements SkuResource.Factory {
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		SkuResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		SkuResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, SkuResource>
 		_getProxyProviderFunction() {
 
@@ -182,7 +189,7 @@ public class SkuResourceFactoryImpl implements SkuResource.Factory {
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		SkuResource skuResource = _componentServiceObjects.getService();
@@ -204,7 +211,6 @@ public class SkuResourceFactoryImpl implements SkuResource.Factory {
 		skuResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		skuResource.setRoleLocalService(_roleLocalService);
-		skuResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(skuResource, arguments);
@@ -244,6 +250,9 @@ public class SkuResourceFactoryImpl implements SkuResource.Factory {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -252,9 +261,6 @@ public class SkuResourceFactoryImpl implements SkuResource.Factory {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

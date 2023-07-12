@@ -113,7 +113,6 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 				getSelectedItems: getSelectedItems,
 				inputPlaceholder:
 					'<%= LanguageUtil.get(request, "find-or-create-an-option") %>',
-				itemCreatedMessage: '<%= LanguageUtil.get(request, "option-created") %>',
 				itemSelectedMessage: '<%= LanguageUtil.get(request, "option-selected") %>',
 				itemsKey: 'id',
 				linkedDatasetsId: [
@@ -140,21 +139,19 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 			elementClasses="mt-4"
 			title='<%= LanguageUtil.get(request, "options") %>'
 		>
-			<aui:form action="<%= cpDefinitionOptionRelDisplayContext.getPortletURL() %>" method="post" name="fm">
-				<clay:data-set-display
-					contextParams='<%=
-						HashMapBuilder.<String, String>put(
-							"cpDefinitionId", String.valueOf(cpDefinitionOptionRelDisplayContext.getCPDefinitionId())
-						).build()
-					%>'
-					dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>"
-					id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>"
-					itemsPerPage="<%= 10 %>"
-					namespace="<%= liferayPortletResponse.getNamespace() %>"
-					pageNumber="<%= 1 %>"
-					portletURL="<%= currentURLObj %>"
-				/>
-			</aui:form>
+			<clay:data-set-display
+				contextParams='<%=
+					HashMapBuilder.<String, String>put(
+						"cpDefinitionId", String.valueOf(cpDefinitionOptionRelDisplayContext.getCPDefinitionId())
+					).build()
+				%>'
+				dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>"
+				id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>"
+				itemsPerPage="<%= 10 %>"
+				namespace="<%= liferayPortletResponse.getNamespace() %>"
+				pageNumber="<%= 1 %>"
+				portletURL="<%= currentURLObj %>"
+			/>
 		</commerce-ui:panel>
 	</div>
 </c:if>

@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.pricing.service.persistence.impl;
 
-import com.liferay.commerce.pricing.exception.DuplicateCommercePriceModifierExternalReferenceCodeException;
 import com.liferay.commerce.pricing.exception.NoSuchPriceModifierException;
 import com.liferay.commerce.pricing.model.CommercePriceModifier;
 import com.liferay.commerce.pricing.model.CommercePriceModifierTable;
@@ -53,6 +52,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -4798,7 +4798,7 @@ public class CommercePriceModifierPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommercePriceModifierModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param companyId the company ID
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce price modifiers
@@ -5659,7 +5659,7 @@ public class CommercePriceModifierPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommercePriceModifierModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param companyId the company ID
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce price modifiers
@@ -6539,41 +6539,6 @@ public class CommercePriceModifierPersistenceImpl
 			commercePriceModifier.setUuid(uuid);
 		}
 
-		if (Validator.isNull(
-				commercePriceModifier.getExternalReferenceCode())) {
-
-			commercePriceModifier.setExternalReferenceCode(
-				commercePriceModifier.getUuid());
-		}
-		else {
-			CommercePriceModifier ercCommercePriceModifier = fetchByC_ERC(
-				commercePriceModifier.getCompanyId(),
-				commercePriceModifier.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommercePriceModifier != null) {
-					throw new DuplicateCommercePriceModifierExternalReferenceCodeException(
-						"Duplicate commerce price modifier with external reference code " +
-							commercePriceModifier.getExternalReferenceCode() +
-								" and company " +
-									commercePriceModifier.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommercePriceModifier != null) &&
-					(commercePriceModifier.getCommercePriceModifierId() !=
-						ercCommercePriceModifier.
-							getCommercePriceModifierId())) {
-
-					throw new DuplicateCommercePriceModifierExternalReferenceCodeException(
-						"Duplicate commerce price modifier with external reference code " +
-							commercePriceModifier.getExternalReferenceCode() +
-								" and company " +
-									commercePriceModifier.getCompanyId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -7116,11 +7081,11 @@ public class CommercePriceModifierPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
 
-		CommercePriceModifierUtil.setPersistence(this);
+		_setCommercePriceModifierUtilPersistence(this);
 	}
 
 	public void destroy() {
-		CommercePriceModifierUtil.setPersistence(null);
+		_setCommercePriceModifierUtilPersistence(null);
 
 		entityCache.removeCache(CommercePriceModifierImpl.class.getName());
 
@@ -7130,6 +7095,22 @@ public class CommercePriceModifierPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCommercePriceModifierUtilPersistence(
+		CommercePriceModifierPersistence commercePriceModifierPersistence) {
+
+		try {
+			Field field = CommercePriceModifierUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, commercePriceModifierPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

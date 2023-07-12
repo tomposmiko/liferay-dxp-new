@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		ERAssetCategoryLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		erAssetCategoryLocalService = (ERAssetCategoryLocalService)aopProxy;
 
-		ERAssetCategoryLocalServiceUtil.setService(erAssetCategoryLocalService);
+		_setLocalServiceUtilService(erAssetCategoryLocalService);
 	}
 
 	/**
@@ -108,6 +108,23 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		ERAssetCategoryLocalService erAssetCategoryLocalService) {
+
+		try {
+			Field field =
+				ERAssetCategoryLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, erAssetCategoryLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected ERAssetCategoryLocalService erAssetCategoryLocalService;
 
 	@Reference
@@ -121,8 +138,5 @@ public abstract class ERAssetCategoryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.asset.kernel.service.AssetCategoryLocalService
 		assetCategoryLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ERAssetCategoryLocalServiceBaseImpl.class);
 
 }

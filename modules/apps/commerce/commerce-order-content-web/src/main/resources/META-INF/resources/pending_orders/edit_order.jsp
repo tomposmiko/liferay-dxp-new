@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+CommerceOrderContentDisplayContext commerceOrderContentDisplayContext = (CommerceOrderContentDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+
 CommerceOrder commerceOrder = commerceOrderContentDisplayContext.getCommerceOrder();
 
 long billingCommerceAddressId = BeanParamUtil.getLong(commerceOrder, request, "billingAddressId");
@@ -79,7 +81,7 @@ List<CommerceAddress> billingAddresses = commerceOrderContentDisplayContext.getB
 		for (CommerceOrderValidatorResult commerceOrderValidatorResult : commerceOrderValidatorResults) {
 		%>
 
-			<liferay-ui:message key="<%= HtmlUtil.escape(commerceOrderValidatorResult.getLocalizedMessage()) %>" />
+			<liferay-ui:message key="<%= commerceOrderValidatorResult.getLocalizedMessage() %>" />
 
 		<%
 		}
@@ -165,7 +167,7 @@ List<CommerceAddress> billingAddresses = commerceOrderContentDisplayContext.getB
 											<aui:input cssClass="commerce-input" inlineField="<%= true %>" label="" name="purchaseOrderNumber" wrappedField="<%= false %>" />
 										</c:when>
 										<c:otherwise>
-											<%= HtmlUtil.escape(commerceOrder.getPurchaseOrderNumber()) %>
+											<%= commerceOrder.getPurchaseOrderNumber() %>
 										</c:otherwise>
 									</c:choose>
 								</dl>
@@ -193,7 +195,7 @@ List<CommerceAddress> billingAddresses = commerceOrderContentDisplayContext.getB
 											for (CommerceAddress commerceAddress : billingAddresses) {
 											%>
 
-												<aui:option label="<%= HtmlUtil.escape(commerceAddress.getName()) %>" selected="<%= billingCommerceAddressId == commerceAddress.getCommerceAddressId() %>" value="<%= commerceAddress.getCommerceAddressId() %>" />
+												<aui:option label="<%= commerceAddress.getName() %>" selected="<%= billingCommerceAddressId == commerceAddress.getCommerceAddressId() %>" value="<%= commerceAddress.getCommerceAddressId() %>" />
 
 											<%
 											}
@@ -239,7 +241,7 @@ List<CommerceAddress> billingAddresses = commerceOrderContentDisplayContext.getB
 											for (CommerceAddress commerceAddress : shippingAddresses) {
 											%>
 
-												<aui:option label="<%= HtmlUtil.escape(commerceAddress.getName()) %>" selected="<%= shippingCommerceAddressId == commerceAddress.getCommerceAddressId() %>" value="<%= commerceAddress.getCommerceAddressId() %>" />
+												<aui:option label="<%= commerceAddress.getName() %>" selected="<%= shippingCommerceAddressId == commerceAddress.getCommerceAddressId() %>" value="<%= commerceAddress.getCommerceAddressId() %>" />
 
 											<%
 											}

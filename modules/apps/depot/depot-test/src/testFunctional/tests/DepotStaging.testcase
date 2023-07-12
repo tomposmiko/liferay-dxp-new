@@ -34,7 +34,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -49,7 +49,7 @@ definition {
 	}
 
 	@description = "This ensures that OG image tag can be viewed on the remote live site when enabling remote staging."
-	@priority = 4
+	@priority = "4"
 	test ViewOGImageTagOnLiveSite {
 		property app.server.bundles.size = "1";
 		property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
@@ -58,11 +58,11 @@ definition {
 
 		Depot.remoteStagingSetUp(
 			depotName = "Test Depot Name",
-			remotePort = 9080,
+			remotePort = "9080",
 			remoteStaging = "true");
 
 		Staging.remoteStagingSetUp(
-			remotePort = 9080,
+			remotePort = "9080",
 			remoteStaging = "true",
 			siteName = "Site Name");
 
@@ -99,7 +99,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = 9080,
+			nodePort = "9080",
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 

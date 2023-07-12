@@ -14,7 +14,6 @@
 
 package com.liferay.headless.admin.user.internal.resource.v1_0.factory;
 
-import com.liferay.headless.admin.user.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.admin.user.resource.v1_0.PhoneResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-admin-user/v1.0/Phone",
-	service = PhoneResource.Factory.class
-)
+@Component(immediate = true, service = PhoneResource.Factory.class)
 @Generated("")
 public class PhoneResourceFactoryImpl implements PhoneResource.Factory {
 
@@ -137,6 +134,16 @@ public class PhoneResourceFactoryImpl implements PhoneResource.Factory {
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		PhoneResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		PhoneResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, PhoneResource>
 		_getProxyProviderFunction() {
 
@@ -184,7 +191,7 @@ public class PhoneResourceFactoryImpl implements PhoneResource.Factory {
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		PhoneResource phoneResource = _componentServiceObjects.getService();
@@ -207,7 +214,6 @@ public class PhoneResourceFactoryImpl implements PhoneResource.Factory {
 		phoneResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		phoneResource.setRoleLocalService(_roleLocalService);
-		phoneResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(phoneResource, arguments);
@@ -247,6 +253,9 @@ public class PhoneResourceFactoryImpl implements PhoneResource.Factory {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -255,9 +264,6 @@ public class PhoneResourceFactoryImpl implements PhoneResource.Factory {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

@@ -15,7 +15,6 @@
 package com.liferay.sharepoint.rest.oauth2.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link SharepointOAuth2TokenEntryLocalService}.
@@ -402,11 +401,6 @@ public class SharepointOAuth2TokenEntryLocalServiceWrapper
 
 		return _sharepointOAuth2TokenEntryLocalService.
 			updateSharepointOAuth2TokenEntry(sharepointOAuth2TokenEntry);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _sharepointOAuth2TokenEntryLocalService.getBasePersistence();
 	}
 
 	@Override

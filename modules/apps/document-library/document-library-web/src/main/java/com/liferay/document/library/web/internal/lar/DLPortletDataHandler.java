@@ -26,7 +26,6 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
-import com.liferay.exportimport.kernel.lar.PortletDataHandlerChoice;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.model.Repository;
@@ -138,17 +137,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 				getNamespace(), "documents", true, false,
 				new PortletDataHandlerControl[] {
 					new PortletDataHandlerBoolean(
-						getNamespace(), "previews-and-thumbnails"),
-					new PortletDataHandlerBoolean(
-						getNamespace(), "referenced-content", true, false,
-						new PortletDataHandlerControl[] {
-							new PortletDataHandlerChoice(
-								getNamespace(), "referenced-content-behavior",
-								0,
-								new String[] {
-									"include-always", "include-if-modified"
-								})
-						})
+						getNamespace(), "previews-and-thumbnails")
 				},
 				DLFileEntryConstants.getClassName()),
 			new PortletDataHandlerBoolean(

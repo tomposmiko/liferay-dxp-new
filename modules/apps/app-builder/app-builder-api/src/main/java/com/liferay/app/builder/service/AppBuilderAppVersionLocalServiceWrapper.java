@@ -15,7 +15,6 @@
 package com.liferay.app.builder.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link AppBuilderAppVersionLocalService}.
@@ -471,11 +470,6 @@ public class AppBuilderAppVersionLocalServiceWrapper
 
 		return _appBuilderAppVersionLocalService.updateAppBuilderAppVersion(
 			appBuilderAppVersion);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _appBuilderAppVersionLocalService.getBasePersistence();
 	}
 
 	@Override

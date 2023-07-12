@@ -300,54 +300,48 @@ public class CompanyModelImpl
 
 	private static final Map<String, Function<Company, Object>>
 		_attributeGetterFunctions;
-
-	static {
-		Map<String, Function<Company, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Company, Object>>();
-
-		attributeGetterFunctions.put("mvccVersion", Company::getMvccVersion);
-		attributeGetterFunctions.put("companyId", Company::getCompanyId);
-		attributeGetterFunctions.put("accountId", Company::getAccountId);
-		attributeGetterFunctions.put("webId", Company::getWebId);
-		attributeGetterFunctions.put("mx", Company::getMx);
-		attributeGetterFunctions.put("homeURL", Company::getHomeURL);
-		attributeGetterFunctions.put("logoId", Company::getLogoId);
-		attributeGetterFunctions.put("system", Company::getSystem);
-		attributeGetterFunctions.put("maxUsers", Company::getMaxUsers);
-		attributeGetterFunctions.put("active", Company::getActive);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
 	private static final Map<String, BiConsumer<Company, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Company, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Company, Object>>();
 		Map<String, BiConsumer<Company, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Company, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Company::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Company, Long>)Company::setMvccVersion);
+		attributeGetterFunctions.put("companyId", Company::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Company, Long>)Company::setCompanyId);
+		attributeGetterFunctions.put("accountId", Company::getAccountId);
 		attributeSetterBiConsumers.put(
 			"accountId", (BiConsumer<Company, Long>)Company::setAccountId);
+		attributeGetterFunctions.put("webId", Company::getWebId);
 		attributeSetterBiConsumers.put(
 			"webId", (BiConsumer<Company, String>)Company::setWebId);
+		attributeGetterFunctions.put("mx", Company::getMx);
 		attributeSetterBiConsumers.put(
 			"mx", (BiConsumer<Company, String>)Company::setMx);
+		attributeGetterFunctions.put("homeURL", Company::getHomeURL);
 		attributeSetterBiConsumers.put(
 			"homeURL", (BiConsumer<Company, String>)Company::setHomeURL);
+		attributeGetterFunctions.put("logoId", Company::getLogoId);
 		attributeSetterBiConsumers.put(
 			"logoId", (BiConsumer<Company, Long>)Company::setLogoId);
+		attributeGetterFunctions.put("system", Company::getSystem);
 		attributeSetterBiConsumers.put(
 			"system", (BiConsumer<Company, Boolean>)Company::setSystem);
+		attributeGetterFunctions.put("maxUsers", Company::getMaxUsers);
 		attributeSetterBiConsumers.put(
 			"maxUsers", (BiConsumer<Company, Integer>)Company::setMaxUsers);
+		attributeGetterFunctions.put("active", Company::getActive);
 		attributeSetterBiConsumers.put(
 			"active", (BiConsumer<Company, Boolean>)Company::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

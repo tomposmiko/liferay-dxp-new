@@ -37,8 +37,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -63,6 +61,8 @@ import com.liferay.segments.service.persistence.SegmentsExperimentPersistence;
 import com.liferay.segments.service.persistence.SegmentsExperimentRelPersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -575,7 +575,7 @@ public abstract class SegmentsExperienceLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		SegmentsExperienceLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -591,8 +591,7 @@ public abstract class SegmentsExperienceLocalServiceBaseImpl
 		segmentsExperienceLocalService =
 			(SegmentsExperienceLocalService)aopProxy;
 
-		SegmentsExperienceLocalServiceUtil.setService(
-			segmentsExperienceLocalService);
+		_setLocalServiceUtilService(segmentsExperienceLocalService);
 	}
 
 	/**
@@ -653,6 +652,23 @@ public abstract class SegmentsExperienceLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SegmentsExperienceLocalService segmentsExperienceLocalService) {
+
+		try {
+			Field field =
+				SegmentsExperienceLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, segmentsExperienceLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected SegmentsEntryPersistence segmentsEntryPersistence;
 
@@ -695,8 +711,5 @@ public abstract class SegmentsExperienceLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SegmentsExperienceLocalServiceBaseImpl.class);
 
 }

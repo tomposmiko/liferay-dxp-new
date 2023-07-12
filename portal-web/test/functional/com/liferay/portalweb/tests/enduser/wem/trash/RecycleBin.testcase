@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -33,7 +33,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-109555. Can bulk restore multiple items from recycle bin."
-	@priority = 5
+	@priority = "5"
 	test BulkRestoreMultipleAssetsFromRecycleBin {
 		property portal.acceptance = "true";
 
@@ -107,7 +107,7 @@ definition {
 		}
 	}
 
-	@priority = 3
+	@priority = "3"
 	test DisableRecycleBin {
 		Site.openSiteSettingsAdmin(siteURLKey = "site-name");
 
@@ -123,7 +123,7 @@ definition {
 		WebContent.deleteWithDisabledRB(entryTitle = "Web Content Title");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test RecycleBinBlogs {
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -169,7 +169,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test RecycleBinBookmarks {
 		property portal.release = "false";
 
@@ -266,7 +266,7 @@ definition {
 			bookmarkURL = "https://www.liferay.com");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test RecycleBinMBAttachment {
 		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "site-name");
 
@@ -283,7 +283,7 @@ definition {
 		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "site-name");
 
 		MessageboardsThread.viewCP(
-			replyCount = 0,
+			replyCount = "0",
 			threadBody = "MB Body Edit",
 			threadSubject = "MB Subject",
 			userName = "Test Test");
@@ -298,13 +298,13 @@ definition {
 
 		MessageboardsThread.viewCP(
 			mbAttachmentFile = "Document_1.doc",
-			replyCount = 0,
+			replyCount = "0",
 			threadBody = "MB Body Edit",
 			threadSubject = "MB Subject",
 			userName = "Test Test");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test RecycleBinScheduledCleanup {
 		property custom.properties = "trash.entry.check.interval=1${line.separator}trash.entries.max.age=1";
 
@@ -335,14 +335,14 @@ definition {
 			customMaxAge = "1 minute",
 			deleteUser = "Test Test");
 
-		Pause(locator1 = 120000);
+		Pause(locator1 = "120000");
 
 		Refresh();
 
 		RecycleBin.viewDefaultCP(assetName = "Blogs Entry Title");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test RecycleBinSearchBlogsEntries {
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -377,7 +377,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = 1);
+		Search.searchCP(searchTerm = "1");
 
 		RecycleBin.viewCP(
 			assetName = "Blogs Entry Title 1",
@@ -386,7 +386,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = 2);
+		Search.searchCP(searchTerm = "2");
 
 		RecycleBin.viewCP(
 			assetName = "Blogs Entry Title 2",
@@ -395,7 +395,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = 3);
+		Search.searchCP(searchTerm = "3");
 
 		RecycleBin.viewCP(
 			assetName = "Blogs Entry Title 3",
@@ -403,7 +403,7 @@ definition {
 			deleteUser = "Test Test");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test RecycleBinSearchDMEntriesInFolder {
 		property custom.properties = "default.layout.template.id=1_column";
 
@@ -460,7 +460,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = 1);
+		Search.searchCP(searchTerm = "1");
 
 		RecycleBin.viewCP(
 			assetName = "DM Document Title 1",
@@ -469,7 +469,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = 2);
+		Search.searchCP(searchTerm = "2");
 
 		RecycleBin.viewCP(
 			assetName = "DM Document Title 2",
@@ -477,7 +477,7 @@ definition {
 			deleteUser = "test test");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test RecycleBinStaging {
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -542,7 +542,83 @@ definition {
 			deleteUser = "Test Test");
 	}
 
-	@priority = 3
+	@priority = "3"
+	test RecycleBinWebContent {
+		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "site-name");
+
+		WebContentStructures.addCP(
+			structureDescription = "WC Structure Description",
+			structureName = "WC Structure Name");
+
+		DynamicDataMapping.addField(
+			field = "Text",
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
+
+		WebContentStructures.saveCP(structureName = "WC Structure Name");
+
+		WebContentTemplates.openWebContentTemplatesAdmin(siteURLKey = "site-name");
+
+		WebContentTemplates.addCP(
+			structureName = "WC Structure Name",
+			templateDescription = "WC Template Description",
+			templateFieldNames = "Text",
+			templateName = "WC Template Name");
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
+
+		WebContent.addWithStructureCP(
+			webContentText = "WC WebContent Text",
+			webContentTitle = "WC WebContent Title");
+
+		PortletEntry.publish();
+
+		WebContent.moveToRecycleBinCP(
+			assetType = "Web Content Article",
+			webContentTitle = "WC WebContent Title");
+
+		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
+
+		RecycleBin.viewCP(
+			assetName = "WC WebContent Title",
+			assetType = "Web Content Article",
+			deleteUser = "Test Test");
+
+		RecycleBin.restoreCP(
+			assetName = "WC WebContent Title",
+			assetRestoreLocation = "Home",
+			assetType = "Web Content Article");
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+
+		WebContent.viewWithStructureCP(
+			webContentText = "WC WebContent Text",
+			webContentTitle = "WC WebContent Title");
+
+		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "site-name");
+
+		WebContentStructures.viewCP(
+			structureDescription = "WC Structure Description",
+			structureName = "WC Structure Name");
+
+		LexiconEntry.gotoEntry(rowEntry = "WC Structure Name");
+
+		DynamicDataMapping.viewField(
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
+
+		WebContentTemplates.openWebContentTemplatesAdmin(siteURLKey = "site-name");
+
+		WebContentTemplates.viewCP(
+			structureName = "WC Structure Name",
+			templateDescription = "WC Template Description",
+			templateFieldNames = "Text",
+			templateName = "WC Template Name");
+	}
+
+	@priority = "3"
 	test RecycleBinWiki {
 		WikiNavigator.openWikiAdmin(siteURLKey = "site-name");
 
@@ -609,7 +685,7 @@ definition {
 		WikiNavigator.openWikiAdmin(siteURLKey = "site-name");
 
 		WikiNode.viewCP(
-			numberOfWikiPages = 2,
+			numberOfWikiPages = "2",
 			wikiNodeName = "Wiki Node Name");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
@@ -622,7 +698,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-109555. Automatically rename documents when bulk restore them from recycle bin if document names already exist in the destination."
-	@priority = 5
+	@priority = "5"
 	test RenameBulkRestoreDocumentsAutomaticallyWhenDocumentNamesAlreadyExistInTheDestination {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -666,7 +742,7 @@ definition {
 
 			for (var entryName : list "Document_1.png,Document_1.txt") {
 				RecycleBin.viewCP(
-					assetName = ${entryName},
+					assetName = "${entryName}",
 					assetType = "Document",
 					deleteUser = "Test Test");
 			}
@@ -678,12 +754,12 @@ definition {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 			for (var assetName : list "Document_1.png,Document_1.txt,Document_1 (1).png,Document_1 (1).txt") {
-				DMDocument.viewCardTitle(dmDocumentTitle = ${assetName});
+				DMDocument.viewCardTitle(dmDocumentTitle = "${assetName}");
 			}
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test RestoreDMDocumentFromFolderCP {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -722,176 +798,141 @@ definition {
 		DMDocument.viewCP(dmDocumentTitle = "DM Document Title 2");
 	}
 
-	@description = "This is a test for LPS-44099. The blogs entry moved to the recycle bin shouldn't be searchable by its comments."
-	@priority = 4
-	test SearchBlogsEntryByComments {
-		task ("Add a Blogs widget to page") {
-			JSONLayout.addWidgetToPublicLayout(
-				groupName = "Site Name",
-				layoutName = "Test Page",
-				widgetName = "Blogs");
-		}
+	@priority = "3"
+	test RestoreWebContentFromFolderCP {
+		JSONWebcontent.addFolder(
+			folderName = "WC Folder Name",
+			groupName = "Site Name");
 
-		task ("Add two blogs entries") {
-			for (var n : list "1,2") {
-				JSONBlog.addEntry(
-					entryContent = "Blogs Entry Content ${n}",
-					entryTitle = "Blogs Entry Title ${n}",
-					groupName = "Site Name");
-			}
-		}
+		JSONWebcontent.addWebContent(
+			content = "Web Content Content",
+			folderName = "WC Folder Name",
+			groupName = "Site Name",
+			title = "Web Content Title");
 
-		task ("Add comments for both blogs entries via Blogs widget") {
-			for (var i : list "1,2") {
-				Navigator.gotoSitePage(
-					pageName = "Test Page",
-					siteName = "Site Name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
-				BlogsNavigator.gotoEntryPG(
-					entryContent = "Blogs Entry Content ${i}",
-					entryTitle = "Blogs Entry Title ${i}");
+		WebContentFolder.moveToRecycleBinCP(
+			assetType = "Web Content Folder",
+			folderName = "WC Folder Name");
 
-				Comments.addPG(entryComment = "Blogs Entry Comment");
-			}
-		}
+		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		task ("Search by comments in Blogs admin") {
-			BlogsNavigator.openBlogsAdmin(siteURLKey = "site-name");
+		RecycleBin.restoreContentFromFolderCP(
+			assetName = "WC Folder Name",
+			assetRestoreLocation = "Home",
+			assetType = "Web Content Folder",
+			assetType2 = "Web Content Article",
+			documentName = "Web Content Title");
 
-			LexiconEntry.changeDisplayStyle(displayStyle = "list");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
-			Search.searchCP(searchTerm = "Comment");
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
 
-			AssertTextEquals(
-				locator1 = "Search#SEARCH_INFO",
-				value1 = "2 Results for Comment");
-
-			for (var title : list "Blogs Entry Title 1,Blogs Entry Title 2") {
-				Blogs.viewEntryTitle(entryTitle = ${title});
-			}
-		}
-
-		task ("Move one of blogs entries to the recycle bin") {
-			BlogsNavigator.openBlogsAdmin(siteURLKey = "site-name");
-
-			BlogsNavigator.moveToRecycleBinCP(entryTitle = "Blogs Entry Title 1");
-		}
-
-		task ("Search by comments in Blogs admin") {
-			Search.searchCP(searchTerm = "Comment");
-
-			AssertTextEquals(
-				locator1 = "Search#SEARCH_INFO",
-				value1 = "1 Results for Comment");
-
-			Blogs.viewEntryTitle(entryTitle = "Blogs Entry Title 2");
-
-			Blogs.viewEntryNotPresent(entryTitle = "Blogs Entry Title 1");
-		}
+		WebContent.viewCP(
+			webContentContent = "Web Content Content",
+			webContentTitle = "Web Content Title");
 	}
 
-	@description = "This is a test for LPS-109555 and LPS-33785. The error message should be shown when restore a document from recycle bin when it has the same name as existing document. Keep both document entries and rename the document entry from the Recycle Bin."
-	@priority = 4
-	test ViewErrorMessageWhenRestoreDocumentHasTheSameNameWithExistingOne {
-		task ("Add a document entry named DM Document Title") {
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentTitle = "DM Document Title",
-				groupName = "Site Name",
-				mimeType = "image/png",
-				sourceFileName = "Document_1.png");
-		}
+	@priority = "3"
+	test RestoreWebContentWithArticleVersions {
+		JSONWebcontent.addFolder(
+			folderName = "WC Folder Name",
+			groupName = "Site Name");
 
-		task ("Remove the document to the recycle bin") {
-			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		JSONWebcontent.addWebContent(
+			content = "Web Content Content",
+			folderName = "WC Folder Name",
+			groupName = "Site Name",
+			title = "Web Content Title");
 
-			DMDocument.moveToRecycleBinCP(dmDocumentTitle = "DM Document Title");
-		}
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
-		task ("Add another document entry with the same name") {
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentTitle = "DM Document Title",
-				groupName = "Site Name",
-				mimeType = "text/plain",
-				sourceFileName = "Document_1.txt");
-		}
+		WebContentFolder.gotoCP(
+			folderName = "WC Folder Name",
+			webContentTitle = "WC Folder Name");
 
-		task ("Keep both entries and rename the entry from the Recycle Bin") {
-			RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
 
-			RecycleBin.viewCP(
-				assetName = "DM Document Title",
-				assetType = "Document",
-				deleteUser = "Test Test");
+		WebContent.editCP(
+			webContentContentEdit = "Web Content Content Edit 1",
+			webContentTitle = "Web Content Title",
+			webContentTitleEdit = "Web Content Title Edit 1");
 
-			RecycleBin.restoreRenameCP(
-				assetName = "DM Document Title",
-				newName = "Previous Document Title");
-		}
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title Edit 1");
 
-		task ("View documents in Documents admin") {
-			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		WebContent.editCP(
+			webContentContentEdit = "Web Content Content Edit 2",
+			webContentTitle = "Web Content Title Edit 1",
+			webContentTitleEdit = "Web Content Title Edit 2");
 
-			for (var assetName : list "DM Document Title,Previous Document Title") {
-				DMDocument.viewCardTitle(dmDocumentTitle = ${assetName});
-			}
-		}
-	}
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title Edit 2");
 
-	@description = "This is a test for LPS-44554. View restored document in subfolder after restore parent folder from the recycle bin."
-	@priority = 4
-	test ViewRestoredDocumentInSubFolderAfterRestoreParentFolder {
-		task ("Add a dm folder") {
-			JSONDocument.addFolder(
-				dmFolderName = "DM Folder Name",
-				groupName = "Site Name");
-		}
+		WebContent.editCP(
+			webContentContentEdit = "Web Content Content Edit 3",
+			webContentTitle = "Web Content Title Edit 2",
+			webContentTitleEdit = "Web Content Title Edit 3");
 
-		task ("Add a dm subfolder") {
-			var folderId = JSONDocumentAPI._getFolderIdByFolderName(
-				groupName = "Site Name",
-				name = "DM Folder Name");
+		WebContent.expireSpecificVersionCP(
+			webContentList = "Web Content Title Edit 1,Web Content Title Edit 2",
+			webContentTitle = "Web Content Title Edit 3");
 
-			JSONDocument.addFolder(
-				dmFolderName = "DM Subfolder Name",
-				groupName = "Site Name",
-				parentFolderId = ${folderId});
-		}
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
-		task ("Add a basic document in subfolder") {
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentTitle = "DM Document Title",
-				folderName = "DM Subfolder Name",
-				groupName = "Site Name",
-				mimeType = "image/jpeg",
-				parentFolderName = "DM Folder Name",
-				sourceFileName = "Document_1.jpg");
-		}
+		WebContentFolder.gotoCP(
+			folderName = "WC Folder Name",
+			webContentTitle = "WC Folder Name");
 
-		task ("Move the dm folder to the Recycle Bin") {
-			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title Edit 3");
 
-			DMFolder.moveToRecycleBinCP(
-				assetType = "Documents Folder",
-				dmFolderName = "DM Folder Name");
-		}
+		WebContent.editCP(
+			saveAsDraft = "true",
+			webContentContentEdit = "Web Content Content Edit Draft",
+			webContentTitle = "Web Content Title Edit 3",
+			webContentTitleEdit = "Web Content Title Edit Draft");
 
-		task ("Restore the dm folder from the Recycle Bin") {
-			RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
-			RecycleBin.restoreCP(
-				assetName = "DM Folder Name",
-				assetType = "Documents Folder");
-		}
+		WebContentFolder.moveToRecycleBinCP(
+			assetType = "Web Content Folder",
+			folderName = "WC Folder Name");
 
-		task ("View the restored document in subfolder") {
-			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-			for (var folderName : list "DM Folder Name,DM Subfolder Name") {
-				DMFolder.gotoEntry(dmFolderName = ${folderName});
-			}
+		RecycleBin.restoreCP(
+			assetName = "WC Folder Name",
+			assetRestoreLocation = "Home",
+			assetType = "Web Content Folder");
 
-			DMDocument.viewCardTitle(dmDocumentTitle = "DM Document Title");
-		}
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+
+		WebContentFolder.gotoCP(
+			folderName = "WC Folder Name",
+			webContentTitle = "WC Folder Name");
+
+		WebContentNavigator.gotoEntryMenuItem(
+			entry = "Web Content Title Edit Draft",
+			menuItem = "View History");
+
+		WebContent.viewSpecificVersionHistoryCP(
+			webContentStatus = "APPROVED",
+			webContentTitle = "Web Content Title");
+
+		WebContent.viewSpecificVersionHistoryCP(
+			webContentStatus = "EXPIRED",
+			webContentTitle = "Web Content Title Edit 1");
+
+		WebContent.viewSpecificVersionHistoryCP(
+			webContentStatus = "EXPIRED",
+			webContentTitle = "Web Content Title Edit 2");
+
+		WebContent.viewSpecificVersionHistoryCP(
+			webContentStatus = "APPROVED",
+			webContentTitle = "Web Content Title Edit 3");
+
+		WebContent.viewSpecificVersionHistoryCP(
+			webContentStatus = "DRAFT",
+			webContentTitle = "Web Content Title Edit Draft");
 	}
 
 }

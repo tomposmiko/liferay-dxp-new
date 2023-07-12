@@ -59,7 +59,6 @@ const CheckboxMultiple = ({
 	disabled,
 	inline,
 	isSwitcher,
-	localizedValueEdited,
 	name,
 	onBlur,
 	onChange,
@@ -70,10 +69,7 @@ const CheckboxMultiple = ({
 }) => {
 	const [value, setValue] = useState(initialValue);
 
-	const displayValues =
-		value?.length || (value?.length === 0 && localizedValueEdited)
-			? value
-			: predefinedValue;
+	const displayValues = value && value.length > 0 ? value : predefinedValue;
 	const Toggle = isSwitcher ? Switcher : ClayCheckbox;
 
 	const handleChange = (event) => {
@@ -130,15 +126,13 @@ const Main = ({
 	readOnly,
 	showAsSwitcher = true,
 	value,
-	localizedValueEdited,
 	...otherProps
 }) => (
-	<FieldBase {...otherProps} name={name} readOnly={readOnly} style={null}>
+	<FieldBase name={name} readOnly={readOnly} {...otherProps}>
 		<CheckboxMultiple
 			disabled={readOnly}
 			inline={inline}
 			isSwitcher={showAsSwitcher}
-			localizedValueEdited={localizedValueEdited}
 			name={name}
 			onBlur={onBlur}
 			onChange={onChange}

@@ -238,11 +238,19 @@ public class CPOptionLocalServiceUtil {
 		return getService().fetchCPOption(CPOptionId);
 	}
 
-	public static CPOption fetchCPOption(long companyId, String key) {
+	public static CPOption fetchCPOption(long companyId, String key)
+		throws PortalException {
+
 		return getService().fetchCPOption(companyId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option, or <code>null</code> if a matching cp option could not be found
+	 */
 	public static CPOption fetchCPOptionByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -250,6 +258,9 @@ public class CPOptionLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CPOption fetchCPOptionByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -302,7 +313,14 @@ public class CPOptionLocalServiceUtil {
 		return getService().getCPOption(companyId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option
+	 * @throws PortalException if a matching cp option could not be found
+	 */
 	public static CPOption getCPOptionByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -440,10 +458,6 @@ public class CPOptionLocalServiceUtil {
 
 	public static CPOptionLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(CPOptionLocalService service) {
-		_service = service;
 	}
 
 	private static volatile CPOptionLocalService _service;

@@ -51,7 +51,6 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.staging.StagingGroupHelper;
 
@@ -962,9 +961,7 @@ public class LayoutReferencesExportImportContentProcessor
 
 			url = replaceExportHostname(group, url, urlSB);
 
-			if (!url.startsWith(StringPool.SLASH) ||
-				PortalInstances.isVirtualHostsIgnorePath(url)) {
-
+			if (!url.startsWith(StringPool.SLASH)) {
 				continue;
 			}
 
@@ -1080,22 +1077,10 @@ public class LayoutReferencesExportImportContentProcessor
 					TreeMap<String, String> publicVirtualHostnames =
 						publicLayoutSet.getVirtualHostnames();
 
-					if (!publicVirtualHostnames.isEmpty()) {
+					if (!publicVirtualHostnames.isEmpty() ||
+						_isDefaultGroup(group)) {
+
 						layoutSet = group.getPublicLayoutSet();
-					}
-					else {
-						LayoutSet privateLayoutSet =
-							group.getPrivateLayoutSet();
-
-						TreeMap<String, String> privateVirtualHostnames =
-							privateLayoutSet.getVirtualHostnames();
-
-						if (!privateVirtualHostnames.isEmpty()) {
-							layoutSet = group.getPrivateLayoutSet();
-						}
-						else if (_isDefaultGroup(group)) {
-							layoutSet = group.getPublicLayoutSet();
-						}
 					}
 				}
 
@@ -1186,23 +1171,19 @@ public class LayoutReferencesExportImportContentProcessor
 		try {
 			URI uri = _http.getURI(url);
 
-			if ((uri != null) && Validator.isIPAddress(uri.getHost())) {
-				InetAddress inetAddress = InetAddressUtil.getInetAddressByName(
-					uri.getHost());
+			if ((uri != null) &&
+				InetAddressUtil.isLocalInetAddress(
+					InetAddress.getByName(uri.getHost()))) {
 
-				if ((inetAddress != null) &&
-					InetAddressUtil.isLocalInetAddress(inetAddress)) {
+				StringBundler sb = new StringBundler(5);
 
-					StringBundler sb = new StringBundler(5);
+				sb.append(uri.getScheme());
+				sb.append("://");
+				sb.append(uri.getHost());
+				sb.append(StringPool.COLON);
+				sb.append(uri.getPort());
 
-					sb.append(uri.getScheme());
-					sb.append("://");
-					sb.append(uri.getHost());
-					sb.append(StringPool.COLON);
-					sb.append(uri.getPort());
-
-					return sb.toString();
-				}
+				return sb.toString();
 			}
 		}
 		catch (UnknownHostException unknownHostException) {

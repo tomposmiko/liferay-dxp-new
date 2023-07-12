@@ -146,7 +146,7 @@ public class UADApplicationSummaryHelper {
 					Collectors.toList()
 				);
 
-			if (ListUtil.isNotEmpty(applicationUADDisplays)) {
+			if (!ListUtil.isEmpty(applicationUADDisplays)) {
 				UADApplicationSummaryDisplay uadApplicationSummaryDisplay =
 					getUADApplicationSummaryDisplay(
 						applicationKey, applicationUADDisplays, userId,

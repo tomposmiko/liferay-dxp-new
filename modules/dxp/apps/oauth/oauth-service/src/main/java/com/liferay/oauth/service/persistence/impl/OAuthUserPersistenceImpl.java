@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -2925,12 +2926,12 @@ public class OAuthUserPersistenceImpl
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"userId", "oAuthApplicationId"}, false);
 
-		OAuthUserUtil.setPersistence(this);
+		_setOAuthUserUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		OAuthUserUtil.setPersistence(null);
+		_setOAuthUserUtilPersistence(null);
 
 		entityCache.removeCache(OAuthUserImpl.class.getName());
 
@@ -2940,6 +2941,21 @@ public class OAuthUserPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setOAuthUserUtilPersistence(
+		OAuthUserPersistence oAuthUserPersistence) {
+
+		try {
+			Field field = OAuthUserUtil.class.getDeclaredField("_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, oAuthUserPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

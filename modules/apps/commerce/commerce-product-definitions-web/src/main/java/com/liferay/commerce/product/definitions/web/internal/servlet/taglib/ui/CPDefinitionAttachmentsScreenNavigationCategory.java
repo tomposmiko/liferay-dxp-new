@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -57,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.product.configuration.AttachmentsConfiguration",
-	enabled = false,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
 	property = {
 		"screen.navigation.category.order:Integer=70",
 		"screen.navigation.entry.order:Integer=10"
@@ -104,10 +105,10 @@ public class CPDefinitionAttachmentsScreenNavigationCategory
 
 		if (_portletResourcePermission.contains(
 				permissionChecker, cpDefinition.getGroupId(),
-				CPActionKeys.VIEW_COMMERCE_PRODUCT_ATTACHMENTS) &&
+				CPActionKeys.MANAGE_COMMERCE_PRODUCT_ATTACHMENTS) &&
 			_portletResourcePermission.contains(
 				permissionChecker, cpDefinition.getGroupId(),
-				CPActionKeys.VIEW_COMMERCE_PRODUCT_ATTACHMENTS)) {
+				CPActionKeys.MANAGE_COMMERCE_PRODUCT_IMAGES)) {
 
 			return true;
 		}

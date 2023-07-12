@@ -25,11 +25,11 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -58,7 +58,7 @@ public abstract class DispatchTriggerServiceBaseImpl
 	 */
 	@Deactivate
 	protected void deactivate() {
-		DispatchTriggerServiceUtil.setService(null);
+		_setServiceUtilService(null);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public abstract class DispatchTriggerServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		dispatchTriggerService = (DispatchTriggerService)aopProxy;
 
-		DispatchTriggerServiceUtil.setService(dispatchTriggerService);
+		_setServiceUtilService(dispatchTriggerService);
 	}
 
 	/**
@@ -117,6 +117,22 @@ public abstract class DispatchTriggerServiceBaseImpl
 		}
 	}
 
+	private void _setServiceUtilService(
+		DispatchTriggerService dispatchTriggerService) {
+
+		try {
+			Field field = DispatchTriggerServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, dispatchTriggerService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@Reference
 	protected DispatchLogPersistence dispatchLogPersistence;
 
@@ -151,8 +167,5 @@ public abstract class DispatchTriggerServiceBaseImpl
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DispatchTriggerServiceBaseImpl.class);
 
 }

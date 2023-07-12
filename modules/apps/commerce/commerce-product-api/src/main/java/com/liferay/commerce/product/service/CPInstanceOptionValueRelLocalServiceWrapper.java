@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPInstanceOptionValueRelLocalService}.
@@ -556,11 +555,6 @@ public class CPInstanceOptionValueRelLocalServiceWrapper
 		_cpInstanceOptionValueRelLocalService.updateCPInstanceOptionValueRels(
 			groupId, companyId, userId, cpInstanceId,
 			cpDefinitionOptionRelIdCPDefinitionOptionValueRelIds);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpInstanceOptionValueRelLocalService.getBasePersistence();
 	}
 
 	@Override

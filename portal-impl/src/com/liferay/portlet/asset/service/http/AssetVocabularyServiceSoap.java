@@ -697,12 +697,6 @@ public class AssetVocabularyServiceSoap {
 		}
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #updateVocabulary(long, String, Map, Map, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
 	public static com.liferay.asset.kernel.model.AssetVocabularySoap
 			updateVocabulary(
 				long vocabularyId, String name, String title,

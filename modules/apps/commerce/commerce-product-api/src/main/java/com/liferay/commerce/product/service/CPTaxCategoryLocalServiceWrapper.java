@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CPTaxCategoryLocalService}.
@@ -273,7 +272,13 @@ public class CPTaxCategoryLocalServiceWrapper
 		return _cpTaxCategoryLocalService.fetchCPTaxCategory(CPTaxCategoryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp tax category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp tax category's external reference code
+	 * @return the matching cp tax category, or <code>null</code> if a matching cp tax category could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPTaxCategory
 		fetchCPTaxCategoryByExternalReferenceCode(
@@ -284,6 +289,9 @@ public class CPTaxCategoryLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPTaxCategoryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CPTaxCategory
@@ -377,7 +385,14 @@ public class CPTaxCategoryLocalServiceWrapper
 		return _cpTaxCategoryLocalService.getCPTaxCategory(CPTaxCategoryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp tax category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp tax category's external reference code
+	 * @return the matching cp tax category
+	 * @throws PortalException if a matching cp tax category could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPTaxCategory
 			getCPTaxCategoryByExternalReferenceCode(
@@ -459,11 +474,6 @@ public class CPTaxCategoryLocalServiceWrapper
 
 		return _cpTaxCategoryLocalService.updateCPTaxCategory(
 			externalReferenceCode, cpTaxCategoryId, nameMap, descriptionMap);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _cpTaxCategoryLocalService.getBasePersistence();
 	}
 
 	@Override

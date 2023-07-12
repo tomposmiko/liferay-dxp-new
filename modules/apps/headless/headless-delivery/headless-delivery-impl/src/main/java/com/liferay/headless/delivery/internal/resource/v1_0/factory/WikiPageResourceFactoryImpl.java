@@ -14,7 +14,6 @@
 
 package com.liferay.headless.delivery.internal.resource.v1_0.factory;
 
-import com.liferay.headless.delivery.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.delivery.resource.v1_0.WikiPageResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,7 +33,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -53,7 +51,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +61,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-delivery/v1.0/WikiPage",
-	service = WikiPageResource.Factory.class
-)
+@Component(immediate = true, service = WikiPageResource.Factory.class)
 @Generated("")
 public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 
@@ -137,6 +134,16 @@ public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 		};
 	}
 
+	@Activate
+	protected void activate() {
+		WikiPageResource.FactoryHolder.factory = this;
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		WikiPageResource.FactoryHolder.factory = null;
+	}
+
 	private static Function<InvocationHandler, WikiPageResource>
 		_getProxyProviderFunction() {
 
@@ -184,7 +191,7 @@ public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		WikiPageResource wikiPageResource =
@@ -208,7 +215,6 @@ public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 		wikiPageResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		wikiPageResource.setRoleLocalService(_roleLocalService);
-		wikiPageResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(wikiPageResource, arguments);
@@ -248,6 +254,9 @@ public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -256,9 +265,6 @@ public class WikiPageResourceFactoryImpl implements WikiPageResource.Factory {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

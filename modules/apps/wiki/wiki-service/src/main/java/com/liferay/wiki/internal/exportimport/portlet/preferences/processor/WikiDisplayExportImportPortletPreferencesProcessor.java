@@ -67,11 +67,6 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 	}
 
 	@Override
-	public boolean isPublishDisplayedContent() {
-		return false;
-	}
-
-	@Override
 	public PortletPreferences processExportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)

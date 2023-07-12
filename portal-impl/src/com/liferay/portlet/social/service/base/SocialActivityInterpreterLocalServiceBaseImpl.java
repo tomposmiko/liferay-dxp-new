@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
@@ -32,6 +30,8 @@ import com.liferay.social.kernel.service.persistence.SocialActivityFinder;
 import com.liferay.social.kernel.service.persistence.SocialActivityPersistence;
 import com.liferay.social.kernel.service.persistence.SocialActivitySetFinder;
 import com.liferay.social.kernel.service.persistence.SocialActivitySetPersistence;
+
+import java.lang.reflect.Field;
 
 import javax.sql.DataSource;
 
@@ -230,12 +230,11 @@ public abstract class SocialActivityInterpreterLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		SocialActivityInterpreterLocalServiceUtil.setService(
-			socialActivityInterpreterLocalService);
+		_setLocalServiceUtilService(socialActivityInterpreterLocalService);
 	}
 
 	public void destroy() {
-		SocialActivityInterpreterLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -272,6 +271,24 @@ public abstract class SocialActivityInterpreterLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		SocialActivityInterpreterLocalService
+			socialActivityInterpreterLocalService) {
+
+		try {
+			Field field =
+				SocialActivityInterpreterLocalServiceUtil.class.
+					getDeclaredField("_service");
+
+			field.setAccessible(true);
+
+			field.set(null, socialActivityInterpreterLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	@BeanReference(type = SocialActivityInterpreterLocalService.class)
 	protected SocialActivityInterpreterLocalService
 		socialActivityInterpreterLocalService;
@@ -305,8 +322,5 @@ public abstract class SocialActivityInterpreterLocalServiceBaseImpl
 
 	@BeanReference(type = SocialActivitySetFinder.class)
 	protected SocialActivitySetFinder socialActivitySetFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialActivityInterpreterLocalServiceBaseImpl.class);
 
 }

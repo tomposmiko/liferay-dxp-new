@@ -21,7 +21,7 @@
 <aui:script require="commerce-frontend-js/components/step_tracker/entry as stepTracker">
 	stepTracker.default('<%= stepTrackerId %>', '<%= stepTrackerId %>', {
 		portletId: '<%= portletDisplay.getRootPortletId() %>',
-		spritemap: '<%= HtmlUtil.escapeJS(spritemap) %>',
+		spritemap: '<%= spritemap %>',
 		steps: <%= jsonSerializer.serializeDeep(steps) %>,
 	});
 </aui:script>

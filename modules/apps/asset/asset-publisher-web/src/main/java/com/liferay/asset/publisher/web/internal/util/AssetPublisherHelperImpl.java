@@ -332,34 +332,14 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 			_assetListEntryService.fetchAssetListEntry(assetListEntryId);
 
 		if (selectionStyle.equals("asset-list") && (assetListEntry != null)) {
-			List<AssetEntry> viewableAssetEntries = new ArrayList<>();
-
 			long[] segmentsEntryIds = _getSegmentsEntryIds(portletRequest);
 
 			String acClientUserId = GetterUtil.getString(
 				portletRequest.getAttribute(
 					SegmentsWebKeys.SEGMENTS_ANONYMOUS_USER_ID));
 
-			List<AssetEntry> assetEntries =
-				_assetListAssetEntryProvider.getAssetEntries(
-					assetListEntry, segmentsEntryIds, acClientUserId);
-
-			for (AssetEntry assetEntry : assetEntries) {
-				AssetRendererFactory<?> assetRendererFactory =
-					AssetRendererFactoryRegistryUtil.
-						getAssetRendererFactoryByClassName(
-							assetEntry.getClassName());
-
-				AssetRenderer<?> assetRenderer =
-					assetRendererFactory.getAssetRenderer(
-						assetEntry.getClassPK());
-
-				if (assetRenderer.hasViewPermission(permissionChecker)) {
-					viewableAssetEntries.add(assetEntry);
-				}
-			}
-
-			return viewableAssetEntries;
+			return _assetListAssetEntryProvider.getAssetEntries(
+				assetListEntry, segmentsEntryIds, acClientUserId);
 		}
 
 		List<AssetEntry> assetEntries = getAssetEntries(
@@ -639,14 +619,9 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 				if (Validator.isNotNull(viewURL) &&
 					!Objects.equals(viewURL, noSuchEntryRedirect)) {
 
-					String redirect = ParamUtil.getString(
-						liferayPortletRequest, "redirect");
-
-					if (Validator.isNull(redirect)) {
-						redirect = _portal.getCurrentURL(liferayPortletRequest);
-					}
-
-					viewURL = _http.setParameter(viewURL, "redirect", redirect);
+					viewURL = _http.setParameter(
+						viewURL, "redirect",
+						_portal.getCurrentURL(liferayPortletRequest));
 				}
 			}
 			catch (Exception exception) {
@@ -819,8 +794,9 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 
 			return parentGroupId;
 		}
-
-		throw new IllegalArgumentException("Invalid scope ID " + scopeId);
+		else {
+			throw new IllegalArgumentException("Invalid scope ID " + scopeId);
+		}
 	}
 
 	@Override

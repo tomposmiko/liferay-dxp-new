@@ -136,10 +136,6 @@ public class CommerceRegionServiceUtil {
 		return _service;
 	}
 
-	public static void setService(CommerceRegionService service) {
-		_service = service;
-	}
-
 	private static volatile CommerceRegionService _service;
 
 }

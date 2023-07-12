@@ -31,7 +31,6 @@ import javax.portlet.Portlet;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +54,6 @@ public class WrongPreferenceWithDataLevelExportImportTest
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
-	@Ignore
 	@Test
 	public void testExportLayoutPortlets() throws Exception {
 		Bundle bundle = FrameworkUtil.getBundle(

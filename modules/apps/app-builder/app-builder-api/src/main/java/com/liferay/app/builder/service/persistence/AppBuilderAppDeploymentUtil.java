@@ -532,12 +532,6 @@ public class AppBuilderAppDeploymentUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		AppBuilderAppDeploymentPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile AppBuilderAppDeploymentPersistence _persistence;
 
 }

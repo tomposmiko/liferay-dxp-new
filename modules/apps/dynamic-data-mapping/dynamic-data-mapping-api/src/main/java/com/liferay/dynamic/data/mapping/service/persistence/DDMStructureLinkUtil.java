@@ -721,10 +721,6 @@ public class DDMStructureLinkUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(DDMStructureLinkPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile DDMStructureLinkPersistence _persistence;
 
 }

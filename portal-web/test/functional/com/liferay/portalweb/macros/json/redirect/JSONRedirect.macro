@@ -9,10 +9,12 @@ definition {
 		}
 
 		var groupId = JSONGroupAPI._getGroupIdByName(
-			groupName = ${groupName},
-			site = ${site});
+			groupName = "${groupName}",
+			site = "${site}");
+
 		var portalURL = JSONCompany.getPortalURL();
-		var destinationURL = StringUtil.replace(${destinationURL}, ":", "%3A");
+
+		var destinationURL = StringUtil.replace("${destinationURL}", ":", "%3A");
 
 		if (!(isSet(expirationDate))) {
 			var expirationDate = "2100-01-01";
@@ -24,12 +26,12 @@ definition {
 
 		var curl = '''
 			${portalURL}/api/jsonws/redirect.redirectentry/add-redirect-entry \
-				-u test@liferay.com:test \
-				-d groupId=${groupId} \
-				-d destinationURL=${destinationURL} \
-				-d expirationDate=${expirationDate} \
-				-d permanent=${permanent} \
-				-d sourceURL=${sourceURL}
+			-u test@liferay.com:test \
+			-d groupId=${groupId} \
+			-d destinationURL=${destinationURL} \
+			-d expirationDate=${expirationDate} \
+			-d permanent=${permanent} \
+			-d sourceURL=${sourceURL}
 		''';
 
 		echo("## Adding a 'Redirection' with the following info using JSONWS:");
@@ -38,7 +40,7 @@ definition {
 
 		echo("## * DestinationURL: ${destinationURL}");
 
-		var messageId = JSONCurlUtil.post(${curl});
+		var messageId = JSONCurlUtil.post("${curl}");
 	}
 
 }

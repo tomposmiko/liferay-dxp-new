@@ -897,12 +897,6 @@ public class AssetCategoryPropertyUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		AssetCategoryPropertyPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile AssetCategoryPropertyPersistence _persistence;
 
 }

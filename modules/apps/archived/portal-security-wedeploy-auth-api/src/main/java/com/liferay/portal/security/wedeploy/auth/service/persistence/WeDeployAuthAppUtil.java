@@ -414,10 +414,6 @@ public class WeDeployAuthAppUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(WeDeployAuthAppPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile WeDeployAuthAppPersistence _persistence;
 
 }

@@ -15,7 +15,6 @@
 package com.liferay.commerce.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link CommerceOrderLocalService}.
@@ -395,7 +394,13 @@ public class CommerceOrderLocalServiceWrapper
 			commerceAccountId, groupId, userId, orderStatus);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce order with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order's external reference code
+	 * @return the matching commerce order, or <code>null</code> if a matching commerce order could not be found
+	 */
 	@Override
 	public com.liferay.commerce.model.CommerceOrder
 		fetchCommerceOrderByExternalReferenceCode(
@@ -406,6 +411,9 @@ public class CommerceOrderLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceOrderByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.model.CommerceOrder
@@ -453,7 +461,14 @@ public class CommerceOrderLocalServiceWrapper
 		return _commerceOrderLocalService.getCommerceOrder(commerceOrderId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce order with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order's external reference code
+	 * @return the matching commerce order
+	 * @throws PortalException if a matching commerce order could not be found
+	 */
 	@Override
 	public com.liferay.commerce.model.CommerceOrder
 			getCommerceOrderByExternalReferenceCode(
@@ -1226,11 +1241,6 @@ public class CommerceOrderLocalServiceWrapper
 			subtotal, shippingAmount, total, paymentStatus, orderStatus,
 			advanceStatus, externalReferenceCode, commerceContext,
 			serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _commerceOrderLocalService.getBasePersistence();
 	}
 
 	@Override

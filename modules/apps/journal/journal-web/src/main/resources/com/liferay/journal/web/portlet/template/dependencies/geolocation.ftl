@@ -10,7 +10,7 @@
 	${r"<#assign"} latitude = 0>
 	${r"<#assign"} longitude = 0>
 
-	${r"<#if"} (${variableName})?? && (${variableName} != "")>
+	${r"<#if"} (${variableName} != "")>
 		${r"<#assign"} geolocationJSONObject = jsonFactoryUtil.createJSONObject(${variableName})>
 
 		${r"<#assign"} latitude = geolocationJSONObject.getDouble("latitude")>
@@ -24,7 +24,5 @@
 		/>
 	${r"</#if>"}
 <#else>
-#if (($${variableName})?? && ($${variableName} != ""))
 	${getVariableReferenceCode(variableName)}
-#end
 </#if>

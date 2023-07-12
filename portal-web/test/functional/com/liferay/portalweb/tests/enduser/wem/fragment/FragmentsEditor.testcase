@@ -30,7 +30,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -39,7 +39,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-80503 and LPS-108566. Assert that when lfr is typed within a tag, a list of choices to autocomplete the fragment are presented. Assert the available variables and taglibs are shown in the IntelliSense and autocomplete works."
-	@priority = 5
+	@priority = "5"
 	test AutocompleteFragment {
 		task ("Navigate to the fragment collection") {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
@@ -51,47 +51,51 @@ definition {
 
 		task ("Assert the fragment editor has autocomplete for lfr-editable tags") {
 			var fragmentHTML = '''<lfr-editable id="" type="image">''';
+
 			var htmlSnippet = '''<lfr-''';
 
 			FragmentsEditor.autocompleteFragmentHTML(
 				autocompleteField = "lfr-editable:image",
-				fragmentHTML = ${fragmentHTML},
-				htmlSnippet = ${htmlSnippet});
+				fragmentHTML = "${fragmentHTML}",
+				htmlSnippet = "${htmlSnippet}");
 		}
 
 		task ("Assert the fragment editor has autocomplete for lfr-widget tags") {
 			var fragmentHTML = '''<lfr-widget-asset-list>''';
+
 			var htmlSnippet = '''<lfr-''';
 
 			FragmentsEditor.autocompleteFragmentHTML(
 				autocompleteField = "lfr-widget-asset-list",
-				fragmentHTML = ${fragmentHTML},
-				htmlSnippet = ${htmlSnippet});
+				fragmentHTML = "${fragmentHTML}",
+				htmlSnippet = "${htmlSnippet}");
 		}
 
 		task ("Assert the fragment editor has autocomplete for variables") {
 			var fragmentHTML = '''${portalUtil''';
+
 			var htmlSnippet = '''${''';
 
 			FragmentsEditor.autocompleteFragmentHTML(
 				autocompleteField = "portalUtil",
-				fragmentHTML = ${fragmentHTML},
-				htmlSnippet = ${htmlSnippet});
+				fragmentHTML = "${fragmentHTML}",
+				htmlSnippet = "${htmlSnippet}");
 		}
 
 		task ("Assert the fragment editor has autocomplete for variables") {
 			var fragmentHTML = '''[@liferay_editor''';
+
 			var htmlSnippet = '''[@''';
 
 			FragmentsEditor.autocompleteFragmentHTML(
 				autocompleteField = "liferay_editor",
-				fragmentHTML = ${fragmentHTML},
-				htmlSnippet = ${htmlSnippet});
+				fragmentHTML = "${fragmentHTML}",
+				htmlSnippet = "${htmlSnippet}");
 		}
 	}
 
 	@description = "This is a test for LPS-108566. The IntelliSense for available resources will popup when the current collection has resources and Auto-Complete works."
-	@priority = 5
+	@priority = "5"
 	test AutocompleteFragmentWithCollectionResource {
 		task ("Navigate to the fragment collection") {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
@@ -108,7 +112,7 @@ definition {
 
 			Type.sendKeysAceEditor(
 				locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
-				value1 = ${htmlSnippet});
+				value1 = "${htmlSnippet}");
 
 			AssertElementNotPresent(locator1 = "//ul[contains(@class,'CodeMirror-hints')]");
 		}
@@ -145,13 +149,14 @@ definition {
 				item = "Edit");
 
 			var htmlSnippet = '''[resources:''';
+
 			var fragmentHTML = '''[resources:Document_1.jpg''';
 
 			FragmentsEditor.typeHtmlEditor(content = "");
 
 			Type.sendKeysAceEditor(
 				locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
-				value1 = ${htmlSnippet});
+				value1 = "${htmlSnippet}");
 
 			AssertElementNotPresent(
 				autocompleteField = "Document_2.jpg",
@@ -167,7 +172,7 @@ definition {
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
-				value1 = ${fragmentHTML});
+				value1 = "${fragmentHTML}");
 		}
 	}
 

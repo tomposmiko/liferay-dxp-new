@@ -1206,12 +1206,6 @@ public class LayoutPageTemplateStructureRelUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(
-		LayoutPageTemplateStructureRelPersistence persistence) {
-
-		_persistence = persistence;
-	}
-
 	private static volatile LayoutPageTemplateStructureRelPersistence
 		_persistence;
 

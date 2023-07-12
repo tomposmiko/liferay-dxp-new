@@ -14,16 +14,13 @@
 
 package com.liferay.portal.layoutconfiguration.util;
 
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletContainerException;
 import com.liferay.portal.kernel.portlet.PortletContainerUtil;
-import com.liferay.portal.kernel.portlet.PortletJSONUtil;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.WebKeys;
+
+import java.io.IOException;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -149,36 +146,13 @@ public class PortletRenderer {
 			new BufferCacheServletResponse(httpServletResponse);
 
 		try {
-			JSONObject jsonObject = null;
-
-			if (_columnId == null) {
-				httpServletRequest.setAttribute(
-					WebKeys.RENDER_PORTLET_RESOURCE, Boolean.TRUE);
-
-				jsonObject = JSONFactoryUtil.createJSONObject();
-
-				PortletJSONUtil.populatePortletJSONObject(
-					httpServletRequest, StringPool.BLANK, _portlet, jsonObject);
-
-				PortletJSONUtil.writeHeaderPaths(
-					bufferCacheServletResponse, jsonObject);
-			}
-
 			PortletContainerUtil.render(
 				httpServletRequest, bufferCacheServletResponse, _portlet);
 
-			if (jsonObject != null) {
-				PortletJSONUtil.writeFooterPaths(
-					bufferCacheServletResponse, jsonObject);
-			}
-
 			return bufferCacheServletResponse.getStringBundler();
 		}
-		catch (Exception exception) {
-			throw new PortletContainerException(exception);
-		}
-		finally {
-			httpServletRequest.removeAttribute(WebKeys.RENDER_PORTLET_RESOURCE);
+		catch (IOException ioException) {
+			throw new PortletContainerException(ioException);
 		}
 	}
 

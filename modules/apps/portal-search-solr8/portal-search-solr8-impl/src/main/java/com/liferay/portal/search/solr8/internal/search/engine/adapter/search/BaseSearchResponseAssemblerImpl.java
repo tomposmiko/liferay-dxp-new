@@ -117,7 +117,7 @@ public class BaseSearchResponseAssemblerImpl
 		Map<String, StatsResponse> statsResponseMap,
 		BaseSearchRequest baseSearchRequest) {
 
-		if (ListUtil.isNotEmpty(baseSearchRequest.getStatsRequests())) {
+		if (!ListUtil.isEmpty(baseSearchRequest.getStatsRequests())) {
 			for (Map.Entry<String, StatsResponse> entry :
 					statsResponseMap.entrySet()) {
 

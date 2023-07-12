@@ -110,6 +110,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import jodd.bean.BeanUtil;
 
+import jodd.util.NameValue;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
@@ -1603,15 +1605,15 @@ public class SyncDLObjectServiceImpl extends SyncDLObjectServiceBaseImpl {
 
 		serviceContext.setRequest(serviceContextThreadLocal.getRequest());
 
-		List<Map.Entry<String, Object>> innerParameters =
+		List<NameValue<String, Object>> innerParameters =
 			jsonWebServiceActionParametersMap.getInnerParameters(
 				"serviceContext");
 
 		if (innerParameters != null) {
-			for (Map.Entry<String, Object> innerParameter : innerParameters) {
+			for (NameValue<String, Object> innerParameter : innerParameters) {
 				try {
-					BeanUtil.pojo.setProperty(
-						serviceContext, innerParameter.getKey(),
+					BeanUtil.setProperty(
+						serviceContext, innerParameter.getName(),
 						innerParameter.getValue());
 				}
 				catch (Exception exception) {

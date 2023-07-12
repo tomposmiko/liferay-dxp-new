@@ -42,8 +42,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -63,6 +61,8 @@ import com.liferay.wiki.service.persistence.WikiPageFinder;
 import com.liferay.wiki.service.persistence.WikiPagePersistence;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -576,7 +576,7 @@ public abstract class WikiNodeLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		WikiNodeLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -591,7 +591,7 @@ public abstract class WikiNodeLocalServiceBaseImpl
 	public void setAopProxy(Object aopProxy) {
 		wikiNodeLocalService = (WikiNodeLocalService)aopProxy;
 
-		WikiNodeLocalServiceUtil.setService(wikiNodeLocalService);
+		_setLocalServiceUtilService(wikiNodeLocalService);
 	}
 
 	/**
@@ -636,6 +636,22 @@ public abstract class WikiNodeLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		WikiNodeLocalService wikiNodeLocalService) {
+
+		try {
+			Field field = WikiNodeLocalServiceUtil.class.getDeclaredField(
+				"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, wikiNodeLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected WikiNodeLocalService wikiNodeLocalService;
 
 	@Reference
@@ -662,8 +678,5 @@ public abstract class WikiNodeLocalServiceBaseImpl
 
 	@Reference
 	protected WikiPageFinder wikiPageFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WikiNodeLocalServiceBaseImpl.class);
 
 }

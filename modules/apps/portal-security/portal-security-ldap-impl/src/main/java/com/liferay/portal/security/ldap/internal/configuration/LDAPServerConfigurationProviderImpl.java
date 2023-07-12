@@ -157,7 +157,7 @@ public class LDAPServerConfigurationProviderImpl
 			objectValuePair = objectValuePairs.get(ldapServerId);
 
 		if ((objectValuePair == null) &&
-			MapUtil.isNotEmpty(defaultObjectValuePairs)) {
+			!MapUtil.isEmpty(defaultObjectValuePairs)) {
 
 			objectValuePair = defaultObjectValuePairs.get(
 				LDAPServerConfiguration.LDAP_SERVER_ID_DEFAULT);
@@ -208,7 +208,7 @@ public class LDAPServerConfigurationProviderImpl
 			objectValuePair = objectValuePairs.get(ldapServerId);
 
 		if ((objectValuePair == null) &&
-			MapUtil.isNotEmpty(defaultObjectValuePairs)) {
+			!MapUtil.isEmpty(defaultObjectValuePairs)) {
 
 			objectValuePair = defaultObjectValuePairs.get(
 				LDAPServerConfiguration.LDAP_SERVER_ID_DEFAULT);
@@ -245,7 +245,7 @@ public class LDAPServerConfigurationProviderImpl
 		if (MapUtil.isEmpty(objectValuePairs) && useDefault) {
 			ldapServerConfigurations.add(_defaultLDAPServerConfiguration);
 		}
-		else if (MapUtil.isNotEmpty(objectValuePairs)) {
+		else if (!MapUtil.isEmpty(objectValuePairs)) {
 			List<ObjectValuePair<Configuration, LDAPServerConfiguration>>
 				objectValuePairsList = new ArrayList<>(
 					objectValuePairs.values());
@@ -300,7 +300,7 @@ public class LDAPServerConfigurationProviderImpl
 			configurationsProperties.add(
 				new HashMapDictionary<String, Object>());
 		}
-		else if (MapUtil.isNotEmpty(objectValuePairs)) {
+		else if (!MapUtil.isEmpty(objectValuePairs)) {
 			for (ObjectValuePair<Configuration, LDAPServerConfiguration>
 					objectValuePair : objectValuePairs.values()) {
 
@@ -358,9 +358,7 @@ public class LDAPServerConfigurationProviderImpl
 				objectValuePairs = _configurations.get(companyId);
 			}
 
-			if ((ldapServerId != null) &&
-				MapUtil.isNotEmpty(objectValuePairs)) {
-
+			if ((ldapServerId != null) && !MapUtil.isEmpty(objectValuePairs)) {
 				objectValuePairs.remove(ldapServerId);
 			}
 		}

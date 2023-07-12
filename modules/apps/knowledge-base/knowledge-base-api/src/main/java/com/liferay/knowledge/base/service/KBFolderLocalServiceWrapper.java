@@ -15,7 +15,6 @@
 package com.liferay.knowledge.base.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.BasePersistence;
 
 /**
  * Provides a wrapper for {@link KBFolderLocalService}.
@@ -520,11 +519,6 @@ public class KBFolderLocalServiceWrapper
 		return _kbFolderLocalService.updateKBFolder(
 			parentResourceClassNameId, parentResourcePrimKey, kbFolderId, name,
 			description, serviceContext);
-	}
-
-	@Override
-	public BasePersistence<?> getBasePersistence() {
-		return _kbFolderLocalService.getBasePersistence();
 	}
 
 	@Override

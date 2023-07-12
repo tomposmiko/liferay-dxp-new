@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -37,8 +38,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.IndexedFieldsFixture;
 import com.liferay.portal.search.test.util.IndexerFixture;
@@ -94,12 +93,13 @@ public class MBMessageIndexerIndexedFieldsTest {
 		MBMessage mbMessage = mbMessageFixture.createMBMessageWithCategory(
 			searchTerm);
 
-		SearchResponse searchResponse =
-			mbMessageIndexerFixture.searchOnlyOneSearchResponse(
-				searchTerm, locale);
+		Document document = mbMessageIndexerFixture.searchOnlyOne(
+			searchTerm, locale);
+
+		indexedFieldsFixture.postProcessDocument(document);
 
 		FieldValuesAssert.assertFieldValues(
-			_expectedFieldValues(mbMessage), searchResponse);
+			_expectedFieldValues(mbMessage), document, searchTerm);
 	}
 
 	@Rule
@@ -121,8 +121,7 @@ public class MBMessageIndexerIndexedFieldsTest {
 	}
 
 	protected void setUpMBMessageIndexerFixture() {
-		mbMessageIndexerFixture = new IndexerFixture<>(
-			MBMessage.class, _searchRequestBuilderFactory);
+		mbMessageIndexerFixture = new IndexerFixture<>(MBMessage.class);
 	}
 
 	protected void setUpUserSearchFixture() throws Exception {
@@ -297,9 +296,6 @@ public class MBMessageIndexerIndexedFieldsTest {
 
 	@DeleteAfterTestRun
 	private List<MBThread> _mbThreads;
-
-	@Inject
-	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 	private User _user;
 

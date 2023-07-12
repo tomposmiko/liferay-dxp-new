@@ -1309,10 +1309,6 @@ public class CPDisplayLayoutUtil {
 		return _persistence;
 	}
 
-	public static void setPersistence(CPDisplayLayoutPersistence persistence) {
-		_persistence = persistence;
-	}
-
 	private static volatile CPDisplayLayoutPersistence _persistence;
 
 }

@@ -293,7 +293,13 @@ public class CPAttachmentFileEntryLocalServiceUtil {
 		return getService().fetchCPAttachmentFileEntry(CPAttachmentFileEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry, or <code>null</code> if a matching cp attachment file entry could not be found
+	 */
 	public static CPAttachmentFileEntry
 		fetchCPAttachmentFileEntryByExternalReferenceCode(
 			long companyId, String externalReferenceCode) {
@@ -302,6 +308,9 @@ public class CPAttachmentFileEntryLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPAttachmentFileEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CPAttachmentFileEntry
 		fetchCPAttachmentFileEntryByReferenceCode(
@@ -376,15 +385,6 @@ public class CPAttachmentFileEntryLocalServiceUtil {
 	}
 
 	public static List<CPAttachmentFileEntry> getCPAttachmentFileEntries(
-			long classNameId, long classPK, String keywords, int type,
-			int status, int start, int end)
-		throws PortalException {
-
-		return getService().getCPAttachmentFileEntries(
-			classNameId, classPK, keywords, type, status, start, end);
-	}
-
-	public static List<CPAttachmentFileEntry> getCPAttachmentFileEntries(
 			long cpDefinitionId, String serializedDDMFormValues, int type,
 			int start, int end)
 		throws Exception {
@@ -443,15 +443,6 @@ public class CPAttachmentFileEntryLocalServiceUtil {
 			classNameId, classPK, type, status);
 	}
 
-	public static int getCPAttachmentFileEntriesCount(
-			long classNameId, long classPK, String keywords, int type,
-			int status)
-		throws PortalException {
-
-		return getService().getCPAttachmentFileEntriesCount(
-			classNameId, classPK, keywords, type, status);
-	}
-
 	/**
 	 * Returns the cp attachment file entry with the primary key.
 	 *
@@ -466,7 +457,14 @@ public class CPAttachmentFileEntryLocalServiceUtil {
 		return getService().getCPAttachmentFileEntry(CPAttachmentFileEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry
+	 * @throws PortalException if a matching cp attachment file entry could not be found
+	 */
 	public static CPAttachmentFileEntry
 			getCPAttachmentFileEntryByExternalReferenceCode(
 				long companyId, String externalReferenceCode)
@@ -662,10 +660,6 @@ public class CPAttachmentFileEntryLocalServiceUtil {
 
 	public static CPAttachmentFileEntryLocalService getService() {
 		return _service;
-	}
-
-	public static void setService(CPAttachmentFileEntryLocalService service) {
-		_service = service;
 	}
 
 	private static volatile CPAttachmentFileEntryLocalService _service;

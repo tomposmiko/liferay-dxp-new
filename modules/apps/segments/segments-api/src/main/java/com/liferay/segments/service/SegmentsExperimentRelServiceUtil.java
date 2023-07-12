@@ -100,10 +100,6 @@ public class SegmentsExperimentRelServiceUtil {
 		return _service;
 	}
 
-	public static void setService(SegmentsExperimentRelService service) {
-		_service = service;
-	}
-
 	private static volatile SegmentsExperimentRelService _service;
 
 }

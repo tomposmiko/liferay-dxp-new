@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -49,6 +47,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.Serializable;
+
+import java.lang.reflect.Field;
 
 import java.util.List;
 
@@ -583,7 +583,7 @@ public abstract class OAuth2AuthorizationLocalServiceBaseImpl
 
 	@Deactivate
 	protected void deactivate() {
-		OAuth2AuthorizationLocalServiceUtil.setService(null);
+		_setLocalServiceUtilService(null);
 	}
 
 	@Override
@@ -599,8 +599,7 @@ public abstract class OAuth2AuthorizationLocalServiceBaseImpl
 		oAuth2AuthorizationLocalService =
 			(OAuth2AuthorizationLocalService)aopProxy;
 
-		OAuth2AuthorizationLocalServiceUtil.setService(
-			oAuth2AuthorizationLocalService);
+		_setLocalServiceUtilService(oAuth2AuthorizationLocalService);
 	}
 
 	/**
@@ -646,6 +645,23 @@ public abstract class OAuth2AuthorizationLocalServiceBaseImpl
 		}
 	}
 
+	private void _setLocalServiceUtilService(
+		OAuth2AuthorizationLocalService oAuth2AuthorizationLocalService) {
+
+		try {
+			Field field =
+				OAuth2AuthorizationLocalServiceUtil.class.getDeclaredField(
+					"_service");
+
+			field.setAccessible(true);
+
+			field.set(null, oAuth2AuthorizationLocalService);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
+		}
+	}
+
 	protected OAuth2AuthorizationLocalService oAuth2AuthorizationLocalService;
 
 	@Reference
@@ -663,8 +679,5 @@ public abstract class OAuth2AuthorizationLocalServiceBaseImpl
 
 	@Reference
 	protected OAuth2ScopeGrantFinder oAuth2ScopeGrantFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2AuthorizationLocalServiceBaseImpl.class);
 
 }

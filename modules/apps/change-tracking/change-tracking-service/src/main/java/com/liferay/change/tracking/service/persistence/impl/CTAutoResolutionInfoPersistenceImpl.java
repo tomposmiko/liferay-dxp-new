@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -1205,7 +1206,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 * @param modelClassNameId the model class name ID
-	 * @param sourceModelClassPKs the source model class pks
+	 * @param sourceModelClassPK the source model class pk
 	 * @param start the lower bound of the range of ct auto resolution infos
 	 * @param end the upper bound of the range of ct auto resolution infos (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2150,12 +2151,12 @@ public class CTAutoResolutionInfoPersistenceImpl
 			},
 			false);
 
-		CTAutoResolutionInfoUtil.setPersistence(this);
+		_setCTAutoResolutionInfoUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		CTAutoResolutionInfoUtil.setPersistence(null);
+		_setCTAutoResolutionInfoUtilPersistence(null);
 
 		entityCache.removeCache(CTAutoResolutionInfoImpl.class.getName());
 
@@ -2165,6 +2166,22 @@ public class CTAutoResolutionInfoPersistenceImpl
 				_serviceRegistrations) {
 
 			serviceRegistration.unregister();
+		}
+	}
+
+	private void _setCTAutoResolutionInfoUtilPersistence(
+		CTAutoResolutionInfoPersistence ctAutoResolutionInfoPersistence) {
+
+		try {
+			Field field = CTAutoResolutionInfoUtil.class.getDeclaredField(
+				"_persistence");
+
+			field.setAccessible(true);
+
+			field.set(null, ctAutoResolutionInfoPersistence);
+		}
+		catch (ReflectiveOperationException reflectiveOperationException) {
+			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
 

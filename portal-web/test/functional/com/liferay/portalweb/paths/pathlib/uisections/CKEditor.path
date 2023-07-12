@@ -66,11 +66,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>BODY_TEXT</td>
-	<td>//body[contains(@class,'cke_editable') and contains(.,'${key_text}')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>OK_BUTTON</td>
 	<td>//a[contains(@role,'button')][normalize-space()='OK']</td>
 	<td></td>
@@ -85,9 +80,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--This locator is necessary for tests that require the sendKey action-->
-
 <tr>
 	<td>RESIZER</td>
 	<td>//span[@id='cke_1_resizer']</td>
@@ -98,9 +91,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--TOOLBAR-->
-
 <tr>
 	<td>TOOLBAR_IMAGE_BUTTON</td>
 	<td>//a[contains(@class,'cke_button') and contains(@class,'image')]</td>
@@ -131,9 +122,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!-- CONTENT_AUDIO_LINK -->
-
 <tr>
 	<td>CONTENT_AUDIO_LINK_IMAGE</td>
 	<td>//img[contains(@class,'audio')]</td>
@@ -144,9 +133,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CONTENT_IMAGE_LINK-->
-
 <tr>
 	<td>CONTENT_IMAGE_LINK_IMAGE</td>
 	<td>//img[contains(@src,'jpg')]</td>
@@ -157,9 +144,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CONTENT_VIDEO_LINK-->
-
 <tr>
 	<td>CONTENT_VIDEO_IMAGE</td>
 	<td>//span[contains(@class,'videoembed_icon')]</td>
@@ -185,9 +170,7 @@
 	<td>//div[label[contains(.,'Video')]]//input</td>
 	<td></td>
 </tr>
-
 <!--SOURCE_CODE_PREVIEW-->
-
 <tr>
 	<td>CODE_PREVIEW_IFRAME</td>
 	<td>//*[contains(@class,'code_preview')]//iframe</td>

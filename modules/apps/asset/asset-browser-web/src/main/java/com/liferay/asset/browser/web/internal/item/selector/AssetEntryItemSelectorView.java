@@ -120,10 +120,6 @@ public class AssetEntryItemSelectorView
 				_toStringArray(
 					!assetEntryItemSelectorCriterion.isSingleSelect())
 			).put(
-				"scopeGroupType",
-				_toStringArray(
-					assetEntryItemSelectorCriterion.getScopeGroupType())
-			).put(
 				"selectedGroupIds",
 				_toStringArray(
 					StringUtil.merge(

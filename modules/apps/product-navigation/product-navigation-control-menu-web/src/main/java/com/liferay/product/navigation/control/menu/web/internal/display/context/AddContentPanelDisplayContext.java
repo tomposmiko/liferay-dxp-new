@@ -214,7 +214,9 @@ public class AddContentPanelDisplayContext {
 				).put(
 					"title",
 					HtmlUtil.escape(
-						assetRenderer.getTitle(_themeDisplay.getLocale()))
+						StringUtil.shorten(
+							assetRenderer.getTitle(_themeDisplay.getLocale()),
+							60))
 				).put(
 					"type",
 					_getAssetEntryTypeLabel(
