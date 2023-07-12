@@ -468,6 +468,10 @@ public interface Localization {
 	public String getXml(
 		Map<String, String> map, String defaultLanguageId, String key);
 
+	public String getXml(
+		Map<String, String> map, String defaultLanguageId, String key,
+		boolean cdata);
+
 	public Map<Locale, String> populateLocalizationMap(
 		Map<Locale, String> localizationMap, String defaultLanguageId,
 		long groupId);
@@ -571,6 +575,23 @@ public interface Localization {
 	public String updateLocalization(
 		Map<Locale, String> localizationMap, String xml, String key,
 		String defaultLanguageId);
+
+	/**
+	 * Updates the localized string for all the available languages in the
+	 * localizations XML for the map of locales and localized strings and
+	 * changes the default language. The localized strings are stored as
+	 * characters in the XML.
+	 *
+	 * @param  localizationMap the locales and localized strings
+	 * @param  xml the localizations XML
+	 * @param  key the name of the localized string, such as &quot;Title&quot;
+	 * @param  defaultLanguageId the ID of the default language
+	 * @param  cdata whether to store localized strings as CDATA in the XML
+	 * @return the updated localizations XML
+	 */
+	public String updateLocalization(
+		Map<Locale, String> localizationMap, String xml, String key,
+		String defaultLanguageId, boolean cdata);
 
 	/**
 	 * Updates the localized string for the system default language in the

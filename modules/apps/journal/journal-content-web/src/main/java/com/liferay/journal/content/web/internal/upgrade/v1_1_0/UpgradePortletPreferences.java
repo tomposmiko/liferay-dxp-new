@@ -78,7 +78,10 @@ public class UpgradePortletPreferences extends BaseUpgradePortletPreferences {
 			String lfrScopeType = portletPreferences.getValue(
 				"lfrScopeType", StringPool.BLANK);
 
-			if (group.isCompany() && Objects.equals("company", lfrScopeType)) {
+			if (Validator.isBlank(lfrScopeType) ||
+				(group.isCompany() &&
+				 Objects.equals("company", lfrScopeType))) {
+
 				return PortletPreferencesFactoryUtil.toXML(portletPreferences);
 			}
 
@@ -86,9 +89,7 @@ public class UpgradePortletPreferences extends BaseUpgradePortletPreferences {
 				return PortletPreferencesFactoryUtil.toXML(portletPreferences);
 			}
 
-			if (!group.isCompany() && !group.isLayout() &&
-				Validator.isNull(lfrScopeType)) {
-
+			if (!group.isCompany() && !group.isLayout()) {
 				return PortletPreferencesFactoryUtil.toXML(portletPreferences);
 			}
 
