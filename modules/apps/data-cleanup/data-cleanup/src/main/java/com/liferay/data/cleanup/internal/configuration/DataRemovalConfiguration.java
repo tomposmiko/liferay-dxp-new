@@ -12,26 +12,26 @@
  * details.
  */
 
-package com.liferay.external.data.source.test.service.destroyer;
+package com.liferay.data.cleanup.internal.configuration;
 
-import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
+import aQute.bnd.annotation.metatype.Meta;
 
-import javax.sql.DataSource;
+import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 
 /**
- * @author Preston Crary
+ * @author Kevin Lee
  */
-public class DataSourceDestroyer {
+@ExtendedObjectClassDefinition(category = "upgrades")
+@Meta.OCD(
+	id = "com.liferay.data.cleanup.internal.configuration.DataRemovalConfiguration",
+	name = "data-removal-configuration-name"
+)
+public interface DataRemovalConfiguration {
 
-	public DataSourceDestroyer(DataSource dataSource) {
-		_dataSource = dataSource;
-	}
-
-	@SuppressWarnings("unused")
-	public void destroy() throws Exception {
-		DataSourceFactoryUtil.destroyDataSource(_dataSource);
-	}
-
-	private final DataSource _dataSource;
+	@Meta.AD(
+		deflt = "false", name = "remove-published-cts-content-data",
+		required = false
+	)
+	public boolean removePublishedCTSContentData();
 
 }

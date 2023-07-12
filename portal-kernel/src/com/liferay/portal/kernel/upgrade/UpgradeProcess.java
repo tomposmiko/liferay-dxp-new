@@ -40,6 +40,9 @@ import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +61,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,6 +69,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.sql.DataSource;
 
 /**
  * @author Brian Wing Shun Chan
@@ -91,7 +97,7 @@ public abstract class UpgradeProcess
 
 		String message = "Completed upgrade process ";
 
-		try (Connection con = DataAccess.getConnection()) {
+		try (Connection con = getConnection()) {
 			connection = con;
 
 			if (isSkipUpgradeProcess()) {
@@ -439,6 +445,41 @@ public abstract class UpgradeProcess
 	}
 
 	protected abstract void doUpgrade() throws Exception;
+
+	protected Connection getConnection() throws Exception {
+		Registry registry = RegistryUtil.getRegistry();
+
+		String symbolicName = registry.getSymbolicName(
+			getClass().getClassLoader());
+
+		if (symbolicName != null) {
+			Collection<ServiceReference<DataSource>> serviceReferences =
+				registry.getServiceReferences(
+					DataSource.class,
+					StringBundler.concat(
+						"(origin.bundle.symbolic.name=", symbolicName, ")"));
+
+			Iterator<ServiceReference<DataSource>> iterator =
+				serviceReferences.iterator();
+
+			if (iterator.hasNext()) {
+				ServiceReference<DataSource> serviceReference = iterator.next();
+
+				DataSource dataSource = registry.getService(serviceReference);
+
+				try {
+					if (dataSource != null) {
+						return dataSource.getConnection();
+					}
+				}
+				finally {
+					registry.ungetService(serviceReference);
+				}
+			}
+		}
+
+		return DataAccess.getConnection();
+	}
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
